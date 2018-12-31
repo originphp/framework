@@ -12,9 +12,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Core;
-
 /**
+ *  namespace Origin\Core;
  *  require ORIGIN . DS . 'src' . DS .'Lib' .DS .'Autoloader.php';
  *  $Autoloader = new Autoloader($projectDirectory);.
  *
@@ -208,7 +207,7 @@ class Autoloader
 
             $prefix = rtrim($prefix, '\\');
         }
-
+     
         return false;
     }
 
