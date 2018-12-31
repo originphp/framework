@@ -81,7 +81,12 @@ class ErrorHandler
 
     public function cliException($exception)
     {
-        echo $this->cliErrorAlert(get_class($exception).
+        $class = get_class($exception);
+        // Incase error is before function.php is loaded
+        if (function_exists('namespaceSplit')) {
+            list($namespace, $class) = namespaceSplit($class);
+        }
+        echo $this->cliErrorAlert($class .
       ': '.$exception->getMessage()).PHP_EOL.
       'Line no:'.$exception->getLine().' of '.$exception->getFile().PHP_EOL.
       $exception->getTraceAsString().PHP_EOL;

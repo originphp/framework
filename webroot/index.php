@@ -12,3 +12,6 @@ ini_set('display_errors', true);
  * Start the Origin Bootstrap Process.
  */
 require dirname(__DIR__).'/origin/src/bootstrap.php';
+
+$Dispatcher = new Origin\Core\Dispatcher();
+$Dispatcher->start();
