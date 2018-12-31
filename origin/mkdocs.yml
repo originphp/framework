@@ -1,0 +1,11 @@
+site_name: Origin Cookbook
+nav:
+    - Welcome: index.md
+    - Installation: installation.md
+    - Overview: overview/index.md
+    - Controllers: controllers/index.md
+    - Models:
+        - 'Associations': 'associations.md'
+        - 'Retrieving Your Data': 'finding-data.md'
+        - 'Saving Your Data': 'saving-data.md'
+        - 'Deleting Data': 'deleting-data.md'

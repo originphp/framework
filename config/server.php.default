@@ -1,0 +1,12 @@
+<?php
+/**
+ * This is your server specific configuration file. For each installation rename
+ * this file without default and set any specific config.
+ * For example, if this is your development server add:
+ *
+ *    Configure::write('debug',true);
+ *
+ */
+use Origin\Core\Configure;
+
+Configure::write('debug',false);

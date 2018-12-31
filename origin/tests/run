@@ -1,0 +1,8 @@
+#!/bin/bash
+clear
+
+if [ $1 ]; then
+	phpunit --colors=auto --bootstrap bootstrap.php $1
+else
+	phpunit --colors=auto --bootstrap bootstrap.php TestCase
+fi

@@ -1,0 +1,55 @@
+/**
+ * CSS file for Debugger (not Debugbar)
+ */
+.preview {
+  padding: 10px;
+}
+
+.preview-line {
+  padding-right: 25px;
+  float: left;
+  color: #000000;
+}
+
+.exception p {
+  margin-bottom: 0px;
+}
+
+.highlight {
+  background: greenyellow;
+}
+
+.exception {
+  padding: 25px;
+}
+
+.exception-message {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.exception-class {
+  color: red;
+}
+
+.preview {
+  overflow-x: scroll;
+}
+
+.list-group-item {
+  color: #495057;
+  border: none;
+  font-size: .85rem;
+}
+
+.list-group-item:first-child, .list-group-item:last-child {
+  border-radius: 0px;
+}
+
+.debug-header {
+  background-color: #ecf0f1;
+}
+
+.stack-frames {
+  padding: 0px;
+}

@@ -1,0 +1,26 @@
+version: '2'
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    links:
+      - "db"
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+    environment:
+      - MYSQL_URL=mysql
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=root
+  db:
+    image: mysql:5.7
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+        - "3306:3306"
+volumes:
+  mysql-data:

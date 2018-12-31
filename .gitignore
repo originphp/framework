@@ -1,0 +1,10 @@
+# ignore an entire directory
+/config/database.php
+/config/email.php
+/config/server.php
+
+/logs/
+/tmp/
+
+# ignore a file type
+#*.json

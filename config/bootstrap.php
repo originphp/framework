@@ -1,0 +1,23 @@
+<?php
+
+use Origin\Core\Configure;
+use Origin\Core\Plugin;
+
+/*
+ * This will go in your server.php file once your app has been developed.
+ */
+Configure::write('debug', true); // goes in server
+
+/*
+ * If you change namespace name then you will need to change:
+ *  1. The namespace declaration in all your files in the src folder
+ *  2. config/autoloader.php folder
+ */
+Configure::write('App.namespace', 'App');
+Configure::write('Session.timeout', 3600);
+
+/*
+ * Load your plugins here
+ * @example Plugin::load('ContactManager');
+ */
+Plugin::load('Debug');

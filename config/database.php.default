@@ -1,0 +1,20 @@
+<?php
+/**
+ * Database Configuration file
+ * Add or remove connections here
+ */
+use Origin\Model\ConnectionManager;
+
+ConnectionManager::config('default',array(
+  'host' => 'localhost',
+  'database' => 'origin',
+  'username' => 'username',
+  'password' => 'password'
+));
+
+ConnectionManager::config('test',array(
+  'host' => 'localhost',
+  'database' => 'origin_test',
+  'username' => 'username',
+  'password' => 'password'
+));
