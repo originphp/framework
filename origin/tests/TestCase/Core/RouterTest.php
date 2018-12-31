@@ -7,11 +7,9 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software.
  *
- * @copyright     Copyright (c) Jamiel Sharief
- *
- * @link          https://www.originphp.com
- *
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
 namespace Origin\Test\Core;
@@ -95,7 +93,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         Router::$routes = array();
         Router::add(
-        '/developers/:action/*', array('controller' => 'users')
+        '/developers/:action/*',
+            array('controller' => 'users')
     );
         $result = Router::parse('/developers/directory');
 

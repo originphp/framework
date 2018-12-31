@@ -7,11 +7,9 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software.
  *
- * @copyright     Copyright (c) Jamiel Sharief
- *
- * @link          https://www.originphp.com
- *
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
 namespace Origin\Model;
@@ -188,7 +186,8 @@ class Model
             return false;
         }
 
-        $object = ModelRegistry::get($name,
+        $object = ModelRegistry::get(
+            $name,
           array('className' => $className, 'alias' => $name)
         );
         if ($object === false and $habtmModel === false) {
@@ -242,7 +241,9 @@ class Model
         foreach ($this->behaviors->enabled() as $Behavior) {
             if (method_exists($this->behaviors->{$Behavior}, $method)) {
                 return call_user_func_array(
-                  array($this->behaviors->{$Behavior}, $method), $arguments);
+                  array($this->behaviors->{$Behavior}, $method),
+                    $arguments
+                );
             }
         }
     }

@@ -7,11 +7,9 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software.
  *
- * @copyright     Copyright (c) Jamiel Sharief
- *
- * @link          https://www.originphp.com
- *
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Core\Debugger;
 
@@ -41,9 +39,7 @@ function pr($var)
  * Splits a classname into an array of namespace and class.
  *
  * @example list($namespace,$classname) = namespaceSplit(Origin\Framework\Dispatcher);
- *
  * @param string $class Origin\Framework\Dispatcher
- *
  * @return array ('Origin\Framework\','Dispatcher')
  */
 function namespaceSplit(string $class)
@@ -62,9 +58,7 @@ function namespaceSplit(string $class)
  * Splits a name into an array of plugin and name.
  *
  * @example list($plugin,$name) = pluginSplit('ContactManager.contacts');
- *
  * @param string $class 'ContactManager.contacts'
- *
  * @return array ('ContactManager','contacts')
  */
 function pluginSplit($name)
@@ -81,10 +75,8 @@ function pluginSplit($name)
  * Translate and format a string.
  *
  * @example __('Order with id %d by user %s...', $id, $name);
- *
  * @param string $string
  * @param mixed arg1 arg2
- *
  * @return string formatted
  */
 function __(string $string)
