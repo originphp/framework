@@ -26,7 +26,7 @@ Install [docker desktop](https://www.docker.com/products/docker-desktop), if you
 
 1. Unzip the OriginPHP archive into a new project folder, e.g `origin-demo`
 2. From within your project folder type `docker-compose build` - it will take a couple of minutes.
-3. Start the web server, type '`docker-compose up` and go to [http://localhost:8000](http://localhost:8000)
+3. Start the web server, type `docker-compose up` and go to [http://localhost:8000](http://localhost:8000)
 
 ## Configuring OriginPHP
 
@@ -57,7 +57,7 @@ To access the demo app, go to the login page, [http://localhost:8000/login](http
 The login the username is `demo@example.com` and password is `origin`.
 
 # Docker
-My prefered method over the years has been using VirtualBox, with this the server setup/installs are done through a checklist, and this eliminates problems when running code on different servers such as development, staging and production. That said I feel the way forward for a development setup is through docker and its disposable containers. I plan to include a server installation script for the staging and production servers on DigitalOcean or AWS, which mimics the docker development container.
+My preferred method over the years has been using VirtualBox, with this the server setup/installs are done through a checklist, and this eliminates problems when running code on different servers such as development, staging and production. That said, I feel the way forward for a development setup is through docker and its disposable containers. I plan to include a server installation script for the staging and production servers on DigitalOcean or AWS, which has the same setup as the docker development container.
 
 The app is docker ready, just install [docker desktop](https://www.docker.com/products/docker-desktop) then go into the project directory and
 type `docker-compose build` this will build the docker container, you only need to do this once (and any time you make changes to the docker configuration files).
@@ -75,11 +75,9 @@ To run commands within the container
 to access the bash terminal
 `docker-compose run app bash`
 
-Remember if you wish to make changes to docker container that persist, you will need to adjust the docker files. An example of this would be adding a php extension which is not included. A full list can be found by examining the Dockerfile.
+Remember, if you wish to make changes to docker container that persist, you will need to adjust the docker files. An example of this would be adding a php extension which is not included. A full list can be found by examining the Dockerfile.
 
-to access MySql client from within bash (you must say MySql as host)
-`mysql -h mysql -uroot -p`
+to access MySql client from within bash. You must put db as host, as in the docker setup MySql is a separate container.
+`mysql -h db -uroot -p`
 
 The MySql password is set in the `docker-compose.yml` file.
-
-The docker container MySql server can be accessed using `localhost` and port `3306`, with any database management application. Mac users can use [Sequel Pro](https://www.sequelpro.com/). Windows users can use [HeidiSql](https://www.heidisql.com/).
