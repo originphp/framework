@@ -1,24 +1,28 @@
-site_name: OriginPHP Cookbook
+site_name: 'OriginPHP Cookbook'
 nav:
-    - Welcome: index.md
-    - 'Getting Started': getting-started.md
-    - Controllers: controllers/index.md
-     - 'Components': 'components.md'
-    - Models:
-      - 'Associations': 'associations.md'
-      - 'Retrieving Your Data': 'finding-data.md'
-      - 'Entitites': 'entities.md'
-      - 'Saving Your Data': 'saving-data.md'
-      - 'Validation': 'validation.md'
-      - 'Deleting Data': 'deleting-data.md'
-      - 'Behaviors': 'behaviors.md'
-      - 'Callbacks': 'callbacks.md'
-     - Views: 'views/index.md'
-        - 'Helpers': 'views/helpers.md'
-        - Helpers: 'views/helpers/index.md'
-         - 'Date Helper': 'views/helpers/date-helper.md'
-         - 'Number Helper': 'views/helpers/number-helper.md'
-         - 'Html Helper': 'views/helpers/html-helper.md'
+   - 'Welcome': index.md
+   - 'Getting Started': getting-started.md
+   - 'Controllers': 'controllers/index.md'
+   - 'Components': 'controllers/components.md'
+   - 'Models':
+      - 'models/index.md'
+      - 'Associations': 'models/associations.md'
+      - 'Retrieving Your Data': 'models/finding-data.md'
+      - 'Entitites': 'models/entities.md'
+      - 'Saving Your Data': 'models/saving-data.md'
+      - 'Validation': 'models/validation.md'
+      - 'Deleting Data': 'models/deleting-data.md'
+      - 'Behaviors': 'models/behaviors.md'
+      - 'Callbacks': 'models/callbacks.md'
+      - 'Views': 
+         - 'views/index.md'
+         - 'Helpers':
+            - 'views/helpers/index.md'
+            - 'Date Helper': 'views/helpers/date-helper.md'
+            - 'Number Helper': 'views/helpers/number-helper.md'
+            - 'Html Helper': 'views/helpers/html-helper.md'
             - 'Form Helper': 'views/helpers/form-helper.md'
-     - Console: 'console/index.md'
-        - 'Tasks': 'console/tasks.md'
+      - 'Console':
+         - 'console/index.md'
+         - 'Tasks': 'console/tasks.md'
+theme: readthedocs
