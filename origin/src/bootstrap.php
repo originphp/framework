@@ -20,10 +20,12 @@ define('ROOT', dirname(dirname(dirname(__FILE__))));
 define('ORIGIN', dirname(dirname(__FILE__)));
 define('CONFIG', ROOT.DS.'config');
 define('SRC', ROOT.DS.'src');
-define('WEBROOT', ROOT.DS.'webroot');
 define('TMP', ROOT.DS.'tmp');
-define('VIEW', SRC.DS.'View');
 define('LOGS', ROOT.DS.'logs');
+
+define('WEBROOT', ROOT.DS.'webroot');
+define('VIEW', SRC.DS.'View');
+
 define('SESSIONS', TMP.DS.'sessions');
 define('PLUGINS', ROOT.DS.'plugins');
 
@@ -52,30 +54,19 @@ use Origin\Core\ErrorHandler;
 $ErrorHandler = new ErrorHandler();
 $ErrorHandler->register();
 
-use Origin\Core\Session;
-
-Session::init();
-
-require CONFIG.DS.'routes.php';
+require 'functions.php';
 if (file_exists(CONFIG.DS.'database.php')) {
     require CONFIG.DS.'database.php';
 }
 
-require 'functions.php';
+use Origin\Core\Session;
+
+Session::init();
+require CONFIG.DS.'routes.php';
 
 if ($_GET) {
     $_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 }
 if ($_POST) {
     $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-}
-
-/*Origin
- * Dispatcher
- */
-use Origin\Core\Dispatcher;
-
-if (php_sapi_name() != 'cli') {
-    $Dispatcher = new Dispatcher();
-    $Dispatcher->start();
 }
