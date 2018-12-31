@@ -21,7 +21,10 @@ From within a model
 ```php
   class User extends AppModel
   {
-    public $hasOne = array('Profile');
+    public function initialize(array $config){
+      parent::initialize($config);
+      $this->hasOne('Profile');
+    }
 
     public function doSomething(){
       $this->Profile->delete(1);
@@ -31,7 +34,7 @@ From within a model
 
 Models should only be used from within controllers or other models.
 
-If you need to load any model then you can use the the following code
+If you need to load any model from anywhere then you can use the the following code
 ```php
   use Origin\Model\ModelRegistry;
   
