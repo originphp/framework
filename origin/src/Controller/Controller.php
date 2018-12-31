@@ -194,16 +194,17 @@ class Controller
      * Loads a model, uses from registry or creates a new one.
      *
      * @param string $model
+     * @params array $options
      *
      * @return Model
      */
-    public function loadModel(string $model)
+    public function loadModel(string $model, array $options=[])
     {
         if (isset($this->{$model})) {
             return $this->{$model};
         }
 
-        $this->{$model} = ModelRegistry::get($model);
+        $this->{$model} = ModelRegistry::get($model, $options);
 
         if ($this->{$model}) {
             return $this->{$model};
