@@ -18,8 +18,6 @@ use Origin\Model\Entity;
 
 class TimestampBehavior extends Behavior
 {
-    protected $config = [];
-
     protected $defaultConfig = [
         'created' => 'created',
         'modified' => 'modified',

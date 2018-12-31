@@ -16,9 +16,11 @@ namespace Origin\View\Helper;
 
 use Origin\View\View;
 use Origin\View\Templater;
+use Origin\Core\ConfigTrait;
 
 class Helper
 {
+    use ConfigTrait;
     /**
      * Holds a reference to the request object.
      *
@@ -32,20 +34,6 @@ class Helper
      * @var object
      */
     protected $registry = null;
-
-    /**
-     * Holds the config.
-     *
-     * @var array
-     */
-    protected $config = null;
-
-    /**
-     * Default config used.
-     *
-     * @var array
-     */
-    protected $defaultConfig = [];
 
     /**
      * Other helpers that will be used.
@@ -96,13 +84,6 @@ class Helper
         }
     }
 
-    public function config(array $config = [])
-    {
-        if ($this->config === null) {
-            $this->config = $this->defaultConfig;
-        }
-        $this->config = array_merge($this->config, $config);
-    }
 
     /**
      * This is called when helper is loaded for the first time from the

@@ -15,9 +15,11 @@
 namespace Origin\Controller\Component;
 
 use Origin\Controller\Controller;
+use Origin\Core\ConfigTrait;
 
 class Component
 {
+    use ConfigTrait;
     /**
      * Holds a reference to the request object.
      *
@@ -30,20 +32,6 @@ class Component
      * @var object
      */
     protected $registry = null;
-
-    /**
-     * Holds the config.
-     *
-     * @var array
-     */
-    protected $config = null;
-
-    /**
-     * Default config used.
-     *
-     * @var array
-     */
-    protected $defaultConfig = [];
 
     /**
      * Holds a list of components that will be shared.
@@ -65,7 +53,7 @@ class Component
         $this->request = $controller->request;
 
         $this->prepareComponents();
-        $this->setDefaultConfig();
+ 
         $this->config($config);
         $this->initialize($config);
     }
@@ -92,31 +80,6 @@ class Component
             $config = array_merge(['className' => $component.'Component'], $config);
             $this->components[$component] = $config;
         }
-    }
-
-    protected function setDefaultConfig()
-    {
-        if ($this->config === null) {
-            $this->config = $this->defaultConfig;
-        }
-    }
-
-    /**
-     * Should be an array or null to get config.
-     *
-     * @param array $config
-     *
-     * @return array
-     */
-    public function config(array $config = null)
-    {
-        if (is_array($config)) {
-            foreach ($config as $key => $value) {
-                $this->config[$key] = $value;
-            }
-        }
-
-        return $this->config;
     }
 
     /**

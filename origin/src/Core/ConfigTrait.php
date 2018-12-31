@@ -19,4 +19,72 @@ namespace Origin\Core;
  */
 trait ConfigTrait
 {
+
+    /**
+     * Holds the config.
+     *
+     * @var array
+     */
+    protected $config = null;
+
+    /**
+     * Sets/Gets config
+     *
+     *  $this->config($config);
+     *  $this->config('setting',true);
+     *
+     *  $config = $this->config();
+     *  $setting = $this->config('setting');
+     * @param null|array|string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function config($key = null, $value = null)
+    {
+        if ($this->config === null) {
+            $this->config = [];
+            if (isset($this->defaultConfig)) {
+                $this->config = $this->defaultConfig;
+            }
+        }
+
+        if (is_array($key) or  func_num_args() === 2) {
+            return $this->setConfig($key, $value);
+        }
+        return $this->getConfig($key);
+    }
+    /**
+     * Sets the config
+     *
+     * @param string|array $key
+     * @param mixed $value
+     * @return void
+     */
+    protected function setConfig($key = null, $value = null)
+    {
+        $config = $key;
+        if (is_string($key)) {
+            $config = [$key => $value];
+        }
+        foreach ($config as $key => $value) {
+            $this->config[$key] = $value;
+        }
+        return true;
+    }
+    /**
+     * Gets the config (all or part)
+     *
+     * @param string|array $key
+     * @param mixed $value
+     * @return void
+     */
+    protected function getConfig($key = null)
+    {
+        if ($key === null) {
+            return $this->config;
+        }
+        if (isset($this->config[$key])) {
+            return $this->config[$key];
+        }
+    }
 }

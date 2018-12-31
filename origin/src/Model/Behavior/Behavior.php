@@ -16,27 +16,16 @@ namespace Origin\Model\Behavior;
 
 use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Core\ConfigTrait;
 
 class Behavior
 {
+    use ConfigTrait;
+    
     /**
      * Holds the model for this behavior.
      */
     protected $model = null;
-
-    /**
-     * Holds the config.
-     *
-     * @var array
-     */
-    protected $config = null;
-
-    /**
-     * Default config used.
-     *
-     * @var array
-     */
-    protected $defaultConfig = [];
 
     public function __construct(Model $model, array $config = [])
     {
@@ -44,14 +33,6 @@ class Behavior
 
         $this->config($config);
         $this->initialize($config);
-    }
-
-    public function config(array $config = [])
-    {
-        if ($this->config === null) {
-            $this->config = $this->defaultConfig;
-        }
-        $this->config = array_merge($this->config, $config);
     }
 
     public function initialize(array $config)
