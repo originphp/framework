@@ -37,8 +37,6 @@ class FooHelper extends Helper
 }
 ````
 
-Remember, we use composer for auto-loading classes, anytime you create a new class ,you will need to run `composer dump-autoload`.
-
 Once you have created the helper, the next thing to do is to load this in the controller, you can optionally pass an array of options.
 
 ```php

@@ -7,8 +7,6 @@ Your application controllers will extend the `AppController`.
 
 ## Creating your own controller
 
-Remember, we use composer for auto-loading classes, anytime you create a new class ,you will need to run `composer dump-autoload`.
-
 When you create a controller, the name should be in plural camel case and it needs to end with Controller. Controller files are placed
 in the `Controller` directory of your app.
 
