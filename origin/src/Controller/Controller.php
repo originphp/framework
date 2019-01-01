@@ -282,10 +282,7 @@ class Controller
         $this->componentRegistry()->call('shutdown');
 
         //# Free Mem for no longer used items
-        foreach ($this->componentRegistry()->loaded() as $component) {
-            unset($this->{$component});
-        }
-        $this->componentRegistry()->clear();
+        $this->componentRegistry()->destroy();
         unset($this->componentRegistry);
     }
 

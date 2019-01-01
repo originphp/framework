@@ -139,6 +139,20 @@ class ObjectRegistry
     }
 
     /**
+     * Frees the memory
+     *
+     * @return void
+     */
+    public function destroy()
+    {
+        foreach ($this->loaded as $name => $object) {
+            $this->unload($name);
+        }
+        $this->clear();
+        return null;
+    }
+
+    /**
      * This is will create the class, options will be passed for loaded for
      * extended classes to use if needed.
      *

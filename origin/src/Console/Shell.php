@@ -162,10 +162,7 @@ class Shell
         $this->taskRegistry()->call('shutdown');
 
         //# Free Mem for no longer used items
-        foreach ($this->taskRegistry()->loaded() as $task) {
-            unset($this->{$task});
-        }
-        $this->taskRegistry()->clear();
+        $this->taskRegistry()->destroy();
         unset($this->taskRegistry);
     }
 
