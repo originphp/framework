@@ -166,7 +166,7 @@ class Shell
             unset($this->{$task});
         }
         $this->taskRegistry()->clear();
-        unset($this->registry);
+        unset($this->taskRegistry);
     }
 
 
