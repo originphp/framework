@@ -56,9 +56,9 @@ class ShellDispatcher
      */
     public function start()
     {
-        $this->stdout("\033[1;32m");
         $this->stdout("\033[2J\033[;H"); // clear screen
-        $this->stdout("<blue>OriginPHP Shell v1.0</blue>\n\n");
+        $this->stdout("<blue>OriginPHP Shell v1.0</blue>\n");
+
         $this->stdout("\033[37m"); // Set all text to white
 
         $shell = array_shift($this->args);
