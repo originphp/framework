@@ -32,12 +32,12 @@ class Task
      *
      * @var TaskRegistry
      */
-    protected $registry = null;
+    protected $taskRegistry = null;
     
 
     public function __construct(Shell $shell, array $config =[])
     {
-        $this->registry = $shell->registry;
+        $this->taskRegistry = $shell->taskRegistry();
 
         $this->config($config);
         $this->initialize($config);
@@ -71,7 +71,7 @@ class Task
      */
     public function shell()
     {
-        return $this->registry->shell();
+        return $this->taskRegistry->shell();
     }
 
     /**

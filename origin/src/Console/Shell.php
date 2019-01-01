@@ -16,6 +16,7 @@ namespace Origin\Console;
 
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\TaskRegistry;
+use Origin\Model\ModelRegistry;
 
 use ReflectionClass;
 use ReflectionMethod;
@@ -25,9 +26,16 @@ class Shell
     /**
      * Name of this shell
      *
-     * @var [type]
+     * @var [string
      */
-    protected $name = null;
+    public $name = null;
+
+    /**
+     * Holds the task registry
+     *
+     * @var TaskRegistry
+     */
+    protected $taskRegistry = null;
 
     /**
      * Inject request and response
@@ -43,7 +51,7 @@ class Shell
 
         list($namespace, $this->name) = namespaceSplit(get_class($this));
      
-        $this->registry = new TaskRegistry($this);
+        $this->taskRegistry = new TaskRegistry($this);
 
         $this->initialize($arguments);
     }
@@ -122,7 +130,7 @@ class Shell
     public function loadTask(string $name, array $config = [])
     {
         $config = array_merge(['className' => $name.'Task'], $config);
-        $this->{$name} = $this->registry->load($name, $config);
+        $this->{$name} = $this->taskRegistry()->load($name, $config);
     }
 
     /**
@@ -145,19 +153,19 @@ class Shell
     public function startupProcess()
     {
         $this->startup();
-        $this->registry->call('startup');
+        $this->taskRegistry()->call('startup');
     }
 
     public function shutdownProcess()
     {
         $this->shutdown();
-        $this->registry->call('shutdown');
+        $this->taskRegistry()->call('shutdown');
 
         //# Free Mem for no longer used items
-        foreach ($this->registry->loaded() as $task) {
+        foreach ($this->taskRegistry()->loaded() as $task) {
             unset($this->{$task});
         }
-        $this->registry->clear();
+        $this->taskRegistry()->clear();
         unset($this->registry);
     }
 
@@ -177,5 +185,15 @@ class Shell
         }
         $reflection = new ReflectionMethod($this, $method);
         return $reflection->isPublic();
+    }
+
+    /**
+     * Gets the task registry object
+     *
+     * @return TaskRegistry
+     */
+    public function taskRegistry()
+    {
+        return $this->taskRegistry;
     }
 }
