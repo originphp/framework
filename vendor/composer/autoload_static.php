@@ -11,33 +11,12 @@ class ComposerStaticInit2748573fff55d10afc2caf40bcefc64d
         array (
             'Vendor\\' => 7,
         ),
-        'O' => 
-        array (
-            'Origin\\Test\\' => 12,
-            'Origin\\' => 7,
-        ),
-        'A' => 
-        array (
-            'App\\' => 4,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Vendor\\' => 
         array (
             0 => __DIR__ . '/../..' . '/vendor',
-        ),
-        'Origin\\Test\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/origin/tests',
-        ),
-        'Origin\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/origin/src',
-        ),
-        'App\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src',
         ),
     );
 

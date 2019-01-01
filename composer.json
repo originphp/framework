@@ -1,9 +1,6 @@
 {
     "autoload": {
         "psr-4": {
-             "Origin\\": "origin/src/",
-             "Origin\\Test\\": "origin/tests/",
-             "App\\": "src/",
              "Vendor\\": "vendor/"
         }
     },

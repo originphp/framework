@@ -14,21 +14,14 @@
 
 /**
  *  namespace Origin\Core;
- *  require ORIGIN . DS . 'src' . DS .'Lib' .DS .'Autoloader.php';
+ *  require ORIGIN . DS . 'src' . DS .'Core' .DS .'Autoloader.php';
  *  $Autoloader = new Autoloader($projectDirectory);.
- *
- * For non namespace
- * $Autoloader->addDirectories(array(
- *   'src' . DS . 'Model',
- *   'src' . DS . 'View',
- *   'src' . DS . 'Controller',
- *  ));
  *
  * Tell the Autoloader where to find files for namespaces that you will use.
  *
  *  $Autoloader->addNamespaces(array(
  *  	'App' => 'src',
- *  	'Framework' => 'origin/src/'
+ *  	'Origin' => 'origin/src/'
  *  ));
  *
  * $Autoloader->register();
@@ -49,12 +42,10 @@ class Autoloader
     protected $prefixes = array();
 
     /**
-     * Map of non namespaced files.
+     * Project diretory
      *
-     * @var array
+     * @var string
      */
-    protected $files = array();
-
     protected $directory = null;
 
     public function __construct(string $directory)
@@ -68,62 +59,6 @@ class Autoloader
     public function register()
     {
         spl_autoload_register(array($this, 'load'));
-    }
-
-    /**
-     * Searches recrusively a folder for PHP class files, they must start with a capital letter.
-     *
-     * @param string $directory
-     *
-     * @return array a list of class files
-     */
-    public function scanDirectory(string $directory)
-    {
-        if (!file_exists($directory)) {
-            return false;
-        }
-        $rdi = new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS);
-        $rit = new RecursiveIteratorIterator($rdi, RecursiveIteratorIterator::LEAVES_ONLY);
-
-        foreach ($rit as $file) {
-            $filename = $file->getFilename();
-            if (preg_match('/^[A-Z](.*)\.php/', $filename)) {
-                $class = basename($filename, '.php');
-                $this->files[$class] = $file->getPathname();
-            }
-        }
-    }
-
-    /**
-     * Recursively search an array of base directories for classes.
-     *
-     *  $Autoloader->addDirectories('src' . DS . 'Traits'));
-     *
-     * @param string $baseDirectory 'src/Traits'
-     */
-    public function addDirectory(string $baseDirectory)
-    {
-        $this->scanDirectory($this->directory.DS.$baseDirectory);
-    }
-
-    /**
-     * Recursively search an array of base directories for classes.
-     *
-     *  $Autoloader->addDirectories(array(
-     *     	 'src' . DS . 'Console',
-     *     	 'src' . DS . 'Controller',
-     *     	 'src' . DS . 'Model',
-     *     	 'src' . DS . 'View',
-     *   	   'src' . DS . 'Lib'
-     *     ));
-     *
-     * @param array $baseDirectories
-     */
-    public function addDirectories(array $baseDirectories)
-    {
-        foreach ($baseDirectories as $baseDirectory) {
-            $this->addDirectory($baseDirectory);
-        }
     }
 
     /**
@@ -147,8 +82,8 @@ class Autoloader
      * Add base directories for namespace prefixes.
      *
      *  $Autoloader->addNamespaces(array(
-     *     	'Origin\Framework' => 'origin/src/'
-     *      'Origin\Framework\Tests' => 'origin/tests/'
+     *     	'Origin' => 'origin/src/'
+     *      'Origin\\Test' => 'origin/tests/'
      *    ));
      *
      * @param string $namespaces array ((namespacePrefix => baseDirectory))
@@ -158,18 +93,6 @@ class Autoloader
         foreach ($namespaces as $namespace => $baseDirectory) {
             $this->addNamespace($namespace, $baseDirectory);
         }
-    }
-
-    /**
-     * Checks if a class name belongs to a namespace prefix.
-     *
-     * @param string $class e.g Autoloader or Origin/Framework/Autoloader
-     *
-     * @return bool
-     */
-    protected function isNamespace(string $class)
-    {
-        return strrpos($class, '\\') == true;
     }
 
     /**
@@ -183,23 +106,14 @@ class Autoloader
     {
         $prefix = $class;
 
-        // Deal with None Namespaces
-        if (!$this->isNamespace($class)) {
-            if (isset($this->files[$class])) {
-                return $this->requireFile($this->files[$class]);
-            }
-
-            return false;
-        }
-
         // Deal with Namespaces
         while (false !== $pos = strrpos($prefix, '\\')) {
             $prefix = substr($class, 0, $pos + 1);
-
+     
             $relativeClass = substr($class, $pos + 1);
+
             if (isset($this->prefixes[$prefix])) {
                 $filename = $this->prefixes[$prefix].str_replace('\\', DS, $relativeClass).'.php';
-
                 if ($this->requireFile($filename)) {
                     return $filename;
                 }
@@ -212,12 +126,10 @@ class Autoloader
     }
 
     /**
-     * Loads the required file. PSR standards say no error should be thrown but
-     * it is silly to check if a file exists on every single page log on a production
-     * server.
+     * Loads the required file.
+     * @todo add caching to reduce io
      *
      * @param string $filename
-     *
      * @return bool
      */
     protected function requireFile(string $filename)

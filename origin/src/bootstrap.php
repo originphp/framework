@@ -37,7 +37,12 @@ mb_internal_encoding('UTF-8');
 require ORIGIN.DS.'src'.DS.'Exception'.DS.'Exception.php';
 
 /**
- * Composer Autoload.
+ * Load our own autoloader
+ */
+require ORIGIN . DS . 'src' . DS .'Core' .DS .'Autoloader.php';
+require CONFIG.DS.'autoload.php';
+/**
+ * Load the composer autoloader
  */
 require ROOT.'/vendor/autoload.php';
 
