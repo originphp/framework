@@ -81,12 +81,13 @@ class View
      */
     public $scripts = '';
 
+
     /**
-     * Registry of helpers.
+     * Holds the HelperRegistry object.
      *
      * @var HelperRegistry
      */
-    public $registry = null;
+    protected $helperRegistry = null;
 
     protected $helpers = [];
 
@@ -102,7 +103,7 @@ class View
 
         $this->viewPath = $this->getViewPath();
 
-        $this->registry = new HelperRegistry($this);
+        $this->helperRegistry = new HelperRegistry($this);
 
         $this->helpers = $controller->viewHelpers;
     }
@@ -113,14 +114,14 @@ class View
     public function __get($name)
     {
         if (isset($this->helpers[$name])) {
-            return $this->registry->load($name.'Helper');
+            return $this->helperRegistry()->load($name.'Helper');
         }
         throw new Exception(sprintf('%sHelper is not loaded.', $name));
     }
 
     public function loadHelper(string $name, array $config = [])
     {
-        $this->{$name} = $this->registry->load($name, $config);
+        $this->{$name} = $this->helperRegistry()->load($name, $config);
     }
 
     protected function loadHelpers(array $helpers)
@@ -181,6 +182,16 @@ class View
         }
 
         return null;
+    }
+
+    /**
+     * Returns the helper registry object
+     *
+     * @return HelperRegistry
+     */
+    public function helperRegistry()
+    {
+        return $this->helperRegistry;
     }
 
     protected function getElementFilename(string $name)
@@ -288,11 +299,11 @@ class View
         }
 
         //# Free Mem for no longer used items
-        foreach ($this->registry->loaded() as $helper) {
+        foreach ($this->helperRegistry()->loaded() as $helper) {
             unset($this->{$helper});
         }
-        $this->registry->clear();
-        unset($this->registry);
+        $this->helperRegistry()->clear();
+        unset($this->helperRegistry);
 
         return $buffer;
     }

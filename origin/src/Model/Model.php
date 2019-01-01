@@ -108,6 +108,13 @@ class Model
      */
     protected $validate = [];
 
+    /**
+     * Behavior registry object
+     *
+     * @var BehaviorRegistry
+     */
+    protected $behaviorRegistry = null;
+
     public function __construct(array $config = [])
     {
         $defaults = array(
@@ -147,7 +154,7 @@ class Model
             unset($this->displayField);
         }
 
-        $this->behaviors = new BehaviorRegistry($this);
+        $this->behaviorRegistry = new BehaviorRegistry($this);
 
         $this->initialize($config);
     }
@@ -238,10 +245,10 @@ class Model
     public function __call(string $method, array $arguments)
     {
         // Runs behavior on first found method and returns result
-        foreach ($this->behaviors->enabled() as $Behavior) {
-            if (method_exists($this->behaviors->{$Behavior}, $method)) {
+        foreach ($this->behaviorRegistry()->enabled() as $Behavior) {
+            if (method_exists($this->behaviorRegistry()->{$Behavior}, $method)) {
                 return call_user_func_array(
-                  array($this->behaviors->{$Behavior}, $method),
+                  array($this->behaviorRegistry()->{$Behavior}, $method),
                     $arguments
                 );
             }
@@ -306,11 +313,15 @@ class Model
     {
     }
 
+    public function behaviorRegistry()
+    {
+        return $this->behaviorRegistry;
+    }
     public function loadBehavior(string $name, array $config = [])
     {
         $config = array_merge(['className' => $name.'Behavior'], $config);
 
-        $this->{$name} = $this->behaviors->load($name, $config);
+        $this->{$name} = $this->behaviorRegistry()->load($name, $config);
     }
 
     /**
@@ -1652,7 +1663,7 @@ class Model
         array($this, $callback),
       );
 
-        foreach ($this->behaviors->enabled() as $behavior) {
+        foreach ($this->behaviorRegistry()->enabled() as $behavior) {
             $callbacks[] = array($this->{$behavior}, $callback);
         }
 

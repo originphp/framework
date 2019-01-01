@@ -85,10 +85,11 @@ class Controller
     public $viewHelpers = array();
 
     /**
-     * @todo change to protected, rename and create function components() same naming
-     * to controller, view, model.
-     */
-    public $registry = null;
+       * Holds the componentregistry object.
+       *
+       * @var ComponentRegistry
+       */
+    protected $componentRegistry = null;
 
     /**
      * Paginator Settings.
@@ -112,7 +113,7 @@ class Controller
         $this->request = $request;
         $this->response = $response;
 
-        $this->registry = new ComponentRegistry($this);
+        $this->componentRegistry = new ComponentRegistry($this);
 
         $this->initialize();
     }
@@ -163,7 +164,7 @@ class Controller
     public function loadComponent(string $name, array $config = [])
     {
         $config = array_merge(['className' => $name.'Component'], $config);
-        $this->{$name} = $this->registry->load($name, $config);
+        $this->{$name} = $this->componentRegistry()->load($name, $config);
     }
 
     /**
@@ -272,20 +273,20 @@ class Controller
     public function startupProcess()
     {
         $this->startup();
-        $this->registry->call('startup');
+        $this->componentRegistry()->call('startup');
     }
 
     public function shutdownProcess()
     {
         $this->shutdown();
-        $this->registry->call('shutdown');
+        $this->componentRegistry()->call('shutdown');
 
         //# Free Mem for no longer used items
-        foreach ($this->registry->loaded() as $component) {
+        foreach ($this->componentRegistry()->loaded() as $component) {
             unset($this->{$component});
         }
-        $this->registry->clear();
-        unset($this->registry);
+        $this->componentRegistry()->clear();
+        unset($this->componentRegistry);
     }
 
     public function paginate(string $model = null, array $settings = [])
@@ -340,5 +341,10 @@ class Controller
     protected function stop()
     {
         exit();
+    }
+    
+    public function componentRegistry()
+    {
+        return $this->componentRegistry;
     }
 }

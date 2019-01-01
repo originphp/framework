@@ -29,11 +29,11 @@ class Helper
     protected $request = null;
 
     /**
-     * Holds a reference to the registry object.
-     *
-     * @var object
-     */
-    protected $registry = null;
+         * Holds the HelperRegistry object.
+         *
+         * @var HelperRegistry
+         */
+    protected $helperRegistry = null;
 
     /**
      * Other helpers that will be used.
@@ -51,7 +51,7 @@ class Helper
 
     public function __construct(View $view, array $config = [])
     {
-        $this->registry = $view->registry;
+        $this->helperRegistry = $view->helperRegistry();
         $this->request = $view->request;
 
         $this->prepareHelpers();
@@ -63,12 +63,22 @@ class Helper
     public function __get($name)
     {
         if (isset($this->helpers[$name])) {
-            $this->{$name} = $this->registry->load($name, $this->helpers[$name]);
+            $this->{$name} = $this->helperRegistry()->load($name, $this->helpers[$name]);
 
             if (isset($this->{$name})) {
                 return $this->{$name};
             }
         }
+    }
+
+    /**
+     * Returns the helper registry object
+     *
+     * @return HelperRegistry
+     */
+    public function helperRegistry()
+    {
+        return $this->helperRegistry;
     }
 
     protected function prepareHelpers()
@@ -151,8 +161,6 @@ class Helper
      */
     public function view()
     {
-        if ($this->registry) {
-            return $this->registry->view();
-        }
+        return $this->helperRegistry()->view();
     }
 }

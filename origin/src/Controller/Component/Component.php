@@ -27,11 +27,11 @@ class Component
      */
     protected $request = null;
     /**
-     * Holds a reference to the registry object.
+     * Holds the componentregistry object.
      *
-     * @var object
+     * @var ComponentRegistry
      */
-    protected $registry = null;
+    protected $componentRegistry = null;
 
     /**
      * Holds a list of components that will be shared.
@@ -49,7 +49,7 @@ class Component
 
     public function __construct(Controller $controller, array $config = [])
     {
-        $this->registry = $controller->registry;
+        $this->componentRegistry = $controller->componentRegistry();
         $this->request = $controller->request;
 
         $this->prepareComponents();
@@ -58,10 +58,15 @@ class Component
         $this->initialize($config);
     }
 
+    public function componentRegistry()
+    {
+        return $this->componentRegistry;
+    }
+
     public function __get($name)
     {
         if (isset($this->components[$name])) {
-            $this->{$name} = $this->registry->load($name, $this->components[$name]);
+            $this->{$name} = $this->componentRegistry()->load($name, $this->components[$name]);
 
             if (isset($this->{$name})) {
                 return $this->{$name};
@@ -111,8 +116,8 @@ class Component
      */
     public function controller()
     {
-        if ($this->registry) {
-            return $this->registry->controller();
+        if ($this->componentRegistry) {
+            return $this->componentRegistry()->controller();
         }
     }
 }

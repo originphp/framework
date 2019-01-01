@@ -122,8 +122,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
           ->willReturn($this->returnArgument(0));
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -146,8 +146,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         ->method('afterValidate');
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -179,8 +179,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         ->method('afterValidate');
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -212,8 +212,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
        ->method('afterSave');
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -246,8 +246,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
           ->willReturn($this->returnArgument(0), $this->returnArgument(1));
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -279,8 +279,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         ->method('afterDelete');
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 
@@ -304,8 +304,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         ->method('afterDelete');
 
         // As we are injecting mock, we need to enable it as well
-        $Article->behaviors->set('BehaviorTester', $behavior);
-        $Article->behaviors->enable('BehaviorTester');
+        $Article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
 

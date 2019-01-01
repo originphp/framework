@@ -47,6 +47,11 @@ class TestsController extends Controller
     {
         $this->initialized = true;
     }
+
+    public function setMockRegistry($registry)
+    {
+        $this->componentRegistry = $registry;
+    }
 }
 
 class ControllerTest extends \PHPUnit\Framework\TestCase
@@ -82,8 +87,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($request, $controller->request);
         $this->assertEquals($response, $controller->response);
 
-        $this->assertNotEmpty($controller->registry);
-        $this->assertInstanceOf('Origin\Controller\Component\ComponentRegistry', $controller->registry);
+        $this->assertNotEmpty($controller->componentRegistry());
+        $this->assertInstanceOf('Origin\Controller\Component\ComponentRegistry', $controller->componentRegistry());
 
         $this->assertEquals('Test', $controller->modelName);
 
@@ -195,7 +200,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
      ->method('call')
        ->with('startup');
 
-        $controller->registry = $components;
+        $controller->setMockRegistry($components);
 
         $controller->startupProcess();
     }
@@ -221,7 +226,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
      ->method('call')
        ->with('shutdown');
 
-        $controller->registry = $components;
+        $controller->setMockRegistry($components);
 
         $controller->shutdownProcess();
     }
