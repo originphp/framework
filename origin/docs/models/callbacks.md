@@ -84,7 +84,7 @@ This is called just before data is validated and must return true. Use this call
 
 This is called before any save operation. The `options` array is the same as the one passed to the save method.
 
-It must `true` or save will fail.
+It must return `true` or save will fail.
 
 ```php
 
