@@ -125,6 +125,23 @@ class Shell
         $this->{$name} = $this->registry->load($name, $config);
     }
 
+    /**
+     * Loads multiple tasks
+     *
+     * @param array $tasks
+     * @return void
+     */
+    public function loadTasks(array $tasks)
+    {
+        foreach ($tasks as $name => $config) {
+            if (is_int($name)) {
+                $name = $config;
+                $config = [];
+            }
+            $this->loadTask($name, $config);
+        }
+    }
+
     public function startupProcess()
     {
         $this->startup();
