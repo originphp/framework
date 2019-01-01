@@ -20,6 +20,8 @@ use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
+use Origin\Utils\Date;
+use Origin\Ultis\Time;
 
 class ViewTestsController extends Controller
 {
@@ -251,15 +253,16 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function testDate()
     {
         $FormHelper = $this->FormHelper;
-
-        $expected = '<input type="text" name="date">';
+        $placeholder =  'e.g. '. Date::format(date('Y-m-d'));
+        $expected = "<input type=\"text\" name=\"date\" placeholder=\"{$placeholder}\">";
         $this->assertEquals($expected, $FormHelper->date('date'));
     }
 
     public function testTime()
     {
         $FormHelper = $this->FormHelper;
-        $expected = '<input type="text" name="time">';
+        $placeholder =  'e.g. '. Date::format(date('H:i:s'));
+        $expected = "<input type=\"text\" name=\"time\" placeholder=\"{$placeholder}\">";
         $this->assertEquals($expected, $FormHelper->time('time'));
     }
 
@@ -387,7 +390,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
 
         $FormHelper->create($widget);
-        $expected = '<div class="form-group text required"><label for="name">Name</label><input type="text" name="name" class="form-control" id="name"></div>';
+        $expected = '<div class="form-group text required"><label for="name">Name</label><input type="text" name="name" class="form-control" id="name" maxlength="80"></div>';
         $result = $FormHelper->control('name');
         $this->assertEquals($expected, $result);
 

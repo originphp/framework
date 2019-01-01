@@ -21,7 +21,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testCurrency()
     {
         $this->assertEquals('$1,234.56', Number::currency(1234.56));
-        $this->assertEquals('$1,234.56', Number::currency('1,234.56'));
+        $this->assertEquals('$1,234.56', Number::currency('1234.56'));
         $this->assertEquals('$1,234.00', Number::currency(1234));
         $this->assertEquals('$1,234.56', Number::currency(1234.56, 'USD'));
         $this->assertEquals('£1,234.56', Number::currency(1234.56, 'GBP'));

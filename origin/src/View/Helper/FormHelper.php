@@ -218,8 +218,8 @@ class FormHelper extends Helper
                     $type = 'number';
                 }
                 $meta['columnMap'][$column] = $type;
-
-                if ($row['length']) {
+           
+                if (empty($row['length']) == false and $type != 'bool') {
                     $parts = explode(',', $row['length']);
                     $meta['maxlength'][$column] = (int) $parts[0];
                 }
@@ -392,7 +392,7 @@ class FormHelper extends Helper
 
         $options['type'] = 'text';
         if (!isset($options['placeholder'])) {
-            $options['placeholder'] = 'e.g. '.Date::format(date('Y-m-d'));
+            $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'));
         }
 
         if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {

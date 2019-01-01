@@ -298,11 +298,7 @@ class View
             $buffer = $this->renderLayout($layout);
         }
 
-        //# Free Mem for no longer used items
-        foreach ($this->helperRegistry()->loaded() as $helper) {
-            unset($this->{$helper});
-        }
-        $this->helperRegistry()->clear();
+        $this->helperRegistry()->destroy();
         unset($this->helperRegistry);
 
         return $buffer;

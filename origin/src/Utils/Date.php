@@ -82,7 +82,7 @@ class Date
      *
      * @param string|array $dateFormat 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
      */
-    public static function setDateformat(string $dateFormat)
+    public static function setDateformat($dateFormat)
     {
         self::$dateFormat = $dateFormat;
     }
@@ -92,7 +92,7 @@ class Date
      *
      * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
      */
-    public static function setDatetimeFormat(string $datetimeFormat)
+    public static function setDatetimeFormat($datetimeFormat)
     {
         self::$datetimeFormat = $datetimeFormat;
     }
@@ -102,7 +102,7 @@ class Date
      *
      * @param string|array $timeFormat 'H:mm' or [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]
      */
-    public static function setTimeFormat(string $timeFormat)
+    public static function setTimeFormat($timeFormat)
     {
         self::$timeFormat = $timeFormat;
     }
