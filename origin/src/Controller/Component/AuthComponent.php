@@ -57,18 +57,16 @@ class AuthComponent extends Component
     ];
 
     /**
-     * Other components that be used.
-     *
-     * @var array
-     */
-    public $uses = ['Flash'];
-
-    /**
      * Allowed actions.
      *
      * @var array
      */
     protected $allowedActions = [];
+
+    public function initialize(array $config)
+    {
+        $this->loadComponent('Flash');
+    }
 
     /**
      * This called after the controller startUp but before the action.
