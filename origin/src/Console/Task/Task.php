@@ -58,7 +58,7 @@ class Task
     }
 
     /**
-     * This is called after the shell method
+     * This is called after the shell method but before the shell shutdown
      */
     public function shutdown()
     {
