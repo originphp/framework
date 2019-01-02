@@ -14,6 +14,8 @@
 
 namespace Origin\Controller;
 
+use Origin\Controller\Request;
+use Origin\Controller\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\View\View;
@@ -110,7 +112,14 @@ class Controller
 
         $this->modelName = Inflector::singularize($this->name);
 
+        if ($request === null) {
+            $request = new Request();
+        }
         $this->request = $request;
+
+        if ($response === null) {
+            $response = new Response;
+        }
         $this->response = $response;
 
         $this->componentRegistry = new ComponentRegistry($this);
