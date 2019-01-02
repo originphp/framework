@@ -1,9 +1,8 @@
-# Console
+# Console & Shell
 
-It is easy to build console applications, use can be for cron jobs, running complex calculations or anything data intensive.
+It is easy to build console applications, use can be for cron jobs, running complex calculations or anything data intensive.  Console apps are run though PHP cli.
 
-## Building a shell app
-
+## Building a Shell
 
 Shells are stored in the `Console` folder of your app. Here is an example of a simple shell
 
@@ -14,14 +13,6 @@ use Origin\Console\Shell;
 
 class HelloShell extends Shell
 {
-    /**
-     * This is called when the Shell is created. You can put any logic here
-     * instead of overiding the construct.
-     */ 
-    public function initialize(array $arguments){
-        ...
-    }
-
     /**
      * This will be called if no other args are put after the shell name
      */
@@ -45,4 +36,22 @@ You can get additional arguments by checking out the args variable in the shell.
 
 ## Callbacks
 
-Like Components, Shell apps have initialze, startup and shutdown
+
+There are three callbacks which a Shell use `initialize`,`startup` and `shutdown`;
+
+````php
+    /**
+     * This is called when the shell is created during the construct.
+     */
+    public function initialize(array $config){}
+
+    /**
+     * This called before the shell method
+     */
+    public function startup(){}
+
+    /**
+     * This is called after the shell method
+     */
+    public function shutdown(){}
+````

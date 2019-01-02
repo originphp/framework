@@ -278,8 +278,8 @@ class Controller
 
     public function shutdownProcess()
     {
-        $this->shutdown();
         $this->componentRegistry()->call('shutdown');
+        $this->shutdown();
 
         //# Free Mem for no longer used items
         $this->componentRegistry()->destroy();

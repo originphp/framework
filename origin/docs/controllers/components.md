@@ -81,7 +81,7 @@ There are three callbacks which Components use `initialize`,`startup` and `shutd
     public function startup(){}
 
     /**
-     * This is called after the controller action.
+     * This is called after the controller action but before the controller shutdown
      */
     public function shutdown(){}
 ````

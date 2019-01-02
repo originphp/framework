@@ -4,7 +4,6 @@
 
 Your application controllers will extend the `AppController`.
 
-
 ## Creating your own controller
 
 When you create a controller, the name should be in plural camel case and it needs to end with Controller. Controller files are placed
@@ -23,8 +22,30 @@ class BookmarksController extends AppController {
 
 ````
 
-You can access the model for the controller, by using `$this->Bookmark`. If you want to use a different models in your controller, then you will
-need to load each model that you want to use with the `$this->loadModel($model)` method.
+You can access the model for the controller, by using `$this->Bookmark`. If you want to use a different models in your controller, then you will need to load each model that you want to use with the `$this->loadModel($model)` method.
+
+## Callbacks 
+
+## Callbacks 
+
+There are three callbacks which Controllers use, `initialize`,`startup` and `shutdown`;
+
+````php
+    /**
+     * This is called when controller is constructed
+     */
+    public function initialize(array $config){}
+
+    /**
+     * This called after initialize but before the controller action
+     */
+    public function startup(){}
+
+    /**
+     * This is called after the controller action.
+     */
+    public function shutdown(){}
+````
 
 ## Methods
 

@@ -158,8 +158,8 @@ class Shell
 
     public function shutdownProcess()
     {
-        $this->shutdown();
         $this->taskRegistry()->call('shutdown');
+        $this->shutdown();
 
         //# Free Mem for no longer used items
         $this->taskRegistry()->destroy();
