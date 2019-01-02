@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Console;
+namespace Origin\Test\Console\Task;
 
 use Origin\Console\Shell;
 use Origin\Console\Task\Task;
@@ -24,6 +24,10 @@ class MockShell extends Shell
 
 class MockTask extends Task
 {
+    public function getTasks()
+    {
+        return $this->_tasks;
+    }
     public $output = null;
     public function out(string $data, $newLine = true)
     {
@@ -34,20 +38,65 @@ class MockTask extends Task
     }
 }
 
+class DummyTask
+{
+    public $name = 'DummyTask';
+}
+
 class TaskTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        $this->MockShell = new MockShell([], new ConsoleOutput());
+        $this->MockTask = new MockTask($this->MockShell);
+    }
+    public function testConstruct()
+    {
+        $this->assertInstanceOf(
+            'Origin\Console\Task\TaskRegistry',
+            $this->MockTask->taskRegistry()
+        );
+    }
+    /**
+     * This will test task and tasks function which uses task function
+     *
+     * @return void
+     */
+    public function testLoadTasks()
+    {
+        $this->MockTask->loadTasks([
+            'Apple',
+            'Orange' => ['type'=>'Fruit']
+        ]);
+        $expected = [
+            'Apple' => ['className'=>'AppleTask'],
+            'Orange' => ['className'=>'OrangeTask','type'=>'Fruit'],
+        ];
+
+        $this->assertEquals($expected, $this->MockTask->getTasks());
+    }
+
     public function testShell()
     {
-        $shell = new MockShell([], new ConsoleOutput());
-        $task = new MockTask($shell);
-        $this->assertEquals($shell, $task->shell());
+        $this->assertEquals($this->MockShell, $this->MockTask->shell());
     }
 
     public function testOut()
     {
-        $shell = new MockShell([], new ConsoleOutput());
-        $task = new MockTask($shell);
-        $task->out('Foo bar');
-        $this->assertEquals("Foo bar\n", $task->output);
+        $this->MockTask->out('Foo bar');
+        $this->assertEquals("Foo bar\n", $this->MockTask->output);
+    }
+
+    /**
+     * @depends testLoadTasks
+     *
+     * @return void
+     */
+    public function testLoading()
+    {
+        $this->MockTask->taskRegistry()->set('Dummy', new DummyTask());
+        $this->MockTask->loadTask('Dummy');
+       
+        $this->assertInstanceOf('Origin\Test\Console\Task\DummyTask', $this->MockTask->Dummy);
     }
 }

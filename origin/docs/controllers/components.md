@@ -52,14 +52,29 @@ To load a component
 
 ````
 
-If you want to use a component within a component then in the component class add the components that you
-want to use to the `uses` array.
+If you want to use a component within a component then call the `loadComponent` method.
 
 ````php
 
 class MathComponent extends Component
 {
-  public $uses = ['Fractions'];
+   public function initialize(array $config)
+    {
+      $this->loadComponent('Math',$config);
+    }
+}
+
+````
+or use the `components` method to load many components.
+
+````php
+
+class MathComponent extends Component
+{
+   public function initialize(array $config)
+    {
+      $this->loadComponents(['Math']);
+    }
 }
 
 ````
@@ -85,14 +100,19 @@ There are three callbacks which Components use `initialize`,`startup` and `shutd
      */
     public function shutdown(){}
 ````
-## Properties
-
-### array Component::$uses
-
-This is an array of other components that you component needs, any components listed here will be loaded automatically when your component is created.
 
 ## Methods
 
 ### Component::controller()
 
 This returns the controller that loaded the component. This is useful if you need to do something with a controller from within your component.
+
+
+### Component::loadComponent(string $name,array $config=[])
+
+Tells the lazy loader that you will be using another Component within this component. Once you do this you can
+access the component using `$this->AnotherComponent->method()`; 
+
+### Component::components(array $names)
+
+Loads multiple components using the `loadComponent` method.

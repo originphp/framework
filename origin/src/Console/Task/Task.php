@@ -34,6 +34,12 @@ class Task
      */
     protected $taskRegistry = null;
     
+    /**
+     * Array of tasks and config. This built during construct using $tasks
+     *
+     * @var array
+     */
+    protected $_tasks = [];
 
     public function __construct(Shell $shell, array $config =[])
     {
@@ -41,6 +47,49 @@ class Task
 
         $this->config($config);
         $this->initialize($config);
+    }
+
+    /**
+     * Handle lazy loading
+     */
+    public function __get($name)
+    {
+        if (isset($this->_tasks[$name])) {
+            $this->{$name} = $this->taskRegistry()->load($name, $this->_tasks[$name]);
+       
+            if (isset($this->{$name})) {
+                return $this->{$name};
+            }
+        }
+    }
+    /**
+    * Sets another Task to be loaded within this Task
+     *
+     * @param string $task
+     * @param array $config
+     * @return void
+     */
+    public function loadTask(string $task, array $config = [])
+    {
+        $config = array_merge(['className' => $task.'Task'], $config);
+        $this->_tasks[$task] = $config;
+    }
+
+    /**
+     * Loads Multiple Tasks through the loadTask method
+     *
+     * @param array $tasks
+     * @return void
+     */
+    public function loadTasks(array $tasks)
+    {
+        foreach ($tasks as $task => $config) {
+            if (is_int($task)) {
+                $task = $config;
+                $config = [];
+            }
+            $this->loadTask($task, $config);
+        }
     }
 
     /**
@@ -71,8 +120,19 @@ class Task
      */
     public function shell()
     {
-        return $this->taskRegistry->shell();
+        return $this->taskRegistry()->shell();
     }
+
+    /**
+    * Gets the componentRegistry
+    *
+    * @return void
+    */
+    public function taskRegistry()
+    {
+        return $this->taskRegistry;
+    }
+
 
     /**
          * Outputs to the console text

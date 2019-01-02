@@ -34,56 +34,63 @@ class Component
     protected $componentRegistry = null;
 
     /**
-     * Holds a list of components that will be shared.
+     * Array of components and config. This built during construct using
+     * $components.
      *
      * @var array
      */
-    public $uses = [];
-
-    /**
-     * Array of components and config.
-     *
-     * @var array
-     */
-    protected $components = [];
+    protected $_components = [];
 
     public function __construct(Controller $controller, array $config = [])
     {
         $this->componentRegistry = $controller->componentRegistry();
         $this->request = $controller->request;
-
-        $this->prepareComponents();
  
         $this->config($config);
         $this->initialize($config);
     }
 
-    public function componentRegistry()
-    {
-        return $this->componentRegistry;
-    }
-
+    /**
+     * Lazy loading
+     */
     public function __get($name)
     {
-        if (isset($this->components[$name])) {
-            $this->{$name} = $this->componentRegistry()->load($name, $this->components[$name]);
-
+        if (isset($this->_components[$name])) {
+            $this->{$name} = $this->componentRegistry()->load($name, $this->_components[$name]);
+       
             if (isset($this->{$name})) {
                 return $this->{$name};
             }
         }
     }
 
-    protected function prepareComponents()
+    /**
+    * Sets another component to be loaded within this component
+    *
+    * @param string $component e.g Auth, Flash
+    * @param array $config
+    * @return void
+    */
+    public function loadComponent(string $component, array $config = [])
     {
-        // Create map of components with config
-        foreach ($this->uses as $component => $config) {
+        $config = array_merge(['className' => $component.'Component'], $config);
+        $this->_components[$component] = $config;
+    }
+
+    /**
+     * Loads Multiple components through the loadComponent method
+     *
+     * @param array $components
+     * @return void
+     */
+    public function loadComponents(array $components)
+    {
+        foreach ($components as $component => $config) {
             if (is_int($component)) {
                 $component = $config;
                 $config = [];
             }
-            $config = array_merge(['className' => $component.'Component'], $config);
-            $this->components[$component] = $config;
+            $this->loadComponent($component, $config);
         }
     }
 
@@ -103,7 +110,7 @@ class Component
     }
 
     /**
-     * This is called after the controller action.
+     * This is called after the controller action but before the controller shutdown
      */
     public function shutdown()
     {
@@ -111,13 +118,19 @@ class Component
 
     /**
      * Returns the controller
-     * Dont want the controller in every component again, when we can use registry
-     * which is referenced.
      */
     public function controller()
     {
-        if ($this->componentRegistry) {
-            return $this->componentRegistry()->controller();
-        }
+        return $this->componentRegistry()->controller();
+    }
+
+    /**
+    * Gets the componentRegistry
+    *
+    * @return void
+    */
+    public function componentRegistry()
+    {
+        return $this->componentRegistry;
     }
 }
