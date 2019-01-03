@@ -40,4 +40,9 @@ trait TestTrait
             return $this->$property;
         }
     }
+
+    public function setProperty(string $property, $value)
+    {
+        $this->{$property} = $value;
+    }
 }
