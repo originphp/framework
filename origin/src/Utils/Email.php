@@ -15,9 +15,12 @@
 namespace Origin\Utils;
 
 use Origin\Exception\Exception;
+use Origin\Core\Configure;
 
 class Email
 {
+    const CRLF = "\r\n";
+
     protected $to = [];
 
     protected $from = [];
@@ -29,6 +32,8 @@ class Email
     protected $replyTo = [];
 
     protected $sender = [];
+
+    protected $returnPath = [];
 
     protected $subject = null;
 
@@ -56,12 +61,104 @@ class Email
      */
     protected $encoding = null;
 
-    public function __construct()
+
+    /**
+     * Config for all email accounts
+     *
+     * @var array
+     */
+    protected static $config = [];
+
+
+    /**
+     * Email account config to use for sending email through this instance
+     *
+     * @var array
+     */
+    protected $account = null;
+
+    protected $socket = null;
+    /**
+     * Holds the log for SMTP
+     *
+     * @var array
+     */
+    protected $smtpLog = [];
+
+    protected static $defaultConfig = ['host'=>'localhost','port'=>25,'username'=>null,'password' => null,'tls'=>false,'client'=>null,'timeout'=>30];
+
+    /**
+       * Sets and gets the config for email account
+       * For ssl connections add the prefix ssl:// to the host
+       * To enable tls set the tls key to true
+       *
+       * @param string $name   name of connection
+       * @param array  $config array(host,port,username,password,tls,client)
+       * For Gsuite
+       *      [   'host' => 'ssl://smtp.gmail.com',
+       *          'port' => 465,
+       *          'username' => 'your_email@gmail.com',
+       *          'password' => 'secret',
+       *          'tls'=>true
+       *        ]
+       *
+       * The 'client' key is optional if is set, it is used when communicating with the smtp server, it used to
+       * identify us on the hello command.
+       * @return array|null config
+       */
+    public static function config(string $name, array $config = null)
+    {
+        if (func_num_args() == 2) {
+            static::$config[$name] = array_merge(static::$defaultConfig, $config);
+        }
+        
+        if (isset(static::$config[$name])) {
+            return static::$config[$name];
+        }
+        return null;
+    }
+
+    public function __construct($config = null)
     {
         if (extension_loaded('mbstring') === false) {
             throw new Exception('mbstring extension is not loaded');
         }
-        mb_internal_encoding($this->charset);
+        $this->charset = Configure::read('App.encoding');
+        mb_internal_encoding($this->charset); // mb_list_encodings()
+        
+        if ($config === null) {
+            $config = static::config('default');
+        }
+        if ($config) {
+            $this->account($config);
+        }
+    }
+
+    /**
+     * Sets and gets the email account to be used by this email instance.
+     * If a string is passed it will load from the config, if its an array it will create
+     * a temporary config which can be only used by instance.
+     *
+     * Use this to create create configs on the fly or switch from default config etc
+     *
+     * @param string|array $config
+     * @return void
+     */
+    public function account($config = null)
+    {
+        if ($config === null) {
+            return $this->account;
+        }
+        if (is_array($config)) {
+            $this->account = array_merge(static::$defaultConfig, $config);
+            return $this;
+        }
+        $config = static::config($config);
+        if ($config) {
+            $this->account = $config;
+            return $this;
+        }
+        throw new Exception(sprintf('Unkown email configuration %s', $config));
     }
 
     /**
@@ -138,7 +235,7 @@ class Email
      */
     public function from(string $email, string $name = null)
     {
-        $this->setEmail('from', $email, $name);
+        $this->setEmailSingle('from', $email, $name);
         return $this;
     }
 
@@ -151,7 +248,7 @@ class Email
     */
     public function sender(string $email, string $name = null)
     {
-        $this->setEmail('sender', $email, $name);
+        $this->setEmailSingle('sender', $email, $name);
         return $this;
     }
 
@@ -164,7 +261,7 @@ class Email
      */
     public function replyTo(string $email, string $name = null)
     {
-        $this->setEmail('replyTo', $email, $name);
+        $this->setEmailSingle('replyTo', $email, $name);
         return $this;
     }
 
@@ -177,7 +274,7 @@ class Email
      */
     public function returnPath(string $email, string $name = null)
     {
-        $this->setEmail('returnPath', $email, $name);
+        $this->setEmailSingle('returnPath', $email, $name);
         return $this;
     }
 
@@ -268,9 +365,213 @@ class Email
         return $this;
     }
 
-    public function send()
+    public function send($content =null)
     {
+        if (empty($this->from)) {
+            throw new Exception('From email is not set.');
+        }
+        if (empty($this->to)) {
+            throw new Exception('To email is not set.');
+        }
+
+        if ($content) {
+            $this->textMessage = $content;
+        }
+    
+        if (empty($this->textMessage) and empty($this->htmlMessage)) {
+            throw new Exception('Message not set.');
+        }
+
+        if ($this->account === null) {
+            throw new Exception('Email config has not been set.');
+        }
+        return $this->sendMessage();
         // Check message is set and to and from etc
+    }
+ 
+    protected function sendMessage()
+    {
+        $account = $this->account;
+        $account['protocol'] = 'tcp';
+        if (strpos($account['host'], '://') !== false) {
+            list($account['protocol'], $account['host']) = explode('://', $account['host']);
+        }
+     
+        $this->openSocket($account);
+        $this->connect($account);
+
+        $this->authenticate($account);
+
+        $this->sendCommand('MAIL FROM: <' . $this->from[0] . '>', '250');
+        $recipients = array_merge($this->to, $this->cc, $this->bcc);
+        foreach ($recipients as $recipient) {
+            $this->sendCommand('RCPT TO: <' . $recipient[0] . '>', '250|251');
+        }
+
+        $this->sendCommand('DATA', '354');
+        $headers = '';
+        foreach ($this->buildHeaders() as $header => $value) {
+            $headers .= "{$header}: {$value}" . self::CRLF;
+        }
+        $message = implode(self::CRLF, $this->buildMessage());
+
+        $this->sendCommand($headers . self::CRLF.self::CRLF . $message . self::CRLF.self::CRLF.self::CRLF .'.', '250');
+       
+        $this->sendCommand('QUIT', '221');
+       
+        $this->closeSocket();
+      
+        return true;
+    }
+
+    protected function authenticate($account)
+    {
+        if (isset($account['username']) and isset($account['password'])) {
+            $this->sendCommand("AUTH LOGIN", '334');
+            $this->sendCommand(base64_encode($account['username']), '334');
+            $this->sendCommand(base64_encode($account['password']), '235');
+        }
+    }
+
+    protected function connect(array $account)
+    {
+        $this->sendCommand(null, '220');
+
+        $host = 'localhost';
+        if (isset($account['client'])) {
+            $host = $account['client'];
+        } elseif (isset($_SERVER['HTTP_HOST'])) {
+            list($host, $port) = explode(':', $_SERVER['HTTP_HOST']);
+        }
+        $this->sendCommand("EHLO {$host}", '250');
+        if ($account['tls']) {
+            $this->sendCommand("STARTTLS", '220');
+            if (stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT) === false) {
+                throw new Exception('The server did not accept the TLS connection.');
+            }
+            $this->sendCommand("EHLO {$host}", '250');
+        }
+    }
+
+
+    protected function isConnected()
+    {
+        return is_resource($this->socket);
+    }
+
+
+
+    /**
+     * Sends a command to the socket and waits for a response.
+     *
+     * @param null,string $data
+     * @param string $code
+     * @return string $code
+     */
+    protected function sendCommand(string $data = null, $code = '250')
+    {
+        if ($data != null) {
+            $this->socketWrite($data);
+        }
+        $response = '';
+        $startTime = time();
+        while (is_resource($this->socket) and !feof($this->socket)) {
+            $buffer = @fgets($this->socket, 515);
+            $this->socketLog(rtrim($buffer));
+            $response .= $buffer;
+         
+            /**
+             * RFC5321 S4.1 + S4.2
+             * @see https://tools.ietf.org/html/rfc5321
+             * Stop if 4 character is space or response is only 3 characters (not valid must be handled
+             * according to standard)
+             */
+
+            if (substr($buffer, 3, 1) == ' ' or strlen($buffer) === 3) {
+                break;
+            }
+
+            $info = stream_get_meta_data($this->socket);
+            if ($info['timed_out'] or (time() - $startTime) >= $this->account['timeout']) {
+                throw new Exception('SMTP timeout.');
+            }
+        }
+        
+        if (preg_match("/^($code)/i", $response)) {
+            return $code; // Return response code
+        }
+        
+        throw new exception(sprintf('SMTP Error: %s', $response));
+    }
+
+    protected function socketWrite(string $data)
+    {
+        if (!$this->isConnected()) {
+            return false;
+        }
+        $this->socketLog($data);
+        return fputs($this->socket, $data . self::CRLF);
+    }
+
+    protected function socketLog(string $data)
+    {
+        //fwrite(STDERR, $data);
+        $this->smtpLog[] = $data;
+    }
+
+    /**
+     * Opens a Socket or throws an exception
+     *
+     * @param array $account
+     * @return void
+     */
+    protected function openSocket(array $account, array $options=[])
+    {
+        set_error_handler([$this, 'connectionErrorHandler']);
+        $server =  $account['protocol'] . '://' . $account['host'] . ':' . $account['port'];
+        $this->socketLog('Connecting to ' . $server);
+        $this->socket = stream_socket_client(
+                $server,
+                $errorNumber,
+                $errorString,
+                $account['timeout'],
+                STREAM_CLIENT_CONNECT,
+                stream_context_create($options)
+            );
+        restore_error_handler();
+ 
+        if (!$this->isConnected()) {
+            $this->socketLog('Unable to connect to the SMTP server.');
+            throw new Exception('Unable to connect to the SMTP server.');
+        }
+        $this->socketLog('Connected to SMTP server.');
+     
+        /**
+         * Does not time out just an array returned by stream_get_meta_data() with the key timed_out
+         */
+        stream_set_timeout($this->socket, $this->account['timeout']); // Sets a timeouted key
+    }
+
+    protected function connectionErrorHandler($code, $message)
+    {
+        $this->smtpLog[] = $message;
+    }
+
+    protected function closeSocket()
+    {
+        if (is_resource($this->socket)) {
+            fclose($this->socket);
+        }
+    }
+
+    /**
+     * Returns the smtp log
+     *
+     * @return void
+     */
+    public function smtpLog()
+    {
+        return $this->smtpLog;
     }
 
     protected function setEmail(string $var, string $email = null, string $name = null)
@@ -285,42 +586,73 @@ class Email
         $this->{$var}[] = array($email,$name);
     }
 
+    protected function setEmailSingle(string $var, string $email = null, string $name = null)
+    {
+        $this->validateEmail($email);
+        $this->{$var} = array($email,$name);
+    }
+
+    /**
+     * Validates an email
+     *
+     * @param string $email
+     * @return void
+     */
     protected function validateEmail($email)
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return true;
         }
-        throw new Exception('Invalid email address ' . $email);
+        throw new Exception(sprintf('Invalid email address %s', $email));
     }
-
-    protected function buildMessageHeader()
+    
+    /**
+     * Builds an array of headers for the email
+     *
+     * @return void
+     */
+    protected function buildHeaders()
     {
-        $this->setHeader('MIME-Version', '1.0');
-        $this->setHeader('Date', date('r'));//RFC 2822
-        if ($this->bcc) {
-            $this->setHeader('Bcc', $this->formatAddresses($this->bcc));
-        }
-        $this->setHeader('Message-ID', $this->getMessageId());
+        $headers = [];
+
+        $headers['MIME-Version'] = '1.0';
+        $headers['Date'] = date('r');//RFC 2822
+        $headers['Message-ID'] = $this->getMessageId();
 
         foreach ($this->additionalHeaders as $header => $value) {
-            $this->setHeader($header, $value);
+            $headers[$header] = $value;
         }
 
-        $this->setHeader('Subject', $this->getSubject());
-        $this->setHeader('From', $this->formatAddresses($this->from));
-        $this->setHeader('To', $this->formatAddresses($this->to));
+        $headers['Subject'] = $this->getSubject();
 
-        if ($this->cc) {
-            $this->setHeader('Cc', $this->formatAddresses($this->cc));
+        $optionals = ['sender'=>'Sender','replyTo'=>'Reply-To','returnPath'=>'Return-Path'];
+        foreach ($optionals as $var => $header) {
+            if ($this->{$var}) {
+                $headers[$header] =  $this->formatAddress($this->{$var});
+            }
+        }
+
+        $headers['From'] = $this->formatAddress($this->from);
+
+        foreach (['to','cc','bcc'] as $var) {
+            if ($this->{$var}) {
+                $headers[ucfirst($var)] =  $this->formatAddresses($this->{$var});
+            }
         }
         
-        $this->setHeader('Content-Type', $this->getContentType());
+        $headers['Content-Type'] = $this->getContentType();
         if ($this->needsEncoding() and empty($this->attachments) and $this->emailFormat() !== 'both') {
-            $this->setHeader('Content-Transfer-Encoding', 'quoted-printable');
+            $headers['Content-Transfer-Encoding'] = 'quoted-printable';
         }
+        return $headers;
     }
 
-    protected function createBody()
+    /**
+     * Builds the message array
+     *
+     * @return array message
+     */
+    protected function buildMessage()
     {
         $message = [];
 
@@ -328,7 +660,22 @@ class Email
         $needsEncoding = $this->needsEncoding();
         $altBoundary = $boundary =  $this->getBoundary();
        
-        if ($emailFormat == 'both' and $this->attachments) {
+
+        if ($this->attachments and ($emailFormat ==='html' or $emailFormat ==='text')) {
+            $message[] = '--'.$boundary;
+            if ($emailFormat == 'text') {
+                $message[] = 'Content-Type: text/plain; charset="' . $this->charset .'"';
+            }
+            if ($emailFormat == 'html') {
+                $message[] = 'Content-Type: text/html; charset="' . $this->charset .'"';
+            }
+            if ($needsEncoding) {
+                $message[] = 'Content-Transfer-Encoding: quoted-printable';
+            }
+            $message[] = '';
+        }
+
+        if ($this->attachments and $emailFormat == 'both') {
             $altBoundary = 'alt-' . $boundary;
             $message[] = '--' . $boundary;
             $message[] = 'Content-Type: multipart/alternative; boundary="' . $altBoundary .'"';
@@ -344,7 +691,7 @@ class Email
                 }
                 $message[] = '';
             }
-            $message[] = $this->prepareMessage($this->textMessage, $needsEncoding);
+            $message[] = $this->formatMessage($this->textMessage, $needsEncoding);
             $message[] = '';
         }
 
@@ -357,9 +704,10 @@ class Email
                 }
                 $message[] = '';
             }
-            $message[] = $this->prepareMessage($this->htmlMessage, $needsEncoding);
+            $message[] = $this->formatMessage($this->htmlMessage, $needsEncoding);
             $message[] = '';
         }
+  
         if ($this->attachments) {
             foreach ($this->attachments as $filename => $name) {
                 $mimeType = mime_content_type($filename);
@@ -375,17 +723,17 @@ class Email
         if ($emailFormat == 'both' or $this->attachments) {
             $message[] = '--' . $boundary . '--';
         }
-        //pr($message);
-        return rtrim(implode("\r\n", $message));
+       
+        return $message;
     }
-
+   
     /**
      * Standardizes the line endings and encodes if needed
      *
      * @param string $message
      * @return void
      */
-    protected function prepareMessage(string $message, bool $needsEncoding)
+    protected function formatMessage(string $message, bool $needsEncoding)
     {
         $message = preg_replace("/\r\n|\n/", "\r\n", $message);
         if ($needsEncoding) {
@@ -394,13 +742,6 @@ class Email
         return $message;
     }
 
-
-    
-
-    protected function setHeader(string $name, string $value)
-    {
-        $this->headers[$name] = $value;
-    }
     /**
      * Gets the message id for the message
      * if messageId is null [default] then it generates a UUID
@@ -426,11 +767,15 @@ class Email
         return $this->messageId . '@' . $this->getDomain();
     }
 
+    /**
+     * Gets the domain to be used for message id generation
+     * @return void
+     */
     public function getDomain()
     {
         $domain = php_uname('n');
         if ($this->from) {
-            $email = $this->from[0][0];
+            $email = $this->from[0];
             list(, $domain) = explode('@', $email);
         }
         return $domain;

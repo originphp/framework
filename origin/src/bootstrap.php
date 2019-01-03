@@ -50,8 +50,12 @@ require ROOT.'/vendor/autoload.php';
  * Error and Exception handling.
  */
 require CONFIG.DS.'bootstrap.php';
+
 if (file_exists(CONFIG.DS.'server.php')) {
     require CONFIG.DS.'server.php';
+}
+if (file_exists(CONFIG.DS.'email.php')) {
+    require CONFIG.DS.'email.php';
 }
 
 use Origin\Core\ErrorHandler;

@@ -14,6 +14,7 @@ Configure::write('debug', true); // goes in server
  *  2. config/autoloader.php folder
  */
 Configure::write('App.namespace', 'App');
+Configure::write('App.encoding', 'UTF-8');
 Configure::write('Session.timeout', 3600);
 
 /*

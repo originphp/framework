@@ -1,0 +1,14 @@
+<?php 
+/**
+ * This is your email config file
+ */
+use Origin\Utils\Email;
+
+Email::config(
+    'default',[
+        'host' => 'ssl://smtp.gmail.com',
+        'port' => 465,
+        'username' => 'email@gmail.com',
+        'password' => 'secret',
+        'timeout' => 5]
+    );
