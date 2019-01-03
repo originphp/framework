@@ -117,14 +117,14 @@ class ShellDispatcher
      */
     protected function buildShell(string $class, string $method)
     {
-        $object = new $class($this->args, $this->consoleOutput);
-        if (!method_exists($object, $method)) {
-            throw new MissingShellMethodException([$shell,$method]);
+        $shell = new $class($this->args, $this->consoleOutput);
+        if (!method_exists($shell, $method)) {
+            throw new MissingShellMethodException([$class,$method]);
         }
-        if (!$object->isAccessible($method)) {
-            throw new MissingShellMethodException([$shell,$method]);
+        if (!$shell->isAccessible($method)) {
+            throw new MissingShellMethodException([$class,$method]);
         }
-        return $object;
+        return $shell;
     }
     
     /**
