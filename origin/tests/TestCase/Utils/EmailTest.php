@@ -1,0 +1,476 @@
+<?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+namespace Origin\Test\Utils;
+
+use Origin\Utils\Email;
+use Origin\TestSuite\TestTrait;
+
+class MockEmail extends Email
+{
+    use TestTrait;
+    protected $boundary = '0000000000000000000000000000';
+}
+
+class EmailTest extends \PHPUnit\Framework\TestCase
+{
+    public function testTo()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->to('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('to');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->to('james@originphp.com', 'James');
+        $property = $Email->getProperty('to');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+    public function testFrom()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->from('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('from');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->from('james@originphp.com', 'James');
+        $property = $Email->getProperty('from');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+
+    public function testSender()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->sender('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('sender');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->sender('james@originphp.com', 'James');
+        $property = $Email->getProperty('sender');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+
+    public function testReplyTo()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->replyTo('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('replyTo');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->replyTo('james@originphp.com', 'James');
+        $property = $Email->getProperty('replyTo');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+
+    public function testReturnPath()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->returnPath('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('returnPath');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->returnPath('james@originphp.com', 'James');
+        $property = $Email->getProperty('returnPath');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+
+    public function testBcc()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->bcc('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('bcc');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->bcc('james@originphp.com', 'James');
+        $property = $Email->getProperty('bcc');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+
+    public function testCc()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->cc('james@originphp.com');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $property = $Email->getProperty('cc');
+        $this->assertEquals(['james@originphp.com',null], $property[0]);
+
+        $Email = $Email->cc('james@originphp.com', 'James');
+        $property = $Email->getProperty('cc');
+        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+    }
+    /**
+     * @depends testCc
+     */
+    public function testAddCc()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->cc('james@originphp.com', 'James');
+        $Email = $Email->addCc('guest@originphp.com', 'Guest');
+        $property = $Email->getProperty('cc');
+        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+    }
+
+    /**
+     * @depends testBcc
+     */
+    public function testAddBcc()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->bcc('james@originphp.com', 'James');
+        $Email = $Email->addBcc('guest@originphp.com', 'Guest');
+        $property = $Email->getProperty('bcc');
+        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+    }
+
+    public function testSubject()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->subject('A subject line');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertEquals('A subject line', $Email->getProperty('subject'));
+    }
+
+    public function testTextMessage()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->textMessage('Text message.');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertEquals('Text message.', $Email->getProperty('textMessage'));
+    }
+
+    public function testHtmlMessage()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->htmlMessage('<p>Html message.</p>');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertEquals('<p>Html message.</p>', $Email->getProperty('htmlMessage'));
+    }
+
+    public function testAddHeader()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->addHeader('X-mailer', 'OriginPHP');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertEquals(['X-mailer'=>'OriginPHP'], $Email->getProperty('additionalHeaders'));
+    }
+
+    public function testAddAttachment()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css');
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+
+        $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css', 'Debugger.css');
+        
+        $expected = [
+            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css' => 'default.css',
+            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+        ];
+        $this->assertSame($expected, $Email->getProperty('attachments'));
+    }
+
+    /**
+     * @depends testAddAttachment
+     */
+    public function testAddAttachments()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->addAttachments([
+            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css',
+            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+        ]);
+        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+
+        $expected = [
+            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css' => 'default.css',
+            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+        ];
+        
+        $this->assertSame($expected, $Email->getProperty('attachments'));
+    }
+
+    public function testBuildMessageHeaderCore()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #1')
+              ->textMessage('this is a test');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+
+        $this->assertEquals('1.0', $headers['MIME-Version']);
+        $this->assertEquals(date('r'), $headers['Date']);
+        $validUUID = (bool) preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}@originphp.com$/i', $headers['Message-ID']);
+        $this->assertTrue($validUUID);
+        $this->assertEquals('test #1', $headers['Subject']);
+        $this->assertEquals('mailer@originphp.com', $headers['From']);
+        $this->assertEquals('james@originphp.com', $headers['To']);
+        $this->assertEquals('text/plain; charset="UTF-8"', $headers['Content-Type']);
+
+        // Adjust data
+        $Email->to('james@originphp.com', 'James')
+              ->from('mailer@originphp.com', 'OriginPHP Mailer');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $this->assertEquals('OriginPHP Mailer <mailer@originphp.com>', $headers['From']);
+        $this->assertEquals('James <james@originphp.com>', $headers['To']);
+    }
+
+    public function testBuildMessageHeaderOptional()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #2')
+              ->textMessage('this is a test');
+
+        $Email->addHeader('X-mailer', 'OriginPHP');
+        
+        $Email->bcc('guest1@originphp.com');
+        $Email->addBcc('guest2@originphp.com', 'Guest 2');
+
+        $Email->cc('guest3@originphp.com');
+        $Email->addCc('guest4@originphp.com', 'Guest 4');
+
+        
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $this->assertEquals('OriginPHP', $headers['X-mailer']);
+        $this->assertEquals('guest1@originphp.com, Guest 2 <guest2@originphp.com>', $headers['Bcc']);
+        $this->assertEquals('guest3@originphp.com, Guest 4 <guest4@originphp.com>', $headers['Cc']);
+    }
+
+    public function testBuildMessageHeaderEncoding()
+    {
+        // Check subject and names of headers are encoded
+        $Email = new MockEmail();
+        $Email->to('ragnar@originphp.com', 'Ragnarr Loþbrók')
+              ->from('mailer@originphp.com')
+              ->subject('Valhöll')
+              ->textMessage('this is a test');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+       
+        $this->assertEquals('=?UTF-8?B?VmFsaMO2bGw=?=', $headers['Subject']);
+        $this->assertEquals('Ragnarr =?UTF-8?B?TG/DvmJyw7Nr?= <ragnar@originphp.com>', $headers['To']);
+        $this->assertFalse(isset($headers['Content-Transfer-Encoding'])); // Dont encode message
+
+        // If we have UTF8 chars in message we need the header ContentTransferEncoding
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #2')
+              ->textMessage('Are you in Valhöll?');
+
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $this->assertEquals('quoted-printable', $headers['Content-Transfer-Encoding']);
+    }
+
+    public function testBuildMessageHeaderContentType()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #1')
+              ->textMessage('this is a test');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $this->assertEquals('text/plain; charset="UTF-8"', $headers['Content-Type']);
+
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #1')
+              ->htmlMessage('<p>this is a test</p>');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $this->assertEquals('text/html; charset="UTF-8"', $headers['Content-Type']);
+
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('test #1')
+              ->textMessage('this is a test')
+              ->htmlMessage('<p>this is a test</p>');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $boundary = $Email->getProperty('boundary');
+        $this->assertEquals("multipart/alternative; boundary=\"{$boundary}\"", $headers['Content-Type']);
+    }
+
+    public function testCreateMessageText()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test');
+        $result = $Email->callMethod('createBody');
+        $this->assertEquals("this is a test", $result);
+    }
+
+    public function testCreateMessageTextAttachments()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test');
+        
+        $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
+        file_put_contents($tempfile, 'foo/bar');
+
+        $Email->addAttachment($tempfile, 'test.txt');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
+        $this->assertEquals($expected, $headers['Content-Type']);
+        $result = $Email->callMethod('createBody');
+      
+        $expected = "this is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCreateMessageHtml()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('html test')
+              ->htmlMessage('<p>this is a test</p>');
+        $result = $Email->callMethod('createBody');
+        $this->assertEquals("<p>this is a test</p>", $result);
+    }
+
+    public function testCreateMessageHtmlAttachments()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->htmlMessage('<p>this is a test</p>');
+        
+        $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
+        file_put_contents($tempfile, 'foo/bar');
+
+        $Email->addAttachment($tempfile, 'test.txt');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
+        $this->assertEquals($expected, $headers['Content-Type']);
+        $result = $Email->callMethod('createBody');
+      
+        $expected = "<p>this is a test</p>\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testCreateMessageBoth()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test')
+              ->htmlMessage('<p>this is a test</p>');
+        
+        $result = $Email->callMethod('createBody');
+       
+        $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
+
+        $this->assertEquals($expected, $result);
+
+        // Check Encoding is added when needed
+        $Email->to('ragnar@originphp.com')
+              ->textMessage('Are you in Valhöll?')
+              ->htmlMessage('<p>Are you in Valhöll?</p>');
+        $result = $Email->callMethod('createBody');
+        //pr(str_replace("\r\n", '\r\n', $result));
+        $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\nAre you in Valh=C3=B6ll?\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n<p>Are you in Valh=C3=B6ll?</p>\r\n\r\n--0000000000000000000000000000--";
+     
+        $this->assertEquals($expected, $result);
+    }
+
+
+    public function testCreateMessageBothAttachments()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test')
+              ->htmlMessage('<p>this is a test</p>');
+        
+        $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
+        file_put_contents($tempfile, 'foo/bar');
+
+        $Email->addAttachment($tempfile, 'test.txt');
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
+        $this->assertEquals($expected, $headers['Content-Type']);
+        $result = $Email->callMethod('createBody');
+        
+        $expected = "--0000000000000000000000000000\r\nContent-Type: multipart/alternative; boundary=\"alt-0000000000000000000000000000\"\r\n\r\n--alt-0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--alt-0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Check that multiple attachments work properly
+     */
+    public function testMultipleAttachments()
+    {
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test');
+        
+        // Needs a unique filename
+        $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
+        file_put_contents($tempfile, 'foo/bar');
+        $Email->addAttachment($tempfile, 'test1.txt');
+
+        $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
+        file_put_contents($tempfile, 'foo/bar');
+        $Email->addAttachment($tempfile, 'test2.txt');
+
+        $Email->callMethod('buildMessageHeader');
+        $headers = $Email->getProperty('headers');
+        $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
+        $this->assertEquals($expected, $headers['Content-Type']);
+        $result = $Email->callMethod('createBody');
+       
+        $expected = "this is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test1.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test2.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Use this whilst creating or debugging tests to see output
+     *
+     * @param [type] $result
+     * @return void
+     */
+    protected function debugResult($result)
+    {
+        pr($result);
+        pr(str_replace("\r\n", '\r\n', $result));
+    }
+}
