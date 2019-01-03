@@ -37,11 +37,19 @@ class ConnectionManager
      *
      * @param string $name   name of connection
      * @param array  $config array(host,database,login,password)
+     * @return array $config
      */
-    public static function config(string $name, array $config)
+    public static function config(string $name, array $config  = null)
     {
-        $defaults = array('host' => 'localhost', 'database' => null, 'username' => null, 'password' => null);
-        static::$config[$name] = array_merge($defaults, $config);
+        if (func_num_args() == 2) {
+            $defaults = array('host' => 'localhost', 'database' => null, 'username' => null, 'password' => null);
+            static::$config[$name] = array_merge($defaults, $config);
+        }
+        
+        if (isset(static::$config[$name])) {
+            return static::$config[$name];
+        }
+        return null;
     }
 
     /**
