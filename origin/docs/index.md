@@ -39,6 +39,8 @@ class UserProfilesController extends AppController
 Table names should be plural and underscored. For example `user_profiles`. 
 Each table in your database should have a primary key,and it should be named `id`. Foreign keys should be the singular underscored name, for example `user_profile_id`.
 
+Dates,datetime,and time use the MySql field types of the same time. So the date format is `YYYY-MM-DD`.
+
 ### View
 
 The view templates are in the `View` folder, and the folder name is plural camel cased, so for user profiles it would be `UserProfiles`, the templates
@@ -49,3 +51,4 @@ So if `/users_profiles/index` is requested it will
 - load the controller `UserProfilesController` from the `Controller` folder
 - load the model `UserProfile` from the `Model` folder
 - load the view template `index.ctp` from the `View/UserProfiles` folder
+
