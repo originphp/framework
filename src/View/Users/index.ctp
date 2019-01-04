@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col users">
+    <div class="col users index">
         <h3><?= __('Users'); ?></h3>
         <table class="table">
         <thead>

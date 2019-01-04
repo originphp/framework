@@ -1,12 +1,11 @@
 /**
- * Minially adjusted bootstrap
+ * Minimally adjusted bootstrap
  * - Make form elements square
  * - Change alert colors
  * - Add some colors for form errors
  * - Configure date/time fields
- */
-
- /**
+ * - Style tables for index and related
+ *
  * More color scheme ideas from:
  * @link https://flatuicolors.com/palette/defo
  * @link http://materialuicolors.co
@@ -115,4 +114,8 @@ div.datetime .form-control {
 }
 div.datetime label {
   display: block;
+}
+
+.index .table th,.related .table th {
+  background-color:#dee2e6;
 }
