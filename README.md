@@ -1,4 +1,4 @@
-# OriginPHP Framework
+# OriginPHP Framework (alpha)
 
 The goals of this framework are
 
@@ -17,3 +17,5 @@ Recently I looked at both Larvel and CakePHP 3.x. Larvel looked like a totally n
 See [Getting Started](https://github.com/originphp/framework/blob/master/origin/docs/getting-started.md) on how to quickly get up and running with our docker setup.
 
 There is also [Documentation](https://github.com/originphp/framework/blob/master/origin/docs/) which can be found on github and within the origin/docs folder.
+
+Jamiel Sharief
