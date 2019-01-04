@@ -21,6 +21,7 @@ use Origin\Controller\Exception\MissingControllerException;
 use Origin\Controller\Exception\MissingMethodException;
 use Origin\Controller\Exception\PrivateMethodException;
 use Origin\Core\Exception\RouterException;
+use Origin\Core\Configure;
 
 class Dispatcher
 {
