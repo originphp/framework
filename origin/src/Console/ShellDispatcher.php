@@ -14,6 +14,7 @@
 
 namespace Origin\Console;
 
+use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Core\Inflector;
 use Origin\Console\Exception\MissingShellException;
@@ -57,7 +58,7 @@ class ShellDispatcher
     public function start()
     {
         $this->stdout("\033[2J\033[;H"); // clear screen
-        $this->stdout("<blue>OriginPHP Shell v1.0</blue>\n");
+        $this->stdout("<blue>OriginPHP Shell v1.0</blue>\n\n");
 
         $this->stdout("\033[37m"); // Set all text to white
 
@@ -117,7 +118,7 @@ class ShellDispatcher
      */
     protected function buildShell(string $class, string $method)
     {
-        $shell = new $class($this->args, $this->consoleOutput);
+        $shell = new $class($this->args, $this->consoleOutput, new ConsoleInput());
         if (!method_exists($shell, $method)) {
             throw new MissingShellMethodException([$class,$method]);
         }

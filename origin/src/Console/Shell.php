@@ -14,6 +14,7 @@
 
 namespace Origin\Console;
 
+use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\TaskRegistry;
 use Origin\Model\ModelRegistry;
@@ -37,6 +38,21 @@ class Shell
      */
     protected $taskRegistry = null;
 
+
+    /**
+     * Holds the console Output Object
+     *
+     * @var ConsoleOutput
+     */
+    protected $consoleOutput = null;
+
+    /**
+     * Holds the console input Resource
+     *
+     * @var resource
+     */
+    protected $consoleInput = null;
+
     /**
      * Inject request and response
      *
@@ -44,10 +60,11 @@ class Shell
      * @param ConsoleOutput $consoleOutput
      * @return void
      */
-    public function __construct(array $arguments =[], ConsoleOutput $consoleOutput)
+    public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
         $this->args = $arguments;
         $this->consoleOutput = $consoleOutput;
+        $this->consoleInput = $consoleInput;
 
         list($namespace, $this->name) = namespaceSplit(get_class($this));
      
@@ -97,6 +114,33 @@ class Shell
             $data .= "\n";
         }
         $this->consoleOutput->write($data);
+    }
+
+    /**
+     * Reads input from the console, use for prompts
+     *
+     * @param string $prompt what
+     * @param array $options ['yes','no']
+     * @param string $default default value if user presses enter
+     * @return void
+     */
+    public function in(string $prompt, array $options=[], string $default = null)
+    {
+        $input = '';
+        $optionsString = implode('/', $options);
+        if ($default) {
+            $defaultString = "[{$default}]";
+        }
+       
+       
+        while ($input === '' || !in_array($input, $options)) {
+            $this->out("<info>{$prompt}</info> ({$optionsString}) {$defaultString}");
+            $input = $this->consoleInput->read();
+            if ($input === '' and $default) {
+                return $default;
+            }
+        }
+        return $input;
     }
 
    

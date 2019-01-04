@@ -76,6 +76,11 @@ class ConsoleOutput
         $this->stream = fopen($stream, 'w');
     }
     
+    public function __destruct()
+    {
+        $this->close();
+    }
+
     /**
      * Writes to the stream
      *
@@ -142,7 +147,7 @@ class ConsoleOutput
             }
         }
      
-        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[37m";
+        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0m\033[37m";
     }
 
     /**
