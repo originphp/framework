@@ -108,7 +108,7 @@ You can also pass an options array with any of the following keys.
   }
 ```
 
-##Has Many
+## Has Many
 The other model contains the foreign key. Similar to has one, but will have more than one record.
 
 e.g. User has many Emails, the foreign key is in the other table, this would be `Email.user_id`
