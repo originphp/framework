@@ -16,6 +16,7 @@ namespace Origin\Test\Console\Task;
 
 use Origin\Console\Shell;
 use Origin\Console\Task\Task;
+use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 
 class MockShell extends Shell
@@ -47,7 +48,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->MockShell = new MockShell([], new ConsoleOutput());
+        $this->MockShell = new MockShell([], new ConsoleOutput(), new ConsoleInput());
         $this->MockTask = new MockTask($this->MockShell);
     }
     public function testConstruct()

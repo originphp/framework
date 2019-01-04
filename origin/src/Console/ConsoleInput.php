@@ -24,7 +24,7 @@ class ConsoleInput
     protected $stream = null;
     /**
     * Constructs a new instance
-    * @param string $stream fopen stream php://stdout
+    * @param string $stream fopen stream php://stdin
     */
     public function __construct(string $stream ='php://stdin')
     {

@@ -15,6 +15,7 @@
 namespace Origin\Test\Console;
 
 use Origin\Console\Shell;
+use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\Task;
 use Origin\Model\ModelRegistry;
@@ -48,10 +49,11 @@ class ShellTest extends \PHPUnit\Framework\TestCase
             unlink(TMP . DS . 'shelltest.txt');
         }
         $this->ConsoleOutput = new ConsoleOutput(TMP . DS . 'shelltest.txt');
+        $this->ConsoleInput = new ConsoleInput();
     }
     public function testConstruct()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $this->assertNotEmpty($shell->taskRegistry());
         $this->assertInstanceOf('Origin\Console\Task\TaskRegistry', $shell->taskRegistry());
         $this->assertEquals('MockShell', $shell->name);
@@ -60,7 +62,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     {
         $mockModel = new MockModel();
         ModelRegistry::set('MockModel', $mockModel);
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         // Test load from Registry
         $this->assertEquals($mockModel, $shell->loadModel('MockModel'));
 
@@ -70,7 +72,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadTask()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $mockTask = new MockTask($shell);
         $shell->taskRegistry()->set('MockTask', $mockTask);
         $shell->loadTask('MockTask');
@@ -79,7 +81,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadTasks()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $mockTask = new MockTask($shell);
         $shell->taskRegistry()->set('MockTask', $mockTask);
         $shell->loadTasks(['MockTask']);
@@ -91,7 +93,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
      */
     public function testCallbacks()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $mockTask = new MockTask($shell);
 
         $shell->taskRegistry()->set('MockTask', $mockTask);
@@ -106,7 +108,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
     public function testOut()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput);
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $shell->out('Hello World!');
         $this->assertEquals("Hello World!\n", file_get_contents(TMP . DS . 'shelltest.txt'));
     }

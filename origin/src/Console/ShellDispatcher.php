@@ -45,7 +45,7 @@ class ShellDispatcher
         $this->args = array_slice($arguments, 1);
     }
 
-    public function stdout(string $data)
+    public function out(string $data)
     {
         $this->consoleOutput->write($data);
     }
@@ -57,22 +57,22 @@ class ShellDispatcher
      */
     public function start()
     {
-        $this->stdout("\033[2J\033[;H"); // clear screen
-        $this->stdout("<blue>OriginPHP Shell v1.0</blue>\n\n");
+        $this->out("\033[2J\033[;H"); // clear screen
+        $this->out("<blue>OriginPHP Shell v1.0</blue>\n\n");
 
-        $this->stdout("\033[37m"); // Set all text to white
+        $this->out("\033[37m"); // Set all text to white
 
         $shell = array_shift($this->args);
         if ($shell == false) {
-            $this->stdout("Usage: console <yellow>shell</yellow>\n");
-            $this->stdout("       console <yellow>shell command</yellow>\n");
-            $this->stdout("\033[0m\n"); // Reset
+            $this->out("Usage: console <yellow>shell</yellow>\n");
+            $this->out("       console <yellow>shell command</yellow>\n");
+            $this->out("\033[0m\n"); // Reset
             return false;
         }
 
         $object = $this->dispatch($shell);
 
-        $this->stdout("\033[0m\n"); // Reset
+        $this->out("\033[0m\n"); // Reset
     }
 
     /**
