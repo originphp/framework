@@ -516,6 +516,16 @@ class Model
         return $options;
     }
 
+    /**
+     * Sets the validation rule/s
+     *
+     * $this->validate('first_name',['rule'=>'notBlank']);
+     * $this->validate($validationRules);
+     *
+     * @param string/array $field
+     * @param array $options
+     * @return void
+     */
     public function validate($field, array $options = [])
     {
         if (is_array($field)) {
