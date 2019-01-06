@@ -58,9 +58,11 @@ if (file_exists(CONFIG.DS.'email.php')) {
     require CONFIG.DS.'email.php';
 }
 
-use Origin\Core\ErrorHandler;
-
-$ErrorHandler = new ErrorHandler();
+if (php_sapi_name() === 'cli') {
+    $ErrorHandler = new Origin\Console\ErrorHandler();
+} else {
+    $ErrorHandler = new Origin\Core\ErrorHandler();
+}
 $ErrorHandler->register();
 
 require 'functions.php';
