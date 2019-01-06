@@ -52,7 +52,6 @@ class ShellDispatcher
 
     /**
      * Starts the dispatcher process
-     *
      * @return void
      */
     public function start()

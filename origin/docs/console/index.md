@@ -55,3 +55,22 @@ There are three callbacks which a Shell use `initialize`,`startup` and `shutdown
      */
     public function shutdown(){}
 ````
+
+## Methods
+
+### Shell::out(string $message)
+
+This outputs text to the console
+
+### Shell::in(string $prompt,array $options=[],string $default)
+
+Ask the user for input.
+
+`$selection = $this->in('Do you want to continue', ['yes','no'], 'yes');`
+
+Will show the user, with the default option being yes. The default option is triggered when the user presses enter without
+entering any text.
+
+````
+Do you want to continue (yes/no) [yes]
+````

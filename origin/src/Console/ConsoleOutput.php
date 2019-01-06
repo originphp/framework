@@ -100,7 +100,7 @@ class ConsoleOutput
      */
     public function close()
     {
-        if ($this->stream) {
+        if (is_resoruce($this->stream)) {
             fclose($this->stream);
         }
     }
@@ -147,7 +147,7 @@ class ConsoleOutput
             }
         }
      
-        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0m\033[37m";
+        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0;37m";
     }
 
     /**
