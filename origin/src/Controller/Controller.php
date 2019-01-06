@@ -295,6 +295,14 @@ class Controller
         unset($this->componentRegistry);
     }
 
+    /**
+     * Loads the PaginatorComponent and passes the settings to it
+     *
+     * @param string $model name of the model
+     * @param array $settings the settings used by PaginatorComponent these are the same settings as in
+     * find query (fields, joins, order,limit, group, callbacks,recursive)
+     * @return array paginated records
+     */
     public function paginate(string $model = null, array $settings = [])
     {
         if ($model === null) {
