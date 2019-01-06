@@ -79,21 +79,62 @@ class ErrorHandler
         exit();
     }
 
+    /**
+     * Renders the cli exception. Initial version
+     * @todo refactor to clean up code
+     * @param Exception $exception
+     * @return void
+     */
     public function cliException($exception)
     {
-        $class = get_class($exception);
-        // Incase error is before function.php is loaded
-        if (function_exists('namespaceSplit')) {
-            list($namespace, $class) = namespaceSplit($class);
+        $debugger = new Debugger();
+        $debug = $debugger->exception($exception);
+      
+        
+        echo "\033[101m\033[97m {$debug['class']} \033[0;32m {$debug['message']}\033[037m\n\n";
+        
+        if (isset($debug['stackFrames'][0]['file'])) {
+            $file = str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
+            echo "\033[036m{$file} \033[043;37m {$debug['stackFrames'][0]['line']} \033[0;37m\n\n";
+            $contents = file($debug['stackFrames'][0]['file']);
+            $start = $debug['stackFrames'][0]['line'] - 5;
+            $end = $debug['stackFrames'][0]['line'] + 5;
+            foreach ($contents as $line => $data) {
+                if ($line >= $start and $line <= $end) {
+                    if ($line == $debug['stackFrames'][0]['line'] - 1) {
+                        $data = $this->highlight($data);
+                    }
+                    echo($line + 1) .' ' .  $data;
+                }
+            }
         }
-        echo $this->cliErrorAlert($class .
-      ': '.$exception->getMessage()).PHP_EOL.
-      'Line no:'.$exception->getLine().' of '.$exception->getFile().PHP_EOL.
-      $exception->getTraceAsString().PHP_EOL;
+
+        // Too much info to be displayed in screen
+        echo "\nPartial Stack trace\n\n";
+        for ($i=1;$i<count($debug['stackFrames']);$i++) {
+            if ($i > 3) {
+                continue;
+            }
+            $class = '';
+            if ($debug['stackFrames'][$i]['class']) {
+                $class = $debug['stackFrames'][$i]['class'] .' ';
+            }
+
+            echo "\033[036m{$class}{$debug['stackFrames'][$i]['function']}\033[037m\n";
+            if ($debug['stackFrames'][$i]['file']) {
+                $file = str_replace(ROOT . DS, '', $debug['stackFrames'][$i]['file']);
+                echo "{$file} \033[043m {$debug['stackFrames'][$i]['line']} \033[0;37m\n\n";
+            } else {
+                echo "\n";
+            }
+        }
+     
+
+        echo "\n\033[0m";
     }
 
-    private function cliErrorAlert($string)
+    public function highlight($string)
     {
-        return "\033[101m\033[97m{$string}\033[0m";
+        return "\033[101m\033[97m{$string}\033[0;37m";
     }
 }
