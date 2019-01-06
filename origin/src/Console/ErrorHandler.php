@@ -74,9 +74,11 @@ class ErrorHandler
         $cyan = "\033[0;36m";
         $reset = "\033[0;37m";
         $green = "\033[0;32m";
-
+ 
         $output = "{$redBackground} {$class} {$reset}{$yellow} {$message} {$reset}\n\n";
-    
+        
+        $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
+
         // Code Preview
         if (isset($stackFrames[0]['file'])) {
             $output .= $cyan . $this->shortenPath($stackFrames[0]['file']). " {$yellowBackground} {$stackFrames[0]['line']} {$reset}\n\n";
@@ -96,8 +98,8 @@ class ErrorHandler
         // Show Partial Stack Trace
         $output .="\n{$blueBackground} Stack trace {$reset}\n\n";
         foreach ($stackFrames as $i => $stackFrame) {
-            if ($i > 3) {
-                break;
+            if ($i== 0 or $i > 3 and !$fullBacktrace) {
+                continue;
             }
             $class = $stackFrame['class']?$stackFrame['class'] .' ':'';
             $output .= "{$cyan}{$class}{$reset}{$green}{$stackFrame['function']}{$reset}\n";
@@ -107,7 +109,9 @@ class ErrorHandler
                 $output .=  "\n";
             }
         }
-  
+        if ($fullBacktrace == false) {
+            $output .= "{$yellow}Use -backtrace to see the full backtrace. {$reset}\n\n";
+        }
         echo $output . $reset;
     }
 
