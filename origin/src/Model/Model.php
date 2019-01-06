@@ -1059,8 +1059,8 @@ class Model
      * The R in CRUD.
      *
      * @param string $type  (first,all,count,list)
-     * @param array  $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     *
+     * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,recursive)
+
      * @return object $resultSet
      */
     public function find(string $type = 'first', $options = [])
@@ -1345,7 +1345,8 @@ class Model
                     if (empty($config['fields'])) {
                         $config['fields'] = $this->{$alias}->fields();
                     }
-                    $query['fields'] = array_merge($query['fields'], $config['fields']);
+                    // If throw an error, then it can be confusing to know source, so turn to array
+                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
                 }
             }
         }
