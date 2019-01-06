@@ -126,15 +126,20 @@ class Shell
      */
     public function in(string $prompt, array $options=[], string $default = null)
     {
-        $input = '';
+        $input =  $defaultString = '';
         $optionsString = implode('/', $options);
         if ($default) {
             $defaultString = "[{$default}]";
         }
        
-       
+        // Check both uppercase and lower case input
+        $options = array_merge(
+            array_map('strtolower', $options),
+            array_map('strtoupper', $options)
+        );
+
         while ($input === '' || !in_array($input, $options)) {
-            $this->out("<info>{$prompt}</info> ({$optionsString}) {$defaultString}");
+            $this->out("<prompt>{$prompt}</prompt> ({$optionsString}) {$defaultString}");
             $input = $this->consoleInput->read();
             if ($input === '' and $default) {
                 return $default;

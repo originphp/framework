@@ -54,11 +54,12 @@ class ConsoleOutput
     );
 
     protected $styles = array(
-      'primary' => array('text' => 'blue','bold' => true),
-      'success' => array('text' => 'green','bold' => true),
-      'danger' => array('text' => 'red','bold' => true),
-      'info' => array('text' => 'cyan','bold' => true),
-      'warning' => array('text' => 'yellow','bold' => true),
+      'primary' => array('text' => 'white','background'=>'blue','bold' => true),
+      'success' => array('text' =>'white', 'background' => 'green','bold' => true),
+      'danger' => array('text' => 'white','background'=>'red','bold' => true),
+      'info' => array('text' => 'white','background' => 'cyan','bold' => true),
+      'warning' => array('text' => 'white','background' => 'yellow','bold' => true),
+      'prompt' => array('text' => 'cyan'),
       'green' => array('text' => 'green'),
       'blue' => array('text' => 'blue'),
       'yellow' => array('text' => 'yellow'),
@@ -100,7 +101,7 @@ class ConsoleOutput
      */
     public function close()
     {
-        if (is_resoruce($this->stream)) {
+        if (is_resource($this->stream)) {
             fclose($this->stream);
         }
     }
