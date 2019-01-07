@@ -396,6 +396,23 @@ class Datasource
     }
 
     /**
+     * Gets a list of tables for the datasource
+     *
+     * @return void
+     */
+    public function tables()
+    {
+        $tables = [];
+        if ($this->execute('SHOW TABLES;')) {
+            $result = $this->fetchAll();
+            foreach ($result as $value) {
+                $tables[] = current($value);
+            }
+        }
+        return $tables;
+    }
+
+    /**
      * Inserts a row into the database.
      *
      * @param string $table
