@@ -25,11 +25,12 @@ class Request
      * @var array
      */
     public $params = array(
-    'controller' => null,
+        'controller' => null,
         'action' => null,
-    'pass' => array(),
+        'pass' => array(),
         'named' => array(),
-    'plugin' => null,
+        'plugin' => null,
+        'route' => null
     );
 
     /**

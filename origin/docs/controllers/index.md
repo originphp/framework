@@ -6,8 +6,7 @@ Your application controllers will extend the `AppController`.
 
 ## Creating your own controller
 
-When you create a controller, the name should be in plural camel case and it needs to end with Controller. Controller files are placed
-in the `Controller` directory of your app.
+When you create a controller, the name should be in plural camel case and it needs to end with Controller. Controller files are placed in the `Controller` directory of your app.
 
 ````php
 
@@ -22,9 +21,77 @@ class BookmarksController extends AppController {
 
 ````
 
-You can access the model for the controller, by using `$this->Bookmark`. If you want to use a different models in your controller, then you will need to load each model that you want to use with the `$this->loadModel($model)` method.
+You can access the model for the controller, by using `$this->Bookmark`. If you want to use a different models in your controller, then you will need to load each model that you want to use the `loadModel` method.
 
-## Callbacks 
+## Request
+
+Request data can be accessed via the Request object. This is available in the controller.
+
+
+```php
+  class BookmarksController extends AppController {
+
+    public function index(){
+      $requestData = $this->request->data;
+    }
+  }
+
+```
+
+What you can access through 
+
+- `params` This is an array of params for the request
+  - `controller` this tells you the controller name, e.g. Bookmarks
+  - `action` this is the action (method) which will be called. e.g. index
+  - `pass` these are the passed arguments. so a request of */bookmarks/view/10* would result in an array of *[10]*
+  - `named` this is an array of named params if they are passed, with the array index by key. e.g. */bookmarks/index/sort:any* would result in an array of *['sort'=>'any']*
+
+  - `route` this is is the matched route for the current request, this can be useful in debugging situations. e.g. */:controller/:action/*.
+
+  - `plugin` this is the plugin name, default is `null`. 
+- `query` This is array of query parameters parsed from the query string, */bookmarks/index?sort=title* and will result in an array of  *['sort'=>'title']*
+- `data` this is the post data
+
+### Request Methods
+
+#### Request::is(string|array $type)
+
+You can check if a request of is a certain type `get`,`post`,`put` or`delete`
+
+```php
+  class BookmarksController extends AppController {
+
+    public function index(){
+      if($this->request->is(['post','put'])){
+        ...
+      }
+    }
+  }
+
+```
+#### Request::allowMethod(string|array $type)
+
+You can also restrict methods to being run by using `allowMethod`. If the request type does not
+match then an `MethodNotAllowedException` will be thrown.
+
+
+
+```php
+  class BookmarksController extends AppController {
+
+    public function delete(){
+
+      $this->request->allowMethod(['post', 'delete']);
+      ...
+    }
+  }
+
+```
+
+
+
+Query paramaters 
+
 
 ## Callbacks 
 
