@@ -15,6 +15,7 @@
 namespace Origin\Console;
 
 use Origin\Core\Debugger;
+use Origin\Console\ConsoleOutput;
 
 /**
  * This is the error handler for Console
@@ -22,6 +23,7 @@ use Origin\Core\Debugger;
 
 class ErrorHandler
 {
+    protected $consoleOutput = null;
 
     /**
      * Registers the Error and Exception Handling.
@@ -55,6 +57,44 @@ class ErrorHandler
         return $this->exception($exception);
     }
 
+    protected $colourStyles = [
+        'redBackground' => ['text' => 'white','background'=>'lightRed'],
+        'yellowBackground' => ['text' => 'white','background'=>'lightYellow'],
+        'blueBackground' => ['text' => 'white','background'=>'blue'],
+        'yellow' => ['text'=>'lightYellow']
+    ];
+
+    /**
+     * Creates or gets the console output object
+     *
+     * @return void
+     */
+    protected function consoleOutput()
+    {
+        $ConsoleOutput = new ConsoleOutput();
+        foreach ($this->colourStyles as $name => $options) {
+            $ConsoleOutput->styles($name, $options);
+        }
+        return $ConsoleOutput;
+    }
+
+    /**
+     * Outputs the text using the console output object
+     *
+     * @param string $message
+     * @param boolean $newLine
+     * @return void
+     */
+    protected function out(string $message, $newLine = true)
+    {
+        if ($this->consoleOutput === null) {
+            $this->consoleOutput = $this->consoleOutput();
+        }
+        if ($newLine) {
+            $message .= "\n";
+        }
+        return $this->consoleOutput->write($message);
+    }
     /**
      * Renders the cli exception. Initial version.
      * @todo refactor to clean up code
@@ -65,54 +105,49 @@ class ErrorHandler
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
-        
+    
         extract($debug); // Make vars shorte
-        $redBackground = "\033[0;101;97m";
-        $yellowBackground = "\033[0;103;97m";
-        $blueBackground = "\033[0;44m";
-        $yellow = "\033[0;33m";
-        $cyan = "\033[0;36m";
-        $reset = "\033[0;37m";
-        $green = "\033[0;32m";
- 
-        $output = "{$redBackground} {$class} {$reset}{$yellow} {$message} {$reset}\n\n";
-        
+     
+       
+        $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
         $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
 
         // Code Preview
         if (isset($stackFrames[0]['file'])) {
-            $output .= $cyan . $this->shortenPath($stackFrames[0]['file']). " {$yellowBackground} {$stackFrames[0]['line']} {$reset}\n\n";
+            $this->out("<cyan>". $this->shortenPath($stackFrames[0]['file'])."</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");
 
             $contents = file($debug['stackFrames'][0]['file']);
-            $on = $debug['stackFrames'][0]['line'];
- 
+            $on = $debug['stackFrames'][0]['line'] - 1;
+            $codeBlock = "";
             foreach ($contents as $line => $data) {
                 if ($line >= ($on-5) and $line <= ($on+5)) {
-                    if ($line == $debug['stackFrames'][0]['line'] - 1) {
-                        $data = "{$redBackground}{$data}{$reset}";
+                    $data = rtrim($data);
+                    if ($line == $on) {
+                        $data = "<redBackground>{$data}</redBackground>";
+                    } else {
+                        $data = "<white>{$data}</white>";
                     }
-                    $output .= ($line + 1) . ' ' .  $data;
+                    $this->out('<blue>' .($line + 1) . '</blue> ' .  $data);
                 }
             }
         }
+
         // Show Partial Stack Trace
-        $output .="\n{$blueBackground} Stack trace {$reset}\n\n";
+        $this->out("\n<blueBackground> Stack Trace </blueBackground>");
         foreach ($stackFrames as $i => $stackFrame) {
             if ($i== 0 or $i > 3 and !$fullBacktrace) {
                 continue;
             }
             $class = $stackFrame['class']?$stackFrame['class'] .' ':'';
-            $output .= "{$cyan}{$class}{$reset}{$green}{$stackFrame['function']}{$reset}\n";
+            $this->out("\n<cyan>{$class}</cyan><green>{$stackFrame['function']}</green>");
+         
             if ($stackFrame['file']) {
-                $output .=  $this->shortenPath($stackFrame['file']) . " {$yellowBackground}{$stackFrame['line']}{$reset}\n\n";
-            } else {
-                $output .=  "\n";
+                $this->out("<white>".$this->shortenPath($stackFrame['file']). "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
             }
         }
-        if ($fullBacktrace == false) {
-            $output .= "{$yellow}Use -backtrace to see the full backtrace. {$reset}\n\n";
+        if ($fullBacktrace === false and $i > 3) {
+            $this->out("\n<yellow>Use -backtrace to see the full backtrace.</yellow>\n");
         }
-        echo $output . $reset;
     }
 
     /**
