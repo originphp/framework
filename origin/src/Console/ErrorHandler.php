@@ -108,7 +108,6 @@ class ErrorHandler
     
         extract($debug); // Make vars shorte
      
-       
         $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
         $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
 
@@ -135,7 +134,7 @@ class ErrorHandler
         // Show Partial Stack Trace
         $this->out("\n<blueBackground> Stack Trace </blueBackground>");
         foreach ($stackFrames as $i => $stackFrame) {
-            if ($i== 0 or $i > 3 and !$fullBacktrace) {
+            if ($i > 2 and !$fullBacktrace) {
                 continue;
             }
             $class = $stackFrame['class']?$stackFrame['class'] .' ':'';
