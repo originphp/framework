@@ -25,6 +25,7 @@ class ConsoleOutput
 
 
     protected $foregroundColors = array(
+        'default' => 39,
         'black' => 30,
         'red' => 31,
         'green' => 32,
@@ -32,10 +33,20 @@ class ConsoleOutput
         'blue' => 34,
         'magenta' => 35,
         'cyan' => 36,
-        'white' => 37
+        'lightGrey' => 37,
+        'darkGrey' => 90,
+        'lightRed' => 91,
+        'lightGreen' => 92,
+        'lightYellow' => 93,
+        'lightBlue' => 94,
+        'lightMagenta' => 95,
+        'lightCyan' => 96,
+        'white' => 97
+
     );
 
     protected $backgroundColors = array(
+        'default' => 49,
         'black' => 40,
         'red' => 41,
         'green' => 42,
@@ -43,10 +54,19 @@ class ConsoleOutput
         'blue' => 44,
         'magenta' => 45,
         'cyan' => 46,
-        'white' => 47
+        'lightGrey' => 37,
+        'darkGrey' => 100,
+        'lightRed' => 101,
+        'lightGreen' => 102,
+        'lightYellow' => 103,
+        'lightBlue' => 104,
+        'lightMagenta' => 105,
+        'lightCyan' => 106,
+        'white' => 107
     );
 
     protected $options = array(
+        'reset' => 0, // reset all
         'bold' => 1,
         'underline' => 4,
         'blink' => 5,
@@ -64,7 +84,9 @@ class ConsoleOutput
       'blue' => array('text' => 'blue'),
       'yellow' => array('text' => 'yellow'),
       'red' => array('text' => 'red'),
-      'white' => array('text' => 'white')
+      'white' => array('text' => 'white'),
+      'magenta' => array('text'=>'magenta'),
+      'cyan' => array('text'=>'cyan')
     );
 
 
@@ -107,13 +129,13 @@ class ConsoleOutput
     }
 
     /**
-    * Parses tags in text with ansi stuff
+    * Fromats the text by parsing tags
     * @param  string $string text
     * @return string        text
     */
-    protected function parseTags($string)
+    public function parseTags($string)
     {
-        if (preg_match_all('/<([a-z0-9-_]+)>(.*?)<\/([a-z0-9-_]+)>/', $string, $matches)) {
+        if (preg_match_all('/<([a-z0-9-_]+)>(.*?)<\/([a-z0-9-_]+)>/i', $string, $matches)) {
             foreach ($matches[1] as $key => $tag) {
                 $text = $matches[2][$key];
 
@@ -125,7 +147,7 @@ class ConsoleOutput
     }
 
     /**
-     * Generates the styled string
+     * Generates the styled ansi string
      */
     protected function style($tag, $text)
     {
@@ -148,18 +170,27 @@ class ConsoleOutput
             }
         }
      
-        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0;37m";
+        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0m";
     }
 
     /**
-     * Add a new style
+     * Sets or gets styles
      *
      * @param string $name
      * @param array $values text,background,bold,underline,blink
      * @return void
      */
-    public function styles(string $name, array $values = [])
+    public function styles(string $name =null, array $values = null)
     {
+        if ($name === null) {
+            return $this->styles;
+        }
+        if ($values === null) {
+            if (isset($this->styles[$name])) {
+                return $this->styles[$name];
+            }
+            return null;
+        }
         $this->styles[$name] = $values;
     }
 }
