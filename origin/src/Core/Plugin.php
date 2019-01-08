@@ -14,11 +14,39 @@
 
 namespace Origin\Core;
 
+use Origin\Core\Exception\MissingPluginException;
+
 class Plugin
 {
+    /**
+     * Loaded plugins are stored here
+     *
+     * @var array
+     */
     protected static $loaded = array();
 
+    /**
+     * Holds an Autoloader object
+     *
+     * @var Autoloader
+     */
     protected static $autoloader = null;
+
+    /**
+     * Checks if a plugin is loaded or returns a list of all loaded plugin
+     *
+     * @param string|null $plugin
+     * @return bool|array
+     */
+    public static function loaded(string $plugin = null)
+    {
+        if ($plugin) {
+            return static::$loaded[$plugin];
+        }
+        $loaded = array_keys(static::$loaded);
+        sort($loaded);
+        return $loaded;
+    }
 
     public static function load(string $plugin, array $options = array())
     {
@@ -34,17 +62,21 @@ class Plugin
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
         }
-        if (empty(self::$autoloader)) {
-            self::$autoloader = new Autoloader(ROOT);
-            self::$autoloader->register();
+      
+        /**
+         * Create Autoloader object for plugins
+         */
+        if (empty(static::$autoloader)) {
+            static::$autoloader = new Autoloader(ROOT);
+            static::$autoloader->register();
         }
 
-        self::$autoloader->addNamespaces(array(
+        static::$autoloader->addNamespaces(array(
           $plugin => 'plugins/'.Inflector::underscore($plugin).'/src',
            "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
     ));
 
-        self::$loaded[$plugin] = $options;
+        static::$loaded[$plugin] = $options;
     }
 
     /**
@@ -52,7 +84,7 @@ class Plugin
      */
     public static function loadRoutes()
     {
-        foreach (self::$loaded as $plugin) {
+        foreach (static::$loaded as $plugin) {
             $routesFilename = $plugin['path'].DS.'config'.DS.'routes.php';
             if ($plugin['routes'] and file_exists($routesFilename)) {
                 include $routesFilename;
