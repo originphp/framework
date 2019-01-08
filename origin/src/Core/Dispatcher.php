@@ -40,13 +40,15 @@ class Dispatcher
         if ($request->params) {
             $class = $request->params['controller'].'Controller';
 
-            $namespace = Configure::read('App.namespace');
-            $class = $namespace.'\Controller\\'.$class;
+            
 
             if ($request->params['plugin']) {
                 $class = $request->params['plugin'].'\Controller\\'.$class;
+            } else {
+                $namespace = Configure::read('App.namespace');
+                $class = $namespace.'\Controller\\'.$class;
             }
-
+      
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params['controller']);
             }
