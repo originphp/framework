@@ -27,11 +27,11 @@ class BookmarksController extends AppController
             $bookmark = $this->Bookmark->newEntity($this->request->data);
             $bookmark->user_id = $this->Auth->user('id');
             if ($this->Bookmark->save($bookmark)) {
-                $this->Flash->success('Your bookmark has been created.');
+                $this->Flash->success(__('Your bookmark has been created.'));
 
                 return $this->redirect(['action' => 'view', $this->Bookmark->id]);
             }
-            $this->Flash->error('Your bookmark could not be saved');
+            $this->Flash->error(__('Your bookmark could not be saved'));
         }
 
         $users = $this->Bookmark->User->find('list');
@@ -50,12 +50,12 @@ class BookmarksController extends AppController
             $bookmark->id = $id;
 
             if ($this->Bookmark->save($bookmark)) {
-                $this->Flash->success('Your bookmark has been updated.');
+                $this->Flash->success(__('Your bookmark has been updated.'));
 
                 return $this->redirect(['action' => 'view', $this->Bookmark->id]);
             }
 
-            $this->Flash->error('Your bookmark could not be saved');
+            $this->Flash->error(__('Your bookmark could not be saved'));
         }
 
         $users = $this->Bookmark->User->find('list');
