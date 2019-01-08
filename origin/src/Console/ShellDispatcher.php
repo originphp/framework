@@ -16,9 +16,12 @@ namespace Origin\Console;
 
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
-use Origin\Core\Inflector;
 use Origin\Console\Exception\MissingShellException;
 use Origin\Console\Exception\MissingShellMethodException;
+
+use Origin\Core\Configure;
+use Origin\Core\Inflector;
+use Origin\Core\Plugin;
 use Origin\Core\Resolver;
 
 class ShellDispatcher
@@ -59,13 +62,26 @@ class ShellDispatcher
         $this->out("\033[2J\033[;H"); // clear screen
         $this->out("<blue>OriginPHP Shell v1.0</blue>\n\n");
 
-        $this->out("\033[37m"); // Set all text to white
+        //$this->out("\033[97m");
 
         $shell = array_shift($this->args);
         if ($shell == false) {
             $this->out("Usage: console <yellow>shell</yellow>\n");
             $this->out("       console <yellow>shell command</yellow>\n");
             $this->out("\033[0m\n"); // Reset
+            $shells = $this->getShellList();
+            if ($shells) {
+                $this->out("Available Shells:\n");
+                foreach ($shells as $namespace => $commands) {
+                    if ($commands) {
+                        $this->out("\n<white>{$namespace}</white>\n");
+                        foreach ($commands as $command) {
+                            $this->out("<cyan>{$command}</cyan>\n");
+                        }
+                    }
+                }
+                $this->out("\n");
+            }
             return false;
         }
 
@@ -83,14 +99,32 @@ class ShellDispatcher
     protected function dispatch(string $shell)
     {
         list($plugin, $class) = pluginSplit($shell);
+        $base = '';
 
-        $base = 'App\Console\\';
-        if ($plugin) {
+        if ($plugin === null) {
+            $shells = $this->getShellList();
+            if (in_array($shell, $shells['App'])) {
+                $base = Configure::read('App.namespace') .'\Console\\';
+            } elseif (in_array($shell, $shells['Core'])) {
+                $base = 'Origin\Console\\';
+            } else {
+                // Search Plugins
+                foreach ($shells as $plugin => $commands) {
+                    if ($plugin === 'App' or $plugin ==='Core') {
+                        continue;
+                    }
+                    if (in_array($shell, $commands)) {
+                        $base = $plugin . '\Console\\';
+                        break;
+                    }
+                }
+            }
+        } else {
             $base = Inflector::camelize($plugin) .'\Console\\';
         }
+
         $class = Inflector::camelize($class) . 'Shell';
         if (!class_exists($base . $class)) {
-            $base = 'Origin\Console\\';
             if (!class_exists($base . $class)) {
                 throw new MissingShellException($class);
             }
@@ -125,6 +159,48 @@ class ShellDispatcher
             throw new MissingShellMethodException([$class,$method]);
         }
         return $shell;
+    }
+
+    /**
+     * Gets a list of available shells
+     *
+     * @return void
+     */
+    protected function getShellList()
+    {
+        $shells = [];
+        $shells['App'] = $this->scandir(SRC . DS . 'Console');
+        $shells['Core'] = $this->scandir(ORIGIN . DS. 'src' . DS . 'Console');
+
+        $plugins = Plugin::loaded();
+        foreach ($plugins as $plugin) {
+            $shells[$plugin] = $this->scandir(ROOT . DS . 'plugins' . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Console');
+        }
+        
+        return $shells;
+    }
+
+    /**
+     * Scans a directory for Shellsxx
+     *
+     * @param string $folder
+     * @return void
+     */
+    protected function scandir(string $folder)
+    {
+        $ignore = ['Shell.php','AppShell.php'];
+        $result = [];
+     
+        if (file_exists($folder)) {
+            $files = scandir($folder);
+            foreach ($files as $file) {
+                if (substr($file, -9) === 'Shell.php' and !in_array($file, $ignore)) {
+                    $result[] = Inflector::underscore(substr($file, 0, -9));
+                }
+            }
+        }
+        
+        return $result;
     }
     
     /**
