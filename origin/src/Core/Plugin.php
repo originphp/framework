@@ -16,6 +16,11 @@ namespace Origin\Core;
 
 use Origin\Core\Exception\MissingPluginException;
 
+/**
+ * For each plugin you will need to setup config/routes.php
+ * Router::add('/demo/:controller/:action/*', ['plugin'=>'Demo']);
+ */
+
 class Plugin
 {
     /**
@@ -67,15 +72,14 @@ class Plugin
          * Create Autoloader object for plugins
          */
         if (empty(static::$autoloader)) {
-            static::$autoloader = new Autoloader(ROOT);
-            static::$autoloader->register();
+            static::$autoloader = Autoloader::init();
         }
-
+      
         static::$autoloader->addNamespaces(array(
           $plugin => 'plugins/'.Inflector::underscore($plugin).'/src',
            "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
-    ));
-
+        ));
+        
         static::$loaded[$plugin] = $options;
     }
 
