@@ -117,11 +117,11 @@ class ErrorHandler
 
             $contents = file($debug['stackFrames'][0]['file']);
             $on = $debug['stackFrames'][0]['line'] - 1;
-            $codeBlock = "";
+
             foreach ($contents as $line => $data) {
                 if ($line >= ($on-5) and $line <= ($on+5)) {
                     $data = rtrim($data);
-                    if ($line == $on) {
+                    if ($line === $on) {
                         $data = "<redBackground>{$data}</redBackground>";
                     } else {
                         $data = "<white>{$data}</white>";
