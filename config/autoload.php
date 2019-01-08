@@ -20,7 +20,9 @@
 
 use Origin\Core\Autoloader;
 
-$Autoloader = new Autoloader(ROOT);
+$Autoloader = Autoloader::init();
+$Autoloader->setFolder(ROOT);
+
 $Autoloader->addNamespaces([
     'App' => 'src',
     'Origin' => 'origin/src',

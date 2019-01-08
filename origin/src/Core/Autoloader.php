@@ -15,7 +15,10 @@
 /**
  *  namespace Origin\Core;
  *  require ORIGIN . DS . 'src' . DS .'Core' .DS .'Autoloader.php';
- *  $Autoloader = new Autoloader($projectDirectory);.
+ *  $Autoloader = new Autoloader($projectDirectory);
+ *  or
+ *  $Autoloader = Autoloader::init();
+ *  $Autoloader->setFolder(ROOT);
  *
  * Tell the Autoloader where to find files for namespaces that you will use.
  *
@@ -34,6 +37,7 @@ use RecursiveIteratorIterator;
 
 class Autoloader
 {
+    protected static $instance;
     /**
      * Map of prefixes.
      *
@@ -42,13 +46,39 @@ class Autoloader
     protected $prefixes = array();
 
     /**
+     * Returns a single instance of the object
+     *
+     * @return void
+     */
+    public static function init()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
+
+    /**
      * Project diretory
      *
      * @var string
      */
     protected $directory = null;
 
-    public function __construct(string $directory)
+    public function __construct(string $directory = null)
+    {
+        if ($directory) {
+            $this->directory = $directory;
+        }
+    }
+
+    /**
+     * Sets the folder
+     *
+     * @param string $directory
+     * @return void
+     */
+    public function setFolder(string $directory)
     {
         $this->directory = $directory;
     }
@@ -105,7 +135,7 @@ class Autoloader
     public function load(string $class)
     {
         $prefix = $class;
-
+    
         // Deal with Namespaces
         while (false !== $pos = strrpos($prefix, '\\')) {
             $prefix = substr($class, 0, $pos + 1);

@@ -44,8 +44,9 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->autoloader = new MockAutoloader(ROOT);
-
+        $this->autoloader = new MockAutoloader();
+        $this->autoloader->setFolder(ROOT);
+        
         $this->autoloader->setFiles(array(
             ROOT.'/src/Autoloader.php',
             ROOT.'/src/Network/Socket.php',
