@@ -63,15 +63,18 @@ class Task
         }
     }
     /**
-    * Sets another Task to be loaded within this Task
+     * Sets another Task to be loaded within this Task. Tasks here
+     * will be lazy loaded when needed. Startup/shutdown callbacks
+     * will not be called for tasks loaded within tasks.
      *
      * @param string $task
      * @param array $config
      * @return void
      */
-    public function loadTask(string $task, array $config = [])
+    public function loadTask(string $name, array $config = [])
     {
-        $config = array_merge(['className' => $task.'Task'], $config);
+        list($plugin, $task) = pluginSplit($name); // split so we can name properly
+        $config = array_merge(['className' => $name . 'Task'], $config);
         $this->_tasks[$task] = $config;
     }
 

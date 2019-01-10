@@ -57,7 +57,7 @@ class Component
     {
         if (isset($this->_components[$name])) {
             $this->{$name} = $this->componentRegistry()->load($name, $this->_components[$name]);
-       
+            
             if (isset($this->{$name})) {
                 return $this->{$name};
             }
@@ -65,15 +65,18 @@ class Component
     }
 
     /**
-    * Sets another component to be loaded within this component
+    * Sets another component to be loaded within this component. It will be
+    * lazy loaded when needed, startup/stutdown callbacks will not be called when loading
+    * components within components.
     *
     * @param string $component e.g Auth, Flash
     * @param array $config
     * @return void
     */
-    public function loadComponent(string $component, array $config = [])
+    public function loadComponent(string $name, array $config = [])
     {
-        $config = array_merge(['className' => $component.'Component'], $config);
+        list($plugin, $component) = pluginSplit($name);
+        $config = array_merge(['className' => $name . 'Component'], $config);
         $this->_components[$component] = $config;
     }
 

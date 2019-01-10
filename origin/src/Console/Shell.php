@@ -178,8 +178,10 @@ class Shell
      */
     public function loadTask(string $name, array $config = [])
     {
-        $config = array_merge(['className' => $name.'Task'], $config);
-        $this->{$name} = $this->taskRegistry()->load($name, $config);
+        list($plugin, $task) = pluginSplit($name); // split so we can name properly
+        $config = array_merge(['className' => $name . 'Task'], $config);
+        $this->{$task} = $this->taskRegistry()->load($name, $config);
+        return $this->{$task};
     }
 
     /**

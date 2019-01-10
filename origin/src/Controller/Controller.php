@@ -172,8 +172,10 @@ class Controller
      */
     public function loadComponent(string $name, array $config = [])
     {
+        list($plugin, $component) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Component'], $config);
-        $this->{$name} = $this->componentRegistry()->load($name, $config);
+        $this->{$component} = $this->componentRegistry()->load($name, $config);
+        return $this->{$component};
     }
 
     /**
@@ -184,8 +186,9 @@ class Controller
      */
     public function loadHelper(string $name, array $config = [])
     {
+        list($plugin, $helper) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Helper'], $config);
-        $this->viewHelpers[$name] = $config;
+        $this->viewHelpers[$helper] = $config;
     }
 
     /**

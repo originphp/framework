@@ -317,11 +317,19 @@ class Model
     {
         return $this->behaviorRegistry;
     }
+    /**
+     * Loads a model behavior
+     *
+     * @param string $name
+     * @param array $config
+     * @return void
+     */
     public function loadBehavior(string $name, array $config = [])
     {
+        list($plugin, $behavior) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Behavior'], $config);
-
-        $this->{$name} = $this->behaviorRegistry()->load($name, $config);
+        $this->{$behavior} = $this->behaviorRegistry()->load($name, $config);
+        return $this->{$behavior};
     }
 
     /**
