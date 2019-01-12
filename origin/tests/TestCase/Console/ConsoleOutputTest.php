@@ -14,7 +14,6 @@
 
 namespace Origin\Test\Console;
 
-use Origin\Test\Console;
 use Origin\Console\ConsoleOutput;
 
 class MockConsoleOutput extends ConsoleOutput
