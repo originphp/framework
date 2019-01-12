@@ -71,6 +71,9 @@ class ErrorHandler
      */
     protected function consoleOutput()
     {
+        if ($this->consoleOutput) {
+            return $this->consoleOutput;
+        }
         $ConsoleOutput = new ConsoleOutput();
         foreach ($this->colourStyles as $name => $options) {
             $ConsoleOutput->styles($name, $options);
@@ -87,13 +90,10 @@ class ErrorHandler
      */
     protected function out(string $message, $newLine = true)
     {
-        if ($this->consoleOutput === null) {
-            $this->consoleOutput = $this->consoleOutput();
-        }
         if ($newLine) {
             $message .= "\n";
         }
-        return $this->consoleOutput->write($message);
+        return $this->consoleOutput()->write($message);
     }
     /**
      * Renders the cli exception. Initial version.
@@ -105,9 +105,8 @@ class ErrorHandler
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
-    
-        extract($debug); // Make vars shorte
-     
+        extract($debug);
+        
         $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
         $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
 
