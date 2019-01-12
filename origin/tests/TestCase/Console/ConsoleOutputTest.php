@@ -28,7 +28,7 @@ class MockConsoleOutput extends ConsoleOutput
     }
 }
 
-class ConsoleInputTest extends \PHPUnit\Framework\TestCase
+class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {

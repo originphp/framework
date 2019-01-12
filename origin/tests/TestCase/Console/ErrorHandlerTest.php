@@ -21,14 +21,14 @@ class MockErrorHandler extends ErrorHandler
 {
     public function setUp()
     {
-        $this->consoleOutput = new MockConsoleOutput();
+        $this->consoleOutput = new MockConsoleOutputErrorHandler();
     }
     public function read()
     {
         return $this->consoleOutput->read();
     }
 }
-class MockConsoleOutput
+class MockConsoleOutputErrorHandler
 {
     protected $buffer = '';
 

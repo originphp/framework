@@ -36,10 +36,10 @@ class ConsoleInputTest extends \PHPUnit\Framework\TestCase
     {
         $ConsoleInput = new MockConsoleInput();
         
-        fwrite(STDERR, 'Press Enter to continue');
+        fwrite(STDERR, 'Testing console input. Press Enter to continue');
         $this->assertEquals('', $ConsoleInput->read());
 
-        fwrite(STDERR, 'Press q to continue');
+        fwrite(STDERR, 'Press q then Enter');
         $this->assertEquals('q', $ConsoleInput->read());
     }
 
