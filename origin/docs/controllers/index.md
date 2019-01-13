@@ -25,7 +25,7 @@ You can access the model for the controller, by using `$this->Bookmark`. If you 
 
 ## Request
 
-Request data can be accessed via the Request object. This is available in the controller.
+Request data can be accessed via the Request object. This is available in the controller and the view.
 
 
 ```php

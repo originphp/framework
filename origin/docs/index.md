@@ -41,6 +41,21 @@ Each table in your database should have a primary key,and it should be named `id
 
 Dates,datetime,and time use the MySql field types of the same time. So the date format is `YYYY-MM-DD`.
 
+When accessing related models from a result (Entity), it is camel cased with the first letter in lower case. If it is `hasOne` or `belongsTo` then it is singular else if it is a `hasMany` or `hasAndBelongsToMany` then it is plural.
+
+
+````php
+
+foreach($users as $user){
+    $tags = $user->tags;
+    $userProfile = $user->userProfile; // hasOne or belongsTo
+    $emails = $user->sentEmails; // hasMany or hasAndBelongsToMany 
+
+}
+
+````
+
+
 ### View
 
 The view templates are in the `View` folder, and the folder name is plural camel cased, so for user profiles it would be `UserProfiles`, the templates
