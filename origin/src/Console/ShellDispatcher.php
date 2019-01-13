@@ -60,7 +60,7 @@ class ShellDispatcher
     public function start()
     {
         $this->out("\033[2J\033[;H"); // clear screen
-        $this->out("<blue>OriginPHP Shell v1.0</blue>\n\n");
+        $this->out("<blue>OriginPHP Console v1.0</blue>\n\n");
 
         //$this->out("\033[97m");
 
