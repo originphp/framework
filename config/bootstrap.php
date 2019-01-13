@@ -22,3 +22,4 @@ Configure::write('Session.timeout', 3600);
  * @example Plugin::load('ContactManager');
  */
 Plugin::load('Debug');
+Plugin::load('Make'); // This is for code gen you can remove
