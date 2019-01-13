@@ -27,3 +27,7 @@ For example if you only wanted to route for the posts controller.
 You can use the same to show a different controller in the url.
 
 `Router::add('/posts/:action/*',['controller'=>'BlogPosts']);`
+
+When you create and use plugins you will need to setup a route for this to work, again this quite straight forward. Lets say you created a demo plugin, this is how you would setup the route.
+
+`Router::add('/demo/:controller/:action/*', ['plugin'=>'Demo']);`
