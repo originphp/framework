@@ -17,6 +17,13 @@ namespace Origin\View;
 use Origin\Exception\Exception;
 
 /**
+ * Example
+ * USE Origin\View\Templater;
+ * $templater = new Templater(false);
+ * $result = $templater->format('Hello {name}!',['name'=>'James']);
+ */
+
+/**
  * This will also be used by Email,.
  */
 class Templater
@@ -26,7 +33,12 @@ class Templater
      *
      * @var bool
      */
-    public $allowBlanks = true;
+    protected $allowBlanks = null;
+
+    public function __construct(bool $allowBlanks = true)
+    {
+        $this->allowBlanks = $allowBlanks;
+    }
 
     public function format(string $template, array $data)
     {
