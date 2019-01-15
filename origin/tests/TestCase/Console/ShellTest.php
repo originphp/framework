@@ -22,6 +22,15 @@ use Origin\Model\ModelRegistry;
 
 class MockShell extends Shell
 {
+    public function publicMethod()
+    {
+    }
+    protected function protectedMethod()
+    {
+    }
+    private function privateMethod()
+    {
+    }
 }
 
 class MockModel
@@ -38,6 +47,20 @@ class MockTask extends Task
     public function shutdown()
     {
         $this->shell()->shutdownCalled = true;
+    }
+}
+
+class DummyConsoleInput extends ConsoleInput
+{
+    protected $result = null;
+
+    public function setResult($result = null)
+    {
+        $this->result = $result;
+    }
+    public function read()
+    {
+        return $this->result;
     }
 }
 
@@ -111,5 +134,28 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $shell->out('Hello World!');
         $this->assertEquals("Hello World!\n", file_get_contents(TMP . DS . 'shelltest.txt'));
+    }
+
+    public function testIn()
+    {
+        // Test result
+        $ConsoleInput = new DummyConsoleInput();
+        $ConsoleInput->setResult('y');
+        $shell = new MockShell(array(), $this->ConsoleOutput, $ConsoleInput);
+        $result = $shell->in('Enter a something', ['y','n']);
+        $this->assertEquals('y', $result);
+
+        // Test default
+        $ConsoleInput->setResult('');
+        $shell = new MockShell(array(), $this->ConsoleOutput, $ConsoleInput);
+        $result = $shell->in('Enter a something', ['y','n'], 'n');
+        $this->assertEquals('n', $result);
+    }
+    public function testIsAccessible()
+    {
+        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $this->assertTrue($shell->isAccessible('publicMethod'));
+        $this->assertFalse($shell->isAccessible('protectedMethod'));
+        $this->assertFalse($shell->isAccessible('privateMethod'));
     }
 }
