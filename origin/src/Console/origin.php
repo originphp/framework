@@ -14,8 +14,9 @@
 namespace Origin\Console;
 
 use Origin\Console\ShellDispatcher;
+use Origin\Console\ConsoleOutput;
 
 require  'origin/src/bootstrap.php';
 
-$Dispatcher = new ShellDispatcher($argv);
+$Dispatcher = new ShellDispatcher($argv, new ConsoleOutput());
 $Dispatcher->start();

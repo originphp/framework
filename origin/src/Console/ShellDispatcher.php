@@ -42,15 +42,31 @@ class ShellDispatcher
 
     protected $shell = null;
 
-    public function __construct(array $arguments =[])
+    public function __construct(array $arguments = [], ConsoleOutput $consoleOutput)
     {
-        $this->consoleOutput = new ConsoleOutput();
+        $this->consoleOutput = $consoleOutput;
         $this->args = array_slice($arguments, 1);
     }
 
+    /**
+     * Returns the ConsoleOutput object
+     *
+     * @return void
+     */
+    public function consoleOutput()
+    {
+        return $this->consoleOutput;
+    }
+
+    /**
+     * Outputs string to console
+     *
+     * @param string $data
+     * @return void
+     */
     public function out(string $data)
     {
-        $this->consoleOutput->write($data);
+        $this->consoleOutput()->write($data);
     }
 
     /**
@@ -62,32 +78,33 @@ class ShellDispatcher
         $this->out("\033[2J\033[;H"); // clear screen
         $this->out("<blue>OriginPHP Console v1.0</blue>\n\n");
 
-        //$this->out("\033[97m");
-
         $shell = array_shift($this->args);
-        if ($shell == false) {
-            $this->out("Usage: console <yellow>shell</yellow>\n");
-            $this->out("       console <yellow>shell command</yellow>\n");
-            $this->out("\033[0m\n"); // Reset
-            $shells = $this->getShellList();
-            if ($shells) {
-                $this->out("Available Shells:\n");
-                foreach ($shells as $namespace => $commands) {
-                    if ($commands) {
-                        $this->out("\n<white>{$namespace}</white>\n");
-                        foreach ($commands as $command) {
-                            $this->out("<cyan>{$command}</cyan>\n");
-                        }
-                    }
-                }
-                $this->out("\n");
-            }
-            return false;
+        if ($shell) {
+            return $this->dispatch($shell);
         }
 
-        $object = $this->dispatch($shell);
+        $this->showUsage();
+        return false;
+    }
 
+    protected function showUsage()
+    {
+        $this->out("Usage: console <yellow>shell</yellow>\n");
+        $this->out("       console <yellow>shell command</yellow>\n");
         $this->out("\033[0m\n"); // Reset
+        $shells = $this->getShellList();
+        if ($shells) {
+            $this->out("Available Shells:\n");
+            foreach ($shells as $namespace => $commands) {
+                if ($commands) {
+                    $this->out("\n<white>{$namespace}</white>\n");
+                    foreach ($commands as $command) {
+                        $this->out("<cyan>{$command}</cyan>\n");
+                    }
+                }
+            }
+            $this->out("\n");
+        }
     }
 
     /**
@@ -125,9 +142,7 @@ class ShellDispatcher
 
         $class = Inflector::camelize($class) . 'Shell';
         if (!class_exists($base . $class)) {
-            if (!class_exists($base . $class)) {
-                throw new MissingShellException($class);
-            }
+            throw new MissingShellException($class);
         }
 
         $className = $base . $class;
