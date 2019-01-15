@@ -48,15 +48,6 @@ class ErrorHandler
         }
     }
 
-    public function exceptionHandler($exception)
-    {
-        if (ob_get_length()) {
-            ob_end_clean();
-        }
-
-        return $this->exception($exception);
-    }
-
     protected $colourStyles = [
         'redBackground' => ['text' => 'white','background'=>'lightRed'],
         'yellowBackground' => ['text' => 'white','background'=>'lightYellow'],
@@ -101,8 +92,12 @@ class ErrorHandler
      * @param Exception $exception
      * @return void
      */
-    public function exception($exception)
+    public function exceptionHandler($exception)
     {
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
         extract($debug);
