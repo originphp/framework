@@ -64,13 +64,13 @@ array(
 
 ```
 
-**Fields** is an array of fields that you want to return in the query
+**fields** is an array of fields that you want to return in the query
 
-**Order** is either a string or an array of how you want the data to be ordered.
+**order** is either a string or an array of how you want the data to be ordered.
 
-**Group** is for the database group query results.
+**group** is for the database group query results.
 
-**Limit** this sets how many rows are returned.
+**limit** this sets how many rows are returned.
 
 **callbacks** - If this is set to true, before or after then it will call the model callbacks.
 
