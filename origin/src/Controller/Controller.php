@@ -315,7 +315,8 @@ class Controller
         $object = $this->loadModel($model);
 
         $this->loadComponent('Paginator');
-
+        $this->loadHelper('Paginator');
+        
         $defaults = $this->paginate;
         if (isset($this->paginate[$model])) {
             $defaults = $this->paginate[$model];
