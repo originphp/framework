@@ -159,10 +159,8 @@ class Entity
      */
     public function set($properties, $value = null)
     {
-        if (is_string($properties)) {
-            $this->_properties[$properties] = $value;
-
-            return $this;
+        if (is_array($properties) === false) {
+            $properties = [$properties => $value];
         }
 
         foreach ($properties as $key => $value) {

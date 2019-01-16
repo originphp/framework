@@ -110,16 +110,16 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Entity = $Marshaller->newEntity($data, ['name' => 'Article']);
 
         $requestData = array(
-      'title' => 'New Article Name',
-      'unkown' => 'insert data',
-      'author' => array(
-        'name' => 'Claire',
-      ),
-      'tags' => array(
-        array('tag' => 'published'),
-        array('tag' => 'top ten'),
-      ),
-    );
+        'title' => 'New Article Name',
+        'unkown' => 'insert data',
+        'author' => array(
+          'name' => 'Claire',
+        ),
+        'tags' => array(
+          array('tag' => 'published'),
+          array('tag' => 'top ten'),
+        ),
+      );
         $patchedEntity = $Marshaller->patchEntity($Entity, $requestData);
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);

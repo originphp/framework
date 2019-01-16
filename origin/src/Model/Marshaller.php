@@ -180,7 +180,9 @@ class Marshaller
     }
 
     /**
-     * Patches an entity. Still working on this. Currently favor new entity each time.
+     * Patches an entity. Still working on this. Currently favor new entity each time, as we are resaving
+     * all data. If keep track of dirty data, then primary keys need to be set, each model
+     * needs to be loaded.
      *
      * @param Entity $entity
      * @param array  $data
