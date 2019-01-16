@@ -15,8 +15,8 @@ To run an individual test:
 `phpunit TestCase/Core/AutoloaderTest.php`
 
 
-To generate the code coverage phpunit requires xdebug to be installed, however xdebug causes
-serious performance issues, so in the docker container it is installed but not enabled by default.
+PHPUnit code coverage generation requires xdebug to be installed, however xdebug causes
+serious performance issues, so in the docker container whilst it is installed it is not enabled by default.
 
 To generate the code coverage you need to first enable xdebug in the container by editing the PHP.ini file. In docker these changes will not be kept once you restart.
 
