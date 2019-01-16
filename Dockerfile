@@ -3,7 +3,7 @@
 # Copyright 2018 Jamiel Sharief.
 #
 # Licensed under The MIT License
-# substantial 
+# The above copyright notice and this permission notice shall be included in all copies or substantial
 # portions of the Software.
 #
 # @copyright    Copyright (c) Jamiel Sharief
