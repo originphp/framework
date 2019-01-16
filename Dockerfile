@@ -4,7 +4,7 @@
 #
 # Licensed under The MIT License
 # substantial 
- * portions of the Software.
+# portions of the Software.
 #
 # @copyright    Copyright (c) Jamiel Sharief
 # @link          https://www.originphp.com
