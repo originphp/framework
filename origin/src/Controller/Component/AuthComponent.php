@@ -77,13 +77,13 @@ class AuthComponent extends Component
     }
 
     /**
-     * Allow an array of actions.
+     * Allow action or actions to not need login
      *
-     * @param array $actions
+     * @param string|array $actions
      */
-    public function allow(array $actions)
+    public function allow($actions)
     {
-        $this->allowedActions = array_merge($this->allowedActions, $actions);
+        $this->allowedActions = array_merge($this->allowedActions, (array) $actions);
     }
 
     /**
