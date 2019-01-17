@@ -5,7 +5,7 @@ namespace App\Console;
 use App\Console\AppShell;
 use Origin\Exception\Exception;
 
-class BookmarkShell extends AppShell
+class BookmarksShell extends AppShell
 {
     private $files = [
         SRC . DS .  'Console' . DS  . 'BookmarksShell.php',
@@ -32,14 +32,18 @@ class BookmarkShell extends AppShell
         $this->out('');
         $this->help();
     }
-
+    /**
+     * Shows the help, commands are coloured using ConsoleOutput.
+     *
+     * @return void
+     */
     public function help()
     {
         $this->out('Avaliable commands:');
-        $this->out('help - shows this');
-        $this->out('list - lists all the bookmarks');
-        $this->out('uninstall - Deletes all the demo files and bookmarks');
-        $this->out('exception - throws an exception');
+        $this->out('<cyan>help</cyan> - shows this');
+        $this->out('<cyan>list</cyan> - lists all the bookmarks');
+        $this->out('<cyan>exception</cyan> - throws an exception');
+        $this->out('<cyan>delete</cyan> - Deletes all the demo files and bookmarks');
     }
 
     public function list()
@@ -61,7 +65,7 @@ class BookmarkShell extends AppShell
      *
      * @return void
      */
-    public function uninstall()
+    public function delete()
     {
         $this->out("The following files will deleted:");
         $this->out('');
