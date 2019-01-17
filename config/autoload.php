@@ -25,6 +25,7 @@ $Autoloader->setFolder(ROOT);
 
 $Autoloader->addNamespaces([
     'App' => 'src',
+    'App\\Test' => 'tests',
     'Origin' => 'origin/src',
     'Origin\\Test' => 'origin/tests'
 ]);
