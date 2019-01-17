@@ -36,6 +36,11 @@ class MockAutoloader extends Autoloader
     {
         return $this->prefixes[$prefix];
     }
+
+    public function getPrefixes()
+    {
+        return $this->prefixes;
+    }
 }
 
 class AutoloaderTest extends \PHPUnit\Framework\TestCase
@@ -44,8 +49,7 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->autoloader = new MockAutoloader();
-        $this->autoloader->setFolder(ROOT);
+        $this->autoloader = new MockAutoloader(ROOT);
         
         $this->autoloader->setFiles(array(
             ROOT.'/src/Autoloader.php',
@@ -89,9 +93,17 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expect, $actual);
     }
 
-    public function _testMissingFile()
+    public function testMissingFile()
     {
         $actual = $this->autoloader->load('No_Vendor\No_Package\NoClass');
         $this->assertFalse($actual);
+    }
+    public function testAddNamespaces()
+    {
+        $Autoloader = new MockAutoloader(ROOT);
+        $Autoloader->addNamespaces(['Origin'=> 'src']);
+    
+        $expected = ['Origin\\'=> ROOT  . '/src/'];
+        $this->assertEquals($expected, $Autoloader->getPrefixes());
     }
 }
