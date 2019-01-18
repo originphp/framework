@@ -34,6 +34,14 @@ class DebugBar
             return null;
         }
 
+        /**
+         * Don't Load in CLI (e.g. unit tests)
+         * @todo think how this should work
+         */
+        if (php_sapi_name() === 'cli') {
+            return;
+        }
+
         global $Dispatcher;
 
         $request = $Dispatcher->getRequest();
