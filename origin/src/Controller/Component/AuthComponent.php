@@ -116,13 +116,15 @@ class AuthComponent extends Component
     }
 
     /**
-     * This logs the user the in.
+     * This logs the user the in with any data provided it
+     * does not check credientials. User data is converted
+     * into an array to be stored in the session.
      *
      * @param Entity $user
      */
     public function setUser(Entity $user)
     {
-        Session::write('Auth.User', $user);
+        Session::write('Auth.User', $user->toArray());
     }
 
     /**
@@ -163,7 +165,8 @@ class AuthComponent extends Component
     }
 
     /**
-     * Gets the logged in User info.
+     * Gets the logged in User info. User info is stored
+     * as an array in the Session.
      *
      * @param string $property to get of the logged in user
      */
@@ -176,8 +179,10 @@ class AuthComponent extends Component
         if ($property === null) {
             return $user;
         }
-
-        return $user->get($property);
+        if (isset($user[$property])) {
+            return $user[$property];
+        }
+        return null;
     }
 
     /**

@@ -56,8 +56,8 @@ The default config for the `AuthComponent`.
 
 ````
 
-In the controller add a method for the login, first we need to identify the user, if the user is authenticated then it will return the user. Then if the user is returned you can modify any data then 
-use the Auth::setUser, which stores the user Entity in the session and this is how the login system works.
+In the controller add a method for the login, first we need to identify the user, if the user is authenticated then it will return a User Entity. Then if the user is returned you can modify any data then 
+use the `setUser` method, which converts the User into an array and stores in the Session which essentially logs the the User in.
 
 ````php
  public function login()
@@ -74,12 +74,14 @@ use the Auth::setUser, which stores the user Entity in the session and this is h
     }
 ````
 
-When you need to access the logged in user info, you call the AuthComponent user method.
+When you need to access the logged in user info, you call the `user` method, if you do not pass a name
+of a field, then it will return an array of the User information.
 
 ````php
     $user = $this->Auth->user();
 ````
-Alternatively, you get a property of the user entity by passing in the user method.
+
+Alternatively, you get an individual value from the user array by passing a key.
 
 ````php
     $email = $this->Auth->user('email');
