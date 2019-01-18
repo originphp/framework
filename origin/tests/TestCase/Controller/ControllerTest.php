@@ -240,13 +240,14 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $response = $this->getMockBuilder('Origin\Controller\Response')
-           ->setMethods(['header', 'send'])
+           ->setMethods(['header', 'send','statusCode'])
            ->getMock();
 
-        $controller = $this->getMockBuilder('Origin\Test\Controller\TestsController')
-           ->setMethods(['stop'])
-           ->setConstructorArgs([$request, $response])
-           ->getMock();
+        $controller = new Controller($request, $response);
+
+        $response->expects($this->once())
+        ->method('statusCode')
+          ->with(302);
 
         $response->expects($this->once())
            ->method('header')
@@ -255,9 +256,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $response->expects($this->once())
            ->method('send');
 
-        $controller->expects($this->once())
-            ->method('stop');
-
+        
         $this->assertEquals($response, $controller->redirect(array('action' => 'view', 2048)));
     }
 }

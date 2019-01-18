@@ -285,6 +285,7 @@ class Controller
     public function startupProcess()
     {
         $this->startup();
+        
         $this->componentRegistry()->call('startup');
     }
 
@@ -342,23 +343,23 @@ class Controller
         $this->response->body($body);
     }
 
-    public function redirect($url)
+    /**
+     * Redirects to a url, will disable autoRender but you should always
+     * return $this->redirect to prevent code from running during tests etc
+     *
+     * @param string|array $url
+     * @param int status code default 302
+     * @return void
+     */
+    public function redirect($url, int $code = 302)
     {
         $this->autoRender = false;
 
+        $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));
         $this->response->send();
-        $this->stop();
 
         return $this->response;
-    }
-
-    /**
-     * Terminates the controller.
-     */
-    protected function stop()
-    {
-        exit();
     }
     
     public function componentRegistry()
