@@ -15,8 +15,76 @@
 namespace Origin\TestSuite;
 
 use PHPUnit\Framework\TestCase;
+use Origin\Core\Resolver;
+use Origin\Model\Exception\MissingModelException;
+use Origin\Model\ModelRegistry;
 
-class OriginTestCase extends TestCase
+class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
     public $fixtures = [];
+    
+    /**
+     * Creates a Mock model, and adds to Registry at the same time. It will load
+     * config from registry to maintain fixture information.
+     *
+     * @param string $alias name of model
+     * @param array $methods methods to mock
+     * @param array $options set the className to be used buy mockBuilder, these will also be passed
+     * to model constructor as config
+     * @return void
+     */
+    public function getMockForModel(string $alias, array $methods = [], array $options =[])
+    {
+        if (empty($options['className'])) {
+            $options['className'] = Resolver::className($alias, 'Model');
+            if (!$options['className']) {
+                throw new MissingModelException($alias);
+            }
+        }
+        list($plugin, $alias) = pluginSplit($alias);
+        $options['alias'] = $alias;
+
+        $existingConfig = ModelRegistry::config($alias);
+        if ($existingConfig) {
+            $options +=  $existingConfig;
+        }
+     
+        $mock = $this->getMock($options['className'], $methods, $options);
+
+        ModelRegistry::set($alias, $mock);
+        return $mock;
+    }
+
+    /**
+     * Creates Mock object using the Mockbuilder
+     *
+     * @param string $className
+     * @param array $methods
+     * @param array $options
+     * @return void
+     */
+    public function getMock(string $className, array $methods=[], array $options = null)
+    {
+        if ($options) {
+            return $this->getMockBuilder($className)
+            ->setMethods($methods)
+            ->setConstructorArgs([$options])
+            ->getMock();
+        }
+        
+        return $this->getMockBuilder($className)
+            ->setMethods($methods)
+             ->getMock();
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+    }
+    
+    public function tearDown()
+    {
+        parent::tearDown();
+        ModelRegistry::clear();
+    }
 }
