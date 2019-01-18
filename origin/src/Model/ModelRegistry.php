@@ -15,7 +15,7 @@
 namespace Origin\Model;
 
 use Origin\Core\Resolver;
-use Origin\Core\Exception\Exception;
+use Origin\Exception\Exception;
 
 class ModelRegistry
 {
@@ -104,7 +104,7 @@ class ModelRegistry
     /**
      * Clears the registry and resets state.
      */
-    public static function reset()
+    public static function clear()
     {
         static::$config = static::$registry = [];
     }
@@ -125,7 +125,7 @@ class ModelRegistry
     }
 
     /**
-     * Stores config for a model. To get all data, dont sent alias. To get
+     * Stores config for a model. To get all data, dont set alias. To get
      * config for an alias dont supply config,.
      *
      * @param string $alias  model alias
@@ -140,7 +140,10 @@ class ModelRegistry
         }
 
         if ($config === null) {
-            return static::$config[$alias];
+            if (isset(static::$config[$alias])) {
+                return static::$config[$alias];
+            }
+            return null;
         }
         if (isset(static::$registry[$alias])) {
             throw new Exception(sprintf('You cannot set the config for "%s" as it is  already in the registry', $alias));

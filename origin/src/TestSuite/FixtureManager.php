@@ -16,6 +16,7 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Configure;
 use Origin\Model\ModelRegistry;
+use Origin\Model\ConnectionManager;
 
 class FixtureManager
 {
@@ -52,9 +53,9 @@ class FixtureManager
         foreach ($test->fixtures as $fixture) {
             $this->unloadFixture($fixture);
         }
-
+    
         // Clear the model registry
-        ModelRegistry::reset();
+        ModelRegistry::clear();
     }
 
     public function loadFixture(string $fixture)
@@ -67,6 +68,8 @@ class FixtureManager
             $createTable = true;
         }
 
+        $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+
         if ($createTable or $this->loaded[$fixture]->dropTables === true) {
             /* @todo waiting for sql schema to be migrated which also invovles rewriting tests to changes, once done this can be removed because unload fixture drops table. */
             $this->loaded[$fixture]->drop();
@@ -77,19 +80,39 @@ class FixtureManager
 
         $this->loaded[$fixture]->initialize();
         $this->loaded[$fixture]->insert();
-
+      
         // Config Model in Registry to use test datasource for this fixture
         list($plugin, $alias) = pluginSplit($fixture);
+      
         ModelRegistry::config($alias, [
-      'datasource' => $this->loaded[$fixture]->datasource,
-    ]);
+            'datasource' => $this->loaded[$fixture]->datasource,
+        ]);
+
+        $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
     }
 
     public function unloadFixture(string $fixture)
     {
+        $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+        
         if ($this->loaded[$fixture]->dropTables === true) {
             $this->loaded[$fixture]->drop();
         }
+        
+        $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+    }
+
+    protected function disableForeignKeyConstraints(string $datasource)
+    {
+        $connection = ConnectionManager::get($datasource);
+        $connection->execute('SET foreign_key_checks = 0');
+    }
+
+
+    protected function enableForeignKeyConstraints(string $datasource)
+    {
+        $connection = ConnectionManager::get($datasource);
+        $connection->execute('SET foreign_key_checks = 1');
     }
 
     protected function resolveFixture(string $fixture)
@@ -97,7 +120,7 @@ class FixtureManager
         list($plugin, $fixture) = pluginSplit($fixture);
 
         $namespace = '';
-        if ($plugin == 'App') {
+        if ($plugin === 'App' or $plugin === null) {
             $namespace = Configure::read('App.namespace');
         } elseif ($plugin == 'Framework') {
             $namespace = 'Origin';
