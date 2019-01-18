@@ -7,16 +7,16 @@
     backupGlobals="true"
     >
     <testsuites>
-        <testsuite name="origin">
+        <testsuite name="OriginPHP Test Suite">
             <directory>./TestCase/</directory>
         </testsuite>
     </testsuites>
     <listeners>
-		<listener
-		class="Origin\TestSuite\OriginTestListener"
-    file ="../src/TestSuite/OriginTestListener.php"
-    >
-  </listener>
+        <listener
+            class="Origin\TestSuite\OriginTestListener"
+        file ="../src/TestSuite/OriginTestListener.php"
+        >
+    </listener>
 	</listeners>
     <filter>
         <whitelist>
