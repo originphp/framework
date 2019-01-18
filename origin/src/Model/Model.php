@@ -683,13 +683,13 @@ class Model
             return false;
         }
         $this->id = null;
-
+        
         if ($entity->hasProperty($this->primaryKey) and $entity->{$this->primaryKey} !== null) {
             $this->id = $entity->{$this->primaryKey};
         }
 
         $exists = $this->exists($this->id);
-
+   
         if ($options['validate'] === true) {
             if ($options['callbacks'] === true and !$this->triggerCallback('beforeValidate', [$entity])) {
                 return false;
@@ -703,7 +703,7 @@ class Model
                 $this->triggerCallback('afterValidate', [$entity]);
             }
         }
-
+       
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (!$this->triggerCallback('beforeSave', [$entity, $options])) {
                 return false;
@@ -713,7 +713,7 @@ class Model
         $hasAndBelongsToMany = [];
         foreach ($this->hasAndBelongsToMany as $alias => $habtm) {
             $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
-            if (isset($entity->{$needle})) {
+            if (isset($entity->{$needle}) and is_array($entity->{$needle})) {
                 $hasAndBelongsToMany[$alias] = $entity->{$needle};
             }
         }
