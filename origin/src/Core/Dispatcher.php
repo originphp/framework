@@ -35,12 +35,10 @@ class Dispatcher
         return $this->dispatch($Request, $Response);
     }
 
-    public function dispatch(Request $request, Response $response, $output = true)
+    public function dispatch(Request $request, Response $response)
     {
         if ($request->params) {
             $class = $request->params['controller'].'Controller';
-
-            
 
             if ($request->params['plugin']) {
                 $class = $request->params['plugin'].'\Controller\\'.$class;
@@ -52,19 +50,19 @@ class Dispatcher
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params['controller']);
             }
-
+            
             $this->controller = $this->buildController($class, $request, $response);
-
+          
             $this->invoke(
               $this->controller,
               $request->params['action'],
               $request->params
             );
-
+      
             if ($this->controller->response instanceof Response) {
                 $this->controller->response->send();
             }
-
+          
             return $this->controller;
         } else {
             throw new RouterException('No route found.', 404);
@@ -98,11 +96,11 @@ class Dispatcher
     public function invoke(Controller &$controller, string $action, array $arguments)
     {
         $response = null;
-
+       
         $controller->startupProcess();
-
+       
         $result = call_user_func_array(array($controller, $action), $arguments['pass']);
-
+     
         if ($result === null and $controller->autoRender) {
             $controller->render();
         }
