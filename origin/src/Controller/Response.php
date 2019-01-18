@@ -81,7 +81,7 @@ class Response
     }
 
     /**
-     * Sets a header for sending.
+     * Sets and gets the headers
      *
      * @param string $header
      * @param mixed  $value
@@ -90,8 +90,8 @@ class Response
      */
     public function header($header = null, $value = null)
     {
-        if ($header == null) {
-            return false;
+        if ($header === null) {
+            return $this->headers;
         }
         if (is_string($header) and $value) {
             $this->headers[$header] = $value;
