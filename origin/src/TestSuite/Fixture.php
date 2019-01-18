@@ -17,6 +17,8 @@ namespace Origin\TestSuite;
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema;
+use Origin\Model\ModelRegistry;
+use Origin\Core\Resolver;
 
 class Fixture
 {
@@ -27,6 +29,13 @@ class Fixture
     public $fields = [];
 
     public $records = [];
+
+    /**
+     * You can import table schema from the model
+     *
+     * @var string
+     */
+    public $import = null;
 
     /**
      * Drops and recreates tables between tests.
@@ -50,6 +59,35 @@ class Fixture
     public function initialize()
     {
     }
+    
+    /**
+     * Import schema. If model is found then use that datasource and table else
+     * try to guess it incase of dynamic models
+     *
+     * @param string $model
+     * @return void
+     */
+    public function import()
+    {
+        $table = Inflector::tableize($this->import);
+        $datasource = 'default';
+
+        $className = Resolver::className($this->import, 'Model');
+        if ($className) {
+            $model = new $className();
+            $datasource = $model->datasource;
+            $table = $model->table;
+        }
+      
+        $connection = ConnectionManager::get($datasource);
+        $connection->execute("SHOW CREATE TABLE {$table}");
+        $result = $connection->fetch();
+        if (!empty($result['Create Table'])) {
+            $sql = $result['Create Table'];
+            $connection = ConnectionManager::get($this->datasource);
+            return $connection->execute($sql);
+        }
+    }
 
     /**
      * Creates the table.
@@ -58,6 +96,9 @@ class Fixture
      */
     public function create()
     {
+        if ($this->import) {
+            return $this->import();
+        }
         $connection = ConnectionManager::get($this->datasource);
         $Schema = new Schema();
         $sql = $Schema->createTable($this->table, $this->fields);
@@ -112,7 +153,6 @@ class Fixture
     {
         list($namespace, $class) = namespaceSplit($class);
         $class = substr($class, 0, -7);
-
         return Inflector::tableize($class);
     }
 }
