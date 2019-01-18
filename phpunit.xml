@@ -6,9 +6,21 @@
     bootstrap="./origin/src/bootstrap.php"
     backupGlobals="true"
     >
+    <testsuites>
+        <testsuite name="App Test Suite">
+            <directory>./tests/TestCase/</directory>
+        </testsuite>
+    </testsuites>
+    <listeners>
+        <listener
+            class="Origin\TestSuite\OriginTestListener"
+        file ="./origin/src/TestSuite/OriginTestListener.php"
+        >
+    </listener>
+	</listeners>
     <filter>
         <whitelist>
-            <directory suffix=".php">./origin/src/</directory>
+            <directory suffix=".php">./src/</directory>
         </whitelist>
     </filter>
 </phpunit>
