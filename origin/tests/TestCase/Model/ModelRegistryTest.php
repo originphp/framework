@@ -75,7 +75,7 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
         MockModelRegistry::resetInstance(); // Reset For Test
         MockModelRegistry::set('Mock', new MockModel());
         $this->assertTrue(MockModelRegistry::has('Mock'));
-        MockModelRegistry::reset();
+        MockModelRegistry::clear();
         $this->assertFalse(MockModelRegistry::has('Mock'));
     }
 
@@ -90,7 +90,7 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfig()
     {
-        MockModelRegistry::reset();
+        MockModelRegistry::clear();
         $config = ['datasource' => 'testGetConfig'];
         MockModelRegistry::config('Origin\Test\Model\MockModel', $config);
         $MockModel = MockModelRegistry::get('Origin\Test\Model\MockModel');
@@ -102,7 +102,7 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
      */
     public function testDelete()
     {
-        MockModelRegistry::reset();
+        MockModelRegistry::clear();
 
         MockModelRegistry::set('Mock', new MockModel());
 
