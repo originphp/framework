@@ -47,16 +47,6 @@ class PaginatorComponentTest extends OriginTestCase
 
     public function testPaginate()
     {
-        $this->assertTrue(true);
-    }
-
-    public function test2()
-    {
-        $this->assertTrue(true);
-    }
-
-    public function test3()
-    {
-        $this->assertTrue(true);
+        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 }
