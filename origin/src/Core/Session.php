@@ -88,16 +88,12 @@ class Session
      */
     public static function destroy()
     {
-        if (self::started()) {
-            $cookieName = session_name();
-
-            session_unset();
-            if (isset($_COOKIE[$cookieName])) {
-                unset($_COOKIE[$cookieName]);
-            }
+        if (!self::started()) {
+            session_start();
+        }
+        if (PHP_SAPI !== 'cli') {
             session_destroy();
         }
-
         $_SESSION = [];
     }
 
