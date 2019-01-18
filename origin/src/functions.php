@@ -12,9 +12,11 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Core\Debugger;
+use Origin\Exception\Exception;
 
 /**
  * Runs a backtrace.
+ * @todo adjust to work in CLI
  */
 function backtrace()
 {
@@ -28,7 +30,7 @@ function backtrace()
 function pr($var)
 {
     $template = '<pre>%s</pre>';
-    if (PHP_SAPI == 'cli') {
+    if (php_sapi_name() === 'cli') {
         $template = "\n%s\n";
     }
     $var = print_r($var, true);
