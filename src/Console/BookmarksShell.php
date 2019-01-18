@@ -23,11 +23,11 @@ class BookmarksShell extends AppShell
         SRC . DS .  'View' . DS  . 'Users'. DS . 'index.ctp',
         SRC . DS .  'View' . DS  . 'Users'. DS . 'view.ctp',
         SRC . DS .  'View' . DS  . 'Users'. DS . 'login.ctp',
-        'tests' . DS . 'Fixture' . DS  . 'BookmarkFixture.php',
-        'tests' . DS . 'Fixture' . DS  . 'BookmarksTagFixture.php',
-        'tests' . DS . 'Fixture' . DS  . 'UserFixture.php',
-        'tests' . DS . 'Testcase' . DS  . 'Controller' .DS . 'BookmarksControllerTest.php',
-        'tests' . DS . 'Testcase' . DS  . 'Model' .DS . 'BookmarksTest.php',
+        ROOT . DS . 'tests' . DS . 'Fixture' . DS  . 'BookmarkFixture.php',
+        ROOT . DS . 'tests' . DS . 'Fixture' . DS  . 'BookmarksTagFixture.php',
+        ROOT . DS . 'tests' . DS . 'Fixture' . DS  . 'UserFixture.php',
+        ROOT . DS . 'tests' . DS . 'TestCase' . DS  . 'Controller' .DS . 'BookmarksControllerTest.php',
+        ROOT . DS . 'tests' . DS . 'TestCase' . DS  . 'Model' .DS . 'BookmarkTest.php',
     ];
 
     public function main()
@@ -48,7 +48,7 @@ class BookmarksShell extends AppShell
         $this->out('<cyan>help</cyan> - shows this');
         $this->out('<cyan>list</cyan> - lists all the bookmarks');
         $this->out('<cyan>exception</cyan> - throws an exception');
-        $this->out('<cyan>delete</cyan> - Deletes all the demo files and bookmarks');
+        $this->out('<cyan>uninstall</cyan> - Deletes all the demo files and bookmarks');
     }
 
     public function list()
@@ -70,7 +70,7 @@ class BookmarksShell extends AppShell
      *
      * @return void
      */
-    public function delete()
+    public function uninstall()
     {
         $this->out("The following files will deleted:");
         $this->out('');
