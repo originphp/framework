@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col bookmarks index">
-        <h3><?= __('Bookmarks'); ?></h3>
+        <h2><?= __('Bookmarks'); ?></h2>
         <table class="table">
         <thead>
             <tr>

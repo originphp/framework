@@ -22,7 +22,12 @@ class BookmarksShell extends AppShell
         SRC . DS .  'View' . DS  . 'Users'. DS . 'edit.ctp',
         SRC . DS .  'View' . DS  . 'Users'. DS . 'index.ctp',
         SRC . DS .  'View' . DS  . 'Users'. DS . 'view.ctp',
-        SRC . DS .  'View' . DS  . 'Users'. DS . 'login.ctp'
+        SRC . DS .  'View' . DS  . 'Users'. DS . 'login.ctp',
+        'tests' . DS . 'Fixture' . DS  . 'BookmarkFixture.php',
+        'tests' . DS . 'Fixture' . DS  . 'BookmarksTagFixture.php',
+        'tests' . DS . 'Fixture' . DS  . 'UserFixture.php',
+        'tests' . DS . 'Testcase' . DS  . 'Controller' .DS . 'BookmarksControllerTest.php',
+        'tests' . DS . 'Testcase' . DS  . 'Model' .DS . 'BookmarksTest.php',
     ];
 
     public function main()
