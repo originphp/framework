@@ -87,13 +87,15 @@ class MakeTask extends Task
             $associations = $this->findHasAndBelongsToMany($model, $associations);
         }
         $validationRules = $this->validationRules();
+        
         // Remove dynamic models jointable models
         foreach ($associations['ignore'] as $remove) {
             unset($associations[$remove]);
             unset($validationRules[$remove]);
+            unset($this->schema[$remove]);
         }
         unset($associations['ignore']);
-  
+        
         /**
          *  [model] => BookmarksTag
          *  [controller] => BookmarksTags
@@ -163,8 +165,8 @@ class MakeTask extends Task
         return $associations;
     }
     /**
-     * Finds the hasAndToBelongsToMany
-     * Use table names
+     * Finds the hasAndToBelongsToMany using table names. Table name needs to be alphabetical order if not
+     * it will be ignored.
      */
     public function findHasAndBelongsToMany(string $model, array $associations=[])
     {

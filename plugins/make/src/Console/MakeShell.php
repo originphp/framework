@@ -78,18 +78,46 @@ class MakeShell extends Shell
         //$this->out('make test Lead'); /**@todo test */
     }
 
-    public function controller()
+
+    public function all()
     {
         if (empty($this->args)) {
+            $models = $this->getAvailable();
+            $this->out('Generate Model, View and Controller for each of the following models:');
+            foreach ($models as $model) {
+                $this->out($model);
+            }
+            $result = $this->in('Do you want to continue?', ['y','n'], 'n');
+            if ($result === 'n') {
+                return;
+            }
+        } else {
+            $models = $this->args;
+        }
+
+        foreach ($models as $model) {
+            $controller = Inflector::pluralize($model);
+            $this->controller($controller);
+            $this->model($model);
+            $this->view($controller);
+        }
+    }
+
+    public function controller(string $controller = null)
+    {
+        if (isset($this->args[0])) {
+            $controller = $this->args[0];
+        }
+        if ($controller === null) {
             $this->showAvailable(true);
             return ;
         }
         $options = $this->getAvailable(true);
         
-        if (in_array($this->args[0], $options) === false) {
-            throw new Exception(sprintf('Invalid controller %s', $this->args[0]));
+        if (in_array($controller, $options) === false) {
+            throw new Exception(sprintf('Invalid controller %s', $controller));
         }
-        $controller = $this->args[0];
+        $controller =$controller;
 
         $filename = SRC . DS . 'Controller' .DS . $controller .'Controller.php';
         if (file_exists($filename)) {
@@ -101,17 +129,20 @@ class MakeShell extends Shell
 
         $model = Inflector::singularize($controller);
         $data = $this->getData($model);
-
+       
         $belongsTo = $this->meta['associations'][$model]['belongsTo'];
 
         // Create Block Data Controller
         $data['blocks'] = []; // Controller Blocks
         $compact = [ $data['singularName'] ];
         foreach ($belongsTo as $otherModel) {
-            $vars = $this->meta['vars'][$otherModel];
-            $vars['currentModel'] = $model;
-            $compact[] = $vars['pluralName'];
-            $data['blocks'][] = $vars;
+            // foreignKey exists
+            if (isset($this->meta['vars'][$otherModel])) {
+                $vars = $this->meta['vars'][$otherModel];
+                $vars['currentModel'] = $model;
+                $compact[] = $vars['pluralName'];
+                $data['blocks'][] = $vars;
+            }
         }
         $data['compact'] = implode("','", $compact);
 
@@ -123,18 +154,20 @@ class MakeShell extends Shell
         $this->out(sprintf('%sController created', $controller));
     }
 
-    public function model()
+    public function model(string $model = null)
     {
-        if (empty($this->args)) {
+        if (isset($this->args[0])) {
+            $model = $this->args[0];
+        }
+        if ($model === null) {
             $this->showAvailable();
             return ;
         }
         $options = $this->getAvailable();
         
-        if (in_array($this->args[0], $options) === false) {
+        if (in_array($model, $options) === false) {
             throw new Exception(sprintf('Invalid model %s', $this->args[0]));
         }
-        $model = $this->args[0];
 
         $filename = SRC . DS . 'Model' .DS .$model .'.php';
         if (file_exists($filename)) {
@@ -149,7 +182,6 @@ class MakeShell extends Shell
         // Load Assocations
         $data['initialize'] = '';
         $associations = $this->meta['associations'][$model];
-      
         foreach ($associations as $association => $models) {
             if ($models) {
                 foreach ($models as $associatedModel) {
@@ -184,19 +216,20 @@ class MakeShell extends Shell
         $this->out(sprintf('%s generated', $model));
     }
 
-    public function view()
+    public function view(string $controller = null)
     {
-        if (empty($this->args)) {
+        if (isset($this->args[0])) {
+            $controller = $this->args[0];
+        }
+        if ($controller === null) {
             $this->showAvailable(true);
             return ;
         }
         $options = $this->getAvailable(true);
         
-        if (in_array($this->args[0], $options) === false) {
-            throw new Exception(sprintf('Invalid controller %s', $this->args[0]));
+        if (in_array($controller, $options) === false) {
+            throw new Exception(sprintf('Invalid controller %s', $controller));
         }
-
-        $controller = $this->args[0];
 
         $folder = SRC . DS . 'View' . DS . $controller ;
         if (file_exists($folder)) {
@@ -259,7 +292,7 @@ class MakeShell extends Shell
 
     protected function getAvailable($isPlural=false)
     {
-        $data = array_keys($this->meta['vars']);
+        $data = array_keys($this->meta['schema']);
         if ($isPlural) {
             array_walk($data, function (&$value, &$key) {
                 $value = Inflector::pluralize(($value));
