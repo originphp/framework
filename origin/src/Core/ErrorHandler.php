@@ -51,10 +51,6 @@ class ErrorHandler
             ob_end_clean();
         }
 
-        if (php_sapi_name() === 'cli') {
-            return $this->cliException($exception);
-        }
-
         if (Configure::read('debug')) {
             return $this->debugException($exception);
         }
