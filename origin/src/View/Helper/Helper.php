@@ -52,7 +52,7 @@ class Helper
     public function __construct(View $view, array $config = [])
     {
         $this->helperRegistry = $view->helperRegistry();
-        $this->request = $view->request;
+        $this->request =& $view->request;
 
         $this->prepareHelpers();
 
