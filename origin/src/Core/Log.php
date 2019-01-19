@@ -35,7 +35,7 @@ class Log
 
         if (!file_exists($filename)) {
             touch($filename);
-            //chmod($filename, 0775);
+            chmod($filename, 0775);
         }
 
         $filehandle = fopen($filename, 'a+');
@@ -49,8 +49,7 @@ class Log
 
     public static function format($message)
     {
-        $now = date('d/m/Y G:i:s');
-
+        $now = date('Y-m-d G:i:s');
         return "{$now} - {$message}\n";
     }
 }
