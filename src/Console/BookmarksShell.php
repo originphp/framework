@@ -101,6 +101,15 @@ class BookmarksShell extends AppShell
                     $this->out('<white>[</white> <red>ERROR</red> <white>] ' . $folder . '</white>');
                 }
             }
+            $appController = SRC . DS .'Controller'.DS .'AppController.php';
+        
+            $contents =  file_get_Contents($appController);
+            $contents = str_replace('$this->loadComponent(\'Auth\');', '', $contents);
+            if (file_put_contents($appController, $contents)) {
+                $this->out('<white>[</white> <green>OK</green> <white>] modify AppController</white>');
+            } else {
+                $this->out('<white>[</white> <red>ERROR</red> <white>] modify AppController</white>');
+            }
         }
     }
 }

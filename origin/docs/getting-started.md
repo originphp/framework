@@ -45,9 +45,9 @@ There is also a Bookmarks shell app which demonstrates the console functionality
 
 `bin/console bookmarks` 
 
-One of the shell commands for bookmarks is delete, this will remove all demo files, this can be run by using the following command.
+One of the shell commands for bookmarks is uninstall, this will remove all demo files, this can be run by using the following command.
 
-`bin/console bookmarks delete` 
+`bin/console bookmarks uninstall` 
 
 # Docker
 My preferred method over the years has been using VirtualBox, with this the server setup/installs are done through a checklist, and this eliminates problems when running code on different servers such as development, staging and production. That said, I feel the way forward for a development setup is through docker and its disposable containers. I plan to include a server installation script for the staging and production servers on DigitalOcean or AWS, which has the same setup as the docker development container.
