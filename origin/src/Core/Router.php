@@ -113,7 +113,7 @@ class Router
         // No params no route
         if (!empty($params)) {
             // Parse Greedy results *
-            if (isset($params['greedy']) and !empty($params['greedy'])) {
+            if (!empty($params['greedy'])) {
                 $pass = $named = [];
                 $parts = explode('/', $params['greedy']);
 
