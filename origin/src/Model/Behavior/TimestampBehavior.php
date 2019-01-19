@@ -38,7 +38,7 @@ class TimestampBehavior extends Behavior
         $timestamp = date('Y-m-d H:i:s');
         $primaryKey = $model->primaryKey;
         $createdField = $this->config['created'];
-        if (!$entity->hasProperty($primaryKey) or empty($entity->{$primaryKey })) {
+        if (!$entity->hasProperty($primaryKey) or empty($entity->{$primaryKey})) {
             if ($model->hasField($createdField) and empty($entity->{$createdField})) {
                 $entity->set($createdField, $timestamp);
             }
