@@ -159,7 +159,7 @@ You can also pass an options array with any of the following keys.
 The HABTM requires a separate join table, in alphabetical order with each model pluralized. A User `hasAnd BelongsToMany` Tags (inverse is also true). The table would be called `tags_users`. It needs to contain the `user_id` and `tag_id`. The join model, called `TagsUser` will be created dynamically, but if you need to more control or functionality, then you can simply create the model.
 
 ```sql
-  CREATE TABLE tags_user (
+  CREATE TABLE tags_users (
       user_id INT NOT NULL,
       tag_id INT NOT NULL
   );
