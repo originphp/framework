@@ -289,7 +289,7 @@ class View
         extract($this->vars, EXTR_SKIP);
         ob_start();
         require $view__filename;
-        $this->view = ob_get_clean();
+        $buffer = $this->view = ob_get_clean();
 
         if ($layout != null) {
             $buffer = $this->renderLayout($layout);
