@@ -211,7 +211,7 @@ trait IntegrationTestTrait
      */
     public function assertRedirect($url)
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
@@ -223,7 +223,7 @@ trait IntegrationTestTrait
      */
     public function assertNoRedirect()
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         $this->assertTrue(empty($headers['Location']));
     }
 
@@ -234,7 +234,7 @@ trait IntegrationTestTrait
      */
     public function assertRedirectContains(string $text)
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
@@ -248,7 +248,7 @@ trait IntegrationTestTrait
      */
     public function assertRedirectNotContains(string $text)
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
@@ -270,14 +270,14 @@ trait IntegrationTestTrait
 
     public function assertHeaderContains(string $header, string $value)
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
         $this->assertContains($value, $headers[$header]);
     }
 
     public function assertHeaderNotContains(string $header, string $value)
     {
-        $headers = $this->response()->header();
+        $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
         $this->assertNotContains($value, $headers[$header]);
     }

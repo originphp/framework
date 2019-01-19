@@ -81,23 +81,22 @@ class Response
     }
 
     /**
-     * Sets and gets the headers
+     * Sets a header
      *
-     * @param string $header
+     *  $response->header('Accept-Language', 'en-us,en;q=0.5');
+     *  $response->header(['Accept-Encoding'=>'gzip,deflate']);
+     *
+     * @param string|array $header []
      * @param mixed  $value
      *
      * @return bool
      */
-    public function header($header = null, $value = null)
+    public function header($header, $value = null)
     {
-        if ($header === null) {
-            return $this->headers;
+        if (is_string($header)) {
+            $header = [$header=>$value];
         }
-        if (is_string($header) and $value) {
-            $this->headers[$header] = $value;
-
-            return true;
-        }
+      
         foreach ($header as $key => $value) {
             $this->headers[$key] = $value;
         }
@@ -106,9 +105,9 @@ class Response
     }
 
     /**
-     * Returns the headers current set.
+     * Gets the headers
      *
-     * @return array
+     * @return array headers
      */
     public function headers()
     {
@@ -119,7 +118,7 @@ class Response
      * Sends a header if not already sent.
      *
      * sendHeader("HTTP/1.0 404 Not Found")
-     * senderHeader("Location","http://www.example.com/")
+     * sendHeader("Location","http://www.example.com/")
      *
      * @param string $name
      * @param string $value
