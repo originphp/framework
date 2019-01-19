@@ -23,9 +23,16 @@ class Component
     /**
      * Holds a reference to the request object.
      *
-     * @var object
+     * @var Request
      */
-    protected $request = null;
+    public $request = null;
+
+    /**
+     * Holds a reference to the response object.
+     *
+     * @var Response
+     */
+    public $response = null;
     /**
      * Holds the componentregistry object.
      *
@@ -34,8 +41,7 @@ class Component
     protected $componentRegistry = null;
 
     /**
-     * Array of components and config. This built during construct using
-     * $components.
+     * Array of components and config. This poupulated by loadComponent
      *
      * @var array
      */
@@ -44,7 +50,9 @@ class Component
     public function __construct(Controller $controller, array $config = [])
     {
         $this->componentRegistry = $controller->componentRegistry();
-        $this->request = $controller->request;
+ 
+        $this->request =& $controller->request;
+        $this->response =& $controller->response;
  
         $this->config($config);
         $this->initialize($config);
