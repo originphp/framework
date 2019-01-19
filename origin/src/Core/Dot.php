@@ -16,7 +16,7 @@ namespace Origin\Core;
 
 /**
  * Dot Class
- * This is for handling arrays paths which are defined by dot notations.
+ * This is for handling array paths which are defined by dot notations.
  *
  *  array('Asset' => array(
  *            'Framework' => array(
