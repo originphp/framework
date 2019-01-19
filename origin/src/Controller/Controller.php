@@ -338,8 +338,8 @@ class Controller
         if ($view === null) {
             $view = $this->request->params['action'];
         }
-        $this->View = new View($this);
-        $body = $this->View->render($view, $this->layout);
+        $viewObject = new View($this);
+        $body = $viewObject->render($view, $this->layout);
         $this->response->body($body);
     }
 

@@ -37,18 +37,11 @@ class View
     public $vars = array();
 
     /**
-     * This is the rendered view without Layout (needed by testing).
+     * This is the rendered view
      *
      * @var string
      */
     public $view = null;
-
-    /**
-     * This is the rendered view with layout (needed by testing).
-     *
-     * @var string
-     */
-    public $contents = null;
 
     /**
      * Request params. For access from view, @todo use __get to fetch
@@ -95,11 +88,10 @@ class View
     {
         $this->name = $controller->name;
 
-        $this->request = $controller->request;
-        $this->response = $controller->reponse;
-        $this->params = $controller->request->params;
-
-        $this->vars = $controller->viewVars;
+        $this->request =& $controller->request;
+        $this->response =& $controller->response;
+        $this->params =& $controller->request->params;
+        $this->vars =& $controller->viewVars;
 
         $this->viewPath = $this->getViewPath();
 
@@ -295,11 +287,9 @@ class View
         $view__filename = $this->getViewFilename($path);
 
         extract($this->vars, EXTR_SKIP);
-
         ob_start();
-
         require $view__filename;
-        $buffer = $this->view = ob_get_clean();
+        $this->view = ob_get_clean();
 
         if ($layout != null) {
             $buffer = $this->renderLayout($layout);
@@ -322,12 +312,8 @@ class View
         extract($this->vars, EXTR_SKIP);
 
         ob_start();
-
         require $layout_filename;
-
-        $this->contents = ob_get_clean();
-
-        return $this->contents;
+        return ob_get_clean();
     }
 
     /**
