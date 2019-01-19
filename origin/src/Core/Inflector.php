@@ -217,8 +217,8 @@ class Inflector
     /**
      * Add user defined rules for the inflector.
      *
-     * Inflector::add('singular',array('/(quiz)zes$/i' => '\\1');
-     * Inflector::add('plural',array('/(quiz)$/i' => '\1zes');
+     * Inflector::rules('singular',['/(quiz)zes$/i' => '\\1']);
+     * Inflector::rules('plural',['/(quiz)$/i' => '\1zes']);
      *
      * @param string $type  singular or plural
      * @param array  $rules array(regexPattern => replacement)
