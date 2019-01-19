@@ -15,6 +15,7 @@
 namespace Origin\Test\Controller;
 
 use Origin\Controller\Request;
+use Origin\Exception\MethodNotAllowedException;
 
 class RequestTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,5 +25,36 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('google', $request->query['ref']);
         $this->assertContains('ppc', $request->query['source']);
+    }
+
+    public function testIs()
+    {
+        $request = new Request('articles/index');
+    
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->assertTrue($request->is(['post']));
+        $this->assertFalse($request->is('get'));
+        
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->assertFalse($request->is('post'));
+        $this->assertTrue($request->is('get'));
+        unset($_SERVER['REQUEST_METHOD']);
+    }
+    public function testAllowMethod()
+    {
+        $request = new Request('articles/index');
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->assertTrue($request->allowMethod(['post']));
+      
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->expectException(MethodNotAllowedException::class);
+        $request->allowMethod(['delete']);
+    }
+    public function testEnv()
+    {
+        $request = new Request('articles/index');
+        $this->assertFalse($request->env('FOO'));
+        $_SERVER['FOO'] = 'bar';
+        $this->assertEquals('bar', $request->env('FOO'));
     }
 }

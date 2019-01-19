@@ -100,6 +100,12 @@ class InflectorTest extends \PHPUnit\Framework\TestCase
         Inflector::rules('plural', ['/bar/i' => 'barFoo']);
         $this->assertEquals('fooBar', Inflector::singularize('foo'));
         $this->assertEquals('barFoo', Inflector::pluralize('bar'));
+
+        Inflector::rules('singular', ['/(quiz)zes$/i' => '\\1']);
+        Inflector::rules('plural', ['/(quiz)$/i' => '\1zes']);
+
+        $this->assertEquals('quiz', Inflector::singularize('quizzes'));
+        $this->assertEquals('quizzes', Inflector::pluralize('quiz'));
     }
 
     public function testDictonary()
