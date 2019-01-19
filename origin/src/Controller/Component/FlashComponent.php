@@ -41,11 +41,11 @@ class FlashComponent extends Component
     public function addMessage(string $type, string $message)
     {
         $messages = [];
-
-        if (Session::check("Message.{$type}")) {
-            $messages = Session::read("Message.{$type}");
+        $sessionKey = "Message.{$type}";
+        if (Session::check($sessionKey)) {
+            $messages = Session::read($sessionKey);
         }
         $messages[] = $message;
-        Session::write("Message.{$type}", $messages);
+        Session::write($sessionKey, $messages);
     }
 }
