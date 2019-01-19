@@ -36,14 +36,14 @@ class Request
     /**
      * Holds the query data.
      */
-    public $query = array();
+    public $query = [];
 
     /**
      * Will contain form post data.
      *
      * @var array
      */
-    public $data = array();
+    public $data = [];
 
     /**
      * Address of request including base folder without Query params.
@@ -89,11 +89,10 @@ class Request
      */
     public function url()
     {
-        if (!isset($_SERVER['REQUEST_URI'])) {
-            return '';
+        if ($uri = $this->env('REQUEST_URI')) {
+            return $uri;
         }
-
-        return $_SERVER['REQUEST_URI'];
+        return '';
     }
 
     protected function processGet($url)
@@ -151,6 +150,14 @@ class Request
         return in_array(strtolower($method), $type);
     }
 
+    /**
+     * Run this from the controller to only allow certian methods, if the
+     * method is not of a certain type e..g post/get/put then it will throw
+     * and exception
+     *
+     * @param string|array $type e.g. post or get
+     * @return bool
+     */
     public function allowMethod($type)
     {
         if ($this->is($type)) {
