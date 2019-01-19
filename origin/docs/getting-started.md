@@ -9,7 +9,7 @@ Whilst in alpha, I have included the Bookmark demo app in the src folder.
 Install [docker desktop](https://www.docker.com/products/docker-desktop), if you don't already have this.
 
 1. Unzip the OriginPHP archive into a new project folder, e.g `origin-demo`
-2. From within your project folder type `docker-compose build` - it will take a couple of minutes.
+2. From within your project folder type `docker-compose build` - it will take a couple of minutes, and is only done once unless you change the Docker configuration files.
 3. Start the web server, type `docker-compose up` and go to [http://localhost:8000](http://localhost:8000)
 
 ## Configuring OriginPHP
@@ -20,7 +20,7 @@ Install [docker desktop](https://www.docker.com/products/docker-desktop), if you
 
     To access the docker MySql server using the MySql client from within the docker container.
     - From the project folder type `docker-compose run app bash`, this will give you access to the docker container.
-    - Then type `mysql -h mysql -uroot -p`
+    - Then type `mysql -h db -uroot -p`
 
 2. Create the database configuration file, make a copy of the `database.php.default` file without the `default` extension. And set the username and password. 
 
