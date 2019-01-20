@@ -306,7 +306,7 @@ class View
         $layout_filename = $this->getLayoutFilename($layout);
 
         if (!isset($this->vars['title'])) {
-            $this->vars['title'] = Inflector::humanize($this->name);
+            $this->vars['title'] = Inflector::humanize(Inflector::underscore($this->name));
         }
 
         extract($this->vars, EXTR_SKIP);
