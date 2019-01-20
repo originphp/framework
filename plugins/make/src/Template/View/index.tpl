@@ -1,5 +1,7 @@
 <div class="bookmarks index">
-    <h3><?= __('%singularHuman%'); ?></h3>
+    <div class="page-header">
+        <h2><?php echo __('%pluralHuman%'); ?></h2>
+    </div>
     <table class="table">
     <thead>
         <tr>

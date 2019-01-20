@@ -36,7 +36,15 @@ use Make\Utils\MakeTemplater;
 
 class MakeShell extends Shell
 {
+    /**
+     * Meta information from introspecting the database.
+     * Contains the following keys vars, associations, schema, validate
+     *
+     * @var array
+     */
     protected $meta = [];
+    
+    protected $force = false;
 
     protected function introspectDatabase()
     {
@@ -52,41 +60,38 @@ class MakeShell extends Shell
             return;
         }
         $this->introspectDatabase();
+        # handle forcing
+        $key = array_search('-force', $this->args);
+        if ($key !== false) {
+            unset($this->args[$key]);
+            $this->force = true;
+        }
     }
     public function main()
     {
         $this->showUsage();
-        /*
-        $this->out('Interactive Make Shell');
-        $this->out('[A] Makes All');
-        $this->out('[M] Model');
-        $this->out('[V] View');
-        $this->out('[C] Controller');
-        $this->out('[T] Test Case');
-        $this->out('[F] Fixture');
-        $selected = $this->in('Select an option', ['A','M','V','C','T','F']);
-        switch (strtoupper($selected)) {
-
-        }*/
     }
     public function showUsage()
     {
         $this->out('make all');
-        $this->out('make model Lead');
-        $this->out('make controller Leads');
-        $this->out('make view Lead');
+        $this->out('make model Contact');
+        $this->out('make controller Contacts');
+        $this->out('make view Contact');
+        $this->out('');
+        $this->out('You can use -force to not prompt');
         //$this->out('make test Lead'); /**@todo test */
     }
-
 
     public function all()
     {
         if (empty($this->args)) {
             $models = $this->getAvailable();
             $this->out('Generate Model, View and Controller for each of the following models:');
+            $this->out('');
             foreach ($models as $model) {
-                $this->out($model);
+                $this->out("<white>- {$model}</white>");
             }
+            $this->out('<yellow>hasAndBelongsToMany wont be listed here.</yellow>');
             $result = $this->in('Do you want to continue?', ['y','n'], 'n');
             if ($result === 'n') {
                 return;
@@ -94,13 +99,21 @@ class MakeShell extends Shell
         } else {
             $models = $this->args;
         }
-
+   
         foreach ($models as $model) {
             $controller = Inflector::pluralize($model);
             $this->controller($controller);
             $this->model($model);
             $this->view($controller);
         }
+    }
+
+    public function in(string $prompt, array $options = [], string $default = null)
+    {
+        if ($this->force) {
+            return 'y';
+        }
+        return parent::in($prompt, $options, $default);
     }
 
     public function controller(string $controller = null)
@@ -151,7 +164,7 @@ class MakeShell extends Shell
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
         }
-        $this->out(sprintf('%sController created', $controller));
+        $this->status(sprintf('%s controller', $controller), 'ok');
     }
 
     public function model(string $model = null)
@@ -213,7 +226,7 @@ class MakeShell extends Shell
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
         }
-        $this->out(sprintf('%s generated', $model));
+        $this->status(sprintf('%s model', $model), 'ok');
     }
 
     public function view(string $controller = null)
@@ -254,10 +267,24 @@ class MakeShell extends Shell
             if (!file_put_contents($folder . DS . $view . '.ctp', $result)) {
                 throw new Exception('Error writing file');
             }
-            $this->out(sprintf('View/%s generated', $view));
         }
+        $this->status(sprintf('%s views', $controller), 'ok');
     }
 
+    
+
+    protected $statusCodes = [
+        'ok' => 'green',
+        'error' => 'red',
+        'ignore' => 'yellow'
+    ];
+
+    public function status(string $message, string $code)
+    {
+        $color = $this->statusCodes[$code];
+        $status = strtoupper($code);
+        $this->out("<white>[</white> <{$color}>{$status}</{$color}> <white>] {$message}</white>");
+    }
 
     protected function getData(string $model)
     {
