@@ -6,12 +6,11 @@
 </div>
 <div class="bookmarks form">
     <?= $this->Form->create($%singularName%); ?>
-        <?php
-            echo $this->Form->create($%singularName%);
-            <RECORDBLOCK>
-            echo $this->Form->control('%field%');
-            </RECORDBLOCK>
-        ?>        
-        <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
-        <?= $this->Form->end(); ?>
+    <?php
+        <RECORDBLOCK>
+        echo $this->Form->control('%field%');
+        </RECORDBLOCK>
+    ?>        
+    <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
+    <?= $this->Form->end(); ?>
 </div>

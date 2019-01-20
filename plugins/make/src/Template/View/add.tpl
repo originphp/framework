@@ -12,6 +12,6 @@
             echo $this->Form->control('%field%');
             </RECORDBLOCK>
         ?>
-        <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
-        <?= $this->Form->end(); ?>
+    <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
+    <?= $this->Form->end(); ?>
 </div>
