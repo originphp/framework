@@ -171,9 +171,12 @@ class FormHelper extends Helper
     {
         $options = array_merge(['hiddenField' => true], $options);
         $options = $this->prepareOptions($name, $options);
-        if (!array_key_exists('value', $options)) {
-            $options['value'] = 1;
+        $checked = !empty($options['value'])?true:false;
+        if ($checked) {
+            $options['checked'] = true;
         }
+        $options['value'] = 1; // Must always be one
+
         $hiddenField = $options['hiddenField'];
         unset($options['hiddenField']);
 
@@ -183,7 +186,7 @@ class FormHelper extends Helper
             $hiddenField = $this->template('hidden', ['value' => 0, 'name' => $options['name']]);
             unset($options['hiddenField']);
 
-            return $checkbox.$hiddenField;
+            return $hiddenField . $checkbox;
         }
 
         return $checkbox;

@@ -320,11 +320,24 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     {
         $FormHelper = $this->FormHelper;
 
-        $expected = '<input type="checkbox" name="agree" value="1"><input type="hidden" name="agree" value="0">';
+        $expected = '<input type="hidden" name="agree" value="0"><input type="checkbox" name="agree" value="1">';
         $this->assertEquals($expected, $FormHelper->checkbox('agree'));
 
         $expected = '<input type="checkbox" name="agree" value="1">';
         $this->assertEquals($expected, $FormHelper->checkbox('agree', ['hiddenField' => false]));
+
+        # Test values
+        $Widget = new Widget();
+        $widget = $Widget->newEntity();
+        $widget->active = true;
+        $widget->in_stock = false;
+        $result = $FormHelper->create($widget);
+
+        $expected = '<input type="checkbox" name="active" value="1" checked>';
+        $this->assertEquals($expected, $FormHelper->checkbox('active', ['hiddenField'=>false]));
+        
+        $expected = '<input type="checkbox" name="in_stock" value="1">';
+        $this->assertEquals($expected, $FormHelper->checkbox('in_stock', ['hiddenField'=>false]));
     }
 
     public function testRadio()
