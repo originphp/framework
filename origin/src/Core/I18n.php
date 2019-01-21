@@ -41,10 +41,7 @@ class I18n
     public static function initialize(array $config = [])
     {
         if (!isset($config['locale'])) {
-            $config['locale'] = 'en_US';
-            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                $config['locale'] = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            }
+            $config['locale'] = static::detectLocale();
         }
 
         setlocale(LC_ALL, $config['locale']);
@@ -56,7 +53,7 @@ class I18n
             $timezone = IntlTimeZone::createDefault();
             $config['timezone'] = $timezone->getId();
         }
-
+        
         if (!isset($config['currency'])) {
             $formatter = new NumberFormatter($config['locale'], NumberFormatter::CURRENCY);
             $config['currency'] = $formatter->getTextAttribute(NumberFormatter::CURRENCY_CODE);
@@ -64,8 +61,41 @@ class I18n
 
         Date::initialize($config);
         Number::initialize($config);
-
+       
         self::$config = $config;
+    }
+
+    /**
+     * Attempts to detect the locale
+     *
+     * @return string
+     */
+    public static function detectLocale()
+    {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            return locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        }
+        return 'en_US';
+    }
+
+    /**
+     * Returns the default timezone
+     *
+     * @return string timezone
+     */
+    public static function defaultTimezone()
+    {
+        $timezone = IntlTimeZone::createDefault();
+        return $timezone->getId();
+    }
+    /**
+     * Returns the default locale
+     *
+     * @return string locale
+     */
+    public static function defaultLocale()
+    {
+        return Locale::getDefault();
     }
 
     /**
@@ -124,7 +154,7 @@ class I18n
         $originalTimeZone = date_default_timezone_get();
         foreach (timezone_identifiers_list() as $key => $zone) {
             date_default_timezone_set($zone);
-            $list[$zone] = 'GMT '.date('P', $timestamp).' - '.replace('_', ' ', $zone);
+            $list[$zone] = 'GMT '.date('P', $timestamp).' - '. str_replace('_', ' ', $zone);
         }
         date_default_timezone_set($originalTimeZone);
 
