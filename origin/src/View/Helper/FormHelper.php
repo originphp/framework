@@ -47,7 +47,7 @@ class FormHelper extends Helper
         'control' => '<div class="{class} {type}{required}">{before}{content}{after}</div>',
         'controlError' => '<div class="{class} {type}{required} error">{before}{content}{after}{error}</div>',
         'div' => '<div{attributes}>{content}</div>',
-        'error' => '<div class="error">{content}</div>',
+        'error' => '<div class="error-message">{content}</div>',
         'file' => '<input type="file" name="{name}"{attributes}>',
         'formStart' => '<form{attributes}>',
         'formEnd' => '</form>',

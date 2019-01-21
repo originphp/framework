@@ -385,7 +385,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $widget->invalidate('description', 'invalid description');
 
         $FormHelper->create($widget);
-        $expected = '<div class="form-group textarea error"><label for="description">Description</label><textarea name="description" class="form-control error" id="description">Widget Name</textarea><div class="error">invalid description</div></div>';
+        $expected = '<div class="form-group textarea error"><label for="description">Description</label><textarea name="description" class="form-control error" id="description">Widget Name</textarea><div class="error-message">invalid description</div></div>';
         $result = $FormHelper->control('description');
         $this->assertEquals($expected, $result);
 

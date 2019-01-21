@@ -29,7 +29,7 @@ input.error {
   border-width: 2px;
 }
 
-div.error {
+div.error-message {
   font-weight: bold;
   color: #ff0000;
 }
