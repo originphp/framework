@@ -6,14 +6,14 @@
 use Origin\Model\ConnectionManager;
 
 ConnectionManager::config('default',array(
-  'host' => 'localhost',
+  'host' => 'db', // if you are not using docker then set this to localhost
   'database' => 'origin',
   'username' => 'username',
   'password' => 'password'
 ));
 
 ConnectionManager::config('test',array(
-  'host' => 'localhost',
+  'host' => 'db',
   'database' => 'origin_test',
   'username' => 'username',
   'password' => 'password'
