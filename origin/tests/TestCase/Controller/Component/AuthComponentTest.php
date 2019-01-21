@@ -110,9 +110,9 @@ class AuthComponentTest extends \PHPUnit\Framework\TestCase
     public function testIsLoggedIn()
     {
         $AuthComponent = $this->AuthComponent;
-        $this->assertFalse($AuthComponent->callMethod('isLoggedIn'));
+        $this->assertFalse($AuthComponent->isLoggedIn());
         Session::write('Auth.User', ['user_name' => 'james']);
-        $this->assertTrue($AuthComponent->callMethod('isLoggedIn'));
+        $this->assertTrue($AuthComponent->isLoggedIn());
     }
 
     public function testIsPrivateOrProtected()

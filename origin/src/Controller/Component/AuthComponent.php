@@ -282,7 +282,7 @@ class AuthComponent extends Component
         return false;
     }
 
-    protected function isLoggedIn()
+    public function isLoggedIn()
     {
         return Session::check('Auth.User');
     }

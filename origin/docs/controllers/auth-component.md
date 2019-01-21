@@ -123,3 +123,11 @@ In some controllers you might to want to allow certain actions to not require au
 ````php
     $this->Auth->allow(['reset_password','verify_email']);
 ````
+
+Sometimes you want to know if the User is logged in, to do this use the `isLoggedIn` method.
+
+````php
+    if($this->Auth->isLoggedIn()){
+        // do something
+    }
+````
