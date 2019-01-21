@@ -407,7 +407,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $result = $FormHelper->control('name');
         $this->assertEquals($expected, $result);
 
-        $expected = '<div class="form-check checkbox"><input type="checkbox" name="active" value="1" class="form-check-input" id="active"><input type="hidden" name="active" value="0"><label for="active" class="form-check-label">Active</label></div>';
+        $expected = '<div class="form-check checkbox"><input type="hidden" name="active" value="0"><input type="checkbox" name="active" value="1" class="form-check-input" id="active"><label for="active" class="form-check-label">Active</label></div>';
         $result = $FormHelper->control('active', ['type' => 'checkbox']);
         $this->assertEquals($expected, $result);
     }
