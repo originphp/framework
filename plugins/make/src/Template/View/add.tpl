@@ -4,7 +4,7 @@
     </div>
     <h2><?php echo __('Add %singularHuman%'); ?></h2>
 </div>
-<div class="bookmarks form">
+<div class="%pluralName% form">
     <?= $this->Form->create($%singularName%); ?>
         <?php
             <RECORDBLOCK>

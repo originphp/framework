@@ -1,4 +1,4 @@
-<div class="bookmarks index">
+<div class="%pluralName% index">
     <div class="page-header">
         <h2><?php echo __('%pluralHuman%'); ?></h2>
     </div>
