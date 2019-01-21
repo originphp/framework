@@ -7,7 +7,6 @@
 <div class="bookmarks form">
     <?= $this->Form->create($%singularName%); ?>
         <?php
-            echo $this->Form->create($%singularName%);
             <RECORDBLOCK>
             echo $this->Form->control('%field%');
             </RECORDBLOCK>
