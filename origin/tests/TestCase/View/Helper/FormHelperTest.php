@@ -86,6 +86,10 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $result = $FormHelper->create($widget, ['type' => 'file']);
         $expected = '<form enctype="multipart/form-data" method="post" action="/widgets/edit">';
         $this->assertEquals($expected, $result);
+
+        $result = $FormHelper->create($widget, ['class' => 'my-class','id'=>'my-id']);
+        $expected = '<form method="post" accept-charset="utf-8" action="/widgets/edit" class="my-class" id="my-id">';
+        $this->assertEquals($expected, $result);
     }
 
     public function testText()

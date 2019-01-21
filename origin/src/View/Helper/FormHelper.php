@@ -142,11 +142,7 @@ class FormHelper extends Helper
         ];
 
         $options = array_merge($defaults, $options);
-
-        if (is_array($options['url'])) {
-            $options['url'] = Router::url($options['url']);
-        }
-
+        
         if ($options['type'] == 'file') {
             $attributes['enctype'] = 'multipart/form-data';
             $attributes['method'] = 'post';
@@ -154,8 +150,10 @@ class FormHelper extends Helper
             $attributes['method'] = $options['type'];
             $attributes['accept-charset'] = 'utf-8';
         }
-        $attributes['action'] = $options['url'];
-
+        $attributes['action'] = Router::url($options['url']);
+        unset($options['type'],$options['url']);
+        $attributes += $options;
+     
         return $this->template('formStart', $attributes);
     }
 
