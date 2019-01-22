@@ -43,11 +43,9 @@ class BookmarksController extends AppController
     public function edit($id = null)
     {
         $bookmark = $this->Bookmark->get($id);
-
+    
         if ($this->request->is(['post', 'put'])) {
-            $bookmark = $this->Bookmark->newEntity($this->request->data);
-
-            $bookmark->id = $id;
+            $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data);
 
             if ($this->Bookmark->save($bookmark)) {
                 $this->Flash->success(__('Your bookmark has been updated.'));

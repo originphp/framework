@@ -165,16 +165,6 @@ class Marshaller
             }
         }
         $data = $this->parseData($data);
-        /*
-         * Here we join datetime field arrays
-         */
-        /* foreach ($dateFields as $field) {
-             if (isset($data[$field]) and is_array($data[$field])) {
-                 if (!empty($data[$field]['date']) and !empty($data[$field]['time'])) {
-                     $data[$field] = $data[$field]['date'].' '.$data[$field]['time'].':00';
-                 }
-             }
-         }*/
 
         return new Entity($data, $options);
     }
@@ -191,6 +181,8 @@ class Marshaller
      */
     public function patchEntity(Entity $entity, array $data)
     {
+        $data = $this->parseData($data);
+        
         foreach ($data as $key => $value) {
             if (is_string($key) and is_array($value)) {
                 foreach ($value as $k => $v) {

@@ -34,7 +34,7 @@ class Entity
      *
      * @var array
      */
-    protected $_validationErrors = [];
+    protected $_errors = [];
 
     /**
      * The name of this entity, alias of the model.
@@ -43,18 +43,43 @@ class Entity
      */
     protected $_name = null;
 
+    /**
+     * Holds modified fields
+     *
+     * @var array
+     */
+    protected $_modified = [];
+
+    /**
+     * Wether this is a new or existingh record. Null means doesnt know
+     *
+     * @var bool
+     */
+    protected $_new = null;
+
+    /**
+     * Undocumented function
+     *
+     * List of options
+     *  - name: Model name
+     *  - new: wether this is  a new record or not
+     *
+     * @param array $properties data
+     * @param array $options
+     */
     public function __construct(array $properties = [], array $options = [])
     {
+        $options += ['name'=>null,'new'=>null];
+
+        $this->_name = $options['name'];
+        $this->_new = $options['new'];
         $this->_properties = $properties;
-        if (isset($options['name'])) {
-            $this->_name = $options['name'];
-        }
     }
 
     public function __set($property, $value)
     {
         $this->_properties[$property] = $value;
-
+        $this->_modified[$property] = true;
         return $this;
     }
 
@@ -78,6 +103,11 @@ class Entity
         return $this->_properties;
     }
 
+    public function __toString()
+    {
+        return json_encode($this->_properties, JSON_PRETTY_PRINT);
+    }
+
     public function __isset($property)
     {
         return isset($this->_properties[$property]);
@@ -92,37 +122,46 @@ class Entity
         return $this;
     }
 
-    public function invalidate(string $field, string $message)
+    /**
+     * Handles the entity errors, can set, get and check
+     *
+     *  $errors = $entity->errors();
+     *  $fieldErrors = $entity->errors('contact_name');
+     *  $entity->errors('email','invalid email address');
+     *  $entity->errors('password',['alphanumeric only','min length must be 5']);
+     *
+     * @param string $field
+     * @param string|array $error
+     * @return null|array
+     */
+    public function errors(string $field = null, string $error = null)
     {
-        if (!isset($this->_validationErrors[$field])) {
-            $this->_validationErrors[$field] = [];
+        if ($field === null) {
+            return $this->_errors;
         }
-        $this->_validationErrors[$field][] = $message;
-    }
-
-    public function errors()
-    {
-        return $this->_validationErrors;
-    }
-
-    public function hasError(string $field)
-    {
-        return isset($this->_validationErrors[$field]);
-    }
-
-    public function getError(string $field)
-    {
-        if (isset($this->_validationErrors[$field])) {
-            return $this->_validationErrors[$field];
+        if ($error === null) {
+            if (isset($this->_errors[$field])) {
+                return $this->_errors[$field];
+            }
+    
+            return null;
         }
 
-        return null;
+        if (!isset($this->_errors[$field])) {
+            $this->_errors[$field] = [];
+        }
+
+        $error = (array) $error;
+        foreach ($error as $message) {
+            $this->_errors[$field][] = $message;
+        }
     }
 
     public function unset($properties)
     {
         foreach ((array) $properties as $key) {
             unset($this->_properties[$key]);
+            unset($this->_modified[$key]);
         }
 
         return $this;
@@ -165,6 +204,7 @@ class Entity
 
         foreach ($properties as $key => $value) {
             $this->_properties[$key] = $value;
+            $this->_modified[$key] = true;
         }
 
         return $this;
@@ -176,6 +216,40 @@ class Entity
     public function clear()
     {
         $this->_properties = [];
+    }
+
+    /**
+     * Resets the modified properties
+     *
+     * @return void
+     */
+    public function clean()
+    {
+        $this->_modified = [];
+    }
+
+    /**
+     * Returns the fields that modified
+     *
+     * @return array
+     */
+    public function modified()
+    {
+        return array_keys($this->_modified);
+    }
+
+    /**
+     * Sets or gets the new propery
+     *
+     * @param boolean $new
+     * @return boolean
+     */
+    public function isNew(bool $new = null)
+    {
+        if ($new === null) {
+            return $this->_new;
+        }
+        return $this->_new = $new;
     }
 
     /**

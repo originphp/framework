@@ -20,6 +20,29 @@ An entity is a single row from the database. Using find first or find all will r
 
 ```
 
+When you want to create an entity from an array, you can do this  in the constructor.
+
+````php 
+  use Origin\Model\Entity;
+
+  $entity = new Entity(['name'=>'Jon']);
+
+````
+
+From within the controller you will want to create entity from request data
+
+
+````php 
+  $user = $this->User->newEntity($this->request->data);
+````
+
+If you are editing an existing record, then use patchEntity. Only fields from request data are saved.
+
+````php 
+  $user = $this->User->patchEntity($existingEntity,$this->request->data);
+````
+
+
 ## Isset
 
 `isset($article->title)`

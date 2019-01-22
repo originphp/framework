@@ -177,7 +177,7 @@ class ModelValidator
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $requiredMessage;
                     }
-                    $entity->invalidate($field, $validationRule['message']);
+                    $entity->errors($field, $validationRule['message']);
                     continue;
                 }
 
@@ -193,15 +193,15 @@ class ModelValidator
 
                     // Invalidate invalid data - If value is not scalar then only add error once
                     if (!is_scalar($value)) {
-                        if ($entity->hasError($field) === false) {
-                            $entity->invalidate($field, $defaultMessage);
+                        if ($entity->errors($field) === false) {
+                            $entity->errors($field, $defaultMessage);
                         }
                         continue;
                     }
 
                     if ($validationRule['rule'] === 'notBlank') {
                         if (!$this->validate($field, $value, $validationRule['rule'])) {
-                            $entity->invalidate($field, $validationRule['message']);
+                            $entity->errors($field, $validationRule['message']);
                         }
                         continue;
                     }
@@ -211,7 +211,7 @@ class ModelValidator
                     }
 
                     if (!$this->validate($field, $value, $validationRule['rule'])) {
-                        $entity->invalidate($field, $validationRule['message']);
+                        $entity->errors($field, $validationRule['message']);
                     }
                 }
             }

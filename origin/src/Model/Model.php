@@ -717,16 +717,24 @@ class Model
                 $hasAndBelongsToMany[$alias] = $entity->{$needle};
             }
         }
-
-        $data = $entity->get(array_keys($this->schema()));
-
+        
+        /**
+         * By default we will save all entity properties that match with schema. If the isNew returns false then
+         * we only save modified columns
+         */
+        $columns = array_keys($this->schema());
+        if ($entity->isNew() === false) {
+            $columns = array_intersect($columns, $entity->modified());
+        }
+        $data = $entity->get($columns);
+      
         /**
          * All data should be scalar. Invalidate any objects or array data e.g. unvalidated datetime fields.
          */
         $invalidData = false;
         foreach ($data as $key => $value) {
             if (!is_scalar($value)) {
-                $entity->invalidate($key, 'Invalid data');
+                $entity->errors($key, 'Invalid data');
                 $invalidData = true;
             }
         }
@@ -785,7 +793,7 @@ class Model
         return $this->save(new Entity([
             $this->primaryKey => $this->id,
             $fieldName => $fieldValue,
-          ]), $params);
+        ]), $params);
     }
 
     /**
@@ -1374,7 +1382,7 @@ class Model
 
     /**
      * Takes results from the datasource and converts into an entity. Different
-     * from model::toEntity which takes an array which can include hasMany
+     * from model::newEntity which takes an array which can include hasMany
      * and converts.
      *
      * @param array $results results from datasource
@@ -1401,18 +1409,17 @@ class Model
     }
 
     /**
-     * Transforms a single row into an entity, overide this to use a custom
+     * Transforms a single row (array) into an entity, overide this to use a custom
      * Entity class. E.g ContactEntity
-     * This does not convert data.
      *
      * @param array  $resultSet result from database
-     * @param string $name      name of entity basically model alias
+     * @param string $name name of entity basically model alias
      *
      * @return Entity
      */
     protected function createEntity(array $resultSet, string $name)
     {
-        return new Entity($resultSet, ['name' => $name]);
+        return new Entity($resultSet, ['name' => $name,'new' => false]);
     }
 
     protected function loadAssociatedHasMany($query, $results)
@@ -1637,7 +1644,7 @@ class Model
     {
         $marshaller = $this->marshaller();
 
-        return $marshaller->newEntity($array, ['name' => $this->alias]);
+        return $marshaller->newEntity($array, ['name' => $this->alias,'new'=>true]);
     }
 
     /**
@@ -1651,7 +1658,6 @@ class Model
     public function patchEntity(Entity $entity, array $data)
     {
         $marshaller = $this->marshaller();
-
         return $marshaller->patchEntity($entity, $data);
     }
 

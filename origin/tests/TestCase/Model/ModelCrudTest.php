@@ -115,7 +115,7 @@ class ModelCrudTest extends \PHPUnit\Framework\TestCase
       'name' => 'Dave',
       'email' => 'dave@example.com',
       'password' => 'secret',
-    ), ['name' => 'User']);
+    ), ['name' => 'User','new'=>false]);
 
         $this->assertEquals($expected, $User->find('first', $params));
         $this->assertEquals(array($expected), $User->find('all', $params));

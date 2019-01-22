@@ -635,6 +635,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     {
         $methods = array('beforeDelete', 'afterDelete', 'deleteDependent', 'deleteHABTM');
         $Article = $this->getMockModel(Article::class, $methods);
+    
         $this->assertTrue($Article->exists(1));
 
         $Article->expects($this->once())
@@ -714,19 +715,19 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     public function testDeleteAll()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-        $article = $Article->find('first');
+        $article = $Article->get(2);
         $this->assertNotEmpty($article);
         $this->assertTrue($Article->deleteAll(['id' => $article->id]));
-        $Article->save($article); // Add back
+        $Article->save(new Entity($article->toArray())); // Add back
     }
 
     public function testDeleteAllCallbacksDisabled()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-        $article = $Article->find('first');
+        $article = $Article->get(2);
         $this->assertNotEmpty($article);
         $this->assertTrue($Article->deleteAll(['id' => $article->id]), true, false);
-        $Article->save($article); // Add back
+        $Article->save(new Entity($article->toArray())); // Add back
     }
 
     public function testSaveManyValidationErrors()
@@ -991,6 +992,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $article = $Article->find('first');
+        $this->assertEquals('Second Post', $article->title); // # sanity check
+        
         $Article->id = $article->id;
         $this->assertTrue($Article->saveField('title', 'testSaveField'));
         $article = $Article->find('first');
@@ -1000,6 +1003,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     public function testUpdateAll()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $count = $Article->find('count', array('conditions' => ['published' => 1]));
+     
         $this->assertTrue($Article->updateAll(['published' => 1], ['published' => 0]));
         $count = $Article->find('count', array('conditions' => ['published' => 1]));
         $this->assertEquals(4, $count);

@@ -20,9 +20,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 {
     public function testSet()
     {
-        $Entity = new Entity();
-        $Entity->id = 1000;
-        $this->assertTrue(isset($Entity->id));
+        $entity = new Entity();
+        $entity->id = 1000;
+        $this->assertTrue(isset($entity->id));
     }
 
     /**
@@ -30,10 +30,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testGet()
     {
-        $Entity = new Entity();
-        $Entity->id = 1001;
+        $entity = new Entity();
+        $entity->id = 1001;
 
-        $this->assertEquals(1001, $Entity->id);
+        $this->assertEquals(1001, $entity->id);
     }
 
     /**
@@ -41,10 +41,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsset()
     {
-        $Entity = new Entity();
-        $Entity->id = 1002;
-        $this->assertTrue(isset($Entity->id));
-        $this->assertFalse(isset($Entity->name));
+        $entity = new Entity();
+        $entity->id = 1002;
+        $this->assertTrue(isset($entity->id));
+        $this->assertFalse(isset($entity->name));
     }
 
     /**
@@ -52,10 +52,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testUnset()
     {
-        $Entity = new Entity();
-        $Entity->id = 1003;
-        unset($Entity->id);
-        $this->assertTrue(!isset($Entity->id));
+        $entity = new Entity();
+        $entity->id = 1003;
+        unset($entity->id);
+        $this->assertTrue(!isset($entity->id));
     }
 
     /**
@@ -64,10 +64,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testEmptyFunc()
     {
-        $Entity = new Entity();
-        $Entity->id = null;
-        $this->assertTrue(empty($Entity->id));
-        $this->assertTrue(empty($Entity->name));
+        $entity = new Entity();
+        $entity->id = null;
+        $this->assertTrue(empty($entity->id));
+        $this->assertTrue(empty($entity->name));
     }
 
     public function testCreate()
@@ -76,9 +76,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
       'id' => 1004,
       'name' => 'EntityName',
     );
-        $Entity = new Entity($data);
-        $this->assertEquals(1004, $Entity->id);
-        $this->assertEquals('EntityName', $Entity->name);
+        $entity = new Entity($data);
+        $this->assertEquals(1004, $entity->id);
+        $this->assertEquals('EntityName', $entity->name);
     }
 
     /**
@@ -115,11 +115,11 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         'author_id' => null,
     );
 
-        $Entity = new Entity($data);
+        $entity = new Entity($data);
 
-        $this->assertTrue($Entity->hasProperty('title'));
-        $this->assertFalse($Entity->hasProperty('author_id'));
-        $this->assertFalse($Entity->hasProperty('undefined'));
+        $this->assertTrue($entity->hasProperty('title'));
+        $this->assertFalse($entity->hasProperty('author_id'));
+        $this->assertFalse($entity->hasProperty('undefined'));
     }
 
     public function testInvalidate()
@@ -129,8 +129,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         'author_id' => null,
     );
 
-        $Entity = new Entity($data);
-        $Entity->invalidate('title', 'invalid title');
-        $this->assertEquals(['invalid title'], $Entity->getError('title'));
+        $entity = new Entity($data);
+        $entity->errors('title', 'invalid title');
+     
+        $this->assertEquals(['invalid title'], $entity->errors('title'));
     }
 }

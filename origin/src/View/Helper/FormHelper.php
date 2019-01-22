@@ -334,10 +334,8 @@ class FormHelper extends Helper
             $entity = $this->getEntity($this->data, $name);
             if ($entity) {
                 $model = $entity->name();
-                if ($entity->hasError($column)) {
-                    $errors = $entity->getError($column);
-
-                    foreach ($errors as $error) {
+                if ($entity->errors($column)) {
+                    foreach ($entity->errors($column) as $error) {
                         $errorOutput .= $this->template('error', ['content' => $error]);
                     }
                     $template = 'controlError';
@@ -665,7 +663,7 @@ class FormHelper extends Helper
             }
 
             // Check Validation Errors
-            if ($this->data->hasError($last)) {
+            if ($this->data->errors($last)) {
                 $errorClass = 'error';
                 $options = $this->addClass('error', $options);
             }
