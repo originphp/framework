@@ -18,6 +18,7 @@ use Origin\Model\Marshaller;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Testsuite\TestTrait;
+use Origin\Model\ModelRegistry;
 
 class MockMarkshaller extends Marshaller
 {
@@ -39,51 +40,57 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $result = $Marshaller->callMethod('buildAssociationMap');
 
         $expected = [
-      'author' => 'Author',
-      'category' => 'Category',
-      'comments' => 'Comment',
-      'tags' => 'Tag',
-    ];
+        'author' => 'one',
+        'category' => 'one',
+        'comments' => 'many',
+        'tags' => 'many',
+      ];
         $this->assertEquals($expected, $result);
     }
+
 
     public function testNewEntity()
     {
         $data = array(
-      'id' => 1024,
-      'title' => 'Some article title',
-      'author' => array(
-        'id' => 2048,
-        'name' => 'Jon',
-      ),
-      'tags' => array(
-        array('tag' => 'new'),
-        array('tag' => 'featured'),
-      ),
-    );
+          'id' => 1024,
+          'title' => 'Some article title',
+          'author' => array(
+            'id' => 2048,
+            'name' => 'Jon',
+            'created' => ['date'=>'22/01/2019','time'=>'01:42pm']
+          ),
+          'tags' => array(
+            array('tag' => 'new', 'created' => ['date'=>'22/01/2019','time'=>'01:43pm']),
+            array('tag' => 'featured'),
+          ),
+          'created' => ['date'=>'22/01/2019','time'=>'01:41pm']
+        );
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
-
+        $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
         $Marshaller = new Marshaller($Article);
 
-        $entity = $Marshaller->newEntity($data, ['name' => 'Article']);
-
+        $entity = $Marshaller->one($data, ['name' => 'Article']);
+          
         $this->assertEquals(1024, $entity->id);
         $this->assertEquals('Some article title', $entity->title);
         $this->assertTrue(is_array($entity->author));
         $this->assertTrue(is_array($entity->tags));
+        $this->assertEquals('2020-10-01 13:41:00', $entity->created);
 
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
+        $Marshaller = new Marshaller($Article);
 
-        $entity = $Marshaller->newEntity($data, ['name' => 'Article']);
-
+        $entity = $Marshaller->one($data, ['name' => 'Article']);
+        $this->assertEquals('2020-10-01 13:42:00', $entity->author->created);
+        $this->assertEquals('2020-10-01 13:43:00', $entity->tags[0]->created);
         $this->assertInstanceOf(Entity::class, $entity->author);
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
     }
 
     /**
-     * @depends testNewEntity
+     * @d epends testNewEntity
      */
     public function testPatchEntity()
     {
@@ -93,22 +100,24 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
       'author' => array(
         'id' => 2048,
         'name' => 'Jon',
+        'created' => ['date'=>'22/01/2019','time'=>'01:41pm']
       ),
       'tags' => array(
         array('tag' => 'new'),
         array('tag' => 'featured'),
       ),
+      'created' => ['date'=>'22/01/2019','time'=>'10:20am']
     );
 
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Author = new Model(array('name' => 'Author', 'datasource' => 'test'));
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
-
+        
         $Article->hasOne('Author');
         $Article->hasMany('Tag');
         $Marshaller = new Marshaller($Article);
-        $Entity = $Marshaller->newEntity($data, ['name' => 'Article']);
-
+        $Entity = $Marshaller->one($data, ['name' => 'Article']);
+        
         $requestData = array(
         'title' => 'New Article Name',
         'unkown' => 'insert data',
@@ -120,7 +129,8 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
           array('tag' => 'top ten'),
         ),
       );
-        $patchedEntity = $Marshaller->patchEntity($Entity, $requestData);
+        $patchedEntity = $Marshaller->patch($Entity, $requestData);
+      
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
         $this->assertEquals('published', $patchedEntity->tags[0]->tag);

@@ -31,6 +31,7 @@ use Origin\Core\Inflector;
  */
 use Origin\Utils\Date;
 use Origin\Utils\Number;
+use Origin\Model\Model;
 
 class Marshaller
 {
@@ -43,6 +44,8 @@ class Marshaller
 
     /**
      * Creates a map for entity fields.
+     * Example:
+     *  ['author' => 'one', 'tags' => 'many']
      *
      * @return array
      */
@@ -51,28 +54,32 @@ class Marshaller
         $map = [];
         $model = $this->model;
         foreach (array_merge($model->hasOne, $model->belongsTo) as $alias => $config) {
-            $map[lcfirst($alias)] = $alias;
+            $map[lcfirst($alias)] = 'one';
         }
         foreach (array_merge($model->hasMany, $model->hasAndBelongsToMany) as  $alias => $config) {
             $key = Inflector::pluralize(lcfirst($alias));
-            $map[$key] = $alias;
+            $map[$key] = 'many';
         }
 
         return $map;
     }
 
     /**
-     * Takes data from user input.
-     *
-     * @todo I am thinking validation should take place in Marshaller to deal
-     * with date/time fields
+     * Parses data from known models
      *
      * @param array $data
      */
-    protected function parseData(array $data)
+    protected function parseData(array $data, string $model = null)
     {
-        $schema = $this->model->schema();
-
+        if ($model === null) {
+            return $data;
+        }
+        if ($model === $this->model->name) {
+            $schema = $this->model->schema();
+        } else {
+            $schema = $this->model->{$model}->schema();
+        }
+             
         foreach ($data as $field => $value) {
             if (!is_string($field) or !isset($schema[$field])) {
                 continue;
@@ -93,7 +100,6 @@ class Marshaller
                         } elseif (!empty($value['date']) and !empty($value['time'])) {
                             $date = Date::parseDate($value['date']);
                             $time = Date::parseTime($value['time']);
-
                             if ($date and $time) {
                                 $data[$field] = $date.' '.$time;
                             }
@@ -128,67 +134,72 @@ class Marshaller
     }
 
     /**
-     * Creates an entity object from data.
+     * Creates One Entity
      *
-     * @param array $array
-     * @param array $options name
+     * Options
+     * - name: model name
      *
-     * @return Entity
+     * @param array $data
+     * @param array $options
+     * @return void
      */
-    public function newEntity(array $array, array $options = [])
+    public function one(array $data, array $options=[])
     {
-        $associations = $this->buildAssociationMap();
+        $options += ['name' => null];
 
-        $data = [];
-        foreach ($array as $key => $value) {
-            if (is_string($key) and is_array($value)) {
-                if (isset($associations[$key])) {
-                    $single = $many = [];
-                    $model = $associations[$key];
-                    foreach ($value as $k => $v) {
-                        if (is_int($k)) {
-                            $many[] = $this->newEntity($v, ['name' => $model]);   // hasMany/hasAndbelongsToMany
-                        } else {
-                            $single[$k] = $v; // belongsTo/hasOne
-                        }
-                    }
-                    if ($single) {
-                        $data[$key] = new Entity($single, ['name' => $model]);
-                    } else {
-                        $data[$key] = $many;
-                    }
-                    continue;
+        $propertyMap = $this->buildAssociationMap($options);
+        
+        $data = $this->parseData($data, $options['name']);
+        
+        $entity = new Entity([], $options);
+        foreach ($data as $property => $value) {
+            if (isset($propertyMap[$property])) {
+                $result = [];
+                $alias = $property;
+                if ($propertyMap[$property] === 'many') {
+                    $alias = Inflector::singularize($alias);
                 }
-                $data[$key] = $value; // If there is no assocation put the data back.
-            } elseif (is_string($key)) {
-                $data[$key] = $value;
+                $entity->set($property, $this->{$propertyMap[$property]}($value, ['name'=>ucfirst($alias)]));
+            } else {
+                $entity->set($property, $value);
             }
         }
-        $data = $this->parseData($data);
-
-        return new Entity($data, $options);
+        return $entity;
+    }
+    
+    /**
+     * Handles the hasMany and hasAndBelongsToMany
+     *
+     * @param array $data
+     * @param array $options
+     * @return void
+     */
+    public function many(array $data, array $options=[])
+    {
+        $result = [];
+        foreach ($data as $row) {
+            $result[] = $this->one($row, $options);
+        }
+        return $result;
     }
 
+
     /**
-     * Patches an entity. Still working on this. Currently favor new entity each time, as we are resaving
-     * all data. If keep track of dirty data, then primary keys need to be set, each model
-     * needs to be loaded.
+     * Patches an existing entity, keeping track on changed fields (used by set, not actual value), this so
+     * when saving existing entities, we don't save non submited data
      *
      * @param Entity $entity
      * @param array  $data
-     *
      * @return Entity
      */
-    public function patchEntity(Entity $entity, array $data)
+    public function patch(Entity $entity, array $data, array $options=[])
     {
-        $data = $this->parseData($data);
-        
         foreach ($data as $key => $value) {
             if (is_string($key) and is_array($value)) {
                 foreach ($value as $k => $v) {
                     $subEntity = $entity->{$key};
                     if (is_int($k)) { // hasMany
-                        $subEntity[$k] = $this->patchEntity($subEntity[$k], $v);
+                        $subEntity[$k] = $this->patch($subEntity[$k], $v);
                     } elseif ($subEntity instanceof Entity) {
                         $subEntity->set($k, $v);
                     }

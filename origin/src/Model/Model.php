@@ -289,7 +289,7 @@ class Model
      */
     public function association(string $name)
     {
-        if (isset($this->{$name})) {
+        if (in_array($name, $this->associations())) {
             return $this->{$name};
         }
 
@@ -1644,7 +1644,21 @@ class Model
     {
         $marshaller = $this->marshaller();
 
-        return $marshaller->newEntity($array, ['name' => $this->alias,'new'=>true]);
+        return $marshaller->one($array, ['name' => $this->alias,'new'=>true]);
+    }
+
+    /**
+     * Creates many Entities from an array of data.
+     *
+     * @param array $data
+     *
+     * @return Entity
+     */
+    public function newEntities(array $array)
+    {
+        $marshaller = $this->marshaller();
+
+        return $marshaller->many($array, ['name' => $this->alias,'new'=>true]);
     }
 
     /**
@@ -1658,7 +1672,7 @@ class Model
     public function patchEntity(Entity $entity, array $data)
     {
         $marshaller = $this->marshaller();
-        return $marshaller->patchEntity($entity, $data);
+        return $marshaller->patch($entity, $data);
     }
 
     /**

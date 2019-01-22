@@ -199,6 +199,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         ),
       );
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
         $Article->hasOne('Author');
         $Entity = $Article->newEntity($data);
 
@@ -1107,6 +1108,8 @@ lastname VARCHAR(30) NOT NULL
         ),
       );
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
+        $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
         $Entity = $Article->newEntity($data);
