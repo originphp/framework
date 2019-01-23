@@ -333,6 +333,19 @@ class Model
     }
 
     /**
+     * This will load any model regardless if it is associated or
+     * not.
+     * - To keep things consistent througout framework.
+     * @param string $model
+     * @param array $config
+     * @return void
+     */
+    public function loadModel(string $model, array $config=[])
+    {
+        return ModelRegistry::get($model, $config);
+    }
+
+    /**
      * JOINING MODELS TOGETHER - These functions help do that if models and fields
      * are named properly. Models should be CamelCase and foreign keys should be
      * underscored_model_id and the primary key field should be id. Whilst we can easily
