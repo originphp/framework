@@ -63,6 +63,7 @@ height:90%;
    cursor: pointer;
    color:white;
    font-weight:bold;
+   text-decoration: none;
 
 }
 
