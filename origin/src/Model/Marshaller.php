@@ -194,6 +194,10 @@ class Marshaller
      */
     public function patch(Entity $entity, array $data, array $options=[])
     {
+        if ($entity->name) {
+            $data = $this->parseData($data, $entity->name());
+        }
+       
         foreach ($data as $key => $value) {
             if (is_string($key) and is_array($value)) {
                 foreach ($value as $k => $v) {
