@@ -36,38 +36,65 @@ class Helper
     protected $helperRegistry = null;
 
     /**
-     * Other helpers that will be used.
+     * Array of helpers and config. This poupulated by loadHelper
      *
      * @var array
      */
-    public $uses = [];
-
-    /**
-     * Array of helpers and config.
-     *
-     * @var array
-     */
-    protected $helpers = [];
+    protected $_helpers = [];
 
     public function __construct(View $view, array $config = [])
     {
         $this->helperRegistry = $view->helperRegistry();
         $this->request =& $view->request;
 
-        $this->prepareHelpers();
-
         $this->config($config);
         $this->initialize($config);
     }
 
+    /**
+     * Lazy loading
+     */
     public function __get($name)
     {
-        if (isset($this->helpers[$name])) {
-            $this->{$name} = $this->helperRegistry()->load($name, $this->helpers[$name]);
-
+        if (isset($this->_helpers[$name])) {
+            $this->{$name} = $this->helperRegistry()->load($name, $this->_helpers[$name]);
+            
             if (isset($this->{$name})) {
                 return $this->{$name};
             }
+        }
+    }
+
+    /**
+    * Sets another helper to be loaded within this helper. It will be
+    * lazy loaded when needed, startup/stutdown callbacks will not be called when loading
+    * helpers within helpers.
+    *
+    * @param string $helper e.g Auth, Flash
+    * @param array $config
+    * @return void
+    */
+    public function loadHelper(string $name, array $config = [])
+    {
+        list($plugin, $helper) = pluginSplit($name);
+        $config = array_merge(['className' => $name . 'Helper'], $config);
+        $this->_helpers[$helper] = $config;
+    }
+
+    /**
+     * Loads Multiple helpers through the loadHelper method
+     *
+     * @param array $helpers
+     * @return void
+     */
+    public function loadHelpers(array $helpers)
+    {
+        foreach ($helpers as $helper => $config) {
+            if (is_int($helper)) {
+                $helper = $config;
+                $config = [];
+            }
+            $this->loadHelper($helper, $config);
         }
     }
 
@@ -79,19 +106,6 @@ class Helper
     public function helperRegistry()
     {
         return $this->helperRegistry;
-    }
-
-    protected function prepareHelpers()
-    {
-        // Create map of helpers with config
-        foreach ($this->uses as $helper => $config) {
-            if (is_int($helper)) {
-                $helper = $config;
-                $config = [];
-            }
-            $config = array_merge(['className' => $helper.'Helper'], $config);
-            $this->helpers[$helper] = $config;
-        }
     }
 
 
