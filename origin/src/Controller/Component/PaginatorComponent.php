@@ -125,8 +125,7 @@ class PaginatorComponent extends Component
 
     protected function mergeDefaults($settings)
     {
-        $settings = $this->config + $settings;
-
+        $settings += $this->config;
         return $this->filterArray($this->whitelist['find'], $settings);
     }
 
