@@ -374,12 +374,11 @@ class Model
         );
         $options = array_merge($defaults, $options);
 
-        $foreignKey = Inflector::underscore($this->name).'_id';
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = $foreignKey;
+            $options['foreignKey'] = Inflector::underscore($this->name).'_id';
         }
         $conditions = array(
-          "{$this->alias}.id = {$association}.{$foreignKey}",
+          "{$this->alias}.id = {$association}.{$options['foreignKey']}",
           );
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
@@ -413,12 +412,12 @@ class Model
         );
 
         $options = array_merge($defaults, $options);
-        $foreignKey = Inflector::underscore($options['className']).'_id';
+
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = $foreignKey;
+            $options['foreignKey'] = Inflector::underscore($options['className']).'_id';
         }
         $conditions = array(
-            "{$this->alias}.{$foreignKey} = {$association}.id",
+            "{$this->alias}.{$options['foreignKey']} = {$association}.id",
         );
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
@@ -517,16 +516,16 @@ class Model
         }
 
         $foreignKey = Inflector::underscore($this->name).'_id';
-        $associationForeignKey = Inflector::underscore($options['className']).'_id';
+     
 
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = $foreignKey;
         }
         if (is_null($options['associationForeignKey'])) {
-            $options['associationForeignKey'] = $associationForeignKey;
+            $options['associationForeignKey'] = Inflector::underscore($options['className']).'_id';
         }
         $conditions = array(
-          "{$options['with']}.{$associationForeignKey} = {$options['className']}.id",
+          "{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id",
         );
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
@@ -1447,7 +1446,7 @@ class Model
             if (empty($config['fields'])) {
                 $config['fields'] = $this->{$alias}->fields();
             }
-
+        
             foreach ($results as $index => &$result) {
                 if (isset($result->{$this->primaryKey})) {
                     $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
@@ -1499,7 +1498,7 @@ class Model
      * Reads the datasource using query array and returns the result set.
      *
      * @param string $type  [description]
-     * @param array  $query [description]
+     * @param array  $query (conditions,joins,fields,order,limit etc)
      *
      * @return [type] [description]
      */
@@ -1656,7 +1655,7 @@ class Model
     public function newEntity(array $array = [])
     {
         $marshaller = $this->marshaller();
-
+        
         return $marshaller->one($array, ['name' => $this->alias,'new'=>true]);
     }
 
@@ -1712,8 +1711,8 @@ class Model
     public function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
     {
         $callbacks = array(
-        array($this, $callback),
-      );
+            array($this, $callback),
+        );
 
         foreach ($this->behaviorRegistry()->enabled() as $behavior) {
             $callbacks[] = array($this->{$behavior}, $callback);
@@ -1721,11 +1720,21 @@ class Model
 
         foreach ($callbacks as $callable) {
             $result = call_user_func_array($callable, $arguments);
+           
             if ($result === false) {
                 return false;
             }
             // overwrite first argument with last result if its array
             if ($passedArgs and is_array($result)) {
+                $arguments[0] = $result;
+            }
+            /**
+             * Bug Fix. When reloading an entity with new belongsTo in afterFind
+             * and trying to replace result is overwritten by original after timestamp
+             * behavior is called. This only happened when overwriting the entire Entity
+             * not when adjusting eg. $entity->property = 'foo'
+             */
+            if ($result instanceof Entity) {
                 $arguments[0] = $result;
             }
         }
