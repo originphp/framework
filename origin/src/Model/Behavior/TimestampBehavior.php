@@ -16,6 +16,12 @@ namespace Origin\Model\Behavior;
 
 use Origin\Model\Entity;
 
+/**
+ * TimestampBehavior
+ * adds timestamp to created and modified fields.
+ * Modified is always set, in the case you are importing records and want
+ * to preserve the existing modified field, then disable the behavior
+ */
 class TimestampBehavior extends Behavior
 {
     protected $defaultConfig = [
@@ -25,11 +31,6 @@ class TimestampBehavior extends Behavior
 
     public function initialize(array $config = [])
     {
-        /*
-         * @todo pending intnialize default config merge trait. This can be removed once
-         * implemented.
-         */
-        $this->config = array_merge($this->defaultConfig, $this->config);
     }
 
     public function beforeSave(Entity $entity, $options = array())
@@ -38,17 +39,17 @@ class TimestampBehavior extends Behavior
         $timestamp = date('Y-m-d H:i:s');
         $primaryKey = $model->primaryKey;
         $createdField = $this->config['created'];
-        if (!$entity->hasProperty($primaryKey) or empty($entity->{$primaryKey})) {
+        if (empty($entity->{$primaryKey})) {
             if ($model->hasField($createdField) and empty($entity->{$createdField})) {
                 $entity->set($createdField, $timestamp);
             }
         }
 
         $modifiedField = $this->config['modified'];
-        if ($model->hasField($modifiedField) and empty($entity->{$modifiedField})) {
+        if ($model->hasField($modifiedField)) {
             $entity->set($modifiedField, $timestamp);
         }
-
+  
         return true;
     }
 }
