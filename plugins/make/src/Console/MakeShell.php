@@ -74,6 +74,7 @@ class MakeShell extends Shell
     public function showUsage()
     {
         $this->out('make all');
+        $this->out('make all Contact');
         $this->out('make model Contact');
         $this->out('make controller Contacts');
         $this->out('make view Contact');
@@ -99,7 +100,7 @@ class MakeShell extends Shell
         } else {
             $models = $this->args;
         }
-   
+       
         foreach ($models as $model) {
             $controller = Inflector::pluralize($model);
             $this->controller($controller);
@@ -118,7 +119,7 @@ class MakeShell extends Shell
 
     public function controller(string $controller = null)
     {
-        if (isset($this->args[0])) {
+        if ($controller === null and isset($this->args[0])) {
             $controller = $this->args[0];
         }
         if ($controller === null) {
@@ -169,7 +170,7 @@ class MakeShell extends Shell
 
     public function model(string $model = null)
     {
-        if (isset($this->args[0])) {
+        if ($model === null and isset($this->args[0])) {
             $model = $this->args[0];
         }
         if ($model === null) {
@@ -231,7 +232,7 @@ class MakeShell extends Shell
 
     public function view(string $controller = null)
     {
-        if (isset($this->args[0])) {
+        if ($controller === null and isset($this->args[0])) {
             $controller = $this->args[0];
         }
         if ($controller === null) {

@@ -20,10 +20,14 @@ We will need to create the Model, View and Controller (MVC);
 
 `bin/console make view Contacts`
 
-If all went ok then you should be able to acesss your contacts app by `http://localhost:8000/contacts`
-
-It will create the following views
+This will generate the following views
 - `/contacts/add` 
 - `/contacts/edit`
 - `/contacts/index`
 - `/contacts/view`
+
+You can also generate the Model,View,Controller (MVC) in one go
+
+`bin/console make all Contact`
+
+If all went ok then you should be able to access your contacts app by `http://localhost:8000/contacts`
