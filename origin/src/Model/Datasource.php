@@ -30,9 +30,9 @@ class Datasource
     protected $connection = null;
 
     /**
-     * Result from executing queries or statement.
+     * PDO statement returned from executing
      */
-    protected $result = null;
+    protected $statement = null;
 
     /**
      * @example Virtual fields are CONCAT(Lead.first_name, " ", Lead.last_name) AS Lead__name
@@ -93,7 +93,7 @@ class Datasource
         try {
             $start = microtime(true);
 
-            $this->result = $query = $this->connection->prepare($sql);
+            $this->statement = $query = $this->connection->prepare($sql);
 
             $result = $query->execute($params);
 
@@ -135,7 +135,7 @@ class Datasource
      */
     public function hasResults()
     {
-        return is_a($this->result, 'PDOStatement') and $this->result->rowCount() > 0;
+        return is_a($this->statement, 'PDOStatement') and $this->statement->rowCount() > 0;
     }
 
     /**
@@ -176,7 +176,7 @@ class Datasource
     public function lastAffected()
     {
         if ($this->hasResults()) {
-            return $this->result->rowCount();
+            return $this->statement->rowCount();
         }
 
         return 0;
@@ -210,7 +210,7 @@ class Datasource
     public function fetchList()
     {
         if ($this->hasResults()) {
-            return $this->toList($this->result->fetchAll(PDO::FETCH_NUM));
+            return $this->toList($this->statement->fetchAll(PDO::FETCH_NUM));
         }
 
         return null;
@@ -227,17 +227,18 @@ class Datasource
     {
         if ($this->hasResults()) {
             $rows = [];
-
+       
             if ($type == 'model') {
                 $this->mapColumns();
             }
-
+       
             while ($row = $this->fetchResult($type)) {
                 $rows[] = $row;
             }
 
             return $rows;
         }
+    
 
         return null;
     }
@@ -258,15 +259,15 @@ class Datasource
             $fetchType = PDO::FETCH_OBJ;
         }
 
-        if ($row = $this->result->fetch($fetchType)) {
+        if ($row = $this->statement->fetch($fetchType)) {
             if ($type == 'model') {
                 $row = $this->toModel($row, $this->columnMap);
             }
 
             return $row;
         }
-
-        $this->result->closeCursor();
+       
+        $this->statement->closeCursor();
 
         return false;
     }
@@ -338,7 +339,7 @@ class Datasource
     {
         $this->columnMap = [];
         if ($statement == null) {
-            $statement = $this->result;
+            $statement = $this->statement;
         }
         $numberOfFields = $statement->columnCount();
         for ($i = 0; $i < $numberOfFields; ++$i) {
