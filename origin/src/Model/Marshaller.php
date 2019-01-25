@@ -148,12 +148,12 @@ class Marshaller
         $options += ['name' => null];
 
         $propertyMap = $this->buildAssociationMap($options);
-        
+     
         $data = $this->parseData($data, $options['name']);
-        
+      
         $entity = new Entity([], $options);
         foreach ($data as $property => $value) {
-            if (isset($propertyMap[$property])) {
+            if (isset($propertyMap[$property]) and is_array($value)) {
                 $result = [];
                 $alias = $property;
                 if ($propertyMap[$property] === 'many') {
