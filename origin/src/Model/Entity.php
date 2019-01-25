@@ -226,6 +226,7 @@ class Entity
     public function clean()
     {
         $this->_modified = [];
+        $this->_errors = [];
     }
 
     /**
