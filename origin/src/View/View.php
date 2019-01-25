@@ -136,7 +136,7 @@ class View
 
         $vars = array_merge($this->vars, $vars);
 
-        extract($vars, EXTR_SKIP);
+        extract($vars);
 
         ob_start();
 
@@ -286,7 +286,7 @@ class View
     {
         $view__filename = $this->getViewFilename($path);
 
-        extract($this->vars, EXTR_SKIP);
+        extract($this->vars);
         ob_start();
         require $view__filename;
         $buffer = $this->view = ob_get_clean();
@@ -309,7 +309,7 @@ class View
             $this->vars['title'] = Inflector::humanize(Inflector::underscore($this->name));
         }
 
-        extract($this->vars, EXTR_SKIP);
+        extract($this->vars);
 
         ob_start();
         require $layout_filename;
