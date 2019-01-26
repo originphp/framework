@@ -86,3 +86,24 @@ You can also get many properties at once
 Sometimes you need to see if a property is set regardless if it is null.
 
 `$bool = $article->propertyExists('id')`
+
+## Errors
+
+Validation errors are contained within the entities.
+
+You can get and set them using `errors`
+
+To get all errors
+`$entity->errors();`
+
+To get errors for a field
+
+`$entity->errors('first_name');`
+
+To set errors 
+````php
+  $entity->errors('email','invalid email address');
+  $entity->errors('password',['alphanumeric only','min length must be 5']);
+````
+
+   
