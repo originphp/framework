@@ -434,7 +434,7 @@ class FormHelper extends Helper
             }
         }
 
-        $dateOptions['name'] = $this->domId($name).'[date]';
+        $dateOptions['name'] = $name .'[date]';
         $date = $this->date($name, $dateOptions);
 
         $tOptions = $this->prepareOptions($name.'_time', []); // Get Value
@@ -442,8 +442,7 @@ class FormHelper extends Helper
             $timeOptions['value'] = $tOptions['value'];
         }
 
-        $timeOptions['name'] = $this->domId($name).'[time]';
-
+        $timeOptions['name'] = $name .'[time]';
         $time = $this->time($name.'_time', $timeOptions);
 
         return $date.$time;
@@ -668,7 +667,7 @@ class FormHelper extends Helper
                 $options = $this->addClass('error', $options);
             }
         }
-
+        
         return $options;
     }
 
