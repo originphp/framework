@@ -173,11 +173,12 @@ class Entity
     public function &get($properties)
     {
         if (is_string($properties)) {
+            $result = null;
             if (isset($this->_properties[$properties])) {
-                return $this->_properties[$properties];
+                $result = $this->_properties[$properties];
             }
 
-            return null;
+            return $result;
         }
 
         $result = [];
