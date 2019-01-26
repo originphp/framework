@@ -76,50 +76,69 @@ class Entity
         $this->_properties = $properties;
     }
 
-    public function __set($property, $value)
+    /**
+    * Magic method for setting data on inaccessible properties.
+    *
+    * @param string $property
+    * @param mixed $value
+    * @return void
+    */
+    public function __set(string $property, $value)
     {
-        $this->_properties[$property] = $value;
-        $this->_modified[$property] = true;
-        return $this;
+        $this->set($property, $value);
     }
 
     /**
-     * Added & to prevent Indirect modification of overloaded property errors. change nulled
-     * to $value for Only variable references should be returned by reference errors. and referenced
-     * result.
+     * Magic method to get data from inaccessible properties.
+     *
+     * @param string $property
+     * @return mixed
      */
-    public function &__get($property)
+    public function &__get(string $property)
     {
-        $value = null;
-        if (isset($this->_properties[$property])) {
-            $value = &$this->_properties[$property];
-        }
-
-        return $value;
+        return $this->get($property);
     }
 
+    /**
+     * Magic method is triggered by calling isset() or empty() on inaccessible properties.
+     *
+     * @param string $property
+     * @return boolean
+     */
+    public function __isset(string $property)
+    {
+        return $this->hasProperty($property);
+    }
+
+    /**
+     * Magic method is triggered by unset on inaccessible properties.
+     *
+     * @param string $property
+     * @return boolean
+     */
+    public function __unset(string $property)
+    {
+        $this->unset($property);
+    }
+
+    /**
+     * Magic method is trigged when calling var_dump
+     *
+     * @return array
+     */
     public function __debugInfo()
     {
         return $this->_properties;
     }
 
+    /**
+     * Magic method is trigged when the object is treated as string,
+     * e.g. echo $entity
+     * @return string
+     */
     public function __toString()
     {
         return json_encode($this->_properties, JSON_PRETTY_PRINT);
-    }
-
-    public function __isset($property)
-    {
-        return isset($this->_properties[$property]);
-    }
-
-    public function __unset($property)
-    {
-        if (isset($this->_properties[$property])) {
-            unset($this->_properties[$property]);
-        }
-
-        return $this;
     }
 
     /**
@@ -170,24 +189,31 @@ class Entity
     /**
      * Added & to prevent Indirect modification of overloaded property errors.
      */
-    public function &get($properties)
+    public function &get(string $property)
     {
-        if (is_string($properties)) {
-            $result = null;
-            if (isset($this->_properties[$properties])) {
-                $result = $this->_properties[$properties];
-            }
-
-            return $result;
+        $result = null;
+        if (isset($this->_properties[$property])) {
+            $result = $this->_properties[$property];
         }
 
+        return $result;
+    }
+
+    /**
+     * Extracts data for selected properties, null values are
+     * important so we use array_key_exists
+     *
+     * @param array $properties
+     * @return void
+     */
+    public function extract(array $properties)
+    {
         $result = [];
         foreach ($properties as $property) {
-            if (isset($this->_properties[$property])) {
-                $result[$property] = $this->_properties[$property];
+            if (array_key_exists($property, $this->_properties)) {
+                $result[$property] = $this->get($property);
             }
         }
-
         return $result;
     }
 

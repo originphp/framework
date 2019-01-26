@@ -738,19 +738,21 @@ class Model
         if ($entity->isNew() === false) {
             $columns = array_intersect($columns, $entity->modified());
         }
-        $data = $entity->get($columns);
-      
+       
+        $data = $entity->extract($columns);
+
         /**
-         * All data should be scalar. Invalidate any objects or array data e.g. unvalidated datetime fields.
+         * Data should not be objects or arrays. Invalidate any objects or array data
+         * e.g. unvalidated datetime fields.
          */
         $invalidData = false;
         foreach ($data as $key => $value) {
-            if (!is_scalar($value)) {
+            if ($value and !is_scalar($value)) {
                 $entity->errors($key, 'Invalid data');
                 $invalidData = true;
             }
         }
-
+ 
         if (empty($data) or $invalidData) {
             return false;
         }
@@ -781,7 +783,6 @@ class Model
             $result = $this->saveHABTM($hasAndBelongsToMany, $options['callbacks']);
         }
 
-        $this->data = null;
         unset($data,$options);
 
         return $result;

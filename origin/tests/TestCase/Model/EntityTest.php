@@ -32,8 +32,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity();
         $entity->id = 1001;
+        $entity->empty = null;
 
         $this->assertEquals(1001, $entity->id);
+        $this->assertEquals(null, $entity->empty);
     }
 
     /**
@@ -73,9 +75,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $data = array(
-      'id' => 1004,
-      'name' => 'EntityName',
-    );
+            'id' => 1004,
+            'name' => 'EntityName',
+        );
         $entity = new Entity($data);
         $this->assertEquals(1004, $entity->id);
         $this->assertEquals('EntityName', $entity->name);
@@ -133,5 +135,19 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $entity->errors('title', 'invalid title');
      
         $this->assertEquals(['invalid title'], $entity->errors('title'));
+    }
+
+    /**
+    * @depends testSet
+    */
+    public function testExtract()
+    {
+        $entity = new Entity();
+        $entity->id = 1024;
+        $entity->name = 'Foo';
+        
+        $expected = ['id'=>1024,'name'=>'Foo'];
+
+        $this->assertEquals($expected, $entity->extract(['id','name','nonExistant']));
     }
 }

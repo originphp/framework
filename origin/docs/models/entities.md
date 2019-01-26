@@ -77,9 +77,11 @@ or
 
 `$title = article->get('title')`
 
+## Extract
+
 You can also get many properties at once
 
-`$extracted = article->get(['title','status'])`
+`$extracted = article->extract(['title','status'])`
 
 ## Property Exists
 
