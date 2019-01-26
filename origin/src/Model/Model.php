@@ -731,13 +731,9 @@ class Model
         }
         
         /**
-         * By default we will save all entity properties that match with schema. If the isNew returns false then
-         * we only save modified columns
+         * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
-        $columns = array_keys($this->schema());
-        if ($entity->isNew() === false) {
-            $columns = array_intersect($columns, $entity->modified());
-        }
+        $columns = array_intersect(array_keys($this->schema()), $entity->modified());
        
         $data = $entity->extract($columns);
 

@@ -194,23 +194,24 @@ class Marshaller
      */
     public function patch(Entity $entity, array $data, array $options=[])
     {
-        $data = $this->parseData($data, $entity->name());
+        $options += ['name' => $entity->name()];
+
+        $propertyMap = $this->buildAssociationMap($options);
      
-        foreach ($data as $key => $value) {
-            if (is_string($key) and is_array($value)) {
-                foreach ($value as $k => $v) {
-                    $subEntity = $entity->{$key};
-                    if (is_int($k)) { // hasMany
-                        $subEntity[$k] = $this->patch($subEntity[$k], $v);
-                    } elseif ($subEntity instanceof Entity) {
-                        $subEntity->set($k, $v);
-                    }
+        $data = $this->parseData($data, $options['name']);
+      
+        foreach ($data as $property => $value) {
+            if (isset($propertyMap[$property]) and is_array($value)) {
+                $result = [];
+                $alias = $property;
+                if ($propertyMap[$property] === 'many') {
+                    $alias = Inflector::singularize($alias);
                 }
-            } elseif (is_string($key)) {
-                $entity->set($key, $value);
+                $entity->set($property, $this->{$propertyMap[$property]}($value, ['name'=>ucfirst($alias)]));
+            } else {
+                $entity->set($property, $value);
             }
         }
-
         return $entity;
     }
 }
