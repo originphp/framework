@@ -270,7 +270,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         // Test Merge went okay
         $relationship = $Post->hasOne('Comment', $hasOneConfig);
         $hasOneConfig['conditions'] = array(
-          'Post.id = Comment.post_id',
+          'Post.id = Comment.funky_post_id',
           '1 == 1',
         );
 
@@ -324,7 +324,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $relationship = $Post->belongsTo('User', $belongsToConfig);
 
         $belongsToConfig['conditions'] = array(
-          'Post.user_id = User.id',
+          'Post.owner_id = User.id',
           '1 == 1',
         );
 
