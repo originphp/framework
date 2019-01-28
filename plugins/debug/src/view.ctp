@@ -66,7 +66,10 @@ height:90%;
    text-decoration: none;
 
 }
-
+.debugbar-memory {
+  padding: 14px 16px;
+  color:#fff;
+}
 .debugbar-header a:hover {
   text-decoration:none;
 }
@@ -82,6 +85,9 @@ height:90%;
     <a id="debug-request-tab" class="debugbar-tab" href="#">Request</a>
     <a id="debug-session-tab" class="debugbar-tab" href="#">Session</a>
     <a id="debug-sql-tab" class="debugbar-tab" href="#">SQL</a>
+    <div class="debugbar-memory float-right">
+      <span> Memory: <?= $debug_vars['memory'] ?> </span>
+    </div>
     <a id="debug-hide-tab" class="debugbar-tab float-right" href="#">&times; hide</a>
   </div>
   <div class="debugbar-body">
@@ -90,7 +96,7 @@ height:90%;
         <?php
           foreach ($debug_vars as $key => $value) {
               ?>
-              <dt class="col-sm-1"><?php echo $key; ?></dt>
+              <dt class="col-sm-1"><?= $key; ?></dt>
               <dd class="col-sm-11"><pre><?php print_r($value); ?></pre></dd>
             <?php
           }
@@ -102,7 +108,7 @@ height:90%;
       <?php
         foreach ($debug_request as $key => $value) {
             ?>
-            <dt class="col-sm-1"><?php echo $key; ?></dt>
+            <dt class="col-sm-1"><?= $key; ?></dt>
             <dd class="col-sm-11"><pre><?php print_r($value); ?></pre></dd>
           <?php
         }
@@ -114,7 +120,7 @@ height:90%;
       <?php
         foreach ($debug_session as $key => $value) {
             ?>
-            <dt class="col-sm-1"><?php echo $key; ?></dt>
+            <dt class="col-sm-1"><?= $key; ?></dt>
             <dd class="col-sm-11"><pre><?php print_r($value); ?></pre></dd>
           <?php
         }
@@ -136,10 +142,10 @@ height:90%;
             foreach ($debug_sql as $query) {
                 ?>
                 <tr>
-                  <td><?php echo $query['query']; ?></td>
-                  <td><?php echo $query['error']; ?></td>
-                  <td><?php echo $query['affected']; ?></td>
-                  <td><?php echo $query['time']; ?></td>
+                  <td><?= $query['query']; ?></td>
+                  <td><?= $query['error']; ?></td>
+                  <td><?= $query['affected']; ?></td>
+                  <td><?= $query['time']; ?></td>
                 </tr>
               <?php
             }
@@ -158,6 +164,7 @@ height:90%;
   function debugbarTabSwitcher(){
     $( "#debug-hide-tab" ).click(function() {
         $(".debugbar-body div").hide();
+        $(".debugbar-memory").show();
         $(this).hide();
           $(".debugbar").height('52px');
     });
@@ -189,7 +196,9 @@ height:90%;
   function debugbarTabClick(){
       $(".debugbar").height('100%');
     $("#debug-hide-tab").show();
+    $(".debugbar-memory").hide();
     $(".debugbar-body div").hide();
     $(".debugbar-tab").removeClass('active');
+    
   }
 </script>
