@@ -15,8 +15,9 @@ class UsersController extends AppController
 
     public function view($id = null)
     {
-        $this->User->recursive = 1;
-        $user = $this->User->get($id);
+        $user = $this->User->get($id, [
+            'contain'=>['Bookmark']
+            ]);
         $this->set('user', $user);
     }
 

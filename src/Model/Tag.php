@@ -4,8 +4,6 @@ namespace App\Model;
 
 class Tag extends AppModel
 {
-    public $recursive = -1;
-
     public $validationRules = [];
     public $displayField = 'title';
 

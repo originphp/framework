@@ -6,8 +6,6 @@ use Origin\Model\Entity;
 
 class Bookmark extends AppModel
 {
-    public $recursive = 1;
-
     public $validationRules = [
       'user_id' => ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
       'title' => ['rule' => 'notBlank'],

@@ -6,8 +6,6 @@ use Origin\Model\Entity;
 
 class User extends AppModel
 {
-    public $recursive = -1;
-
     public $validationRules = [
         'name' => ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
         'email' => [

@@ -26,7 +26,7 @@ class PaginatorComponent extends Component
     ];
 
     protected $whitelist = [
-      'find' => ['conditions', 'fields', 'joins', 'limit', 'order', 'group', 'recursive', 'page'],
+      'find' => ['conditions', 'fields', 'joins', 'limit', 'order', 'group', 'contain', 'page'],
       'query' => ['direction', 'limit', 'page', 'sort'],
     ];
 

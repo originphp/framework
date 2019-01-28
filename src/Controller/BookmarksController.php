@@ -10,12 +10,17 @@ class BookmarksController extends AppController
 
     public function index()
     {
-        $this->set('bookmarks', $this->paginate('Bookmark'));
+        $this->set('bookmarks', $this->paginate('Bookmark', [
+            'contain' => ['User']
+        ]));
     }
 
     public function view($id = null)
     {
-        $bookmark = $this->Bookmark->get($id);
+        $bookmark = $this->Bookmark->get($id, [
+            'contain'=>['User','Tag']
+            ]);
+   
         $this->set('bookmark', $bookmark);
     }
 

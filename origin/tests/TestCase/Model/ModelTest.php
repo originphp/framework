@@ -460,24 +460,20 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         ModelRegistry::set('Profile', new Profile(array('datasource' => 'test')));
 
         // Only fetch this domain
-        $this->assertEquals(-1, $Article->recursive);
         $article = $Article->find('first');
         $this->assertEquals('first-post', $article->slug);
         $objectVars = get_object_vars($article);
         $this->assertArrayNotHasKey('user', $objectVars);
         $this->assertArrayNotHasKey('comments', $objectVars);
 
-        // Fetch record with belongsTo and hasOne
-        $Article->recursive = 0;
-        $article = $Article->find('first');
+        $article = $Article->find('first', ['contain'=>['User']]);
         $this->assertEquals('first-post', $article->slug);
 
         $this->assertTrue($article->hasProperty('user'));
         $this->assertFalse($article->hasProperty('comments'));
 
         // Fetch record with belongsTo/hasOne/and Has Many
-        $Article->recursive = 1;
-        $article = $Article->find('first');
+        $article = $Article->find('first', ['contain'=>['User','Comment','Tag']]);
         $this->assertEquals('first-post', $article->slug);
         $objectVars = $article->properties();
 
@@ -489,8 +485,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(in_array('article', $objectVars));
 
         // Fetch record with belongsTo/hasOne/and Has many and related related
-        $Article->recursive = 2;
-        $article = $Article->find('first');
+        $article = $Article->find('first', ['contain'=>['User','Comment'=>['contain'=>['Article']],'Tag']]);
         $this->assertEquals('first-post', $article->slug);
         $objectVars = $article->properties();
         $this->assertContains('comments', $objectVars);
@@ -607,6 +602,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           'slug' => 'test-save',
           'created' => date('Y-m-d'),
           'modified' => date('Y-m-d'),
+          'marker' => true
         ));
 
         $Article->expects($this->once())

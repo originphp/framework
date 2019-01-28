@@ -304,7 +304,7 @@ class Controller
      *
      * @param string $model name of the model
      * @param array $settings the settings used by PaginatorComponent these are the same settings as in
-     * find query (fields, joins, order,limit, group, callbacks,recursive)
+     * find query (fields, joins, order,limit, group, callbacks,contain)
      * @return array paginated records
      */
     public function paginate(string $model = null, array $settings = [])

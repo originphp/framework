@@ -38,17 +38,6 @@ class Model
     public $displayField = null;
 
     /**
-     * Level to get records
-     * -1 no joins
-     * 0 record with domain
-     * 1 same as 0 but with related records
-     * 2 same but with related related.
-     *
-     * @var int
-     */
-    public $recursive = -1; // ≈
-
-    /**
      * belongsTo keys className, foreignKey, conditions, fields, order).
      */
     protected $belongsTo = [];
@@ -114,6 +103,13 @@ class Model
      * @var BehaviorRegistry
      */
     protected $behaviorRegistry = null;
+
+    /**
+     * Holds the contain stuff
+     *
+     * @var array
+     */
+    protected $contain = [];
 
     public function __construct(array $config = [])
     {
@@ -736,7 +732,7 @@ class Model
         $columns = array_intersect(array_keys($this->schema()), $entity->modified());
        
         $data = $entity->extract($columns);
-
+        
         /**
          * Data should not be objects or arrays. Invalidate any objects or array data
          * e.g. unvalidated datetime fields.
@@ -748,7 +744,7 @@ class Model
                 $invalidData = true;
             }
         }
- 
+   
         if (empty($data) or $invalidData) {
             return false;
         }
@@ -844,7 +840,6 @@ class Model
 
                 $tag = $this->{$association}->find('first', array(
                   'conditions' => array($needle => $row->get($needle)),
-                  'recursive' => -1,
                   'callbacks' => false,
                 ));
 
@@ -1066,8 +1061,7 @@ class Model
 
         return (bool) $this->find('count', array(
         'conditions' => array("{$this->alias}.{$this->primaryKey}" => $id),
-        'callbacks' => false,
-        'recursive' => -1,
+        'callbacks' => false
       ));
     }
 
@@ -1075,7 +1069,7 @@ class Model
      * PSR friendly find by id.
      *
      * @param int|string $id      id of record to fetch
-     * @param array      $options [fields,order,conditions,recursive etc]
+     * @param array $options  (conditions, fields, joins, order,limit, group, callbacks,contain)
      *
      * @return result
      */
@@ -1094,8 +1088,7 @@ class Model
      * The R in CRUD.
      *
      * @param string $type  (first,all,count,list)
-     * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,recursive)
-
+     * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,contain)
      * @return object $resultSet
      */
     public function find(string $type = 'first', $options = [])
@@ -1110,16 +1103,16 @@ class Model
              'page' => null,
              'offset' => null,
              'callbacks' => true,
-             'recursive' => $this->recursive,
+             'contain' => []
            );
 
         $options = array_merge($default, $options);
 
-        $options = $this->prepareQuery($type, $options); // AutoJoin
-
         if ($options['callbacks'] === true) {
             $options = $this->triggerCallback('beforeFind', [$options], true);
         }
+
+        $options = $this->prepareQuery($type, $options); // AutoJoin
 
         $results = $this->{'finder'.ucfirst($type)}($options);
 
@@ -1214,10 +1207,12 @@ class Model
             return false;
         }
 
-        $ids = $this->find('list', array(
+        $ids = $this->find(
+            'list',
+            array(
           'fields' => array($this->primaryKey),
-          'conditions' => $conditions,
-          'recursive' => -1, ));
+          'conditions' => $conditions)
+        );
 
         if (empty($ids)) {
             return false;
@@ -1354,39 +1349,63 @@ class Model
             $query['fields'] = $this->fields();
         }
 
-        // Add AutoJoins
-        if ($query['recursive'] >= 0) {
-            foreach (['belongsTo', 'hasOne'] as $association) {
-                foreach ($this->{$association} as $alias => $config) {
-                    if (!isset($this->{$alias})) {
-                        throw new MissingModelException($config['className'].':'.$alias);
-                    }
-
-                    $query['joins'][] = array(
-                        'table' => Inflector::tableize($config['className']),
-                        'alias' => $alias,
-                        'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
-                        'conditions' => $config['conditions'],
-                        'datasource' => $this->datasource,
-                      );
-
-                    if (!empty($config['order'])) {
-                        if ($query['order'] === null) {
-                            $query['order'] = [];
-                        }
-                        $query['order'][] = $config['order'];
-                    }
-
-                    if (empty($config['fields'])) {
-                        $config['fields'] = $this->{$alias}->fields();
-                    }
-                    // If throw an error, then it can be confusing to know source, so turn to array
-                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
+        $query['contain'] = $this->containConfig($query);
+     
+        foreach (['belongsTo', 'hasOne'] as $association) {
+            foreach ($this->{$association} as $alias => $config) {
+                if (!isset($this->{$alias})) {
+                    throw new MissingModelException($config['className'].':'.$alias);
                 }
+
+                if (isset($query['contain'][$alias]) === false) {
+                    continue;
+                }
+
+                $config += $query['contain'][$alias];
+
+                $query['joins'][] = array(
+                    'table' => Inflector::tableize($config['className']),
+                    'alias' => $alias,
+                    'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
+                    'conditions' => $config['conditions'],
+                    'datasource' => $this->datasource,
+                    );
+
+                if (!empty($config['order'])) {
+                    if ($query['order'] === null) {
+                        $query['order'] = [];
+                    }
+                    $query['order'][] = $config['order'];
+                }
+
+                if (empty($config['fields'])) {
+                    $config['fields'] = $this->{$alias}->fields();
+                }
+                // If throw an error, then it can be confusing to know source, so turn to array
+                $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
             }
         }
 
         return $query;
+    }
+
+    /**
+     * Standardizes the contain config
+     *
+     * @param array $query
+     * @return void
+     */
+    protected function containConfig(array $query)
+    {
+        $contain = [];
+        foreach ((array) $query['contain'] as $model => $config) {
+            if (is_int($model)) {
+                $model = $config;
+                $config = [];
+            }
+            $contain[$model] = $config;
+        }
+        return $contain;
     }
 
     /**
@@ -1438,7 +1457,11 @@ class Model
                 throw new MissingModelException($config['className'].':'.$alias);
             }
 
-            $config['recursive'] = $query['recursive'];
+            if (isset($query['contain'][$alias]) === false) {
+                continue;
+            }
+
+            $config += $query['contain'][$alias];
 
             if (empty($config['fields'])) {
                 $config['fields'] = $this->{$alias}->fields();
@@ -1463,7 +1486,12 @@ class Model
                 throw new MissingModelException($config['className'].':'.$alias);
             }
 
-            $config['recursive'] = $query['recursive'];
+            if (isset($query['contain'][$alias]) === false) {
+                continue;
+            }
+
+            $config += $query['contain'][$alias];
+
             $config['joins'][0] = array(
               'table' => $config['joinTable'],
               'alias' => $config['with'],
@@ -1516,11 +1544,8 @@ class Model
         if ($results and $type === 'model') {
             $results = $this->prepareResults($results);
 
-            if ($query['recursive'] >= 1) {
-                $query['recursive'] = $query['recursive'] - 2; // Skip 1 level to get right
-                $results = $this->loadAssociatedHasMany($query, $results);
-                $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
-            }
+            $results = $this->loadAssociatedHasMany($query, $results);
+            $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
         }
 
         unset($QueryBuilder,$sql,$connection);

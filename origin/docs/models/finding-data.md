@@ -64,22 +64,22 @@ array(
 
 ```
 
-**fields** is an array of fields that you want to return in the query
+- **fields** is an array of fields that you want to return in the query
 
-**order** is either a string or an array of how you want the data to be ordered.
+- **order** is either a string or an array of how you want the data to be ordered.
 
-**group** is for the database group query results.
+- **group** is for the database group query results.
 
-**limit** this sets how many rows are returned.
+- **limit** this sets how many rows are returned.
 
-**callbacks** - If this is set to true, before or after then it will call the model callbacks.
+- **callbacks** - If this is set to true, before or after then it will call the model callbacks.
 
-**recursive** - depending upon levels of recursion that you want to go.
+- **contain** - An array of models that you want to load associated data for. You can also pass the model as key and array of config, e.g ['Tag'=>['fields'=>$field,'conditions'=>$conditions]]
 
-- *-1* does no joins at all.
-- *0* fetches `belongsTo` and `hasOne` associated records
-- *1* will also fetch the `hasMany` associated records
-- *2* will fetch the `hasMany` records with their `belongsTo` and `hasOne` information.
+  - *-1* does no joins at all.
+  - *0* fetches `belongsTo` and `hasOne` associated records
+  - *1* will also fetch the `hasMany` associated records
+  - *2* will fetch the `hasMany` records with their `belongsTo` and `hasOne` information.
 
 **offset** - Select from which record to find the data, this is used with limit.
 

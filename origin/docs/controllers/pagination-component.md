@@ -27,7 +27,7 @@ You can pass an array with the following keys, which are the same as used in Mod
 - **group** is for the database group query results.
 - **limit** this sets how many rows are returned.
 - **callbacks** If this is set to true, before or after then it will call the model callbacks.
-- **recursive** depending upon levels of recursion that you want to go.
+- **contain** An array of models that you want to load associated data for. You can also pass the model as key and array of config, e.g ['Tag'=>['fields'=>$field,'conditions'=>$conditions]]
 - **joins**  An array of join settings to join a table.
 
 ```php

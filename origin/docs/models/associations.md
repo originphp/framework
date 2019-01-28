@@ -14,6 +14,15 @@ When working from the controller, you would access like this
 
 `$results = $this->Model->RelatedModel->find('all')`
 
+To load associated records for model, in the find options you pass an array of models that you want to get, and providing that models have been setup properly (See below) then data will be loaded.
+
+````php
+  $user = $this->User->get($id, [
+            'contain'=>['Task','Email'=>['fields'=>$fields],'Contact'=>['contain'=>$nestedModels]]
+            ]);
+````
+You can pass options for each model to be contained, these will overide what was set with the functions below. You can also load nested associated data, by passing the contain option for each model.
+
 ## Has One
 This is one-to-one relationship. The other model contains the foreign key.
 e.g. User has one Profile, the foreign key is in the other table, this would be
