@@ -13,3 +13,4 @@
         <?= $this->Html->link(__('Back'), ['action' => 'index'],['class'=>'btn btn-primary']); ?>
     </div>
 </div>
+{RELATEDLISTS}

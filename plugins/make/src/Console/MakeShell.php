@@ -77,7 +77,7 @@ class MakeShell extends Shell
         $this->out('make all Contact');
         $this->out('make model Contact');
         $this->out('make controller Contacts');
-        $this->out('make view Contact');
+        $this->out('make view Contacts');
         $this->out('');
         $this->out('You can use -force to not prompt');
         //$this->out('make test Lead'); /**@todo test */
@@ -265,6 +265,17 @@ class MakeShell extends Shell
 
         foreach (['add','edit','index','view'] as $view) {
             $result = $Templater->generate('View/'. $view, $data);
+            // create related lists
+            if ($view === 'view') {
+                $associations = $this->meta['associations'][$model];
+                $related = array_merge($associations ['hasMany'], $associations ['hasAndBelongsToMany']);
+                $relatedList = '';
+                foreach ($related as $associated) {
+                    $relatedList .= $Templater->generate('View/view_related', $this->getData($associated));
+                }
+                $result = str_replace('{RELATEDLISTS}', $relatedList, $result);//One off tag this allows user to wrap in div etc
+            }
+   
             if (!file_put_contents($folder . DS . $view . '.ctp', $result)) {
                 throw new Exception('Error writing file');
             }

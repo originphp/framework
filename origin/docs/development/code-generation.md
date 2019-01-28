@@ -31,3 +31,19 @@ You can also generate the Model,View,Controller (MVC) in one go
 `bin/console make all Contact`
 
 If all went ok then you should be able to access your contacts app by `http://localhost:8000/contacts`
+
+Whats is really great, is if you look in the `plugin/make` folder you will find easy to edit templates, simply
+modify your html there, wrap up stuff in divs, add classes and then make the code. It requires no learning at all.
+
+There are number of vars which are used, and in most cases you wont even need to use these as you will modifying the html structure in the templates.
+
+`%model%` - BookmarksTag
+`%controller%` - BookmarksTags
+`%singularName%` - bookmarksTag
+`%pluralName%` - bookmarksTags
+`%singularHuman%` - Bookmarks Tag
+`%pluralHuman%` - Bookmarks Tags
+`%singularHumanLower%` - bookmarks tag
+`%pluralHumanLower%` - bookmarks tags
+`%controllerUnderscored%` - bookmarks_tags
+`%primaryKey%` - id
