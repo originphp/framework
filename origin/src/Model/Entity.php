@@ -73,7 +73,10 @@ class Entity
 
         $this->_name = $options['name'];
         $this->_new = $options['new'];
-        $this->_properties = $properties;
+        
+        foreach ($properties as $property => $value) {
+            $this->set($property, $value);
+        }
     }
 
     /**
