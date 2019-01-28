@@ -44,8 +44,8 @@ class DebugBar
 
         global $Dispatcher;
 
-        $request = $Dispatcher->getRequest();
-        $controller = $Dispatcher->getController();
+        $request = $Dispatcher->request();
+        $controller = $Dispatcher->controller();
 
         $log = [];
         if (ConnectionManager::has('default')) {

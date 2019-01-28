@@ -112,13 +112,20 @@ class Dispatcher
 
     /**
      * Gets the last request object.
+     *
+     * @return Request
      */
-    public function getRequest()
+    public function request()
     {
         return $this->controller->request;
     }
 
-    public function getController()
+    /**
+     * Gets the controller
+     *
+     * @return Controller
+     */
+    public function controller()
     {
         return $this->controller;
     }
