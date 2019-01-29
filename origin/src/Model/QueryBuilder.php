@@ -545,12 +545,12 @@ class QueryBuilder
         $params['type'] = strtoupper($params['type']);
         $tableReference = $this->tableReference($params['table'], $params['alias']);
 
-        return "{$params['type']} JOIN {$tableReference} ON ( {$this->conditions($params['alias'], $params['conditions'])} )";
+        return "{$params['type']} JOIN {$tableReference} ON ({$this->conditions($params['alias'], $params['conditions'])})";
     }
 
-    public function groupToString(array $fields)
+    public function groupToString($fields)
     {
-        return implode(', ', $this->addAliases($fields));
+        return implode(', ', $this->addAliases((array) $fields));
     }
 
     public function havingToString(array $conditions)
@@ -563,10 +563,10 @@ class QueryBuilder
      *
      * @return clause ORDER BY Country,UserName ASC
      */
-    public function orderToString(array $order)
+    public function orderToString($order)
     {
         $array = [];
-        foreach ($order as $key => $value) {
+        foreach ((array) $order as $key => $value) {
             if (is_int($key)) {
                 $array[] = $this->addAlias($value); //user_name}
             } else {
@@ -703,8 +703,8 @@ class QueryBuilder
             //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
             if (is_string($key) and in_array($key, ['AND', 'OR', 'NOT'])) {
                 $buffer = array();
-                $start = '( ';
-                $end = ' )';
+                $start = '(';
+                $end = ')';
                 foreach ($value as $k => $v) {
                     $data = [$k => $v];
                     if (is_integer($k) and is_string($v)) {
@@ -713,14 +713,17 @@ class QueryBuilder
                         $data = $v;
                     }
 
-                    if ($key == 'NOT') {
-                        $buffer[] = $this->conditions($alias, $data, $join);
-                        $start = 'NOT ( ';
-                    } else {
-                        $buffer[] = $this->conditions($alias, $data, $key);
+                    if ($key === 'NOT') {
+                        $start = 'NOT (';
                     }
+                    $pre = $post = '';
+                    if (count($data)>1) {
+                        $pre = '(';
+                        $post = ')';
+                    }
+                    $buffer[] = $pre. $this->conditions($alias, $data, $join) . $post;
                 }
-                $block[] = $start.implode(' '.$key.' ', $buffer).$end;
+                $block[] = $start.implode(' ' . $key . ' ', $buffer).$end;
                 continue;
             }
             // array('id'=>1234)

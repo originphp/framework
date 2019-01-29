@@ -45,7 +45,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       'alias' => 'UserRole',
       'conditions' => array('UserRole.id => User.role_id'),
     ];
-        $expected = 'LEFT JOIN `user_roles` AS UserRole ON ( UserRole.id => User.role_id )';
+        $expected = 'LEFT JOIN `user_roles` AS UserRole ON (UserRole.id => User.role_id)';
         $this->assertEquals($expected, $Builder->joinToString($data));
 
         $Builder = new QueryBuilder('tag', 'Tag');
@@ -56,7 +56,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
             'ArticlesTag.tag_id = Tag.id',
             'ArticlesTag.article_id' => 1,
           ), ];
-        $expected = 'LEFT JOIN `articles_tags` AS ArticlesTag ON ( ArticlesTag.tag_id = Tag.id AND ArticlesTag.article_id = :t0 )';
+        $expected = 'LEFT JOIN `articles_tags` AS ArticlesTag ON (ArticlesTag.tag_id = Tag.id AND ArticlesTag.article_id = :t0)';
         $this->assertEquals($expected, $Builder->joinToString($data));
     }
 
@@ -197,7 +197,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         'conditions' => ['User.role_id = UserRole.id'],
       ]);
 
-        $expected = 'SELECT User.* FROM `user` AS User LEFT JOIN `roles` AS UserRole ON ( User.role_id = UserRole.id ) WHERE User.id = :u0';
+        $expected = 'SELECT User.* FROM `user` AS User LEFT JOIN `roles` AS UserRole ON (User.role_id = UserRole.id) WHERE User.id = :u0';
         $this->assertSame($expected, $Builder->write());
     }
 
@@ -263,6 +263,20 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $Builder->conditions('Article', ['id IN' => null]);
     }
 
+    public function testOr()
+    {
+        $Builder = new QueryBuilder('post', 'Posts');
+        $conditions = [
+            'model' => 'Contact',
+            'OR' => [
+                ['task'=> 1,'closed'=>0],
+                ['task'=> 0,'start_date <='=> '2019-01-29 09:30:00']
+            ]];
+        $expected = 'Post.model = :p0 AND ((Post.task = :p1 AND Post.closed = :p2) OR (Post.task = :p3 AND Post.start_date <= :p4))';
+        
+        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
+    }
+
     public function testConditionsFull()
     {
         $Builder = new QueryBuilder('post', 'Posts');
@@ -289,14 +303,14 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
             'Post.title' => array('First post', 'Second post', 'Third post'),
         ),
     );
-        $expected = 'NOT ( Post.title IN ( :p7, :p8, :p9 ) )';
+        $expected = 'NOT (Post.title IN ( :p7, :p8, :p9 ))';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array('OR' => array(
           'Post.title' => array('First post', 'Second post', 'Third post'),
           'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
       ));
-        $expected = '( Post.title IN ( :p10, :p11, :p12 ) OR Post.created > :p13 )';
+        $expected = '(Post.title IN ( :p10, :p11, :p12 ) OR Post.created > :p13)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array(
@@ -306,12 +320,12 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
               'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
           ),
       );
-        $expected = 'Author.name = :p14 AND ( Post.title LIKE :p15 OR Post.created > :p16 )';
+        $expected = 'Author.name = :p14 AND (Post.title LIKE :p15 OR Post.created > :p16)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         // Test adding a condition array without key
         $conditions[] = array('Post.appened_field' => 'zigzag');
-        $expected = 'Author.name = :p17 AND ( Post.title LIKE :p18 OR Post.created > :p19 ) AND Post.appened_field = :p20';
+        $expected = 'Author.name = :p17 AND (Post.title LIKE :p18 OR Post.created > :p19) AND Post.appened_field = :p20';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         // Looks the same but is not, SAME FIELD, extra array
@@ -319,7 +333,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         array('Post.title LIKE' => '%one%'),
         array('Post.title LIKE' => '%two%'),
       ));
-        $expected = '( Post.title LIKE :p21 OR Post.title LIKE :p22 )';
+        $expected = '(Post.title LIKE :p21 OR Post.title LIKE :p22)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $Builder = new QueryBuilder('companies', 'Company');
@@ -335,7 +349,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
              ),
          );
 
-        $expected = '( Company.name = :c0 OR Company.city = :c1 ) AND ( Company.status = :c2 AND Company.type IN ( :c3, :c4 ) )';
+        $expected = '(Company.name = :c0 OR Company.city = :c1) AND (Company.status = :c2 AND Company.type IN ( :c3, :c4 ))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
 
         $conditions = array(
@@ -351,7 +365,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
               ),
           );
 
-        $expected = '( Company.name = :c5 OR Company.city = :c6 ) AND ( ( Company.status = :c7 OR Company.type IN ( :c8, :c9 ) ) )';
+        $expected = '(Company.name = :c5 OR Company.city = :c6) AND ((Company.status = :c7 OR Company.type IN ( :c8, :c9 )))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
 
         $conditions = array(
@@ -370,7 +384,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
                 ),
             ),
         );
-        $expected = '( Company.name = :c10 OR Company.city = :c11 ) AND ( ( Company.status = :c12 OR NOT ( Company.status IN ( :c13, :c14 ) ) ) )';
+        $expected = '(Company.name = :c10 OR Company.city = :c11) AND ((Company.status = :c12 OR NOT (Company.status IN ( :c13, :c14 ))))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
     }
 
