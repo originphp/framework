@@ -633,7 +633,7 @@ class FormHelper extends Helper
 
     protected function prepareOptions(string $name, array $options = [])
     {
-        if (isset($options['id']) and $options['id'] == true) {
+        if (isset($options['id']) and $options['id'] === true) {
             $options['id'] = $this->domId($name);
         }
         if (!isset($options['name'])) {
