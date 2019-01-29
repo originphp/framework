@@ -195,6 +195,8 @@ class Marshaller
     public function patch(Entity $entity, array $data, array $options=[])
     {
         $options += ['name' => $entity->name()];
+        
+        $entity->clean(); // reset modified
 
         $propertyMap = $this->buildAssociationMap($options);
      

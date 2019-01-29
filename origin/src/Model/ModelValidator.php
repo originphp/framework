@@ -153,7 +153,7 @@ class ModelValidator
         $requiredMessage = 'This field is required';
         $notBlankMessage = 'This field cannot be left blank';
         $defaultMessage = 'Invalid value';
-
+        
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 $defaults = array(
@@ -173,15 +173,15 @@ class ModelValidator
                     );
                 }
 
-                if ($validationRule['required'] === true and !$entity->hasProperty($field)) {
+                if ($validationRule['required'] === true and !in_array($field, $entity->modified())) {
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $requiredMessage;
                     }
                     $entity->errors($field, $validationRule['message']);
                     continue;
                 }
-
-                if ($entity->hasProperty($field)) {
+               
+                if (in_array($field, $entity->modified())) {
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $defaultMessage;
                         if ($validationRule['rule'] === 'notBlank') {
@@ -190,15 +190,15 @@ class ModelValidator
                     }
 
                     $value = $entity->get($field);
-
-                    // Invalidate invalid data - If value is not scalar then only add error once
-                    if (!is_scalar($value)) {
+                  
+                    // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
+                    if (is_object($value) or is_array($value)) {
                         if ($entity->errors($field) === false) {
                             $entity->errors($field, $defaultMessage);
                         }
                         continue;
                     }
-
+                 
                     if ($validationRule['rule'] === 'notBlank') {
                         if (!$this->validate($field, $value, $validationRule['rule'])) {
                             $entity->errors($field, $validationRule['message']);

@@ -691,8 +691,8 @@ class Model
             return false;
         }
         $this->id = null;
-        
-        if ($entity->hasProperty($this->primaryKey) and $entity->{$this->primaryKey} !== null) {
+    
+        if ($entity->hasProperty($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
         }
 
