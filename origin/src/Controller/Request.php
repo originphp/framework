@@ -67,7 +67,7 @@ class Request
     public function __construct($url = null)
     {
         if ($url === null) {
-            $url = $this->url();
+            $url = $this->uri();
         }
         if (strlen($url) and $url[0] === '/') {
             $url = substr($url, 1);
@@ -87,12 +87,27 @@ class Request
      *
      * @return string uri
      */
-    public function url()
+    protected function uri()
     {
         if ($uri = $this->env('REQUEST_URI')) {
             return $uri;
         }
         return '';
+    }
+
+    /**
+     * This will return the url with the query string
+     * @example /contacts/view/100?page=1
+     * @return string
+     */
+    public function here()
+    {
+        $url = $this->url;
+        if ($this->query) {
+            $url .= '?' . http_build_query($this->query);
+        }
+    
+        return $url;
     }
 
     protected function processGet($url)

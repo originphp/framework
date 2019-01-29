@@ -138,7 +138,7 @@ class FormHelper extends Helper
 
         $defaults = [
           'type' => 'post',
-          'url' => $this->request->url,
+          'url' => $this->request->here(),
         ];
 
         $options = array_merge($defaults, $options);
