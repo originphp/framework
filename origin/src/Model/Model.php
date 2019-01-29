@@ -1361,8 +1361,8 @@ class Model
                     continue;
                 }
 
-                $config += $query['contain'][$alias];
-
+                $config = array_merge($config, $query['contain'][$alias]);
+              
                 $query['joins'][] = array(
                     'table' => Inflector::tableize($config['className']),
                     'alias' => $alias,
@@ -1461,12 +1461,12 @@ class Model
                 continue;
             }
 
-            $config += $query['contain'][$alias];
-
+            $config = array_merge($config, $query['contain'][$alias]);
+        
             if (empty($config['fields'])) {
                 $config['fields'] = $this->{$alias}->fields();
             }
-        
+            
             foreach ($results as $index => &$result) {
                 if (isset($result->{$this->primaryKey})) {
                     $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
@@ -1490,7 +1490,7 @@ class Model
                 continue;
             }
 
-            $config += $query['contain'][$alias];
+            $config = array_merge($config, $query['contain'][$alias]);
 
             $config['joins'][0] = array(
               'table' => $config['joinTable'],
@@ -1531,7 +1531,7 @@ class Model
     {
         $QueryBuilder = new QueryBuilder($this->table, $this->alias);
         $sql = $QueryBuilder->selectStatement($query);
-
+    
         $connection = $this->getConnection();
         $connection->execute($sql, $QueryBuilder->getValues());
 
