@@ -76,9 +76,11 @@ use Origin\Core\Session;
 Session::init();
 require CONFIG.DS.'routes.php';
 
+/*
 if ($_GET) {
     $_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 }
 if ($_POST) {
     $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 }
+*/
