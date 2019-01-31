@@ -213,14 +213,16 @@ class Controller
      */
     public function loadModel(string $model, array $options=[])
     {
-        if (isset($this->{$model})) {
-            return $this->{$model};
+        list($plugin, $alias) = pluginSplit($model);
+
+        if (isset($this->{$alias})) {
+            return $this->{$alias};
         }
 
-        $this->{$model} = ModelRegistry::get($model, $options);
+        $this->{$alias} = ModelRegistry::get($model, $options);
 
-        if ($this->{$model}) {
-            return $this->{$model};
+        if ($this->{$alias}) {
+            return $this->{$alias};
         }
         throw new MissingModelException($model);
     }

@@ -37,8 +37,15 @@ class ModelRegistry
      *
      * @return Model or bool
      */
-    public static function get(string $model, array $options = [])
+    public static function get(string $alias, array $options = [])
     {
+        list($plugin, $model) = pluginSplit($alias);
+        
+        if (empty($options['className'])) {
+            $options['className'] = $alias;
+        }
+        $options['alias'] = $model;
+ 
         if (isset(static::$registry[$model])) {
             return static::$registry[$model];
         }
