@@ -19,24 +19,13 @@ use Origin\Core\Configure;
 class Security
 {
     /**
-     * Holds the IV length
-     * $length = openssl_cipher_iv_length('AES-256-CBC')
-     */
-    const ivLength = 16;
-    /**
-     * Holds the cipher method
-     * @see openssl_get_cipher_methods()
-     */
-    const method= 'AES-256-CBC';
-    
-    /**
-     * Hashes a string
-     *
-     * @param string $string
-     * @param string $type sha1,sha256,sha512 etc see hash_algos()
-     * @param boolean|string $salt
-     * @return boolean
-     */
+    * Hashes a string
+    *
+    * @param string $string
+    * @param string $type sha1,sha256,sha512 etc see hash_algos()
+    * @param boolean|string $salt
+    * @return boolean
+    */
     public static function hash(string $string, string $type ='sha1', $salt = false)
     {
         if ($salt) {
@@ -71,9 +60,10 @@ class Security
         }
         $key = hash('sha256', $key);
         
-        $initializationVector  = openssl_random_pseudo_bytes(self::ivLength); //
+        $length = openssl_cipher_iv_length('AES-256-CBC');
+        $initializationVector  = openssl_random_pseudo_bytes($length);
         
-        return $initializationVector . openssl_encrypt($string, self::method, $key, OPENSSL_RAW_DATA, $initializationVector);
+        return $initializationVector . openssl_encrypt($string, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $initializationVector);
     }
 
     /**
@@ -92,9 +82,10 @@ class Security
         }
         $key = hash('sha256', $key);
 
-        $initializationVector = mb_substr($string, 0, self::ivLength, '8bit');
-        $encryptedString = mb_substr($string, self::ivLength, null, '8bit');
+        $length = openssl_cipher_iv_length('AES-256-CBC');
+        $initializationVector = mb_substr($string, 0, $length, '8bit');
+        $encryptedString = mb_substr($string, $length, null, '8bit');
         
-        return openssl_decrypt($encryptedString, self::method, $key, OPENSSL_RAW_DATA, $initializationVector);
+        return openssl_decrypt($encryptedString, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $initializationVector);
     }
 }
