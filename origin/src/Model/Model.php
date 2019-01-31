@@ -534,15 +534,20 @@ class Model
 
     /**
      * Sets the validation rule/s
-     *
+     * Examples:
+     * $this->validate('first_name','notBlank');
      * $this->validate('first_name',['rule'=>'notBlank']);
+     * $this->validate('email', [
+     *   'notBlank' =>  ['rule' => 'notBlank'],
+     *   'email' =>  ['rule' => 'email']
+     *  ]);
      * $this->validate($validationRules);
      *
      * @param string/array $field
      * @param array $options
      * @return void
      */
-    public function validate($field, array $options = [])
+    public function validate($field, $options)
     {
         if (is_array($field)) {
             foreach ($field as $key => $value) {
