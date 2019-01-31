@@ -342,6 +342,8 @@ class FormHelper extends Helper
                 }
             }
         }
+      
+        
         // Check if field is required to add required class
         $required = false;
         if ($model and in_array($column, $this->requiredFields($model))) {
@@ -601,7 +603,7 @@ class FormHelper extends Helper
             $options = ['' => $selectOptions['empty']] + $options;
             unset($selectOptions['empty']);
         }
-
+     
         $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions);
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);
@@ -616,11 +618,12 @@ class FormHelper extends Helper
         foreach ($options as $key => $value) {
             if (is_array($value)) {
                 $optgroup = str_replace('{label}', $key, $this->config['templates']['optgroup']);
-                $output .= str_replace('{content}', $this->buildSelectOptions($value), $optgroup, $selectOptions);
+                $output .= str_replace('{content}', $this->buildSelectOptions($value), $optgroup);
                 continue;
             }
-            $template = $this->config['templates']['option'];
 
+            $template = $this->config['templates']['option'];
+      
             if (array_key_exists('value', $selectOptions) and $selectOptions['value'] === $key) {
                 $template = $this->config['templates']['optionSelected'];
             }
@@ -655,7 +658,7 @@ class FormHelper extends Helper
             $entity = $this->getEntity($this->data, $name);
             $parts = explode('.', $name);
             $last = end($parts);
-
+            
             // Get value unless overridden
             if (!isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
                 $options['value'] = $entity->{$last};
