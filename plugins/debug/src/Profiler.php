@@ -39,6 +39,12 @@ use Origin\Core\Log;
  */
 class Profiler
 {
+    protected $timestamp = null;
+
+    public function __construct()
+    {
+        $this->timestamp = time();
+    }
     /**
      * This is run on every statement
      *
@@ -90,6 +96,6 @@ class Profiler
      */
     public function log(string $message)
     {
-        Log::write('profile', $message);
+        Log::write('profile-' . $this->timestamp, $message);
     }
 }
