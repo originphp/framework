@@ -14,6 +14,10 @@ FROM ubuntu:18.04
 LABEL maintainer="Jamiel Sharief"
 LABEL version="1.0-alpha"
 
+# Setup Enviroment
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
 ENV DATE_TIMEZONE UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -82,4 +86,4 @@ RUN pecl install xdebug
 # echo 'zend_extension="/usr/lib/php/20170718/xdebug.so"' >> /etc/php/7.2/cli/php.ini
 # echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
 
-CMD /usr/sbin/apache2ctl -D FOREGROUND
+CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
