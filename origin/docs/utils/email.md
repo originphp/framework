@@ -30,7 +30,7 @@ The keys for the config are as follows:
 
 If a config for `default` is found this will be usd by default.
 
-To send a text email it would look like this:
+To send a text email (default) it would look like this:
 
 ````php
 use Origin\Utils\Email;
@@ -54,6 +54,7 @@ use Origin\Utils\Email;
         ->from('me@@originphp.com')
         ->subject('This is a test')
         ->htmlMessage('<p>This is the html content</p>')
+        ->format('html');
     $Email->send();
 
 ````
@@ -69,6 +70,7 @@ use Origin\Utils\Email;
         ->subject('This is a test')
         ->textMessage('This is the text content')
         ->htmlMessage('<p>This is the html content</p>')
+        ->format('both');
         $Email->send();
 
 ````
@@ -83,7 +85,7 @@ use Origin\Utils\Email;
         ->from('me@@originphp.com')
         ->subject('This is a test')
         ->textMessage('This is the text content')
-        ->account('gmail')
+        ->account('gmail');
     $Email->send();
 
 ````
@@ -99,7 +101,38 @@ use Origin\Utils\Email;
         ->subject('This is a test')
         ->textMessage('This is the text content')
         ->addAttachment($filename1)
-        ->addAttachment($filename2,'Logo.png')
+        ->addAttachment($filename2,'Logo.png');
+    $Email->send();
+
+````
+
+To use templates
+
+Templates are stored in the `View/Email` folder
+
+````php
+use Origin\Utils\Email;
+
+    $Email = new Email();
+    $Email->to('somebody@originphp.com')
+        ->from('me@@originphp.com')
+        ->subject('This is a test')
+        ->template('welcome')
+        ->format('both')
+    $Email->send();
+
+````
+
+Template files also accept plugin syntax, so to load a template from a plugin just add the plugin name.
+````php
+use Origin\Utils\Email;
+
+    $Email = new Email();
+    $Email->to('somebody@originphp.com')
+        ->from('me@@originphp.com')
+        ->subject('This is a test')
+        ->template('ContactManager.reset_password')
+        ->format('both')
     $Email->send();
 
 ````
