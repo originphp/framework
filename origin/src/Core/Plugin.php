@@ -57,8 +57,8 @@ class Plugin
     {
         $defaults = array('routes' => true, 'bootstrap' => true);
         $options = array_merge($defaults, $options);
-        $options['path'] = PLUGINS.DS.$plugin;
-
+        $options['path'] = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src';
+    
         $bootstrapFilename = $options['path'].DS.'config'.DS.'bootstrap.php';
         if ($options['bootstrap'] and file_exists($bootstrapFilename)) {
             include $bootstrapFilename;
@@ -77,7 +77,7 @@ class Plugin
       
         static::$autoloader->addNamespaces(array(
           $plugin => 'plugins/'.Inflector::underscore($plugin).'/src',
-           "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
+          "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
         ));
         
         static::$loaded[$plugin] = $options;
