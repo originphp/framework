@@ -17,6 +17,11 @@ Configure::write('App.namespace', 'App');
 Configure::write('App.encoding', 'UTF-8');
 Configure::write('Session.timeout', 3600);
 
+/**
+ * Generate a random string such as md5(time()) and place
+ * here. This is used with hashing and key generation by Security.
+ */
+Configure::write('Security.salt', '-----ORIGIN PHP-----');
 /*
  * Load your plugins here
  * @example Plugin::load('ContactManager');
