@@ -78,9 +78,60 @@ class MakeShell extends Shell
         $this->out('make model Contact');
         $this->out('make controller Contacts');
         $this->out('make view Contacts');
+        $this->out('make plugin ContactManager');
         $this->out('');
         $this->out('You can use -force to not prompt');
         //$this->out('make test Lead'); /**@todo test */
+    }
+
+    public function plugin()
+    {
+        if (empty($this->args)) {
+            throw new Exception('You must speficify a plugin name');
+        }
+        $plugin = $this->args[0];
+        $underscored = Inflector::underscore($plugin);
+        
+        $path = PLUGINS . DS. $underscored;
+        if (file_exists($path)) {
+            throw new Exception(sprintf('Plugin folder %s already exists', $underscored));
+        }
+        $folders = [
+            $path,
+            $path . DS . 'src',
+            $path . DS . 'tests',
+            $path . DS . 'src' . DS . 'config',
+            $path . DS . 'src' . DS . 'Console',
+            $path . DS . 'src' . DS . 'Controller',
+            $path . DS . 'src' . DS . 'Controller' . DS . 'Component',
+            $path . DS . 'src' . DS . 'Model',
+            $path . DS . 'src' . DS . 'Model' . DS . 'Behavior',
+            $path . DS . 'src' . DS . 'View',
+            $path . DS . 'src' . DS . 'View' . DS . 'Helper',
+        ];
+        foreach ($folders as $folder) {
+            if (!mkdir($folder)) {
+                throw new Exception('Error creating folder');
+            }
+        }
+        $data = [
+            'plugin' => $plugin,
+            'underscored' => $underscored
+        ];
+    
+        $Templater = new MakeTemplater();
+        $result = $Templater->generate('plugin/routes', $data);
+        if (!file_put_contents($path. DS . 'src' . DS .'config' . DS .'routes.php', $result)) {
+            throw new Exception('Error writing file');
+        }
+        $result = $Templater->generate('plugin/controller', $data);
+        if (!file_put_contents($path. DS . 'src' . DS .'Controller' . DS . $data['plugin']. 'AppController.php', $result)) {
+            throw new Exception('Error writing file');
+        }
+        $result = $Templater->generate('plugin/model', $data);
+        if (!file_put_contents($path. DS . 'src' . DS .'Model' . DS . $data['plugin']. 'AppModel.php', $result)) {
+            throw new Exception('Error writing file');
+        }
     }
 
     public function all()

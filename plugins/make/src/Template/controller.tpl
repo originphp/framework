@@ -33,7 +33,7 @@ class %controller%Controller extends AppController
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been created.'));
 
-                return $this->redirect(['action' => 'view', $this->%model%->id]);
+                return $this->redirect(['action' => 'view', $%singularName%->id]);
             }
             $this->Flash->error(__('Your %singularHumanLower% could not be saved'));
         }
@@ -51,10 +51,12 @@ class %controller%Controller extends AppController
         if ($this->request->is(['post', 'put'])) {
             $%singularName% = $this->%model%->patchEntity($%singularName%,$this->request->data);
 
+            $%singularName%->id = $id;
+
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been updated.'));
 
-                return $this->redirect(['action' => 'view', $this->%model%->id]);
+                return $this->redirect(['action' => 'view', $%singularName%->id]);
             }
 
             $this->Flash->error(__('Your %singularHumanLower% could not be saved'));
