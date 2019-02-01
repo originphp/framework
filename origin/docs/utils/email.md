@@ -13,7 +13,8 @@ Email::config(
         'port' => 25,
         'username' => 'demo@example.com',
         'password' => 'secret',
-        'timeout' => 5
+        'timeout' => 5,
+        'tls' => false
         ]
     );
 ````
@@ -27,8 +28,22 @@ The keys for the config are as follows:
 - *tls* default is false, set to true if you want to enable TLS
 - *timeout* how many seconds to timeout
 - *client* When we send the HELO command to the sever we have to identify your hostname, so we will use localhost or HTTP_SERVER var if client is not set.
+- *debug* If set and is true the headers and message is rendered and returned (without sending via SMTP)
 
-If a config for `default` is found this will be usd by default.
+You can also pass keys such as `from`,`to`,`cc`,`bcc`,`sender` and `replyTo` this pass the data to its functions either as string if its just an email or an array if you want to include a name. Remember if you are going to automatically cc or bcc somewhere, then you have to next call addBcc or addCc to ensure that you don't overwrite this.
+
+For example
+
+````php
+    [
+        'from' => 'james@originphp.com'
+        'bcc' => ['someone@origin.php', 'Someone']
+    ]
+````
+
+If a config for `default` is found this will be used unless you specify something else with the `account`.
+
+
 
 To send a text email (default) it would look like this:
 
@@ -75,7 +90,7 @@ use Origin\Utils\Email;
 
 ````
 
-To change the email account 
+To change the email account (accounts are setup using the Email::config() usually in the config/email.php)
 
 ````php
 use Origin\Utils\Email;
@@ -89,6 +104,22 @@ use Origin\Utils\Email;
     $Email->send();
 
 ````
+
+You can also setup the config during the creation of the Email object.
+
+````php
+use Origin\Utils\Email;
+    $config = [ 
+        'host' => 'ssl://smtp.gmail.com',
+        'port' => 465,
+        'username' => 'email@gmail.com',
+        'password' => 'secret'
+        ];
+    $Email = new Email($config);
+    
+
+````
+
 
 To add attachments
 

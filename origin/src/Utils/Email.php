@@ -97,6 +97,13 @@ class Email
     protected $emailFormat = 'text';
 
     /**
+     * This is the headrers + body
+     *
+     * @var array
+     */
+    protected $content = null;
+
+    /**
      * Vars to be loaded in template
      *
      * @var array
@@ -157,7 +164,7 @@ class Email
      * If a string is passed it will load from the config, if its an array it will create
      * a temporary config which can be only used by instance.
      *
-     * Use this to create create configs on the fly or switch from default config etc
+     * Use this to create configs on the fly or switch from default config etc
      *
      * @param string|array $config
      * @return void
@@ -167,16 +174,35 @@ class Email
         if ($config === null) {
             return $this->account;
         }
+
+        if (is_string($config)) {
+            $config = static::config($config);
+        }
+
         if (is_array($config)) {
             $this->account = array_merge(static::$defaultConfig, $config);
+            $this->applyConfig();
             return $this;
         }
-        $config = static::config($config);
-        if ($config) {
-            $this->account = $config;
-            return $this;
-        }
+        
         throw new Exception(sprintf('Unkown email configuration %s', $config));
+    }
+
+    /**
+     * Goes through the account config and passing data to certain function. When
+     * setting up email in app for an account setting from all over the app can be
+     * messy.
+     *
+     * @return void
+     */
+    protected function applyConfig()
+    {
+        $methods = ['to','from','sender','bcc','cc','replyTo'];
+        foreach ($this->account as $method => $args) {
+            if (in_array($method, $methods)) {
+                call_user_func_array([$this,$method], (array) $args);
+            }
+        }
     }
 
     /**
@@ -189,6 +215,19 @@ class Email
     public function to(string $email, string $name = null)
     {
         $this->setEmail('to', $email, $name);
+        return $this;
+    }
+
+    /**
+     * Add another to address
+     *
+     * @param string $email
+     * @param string $name
+     * @return void
+     */
+    public function addTo(string $email, string $name = null)
+    {
+        $this->addEmail('to', $email, $name);
         return $this;
     }
 
@@ -442,11 +481,12 @@ class Email
         return $this;
     }
 
-    public function send($content =null)
+    public function send($content = null)
     {
         if (empty($this->from)) {
             throw new Exception('From email is not set.');
         }
+        
         if (empty($this->to)) {
             throw new Exception('To email is not set.');
         }
@@ -470,12 +510,33 @@ class Email
         if ($this->account === null) {
             throw new Exception('Email config has not been set.');
         }
-        return true;
-        return $this->sendMessage();
-        // Check message is set and to and from etc
+
+        $this->content = $this->render();
+
+        if (!isset($this->account['debug']) or $this->account['debug']) {
+            $this->smtpSend();
+        }
+
+        return $this->content;
     }
- 
-    protected function sendMessage()
+    
+    protected function render()
+    {
+        $headers = '';
+        foreach ($this->buildHeaders() as $header => $value) {
+            $headers .= "{$header}: {$value}" . self::CRLF;
+        }
+        $message = implode(self::CRLF, $this->buildMessage());
+        
+        return $headers . self::CRLF . self::CRLF . $message;
+    }
+
+    /**
+     * Sends the actual message
+     *
+     * @return string headers + message
+     */
+    protected function smtpSend()
     {
         $account = $this->account;
         $account['protocol'] = 'tcp';
@@ -495,19 +556,12 @@ class Email
         }
 
         $this->sendCommand('DATA', '354');
-        $headers = '';
-        foreach ($this->buildHeaders() as $header => $value) {
-            $headers .= "{$header}: {$value}" . self::CRLF;
-        }
-        $message = implode(self::CRLF, $this->buildMessage());
-
-        $this->sendCommand($headers . self::CRLF.self::CRLF . $message . self::CRLF.self::CRLF.self::CRLF .'.', '250');
+        
+        $this->sendCommand($this->content . self::CRLF.self::CRLF.self::CRLF .'.', '250');
        
         $this->sendCommand('QUIT', '221');
        
         $this->closeSocket();
-      
-        return true;
     }
 
     protected function authenticate($account)
