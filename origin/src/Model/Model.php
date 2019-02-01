@@ -249,6 +249,7 @@ class Model
                 );
             }
         }
+        trigger_error('Call to undefined method '  .get_class($this) . '\\'.  $method .'()');
     }
 
     /**
@@ -331,14 +332,24 @@ class Model
     /**
      * This will load any model regardless if it is associated or
      * not.
-     * - To keep things consistent througout framework.
+     * If you are loading a model with same name like in a plugin, then best set a unique
+     * alias.
+     * example:
+     * $this->loadModel('CustomModel2',['className'=>'Plugin.CustomModel']);
+     * $results = $this->CustomModel2->find('all');
      * @param string $model
      * @param array $config
      * @return void
      */
-    public function loadModel(string $model, array $config=[])
+    public function loadModel(string $name, array $config=[])
     {
-        return ModelRegistry::get($model, $config);
+        list($plugin, $alias) = pluginSplit($name);
+        $config = array_merge(['className' => $name], $config);
+        $this->{$alias} = ModelRegistry::get($alias, $config);
+        if ($this->{$alias}) {
+            return $this->{$alias};
+        }
+        throw new MissingModelException($name);
     }
 
     /**
