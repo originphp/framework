@@ -38,15 +38,16 @@ $options = array(
 $this->Article->save($article,$options);
 ```
 
-## saveField(string $name,string $value,array $options = array())
+## saveField($primaryKey, string $name,string $value,array $options = array())
 
-This is for saving a single field, `Model->id` needs to be set first. When you save a record, `Model->id` is set to that record, so you can call this afterwards without setting the id.
+If you have all ready loaded a record, then just use save, and 
+this will save the modified fields. However, when you need to update a field in the database without having
+to load the record, then you can use save field.
 
-`$this->Article->saveField($fieldName',$fieldValue,$options)`
+`$this->Article->saveField($primaryKey, $fieldName,$fieldValue,$options)`
 
 ```php
-$this->Article->id = 1024;
-$this->Article->saveField('title','New Title');
+$this->Article->saveField(1024,'title','New Title');
 ```
 
 

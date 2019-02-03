@@ -990,9 +990,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $article = $Article->find('first');
         $this->assertEquals('Second Post', $article->title); // # sanity check
-        
-        $Article->id = $article->id;
-        $this->assertTrue($Article->saveField('title', 'testSaveField'));
+    
+        $this->assertTrue($Article->saveField($article->id, 'title', 'testSaveField'));
         $article = $Article->find('first');
         $this->assertEquals('testSaveField', $article->title);
     }

@@ -799,20 +799,17 @@ class Model
     /**
      * Saves a single field on the current record. Must set $this->id for this work.
      *
+     * @params int|string $primaryKey the id for the record
      * @param string $fieldName
-     * @param mixed  $fieldValue [description]
+     * @param mixed  $fieldValue
      * @param array  $params     (callbacks, validate)
      *
      * @return bool true or false
      */
-    public function saveField(string $fieldName, $fieldValue, array $params = [])
+    public function saveField($primaryKey, string $fieldName, $fieldValue, array $params = [])
     {
-        if (!$this->id) {
-            return false;
-        }
-
         return $this->save(new Entity([
-            $this->primaryKey => $this->id,
+            $this->primaryKey => $primaryKey,
             $fieldName => $fieldValue,
         ]), $params);
     }
