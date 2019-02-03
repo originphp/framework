@@ -27,7 +27,8 @@ class Bookmark extends AppModel
          * Setup validation rules
          */
         $this->validate('user_id', [
-            'rule' => 'notBlank', 'required' => true, 'on' => 'create'
+            'rule' => 'notBlank',
+            'message' => 'This field is required'
             ]);
         $this->validate('title', 'notBlank');
         $this->validate('url', 'notBlank');
