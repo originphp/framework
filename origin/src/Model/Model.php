@@ -845,7 +845,6 @@ class Model
                 if ($tag) {
                     $links[] = $tag->get($primaryKey);
                 } else {
-                    $this->{$association}->create();
                     if (!$this->{$association}->save($row, array(
                       'callbacks' => $callbacks,
                       'transaction' => false,
@@ -932,7 +931,6 @@ class Model
         }
 
         if ($result) {
-            $this->create();
             $result = $this->save($data, $options);
         }
 
@@ -958,7 +956,6 @@ class Model
                     foreach ($data->get($key) as $record) {
                         if ($record instanceof Entity) {
                             $record->$foreignKey = $this->id;
-                            $this->{$alias}->create();
                             if (!$this->{$alias}->save($record, $associatedOptions)) {
                                 $result = false;
                                 break;

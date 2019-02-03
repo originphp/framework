@@ -312,7 +312,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email->to('james@originphp.com')
               ->from('mailer@originphp.com')
               ->subject('test #1')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('html');
         
         $headers = $Email->callMethod('buildHeaders');
       
@@ -323,7 +324,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
               ->from('mailer@originphp.com')
               ->subject('test #1')
               ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('both');
 
         $headers = $Email->callMethod('buildHeaders');
 
@@ -369,7 +371,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email->to('james@originphp.com')
               ->from('mailer@originphp.com')
               ->subject('html test')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('html');
         $result = $this->messageToString($Email->callMethod('buildMessage'));
         $this->assertEquals("<p>this is a test</p>\r\n", $result);
     }
@@ -380,7 +383,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email->to('james@originphp.com')
               ->from('mailer@originphp.com')
               ->subject('text test')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('html');
         
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');
@@ -402,7 +406,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
               ->from('mailer@originphp.com')
               ->subject('text test')
               ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('both');
         
         $result = $this->messageToString($Email->callMethod('buildMessage'));
        
@@ -429,7 +434,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
               ->from('mailer@originphp.com')
               ->subject('text test')
               ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>');
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('both');
         
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');

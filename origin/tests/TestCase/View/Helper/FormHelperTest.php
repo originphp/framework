@@ -29,15 +29,17 @@ class ViewTestsController extends Controller
 
 class Widget extends Model
 {
-    public $validate = array(
-    'name' => ['rule' => 'notBlank', 'required' => true],
-  );
     public $schema = array(
     'id' => ['type' => 'int', 'length' => 11],
     'name' => ['type' => 'varchar', 'length' => 80],
     'description' => ['type' => 'text'],
     'active' => ['type' => 'tinyint', 'length' => 1],
   );
+
+    public function initialize(array $config)
+    {
+        $this->validate('name', ['rule' => 'notBlank', 'required' => true]);
+    }
 
     public function setSchema($schema)
     {
