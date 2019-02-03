@@ -50,8 +50,8 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
             'message' => 'Minimum 10 characters long',
         ),
       );
-
-        $result = $this->Validator->invoke('prepareRules', array($rules));
+        $this->Validator->rules($rules);
+        $result =  $this->Validator->rules();
 
         $this->assertArrayHasKey('message', $result['field1']['field1']);
         $this->assertArrayHasKey('message', $result['field2']['rule1']);
@@ -67,7 +67,7 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
         ),
       );
 
-        $Validator->set($validate);
+        $Validator->rules($validate);
         $data = new Entity(array('value' => 'some string'));
         $this->assertFalse($Validator->validates($data));
 
@@ -85,7 +85,7 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
         ),
       );
 
-        $Validator->set($validationRules);
+        $Validator->rules($validationRules);
         $data = new Entity(array('framework' => 'something else'));
         $this->assertFalse($Validator->validates($data));
 

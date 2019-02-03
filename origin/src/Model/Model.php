@@ -90,12 +90,6 @@ class Model
      */
     public $id = null;
 
-    /**
-     * Validation rules.
-     *
-     * @var array
-     */
-    protected $validate = [];
 
     /**
      * Behavior registry object
@@ -557,6 +551,7 @@ class Model
      * @param string/array $field
      * @param array $options
      * @return void
+     *
      */
     public function validate($field, $options)
     {
@@ -572,16 +567,7 @@ class Model
 
             return;
         }
-
-        if (is_string($options)) {
-            $options = array(
-              $field => array('rule' => $options, 'message' => 'Invalid data'),
-            );
-        }
-        if (isset($options['rule'])) {
-            $options = array('rule1' => $options);
-        }
-        $this->validate[$field] = $options;
+        $this->validator()->add($field, $options);
     }
 
     /**

@@ -28,17 +28,38 @@ class ModelValidator
      */
     protected $validationRules = array();
 
-    public function __construct(Model $model, $validationRules = null)
+    public function __construct(Model $model)
     {
         $this->model = $model;
-        if ($validationRules) {
-            $this->set($validationRules);
+    }
+
+    /**
+     * Sets and gets rules
+     *
+     * @param array $rules
+     * @return void
+     */
+    public function rules(array $rules = null)
+    {
+        if ($rules === null) {
+            return $this->validationRules;
+        }
+        foreach ($rules as $field => $params) {
+            $this->add($field, $params);
         }
     }
 
-    public function add($field, array $ruleSet)
+    public function add(string $field, $params)
     {
-        $this->validationRules[$field] = $this->prepareRules(array($field => $ruleSet));
+        if (is_string($params)) {
+            $params = array(
+              $field => array('rule' => $params, 'message' => 'Invalid data'),
+            );
+        }
+        if (isset($params['rule'])) {
+            $params = array('rule1' => $params);
+        }
+        $this->validationRules[$field] = $params;
     }
 
     public function remove($field)
@@ -51,45 +72,7 @@ class ModelValidator
 
         return false;
     }
-
-    public function set(array $rules)
-    {
-        $this->validationRules = $this->prepareRules($rules);
-    }
-
-    /**
-     * Standardize the validation rules into multiple rules per field.
-     *
-     * array(
-     *    'username' => array(
-     *        'email',
-     *        'unique',
-     *        'required'
-     *      )
-     * )
-     *
-     * @param array $validationRules
-     *
-     * @return array
-     */
-    protected function prepareRules(array $validationRules)
-    {
-        foreach ($validationRules as $field => $validationRule) {
-            // deal with (email=>email)
-            if (is_string($validationRule)) {
-                $validationRule = array(
-                    $field => array('rule' => $validationRule, 'message' => 'Invalid data'),
-                  );
-            }
-            if (isset($validationRule['rule'])) {
-                $validationRule = array('rule1' => $validationRule);
-            }
-            $validationRules[$field] = $validationRule;
-        }
-
-        return $validationRules;
-    }
-
+    
     public function validate($field, $value, $ruleSet)
     {
         $options = null;
@@ -148,12 +131,27 @@ class ModelValidator
         return $result;
     }
 
-    public function validates(Entity $entity, $create = true)
+    /**
+     * Handles the on
+     *
+     * @param bool $create
+     * @param string|bool $on true,'create','update'
+     * @return bool
+     */
+    protected function runRule(bool $create, $on)
+    {
+        if ($on === true || ($create and $on ==='create') || (!$create and $on ==='update')) {
+            return true;
+        }
+        return false;
+    }
+
+    public function validates(Entity $entity, bool $create = true)
     {
         $requiredMessage = 'This field is required';
         $notBlankMessage = 'This field cannot be left blank';
         $defaultMessage = 'Invalid value';
-        
+       
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 $defaults = array(
@@ -161,8 +159,16 @@ class ModelValidator
                 );
 
                 $validationRule = array_merge($defaults, $validationRule);
+                
+                if ($validationRule['required'] and $this->runRule($create, $validationRule['required']) and !in_array($field, $entity->modified())) {
+                    if ($validationRule['message'] === null) {
+                        $validationRule['message'] = $requiredMessage;
+                    }
+                    $entity->errors($field, $validationRule['message']);
+                    continue;
+                }
 
-                if (($create and $validationRule['on'] === 'update') or (!$create and $validationRule['on'] === 'create')) {
+                if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
 
@@ -171,14 +177,6 @@ class ModelValidator
                     'isUnique',
                       array($entity, $field),
                     );
-                }
-
-                if ($validationRule['required'] === true and !in_array($field, $entity->modified())) {
-                    if ($validationRule['message'] === null) {
-                        $validationRule['message'] = $requiredMessage;
-                    }
-                    $entity->errors($field, $validationRule['message']);
-                    continue;
                 }
                
                 if (in_array($field, $entity->modified())) {
@@ -216,7 +214,7 @@ class ModelValidator
                 }
             }
         }
-
+      
         return empty($entity->errors());
     }
 
