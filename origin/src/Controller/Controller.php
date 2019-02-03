@@ -356,12 +356,12 @@ class Controller
     public function redirect($url, int $code = 302)
     {
         $this->autoRender = false;
-
+    
         $this->response->statusCode($code);
+
         $this->response->header('Location', Router::url($url));
         $this->response->send();
-
-        return $this->response;
+        $this->response->stop();
     }
     
     public function componentRegistry()

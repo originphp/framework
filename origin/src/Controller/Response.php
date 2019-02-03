@@ -66,6 +66,16 @@ class Response
     }
 
     /**
+     * Wrapper for exit. Mocked during testing.
+     *
+     * @return void
+     */
+    public function stop()
+    {
+        exit();
+    }
+
+    /**
      * Sets or gets the status code for sending.
      *
      * @param int $statusCode

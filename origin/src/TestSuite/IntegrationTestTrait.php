@@ -404,7 +404,7 @@ trait IntegrationTestTrait
         }
             
         $this->request = new Request($url);
-        $this->response = $this->getMock(Response::class, ['send']);
+        $this->response = $this->getMock(Response::class, ['send','stop']);
 
         // Send Headers
         foreach ($this->headers as $header => $value) {
