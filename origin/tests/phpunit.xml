@@ -11,6 +11,9 @@
             <directory>./TestCase/</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <const name="PHPUNIT" value="true"/>
+    </php>
     <listeners>
         <listener
             class="Origin\TestSuite\OriginTestListener"
