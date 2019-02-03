@@ -232,13 +232,32 @@ class FormHelper extends Helper
                     $create = false;
                 }
                 $validator = $model->validator();
-                $meta['requiredFields'] = $validator->requiredFields($create);
+                $meta['requiredFields'] = $this->parseRequiredFields($validator->rules(), $create);
             }
         }
 
         $this->meta[$name] = $meta;
 
         return $meta;
+    }
+
+    /**
+    * Gets the required fields for the form, in terms of a form, reuqired field is one
+    * that cannot be blank, in terms of the validator required means the key must be present.
+    */
+    protected function parseRequiredFields(array $validationRules, $create = true)
+    {
+        $result = [];
+
+        foreach ($validationRules as $field => $ruleset) {
+            foreach ($ruleset as $validationRule) {
+                if ($validationRule['rule'] === 'notBlank') {
+                    $result[] = $field;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

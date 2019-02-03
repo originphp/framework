@@ -53,7 +53,7 @@ class ModelValidator
     {
         if (is_string($params)) {
             $params = array(
-              $field => array('rule' => $params, 'message' => 'Invalid data'),
+              $field => array('rule' => $params),
             );
         }
         if (isset($params['rule'])) {
@@ -101,34 +101,6 @@ class ModelValidator
         }
 
         throw new ValidatorException('Unkown Validation Rule');
-    }
-
-    /**
-     * Gets a list of required fields.
-     */
-    public function requiredFields($create = true)
-    {
-        $result = [];
-
-        foreach ($this->validationRules as $field => $ruleset) {
-            foreach ($ruleset as $validationRule) {
-                $on = null;
-                if (isset($validationRule['on'])) {
-                    $on = $validationRule['on'];
-                }
-                if (($create and $on === 'update') or (!$create and $on === 'create')) {
-                    continue;
-                }
-                if (isset($validationRule['required']) and $validationRule['required']) {
-                    $result[] = $field;
-                }
-                if ($validationRule['rule'] === 'notBlank') {
-                    $result[] = $field;
-                }
-            }
-        }
-
-        return $result;
     }
 
     /**
