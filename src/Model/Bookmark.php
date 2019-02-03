@@ -6,12 +6,6 @@ use Origin\Model\Entity;
 
 class Bookmark extends AppModel
 {
-    public $validationRules = [
-      'user_id' => ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
-      'title' => ['rule' => 'notBlank'],
-      'url' => ['rule' => 'url'],
-    ];
-
     /**
      * A list of Categories for dropdown select.
      *
@@ -28,7 +22,19 @@ class Bookmark extends AppModel
     public function initialize(array $config)
     {
         parent::initialize($config);
-        $this->validate($this->validationRules);
+
+        /**
+         * Setup validation rules
+         */
+        $this->validate('user_id', [
+            'rule' => 'notBlank', 'required' => true, 'on' => 'create'
+            ]);
+        $this->validate('title', 'notBlank');
+        $this->validate('url', 'notBlank');
+        
+        /**
+         * Configure associations
+         */
         $this->belongsTo('User');
         $this->hasAndBelongsToMany('Tag');
     }

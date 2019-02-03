@@ -6,25 +6,24 @@ use Origin\Model\Entity;
 
 class User extends AppModel
 {
-    public $validationRules = [
-        'name' => ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
-        'email' => [
+    public function initialize(array $config)
+    {
+        parent::initialize($config);
+        $this->validate('name', [
+            'rule' => 'notBlank', 'required' => true, 'on' => 'create'
+            ]);
+        $this->validate('email', [
             ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
             ['rule' => 'email'],
-        ],
-        'password' => [
+        ]);
+        $this->validate('password', [
             ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
             ['rule' => 'alphaNumeric', 'message' => 'Alphanumeric characters only'],
             ['rule' => ['minLength', 6], 'message' => 'Min 6 characters'],
             ['rule' => ['maxLength', 8], 'message' => 'Max 8 characters'],
-        ],
-        'dob' => ['rule' => 'date'],
-      ];
+        ]);
+        $this->validate('dob', 'date');
 
-    public function initialize(array $config)
-    {
-        parent::initialize($config);
-        $this->validate($this->validationRules);
         $this->hasMany('Bookmark');
     }
 
