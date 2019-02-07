@@ -51,6 +51,12 @@ class Plugin
         return array_keys(static::$loaded);
     }
 
+    /**
+     * Loads a plugin
+     *
+     * @param string $plugin
+     * @param array $options
+     */
     public static function load(string $plugin, array $options = array())
     {
         $defaults = array('routes' => true, 'bootstrap' => true);
@@ -70,18 +76,25 @@ class Plugin
         ));
     }
 
-
+    /**
+     * Get the autoloader object
+     *
+     * @return Autoloader
+     */
     protected static function autoloader()
     {
-        /**
-             * Create Autoloader object for plugins
-             */
         if (empty(static::$autoloader)) {
             static::$autoloader = Autoloader::init();
         }
         return static::$autoloader;
     }
     
+    /**
+     * Loads the bootstrap config for a plugin
+     *
+     * @param string $plugin
+     * @return void
+     */
     public static function bootstrap(string $plugin)
     {
         $options = static::$loaded[$plugin];
@@ -91,6 +104,12 @@ class Plugin
         return false;
     }
 
+    /**
+     * Loads  the routes for all the plugins
+     *
+     * @param string $plugin
+     * @return void
+     */
     public static function loadRoutes()
     {
         foreach (static::$loaded as $plugin => $options) {
@@ -99,9 +118,9 @@ class Plugin
         return true;
     }
     /**
-     * Loads routes for plugin or all plugins. Used in config/routes.php.
+     * Loads routes for plugin∂. Used in config/routes.php.
      */
-    public static function routes(string $plugin = null)
+    public static function routes(string $plugin)
     {
         $options = static::$loaded[$plugin];
         if ($options['routes']) {
@@ -110,6 +129,12 @@ class Plugin
         return false;
     }
 
+    /**
+     * Includes a file
+     *
+     * @param string $filename
+     * @return void
+     */
     protected static function include(string $filename)
     {
         if (file_exists($filename)) {
