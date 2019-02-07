@@ -29,10 +29,20 @@ class I18n
      *
      * @var array
      */
-    public static $config = [];
+    protected static $config = [];
 
     /**
-     * Initializes I18N -
+     * Gets the config for I18n from intialize
+     *
+     * @return void
+     */
+    public static function config()
+    {
+        return static::$config;
+    }
+
+    /**
+     * Initializes I18N
      * Dates set locale and timezone
      * Numbers sets locale and currency.
      *

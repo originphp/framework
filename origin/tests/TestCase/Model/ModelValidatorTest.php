@@ -52,8 +52,7 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
       );
         $this->Validator->rules($rules);
         $result =  $this->Validator->rules();
-
-        $this->assertArrayHasKey('message', $result['field1']['field1']);
+        $this->assertEquals(['field1'=>['rule'=>'email']], $result['field1']);
         $this->assertArrayHasKey('message', $result['field2']['rule1']);
     }
 
