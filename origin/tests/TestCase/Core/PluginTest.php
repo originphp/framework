@@ -14,6 +14,20 @@
 
 namespace Origin\Test\Core;
 
+use Origin\Core\Plugin;
+use Origin\Core\Exception\MissingPluginException;
+
 class PluginTest extends \PHPUnit\Framework\TestCase
 {
+    public function testLoadException()
+    {
+        $this->expectException(MissingPluginException::class);
+        Plugin::load('PluginThatDoesNotExist');
+    }
+
+    public function testLoad()
+    {
+        Plugin::load('Make');
+        $this->assertTrue(Plugin::loaded('Make'));
+    }
 }

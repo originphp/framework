@@ -73,7 +73,7 @@ if (file_exists(CONFIG.DS.'database.php')) {
 
 use Origin\Core\Session;
 
-Session::init();
+Session::initialize();
 require CONFIG.DS.'routes.php';
 
 /*

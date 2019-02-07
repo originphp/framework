@@ -38,7 +38,7 @@ class Plugin
     protected static $autoloader = null;
 
     /**
-     * Checks if a plugin is loaded or returns a list of all loaded plugin
+     * Checks if a plugin is loaded or returns a list of loaded plugins
      *
      * @param string|null $plugin
      * @return bool|array
@@ -46,11 +46,9 @@ class Plugin
     public static function loaded(string $plugin = null)
     {
         if ($plugin) {
-            return static::$loaded[$plugin];
+            return isset(static::$loaded[$plugin]);
         }
-        $loaded = array_keys(static::$loaded);
-        sort($loaded);
-        return $loaded;
+        return array_keys(static::$loaded);
     }
 
     public static function load(string $plugin, array $options = array())
@@ -59,40 +57,67 @@ class Plugin
         $options = array_merge($defaults, $options);
         $options['path'] = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src';
     
-        $bootstrapFilename = $options['path'].DS.'config'.DS.'bootstrap.php';
-        if ($options['bootstrap'] and file_exists($bootstrapFilename)) {
-            include $bootstrapFilename;
-        }
-
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
         }
-      
-        /**
-         * Create Autoloader object for plugins
-         */
-        if (empty(static::$autoloader)) {
-            static::$autoloader = Autoloader::init();
-        }
-      
-        static::$autoloader->addNamespaces(array(
+        static::$loaded[$plugin] = $options;
+
+        static::bootstrap($plugin);
+ 
+        static::autoloader()->addNamespaces(array(
           $plugin => 'plugins/'.Inflector::underscore($plugin).'/src',
           "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
         ));
-        
-        static::$loaded[$plugin] = $options;
     }
 
-    /**
-     * Loads routes for all plugins. Used by config/routes.php.
-     */
-    public static function loadRoutes()
+
+    protected static function autoloader()
     {
-        foreach (static::$loaded as $plugin) {
-            $routesFilename = $plugin['path'].DS.'config'.DS.'routes.php';
-            if ($plugin['routes'] and file_exists($routesFilename)) {
-                include $routesFilename;
-            }
+        /**
+             * Create Autoloader object for plugins
+             */
+        if (empty(static::$autoloader)) {
+            static::$autoloader = Autoloader::init();
         }
+        return static::$autoloader;
+    }
+    public static function bootstrap(string $plugin = null)
+    {
+        if ($plugin === null) {
+            foreach (static::$loaded as $plugin => $options) {
+                static::bootstrap($plugin);
+            }
+            return true;
+        }
+        $options = static::$loaded[$plugin];
+        if ($options['bootstrap']) {
+            return static::include($options['path'].DS.'config'.DS.'bootstrap.php');
+        }
+        return false;
+    }
+    /**
+     * Loads routes for plugin or all plugins. Used in config/routes.php.
+     */
+    public static function routes(string $plugin = null)
+    {
+        if ($plugin === null) {
+            foreach (static::$loaded as $plugin => $options) {
+                static::routes($plugin);
+            }
+            return true;
+        }
+        $options = static::$loaded[$plugin];
+        if ($options['routes']) {
+            return static::include($options['path'].DS.'config'.DS.'routes.php');
+        }
+        return false;
+    }
+
+    protected static function include(string $filename)
+    {
+        if (file_exists($filename)) {
+            return include $filename;
+        }
+        return false;
     }
 }

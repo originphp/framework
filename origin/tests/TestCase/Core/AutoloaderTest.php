@@ -32,6 +32,10 @@ class MockAutoloader extends Autoloader
         return in_array($file, $this->mockFiles);
     }
 
+    public function getFolder()
+    {
+        return $this->directory;
+    }
     public function getDirectory($prefix)
     {
         return $this->prefixes[$prefix];
@@ -67,6 +71,17 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
           'Elements\Database',
           'vendor/elements/src/Database'
         );
+    }
+
+    public function testInstance()
+    {
+        $this->assertInstanceOf(Autoloader::class, Autoloader::init());
+    }
+    
+    public function testRegister()
+    {
+        $Autoloader = Autoloader::init();
+        $this->assertTrue($Autoloader->register());
     }
 
     public function testDirectory()
@@ -105,5 +120,13 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     
         $expected = ['Origin\\'=> ROOT  . '/src/'];
         $this->assertEquals($expected, $Autoloader->getPrefixes());
+    }
+
+    public function testSetFolder()
+    {
+        $Autoloader = new MockAutoloader(ROOT);
+        $expected = '/var/www/someFolder';
+        $Autoloader->setFolder($expected);
+        $this->assertEquals($expected, $Autoloader->getFolder());
     }
 }

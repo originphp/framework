@@ -17,6 +17,17 @@ namespace Origin\Test\Controller;
 use Origin\Controller\Request;
 use Origin\Exception\MethodNotAllowedException;
 
+class MockRequest extends Request
+{
+    public function setInput($input)
+    {
+        $this->input = $input;
+    }
+    protected function readInput()
+    {
+        return $this->input;
+    }
+}
 class RequestTest extends \PHPUnit\Framework\TestCase
 {
     public function testParseGet()
@@ -25,6 +36,16 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('google', $request->query['ref']);
         $this->assertContains('ppc', $request->query['source']);
+    }
+
+    public function testHere()
+    {
+        $request = new Request('blog/home?ref=google&source=ppc');
+        $expected = '/blog/home?ref=google&source=ppc';
+        $this->assertEquals($expected, $request->here());
+        $request = new Request('blog/home/1234');
+        $expected = '/blog/home/1234';
+        $this->assertEquals($expected, $request->here());
     }
 
     public function testIs()
@@ -56,5 +77,17 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($request->env('FOO'));
         $_SERVER['FOO'] = 'bar';
         $this->assertEquals('bar', $request->env('FOO'));
+    }
+    public function testJsonPost()
+    {
+        $request = new MockRequest();
+       
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request->setInput('{"title":"CNBC","url":"https://www.cnbc.com"}');
+
+        $request->initialize('articles/index');
+        $expected=['title'=>'CNBC','url'=>'https://www.cnbc.com'];
+        $this->assertEquals($expected, $request->data);
     }
 }

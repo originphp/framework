@@ -98,6 +98,14 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('shutdown called', $buffer);
     }
 
+    public function testInvalidShell()
+    {
+        $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','NonExistantShellClass'], new AnotherConsoleOutput('php://memory'));
+       
+        $this->expectException(MissingShellException::class);
+        $ShellDispatcher->start();
+    }
+
     public function testInvalidArg()
     {
         $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','unknowMethod'], new AnotherConsoleOutput('php://memory'));
@@ -108,7 +116,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidPrivateMethod()
     {
-        $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','privateMethod'], new AnotherConsoleOutput('php://memory'));
+        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','privateMethod'], new AnotherConsoleOutput('php://memory'));
        
         $this->expectException(MissingShellMethodException::class);
         $ShellDispatcher->start();

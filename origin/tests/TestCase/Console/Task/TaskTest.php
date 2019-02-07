@@ -19,8 +19,20 @@ use Origin\Console\Task\Task;
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 
+class MockConsoleOutput extends ConsoleOutput
+{
+    public function stream()
+    {
+        return $this->stream;
+    }
+}
+
 class MockShell extends Shell
 {
+    public function consoleOutput()
+    {
+        return $this->consoleOutput;
+    }
 }
 
 class MockTask extends Task
@@ -28,14 +40,6 @@ class MockTask extends Task
     public function getTasks()
     {
         return $this->_tasks;
-    }
-    public $output = null;
-    public function out(string $data, $newLine = true)
-    {
-        if ($newLine) {
-            $data .= "\n";
-        }
-        $this->output = $data;
     }
 }
 
@@ -48,7 +52,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->MockShell = new MockShell([], new ConsoleOutput(), new ConsoleInput());
+        $this->MockShell = new MockShell([], new MockConsoleOutput('php://memory'), new ConsoleInput());
         $this->MockTask = new MockTask($this->MockShell);
     }
     public function testConstruct()
@@ -85,7 +89,10 @@ class TaskTest extends \PHPUnit\Framework\TestCase
     public function testOut()
     {
         $this->MockTask->out('Foo bar');
-        $this->assertEquals("Foo bar\n", $this->MockTask->output);
+
+        $stream = $this->MockTask->shell()->consoleOutput()->stream();
+        rewind($stream);
+        $this->assertEquals("Foo bar\n", stream_get_contents($stream));
     }
 
     /**

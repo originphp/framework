@@ -16,22 +16,24 @@ namespace Origin\Core;
 
 class Session
 {
-    public static function init()
+    public static function initialize()
     {
         if (PHP_SAPI != 'cli' and is_writable(SESSIONS)) {
             session_save_path(SESSIONS);
         }
+        
         $timeout = 3600;
-
-        if ($timeout = Configure::read('Session.timeout')) {
+        if (Configure::has('Session.timeout')) {
             $timeout = Configure::read('Session.timeout');
         }
-        session_start();
-        $lastActivity = Session::read('Session.lastActivity');
-        if ($lastActivity) {
-            if (time() - $lastActivity > $timeout) {
+        if (!self::started()) {
+            session_start();
+        }
+      
+        if (Session::check('Session.lastActivity')) {
+            if (time() - Session::read('Session.lastActivity') > $timeout) {
                 Session::destroy();
-                Session::init();
+                Session::initialize();
             }
         }
         Session::write('Session.lastActivity', time());

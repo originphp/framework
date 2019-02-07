@@ -21,7 +21,14 @@ use Origin\View\Helper\Helper;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Core\Router;
+use Origin\Model\Model;
 
+use Origin\Model\ConnectionManager;
+
+class Pet extends Model
+{
+    public $datasource = 'test';
+}
 class TestModel
 {
     public $name = 'TestModel';
@@ -33,6 +40,14 @@ class TesterComponent extends Component
 
 class TesterHelper extends Helper
 {
+}
+
+class MockPaginator
+{
+    public function paginate($object, $config)
+    {
+        return [$object,$config];
+    }
 }
 
 class TestsController extends Controller
@@ -177,6 +192,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         ModelRegistry::set('Test2', $Test);
 
         $this->assertEquals($Test, $controller->loadModel('Test2'));
+        $this->assertEquals($Test, $controller->Test2);
+        $this->assertNull($controller->NonExistantModel);
     }
 
     public function testCallbacksStartup()
@@ -231,9 +248,26 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->shutdownProcess();
     }
 
+    /**
+     * Create tmp view file
+     *
+     * @return void
+     */
     public function testRender()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $tmpFolder = VIEW . DS . 'Tests';
+        $expected = '<h1>Test Render<h1>';
+        mkdir($tmpFolder);
+        file_put_contents($tmpFolder.DS . 'edit.ctp', $expected);
+
+        $request = new Request('tests/edit/1024');
+        $controller = new TestsController($request, new Response());
+        $controller->layout = false;
+        $controller->render();
+
+        $this->assertEquals($expected, $controller->response->body());
+        unlink($tmpFolder.DS . 'edit.ctp');
+        rmdir($tmpFolder);
     }
 
     public function testRedirect()
@@ -258,5 +292,35 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
         
         $this->assertNull($controller->redirect(array('action' => 'view', 2048)));
+    }
+
+    public function testPaginate()
+    {
+        # Create Table
+        $connection = ConnectionManager::get('test');
+        $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(20));');
+        $connection->execute('TRUNCATE TABLE pets');
+
+        # Create Dummy Data
+        $Pet = new Pet();
+        ModelRegistry::set('Pet', $Pet);
+        for ($i=0;$i<100;$i++) {
+            $Pet->save($Pet->newEntity(['name'=>'Pet' . $i]));
+        }
+        
+
+     
+        $controller = new TestsController(
+            new Request('pets/edit/2048'),
+            new Response()
+        );
+        $controller->Paginator = new MockPaginator();
+       
+    
+        $results = $controller->paginate();
+        $this->assertEquals(20, count($results));
+
+        $results = $controller->paginate('Pet', ['limit'=>10]);
+        $this->assertEquals(10, count($results));
     }
 }

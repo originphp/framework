@@ -29,5 +29,35 @@ class SessionTest extends \PHPUnit\Framework\TestCase
     {
         Session::write('sessionTest', 'works');
         $this->assertEquals('works', Session::read('sessionTest'));
+        
+        Session::write('Test.status', 'ok');
+        $this->assertEquals('ok', Session::read('Test.status'));
+    }
+
+    public function testCheck()
+    {
+        Session::write('Test.status', 'ok');
+        $this->assertTrue(Session::check('Test.status'));
+        $this->assertFalse(Session::check('Test.password'));
+    }
+
+    public function testDestroy()
+    {
+        Session::write('Test.status', 'ok');
+
+        $this->assertTrue(Session::started());
+        Session::destroy();
+        $this->assertFalse(Session::check('Test.status'));
+    }
+    /**
+     * @depends testDestroy
+     */
+    public function testCreate()
+    {
+        Session::destroy();
+        Session::initialize();
+        Session::write('Test.status', 'ok');
+        $this->assertTrue(Session::check('Test.status'));
+        $this->assertTrue(Session::check('Session.lastActivity'));
     }
 }

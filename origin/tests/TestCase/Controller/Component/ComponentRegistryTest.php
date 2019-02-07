@@ -14,6 +14,28 @@
 
 namespace Origin\Test\Controller\Component;
 
+use Origin\Controller\Controller;
+use Origin\Controller\Component\Component;
+use Origin\Controller\Component\ComponentRegistry;
+use Origin\Controller\Component\Exception\MissingComponentException;
+
 class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        $this->Controller = new Controller();
+    }
+    public function testLoad()
+    {
+        $componentRegistry = new ComponentRegistry($this->Controller);
+        $component = $componentRegistry->load('Component');
+        $this->assertInstanceOf(Component::class, $component);
+    }
+
+    public function testThrowException()
+    {
+        $this->expectException(MissingComponentException::class);
+        $componentRegistry = new ComponentRegistry($this->Controller);
+        $componentRegistry->load('ComponentThatDoesNotExist');
+    }
 }

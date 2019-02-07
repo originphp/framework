@@ -31,7 +31,7 @@ Router::add('/pages/*', ['controller'=>'Pages','action'=>'display']);
 /*
 * Load the routes for plugins
 */
-Plugin::loadRoutes();
+Plugin::routes();
 
 /*
 * Load default routes - You can remove these if you want but you will need to add a

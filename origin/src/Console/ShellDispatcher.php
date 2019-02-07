@@ -188,6 +188,7 @@ class ShellDispatcher
         $shells['Core'] = $this->scandir(ORIGIN . DS. 'src' . DS . 'Console');
 
         $plugins = Plugin::loaded();
+        sort($plugins);
         foreach ($plugins as $plugin) {
             $shells[$plugin] = $this->scandir(ROOT . DS . 'plugins' . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Console');
         }

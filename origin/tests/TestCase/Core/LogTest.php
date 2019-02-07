@@ -14,6 +14,16 @@
 
 namespace Origin\Test\Core;
 
+use Origin\Core\Log;
+
 class LogTest extends \PHPUnit\Framework\TestCase
 {
+    public function testWrite()
+    {
+        $logFilename = LOGS.DS.'log-test.log';
+        Log::write('log-test', 'This is a test');
+        $expected =  date('Y-m-d G:i:s') ." - This is a test\n";
+        $this->assertEquals($expected, file_get_contents($logFilename));
+        unlink($logFilename);
+    }
 }

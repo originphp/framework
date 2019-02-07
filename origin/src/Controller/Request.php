@@ -60,11 +60,20 @@ class Request
     public $base = null;
 
     /**
-     * Takes a uri from request uri.
+     * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
-     * @example controller/action (without /)
+     * @param string $url articles/edit/2048
      */
     public function __construct($url = null)
+    {
+        $this->initialize($url);
+    }
+
+    /**
+     * Initializes the request
+     * @params string $url articles/edit/2048
+     */
+    public function initialize($url = null)
     {
         if ($url === null) {
             $url = $this->uri();
@@ -123,6 +132,11 @@ class Request
         $this->query = $query;
     }
 
+    /**
+     * curl -i -X POST -H 'Content-Type: application/json' -d '{"title":"CNBC","url":"https://www.cnbc.com"}' http://localhost:8000/bookmarks/add
+     *
+     * @return void
+     */
     protected function processPost()
     {
         $data = [];
@@ -130,6 +144,9 @@ class Request
             parse_str($this->readInput(), $data);
         }
         if ($this->is(['post'])) {
+            /**
+             * curl -i -X POST -H 'Content-Type: application/json' -d '{"title":"CNBC","url":"https://www.cnbc.com"}' http://localhost:8000/bookmarks/test
+             */
             if ($this->env('CONTENT_TYPE') === 'application/json') {
                 $data = json_decode($this->readInput(), true);
                 if (!is_array($data)) {
@@ -202,7 +219,7 @@ class Request
         $fh = fopen('php://input', 'r');
         $contents = stream_get_contents($fh);
         fclose($fh);
-
+        pr($contents);
         return $contents;
     }
 }

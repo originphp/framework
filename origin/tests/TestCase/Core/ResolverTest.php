@@ -50,6 +50,10 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
 
         $result = MockResolver::className('MathComponent', 'Controller/Component');
         $this->assertEquals($expected, $result);
+
+        MockResolver::addClass('MyPlugin\Controller\Component\MathComponent');
+        $result = MockResolver::className('MyPlugin.MathComponent', 'Controller/Component');
+        $this->assertEquals('MyPlugin\Controller\Component\MathComponent', $result);
     }
 
     public function testHelper()
@@ -69,6 +73,10 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
 
         $result = MockResolver::className('ListHelper', 'View/Helper');
         $this->assertEquals($expected, $result);
+
+        MockResolver::addClass('MyPlugin\View\Helper\ListHelper');
+        $result = MockResolver::className('MyPlugin.ListHelper', 'View/Helper');
+        $this->assertEquals('MyPlugin\View\Helper\ListHelper', $result);
     }
 
     public function testBehavior()
@@ -88,5 +96,9 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
 
         $result = MockResolver::className('TreeBehavior', 'Model/Behavior');
         $this->assertEquals($expected, $result);
+
+        MockResolver::addClass('MyPlugin\Model\Behavior\TreeBehavior');
+        $result = MockResolver::className('MyPlugin.TreeBehavior', 'Model/Behavior');
+        $this->assertEquals('MyPlugin\Model\Behavior\TreeBehavior', $result);
     }
 }
