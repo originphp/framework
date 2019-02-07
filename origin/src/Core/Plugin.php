@@ -81,31 +81,28 @@ class Plugin
         }
         return static::$autoloader;
     }
-    public static function bootstrap(string $plugin = null)
+    
+    public static function bootstrap(string $plugin)
     {
-        if ($plugin === null) {
-            foreach (static::$loaded as $plugin => $options) {
-                static::bootstrap($plugin);
-            }
-            return true;
-        }
         $options = static::$loaded[$plugin];
         if ($options['bootstrap']) {
             return static::include($options['path'].DS.'config'.DS.'bootstrap.php');
         }
         return false;
     }
+
+    public static function loadRoutes()
+    {
+        foreach (static::$loaded as $plugin => $options) {
+            static::routes($plugin);
+        }
+        return true;
+    }
     /**
      * Loads routes for plugin or all plugins. Used in config/routes.php.
      */
     public static function routes(string $plugin = null)
     {
-        if ($plugin === null) {
-            foreach (static::$loaded as $plugin => $options) {
-                static::routes($plugin);
-            }
-            return true;
-        }
         $options = static::$loaded[$plugin];
         if ($options['routes']) {
             return static::include($options['path'].DS.'config'.DS.'routes.php');
