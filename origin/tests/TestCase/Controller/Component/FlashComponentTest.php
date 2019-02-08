@@ -14,6 +14,49 @@
 
 namespace Origin\Test\Controller\Component;
 
+use Origin\Controller\Controller;
+use Origin\Controller\Component\FlashComponent;
+use Origin\Core\Session;
+use Origin\Controller\Request;
+use Origin\Controller\Response;
+
+class MockFlashComponent extends FlashComponent
+{
+}
+
+class ApplesController extends Controller
+{
+    public $autoRender = false;
+
+    public function index()
+    {
+    }
+}
 class FlashComponentTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        $request = new Request('/apples/index');
+        $this->FlashComponent = new MockFlashComponent(new ApplesController($request, new Response()));
+    }
+    public function testAddMessages()
+    {
+        $flashComponent = $this->FlashComponent;
+
+        $flashComponent->error('error called');
+        $this->assertEquals(['error called'], Session::read('Message.error'));
+        
+        $flashComponent->success('success called');
+        $this->assertEquals(['success called'], Session::read('Message.success'));
+
+        $flashComponent->warning('warning called');
+        $this->assertEquals(['warning called'], Session::read('Message.warning'));
+
+        $flashComponent->info('info called');
+        $this->assertEquals(['info called'], Session::read('Message.info'));
+
+        // Test multiple messages
+        $flashComponent->error('error called again');
+        $this->assertEquals(['error called','error called again'], Session::read('Message.error'));
+    }
 }
