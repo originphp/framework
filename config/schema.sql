@@ -1,47 +1,42 @@
 # This is where your database schema goes
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dob` date DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  dob DATE DEFAULT NULL,
+  created DATETIME DEFAULT NULL,
+  modified DATETIME DEFAULT NULL
+) ENGINE=InnoDB;
 
-CREATE TABLE `bookmarks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `title` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `url` text COLLATE utf8mb4_unicode_ci,
-  `category` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_key` (`user_id`),
-  CONSTRAINT `bookmarks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE bookmarks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(50) DEFAULT NULL,
+  description TEXT,
+  url TEXT,
+  category VARCHAR(80) DEFAULT NULL,
+  created DATETIME DEFAULT NULL,
+  modified DATETIME DEFAULT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id)
+) ENGINE=InnoDB;
 
-CREATE TABLE `tags` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `title` (`title`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE tags (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) DEFAULT NULL,
+  created DATETIME DEFAULT NULL,
+  modified DATETIME DEFAULT NULL,
+  UNIQUE KEY title (title)
+) ENGINE=InnoDB;
 
-CREATE TABLE `bookmarks_tags` (
-  `bookmark_id` int(11) NOT NULL,
-  `tag_id` int(11) NOT NULL,
-  PRIMARY KEY (`bookmark_id`,`tag_id`),
-  KEY `tag_key` (`tag_id`),
-  CONSTRAINT `bookmarks_tags_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`),
-  CONSTRAINT `bookmarks_tags_ibfk_2` FOREIGN KEY (`bookmark_id`) REFERENCES `bookmarks` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE bookmarks_tags (
+  bookmark_id INT NOT NULL,
+  tag_id INT NOT NULL,
+  PRIMARY KEY (bookmark_id,tag_id),
+  FOREIGN KEY (tag_id) REFERENCES tags (id),
+  FOREIGN KEY (bookmark_id) REFERENCES bookmarks (id)
+) ENGINE=InnoDB;
 
 
 
