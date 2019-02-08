@@ -22,7 +22,6 @@ use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Core\Router;
 use Origin\Model\Model;
-
 use Origin\Model\ConnectionManager;
 
 class Pet extends Model
@@ -298,8 +297,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         # Create Table
         $connection = ConnectionManager::get('test');
+        $connection->execute('DROP TABLE IF EXISTS pets');
         $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(20));');
-        $connection->execute('TRUNCATE TABLE pets');
+        
 
         # Create Dummy Data
         $Pet = new Pet();

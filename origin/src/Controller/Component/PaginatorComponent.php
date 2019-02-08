@@ -25,10 +25,12 @@ class PaginatorComponent extends Component
       'limit' => 20,
     ];
 
-    protected $whitelist = [
-      'find' => ['conditions', 'fields', 'joins', 'limit', 'order', 'group', 'contain', 'page'],
-      'query' => ['direction', 'limit', 'page', 'sort'],
-    ];
+    /**
+     * Name of keys allowed to be passed in a query
+     *
+     * @var array
+     */
+    protected $whitelist = ['direction', 'limit', 'page', 'sort'];
 
     /**
      * This is the model for the current Pagination request. All functions that need
@@ -41,11 +43,11 @@ class PaginatorComponent extends Component
     public function paginate(Model $model, array $settings = [])
     {
         $this->model = $model;
-
-        $settings = $this->mergeDefaults($settings);
-        $settings = $this->mergeQuery($settings);
-
+       
+        $settings = $this->mergeSettings($settings);
+    
         $settings = $this->prepareSort($settings);
+      
         $sort = $direction = false;
         if (isset($settings['order'])) {
             $sort = key($settings['order']);
@@ -71,10 +73,15 @@ class PaginatorComponent extends Component
 
         // Enable sorting on related Fields. e.g author_id - this sort by Display Field
         if ($sort and substr($sort, -3) === '_id') {
+            // Setup default sort if intra model fails
+            $settings['order'] = ["{$this->model->alias}.{$sort}" => $direction];
+            // intra model sorting by display field if configured
             $alias = $this->getModelFromField($sort);
-            $displayField = $this->model->{$alias}->displayField;
-            if ($displayField) {
-                $settings['order'] = ["{$alias}.{$displayField}" => $direction];
+            if (isset($this->model->{$alias})) {
+                $displayField = $this->model->{$alias}->displayField;
+                if ($displayField) {
+                    $settings['order'] = ["{$alias}.{$displayField}" => $direction];
+                }
             }
         }
 
@@ -123,17 +130,24 @@ class PaginatorComponent extends Component
         return $this->model->find('count', $settings);
     }
 
-    protected function mergeDefaults($settings)
+    /**
+     * Merges settings with defaults, and then checks and whitelists request query  params
+     *
+     * @param array $settings
+     * @return void
+     */
+    protected function mergeSettings(array $settings)
     {
+     
+        // merge with defaults
         $settings += $this->config;
-        return $this->filterArray($this->whitelist['find'], $settings);
-    }
-
-    protected function mergeQuery($settings)
-    {
         $query = $this->controller()->request->query;
-
-        return $this->filterArray($this->whitelist['query'], $query) + $settings;
+        if ($query) {
+            $query = $this->filterArray($this->whitelist, $query);
+            $settings += $query;
+        }
+       
+        return $settings;
     }
 
     protected function prepareSort($settings)
