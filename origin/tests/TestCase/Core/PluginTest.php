@@ -17,6 +17,19 @@ namespace Origin\Test\Core;
 use Origin\Core\Plugin;
 use Origin\Core\Exception\MissingPluginException;
 
+class MockPlugin extends Plugin
+{
+    public static function getLoaded()
+    {
+        return static::$loaded;
+    }
+    public static $fileFound = true;
+
+    public static function include(string $filename)
+    {
+        return static::$fileFound;
+    }
+}
 class PluginTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadException()
@@ -27,7 +40,27 @@ class PluginTest extends \PHPUnit\Framework\TestCase
 
     public function testLoad()
     {
-        Plugin::load('Make');
-        $this->assertTrue(Plugin::loaded('Make'));
+        MockPlugin::load('Make');
+        $this->assertTrue(MockPlugin::loaded('Make'));
+        $config = MockPlugin::getLoaded();
+        $this->assertEquals('/var/www/plugins/make/src', $config['Make']['path']);
+        $this->assertTrue($config['Make']['routes']);
+        $this->assertTrue($config['Make']['bootstrap']);
+        MockPlugin::unload('Make');
+        $this->assertFalse(MockPlugin::loaded('Make'));
+
+        MockPlugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
+        
+        $this->assertTrue(MockPlugin::loaded('Make'));
+        $config = MockPlugin::getLoaded();
+
+        $this->assertFalse($config['Make']['routes']);
+        $this->assertFalse($config['Make']['bootstrap']);
+    }
+    public function testRoutes()
+    {
+        MockPlugin::load('Make');
+        $this->assertTrue(MockPlugin::routes('Make'));
+        MockPlugin::loadRoutes();
     }
 }

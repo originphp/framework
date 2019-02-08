@@ -20,8 +20,15 @@ class BookmarksController extends AppController {
 }
 
 ````
+In this example when the user requests `/bookmarks/view/128` it will load the Bookmarks controller, call the view method and render the `View/Booksmarks/view.ctp` file;
+
+If you don't want a method to be rendered, then you set the `autoRender` property to false. The views are rendered in layouts, you can set the `layout` method to the name or `false`.
+
+Private and protected methods can't be accessed using the url.
 
 You can access the model for the controller, by using `$this->Bookmark`. If you want to use a different models in your controller, then you will need to load each model that you want to use the `loadModel` method.
+
+
 
 ## Request
 
@@ -101,7 +108,7 @@ There are three callbacks which Controllers use, `initialize`,`startup` and `shu
     /**
      * This is called when controller is constructed
      */
-    public function initialize(array $config){}
+    public function initialize(){}
 
     /**
      * This called after initialize but before the controller action

@@ -27,6 +27,12 @@ class Dispatcher
 {
     protected $controller = null;
 
+    /**
+     * Starts the disatch process by creating the request and response objects
+     *
+     * @param string $url
+     * @return void
+     */
     public function start(string $url = null)
     {
         $Request = new Request($url);
@@ -35,18 +41,27 @@ class Dispatcher
         return $this->dispatch($Request, $Response);
     }
 
+    protected function getClass(string $controller, string $plugin = null)
+    {
+        $namespace = Configure::read('App.namespace');
+        if ($plugin) {
+            $namespace = $plugin;
+        }
+        return $namespace.'\Controller\\'. $controller . 'Controller';
+    }
+
+    /**
+     * This is the dispatch workhorse
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return Controller
+     */
     public function dispatch(Request $request, Response $response)
     {
         if ($request->params) {
-            $class = $request->params['controller'].'Controller';
+            $class = $this->getClass($request->params['controller'], $request->params['plugin']);
 
-            if ($request->params['plugin']) {
-                $class = $request->params['plugin'].'\Controller\\'.$class;
-            } else {
-                $namespace = Configure::read('App.namespace');
-                $class = $namespace.'\Controller\\'.$class;
-            }
-      
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params['controller']);
             }
@@ -78,7 +93,7 @@ class Dispatcher
      *
      * @return Controller
      */
-    public function buildController(string $class, Request $request, Response $response)
+    protected function buildController(string $class, Request $request, Response $response)
     {
         $controller = new $class($request, $response);
 
@@ -93,7 +108,7 @@ class Dispatcher
         return $controller;
     }
 
-    public function invoke(Controller &$controller, string $action, array $arguments)
+    protected function invoke(Controller &$controller, string $action, array $arguments)
     {
         $response = null;
        
@@ -101,23 +116,13 @@ class Dispatcher
        
         $result = call_user_func_array(array($controller, $action), $arguments['pass']);
      
-        if ($result === null and $controller->autoRender) {
+        if ($controller->autoRender) {
             $controller->render();
         }
 
         $controller->shutdownProcess();
 
         return $controller;
-    }
-
-    /**
-     * Gets the last request object.
-     *
-     * @return Request
-     */
-    public function request()
-    {
-        return $this->controller->request;
     }
 
     /**

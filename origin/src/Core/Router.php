@@ -23,7 +23,7 @@ class Router
      *
      * @var array
      */
-    public static $routes = array();
+    protected static $routes = [];
 
     protected static $request = null;
 
@@ -206,5 +206,10 @@ class Router
     public static function setRequest(Request $request)
     {
         static::$request = $request;
+    }
+
+    public static function routes()
+    {
+        return static::$routes;
     }
 }

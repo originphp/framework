@@ -24,18 +24,11 @@ use Origin\Core\Exception\MissingPluginException;
 class Plugin
 {
     /**
-     * Loaded plugins are stored here
+     * Loaded plugins are stored here with config
      *
      * @var array
      */
-    protected static $loaded = array();
-
-    /**
-     * Holds an Autoloader object
-     *
-     * @var Autoloader
-     */
-    protected static $autoloader = null;
+    protected static $loaded = [];
 
     /**
      * Checks if a plugin is loaded or returns a list of loaded plugins
@@ -57,10 +50,9 @@ class Plugin
      * @param string $plugin
      * @param array $options
      */
-    public static function load(string $plugin, array $options = array())
+    public static function load(string $plugin, array $options = [])
     {
-        $defaults = array('routes' => true, 'bootstrap' => true);
-        $options = array_merge($defaults, $options);
+        $options += ['routes' => true, 'bootstrap' => true];
         $options['path'] = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src';
     
         if (!file_exists($options['path'])) {
@@ -70,23 +62,35 @@ class Plugin
 
         static::bootstrap($plugin);
  
-        static::autoloader()->addNamespaces(array(
-          $plugin => 'plugins/'.Inflector::underscore($plugin).'/src',
-          "{$plugin}\\Test" => 'plugins/'.Inflector::underscore($plugin).'/tests',
-        ));
+        static::autoload($plugin);
     }
 
     /**
-     * Get the autoloader object
+     * Unloads a plugin for use
      *
-     * @return Autoloader
+     * @param string $plugin
+     * @return void
      */
-    protected static function autoloader()
+    public static function unload(string $plugin)
     {
-        if (empty(static::$autoloader)) {
-            static::$autoloader = Autoloader::init();
+        if (isset(static::$loaded[$plugin])) {
+            unset(static::$loaded[$plugin]);
+            return true;
         }
-        return static::$autoloader;
+        return false;
+    }
+
+    /**
+     * Sets up the autoloading of classes for the plugin
+     */
+    protected static function autoload(string $plugin)
+    {
+        $autoloader = Autoloader::init();
+        $pluginPath = 'plugins/' . Inflector::underscore($plugin);
+        $autoloader->addNamespaces([
+            $plugin => $pluginPath . '/src',
+            "{$plugin}\\Test" => $pluginPath . '/tests',
+        ]);
     }
     
     /**
@@ -99,7 +103,7 @@ class Plugin
     {
         $options = static::$loaded[$plugin];
         if ($options['bootstrap']) {
-            return static::include($options['path'].DS.'config'.DS.'bootstrap.php');
+            return static::include($options['path'] . DS . 'config' . DS . 'bootstrap.php');
         }
         return false;
     }
@@ -118,13 +122,13 @@ class Plugin
         return true;
     }
     /**
-     * Loads routes for plugin∂. Used in config/routes.php.
+     * Loads routes for plugin. Used in config/routes.php.
      */
     public static function routes(string $plugin)
     {
         $options = static::$loaded[$plugin];
         if ($options['routes']) {
-            return static::include($options['path'].DS.'config'.DS.'routes.php');
+            return static::include($options['path'] . DS . 'config' . DS . 'routes.php');
         }
         return false;
     }

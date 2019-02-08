@@ -27,6 +27,7 @@ class SessionTest extends \PHPUnit\Framework\TestCase
 
     public function testRead()
     {
+        $this->assertFalse(Session::read('sessionTest'));
         Session::write('sessionTest', 'works');
         $this->assertEquals('works', Session::read('sessionTest'));
         
@@ -39,6 +40,13 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         Session::write('Test.status', 'ok');
         $this->assertTrue(Session::check('Test.status'));
         $this->assertFalse(Session::check('Test.password'));
+    }
+
+    public function testDelete()
+    {
+        Session::write('Test.status', 'ok');
+        $this->assertTrue(Session::delete('Test.status'));
+        $this->assertFalse(Session::delete('Test.password'));
     }
 
     public function testDestroy()
@@ -59,5 +67,13 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         Session::write('Test.status', 'ok');
         $this->assertTrue(Session::check('Test.status'));
         $this->assertTrue(Session::check('Session.lastActivity'));
+    }
+
+    public function testTimeout()
+    {
+        Session::write('Test.status', 'ok');
+        Session::write('Session.lastActivity', 0);
+        Session::initialize();
+        $this->assertFalse(Session::check('Test.status'));
     }
 }
