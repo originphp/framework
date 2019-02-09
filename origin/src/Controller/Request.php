@@ -219,7 +219,6 @@ class Request
         $fh = fopen('php://input', 'r');
         $contents = stream_get_contents($fh);
         fclose($fh);
-        pr($contents);
         return $contents;
     }
 }

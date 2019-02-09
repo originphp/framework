@@ -20,6 +20,7 @@ use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Core\Session;
+use Origin\Model\Entity;
 
 class MockAuthComponent extends AuthComponent
 {
@@ -163,24 +164,40 @@ class AuthComponentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $AuthComponent->callMethod('getCredentials'));
     }
 
-    public function testUnauthorize()
+    public function testSetUser()
     {
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $data = ['username'=>'fred@smith.com','password'=>1234];
+        $entity = new Entity($data);
+        $this->AuthComponent->setUser($entity);
+        $this->assertEquals($data, Session::read('Auth.User'));
     }
 
-    public function testLoadUser()
+    /**
+     * @depends testSetUser
+     *
+     * @return void
+     */
+    public function testUser()
     {
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $data = ['username'=>'fred@smith.com','password'=>1234,'date'=>'2019-02-07'];
+        $entity = new Entity($data);
+        $this->AuthComponent->setUser($entity);
+        $this->assertEquals($data, $this->AuthComponent->user());
+        $this->assertEquals('fred@smith.com', $this->AuthComponent->user('username'));
     }
 
-    public function testRedirectUrl()
+    public function testAuth()
     {
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $expected = [
+            'controller' => 'Users',
+        'action' => 'index',
+        'plugin' => null];
+        $redirectUrl = $this->AuthComponent->redirectUrl();
+        $this->assertEquals($expected, $redirectUrl);
+        
+        $expected = '/dashboard/home';
+        Session::write('Auth.redirect', $expected);
+        $redirectUrl = $this->AuthComponent->redirectUrl();
+        $this->assertEquals($expected, $redirectUrl);
     }
 }

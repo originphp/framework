@@ -29,4 +29,25 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Origin\Framework', $namespace);
         $this->assertEquals('Dispatcher', $classname);
     }
+
+    public function testTranslate()
+    {
+        $expected = 'Nothing';
+        $translate = __($expected); // no translation return as is
+        $this->assertEquals('Nothing', $translate);
+
+        $translated = __('Your password is %s!', 'secret');
+        $this->assertEquals('Your password is secret!', $translated);
+        
+        $translated = __('Your username is %s and your password is %s.', 'jimbo@example.com', 'secret');
+        $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
+    }
+    public function testH()
+    {
+        $this->assertEquals('&lt;h1&gt;Headline&lt;/h1&gt;', h('<h1>Headline</h1>'));
+    }
+    public function testNow()
+    {
+        $this->assertEquals(date('Y-m-d H:i:s'), now());
+    }
 }
