@@ -33,6 +33,17 @@ class TestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $FunkyClass = new FunkyClass();
         $this->assertEquals('FunkyClass', $FunkyClass->getProperty('name'));
+        $this->assertNull($FunkyClass->getProperty('nonExistant'));
+    }
+
+    /**
+     * @depends testGetProperty
+     */
+    public function testSetProperty()
+    {
+        $FunkyClass = new FunkyClass();
+        $FunkyClass->setProperty('foo', 'bar');
+        $this->assertEquals('bar', $FunkyClass->getProperty('foo'));
     }
 
     public function testCallMethod()

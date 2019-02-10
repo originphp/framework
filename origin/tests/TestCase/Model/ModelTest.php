@@ -150,9 +150,12 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $expected = array(
             'type' => 'int',
             'length' => 11,
+            'precision' => null,
             'default' => null,
             'null' => null,
             'key' => 'primary',
+            'autoIncrement' => true,
+            'unsigned' => false
       );
         $this->assertEquals($expected, $schema['id']);
         $idSchema = $Article->schema('id');

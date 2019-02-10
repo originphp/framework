@@ -15,6 +15,7 @@
 namespace Origin\Model;
 
 use Origin\Exception\Exception;
+use Origin\Model\ConnectionManager;
 
 class Schema
 {
@@ -83,11 +84,14 @@ class Schema
 
             $output = "{$field} {$mapping['name']}";
 
-            if (isset($settings['length'])) {
+            if (!empty($settings['length'])) {
                 if (in_array($settings['type'], ['decimal', 'float'])) {
                     $output .= "({$settings['length']},{$settings['precision']})";
                 } else {
                     $output .= "({$settings['length']})";
+                }
+                if (!empty($settings['unsigned'])) {
+                    $output .= " unsigned";
                 }
             }
 
@@ -104,12 +108,34 @@ class Schema
             }
 
             // When key is set as primary we automatically make it autoincrement
-            if (isset($settings['key']) and $settings['key'] === 'primary') {
+            if (!empty($settings['autoIncrement'])) {
                 $output .= ' AUTO_INCREMENT PRIMARY KEY';
             }
             $result[] = ' '.$output;
         }
 
         return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n)";
+    }
+
+    /**
+     * Generates the schema as used by createTable
+     *
+     * @param array $describe
+     * @return void
+     */
+    public function generate(string $table, string $datasource='default')
+    {
+        $reverseMapping = [];
+        foreach ($this->mapping as $key => $value) {
+            $reverseMapping[strtolower($value['name'])] = $key;
+        }
+        $data = [];
+
+        $connection = ConnectionManager::get($datasource);
+        $schema = $connection->schema($table);
+        foreach ($schema as &$result) {
+            $result['type'] = $reverseMapping[$result['type']];
+        }
+        return $schema;
     }
 }

@@ -19,6 +19,7 @@ use Origin\Model\ConnectionManager;
 use Origin\Model\Schema;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Resolver;
+use Orign\Exception\Exception;
 
 class Fixture
 {
@@ -31,9 +32,9 @@ class Fixture
     public $records = [];
 
     /**
-     * You can import table schema from the model
+     * You can import data using a model or table key
      *
-     * @var string
+     * @var array|null
      */
     public $import = null;
 
@@ -47,7 +48,9 @@ class Fixture
     public function __construct()
     {
         if ($this->table === null) {
-            $this->table = $this->tableFromClass(get_class($this));
+            list($namespace, $class) = namespaceSplit(get_class($this));
+            $name =  substr($class, 0, -7);
+            $this->table = Inflector::tableize($name);
         }
 
         $this->initialize();
@@ -69,24 +72,36 @@ class Fixture
      */
     public function import()
     {
-        $table = Inflector::tableize($this->import);
-        $datasource = 'default';
+        if ($this->import === null) {
+            return;
+        }
+       
+        $defaults = ['datasource'=>'default','model'=>null,'table'=>null];
 
-        $className = Resolver::className($this->import, 'Model');
-        if ($className) {
-            $model = new $className();
-            $datasource = $model->datasource;
-            $table = $model->table;
+        $options = array_merge($defaults, $this->import);
+
+        // Load information from model is specificied
+        if ($options['model']) {
+            $className = Resolver::className($options['model'], 'Model');
+            if ($className) {
+                $model = new $className();
+                $options['datasource'] = $model->datasource;
+                $options['table'] = $model->table;
+            } else {
+                $options['table'] = Inflector::tableize($options['model']); // for dynamic models fall back
+            }
         }
-      
-        $connection = ConnectionManager::get($datasource);
-        $connection->execute("SHOW CREATE TABLE {$table}");
-        $result = $connection->fetch();
-        if (!empty($result['Create Table'])) {
-            $sql = $result['Create Table'];
-            $connection = ConnectionManager::get($this->datasource);
-            return $connection->execute($sql);
+        // Table is not specificied or could not find model
+        if (empty($options['table'])) {
+            throw new Exception('Undefined table');
         }
+
+        $connection = ConnectionManager::get($this->datasource);
+        $Schema = new Schema();
+        $fields = $Schema->generate($options['table'], $options['datasource']);
+        $sql = $Schema->createTable($this->table, $fields);
+
+        return $connection->execute($sql);
     }
 
     /**
@@ -102,7 +117,7 @@ class Fixture
         $connection = ConnectionManager::get($this->datasource);
         $Schema = new Schema();
         $sql = $Schema->createTable($this->table, $this->fields);
-
+    
         return $connection->execute($sql);
     }
 
@@ -139,20 +154,5 @@ class Fixture
         $connection = ConnectionManager::get($this->datasource);
 
         return $connection->execute("TRUNCATE {$this->table}");
-    }
-
-    /**
-     * Gets table name from class name
-     * Origin\Test\Fixture\ArticleFixture -> articles.
-     *
-     * @param string $class
-     *
-     * @return string table name
-     */
-    protected function tableFromClass(string $class)
-    {
-        list($namespace, $class) = namespaceSplit($class);
-        $class = substr($class, 0, -7);
-        return Inflector::tableize($class);
     }
 }

@@ -22,7 +22,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
     {
         $Schema = new Schema();
         $data = array(
-          'id' => array('type' => 'integer', 'key' => 'primary'),
+          'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
           'title' => array(
             'type' => 'string',
             'length' => 255,
@@ -49,7 +49,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $Schema->createTable('articles', $data));
 
         $data = array(
-        'id' => array('type' => 'integer', 'key' => 'primary'),
+        'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
         'deal' => array(
           'type' => 'string',
           'length' => 80,

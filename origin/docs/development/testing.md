@@ -66,6 +66,121 @@ class BookmarkTest extends OriginTestCase
 
 ````
 
+If you are want to load a fixture from a plugin, then add the plugin name with the dot notation to list, e.g. `MyPlugin.Bookmark`.
+
+Create the fixtures in the `tests\Fixture` folder. You are most likely going to be testing existing models, so we can import the schema easily.
+
+
+````php
+namespace App\Test\Fixture;
+
+use Origin\TestSuite\Fixture;
+
+class ArticleFixture extends Fixture
+{
+    public $import = ['model' =>'Article']
+}
+
+````
+
+To set some test data set the `records` property.
+
+````php
+namespace App\Test\Fixture;
+
+use Origin\TestSuite\Fixture;
+
+class ArticleFixture extends Fixture
+{
+    public $import = ['model' =>'Article'];
+
+      public $records = array(
+         array(
+           'id' => 1,
+           'title' => 'First Article',
+           'body' => 'Article body goes here',
+           'published' => '1',
+           'created' => '2018-12-19 13:29:10',
+           'modified' => '2018-12-19 13:30:20',
+         ),
+         array(
+           'id' => 2,
+           'title' => 'Second Article',
+           'body' => 'Article body goes here',
+           'published' => '1',
+           'created' => '2018-12-19 13:31:30',
+           'modified' => '2018-12-19 13:32:40',
+         ),
+         array(
+           'id' => 3,
+           'title' => 'Third Article',
+           'body' => 'Third Article Body',
+           'published' => '1',
+           'created' => '2018-12-19 13:33:50',
+           'modified' => '2018-12-19 13:34:59',
+         ),
+     );
+}
+````
+
+Sometimes you will want to use dynamic data, in this case you will modify the data using the `initialize` method.
+
+````php
+    public function initialize() {
+        $this->records = array(
+            array(
+                'id' => 1,
+                'title' => 'First Article',
+                'body' => 'Article body goes here',
+                'published' => '1',
+                'created' => date('Y-m-d H:i:s'),
+                'modified' => date('Y-m-d H:i:s'),
+            ),
+        );
+        parent::initialize(); // always call parent
+    }
+
+````
+
+You can also manually specify the field data, the type field represents our own internal mapping, should we decide to add support PostgreSQL or other drivers later.
+
+Here is an example:
+
+````php
+namespace App\Test\Fixture;
+
+use Origin\TestSuite\Fixture;
+
+class ArticleFixture extends Fixture
+{
+    public $fields = array(
+         'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
+         'title' => array(
+           'type' => 'string',
+           'length' => 255,
+           'null' => false,
+         ),
+         'body' => 'text',
+         'published' => array(
+           'type' => 'integer',
+           'default' => '0',
+           'null' => false,
+         ),
+         'created' => 'datetime',
+         'modified' => 'datetime',
+     );
+}
+
+````
+
+You can generate the schema from your existing database using the SchemaShell using the following command:
+
+`bin/console schema generate`
+
+This will create a folder in your config folder, called schema with a PHP file for each table. You can run this anytime 
+you make changes, but you will need to update the fixture file separately. 
+When you are first developing your app, using the import method makes the most sense, since it will just your current database at all times. As you start to get into beta and production, you can code the field data into the fixtures - but it is up to you.
+
 ### Mocking Models 
 
 To mock models extend your Test case by either `TestCase` or `ControllerTestCase` and then call the `getMockForModel` method. When the Model is mocked, we also add this to model registry. Remember if use the `tearDown` method in your test case, then call `parent::tearDown()`;

@@ -103,7 +103,7 @@ class Datasource
                     if (is_string($replace)) {
                         $replace = "'{$replace}'";
                     }
-                    $sql = str_replace(':'.$needle, $replace, $sql);
+                    $sql = preg_replace("/\B:{$needle}/", $replace, $sql);
                 }
                 $this->log[] = [
                 'query' => $sql,
@@ -378,17 +378,26 @@ class Datasource
             $result = $this->fetchAll();
 
             foreach ($result as $column) {
-                $length = null;
+                $precision = $length = null;
+                $unsigned = false;
                 $type = str_replace(')', '', $column['Type']);
                 if (strpos($type, '(') !== false) {
                     list($type, $length) = explode('(', $type);
+                    $unsigned = (bool) strpos($length, 'unsigned');
+                    if (strpos(',', $length) !== false) {
+                        list($length, $precision) = explode(',', $length);
+                    }
                 }
+                
                 $schema[$column['Field']] = array(
                   'type' => $type,
-                  'length' => $length,
+                  'length' => (int) $length,
+                  'precision' => (int) $precision,
                   'default' => $column['Default'],
                   'null' => ($column['Null'] === 'YES' ? true : false),
                   'key' => ($column['Key'] === 'PRI' ? 'primary' : null),
+                  'autoIncrement' => ($column['Extra']==='auto_increment')?true:false,
+                  'unsigned' => $unsigned
                 );
             }
         }

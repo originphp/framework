@@ -221,8 +221,7 @@ class FormHelper extends Helper
                 $meta['columnMap'][$column] = $type;
            
                 if (empty($row['length']) == false and $type != 'bool') {
-                    $parts = explode(',', $row['length']);
-                    $meta['maxlength'][$column] = (int) $parts[0];
+                    $meta['maxlength'][$column] = $row['length'];
                 }
             }
 
