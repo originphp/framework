@@ -58,6 +58,14 @@ class FixtureManager
         ModelRegistry::clear();
     }
 
+    public function loaded(string $fixture = null)
+    {
+        if ($fixture === null) {
+            return $this->loaded;
+        }
+        return isset($this->loaded[$fixture]);
+    }
+
     public function loadFixture(string $fixture)
     {
         $class = $this->resolveFixture($fixture);
@@ -83,11 +91,11 @@ class FixtureManager
       
         // Config Model in Registry to use test datasource for this fixture
         list($plugin, $alias) = pluginSplit($fixture);
-      
+    
         ModelRegistry::config($alias, [
-            'datasource' => $this->loaded[$fixture]->datasource,
+            'datasource' => $this->loaded[$fixture]->datasource
         ]);
-
+  
         $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
     }
 

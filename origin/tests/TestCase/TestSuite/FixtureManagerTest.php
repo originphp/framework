@@ -18,13 +18,26 @@ use Origin\TestSuite\FixtureManager;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 
+class MockTestCase
+{
+    public $fixtures = ['Framework.Article'];
+}
+
 class MockFixtureManager extends FixtureManager
 {
     use TestTrait;
 }
 
-class FixtureManagerTest extends OriginTestCase
+class FixtureManagerTest extends \PHPUnit\Framework\TestCase
 {
+    public function testLoadUnload()
+    {
+        $FixtureManager = new MockFixtureManager();
+        $TestCase = new MockTestCase();
+        $FixtureManager->load($TestCase);
+        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $this->assertNull($FixtureManager->unload($TestCase));
+    }
     public function testResolveFixture()
     {
         $FixtureManager = new MockFixtureManager();

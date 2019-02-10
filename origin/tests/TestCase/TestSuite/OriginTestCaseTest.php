@@ -17,6 +17,7 @@ namespace Origin\Test\TestSuite;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
+use Origin\Model\Exception\MissingModelException;
 
 class User extends Model
 {
@@ -86,5 +87,19 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         ->willReturn(false);
       
         $this->assertFalse($mock->true());
+    }
+
+    public function testUnkownClass()
+    {
+        $this->expectException(MissingModelException::class);
+
+        $OriginTestCase = new OriginTestCase();
+        $mock = $OriginTestCase->getMockForModel('Foo');
+    }
+    public function testCallbacks()
+    {
+        $OriginTestCase = new OriginTestCase();
+        $this->assertNull($OriginTestCase->setUp());
+        $this->assertNull($OriginTestCase->tearDown());
     }
 }
