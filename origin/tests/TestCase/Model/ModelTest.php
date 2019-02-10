@@ -69,6 +69,10 @@ class BehaviorTesterBehavior extends Behavior
 
 class ModelTest extends \PHPUnit\Framework\TestCase
 {
+    public function tearDown()
+    {
+        ModelRegistry::clear();
+    }
     /**
      * @todo migrate to Fixtures
      */
