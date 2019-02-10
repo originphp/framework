@@ -5,5 +5,5 @@ use Origin\TestSuite\Fixture;
 
 class BookmarksTagFixture extends Fixture
 {
-    public $import = 'BookmarksTag';
+    public $import = ['model'=>'BookmarksTag'];
 }

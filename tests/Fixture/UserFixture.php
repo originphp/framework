@@ -5,7 +5,7 @@ use Origin\TestSuite\Fixture;
 
 class UserFixture extends Fixture
 {
-    public $import = 'User';
+    public $import = ['model'=>'User'];
     public $records = [
         ['id' => 1000,
         'name' => 'Frank' ,
