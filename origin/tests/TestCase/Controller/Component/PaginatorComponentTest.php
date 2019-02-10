@@ -16,7 +16,6 @@ namespace Origin\Test\Controller\Component;
 
 use Origin\Controller\Component\PaginatorComponent;
 use Origin\TestSuite\TestTrait; // callMethod + getProperty
-use Origin\TestSuite\OriginTestCase;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
@@ -48,12 +47,8 @@ class MockPaginatorComponent extends PaginatorComponent
     use TestTrait;
 }
 
-class PaginatorComponentTest extends OriginTestCase
+class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public $fixtures = ['Framework.Article'];
-
-
-
     public function setUp()
     {
         parent::setUp();
