@@ -127,6 +127,148 @@ trait IntegrationTestTrait
         $this->sendRequest($url, 'PUT', $data);
     }
     
+
+    /**
+     * Fetches a view variable
+     *
+     * @param string $key
+     * @return string|null
+     */
+    public function viewVariable(string $key)
+    {
+        if ($this->controller === null) {
+            $this->fail('No request');
+        }
+        if (isset($this->controller->viewVars[$key])) {
+            return $this->controller->viewVars[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Sets the headers for the next request
+     *
+     * @param string $header
+     * @param string $value
+     */
+    public function header(string $header, string $value = null)
+    {
+        $this->headers[$header] = $value;
+    }
+
+    /**
+     * Sets the session data for the next request
+     *
+     * @param array $data
+     */
+    public function session(array $data)
+    {
+        $this->session += $data;
+    }
+
+    /**
+     * Sets a cookie for the next request
+     *
+     * @todo request
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function cookie(string $key, string $value = null)
+    {
+        $this->cookies[$key] = $value;
+    }
+
+    /**
+     * Sets server enviroment vars $_SERVER
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function env(string $key, string $value)
+    {
+        $this->env[$key] = $value;
+    }
+
+    /**
+     * Gets the controller used in the request
+     *
+     * @return Controller
+     */
+    public function controller()
+    {
+        if ($this->controller === null) {
+            $this->fail('No controller');
+        }
+        return $this->controller;
+    }
+
+    /**
+     * Gets the Request object
+     *
+     * @return Request
+     */
+    public function request()
+    {
+        if ($this->request === null) {
+            $this->fail('No request');
+        }
+        return $this->response;
+    }
+    /**
+     * Gets the response object
+     *
+     * @return Response
+     */
+    public function response()
+    {
+        if ($this->response === null) {
+            $this->fail('No response');
+        }
+        return $this->response;
+    }
+
+    protected function sendRequest($url, $method, $data = [])
+    {
+        $_SERVER['REQUEST_METHOD'] = $method;
+
+        $_POST = $_GET = [];
+        if ($data) {
+            $_POST = $data;
+        }
+
+        // Set server env
+        foreach ($this->env as $key => $value) {
+            $_SERVER[$key] = $value;
+        }
+            
+        $this->request = new Request($url);
+        $this->response = $this->getMock(Response::class, ['send','stop']);
+
+        // Send Headers
+        foreach ($this->headers as $header => $value) {
+            $this->response->header($header, $value);
+        }
+        // Write session data
+        foreach ($this->session as $key => $value) {
+            Session::write($key, $value);
+        }
+    
+        $dispatcher = new Dispatcher();
+        $this->controller = $dispatcher->dispatch($this->request, $this->response);
+    }
+
+    /**
+     * IMPORTANT:: call parent::tearDown
+     */
+    public function tearDown()
+    {
+        parent::teardown();
+        $this->session = $this->headers = $this->cookies = $this->env = [];
+        $this->controller = $this->request = $this->response = null;
+    }
+
+
     /**
      * Asserts that the response code is 2xx
      */
@@ -156,6 +298,13 @@ trait IntegrationTestTrait
     public function assertResponseFailure()
     {
         $this->assertStatus(500, 505, 'Expected status code between 500 and 505');
+    }
+
+    protected function assertStatus(int $min, int $max, string $errorMessage = 'Invalid status')
+    {
+        $status = $this->response()->statusCode();
+        $this->assertGreaterThanOrEqual($min, $status, $errorMessage);
+        $this->assertLessThanOrEqual($max, $status, $errorMessage);
     }
 
     /**
@@ -280,152 +429,5 @@ trait IntegrationTestTrait
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
         $this->assertNotContains($value, $headers[$header]);
-    }
-
-    /**
-     * Fetches a view variable
-     *
-     * @param string $key
-     * @return string|null
-     */
-    public function viewVariable(string $key)
-    {
-        if ($this->controller === null) {
-            $this->fail('No request');
-        }
-        if (isset($this->controller->viewVars[$key])) {
-            return $this->controller->viewVars[$key];
-        }
-        return null;
-    }
-
-    /**
-     * Sets the headers for the next request
-     *
-     * @param string $header
-     * @param string $value
-     */
-    public function header(string $header, string $value = null)
-    {
-        $this->headers[$header] = $value;
-    }
-
-    /**
-     * Sets the session data for the next request
-     *
-     * @param array $data
-     */
-    public function session(array $data)
-    {
-        $this->session += $data;
-    }
-
-    /**
-     * Sets a cookie for the next request
-     *
-     * @todo request
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public function cookie(string $key, string $value = null)
-    {
-        $this->cookies[$key] = $value;
-    }
-
-    /**
-     * Sets server enviroment vars $_SERVER
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public function env(string $key, string $value)
-    {
-        $this->env[$key] = $value;
-    }
-
-    protected function assertStatus(int $min, int $max, string $errorMessage = 'Invalid status')
-    {
-        $status = $this->response()->statusCode();
-        $this->assertGreaterThanOrEqual($min, $status, $errorMessage);
-        $this->assertLessThanOrEqual($max, $status, $errorMessage);
-    }
-
-    /**
-     * Gets the controller used in the request
-     *
-     * @return Controller
-     */
-    public function controller()
-    {
-        if ($this->controller === null) {
-            $this->fail('No controller');
-        }
-        return $this->controller;
-    }
-
-    /**
-     * Gets the Request object
-     *
-     * @return Request
-     */
-    public function request()
-    {
-        if ($this->request === null) {
-            $this->fail('No request');
-        }
-        return $this->response;
-    }
-    /**
-     * Gets the response object
-     *
-     * @return Response
-     */
-    public function response()
-    {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
-        return $this->response;
-    }
-
-    protected function sendRequest($url, $method, $data = [])
-    {
-        $_SERVER['REQUEST_METHOD'] = $method;
-
-        $_POST = $_GET = [];
-        if ($data) {
-            $_POST = $data;
-        }
-
-        // Set server env
-        foreach ($this->env as $key => $value) {
-            $_SERVER[$key] = $value;
-        }
-            
-        $this->request = new Request($url);
-        $this->response = $this->getMock(Response::class, ['send','stop']);
-
-        // Send Headers
-        foreach ($this->headers as $header => $value) {
-            $this->response->header($header, $value);
-        }
-        // Write session data
-        foreach ($this->session as $key => $value) {
-            Session::write($key, $value);
-        }
-    
-        $dispatcher = new Dispatcher();
-        $this->controller = $dispatcher->dispatch($this->request, $this->response);
-    }
-
-    /**
-     * IMPORTANT:: call parent::tearDown
-     */
-    public function tearDown()
-    {
-        parent::teardown();
-        $this->session = $this->headers = $this->cookies = $this->env = [];
-        $this->controller = $this->request = $this->response = null;
     }
 }
