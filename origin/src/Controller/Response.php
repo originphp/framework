@@ -38,6 +38,13 @@ class Response
     protected $headers = [];
 
     /**
+     * holds an array of cookies to be sent
+     *
+     * @var array
+     */
+    protected $cookies = [];
+
+    /**
      * Sets or gets the buffered output.
      *
      * @param string $content
@@ -58,10 +65,12 @@ class Response
      */
     public function send()
     {
-        http_response_code($this->statusCode); /* @requires php 5.4 */
+        http_response_code($this->statusCode);
+
         foreach ($this->headers as $name => $value) {
             $this->sendHeader($name, $value);
         }
+        $this->sendCookies();
         echo $this->body;
     }
 
@@ -125,6 +134,16 @@ class Response
     }
 
     /**
+     * Gets the cookies to be sent
+     *
+     * @return array cookies
+     */
+    public function cookies()
+    {
+        return $this->cookies;
+    }
+
+    /**
      * Sends a header if not already sent.
      *
      * sendHeader("HTTP/1.0 404 Not Found")
@@ -143,6 +162,46 @@ class Response
             header($name);
         } else {
             header("{$name}: {$value}");
+        }
+    }
+
+
+    /**
+     * Sets a cookie or gets a cookie value from RESPONSE
+     *
+     *  $response->cookie('fruit','apple');
+     *  $response->cookie('fruit,[
+     *      'value' => 'apple',
+     *      'expire' => strtotime('+1 day')
+     *  ])
+     *  $value = $response->cookie('fruit');
+     *
+     * @param string $name
+     * @param array|null $value keys include value,path,domain,httpOnly,secure and expire
+     * @return void
+     */
+    public function cookie(string $name, $options = null)
+    {
+        if ($options === null) {
+            if (isset($this->cookies[$name])) {
+                return $this->cookies[$name]['value'];
+            }
+            return false;
+        }
+        $defaults = ['value'=>null,'path'=>'/','domain'=>'','httpOnly'=>false,'secure'=>false,'expire'=>0];
+
+        if (is_string($options)) {
+            $options = ['value' => $options];
+        }
+
+        $options = array_merge($defaults, $options);
+        $this->cookies[$name] = $options;
+    }
+
+    private function sendCookies()
+    {
+        foreach ($this->cookies as $name => $options) {
+            set_cookie($name, $options['value'], $options['expire'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
         }
     }
 }

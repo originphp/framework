@@ -20,6 +20,7 @@ use Origin\Controller\Response;
 use Origin\Core\Dispatcher;
 use Origin\Core\Router;
 use Origin\Core\Session;
+use Origin\Core\Cookie;
 
 /**
  * A way to test controllers from a higher level
@@ -232,7 +233,7 @@ trait IntegrationTestTrait
     {
         $_SERVER['REQUEST_METHOD'] = $method;
 
-        $_POST = $_GET = [];
+        $_SESSION = $_POST = $_GET = $_COOKIE = [];
         if ($data) {
             $_POST = $data;
         }
@@ -253,9 +254,18 @@ trait IntegrationTestTrait
         foreach ($this->session as $key => $value) {
             Session::write($key, $value);
         }
+        // Write cookie data for request
+        foreach ($this->cookies as $name => $value) {
+            $this->response->cookie($name, $value);
+        }
     
+        $this->controller = $this->dispatchRequest();
+    }
+
+    protected function dispatchRequest()
+    {
         $dispatcher = new Dispatcher();
-        $this->controller = $dispatcher->dispatch($this->request, $this->response);
+        return $dispatcher->dispatch($this->request, $this->response);
     }
 
     /**
