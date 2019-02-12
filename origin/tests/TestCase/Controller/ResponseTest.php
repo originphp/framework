@@ -37,7 +37,17 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('en-us,en;q=0.5', $headers['Accept-Language']);
         $this->assertEquals('gzip,deflate', $headers['Accept-Encoding']);
     }
-    
+    public function testCookie()
+    {
+        $response  = new Response();
+        $response->cookie('foo', 'bar');
+        $this->assertEquals('bar', $response->cookie('foo'));
+
+        $cookies = $response->cookies();
+
+        $this->assertEquals('bar', $cookies['foo']['value']);
+        $this->assertFalse($response->cookie('jar'));
+    }
     public function testStatusCode()
     {
         $response  = new Response();
@@ -49,7 +59,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     {
         $response  = new Response();
         $response->statusCode(200);
-        $response->header('Accept-Language', 'en-us');
+        $response->header('Accept-Language', 'en-us,en;q=0.5');
         $this->assertNull($response->send()); // or $response->send()
     }
 }

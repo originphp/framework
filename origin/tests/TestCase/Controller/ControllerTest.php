@@ -24,6 +24,7 @@ use Origin\Core\Router;
 use Origin\Model\Model;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Controller\Component\Exception\MissingComponentException;
 
 class Pet extends Model
 {
@@ -118,6 +119,10 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->loadComponent('Tester', ['className' => 'Origin\Test\Controller\TesterComponent']);
         $this->assertObjectHasAttribute('Tester', $controller);
         $this->assertInstanceOf('Origin\Test\Controller\TesterComponent', $controller->Tester);
+
+      
+        $this->expectException(MissingComponentException::class);
+        $controller->loadComponent('Tron');
     }
 
     public function testLoadComponents()

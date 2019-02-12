@@ -96,7 +96,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view = new View($controller);
         $this->assertEquals('Tests', $view->name);
         $this->assertEquals(['framework' => 'Origin'], $view->vars);
-        $this->assertEquals(SRC.'/View/Tests', $view->viewPath);
+        $this->assertEquals(SRC.'/View', $view->viewPath());
     }
 
     public function testLoadHelper()

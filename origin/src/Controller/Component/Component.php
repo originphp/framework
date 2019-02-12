@@ -70,6 +70,7 @@ class Component
                 return $this->{$name};
             }
         }
+        return null;
     }
 
     /**

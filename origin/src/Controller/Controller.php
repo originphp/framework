@@ -287,7 +287,6 @@ class Controller
     public function startupProcess()
     {
         $this->startup();
-        
         $this->componentRegistry()->call('startup');
     }
 
@@ -340,9 +339,19 @@ class Controller
         if ($view === null) {
             $view = $this->request->params['action'];
         }
-        $viewObject = new View($this);
+        $viewObject = $this->createView();
         $body = $viewObject->render($view, $this->layout);
         $this->response->body($body);
+    }
+
+    /**
+     * Use this to customise view class
+     *
+     * @return View
+     */
+    protected function createView()
+    {
+        return new View($this);
     }
 
     /**

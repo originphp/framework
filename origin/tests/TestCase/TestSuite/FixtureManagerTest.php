@@ -14,6 +14,7 @@
 
 namespace Origin\Test\TestSuite;
 
+use Origin\TestSuite\Fixture;
 use Origin\TestSuite\FixtureManager;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
@@ -26,6 +27,11 @@ class MockTestCase
 class MockFixtureManager extends FixtureManager
 {
     use TestTrait;
+
+    public function setDropTables($fixture, $value)
+    {
+        $this->loaded[$fixture]->dropTables = $value;
+    }
 }
 
 class FixtureManagerTest extends \PHPUnit\Framework\TestCase
@@ -34,15 +40,39 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
     {
         $FixtureManager = new MockFixtureManager();
         $TestCase = new MockTestCase();
-        $FixtureManager->load($TestCase);
-
+       
         // Load/unload first time
+        $FixtureManager->load($TestCase);
         $this->assertTrue($FixtureManager->loaded('Framework.Article'));
         $this->assertNull($FixtureManager->unload($TestCase));
+  
         // Load/unload second time
+        $FixtureManager->load($TestCase);
         $this->assertTrue($FixtureManager->loaded('Framework.Article'));
         $this->assertNull($FixtureManager->unload($TestCase));
+
+        $FixtureManager->setDropTables('Framework.Article', true);
+        $FixtureManager->load($TestCase);
+        $FixtureManager->unload($TestCase);
+
+        $FixtureManager->setDropTables('Framework.Article', false);
+        $FixtureManager->unload($TestCase);
+
+        // set with Set
     }
+
+    public function testLoaded()
+    {
+        $FixtureManager = new MockFixtureManager();
+        $TestCase = new MockTestCase();
+       
+        // Load/unload first time
+        $FixtureManager->load($TestCase);
+        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $loaded = $FixtureManager->loaded();
+        $this->assertInstanceOf(Fixture::class, $loaded['Framework.Article']);
+    }
+
     public function testResolveFixture()
     {
         $FixtureManager = new MockFixtureManager();

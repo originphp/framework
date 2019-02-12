@@ -78,6 +78,7 @@ class Response
      * Wrapper for exit. Mocked during testing.
      *
      * @return void
+     * @codeCoverageIgnore
      */
     public function stop()
     {
@@ -158,11 +159,11 @@ class Response
         if (headers_sent($file, $line)) {
             return;
         }
-        if ($value === null) {
-            header($name);
-        } else {
-            header("{$name}: {$value}");
+        $header = $name;
+        if ($value) {
+            $header = "{$name}: {$value}";
         }
+        header($header);
     }
 
 
@@ -201,7 +202,7 @@ class Response
     private function sendCookies()
     {
         foreach ($this->cookies as $name => $options) {
-            set_cookie($name, $options['value'], $options['expire'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
+            setcookie($name, $options['value'], $options['expire'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
         }
     }
 }

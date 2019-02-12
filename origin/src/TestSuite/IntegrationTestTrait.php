@@ -214,7 +214,7 @@ trait IntegrationTestTrait
         if ($this->request === null) {
             $this->fail('No request');
         }
-        return $this->response;
+        return $this->request;
     }
     /**
      * Gets the response object
@@ -244,7 +244,10 @@ trait IntegrationTestTrait
         }
             
         $this->request = new Request($url);
-        $this->response = $this->getMock(Response::class, ['send','stop']);
+        
+        $this->response = $this->getMockBuilder(Response::class)
+                            ->setMethods(['send','stop'])
+                            ->getMock();
 
         // Send Headers
         foreach ($this->headers as $header => $value) {
@@ -347,7 +350,7 @@ trait IntegrationTestTrait
     }
 
     /**
-     * Asserts that response contains some text
+     * Asserts that response equals
      */
     public function assertResponseEquals(string $expected)
     {
@@ -368,15 +371,17 @@ trait IntegrationTestTrait
      *
      * @param string|array $url
      */
-    public function assertRedirect($url)
+    public function assertRedirect($url = null)
     {
         $headers = $this->response()->headers();
-        if (empty($headers['Location'])) {
-            $this->fail('No location set');
+        $this->assertArrayHasKey('Location', $headers);
+
+        if ($url) {
+            $this->assertEquals(Router::url($url), $headers['Location']);
         }
-        $this->assertEquals(Router::url($url), $headers['Location']);
     }
 
+    
     /**
      * Asserts that the location header is empty
      */

@@ -49,13 +49,6 @@ class View
      */
     public $params = [];
 
-    /**
-     * Where the view files are.
-     *
-     * @var string
-     */
-    public $viewPath = null;
-
     public $request = null;
 
     public $response = null;
@@ -84,6 +77,13 @@ class View
 
     protected $helpers = [];
 
+    /**
+     * Root folder for views
+     * @example /var/www/src/View
+     * @var string
+     */
+    protected $viewPath = null;
+
     public function __construct(Controller $controller)
     {
         $this->name = $controller->name;
@@ -93,11 +93,26 @@ class View
         $this->params =& $controller->request->params;
         $this->vars =& $controller->viewVars;
 
-        $this->viewPath = $this->getViewPath();
-
         $this->helperRegistry = new HelperRegistry($this);
 
         $this->helpers = $controller->viewHelpers;
+
+        $this->viewPath(VIEW);
+    }
+
+    /**
+     * This is used to set or get the base view folder
+     * $view->viewFolder('/var/www/src/View')
+     * Should not really use this, this was setup to make testing easier
+     * @param string $folder
+     * @return void
+     */
+    public function viewPath(string $folder = null)
+    {
+        if ($folder === null) {
+            return $this->viewPath;
+        }
+        $this->viewPath = $folder;
     }
 
     /**
@@ -195,11 +210,11 @@ class View
 
     protected function getElementFilename(string $name)
     {
-        $path = VIEW.DS.'Element';
+        $path = $this->viewPath . DS . 'Element';
         list($plugin, $name) = pluginSplit($name);
 
         if ($plugin) {
-            $path = PLUGINS.DS.$plugin.DS.'src'.DS.'View'.DS.'Element';
+            $path = PLUGINS . DS . $plugin . DS . 'src' . DS . 'View' . DS . 'Element';
         }
 
         $filename = $path.DS.$name.'.ctp';
@@ -220,30 +235,30 @@ class View
      */
     protected function getViewFilename(string $name)
     {
-        $path = $this->viewPath;
+        $path = $this->getViewPath();
 
         if (strpos($name, '/') !== false) {
             $path = $this->getViewPath(false); // get without controller folder
         }
 
-        $filename = $path.DS.$name.'.ctp';
+        $filename = $path . DS . $name . '.ctp';
 
         if ($this->fileExists($filename)) {
             return $filename;
         }
-
+   
         throw new MissingViewException([$this->name, $name]);
     }
 
     protected function getViewPath($withControllerName = true)
     {
-        $viewPath = VIEW;
-
+        $viewPath = $this->viewPath;
+   
         if (isset($this->params['plugin'])) {
-            $viewPath = PLUGINS.DS.$this->params['plugin'].DS.'src'.DS.'View';
+            $viewPath = PLUGINS . DS . $this->params['plugin'] . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
-            $viewPath .= DS.$this->name;
+            $viewPath = $this->viewPath . DS . $this->name;
         }
 
         return $viewPath;
@@ -258,7 +273,7 @@ class View
      */
     protected function getLayoutFilename(string $layout)
     {
-        $path = VIEW.DS.'Layout';
+        $path = $this->viewPath . DS . 'Layout';
         list($plugin, $layout) = pluginSplit($layout);
 
         if ($plugin) {

@@ -19,7 +19,7 @@ use Origin\Model\ConnectionManager;
 use Origin\Model\Schema;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Resolver;
-use Orign\Exception\Exception;
+use Origin\Exception\Exception;
 
 class Fixture
 {

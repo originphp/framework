@@ -18,6 +18,7 @@ use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
 use Origin\Controller\Controller;
 use Origing\Controller\Component\AuthComponent;
+use Origin\Controller\Component\Exception\MissingComponentException;
 
 class MockComponent extends Component
 {
@@ -73,5 +74,6 @@ class ComponentTest extends \PHPUnit\Framework\TestCase
         $MockComponent->loadComponent('Auth');
   
         $this->assertInstanceOf('Origin\Controller\Component\AuthComponent', $MockComponent->Auth);
+        $this->assertNull($MockComponent->nonExistant);
     }
 }

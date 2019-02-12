@@ -19,6 +19,7 @@ use Origin\Exception\MethodNotAllowedException;
 
 class MockRequest extends Request
 {
+    public $input = null;
     public function setInput($input)
     {
         $this->input = $input;
@@ -36,6 +37,16 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('google', $request->query['ref']);
         $this->assertContains('ppc', $request->query['source']);
+    }
+
+    public function testUri()
+    {
+        $request = new Request();
+        $this->assertEquals('/', $request->url);
+      
+        $_SERVER['REQUEST_URI'] = 'controller/action/100';
+        $request = new Request();
+        $this->assertEquals('/controller/action/100', $request->url);
     }
 
     public function testHere()
@@ -89,5 +100,12 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $request->initialize('articles/index');
         $expected=['title'=>'CNBC','url'=>'https://www.cnbc.com'];
         $this->assertEquals($expected, $request->data);
+
+        $request = new MockRequest();
+       
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request->setInput('{"title":"CNBC","url":""https://www.cnbc.com"}'); // Badd data
+        $this->assertEquals([], $request->data);
     }
 }

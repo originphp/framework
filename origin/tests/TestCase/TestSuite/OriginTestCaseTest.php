@@ -78,6 +78,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
     
     public function testGetMockForModel()
     {
+        ModelRegistry::config('User', ['table'=>'userz']);
         $OriginTestCase = new OriginTestCase();
         $mock = $OriginTestCase->getMockForModel('User', ['true'], ['className'=>'Origin\Test\TestSuite\User']);
         
@@ -85,8 +86,9 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $mock->expects($this->once())
         ->method('true')
         ->willReturn(false);
-      
+
         $this->assertFalse($mock->true());
+        $this->assertEquals('userz', $mock->table);
     }
 
     public function testUnkownClass()
