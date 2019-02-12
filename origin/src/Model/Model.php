@@ -1325,11 +1325,13 @@ class Model
         $results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
-        if (empty($results)) {
-            return array();
+        
+
+        if (isset($results[0]['count'])) {
+            return $results[0]['count'];
         }
 
-        return $results[0]['count'];
+        return false;
     }
 
     /**
