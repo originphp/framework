@@ -14,6 +14,8 @@
 
 namespace Origin\Core;
 
+use Origin\Core\Dot;
+
 class Session
 {
     public static function initialize()
