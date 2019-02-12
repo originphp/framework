@@ -35,6 +35,11 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $FixtureManager = new MockFixtureManager();
         $TestCase = new MockTestCase();
         $FixtureManager->load($TestCase);
+
+        // Load/unload first time
+        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $this->assertNull($FixtureManager->unload($TestCase));
+        // Load/unload second time
         $this->assertTrue($FixtureManager->loaded('Framework.Article'));
         $this->assertNull($FixtureManager->unload($TestCase));
     }

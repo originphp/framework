@@ -14,6 +14,7 @@
 
 namespace Origin\TestSuite;
 
+use Origin\TestSuite\FixtureManager;
 /*
  *
  * @link https://phpunit.readthedocs.io/en/7.4/extending-phpunit.html
@@ -51,27 +52,39 @@ class OriginTestListener implements TestListener
     {
         unset($this->fixtureManager);
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addError(Test $test, \Throwable $e, float $time): void
     {
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addWarning(Test $test, Warning $e, float $time): void
     {
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addFailure(Test $test, AssertionFailedError $e, float $time): void
     {
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addIncompleteTest(Test $test, \Throwable $e, float $time): void
     {
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addRiskyTest(Test $test, \Throwable $e, float $time): void
     {
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     public function addSkippedTest(Test $test, \Throwable $e, float $time): void
     {
     }

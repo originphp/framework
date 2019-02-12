@@ -23,6 +23,7 @@ use Origin\Controller\Response;
 use Origin\Core\Router;
 use Origin\Model\Model;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Exception\MissingModelException;
 
 class Pet extends Model
 {
@@ -127,6 +128,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $controller->loadComponents(['Tester' => ['className' => 'Origin\Test\Controller\TesterComponent']]);
         $this->assertObjectHasAttribute('Tester', $controller);
+
+        $controller->loadComponents(['Flash']);
+        $this->assertObjectHasAttribute('Flash', $controller);
     }
 
     public function testLoadHelper()
@@ -143,6 +147,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $controller->loadHelpers(['Tester' => ['className' => 'Origin\Test\Controller\TesterHelper']]);
         $this->assertArrayHasKey('Tester', $controller->viewHelpers);
+        // test no config passed
+        $controller->loadHelpers(['Form']);
+        $this->assertArrayHasKey('Form', $controller->viewHelpers);
     }
 
     public function testSet()
@@ -161,13 +168,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($controller->viewVars['fruits'], $fruits);
 
         $combo = array(
-      'apples' => array('granny smith', 'pink lady'),
-      'bananas' => array('cavendish', 'Baby (Niño)'),
-      'oranges' => array('blood', 'clementine'),
-    );
-        $controller->set('combo', $combo);
-        $this->assertArrayHasKey('combo', $controller->viewVars);
-        $this->assertEquals($controller->viewVars['combo'], $combo);
+        'apples' => array('granny smith', 'pink lady'),
+        'bananas' => array('cavendish', 'Baby (Niño)'),
+        'oranges' => array('blood', 'clementine'),
+        );
+        $controller->set($combo);
+        $this->assertArrayHasKey('bananas', $controller->viewVars);
+        $this->assertEquals(['granny smith', 'pink lady'], $controller->viewVars['apples']);
     }
 
     public function testIsAccessible()
@@ -193,6 +200,14 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($Test, $controller->loadModel('Test2'));
         $this->assertEquals($Test, $controller->Test2);
         $this->assertNull($controller->NonExistantModel);
+    }
+
+    public function testLoadModelException()
+    {
+        $request = new Request('tests/edit/2048');
+        $controller = new TestsController($request, new Response());
+        $this->expectException(MissingModelException::class);
+        $controller->loadModel('Panda');
     }
 
     public function testCallbacksStartup()
@@ -322,5 +337,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
         $results = $controller->paginate('Pet', ['limit'=>10]);
         $this->assertEquals(10, count($results));
+
+        $controller->paginate = ['Pet'=>['limit'=>7]];
+        $results = $controller->paginate('Pet');
+        $this->assertEquals(7, count($results));
     }
 }
