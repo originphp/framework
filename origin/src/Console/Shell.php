@@ -44,14 +44,14 @@ class Shell
      *
      * @var ConsoleOutput
      */
-    protected $consoleOutput = null;
+    public $output = null;
 
     /**
      * Holds the console input Resource
      *
-     * @var resource
+     * @var ConsoleInput
      */
-    protected $consoleInput = null;
+    public $input = null;
 
     /**
      * Inject request and response
@@ -63,8 +63,8 @@ class Shell
     public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
         $this->args = $arguments;
-        $this->consoleOutput = $consoleOutput;
-        $this->consoleInput = $consoleInput;
+        $this->output = $consoleOutput;
+        $this->input = $consoleInput;
 
         list($namespace, $this->name) = namespaceSplit(get_class($this));
      
@@ -113,7 +113,7 @@ class Shell
         if ($newLine) {
             $data .= "\n";
         }
-        $this->consoleOutput->write($data);
+        $this->output->write($data);
     }
 
     /**
@@ -140,7 +140,7 @@ class Shell
 
         while ($input === '' || !in_array($input, $options)) {
             $this->out("<prompt>{$prompt}</prompt> ({$optionsString}) {$defaultString}");
-            $input = $this->consoleInput->read();
+            $input = $this->input->read();
             if ($input === '' and $default) {
                 return $default;
             }

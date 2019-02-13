@@ -29,10 +29,6 @@ class MockConsoleOutput extends ConsoleOutput
 
 class MockShell extends Shell
 {
-    public function consoleOutput()
-    {
-        return $this->consoleOutput;
-    }
 }
 
 class MockTask extends Task
@@ -90,7 +86,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
     {
         $this->MockTask->out('Foo bar');
 
-        $stream = $this->MockTask->shell()->consoleOutput()->stream();
+        $stream = $this->MockTask->shell()->output->stream();
         rewind($stream);
         $this->assertEquals("Foo bar\n", stream_get_contents($stream));
     }

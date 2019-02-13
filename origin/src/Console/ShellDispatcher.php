@@ -31,7 +31,7 @@ class ShellDispatcher
      *
      * @var ConsoleOutput
      */
-    protected $consoleOutput = null;
+    protected $output = null;
 
     /**
      * Holds the arguments called
@@ -44,18 +44,8 @@ class ShellDispatcher
 
     public function __construct(array $arguments = [], ConsoleOutput $consoleOutput)
     {
-        $this->consoleOutput = $consoleOutput;
         $this->args = array_slice($arguments, 1);
-    }
-
-    /**
-     * Returns the ConsoleOutput object
-     *
-     * @return void
-     */
-    public function consoleOutput()
-    {
-        return $this->consoleOutput;
+        $this->output = $consoleOutput;
     }
 
     /**
@@ -66,7 +56,7 @@ class ShellDispatcher
      */
     public function out(string $data)
     {
-        $this->consoleOutput()->write($data);
+        $this->output->write($data);
     }
 
     /**
@@ -166,7 +156,7 @@ class ShellDispatcher
      */
     protected function buildShell(string $class, string $method)
     {
-        $shell = new $class($this->args, $this->consoleOutput, new ConsoleInput());
+        $shell = new $class($this->args, $this->output, new ConsoleInput());
         if (!method_exists($shell, $method)) {
             throw new MissingShellMethodException([$class,$method]);
         }

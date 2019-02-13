@@ -174,13 +174,17 @@ class ConsoleOutput
     }
 
     /**
-     * Sets or gets styles
+     * Sets or modifies existing styles
+     *  $styles = $ConsoleOutput->styles();
+     *  $style = $ConsoleOutput->style('primary');
+     *  $ConsoleOutput->style('primary',$styleArray);
+     *  $ConsoleOutput->style('primary',false);
      *
      * @param string $name
-     * @param array $values text,background,bold,underline,blink
+     * @param array $values array('text' => 'white','background'=>'blue','bold' => true) or false to delete
      * @return void
      */
-    public function styles(string $name =null, array $values = null)
+    public function styles(string $name = null, $values = null)
     {
         if ($name === null) {
             return $this->styles;
@@ -191,6 +195,11 @@ class ConsoleOutput
             }
             return null;
         }
+        if ($values === false) {
+            unset($this->styles[$name]);
+            return true;
+        }
         $this->styles[$name] = $values;
+        return true;
     }
 }
