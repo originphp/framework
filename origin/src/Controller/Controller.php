@@ -240,8 +240,10 @@ class Controller
         if ($controller->hasMethod($action)) {
             return false;
         }
+        if (!method_exists($this, $action)) {
+            return false;
+        }
         $reflection = new ReflectionMethod($this, $action);
-
         return $reflection->isPublic();
     }
 

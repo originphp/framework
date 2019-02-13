@@ -22,6 +22,8 @@ use Origin\Model\ModelRegistry;
 use ReflectionClass;
 use ReflectionMethod;
 
+use Origin\Model\Exception\MissingModelException;
+
 class Shell
 {
     /**
@@ -229,6 +231,9 @@ class Shell
     {
         $shell = new ReflectionClass('Origin\Console\Shell');
         if ($shell->hasMethod($method)) {
+            return false;
+        }
+        if (!method_exists($this, $method)) {
             return false;
         }
         $reflection = new ReflectionMethod($this, $method);
