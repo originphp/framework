@@ -12,7 +12,7 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Console\Task;
+namespace Make\Console\Task;
 
 use Origin\Console\Task\Task;
 use Origin\Model\ConnectionManager;
