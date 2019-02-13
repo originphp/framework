@@ -94,10 +94,6 @@ class ErrorHandler
      */
     public function exceptionHandler($exception)
     {
-        if (ob_get_length()) {
-            ob_end_clean();
-        }
-
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
         extract($debug);
