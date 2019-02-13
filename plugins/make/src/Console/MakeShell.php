@@ -69,9 +69,9 @@ class MakeShell extends Shell
     }
     public function main()
     {
-        $this->showUsage();
+        $this->help();
     }
-    public function showUsage()
+    public function help()
     {
         $this->out('make all');
         $this->out('make all Contact');
