@@ -66,8 +66,8 @@ class PaginatorComponent extends Component
           'prevPage' => ($settings['page'] > 1),
           'nextPage' => ($settings['page'] < $pages),
         ]);
-
-        if ($settings['page'] > 1 and $settings['page'] > ($count > $settings['limit'])) {
+      
+        if ($settings['page'] > 1 and $settings['page'] > ($count * $settings['limit'])) {
             throw new NotFoundException();
         }
 
