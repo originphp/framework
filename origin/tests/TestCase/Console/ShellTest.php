@@ -19,6 +19,7 @@ use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\Task;
 use Origin\Model\ModelRegistry;
+use Origin\Model\Exception\MissingModelException;
 
 class MockShell extends Shell
 {
@@ -91,6 +92,9 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
         // Test already loaded
         $this->assertEquals($mockModel, $shell->loadModel('MockModel'));
+
+        $this->expectException(MissingModelException::class);
+        $shell->loadModel('NonExistantModel');
     }
 
     public function testLoadTask()
@@ -155,7 +159,9 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     {
         $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
         $this->assertTrue($shell->isAccessible('publicMethod'));
+        $this->assertFalse($shell->isAccessible('initialize'));
         $this->assertFalse($shell->isAccessible('protectedMethod'));
         $this->assertFalse($shell->isAccessible('privateMethod'));
+        $this->assertFalse($shell->isAccessible('unkownMethod'));
     }
 }

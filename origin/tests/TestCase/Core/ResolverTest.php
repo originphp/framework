@@ -101,4 +101,27 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
         $result = MockResolver::className('MyPlugin.TreeBehavior', 'Model/Behavior');
         $this->assertEquals('MyPlugin\Model\Behavior\TreeBehavior', $result);
     }
+
+    public function testTask()
+    {
+        MockResolver::addClass('Origin\Console\Task\FlashTask');
+        $result = MockResolver::className('Flash', 'Console/Task', 'Task');
+        $expected = 'Origin\Console\Task\FlashTask';
+        $this->assertEquals($expected, $result);
+
+        $result = MockResolver::className('FlashTask', 'Console/Task');
+        $this->assertEquals($expected, $result);
+
+        MockResolver::addClass('App\Console\Task\MathTask');
+        $result = MockResolver::className('Math', 'Console/Task', 'Task');
+        $expected = 'App\Console\Task\MathTask';
+        $this->assertEquals($expected, $result);
+
+        $result = MockResolver::className('MathTask', 'Console/Task');
+        $this->assertEquals($expected, $result);
+
+        MockResolver::addClass('MyPlugin\Console\Task\MathTask');
+        $result = MockResolver::className('MyPlugin.MathTask', 'Console/Task');
+        $this->assertEquals('MyPlugin\Console\Task\MathTask', $result);
+    }
 }

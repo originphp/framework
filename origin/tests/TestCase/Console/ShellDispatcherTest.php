@@ -21,9 +21,26 @@ use Origin\Console\Shell;
 use Origin\Console\Exception\MissingShellException;
 use Origin\Console\Exception\MissingShellMethodException;
 
-class MockShelLDispatcher extends ShellDispatcher
+class MockShellDispatcher extends ShellDispatcher
 {
     use TestTrait;
+    protected $shellList = null;
+
+    protected function getShellList()
+    {
+        if ($this->shellList === null) {
+            $this->populateShelllist();
+        }
+        return $this->shellList;
+    }
+    public function setShellList(array $shellList)
+    {
+        $this->shellList = $shellList;
+    }
+    public function populateShelllist()
+    {
+        $this->shellList = parent::getShellList();
+    }
 }
 
 class LemonPieShell extends Shell
@@ -78,7 +95,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testGetShellList()
     {
-        $ShellDispatcher = new MockShelLDispatcher([], new AnotherConsoleOutput('php://memory'));
+        $ShellDispatcher = new MockShellDispatcher([], new AnotherConsoleOutput('php://memory'));
         $result = $ShellDispatcher->callMethod('getShellList');
         $this->assertArrayHasKey('App', $result);
         $this->assertArrayHasKey('Core', $result);
@@ -89,7 +106,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchAndOut()
     {
         $ConsoleOutput =  new AnotherConsoleOutput('php://memory');
-        $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie'], $ConsoleOutput);
+        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie'], $ConsoleOutput);
         $ShellDispatcher->start();
         $buffer =  $ConsoleOutput->read();
         $this->assertContains('LemonPie Shell', $buffer);
@@ -98,9 +115,66 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('shutdown called', $buffer);
     }
 
+   
+    public function testPluginDispatchPluginSearch()
+    {
+        // Test Plugin Search
+        $ShellDispatcher = new MockShellDispatcher(
+            ['pathTo/origin.php','make'],
+            new AnotherConsoleOutput('php://memory')
+        );
+        $result = $ShellDispatcher->start();
+        $this->assertInstanceOf(Shell::class, $result);
+    }
+
+    /**
+     * Check that its locating shells in app folder, since there is not
+     * one lets make it look as if file exists then it will throw a missing exception
+     *
+     * @return void
+     */
+    public function testPluginDispatchApp()
+    {
+        // Test Plugin Search
+        $ShellDispatcher = new MockShellDispatcher(
+            ['pathTo/origin.php','math'],
+            new AnotherConsoleOutput('php://memory')
+        );
+        $ShellDispatcher->setShellList([
+            'App' => ['math'],
+            'Core' => []
+        ]);
+        
+        $this->expectException(MissingShellException::class);
+        $this->expectExceptionMessage('App\Console\MathShell'); #! Important
+        $result = $ShellDispatcher->start();
+    }
+
+    public function testPluginDispatchCore()
+    {
+        // Test Plugin Search
+        $ShellDispatcher = new MockShellDispatcher(
+            ['pathTo/origin.php','schema'],
+            new AnotherConsoleOutput('php://memory')
+        );
+        $result = $ShellDispatcher->start();
+        $this->assertInstanceOf(Shell::class, $result);
+    }
+
+    public function testPluginDispatchPluginCall()
+    {
+        // Test direct plugin call
+        $ShellDispatcher = new MockShellDispatcher(
+             ['pathTo/origin.php','Make.make','help'],
+             new AnotherConsoleOutput('php://memory')
+         );
+        $result = $ShellDispatcher->start();
+      
+        $this->assertInstanceOf(Shell::class, $result);
+    }
     public function testInvalidShell()
     {
-        $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','NonExistantShellClass'], new AnotherConsoleOutput('php://memory'));
+        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','NonExistantShellClass'], new AnotherConsoleOutput('php://memory'));
        
         $this->expectException(MissingShellException::class);
         $ShellDispatcher->start();
@@ -108,7 +182,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidArg()
     {
-        $ShellDispatcher = new MockShelLDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','unknowMethod'], new AnotherConsoleOutput('php://memory'));
+        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','unknowMethod'], new AnotherConsoleOutput('php://memory'));
        
         $this->expectException(MissingShellMethodException::class);
         $ShellDispatcher->start();

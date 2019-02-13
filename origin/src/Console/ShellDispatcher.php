@@ -98,9 +98,9 @@ class ShellDispatcher
     }
 
     /**
-     * Dispatches the request
+     * Dispatches the request base on the shell name
      *
-     * @param string $shell
+     * @param string $shell shell_name or Plugin.shell_name
      * @return void
      */
     protected function dispatch(string $shell)
@@ -110,11 +110,13 @@ class ShellDispatcher
 
         if ($plugin === null) {
             $shells = $this->getShellList();
+         
             if (in_array($shell, $shells['App'])) {
                 $base = Configure::read('App.namespace') .'\Console\\';
             } elseif (in_array($shell, $shells['Core'])) {
                 $base = 'Origin\Console\\';
             } else {
+                
                 // Search Plugins
                 foreach ($shells as $plugin => $commands) {
                     if ($plugin === 'App' or $plugin ==='Core') {
@@ -131,8 +133,9 @@ class ShellDispatcher
         }
 
         $class = Inflector::camelize($class) . 'Shell';
+ 
         if (!class_exists($base . $class)) {
-            throw new MissingShellException($class);
+            throw new MissingShellException($base . $class);
         }
 
         $className = $base . $class;

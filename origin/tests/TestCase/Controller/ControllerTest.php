@@ -68,6 +68,15 @@ class TestsController extends Controller
     {
         $this->componentRegistry = $registry;
     }
+    public function publicMethod()
+    {
+    }
+    protected function protectedMethod()
+    {
+    }
+    private function privateMethod()
+    {
+    }
 }
 
 class ControllerTest extends \PHPUnit\Framework\TestCase
@@ -186,8 +195,11 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new TestsController($request, new Response());
-        $this->assertTrue($controller->isAccessible('action'));
-        $this->assertFalse($controller->isAccessible('startup'));
+        $this->assertTrue($controller->isAccessible('publicMethod'));
+        $this->assertFalse($controller->isAccessible('initialize'));
+        $this->assertFalse($controller->isAccessible('protectedMethod'));
+        $this->assertFalse($controller->isAccessible('privateMethod'));
+        $this->assertFalse($controller->isAccessible('unkownMethod'));
     }
 
     public function testLoadModel()

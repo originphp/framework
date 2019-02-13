@@ -102,5 +102,6 @@ class TaskTest extends \PHPUnit\Framework\TestCase
         $this->MockTask->loadTask('Dummy');
        
         $this->assertInstanceOf('Origin\Test\Console\Task\DummyTask', $this->MockTask->Dummy);
+        $this->assertNull($this->MockTask->DoesNotExist);
     }
 }

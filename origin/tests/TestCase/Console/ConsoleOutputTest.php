@@ -73,5 +73,8 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
+        $this->assertNull($ConsoleOutput->styles('nonExistant'));
+        $ConsoleOutput->styles('foo', false);
+        $this->assertNull($ConsoleOutput->styles('foo'));
     }
 }

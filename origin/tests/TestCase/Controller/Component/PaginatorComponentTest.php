@@ -23,9 +23,16 @@ use Origin\Controller\Response;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\Model\ConnectionManager;
+use Origin\Exception\NotFoundException;
 
 class Pet extends Model
 {
+    public $datasource = 'test';
+}
+
+class Owner extends Model
+{
+    public $displayField = 'owner_name';
     public $datasource = 'test';
 }
 
@@ -44,9 +51,16 @@ class PaginatorControllerTest extends Controller
 
 class MockPaginatorComponent extends PaginatorComponent
 {
-    use TestTrait;
+    public function fetchResults(array $settings)
+    {
+        return $settings;
+    }
 }
 
+
+/**
+ * @todo i think this test can be written without database access mocking fetchResults and check settings array is correct
+ */
 class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
@@ -55,13 +69,15 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 
         $this->Controller = new PetsController(new Request('pets/index'), new Response());
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
-
+      
+        
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
         $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY, owner_id INT NOT NULL,name VARCHAR(20));');
         
         # Create Dummy Data
         $this->Pet = new Pet();
+      
         ModelRegistry::set('Pet', $this->Pet);
         for ($i=0;$i<100;$i++) {
             $this->Pet->save($this->Pet->newEntity(['owner_id' => $i + 1000, 'name'=>'Pet' . $i]));
@@ -91,13 +107,29 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 
         // test url sorting
         $this->Controller = new PetsController(new Request('pets/index?sort=name&direction=desc'), new Response());
-        $this->PaginatorComponent = new PaginatorComponent($this->Controller);
-        $results = $this->PaginatorComponent->paginate($this->Pet);
+        $PaginatorComponent = new PaginatorComponent($this->Controller);
+        $results = $PaginatorComponent->paginate($this->Pet);
         $this->assertEquals('Pet99', $results[0]->name);
 
         $this->Controller = new PetsController(new Request('pets/index?sort=name&direction=asc'), new Response());
-        $this->PaginatorComponent = new PaginatorComponent($this->Controller);
-        $results = $this->PaginatorComponent->paginate($this->Pet);
+        $PaginatorComponent = new PaginatorComponent($this->Controller);
+        $results = $PaginatorComponent->paginate($this->Pet);
         $this->assertEquals('Pet0', $results[0]->name);
+
+        $this->expectException(NotFoundException::class);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['page'=>10000]);
+    }
+    /**
+     * Because owner model is loaded, it will start doing magic. This test
+     * is to reach some deeper code.
+     */
+    public function testPaginateSortForeignKey()
+    {
+        $PaginatorComponent = new MockPaginatorComponent($this->Controller); // disable find
+        $Pet = $this->Pet;
+        $Pet->belongsTo('Owner');
+        $Pet->Owner = new Owner();
+        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id']);
+        $this->assertEquals('asc', $results['order']['Owner.owner_name']); // check alias.
     }
 }

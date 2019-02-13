@@ -83,4 +83,12 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $consoleOutput = $ErrorHandler->callMethod('consoleOutput');
         $this->assertInstanceOf(ConsoleOutput::class, $consoleOutput);
     }
+    public function testSupression()
+    {
+        $ErrorHandler = new MockErrorHandler();
+        $ErrorHandler->register();
+        $ErrorHandler->setUp();
+        @unlink('someFileThatDoesNotExist'); //
+        $this->assertTrue(true); // if we get here all is ok!
+    }
 }
