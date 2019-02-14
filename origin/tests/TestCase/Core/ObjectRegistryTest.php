@@ -15,6 +15,7 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\ObjectRegistry;
+use Origin\Core\Exception\MissingClassException;
 
 class MockObjectRegistry extends ObjectRegistry
 {
@@ -36,6 +37,8 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
         $Registry = new MockObjectRegistry();
         $Registry->set('LemonPie', $LemonPie);
         $this->assertEquals(['LemonPie'], $Registry->getLoaded());
+        $this->assertTrue(isset($Registry->LemonPie));
+        $this->assertNull($Registry->set('LemonPie', $LemonPie)); // set second time
     }
 
     /**
@@ -49,6 +52,7 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
         $Registry->set('LemonPie', $LemonPie);
 
         $this->assertEquals($LemonPie, $Registry->get('LemonPie'));
+        $this->assertEquals($LemonPie, $Registry->LemonPie);
     }
 
     /**
@@ -86,6 +90,8 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
         $Registry = new ObjectRegistry();
         $Registry->load('Origin\Test\Core\LemonPie');
         $this->assertTrue($Registry->has('Origin\Test\Core\LemonPie'));
+        $this->expectException(MissingClassException::class);
+        $Registry->load('UnkownClass');
     }
 
     /**
@@ -98,5 +104,28 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
         $Registry->load('Origin\Test\Core\LemonPie');
         $this->assertTrue($Registry->unload('Origin\Test\Core\LemonPie'));
         $this->assertFalse($Registry->has('Origin\Test\Core\LemonPie'));
+        $this->assertFalse($Registry->unload('UnkownClass'));
+    }
+
+    /**
+     * depends testLoad.
+     */
+    public function testDisable()
+    {
+        $Registry = new ObjectRegistry();
+        $Registry->load('Origin\Test\Core\LemonPie');
+        $this->assertTrue($Registry->disable('Origin\Test\Core\LemonPie'));
+        $this->assertFalse($Registry->disable('UnkownObject'));
+    }
+    /**
+     * @depends testDisable
+     */
+    public function testEnable()
+    {
+        $Registry = new ObjectRegistry();
+        $Registry->load('Origin\Test\Core\LemonPie');
+        $Registry->disable('Origin\Test\Core\LemonPie');
+        $this->assertTrue($Registry->enable('Origin\Test\Core\LemonPie'));
+        $this->assertFalse($Registry->enable('Origin\Test\Core\LemonPie'));
     }
 }

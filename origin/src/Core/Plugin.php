@@ -141,9 +141,9 @@ class Plugin
      */
     protected static function include(string $filename)
     {
-        if (file_exists($filename)) {
-            return include $filename;
+        if (file_exists($filename) === false) {
+            return false;
         }
-        return false;
+        return include $filename;
     }
 }

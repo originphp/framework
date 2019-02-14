@@ -24,7 +24,7 @@ class MockPlugin extends Plugin
         return static::$loaded;
     }
     public static $fileFound = true;
-
+ 
     public static function include(string $filename)
     {
         return static::$fileFound;
@@ -40,27 +40,44 @@ class PluginTest extends \PHPUnit\Framework\TestCase
 
     public function testLoad()
     {
+        // test with routes and bootstrap
         MockPlugin::load('Make');
+        $this->assertEquals(['Debug','Make'], MockPlugin::loaded());
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
         $this->assertEquals('/var/www/plugins/make/src', $config['Make']['path']);
         $this->assertTrue($config['Make']['routes']);
         $this->assertTrue($config['Make']['bootstrap']);
-        MockPlugin::unload('Make');
-        $this->assertFalse(MockPlugin::loaded('Make'));
-
-        MockPlugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
         
+        // Test with no routes and bootstrap
+        MockPlugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
-
         $this->assertFalse($config['Make']['routes']);
         $this->assertFalse($config['Make']['bootstrap']);
     }
+
+    public function testUnload()
+    {
+        MockPlugin::load('Make');
+        $this->assertTrue(MockPlugin::unload('Make'));
+        $this->assertFalse(MockPlugin::unload('Make'));
+        $this->assertFalse(MockPlugin::loaded('Make'));
+    }
+
     public function testRoutes()
     {
         MockPlugin::load('Make');
         $this->assertTrue(MockPlugin::routes('Make'));
         MockPlugin::loadRoutes();
+
+        // Give include test
+        Plugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
+        $this->assertFalse(Plugin::routes('Make')); // Test Include
+    }
+    public function testInclude()
+    {
+        Plugin::load('Make');
+        $this->assertFalse(Plugin::routes('Make'));
     }
 }

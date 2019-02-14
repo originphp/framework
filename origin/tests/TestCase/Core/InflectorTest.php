@@ -36,6 +36,8 @@ class InflectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('processes', Inflector::pluralize('process'));
         $this->assertEquals('patches', Inflector::pluralize('patch'));
         $this->assertEquals('cases', Inflector::pluralize('case'));
+
+        $this->AssertEquals('-----s', Inflector::pluralize('-----'));
     }
 
     public function testSingularize()
@@ -54,6 +56,8 @@ class InflectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('process', Inflector::singularize('processes'));
         $this->assertEquals('patch', Inflector::singularize('patches'));
         $this->assertEquals('case', Inflector::singularize('cases'));
+        $this->AssertEquals('-----', Inflector::singularize('-----s'));
+        $this->AssertEquals('-----', Inflector::singularize('-----'));
     }
 
     public function testCamelize()

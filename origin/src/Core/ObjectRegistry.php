@@ -168,12 +168,10 @@ class ObjectRegistry
         }
 
         $className = $this->className($name);
-
-        if ($className) {
-            return $this->createObject($className, $options);
+        if ($className === null) {
+            $this->throwException($name);
         }
-
-        $this->throwException($name);
+        return $this->createObject($className, $options);
     }
 
     /**

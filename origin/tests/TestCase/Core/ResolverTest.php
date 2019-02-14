@@ -33,6 +33,10 @@ class MockResolver extends Resolver
 
 class ResolverTest extends \PHPUnit\Framework\TestCase
 {
+    public function testNameOnly()
+    {
+        $this->assertNull(MockResolver::className('NameOnly'));
+    }
     public function testComponent()
     {
         MockResolver::addClass('Origin\Controller\Component\FlashComponent');

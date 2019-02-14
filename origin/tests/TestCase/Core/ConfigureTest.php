@@ -15,6 +15,19 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\Configure;
+use Origin\Core\Dot;
+
+class MockConfigure extends Configure
+{
+    public static function setDot($dot)
+    {
+        static::$Dot = $dot;
+    }
+    public static function getDot()
+    {
+        return static::$Dot;
+    }
+}
 
 class ConfigureTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,5 +91,17 @@ class ConfigureTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(Configure::has('Name.key1'));
         $this->assertFalse(Configure::has('Name.key2'));
         $this->assertFalse(Configure::has('Name'));
+    }
+
+    /**
+     * Testing getInstance
+     */
+    public function testGetInstance()
+    {
+        $dot = MockConfigure::getDot();
+        MockConfigure::setDot(null);
+        MockConfigure::init();
+        $this->assertInstanceOf(Dot::class, MockConfigure::getDot());
+        MockConfigure::setDot($dot);// restore
     }
 }

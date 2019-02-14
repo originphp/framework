@@ -18,10 +18,13 @@ use Origin\Core\Dispatcher;
 use Origin\Controller\Controller;
 use Origin\TestSuite\TestTrait;
 
+use Origin\Core\Exception\RouterException;
 use Origin\Controller\Exception\MissingControllerException;
 use Origin\Controller\Exception\MissingMethodException;
 use Origin\Controller\Exception\PrivateMethodException;
-use Origin\Core\Exception\RouterException;
+
+use Origin\Controller\Request;
+use Origin\Controller\Response;
 
 class BlogPostsController extends Controller
 {
@@ -91,5 +94,17 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 
         $Dispatcher = new MockDispatcher();
         $Dispatcher->start('blog_posts/reveal_password');
+    }
+
+    /**
+     * Test if not route is found without messing with router
+     */
+    public function testNoRoute()
+    {
+        $this->expectException(RouterException::class);
+        $Dispatcher = new MockDispatcher();
+        $request = new Request();
+        $request->params = []; // Skip Pages controller setup by default
+        $Dispatcher->dispatch($request, new Response());
     }
 }

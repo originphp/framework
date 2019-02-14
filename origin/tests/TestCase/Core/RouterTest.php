@@ -61,7 +61,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testRouteIndex()
     {
-        $result =MockRouter::parse('/leads');
+        $result = MockRouter::parse('/leads');
 
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('index', $result['action']);
@@ -70,6 +70,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('UserProfiles', $result['controller']);
         $this->assertEquals('index', $result['action']);
+    }
+
+    public function testRoutes()
+    {
+        $this->assertNotEmpty(MockRouter::routes());
     }
 
     public function testRouteHome()
@@ -164,6 +169,10 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $url = array('action' => 'edit', 100, '#' => 'top');
         $expected = '/articles/edit/100#top';
+        $this->assertEquals($expected, MockRouter::url($url));
+
+        $url = array('action' => 'index', 'plugin'=>'contact_manager');
+        $expected = '/contact_manager/articles/index';
         $this->assertEquals($expected, MockRouter::url($url));
     }
 }

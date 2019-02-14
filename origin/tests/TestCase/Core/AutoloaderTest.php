@@ -15,12 +15,14 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\Autoloader;
+use Origin\Test\Controller\Component\MockAuthComponent;
 
 class MockAutoloader extends Autoloader
 {
     protected $mockFiles = array();
 
     protected $prefixes = array();
+    protected static $backup = null;
 
     public function setFiles(array $files)
     {
@@ -44,6 +46,24 @@ class MockAutoloader extends Autoloader
     public function getPrefixes()
     {
         return $this->prefixes;
+    }
+
+    /**
+     *  Hacky way to test get instance without messing up autoloading
+     *
+     * @return void
+     */
+    public static function disableInstance()
+    {
+        self::$backup = self::$instance;
+        self::$instance = null;
+        return true;
+    }
+    public static function enableInstance()
+    {
+        self::$instance = self::$backup ;
+        self::$backup = null;
+        return true;
     }
 }
 
@@ -128,5 +148,11 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
         $expected = '/var/www/someFolder';
         $Autoloader->setFolder($expected);
         $this->assertEquals($expected, $Autoloader->getFolder());
+    }
+    public function testGetInstance()
+    {
+        $this->assertTrue(MockAutoloader::disableInstance());
+        $this->assertInstanceOf(Autoloader::class, MockAutoloader::init());
+        $this->assertTrue(MockAutoloader::enableInstance());
     }
 }

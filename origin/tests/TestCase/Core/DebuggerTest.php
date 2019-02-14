@@ -15,6 +15,12 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\Debugger;
+use Origin\TestSuite\TestTrait;
+
+class MockDebugger extends Debugger
+{
+    use TestTrait;
+}
 
 class DebuggerTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,5 +43,16 @@ class DebuggerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('stackFrames', $result);
         
         $this->assertEquals($expected, $result['stackFrames'][0]);
+    }
+    public function testNamespaceSplit()
+    {
+        $debugger = new MockDebugger();
+        list($namespace, $classname) = $debugger->callMethod('namespaceSplit', ['Origin\Framework\Dispatcher']);
+        $this->assertEquals('Origin\Framework', $namespace);
+        $this->assertEquals('Dispatcher', $classname);
+        list($namespace, $classname) = $debugger->callMethod('namespaceSplit', ['NoNamespace']);
+       
+        $this->assertNull($namespace);
+        $this->assertEquals('NoNamespace', $classname);
     }
 }

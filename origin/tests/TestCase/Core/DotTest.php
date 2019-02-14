@@ -60,6 +60,7 @@ class DotTest extends \PHPUnit\Framework\TestCase
         $Dot = new Dot();
         $Dot->set('key', 'value');
         $this->assertEquals('value', $Dot->get('key'));
+        $this->assertNull($Dot->get('nonExistant', null));
     }
 
     /**
@@ -75,6 +76,7 @@ class DotTest extends \PHPUnit\Framework\TestCase
 
         $Dot->set('System.settings.server', 'localhost');
         $this->assertTrue($Dot->has('System.settings.server'));
+        $this->assertFalse($Dot->has('NonExistant'));
     }
 
     /**
@@ -89,10 +91,14 @@ class DotTest extends \PHPUnit\Framework\TestCase
 
         $items = $Dot->items();
         $this->assertArrayHasKey('encoding', $items['App']);
-        $Dot->delete('App.encoding');
-
+        $this->assertTrue($Dot->delete('App.encoding'));
+        $this->assertFalse($Dot->delete('App.encoding'));
+       
         $items = $Dot->items();
         $this->assertArrayNotHasKey('encoding', $items['App']);
+
+        $this->assertFalse($Dot->delete('FozzyWozzy'));
+        $this->assertFalse($Dot->delete('App.nonExistant.deeper'));
     }
 
     public function testCycle()

@@ -38,5 +38,6 @@ class ConfigTraitTest extends \PHPUnit\Framework\TestCase
 
         $mock->config(['foo'=>'bar']);
         $this->assertEquals('bar', $mock->config('foo'));
+        $this->assertNull($mock->config('bar'));
     }
 }

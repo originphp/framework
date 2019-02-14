@@ -22,6 +22,10 @@ class MockI18n extends I18n
     {
         static::$config = [];
     }
+    public static function setConfig(array $config)
+    {
+        static::$config = $config;
+    }
 }
 
 class I18nTest extends \PHPUnit\Framework\TestCase
@@ -73,6 +77,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
 
     public function testLocales()
     {
+        MockI18n::setConfig(['language'=>'en']);
         $locales = MockI18n::locales();
         $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // check one
     }
