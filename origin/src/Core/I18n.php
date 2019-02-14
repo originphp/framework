@@ -33,6 +33,7 @@ class I18n
 
     /**
      * Gets the config for I18n from intialize
+     * @todo setup static config trait
      *
      * @return void
      */

@@ -14,6 +14,8 @@
 
 namespace Origin\Core;
 
+use Origin\Core\Dot;
+
 class Configure
 {
     protected static $Dot = null;

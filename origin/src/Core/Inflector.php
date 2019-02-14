@@ -76,8 +76,6 @@ class Inflector
                 return self::$cache['pluralize'][$singular];
             }
         }
-
-        return $singular;
     }
 
     /**
