@@ -150,10 +150,10 @@ class Router
             return '/';
         }
         $params = array(
-        'controller' => null,
-        'action' => null,
-        'plugin' => null,
-      );
+            'controller' => null,
+            'action' => null,
+            'plugin' => null,
+        );
         $url = array_merge($params, $url);
 
         $output = '';
@@ -165,15 +165,12 @@ class Router
             $base = static::$request->base;
         }
         if ($url['plugin']) {
-            $output .= '/'.$url['plugin'];
+            $output .= '/' . Inflector::underscore($url['plugin']);
         }
 
-        $url['controller'] = (empty($url['controller']) ? $params['controller'] : $url['controller']);
-
-        $output .= '/'.Inflector::underscore($url['controller']);
-
-        $url['action'] = (empty($url['action']) ? $params['action'] : $url['action']);
-        $output .= '/'.$url['action'];
+        $controller = empty($url['controller']) ? $params['controller'] : $url['controller'];
+        $action = empty($url['action']) ? $params['action'] : $url['action'];
+        $output .= '/' . Inflector::underscore($controller) . '/' . $action;
 
         unset($url['controller'],$url['action'],$url['plugin']);
 
