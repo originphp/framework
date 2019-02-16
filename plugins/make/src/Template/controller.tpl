@@ -51,8 +51,6 @@ class %controller%Controller extends AppController
         if ($this->request->is(['post', 'put'])) {
             $%singularName% = $this->%model%->patchEntity($%singularName%,$this->request->data);
 
-            $%singularName%->id = $id;
-
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been updated.'));
 

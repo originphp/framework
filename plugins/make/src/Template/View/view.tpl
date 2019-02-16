@@ -1,4 +1,4 @@
-<div class="%pluralName% form">
+<div class="%pluralName% view">
     <div class="page-header">
         <h2><?php echo __('%singularHuman%'); ?></h2>
     </div>

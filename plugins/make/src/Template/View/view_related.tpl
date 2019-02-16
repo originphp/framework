@@ -1,6 +1,6 @@
 <div class="row %pluralName% related">
     <h4><?= __('%singularHuman%'); ?></h4>
-    <?php if (!empty($user->%pluralName%)): ?>
+    <?php if (!empty($%currentModel%->%pluralName%)): ?>
     <table class="table">
         <tr>
              <th><?= __('%primaryKey%'); ?></th>
@@ -9,7 +9,7 @@
             </RECORDBLOCK>
             <th class="actions"><?= __('Actions'); ?></th>
         </tr>
-        <?php foreach ($user->%pluralName% as $%singularName%): ?>
+        <?php foreach ($%currentModel%->%pluralName% as $%singularName%): ?>
         <tr>
             <td><?= $this->Html->link($%singularName%->%primaryKey%, ['controller' => '%controller%', 'action' => 'view', $%singularName%->id]); ?></td>
              <RECORDBLOCK>
