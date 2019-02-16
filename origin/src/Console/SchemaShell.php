@@ -18,6 +18,9 @@ use Origin\Model\Schema;
 use Origin\Model\ConnectionManager;
 use Origin\Model\QueryBuilder;
 
+/**
+ * @todo think about importing generating plugin stuff. and option parsing
+ */
 class SchemaShell extends Shell
 {
     public function startup()
@@ -140,15 +143,38 @@ class SchemaShell extends Shell
             $this->Status->error('Could not save to config/dump.sql');
         }
     }
-
-    /**
-     * We dont pdo sta
-     *
-     * @param array $data
-     * @return void
-     */
-    protected function insertStatement(array $data)
+    public function import()
     {
+        $datasource = 'default';
+        if (!empty($this->args)) {
+            $datasource = $this->args[0];
+        }
+        $connection = ConnectionManager::get($datasource);
+
+        $filename = CONFIG . DS .'schema.sql';
+        
+        if (!file_exists($filename)) {
+            $this->Status->error('config/schema.sql not found');
+            exit();
+        }
+
+
+        $sql = preg_replace('!/\*.*?\*/!s', '', file_get_contents($filename)); // Remove comments
+
+        $array = explode(";\n", $sql);
+        $this->out(sprintf('Running <white>%s</white> queries', count($array)));
+
+        foreach ($array as $query) {
+            if ($query != '' and $query != "\n") {
+                $query = trim($query) . ';';
+                if ($connection->execute($query)) {
+                    $this->Status->ok($query);
+                } else {
+                    $this->Status->error($query);
+                    return ;
+                }
+            }
+        }
     }
     protected function loadSchema(string $filename)
     {
@@ -164,5 +190,6 @@ class SchemaShell extends Shell
         $this->out("generate\tgenerates the config\schema\\table.php files");
         $this->out("create\t\tcreates the tables using the schema files");
         $this->out("dump\t\tdumps the tables and records into an sql file");
+        $this->out("import\t\timports sql files");
     }
 }
