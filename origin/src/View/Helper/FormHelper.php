@@ -610,18 +610,26 @@ class FormHelper extends Helper
         return $output;
     }
 
+    /**
+     * Select form element
+     *
+     * @param string $name
+     * @param array $options
+     * @param array $selectOptions empty,value
+     * @return void
+     */
     public function select(string $name, array $options = [], array $selectOptions = [])
     {
         $selectOptions = $this->prepareOptions($name, $selectOptions);
 
-        if (isset($selectOptions['empty'])) {
+        if (!empty($selectOptions['empty'])) {
             if ($selectOptions['empty'] === true) {
                 $selectOptions['empty'] = '--None--';
             }
             $options = ['' => $selectOptions['empty']] + $options;
             unset($selectOptions['empty']);
         }
-     
+
         $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions);
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);

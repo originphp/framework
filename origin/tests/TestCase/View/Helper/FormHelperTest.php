@@ -220,6 +220,9 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<select name="status"><option value="0">draft</option><option value="1">new</option><option value="2">published</option></select>';
         $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published']));
 
+        $expected = '<select name="status"><option value="0">draft</option><option value="1">new</option><option value="2">published</option></select>';
+        $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published'], ['empty' => false]));
+
         $expected = '<select name="status"><option value="">--None--</option><option value="0">draft</option><option value="1">new</option><option value="2">published</option></select>';
         $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published'], ['empty' => true]));
 
