@@ -196,7 +196,7 @@ class Entity
     {
         $result = null;
         if (isset($this->_properties[$property])) {
-            $result = $this->_properties[$property];
+            $result =& $this->_properties[$property];
         }
 
         return $result;
