@@ -135,7 +135,7 @@ class ConsoleOutput
     */
     public function parseTags($string)
     {
-        if (preg_match_all('/<([a-z0-9-_]+)>(.*?)<\/([a-z0-9-_]+)>/i', $string, $matches)) {
+        if (preg_match_all('/<([a-z0-9-_]+)>(.*?)<\/([a-z0-9-_]+)>/ims', $string, $matches)) {
             foreach ($matches[1] as $key => $tag) {
                 $text = $matches[2][$key];
 
