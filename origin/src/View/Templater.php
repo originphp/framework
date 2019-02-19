@@ -17,15 +17,11 @@ namespace Origin\View;
 use Origin\Exception\Exception;
 
 /**
- * Example
- * USE Origin\View\Templater;
- * $templater = new Templater(false);
- * $result = $templater->format('Hello {name}!',['name'=>'James']);
+ * Templater
+ * This has now been rewritten and works differently.
  */
 
-/**
- * This will also be used by Email,.
- */
+
 class Templater
 {
     /**
@@ -33,25 +29,94 @@ class Templater
      *
      * @var bool
      */
-    protected $allowBlanks = null;
+    protected $templates = [];
 
-    public function __construct(bool $allowBlanks = true)
+    public function __construct(array $templates = [])
     {
-        $this->allowBlanks = $allowBlanks;
+        $this->templates = $templates;
     }
 
-    public function format(string $template, array $data)
+    /**
+     * This will fetch template and merge the data into it, if there is no key then the value
+     * is set to null.
+     *
+     * @param string $name
+     * @param array $data
+     * @return void
+     */
+    public function format(string $name, array $data)
     {
-        foreach ($data as $key => $value) {
-            if ($this->allowBlanks === false and ($value === '' or $value === null)) {
-                throw new Exception(sprintf('Empty data for %s', $key));
+        if (!isset($this->templates[$name])) {
+            throw new Exception("Template '{$name}' does not exist");
+        }
+        
+        $template = $this->templates[$name];
+        
+        if (preg_match_all('/\{([a-z0-9_]+)\}/i', $template, $matches)) {
+            foreach ($matches[1] as $placeholder) {
+                $value = isset($data[$placeholder])?$data[$placeholder]:null;
+                $template = str_replace("{{$placeholder}}", $value, $template);
             }
-            $template = str_replace("{{$key}}", $value, $template);
         }
-        if (preg_match_all('/\{([^ }]+)\}/', $template, $matches, PREG_PATTERN_ORDER)) {
-            throw new Exception(sprintf('Some fields in templates not matched'));
-        }
-
         return $template;
+    }
+
+
+    /**
+     * Loads templates from a file in the config folder
+     *
+     * $templater->load('templates-pagination');
+     *
+     *  return [
+     *      'link' => '<a href="{url}">{text}</a>'
+     *   ];
+     *
+     * @param string $name
+     * @return void
+     */
+    public function load(string $name)
+    {
+        $filename = CONFIG . DS . $name . '.php';
+        if (file_exists($filename)) {
+            $return = include $filename;
+            if (is_array($return)) {
+                foreach ($return as $key => $value) {
+                    $this->templates[$key] = $value;
+                }
+                return true;
+            }
+            throw new Exception("'{$name}.php' does not return an array");
+        }
+        throw new Exception("'config/{$name}.php' does not exist.");
+    }
+
+    /**
+    * Sets templates
+    *
+    * @param array $templates
+    * @return void
+    */
+    public function set(array $templates)
+    {
+        foreach ($templates as $name => $template) {
+            $this->templates[$name] =  $template;
+        }
+    }
+
+    /**
+    * Gets template
+    *
+    * @param string|null $template
+    * @return array|string|null
+    */
+    public function get($template = null)
+    {
+        if ($template === null) {
+            return $this->templates;
+        }
+        if (isset($this->templates[$template])) {
+            return $this->templates[$template];
+        }
+        return null;
     }
 }

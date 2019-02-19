@@ -15,12 +15,16 @@
 namespace Origin\View\Helper;
 
 use Origin\Core\Router;
+use Origin\View\TemplateTrait;
 
 class HtmlHelper extends Helper
 {
-    protected $templates = [
-    'a' => '<a href="{url}"{attributes}>{text}</a>',
-  ];
+    use TemplateTrait;
+    protected $defaultConfig = [
+        'templates' => [
+            'a' => '<a href="{url}"{attributes}>{text}</a>',
+        ]
+    ];
 
     public function link($text, $url, array $attributes = [])
     {
@@ -30,6 +34,6 @@ class HtmlHelper extends Helper
             'attributes' => $this->attributesToString($attributes),
             ];
 
-        return $this->templater()->format($this->templates['a'], $options);
+        return $this->templater()->format('a', $options);
     }
 }

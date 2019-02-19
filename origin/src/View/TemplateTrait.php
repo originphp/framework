@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\View\Helper;
+namespace Origin\View;
 
 /**
  * This is the new Template Trait. Whilst building apps, despite using bootstrap, I wanted to add
@@ -35,47 +35,37 @@ trait TemplateTrait
     public function templates($template = null)
     {
         if (is_array($template)) {
-            return $this->setTemplates($template);
+            return $this->setTemplate($template);
         }
         return $this->getTemplate($template);
     }
+    
     /**
-     * Sets templates
+     * Sets a template or templates at runtime
      *
-     * @param array $templates
+     * @param array $array
      * @return void
      */
-    public function setTemplates(array $templates)
+    public function setTemplate(array $array)
     {
-        foreach ($template as $name => $string) {
-            $this->setTemplate($name, $template);
-        }
-        return true;
+        return $this->templater()->set($template);
     }
 
-    public function setTemplate(string $name, string $template)
-    {
-        $this->config['templates'][$name] =  $template;
-    }
     /**
-     * Gets template
+     * Gets a template at run time
      *
-     * @param [type] $template
-     * @return void
+     * @param string $template
+     * @return string|null
      */
-    public function getTemplate($template = null)
+    public function getTemplate(string $template= null)
     {
-        if ($template === null) {
-            return $this->config['templates'];
-        }
-        if (isset($this->config['templates'][$template])) {
-            return $this->config['templates'][$template];
-        }
-        return false;
+        return $this->templater()->get($template);
     }
 
     /*
-    * Gets a templater instance.
+    * Gets the templater object if it exists, or it will create one
+    * if the templates key is a string, then it will load a file from the config
+    * and overwrite default config.
     *
     * @return Templater
     */
@@ -83,6 +73,13 @@ trait TemplateTrait
     {
         if (!isset($this->templater)) {
             $this->templater = new Templater();
+            $templates = $this->config('templates');
+            if (is_array($templates)) {
+                $this->templater->set($templates);
+            } else {
+                $this->templater->set($this->defaultConfig['templates']);
+                $this->templater->load($templates);
+            }
         }
 
         return $this->templater;

@@ -15,22 +15,24 @@
 namespace Origin\View\Helper;
 
 use Origin\Core\Inflector;
+use Origin\View\TemplateTrait;
 
 class PaginatorHelper extends Helper
 {
-    public $uses = ['Html'];
+    use TemplateTrait;
 
     public $defaultConfig = [
-    'sort' => '<a href="{url}">{text}</a>',
-    'sortAsc' => '<a href="{url}" class="asc">{text}</a>',
-    'sortDesc' => '<a href="{url}" class="desc">{text}</a>',
-    'control' => '<ul class="pagination">{content}</ul>',
-    'number' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-    'numberActive' => '<li class="page-item active"><a class="page-link" href="{url}">{text}</a></li>',
-    'prev' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-    'prevDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
-    'next' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-    'nextDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
+        'templates'=> [
+            'sort' => '<a href="{url}">{text}</a>',
+            'sortAsc' => '<a href="{url}" class="asc">{text}</a>',
+            'sortDesc' => '<a href="{url}" class="desc">{text}</a>',
+            'control' => '<ul class="pagination">{content}</ul>',
+            'number' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
+            'numberActive' => '<li class="page-item active"><a class="page-link" href="{url}">{text}</a></li>',
+            'prev' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
+            'prevDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
+            'next' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
+            'nextDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>']
   ];
 
     /**
@@ -63,7 +65,7 @@ class PaginatorHelper extends Helper
           'url' => $this->request->url.'?'.http_build_query($query),
         ];
 
-        return $this->templater()->format($this->config[$template], $options);
+        return $this->templater()->format($template, $options);
     }
 
     public function prev(string $text = 'Previous', array $options = [])
@@ -97,7 +99,7 @@ class PaginatorHelper extends Helper
 
             $options['url'] = $this->request->url.'?'.http_build_query($query);
             $options['text'] = $i;
-            $output .= $this->templater()->format($this->config[$template], $options);
+            $output .= $this->templater()->format($template, $options);
         }
 
         return $output;
@@ -114,8 +116,7 @@ class PaginatorHelper extends Helper
     public function control($previous = 'Previous', $next = 'Next')
     {
         $output = $this->prev($previous).$this->numbers().$this->next($next);
-
-        return $this->templater()->format($this->config['control'], ['content' => $output]);
+        return $this->templater()->format('control', ['content' => $output]);
     }
 
     protected function generateLink($text, $type, $options)
@@ -146,7 +147,7 @@ class PaginatorHelper extends Helper
         }
         $options['url'] = $this->request->url.'?'.http_build_query($query);
 
-        return $this->templater()->format($this->config[$template], $options);
+        return $this->templater()->format($template, $options);
     }
 
     protected function paging()

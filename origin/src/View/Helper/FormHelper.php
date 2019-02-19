@@ -21,8 +21,11 @@ use Origin\Model\Entity;
 use Origin\Utils\Date;
 use Origin\Utils\Number;
 
+use Origin\View\TemplateTrait;
+
 class FormHelper extends Helper
 {
+    use TemplateTrait;
     /**
      * If you want to change these, you need to copy the whole set e.g controlDefaults.
      *
@@ -627,8 +630,8 @@ class FormHelper extends Helper
                 $selectOptions['empty'] = '--None--';
             }
             $options = ['' => $selectOptions['empty']] + $options;
-            unset($selectOptions['empty']);
         }
+        unset($selectOptions['empty']);
 
         $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions);
         if (array_key_exists('value', $selectOptions)) { // Work with null values
@@ -793,15 +796,15 @@ class FormHelper extends Helper
         return 'text';
     }
 
-    protected function template(string $template, array $options = [])
+    protected function template(string $name, array $options = [])
     {
-        $template = $this->config['templates'][$template];
+        $template = $this->getTemplate($name);
 
         if (empty($options)) {
             return $template;
         }
         $data = [];
-        preg_match_all('/\{([a-z]+)\}/', $template, $matches); ///\{([^ }]+)\}/
+        preg_match_all('/\{([a-z]+)\}/', $template, $matches);
         if ($matches) {
             foreach ($matches[1] as $mergeVar) {
                 if ($mergeVar === 'attributes') {
@@ -817,7 +820,6 @@ class FormHelper extends Helper
         }
         // Remaining items in options are attributes
         $data['attributes'] = $this->attributesToString($options);
-
-        return $this->templater()->format($template, $data);
+        return $this->templater()->format($name, $data);
     }
 }

@@ -19,20 +19,29 @@ use Origin\Exception\Exception;
 
 class TemplaterTest extends \PHPUnit\Framework\TestCase
 {
+    public function testGet()
+    {
+        $expected = '<a href="{url}">{text}</a>';
+        $templater = new Templater(['link'=>$expected]);
+        $this->assertEquals($expected, $templater->get('link'));
+    }
+
+    public function testSet()
+    {
+        $expected = '<a href="{url}">{text}</a>';
+        $templater = new Templater();
+        $templater->set(['link'=>$expected]);
+        $this->assertEquals($expected, $templater->get('link'));
+    }
+
     public function testFormat()
     {
-        $Templater = new Templater();
-
-        $template = '<a href="{url}">{text}</a>';
+        $expected = '<a href="{url}">{text}</a>';
+        $templater = new Templater(['link'=>$expected]);
 
         $data = ['url' => '#', 'text' => 'my link'];
         $expected = '<a href="#">my link</a>';
-        $result = $Templater->format($template, $data);
-        $this->assertEquals($expected, $result);
-
-        $data = ['text' => 'my link'];
-        $expected = '<a href="#">my link</a>';
-        $this->expectException(Exception::class);
-        $result = $Templater->format($template, $data);
+ 
+        $this->assertEquals($expected, $templater->format('link', $data));
     }
 }

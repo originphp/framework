@@ -29,10 +29,10 @@ class Helper
     protected $request = null;
 
     /**
-         * Holds the HelperRegistry object.
-         *
-         * @var HelperRegistry
-         */
+     * Holds the HelperRegistry object.
+     *
+     * @var HelperRegistry
+     */
     protected $helperRegistry = null;
 
     /**
@@ -46,7 +46,7 @@ class Helper
     {
         $this->helperRegistry = $view->helperRegistry();
         $this->request =& $view->request;
-
+        
         $this->config($config);
         $this->initialize($config);
     }
@@ -154,20 +154,6 @@ class Helper
         }
 
         return '';
-    }
-
-    /**
-     * Gets a templater instance.
-     *
-     * @return Templater
-     */
-    public function templater()
-    {
-        if (!isset($this->_templater)) {
-            $this->_templater = new Templater();
-        }
-
-        return $this->_templater;
     }
 
     /**
