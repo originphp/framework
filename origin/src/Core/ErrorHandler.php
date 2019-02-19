@@ -25,6 +25,39 @@ class ErrorHandler
     {
         set_error_handler(array($this, 'errorHandler'));
         set_exception_handler(array($this, 'exceptionHandler'));
+
+        if ($this->isAjax()) {
+            set_exception_handler(array($this, 'ajaxExceptionHandler'));
+        }
+    }
+
+    /**
+     * We want to handle ajax/json exception properly (ie. not rendering html)
+     *
+     * Conventions which means json:
+     * 1. If server requested with XMLHttpRequest (cross-domain requests might not show this jquery)
+     * 2. If content_type of the request was application/json (this would have to be set manually by curl etc). Ajax
+     * post also set this
+     * 3. If the .json extension is detected
+     *
+     *
+     * @todo how to set content type to json then
+     * @return boolean
+     */
+    private function isAjax()
+    {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+            return true;
+        }
+        // check if content type requted
+        if (isset($_SERVER['CONTENT_TYPE']) and $_SERVER['CONTENT_TYPE'] === 'application/json') {
+            return true;
+        }
+        $uri = $_SERVER['REQUEST_URI'];
+        if (strpos($uri, '?') !== false) {
+            list($uri, $query) = explode('?', $uri);
+        }
+        return substr(basename($uri), -5) === '.json';
     }
 
     /**
@@ -65,6 +98,45 @@ class ErrorHandler
         Log::write('errors', $message);
 
         include VIEW.DS.'error'.DS.$errorCode.'.ctp';
+    }
+
+    /**
+     * Ajax and json error handler
+     *
+     * @param Exception $exception
+     * @return void
+     */
+    public function ajaxExceptionHandler($exception)
+    {
+        $errorCode = 500;
+        if ($exception->getCode() === 404) {
+            $errorCode = 404;
+        }
+      
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        if (Configure::read('debug')) {
+            $response = ['error' => ['message' => $exception->getMessage(),'code' => $exception->getCode()]];
+            echo json_encode($response);
+            return true;
+        }
+
+        http_response_code($errorCode);
+
+        $message = get_class($exception)."\n";
+        $message .= $exception->getMessage()."\n";
+        $message .= 'Line '.$exception->getLine().' of '.$exception->getFile()."\n";
+        $message .= $exception->getTraceAsString();
+
+        Log::write('errors', $message);
+
+        $response = ['error' => ['message' => 'An Internal Error has Occured','code' => 500]];
+        if ($errorCode === 404) {
+            $response = ['error' => ['message' => 'Not found','code' => 404]];
+        }
+        echo json_encode($response);
     }
 
     public function debugException($exception)

@@ -303,7 +303,7 @@ class Controller
     }
 
     /**
-     * Loads the PaginatorComponent and passes the settings to it
+     * Loads the PaginatorComponent and passes the settings to it.
      *
      * @param string $model name of the model
      * @param array $settings the settings used by PaginatorComponent these are the same settings as in
@@ -319,7 +319,9 @@ class Controller
         $object = $this->loadModel($model);
 
         $this->loadComponent('Paginator');
-        $this->loadHelper('Paginator');
+        if (!isset($this->viewHelpers['Paginator'])) {
+            $this->loadHelper('Paginator');
+        }
         
         $defaults = $this->paginate;
         if (isset($this->paginate[$model])) {
@@ -332,7 +334,7 @@ class Controller
     /**
      * Renders a view. This is called automatically by the dispatcher.
      *
-     * @param string $view index | /Rest/json | Plugin.Controller/action
+     * @param string $view index | /Folder/another_one | Plugin.Controller/action
      */
     public function render(string $view = null)
     {
@@ -345,6 +347,46 @@ class Controller
         $body = $viewObject->render($view, $this->layout);
         $this->response->body($body);
     }
+
+    /**
+     * Renders a json view
+     *
+     *  $this->renderJson([
+     *     'data' => [
+     *         'id' => 1234,'name'=>'James'
+     *      ]
+     *    ]);
+     *
+     *  $this->renderJson([
+     *      'error' =>[
+     *          'message' => 'Not Found','code' => 404
+     *       ]
+     *     ],404);
+     *
+     *  Most API providers use only a small subset of the 70+ http error codes
+     *
+     *  These are the most important ones if you don't want to overcomplicate
+     *
+     *  200 - OK (Success)
+     *  400 - Bad Request (Failure - client side problem)
+     *  500 - Internal Error (Failure - server side problem)
+     *  401 - Unauthorized
+     *  404 - Not Found
+     *  403 - Forbidden (For application level permisions)
+     *
+     * @param array|string $value data which will be json encoded
+     * @param integer $statusCode http status code to send
+     *
+     * @return void
+     */
+    public function renderJson($value, int $statusCode = 200)
+    {
+        $this->autoRender = false;
+        $this->response->type('json');
+        $this->response->statusCode($statusCode);
+        $this->response->body(json_encode($value));
+    }
+
 
     /**
      * Use this to customise view class

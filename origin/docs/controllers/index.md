@@ -206,3 +206,26 @@ You load helpers in your controller initialize method.
 or you can pass an options array
 
 `$this->loadComponent('Form',['className'=>'CustomFormHelper'])`
+
+
+### Controller::renderJson($data, int $statusCode=200 )
+
+To render a json view, you can either create view for the controller action or use the `renderJson` method.
+
+````php 
+
+ $this->renderJson([
+  'data'=>['name' => 'Dota 2']
+  ]);
+
+````
+
+Or if you want to set a status code with the data.
+
+````php 
+
+ $this->renderJson([
+  'error'=>[ 'message'=>'Not Found' ]
+  ],404);
+
+````

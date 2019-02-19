@@ -45,6 +45,18 @@ class Response
     protected $cookies = [];
 
     /**
+     * Holds the content type
+     *
+     * @var string
+     */
+    protected $contentType = 'text/html';
+
+    protected $mimeTypes = [
+        'html' => 'text/html',
+        'json' => 'application/json',
+        'xml' => 'application/xml',
+    ];
+    /**
      * Sets or gets the buffered output.
      *
      * @param string $content
@@ -67,10 +79,12 @@ class Response
     {
         http_response_code($this->statusCode);
 
+        $this->sendCookies();
+        $this->header('Content-Type', $this->contentType);
+
         foreach ($this->headers as $name => $value) {
             $this->sendHeader($name, $value);
         }
-        $this->sendCookies();
         echo $this->body;
     }
 
@@ -197,6 +211,42 @@ class Response
 
         $options = array_merge($defaults, $options);
         $this->cookies[$name] = $options;
+    }
+
+    /**
+     * Sets the content type
+     *
+     *  // get the current content type
+     *  $contentType = $request->type();
+     *
+     *  // add definitions
+     *  $request->type(['swf' => 'application/x-shockwave-flash']);
+     *
+     *
+     *
+     * @param string$contentType
+     * @return void
+     */
+    public function type($contentType = null)
+    {
+        if ($contentType === null) {
+            return $this->contentType;
+        }
+        if (is_array($contentType)) {
+            foreach ($contentType as $type => $defintion) {
+                $this->mimeTypes[$type] = $defintion;
+            }
+            return $this->contentType;
+        }
+        if (isset($this->mimeTypes[$contentType])) {
+            return $this->contentType = $this->mimeTypes[$contentType];
+        }
+
+        if (strpos($contentType, '/') !== false) {
+            return $this->contentType = $contentType;
+        }
+
+        return false;
     }
 
     private function sendCookies()

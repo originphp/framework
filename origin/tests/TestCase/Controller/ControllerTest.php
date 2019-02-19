@@ -301,6 +301,17 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         rmdir($tmpFolder);
     }
 
+    public function testRenderJson()
+    {
+        $request = new Request('tests/edit/1024');
+        $controller = new TestsController($request, new Response());
+        $data = ['data'=>['game'=>'Dota 2']];
+        $controller->renderJson($data, 201);
+        $this->assertEquals(json_encode($data), $controller->response->body());
+        $this->assertEquals(201, $controller->response->statusCode());
+        $this->assertEquals('application/json', $controller->response->type());
+    }
+
     public function testRedirect()
     {
         $request = new Request('tests/edit/2048');
