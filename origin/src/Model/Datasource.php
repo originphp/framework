@@ -96,37 +96,38 @@ class Datasource
             $this->statement = $query = $this->connection->prepare($sql);
 
             $result = $query->execute($params);
-
             if (Configure::read('debug')) {
-                $sql = $sql;
-                foreach ($params as $needle => $replace) {
-                    if (is_string($replace)) {
-                        $replace = "'{$replace}'";
-                    }
-                    $sql = preg_replace("/\B:{$needle}/", $replace, $sql);
-                }
                 $this->log[] = [
-                'query' => $sql,
+                'query' => $this->unprepare($sql, $params),
                 'error' => !$result,
                 'affected' => $this->lastAffected(),
                 'time' => microtime(true) - $start,
               ];
             }
 
-            // Fallback - PDO::ERRMODE_EXCEPTION flag moots this
+            // Fallback if dsiable PDO::ERRMODE_EXCEPTION flag
             if (!$result) {
                 return false;
             }
         } catch (PDOException $e) {
-            if (isset($query->queryString)) {
-                $sql = $query->queryString;
-            }
-            Log::write('sql-error', $sql);
+            Log::write('sql-error', $this->unprepare($sql, $params));
             throw new DatasourceException($e->getMessage());
         }
 
         return true;
     }
+
+    protected function unprepare($sql, $params)
+    {
+        foreach ($params as $needle => $replace) {
+            if (is_string($replace)) {
+                $replace = "'{$replace}'";
+            }
+            $sql = preg_replace("/\B:{$needle}/", $replace, $sql);
+        }
+        return $sql;
+    }
+
 
     /**
      * Check result object is part of PDOStatement.
