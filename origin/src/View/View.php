@@ -121,7 +121,7 @@ class View
     public function __get($name)
     {
         if (isset($this->helpers[$name])) {
-            return $this->helperRegistry()->load($name.'Helper');
+            return $this->helperRegistry()->load($name.'Helper', $this->helpers[$name]);
         }
         throw new Exception(sprintf('%sHelper is not loaded.', $name));
     }
