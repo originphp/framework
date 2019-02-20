@@ -13,6 +13,7 @@
  */
 use Origin\Core\Debugger;
 use Origin\Exception\Exception;
+use Origin\Core\Collection;
 
 /**
  * Runs a backtrace.
@@ -115,4 +116,16 @@ function h($text)
 function now()
 {
     return date('Y-m-d H:i:s');
+}
+
+/**
+ * Returns a Origin\Core\Collection object using the array (can be any array or array of objects such as from
+ * results).
+ *
+ * @param array $array
+ * @return void
+ */
+function collection(array $items)
+{
+    return new Collection($items);
 }
