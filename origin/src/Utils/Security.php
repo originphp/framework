@@ -51,7 +51,7 @@ class Security
      * @see http://php.net/manual/en/function.openssl-encrypt.php
      * @param string $string
      * @param string $key
-     * @return string encrypted string
+     * @return binary
      */
     public static function encrypt(string $string, string $key=null)
     {
@@ -71,6 +71,7 @@ class Security
 
     * The first 16 bytes are to be the initialization vector and the rest of the string to be the encrypted
     * data. See openssl_cipher_iv_length('AES-256-CBC') for initialization vector length
+    *
     * @param string $string
     * @param string $key
     * @return string encrypted string
