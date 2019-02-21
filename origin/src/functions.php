@@ -129,3 +129,28 @@ function collection(array $items)
 {
     return new Collection($items);
 }
+
+/**
+ * Generates a UUID (Universal Unique Identifier)
+ * Set version to 0100 and bits 6-7 to 10
+ * @see http://tools.ietf.org/html/rfc4122#section-4.4
+ * @return string
+ */
+function uuid()
+{
+    $random = random_bytes(16);
+    $random[6] = chr(ord($random[6]) & 0x0f | 0x40);
+    $random[8] = chr(ord($random[8]) & 0x3f | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($random), 4));
+}
+
+/**
+ * Generates a random unpredictable unique id (Unique Identifier)
+ * @param integer $length
+ * @return string
+ */
+function uid($length=13)
+{
+    $random = random_bytes(ceil($length/2));
+    return substr(bin2hex($random), 0, $length);
+}
