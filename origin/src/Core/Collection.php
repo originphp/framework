@@ -363,9 +363,6 @@ class Collection
     public function avg($callback)
     {
         $values = $this->extract($callback)->toArray();
-        if (!$values) {
-            return null;
-        }
         return array_sum($values) / count($values);
     }
 
@@ -385,13 +382,7 @@ class Collection
     public function median($callback)
     {
         $values = $this->extract($callback)->toArray();
-        if (!$values) {
-            return null;
-        }
         $count = count($values);
-        if ($count == 0) {
-            return null;
-        }
         sort($values);
         $middle = (int) ($count / 2);
 

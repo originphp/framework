@@ -69,10 +69,20 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($titles, $collection->extract('name')->toArray());
         $this->assertEquals($authors, $collection->extract('author.name')->toArray());
 
+        $expected = [
+            0 => null,
+            1 => null,
+            2 => null,
+            3 => null,
+            4 => null
+        ];
+        $this->assertEquals($expected, $collection->extract('nonExistant')->toArray());
+
         // test nested arrays
         $collection = collection($this->array);
         $this->assertEquals($titles, $collection->extract('name')->toArray());
         $this->assertEquals($authors, $collection->extract('author.name')->toArray());
+        $this->assertEquals($expected, $collection->extract('nonExistant')->toArray());
     }
     public function testMap()
     {
@@ -291,13 +301,21 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
             return $book->id + 100;
         }));
         $this->assertEquals(300, $collection->median('author.id'));
+
+        // test odd median
+        $books = $this->books;
+        $books[] = $this->books[1];
+        $collection = collection($books);
+        $this->assertEquals(400, $collection->median('author.id'));
     }
 
+    public function testCount()
+    {
+        $collection = collection($this->books);
+        $this->assertEquals(5, $collection->count());
+    }
     public function testCountBy()
     {
-        /*$classResults = $students->countBy(function ($student) {
-    return $student->grade > 6 ? 'approved' : 'denied';
-});*/
         $collection = collection($this->books);
         $expected = ['Business' => 1,'Personal Development'=>4];
         $this->assertEquals($expected, $collection->countBy('category'));
