@@ -234,7 +234,6 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
             "William N. Thorndike-The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success"
             ];
         $this->assertEquals($expected, $sorted);
-        //pr(json_encode($sorted, JSON_PRETTY_PRINT));
     }
 
     /**
