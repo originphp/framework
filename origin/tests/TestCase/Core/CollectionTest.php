@@ -342,9 +342,10 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testTake()
     {
         $collection = collection($this->books);
-        $first = $collection->take(5);
-        pr($first->toArray());
+        $first = $collection->take(2);
         $second = $collection->take(2);
-        pr($second->toArray());
+        $this->assertEquals(2, count($first->toArray()));
+        $this->assertEquals(2, count($second->toArray()));
+        $this->assertFalse($first->toArray() === $second->toArray());
     }
 }
