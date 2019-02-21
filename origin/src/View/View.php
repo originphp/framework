@@ -34,7 +34,7 @@ class View
      *
      * @var array
      */
-    public $vars = array();
+    public $vars = [];
 
     /**
      * This is the rendered view
@@ -340,5 +340,15 @@ class View
     public function set(string $key, $value)
     {
         $this->vars[$key] = $value;
+    }
+
+    /**
+     * Returns the request object
+     *
+     * @return Request
+     */
+    public function request()
+    {
+        return $this->request;
     }
 }

@@ -48,8 +48,8 @@ class PaginatorHelper extends Helper
         if ($text === null) {
             $text = Inflector::humanize($column);
         }
-        $query = $this->request->query;
-        $paging = $this->paging();
+        $query = $this->view()->request()->query;
+        $paging = $this->params();
 
         $query['sort'] = $column;
         if ($paging and $column === $paging['sort']) {
@@ -62,7 +62,7 @@ class PaginatorHelper extends Helper
 
         $options = [
           'text' => $text,
-          'url' => $this->request->url.'?'.http_build_query($query),
+          'url' => $this->view()->request()->url.'?'.http_build_query($query),
         ];
 
         return $this->templater()->format($template, $options);
@@ -75,7 +75,7 @@ class PaginatorHelper extends Helper
 
     public function numbers(array $options = [])
     {
-        $paging = $this->paging();
+        $paging = $this->params();
 
         $first = $last = $current = 1;
 
@@ -89,7 +89,7 @@ class PaginatorHelper extends Helper
         }
 
         $output = '';
-        $query = $this->request->query;
+        $query = $this->view()->request()->query;
         for ($i = $first; $i < $last + 1; ++$i) {
             $template = 'number';
             if ($current == $i) {
@@ -97,7 +97,7 @@ class PaginatorHelper extends Helper
             }
             $query['page'] = $i;
 
-            $options['url'] = $this->request->url.'?'.http_build_query($query);
+            $options['url'] = $this->view()->request()->url.'?'.http_build_query($query);
             $options['text'] = $i;
             $output .= $this->templater()->format($template, $options);
         }
@@ -124,8 +124,8 @@ class PaginatorHelper extends Helper
         $defaults = ['active' => '', 'text' => $text, 'url' => '#', 'onclick' => 'return false;'];
         $options += $defaults;
 
-        $query = $this->request->query;
-        $paging = $this->paging();
+        $query = $this->view()->request()->query;
+        $paging = $this->params();
 
         if (!isset($query['page'])) {
             $query['page'] = $paging['current'];
@@ -145,12 +145,17 @@ class PaginatorHelper extends Helper
                 $template = 'prev';
             }
         }
-        $options['url'] = $this->request->url.'?'.http_build_query($query);
+        $options['url'] = $this->view()->request()->url.'?'.http_build_query($query);
 
         return $this->templater()->format($template, $options);
     }
 
-    protected function paging()
+    /**
+     * Gets the paging paramaters
+     *
+     * @return array
+     */
+    public function params()
     {
         return $this->view()->get('paging');
     }

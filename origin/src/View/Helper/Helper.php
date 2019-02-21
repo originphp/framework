@@ -22,18 +22,12 @@ class Helper
 {
     use ConfigTrait;
     /**
-     * Holds a reference to the request object.
+     * Holds a reference to the view object.
      *
      * @var object
      */
-    protected $request = null;
+    protected $view = null;
 
-    /**
-     * Holds the HelperRegistry object.
-     *
-     * @var HelperRegistry
-     */
-    protected $helperRegistry = null;
 
     /**
      * Array of helpers and config. This poupulated by loadHelper
@@ -44,8 +38,7 @@ class Helper
 
     public function __construct(View $view, array $config = [])
     {
-        $this->helperRegistry = $view->helperRegistry();
-        $this->request =& $view->request;
+        $this->view = $view;
         
         $this->config($config);
         $this->initialize($config);
@@ -57,7 +50,7 @@ class Helper
     public function __get($name)
     {
         if (isset($this->_helpers[$name])) {
-            $this->{$name} = $this->helperRegistry()->load($name, $this->_helpers[$name]);
+            $this->{$name} = $this->view()->helperRegistry()->load($name, $this->_helpers[$name]);
             
             if (isset($this->{$name})) {
                 return $this->{$name};
@@ -97,17 +90,6 @@ class Helper
             $this->loadHelper($helper, $config);
         }
     }
-
-    /**
-     * Returns the helper registry object
-     *
-     * @return HelperRegistry
-     */
-    public function helperRegistry()
-    {
-        return $this->helperRegistry;
-    }
-
 
     /**
      * This is called when helper is loaded for the first time from the
@@ -161,6 +143,6 @@ class Helper
      */
     public function view()
     {
-        return $this->helperRegistry()->view();
+        return $this->view;
     }
 }

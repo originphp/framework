@@ -22,6 +22,7 @@ use Origin\Utils\Date;
 use Origin\Utils\Number;
 
 use Origin\View\TemplateTrait;
+use Origin\Core\Dot;
 
 class FormHelper extends Helper
 {
@@ -127,7 +128,7 @@ class FormHelper extends Helper
         $attributes = [];
 
         if ($model === null) {
-            $controller = $this->request->params['controller'];
+            $controller = $this->view()->request()->params['controller'];
             $model = Inflector::camelize(Inflector::singularize($controller));
         }
         if (is_object($model)) {
@@ -141,7 +142,7 @@ class FormHelper extends Helper
 
         $defaults = [
           'type' => 'post',
-          'url' => $this->request->here(),
+          'url' => $this->view()->request()->here(),
         ];
 
         $options = array_merge($defaults, $options);
@@ -682,23 +683,35 @@ class FormHelper extends Helper
                 $options['maxlength'] = $maxlength;
             }
         }
-
-        if ($this->data) {
-            $entity = $this->getEntity($this->data, $name);
-            $parts = explode('.', $name);
-            $last = end($parts);
-            
-            // Get value unless overridden
-            if (!isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
-                $options['value'] = $entity->{$last};
-            }
-
-            // Check Validation Errors
-            if ($this->data->errors($last)) {
-                $errorClass = 'error';
-                $options = $this->addClass('error', $options);
+        if (!isset($options['value'])) {
+            if ($this->data) {
+                $entity = $this->getEntity($this->data, $name);
+                $parts = explode('.', $name);
+                $last = end($parts);
+                
+                // Get value unless overridden
+                if (!isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
+                    $options['value'] = $entity->{$last};
+                }
+    
+                // Check Validation Errors
+                if ($this->data->errors($last)) {
+                    $errorClass = 'error';
+                    $options = $this->addClass('error', $options);
+                }
+            } else {
+                // get data from request, if user is using different model or not supplying results. e.g is a search form
+                $requestData = $this->view()->request()->data;
+                if ($requestData) {
+                    $dot = new Dot($requestData);
+                    $value = $dot->get($name);
+                    if ($value) {
+                        $options['value'] = $value;
+                    }
+                }
             }
         }
+        
         
         return $options;
     }
