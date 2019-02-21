@@ -243,6 +243,17 @@ Then you would setup the array like this:
 
 ```php
 array(
+    'User.name' => 'James',
+    'OR' => array(
+        'Article.title LIKE' => '%how to%',
+        'status' => 'Published'
+    )
+)
+```
+If you want to set multiple conditions on the same field you can further wrap them in array like this:
+
+```php
+array(
   'OR' => array(
     array('Article.title LIKE' => 'How to%'),
     array('Article.title LIKE' => '%Computers%')
@@ -250,6 +261,28 @@ array(
   'Article.published' => 1
 );
 
+```
+
+Lets say you wanted to search multiple job titles and company names, for this we will need multiple ORs, to produce
+something like this.
+
+````sql
+(title LIKE '%manager%' OR title LIKE '%ceo%') AND (company LIKE '%microsoft%' OR company LIKE '%oracle%')
+````
+We have to wrap them in another array so we can use the same keys.
+
+```php
+      
+        $conditions = [
+            ['OR' => [
+              ['title LIKE' => '%manager%'],
+              ['title LIKE' => '%ceo%'],
+              ]],
+            ['OR' => [
+                ['company LIKE' => '%microsoft%'],
+                ['company LIKE' => '%oracle%'],
+            ]],
+            ];
 ```
 
 ## Queries
