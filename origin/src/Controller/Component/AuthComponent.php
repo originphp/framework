@@ -63,9 +63,17 @@ class AuthComponent extends Component
      */
     protected $allowedActions = [];
 
+    /**
+     * Holds the reuest object
+     *
+     * @var Request
+     */
+    public $request = null;
+
     public function initialize(array $config)
     {
         $this->loadComponent('Flash');
+        $this->request =& $this->controller()->request;
     }
 
     /**

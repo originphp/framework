@@ -20,25 +20,8 @@ use Origin\Core\ConfigTrait;
 class Component
 {
     use ConfigTrait;
-    /**
-     * Holds a reference to the request object.
-     *
-     * @var Request
-     */
-    public $request = null;
-
-    /**
-     * Holds a reference to the response object.
-     *
-     * @var Response
-     */
-    public $response = null;
-    /**
-     * Holds the componentregistry object.
-     *
-     * @var ComponentRegistry
-     */
-    protected $componentRegistry = null;
+    
+    protected $controller = null;
 
     /**
      * Array of components and config. This poupulated by loadComponent
@@ -49,10 +32,7 @@ class Component
 
     public function __construct(Controller $controller, array $config = [])
     {
-        $this->componentRegistry = $controller->componentRegistry();
- 
-        $this->request =& $controller->request;
-        $this->response =& $controller->response;
+        $this->controller = $controller;
  
         $this->config($config);
         $this->initialize($config);
@@ -64,7 +44,7 @@ class Component
     public function __get($name)
     {
         if (isset($this->_components[$name])) {
-            $this->{$name} = $this->componentRegistry()->load($name, $this->_components[$name]);
+            $this->{$name} = $this->controller()->componentRegistry()->load($name, $this->_components[$name]);
             
             if (isset($this->{$name})) {
                 return $this->{$name};
@@ -133,16 +113,6 @@ class Component
      */
     public function controller()
     {
-        return $this->componentRegistry()->controller();
-    }
-
-    /**
-    * Gets the componentRegistry
-    *
-    * @return void
-    */
-    public function componentRegistry()
-    {
-        return $this->componentRegistry;
+        return $this->controller;
     }
 }

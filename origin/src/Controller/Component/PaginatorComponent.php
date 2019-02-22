@@ -70,13 +70,14 @@ class PaginatorComponent extends Component
         if ($settings['page'] > 1 and $settings['page'] > ($count * $settings['limit'])) {
             throw new NotFoundException();
         }
-
+ 
         // Enable sorting on related Fields. e.g author_id - this sort by Display Field
         if ($sort and substr($sort, -3) === '_id') {
             // Setup default sort if intra model fails
             $settings['order'] = ["{$this->model->alias}.{$sort}" => $direction];
             // intra model sorting by display field if configured
             $alias = $this->getModelFromField($sort);
+            
             if (isset($this->model->{$alias})) {
                 $displayField = $this->model->{$alias}->displayField;
                 if ($displayField) {
@@ -141,7 +142,7 @@ class PaginatorComponent extends Component
      
         // merge with defaults
         $settings += $this->config;
-        $query = $this->controller()->request->query;
+        $query = $this->controller()->request()->query;
         if ($query) {
             $query = $this->filterArray($this->whitelist, $query);
             $settings = array_merge($settings, $query);

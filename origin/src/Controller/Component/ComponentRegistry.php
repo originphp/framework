@@ -25,6 +25,11 @@ use Origin\Controller\Component\Exception\MissingComponentException;
  */
 class ComponentRegistry extends ObjectRegistry
 {
+    /**
+     * Holds the controller object
+     *
+     * @var Controller
+     */
     protected $controller = null;
 
     public function __construct(Controller $controller)

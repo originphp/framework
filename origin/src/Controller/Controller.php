@@ -280,6 +280,19 @@ class Controller
     }
 
     /**
+     * Callback just prior to redirecting
+     */
+    public function beforeRedirect()
+    {
+    }
+    /**
+     * This is called after the startup, before shutdown
+     */
+    public function beforeRender()
+    {
+    }
+
+    /**
      * Callback after the action in the controller is called.
      */
     public function shutdown()
@@ -339,10 +352,13 @@ class Controller
     public function render(string $view = null)
     {
         $this->autoRender = false; // Only render once
-
+        
         if ($view === null) {
             $view = $this->request->params['action'];
         }
+
+        $this->beforeRender();
+
         $viewObject = $this->createView();
         $body = $viewObject->render($view, $this->layout);
         $this->response->body($body);
@@ -382,6 +398,9 @@ class Controller
     public function renderJson($value, int $statusCode = 200)
     {
         $this->autoRender = false;
+        
+        $this->beforeRender();
+
         $this->response->type('json');
         $this->response->statusCode($statusCode);
         $this->response->body(json_encode($value));
@@ -409,14 +428,40 @@ class Controller
     public function redirect($url, int $code = 302)
     {
         $this->autoRender = false;
-    
-        $this->response->statusCode($code);
+        
+        $this->beforeRedirect();
 
+        $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));
         $this->response->send();
         $this->response->stop();
     }
+
+    /**
+     * Returns the request object
+     *
+     * @return Request
+     */
+    public function request()
+    {
+        return $this->request;
+    }
     
+    /**
+     * Returns the response object
+     *
+     * @return response
+     */
+    public function response()
+    {
+        return $this->response;
+    }
+
+    /**
+     * Returns the component registry
+     *
+     * @return ComponentRegistry
+     */
     public function componentRegistry()
     {
         return $this->componentRegistry;

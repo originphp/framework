@@ -38,4 +38,19 @@ class AppController extends Controller
     public function shutdown()
     {
     }
+
+     /**
+     * Callback just prior to redirecting
+     */
+    public function beforeRedirect()
+    {
+    }
+
+    /**
+     * This is called after the startup, before shutdown and before the
+     * view is rendered
+     */
+    public function beforeRender()
+    {
+    }
 }
