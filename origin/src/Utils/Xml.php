@@ -31,12 +31,12 @@ class Xml
      * Creates an XML block of elements. If you need custom xml and fromArray does not cut it
      * then use this.
      *
-     * $xml = $builder->create('post', [
+     * $xml = Xml::create('post', [
      *            '@category' => 'how tos', // add @ to set the attribute
      *            'id' => 12345,
      *            'title' => 'How to create an XML block',
-     *            'body' =>  $builder->cdata(' ... ')
-     *           ]);
+     *            'body' =>  Xml::cdata(' ... ')
+     *          ]);
      *
      * This will give you something like this
      *
