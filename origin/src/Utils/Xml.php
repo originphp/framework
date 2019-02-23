@@ -104,13 +104,9 @@ class Xml
             $dom->formatOutput = true;
             $dom->preserveWhitespace = false;
         }
-        $root = key($data);
-       
-        // Create the root element
-        $rootElement =  $dom->createElement($root);
-        static::convertArray($dom, $rootElement, $data[$root]);
-        $dom->appendChild($rootElement);
-  
+    
+        static::convertArray($dom, $dom, $data);
+
         return  $dom->saveXML();
     }
 
@@ -118,11 +114,11 @@ class Xml
      * Is is the workhorse for the fromArray
      *
      * @param DOMDocument $dom
-     * @param DOMElement $parent
+     * @param DOMDocument/DOMElement $parent
      * @param array $data
      * @return void
      */
-    protected static function convertArray(DOMDocument $dom, DOMElement $parent, array $data) : void
+    protected static function convertArray(DOMDocument $dom, $parent, array $data) : void
     {
         $tags = [];
         // Deal with attributes/values
