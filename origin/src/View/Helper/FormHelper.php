@@ -70,8 +70,18 @@ class FormHelper extends Helper
       ),
     ];
 
+    /**
+     * The model name
+     *
+     * @var string|null
+     */
     protected $modelName = null;
 
+    /**
+     * Holds the data
+     *
+     * @var array|entity|null
+     */
     protected $data = null;
 
     /**

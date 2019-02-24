@@ -75,16 +75,9 @@ class Controller
     public $response = null;
 
     /**
-     * Methods here are not reachable by a URL.
-     *
-     * @var array
-     */
-    public $privateMethods = array();
-
-    /**
      * Helpers to load.
      */
-    public $viewHelpers = array();
+    public $viewHelpers = [];
 
     /**
        * Holds the componentregistry object.

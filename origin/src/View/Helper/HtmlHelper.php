@@ -20,6 +20,7 @@ use Origin\View\TemplateTrait;
 class HtmlHelper extends Helper
 {
     use TemplateTrait;
+    
     protected $defaultConfig = [
         'templates' => [
             'a' => '<a href="{url}"{attributes}>{text}</a>',

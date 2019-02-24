@@ -15,9 +15,12 @@
 namespace Origin\View\Helper;
 
 use Origin\Core\Session;
+use Origin\View\TemplateTrait;
 
 class FlashHelper extends Helper
 {
+    use TemplateTrait;
+    
     public $defaultConfig = array(
     'templates' => array(
       'error' => '<div class="alert alert-danger" role="alert">%s</div>',

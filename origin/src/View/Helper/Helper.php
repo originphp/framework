@@ -104,7 +104,6 @@ class Helper
      * Should be used by helpers to generate dom ids for fields.
      *
      * @param string $field
-     *
      * @return string id
      */
     protected function domId(string $field)
