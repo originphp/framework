@@ -62,4 +62,19 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $response->header('Accept-Language', 'en-us,en;q=0.5');
         $this->assertNull($response->send()); // or $response->send()
     }
+
+    public function testType()
+    {
+        $response  = new Response();
+        
+        // Test Set
+        $this->assertEquals('text/html', $response->type());
+        $this->assertEquals('application/json', $response->type('json'));
+
+        $response->type(['swf' => 'application/x-shockwave-flash']);
+        $this->assertEquals('application/x-shockwave-flash', $response->type('swf'));
+        $mpeg = 'audio/mpeg';
+        $this->assertEquals($mpeg, $response->Type($mpeg));
+        $this->assertFalse($response->type('foo'));
+    }
 }

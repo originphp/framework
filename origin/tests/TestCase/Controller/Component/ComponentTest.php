@@ -36,14 +36,6 @@ class ComponentTest extends \PHPUnit\Framework\TestCase
         $this->MockComponent = new MockComponent($Controller);
     }
 
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(
-            'Origin\Controller\Component\ComponentRegistry',
-            $this->MockComponent->componentRegistry()
-        );
-    }
-
     public function testLoadComponents()
     {
         $MockComponent = $this->MockComponent;

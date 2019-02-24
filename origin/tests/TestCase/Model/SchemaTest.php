@@ -15,6 +15,7 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\Schema;
+use Origin\Exception\Exception;
 
 class SchemaTest extends \PHPUnit\Framework\TestCase
 {
@@ -71,5 +72,13 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
  updated DATETIME
 )';
         $this->assertEquals($expected, $Schema->createTable('deals', $data));
+    }
+
+    public function testException()
+    {
+        $this->expectException(Exception::class);
+      
+        $schema = new Schema();
+        $schema->createTable('foo', ['id'=>['type'=>'magic']]);
     }
 }

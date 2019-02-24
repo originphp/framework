@@ -14,6 +14,25 @@
 
 namespace Origin\Test\Model;
 
+use Origin\Model\ConnectionManager;
+use Origin\Model\Datasource;
+use Origin\Model\Exception\MissingDatasourceException;
+
 class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 {
+    public function testGet()
+    {
+        $this->assertInstanceOf(Datasource::class, ConnectionManager::get('default'));
+    }
+    public function testGetException()
+    {
+        $this->expectException(MissingDatasourceException::class);
+        ConnectionManager::get('foo');
+    }
+
+    public function testHas()
+    {
+        $this->assertTrue(ConnectionManager::has('default'));
+        $this->assertFalse(ConnectionManager::has('foo'));
+    }
 }

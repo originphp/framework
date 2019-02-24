@@ -15,6 +15,9 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
+use Origin\Model\Datasource;
+use PDOException;
+use Origin\Model\Exception\DatasourceException;
 
 class DatasourceTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,6 +43,38 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(3, $this->connection->lastInsertId());
     }
 
+    public function testConnectionException()
+    {
+        $config =  ConnectionManager::config('test');
+        $config['password'] = 'fozzywozzy';
+        $this->expectException(DatasourceException::class);
+        $ds = new Datasource();
+        $ds->connect($config);
+    }
+
+
+    public function testExecuteException()
+    {
+        $this->expectException(DatasourceException::class);
+        $this->connection->execute('select * from funky table');
+    }
+
+    public function testDisconnect()
+    {
+        $config =  ConnectionManager::config('test');
+        $ds = new Datasource();
+        $ds->connect($config);
+        $this->assertNull($ds->disconnect());
+    }
+
+    public function testLog()
+    {
+        $config =  ConnectionManager::config('test');
+        $ds = new Datasource();
+        $ds->connect($config);
+        $ds->execute('SELECT id, name, description FROM authors LIMIT 1');
+        $this->assertNotEmpty($ds->log());
+    }
     /**
      * @depends testCreate
      */
@@ -218,6 +253,8 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
+
+
     public function createTables()
     {
         $this->connection->execute('DROP TABLE IF EXISTS articles, authors');
@@ -227,6 +264,8 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
             $this->connection->execute($statement);
         }
     }
+
+
 
     private function getStatements()
     {

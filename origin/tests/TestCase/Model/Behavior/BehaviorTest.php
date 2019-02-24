@@ -104,6 +104,72 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testBeforeFind()
+    {
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $query = ['foo'=>'bar'];
+        $this->assertEquals($query, $behavior->beforeFind($query));
+    }
+
+    public function testAfterFind()
+    {
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $results = ['foo'=>'bar'];
+        $this->assertEquals($results, $behavior->afterFind($results));
+    }
+
+    public function testBeforeValidate()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertTrue($behavior->beforeValidate($entity));
+    }
+
+    public function testAfterValidate()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertNull($behavior->afterValidate($entity));
+    }
+
+    public function testBeforeSave()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertTrue($behavior->beforeSave($entity, ['option1'=>true]));
+    }
+
+    public function testAfterSave()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertNull($behavior->afterSave($entity, true, ['option1'=>true]));
+    }
+
+    public function testBeforeDelete()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertTrue($behavior->beforeDelete(true));
+    }
+
+
+    public function testAfterDelete()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertNull($behavior->afterDelete());
+    }
+
+    public function testModel()
+    {
+        $entity = new Entity(['name'=>'Foo']);
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertInstanceOf(Model::class, $behavior->model());
+    }
+
+
+
     public function testFindCallbacks()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));

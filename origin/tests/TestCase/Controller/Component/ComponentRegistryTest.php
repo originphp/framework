@@ -38,4 +38,10 @@ class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
         $componentRegistry = new ComponentRegistry($this->Controller);
         $componentRegistry->load('ComponentThatDoesNotExist');
     }
+
+    public function testController()
+    {
+        $componentRegistry = new ComponentRegistry($this->Controller);
+        $this->assertInstanceOf('Origin\Controller\Controller', $componentRegistry->controller());
+    }
 }

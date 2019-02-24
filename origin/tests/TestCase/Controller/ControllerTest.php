@@ -25,6 +25,7 @@ use Origin\Model\Model;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Controller\Component\Exception\MissingComponentException;
+use Origin\Controller\Component\ComponentRegistry;
 
 class Pet extends Model
 {
@@ -369,5 +370,19 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->paginate = ['Pet'=>['limit'=>7]];
         $results = $controller->paginate('Pet');
         $this->assertEquals(7, count($results));
+    }
+
+    public function testRequest()
+    {
+        $this->assertInstanceOf(Request::class, $this->controller->request());
+    }
+
+    public function testResponse()
+    {
+        $this->assertInstanceOf(Response::class, $this->controller->response());
+    }
+    public function testComponentRegistry()
+    {
+        $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
     }
 }

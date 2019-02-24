@@ -14,6 +14,17 @@
 
 namespace Origin\Test\Model\Behavior;
 
+use Origin\Model\Behavior\BehaviorRegistry;
+use Origin\Model\Exception\MissingBehaviorException;
+use Origin\Model\Model;
+
 class BehaviorRegistryTest extends \PHPUnit\Framework\TestCase
 {
+    public function testThrowException()
+    {
+        $this->expectException(MissingBehaviorException::class);
+        $model = new Model(array('name' => 'Post'));
+        $registry = new BehaviorRegistry($model);
+        $registry->load('foo');
+    }
 }

@@ -17,6 +17,7 @@ namespace Origin\Core\Test;
 use Origin\Model\ModelValidator;
 use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Model\Exception\ValidatorException;
 
 class MockValidator extends ModelValidator
 {
@@ -78,11 +79,11 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $Validator = $this->Validator;
         $validationRules = array(
-        'framework' => array(
-            'rule' => array('equalTo', 'origin'),
-            'message' => 'This value must be origin',
-        ),
-      );
+            'framework' => array(
+                'rule' => array('equalTo', 'origin'),
+                'message' => 'This value must be origin',
+            ),
+        );
 
         $Validator->rules($validationRules);
         $data = new Entity(array('framework' => 'something else'));
@@ -90,6 +91,25 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
 
         $data = new Entity(array('framework' => 'origin'));
         $this->assertTrue($Validator->validates($data));
+
+        $validationRules = array(
+            'framework' => '/^[a-zA-Z ]+$/'
+        );
+        $Validator->rules($validationRules);
+        $data = new Entity(array('framework' => 'origin'));
+        $this->assertTrue($Validator->validates($data));
+    }
+
+    public function testUnkownValidationRule()
+    {
+        $this->expectException(ValidatorException::class);
+        $rules = array(
+          
+            'name' => 'php'
+        );
+        $this->Validator->rules($rules);
+        $data = new Entity(array('name' => 'abc'));
+        $this->Validator->validates($data);
     }
 
     public function testAlphaNumeric()
