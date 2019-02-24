@@ -1,6 +1,8 @@
 <?php 
 /**
- * This is your email config file
+ * This is your email config file, you can have multiple configurations which
+ * which you can switch between.
+ *
  */
 use Origin\Utils\Email;
 
@@ -10,5 +12,7 @@ Email::config(
         'port' => 465,
         'username' => 'email@gmail.com',
         'password' => 'secret',
-        'timeout' => 5]
+        'timeout' => 30,
+        'tls' => false
+        ]
     );
