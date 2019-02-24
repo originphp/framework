@@ -15,9 +15,11 @@
 namespace Origin\Model;
 
 use Origin\Model\Exception\MissingDatasourceException;
+use Origin\Core\StaticConfigTrait;
 
 class ConnectionManager
 {
+    use StaticConfigTrait;
     /**
      * Holds all the connections.
      *
@@ -26,38 +28,11 @@ class ConnectionManager
     protected static $datasources = [];
 
     /**
-     * Config for database connections.
-     *
-     * @var array
-     */
-    protected static $config = [];
-
-    /**
-     * Dynamically create a new connection.
-     *
-     * @param string $name   name of connection
-     * @param array  $config array(host,database,login,password)
-     * @return array $config
-     */
-    public static function config(string $name, array $config  = null)
-    {
-        if (func_num_args() == 2) {
-            $defaults = array('host' => 'localhost', 'database' => null, 'username' => null, 'password' => null);
-            static::$config[$name] = array_merge($defaults, $config);
-        }
-        
-        if (isset(static::$config[$name])) {
-            return static::$config[$name];
-        }
-        return null;
-    }
-
-    /**
      * Gets a datasource.
      *
      * @param string $name default
      *
-     * @return [type] [description]
+     * @return Datasource
      */
     public static function get(string $name)
     {
@@ -65,12 +40,17 @@ class ConnectionManager
             return static::$datasources[$name];
         }
 
-        if (!isset(static::$config[$name])) {
+        if (!static::config($name)) {
             throw new MissingDatasourceException($name);
         }
 
         $datasource = new Datasource();
-        $datasource->connect(static::$config[$name]);
+
+        $defaults = [
+            'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null
+        ];
+        $config = array_merge($defaults, static::config($name));
+        $datasource->connect($config);
 
         static::$datasources[$name] = $datasource;
 

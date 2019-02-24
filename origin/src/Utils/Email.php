@@ -18,9 +18,12 @@ use Origin\Exception\Exception;
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Utils\Exception\MissingTemplateException;
+use Origin\Core\StaticConfigTrait;
 
 class Email
 {
+    use StaticConfigTrait;
+
     const CRLF = "\r\n";
 
     protected $to = [];
@@ -63,15 +66,6 @@ class Email
      */
     protected $encoding = null;
 
-
-    /**
-     * Config for all email accounts
-     *
-     * @var array
-     */
-    protected static $config = [];
-
-
     /**
      * Email account config to use for sending email through this instance
      *
@@ -110,39 +104,6 @@ class Email
      */
     protected $viewVars = [];
 
-    protected static $defaultConfig = ['host'=>'localhost','port'=>25,'username'=>null,'password' => null,'tls'=>false,'client'=>null,'timeout'=>30];
-
-    /**
-       * Sets and gets the config for email account
-       * For ssl connections add the prefix ssl:// to the host
-       * To enable tls set the tls key to true
-       *
-       * @param string $name   name of connection
-       * @param array  $config array(host,port,username,password,tls,client)
-       * For Gsuite
-       *      [   'host' => 'ssl://smtp.gmail.com',
-       *          'port' => 465,
-       *          'username' => 'your_email@gmail.com',
-       *          'password' => 'secret',
-       *          'tls'=>true
-       *        ]
-       *
-       * The 'client' key is optional if is set, it is used when communicating with the smtp server, it used to
-       * identify us on the hello command.
-       * @return array|null config
-       */
-    public static function config(string $name, array $config = null)
-    {
-        if (func_num_args() == 2) {
-            static::$config[$name] = array_merge(static::$defaultConfig, $config);
-        }
-        
-        if (isset(static::$config[$name])) {
-            return static::$config[$name];
-        }
-        return null;
-    }
-
     public function __construct($config = null)
     {
         if (extension_loaded('mbstring') === false) {
@@ -180,7 +141,16 @@ class Email
         }
 
         if (is_array($config)) {
-            $this->account = array_merge(static::$defaultConfig, $config);
+            $defaults = [
+                'host'=>'localhost',
+                'port'=>25,
+                'username'=>null,
+                'password' => null,
+                'tls'=>false,
+                'client'=>null,
+                'timeout'=>30
+            ];
+            $this->account = array_merge($defaults, $config);
             $this->applyConfig();
             return $this;
         }

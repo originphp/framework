@@ -60,7 +60,7 @@ trait StaticConfigTrait
      * @param mixed $value
      * @return void
      */
-    protected function setConfig($key = null, $value = null)
+    public static function setConfig($key = null, $value = null)
     {
         $config = $key;
         if (is_string($key)) {
@@ -78,13 +78,14 @@ trait StaticConfigTrait
      * @param mixed $value
      * @return void
      */
-    protected function getConfig($key = null)
+    public static function getConfig($key = null)
     {
         if ($key === null) {
-            return static::config;
+            return static::$config;
         }
-        if (isset(static::config[$key])) {
-            return static::config[$key];
+        if (isset(static::$config[$key])) {
+            return static::$config[$key];
         }
+        return null;
     }
 }

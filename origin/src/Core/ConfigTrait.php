@@ -60,7 +60,7 @@ trait ConfigTrait
      * @param mixed $value
      * @return void
      */
-    protected function setConfig($key = null, $value = null)
+    public function setConfig($key = null, $value = null)
     {
         $config = $key;
         if (is_string($key)) {
@@ -74,11 +74,10 @@ trait ConfigTrait
     /**
      * Gets the config (all or part)
      *
-     * @param string|array $key
-     * @param mixed $value
+     * @param string $key
      * @return void
      */
-    protected function getConfig($key = null)
+    public function getConfig(string $key = null)
     {
         if ($key === null) {
             return $this->config;
@@ -86,5 +85,6 @@ trait ConfigTrait
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
+        return null;
     }
 }
