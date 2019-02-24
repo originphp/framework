@@ -220,7 +220,7 @@ class Response
      *  $contentType = $request->type();
      *
      *  // add definitions
-     *  $request->type(['swf' => 'application/x-shockwave-flash']);
+     *  $response->type(['swf' => 'application/x-shockwave-flash']);
      *
      *
      *

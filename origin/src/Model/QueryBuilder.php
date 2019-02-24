@@ -150,7 +150,6 @@ class QueryBuilder
         'NOT BETWEEN', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN',
       );
 
-    //https://www.w3schools.com/sql/
     public function __construct($table = null, $alias = null)
     {
         if (!empty($table)) {
