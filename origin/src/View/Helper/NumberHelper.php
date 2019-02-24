@@ -55,7 +55,7 @@ class NumberHelper extends Helper
      */
     public function precision(float $value, int $precision = 2, array $options = [])
     {
-        return Number::currency($value, $precision, $options);
+        return Number::precision($value, $precision, $options);
     }
 
     /**
@@ -69,6 +69,6 @@ class NumberHelper extends Helper
      */
     public function toPercentage(float $value, int $precision = 2, array $options = [])
     {
-        return Number::currency($value, $precision, $options);
+        return Number::toPercentage($value, $precision, $options);
     }
 }
