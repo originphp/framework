@@ -77,7 +77,7 @@ class Schema
 
             $mapping = $this->mapping($settings['type']);
             if (!$mapping) {
-                throw new Exception("Unkown column type '{$setting['type']}'");
+                throw new Exception("Unkown column type '{$settings['type']}'");
             }
 
             $settings = $settings + $mapping;

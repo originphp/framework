@@ -97,7 +97,7 @@ class ModelValidator
         }
         // Regex expressions
         if ($rule[0] === '/') {
-            return $this->custom($rule, $value);
+            return $this->custom($value, $rule);
         }
 
         throw new ValidatorException('Unkown Validation Rule');

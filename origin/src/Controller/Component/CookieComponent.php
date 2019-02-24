@@ -31,6 +31,18 @@ class CookieComponent extends Component
         'encrypt' => true, // wether to encrypt contents or not
     ];
 
+
+    /**
+     * Keep a copy of the response object
+     *
+     * @var Response
+     */
+    protected $response = null;
+
+    public function initialize(array $config)
+    {
+        $this->response =& $this->controller()->response;
+    }
     /**
      * Reads a value of a cookie
      *
