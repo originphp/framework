@@ -19,18 +19,6 @@ use Origin\Utils\Exception\XmlException;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCreate()
-    {
-        $result = Xml::create('post', [
-            '@category' => 'how tos',
-            'id' => 12345,
-            'title' => 'How to create an XML block',
-            'body' =>  Xml::cdata('A quick brown fox jumps of a lazy dog.')
-           ]);
-
-        $expected = '<post category="how tos"><id>12345</id><title>How to create an XML block</title><body>&lt;![CDATA["A quick brown fox jumps of a lazy dog."]]&gt;</body></post>';
-        $this->assertEquals($expected, $result);
-    }
     public function testFromArray()
     {
         $data = [
@@ -49,15 +37,15 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, Xml::fromArray($data));
 
         $data = [
-            'case' => [
+            'book' => [
                 '@id' => 256,
-                'name' => 'case name',
-                '@' => 'case value'
+                'name' => 'book name',
+                '@' => 'text value'
             ]
         ];
    
-        $expected = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<case id="256">case value<name>case name</name></case>'."\n";
-        $this->assertEquals($expected, Xml::fromArray($data));
+        $needle = '<book id="256">text value<name>book name</name></book>';
+        $this->assertContains($needle, Xml::fromArray($data));
 
         $data = [
             'charges' => [
@@ -76,6 +64,39 @@ class DateTest extends \PHPUnit\Framework\TestCase
        
         $expected = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<charges><charge><amount>10</amount><description>Shipping</description></charge><charge><amount>35</amount><description>Tax</description></charge></charges>'."\n";
         $this->assertEquals($expected, Xml::fromArray($data));
+
+        $data = [
+            'book' => [
+                'xmlns:' => 'http://www.w3.org/1999/xhtml',
+                'title' => 'Its a Wonderful Day'
+            ]
+            ];
+        $needle = '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>';
+    
+        $this->assertContains($needle, Xml::fromArray($data));
+
+        $data = [
+            'student:record' => [
+                'xmlns:student' => 'https://www.originphp.com/student',
+                'student:name' => 'James',
+                'student:phone' => '07986 123 4567'
+            ]];
+
+        $needle = '<student:record xmlns:student="https://www.originphp.com/student"><student:name>James</student:name><student:phone>07986 123 4567</student:phone></student:record>';
+      
+        $this->assertContains($needle, Xml::fromArray($data));
+
+        $data = [
+            'book' => [
+                'xmlns:' => 'urn:loc.gov:books',
+                'xmlns:isbn' => 'urn:ISBN:0-395-36341-6',
+                'title' => 'Cheaper by the Dozen',
+                'isbn:number' => '1568491379'
+            ]
+        ];
+
+        $needle = '<book xmlns="urn:loc.gov:books" xmlns:isbn="urn:ISBN:0-395-36341-6"><title>Cheaper by the Dozen</title><isbn:number>1568491379</isbn:number></book>';
+        $this->assertContains($needle, Xml::fromArray($data));
     }
 
     /**
@@ -147,11 +168,65 @@ class DateTest extends \PHPUnit\Framework\TestCase
        
         $string = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<charges><charge><amount>10</amount><description>Shipping</description></charge><charge><amount>35</amount><description>Tax</description></charge></charges>'."\n";
         $this->assertEquals($expected, Xml::toArray($string));
+
+        $expected = [
+            'book' => [
+                'xmlns:' => 'http://www.w3.org/1999/xhtml',
+                'title' => 'Its a Wonderful Day'
+            ]
+            ];
+
+        $string = '<?xml version="1.0" encoding="UTF-8"?>
+        <book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>';
+       
+        $this->assertEquals($expected, Xml::toArray($string));
+
+        $expected = [
+            'student:record' => [
+                'xmlns:student' => 'https://www.originphp.com/student',
+                'student:name' => 'James',
+                'student:phone' => '07986 123 4567'
+            ]];
+
+        $string = '<?xml version="1.0" encoding="UTF-8"?>
+        <student:record xmlns:student="https://www.originphp.com/student"><student:name>James</student:name><student:phone>07986 123 4567</student:phone></student:record>';
+                
+        $this->assertEquals($expected, Xml::toArray($string));
+
+        $expected = [
+            'book' => [
+                'xmlns:' => 'urn:loc.gov:books',
+                'xmlns:isbn' => 'urn:ISBN:0-395-36341-6',
+                'title' => 'Cheaper by the Dozen',
+                'isbn:number' => '1568491379'
+            ]
+        ];
+
+        $string = '<?xml version="1.0" encoding="UTF-8"?>
+        <book xmlns="urn:loc.gov:books" xmlns:isbn="urn:ISBN:0-395-36341-6"><title>Cheaper by the Dozen</title><isbn:number>1568491379</isbn:number></book>';
+
+        $this->assertEquals($expected, Xml::toArray($string));
+    }
+
+
+    public function testCdata()
+    {
+        $data = [
+            'note' => [
+                'description' => Xml::cdata('This is a test.')
+            ]
+            ];
+        $string = Xml::fromArray($data);
+       
+        $expected = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<note><description>&lt;![CDATA["This is a test."]]&gt;</description></note>'."\n";
+        $this->assertEquals($expected, $string);
+        
+        $this->assertEquals($data, Xml::toArray($string));
     }
 
     public function testToArrayException()
     {
-        $this->expectException(XmlException::class);
+        $this->expectException(\Exception::class);
         Xml::toArray('no xml here');
     }
 }
