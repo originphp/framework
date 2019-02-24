@@ -17,7 +17,7 @@ namespace Origin\Test\Utils;
 use Origin\Utils\Xml;
 use Origin\Utils\Exception\XmlException;
 
-class DateTest extends \PHPUnit\Framework\TestCase
+class XmlTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromArray()
     {
