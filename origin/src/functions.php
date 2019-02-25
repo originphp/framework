@@ -12,7 +12,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Core\Debugger;
-use Origin\Exception\Exception;
 use Origin\Core\Collection;
 
 /**

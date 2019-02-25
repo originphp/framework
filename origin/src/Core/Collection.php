@@ -13,8 +13,6 @@
  */
 namespace Origin\Core;
 
-use Origin\Exception\InvalidArgumentException;
-use Origin\Exception\Exception;
 use ArrayIterator;
 
 class Collection
