@@ -1,8 +1,8 @@
 <div class="page-header">
     <div class="float-right">
-        <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><?php echo __('Back');?></a>
+        <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><= __('Back') ?></a>
     </div>
-    <h2><?php echo __('Edit %singularHuman%'); ?></h2>
+    <h2><?= __('Edit %singularHuman%') ?></h2>
 </div>
 <div class="%pluralName% form">
     <?= $this->Form->create($%singularName%); ?>
@@ -10,7 +10,7 @@
         <RECORDBLOCK>
         echo $this->Form->control('%field%');
         </RECORDBLOCK>
-    ?>        
-    <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
-    <?= $this->Form->end(); ?>
+        $this->Form->button(__('Save'), ['class' => 'btn btn-primary']);
+        $this->Form->end();
+    ?>
 </div>
