@@ -77,7 +77,7 @@ trait ConfigTrait
      * @param string $key
      * @return void
      */
-    public function getConfig(string $key = null)
+    public function getConfig(string $key = null, $default=null)
     {
         if ($key === null) {
             return $this->config;
@@ -85,6 +85,6 @@ trait ConfigTrait
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
-        return null;
+        return $default;
     }
 }

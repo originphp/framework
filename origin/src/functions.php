@@ -13,6 +13,7 @@
  */
 use Origin\Core\Debugger;
 use Origin\Core\Collection;
+use Origin\Core\I18n;
 
 /**
  * Runs a backtrace.
@@ -86,12 +87,9 @@ function __(string $string)
     if (!$string) {
         return '';
     }
+    
+    $string = I18n::translate($string);
 
-    /**
-     * @todo I18n
-     *
-     * @example string = I18n::translate($string);
-     */
     $arguments = array_slice(func_get_args(), 1);
 
     return vsprintf($string, $arguments);

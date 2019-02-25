@@ -20,34 +20,25 @@ use NumberFormatter;
 use IntlTimeZone;
 use Locale;
 use ResourceBundle;
+use Origin\Core\StaticConfigTrait;
+use Origin\Exception\Exception;
 
 class I18n
 {
+    use StaticConfigTrait;
     /**
-     * Holds the current config which includes locale, currency, timezone and language for
-     * locale. Changing this has no effect.
+     * Holds the messages
      *
      * @var array
      */
-    protected static $config = [];
-
+    protected static $messages = [];
+    
     /**
-     * Gets the config for I18n from intialize
-     * @todo setup static config trait
-     *
-     * @return void
-     */
-    public static function config()
-    {
-        return static::$config;
-    }
-
-    /**
-     * Initializes I18N
-     * Dates set locale and timezone
-     * Numbers sets locale and currency.
-     *
-     * @param array $config
+     * Initializes and configures I18N - use this configure or reconfigure
+     * - Dates set locale and timezone
+     * - Numbers sets locale and currency.
+     * - sets language
+     * @param array $config (locale,language,timezone,currency)
      */
     public static function initialize(array $config = [])
     {
@@ -58,7 +49,14 @@ class I18n
         setlocale(LC_ALL, $config['locale']);
         Locale::setDefault($config['locale']);
 
-        $config['language'] = static::language($config['locale']);
+        if (!isset($config['language'])) {
+            $config['language'] = static::language($config['locale']);
+        }
+        
+        $messages = static::loadMessages($config['language']);
+        if ($messages) {
+            static::$messages = $messages;
+        }
 
         if (!isset($config['timezone'])) {
             $timezone = IntlTimeZone::createDefault();
@@ -72,8 +70,8 @@ class I18n
 
         Date::initialize($config);
         Number::initialize($config);
-       
-        self::$config = $config;
+        
+        static::config($config);
     }
 
     /**
@@ -140,10 +138,7 @@ class I18n
     {
         $list = [];
         if ($language === null) {
-            $language = 'en';
-            if (isset(self::$config['language'])) {
-                $language = self::$config['language'];
-            }
+            $language = static::getConfig('language', 'en');
         }
         $locales = self::getLocales(); //locale_get_display_region($locale, 'es');
         foreach ($locales as $locale) {
@@ -170,5 +165,39 @@ class I18n
         date_default_timezone_set($originalTimeZone);
 
         return $list;
+    }
+
+    /**
+     * Translates a string
+     *
+     * @param string $message
+     * @return void
+     */
+    public static function translate(string $message)
+    {
+        if (isset(static::$messages[$message])) {
+            return static::$messages[$message];
+        }
+        return $message;
+    }
+    /**
+     * Loads the message file for
+     *
+     * @param string $locale
+     * @return void
+     */
+    protected static function loadMessages(string $language)
+    {
+        $filename = SRC  . DS . 'Messages' . DS . $language . '.php';
+       
+        if (file_exists($filename)) {
+            $messages = include $filename;
+
+            if (is_array($messages)) {
+                return $messages;
+            }
+            throw new Exception("{$language}.php does not return an array");
+        }
+        return false;
     }
 }

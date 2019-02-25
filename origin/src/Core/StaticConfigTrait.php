@@ -75,10 +75,12 @@ trait StaticConfigTrait
      * Gets the config (all or part)
      *
      * @param string|array $key
-     * @param mixed $value
+     * @param mixed $default
      * @return void
      */
-    public static function getConfig($key = null)
+ 
+
+    public static function getConfig($key = null, $default=null)
     {
         if ($key === null) {
             return static::$config;
@@ -86,6 +88,6 @@ trait StaticConfigTrait
         if (isset(static::$config[$key])) {
             return static::$config[$key];
         }
-        return null;
+        return $default;
     }
 }
