@@ -18,6 +18,7 @@ use Origin\Core\Inflector;
 use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Exception\NotFoundException;
+use Origin\Exception\InvalidArgumentException;
 
 class Model
 {
@@ -72,9 +73,9 @@ class Model
      *
      * @var array
      */
-    protected $associations = array(
-      'hasOne', 'belongsTo', 'hasMany', 'hasAndBelongsToMany',
-    );
+    protected $associations = [
+      'belongsTo', 'hasMany','hasOne','hasAndBelongsToMany',
+    ];
 
     /**
      * The column data describing the table.
@@ -107,12 +108,12 @@ class Model
 
     public function __construct(array $config = [])
     {
-        $defaults = array(
+        $defaults = [
             'name' => $this->name,
             'alias' => $this->alias,
             'datasource' => $this->datasource,
             'table' => $this->table,
-        );
+        ];
 
         $config = array_merge($defaults, $config);
 
@@ -160,16 +161,12 @@ class Model
     public function __isset($name)
     {
         $className = null;
-
-        foreach ($this->associations as $association) {
-            if (isset($this->{$association}[$name]['className'])) {
-                $className = $this->{$association}[$name]['className'];
-                break;
-            }
-        }
-
         $habtmModel = false;
-        if ($className === null) {
+
+        $association = $this->findAssociation($name);
+        if ($association) {
+            $className = $association['className'];
+        } else {
             foreach ($this->hasAndBelongsToMany as $alias => $config) {
                 if (isset($config['with']) and $config['with'] === $name) {
                     $className = $config['with'];
@@ -178,7 +175,7 @@ class Model
                 }
             }
         }
-
+        
         if ($className === null and $habtmModel === false) {
             return false;
         }
@@ -1396,14 +1393,34 @@ class Model
     protected function containConfig(array $query)
     {
         $contain = [];
-        foreach ((array) $query['contain'] as $model => $config) {
-            if (is_int($model)) {
-                $model = $config;
+        foreach ((array) $query['contain'] as $alias => $config) {
+            if (is_int($alias)) {
+                $alias = $config;
                 $config = [];
             }
-            $contain[$model] = $config;
+            $contain[$alias] = $config;
+           
+            if (!$this->findAssociation($alias)) {
+                throw new InvalidArgumentException("{$this->name} is not associated with {$alias}.");
+            }
         }
         return $contain;
+    }
+
+    /**
+     * Searches for the associations
+     *
+     * @param string $name
+     * @return void
+     */
+    protected function findAssociation(string $name)
+    {
+        foreach ($this->associations as $association) {
+            if (isset($this->{$association}[$name])) {
+                return $this->{$association}[$name];
+            }
+        }
+        return null;
     }
 
     /**
