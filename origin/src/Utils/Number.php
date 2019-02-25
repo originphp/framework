@@ -113,11 +113,32 @@ class Number
      *
      * @return float
      */
-    public static function parse(string $string)
+    /**
+     * Undocumented function
+     *
+     * @param string $string
+     * @param integer $format  NumberFormatter::DECIMAL, NumberFormatter::INT_32
+     * @return void
+     */
+    public static function parse(string $string, $type = NumberFormatter::DECIMAL)
     {
-        $formatter = new NumberFormatter(static::$locale, NumberFormatter::DECIMAL);
-
+        $formatter = new NumberFormatter(static::$locale, $type);
         return $formatter->parse($string);
+    }
+
+    public static function parseDecimal(string $string)
+    {
+        return static::parse($string, NumberFormatter::DECIMAL);
+    }
+
+    public static function parseInteger(string $string)
+    {
+        return static::parse($string, NumberFormatter::TYPE_INT32);
+    }
+
+    public static function parseFloat(string $string)
+    {
+        return static::parse($string, NumberFormatter::TYPE_DOUBLE);
     }
 
     /**

@@ -79,7 +79,7 @@ class Marshaller
         } else {
             $schema = $this->model->{$model}->schema();
         }
-             
+   
         foreach ($data as $field => $value) {
             if (!is_string($field) or !isset($schema[$field])) {
                 continue;
@@ -88,6 +88,8 @@ class Marshaller
                 continue;
             }
             $column = $schema[$field];
+            
+            $valueToSet = null;
 
             switch ($column['type']) {
                 case 'datetime':
@@ -101,32 +103,32 @@ class Marshaller
                             $date = Date::parseDate($value['date']);
                             $time = Date::parseTime($value['time']);
                             if ($date and $time) {
-                                $data[$field] = $date.' '.$time;
+                                $valueToSet = $date . ' ' . $time;
                             }
                         }
                     } elseif (is_string($value)) {
-                        $data[$field] = Date::parseDatetime($value);
+                        $valueToSet = Date::parseDatetime($value);
                     }
 
                 break;
                 case 'date':
-                    $date = Date::parseDate($value);
-                    if ($date) {
-                        $data[$field] = $date;
-                    }
+                    $valueToSet = Date::parseDate($value);
                 break;
                 case 'time':
-                    $time = Date::parseTime($value);
-                    if ($time) {
-                        $data[$field] = $time;
-                    }
+                    $valueToSet =  Date::parseTime($value);
                 break;
                 case 'decimal':
-                case 'float':
-                case 'integer':
-                   $data[$field] = Number::parse($value);
+                    $valueToSet = Number::parseDecimal($value);
                 break;
-            break;
+                case 'float':
+                     $valueToSet = Number::parseFloat($value);
+                break;
+                case 'integer':
+                    $valueToSet = Number::parseInteger($value);
+                break;
+            }
+            if ($valueToSet !== null) {
+                $data[$field] = $valueToSet;
             }
         }
 

@@ -60,6 +60,22 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testParse()
     {
         $this->assertEquals(123456789.25, Number::parse('123,456,789.25'));
+        $this->assertEquals(123456789.0, Number::parse('123,456,789'));
+        $this->assertEquals(123456, Number::parse('123456'));
+    }
+
+    public function testParseDecimal()
+    {
+        $this->assertEquals(123456789.25, Number::parseDecimal('123,456,789.25'));
+        $this->assertEquals(123456789.0, Number::parseDecimal('123,456,789'));
+        $this->assertEquals(123456, Number::parseDecimal('123456'));
+    }
+
+    public function testParseNumber()
+    {
+        $this->assertEquals(123456789.25, Number::parseInteger('123,456,789.25'));
+        $this->assertEquals(123456789, Number::parseInteger('123,456,789'));
+        $this->assertEquals(123456, Number::parseInteger('123456'));
     }
 
     public function testFormat()
