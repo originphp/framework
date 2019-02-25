@@ -26,6 +26,7 @@ class DateTest extends \PHPUnit\Framework\TestCase
 
         $result = Date::convertTimezone('2018-12-26 21:00:00', 'UTC', 'Europe/Madrid');
         $this->assertEquals('2018-12-26 22:00:00', $result);
+        $this->assertNull(Date::convertTimezone('foo', 'UTC', 'Europe/Madrid'));
     }
 
     public function testFormat()
@@ -53,12 +54,16 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $options = [IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE];
         $this->assertEquals('Dec 27, 2018', Date::format('2018-12-27 13:02:00', $options));
 
+
         $options = [IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM];
         $this->assertEquals('Dec 27, 2018, 1:02:00 PM', Date::format('2018-12-27 13:02:00', $options));
 
         $options = [IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM];
         $this->assertEquals('1:02:00 PM', Date::format('2018-12-27 13:02:00', $options));
 
+
+        $this->assertEquals('Feb 25, 2019', Date::format('2019-02-25 08:20:00', IntlDateFormatter::MEDIUM));
+        
         // Test Overide settings
         Date::setDateFormat([IntlDateFormatter::FULL, IntlDateFormatter::NONE]);
         $this->assertEquals('Thursday, December 27, 2018', Date::format('2018-12-27'));
@@ -81,6 +86,8 @@ class DateTest extends \PHPUnit\Framework\TestCase
         Date::setDateFormat([IntlDateFormatter::SHORT, IntlDateFormatter::NONE]); // Reset
         Date::setDatetimeFormat([IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]); // Reset
         Date::setTimeFormat([IntlDateFormatter::NONE, IntlDateFormatter::SHORT]); // Reset
+
+        $this->assertNull(Date::format('foo'));
     }
 
     public function testParse()
@@ -100,11 +107,54 @@ class DateTest extends \PHPUnit\Framework\TestCase
             '2018-12-27',
             Date::parse('12/27/2018', [IntlDateFormatter::SHORT, IntlDateFormatter::NONE])
             );
+
+        $this->assertEquals('07:50:00', Date::parse('7:50 AM', [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]));
+    
+        $this->assertNull(Date::parse('foo'));
+    }
+
+    public function testParseDate()
+    {
+        $this->assertEquals('2019-02-25', Date::parseDate('02/25/2019'));
+        $this->assertNull(Date::parseDate('foo'));
+    }
+
+    public function testParseDateTime()
+    {
+        $this->assertEquals('2019-02-25 07:50:00', Date::parseDateTime('02/25/2019, 7:50 AM'));
+        $this->assertNull(Date::parseDateTime('foo'));
+    }
+
+    public function testParseTime()
+    {
+        $this->assertEquals('07:50:00', Date::parseTime('7:50 AM'));
+        $this->assertNull(Date::parseTime('foo'));
     }
 
     public function testToServer()
     {
         Date::setTimezone('Europe/Madrid'); // + 1 hour
         $this->assertEquals('2018-12-27 10:56:00', Date::toServer('2018-12-27 11:56:00'));
+    }
+
+    public function testFormatDate()
+    {
+        $this->assertEquals('2/24/19', Date::formatDate('2019-02-24 21:00'));
+        $this->assertEquals('2/24/19', Date::formatDate('2019-02-24'));
+    }
+    public function testFormatDateTime()
+    {
+        $this->assertEquals('2/24/19, 10:00 PM', Date::formatDateTime('2019-02-24 21:00'));
+    }
+    public function testFormatTime()
+    {
+        $this->assertEquals('10:00 PM', Date::formatTime('2019-02-24 21:00'));
+        $this->assertEquals('10:00 PM', Date::formatTime('21:00'));
+    }
+
+    public function testConvertFormat()
+    {
+        $this->assertEquals('2019-02-25', Date::convertFormat('25/02/2019', 'd/m/Y', 'Y-m-d'));
+        $this->assertNull(Date::convertFormat('foo', 'd/m/Y', 'Y-m-d'));
     }
 }

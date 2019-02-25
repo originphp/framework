@@ -186,7 +186,7 @@ class Date
         $pattern = $formatter->getPattern();
         $hasDate = (stripos($pattern, 'y') !== false);
         $hasTime = (stripos($pattern, 'h') !== false);
-
+   
         $returnFormat = 'Y-m-d H:i:s';
         if ($hasTime and !$hasDate) {
             $returnFormat = 'H:i:s';
@@ -214,6 +214,7 @@ class Date
         if ($timestamp !== false) {
             return date('Y-m-d', $timestamp);
         }
+        return null;
     }
 
     public static function parseTime(string $dateString, $format = null)
@@ -228,12 +229,13 @@ class Date
         if ($timestamp !== false) {
             return date('H:i:s', $timestamp);
         }
+        return null;
     }
 
     public static function parseDatetime(string $dateString, $format = null)
     {
         if ($format === null) {
-            $format = self::$timeFormat;
+            $format = self::$datetimeFormat;
         }
         $formatter = self::formatter($format);
 
@@ -242,6 +244,8 @@ class Date
         if ($timestamp !== false) {
             return date('Y-m-d H:i:s', $timestamp);
         }
+
+        return null;
     }
 
     /**
@@ -368,7 +372,7 @@ class Date
 
     /**
      * Converts a format of a valid strtotime() string.
-     *
+     * @example Date::convertFormat('25/02/2019', 'd/m/Y', 'Y-m-d'); // 2019-02-25
      * @param string $datetime
      * @param string $fromFormat
      * @param string $toFormat
@@ -385,6 +389,8 @@ class Date
 
     /**
      * Converts a datetime string to another timezone.
+     *
+     * @example Date::convertTimezone('2018-12-26 22:00:00', 'Europe/Madrid', 'UTC');
      *
      * @param string $datetime     Y-m-d H:i:s
      * @param string $fromTimezone

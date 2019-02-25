@@ -116,9 +116,7 @@ class Xml
                     }
                     continue;
                 }
-                if (is_integer($key)) {
-                    throw new XmlException('Invalid array.');
-                }
+               
                 $node = $dom->createElement($key);
 
                 if (isset($value['xmlns:'])) {

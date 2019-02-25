@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Exception;
+namespace Origin\Test\Utils\Exception;
 
-use Origin\Exception\BadRequestException;
+use Origin\Utils\Exception\XmlException;
 
-class BadRequestExceptionTest extends \PHPUnit\Framework\TestCase
+class XmlExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testIt()
+    public function testException()
     {
-        $exception = new BadRequestException();
-        $this->assertEquals(400, $exception->getCode());
-        $this->assertEquals('Bad Request', $exception->getMessage());
+        $exception = new XmlException('Invalid XML.');
+        $this->assertEquals(500, $exception->getCode());
+        $this->assertEquals('Invalid XML.', $exception->getMessage());
     }
 }

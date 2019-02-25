@@ -145,7 +145,7 @@ class Number
     public static function format($value, array $options = [])
     {
         $defaults = [
-        'type' => NumberFormatter::DECIMAL, 'before' => null, 'after' => null,
+            'type' => NumberFormatter::DECIMAL, 'before' => null, 'after' => null,
         ];
         $options = array_merge($defaults, $options);
 

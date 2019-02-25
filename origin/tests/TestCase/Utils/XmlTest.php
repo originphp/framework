@@ -19,6 +19,18 @@ use Origin\Utils\Exception\XmlException;
 
 class XmlTest extends \PHPUnit\Framework\TestCase
 {
+    public function testInvalidArray()
+    {
+        $this->expectException(XmlException::class);
+
+        $data = [];
+        Xml::fromArray($data);
+    }
+    public function testInvalidXml()
+    {
+        $this->expectException(\Exception::class);
+        $result = Xml::toArray('<foo/><bar/>');
+    }
     public function testFromArray()
     {
         $data = [
@@ -73,6 +85,19 @@ class XmlTest extends \PHPUnit\Framework\TestCase
             ];
         $needle = '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>';
     
+        $this->assertContains($needle, Xml::fromArray($data));
+
+        $data = [
+            'tag' => [
+                'item'=> [
+                    'one',
+                    'two',
+                    'three'
+                ]
+            ]
+                ];
+
+        $needle = '<tag><item>one</item><item>two</item><item>three</item></tag>';
         $this->assertContains($needle, Xml::fromArray($data));
 
         $data = [
