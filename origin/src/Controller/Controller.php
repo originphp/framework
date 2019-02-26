@@ -24,6 +24,7 @@ use Origin\Core\Inflector;
 use Origin\Core\Router;
 use ReflectionClass;
 use ReflectionMethod;
+use Origin\Utils\Xml;
 
 class Controller
 {
@@ -383,12 +384,12 @@ class Controller
      *  404 - Not Found
      *  403 - Forbidden (For application level permisions)
      *
-     * @param array|string $value data which will be json encoded
+     * @param array|string $data data which will be json encoded
      * @param integer $statusCode http status code to send
      *
      * @return void
      */
-    public function renderJson($value, int $statusCode = 200)
+    public function renderJson($data, int $statusCode = 200)
     {
         $this->autoRender = false;
         
@@ -396,8 +397,39 @@ class Controller
 
         $this->response->type('json');
         $this->response->statusCode($statusCode);
-        $this->response->body(json_encode($value));
+        $this->response->body(json_encode($data));
     }
+
+    /**
+     * Renders an XML view using an array.
+     *
+     *  $this->renderXml([
+     *       'post' => [
+     *           '@category' => 'how tos', // to set attribute use @
+     *           'id' => 12345,
+     *           'title' => 'How to create an XML block',
+     *           'body' =>  Xml::cdata('A quick brown fox jumps of a lazy dog.'),
+     *           'author' => [
+     *              'name' => 'James'
+     *            ]
+     *          ]
+     *     ]);
+     *
+     * @param array $data
+     * @param integer $statusCode
+     * @return void
+     */
+    public function renderXml(array $data, int $statusCode = 200)
+    {
+        $this->autoRender = false;
+        
+        $this->beforeRender();
+
+        $this->response->type('xml');
+        $this->response->statusCode($statusCode);
+        $this->response->body(Xml::fromArray($data));
+    }
+
 
 
     /**

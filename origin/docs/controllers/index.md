@@ -229,3 +229,24 @@ Or if you want to set a status code with the data.
   ],404);
 
 ````
+
+### Controller::renderXml($data, int $statusCode=200 )
+
+
+This renders an XML view by converting the array through the `Xml` utility. 
+
+````php 
+
+ $this->renderXml([
+           'post' => [
+               '@category' => 'how tos', // to set attribute use @
+               'id' => 12345,
+               'title' => 'How to create an XML block',
+               'body' =>  Xml::cdata('A quick brown fox jumps of a lazy dog.'),
+                'author' => [
+                    'name' => 'James'
+                  ]
+              ]
+         ]);
+
+````
