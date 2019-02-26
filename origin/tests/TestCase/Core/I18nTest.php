@@ -22,10 +22,6 @@ class MockI18n extends I18n
     {
         static::$config = [];
     }
-    public static function setConfig(array $config)
-    {
-        static::$config = $config;
-    }
 }
 
 class I18nTest extends \PHPUnit\Framework\TestCase

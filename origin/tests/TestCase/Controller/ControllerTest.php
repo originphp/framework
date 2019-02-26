@@ -313,6 +313,27 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('application/json', $controller->response->type());
     }
 
+    public function testRenderXml()
+    {
+        $request = new Request('tests/feed');
+        $controller = new TestsController($request, new Response());
+        
+        $data = [
+            'book' => [
+                'xmlns:' => 'http://www.w3.org/1999/xhtml',
+                'title' => 'Its a Wonderful Day'
+            ]
+            ];
+
+        $expected = '<?xml version="1.0" encoding="UTF-8"?>' . "\n". '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>'."\n";
+       
+        $controller->renderXml($data, 201);
+        $this->assertEquals($expected, $controller->response->body());
+        $this->assertEquals(201, $controller->response->statusCode());
+        $this->assertEquals('application/xml', $controller->response->type());
+    }
+
+
     public function testRedirect()
     {
         $request = new Request('tests/edit/2048');
