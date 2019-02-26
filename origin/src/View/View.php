@@ -145,12 +145,12 @@ class View
         }
     }
 
-    public function element(string $name, $vars = array())
+    public function element(string $name, array $vars = [])
     {
         $element__filename = $this->getElementFilename($name);
 
         $vars = array_merge($this->vars, $vars);
-
+       
         extract($vars);
 
         ob_start();

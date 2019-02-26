@@ -48,7 +48,7 @@ class Number
     }
 
     /**
-     * Sets the locale which be used by this helper.
+     * Sets the locale to be used
      *
      * @param string $locale en_US en_GB etc
      */
@@ -104,22 +104,15 @@ class Number
     }
 
     /**
-     * Parses a localized string and coverts to a float.
+     * Parses a localized string
      * Use case converting user input.
      *
      * @example 123,456,789.25 -> 123456789.25
-     *
-     * @param string $string
-     *
-     * @return float
-     */
-    /**
-     * Undocumented function
-     *
      * @param string $string
      * @param integer $format  NumberFormatter::DECIMAL, NumberFormatter::INT_32
-     * @return void
+     * @return string
      */
+
     public static function parse(string $string, $type = NumberFormatter::DECIMAL)
     {
         $formatter = new NumberFormatter(static::$locale, $type);

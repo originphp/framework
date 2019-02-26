@@ -555,7 +555,7 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
-
+   
         if (!empty($options['value'])) {
             $options['value'] = Number::format($options['value']);
         }
