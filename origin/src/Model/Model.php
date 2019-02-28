@@ -32,6 +32,11 @@ class Model
      */
     public $datasource = 'default';
 
+    /**
+     * Table name
+     *
+     * @var string
+     */
     public $table = null;
 
     public $primaryKey = null;
@@ -1189,7 +1194,7 @@ class Model
      * Deletes multiple records.
      *
      * @param array $conditions e.g ('Article.status' => 'draft')
-     * @param bool  $cascade    delete hasOne,hasMany, hasAndBelongsToMany records
+     * @param bool  $cascade    delete hasOne,hasMany records
      * @param bool  $callbacks  call beforeDelete and afterDelete callbacks
      *
      * @return bool true or false
