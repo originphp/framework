@@ -226,16 +226,6 @@ class ModelValidator
         return false;
     }
 
-    protected function getDateString(array $value)
-    {
-        $dateString = '';
-        if (!empty($value['date']) and !empty($value['time'])) {
-            $dateString = $value['date'].' '.$value['time'].':00';
-        }
-
-        return $dateString;
-    }
-
     /**
      * Validates datetime using a format compatible with the php date function.
      *
@@ -246,9 +236,6 @@ class ModelValidator
      */
     public function datetime($value, $dateFormat = 'Y-m-d H:i:s')
     {
-        if (is_array($value)) {
-            $value = $this->getDateString($value);
-        }
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
