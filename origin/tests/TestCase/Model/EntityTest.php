@@ -196,4 +196,11 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($entity->propertyExists('name'));
         $this->assertFalse($entity->propertyExists('foo'));
     }
+
+    public function testDebugInfo()
+    {
+        $data = ['name'=>'test'];
+        $entity = new Entity($data);
+        $this->assertEquals($data, $entity->__debugInfo());
+    }
 }

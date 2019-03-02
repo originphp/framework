@@ -20,6 +20,8 @@ use Origin\Model\ConnectionManager;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Entity;
 use Origin\Model\Behavior\Behavior;
+use Origin\Model\Exception\MissingModelException;
+use Origin\Exception\NotFoundException;
 
 class Article extends AppModel
 {
@@ -186,15 +188,28 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testNewEntity()
     {
-        $data = array(
-        'id' => 1004,
-        'name' => 'EntityName',
-      );
+        $data = [
+          'id' => 1004,
+          'name' => 'EntityName',
+        ];
+
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Entity = $Article->newEntity($data);
         $this->assertEquals(1004, $Entity->id);
         $this->assertEquals('EntityName', $Entity->name);
         $this->assertEquals('Article', $Entity->name());
+    }
+
+    public function testNewEntities()
+    {
+        $data = [
+        ['name'=>'Entity 1'],
+        ['name'=>'Entity 2'],
+      ];
+        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $entities = $Article->newEntities($data);
+        $this->assertEquals('Entity 1', $entities[0]->name);
+        $this->assertEquals('Entity 2', $entities[1]->name);
     }
 
     public function testNewEntityBelongsTo()
@@ -400,6 +415,11 @@ class ModelTest extends \PHPUnit\Framework\TestCase
             'mode' => 'replace',
           );
         $this->assertEquals($expected, $relationship);
+        
+        // Test Merging
+        $relationship = $Candidate->hasAndBelongsToMany('Candidate', ['conditions'=>['Candidate.active'=>true]]);
+        $this->assertEquals('CandidatesJob.candidate_id = Candidate.id', $relationship['conditions'][0]);
+        $this->assertEquals(true, $relationship['conditions']['Candidate.active']);
     }
 
     public function testRelationsAgain()
@@ -433,6 +453,14 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article = new Article(array('datasource' => 'test'));
         $count = $Article->find('count');
         $this->assertNotNull($count);
+    }
+
+    public function testGet()
+    {
+        $Article = new Article(array('datasource' => 'test'));
+        $this->assertNotEmpty($Article->get(2));
+        $this->expectException(NotFoundException::class);
+        $Article->get(1024);
     }
 
     public function testFindList()
@@ -503,7 +531,10 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testFindAll()
     {
-        $this->markTestIncomplete('This is test has not been done yet');
+        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $this->assertEquals([], $Article->find('all', ['conditions'=>['title'=>'Foo']]));
+        $results = $Article->find('all');
+        $this->assertEquals(3, count($results));
     }
 
     public function testExists()
@@ -545,7 +576,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
                  ->setConstructorArgs($arguments)
                  ->getMock();
     }
-
     /**
      * Depends testExists.
      */
@@ -635,6 +665,14 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($Article->id);
     }
 
+    public function testSaveBadData()
+    {
+        $Article = new Article(array('datasource' => 'test'));
+        $entity = $Article->newEntity(['title'=>'testSaveBadData']);
+        $entity->user_id = [];
+        $this->assertFalse($Article->save($entity));
+    }
+
     public function testDelete()
     {
         $methods = array('beforeDelete', 'afterDelete', 'deleteDependent', 'deleteHABTM');
@@ -719,19 +757,22 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     public function testDeleteAll()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+
+        $this->assertFalse($Article->deleteAll()); //
+
         $article = $Article->get(2);
         $this->assertNotEmpty($article);
         $this->assertTrue($Article->deleteAll(['id' => $article->id]));
-        $Article->save(new Entity($article->toArray())); // Add back
+        $Article->save($article); // Add back
     }
 
-    public function testDeleteAllCallbacksDisabled()
+    public function testDeleteAllCallbacksEnabled()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $article = $Article->get(2);
         $this->assertNotEmpty($article);
-        $this->assertTrue($Article->deleteAll(['id' => $article->id]), true, false);
-        $Article->save(new Entity($article->toArray())); // Add back
+        $this->assertTrue($Article->deleteAll(['id' => $article->id]), true, true);
+        $Article->save($article); // Add back
     }
 
     public function testSaveManyValidationErrors()
@@ -752,6 +793,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveMany()
     {
+        $Article = new Model(array('name' => 'Article','datasource'=>'test'));
+
         $methods = array('save');
         $Article = $this->getMockModel(Article::class, $methods);
 
@@ -1140,5 +1183,24 @@ lastname VARCHAR(30) NOT NULL
         $Article->loadBehavior('BehaviorTester', ['className' => 'Origin\Test\Model\BehaviorTesterBehavior']);
         $this->assertObjectHasAttribute('BehaviorTester', $Article);
         $this->assertInstanceOf('Origin\Test\Model\BehaviorTesterBehavior', $Article->BehaviorTester);
+    }
+
+    public function testLoadModel()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        ModelRegistry::set('Author', new Model(['name' => 'Author', 'datasource' => 'test']));
+        $this->assertInstanceOf(Model::class, $Article->loadModel('Author'));
+        $this->expectException(MissingModelException::class);
+        $Article->loadModel('Bananana');
+    }
+
+    public function testValidates()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->validate('title', 'notBlank');
+        $entity = $Article->newEntity(['title'=>null]);
+        $this->assertFalse($Article->validates($entity));
+        $entity = $Article->newEntity(['title'=>'foo']);
+        $this->assertTrue($Article->validates($entity));
     }
 }

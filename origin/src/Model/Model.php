@@ -448,7 +448,7 @@ class Model
         $defaults = array(
           'className' => $association,
           'foreignKey' => null,
-          'conditions' => array(),
+          'conditions' => [],
           'fields' => null,
           'order' => null,
           'dependent' => false,
@@ -688,12 +688,9 @@ class Model
      */
     public function save(Entity $entity, array $options = [])
     {
-        $defaults = array('validate' => true, 'callbacks' => true, 'transaction' => true);
+        $defaults = ['validate' => true, 'callbacks' => true, 'transaction' => true];
         $options = array_merge($defaults, $options);
 
-        if (empty($entity)) {
-            return false;
-        }
         $this->id = null;
     
         if ($entity->hasProperty($this->primaryKey)) {
@@ -741,15 +738,13 @@ class Model
          * Data should not be objects or arrays. Invalidate any objects or array data
          * e.g. unvalidated datetime fields.
          */
-        $invalidData = false;
         foreach ($data as $key => $value) {
-            if ($value and !is_scalar($value)) {
+            if (is_array($value) or is_object($value)) {
                 $entity->errors($key, 'Invalid data');
-                $invalidData = true;
             }
         }
    
-        if (empty($data) or $invalidData) {
+        if (empty($data) or $entity->errors()) {
             return false;
         }
 
@@ -900,16 +895,13 @@ class Model
     /**
      * Can save data with multiple associations.
      *
-     * @param entity|array $data    record
-     * @param array        $options (validate,callbacks,transaction)
+     * @param Entity $data    record
+     * @param array  $options (validate,callbacks,transaction)
      *
      * @return bool true or false
      */
-    public function saveAssociated($data, $options = array())
+    public function saveAssociated(Entity $data, $options = [])
     {
-        if (empty($data)) {
-            return false;
-        }
         $defaults = array('validate' => true, 'callbacks' => true, 'transaction' => true);
         $options = array_merge($defaults, $options);
 
@@ -987,8 +979,8 @@ class Model
      *
      * @param entity|array $data    to save =
      *                              array(
-     *                              array('title' => 'title 1'),
-     *                              array('title' => 'title 2')
+        *                              $entity,
+        *                              $entity
      *                              );
      * @param array        $options keys include:
      *                              validate: wether to validate data or not
@@ -998,12 +990,12 @@ class Model
      *
      * @return bool true or false
      */
-    public function saveMany($data, array $options = [])
+    public function saveMany(array $data, array $options = [])
     {
         if (empty($data)) {
             return false;
         }
-        $defaults = array('validate' => true, 'callbacks' => true, 'transaction' => true);
+        $defaults = ['validate' => true, 'callbacks' => true, 'transaction' => true];
         $options = array_merge($defaults, $options);
 
         if ($options['transaction']) {
@@ -1037,7 +1029,7 @@ class Model
      */
     public function saveAll($data, array $params = [])
     {
-        if (is_object($data) or array_keys($data) !== range(0, count($data) - 1)) {
+        if (is_object($data)) {
             return $this->saveAssociated($data, $params);
         }
 
@@ -1094,7 +1086,7 @@ class Model
         $default = array(
              'conditions' => null,
              'fields' => [],
-             'joins' => array(),
+             'joins' => [],
              'order' => $this->order,
              'limit' => null,
              'group' => null,
@@ -1275,7 +1267,7 @@ class Model
 
         // Modify Results
         if (empty($results)) {
-            return array();
+            return [];
         }
 
         return $results;
@@ -1303,7 +1295,7 @@ class Model
 
         // Modify Results
         if (empty($results)) {
-            return array();
+            return [];
         }
 
         return $results;
@@ -1319,7 +1311,7 @@ class Model
     protected function finderCount($query)
     {
         // Modify Query
-        $query['fields'] = array('COUNT(*) AS count');
+        $query['fields'] = ['COUNT(*) AS count'];
         $query['order'] = null;
         $query['limit'] = null;
 
@@ -1327,13 +1319,7 @@ class Model
         $results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
-        
-
-        if (isset($results[0]['count'])) {
-            return $results[0]['count'];
-        }
-
-        return false;
+        return $results[0]['count'];
     }
 
     /**
@@ -1473,12 +1459,12 @@ class Model
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
-            if (!isset($this->{$alias})) {
-                throw new MissingModelException($config['className'].':'.$alias);
-            }
-
             if (isset($query['contain'][$alias]) === false) {
                 continue;
+            }
+
+            if (!isset($this->{$alias})) {
+                throw new MissingModelException($config['className'].':'.$alias);
             }
 
             $config = array_merge($config, $query['contain'][$alias]);

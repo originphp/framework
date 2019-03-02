@@ -82,17 +82,16 @@ function pluginSplit($name)
  * @param mixed arg1 arg2
  * @return string formatted
  */
-function __(string $string)
+function __(string $string = null)
 {
-    if (!$string) {
-        return '';
-    }
+    if ($string) {
+        $string = I18n::translate($string);
+
+        $arguments = array_slice(func_get_args(), 1);
     
-    $string = I18n::translate($string);
-
-    $arguments = array_slice(func_get_args(), 1);
-
-    return vsprintf($string, $arguments);
+        return vsprintf($string, $arguments);
+    }
+    return null;
 }
 
 /**

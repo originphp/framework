@@ -54,6 +54,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $data = array(
           'id' => 1024,
           'title' => 'Some article title',
+          'description' => null,
           'author' => array(
             'id' => 2048,
             'name' => 'Jon',
@@ -87,6 +88,10 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2020-10-01 13:43:00', $entity->tags[0]->created);
         $this->assertInstanceOf(Entity::class, $entity->author);
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
+
+        // Test no parsing (as no model spec)
+        $entity = $Marshaller->one($data);
+        $this->assertEquals('22/01/2019', $entity->created['date']);
     }
 
     /**

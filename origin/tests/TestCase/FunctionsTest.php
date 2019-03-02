@@ -32,6 +32,8 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
 
     public function testTranslate()
     {
+        $null = null;
+        $this->assertNull(__($null));
         $expected = 'Nothing';
         $translate = __($expected); // no translation return as is
         $this->assertEquals('Nothing', $translate);
@@ -49,5 +51,17 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testNow()
     {
         $this->assertEquals(date('Y-m-d H:i:s'), now());
+    }
+    public function testUUID()
+    {
+        $this->assertRegExp(
+            '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
+            uuid()
+        );
+    }
+    public function testUid()
+    {
+        $this->assertRegExp('/^([a-z0-9]*){13}$/', uid());
+        $this->assertRegExp('/^([a-z0-9]*){5}$/', uid(5));
     }
 }
