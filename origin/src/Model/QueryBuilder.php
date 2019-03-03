@@ -134,9 +134,8 @@ Array
  */
 class QueryBuilder
 {
-    public $query = array();
-    public $values = [];
-    public $backtick = false;
+    protected $query = [];
+    protected $values = [];
 
     protected $table = null;
     protected $alias = null;
@@ -181,14 +180,6 @@ class QueryBuilder
         }
 
         return $tableReference;
-    }
-
-    public function fieldName(string $fieldname)
-    {
-        if (!$this->backtick) {
-            return $fieldname;
-        }
-        trigger_error('not completed');
     }
 
     public function select(array $fields = [], array $conditions = [])
@@ -308,12 +299,12 @@ class QueryBuilder
 
     public function join(array $params)
     {
-        $defaults = array(
+        $defaults = [
               'table' => null,
               'alias' => null,
-              'type' => null,
-              'conditions' => array(),
-            );
+              'type' => 'LEFT',
+              'conditions' => []
+        ];
         $params = array_merge($defaults, $params);
         if (!isset($this->query['joins']) or $this->query['joins'] == null) {
             $this->query['joins'] = [];
@@ -321,10 +312,6 @@ class QueryBuilder
 
         if (empty($params['alias'])) {
             $params['alias'] = $params['table'];
-        }
-
-        if (empty($params['type'])) {
-            $params['type'] = 'LEFT';
         }
 
         $this->query['joins'][] = $params;

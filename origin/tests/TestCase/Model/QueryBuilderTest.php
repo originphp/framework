@@ -16,6 +16,12 @@ namespace Origin\Core\Test;
 
 use Origin\Model\QueryBuilder;
 use Origin\Model\Exception\QueryBuilderException;
+use Origin\TestSuite\TestTrait;
+
+class MockQueryBuilder extends QueryBuilder
+{
+    use TestTrait;
+}
 
 class QueryBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -407,6 +413,9 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       );
 
         $this->assertEquals($expected, $Builder->getValues());
+
+        $this->expectException(QueryBuilderException::class);
+        $Builder->insertStatement([]);
     }
 
     public function testUpdateStatement()
@@ -445,6 +454,9 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       );
 
         $this->assertEquals($expected, $Builder->getValues());
+
+        $this->expectException(QueryBuilderException::class);
+        $Builder->updateStatement([]);
     }
 
     public function testDeleteStatement()
@@ -465,5 +477,100 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
 
         $expected = 'DELETE FROM user WHERE user.id = :u0 ORDER BY id ASC LIMIT 1';
         $this->assertEquals($expected, $Builder->deleteStatement($data));
+
+        $this->expectException(QueryBuilderException::class);
+        $Builder->deleteStatement([]);
+    }
+
+    public function testFrom()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->from('table', 'alias');
+        $this->assertEquals('table', $builder->getProperty('table'));
+        $this->assertEquals('alias', $builder->getProperty('alias'));
+    }
+
+    public function testWhere()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->where(['foo'=>'bar']);
+        $query = $builder->getProperty('query');
+        $this->assertEquals(['foo'=>'bar'], $query['conditions']);
+    }
+    public function testGroup()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->group(['status']);
+        $query = $builder->getProperty('query');
+        $this->assertEquals(['status'], $query['group']);
+    }
+    public function testOrder()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->order(['field'=>'ASC']);
+        $query = $builder->getProperty('query');
+        $this->assertEquals(['field'=>'ASC'], $query['order']);
+    }
+    public function testLimit()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->limit(100, 20);
+        $query = $builder->getProperty('query');
+        $this->assertEquals(100, $query['limit']);
+        $this->assertEquals(20, $query['offset']);
+    }
+    public function testPage()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->page(10);
+        $query = $builder->getProperty('query');
+        $this->assertEquals(10, $query['page']);
+    }
+
+    public function testJoin()
+    {
+        $builder = new MockQueryBuilder('user');
+        $params = [
+            'table' => 'users',
+            'alias' => null,
+            'type' => 'INNER',
+            'conditions' => ['active'=>1],
+        ];
+        $builder->join($params);
+        $query = $builder->getProperty('query');
+        $params['alias'] = 'users';
+        $this->assertEquals($params, $query['joins'][0]);
+    }
+    public function testLeftJoin()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->leftJoin(['table'=>'users','alias'=>'users']);
+        $query = $builder->getProperty('query');
+        
+        $this->assertEquals('LEFT', $query['joins'][0]['type']);
+    }
+    public function testInnerJoin()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->innerJoin(['table'=>'users','alias'=>'users']);
+        $query = $builder->getProperty('query');
+        
+        $this->assertEquals('INNER', $query['joins'][0]['type']);
+    }
+    public function testRightJoin()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->rightJoin(['table'=>'users','alias'=>'users']);
+        $query = $builder->getProperty('query');
+        
+        $this->assertEquals('RIGHT', $query['joins'][0]['type']);
+    }
+    public function testFullJoin()
+    {
+        $builder = new MockQueryBuilder('user');
+        $builder->fullJoin(['table'=>'users','alias'=>'users']);
+        $query = $builder->getProperty('query');
+        
+        $this->assertEquals('FULL', $query['joins'][0]['type']);
     }
 }
