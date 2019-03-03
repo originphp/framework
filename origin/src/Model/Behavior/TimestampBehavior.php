@@ -33,11 +33,12 @@ class TimestampBehavior extends Behavior
     {
     }
 
-    public function beforeSave(Entity $entity, $options = array())
+    public function beforeSave(Entity $entity, $options = [])
     {
         $model = $this->model();
         $timestamp = date('Y-m-d H:i:s');
         $primaryKey = $model->primaryKey;
+        
         $createdField = $this->config['created'];
         if (empty($entity->{$primaryKey})) {
             if ($model->hasField($createdField) and empty($entity->{$createdField})) {
