@@ -45,11 +45,11 @@ class ModelValidator
             return $this->validationRules;
         }
         foreach ($rules as $field => $params) {
-            $this->add($field, $params);
+            $this->setRule($field, $params);
         }
     }
 
-    public function add(string $field, $params)
+    public function setRule(string $field, $params)
     {
         if (is_string($params)) {
             $params = array(
@@ -61,22 +61,16 @@ class ModelValidator
         }
         $this->validationRules[$field] = $params;
     }
-
-    public function remove($field)
-    {
-        if (isset($this->validationRules[$field])) {
-            unset($this->validationRules[$field]);
-
-            return true;
-        }
-
-        return false;
-    }
     
-    public function validate($field, $value, $ruleSet)
+    /**
+     * Validates a value
+     *
+     * @param mixed $value
+     * @param string|array $ruleSet email or ['equalTo', 'origin']
+     * @return bool
+     */
+    public function validate($value, $ruleSet)
     {
-        $options = null;
-
         if (is_array($ruleSet)) {
             $rule = $ruleSet[0];
             $args = $ruleSet;
@@ -145,10 +139,7 @@ class ModelValidator
                 }
 
                 if ($validationRule['rule'] === 'isUnique') {
-                    $validationRule['rule'] = array(
-                    'isUnique',
-                      array($entity, $field),
-                    );
+                    $validationRule['rule'] = ['isUnique',[$entity, $field]];
                 }
                
                 if (in_array($field, $entity->modified())) {
@@ -170,7 +161,7 @@ class ModelValidator
                     }
                  
                     if ($validationRule['rule'] === 'notBlank') {
-                        if (!$this->validate($field, $value, $validationRule['rule'])) {
+                        if (!$this->validate($value, $validationRule['rule'])) {
                             $entity->errors($field, $validationRule['message']);
                         }
                         continue;
@@ -180,7 +171,7 @@ class ModelValidator
                         continue;
                     }
 
-                    if (!$this->validate($field, $value, $validationRule['rule'])) {
+                    if (!$this->validate($value, $validationRule['rule'])) {
                         $entity->errors($field, $validationRule['message']);
                     }
                 }
@@ -296,9 +287,9 @@ class ModelValidator
         return (bool) filter_var($value, FILTER_VALIDATE_IP);
     }
 
-    public function isUnique($value)
+    public function isUnique($value, $fields=[])
     {
-        return $this->model->isUnique($value);
+        return $this->model->isUnique($value, $fields);
     }
 
     /**

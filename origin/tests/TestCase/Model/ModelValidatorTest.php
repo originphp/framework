@@ -19,6 +19,14 @@ use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Exception\ValidatorException;
 
+class Widget extends Model
+{
+    public function isOne(int $value)
+    {
+        return $value === 1;
+    }
+}
+
 class MockValidator extends ModelValidator
 {
     public function invoke(string $method, array $args = [])
@@ -73,6 +81,36 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
 
         $data = new Entity(array('value' => 256));
         $this->assertTrue($Validator->validates($data));
+    }
+
+    public function testValidatesRequiredOn()
+    {
+        $Validator = $this->Validator;
+        $validate = array(
+        'name' => array(
+            'rule' => 'notBlank',
+            'required' => 'update'
+        ),
+      );
+        $Validator->rules($validate);
+        $data = new Entity(['value' => 'some string']);
+        $this->assertTrue($Validator->validates($data, true));
+        $this->assertFalse($Validator->validates($data, false));
+    }
+
+    public function testValidatesOn()
+    {
+        $Validator = $this->Validator;
+        $validate = array(
+        'email' => array(
+            'rule' => 'email',
+            'on' => 'update'
+        ),
+      );
+        $Validator->rules($validate);
+        $data = new Entity(['email' => 'fozzy wozzy was a woman']);
+        $this->assertTrue($Validator->validates($data, true));
+        $this->assertFalse($Validator->validates($data, false));
     }
 
     public function testValidationRuleArray()
@@ -207,23 +245,18 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testIsUnique()
     {
-        $this->markTestIncomplete(
-         'This test has not been implemented yet.'
-       );
+        $Article = new Model(array('name' => 'Article','datasource'=>'test'));
+        $validator = new MockValidator($Article);
+        $entity = new Entity(['id'=>1024,'title'=>'foo']);
+        $this->assertTrue($validator->isUnique($entity, ['id']));
+    }
 
-        $config = array('name' => 'Article', 'datasource' => 'test');
-
-        $Article = $this->getMockBuilder(Model::class)
-               ->setMethods(['isUnique'])
-               ->setConstructorArgs(array($config))
-               ->getMock();
-
-        $Article->expects($this->once())
-        ->method('isUnique')
-        ->willReturn(true);
-
-        $Validator = new ModelValidator($Article);
-        $this->assertTrue($Validator->isUnique(array('id')));
+    public function testValidateCustomRule()
+    {
+        $validator = new MockValidator(new Widget());
+     
+        $this->assertTrue($validator->validate(1, 'isOne'));
+        $this->assertFalse($validator->validate(2, 'isOne'));
     }
 
     public function testMaxLength()
@@ -276,6 +309,7 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
     public function testRange()
     {
         $Validator = $this->Validator;
+        $this->assertFalse($Validator->range('xxx', 5, 10));
         $this->assertTrue($Validator->range(5, 5, 10));
         $this->assertTrue($Validator->range(10, 5, 10));
         $this->assertFalse($Validator->range(1, 5, 10));

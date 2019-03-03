@@ -569,7 +569,7 @@ class Model
 
             return;
         }
-        $this->validator()->add($field, $options);
+        $this->validator()->setRule($field, $options);
     }
 
     /**
@@ -1639,14 +1639,14 @@ class Model
     }
 
     /**
-     * @todo test
+     * Checks values in an entity are unique, this could be that a username is not already
+     * taken or an email is not used twice
+     * @param Entity $entity
+     * @param array  $fields array of fields to check values in entity
      *
-     * @param Entity $entity [description]
-     * @param array  $fields [description]
-     *
-     * @return bool [description]
+     * @return bool
      */
-    public function isUnique(Entity $entity, $fields = [])
+    public function isUnique(Entity $entity, array $fields = [])
     {
         $conditions = [];
         foreach ($fields as $field) {
@@ -1654,7 +1654,6 @@ class Model
                 $conditions[$field] = $entity->{$field};
             }
         }
-
         return $this->find('count', array('conditions' => $conditions)) === 0;
     }
 
