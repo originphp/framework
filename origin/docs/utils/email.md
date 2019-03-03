@@ -142,19 +142,19 @@ To use templates
 Templates are stored in the `View/Email` folder
 
 ````php
-use Origin\Utils\Email;
-
+    use Origin\Utils\Email;
     $Email = new Email();
     $Email->to('somebody@originphp.com')
         ->from('me@@originphp.com')
         ->subject('This is a test')
         ->template('welcome')
+        ->set(['first_name'=>'Frank','email'=>'dev@originphp.com'])
         ->format('both')
     $Email->send();
-
 ````
 
 Template files also accept plugin syntax, so to load a template from a plugin just add the plugin name.
+
 ````php
 use Origin\Utils\Email;
 

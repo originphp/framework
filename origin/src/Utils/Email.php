@@ -180,7 +180,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function to(string $email, string $name = null)
     {
@@ -193,7 +193,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function addTo(string $email, string $name = null)
     {
@@ -206,7 +206,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function cc(string $email, string $name = null)
     {
@@ -219,7 +219,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function addCc(string $email, string $name = null)
     {
@@ -232,7 +232,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function bcc(string $email, string $name = null)
     {
@@ -245,7 +245,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function addBcc(string $email, string $name = null)
     {
@@ -258,7 +258,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function from(string $email, string $name = null)
     {
@@ -271,7 +271,7 @@ class Email
     *
     * @param string $email
     * @param string $name
-    * @return void
+    * @return Email
     */
     public function sender(string $email, string $name = null)
     {
@@ -284,7 +284,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function replyTo(string $email, string $name = null)
     {
@@ -297,7 +297,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function returnPath(string $email, string $name = null)
     {
@@ -309,7 +309,7 @@ class Email
      * Sets the subject
      *
      * @param string $subject
-     * @return void
+     * @return Email
      */
     public function subject(string $subject)
     {
@@ -321,7 +321,7 @@ class Email
      * Sets the text version of email
      *
      * @param string $message
-     * @return void
+     * @return Email
      */
     public function textMessage(string $message)
     {
@@ -334,7 +334,7 @@ class Email
      * Sets the html version of email
      *
      * @param string $message
-     * @return void
+     * @return Email
      */
     public function htmlMessage(string $message)
     {
@@ -346,7 +346,7 @@ class Email
      * Sets the template to be loaded
      *
      * @param string $name
-     * @return void
+     * @return Email
      */
     public function template(string $name)
     {
@@ -356,12 +356,12 @@ class Email
     }
 
     /**
-     * Sets the vars which will be set in temploate
+     * Sets the vars which will be set in template
      *
      * @param array $vars
-     * @return void
+     * @return Email
      */
-    public function setVars(array $vars)
+    public function set(array $vars)
     {
         $this->viewVars = $vars;
         return $this;
@@ -483,7 +483,7 @@ class Email
 
         $this->content = $this->render();
 
-        if (!isset($this->account['debug']) or $this->account['debug']) {
+        if (!isset($this->account['debug']) or $this->account['debug']===false) {
             $this->smtpSend();
         }
 

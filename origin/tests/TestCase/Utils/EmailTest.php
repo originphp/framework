@@ -43,7 +43,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->to('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('to');
         $this->assertEquals(['james@originphp.com',null], $property[0]);
 
@@ -55,7 +55,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->from('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('from');
 
         $this->assertEquals(['james@originphp.com',null], $property);
@@ -69,7 +69,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->sender('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('sender');
         $this->assertEquals(['james@originphp.com',null], $property);
 
@@ -82,7 +82,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->replyTo('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('replyTo');
         $this->assertEquals(['james@originphp.com',null], $property);
 
@@ -95,7 +95,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->returnPath('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('returnPath');
         $this->assertEquals(['james@originphp.com',null], $property);
 
@@ -108,7 +108,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->bcc('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('bcc');
         $this->assertEquals(['james@originphp.com',null], $property[0]);
 
@@ -121,7 +121,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->cc('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('cc');
         $this->assertEquals(['james@originphp.com',null], $property[0]);
 
@@ -129,6 +129,19 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $property = $Email->getProperty('cc');
         $this->assertEquals(['james@originphp.com','James'], $property[0]);
     }
+
+    /**
+    * @depends testTo
+    */
+    public function testAddTo()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->to('james@originphp.com', 'James');
+        $Email = $Email->addTo('guest@originphp.com', 'Guest');
+        $property = $Email->getProperty('to');
+        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+    }
+
     /**
      * @depends testCc
      */
@@ -157,7 +170,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->subject('A subject line');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $this->assertEquals('A subject line', $Email->getProperty('subject'));
     }
 
@@ -165,7 +178,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->textMessage('Text message.');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $this->assertEquals('Text message.', $Email->getProperty('textMessage'));
     }
 
@@ -173,15 +186,31 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->htmlMessage('<p>Html message.</p>');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $this->assertEquals('<p>Html message.</p>', $Email->getProperty('htmlMessage'));
+    }
+
+    public function testTemplate()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->template('foo');
+        $this->assertInstanceOf(Email::class, $Email);
+        $this->assertEquals('foo', $Email->getProperty('template'));
+    }
+
+    public function testSetVars()
+    {
+        $Email = new MockEmail();
+        $Email = $Email->set(['foo'=>'bar']);
+        $this->assertInstanceOf(Email::class, $Email);
+        $this->assertEquals(['foo'=>'bar'], $Email->getProperty('viewVars'));
     }
 
     public function testAddHeader()
     {
         $Email = new MockEmail();
         $Email = $Email->addHeader('X-mailer', 'OriginPHP');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
         $this->assertEquals(['X-mailer'=>'OriginPHP'], $Email->getProperty('additionalHeaders'));
     }
 
@@ -189,7 +218,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
 
         $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css', 'Debugger.css');
         
@@ -210,7 +239,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css',
             ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
         ]);
-        $this->assertInstanceOf('Origin\Utils\Email', $Email);
+        $this->assertInstanceOf(Email::class, $Email);
 
         $expected = [
             ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css' => 'default.css',
@@ -532,5 +561,21 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new MockEmail();
         $Email->account('nonExistant');
+    }
+
+    public function testSendWithoutSmtp()
+    {
+        $config = ['debug'=>true];
+        $Email = new MockEmail($config);
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('text test')
+              ->textMessage('this is a test')
+              ->htmlMessage('<p>this is a test</p>')
+              ->format('both');
+
+        $result = $Email->send();
+        $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
+        $this->assertContains($expected, $result);
     }
 }
