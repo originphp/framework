@@ -14,6 +14,7 @@
 
 namespace Origin\Core;
 
+use Origin\Core\Autoloader;
 use Origin\Core\Exception\MissingPluginException;
 
 /**
@@ -85,7 +86,7 @@ class Plugin
      */
     protected static function autoload(string $plugin)
     {
-        $autoloader = Autoloader::init();
+        $autoloader = Autoloader::getInstance();
         $pluginPath = 'plugins/' . Inflector::underscore($plugin);
         $autoloader->addNamespaces([
             $plugin => $pluginPath . '/src',

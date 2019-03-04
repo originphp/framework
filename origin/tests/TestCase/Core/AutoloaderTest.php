@@ -95,12 +95,12 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
 
     public function testInstance()
     {
-        $this->assertInstanceOf(Autoloader::class, Autoloader::init());
+        $this->assertInstanceOf(Autoloader::class, Autoloader::getInstance());
     }
     
     public function testRegister()
     {
-        $Autoloader = Autoloader::init();
+        $Autoloader = Autoloader::getInstance();
         $this->assertTrue($Autoloader->register());
     }
 
@@ -152,7 +152,7 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     public function testGetInstance()
     {
         $this->assertTrue(MockAutoloader::disableInstance());
-        $this->assertInstanceOf(Autoloader::class, MockAutoloader::init());
+        $this->assertInstanceOf(Autoloader::class, MockAutoloader::getInstance());
         $this->assertTrue(MockAutoloader::enableInstance());
     }
 }

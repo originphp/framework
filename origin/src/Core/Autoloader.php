@@ -13,21 +13,23 @@
  */
 
 /**
- *  namespace Origin\Core;
- *  require ORIGIN . DS . 'src' . DS .'Core' .DS .'Autoloader.php';
- *  $Autoloader = new Autoloader($projectDirectory);
- *  or
- *  $Autoloader = Autoloader::init();
- *  $Autoloader->setFolder(ROOT);
+ *  use Origin\Core\Autoloader;
+ *  require ORIGIN . '/src/Core/Autoloader.php';
+ *  $autoloader = new Autoloader(__DIR__);
+ *
+ *  or get a singleton instance
+ *
+ *  $autoloader = Autoloader::getInstance();
+ *  $autoloader->setFolder(ROOT);  // this sets the project folder
  *
  * Tell the Autoloader where to find files for namespaces that you will use.
  *
- *  $Autoloader->addNamespaces(array(
+ *  $autoloader->addNamespaces(array(
  *  	'App' => 'src',
  *  	'Origin' => 'origin/src/'
  *  ));
  *
- * $Autoloader->register();
+ * $autoloader->register();
  */
 
 namespace Origin\Core;
@@ -37,26 +39,19 @@ use RecursiveIteratorIterator;
 
 class Autoloader
 {
-    protected static $instance;
+    /**
+     * Singleton Instance of the Autoloader
+     *
+     * @var Autoloader
+     */
+    protected static $instance = null;
+
     /**
      * Map of prefixes.
      *
      * @var array ('Psr\Log\'=>'/var/www/..')
      */
-    protected $prefixes = array();
-
-    /**
-     * Returns a single instance of the object
-     *
-     * @return void
-     */
-    public static function init()
-    {
-        if (!isset(self::$instance)) {
-            self::$instance = new self;
-        }
-        return self::$instance;
-    }
+    protected $prefixes = [];
 
     /**
      * Project diretory
@@ -65,11 +60,22 @@ class Autoloader
      */
     protected $directory = null;
 
+    /**
+     * Returns a single instance of the object
+     *
+     * @return Autoloader
+     */
+    public static function getInstance()
+    {
+        if (static::$instance === null) {
+            static::$instance = new Autoloader();
+        }
+        return static::$instance;
+    }
+
     public function __construct(string $directory = null)
     {
-        if ($directory) {
-            $this->directory = $directory;
-        }
+        $this->directory = $directory;
     }
 
     /**
@@ -103,9 +109,9 @@ class Autoloader
     {
         $prefix = trim($prefix, '\\').'\\';
 
-        $baseDirectory = rtrim($baseDirectory, DS).'/';
+        $path = rtrim($baseDirectory, DS).'/';
 
-        $this->prefixes[$prefix] = $this->directory.DS.$baseDirectory;
+        $this->prefixes[$prefix] = $this->directory . DS . $path;
     }
 
     /**
