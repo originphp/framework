@@ -18,7 +18,8 @@ namespace Origin\View;
  * This is the new Template Trait. Whilst building apps, despite using bootstrap, I wanted to add
  * a class to paginator, and found it was messesy, and i did not want to set html template in the controller.
  * However this requires remodifying system and how it works.
- * It assumes that Config trait is also used and therefore defaultConfig['templates] is available
+ * It assumes that Config trait is also used and therefore defaultConfig['templates] is available.
+ * Set and get functions must not be amibious e.g function set(), as this is a trait.
  */
 
 trait TemplateTrait
@@ -42,8 +43,7 @@ trait TemplateTrait
     }
     
     /**
-     * Sets a template or templates at runtime
-     *
+     * Sets a template or templates at runtime.
      * @param array $array ['input'=>'<input class="form-control">'])
      * @return void
      */

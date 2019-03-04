@@ -24,6 +24,8 @@ class TemplaterTest extends \PHPUnit\Framework\TestCase
         $expected = '<a href="{url}">{text}</a>';
         $templater = new Templater(['link'=>$expected]);
         $this->assertEquals($expected, $templater->get('link'));
+        $this->assertEquals(['link'=>$expected], $templater->get());
+        $this->assertNull($templater->get('foo'));
     }
 
     public function testSet()
@@ -43,5 +45,8 @@ class TemplaterTest extends \PHPUnit\Framework\TestCase
         $expected = '<a href="#">my link</a>';
  
         $this->assertEquals($expected, $templater->format('link', $data));
+
+        $this->expectException(Exception::class);
+        $templater->format('foo', ['key'=>'value']);
     }
 }
