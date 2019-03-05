@@ -14,15 +14,15 @@ Install [docker desktop](https://www.docker.com/products/docker-desktop), if you
 
 ## Configuring OriginPHP
 
-1. Run the sql statements `config/database.sql` to create the database and `config/schema.sql` to create the tables and sample data.
+1. Create the database using the statements in `config/database.sql`.
 
-    The docker container MySql server can be accessed using `localhost` and port `3306`, with any database management application. The username is `root` and the password is `root`. Mac users can use [Sequel Pro](https://www.sequelpro.com/) and Windows users can use [HeidiSql](https://www.heidisql.com/).
+    The docker container MySQL server can be accessed using `localhost` and port `3306`, with any database management application. The username is `root` and the password is `root`. Mac users can use [Sequel Pro](https://www.sequelpro.com/) and Windows users can use [HeidiSql](https://www.heidisql.com/) both of those software are free.
 
-    To access the docker MySql server using the MySql client from within the docker container.
+    To access the docker MySQL server using the MySQL client from within the docker container.
     - From the project folder type `docker-compose run app bash`, this will give you access to the docker container.
     - Then type `mysql -h db -uroot -p`
 
-2. Create the database configuration file, make a copy of the `database.php.default` file without the `default` extension. And set the username and password. 
+2. Create the database configuration file in the `config` folder , make a copy of the `database.php.default` file without the `default` extension, remember to set the username and password. 
 
     If you are using the docker setup then change the host to `db` (to access from within docker), username `origin` and set the password to `secret`.  This user was created in the database.sql.
 
@@ -34,6 +34,16 @@ Install [docker desktop](https://www.docker.com/products/docker-desktop), if you
             'password' => 'secret'
         ]);
     ````
+3. Create the tables and sample data using the statements in `config/schema.sql`. From the project folder type in the following command to access the docker container:
+
+    `docker-compose run app bash`
+
+    Then type in the following to import the schema.sql file:
+
+    `bin/console schema import`
+
+
+
 
 When you go to [http://localhost:8000](http://localhost:8000) you should see a status page showing you that everything is working.
 

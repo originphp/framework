@@ -47,19 +47,19 @@ class Debugger
 
         $result['stackFrames'] = [];
         $result['stackFrames'][] = [
-      'file' => $exception->getFile(),
-      'line' => $exception->getLine(),
-      'class' => $class,
-      'function' => null,
-     ];
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'class' => $class,
+            'function' => null,
+            ];
         $stacktrace = $exception->getTrace();
         foreach ($stacktrace as $stack) {
             $result['stackFrames'][] = [
-        'file' => isset($stack['file']) ? $stack['file'] : '',
-        'line' => isset($stack['line']) ? $stack['line'] : '',
-        'class' => isset($stack['class']) ? $stack['class'] : '',
-        'function' => $stack['function'],
-       ];
+                'file' => isset($stack['file']) ? $stack['file'] : '',
+                'line' => isset($stack['line']) ? $stack['line'] : '',
+                'class' => isset($stack['class']) ? $stack['class'] : '',
+                'function' => $stack['function'],
+            ];
         }
 
         return $result;
@@ -68,22 +68,22 @@ class Debugger
     public function backtrace()
     {
         $result = [
-       'namespace' => '',
-       'class' => '',
-       'code' => '',
-       'message' => 'Backtrace',
-       'stackFrames' => [],
-     ];
+            'namespace' => '',
+            'class' => '',
+            'code' => '',
+            'message' => 'Backtrace',
+            'stackFrames' => [],
+        ];
         $debug = debug_backtrace();
         unset($debug[0]);
         foreach ($debug as $stack) {
             $result['stackFrames'][] = [
-          'file' => isset($stack['file']) ? $stack['file'] : '',
-          'line' => isset($stack['line']) ? $stack['line'] : '',
-          'class' => isset($stack['class']) ? $stack['class'] : '',
-          'function' => $stack['function'],
-          'args' => $stack['args'],
-        ];
+                'file' => isset($stack['file']) ? $stack['file'] : '',
+                'line' => isset($stack['line']) ? $stack['line'] : '',
+                'class' => isset($stack['class']) ? $stack['class'] : '',
+                'function' => $stack['function'],
+                'args' => $stack['args'],
+                ];
         }
 
         return $result;

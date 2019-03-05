@@ -96,10 +96,23 @@ class ErrorHandler
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
+        
+        $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
+        $this->render($debug, $fullBacktrace);
+    }
+
+    /**
+     * Renders a debugger array
+     *
+     * @param array $debug
+     * @return void
+     */
+    public function render(array $debug, $fullBacktrace=false)
+    {
         extract($debug);
         
         $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
-        $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
+       
 
         // Code Preview
         if (isset($stackFrames[0]['file'])) {

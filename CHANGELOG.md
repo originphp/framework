@@ -19,9 +19,15 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- Debug function
+
 ### Changed
-- ready
+- backtrace() now works properly in CLI
+- Updated docs
+- adjusted PR function to only show when debug is set
+
+### Removed
+- Deleted composer.lock
 
 ## [1.0.0-beta] - 2019-03-04
-### Added
-- ready

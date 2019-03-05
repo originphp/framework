@@ -12,6 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Core\Debugger;
+use Origin\Core\Configure;
 use Origin\Core\Collection;
 use Origin\Core\I18n;
 
@@ -21,21 +22,65 @@ use Origin\Core\I18n;
  */
 function backtrace()
 {
-    ob_clean();
     $debugger = new Debugger();
     $debug = $debugger->backtrace();
-    include VIEW.DS.'error'.DS.'debug.ctp';
+
+    if (php_sapi_name() === 'cli') {
+        $errorHandler = new Origin\Console\ErrorHandler();
+        $errorHandler->render($debug, true);
+    } else {
+        ob_clean();
+        include VIEW.DS.'error'.DS.'debug.ctp';
+    }
+   
     exit();
 }
 
-function pr($var)
+/**
+ * Debug vars to screen, it will show the line number and file where it is called from.
+ * Only works in debug mode
+ *
+ * @param mixed $data
+ * @param boolean $isHtml if set to true data will passed through htmlspecialchars
+ * @return void
+ */
+function debug($data, bool $isHtml = false)
 {
-    $template = '<pre>%s</pre>';
-    if (php_sapi_name() === 'cli') {
-        $template = "\n%s\n";
+    if (Configure::read('debug')) {
+        $backtrace = debug_backtrace();
+        $filename = str_replace(ROOT . DS, '', $backtrace[0]['file']);
+        $line = $backtrace[0]['line'];
+        $data = print_r($data, true);
+        if ($isHtml) {
+            $data = h($data);
+        }
+        
+        if (PHP_SAPI === 'cli') {
+            $where = "{$filename} Line: {$line}";
+            $template =  sprintf("\n# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n\n", $where, $data);
+        } else {
+            $where = "<p><strong>{$filename}</strong> Line: <strong>{$line}</strong></p>";
+            $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
+        }
+        printf($template);
     }
-    $var = print_r($var, true);
-    printf($template, $var);
+}
+
+/**
+ * An easy to use print_r which only works in debug mode.
+ * @param mixed $data
+ * @return void
+ */
+function pr($data)
+{
+    if (Configure::read('debug')) {
+        $template = '<pre>%s</pre>';
+        if (PHP_SAPI === 'cli') {
+            $template = "\n%s\n";
+        }
+        $data = print_r($data, true);
+        printf($template, $data);
+    }
 }
 
 /**
@@ -54,7 +99,7 @@ function namespaceSplit(string $class)
         $class = substr($class, $position + 1);
     }
 
-    return array($namespace, $class);
+    return [$namespace, $class];
 }
 
 /**
@@ -71,7 +116,7 @@ function pluginSplit($name)
         list($plugin, $name) = explode('.', $name, 2);
     }
 
-    return array($plugin, $name);
+    return [$plugin, $name];
 }
 
 /**
