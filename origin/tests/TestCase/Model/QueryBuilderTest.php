@@ -402,15 +402,17 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         'name' => 'Amanda Lee',
         'email' => 'amanda@example.com',
         'phone' => '+1 123 4567',
+        'description' => ''
       );
-        $expected = 'INSERT INTO user ( name, email, phone ) VALUES ( :u0, :u1, :u2 )';
+        $expected = 'INSERT INTO user ( name, email, phone, description ) VALUES ( :u0, :u1, :u2, :u3 )';
         $this->assertEquals($expected, $Builder->insertStatement(array('data' => $data)));
 
         $expected = array(
-        'u0' => 'Amanda Lee',
-        'u1' => 'amanda@example.com',
-        'u2' => '+1 123 4567',
-      );
+            'u0' => 'Amanda Lee',
+            'u1' => 'amanda@example.com',
+            'u2' => '+1 123 4567',
+            'u3' => null
+        );
 
         $this->assertEquals($expected, $Builder->getValues());
 
@@ -427,10 +429,20 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
           'name' => 'Amanda Lee',
           'email' => 'amanda@example.com',
           'phone' => '+1 123 4567',
+          'description' => ''
         ),
       );
-        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3';
+        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3, description = :u4';
         $this->assertEquals($expected, $Builder->updateStatement($data));
+
+        $data = array(
+            'data' => array(
+              'id' => 85,
+              'name' => 'Amanda Lee',
+              'email' => 'amanda@example.com',
+              'phone' => '+1 123 4567'
+            ),
+          );
 
         $expected = array(
         'u0' => 85,

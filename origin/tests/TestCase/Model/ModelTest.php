@@ -450,14 +450,14 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testFindCount()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
         $count = $Article->find('count');
         $this->assertNotNull($count);
     }
 
     public function testGet()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
         $this->assertNotEmpty($Article->get(2));
         $this->expectException(NotFoundException::class);
         $Article->get(1024);
@@ -465,7 +465,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testFindList()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
 
         ///['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']]
         $expected = array('First Post', 'Second Post', 'Third Post');
@@ -487,7 +487,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testFindFirst()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
         ModelRegistry::set('Article', $Article);
         ModelRegistry::set('User', new User(array('datasource' => 'test')));
         ModelRegistry::set('Comment', new Comment(array('datasource' => 'test')));
@@ -539,7 +539,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testExists()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
 
         $this->assertTrue($Article->exists(1));
         $this->assertFalse($Article->exists(1024));
@@ -667,7 +667,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveBadData()
     {
-        $Article = new Article(array('datasource' => 'test'));
+        $Article = new Article(['datasource' => 'test']);
         $entity = $Article->newEntity(['title'=>'testSaveBadData']);
         $entity->user_id = [];
         $this->assertFalse($Article->save($entity));
@@ -814,17 +814,17 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     {
         $methods = ['saveHABTM'];
         $Article = $this->getMockModel(Article::class, $methods);
-
+        $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
         $data = $Article->newEntity(array(
         'id' => 1,
-        'tags' => array(
+        'tags' =>  [
           ['title' => 'testSaveHABTMIsCalled'],
-        ),
-      ));
+        ],
+       ));
 
         $Article->expects($this->once())
-      ->method('saveHABTM')
-      ->willReturn(true);
+          ->method('saveHABTM')
+          ->willReturn(true);
 
         $Article->save($data);
     }
