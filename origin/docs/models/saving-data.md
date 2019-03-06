@@ -1,27 +1,15 @@
 # Saving data
 
-## save($ data,array $options = array())
+## save(Entity $data,array $options = [])
 
-This function is to save one record for the current model. Data can be an array or object. Optionally you can pass  `options`.
+This function is to save one record for the current model. Optionally you can pass an array of options.
 
-`$this->Article->save($data,$options)`
-
-```php
-$article = array(
-    'title' => 'How to save models using arrays'
-  );
-
-$this->Article->save($article)
-```
-
-or if you are working with objects then
+`$this->Article->save(Entity $data,$options)`
 
 ```php
-$article->title = 'How to save models using objects';
-
-$this->Article->save($article);
+  $article->title = 'How to save models using objects';
+  $this->Article->save($article);
 ```
-
 
 You can also pass a options array with any of the following keys.
 
@@ -30,45 +18,41 @@ You can also pass a options array with any of the following keys.
 - `transaction` default is `true`. Saves the record as a single transaction.
 
 ```php
-$options = array(
-  'callbacks' => false,
-  'validate' => false
-);
+  $options = [
+    'callbacks' => false,
+    'validate' => false
+  ];
 
-$this->Article->save($article,$options);
+  $this->Article->save($article,$options);
 ```
 
-## saveField($primaryKey, string $name,string $value,array $options = array())
+Sometimes you will not have data as an entity and you want  save this.
 
-If you have all ready loaded a record, then just use save, and 
-this will save the modified fields. However, when you need to update a field in the database without having
-to load the record, then you can use save field.
+## saveField($primaryKey, string $name,string $value,array $options = [])
 
-`$this->Article->saveField($primaryKey, $fieldName,$fieldValue,$options)`
+If you have all ready loaded a record, then just use save, and this will save the modified fields. However, when you need to update a field in the database without having to load the record, then you can use `saveField`. The options that you can pass
+are the same as when using the `save` this is because the `saveField` method basically creates the object and then saves through `save`.
+
+`$this->Article->saveField($primaryKey, $fieldName, $fieldValue,$options)`
 
 ```php
-$this->Article->saveField(1024,'title','New Title');
+  $this->Article->saveField(1024,'title','New Title');
 ```
 
 
-## saveMany($data,array $options = array())
+## saveMany($data,array $options = [])
 
-This function is to save multiple records for the current model. Optionally you can pass `options`.
+This function is to save multiple records for the current model. Optionally you can pass an array of options as used in the `save` method.
 
 `$this->Article->saveMany($data)`
 
-This basically loops over the data and runs the `save` method.
+This basically loops over the array of entities and runs the `save` method.
 
 ```php
-$articles array(
-    array('tile'=>'Saving many part # 1'),
-    array('tile'=>'Saving many part # 1'),
-  );
-
-$this->Article->saveMany($articles)
+  $this->Article->saveMany($articles)
 ```
 
-You can also pass a options array with any of the following keys.
+The options array with any of the following keys.
 
 - `validate` default is `true` but you can set to `false` to disable validation
 - `callbacks` default is `true` but you can set to `false` to not call the [callback](callbacks.md) methods such `beforeSave` or `afterSave`. You can also set to either `before` or `after` to only call the `beforeSave` or `afterSave`.
@@ -82,40 +66,42 @@ To update one or multiple records in a single call. Note callbacks are not trigg
 `$this->Article->updateAll($data,$conditions)`
 
 ```php
-$data = array(
-  'checked' => true,
-  'status' => 'Verified'
-);
+  $data = [
+    'checked' => true,
+    'status' => 'Verified'
+  ];
 
-$conditions = array(
-  'status' => 'Pending'
-);
+  $conditions = [
+    'status' => 'Pending'
+  ];
 
-$this->Article->updateAll($data,$conditions);
+  $this->Article->updateAll($data,$conditions);
 ```
 
-## saveAssociated($data, array $options = array())
+## saveAssociated($data, array $options = [])
 
 You can save records with with associated data such as `hasOne`,`BelongsTo` and `hasMany`.
 
 `$this->Article->saveAssociated($data,$options)`
 
 ```php
-$article = array(
-  'title' => 'How to save data with associated data',
-  'author' => array(          // belongsTo
-      'name' => 'Jane Smith',
-    ),
-   'approval' => array(     // hasOne
-      'approvedBy' => 'Tony'
-     ),
-   'comments' => array(     // Has Many
-       array('text' => 'foo'),
-       array('text' => 'bar'),
-     )
-);
+  $article = [
+    'title' => 'How to save data with associated data',
+    'author' => [          // belongsTo
+        'name' => 'Jane Smith',
+      ],
+    'approval' => [     // hasOne
+        'approved_by' => 'Tony'
+      ],
+    'comments' => [    // Has Many
+        ['text' => 'foo'],
+        ['text' => 'bar'],
+      ]
+  ];
+  $entity = $this->Article->newEntity($article);
+  $this->Article->saveAssociated($entity);
 ```
-## saving HABTM
+## Saving HABTM records
 
 Saving `hasAndBelongsToMany` data is done through the normal model save.
 
@@ -125,14 +111,14 @@ You can save HABTM in two ways
 
 ```php
 
-$data = array(
-  'id' => 1,
-  'tags' => array(
-    array('id' => 1),
-    array('id' => 2)
-  );
-
-$this->Article->save($data);
+  $data = array(
+    'id' => 1,
+    'tags' => array(
+      array('id' => 1),
+      array('id' => 2)
+    ));
+  $entity = $this->Article->newEntity($data);
+  $this->Article->save($data);
 
 ```
 
@@ -140,14 +126,14 @@ $this->Article->save($data);
 
 ```php
 
-$data = array(
-  'id' => 1,
-  'tags' => array(
-    array('name' => 'New'),
-    array('name' => 'Featured')
-  );
-
-$this->Article->save($data);
+  $data = array(
+    'id' => 1,
+    'tags' => array(
+      array('name' => 'New'),
+      array('name' => 'Featured')
+    );
+  $entity = $this->Article->newEntity($data);
+  $this->Article->save($data);
 
 ```
 Saving data through this method is a quick and easy method to save `hasAndBelongsToMany` data. However callbacks are only called when creating the associated model, in this example the Tag model.
@@ -156,12 +142,12 @@ If you wish to save extra data to the join table or use callbacks then you shoul
 
 ```php
 
-$data = array(
-  'article_id' => 123,
-  'tag_id' => 456,
-  'status' => 'new'
-);
+  $articlesTag = $this->Article->ArticlesTag->newEntity();
 
-$this->Article->ArticlesTag->save($data);
+  $articleTag->article_id = 123
+  $articleTag->tag_id = 456;
+  $articleTag->status = 'new'
+
+  $this->Article->ArticlesTag->save($entity);
 
 ```

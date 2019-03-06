@@ -45,7 +45,7 @@ Request data can be accessed via the Request object. This is available in the co
 
 ```
 
-What you can access through 
+What you can access through the Request object.
 
 - `params` This is an array of params for the request
   - `controller` this tells you the controller name, e.g. Bookmarks

@@ -20,28 +20,38 @@ An entity is a single row from the database. Using find first or find all will r
 
 ```
 
-When you want to create an entity from an array, you can do this  in the constructor.
-
-````php 
-  use Origin\Model\Entity;
-
-  $entity = new Entity(['name'=>'Jon']);
-
-````
-
-From within the controller you will want to create entity from request data
-
+From within the controller you will want to create entity from request data, you do this by accessing the model methods `newEntity` and `patchEntity`;
 
 ````php 
   $user = $this->User->newEntity($this->request->data);
 ````
 
-If you are editing an existing record, then use patchEntity. Only fields from request data are saved.
+You can also just get a blank entity for the model by not passing an array when calling `newEntity`;
+
+````php 
+  $user = $this->User->newEntity();
+  $user->name = 'james'
+  $user->email = 'james@example.com'
+````
+
+If you want to create multiple entities then you can do as follows:
+
+````php 
+  $entities = $this->User->newEntities([
+    ['name'=>'James'],
+    ['name'=>'John']
+  ]);
+````
+
+This will create an array with two entities.
+
+If you are editing an existing record, then use `patchEntity`. Only fields that have been modified will be
+saved. The field will be classed as modified even if the value stays the same, since we are going patch the existing 
+entity with the data, in this case from the request.
 
 ````php 
   $user = $this->User->patchEntity($existingEntity,$this->request->data);
 ````
-
 
 ## Isset
 
@@ -108,4 +118,16 @@ To set errors
   $entity->errors('password',['alphanumeric only','min length must be 5']);
 ````
 
-   
+## Other Methods
+
+### clear()
+Clears all data from the entity
+
+### clean()
+This resets the modified property and any errors.
+
+### Modified()
+Gets a list of fields that were modified.
+
+### Name()
+Gets the model name of the entity.

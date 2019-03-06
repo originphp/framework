@@ -46,4 +46,25 @@ To use a behavior the functions will be added to the model.
 
 ````
 
-Behaviors have the same callbacks functions as models. So if you add them they will be called.
+Behaviors have the same [callbacks](callbacks.md) functions as models. So if you add them they will be called. 
+
+Sometimes you will need to disable or unload behaviors, to do this you will need access the behavior registry
+
+
+
+````php
+    class Article extends AppModel
+    {
+      public function import()
+      {
+          $this->behaviorRegistry()->disable('timestamp');
+
+          ...
+
+          $this->behaviorRegistry()->enable('timestamp');
+
+      }
+    }
+````
+
+You can also `unload` a behavior.

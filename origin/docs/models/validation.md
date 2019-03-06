@@ -130,6 +130,7 @@ Checks if a value is a decimal. The value must have a decimal place in it.
 ### Email
 
 Checks that a value is a valid email address, works with UTF8 email address.
+
 ```php
   $this->validate('email',[
     'rule' => 'email'

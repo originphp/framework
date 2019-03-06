@@ -32,9 +32,8 @@ From within a model
   }
 ```
 
-Models should only be used from within controllers or other models.
+Models should only be used from within controllers or other models. However, if you need to load any model from anywhere then you can use the the following code:
 
-If you need to load any model from anywhere then you can use the the following code
 ```php
   use Origin\Model\ModelRegistry;
   

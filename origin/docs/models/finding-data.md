@@ -76,11 +76,6 @@ array(
 
 - **contain** - An array of models that you want to load associated data for. You can also pass the model as key and array of config, e.g ['Tag'=>['fields'=>$field,'conditions'=>$conditions]]
 
-  - *-1* does no joins at all.
-  - *0* fetches `belongsTo` and `hasOne` associated records
-  - *1* will also fetch the `hasMany` associated records
-  - *2* will fetch the `hasMany` records with their `belongsTo` and `hasOne` information.
-
 **offset** - Select from which record to find the data, this is used with limit.
 
 **page** - Instead of using offset you can use page, this works with the limit setting. This will automatically calculate the offset.
