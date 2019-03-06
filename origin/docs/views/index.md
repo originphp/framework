@@ -26,8 +26,8 @@ Sometimes you might use the same block of code inside multiple views, in this ca
 Create a file  `View/Element/widget.ctp`
 
 ````php
-<h2>Widget</h2>
-<p>What is 1 + 1 ? <?= $answer ?></p>
+   <h2>Widget</h2>
+   <p>What is 1 + 1 ? <?= $answer ?></p>
 ````
 
 Now anytime you want to use that element, you can also pass an array options where the data will be converted into variables with the names taken from the key value.

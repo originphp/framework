@@ -52,7 +52,7 @@ use Origin\Utils\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->textMessage('This is the text content')
     $Email->send();
@@ -66,7 +66,7 @@ use Origin\Utils\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->htmlMessage('<p>This is the html content</p>')
         ->format('html');
@@ -81,7 +81,7 @@ use Origin\Utils\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->textMessage('This is the text content')
         ->htmlMessage('<p>This is the html content</p>')
@@ -97,7 +97,7 @@ use Origin\Utils\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->textMessage('This is the text content')
         ->account('gmail');
@@ -128,7 +128,7 @@ use Origin\Utils\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->textMessage('This is the text content')
         ->addAttachment($filename1)
@@ -145,7 +145,7 @@ Templates are stored in the `View/Email` folder
     use Origin\Utils\Email;
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->template('welcome')
         ->set(['first_name'=>'Frank','email'=>'dev@originphp.com'])
@@ -158,9 +158,10 @@ Template files also accept plugin syntax, so to load a template from a plugin ju
 ````php
 use Origin\Utils\Email;
 
+
     $Email = new Email();
     $Email->to('somebody@originphp.com')
-        ->from('me@@originphp.com')
+        ->from('me@originphp.com')
         ->subject('This is a test')
         ->template('ContactManager.reset_password')
         ->format('both')

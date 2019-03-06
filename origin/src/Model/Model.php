@@ -676,8 +676,8 @@ class Model
     /**
      * Save model data to databse.
      *
-     * @param entity|array $entity  to save
-     * @param array        $options keys include:
+     * @param entity $entity to save
+     * @param array  $options keys include:
      *                              validate: wether to validate data or not
      *                              callbacks: call the callbacks duing each stage.  You can also put only before or after
      *
@@ -782,16 +782,16 @@ class Model
      * @params int|string $primaryKey the id for the record
      * @param string $fieldName
      * @param mixed  $fieldValue
-     * @param array  $params     (callbacks, validate)
+     * @param array  $options    (callbacks, validate,transaction)
      *
      * @return bool true or false
      */
-    public function saveField($primaryKey, string $fieldName, $fieldValue, array $params = [])
+    public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = [])
     {
         return $this->save(new Entity([
             $this->primaryKey => $primaryKey,
             $fieldName => $fieldValue,
-        ]), $params);
+        ]), $options);
     }
 
     /**
@@ -1742,7 +1742,7 @@ class Model
      *
      * @return [type] [description]
      */
-    public function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
+    protected function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
     {
         $callbacks = array(
             array($this, $callback),

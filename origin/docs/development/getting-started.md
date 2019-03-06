@@ -99,21 +99,20 @@ This is done with a one liner.
 You can edit the templates that used to generate the code which are stored in the `plugins\make\src\Template`. These are single files which are simple to understand, see [code generation](code-generation.md) for more information. In most cases you will want to rearrange the templates and classes or divs etc.
 
 ````html
-
-<div class="page-header">
-    <div class="float-right">
-        <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><?php echo __('Back');?></a>
+    <div class="page-header">
+        <div class="float-right">
+            <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><?php echo __('Back');?></a>
+        </div>
+        <h2><?php echo __('Add %singularHuman%'); ?></h2>
     </div>
-    <h2><?php echo __('Add %singularHuman%'); ?></h2>
-</div>
-<div class="%pluralName% form">
-    <?= $this->Form->create($%singularName%); ?>
-        <?php
-            <RECORDBLOCK>
-            echo $this->Form->control('%field%');
-            </RECORDBLOCK>
-        ?>
-    <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
-    <?= $this->Form->end(); ?>
-</div>
+    <div class="%pluralName% form">
+        <?= $this->Form->create($%singularName%); ?>
+            <?php
+                <RECORDBLOCK>
+                echo $this->Form->control('%field%');
+                </RECORDBLOCK>
+            ?>
+        <?= $this->Form->button(__('Save'), ['class' => 'btn btn-primary']); ?>
+        <?= $this->Form->end(); ?>
+    </div>
 ````
