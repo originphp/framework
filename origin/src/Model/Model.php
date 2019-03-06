@@ -185,10 +185,7 @@ class Model
             return false;
         }
 
-        $object = ModelRegistry::get(
-            $name,
-          array('className' => $className, 'alias' => $name)
-        );
+        $object = ModelRegistry::get($name, ['className' => $className, 'alias' => $name]);
         if ($object === false and $habtmModel === false) {
             throw new MissingModelException($name);
         }
@@ -1339,12 +1336,12 @@ class Model
      
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
-                if (!isset($this->{$alias})) {
-                    throw new MissingModelException($config['className'].':'.$alias);
-                }
-
                 if (isset($query['contain'][$alias]) === false) {
                     continue;
+                }
+
+                if (!isset($this->{$alias})) {
+                    throw new MissingModelException($config['className'].':'.$alias);
                 }
 
                 $config = array_merge($config, $query['contain'][$alias]);
@@ -1488,12 +1485,12 @@ class Model
     protected function loadAssociatedHasAndBelongsToMany($query, $results)
     {
         foreach ($this->hasAndBelongsToMany as $alias => $config) {
-            if (!isset($this->{$alias})) {
-                throw new MissingModelException($config['className'].':'.$alias);
-            }
-
             if (isset($query['contain'][$alias]) === false) {
                 continue;
+            }
+
+            if (!isset($this->{$alias})) {
+                throw new MissingModelException($config['className'] . ':' . $alias);
             }
 
             $config = array_merge($config, $query['contain'][$alias]);
@@ -1675,43 +1672,53 @@ class Model
     /**
      * Creates an Entity from an array of data.
      *
-     * @param array $data
+     * options:
+     * parse - By default date/datetime/time/number
+     * fields will be parsed unless you set parse to false in the options.
      *
+     * @param array $data
+     * @param array $options parse default is set to true
      * @return Entity
      */
-    public function newEntity(array $array = [])
+    public function newEntity(array $array = [], array $options=[])
     {
+        $options += ['name' => $this->alias,'new'=>true];
         $marshaller = $this->marshaller();
         
-        return $marshaller->one($array, ['name' => $this->alias,'new'=>true]);
+        return $marshaller->one($array, $options);
     }
 
     /**
      * Creates many Entities from an array of data.
      *
      * @param array $data
-     *
+     * @param array $options parse default is set to true
      * @return Entity
      */
-    public function newEntities(array $array)
+    public function newEntities(array $array, array $options=[])
     {
+        $options += ['name' => $this->alias,'new'=>true];
         $marshaller = $this->marshaller();
 
-        return $marshaller->many($array, ['name' => $this->alias,'new'=>true]);
+        return $marshaller->many($array, $options);
     }
 
     /**
      * Merges data array into an entity.
      *
+     * options:
+     * parse - By default date/datetime/time/number
+     * fields will be parsed unless you set parse to false in the options.
+     *
      * @param Entity $entity
      * @param array  $data
-     *
+     * @param array $options parse
      * @return Entity
      */
-    public function patchEntity(Entity $entity, array $data)
+    public function patchEntity(Entity $entity, array $data, array $options=[])
     {
         $marshaller = $this->marshaller();
-        return $marshaller->patch($entity, $data);
+        return $marshaller->patch($entity, $data, $options);
     }
 
     /**

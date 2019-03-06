@@ -19,13 +19,18 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Bookmarks edit tags not listed
+
 ### Added
+- Marshalling now has option to disable parsing of date/datetime/numbers etc
 - Debug function
 
 ### Changed
 - backtrace() now works properly in CLI
 - Updated docs
 - adjusted PR function to only show when debug is set
+- TestApp is now completeley independant, tests modified as well.
 
 ### Removed
 - Deleted composer.lock

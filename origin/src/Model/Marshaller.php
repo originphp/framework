@@ -140,6 +140,7 @@ class Marshaller
      *
      * Options
      * - name: model name
+     * - parse: parse date/number/time/datetime strings
      *
      * @param array $data
      * @param array $options
@@ -147,12 +148,14 @@ class Marshaller
      */
     public function one(array $data, array $options=[])
     {
-        $options += ['name' => null];
+        $options += ['name' => null,'parse'=>true];
 
         $propertyMap = $this->buildAssociationMap($options);
      
-        $data = $this->parseData($data, $options['name']);
-      
+        if ($options['parse']) {
+            $data = $this->parseData($data, $options['name']);
+        }
+   
         $entity = new Entity([], $options);
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property]) and is_array($value)) {
@@ -196,7 +199,7 @@ class Marshaller
      */
     public function patch(Entity $entity, array $data, array $options=[])
     {
-        $options += ['name' => $entity->name()];
+        $options += ['name' => $entity->name(),'parse'=>true];
         
         $entity->clean(); // reset modified
 
