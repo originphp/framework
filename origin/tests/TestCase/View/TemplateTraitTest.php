@@ -41,10 +41,8 @@ class TemplateTraitTest extends \PHPUnit\Framework\TestCase
     {
         $object = new MockObject();
         $object->config('templates', 'templates-test');
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-          );
+ 
         $this->assertInstanceOf(Templater::class, $object->templater());
-        $this->assertEquals('<p>{text}</p>', $object->template('text'));
+        $this->assertEquals('<p>{text}</p>', $object->getTemplate('text'));
     }
 }

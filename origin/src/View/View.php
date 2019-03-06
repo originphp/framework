@@ -97,7 +97,7 @@ class View
 
         $this->helpers = $controller->viewHelpers;
 
-        $this->viewPath(VIEW);
+        $this->viewPath(SRC . DS . 'View');
     }
 
     /**

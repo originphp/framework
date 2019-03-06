@@ -97,7 +97,7 @@ class ErrorHandler
 
         Log::write('errors', $message);
 
-        include VIEW.DS.'error'.DS.$errorCode.'.ctp';
+        include SRC . DS . 'View' . DS . 'error' . DS . $errorCode . '.ctp';
     }
 
     /**
@@ -144,7 +144,7 @@ class ErrorHandler
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
 
-        include VIEW.DS.'error'.DS.'debug.ctp';
+        include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
 
         exit();
     }

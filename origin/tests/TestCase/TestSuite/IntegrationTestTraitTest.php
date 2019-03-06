@@ -28,12 +28,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use IntegrationTestTrait;
     use TestTrait;
-    public function setUp()
-    {
-        Configure::write('App.namespace', 'TestApp');
-        $autoloader = Autoloader::getInstance();
-        $autoloader->addNamespace('TestApp', 'origin' . DS . 'tests'. DS . 'test_app');
-    }
+    
     public function testGet()
     {
         $this->get('/posts/index');

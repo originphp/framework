@@ -15,41 +15,31 @@
 /**
  * FrontController.
  */
-define('DS', DIRECTORY_SEPARATOR);
-define('ROOT', dirname(dirname(dirname(__FILE__))));
-define('ORIGIN', dirname(dirname(__FILE__)));
-define('CONFIG', ROOT.DS.'config');
-define('SRC', ROOT.DS.'src');
-define('TMP', ROOT.DS.'tmp');
-define('LOGS', ROOT.DS.'logs');
 
-define('WEBROOT', ROOT.DS.'webroot');
-define('VIEW', SRC.DS.'View');
-
-define('SESSIONS', TMP.DS.'sessions');
-define('PLUGINS', ROOT.DS.'plugins');
-
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', true);
 ini_set('error_log', LOGS);
 
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 
-require ORIGIN.DS.'src'.DS.'Exception'.DS.'Exception.php';
+require ORIGIN . DS . 'src' . DS . 'Exception' . DS . 'Exception.php';
 
 /**
  * Load our own autoloader
  */
-require ORIGIN . DS . 'src' . DS .'Core' .DS .'Autoloader.php';
-require CONFIG.DS.'autoload.php';
+require ORIGIN . DS . 'src' . DS .'Core' . DS .'Autoloader.php';
+require CONFIG . DS . 'autoload.php';
 /**
  * Load the composer autoloader
  */
-require ROOT.'/vendor/autoload.php';
+require ROOT . '/vendor/autoload.php';
 
 /**
  * Error and Exception handling.
  */
-if (php_sapi_name() === 'cli') {
+if (PHP_SAPI === 'cli') {
     $ErrorHandler = new Origin\Console\ErrorHandler();
 } else {
     $ErrorHandler = new Origin\Core\ErrorHandler();
@@ -57,21 +47,23 @@ if (php_sapi_name() === 'cli') {
 $ErrorHandler->register();
 
 require 'functions.php';
+
 /**
  * Load Config
  */
-require CONFIG.DS.'bootstrap.php';
-if (file_exists(CONFIG.DS.'server.php')) {
-    require CONFIG.DS.'server.php';
+require CONFIG . DS . 'bootstrap.php';
+if (file_exists(CONFIG . DS . 'server.php')) {
+    require CONFIG . DS . 'server.php';
 }
-if (file_exists(CONFIG.DS.'email.php')) {
-    require CONFIG.DS.'email.php';
+if (file_exists(CONFIG . DS . 'email.php')) {
+    require CONFIG . DS . 'email.php';
 }
-if (file_exists(CONFIG.DS.'database.php')) {
-    require CONFIG.DS.'database.php';
+if (file_exists(CONFIG . DS . 'database.php')) {
+    require CONFIG . DS . 'database.php';
 }
 
 use Origin\Core\Session;
 
 Session::initialize();
-require CONFIG.DS.'routes.php';
+
+require CONFIG . DS . 'routes.php';

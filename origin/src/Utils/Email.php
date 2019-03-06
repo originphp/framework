@@ -370,7 +370,7 @@ class Email
     protected function loadTemplate(string $name)
     {
         list($plugin, $template) = pluginSplit($name);
-        $path = VIEW . DS . 'Email';
+        $path = SRC . DS . 'View' . DS . 'Email';
         if ($plugin) {
             $path = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View'. DS . 'Email';
         }

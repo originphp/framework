@@ -4,9 +4,16 @@
  */
 define('START_TIME', microtime(true));
 
-error_reporting(E_ALL);
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', true);
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(dirname(__FILE__)));
+
+define('CONFIG', ROOT . DS . 'config');
+define('LOGS', ROOT . DS . 'logs');
+define('ORIGIN', ROOT . DS . 'origin');
+define('PLUGINS', ROOT . DS . 'plugins');
+define('SRC', ROOT . DS . 'src');
+define('TMP', ROOT . DS . 'tmp');
+define('WEBROOT', ROOT . DS . 'webroot');
 
 /**
  * Start the Origin Bootstrap Process.

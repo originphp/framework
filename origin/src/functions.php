@@ -25,12 +25,12 @@ function backtrace()
     $debugger = new Debugger();
     $debug = $debugger->backtrace();
 
-    if (php_sapi_name() === 'cli') {
+    if (PHP_SAPI === 'cli') {
         $errorHandler = new Origin\Console\ErrorHandler();
         $errorHandler->render($debug, true);
     } else {
         ob_clean();
-        include VIEW.DS.'error'.DS.'debug.ctp';
+        include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
     }
    
     exit();

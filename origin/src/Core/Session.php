@@ -20,8 +20,8 @@ class Session
 {
     public static function initialize()
     {
-        if (PHP_SAPI != 'cli' and is_writable(SESSIONS)) {
-            session_save_path(SESSIONS);
+        if (PHP_SAPI != 'cli' and is_writable(TMP . DS . 'sessions')) {
+            session_save_path(TMP . DS . 'sessions');
         }
         
         $timeout = 3600;

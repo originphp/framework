@@ -99,7 +99,6 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $result = $ShellDispatcher->callMethod('getShellList');
         $this->assertArrayHasKey('App', $result);
         $this->assertArrayHasKey('Core', $result);
-        $this->assertArrayHasKey('Debug', $result);
         $this->assertArrayHasKey('Make', $result);
     }
 

@@ -287,7 +287,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
      */
     public function testRender()
     {
-        $tmpFolder = VIEW . DS . 'Tests';
+        $tmpFolder = SRC . DS . 'View' . DS . 'Tests';
         $expected = '<h1>Test Render<h1>';
         mkdir($tmpFolder);
         file_put_contents($tmpFolder.DS . 'edit.ctp', $expected);

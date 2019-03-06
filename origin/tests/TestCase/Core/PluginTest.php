@@ -42,10 +42,10 @@ class PluginTest extends \PHPUnit\Framework\TestCase
     {
         // test with routes and bootstrap
         MockPlugin::load('Make');
-        $this->assertEquals(['Debug','Make'], MockPlugin::loaded());
+        $this->assertEquals(['Make'], MockPlugin::loaded());
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
-        $this->assertEquals('/var/www/plugins/make/src', $config['Make']['path']);
+        $this->assertEquals('/var/www/origin/tests/TestApp/plugins/make/src', $config['Make']['path']);
         $this->assertTrue($config['Make']['routes']);
         $this->assertTrue($config['Make']['bootstrap']);
         
