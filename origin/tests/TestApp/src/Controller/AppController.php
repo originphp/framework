@@ -1,6 +1,6 @@
 <?php
 
-namespace TestApp\Controller;
+namespace App\Controller;
 
 use Origin\Controller\Controller;
 use Origin\Core\I18n;
@@ -47,7 +47,7 @@ class AppController extends Controller
     protected function createView()
     {
         $view = new View($this);
-        $view->viewPath(ORIGIN  . DS . 'tests' . DS . 'test_app' . DS . 'View');
+        // $view->viewPath(ORIGIN  . DS . 'tests' . DS . 'TestApp' . DS . 'src' . DS . 'View');
         return $view;
     }
 }
