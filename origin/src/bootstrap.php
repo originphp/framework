@@ -16,6 +16,24 @@
  * FrontController.
  */
 
+
+define('START_TIME', microtime(true));
+
+/**
+ * Load the Paths constants, if not already set (e.g. Tests)
+ */
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+    define('ROOT', dirname(dirname(dirname(__FILE__))));
+    define('CONFIG', ROOT . DS . 'config');
+    define('LOGS', ROOT . DS . 'logs');
+    define('ORIGIN', ROOT . DS . 'origin');
+    define('PLUGINS', ROOT . DS . 'plugins');
+    define('SRC', ROOT . DS . 'src');
+    define('TMP', ROOT . DS . 'tmp');
+    define('WEBROOT', ROOT . DS . 'webroot');
+}
+
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
@@ -24,13 +42,13 @@ ini_set('error_log', LOGS);
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 
-require ORIGIN . DS . 'src' . DS . 'Exception' . DS . 'Exception.php';
+require ORIGIN . '/src/Exception/Exception.php';
 
 /**
  * Load our own autoloader
  */
-require ORIGIN . DS . 'src' . DS .'Core' . DS .'Autoloader.php';
-require CONFIG . DS . 'autoload.php';
+require ORIGIN . '/src/Core/Autoloader.php';
+require CONFIG . '/autoload.php';
 /**
  * Load the composer autoloader
  */
@@ -46,24 +64,24 @@ if (PHP_SAPI === 'cli') {
 }
 $ErrorHandler->register();
 
-require 'functions.php';
+require __DIR__ . '/functions.php';
 
 /**
  * Load Config
  */
-require CONFIG . DS . 'bootstrap.php';
-if (file_exists(CONFIG . DS . 'server.php')) {
-    require CONFIG . DS . 'server.php';
+require CONFIG . '/bootstrap.php';
+if (file_exists(CONFIG . '/server.php')) {
+    require CONFIG . '/server.php';
 }
-if (file_exists(CONFIG . DS . 'email.php')) {
-    require CONFIG . DS . 'email.php';
+if (file_exists(CONFIG . '/email.php')) {
+    require CONFIG . '/email.php';
 }
-if (file_exists(CONFIG . DS . 'database.php')) {
-    require CONFIG . DS . 'database.php';
+if (file_exists(CONFIG . '/database.php')) {
+    require CONFIG . '/database.php';
 }
 
 use Origin\Core\Session;
 
 Session::initialize();
 
-require CONFIG . DS . 'routes.php';
+require CONFIG . '/routes.php';

@@ -16,6 +16,17 @@ namespace Origin\Console;
 use Origin\Console\ShellDispatcher;
 use Origin\Console\ConsoleOutput;
 
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(dirname(dirname(dirname(__FILE__)))));
+
+define('CONFIG', ROOT . DS . 'config');
+define('LOGS', ROOT . DS . 'logs');
+define('ORIGIN', ROOT . DS . 'origin');
+define('PLUGINS', ROOT . DS . 'plugins');
+define('SRC', ROOT . DS . 'src');
+define('TMP', ROOT . DS . 'tmp');
+define('WEBROOT', ROOT . DS . 'webroot');
+
 require  'origin/src/bootstrap.php';
 
 $Dispatcher = new ShellDispatcher($argv, new ConsoleOutput());

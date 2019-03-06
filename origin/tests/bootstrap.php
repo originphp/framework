@@ -1,7 +1,5 @@
 <?php
-/**
- * These are for development only
- */
+
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 
@@ -16,4 +14,4 @@ define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', ROOT . DS . 'tmp');
 define('WEBROOT', ROOT . DS . 'webroot');
 
-require '../src/bootstrap.php';
+require ORIGIN . '/src/bootstrap.php';
