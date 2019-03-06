@@ -25,6 +25,7 @@ Delete tag:   git tag -d <tag_name>
 ### Added
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
 - Debug function
+- Make plugin now creates PHPUnit xml configuration file
 
 ### Changed
 - backtrace() now works properly in CLI

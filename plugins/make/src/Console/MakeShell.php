@@ -15,11 +15,10 @@
 namespace Make\Console;
 
 use Origin\Console\Shell;
-use Origin\Model\ConnectionManager;
 use Origin\Core\Inflector;
 use Origin\Exception\Exception; // @todo a different exception?
-use Origin\View\Templater;
 use Make\Utils\MakeTemplater;
+use Origin\Utils\Xml;
 
 /**
 *  Reference
@@ -100,6 +99,8 @@ class MakeShell extends Shell
             $path,
             $path . DS . 'src',
             $path . DS . 'tests',
+            $path . DS . 'tests' .DS . 'Fixture',
+            $path . DS . 'tests' .DS . 'TestCase',
             $path . DS . 'src' . DS . 'config',
             $path . DS . 'src' . DS . 'Console',
             $path . DS . 'src' . DS . 'Controller',
@@ -132,6 +133,52 @@ class MakeShell extends Shell
         if (!file_put_contents($path. DS . 'src' . DS .'Model' . DS . $data['plugin']. 'AppModel.php', $result)) {
             throw new Exception('Error writing file');
         }
+
+        if (!file_put_contents($path . DS . 'phpunit.xml', $this->phpunitXml())) {
+            throw new Exception('Error writing file');
+        }
+
+        $this->status(sprintf('%s plugin', $plugin), 'ok');
+    }
+
+    protected function phpunitXml()
+    {
+        $data = [
+            'phpunit' => [
+                '@colors' => "true",
+                '@processIsolation' => "false",
+                '@stopOnFailure' => "false",
+                '@bootstrap' => "../../origin/src/bootstrap.php",
+                '@backupGlobals' => "true",
+                'testsuites' =>  [
+                    'testsuite' => [
+                        '@name'=>'Plugin Test Suite',
+                        'directory'=>[
+                            '@'=>'./tests/TestCase/'
+                            ]]
+                        ],
+                'php' => [
+                    'const' => ['@name'=>'PHPUNIT','@value'=>'true']
+                ],
+                'listeners' => [
+                    'listener' => [
+                        '@class'=>'Origin\TestSuite\OriginTestListener',
+                        '@file'=>'../../origin/src/TestSuite/OriginTestListener.php',
+                        '@' => ''
+                        ]
+
+                    ],
+                'filter'=> [
+                    'whitelist'=>[
+                        'directory'=> [
+                            '@suffix'=>'.php',
+                            '@' => './src/'
+                            ]
+                    ]
+                ]
+            ]
+        ];
+        return Xml::fromArray($data, ['pretty'=>true]);
     }
 
     public function all()
