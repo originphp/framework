@@ -38,16 +38,4 @@ class AppController extends Controller
     public function shutdown()
     {
     }
-
-
-    /**
-     * Overide default viewPath is not affected by namespace changes.
-     *
-     */
-    protected function createView()
-    {
-        $view = new View($this);
-        // $view->viewPath(ORIGIN  . DS . 'tests' . DS . 'TestApp' . DS . 'src' . DS . 'View');
-        return $view;
-    }
 }
