@@ -47,7 +47,9 @@ class BookmarksController extends AppController
 
     public function edit($id = null)
     {
-        $bookmark = $this->Bookmark->get($id);
+        $bookmark = $this->Bookmark->get($id, [
+            'contain' => ['Tag']
+        ]);
     
         if ($this->request->is(['post', 'put'])) {
             $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data);
