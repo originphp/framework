@@ -16,9 +16,6 @@
  * FrontController.
  */
 
-
-define('START_TIME', microtime(true));
-
 /**
  * Load the Paths constants, if not already set (e.g. Tests)
  */

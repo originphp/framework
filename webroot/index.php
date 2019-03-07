@@ -3,6 +3,8 @@
  * Front Controller.
  */
 
+define('START_TIME', microtime(true));
+
 /**
  * Start the Origin Bootstrap Process.
  */
