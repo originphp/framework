@@ -21,17 +21,23 @@ Delete tag:   git tag -d <tag_name>
 ## [Unreleased]
 ### Fixed
 - Bookmarks edit tags not listed
+- Bookmarks not validating URL
 
 ### Added
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
 - Debug function
 - Make plugin now creates PHPUnit xml configuration file
+- Added Collection documentation
+- setError,getError functions in Entity and refactored use of errors
 
 ### Changed
 - backtrace() now works properly in CLI
-- Updated docs
+- Improved documentation
 - adjusted PR function to only show when debug is set
-- TestApp is now completeley independant, tests modified as well.
+- TestApp is now completely independent, tests modified as well.
+- Changed some public methods to protected or private
+- Moved Collections to Utils
+- Make controller delete action template changed to use object->id
 
 ### Removed
 - Deleted composer.lock
