@@ -11,9 +11,8 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Core;
+namespace Origin\Test\Utils;
 
-use Origin\Core\Collection;
 use Origin\Model\Entity;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase

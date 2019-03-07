@@ -11,7 +11,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Core;
+namespace Origin\Utils;
 
 use ArrayIterator;
 
@@ -60,7 +60,6 @@ class Collection
      */
     public function each(callable $callback)
     {
-        $me = $this;
         foreach ($this->items as $key => $value) {
             $callback($value, $key);
         }
@@ -254,7 +253,7 @@ class Collection
     }
 
     /**
-     * Sorts by a field or called back
+     * Sorts by a field or call back
      *
      * $collection->sortBy('author.name');
      *
@@ -394,10 +393,10 @@ class Collection
     /**
      * Counts by a field and groups the results
      *
-     * $collection->countBy('student.grade');
+     * $collection->countBy('author.status');
      *
      * // ['odd'=>2,'even'=>3]
-     * $collection->countBy(function ($book) {
+     *  $collection->countBy(function ($book) {
      *      return $book->id % 2 == 0 ? 'even' : 'odd';
      *   })
      *
