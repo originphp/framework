@@ -105,8 +105,8 @@ Which gives this:
 You can also create an array from the XML using the `toArray` method.
 
 ````php
-    $xml= '<?xml version="1.0" encoding="utf-8"?><note><to>You</to><from>Me</from><heading>Reminder</heading>  <description>Buy milk</description></note>';
-    $xml= Xml::toArray($xml);
+    $xml = '<?xml version="1.0" encoding="utf-8"?><note><to>You</to><from>Me</from><heading>Reminder</heading>  <description>Buy milk</description></note>';
+    $array = Xml::toArray($xml);
 ````
 
 # Namespaces

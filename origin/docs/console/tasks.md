@@ -113,6 +113,6 @@ This returns the controller that loaded the task. This is useful if you need to 
 Tells the lazy loader that you will be using another Task within this task. Once you do this you can
 access the task using `$this->AnotherTask->method()`; 
 
-### Task::loadTask(array $names)
+### Task::loadTasks(array $names)
 
 Loads multiple tasks using the `loadTask` method.
