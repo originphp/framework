@@ -146,9 +146,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     );
 
         $entity = new Entity($data);
-        $entity->errors('title', 'invalid title');
+        $entity->setError('title', 'invalid title');
      
-        $this->assertEquals(['invalid title'], $entity->errors('title'));
+        $this->assertEquals(['invalid title'], $entity->getError('title'));
     }
 
     /**

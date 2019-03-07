@@ -737,7 +737,7 @@ class Model
          */
         foreach ($data as $key => $value) {
             if (is_array($value) or is_object($value)) {
-                $entity->errors($key, 'Invalid data');
+                $entity->setError($key, 'Invalid data');
             }
         }
    
@@ -1440,12 +1440,11 @@ class Model
     }
 
     /**
-     * Transforms a single row (array) into an entity, overide this to use a custom
-     * Entity class. E.g ContactEntity
+     * Transforms a single row (array) into an entity. This is used when preparing
+     * results loaded from the database. Entity new is set to false.
      *
      * @param array  $resultSet result from database
      * @param string $name name of entity basically model alias
-     *
      * @return Entity
      */
     protected function createEntity(array $resultSet, string $name)

@@ -150,7 +150,6 @@ class Entity
      *  $errors = $entity->errors();
      *  $fieldErrors = $entity->errors('contact_name');
      *  $entity->errors('email','invalid email address');
-     *  $entity->errors('password',['alphanumeric only','min length must be 5']);
      *
      * @param string $field
      * @param string|array $error
@@ -162,21 +161,38 @@ class Entity
             return $this->_errors;
         }
         if ($error === null) {
-            if (isset($this->_errors[$field])) {
-                return $this->_errors[$field];
-            }
-    
-            return null;
+            return $this->getError($field);
         }
+        $this->setError($field, $error);
+    }
 
+    /**
+     * Sets a validation error
+     *
+     * @param string $field
+     * @param string $error
+     * @return void
+     */
+    public function setError(string $field, string $error)
+    {
         if (!isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
         }
+        $this->_errors[$field][] = $error;
+    }
 
-        $error = (array) $error;
-        foreach ($error as $message) {
-            $this->_errors[$field][] = $message;
+    /**
+     * Gets an error for field
+     *
+     * @param string $field
+     * @return void
+     */
+    public function getError(string $field)
+    {
+        if (isset($this->_errors[$field])) {
+            return $this->_errors[$field];
         }
+        return null;
     }
 
     public function unset($properties)
@@ -287,7 +303,6 @@ class Entity
      * Checks if Entity has property set. This SHOULD work like isset.
      *
      * @param string $property name of property
-     *
      * @return bool true of false
      */
     public function hasProperty($property)
@@ -310,7 +325,6 @@ class Entity
      * Checks if a entity has a property SET (regardless if null).
      *
      * @param string $property [description]
-     *
      * @return bool [description]
      */
     public function propertyExists(string $property)
@@ -319,7 +333,7 @@ class Entity
     }
 
     /**
-     * Gets the model.
+     * Gets the model name.
      *
      * @return string model name
      */
@@ -337,17 +351,18 @@ class Entity
     {
         $result = [];
         foreach ($this->_properties as $property => $value) {
-            if ($value instanceof Entity) {
-                $result[$property] = $value->toArray();
-            } elseif (is_array($value)) {
+            if (is_array($value)) {
                 foreach ($value as $k => $v) {
                     if ($v instanceof Entity) {
                         $result[$property][$k] = $v->toArray();
                     }
                 }
-            } else {
-                $result[$property] = $value;
+                continue;
             }
+            if ($value instanceof Entity) {
+                $value = $value->toArray();
+            }
+            $result[$property] = $value;
         }
 
         return $result;

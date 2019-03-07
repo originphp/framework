@@ -144,7 +144,7 @@ class Marshaller
      *
      * @param array $data
      * @param array $options
-     * @return void
+     * @return Entity
      */
     public function one(array $data, array $options=[])
     {
@@ -177,7 +177,7 @@ class Marshaller
      *
      * @param array $data
      * @param array $options
-     * @return void
+     * @return array
      */
     public function many(array $data, array $options=[])
     {

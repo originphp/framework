@@ -1,10 +1,43 @@
 # Saving data
 
-## save(Entity $data,array $options = [])
+To save a record, it needs to be an [entity object](entities.md). 
+
+You can use the `newEntity` or `patchEntity` methods in the model to create the entity object for you.
+
+When creating the entity you can do so like this from within the model:
+
+```php
+    $entity = $this->newEntity();
+    $entity->name = 'foo';
+```
+
+Or like this
+
+```php
+  $entity = $this->newEntity(['name'=>'foo']);
+```
+
+From the controller it would be
+
+```php
+    $entity = $this->MyModel->newEntity(['name'=>'foo']);
+```
+
+Patch Entity is used for taking a complex/nested array and patching an existing entity. 
+
+From the controller patch entity is used like this:
+
+```php
+    $entity = $this->MyModel->patchEntity($existing,$this->request->data);
+```
+
+You don't have to use `patchEntity`. If the entity is already exists, simply by setting any values, they will be marked as modified and you will get the same result.
+
+## save(Entity $entity,array $options = [])
 
 This function is to save one record for the current model. Optionally you can pass an array of options.
 
-`$this->Article->save(Entity $data,$options)`
+`$this->Article->save(Entity $entity,$options)`
 
 ```php
   $article->title = 'How to save models using objects';

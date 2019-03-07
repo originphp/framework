@@ -154,16 +154,16 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $Widget = new Widget();
         $widget = $Widget->newEntity();
         $widget->name = 'foo';
-        $widget->errors('name', 'its not bar');
+        $widget->setError('name', 'its not bar');
 
         $widget2 = $Widget->newEntity();
         $widget2->name = 'bar';
-        $widget2->errors('name', 'its not foo');
+        $widget2->setError('name', 'its not foo');
         $widget->related = $widget2;
 
         $widget3 = $Widget->newEntity();
         $widget3->name = 'foo/bar';
-        $widget3->errors('name', 'its messy');
+        $widget3->setError('name', 'its messy');
 
         $widget->widgets = [$widget3];
 
@@ -404,7 +404,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
         $widget = $Widget->newEntity();
         $widget->description = 'Widget Name';
-        $widget->errors('description', 'invalid description');
+        $widget->setError('description', 'invalid description');
 
         $FormHelper->create($widget);
         $expected = '<div class="form-group textarea error"><label for="description">Description</label><textarea name="description" class="form-control error" id="description">Widget Name</textarea><div class="error-message">invalid description</div></div>';
