@@ -598,7 +598,7 @@ class Model
     /**
      * Adds aliases to an array of fields. Skips fields that
      * 1. Have space example somefield AS anotherName
-     * 2. Are a MySql function example count,max,avg,quarter,date etc
+     * 2. Are a MySQL function example count,max,avg,quarter,date etc
      * 3. Already alaised Post.title.
      *
      * @param array $fields [description]

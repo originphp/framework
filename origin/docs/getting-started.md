@@ -115,7 +115,7 @@ to access the bash terminal
 
 Remember, if you wish to make changes to docker container that persist, you will need to adjust the docker files. An example of this would be adding a php extension which is not included. A full list can be found by examining the Dockerfile.
 
-to access MySql client from within bash. You must put db as host, as in the docker setup MySql is a separate container.
+to access MySQL client from within bash. You must put db as host, as in the docker setup MySQL is a separate container.
 `mysql -h db -uroot -p`
 
-The MySql password is set in the `docker-compose.yml` file.
+The MySQL password is set in the `docker-compose.yml` file.

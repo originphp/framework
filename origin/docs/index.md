@@ -39,7 +39,7 @@ class UserProfilesController extends AppController
 Table names should be plural and underscored. For example `user_profiles`. 
 Each table in your database should have a primary key,and it should be named `id`. Foreign keys should be the singular underscored name, for example `user_profile_id`.
 
-Dates,datetime,and time use the MySql field types of the same time. So the date format is `YYYY-MM-DD`.
+Dates,datetime,and time use the MySQL field types of the same time. So the date format is `YYYY-MM-DD`.
 
 When accessing related models from a result (Entity), it is camel cased with the first letter in lower case. If it is `hasOne` or `belongsTo` then it is singular else if it is a `hasMany` or `hasAndBelongsToMany` then it is plural.
 
