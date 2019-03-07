@@ -31,7 +31,15 @@ class Bookmark extends AppModel
             'message' => 'This field is required'
             ]);
         $this->validate('title', 'notBlank');
-        $this->validate('url', 'notBlank');
+        $this->validate('url', [
+            'notBlank' => [
+                'rule'=>'notBlank'
+            ],
+            'url' => [
+                'rule'=>'url',
+                'message' => 'Invalid URL'
+            ],
+        ]);
         
         /**
          * Configure associations
@@ -53,7 +61,8 @@ class Bookmark extends AppModel
     }
 
     /**
-     * Take the comma seperated string and covert to array of Tags.
+     * Take the comma seperated string and covert to array of Tags so
+     * that they can be saved with HABTM.
      *
      * @param Entity $entity
      * @param array  $options
@@ -61,9 +70,8 @@ class Bookmark extends AppModel
     public function beforeSave(Entity $entity, array $options = [])
     {
         if ($entity->hasProperty('tag_string')) {
-            $entity->tags = array();
+            $entity->tags = [];
             $tags = explode(',', $entity->tag_string);
-
             foreach ($tags as $tag) {
                 $entity->tags[] = $this->Tag->newEntity(['title' => $tag]);
             }

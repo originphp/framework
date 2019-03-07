@@ -75,8 +75,8 @@ class BookmarksController extends AppController
 
         $bookmark = $this->Bookmark->get($id);
 
-        if ($this->Bookmark->delete($id)) {
-            $this->Flash->success(__('The bookmark %d has been deleted.', $id));
+        if ($this->Bookmark->delete($bookmark->id)) {
+            $this->Flash->success(__('The bookmark %d hasbeen deleted.', $bookmark->id));
         } else {
             $this->Flash->error(__('The bookmark could not be deleted.'));
         }
