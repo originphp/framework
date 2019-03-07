@@ -59,6 +59,42 @@ One of the shell commands for bookmarks is uninstall, this will remove all demo 
 
 `bin/console bookmarks uninstall` 
 
+## Super Quick Tutorial
+
+What we are going to do is remove the sample files, and then use the Make plugin to generate the models,views and controllers to give you an idea how quick you can build apps.
+
+Lets uninstall the bookmarks files (later on you can re-download these if you want)
+
+`bin/console bookmarks uninstall` 
+
+Now we are going to generate the code.
+
+`bin/console make all` 
+
+Thats it, you have now built your own bookmarks app using just the database. Ofcourse, our demo was slightly customised so would look different and have some different features. But that is the process you will normally start with when starting a new project, setting up the database and then generating the code.
+
+If you go to [http://localhost:8000/bookmarks](http://localhost:8000/bookmarks) you will see some bookmarks, if you did not delete them.
+
+Open one of the bookmarks, by clicking on one of the id numbers, this will take you to the view page.
+
+You will see that there is a related list for tags, but nothing is showing. Open up the BookmarksController file in the src/Controller folder.
+
+Edit the view action so you add the contain key to the options for get, and set the model name there. Now when you reload the page, it will load all associated Tags with this (These are defined in the Model itself). By default associated data is not fetched unless you specify with contain.
+
+````php
+    public function view($id = null)
+    {
+        $bookmark = $this->Bookmark->get($id, [
+            'contain'=>['Tag']
+            ]);
+   
+        $this->set('bookmark', $bookmark);
+    }
+````
+Okay lets shut the container down, type in the following
+
+`docker-compose down`
+
 # Docker
 My preferred method over the years has been using VirtualBox, with this the server setup/installs are done through a checklist, and this eliminates problems when running code on different servers such as development, staging and production. That said, I feel the way forward for a development setup is through docker and its disposable containers. I plan to include a server installation script for the staging and production servers on DigitalOcean or AWS, which has all the same extensions (except X-debug) as the docker development container.
 

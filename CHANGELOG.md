@@ -22,6 +22,7 @@ Delete tag:   git tag -d <tag_name>
 ### Fixed
 - Bookmarks edit tags not listed
 - Bookmarks not validating URL
+- Fixed Make plugin related list issue and back button
 
 ### Added
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
@@ -29,6 +30,7 @@ Delete tag:   git tag -d <tag_name>
 - Make plugin now creates PHPUnit xml configuration file
 - Added Collection documentation
 - setError,getError functions in Entity and refactored use of errors
+- Bookmarks demo tags
 
 ### Changed
 - backtrace() now works properly in CLI

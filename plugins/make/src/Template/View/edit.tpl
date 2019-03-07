@@ -1,6 +1,6 @@
 <div class="page-header">
     <div class="float-right">
-        <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><= __('Back') ?></a>
+        <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><?= __('Back') ?></a>
     </div>
     <h2><?= __('Edit %singularHuman%') ?></h2>
 </div>

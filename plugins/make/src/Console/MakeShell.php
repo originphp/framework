@@ -370,7 +370,7 @@ class MakeShell extends Shell
                 $relatedList = '';
                 foreach ($related as $associated) {
                     $vars = $this->getData($associated);
-                    $vars['currentModel'] = $model;
+                    $vars['currentModel'] = lcfirst($model);
                     $relatedList .= $Templater->generate('View/view_related', $vars);
                 }
                 $result = str_replace('{RELATEDLISTS}', $relatedList, $result);//One off tag this allows user to wrap in div etc
