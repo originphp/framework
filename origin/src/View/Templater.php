@@ -71,12 +71,19 @@ class Templater
      *      'link' => '<a href="{url}">{text}</a>'
      *   ];
      *
+     * You can also use dot notation which will load from the plugin folder.
+     * $templater->load('MyPlugin.templates-pagination');
      * @param string $name
      * @return void
      */
     public function load(string $name)
     {
         $filename = CONFIG . DS . $name . '.php';
+        list($plugin, $name) = pluginSplit($name);
+        if ($plugin) {
+            $filename = PLUGINS . DS . $plugin . DS . 'config' . DS . $name . '.php';
+        }
+
         if (file_exists($filename)) {
             $return = include $filename;
             if (is_array($return)) {
