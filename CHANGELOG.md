@@ -24,6 +24,7 @@ Delete tag:   git tag -d <tag_name>
 - Bookmarks not validating URL
 - Fixed Make plugin related list issue and back button
 - Bookmarks creating null tags
+- Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
@@ -32,6 +33,7 @@ Delete tag:   git tag -d <tag_name>
 - Added Collection documentation
 - setError,getError functions in Entity and refactored use of errors
 - Bookmarks demo tags
+- Templater now works with dot notation
 
 ### Changed
 - backtrace() now works properly in CLI
@@ -44,5 +46,6 @@ Delete tag:   git tag -d <tag_name>
 
 ### Removed
 - Deleted composer.lock
+- unused code in Entity and View
 
 ## [1.0.0-beta] - 2019-xx-xx
