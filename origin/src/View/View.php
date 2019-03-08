@@ -82,7 +82,7 @@ class View
      * @example /var/www/src/View
      * @var string
      */
-    protected $viewPath = null;
+    protected $viewPath = SRC . DS . 'View';
 
     public function __construct(Controller $controller)
     {
@@ -96,23 +96,6 @@ class View
         $this->helperRegistry = new HelperRegistry($this);
 
         $this->helpers = $controller->viewHelpers;
-
-        $this->viewPath(SRC . DS . 'View');
-    }
-
-    /**
-     * This is used to set or get the base view folder
-     * $view->viewFolder('/var/www/src/View')
-     * Should not really use this, this was setup to make testing easier
-     * @param string $folder
-     * @return void
-     */
-    public function viewPath(string $folder = null)
-    {
-        if ($folder === null) {
-            return $this->viewPath;
-        }
-        $this->viewPath = $folder;
     }
 
     /**
@@ -210,14 +193,7 @@ class View
 
     protected function getElementFilename(string $name)
     {
-        $path = $this->viewPath . DS . 'Element';
-        list($plugin, $name) = pluginSplit($name);
-
-        if ($plugin) {
-            $path = PLUGINS . DS . $plugin . DS . 'src' . DS . 'View' . DS . 'Element';
-        }
-
-        $filename = $path.DS.$name.'.ctp';
+        $filename = $this->getFilename($name, 'Element');
 
         if ($this->fileExists($filename)) {
             return $filename;
@@ -250,6 +226,12 @@ class View
         throw new MissingViewException([$this->name, $name]);
     }
 
+    /**
+     * Gets the view path for the current request
+     *
+     * @param boolean $withControllerName
+     * @return string
+     */
     protected function getViewPath($withControllerName = true)
     {
         $viewPath = $this->viewPath;
@@ -273,20 +255,29 @@ class View
      */
     protected function getLayoutFilename(string $layout)
     {
-        $path = $this->viewPath . DS . 'Layout';
-        list($plugin, $layout) = pluginSplit($layout);
-
-        if ($plugin) {
-            $path = PLUGINS.DS.$plugin.DS.'src'.DS.'View'.DS.'Layout';
-        }
-
-        $filename = $path.DS.$layout.'.ctp';
+        $filename = $this->getFilename($layout, 'Layout');
 
         if ($this->fileExists($filename)) {
             return $filename;
         }
 
         throw new MissingLayoutException($layout);
+    }
+
+    /**
+     * Used for determining layout/element filenames
+     *
+     * @param string $name
+     * @param string $folder
+     * @return string
+     */
+    protected function getFilename(string $name, string $folder)
+    {
+        list($plugin, $name) = pluginSplit($name);
+        if ($plugin) {
+            return PLUGINS .DS . $plugin . DS . 'src' . DS . 'View' . DS . $folder . DS . $name . '.ctp';
+        }
+        return $this->viewPath . DS . $folder . DS . $name . '.ctp';
     }
 
     /**
