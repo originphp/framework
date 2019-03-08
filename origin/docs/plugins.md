@@ -10,8 +10,8 @@ Lets say you want to create a contact manager plugin, you create the folder stru
 .
 |-- plugins
 |   |-- contact_manager
+|   |   -- config
 |   |   -- src
-|   |       |-- config
 |   |       |-- Controller
 |   |       |-- Model
 |   |       |-- View

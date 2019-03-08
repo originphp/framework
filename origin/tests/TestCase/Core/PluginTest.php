@@ -45,7 +45,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Make'], MockPlugin::loaded());
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
-        $this->assertEquals('/var/www/origin/tests/TestApp/plugins/make/src', $config['Make']['path']);
+        $this->assertEquals('/var/www/origin/tests/TestApp/plugins/make', $config['Make']['path']);
         $this->assertTrue($config['Make']['routes']);
         $this->assertTrue($config['Make']['bootstrap']);
         
@@ -74,10 +74,14 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         // Give include test
         Plugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
         $this->assertFalse(Plugin::routes('Make')); // Test Include
+        Plugin::load('Make', ['routes'=>true]);
+        $this->assertTrue(Plugin::routes('Make'));
     }
     public function testInclude()
     {
-        Plugin::load('Make');
+        Plugin::load('Make', ['routes'=>false]);
         $this->assertFalse(Plugin::routes('Make'));
+        Plugin::load('Make', ['routes'=>true]);
+        $this->assertTrue(Plugin::routes('Make'));
     }
 }

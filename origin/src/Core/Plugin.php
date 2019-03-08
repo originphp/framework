@@ -54,7 +54,7 @@ class Plugin
     public static function load(string $plugin, array $options = [])
     {
         $options += ['routes' => true, 'bootstrap' => true];
-        $options['path'] = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src';
+        $options['path'] = PLUGINS . DS . Inflector::underscore($plugin);
     
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
@@ -142,9 +142,9 @@ class Plugin
      */
     protected static function include(string $filename)
     {
-        if (file_exists($filename) === false) {
-            return false;
+        if (file_exists($filename)) {
+            return (bool) include $filename;
         }
-        return include $filename;
+        return false;
     }
 }
