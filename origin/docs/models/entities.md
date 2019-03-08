@@ -123,11 +123,8 @@ To set errors manually
 
 ## Other Methods
 
-### clear()
-Clears all data from the entity
-
-### clean()
-This resets the modified property and any errors.
+### reset()
+This resets the modified property and any validation errors.
 
 ### modified()
 Gets a list of fields that were modified.

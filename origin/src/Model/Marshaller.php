@@ -201,7 +201,7 @@ class Marshaller
     {
         $options += ['name' => $entity->name(),'parse'=>true];
         
-        $entity->clean(); // reset modified
+        $entity->reset(); // reset modified
 
         $propertyMap = $this->buildAssociationMap($options);
      

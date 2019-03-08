@@ -621,7 +621,7 @@ class Model
      *
      * @param string $field
      *
-     * @return string $field;
+     * @return string|null|array $field;
      */
     public function schema(string $field = null)
     {
@@ -685,11 +685,9 @@ class Model
      */
     public function save(Entity $entity, array $options = [])
     {
-        $defaults = ['validate' => true, 'callbacks' => true, 'transaction' => true];
-        $options = array_merge($defaults, $options);
-
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
+   
         $this->id = null;
-    
         if ($entity->hasProperty($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
         }
@@ -899,10 +897,9 @@ class Model
      */
     public function saveAssociated(Entity $data, $options = [])
     {
-        $defaults = array('validate' => true, 'callbacks' => true, 'transaction' => true);
-        $options = array_merge($defaults, $options);
-
-        $associatedOptions = array('transaction' => false) + $options;
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
+      
+        $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
             $this->begin();
@@ -1441,7 +1438,7 @@ class Model
 
     /**
      * Transforms a single row (array) into an entity. This is used when preparing
-     * results loaded from the database. Entity new is set to false.
+     * results loaded from the database.
      *
      * @param array  $resultSet result from database
      * @param string $name name of entity basically model alias
@@ -1449,7 +1446,7 @@ class Model
      */
     protected function createEntity(array $resultSet, string $name)
     {
-        return new Entity($resultSet, ['name' => $name,'new' => false]);
+        return new Entity($resultSet, ['name' => $name]);
     }
 
     protected function loadAssociatedHasMany($query, $results)

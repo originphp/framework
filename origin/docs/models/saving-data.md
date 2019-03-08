@@ -23,15 +23,13 @@ From the controller it would be
     $entity = $this->MyModel->newEntity(['name'=>'foo']);
 ```
 
-Patch Entity is used for taking a complex/nested array and patching an existing entity. 
+The PatchEntity method is used for taking an existing entity and patching it with data from an array. When this entity is saved, only the modified fields will be saved the database.
 
 From the controller patch entity is used like this:
 
 ```php
     $entity = $this->MyModel->patchEntity($existing,$this->request->data);
 ```
-
-You don't have to use `patchEntity`. If the entity is already exists, simply by setting any values, they will be marked as modified and you will get the same result.
 
 ## save(Entity $entity,array $options = [])
 

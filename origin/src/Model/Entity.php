@@ -51,28 +51,19 @@ class Entity
     protected $_modified = [];
 
     /**
-     * Wether this is a new or existingh record. Null means doesnt know
-     *
-     * @var bool
-     */
-    protected $_new = null;
-
-    /**
-     * Undocumented function
+     * Constructor
      *
      * List of options
      *  - name: Model name
-     *  - new: wether this is  a new record or not
      *
      * @param array $properties data
      * @param array $options
      */
     public function __construct(array $properties = [], array $options = [])
     {
-        $options += ['name'=>null,'new'=>null];
+        $options += ['name'=>null];
 
         $this->_name = $options['name'];
-        $this->_new = $options['new'];
         
         foreach ($properties as $property => $value) {
             $this->set($property, $value);
@@ -223,7 +214,7 @@ class Entity
      * important so we use array_key_exists
      *
      * @param array $properties
-     * @return void
+     * @return array
      */
     public function extract(array $properties)
     {
@@ -257,19 +248,11 @@ class Entity
     }
 
     /**
-     * Clears the current entity properties.
-     */
-    public function clear()
-    {
-        $this->_properties = [];
-    }
-
-    /**
      * Resets the modified properties
      *
      * @return void
      */
-    public function clean()
+    public function reset()
     {
         $this->_modified = [];
         $this->_errors = [];
@@ -283,20 +266,6 @@ class Entity
     public function modified()
     {
         return array_keys($this->_modified);
-    }
-
-    /**
-     * Sets or gets the new propery
-     *
-     * @param boolean $new
-     * @return boolean
-     */
-    public function isNew(bool $new = null)
-    {
-        if ($new === null) {
-            return $this->_new;
-        }
-        return $this->_new = $new;
     }
 
     /**
@@ -333,7 +302,7 @@ class Entity
     }
 
     /**
-     * Gets the model name.
+     * Gets the entity name, aka the model or alias.
      *
      * @return string model name
      */

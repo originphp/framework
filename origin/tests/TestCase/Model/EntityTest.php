@@ -172,22 +172,6 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, (string) $entity);
     }
 
-    public function testClear()
-    {
-        $entity = new Entity(['name'=>'Test']);
-        $this->assertTrue($entity->hasProperty('name'));
-        $entity->clear();
-        $this->assertFalse($entity->hasProperty('name'));
-    }
-
-    public function testIsNew()
-    {
-        $entity = new Entity(['name'=>'Test'], ['new'=>true]);
-        $this->assertTrue($entity->isNew());
-        $entity->isNew(false);
-        $this->assertFalse($entity->isNew());
-    }
-
     public function testPropertyExists()
     {
         $entity = new Entity(['name'=>'test']);

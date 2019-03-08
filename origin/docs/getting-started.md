@@ -8,8 +8,11 @@ Whilst in alpha, I have included the Bookmark demo app in the src folder.
 
 Install [docker desktop](https://www.docker.com/products/docker-desktop), if you don't already have this.
 
-1. Unzip the OriginPHP archive into a new project folder, e.g `origin-demo`
-2. From within your project folder type `docker-compose build` - it will take a couple of minutes, and is only done once unless you change the Docker configuration files.
+1. Download the sourcecode from github.com into a folder called demo.
+
+ `git clone https://github.com/originphp/originphp.git demo`
+
+2. From within your project folder type `docker-compose build` - it will take a couple of minutes, and only needs to be done once unless you change the Docker configuration files.
 3. Start the web server, type `docker-compose up` and go to [http://localhost:8000](http://localhost:8000)
 
 ## Configuring OriginPHP
