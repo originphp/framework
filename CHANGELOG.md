@@ -23,6 +23,7 @@ Delete tag:   git tag -d <tag_name>
 - Bookmarks edit tags not listed
 - Bookmarks not validating URL
 - Fixed Make plugin related list issue and back button
+- Bookmarks creating null tags
 
 ### Added
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
