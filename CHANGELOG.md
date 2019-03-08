@@ -45,4 +45,4 @@ Delete tag:   git tag -d <tag_name>
 ### Removed
 - Deleted composer.lock
 
-## [1.0.0-beta] - 2019-03-04
+## [1.0.0-beta] - 2019-xx-xx
