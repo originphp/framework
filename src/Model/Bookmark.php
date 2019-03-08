@@ -71,9 +71,11 @@ class Bookmark extends AppModel
     {
         if ($entity->hasProperty('tag_string')) {
             $entity->tags = [];
-            $tags = explode(',', $entity->tag_string);
-            foreach ($tags as $tag) {
-                $entity->tags[] = $this->Tag->newEntity(['title' => $tag]);
+            if ($entity->tag_string) {
+                $tags = explode(',', $entity->tag_string);
+                foreach ($tags as $tag) {
+                    $entity->tags[] = $this->Tag->newEntity(['title' => $tag]);
+                }
             }
         }
 
