@@ -614,9 +614,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email->to('james@originphp.com')
         ->from('mailer@originphp.com')
         ->subject('template test')
-        ->format('both')
+        ->format('text')
         ->set(['first_name'=>'Frank'])
-        ->template('bar');
+        ->template('text-exception');
         $result = $Email->send();
     }
     public function testCreateMessageTemplateHtmlException()
@@ -626,9 +626,78 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email->to('james@originphp.com')
         ->from('mailer@originphp.com')
         ->subject('template test')
-        ->format('both')
+        ->format('html')
         ->set(['first_name'=>'Frank'])
-        ->template('foo');
+        ->template('html-exception');
         $result = $Email->send();
+    }
+
+    public function testSendNoFromAddress()
+    {
+        $this->expectException(Exception::class);
+        $Email = new Email();
+        $Email->to('james@originphp.com')
+        ->subject('template test')
+        ->format('html')
+        ->set(['first_name'=>'Frank'])
+        ->template('html-exception');
+        $result = $Email->send();
+    }
+    public function testSendNoToAddress()
+    {
+        $this->expectException(Exception::class);
+        $Email = new Email();
+        $Email->from('james@originphp.com')
+        ->subject('template test')
+        ->format('html')
+        ->set(['first_name'=>'Frank'])
+        ->template('html-exception');
+        $result = $Email->send();
+    }
+
+    public function testSendMessageArg()
+    {
+        $Email = new MockEmail(['debug'=>true]);
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('send arg');
+        $result = $Email->send("Yo Adrian!\nRocky");
+        $this->assertContains("Yo Adrian!\r\nRocky", $result);
+    }
+
+    public function testSendTextMessageNotSet()
+    {
+        $this->expectException(Exception::class);
+        $Email = new Email();
+        $Email->from('james@originphp.com')
+        ->subject('exception testt')
+        ->format('text');
+        $Email->send();
+    }
+
+    public function testSendHtmlMessageNotSet()
+    {
+        $this->expectException(Exception::class);
+        $Email = new Email();
+        $Email->from('james@originphp.com')
+        ->subject('exception test')
+        ->format('html');
+        $Email->send();
+    }
+
+    public function testAccountNotSet()
+    {
+        $this->expectException(Exception::class);
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('send arg');
+        $Email->send("Yo Adrian!\nRocky");
+    }
+
+    public function testSmtpLog()
+    {
+        $Email = new MockEmail();
+        $this->assertIsArray($Email->smtpLog());
     }
 }

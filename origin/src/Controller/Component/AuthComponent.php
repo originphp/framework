@@ -19,6 +19,7 @@ use Origin\Core\Session;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
+use Origin\Exception\ForbiddenException;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -110,7 +111,7 @@ class AuthComponent extends Component
      * This will try to identify the user. Check if there are credentials
      * based upon auth methods (form, http).
      *
-     * @return Entity $user
+     * @return Entity|bool $user false
      */
     public function identify()
     {
@@ -120,7 +121,7 @@ class AuthComponent extends Component
             return $this->loadUser($credentials['username'], $credentials['password']);
         }
 
-        return null;
+        return false;
     }
 
     /**
@@ -220,7 +221,7 @@ class AuthComponent extends Component
         if ($this->isAllowed($action)) {
             return null;
         }
-
+        
         if ($this->isPrivateOrProtected($action)) {
             return null;
         }
@@ -258,7 +259,6 @@ class AuthComponent extends Component
         if (in_array('Http', $this->config['authenticate'])) {
             $username = $this->request->env('PHP_AUTH_USER');
             $password = $this->request->env('PHP_AUTH_PW');
-
             if ($username and $password) {
                 return ['username' => $username, 'password' => $password];
             }
@@ -319,8 +319,8 @@ class AuthComponent extends Component
           $this->config['fields']['username'] => $username,
         ];
 
-        if (!empty($this->config['scope']) and is_array($this->scope)) {
-            $conditions = array_merge($conditions, $this->scope);
+        if (!empty($this->config['scope']) and is_array($this->config['scope'])) {
+            $conditions = array_merge($conditions, $this->config['scope']);
         }
 
         $result = $model->find('first', ['conditions' => $conditions]);
@@ -347,9 +347,9 @@ class AuthComponent extends Component
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
             Session::write('Auth.redirect', $this->request->url);
-
             return $controller->redirect(Router::url($this->config['loginAction']));
         }
-        throw new ForibddenException($this->config['authError']);
+       
+        throw new ForbiddenException($this->config['authError']);
     }
 }

@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Auth scope fixed
 - Bookmarks edit tags not listed
 - Bookmarks not validating URL
 - Fixed Make plugin related list issue and back button

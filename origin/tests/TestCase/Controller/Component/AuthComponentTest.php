@@ -21,6 +21,9 @@ use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Core\Session;
 use Origin\Model\Entity;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Exception\ForbiddenException;
+use Origin\Model\Exception\MissingModelException;
 
 class MockAuthComponent extends AuthComponent
 {
@@ -33,13 +36,26 @@ class UsersController extends Controller
         $this->loadComponent('Auth');
     }
 
+    private function secret()
+    {
+    }
+
     public function index()
     {
     }
+
+    public function login()
+    {
+    }
+    public function redirect($url, int $code = 302)
+    {
+        return true;
+    }
 }
 
-class AuthComponentTest extends \PHPUnit\Framework\TestCase
+class AuthComponentTest extends OriginTestCase
 {
+    public $fixtures = ['Framework.User'];
     public function setUp()
     {
         $request = new Request('/users/login');
@@ -184,6 +200,9 @@ class AuthComponentTest extends \PHPUnit\Framework\TestCase
         $this->AuthComponent->setUser($entity);
         $this->assertEquals($data, $this->AuthComponent->user());
         $this->assertEquals('fred@smith.com', $this->AuthComponent->user('username'));
+        $this->assertNull($this->AuthComponent->user('foo'));
+        Session::delete('Auth.User');
+        $this->assertNull($this->AuthComponent->user('username'));
     }
 
     public function testAuth()
@@ -199,5 +218,117 @@ class AuthComponentTest extends \PHPUnit\Framework\TestCase
         Session::write('Auth.redirect', $expected);
         $redirectUrl = $this->AuthComponent->redirectUrl();
         $this->assertEquals($expected, $redirectUrl);
+    }
+
+    public function testStartup()
+    {
+        $request = new Request('/users/index');
+        $this->Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($this->Controller);
+        $AuthComponent->startup();
+        $this->assertEquals('/users/index', Session::read('Auth.redirect'));
+    }
+
+    public function testStartupNoRedirect()
+    {
+        $this->expectException(ForbiddenException::class);
+        $request = new Request('/users/index');
+        $this->Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($this->Controller);
+        $AuthComponent->config('unauthorizedRedirect', false);
+        $AuthComponent->startup();
+    }
+
+    public function testIdentifyNone()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $this->assertFalse($AuthComponent->identify());
+    }
+
+    public function testIdentifyForm()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $result = $AuthComponent->identify();
+        $this->assertEquals('James', $result->name);
+    }
+
+    public function testIdentifyScope()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->config('scope', ['id'=>1024]);
+        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $this->assertFalse($AuthComponent->identify());
+    }
+
+    public function testIdentifyMissingModel()
+    {
+        $this->expectException(MissingModelException::class);
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->config('model', 'Fozzy');
+        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->identify();
+    }
+
+    public function testIdentifyHttp()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Http']);
+        $_SERVER['PHP_AUTH_USER'] = 'amanda@example.com';
+        $_SERVER['PHP_AUTH_PW'] = 'secret2';
+        $result = $AuthComponent->identify();
+        $this->assertEquals('Amanda', $result->name);
+        unset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+    }
+
+    public function testIdentifyInvalidPassword()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'1234`'];
+        $this->assertFalse($AuthComponent->identify());
+    }
+
+    public function testIdentifyUnkownUser()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->request->data = ['email'=>'mark.ronson@example.com','password'=>'funky'];
+        $this->assertFalse($AuthComponent->identify());
+    }
+
+    public function testCheckAuthenticeIsAllowed()
+    {
+        $request = new Request('/users/index');
+        $this->Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($this->Controller);
+        $AuthComponent->allow('index');
+        $this->assertNull($AuthComponent->startup());
+    }
+
+    public function testCheckAuthenticeIsPrivate()
+    {
+        $request = new Request('/users/secret');
+        $this->Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($this->Controller);
+        $this->assertNull($AuthComponent->startup());
+    }
+
+    public function testCheckAuthenticeIsLoggedIn()
+    {
+        Session::write('Auth.User', ['user_name' => 'james']);
+        $this->assertNull($this->AuthComponent->startup());
+        Session::delete('Auth');
+    }
+
+    public function testCheckAuthenticeIsLoginPage()
+    {
+        $request = new Request('/users/login');
+        $this->Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($this->Controller);
+        $this->assertNull($AuthComponent->startup());
     }
 }

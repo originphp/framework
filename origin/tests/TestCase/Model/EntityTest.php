@@ -187,4 +187,11 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $entity = new Entity($data);
         $this->assertEquals($data, $entity->__debugInfo());
     }
+
+    public function testErrors()
+    {
+        $entity = new Entity(['name'=>'test']);
+        $entity->errors('name', 'Can\'t be called test');
+        $this->assertEquals(['Can\'t be called test'], $entity->errors('name'));
+    }
 }

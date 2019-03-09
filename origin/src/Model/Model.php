@@ -119,9 +119,10 @@ class Model
             'datasource' => $this->datasource,
             'table' => $this->table,
         ];
+       
 
         $config = array_merge($defaults, $config);
-
+     
         extract($config);
 
         if (is_null($name)) {
@@ -1344,7 +1345,7 @@ class Model
                 $config = array_merge($config, $query['contain'][$alias]);
               
                 $query['joins'][] = array(
-                    'table' => Inflector::tableize($config['className']),
+                    'table' => $this->{$alias}->table,
                     'alias' => $alias,
                     'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                     'conditions' => $config['conditions'],
@@ -1532,6 +1533,7 @@ class Model
         $sql = $QueryBuilder->selectStatement($query);
     
         $connection = $this->getConnection();
+       
         $connection->execute($sql, $QueryBuilder->getValues());
 
         if ($type == 'list') {

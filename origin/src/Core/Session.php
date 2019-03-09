@@ -41,7 +41,7 @@ class Session
         Session::write('Session.lastActivity', time());
     }
 
-    public static function write($key = null, $value = null)
+    public static function write(string $key = null, $value = null)
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
@@ -57,24 +57,30 @@ class Session
         }
     }
 
-    public static function read($key = null)
+    /**
+     * Reads an item from the session
+     *
+     * @param [type] $key
+     * @return mixed|null
+     */
+    public static function read(string $key = null)
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
             return $Dot->get($key);
         }
 
-        return false;
+        return null;
     }
 
-    public static function check($key = null)
+    public static function check(string $key = null)
     {
         $Dot = new Dot($_SESSION);
 
         return $Dot->has($key);
     }
 
-    public static function delete($key = null)
+    public static function delete(string $key = null)
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {

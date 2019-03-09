@@ -32,7 +32,6 @@ class Pet extends Model
 
 class Owner extends Model
 {
-    public $displayField = 'owner_name';
     public $datasource = 'test';
 }
 
@@ -72,13 +71,15 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
       
         
         $connection = ConnectionManager::get('test');
-        $connection->execute('DROP TABLE IF EXISTS pets');
+        $connection->execute('DROP TABLE IF EXISTS pets,owners');
         $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY, owner_id INT NOT NULL,name VARCHAR(20));');
+        $connection->execute('CREATE TABLE IF NOT EXISTS owners ( id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20));');
         
         # Create Dummy Data
         $this->Pet = new Pet();
       
         ModelRegistry::set('Pet', $this->Pet);
+
         for ($i=0;$i<100;$i++) {
             $this->Pet->save($this->Pet->newEntity(['owner_id' => $i + 1000, 'name'=>'Pet' . $i]));
         }
@@ -92,6 +93,9 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
     public function testPaginate()
     {
         $results = $this->PaginatorComponent->paginate($this->Pet);
+        $this->assertEquals(20, count($results));
+
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort'=>'non_existant']);
         $this->assertEquals(20, count($results));
 
         // Test foreign_keys
@@ -119,6 +123,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->expectException(NotFoundException::class);
         $results = $this->PaginatorComponent->paginate($this->Pet, ['page'=>10000]);
     }
+
     /**
      * Because owner model is loaded, it will start doing magic. This test
      * is to reach some deeper code.
@@ -129,7 +134,19 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $Pet = $this->Pet;
         $Pet->belongsTo('Owner');
         $Pet->Owner = new Owner();
-        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id']);
-        $this->assertEquals('asc', $results['order']['Owner.owner_name']); // check alias.
+
+        // Test foreign_keys
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['Owner']]);
+        $this->assertEquals(20, count($results));
+
+        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['Owner']]);
+        $this->assertEquals('asc', $results['order']['Owner.name']); // check alias.
+
+        $Pet = new Pet();
+        $Pet->belongsTo('MyOwner', ['foreignKey'=>'owner_id']);
+        $Pet->MyOwner = new Model(['name'=>'MyOwner','alias'=>'MyOwner','table'=>'owners','datasource'=>'test']);
+
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['MyOwner']]);
+        $this->assertEquals(20, count($results));
     }
 }

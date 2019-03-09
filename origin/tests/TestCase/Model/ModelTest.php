@@ -1203,4 +1203,10 @@ lastname VARCHAR(30) NOT NULL
         $entity = $Article->newEntity(['title'=>'foo']);
         $this->assertTrue($Article->validates($entity));
     }
+
+    public function testIsset()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $this->assertFalse(isset($Article->Foo));
+    }
 }

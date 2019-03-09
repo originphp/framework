@@ -43,7 +43,7 @@ class PaginatorComponent extends Component
     public function paginate(Model $model, array $settings = [])
     {
         $this->model = $model;
-       
+
         $settings = $this->mergeSettings($settings);
     
         $settings = $this->prepareSort($settings);
@@ -79,8 +79,7 @@ class PaginatorComponent extends Component
             $alias = $this->getModelFromField($sort);
             
             if (isset($this->model->{$alias})) {
-                $displayField = $this->model->{$alias}->displayField;
-                if ($displayField) {
+                if ($displayField = $this->model->{$alias}->displayField) {
                     $settings['order'] = ["{$alias}.{$displayField}" => $direction];
                 }
             }
@@ -104,14 +103,15 @@ class PaginatorComponent extends Component
     protected function getModelFromField(string $field)
     {
         $needle = Inflector::camelize(substr($field, 0, -3)); // owner_id -> Owner;
-        $belongsTo = $this->model->association('belongsTo');
-
+        $belongsTo =  $this->model->association('belongsTo');
+    
         if (isset($belongsTo[$needle])) {
             return $needle;
         }
         // Fallback Magic Detect
         // Search for field as foreignKey, but only if it is unique across belongsTo
         $found = [];
+    
         foreach ($belongsTo as $alias => $config) {
             if (isset($config['foreignKey']) and $config['foreignKey'] == $field) {
                 $found[] = $alias;

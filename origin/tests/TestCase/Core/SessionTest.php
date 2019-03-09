@@ -27,7 +27,8 @@ class SessionTest extends \PHPUnit\Framework\TestCase
 
     public function testRead()
     {
-        $this->assertFalse(Session::read('sessionTest'));
+        $this->assertNull(Session::read('sessionTest'));
+        
         Session::write('sessionTest', 'works');
         $this->assertEquals('works', Session::read('sessionTest'));
         

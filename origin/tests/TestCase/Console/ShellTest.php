@@ -77,10 +77,13 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     }
     public function testConstruct()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $arguments = ['foo','-bar','-foo=setting'];
+        $shell = new MockShell($arguments, $this->ConsoleOutput, $this->ConsoleInput);
         $this->assertNotEmpty($shell->taskRegistry());
         $this->assertInstanceOf('Origin\Console\Task\TaskRegistry', $shell->taskRegistry());
         $this->assertEquals('MockShell', $shell->name);
+        $this->assertEquals(['foo'], $shell->args);
+        $this->assertEquals(['bar'=>true,'foo'=>'setting'], $shell->params);
     }
     public function testLoadModel()
     {

@@ -17,6 +17,7 @@ namespace Origin\Test\Model;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
+use Origin\Exception\Exception;
 
 class MockModelRegistry extends ModelRegistry
 {
@@ -79,12 +80,10 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(MockModelRegistry::has('Mock'));
     }
 
-    /**
-     * @depends testGet
-     */
     public function testGet()
     {
-        MockModelRegistry::set('Mock', new MockModel());
+        $MockModel = new MockModel();
+        MockModelRegistry::set('Mock', $MockModel);
         $this->assertEquals($MockModel, MockModelRegistry::get('Mock'));
     }
 
@@ -95,6 +94,10 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
         MockModelRegistry::config('Origin\Test\Model\MockModel', $config);
         $MockModel = MockModelRegistry::get('Origin\Test\Model\MockModel');
         $this->assertEquals('testGetConfig', $MockModel->datasource);
+        $this->assertNull(MockModelRegistry::config('Foo'));
+
+        $this->expectException(Exception::class);
+        MockModelRegistry::config('Origin\Test\Model\MockModel', $config);
     }
 
     /**
