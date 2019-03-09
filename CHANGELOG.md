@@ -27,6 +27,8 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- Queue System
+- Basic console options parsing
 - Queue System for background jobs
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
 - Debug function
@@ -37,6 +39,7 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Removed irrelvant keys from schema generate
 - Changed location of schema files from config, to config/schema
 - backtrace() now works properly in CLI
 - Improved documentation
