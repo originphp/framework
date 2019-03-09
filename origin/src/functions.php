@@ -13,7 +13,7 @@
  */
 use Origin\Core\Debugger;
 use Origin\Core\Configure;
-use Origin\Utils\Collection;
+use Origin\Utility\Collection;
 use Origin\Core\I18n;
 
 /**
@@ -160,7 +160,7 @@ function now()
 }
 
 /**
- * Returns a Origin\Utils\Collection object using the array (can be any array or array of objects such as from
+ * Returns a Origin\Utility\Collection object using the array (can be any array or array of objects such as from
  * results).
  *
  * @param array $array

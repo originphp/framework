@@ -16,7 +16,7 @@
  * This is a Queue System with a MySQL backend. For now i want to keep it as one file.
  */
 
-namespace Origin\Utils;
+namespace Origin\Utility;
 
 use Origin\Model\Entity;
 use Origin\Model\Model;

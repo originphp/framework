@@ -220,7 +220,7 @@ There will be times you will want to test that protected or private methods or p
     {
         $Email = new MockEmail();
         $Email = $Email->from('james@originphp.com');
-        $this->assertInstanceOf('Origin\Utils\Email', $Email); // check returning this
+        $this->assertInstanceOf('Origin\Utility\Email', $Email); // check returning this
 
         $property = $Email->getProperty('from'); # TestTrait
         $this->assertEquals(['james@originphp.com',null], $property);

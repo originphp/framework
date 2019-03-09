@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utils;
+namespace Origin\Utility;
 
 use Origin\Core\Configure;
 

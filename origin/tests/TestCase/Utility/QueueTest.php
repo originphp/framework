@@ -11,9 +11,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Utils;
+namespace Origin\Test\Utility;
 
-use Origin\Utils\Queue;
+use Origin\Utility\Queue;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\InvalidArgumentException;
 

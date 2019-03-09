@@ -12,12 +12,12 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utils;
+namespace Origin\Utility;
 
 use Origin\Exception\Exception;
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
-use Origin\Utils\Exception\MissingTemplateException;
+use Origin\Utility\Exception\MissingTemplateException;
 use Origin\Core\StaticConfigTrait;
 
 class Email

@@ -29,8 +29,8 @@ use Origin\Core\Inflector;
  * Marshaller is used to process request data as it converts localized fields such as dates,
  * decimals etc.
  */
-use Origin\Utils\Date;
-use Origin\Utils\Number;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 use Origin\Model\Model;
 
 class Marshaller

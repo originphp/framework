@@ -18,8 +18,8 @@ use Origin\Model\ModelRegistry;
 use Origin\Core\Router;
 use Origin\Core\Inflector;
 use Origin\Model\Entity;
-use Origin\Utils\Date;
-use Origin\Utils\Number;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 
 use Origin\View\TemplateTrait;
 use Origin\Core\Dot;

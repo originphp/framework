@@ -12,9 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utils;
+namespace Origin\Test\Utility;
 
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 use Origin\TestSuite\TestTrait;
 use Origin\Exception\Exception;
 

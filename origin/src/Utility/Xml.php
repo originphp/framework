@@ -12,12 +12,12 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utils;
+namespace Origin\Utility;
 
 use DOMDocument;
 use DOMElement;
 use SimpleXMLElement;
-use Origin\Utils\Exception\XmlException;
+use Origin\Utility\Exception\XmlException;
 use Origin\Core\Configure;
 
 /**

@@ -12,10 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utils\Exception;
+namespace Origin\Utility\Exception;
 
 use Origin\Exception\Exception;
 
-class MissingTemplateException extends Exception
+class XmlException extends Exception
 {
 }

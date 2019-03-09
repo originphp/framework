@@ -12,10 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utils;
+namespace Origin\Test\Utility;
 
-use Origin\Utils\Xml;
-use Origin\Utils\Exception\XmlException;
+use Origin\Utility\Xml;
+use Origin\Utility\Exception\XmlException;
 
 class XmlTest extends \PHPUnit\Framework\TestCase
 {

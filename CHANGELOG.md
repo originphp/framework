@@ -39,6 +39,7 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Changed Utils folder to Utility
 - Removed irrelvant keys from schema generate
 - Changed location of schema files from config, to config/schema
 - backtrace() now works properly in CLI

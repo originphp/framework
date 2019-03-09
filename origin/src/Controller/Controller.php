@@ -24,7 +24,7 @@ use Origin\Core\Inflector;
 use Origin\Core\Router;
 use ReflectionClass;
 use ReflectionMethod;
-use Origin\Utils\Xml;
+use Origin\Utility\Xml;
 
 class Controller
 {

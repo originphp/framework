@@ -5,7 +5,7 @@ The email class enables you to send emails easily through SMTP.
 You setup your email accounts in your `config/email.php` we have created a template for you, just rename the file and fill your details.
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
 Email::config(
     'default',[
@@ -48,7 +48,7 @@ If a config for `default` is found this will be used unless you specify somethin
 To send a text email (default) it would look like this:
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -62,7 +62,7 @@ use Origin\Utils\Email;
 To send a HTML email  (if you are going to send HTML you should send both, see below)
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -77,7 +77,7 @@ use Origin\Utils\Email;
 To send both HTML and text
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -93,7 +93,7 @@ use Origin\Utils\Email;
 To change the email account (accounts are setup using the Email::config() usually in the config/email.php)
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -108,7 +108,7 @@ use Origin\Utils\Email;
 You can also setup the config during the creation of the Email object.
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
     $config = [ 
         'host' => 'ssl://smtp.gmail.com',
         'port' => 465,
@@ -124,7 +124,7 @@ use Origin\Utils\Email;
 To add attachments
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -142,7 +142,7 @@ To use templates
 Templates are stored in the `View/Email` folder
 
 ````php
-    use Origin\Utils\Email;
+    use Origin\Utility\Email;
     $Email = new Email();
     $Email->to('somebody@originphp.com')
         ->from('me@originphp.com')
@@ -156,7 +156,7 @@ Templates are stored in the `View/Email` folder
 Template files also accept plugin syntax, so to load a template from a plugin just add the plugin name.
 
 ````php
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
 
     $Email = new Email();

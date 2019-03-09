@@ -14,8 +14,8 @@
 
 namespace Origin\Core;
 
-use Origin\Utils\Date;
-use Origin\Utils\Number;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 use NumberFormatter;
 use IntlTimeZone;
 use Locale;

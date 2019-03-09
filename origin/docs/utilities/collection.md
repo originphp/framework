@@ -5,7 +5,7 @@ You can create a collection using arrays. These can be standard arrays or arrays
 To create a collection from an array:
 
 ````php
-    use Origin\Utils\Collection;
+    use Origin\Utility\Collection;
     $collection = new Collection($array);
 ````
 

@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Utils\Date;
+use Origin\Utility\Date;
 
 class DateHelper extends Helper
 {

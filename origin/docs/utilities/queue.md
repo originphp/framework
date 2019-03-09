@@ -15,7 +15,7 @@ bin/console schema import queue
 To create a Queue object which uses the default database connection.
 
 ````php
-Use Origin\Utils\Queue;
+Use Origin\Utility\Queue;
 $queue = new Queue();
 ````
 
@@ -23,7 +23,7 @@ If you want to use a different datasource and/or table then you can configure th
 options. These options are the same as when creating a model.
 
 ````php
-Use Origin\Utils\Queue;
+Use Origin\Utility\Queue;
 $queue = new Queue([
     'datasource'=>'queue-server',
     'table'=>'jobs'
@@ -36,7 +36,7 @@ To add a job to the queue, you just use set a queue name and then pass array of 
 as a JSON string in the table. The queue name can consist of letters,numbers,hypens and underscores. Once you have added the job it will return the job id.
 
 ````php
-Use Origin\Utils\Queue;
+Use Origin\Utility\Queue;
 $queue = new Queue();
 $jobId = $queue->add('welcome_emails',[
     'user_id'=>1024
@@ -67,7 +67,7 @@ If there is a job in the queue then it will return a job object. The body is the
 When you process a job, it is best to run through a try block, incase of any unexpected errors or exceptions that might happen. 
 
 ````php
- Use Origin\Utils\Queue;
+ Use Origin\Utility\Queue;
  $queue = new Queue();
 
  while ($job = $queue->fetch('welcome_emails')) {
@@ -84,7 +84,7 @@ When you process a job, it is best to run through a try block, incase of any une
 If you want to keep track of the jobs that have been processed then use executed, which will set the status accordingly.
 
 ````php
- Use Origin\Utils\Queue;
+ Use Origin\Utility\Queue;
  $queue = new Queue();
 
  while ($job = $queue->fetch('welcome_emails')) {

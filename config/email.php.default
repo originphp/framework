@@ -4,7 +4,7 @@
  * which you can switch between.
  *
  */
-use Origin\Utils\Email;
+use Origin\Utility\Email;
 
 Email::config(
     'default',[

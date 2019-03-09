@@ -12,16 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utils\Exception;
+namespace Origin\Utility\Exception;
 
-use Origin\Utils\Exception\XmlException;
+use Origin\Exception\Exception;
 
-class XmlExceptionTest extends \PHPUnit\Framework\TestCase
+class MissingTemplateException extends Exception
 {
-    public function testException()
-    {
-        $exception = new XmlException('Invalid XML.');
-        $this->assertEquals(500, $exception->getCode());
-        $this->assertEquals('Invalid XML.', $exception->getMessage());
-    }
 }

@@ -14,7 +14,7 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Utils\Security;
+use Origin\Utility\Security;
 
 /**
  * Cookie Component - makes it easy to work with cookies, cookies are set using the response

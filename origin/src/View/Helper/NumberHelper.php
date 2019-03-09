@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Utils\Number;
+use Origin\Utility\Number;
 
 class NumberHelper extends Helper
 {

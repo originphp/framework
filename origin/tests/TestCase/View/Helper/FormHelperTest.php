@@ -20,7 +20,7 @@ use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
-use Origin\Utils\Date;
+use Origin\Utility\Date;
 use Origin\Ultis\Time;
 
 class ViewTestsController extends Controller

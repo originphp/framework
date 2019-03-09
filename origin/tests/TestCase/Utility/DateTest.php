@@ -12,9 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utils;
+namespace Origin\Test\Utility;
 
-use Origin\Utils\Date;
+use Origin\Utility\Date;
 use IntlDateFormatter;
 
 class DateTest extends \PHPUnit\Framework\TestCase

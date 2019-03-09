@@ -18,7 +18,7 @@ use Origin\Console\Shell;
 use Origin\Core\Inflector;
 use Origin\Exception\Exception; // @todo a different exception?
 use Make\Utils\MakeTemplater;
-use Origin\Utils\Xml;
+use Origin\Utility\Xml;
 
 /**
 *  Reference
