@@ -126,7 +126,7 @@ class Schema
 
     /**
      * Generates the schema as used by createTable
-     *
+     * @todo this is dumping too much irrelevant info
      * @param array $describe
      * @return void
      */
@@ -136,13 +136,26 @@ class Schema
         foreach ($this->mapping as $key => $value) {
             $reverseMapping[strtolower($value['name'])] = $key;
         }
+      
         $data = [];
 
         $connection = ConnectionManager::get($datasource);
         $schema = $connection->schema($table);
         foreach ($schema as &$result) {
             $result['type'] = $reverseMapping[$result['type']];
+            foreach (['key','unsigned','autoIncrement','length'] as $key) {
+                if ($result[$key] == false) {
+                    unset($result[$key]);
+                }
+            }
+            if ($result['type'] !== 'decimal') {
+                unset($result['precision']);
+            }
+            if ($result['null'] === false and $result['default'] === null) {
+                unset($result['default']);
+            }
         }
+       
         return $schema;
     }
 }
