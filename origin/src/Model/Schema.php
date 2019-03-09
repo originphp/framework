@@ -19,6 +19,13 @@ use Origin\Model\ConnectionManager;
 
 class Schema
 {
+    /**
+     * Not all databases will support each type.
+     * @todo how to deal with MediumText will generate error
+     * @todo other field types big int etc
+     *
+     * @var array
+     */
     protected $mapping = array(
             'string' => array('name' => 'VARCHAR', 'length' => 255),
             'text' => array('name' => 'TEXT'),
