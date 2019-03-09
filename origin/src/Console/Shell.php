@@ -56,6 +56,19 @@ class Shell
     public $input = null;
 
     /**
+     * Holds the arguments (after being parsed)
+     *
+     * @var array
+     */
+    public $args = [];
+    /**
+     * This holds the parmams that were parsed from argv
+     *
+     * @var array
+     */
+    public $params = [];
+
+    /**
      * Inject request and response
      *
      * @param array $arguments
@@ -64,7 +77,7 @@ class Shell
      */
     public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
-        $this->args = $arguments;
+        $this->parseArguments($arguments);
         $this->output = $consoleOutput;
         $this->input = $consoleInput;
 
@@ -73,6 +86,30 @@ class Shell
         $this->taskRegistry = new TaskRegistry($this);
 
         $this->initialize($arguments);
+    }
+
+    /**
+     * A Simple argument parser which populates the $args and $parms
+     *
+     * -save  (the value will true)
+     * -datasource=test
+     * @param array $arguments
+     * @return void
+     */
+    protected function parseArguments(array $arguments)
+    {
+        foreach ($arguments as $arg) {
+            if ($arg[0]==='-') {
+                $value = true;
+                $param = substr($arg, 1);
+                if (strpos($param, '=') !== false) {
+                    list($param, $value) = explode('=', $param);
+                }
+                $this->params[$param] = $value;
+            } else {
+                $this->args[] = $arg;
+            }
+        }
     }
 
     /**
