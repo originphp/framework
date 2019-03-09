@@ -42,9 +42,9 @@ Install [docker desktop](https://www.docker.com/products/docker-desktop), if you
     ````
     When you go to [http://localhost:8000](http://localhost:8000) you should see a status page showing you that is connected to the database.
 
-3. Create the tables and sample data using the statements in `config/schema.sql`.  If you are not already in the container, from the project folder type in the following command to access the docker container `docker-compose run app bash`
+3. Create the tables and sample data using the statements in `config/schema/schema.sql`.  If you are not already in the container, from the project folder type in the following command to access the docker container `docker-compose run app bash`
 
-    Then type in the following to import the `config/schema.sql` file:
+    Then type in the following to import the `config/schema/schema.sql` file:
 
     `bin/console schema import`
 

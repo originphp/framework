@@ -1,0 +1,11 @@
+CREATE TABLE `queue` (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  queue VARCHAR(80) NOT NULL,
+  params TEXT NOT NULL,
+  status VARCHAR(40) NOT NULL,
+  locked TINYINT(1) DEFAULT 0,
+  created DATETIME NOT NULL,
+  modified DATETIME NOT NULL
+) ENGINE=InnoDB;
+ALTER TABLE queue ADD INDEX queue (queue);
+ALTER TABLE queue ADD INDEX status (status);

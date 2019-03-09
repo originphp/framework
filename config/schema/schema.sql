@@ -6,8 +6,8 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   dob DATE DEFAULT NULL,
-  created DATETIME DEFAULT NULL,
-  modified DATETIME DEFAULT NULL
+  created DATETIME NOT NULL,
+  modified DATETIME NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE bookmarks (
@@ -17,16 +17,16 @@ CREATE TABLE bookmarks (
   description TEXT,
   url TEXT,
   category VARCHAR(80) DEFAULT NULL,
-  created DATETIME DEFAULT NULL,
-  modified DATETIME DEFAULT NULL,
+  created DATETIME NOT NULL,
+  modified DATETIME NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE tags (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) DEFAULT NULL,
-  created DATETIME DEFAULT NULL,
-  modified DATETIME DEFAULT NULL,
+  created DATETIME NOT NULL,
+  modified DATETIME NOT NULL,
   UNIQUE KEY title (title)
 ) ENGINE=InnoDB;
 

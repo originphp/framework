@@ -35,12 +35,16 @@ class SchemaShell extends Shell
     public function generate()
     {
         $datasource = 'default';
-        if (!empty($this->args)) {
-            $datasource = $this->args[0];
+        if (!empty($this->params['datasource'])) {
+            $datasource = $this->params['datasource'];
         }
+       
         $schema = new Schema();
         $connection = ConnectionManager::get($datasource);
         $tables = $connection->tables();
+        if (!empty($this->args)) {
+            $tables = [$this->args[0]];
+        }
         $folder = CONFIG . DS . 'schema';
         if (!file_exists($folder)) {
             mkdir($folder);
@@ -63,17 +67,25 @@ class SchemaShell extends Shell
         }
     }
 
+    /**
+     * Creates schema from PHP files
+     *
+     * @return void
+     */
     public function create()
     {
         $datasource = 'default';
-        if (!empty($this->args)) {
-            $datasource = $this->args[0];
+        if (!empty($this->params['datasource'])) {
+            $datasource = $this->params['datasource'];
         }
 
         $schema = new Schema();
         $connection = ConnectionManager::get($datasource);
         $folder = CONFIG . DS . 'schema';
         $files = scandir($folder);
+        if ($this->args) {
+            $files = [$this->args[0] .'.php'];
+        }
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                 $table = pathinfo($file, PATHINFO_FILENAME);
@@ -92,8 +104,8 @@ class SchemaShell extends Shell
         $this->out('Schema Dump');
     
         $datasource = 'default';
-        if (!empty($this->args)) {
-            $datasource = $this->args[0];
+        if (!empty($this->params['datasource'])) {
+            $datasource = $this->params['datasource'];
         }
         $connection = ConnectionManager::get($datasource);
 
@@ -136,25 +148,29 @@ class SchemaShell extends Shell
             $this->Status->ok(sprintf('Processed %s table with %d records ', $table, count($results)));
         }
         
-        $result =  file_put_contents(CONFIG . DS . 'dump.sql', implode("\n\n", $dump) . "\n\n" . implode("\n", $records));
+        $result =  file_put_contents(TMP . DS . 'dump.sql', implode("\n\n", $dump) . "\n\n" . implode("\n", $records));
         if ($result) {
-            $this->Status->ok('Saved to config/dump.sql');
+            $this->Status->ok('Saved to tmp/dump.sql');
         } else {
-            $this->Status->error('Could not save to config/dump.sql');
+            $this->Status->error('Could not save to tmp/dump.sql');
         }
     }
     public function import()
     {
         $datasource = 'default';
-        if (!empty($this->args)) {
-            $datasource = $this->args[0];
+        if (!empty($this->params['datasource'])) {
+            $datasource = $this->params['datasource'];
         }
         $connection = ConnectionManager::get($datasource);
 
-        $filename = CONFIG . DS .'schema.sql';
+        $default = 'schema.sql';
+        if ($this->args) {
+            $default = $this->args[0];
+        }
+        $filename = CONFIG . DS .'schema'. DS . $default . '.sql';
         
         if (!file_exists($filename)) {
-            $this->Status->error('config/schema.sql not found');
+            $this->Status->error('config/schema/'.$default. '.sql not found');
             exit();
         }
 
@@ -184,12 +200,14 @@ class SchemaShell extends Shell
     public function help()
     {
         $this->out('Usage: schema [command]');
-        $this->out('Usage: schema [command] [datasource]');
+        $this->out('Usage: schema [command] -datasource=[name]');
         $this->out('');
         $this->out('Commands:');
-        $this->out("generate\tgenerates the config\schema\\table.php files");
-        $this->out("create\t\tcreates the tables using the schema files");
-        $this->out("dump\t\tdumps the tables and records into an sql file");
-        $this->out("import\t\timports sql files");
+        $this->out("generate\tgenerates the config\schema\\table.php file or files");
+        $this->out("create\t\tcreates the tables using the schema file or files");
+        $this->out("dump\t\tdumps all the tables and records into an sql file");
+        $this->out("import\t\timports sql file or files");
+        $this->out('Options:');
+        $this->out("-datasource=name\tto set a different datasource");
     }
 }

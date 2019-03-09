@@ -27,6 +27,7 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- Queue System for background jobs
 - Marshalling now has option to disable parsing of date/datetime/numbers etc
 - Debug function
 - Make plugin now creates PHPUnit xml configuration file
@@ -36,6 +37,7 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Changed location of schema files from config, to config/schema
 - backtrace() now works properly in CLI
 - Improved documentation
 - adjusted PR function to only show when debug is set

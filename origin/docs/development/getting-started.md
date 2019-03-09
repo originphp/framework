@@ -80,13 +80,13 @@ status is now green.
 
 ### Import the schema
 
-Before working on your app you will want to have the database schema setup. Paste your schema in `config/schema.sql`
+Before working on your app you will want to have the database schema setup. Paste your schema in `config/schema/schema.sql`
 
-From within your project directory run the following command
+Or from within your project directory run the following command
 
 `bin/console schema import`
 
-This has now imported your SQL file.
+This has now imported the schema.sql file.
 
 ## Code Generation
 
