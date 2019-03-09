@@ -49,16 +49,58 @@ class QueueTest extends \PHPUnit\Framework\TestCase
         $queue->add('overload', ['data'=>str_repeat('+', 65535)]);
     }
 
+    public function testDelete()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $this->assertTrue($job->delete());
+    }
+
     public function testFetch()
     {
         $queue = new Queue(['datasource'=>'test']);
         $id = $queue->add('welcome_emails', ['user_id'=>1234]);
         // Test job entity
         $job = $queue->fetch('welcome_emails');
+
         $this->assertEquals($id, $job->id);
+        
+        $message = $job->getBody();
+        $this->assertEquals(1234, $message->user_id);
+        
         // Test is set to locked
         $job = $queue->model()->get($id);
         $this->assertEquals(1, $job->locked);
+
+        $this->assertFalse($queue->fetch('welcome_emails'));
+    }
+
+    public function testStatus()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $id = $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $this->assertTrue($job->status('testing'));
+        $job = $queue->model()->get($id);
+        $this->assertEquals(0, $job->locked);
+    }
+
+    public function testStuck()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $id = $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $this->assertEquals(1, count($queue->stuck('+5 minutes')));
+    }
+
+    public function testExecutedAndFailed()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $id = $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $this->assertTrue($job->executed());
+        $this->assertTrue($job->failed());
     }
 
     

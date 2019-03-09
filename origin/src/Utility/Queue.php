@@ -13,7 +13,7 @@
  */
 
 /**
- * This is a Queue System with a MySQL backend. For now i want to keep it as one file.
+ * This is a Queue System with a MySQL backend. For now I want to keep it as one file, until packages are ready.
  */
 
 namespace Origin\Utility;
@@ -198,9 +198,9 @@ class Queue
      */
     public function stuck(string $strtotime ='-2 minutes')
     {
-        return $this->find('all', ['conditions'=>[
+        return $this->Job->find('all', ['conditions'=>[
             'locked' => 1,
-            'modified <' => date('Y-m-d H:i:s', $strtotime)
+            'modified <' => date('Y-m-d H:i:s', strtotime($strtotime))
         ]]);
     }
     
