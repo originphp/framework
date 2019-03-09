@@ -17,6 +17,7 @@ namespace Origin\Test\Utility;
 use Origin\Utility\Email;
 use Origin\TestSuite\TestTrait;
 use Origin\Exception\Exception;
+use Origin\Utility\Exception\MissingTemplateException;
 
 class MockEmail extends Email
 {
@@ -227,6 +228,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
         ];
         $this->assertSame($expected, $Email->getProperty('attachments'));
+
+        $this->expectException(Exception::class);
+        $Email->addAttachment('/users/tony_stark/floor_plan.pdf');
     }
 
     /**
@@ -369,7 +373,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
               ->from('mailer@originphp.com')
               ->subject('text test')
               ->textMessage('this is a test');
-        $result = $result = $this->messageToString($Email->callMethod('buildMessage'));
+        $result = $this->messageToString($Email->callMethod('buildMessage'));
         $this->assertEquals("this is a test\r\n", $result);
     }
 
@@ -565,8 +569,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testSendWithoutSmtp()
     {
-        $config = ['debug'=>true];
-        $Email = new MockEmail($config);
+        $Email = new MockEmail(['debug'=>true]);
         $Email->to('james@originphp.com')
               ->from('mailer@originphp.com')
               ->subject('text test')
@@ -577,5 +580,55 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $result = $Email->send();
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
         $this->assertContains($expected, $result);
+    }
+
+    public function testCreateMessageTemplate()
+    {
+        $Email = new MockEmail(['debug'=>true]);
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('template test')
+              ->format('both')
+              ->set(['first_name'=>'Frank'])
+              ->template('demo');
+        $result = $Email->send();
+        $this->assertContains("Hi Frank,\r\nHow is your day so far?", $result);
+        $this->assertContains("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
+
+        $Email = new MockEmail(['debug'=>true]);
+        $Email->to('james@originphp.com')
+              ->from('mailer@originphp.com')
+              ->subject('template test')
+              ->format('both')
+              ->set(['first_name'=>'Tony'])
+              ->template('Widget.how-are-you');
+        $result = $Email->send();
+        $this->assertContains("Hi Tony,\r\nHow are you?", $result);
+        $this->assertContains("<p>Hi Tony</p>\r\n<p>How are you?</p>", $result);
+    }
+
+    public function testCreateMessageTemplateTextException()
+    {
+        $this->expectException(MissingTemplateException::class);
+        $Email = new MockEmail(['debug'=>true]);
+        $Email->to('james@originphp.com')
+        ->from('mailer@originphp.com')
+        ->subject('template test')
+        ->format('both')
+        ->set(['first_name'=>'Frank'])
+        ->template('bar');
+        $result = $Email->send();
+    }
+    public function testCreateMessageTemplateHtmlException()
+    {
+        $this->expectException(MissingTemplateException::class);
+        $Email = new MockEmail(['debug'=>true]);
+        $Email->to('james@originphp.com')
+        ->from('mailer@originphp.com')
+        ->subject('template test')
+        ->format('both')
+        ->set(['first_name'=>'Frank'])
+        ->template('foo');
+        $result = $Email->send();
     }
 }

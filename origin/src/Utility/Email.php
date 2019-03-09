@@ -19,6 +19,7 @@ use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Utility\Exception\MissingTemplateException;
 use Origin\Core\StaticConfigTrait;
+use Origin\Exception\InvalidArgumentException;
 
 class Email
 {
@@ -611,7 +612,7 @@ class Email
             return $code; // Return response code
         }
         
-        throw new exception(sprintf('SMTP Error: %s', $response));
+        throw new Exception(sprintf('SMTP Error: %s', $response));
     }
 
     protected function socketWrite(string $data)
@@ -625,7 +626,6 @@ class Email
 
     protected function socketLog(string $data)
     {
-        //fwrite(STDERR, $data);
         $this->smtpLog[] = $data;
     }
 
@@ -933,13 +933,10 @@ class Email
         if ($emailFormat === 'both') {
             return 'multipart/alternative; boundary="'.$this->getBoundary() .'"';
         }
-
-        if ($emailFormat === 'text') {
-            return 'text/plain; charset="' . $this->charset .'"';
-        }
         if ($emailFormat === 'html') {
             return 'text/html; charset="' . $this->charset .'"';
         }
+        return 'text/plain; charset="' . $this->charset .'"';
     }
 
     /**
@@ -951,6 +948,9 @@ class Email
     {
         if ($format === null) {
             return $this->emailFormat;
+        }
+        if (!in_array($format, ['text','html','both'])) {
+            throw new InvalidArgumentException('Invalid email format');
         }
         $this->emailFormat = $format;
         return $this;

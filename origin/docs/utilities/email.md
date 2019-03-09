@@ -139,7 +139,7 @@ use Origin\Utility\Email;
 
 To use templates
 
-Templates are stored in the `View/Email` folder
+Templates are stored in the `View/Email` folder, use the template method to set the name and use the set method to send variables to the templates.
 
 ````php
     use Origin\Utility\Email;
@@ -148,9 +148,16 @@ Templates are stored in the `View/Email` folder
         ->from('me@originphp.com')
         ->subject('This is a test')
         ->template('welcome')
-        ->set(['first_name'=>'Frank','email'=>'dev@originphp.com'])
+        ->set(['first_name'=>'Frank'])
         ->format('both')
     $Email->send();
+````
+Here is how you use variables in the email templates:
+
+````php
+// View/Email/html/welcome.ctp
+<p>Hi <?= $first_name ?></p>
+<p>How is your day so far?</p>
 ````
 
 Template files also accept plugin syntax, so to load a template from a plugin just add the plugin name.
