@@ -163,7 +163,7 @@ class SchemaShell extends Shell
         }
         $connection = ConnectionManager::get($datasource);
 
-        $default = 'schema.sql';
+        $default = 'schema';
         if ($this->args) {
             $default = $this->args[0];
         }
