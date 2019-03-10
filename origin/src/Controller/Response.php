@@ -209,8 +209,7 @@ class Response
             $options = ['value' => $options];
         }
 
-        $options = array_merge($defaults, $options);
-        $this->cookies[$name] = $options;
+        $this->cookies[$name] = array_merge($defaults, $options);
     }
 
     /**

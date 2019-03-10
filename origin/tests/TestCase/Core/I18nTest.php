@@ -73,7 +73,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
 
     public function testLocales()
     {
-        MockI18n::setConfig(['language'=>'en']);
+        MockI18n::config(['language'=>'en']);
         $locales = MockI18n::locales();
         $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // check one
     }

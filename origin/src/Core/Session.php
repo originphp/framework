@@ -25,7 +25,7 @@ class Session
         }
         
         $timeout = 3600;
-        if (Configure::has('Session.timeout')) {
+        if (Configure::check('Session.timeout')) {
             $timeout = Configure::read('Session.timeout');
         }
         if (!self::started()) {

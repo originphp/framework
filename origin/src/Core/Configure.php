@@ -18,48 +18,46 @@ use Origin\Core\Dot;
 
 class Configure
 {
-    protected static $Dot = null;
+    /**
+     * Dot Object
+     *
+     * @var Dot
+     */
+    protected static $dot = null;
 
-    public static function init()
+    /**
+     * Returns the dot object
+     *
+     * @return Dot
+     */
+    protected static function dot()
     {
-        if (self::$Dot === null) {
-            self::$Dot = new Dot();
+        if (self::$dot === null) {
+            self::$dot = new Dot();
         }
+        return self::$dot;
     }
 
     public static function write($key = null, $value = null)
     {
-        self::init();
-
-        self::$Dot->set($key, $value);
-
-        if ($key == 'debug' and function_exists('ini_set')) {
-            if ($value) {
-                ini_set('display_errors', 1);
-            } else {
-                ini_set('display_errors', 0);
-            }
+        self::dot()->set($key, $value);
+        if ($key === 'debug') {
+            ini_set('display_errors', (int) $value);
         }
     }
 
     public static function read($key = null)
     {
-        self::init();
-
-        return self::$Dot->get($key);
+        return self::dot()->get($key);
     }
 
-    public static function has($key = null)
+    public static function check($key = null)
     {
-        self::init();
-
-        return self::$Dot->has($key);
+        return self::dot()->has($key);
     }
 
     public static function delete($key = null)
     {
-        self::init();
-
-        return self::$Dot->delete($key);
+        return self::dot()->delete($key);
     }
 }

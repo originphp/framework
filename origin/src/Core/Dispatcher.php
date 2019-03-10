@@ -31,14 +31,11 @@ class Dispatcher
      * Starts the disatch process by creating the request and response objects
      *
      * @param string $url
-     * @return void
+     * @return Controller
      */
     public function start(string $url = null)
     {
-        $Request = new Request($url);
-        $Response = new Response();
-
-        return $this->dispatch($Request, $Response);
+        return $this->dispatch(new Request($url), new Response());
     }
 
     protected function getClass(string $controller, string $plugin = null)

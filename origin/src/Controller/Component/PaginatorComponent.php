@@ -26,7 +26,7 @@ class PaginatorComponent extends Component
     ];
 
     /**
-     * Name of keys allowed to be passed in a query
+     * Name of keys allowed to be passed in params
      *
      * @var array
      */
@@ -97,7 +97,6 @@ class PaginatorComponent extends Component
      * Get the model name from the field.
      *
      * @param string $field
-     *
      * @return string model/alias
      */
     protected function getModelFromField(string $field)
@@ -139,7 +138,6 @@ class PaginatorComponent extends Component
      */
     protected function mergeSettings(array $settings)
     {
-     
         // merge with defaults
         $settings += $this->config;
         $query = $this->controller()->request()->query;

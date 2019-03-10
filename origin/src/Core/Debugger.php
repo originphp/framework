@@ -11,9 +11,11 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Core;
 
+/**
+ * Parses exception and backtrace objects into an array
+ */
 class Debugger
 {
     /**
@@ -31,7 +33,7 @@ class Debugger
             return [null, $class];
         }
 
-        return array(substr($class, 0, $position), substr($class, $position + 1));
+        return [substr($class, 0, $position), substr($class, $position + 1)];
     }
 
     public function exception($exception)

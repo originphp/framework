@@ -12,12 +12,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-/**
- * Log::write('debug',$message);.
- *
- * @var [type]
- */
-
 namespace Origin\Core;
 
 class Log
@@ -25,31 +19,14 @@ class Log
     /**
      * Writes to a log file.
      *
-     * @param string $name      e.g debug,error, mysql
+     * @param string $name
      * @param string $message   what you want to log
      * @param bool   $timestamp include timestamp
      */
-    public static function write(string $name, string $message, bool $timestamp = true)
+    public static function write(string $name, string $message)
     {
-        $filename = LOGS.DS.$name.'.log';
-
-        if (!file_exists($filename)) {
-            touch($filename);
-            chmod($filename, 0775);
-        }
-
-        $filehandle = fopen($filename, 'a+');
-        if ($timestamp) {
-            $message = self::format($message);
-        }
-
-        fwrite($filehandle, $message);
-        fclose($filehandle);
-    }
-
-    public static function format($message)
-    {
-        $now = date('Y-m-d G:i:s');
-        return "{$now} - {$message}\n";
+        $filename = LOGS . DS . $name . '.log' ;
+        $data  = '[' . date('Y-m-d G:i:s') . '] ' .  $message . "\n";
+        return file_put_contents($filename, $data, FILE_APPEND | LOCK_EX);
     }
 }

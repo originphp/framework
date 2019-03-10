@@ -31,8 +31,7 @@ class Inflector
     private static $cache = array();
 
     /**
-     * Core set of rules for inflection that work
-     * pretty well.
+     * Core set of rules for inflection that work pretty well.
      *
      * @var array
      */
@@ -224,7 +223,7 @@ class Inflector
     public static function rules(string $type, array $rules)
     {
         foreach ($rules as $find => $replace) {
-            self::$rules[$type] = array($find => $replace) + self::$rules[$type];
+            self::$rules[$type] = [$find => $replace] + self::$rules[$type];
         }
     }
 

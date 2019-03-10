@@ -82,7 +82,25 @@ class AuthComponent extends Component
      */
     public function startup()
     {
-        $this->checkAuthenticate();
+        $action = $this->request->params['action'];
+
+        if ($this->isLoggedIn()) {
+            return null;
+        }
+
+        if ($this->isAllowed($action)) {
+            return null;
+        }
+        
+        if ($this->isPrivateOrProtected($action)) {
+            return null;
+        }
+
+        if ($this->isLoginPage()) {
+            return null;
+        }
+
+        $this->unauthorize();
     }
 
     /**
@@ -206,33 +224,7 @@ class AuthComponent extends Component
     {
         return password_verify($password, $hash);
     }
-
-    /**
-     * Runs through checklist for auth.
-     */
-    protected function checkAuthenticate()
-    {
-        $action = $this->request->params['action'];
-
-        if ($this->isLoggedIn()) {
-            return null;
-        }
-
-        if ($this->isAllowed($action)) {
-            return null;
-        }
-        
-        if ($this->isPrivateOrProtected($action)) {
-            return null;
-        }
-
-        if ($this->isLoginPage()) {
-            return null;
-        }
-
-        $this->unauthorize();
-    }
-
+    
     /**
      * Gets the username and password from request
      * This can be form or http request such as using curl.
