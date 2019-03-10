@@ -40,4 +40,19 @@ class ConfigTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $mock->config('foo'));
         $this->assertNull($mock->config('bar'));
     }
+
+    public function testSetGetConfig()
+    {
+        $mock = new MockObject();
+        $this->assertEquals('on', $mock->getConfig('setting')); // default setting (after get)
+
+        $mock = new MockObject();
+        $mock->setConfig('foo', 'bar');
+        $mock->setConfig(['foo/bar'=>'bar/foo']);
+
+        $this->assertEquals('on', $mock->getConfig('setting')); // default setting after set
+        $this->assertEquals('none', $mock->getConfig('settingz', 'none'));
+        $this->assertEquals('bar', $mock->getConfig('foo'));
+        $this->assertEquals('bar/foo', $mock->getConfig('foo/bar'));
+    }
 }

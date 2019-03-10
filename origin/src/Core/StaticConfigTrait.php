@@ -19,13 +19,20 @@ namespace Origin\Core;
  */
 trait StaticConfigTrait
 {
-
     /**
      * Holds the config.
      *
      * @var array
      */
     protected static $config = null;
+
+    protected static function initConfig()
+    {
+        static::$config = [];
+        if (isset(static::$defaultConfig)) {
+            static::$config = static::$defaultConfig;
+        }
+    }
 
     /**
      * Sets/Gets config
@@ -41,13 +48,6 @@ trait StaticConfigTrait
      */
     public static function config($key = null, $value = null)
     {
-        if (static::$config === null) {
-            static::$config = [];
-            if (isset(static::$defaultConfig)) {
-                static::$config = static::$defaultConfig;
-            }
-        }
-
         if (is_array($key) or  func_num_args() === 2) {
             return static::setConfig($key, $value);
         }
@@ -62,6 +62,10 @@ trait StaticConfigTrait
      */
     public static function setConfig($key = null, $value = null)
     {
+        if (static::$config === null) {
+            static::initConfig();
+        }
+
         $config = $key;
         if (is_string($key)) {
             $config = [$key => $value];
@@ -74,20 +78,27 @@ trait StaticConfigTrait
     /**
      * Gets the config (all or part)
      *
+     * @internal to make this a public then
      * @param string|array $key
      * @param mixed $default
-     * @return void
+     * @return mixed|null
      */
  
 
-    public static function getConfig($key = null, $default=null)
+    public static function getConfig(string $key = null, $default = null)
     {
+        if (static::$config === null) {
+            static::initConfig();
+        }
+
         if ($key === null) {
             return static::$config;
         }
+      
         if (isset(static::$config[$key])) {
             return static::$config[$key];
         }
+
         return $default;
     }
 }

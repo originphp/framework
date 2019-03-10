@@ -27,6 +27,13 @@ trait ConfigTrait
      */
     protected $config = null;
 
+    protected function initConfig()
+    {
+        $this->config = [];
+        if (isset($this->defaultConfig)) {
+            $this->config = $this->defaultConfig;
+        }
+    }
     /**
      * Sets/Gets config
      *
@@ -41,13 +48,6 @@ trait ConfigTrait
      */
     public function config($key = null, $value = null)
     {
-        if ($this->config === null) {
-            $this->config = [];
-            if (isset($this->defaultConfig)) {
-                $this->config = $this->defaultConfig;
-            }
-        }
-
         if (is_array($key) or  func_num_args() === 2) {
             return $this->setConfig($key, $value);
         }
@@ -60,8 +60,11 @@ trait ConfigTrait
      * @param mixed $value
      * @return void
      */
-    public function setConfig($key = null, $value = null)
+    public function setConfig($key, $value = null)
     {
+        if ($this->config === null) {
+            $this->initConfig();
+        }
         $config = $key;
         if (is_string($key)) {
             $config = [$key => $value];
@@ -72,13 +75,18 @@ trait ConfigTrait
         return true;
     }
     /**
-     * Gets the config (all or part)
+     * Gets a config
      *
      * @param string $key
+     * @param mixed $default default value to return
      * @return void
      */
-    public function getConfig(string $key = null, $default=null)
+    public function getConfig(string $key = null, $default =null)
     {
+        if ($this->config === null) {
+            $this->initConfig();
+        }
+
         if ($key === null) {
             return $this->config;
         }
