@@ -83,5 +83,8 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(Plugin::routes('Make'));
         Plugin::load('Make', ['routes'=>true]);
         $this->assertTrue(Plugin::routes('Make'));
+        
+        Plugin::load('Widget', ['bootstrap'=>true]);
+        $this->assertFalse(Plugin::routes('Widget'));
     }
 }
