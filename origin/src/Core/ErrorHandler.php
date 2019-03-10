@@ -15,6 +15,7 @@
 namespace Origin\Core;
 
 use Origin\Core\Debugger;
+use Origin\Core\Logger;
 
 class ErrorHandler
 {
@@ -88,15 +89,9 @@ class ErrorHandler
             return $this->debugException($exception);
         }
 
+        $this->logException($exception, $errorCode);
+
         http_response_code($errorCode);
-
-        $message = get_class($exception)."\n";
-        $message .= $exception->getMessage()."\n";
-        $message .= 'Line '.$exception->getLine().' of '.$exception->getFile()."\n";
-        $message .= $exception->getTraceAsString();
-
-        Log::write('errors', $message);
-
         include SRC . DS . 'View' . DS . 'error' . DS . $errorCode . '.ctp';
     }
 
@@ -123,20 +118,30 @@ class ErrorHandler
             return true;
         }
 
+        $this->logException($exception, $errorCode);
+
         http_response_code($errorCode);
-
-        $message = get_class($exception)."\n";
-        $message .= $exception->getMessage()."\n";
-        $message .= 'Line '.$exception->getLine().' of '.$exception->getFile()."\n";
-        $message .= $exception->getTraceAsString();
-
-        Log::write('errors', $message);
-
         $response = ['error' => ['message' => 'An Internal Error has Occured','code' => 500]];
         if ($errorCode === 404) {
             $response = ['error' => ['message' => 'Not found','code' => 404]];
         }
         echo json_encode($response);
+    }
+
+    private function logException($exception)
+    {
+        $class = (new \ReflectionClass($exception))->getShortName();
+        $message = $exception->getMessage();
+        $line = $exception->getLine();
+        $file =  str_replace(ROOT . DS, '', $exception->getFile());
+     
+        $message = "{$class} {$message} in {$file}:{$line}";
+        $logger = new Logger('ErrorHandler');
+        if ($exception instanceof \ErrorException) {
+            $logger->error($message);
+        } else {
+            $logger->critical($message);
+        }
     }
 
     public function debugException($exception)

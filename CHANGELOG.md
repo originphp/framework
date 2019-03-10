@@ -28,6 +28,7 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- Logger Object
 - Queue System
 - Basic console options parsing
 - Queue System for background jobs
@@ -40,6 +41,7 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Changed configure has to check
 - Changed Utils folder to Utility
 - Removed irrelvant keys from schema generate
 - Changed location of schema files from config, to config/schema
@@ -52,6 +54,7 @@ Delete tag:   git tag -d <tag_name>
 - Make controller delete action template changed to use object->id
 
 ### Removed
+- Log Class
 - Deleted composer.lock
 - unused code in Entity and View
 

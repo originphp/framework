@@ -17,6 +17,7 @@ namespace Origin\Model\Behavior;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Core\ConfigTrait;
+use Origin\Core\Logger;
 
 class Behavior
 {
@@ -87,5 +88,17 @@ class Behavior
     public function model()
     {
         return $this->model;
+    }
+
+
+    /**
+     * Returns a Logger Object
+     *
+     * @param string $channel
+     * @return Logger
+     */
+    public function logger(string $channel = 'Behavior')
+    {
+        return new Logger($channel);
     }
 }

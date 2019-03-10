@@ -25,6 +25,7 @@ use Origin\Core\Router;
 use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
+use Origin\Core\Logger;
 
 class Controller
 {
@@ -47,7 +48,7 @@ class Controller
      *
      * @var array
      */
-    public $viewVars = array();
+    public $viewVars = [];
 
     /**
      * Automatically renders view.
@@ -201,8 +202,7 @@ class Controller
      * Loads a model, uses from registry or creates a new one.
      *
      * @param string $model
-     * @params array $options
-     *
+     * @param array $options
      * @return Model
      */
     public function loadModel(string $model, array $options=[])
@@ -225,12 +225,11 @@ class Controller
      * Checks if an action on this controller is accessible.
      *
      * @param string $action
-     *
      * @return bool
      */
     public function isAccessible(string $action)
     {
-        $controller = new ReflectionClass('Origin\Controller\Controller');
+        $controller = new ReflectionClass(Controller::class);
         if ($controller->hasMethod($action)) {
             return false;
         }
@@ -353,7 +352,7 @@ class Controller
 
         $this->beforeRender();
 
-        $viewObject = $this->createView();
+        $viewObject = new View($this);
         $body = $viewObject->render($view, $this->layout);
         $this->response->body($body);
     }
@@ -430,18 +429,6 @@ class Controller
         $this->response->body(Xml::fromArray($data));
     }
 
-
-
-    /**
-     * Use this to customise view class
-     *
-     * @return View
-     */
-    protected function createView()
-    {
-        return new View($this);
-    }
-
     /**
      * Redirects to a url, will disable autoRender but you should always
      * return $this->redirect to prevent code from running during tests etc
@@ -475,7 +462,7 @@ class Controller
     /**
      * Returns the response object
      *
-     * @return response
+     * @return Response
      */
     public function response()
     {
@@ -490,5 +477,16 @@ class Controller
     public function componentRegistry()
     {
         return $this->componentRegistry;
+    }
+
+    /**
+     * Returns a Logger Object
+     *
+     * @param string $channel
+     * @return Logger
+     */
+    public function logger(string $channel = 'Controller')
+    {
+        return new Logger($channel);
     }
 }

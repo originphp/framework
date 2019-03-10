@@ -15,7 +15,7 @@
 namespace Origin\Model;
 
 use Origin\Core\Configure;
-use Origin\Core\Log;
+use Origin\Core\Logger;
 use Origin\Model\Exception\DatasourceException;
 use PDO;
 use PDOException;
@@ -110,7 +110,8 @@ class Datasource
                 return false;
             }
         } catch (PDOException $e) {
-            Log::write('sql-error', $this->unprepare($sql, $params));
+            $logger = new Logger('Datasource');
+            $logger->debug($this->unprepare($sql, $params));
             throw new DatasourceException($e->getMessage());
         }
 

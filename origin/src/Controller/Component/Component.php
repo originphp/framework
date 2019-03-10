@@ -16,6 +16,7 @@ namespace Origin\Controller\Component;
 
 use Origin\Controller\Controller;
 use Origin\Core\ConfigTrait;
+use Origin\Core\Logger;
 
 class Component
 {
@@ -114,5 +115,16 @@ class Component
     public function controller()
     {
         return $this->controller;
+    }
+
+    /**
+     * Returns a Logger Object
+     *
+     * @param string $channel
+     * @return Logger
+     */
+    public function logger(string $channel = 'Component')
+    {
+        return new Logger($channel);
     }
 }
