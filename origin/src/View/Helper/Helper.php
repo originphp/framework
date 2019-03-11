@@ -138,8 +138,10 @@ class Helper
     }
 
     /**
-     * Returns the view.
-     */
+     * Returns the View
+    *
+    * @return View
+    */
     public function view()
     {
         return $this->view;

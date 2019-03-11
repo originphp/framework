@@ -334,7 +334,7 @@ class Model
      * $results = $this->CustomModel2->find('all');
      * @param string $model
      * @param array $config
-     * @return void
+     * @return Model
      */
     public function loadModel(string $name, array $config=[])
     {
@@ -1057,7 +1057,7 @@ class Model
      * @param int|string $id      id of record to fetch
      * @param array $options  (conditions, fields, joins, order,limit, group, callbacks,contain)
      *
-     * @return result
+     * @return Entity
      */
     public function get($id, array $options = [])
     {
@@ -1075,7 +1075,7 @@ class Model
      *
      * @param string $type  (first,all,count,list)
      * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,contain)
-     * @return object $resultSet
+     * @return Entity|array $resultSet
      */
     public function find(string $type = 'first', $options = [])
     {
@@ -1722,6 +1722,8 @@ class Model
 
     /**
      * Gets the Marshaller object.
+     *
+     * @return Marshaller
      */
     protected function marshaller()
     {

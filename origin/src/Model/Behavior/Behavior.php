@@ -85,6 +85,11 @@ class Behavior
     {
     }
 
+    /**
+     * Returns the model
+     *
+     * @return Model
+     */
     public function model()
     {
         return $this->model;

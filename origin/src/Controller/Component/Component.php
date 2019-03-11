@@ -111,6 +111,7 @@ class Component
 
     /**
      * Returns the controller
+     * @return Controller
      */
     public function controller()
     {
