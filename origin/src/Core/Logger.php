@@ -35,7 +35,7 @@ class Logger
      * @var string
      */
     
-    protected $filename = null;
+    protected $filename = LOGS . DS .  'application.log';
 
     /**
      * Constructor function
@@ -43,14 +43,9 @@ class Logger
      * @param string $channel  a simple descriptive name which logs are related to
      * @param string $filename full path and filename
      */
-    public function __construct(string $channel, string $filename = null)
+    public function __construct(string $channel)
     {
         $this->channel = $channel;
-        if ($filename === null) {
-            $filename = LOGS . DS .  'application.log';
-        }
-        
-        $this->setFilename($filename);
     }
     
     /**
@@ -62,6 +57,11 @@ class Logger
     public function setFilename(string $filename)
     {
         $this->filename = $filename;
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
     }
 
     /**
