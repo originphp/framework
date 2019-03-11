@@ -1,9 +1,10 @@
 CREATE TABLE `queue` (
   id INT AUTO_INCREMENT PRIMARY KEY,
   queue VARCHAR(80) NOT NULL,
-  body TEXT NOT NULL,
+  data TEXT NOT NULL,
   status VARCHAR(40) NOT NULL,
   locked TINYINT(1) DEFAULT 0,
+  tries INT(1) DEFAULT 0,
   scheduled DATETIME NOT NULL,
   created DATETIME NOT NULL,
   modified DATETIME NOT NULL

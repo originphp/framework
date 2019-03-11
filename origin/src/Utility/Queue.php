@@ -14,6 +14,7 @@
 
 /**
  * This is a Queue System with a MySQL backend. For now I want to keep it as one file, until packages are ready.
+ * @todo investigate using pcntl_signal/ pcntl_alarm for timing out tasks
  */
 
 namespace Origin\Utility;
@@ -21,6 +22,7 @@ namespace Origin\Utility;
 use Origin\Model\Entity;
 use Origin\Model\Model;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Exception\Exception;
 
 class Job
 {
@@ -38,67 +40,103 @@ class Job
      */
     protected $Job = null;
 
+
     /**
-     * Holds the body
+     * Holds the data
      *
      * @var Object
      */
-    protected $body = null;
+    protected $data = null;
 
     public function __construct(Model $job, Entity $entity)
     {
         $this->Job = $job;
         $this->id = $entity->id;
-        $this->body = json_decode($entity->body);
+        $this->entity = $entity;
     }
 
     /**
-     * Returns the payload body
+     * Returns the message data as an object
      *
-     * @return Object
+     * @param boolean $array return as array instead of object
+     * @return object|array
      */
-    public function getBody()
+    public function getData(bool $array=false)
     {
-        return $this->body;
+        return json_decode($this->entity->data, $array);
     }
-
+    
     /**
-     * Marks the job as executed
-     * @return bool
-     */
-    public function executed()
-    {
-        return $this->status('executed');
-    }
-
-    /**
-     * Marks the job as failed
+     * Once the job is finished run this
      *
      * @return bool
      */
-    public function failed()
+    public function executed() : bool
     {
-        return $this->status('failed');
+        return $this->setStatus('executed');
     }
 
+    /**
+    * If there was an error run this so you can inspect later.
+    *
+    * @return bool
+    */
+    public function failed() : bool
+    {
+        return $this->setStatus('failed');
+    }
 
     /**
-     * Deletes the job from the queue
+     * Run this to delete the job
      *
-     * @return bool
+     * @return boolean
      */
-    public function delete()
+    public function delete() : bool
     {
         return $this->Job->delete($this->id);
     }
 
-    public function status(string $status)
+    /**
+     * Release a job backinto the queue
+     *
+     * @param string $strtotime a strtotime compatiable string, now,+5 minutes, 2022-12-31
+     * @return void
+     */
+    public function release($strtotime = 'now') : bool
     {
-        $job = $this->Job->newEntity([
-            'id' => $this->id,
-            'status' => $status,
-            'locked' => 0
-        ]);
+        $job = $this->entity;
+        $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+        return $this->setStatus('queued');
+    }
+
+    /**
+    * Will retry a job a maximum number of times or bury it
+    *
+    * @param integer $tries
+    * @param string $strtotime
+    * @return void
+    */
+    public function retry(int $tries, $strtotime = 'now')
+    {
+        $job = $this->entity;
+        if ($job->tries < $tries) {
+            $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+            return $this->release();
+        }
+        $this->bury();
+    }
+
+    /**
+     * Sets the status of a job (and automatically releases it)
+     *
+     * @param string $status
+     * @return boolean
+     */
+    public function setStatus(string $status)  : bool
+    {
+        $job = $this->entity;
+        $job->status = $status;
+        $job->locked = 0;
         return $this->Job->save($job);
     }
 }
@@ -129,26 +167,42 @@ class Queue
     }
 
     /**
+     * Purge the executed Jobs from the queue
+     *
+     * @param string $queue
+     * @return bool
+     */
+    public function purge(string $queue = null) : bool
+    {
+        $conditions = ['status'=> 'executed'];
+        if ($queue) {
+            $conditions['queue'] = $queue;
+        }
+        return $this->Job->deleteAll($conditions);
+    }
+
+    /**
      * Adds a job to the queue
      *
      * @param string $queue name of queue, letters, numbers, underscore and hyphens only.
-     * @param array $body this is converted to json, and max length is 65535 chars
+     * @param array $data this is converted to JSON, and max length is 65535 chars
      * @param string $schedule when to process
      * @return int $id
      */
-    public function add(string $queue = null, array $body = [], string $strtotime = 'now')
+    public function add(string $queue = null, array $data = [], string $strtotime = 'now') :bool
     {
         if (!preg_match('/^[a-z0-9_-]+$/i', $queue)) {
             throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores and hypens');
         }
         $entity = $this->Job->newEntity();
+
         $entity->queue = $queue;
-        $entity->body = json_encode($body);
+        $entity->data = json_encode($data);
         $entity->status = 'queued';
         $entity->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
 
-        if (mb_strlen($entity->body) >= 65535) {
-            throw new InvalidArgumentException('Body data is longer than 65,535');
+        if (mb_strlen($entity->data) >= 65535) {
+            throw new InvalidArgumentException('Data string is longer than 65,535');
         }
         
         return $this->Job->save($entity);
@@ -156,7 +210,7 @@ class Queue
 
 
     /**
-     * Fetches the next job from a queue. Remeber to work with the queue in a try block
+     * Fetches the next job from a queue and locks it. Remember to work with the queue in a try/catch block
      *
      * @param string $queue name of queue
      * @return void
@@ -172,7 +226,6 @@ class Queue
         return false;
     }
 
-
     /**
      * Claims a job for processing and record is set to locked, prevents multiple.
      *
@@ -183,33 +236,20 @@ class Queue
     {
         $this->Job->begin();
         $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = {$id} AND locked = 0 FOR UPDATE;");
-        $this->Job->query("UPDATE {$this->Job->table} SET locked = 1 , modified = '" . now() . "' WHERE id = {$id};");
+        $this->Job->query("UPDATE {$this->Job->table} SET locked = 1 , tries = tries + 1, modified = '" . now() . "' WHERE id = {$id};");
         $this->Job->commit();
         if ($result) {
             return $result;
         }
         return false;
     }
-    /**
-     * Gets stuck jobs
-     *  $stuck = $queue->stuck('-5 minutes');
-     * @param string $strtotime a string to time valid string
-     * @return void
-     */
-    public function stuck(string $strtotime ='-2 minutes')
-    {
-        return $this->Job->find('all', ['conditions'=>[
-            'locked' => 1,
-            'modified <' => date('Y-m-d H:i:s', strtotime($strtotime))
-        ]]);
-    }
-    
+      
     /**
     * Returns the Queue Job Model
     *
     * @return Model
     */
-    public function model()
+    public function model() : Model
     {
         return $this->Job;
     }

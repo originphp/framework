@@ -32,8 +32,9 @@ $queue = new Queue([
 
 ## Adding Jobs to the Queue
 
-To add a job to the queue, you just use set a queue name and then pass array of data. This data is stored
-as a JSON string in the table. The queue name can consist of letters,numbers,hypens and underscores. Once you have added the job it will return the job id.
+You will most likely be adding jobs to a queue from either the controller, model or shell. 
+
+To add a job to the queue you just use set a queue name and then pass array of data. The queue name can consist of letters,numbers,hyphens and underscores. Once you have added the job it will return the job id.
 
 ````php
 Use Origin\Utility\Queue;
@@ -43,7 +44,7 @@ $jobId = $queue->add('welcome_emails',[
     ]);
 ````
 
-You can also delay (or schedule) the job using a `strtotime` compatible string or `Y-m-d H:i:s` date.
+You can also delay (or schedule) the job using a `strtotime` compatible string including a `Y-m-d H:i:s` date.
 
 ````php
  $queue->add('welcome_emails',[
@@ -52,19 +53,10 @@ You can also delay (or schedule) the job using a `strtotime` compatible string o
     '+5 hours');
 ````
 
-## Fetching Jobs
+## Fetching Jobs from the Queue
+The fetch method pulls one job at a time and locks it to prevent the job from being run more than once. For example, this can happen when running a cron job every minute, and the first job takes more than a minute, we lock it so even two processes that are running at the same time, so only one of them will get the job.
 
-The fetch method pulls one job at a time and locks it to prevent the job from being run more than once. For example, this can happen when running a cron job every minute, and the first job takes more than a minute, we lock it so even two processes that are running at the same time, so only of them will get the job.
-
-````php
- while ($job = $queue->fetch('welcome_emails')) {
-    ...
- }
-````
-
-If there is a job in the queue then it will return a job object. The body is the message you passed when you added the job to the queue, this is also returned as an object as it is decoded from the JSON string.
-
-When you process a job, it is best to run through a try block, incase of any unexpected errors or exceptions that might happen. 
+If there is a job in the queue then it will return a Job object. When you process a job, it is best to run through a try block, in-case of any unexpected errors or exceptions that might happen.
 
 ````php
  Use Origin\Utility\Queue;
@@ -72,54 +64,72 @@ When you process a job, it is best to run through a try block, incase of any une
 
  while ($job = $queue->fetch('welcome_emails')) {
     try {
-        $message = $job->getBody();
-        $this->User->sendEmail($message->user_id);
-        $job->delete();
-    } catch (Exception $e) {
-        $job->failed();
-    }  
- }
-````
-
-If you want to keep track of the jobs that have been processed then use executed, which will set the status accordingly.
-
-````php
- Use Origin\Utility\Queue;
- $queue = new Queue();
-
- while ($job = $queue->fetch('welcome_emails')) {
-    try {
-        $message = $job->getBody();
-        $this->User->sendEmail($message->user_id);
+        $message = $job->getData();
+        $this->sendWelcomeEmail($message->user_id);
         $job->executed();
     } catch (Exception $e) {
         $job->failed();
+        $logger->error('Job with id {id} failed.',['id'=>$job->id]);
     }  
  }
 ````
 
-You can also set custom statuses:
+## Processing Jobs
+
+Jobs in the queue are typically processed in the background, and this will usually be done in a shell script
 
 ````php
-    $job->status('skipped');
+<?php
+
+namespace App\Console;
+
+use App\Console\AppShell;
+
+class UsersShell extends AppShell
+{
+    public function hourly(){
+        $this->sendWelcomeEmails();
+    }
+    protected function sendWelcomeEmails(){
+
+        while ($job = $queue->fetch('welcome_emails')) {
+            ...
+        }
+    }
+}
 ````
 
-When you set a status (including executed or failed), the job is released (unlocked), this is important incase of long running jobs or timeouts which might cause stuck jobs, and will allow you to identify these in the database because they will be locked.
+On Ubuntu to setup cron tab for the `www-data` user type in the following command:
+
+````linux
+sudo crontab -u www-data -e
+````
+
+Then add the following line, assuming the source code is in the folder
+`/var/www/app.mydomain.com`.
+````
+0 * * * * cd /var/www/app.mydomain.com && bin/console user hourly
+````
 
 ## Accessing The Model
 
-If you need to do something with the queue table you can access the job model calling the `model` method.
+If you need to do something with records in the queue table you can access the job model calling the `model` method.
 
 ````php
 $Job = $queue->model();
-$jobs = $Job->find('all');
+$jobs =  $Job->find('all');
 ````
 
+## Purging Jobs
 
-## Stuck Jobs
-
-You can access stuck jobs using the stuck method and pass a valid strtotime compatible string.
+To purge all the executed jobs from the database
 
 ````php
-$stuck = $queue->stuck('-1 minutes');
+$queue->purge();
+````
+
+Or to just purge a specific a queue, use the queue name
+
+````php
+$queue->purge('welcome-emails');
 ````
