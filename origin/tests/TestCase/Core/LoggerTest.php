@@ -22,7 +22,6 @@ class LoggerTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        pr($this->filename);
         if (file_exists($this->filename)) {
             unlink($this->filename);
         }
