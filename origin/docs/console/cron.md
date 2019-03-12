@@ -6,7 +6,7 @@ On Ubunu or other Debian based flavors of unix use the crontab command.
 ````linux
     sudo crontab -u www-data -e
 ````
-For Redhat or Redhat base distributions edit the `/etc/crontab` file, although at the time of writing Redhat does not support Php 7.0 as of yet.
+For Redhat or Redhat base distributions edit the `/etc/crontab` file, although at the time of writing Redhat does not officially support Php 7.0.
 
 To setup a cron to run the send_emails method in the users shell once each day
 

@@ -1,7 +1,7 @@
 <?php
-
 use Origin\Core\Configure;
 use Origin\Core\Plugin;
+use Origin\Cache\Cache;
 
 /*
  * This will go in your server.php file once your app has been developed.
@@ -16,6 +16,8 @@ Configure::write('debug', true); // goes in server
 Configure::write('App.namespace', 'App');
 Configure::write('App.encoding', 'UTF-8');
 Configure::write('Session.timeout', 3600);
+
+Cache::config('default', ['engine' => 'File']);
 
 /**
  * Generate a random string such as md5(time()) and place

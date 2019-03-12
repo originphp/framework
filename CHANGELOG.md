@@ -28,6 +28,7 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- Cache system (Redis,Memcached,File,Apcu,Array and Null)
 - Logger Object
 - Queue System
 - Basic console options parsing
