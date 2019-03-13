@@ -82,13 +82,13 @@ Open one of the bookmarks, by clicking on one of the id numbers, this will take 
 
 You will see that there is a related list for tags, but nothing is showing. Open up the BookmarksController file in the src/Controller folder.
 
-Edit the view action so you add the contain key to the options for get, and set the model name there. Now when you reload the page, it will load all associated Tags with this (These are defined in the Model itself). By default associated data is not fetched unless you specify with contain.
+Edit the view action so you add the contain key to the options for get, and set the model name there. Now when you reload the page, it will load all associated Tags with this (These are defined in the Model itself). By default associated data is not fetched unless you tell it to do so.
 
 ````php
     public function view($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'contain'=>['Tag']
+            'with'=>['Tag']
             ]);
    
         $this->set('bookmark', $bookmark);

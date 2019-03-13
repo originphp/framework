@@ -18,7 +18,7 @@ To load associated records for model, in the find options you pass an array of m
 
 ````php
   $user = $this->User->get($id, [
-            'contain'=>['Task','Email'=>['fields'=>$fields],'Contact'=>['contain'=>$nestedModels]]
+            'with'=>['Task','Email'=>['fields'=>$fields],'Contact'=>['with'=>$nestedModels]]
             ]);
 ````
 You can pass options for each model to be contained, these will overide what was set with the functions below. You can also load nested associated data, by passing the contain option for each model.
@@ -192,7 +192,7 @@ You can also pass an options array with any of the following keys.
 - `className` is the name of the class that you want to load.
 - `joinTable` the name of the table used by this relationship
 - `with` the name of the model which uses the join table
-- `foreignKey` - `foreignKey` the foreign key in the current model. The default value would be the underscored name of the other model suffixed with '\_id'.
+- `foreignKey` - the foreign key in the current model. The default value would be the underscored name of the other model suffixed with '\_id'.
 - `associationForeignKey` the foreign key in the other model. The default value would be the underscored name of the other model suffixed with '\_id'.
 - `conditions` an array of additional conditions to the join
 - `fields` an array of fields to return from the join model, by default it returns all
@@ -207,10 +207,10 @@ You can also pass an options array with any of the following keys.
   {
     public function initialize(array $config){
       parent::initialize($config);
-      $this->hasMany('Tag',array(
+      $this->hasAndBelongsToMany('Tag',array(
       'className' => 'Tag',
       'joinTable' => 'users_tags',
-      'with' => 'UsersTags'
+      'through' => 'UsersTags'
       'foreignKey' => 'user_id',
       'associationForeignKey' => 'tag_id',
       'fields' => array('User.name','User.email','Tag.title','Tag.created')

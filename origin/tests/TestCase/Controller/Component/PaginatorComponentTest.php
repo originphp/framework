@@ -136,17 +136,17 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $Pet->Owner = new Owner();
 
         // Test foreign_keys
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['Owner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['Owner']]);
         $this->assertEquals(20, count($results));
 
-        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['Owner']]);
+        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['Owner']]);
         $this->assertEquals('asc', $results['order']['Owner.name']); // check alias.
 
         $Pet = new Pet();
         $Pet->belongsTo('MyOwner', ['foreignKey'=>'owner_id']);
         $Pet->MyOwner = new Model(['name'=>'MyOwner','alias'=>'MyOwner','table'=>'owners','datasource'=>'test']);
 
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','contain'=>['MyOwner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['MyOwner']]);
         $this->assertEquals(20, count($results));
     }
 }

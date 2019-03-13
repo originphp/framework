@@ -11,14 +11,15 @@ class BookmarksController extends AppController
     public function index()
     {
         $this->set('bookmarks', $this->paginate('Bookmark', [
-            'contain' => ['User']
+            'with' => ['User']
         ]));
+        deprecationWarning('This is a test');
     }
 
     public function view($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'contain'=>['User','Tag']
+            'with'=>['User','Tag']
             ]);
    
         $this->set('bookmark', $bookmark);
@@ -48,7 +49,7 @@ class BookmarksController extends AppController
     public function edit($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'contain' => ['Tag']
+            'with' => ['Tag']
         ]);
     
         if ($this->request->is(['post', 'put'])) {

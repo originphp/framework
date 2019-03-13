@@ -105,13 +105,6 @@ class Model
      */
     protected $behaviorRegistry = null;
 
-    /**
-     * Holds the contain stuff
-     *
-     * @var array
-     */
-    protected $contain = [];
-
     public function __construct(array $config = [])
     {
         $defaults = [
@@ -175,8 +168,8 @@ class Model
             $className = $association['className'];
         } else {
             foreach ($this->hasAndBelongsToMany as $alias => $config) {
-                if (isset($config['with']) and $config['with'] === $name) {
-                    $className = $config['with'];
+                if (isset($config['through']) and $config['through'] === $name) {
+                    $className = $config['through'];
                     $habtmModel = true;
                     break;
                 }
@@ -475,7 +468,7 @@ class Model
      * className: name of model associating to other model
      * foreignKey: foreign key found in this model
      * associationForeignKey: foreign key for other model
-     * with: name of JoinModel.  e.g ContactsTag (must be Alphabetical Order an)
+     * through: name of JoinModel.  e.g ContactsTag (must be Alphabetical Order)
      * mode: replace or append. Default is replace.
      *
      * @param string $association e.g Comment
@@ -494,7 +487,7 @@ class Model
           'dependent' => false,
           'limit' => null,
           'offset' => null,
-          'with' => null,
+          'through' => null,
           'mode' => 'replace',
         );
 
@@ -510,11 +503,11 @@ class Model
         $models = array_values($models);
 
         $with = Inflector::pluralize($models[0]).$models[1];
-        if (is_null($options['with'])) {
-            $options['with'] = $with;
+        if (is_null($options['through'])) {
+            $options['through'] = $with;
         }
         if (is_null($options['joinTable'])) {
-            $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['with']));
+            $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['through']));
         }
 
         $foreignKey = Inflector::underscore($this->name).'_id';
@@ -527,7 +520,7 @@ class Model
             $options['associationForeignKey'] = Inflector::underscore($options['className']).'_id';
         }
         $conditions = array(
-          "{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id",
+          "{$options['through']}.{$options['associationForeignKey']} = {$options['className']}.id",
         );
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
@@ -815,7 +808,7 @@ class Model
 
         foreach ($hasAndBelongsToMany as $association => $data) {
             $config = $this->hasAndBelongsToMany[$association];
-            $joinModel = $this->{$config['with']};
+            $joinModel = $this->{$config['through']};
 
             $links = [];
             foreach ($data as $row) {
@@ -848,7 +841,7 @@ class Model
                     $links[] = $this->{$association}->id;
                 }
 
-                $joinModel = $this->{$config['with']};
+                $joinModel = $this->{$config['through']};
             }
             $existingJoins = $joinModel->find('list', array(
                 'conditions' => array($config['foreignKey'] => $this->id),
@@ -1089,7 +1082,7 @@ class Model
              'page' => null,
              'offset' => null,
              'callbacks' => true,
-             'contain' => []
+             'with' => []
            );
 
         $options = array_merge($default, $options);
@@ -1174,7 +1167,7 @@ class Model
     {
         foreach ($this->hasAndBelongsToMany as $association => $config) {
             $deleteConditions = array($config['foreignKey'] => $id);
-            $this->{$config['with']}->deleteAll($deleteConditions, true, false);
+            $this->{$config['through']}->deleteAll($deleteConditions, true, false);
         }
     }
 
@@ -1331,11 +1324,11 @@ class Model
             $query['fields'] = $this->fields();
         }
 
-        $query['contain'] = $this->containConfig($query);
+        $query['with'] = $this->containConfig($query);
      
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
-                if (isset($query['contain'][$alias]) === false) {
+                if (isset($query['with'][$alias]) === false) {
                     continue;
                 }
 
@@ -1343,7 +1336,7 @@ class Model
                     throw new MissingModelException($config['className'].':'.$alias);
                 }
 
-                $config = array_merge($config, $query['contain'][$alias]);
+                $config = array_merge($config, $query['with'][$alias]);
               
                 $query['joins'][] = array(
                     'table' => $this->{$alias}->table,
@@ -1372,7 +1365,8 @@ class Model
     }
 
     /**
-     * Standardizes the contain config
+     * Standardizes the config for eager loading of related
+     * data
      *
      * @param array $query
      * @return void
@@ -1380,7 +1374,7 @@ class Model
     protected function containConfig(array $query)
     {
         $contain = [];
-        foreach ((array) $query['contain'] as $alias => $config) {
+        foreach ((array) $query['with'] as $alias => $config) {
             if (is_int($alias)) {
                 $alias = $config;
                 $config = [];
@@ -1454,7 +1448,7 @@ class Model
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
-            if (isset($query['contain'][$alias]) === false) {
+            if (isset($query['with'][$alias]) === false) {
                 continue;
             }
 
@@ -1462,7 +1456,7 @@ class Model
                 throw new MissingModelException($config['className'].':'.$alias);
             }
 
-            $config = array_merge($config, $query['contain'][$alias]);
+            $config = array_merge($config, $query['with'][$alias]);
         
             if (empty($config['fields'])) {
                 $config['fields'] = $this->{$alias}->fields();
@@ -1483,7 +1477,7 @@ class Model
     protected function loadAssociatedHasAndBelongsToMany($query, $results)
     {
         foreach ($this->hasAndBelongsToMany as $alias => $config) {
-            if (isset($query['contain'][$alias]) === false) {
+            if (isset($query['with'][$alias]) === false) {
                 continue;
             }
 
@@ -1491,11 +1485,11 @@ class Model
                 throw new MissingModelException($config['className'] . ':' . $alias);
             }
 
-            $config = array_merge($config, $query['contain'][$alias]);
+            $config = array_merge($config, $query['with'][$alias]);
 
             $config['joins'][0] = array(
               'table' => $config['joinTable'],
-              'alias' => $config['with'],
+              'alias' => $config['through'],
               'type' => 'INNER',
               'conditions' => $config['conditions'],
             );
@@ -1503,13 +1497,13 @@ class Model
             if (empty($config['fields'])) {
                 $config['fields'] = array_merge(
                 $this->{$alias}->fields(),
-                $this->{$config['with']}->fields()
+                $this->{$config['through']}->fields()
               );
             }
 
             foreach ($results as $index => &$result) {
                 if (isset($result->{$this->primaryKey})) {
-                    $config['joins'][0]['conditions']["{$config['with']}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                    $config['joins'][0]['conditions']["{$config['through']}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
                 }
 
                 $models = Inflector::pluralize(Inflector::variable($alias));
