@@ -6,7 +6,7 @@
 /logs/
 /tmp/
 
-/webroot/coverage
+/public/coverage
 
 # ignore a file type
 #*.json
