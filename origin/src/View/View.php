@@ -42,7 +42,7 @@ class View
      *
      * @var string
      */
-    public $view = null;
+    public $content = null;
 
     /**
      * Request params. For access from view, @todo use __get to fetch
@@ -145,9 +145,31 @@ class View
     }
 
     /**
-     * Gets a attribute value.
+     * Returns the rendered view
      *
-     * @param string $key vars,conents,params
+     * @return string|null
+     */
+    public function content()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Returns the page title
+     *
+     * @return string|null
+     */
+    public function title()
+    {
+        if (isset($this->vars['title'])) {
+            return $this->vars['title'];
+        }
+        return null;
+    }
+    /**
+     * Gets a property value
+     *
+     * @param string $key vars,contents,params
      *
      * @return
      */
@@ -195,7 +217,6 @@ class View
     protected function getElementFilename(string $name)
     {
         $filename = $this->getFilename($name, 'Element');
-
         if ($this->fileExists($filename)) {
             return $filename;
         }
@@ -213,7 +234,6 @@ class View
     protected function getViewFilename(string $name)
     {
         $path = $this->getViewPath();
-
         if (strpos($name, '/') !== false) {
             $path = $this->getViewPath(false); // get without controller folder
         }
@@ -236,7 +256,6 @@ class View
     protected function getViewPath($withControllerName = true)
     {
         $viewPath = $this->viewPath;
-   
         if (isset($this->params['plugin'])) {
             $viewPath = PLUGINS . DS . $this->params['plugin'] . DS . 'src' . DS . 'View';
         }
@@ -296,7 +315,7 @@ class View
         extract($this->vars);
         ob_start();
         require $view__filename;
-        $buffer = $this->view = ob_get_clean();
+        $buffer = $this->content = ob_get_clean();
 
         if ($layout != null) {
             $buffer = $this->renderLayout($layout);

@@ -13,8 +13,8 @@
   <body>
 
     <div class="container">
-      <?= $this->Flash->messages(); ?>
-      <?= $this->fetch('view'); ?>
+      <?= $this->Flash->messages() ?>
+      <?= $this->content() ?>
     </div>
 
     <!-- Optional JavaScript -->

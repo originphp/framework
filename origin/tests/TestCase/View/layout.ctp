@@ -1,4 +1,2 @@
-<h1><?php echo $this->get('title');?><h1>
-<?php
-echo $this->fetch('view');
-?>
+<h1><?= $this->title() ?><h1>
+<?= $this->content() ?>
