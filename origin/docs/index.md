@@ -55,15 +55,13 @@ foreach($users as $user){
 
 ````
 
-
 ### View
 
 The view templates are in the `View` folder, and the folder name is plural camel cased, so for user profiles it would be `UserProfiles`, the templates
 end with `.ctp` extension.
 
-So if `/users_profiles/index` is requested it will 
+When `/users_profiles/index` is requested, the following will happen: 
 
 - load the controller `UserProfilesController` from the `Controller` folder
 - load the model `UserProfile` from the `Model` folder
 - load the view template `index.ctp` from the `View/UserProfiles` folder
-

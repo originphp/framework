@@ -37,6 +37,13 @@ class HelperRegistry extends ObjectRegistry
         return Resolver::className($class, 'View/Helper');
     }
 
+    /**
+     * Creates the object
+     *
+     * @param string $class
+     * @param array $options
+     * @return \App\View\Helper\Helper
+     */
     protected function createObject(string $class, array $options = [])
     {
         return new $class($this->view, $options);

@@ -1669,55 +1669,58 @@ class Model
     }
 
     /**
-     * Creates an Entity from an array of data.
+     * Returns a new Entity object, if an array of data is passed then it will marshal that data
+     * and dates,times,numbers will be parsed according to locale settings.
      *
      * options:
      * parse - By default date/datetime/time/number
      * fields will be parsed unless you set parse to false in the options.
      *
-     * @param array $data
+     * @param array $requestData
      * @param array $options parse default is set to true
      * @return Entity
      */
-    public function newEntity(array $array = [], array $options=[])
+    public function newEntity(array $requestData = [], array $options=[])
     {
         $options += ['name' => $this->alias,'new'=>true];
         $marshaller = $this->marshaller();
         
-        return $marshaller->one($array, $options);
+        return $marshaller->one($requestData, $options);
     }
 
     /**
-     * Creates many Entities from an array of data.
+     * Creates many Entities from an array of data. The data goes through the marshalling process
+     * and dates,times,numbers are parsed according to locale.
      *
      * @param array $data
      * @param array $options parse default is set to true
      * @return Entity
      */
-    public function newEntities(array $array, array $options=[])
+    public function newEntities(array $requestData, array $options=[])
     {
         $options += ['name' => $this->alias,'new'=>true];
         $marshaller = $this->marshaller();
 
-        return $marshaller->many($array, $options);
+        return $marshaller->many($requestData, $options);
     }
 
     /**
-     * Merges data array into an entity.
+     * Merges data array into an entity. The data goes through the marshalling process
+     * and dates,times,numbers are parsed according to locale.
      *
      * options:
      * parse - By default date/datetime/time/number
      * fields will be parsed unless you set parse to false in the options.
      *
      * @param Entity $entity
-     * @param array  $data
+     * @param array  $requestData
      * @param array $options parse
      * @return Entity
      */
-    public function patchEntity(Entity $entity, array $data, array $options=[])
+    public function patchEntity(Entity $entity, array $requestData, array $options=[])
     {
         $marshaller = $this->marshaller();
-        return $marshaller->patch($entity, $data, $options);
+        return $marshaller->patch($entity, $requestData, $options);
     }
 
     /**

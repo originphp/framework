@@ -107,6 +107,13 @@ class ObjectRegistry
         $this->loaded[$name] = $object;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param array $options
+     * @return mixed
+     */
     public function load(string $name, array $options = array())
     {
         if (isset($this->loaded[$name])) {

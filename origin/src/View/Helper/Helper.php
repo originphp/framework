@@ -45,7 +45,10 @@ class Helper
     }
 
     /**
-     * Lazy loading
+     * Handles the lazyloading
+     *
+     * @param string $name
+     * @return mixed
      */
     public function __get($name)
     {
@@ -65,7 +68,7 @@ class Helper
     *
     * @param string $helper e.g Auth, Flash
     * @param array $config
-    * @return void
+    * @return Helper
     */
     public function loadHelper(string $name, array $config = [])
     {

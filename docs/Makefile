@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = OriginPHPCookbook
 SOURCEDIR     = .
-BUILDDIR      = _build
+BUILDDIR      = ../guides
 
 # Put it first so that "make" without argument is like "make help".
 help:

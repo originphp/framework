@@ -92,7 +92,7 @@ class ErrorHandler
         $this->logException($exception, $errorCode);
 
         http_response_code($errorCode);
-        include SRC . DS . 'View' . DS . 'error' . DS . $errorCode . '.ctp';
+        include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
     }
 
     /**
@@ -149,7 +149,7 @@ class ErrorHandler
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
 
-        include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+        include SRC . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
 
         exit();
     }

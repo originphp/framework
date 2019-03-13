@@ -16,14 +16,14 @@ namespace Origin\Cache;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Cache\NullCache;
+use Origin\Cache\NullEngine;
 
 class Cache
 {
     use StaticConfigTrait;
     protected static $defaultConfig = [
         'default' => [
-            'className' => 'Origin\Cache\Engine\ApcuEngine',
+            'className' => 'Origin\Cache\Engine\FileEngine',
             'duration' => 3600
             ]
     ];
@@ -37,6 +37,11 @@ class Cache
 
     protected static $disabled = false;
 
+    /**
+     * Undocumented variable
+     *
+     * @var NullEngine
+     */
     protected static $nullEngine = null;
 
     /**
@@ -131,7 +136,7 @@ class Cache
 
     public static function disable()
     {
-        static::$nullEngine = new NullCache();
+        static::$nullEngine = new NullEngine();
         static::$disabled =  true;
     }
 

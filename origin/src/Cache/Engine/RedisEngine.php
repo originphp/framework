@@ -118,7 +118,7 @@ class RedisEngine extends CacheEngine
         return $this->Redis->exists($this->key($key));
     }
     /**
-     * Deletes a kehy from the cache
+     * Deletes a key from the cache
      *
      * @param string $key
      * @return boolean

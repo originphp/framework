@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Issue with error folder in lower case (not picked up in docker)
 - Auth scope fixed
 - Bookmarks edit tags not listed
 - Bookmarks not validating URL

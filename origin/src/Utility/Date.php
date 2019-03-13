@@ -88,7 +88,7 @@ class Date
     }
 
     /**
-     * Sets the datetimeformat using pattern of intl settings.
+     * Sets the datetimeformat using pattern of intl settings. Possible patterns can be found at http://userguide.icu-project.org/formatparse/datetime.
      *
      * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
      */
@@ -237,6 +237,7 @@ class Date
         if ($format === null) {
             $format = self::$datetimeFormat;
         }
+       
         $formatter = self::formatter($format);
 
         $timestamp = $formatter->parse($dateString);
@@ -278,7 +279,6 @@ class Date
         if (preg_match('/buddhist|chinese|coptic|ethiopic|hebrew|indian|islamic|japanese|/', self::$locale)) {
             $calendar = IntlDateFormatter::TRADITIONAL;
         }
-
         $formatter = new IntlDateFormatter(
             self::$locale,
             $dateFormat,
