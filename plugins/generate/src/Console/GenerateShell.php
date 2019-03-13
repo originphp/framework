@@ -12,12 +12,12 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Make\Console;
+namespace Generate\Console;
 
 use Origin\Console\Shell;
 use Origin\Core\Inflector;
 use Origin\Exception\Exception; // @todo a different exception?
-use Make\Utils\MakeTemplater;
+use Generate\Utils\GenerateTemplater;
 use Origin\Utility\Xml;
 
 /**
@@ -33,7 +33,7 @@ use Origin\Utility\Xml;
 */
 
 
-class MakeShell extends Shell
+class GenerateShell extends Shell
 {
     /**
      * Meta information from introspecting the database.
@@ -47,9 +47,9 @@ class MakeShell extends Shell
 
     protected function introspectDatabase()
     {
-        $this->loadTask('Make.Make');
-        $this->Make->introspectDatabase();
-        $this->meta = $this->Make->build();
+        $this->loadTask('Generate.Generate');
+        $this->Generate->introspectDatabase();
+        $this->meta = $this->Generate->build();
     }
     public function initialize(array $arguments)
     {
@@ -72,15 +72,15 @@ class MakeShell extends Shell
     }
     public function help()
     {
-        $this->out('make all');
-        $this->out('make all Contact');
-        $this->out('make model Contact');
-        $this->out('make controller Contacts');
-        $this->out('make view Contacts');
-        $this->out('make plugin ContactManager');
+        $this->out('generate all');
+        $this->out('generate all Contact');
+        $this->out('generate model Contact');
+        $this->out('generate controller Contacts');
+        $this->out('generate view Contacts');
+        $this->out('generate plugin ContactManager');
         $this->out('');
         $this->out('You can use -force to not prompt');
-        //$this->out('make test Lead'); /**@todo test */
+        //$this->out('generate test Lead'); /**@todo test */
     }
 
     public function plugin()
@@ -120,7 +120,7 @@ class MakeShell extends Shell
             'underscored' => $underscored
         ];
     
-        $Templater = new MakeTemplater();
+        $Templater = new GenerateTemplater();
         $result = $Templater->generate('plugin/routes', $data);
         if (!file_put_contents($path. DS . 'src' . DS .'config' . DS .'routes.php', $result)) {
             throw new Exception('Error writing file');
@@ -263,7 +263,7 @@ class MakeShell extends Shell
         }
         $data['compact'] = implode("','", $compact);
 
-        $Templater = new MakeTemplater();
+        $Templater = new GenerateTemplater();
         $result = $Templater->generate('controller', $data);
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
@@ -325,7 +325,7 @@ class MakeShell extends Shell
             }
         }
 
-        $Templater = new MakeTemplater();
+        $Templater = new GenerateTemplater();
         $result = $Templater->generate('model', $data);
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
@@ -364,7 +364,7 @@ class MakeShell extends Shell
         $data += [
             'controllerUnderscored' => Inflector::underscore($controller)
         ];
-        $Templater = new MakeTemplater();
+        $Templater = new GenerateTemplater();
 
         foreach (['add','edit','index','view'] as $view) {
             $result = $Templater->generate('View/'. $view, $data);
@@ -406,7 +406,7 @@ class MakeShell extends Shell
     protected function getData(string $model)
     {
         $data = $this->meta['vars'][$model];
-        $data['primaryKey'] = $this->Make->primaryKey($model);
+        $data['primaryKey'] = $this->Generate->primaryKey($model);
         $fields = array_keys($this->meta['schema'][$model]);
         $key = array_search($data['primaryKey'], $fields);
         if ($key !== false) {

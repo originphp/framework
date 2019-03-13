@@ -3,7 +3,7 @@
 You can customise all these templates before generating code, you can pass the -force argument
 to overwrite without prompting.
 
-All info is stored in MakeShell::meta['vars'];
+All info is stored in GenerateShell::meta['vars'];
 
 ## Reference
 model - BookmarksTag

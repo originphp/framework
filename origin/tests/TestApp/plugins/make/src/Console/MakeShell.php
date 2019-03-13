@@ -12,14 +12,14 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Make\Console;
+namespace Generate\Console;
 
 use Origin\Console\Shell;
 
-class MakeShell extends Shell
+class GenerateShell extends Shell
 {
     public function main()
     {
-        $this->out('Make Dummy Shell');
+        $this->out('Generate Dummy Shell');
     }
 }

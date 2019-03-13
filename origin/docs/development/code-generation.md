@@ -8,17 +8,17 @@ The first thing to do is setup your database and config.
 
 Run the console command (this is a shell script in the bin folder)
 
-`bin/console make` and this will show the options that are available to you.
+`bin/console generate` and this will show the options that are available to you.
 
 So lets you are creating a contact app, and you have a `contacts` table setup
 
 We will need to create the Model, View and Controller (MVC);
 
-`bin/console make controller Contacts`
+`bin/console generate controller Contacts`
 
-`bin/console make model Contact`
+`bin/console generate model Contact`
 
-`bin/console make view Contacts`
+`bin/console generate view Contacts`
 
 This will generate the following views
 - `/contacts/add` 
@@ -28,7 +28,7 @@ This will generate the following views
 
 You can also generate the Model,View,Controller (MVC) in one go
 
-`bin/console make all Contact`
+`bin/console generate all Contact`
 
 If all went ok then you should be able to access your contacts app by `http://localhost:8000/contacts`
 

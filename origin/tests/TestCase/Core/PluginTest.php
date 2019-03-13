@@ -41,48 +41,48 @@ class PluginTest extends \PHPUnit\Framework\TestCase
     public function testLoad()
     {
         // test with routes and bootstrap
-        MockPlugin::load('Make');
-        $this->assertEquals(['Make'], MockPlugin::loaded());
-        $this->assertTrue(MockPlugin::loaded('Make'));
+        MockPlugin::load('Generate');
+        $this->assertEquals(['Generate'], MockPlugin::loaded());
+        $this->assertTrue(MockPlugin::loaded('Generate'));
         $config = MockPlugin::getLoaded();
-        $this->assertEquals('/var/www/origin/tests/TestApp/plugins/make', $config['Make']['path']);
-        $this->assertTrue($config['Make']['routes']);
-        $this->assertTrue($config['Make']['bootstrap']);
+        $this->assertEquals('/var/www/origin/tests/TestApp/plugins/make', $config['Generate']['path']);
+        $this->assertTrue($config['Generate']['routes']);
+        $this->assertTrue($config['Generate']['bootstrap']);
         
         // Test with no routes and bootstrap
-        MockPlugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
-        $this->assertTrue(MockPlugin::loaded('Make'));
+        MockPlugin::load('Generate', ['routes'=>false,'bootstrap'=>false]);
+        $this->assertTrue(MockPlugin::loaded('Generate'));
         $config = MockPlugin::getLoaded();
-        $this->assertFalse($config['Make']['routes']);
-        $this->assertFalse($config['Make']['bootstrap']);
+        $this->assertFalse($config['Generate']['routes']);
+        $this->assertFalse($config['Generate']['bootstrap']);
     }
 
     public function testUnload()
     {
-        MockPlugin::load('Make');
-        $this->assertTrue(MockPlugin::unload('Make'));
-        $this->assertFalse(MockPlugin::unload('Make'));
-        $this->assertFalse(MockPlugin::loaded('Make'));
+        MockPlugin::load('Generate');
+        $this->assertTrue(MockPlugin::unload('Generate'));
+        $this->assertFalse(MockPlugin::unload('Generate'));
+        $this->assertFalse(MockPlugin::loaded('Generate'));
     }
 
     public function testRoutes()
     {
-        MockPlugin::load('Make');
-        $this->assertTrue(MockPlugin::routes('Make'));
+        MockPlugin::load('Generate');
+        $this->assertTrue(MockPlugin::routes('Generate'));
         MockPlugin::loadRoutes();
 
         // Give include test
-        Plugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
-        $this->assertFalse(Plugin::routes('Make')); // Test Include
-        Plugin::load('Make', ['routes'=>true]);
-        $this->assertTrue(Plugin::routes('Make'));
+        Plugin::load('Generate', ['routes'=>false,'bootstrap'=>false]);
+        $this->assertFalse(Plugin::routes('Generate')); // Test Include
+        Plugin::load('Generate', ['routes'=>true]);
+        $this->assertTrue(Plugin::routes('Generate'));
     }
     public function testInclude()
     {
-        Plugin::load('Make', ['routes'=>false]);
-        $this->assertFalse(Plugin::routes('Make'));
-        Plugin::load('Make', ['routes'=>true]);
-        $this->assertTrue(Plugin::routes('Make'));
+        Plugin::load('Generate', ['routes'=>false]);
+        $this->assertFalse(Plugin::routes('Generate'));
+        Plugin::load('Generate', ['routes'=>true]);
+        $this->assertTrue(Plugin::routes('Generate'));
         
         Plugin::load('Widget', ['bootstrap'=>true]);
         $this->assertFalse(Plugin::routes('Widget'));

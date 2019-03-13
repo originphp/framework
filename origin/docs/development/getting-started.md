@@ -94,7 +94,7 @@ Now that your database is configured and setup, the next step is to generate the
 
 This is done with a one liner.
 
-`bin/console make all`
+`bin/console generate all`
 
 You can edit the templates that used to generate the code which are stored in the `plugins\make\src\Template`. These are single files which are simple to understand, see [code generation](code-generation.md) for more information. In most cases you will want to rearrange the templates and classes or divs etc.
 

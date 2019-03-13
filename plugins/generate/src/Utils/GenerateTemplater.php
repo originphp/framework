@@ -12,9 +12,9 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Make\Utils;
+namespace Generate\Utils;
 
-class MakeTemplater
+class GenerateTemplater
 {
 
     /**
@@ -54,6 +54,6 @@ class MakeTemplater
     }
     public function loadTemplate(string $name)
     {
-        return file_get_contents(PLUGINS . DS . 'make' . DS . 'src' . DS  .'Template'. DS . $name . '.tpl');
+        return file_get_contents(PLUGINS . DS . 'generate' . DS . 'src' . DS  .'Template'. DS . $name . '.tpl');
     }
 }

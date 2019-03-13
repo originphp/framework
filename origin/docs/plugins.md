@@ -18,9 +18,9 @@ Lets say you want to create a contact manager plugin, you create the folder stru
 |   |   -- tests
 ````
 
-You can use the make plugin to create the folder structure, routes and app controller and model.
+You can use the generate plugin to create the folder structure, routes and app controller and model.
 
-`bin/console make plugin ContactManager` 
+`bin/console generate plugin ContactManager` 
 
 Then in your `config/bootstrap.php` add:
 
@@ -28,7 +28,7 @@ Then in your `config/bootstrap.php` add:
 
 The plugin name in load should be `CamelCase`, but the folder should be `underscored`.
 
-If you did not use the make plugin then follow these steps.
+If you did not use the generate plugin then follow these steps.
 
 
 ## Setup Routing

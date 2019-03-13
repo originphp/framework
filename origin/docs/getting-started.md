@@ -64,7 +64,7 @@ One of the shell commands for bookmarks is uninstall, this will remove all demo 
 
 ## Super Quick Tutorial
 
-What we are going to do is remove the sample files, and then use the Make plugin to generate the models,views and controllers to give you an idea how quick you can build apps.
+What we are going to do is remove the sample files, and then use the Generate plugin to generate the models,views and controllers to give you an idea how quick you can build apps.
 
 Lets uninstall the bookmarks files (later on you can re-download these if you want)
 
@@ -72,7 +72,7 @@ Lets uninstall the bookmarks files (later on you can re-download these if you wa
 
 Now we are going to generate the code.
 
-`bin/console make all` 
+`bin/console generate all` 
 
 Thats it, you have now built your own bookmarks app using just the database. Ofcourse, our demo was slightly customised so would look different and have some different features. But that is the process you will normally start with when starting a new project, setting up the database and then generating the code.
 

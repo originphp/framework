@@ -99,7 +99,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $result = $ShellDispatcher->callMethod('getShellList');
         $this->assertArrayHasKey('App', $result);
         $this->assertArrayHasKey('Core', $result);
-        $this->assertArrayHasKey('Make', $result);
+        $this->assertArrayHasKey('Generate', $result);
     }
 
     public function testDispatchAndOut()
@@ -164,7 +164,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         // Test direct plugin call
         $ShellDispatcher = new MockShellDispatcher(
-             ['pathTo/origin.php','Make.make','help'],
+             ['pathTo/origin.php','Generate.generate','help'],
              new AnotherConsoleOutput('php://memory')
          );
         $result = $ShellDispatcher->start();

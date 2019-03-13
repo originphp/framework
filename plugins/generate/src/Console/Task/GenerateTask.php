@@ -12,16 +12,13 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Make\Console\Task;
+namespace Generate\Console\Task;
 
 use Origin\Console\Task\Task;
 use Origin\Model\ConnectionManager;
 use Origin\Core\Inflector;
-use Origin\Model\Model;
 
-use PDO;
-
-class MakeTask extends Task
+class GenerateTask extends Task
 {
     protected $schema = [];
 
