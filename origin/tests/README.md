@@ -27,6 +27,6 @@ echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
 
 From the container and in the `origin/tests` folder run the following commands
 
-`phpunit --coverage-html /var/www/webroot/coverage`
+`phpunit --coverage-html /var/www/public/coverage`
 
-You can then access this by visiting [http://localhost:8000/coverage](http://localhost:8000/coverage).
+You can then access this by visiting [http://localhost:8000/coverage/index.html](http://localhost:8000/coverage/index.html).

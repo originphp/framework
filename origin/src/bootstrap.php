@@ -28,7 +28,7 @@ if (!defined('DS')) {
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
     define('TMP', ROOT . DS . 'tmp');
-    define('WEBROOT', ROOT . DS . 'webroot');
+    define('WEBROOT', ROOT . DS . 'public');
 }
 
 error_reporting(E_ALL);

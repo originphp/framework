@@ -18,7 +18,7 @@ use Origin\Core\Log;
  *
  * Include declare(ticks=1); at the start of each file for this work.
  *
- * To test whole app: in webroot/index.php add before the dispatcher code: (Or you can add to your App controller)
+ * To test whole app: in public/index.php add before the dispatcher code: (Or you can add to your App controller)
  *
  *  require dirname(__DIR__).'/plugins/debug/src/Profiler.php';
  *  $profiler = new Debug\Profiler();

@@ -218,14 +218,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAddAttachment()
     {
         $Email = new MockEmail();
-        $Email = $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css');
+        $Email = $Email->addAttachment(ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css');
         $this->assertInstanceOf(Email::class, $Email);
 
-        $Email->addAttachment(ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css', 'Debugger.css');
+        $Email->addAttachment(ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css', 'Debugger.css');
         
         $expected = [
-            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css' => 'default.css',
-            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css' => 'default.css',
+            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
         ];
         $this->assertSame($expected, $Email->getProperty('attachments'));
 
@@ -240,14 +240,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->addAttachments([
-            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css',
-            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css',
+            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
         ]);
         $this->assertInstanceOf(Email::class, $Email);
 
         $expected = [
-            ROOT . DS . 'webroot' . DS  .'css'  . DS. 'default.css' => 'default.css',
-            ROOT . DS . 'webroot' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css' => 'default.css',
+            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
         ];
         
         $this->assertSame($expected, $Email->getProperty('attachments'));
