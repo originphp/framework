@@ -183,8 +183,9 @@ class MakeShell extends Shell
 
     public function all()
     {
+        $avilable = $this->getAvailable();
         if (empty($this->args)) {
-            $models = $this->getAvailable();
+            $models = $avilable;
             $this->out('Generate Model, View and Controller for each of the following models:');
             $this->out('');
             foreach ($models as $model) {
@@ -198,12 +199,16 @@ class MakeShell extends Shell
         } else {
             $models = $this->args;
         }
-       
+        
         foreach ($models as $model) {
-            $controller = Inflector::pluralize($model);
-            $this->controller($controller);
-            $this->model($model);
-            $this->view($controller);
+            if (in_array($model, $avilable)) {
+                $controller = Inflector::pluralize($model);
+                $this->controller($controller);
+                $this->model($model);
+                $this->view($controller);
+            } else {
+                throw new Exception(sprintf('Invalid model name %s', $model));
+            }
         }
     }
 
