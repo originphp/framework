@@ -86,16 +86,29 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidatesRequiredOn()
     {
         $Validator = $this->Validator;
-        $validate = array(
-        'name' => array(
-            'rule' => 'notBlank',
-            'required' => 'update'
-        ),
-      );
-        $Validator->rules($validate);
-        $data = new Entity(['value' => 'some string']);
-        $this->assertTrue($Validator->validates($data, true));
-        $this->assertFalse($Validator->validates($data, false));
+ 
+        $Validator->rules([
+            'name' => ['rule' => 'notBlank','required' => true]
+            ]);
+    
+        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), true));
+        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), false));
+
+       
+        $Validator->rules([
+            'name' => ['rule' => 'notBlank','required' => true,'on' => 'create']
+            ]);
+    
+        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), true));
+        $this->assertTrue($Validator->validates(new Entity(['value' => 'some string']), false));
+
+        
+        $Validator->rules([
+            'name' => ['rule' => 'notBlank','required' => true,'on' => 'update']
+            ]);
+    
+        $this->assertTrue($Validator->validates(new Entity(['value' => 'some string']), true));
+        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), false));
     }
 
     public function testValidatesOn()

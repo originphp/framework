@@ -101,12 +101,12 @@ class ModelValidator
      * Handles the on
      *
      * @param bool $create
-     * @param string|bool $on true,'create','update'
+     * @param string|bool $on null,'create','update'
      * @return bool
      */
     protected function runRule(bool $create, $on)
     {
-        if ($on === true || ($create and $on ==='create') || (!$create and $on ==='update')) {
+        if ($on === null or ($create and $on ==='create') or (!$create and $on ==='update')) {
             return true;
         }
         return false;
@@ -117,16 +117,16 @@ class ModelValidator
         $requiredMessage = 'This field is required';
         $notBlankMessage = 'This field cannot be left blank';
         $defaultMessage = 'Invalid value';
-       
+     
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                $defaults = array(
+                $defaults = [
                   'rule' => null, 'message' => null, 'required' => false, 'on' => null,
-                );
+                ];
 
                 $validationRule = array_merge($defaults, $validationRule);
-                
-                if ($validationRule['required'] and $this->runRule($create, $validationRule['required']) and !in_array($field, $entity->modified())) {
+              
+                if ($validationRule['required'] and $this->runRule($create, $validationRule['on']) and !in_array($field, $entity->modified())) {
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $requiredMessage;
                     }
