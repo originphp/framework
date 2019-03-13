@@ -44,6 +44,13 @@ class Entity
     protected $_name = null;
 
     /**
+     * If the record exists in the database (set during find)
+     *
+     * @var [type]
+     */
+    protected $_exists = null;
+
+    /**
      * Holds modified fields
      *
      * @var array
@@ -54,14 +61,14 @@ class Entity
      * Constructor
      *
      * List of options
-     *  - name: Model name
-     *
+     * name: Model name
+     * exists: if the model exists in the database (set during find), null, means dont know
      * @param array $properties data
      * @param array $options
      */
     public function __construct(array $properties = [], array $options = [])
     {
-        $options += ['name'=>null];
+        $options += ['name'=>null,'exists'=>null];
 
         $this->_name = $options['name'];
         
@@ -309,6 +316,16 @@ class Entity
     public function name()
     {
         return $this->_name;
+    }
+
+    /**
+     * Returns if exists or not (false or null for dont know)
+     *
+     * @return null|bool
+     */
+    public function exists()
+    {
+        return $this->exists;
     }
 
     /**

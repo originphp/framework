@@ -1418,12 +1418,12 @@ class Model
         $buffer = [];
 
         foreach ($results as $record) {
-            $entity = $this->createEntity($record[$this->alias], $this->alias);
+            $entity = $this->create($record[$this->alias], ['name'=>$this->alias,'exists'=>true]);
             unset($record[$this->alias]);
 
             foreach ($record as $model => $data) {
                 $associated = Inflector::variable($model);
-                $entity->{$associated} = $this->createEntity($data, $associated);
+                $entity->{$associated} = $this->create($data, ['name'=>$associated,'exists'=>true]);
             }
 
             $buffer[] = $entity;
@@ -1433,16 +1433,16 @@ class Model
     }
 
     /**
-     * Transforms a single row (array) into an entity. This is used when preparing
-     * results loaded from the database.
+     * Transforms a single row (array) into an entity. Does not work with related
+     * and nor does it parse I18n
      *
-     * @param array  $resultSet result from database
-     * @param string $name name of entity basically model alias
+     * @param array $data to build with entity with
+     * @param array $options
      * @return Entity
      */
-    protected function createEntity(array $resultSet, string $name)
+    public function create(array $data = [], array $options=[])
     {
-        return new Entity($resultSet, ['name' => $name]);
+        return new Entity($data, $options);
     }
 
     protected function loadAssociatedHasMany($query, $results)
