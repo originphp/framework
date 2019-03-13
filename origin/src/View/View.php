@@ -241,7 +241,7 @@ class View
             $viewPath = PLUGINS . DS . $this->params['plugin'] . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
-            $viewPath = $this->viewPath . DS . $this->name;
+            $viewPath = $viewPath . DS . $this->name;
         }
 
         return $viewPath;
