@@ -15,6 +15,8 @@
 namespace Origin\Model;
 
 use Origin\Core\Inflector;
+use Origin\Core\Configure;
+
 /*
  * In computer science, marshalling (similar to serialization) is the process
  * of transforming the memory representation of an object to a data format suitable
@@ -37,9 +39,12 @@ class Marshaller
 {
     protected $model = null;
 
+    protected $autoParse = true;
+
     public function __construct(Model $model)
     {
         $this->model = $model;
+        $this->autoParse = Configure::read('I18n.parse');
     }
 
     /**
@@ -152,7 +157,7 @@ class Marshaller
 
         $propertyMap = $this->buildAssociationMap($options);
      
-        if ($options['parse']) {
+        if ($this->autoParse and $options['parse']) {
             $data = $this->parseData($data, $options['name']);
         }
    
@@ -204,7 +209,7 @@ class Marshaller
 
         $propertyMap = $this->buildAssociationMap($options);
      
-        if ($options['parse']) {
+        if ($this->autoParse and $options['parse']) {
             $data = $this->parseData($data, $options['name']);
         }
         

@@ -23,6 +23,7 @@ use Origin\Utility\Number;
 
 use Origin\View\TemplateTrait;
 use Origin\Core\Dot;
+use Origin\Core\Configure;
 
 class FormHelper extends Helper
 {
@@ -424,13 +425,17 @@ class FormHelper extends Helper
         $options = $this->prepareOptions($name, $options);
 
         $options['type'] = 'text';
-        if (!isset($options['placeholder'])) {
-            $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'));
-        }
 
-        if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
-            $options['value'] = Date::formatDate($options['value']);
+        if (Configure::read('I18n.parse')) {
+            if (!isset($options['placeholder'])) {
+                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'));
+            }
+            
+            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
+                $options['value'] = Date::formatDate($options['value']);
+            }
         }
+        
 
         return $this->template('input', $options);
     }
@@ -445,6 +450,10 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
+
+        if (!Configure::read('I18n.parse')) {
+            return $this->template('input', $options);
+        }
 
         $dateOptions = $timeOptions = $options;
         $dateString = '';
@@ -540,14 +549,17 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
-        if (!isset($options['placeholder'])) {
-            $options['placeholder'] = 'e.g. '.Date::format(date('H:i:s'));
-        }
 
-        if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
-            $options['value'] = Date::formatTime($options['value']);
-        }
+        if (Configure::read('I18n.parse')) {
+            if (!isset($options['placeholder'])) {
+                $options['placeholder'] = 'e.g. '.Date::format(date('H:i:s'));
+            }
 
+            if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+                $options['value'] = Date::formatTime($options['value']);
+            }
+        }
+         
         return $this->template('input', $options);
     }
 
