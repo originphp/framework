@@ -87,11 +87,11 @@ class FileEngine extends CacheEngine
      */
     public function clear() : bool
     {
-        $files = scandir($this->path);
+        $files = scandir($this->config['path']);
         $result = [];
         foreach ($files as $file) {
             if (substr($file, 0, strlen($this->config['prefix'])) == $this->config['prefix']) {
-                $result[] = (unlink($this->path . DS . $file) === true);
+                $result[] = (unlink($this->config['path'] . DS . $file) === true);
             }
         }
         return !in_array(false, $result);
