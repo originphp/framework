@@ -15,6 +15,7 @@ use Origin\Core\Debugger;
 use Origin\Core\Configure;
 use Origin\Utility\Collection;
 use Origin\Core\I18n;
+use Origin\Core\Logger;
 
 /**
  * Runs a backtrace.
@@ -194,4 +195,25 @@ function uid($length=13)
 {
     $random = random_bytes(ceil($length/2));
     return substr(bin2hex($random), 0, $length);
+}
+
+/**
+ * A helper function that Logs a deprecation warning and triggers an error if in debug mode
+ *
+ * @param string $message
+ * @return void
+ */
+function deprecationWarning(string $message)
+{
+    $trace = debug_backtrace();
+    if (isset($trace[0])) {
+        $message = sprintf('%s - %s %s', $message, str_replace(ROOT .DS, '', $trace[0]['file']), $trace[0]['line']);
+    }
+
+    $logger = new Logger('depreciation');
+    $logger->warning($message);
+
+    if (Configure::read('debug')) {
+        trigger_error($message, E_USER_DEPRECATED);
+    }
 }
