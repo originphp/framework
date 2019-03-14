@@ -20,6 +20,10 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Plugin view path bug
+- Validation required bug fix
+- FileEngine cache
+- NullCache engine name
 - Issue with error folder in lower case (not picked up in docker)
 - Auth scope fixed
 - Bookmarks edit tags not listed
@@ -29,6 +33,7 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- Option to disable I18N date/number parsing
 - Cache system (Redis,Memcached,File,Apcu,Array and Null)
 - Logger Object
 - Queue System
@@ -43,6 +48,8 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Changed make plugin to generate
+- Changed webroot to public
 - Changed configure has to check
 - Changed Utils folder to Utility
 - Removed irrelvant keys from schema generate
