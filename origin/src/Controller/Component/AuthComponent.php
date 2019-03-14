@@ -151,7 +151,7 @@ class AuthComponent extends Component
      */
     public function setUser(Entity $user)
     {
-        Session::write('Auth.User', $user->toArray());
+        $this->request->session()->write('Auth.User', $user->toArray());
     }
 
     /**
@@ -163,9 +163,9 @@ class AuthComponent extends Component
     public function redirectUrl()
     {
         $redirectUrl = $this->config['loginRedirect'];
-        if (Session::check('Auth.redirect')) {
-            $redirectUrl = Session::read('Auth.redirect');
-            Session::delete('Auth.redirect');
+        if ($this->request->session()->check('Auth.redirect')) {
+            $redirectUrl = $this->request->session()->read('Auth.redirect');
+            $this->request->session()->delete('Auth.redirect');
         }
 
         return $redirectUrl;
@@ -181,7 +181,7 @@ class AuthComponent extends Component
      */
     public function logout()
     {
-        Session::delete('Auth');
+        $this->request->session()->delete('Auth');
 
         $logoutRedirect = $this->config['loginAction'];
         if ($this->config['logoutRedirect']) {
@@ -199,7 +199,7 @@ class AuthComponent extends Component
      */
     public function user(string $property = null)
     {
-        $user = Session::read('Auth.User');
+        $user = $this->request->session()->read('Auth.User');
         if ($user === null) {
             return null;
         }
@@ -284,7 +284,7 @@ class AuthComponent extends Component
 
     public function isLoggedIn()
     {
-        return Session::check('Auth.User');
+        return $this->request->session()->check('Auth.User');
     }
 
     protected function isPrivateOrProtected(string $action)
@@ -338,7 +338,7 @@ class AuthComponent extends Component
 
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
-            Session::write('Auth.redirect', $this->request->url);
+            $this->request->session()->write('Auth.redirect', $this->request->url);
             return $controller->redirect(Router::url($this->config['loginAction']));
         }
        

@@ -128,7 +128,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $this->assertFalse($AuthComponent->isLoggedIn());
-        Session::write('Auth.User', ['user_name' => 'james']);
+        $AuthComponent->request->session()->write('Auth.User', ['user_name' => 'james']);
         $this->assertTrue($AuthComponent->isLoggedIn());
     }
 
@@ -145,13 +145,13 @@ class AuthComponentTest extends OriginTestCase
     public function testLogout()
     {
         $AuthComponent = $this->AuthComponent;
-        Session::write('Auth.User', ['user_name' => 'james']);
+        $AuthComponent->request->session()->write('Auth.User', ['user_name' => 'james']);
         $this->assertTrue($AuthComponent->callMethod('isLoggedIn'));
 
         $this->assertEquals('/users/login', $AuthComponent->logout());
         $this->assertFalse($AuthComponent->callMethod('isLoggedIn'));
         // relogin
-        Session::write('Auth.User', ['user_name' => 'james']);
+        $AuthComponent->request->session()->write('Auth.User', ['user_name' => 'james']);
         $newConfig = ['controller' => 'users', 'action' => 'bye'];
         $AuthComponent->config(['logoutRedirect' => $newConfig]);
         $this->assertEquals('/users/bye', $AuthComponent->logout());
@@ -185,7 +185,8 @@ class AuthComponentTest extends OriginTestCase
         $data = ['username'=>'fred@smith.com','password'=>1234];
         $entity = new Entity($data);
         $this->AuthComponent->setUser($entity);
-        $this->assertEquals($data, Session::read('Auth.User'));
+        $session = $this->AuthComponent->request()->session();
+        $this->assertEquals($data, $session->read('Auth.User'));
     }
 
     /**
@@ -201,7 +202,8 @@ class AuthComponentTest extends OriginTestCase
         $this->assertEquals($data, $this->AuthComponent->user());
         $this->assertEquals('fred@smith.com', $this->AuthComponent->user('username'));
         $this->assertNull($this->AuthComponent->user('foo'));
-        Session::delete('Auth.User');
+        $session = $this->AuthComponent->request()->session();
+        $session->delete('Auth.User');
         $this->assertNull($this->AuthComponent->user('username'));
     }
 
@@ -215,7 +217,8 @@ class AuthComponentTest extends OriginTestCase
         $this->assertEquals($expected, $redirectUrl);
         
         $expected = '/dashboard/home';
-        Session::write('Auth.redirect', $expected);
+        $session = $this->AuthComponent->request->session();
+        $session->write('Auth.redirect', $expected);
         $redirectUrl = $this->AuthComponent->redirectUrl();
         $this->assertEquals($expected, $redirectUrl);
     }
@@ -226,7 +229,7 @@ class AuthComponentTest extends OriginTestCase
         $this->Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($this->Controller);
         $AuthComponent->startup();
-        $this->assertEquals('/users/index', Session::read('Auth.redirect'));
+        $this->assertEquals('/users/index', $AuthComponent->request->session()->read('Auth.redirect'));
     }
 
     public function testStartupNoRedirect()
@@ -319,9 +322,10 @@ class AuthComponentTest extends OriginTestCase
 
     public function testCheckAuthenticeIsLoggedIn()
     {
-        Session::write('Auth.User', ['user_name' => 'james']);
+        $session = $this->AuthComponent->request()->session();
+        $session->write('Auth.User', ['user_name' => 'james']);
         $this->assertNull($this->AuthComponent->startup());
-        Session::delete('Auth');
+        $session->delete('Auth');
     }
 
     public function testCheckAuthenticeIsLoginPage()

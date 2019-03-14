@@ -17,6 +17,8 @@ namespace Origin\Controller\Component;
 use Origin\Controller\Controller;
 use Origin\Core\ConfigTrait;
 use Origin\Core\Logger;
+use Origin\Controller\Request;
+use Origin\Controller\Response;
 
 class Component
 {
@@ -116,6 +118,26 @@ class Component
     public function controller()
     {
         return $this->controller;
+    }
+
+    /**
+     * Returns the request object
+     *
+     * @return Request
+     */
+    public function request()
+    {
+        return $this->controller->request();
+    }
+
+    /**
+     * Returns the response object
+     *
+     * @return Response
+     */
+    public function response()
+    {
+        return $this->controller->response();
     }
 
     /**

@@ -42,10 +42,11 @@ class FlashComponent extends Component
     {
         $messages = [];
         $sessionKey = "Message.{$type}";
-        if (Session::check($sessionKey)) {
-            $messages = Session::read($sessionKey);
+        $session = $this->request()->session();
+        if ($session->check($sessionKey)) {
+            $messages = $session->read($sessionKey);
         }
         $messages[] = $message;
-        Session::write($sessionKey, $messages);
+        $session->write($sessionKey, $messages);
     }
 }

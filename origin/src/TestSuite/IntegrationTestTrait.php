@@ -243,8 +243,10 @@ trait IntegrationTestTrait
             $_SERVER[$key] = $value;
         }
             
+       
         $this->request = new Request($url);
-        
+        $this->request->session()->destroy();
+       
         $this->response = $this->getMockBuilder(Response::class)
                             ->setMethods(['send','stop'])
                             ->getMock();
@@ -253,9 +255,10 @@ trait IntegrationTestTrait
         foreach ($this->headers as $header => $value) {
             $this->response->header($header, $value);
         }
+        
         // Write session data
         foreach ($this->session as $key => $value) {
-            Session::write($key, $value);
+            $this->request->session()->write($key, $value);
         }
         // Write cookie data for request
         foreach ($this->cookies as $name => $value) {

@@ -17,6 +17,8 @@ namespace Origin\View\Helper;
 use Origin\View\View;
 use Origin\Core\ConfigTrait;
 use Origin\Core\Logger;
+use Origin\Controller\Request;
+use Origin\Controller\Response;
 
 class Helper
 {
@@ -149,6 +151,27 @@ class Helper
     {
         return $this->view;
     }
+
+    /**
+     * Returns the request object
+     *
+     * @return Request
+     */
+    public function request()
+    {
+        return $this->view->request;
+    }
+
+    /**
+     * Returns the response object
+     *
+     * @return Response
+     */
+    public function response()
+    {
+        return $this->view->response;
+    }
+
 
     /**
      * Returns a Logger Object

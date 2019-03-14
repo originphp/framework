@@ -32,19 +32,20 @@ class FlashHelper extends Helper
 
     public function messages()
     {
-        if (!Session::check('Message')) {
+        $session = $this->request()->session();
+        if (!$session->check('Message')) {
             return null;
         }
         $output = '';
 
-        foreach (Session::read('Message') as $template => $messages) {
+        foreach ($session->read('Message') as $template => $messages) {
             if (isset($this->config['templates'][$template])) {
                 foreach ($messages as $message) {
                     $output .= sprintf($this->config['templates'][$template], $message);
                 }
             }
         }
-        Session::delete('Message');
+        $session->delete('Message');
 
         return $output;
     }

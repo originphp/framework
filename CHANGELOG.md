@@ -49,6 +49,7 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Changed session from static to object and refactored. Now session is available from request.
 - Renamed controller startup/shutdown to before/after filter
 - Changed make plugin to generate
 - Changed webroot to public

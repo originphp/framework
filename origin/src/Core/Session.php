@@ -15,33 +15,78 @@
 namespace Origin\Core;
 
 use Origin\Core\Dot;
+use Origin\Exception\Exception;
 
 class Session
 {
-    public static function initialize()
+    protected $started = false;
+
+    protected $cli = false;
+
+    public function __construct()
     {
-        if (PHP_SAPI != 'cli' and is_writable(TMP . DS . 'sessions')) {
-            session_save_path(TMP . DS . 'sessions');
+        $this->cli = (PHP_SAPI === 'cli');
+
+        if ($this->started() === false) {
+            $this->start();
         }
-        
-        $timeout = 3600;
+        // For DOT
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
+    }
+
+    public function start()
+    {
+        if ($this->started) {
+            return false;
+        }
+
+        if ($this->cli) {
+            return $this->started = true;
+        }
+
+        if ($this->started() === PHP_SESSION_ACTIVE) {
+            throw new Exception('Session alredy started.');
+        }
+
+        session_save_path(TMP . DS . 'sessions');
+
+        if (!session_start()) {
+            throw new Exception('Error starting a session.');
+        }
+     
+        $this->started = true;
+
+        if ($this->timedOut()) {
+            $this->destroy();
+            $this->start();
+        }
+    }
+
+    /**
+     * Checks if session timedout
+     *
+     * @param integer $timeout
+     * @return boolean
+     */
+    protected function timedOut($timeout = 3600) : bool
+    {
         if (Configure::check('Session.timeout')) {
             $timeout = Configure::read('Session.timeout');
         }
-        if (!self::started()) {
-            session_start();
+        $lastActivity = $this->read('Session.lastActivity');
+        $this->write('Session.lastActivity', time());
+
+        $result = false;
+        if ($lastActivity) {
+            $result = (time() - $lastActivity > $timeout);
         }
-      
-        if (Session::check('Session.lastActivity')) {
-            if (time() - Session::read('Session.lastActivity') > $timeout) {
-                Session::destroy();
-                Session::initialize();
-            }
-        }
-        Session::write('Session.lastActivity', time());
+        
+        return $result;
     }
 
-    public static function write(string $key = null, $value = null)
+    public function write(string $key = null, $value = null)
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
@@ -63,7 +108,7 @@ class Session
      * @param [type] $key
      * @return mixed|null
      */
-    public static function read(string $key = null)
+    public function read(string $key = null)
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
@@ -73,14 +118,14 @@ class Session
         return null;
     }
 
-    public static function check(string $key = null)
+    public function check(string $key = null)
     {
         $Dot = new Dot($_SESSION);
 
         return $Dot->has($key);
     }
 
-    public static function delete(string $key = null)
+    public function delete(string $key = null)
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
@@ -96,24 +141,42 @@ class Session
     /**
      * Destroys the session.
      */
-    public static function destroy()
+    public function destroy()
     {
-        if (!self::started()) {
+        if ($this->cli and !$this->started()) {
             session_start();
         }
-        if (PHP_SAPI !== 'cli') {
+        if ($this->cli === false) {
             session_destroy();
         }
+        $this->started = false;
         $_SESSION = [];
     }
 
-    public static function started()
+    /**
+     * Checks if session started
+     *
+     * @return void
+     */
+    public function started() : bool
     {
-        return isset($_SESSION) and session_id();
+        if ($this->started or session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        }
+        return false;
     }
 
-    public static function id()
+    /**
+     * Sets (if headers not already sent) and gets the session id
+    *
+    * @param string $id
+    * @return string
+    */
+    public function id(string $id = null) : string
     {
+        if ($id and !headers_sent()) {
+            session_id($id);
+        }
         return session_id();
     }
 }

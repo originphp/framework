@@ -15,6 +15,8 @@
 namespace Origin\Controller;
 
 use Origin\Core\Router;
+use Origin\Core\Session;
+
 use Origin\Exception\MethodNotAllowedException;
 
 class Request
@@ -60,6 +62,13 @@ class Request
     public $base = null;
 
     /**
+     * Session
+     *
+     * @var Session
+     */
+    protected $session = null;
+
+    /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
@@ -83,6 +92,8 @@ class Request
         }
 
         $this->params = Router::parse($url);
+
+        $this->session = new Session();
 
         $this->processGet($url);
         $this->processPost();
@@ -212,6 +223,16 @@ class Request
         }
 
         return false;
+    }
+
+    /**
+     * Returns the session object
+     *
+     * @return Session
+     */
+    public function session()
+    {
+        return $this->session;
     }
 
     protected function readInput()
