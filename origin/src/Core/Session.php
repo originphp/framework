@@ -143,7 +143,7 @@ class Session
      */
     public function destroy()
     {
-        if ($this->cli and !$this->started()) {
+        if (!$this->started()) {
             session_start();
         }
         if ($this->cli === false) {
