@@ -110,7 +110,7 @@ class ShellDispatcher
 
         if ($plugin === null) {
             $shells = $this->getShellList();
-         
+            
             if (in_array($shell, $shells['App'])) {
                 $base = Configure::read('App.namespace') .'\Console\\';
             } elseif (in_array($shell, $shells['Core'])) {
@@ -155,7 +155,7 @@ class ShellDispatcher
      *
      * @param string $class
      * @param string $method
-     * @return void
+     * @return Shell
      */
     protected function buildShell(string $class, string $method)
     {
@@ -183,9 +183,9 @@ class ShellDispatcher
         $plugins = Plugin::loaded();
         sort($plugins);
         foreach ($plugins as $plugin) {
-            $shells[$plugin] = $this->scandir(ROOT . DS . 'plugins' . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Console');
+            $shells[$plugin] = $this->scandir(PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Console');
         }
-        
+    
         return $shells;
     }
 

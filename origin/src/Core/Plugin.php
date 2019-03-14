@@ -53,8 +53,11 @@ class Plugin
      */
     public static function load(string $plugin, array $options = [])
     {
-        $options += ['routes' => true, 'bootstrap' => true];
-        $options['path'] = PLUGINS . DS . Inflector::underscore($plugin);
+        $options += [
+            'routes' => true,
+            'bootstrap' => true,
+            'path' => PLUGINS . DS . Inflector::underscore($plugin)
+        ];
     
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
@@ -87,7 +90,8 @@ class Plugin
     protected static function autoload(string $plugin)
     {
         $autoloader = Autoloader::getInstance();
-        $pluginPath = 'plugins/' . Inflector::underscore($plugin);
+        $options = static::$loaded[$plugin];
+        $pluginPath = str_replace(ROOT .DS, '', $options['path']);
         $autoloader->addNamespaces([
             $plugin => $pluginPath . '/src',
             "{$plugin}\\Test" => $pluginPath . '/tests',

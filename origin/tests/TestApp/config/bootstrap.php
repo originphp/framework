@@ -36,4 +36,4 @@ Configure::write('I18n.parse', true);
  * Load your plugins here
  * @example Plugin::load('ContactManager');
  */
-Plugin::load('Generate'); // This is for code gen you can remove
+Plugin::load('Make'); // This is for code gen you can remove

@@ -202,6 +202,13 @@ class Date
         return null;
     }
 
+    /**
+     * Parses a date string
+     * Date::parseDate('27 Dec, 2018 15:00', 'dd MMM, y H:mm');
+     * @param string $dateString
+     * @param [type] $format
+     * @return void
+     */
     public static function parseDate(string $dateString, $format = null)
     {
         if ($format === null) {
