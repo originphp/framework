@@ -13,7 +13,6 @@ class BookmarksController extends AppController
         $this->set('bookmarks', $this->paginate('Bookmark', [
             'with' => ['User']
         ]));
-        deprecationWarning('This is a test');
     }
 
     public function view($id = null)
