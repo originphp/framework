@@ -669,19 +669,34 @@ class Model
     }
 
     /**
-     * Save model data to databse.
+     * Save model data to database, hasAndBelongsToMany will also be saved.
+     *
+     * # Options
+     *
+     * The options array can be passed with the following keys:
+     *
+     * - validate: wether to validate data or not
+     * - callbacks: call the callbacks duing each stage.  You can also put only before or after
+     * - transaction: wether to save through a database transaction (default:true)
+     *
+     * # Callbacks
+     *
+     * The following callbacks will called in this Model and enabled Behaviors
+     *
+     * - beforeValidate
+     * - afterValidate
+     * - beforeSave
+     * - afterSave
      *
      * @param entity $entity to save
      * @param array  $options keys include:
-     *                              validate: wether to validate data or not
-     *                              callbacks: call the callbacks duing each stage.  You can also put only before or after
      *
      * @return bool true or false
      */
     public function save(Entity $entity, array $options = [])
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
-   
+
         $this->id = null;
         if ($entity->hasProperty($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
@@ -903,7 +918,7 @@ class Model
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
             $key = lcfirst($alias);
-            if ($data->hasProperty($key) and $data->{$key} instanceof Entity) {
+            if ($data->hasProperty($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
                 if (!$this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
                     break;
@@ -920,7 +935,7 @@ class Model
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
                 $key = lcfirst($alias);
-                if ($data->hasProperty($key) and $data->{$key} instanceof Entity) {
+                if ($data->hasProperty($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
 
@@ -937,7 +952,7 @@ class Model
                 if ($data->hasProperty($key)) {
                     $foreignKey = $this->hasMany[$alias]['foreignKey'];
                     foreach ($data->get($key) as $record) {
-                        if ($record instanceof Entity) {
+                        if ($record instanceof Entity and $record->modified()) {
                             $record->$foreignKey = $this->id;
                             if (!$this->{$alias}->save($record, $associatedOptions)) {
                                 $result = false;

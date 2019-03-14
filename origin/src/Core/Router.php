@@ -46,7 +46,7 @@ class Router
         $pattern = preg_replace('/\//', '\\/', trim($route, '/'));
 
         // Convert vars e.g. :controller :action
-        $pattern = preg_replace('/\:([a-z]+)/', '(?P<\1>[^\/]+)', $pattern);
+        $pattern = preg_replace('/\:([a-z]+)/', '(?P<\1>[^.\/]+)', $pattern);//[^\/] [a-z0-9_.]
 
         // Enable greedy capture
         $pattern = str_replace('*', '?(?P<greedy>.*)', $pattern);
@@ -130,7 +130,7 @@ class Router
             }
             unset($params['greedy']);
         }
-
+   
         return $params;
     }
 

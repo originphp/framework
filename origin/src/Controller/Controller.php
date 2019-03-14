@@ -266,9 +266,9 @@ class Controller
     }
 
     /**
-     * Callback before the action in the controller is called.
-     */
-    public function startup()
+    * Callback before the action in the controller is called.
+    */
+    public function beforeFilter()
     {
     }
 
@@ -290,18 +290,29 @@ class Controller
      */
     public function shutdown()
     {
+        deprecationWarning('use afterFilter instead');
+    }
+
+    /**
+     * Called after the controller action and the component shutdown function.
+     * Remember to call parent
+     *
+     * @return void
+     */
+    public function afterFilter()
+    {
     }
 
     public function startupProcess()
     {
-        $this->startup();
+        $this->beforeFilter();
         $this->componentRegistry()->call('startup');
     }
 
     public function shutdownProcess()
     {
         $this->componentRegistry()->call('shutdown');
-        $this->shutdown();
+        $this->afterFilter();
 
         //# Free Mem for no longer used items
         $this->componentRegistry()->destroy();

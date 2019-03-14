@@ -233,12 +233,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Controller\TestsController')
-            ->setMethods(['startup'])
+            ->setMethods(['beforeFilter'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-    ->method('startup');
+    ->method('beforeFilter');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -259,12 +259,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Controller\TestsController')
-            ->setMethods(['shutdown'])
+            ->setMethods(['afterFilter'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-    ->method('shutdown');
+    ->method('afterFilter');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])

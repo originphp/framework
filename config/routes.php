@@ -23,7 +23,11 @@ use Origin\Core\Plugin;
 * Add your routes here
 * @example
 * Router::add('/login',['controller'=>'Users','action'=>'login']);
+* Router::add('/:controller/:action.:type');
+* Router::add('/:controller/:action/:id.:type');
 */
+
+
 
 Router::add('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
 Router::add('/pages/*', ['controller'=>'Pages','action'=>'display']);
