@@ -286,14 +286,6 @@ class Controller
     }
 
     /**
-     * Callback after the action in the controller is called.
-     */
-    public function shutdown()
-    {
-        deprecationWarning('use afterFilter instead');
-    }
-
-    /**
      * Called after the controller action and the component shutdown function.
      * Remember to call parent
      *
@@ -443,6 +435,12 @@ class Controller
     /**
      * Redirects to a url, will disable autoRender but you should always
      * return $this->redirect to prevent code from running during tests etc
+     *
+     * # Options
+     * - controller
+     * - action
+     * - ? : query
+     * - # : fragment
      *
      * @param string|array $url
      * @param int status code default 302
