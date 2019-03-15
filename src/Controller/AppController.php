@@ -26,31 +26,33 @@ class AppController extends Controller
     }
 
     /**
-     * This is called before the controller action is executed.
+     * This is called before the controller action is executed but after initialize.
      */
-    public function startup()
+    public function beforeFilter()
     {
     }
+
 
     /**
-     * This is called after the controller action is executed.
-     */
-    public function shutdown()
-    {
-    }
-
-     /**
-     * Callback just prior to redirecting
-     */
-    public function beforeRedirect()
-    {
-    }
-
-    /**
-     * This is called after the startup, before shutdown and before the
-     * view is rendered
+     * This is called after the after the action has been run before the view has
+     * been rendered but beore the after filter.
      */
     public function beforeRender()
+    {
+    }
+
+    /**
+     * This is called after the controller action is executed, and view has been generated
+     * but before it has been sent to the client.
+     */
+    public function afterFilter()
+    {
+    }
+
+    /**
+    * Callback just prior to redirecting
+    */
+    public function beforeRedirect()
     {
     }
 }

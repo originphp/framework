@@ -53,10 +53,10 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('blog/home?ref=google&source=ppc');
         $expected = '/blog/home?ref=google&source=ppc';
-        $this->assertEquals($expected, $request->here());
+        $this->assertEquals($expected, $request->url());
         $request = new Request('blog/home/1234');
         $expected = '/blog/home/1234';
-        $this->assertEquals($expected, $request->here());
+        $this->assertEquals($expected, $request->url());
     }
 
     public function testIs()

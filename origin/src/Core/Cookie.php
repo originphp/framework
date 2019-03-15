@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Controller\Component;
+namespace Origin\Core;
 
 use Origin\Utility\Security;
 
@@ -21,28 +21,8 @@ use Origin\Utility\Security;
  * object. By default contents of cookies are encrypted.
  */
 
-class CookieComponent extends Component
+class Cookie
 {
-    public $defaultConfig = [
-        'path' => '/', // path on server
-        'domain' => '', // domains cookie will be available on
-        'secure' => false, // only send if through https
-        'httpOnly' => false, // only available to  HTTP protocol not to javascript
-        'encrypt' => true, // wether to encrypt contents or not
-    ];
-
-
-    /**
-     * Keep a copy of the response object
-     *
-     * @var Response
-     */
-    protected $response = null;
-
-    public function initialize(array $config)
-    {
-        $this->response =& $this->controller()->response;
-    }
     /**
      * Reads a value of a cookie
      *
@@ -51,31 +31,34 @@ class CookieComponent extends Component
      */
     public function read(string $name)
     {
-        $cookies = $this->response->cookies();
-
-        if (isset($cookies[$name])) {
-            return $this->unpack($cookies[$name]['value']);
-        }
         if (isset($_COOKIE[$name])) {
             return $this->unpack($_COOKIE[$name]);
         }
-      
         return null;
     }
 
     /**
      * Writes a cookie
      *
-     *  $this->Cookie->write('key',$value);
-     *  $this->Cookie->write('key',$value,strtotime('+1 day'));
+     *  $cookie->write('key',$value);
+     *  $cookie->write('key',$value,strtotime('+1 day'));
+     *
      * @param string $key
      * @param mixed $value
      * @param integer $expire unix timestamp
      * @return void
      */
-    public function write(string $name, $value, int $expire=0)
+    public function write(string $name, $value, int $expire=0, $options=[])
     {
-        $this->setCookie($name, ['value'=>$this->pack($value),'expire'=>$expire]);
+        $options += [
+            'path' => '/', // path on server
+            'domain' => '', // domains cookie will be available on
+            'secure' => false, // only send if through https
+            'httpOnly' => false, // only available to  HTTP protocol not to javascript
+        ];
+        extract($options);
+        $value = $this->pack($value);
+        $this->setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -87,7 +70,7 @@ class CookieComponent extends Component
     public function delete(string $name)
     {
         unset($_COOKIE[$name]);
-        $this->setCookie($name, ['expire'=>time() - 3600]);
+        $this->write($name, null, time() - 3600);
     }
 
     /**
@@ -96,17 +79,16 @@ class CookieComponent extends Component
      * @param string $name
      * @return void
      */
-    public function check(string $name)
+    public function check(string $name) : bool
     {
-        $cookies = $this->response->cookies();
-        if (isset($cookies[$name]) or isset($_COOKIE[$name])) {
+        if (isset($_COOKIE[$name])) {
             return true;
         }
         return false;
     }
     
     /**
-     * Delets all cookies
+     * Deletes all cookies
      *
      * @return void
      */
@@ -124,9 +106,9 @@ class CookieComponent extends Component
      * @param array $value
      * @return void
      */
-    protected function setCookie(string $name, array $value)
+    protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
     {
-        $this->response->cookie($name, $value);
+        setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -138,9 +120,7 @@ class CookieComponent extends Component
     protected function pack($value)
     {
         $value = json_encode($value);
-        if ($this->config['encrypt']) {
-            $value = base64_encode(Security::encrypt($value));
-        }
+        $value = base64_encode(Security::encrypt($value));
 
         return $value;
     }
@@ -153,9 +133,7 @@ class CookieComponent extends Component
      */
     protected function unpack(string $value)
     {
-        if ($this->config['encrypt']) {
-            $value = Security::decrypt(base64_decode($value));
-        }
+        $value = Security::decrypt(base64_decode($value));
         return json_decode($value);
     }
 }

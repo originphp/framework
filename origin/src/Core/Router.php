@@ -157,12 +157,9 @@ class Router
         $url = array_merge($params, $url);
 
         $output = '';
-        $here = $base = null;
 
         if (static::$request) {
             $params = static::$request->params;
-            $here = static::$request->url;
-            $base = static::$request->base;
         }
         if ($url['plugin']) {
             $output .= '/' . Inflector::underscore($url['plugin']);

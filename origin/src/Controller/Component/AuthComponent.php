@@ -338,7 +338,7 @@ class AuthComponent extends Component
 
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
-            $this->request->session()->write('Auth.redirect', $this->request->url);
+            $this->request->session()->write('Auth.redirect', $this->request->url());
             return $controller->redirect(Router::url($this->config['loginAction']));
         }
        

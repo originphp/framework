@@ -46,7 +46,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $cookies = $response->cookies();
 
         $this->assertEquals('bar', $cookies['foo']['value']);
-        $this->assertFalse($response->cookie('jar'));
+        $this->assertNull($response->cookie('jar'));
     }
     public function testStatusCode()
     {

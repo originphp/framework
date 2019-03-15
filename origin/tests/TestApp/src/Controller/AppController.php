@@ -15,7 +15,7 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
-        $this->loadComponents(['Flash','Cookie']);
+        $this->loadComponents(['Flash']);
         $this->loadHelpers(['Html', 'Form', 'Flash', 'Number', 'Date']);
 
         /*

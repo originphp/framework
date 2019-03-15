@@ -16,6 +16,7 @@ namespace Origin\Controller;
 
 use Origin\Core\Router;
 use Origin\Core\Session;
+use Origin\Core\Cookie;
 
 use Origin\Exception\MethodNotAllowedException;
 
@@ -69,6 +70,13 @@ class Request
     protected $session = null;
 
     /**
+     * Cookie
+     *
+     * @var Cookie
+     */
+    protected $cookie = null;
+
+    /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
@@ -93,8 +101,6 @@ class Request
 
         $this->params = Router::parse($url);
 
-        $this->session = new Session();
-
         $this->processGet($url);
         $this->processPost();
 
@@ -116,14 +122,15 @@ class Request
     }
 
     /**
-     * This will return the url with the query string
+     * This will return the url of the request
      * @example /contacts/view/100?page=1
+     * @param boolean $includeQuery
      * @return string
      */
-    public function here()
+    public function url(bool $includeQuery = true)
     {
         $url = $this->url;
-        if ($this->query) {
+        if ($includeQuery and $this->query) {
             $url .= '?' . http_build_query($this->query);
         }
     
@@ -176,7 +183,7 @@ class Request
     /**
      * Checks the server request method.
      *
-     * @param string|array $type get|post|put|delete
+     * @param string|array $method get|post|put|delete
      *
      * @return bool true or false
      */
@@ -191,6 +198,16 @@ class Request
         }
 
         return in_array(strtolower($method), $type);
+    }
+
+    /**
+     * Returns the server request method
+     * example get|post|put|delete
+     * @return string
+     */
+    public function method()
+    {
+        return $this->env('REQUEST_METHOD');
     }
 
     /**
@@ -226,14 +243,37 @@ class Request
     }
 
     /**
-     * Returns the session object
+     * Lazy loads and returns the session object
      *
      * @return Session
      */
     public function session()
     {
+        if ($this->session === null) {
+            $this->session = new Session();
+        }
         return $this->session;
     }
+
+    /**
+     * Lazy loads and returns the cookie object. If a
+     * key is specified then it will return the value of that
+     * key.
+     *
+     * @return \Origin\Core\Cookie
+     */
+    public function cookie(string $key = null)
+    {
+        if ($this->cookie === null) {
+            $this->cookie = new Cookie();
+        }
+        if ($key) {
+            return $this->cookie->read($key);
+        }
+        return $this->cookie;
+    }
+
+
 
     protected function readInput()
     {

@@ -36,6 +36,11 @@ class Session
         }
     }
 
+    /**
+     * Starts the session
+     *
+     * @return void
+     */
     public function start()
     {
         if ($this->started) {
@@ -86,14 +91,20 @@ class Session
         return $result;
     }
 
+    /**
+     * Writes a value into the session, accepts dot notation
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return null
+     */
     public function write(string $key = null, $value = null)
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
         if (strpos($key, '.') === false) {
             $_SESSION[$key] = $value;
-
-            return true;
+            return;
         }
         // Overwite session vars
         $data = $Dot->items();
@@ -105,7 +116,7 @@ class Session
     /**
      * Reads an item from the session
      *
-     * @param [type] $key
+     * @param string $key
      * @return mixed|null
      */
     public function read(string $key = null)
@@ -118,14 +129,25 @@ class Session
         return null;
     }
 
-    public function check(string $key = null)
+    /**
+     * Checks if a key exists in the session
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function check(string $key = null) : bool
     {
         $Dot = new Dot($_SESSION);
 
         return $Dot->has($key);
     }
-
-    public function delete(string $key = null)
+    /**
+     * Deletes a key in the session
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function delete(string $key = null) :bool
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
@@ -178,5 +200,14 @@ class Session
             session_id($id);
         }
         return session_id();
+    }
+    /**
+     * Resets the session data
+     *
+     * @return void
+     */
+    public function reset()
+    {
+        $_SESSION = [];
     }
 }

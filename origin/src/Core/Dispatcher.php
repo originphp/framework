@@ -25,6 +25,11 @@ use Origin\Core\Configure;
 
 class Dispatcher
 {
+    /**
+     * Controller object
+     *
+     * @var Controller
+     */
     protected $controller = null;
 
     /**
@@ -105,21 +110,21 @@ class Dispatcher
         return $controller;
     }
 
-    protected function invoke(Controller &$controller, string $action, array $arguments)
+
+    /**
+     * Does the whole lifecylce
+     */
+    protected function invoke(Controller $controller, string $action, array $arguments)
     {
-        $response = null;
-       
         $controller->startupProcess();
        
-        $result = call_user_func_array(array($controller, $action), $arguments['pass']);
+        call_user_func_array(array($controller, $action), $arguments['pass']);
      
         if ($controller->autoRender) {
             $controller->render();
         }
 
         $controller->shutdownProcess();
-
-        return $controller;
     }
 
     /**

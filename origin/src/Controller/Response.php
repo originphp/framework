@@ -14,6 +14,8 @@
 
 namespace Origin\Controller;
 
+use Origin\Core\Cookie;
+
 class Response
 {
     /**
@@ -139,7 +141,7 @@ class Response
     }
 
     /**
-     * Gets the headers
+     * Gets all the headers to be sent
      *
      * @return array headers
      */
@@ -149,7 +151,7 @@ class Response
     }
 
     /**
-     * Gets the cookies to be sent
+     * Gets all the cookies to be sent
      *
      * @return array cookies
      */
@@ -182,48 +184,53 @@ class Response
 
 
     /**
-     * Sets a cookie or gets a cookie value from RESPONSE
+     * Sets a cookie or gets a cookie value from RESPONSE (what is going
+     * to be sent, existing cookies wont show up here e.g. REQUEST)
      *
-     *  $response->cookie('fruit','apple');
-     *  $response->cookie('fruit,[
-     *      'value' => 'apple',
-     *      'expire' => strtotime('+1 day')
-     *  ])
+     *  $response->cookie('key',$value);
+     *  $response->cookie('key',$value,strtotime('+1 day'));
      *  $value = $response->cookie('fruit');
      *
      * @param string $name
-     * @param array|null $value keys include value,path,domain,httpOnly,secure and expire
-     * @return void
+     * @param mixed $value
+     * @param integer $expire
+     * @param array $options setcookie params: path,domain,secure,httpOnly
+     * @return mixed
      */
-    public function cookie(string $name, $options = null)
+    public function cookie(string $name, $value = null, int $expire=0, array $options = [])
     {
-        if ($options === null) {
+        // Getting
+        if (func_num_args() === 1) {
             if (isset($this->cookies[$name])) {
                 return $this->cookies[$name]['value'];
             }
-            return false;
-        }
-        $defaults = ['value'=>null,'path'=>'/','domain'=>'','httpOnly'=>false,'secure'=>false,'expire'=>0];
-
-        if (is_string($options)) {
-            $options = ['value' => $options];
+            return null;
         }
 
-        $this->cookies[$name] = array_merge($defaults, $options);
+        $options += [
+            'value' => $value,
+            'path' => '/', // path on server
+            'domain' => '', // domains cookie will be available on
+            'secure' => false, // only send if through https
+            'httpOnly' => false, // only available to  HTTP protocol not to javascript
+            'expire' => $expire
+        ];
+        
+        $this->cookies[$name] = $options;
     }
 
     /**
      * Sets the content type
      *
      *  // get the current content type
-     *  $contentType = $request->type();
+     *  $contentType = $response->type();
      *
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
      *
      *
      *
-     * @param string$contentType
+     * @param string $contentType
      * @return void
      */
     public function type($contentType = null)
@@ -250,8 +257,9 @@ class Response
 
     private function sendCookies()
     {
+        $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {
-            setcookie($name, $options['value'], $options['expire'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
+            $cookie->write($name, $options['value'], $options['expire'], [$options['path'], $options['domain'], $options['secure'], $options['httpOnly']]);
         }
     }
 }
