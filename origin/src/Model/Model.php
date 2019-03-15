@@ -20,6 +20,7 @@ use Origin\Model\Exception\MissingModelException;
 use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Core\Logger;
+use Origin\Model\Collection;
 
 class Model
 {
@@ -1273,8 +1274,8 @@ class Model
         if (empty($results)) {
             return [];
         }
-
-        return $results;
+        // return $results;
+        return new Collection($results, ['name'=>$this->alias]);
     }
 
     /**

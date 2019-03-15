@@ -167,7 +167,7 @@ function now()
  * @param array $array
  * @return void
  */
-function collection(array $items)
+function collection($items)
 {
     return new Collection($items);
 }

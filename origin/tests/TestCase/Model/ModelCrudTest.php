@@ -18,6 +18,7 @@ use App\Model\AppModel;
 use Origin\Model\Model;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Entity;
+use Origin\Model\Collection;
 
 class Article extends AppModel
 {
@@ -116,9 +117,10 @@ class ModelCrudTest extends \PHPUnit\Framework\TestCase
       'email' => 'dave@example.com',
       'password' => 'secret',
     ), ['name' => 'User','new'=>false]);
-
+      
         $this->assertEquals($expected, $User->find('first', $params));
-        $this->assertEquals(array($expected), $User->find('all', $params));
+        $result = $User->find('all', $params);
+        $this->assertEquals([$expected->toArray()], $result->toArray());
         $this->assertEquals(1, $User->find('count', $params));
         $this->assertEquals(array(3 => 'Dave'), $User->find('list', $params)); // Generic test to see works with objects
     }

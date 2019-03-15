@@ -208,7 +208,7 @@ or you can pass an options array
 `$this->loadComponent('Form',['className'=>'CustomFormHelper'])`
 
 
-### Controller::renderJson($data, int $statusCode=200 )
+### Controller::renderJson($data, int $status=200 )
 
 To render a json view, you can either create view for the controller action or use the `renderJson` method.
 
@@ -230,7 +230,7 @@ Or if you want to set a status code with the data.
 
 ````
 
-### Controller::renderXml($data, int $statusCode=200 )
+### Controller::renderXml($data, int $status=200 )
 
 
 This renders an XML view by converting the array through the `Xml` utility. 

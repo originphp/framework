@@ -20,6 +20,10 @@
 
 namespace Origin\Model;
 
+use Origin\Utility\Xml;
+use Origin\Core\Inflector;
+use Origin\Model\Collection;
+
 class Entity
 {
     /**
@@ -139,7 +143,7 @@ class Entity
      */
     public function __toString()
     {
-        return json_encode($this->_properties, JSON_PRETTY_PRINT);
+        return json_encode($this->toArray(), JSON_PRETTY_PRINT);
     }
 
     /**
@@ -337,7 +341,7 @@ class Entity
     {
         $result = [];
         foreach ($this->_properties as $property => $value) {
-            if (is_array($value)) {
+            if (is_array($value) or $value instanceof Collection) {
                 foreach ($value as $k => $v) {
                     if ($v instanceof Entity) {
                         $result[$property][$k] = $v->toArray();
@@ -352,5 +356,27 @@ class Entity
         }
 
         return $result;
+    }
+
+
+    /**
+     * Converts into Json
+     *
+     * @return void
+     */
+    public function toJson()
+    {
+        return json_encode($this->toArray());
+    }
+
+    /**
+     * Converts into XML
+     *
+     * @return void
+     */
+    public function toXml()
+    {
+        $root = Inflector::variable($this->_name);
+        return Xml::fromArray([$root => $this->toArray()]);
     }
 }

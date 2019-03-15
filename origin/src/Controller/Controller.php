@@ -401,14 +401,20 @@ class Controller
 
         if (!empty($options['json'])) {
             $options['type'] = 'json';
-            $body = json_encode($this->resultsToArray($options['json']));
+            if (is_object($options['json']) and method_exists($options['json'], 'toJson')) {
+                $body = $options['json']->toJson();
+            } else {
+                $body = json_encode($options['json']);
+            }
         } elseif (!empty($options['xml'])) {
             $options['type'] = 'xml';
-            $options['xml'] = $this->resultsToArray($options['xml']);
-            if (is_array($options['xml'])) {
-                $options['xml'] = Xml::fromArray($options['xml']);
+            if (is_object($options['xml']) and method_exists($options['xml'], 'toXml')) {
+                $body = $options['xml']->toXml();
+            } elseif (is_array($options['xml'])) {
+                $body = Xml::fromArray($options['xml']);
+            } else {
+                $body = $options['xml'];
             }
-            $body = $options['xml']; // todo work with arrays of entities.
         } elseif (!empty($options['text'])) {
             $options['type'] = 'text';
             $body = $options['text'];
@@ -424,36 +430,6 @@ class Controller
         $this->response->status($options['status']); // 200
         $this->response->body($body); //
     }
-
-    /**
-     * Recrusively goes through entities or arrays of entities and converts each
-     * one to an array. Need to handle results from all finders
-     *
-     * @param Entity|array $results
-     * @return void
-     */
-    public function resultsToArray($results)
-    {
-        if ($results instanceof Entity) {
-            return $results->toArray();
-        }
-        if (is_array($results)) {
-            foreach ($results as $key => $value) {
-                $results[$key] = $this->resultsToArray($value);
-            }
-        }
-        return $results;
-    }
-
-    // add child names
-    public function xmlArray($results)
-    {
-        if (is_array($results)) {
-            foreach ($results as $key => $value) {
-            }
-        }
-    }
-
 
     /**
      * Renders a json view

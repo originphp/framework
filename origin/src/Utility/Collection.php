@@ -13,15 +13,28 @@
  */
 namespace Origin\Utility;
 
-use ArrayIterator;
+use ArrayAccess;
+use Iterator;
+use Countable;
 
-class Collection
+class Collection implements ArrayAccess, Iterator, Countable
 {
     protected $items = null;
+    protected $position = 0;
 
-    public function __construct(array $items)
+    public function __construct($items)
     {
-        $this->items = new ArrayIterator($items);
+        $this->items = $items;
+    }
+
+    /**
+     * Magic method is trigged when calling var_dump
+     *
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return $this->toArray();
     }
 
     /**
@@ -535,7 +548,10 @@ class Collection
      */
     public function toArray()
     {
-        return $this->items->getArrayCopy();// an array of public properties
+        if (is_object($this->items)) {
+            return $this->items->toArray();
+        }
+        return $this->items;
     }
 
     /**
@@ -588,5 +604,54 @@ class Collection
             $data = $value; // Next In path
         }
         return $value;
+    }
+    // ArrayAccess
+    public function offsetExists($key)
+    {
+        return array_key_exists($key, $this->items);
+    }
+ 
+    public function offsetSet($key, $value)
+    {
+        if (is_null($key)) {
+            $this->items[] = $value;
+        } else {
+            $this->items[$key] = $value;
+        }
+    }
+ 
+    public function offsetGet($key)
+    {
+        return $this->items[$key];
+    }
+
+    public function offsetUnset($key)
+    {
+        unset($this->items[$key]);
+    }
+    // Interable
+    public function rewind()
+    {
+        $this->position = 0;
+    }
+
+    public function current()
+    {
+        return $this->items[$this->position];
+    }
+
+    public function key()
+    {
+        return $this->position;
+    }
+
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    public function valid()
+    {
+        return isset($this->items[$this->position]);
     }
 }
