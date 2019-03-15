@@ -26,6 +26,8 @@ use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
 use Origin\Core\Logger;
+use Origin\Exception\InvalidArgumentException;
+use Origin\Model\Entity;
 
 class Controller
 {
@@ -343,22 +345,115 @@ class Controller
     /**
      * Renders a view. This is called automatically by the dispatcher.
      *
-     * @param string $view index | /Folder/another_one | Plugin.Controller/action
+     * If the argument is a string it will assume you want to load a standard
+     * view using a template.
+     *
+     * $this->render('action');
+     * $this->render('Controller/action')
+     * $this->render('Plugin.Controller/action');
+     *
+     * // Set the type to render with data
+     * $this->render(['xml'=>$array)
+     * $this->render(['json'=>$array,'status'=>403]);
+     * $this->render(['text'=>'OK']);
+     *
+     *
+     * ### View Types
+     * template - standard view
+     * xml - takes an array and coverts to xml
+     * json - takes an array of data and converts to json
+     * text - sends a txt response, this can be handy when dealing with ajax
+     * file - this loads an external file with file_get_contents, if it is not html then remember to set the content type. This
+     * does send the file.
+     *
+     * ### Options
+     * type: this is the content type that will be used (default:html). If use the xml or json options then the type will
+     * be changed automatically. If you use file that is anything other than html then change the type
+     * status: the status code to send. Most API providers use only a small subset of huge amount of
+     * http error codes.
+     *
+     *  Here is set which should cover everything.
+     *
+     *  200 - OK (Success)
+     *  400 - Bad Request (Failure - client side problem)
+     *  500 - Internal Error (Failure - server side problem)
+     *  401 - Unauthorized
+     *  404 - Not Found
+     *  403 - Forbidden (For application level permisions)
      */
-    public function render(string $view = null)
+    public function render($options=[])
     {
-        $this->autoRender = false; // Only render once
-        
-        if ($view === null) {
-            $view = $this->request->params['action'];
+        if (empty($options)) {
+            $options = $this->request->params['action'];
         }
-
+        if (is_string($options)) {
+            $options = ['template'=>$options];
+        }
+        
+        $this->autoRender = false; // Only render once
         $this->beforeRender();
 
-        $viewObject = new View($this);
-        $body = $viewObject->render($view, $this->layout);
-        $this->response->body($body);
+        $options += [
+            'status' => 200,
+            'type' => 'html'
+        ];
+        $body = null;
+
+        if (!empty($options['json'])) {
+            $options['type'] = 'json';
+            $body = json_encode($this->resultsToArray($options['json']));
+        } elseif (!empty($options['xml'])) {
+            $options['type'] = 'xml';
+            $options['xml'] = $this->resultsToArray($options['xml']);
+            if (is_array($options['xml'])) {
+                $options['xml'] = Xml::fromArray($options['xml']);
+            }
+            $body = $options['xml']; // todo work with arrays of entities.
+        } elseif (!empty($options['text'])) {
+            $options['type'] = 'text';
+            $body = $options['text'];
+        } elseif (!empty($options['file'])) {
+            $body = file_get_contents($options['file']);
+        }
+        if ($body === null) {
+            $viewObject = new View($this);
+            $body = $viewObject->render($options['template'], $this->layout);
+        }
+    
+        $this->response->type($options['type']);   // 'json' or application/json
+        $this->response->status($options['status']); // 200
+        $this->response->body($body); //
     }
+
+    /**
+     * Recrusively goes through entities or arrays of entities and converts each
+     * one to an array. Need to handle results from all finders
+     *
+     * @param Entity|array $results
+     * @return void
+     */
+    public function resultsToArray($results)
+    {
+        if ($results instanceof Entity) {
+            return $results->toArray();
+        }
+        if (is_array($results)) {
+            foreach ($results as $key => $value) {
+                $results[$key] = $this->resultsToArray($value);
+            }
+        }
+        return $results;
+    }
+
+    // add child names
+    public function xmlArray($results)
+    {
+        if (is_array($results)) {
+            foreach ($results as $key => $value) {
+            }
+        }
+    }
+
 
     /**
      * Renders a json view
@@ -375,7 +470,7 @@ class Controller
      *       ]
      *     ],404);
      *
-     *  Most API providers use only a small subset of the 70+ http error codes
+     *  Most API providers use only a small subset of massiave amount of http error codes
      *
      *  These are the most important ones if you don't want to overcomplicate
      *
@@ -387,19 +482,11 @@ class Controller
      *  403 - Forbidden (For application level permisions)
      *
      * @param array|string $data data which will be json encoded
-     * @param integer $statusCode http status code to send
-     *
      * @return void
      */
-    public function renderJson($data, int $statusCode = 200)
+    public function renderJson($data, int $status = 200)
     {
-        $this->autoRender = false;
-        
-        $this->beforeRender();
-
-        $this->response->type('json');
-        $this->response->statusCode($statusCode);
-        $this->response->body(json_encode($data));
+        return $this->render(['json'=>$data,'status'=>$status]);
     }
 
     /**
@@ -418,18 +505,12 @@ class Controller
      *     ]);
      *
      * @param array $data
-     * @param integer $statusCode
+     * @param integer $status
      * @return void
      */
-    public function renderXml(array $data, int $statusCode = 200)
+    public function renderXml($data, int $status = 200)
     {
-        $this->autoRender = false;
-        
-        $this->beforeRender();
-
-        $this->response->type('xml');
-        $this->response->statusCode($statusCode);
-        $this->response->body(Xml::fromArray($data));
+        return $this->render(['xml'=>$data,'status'=>$status]);
     }
 
     /**
@@ -452,7 +533,7 @@ class Controller
         
         $this->beforeRedirect();
 
-        $this->response->statusCode($code);
+        $this->response->status($code);
         $this->response->header('Location', Router::url($url));
         $this->response->send();
         $this->response->stop();

@@ -41,7 +41,7 @@ class BlogPostsController extends Controller
      * @param string $view
      * @return void
      */
-    public function render(string $view = null)
+    public function render($options=[])
     {
         return true;
     }

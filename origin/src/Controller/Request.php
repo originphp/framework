@@ -76,6 +76,7 @@ class Request
      */
     protected $cookie = null;
 
+    
     /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
@@ -224,6 +225,46 @@ class Request
             return true;
         }
         throw new MethodNotAllowedException();
+    }
+    protected $accepts = [
+        'json' => 'application/json',
+        'xml' => 'application/xml'
+    ];
+
+    /**
+     * Checks if the request accepts, this will search the HTTP accept, extension
+     * being called.
+     *
+     * $request->accepts('application/json');
+     * $request->accepts(['application/xml','application/json]);
+     *
+     * @todo in future maybe something routing maybe without complicating things.
+     * @param string|array $type
+     * @return bool
+     */
+    public function accepts($type) : bool
+    {
+        if (!is_array($type)) {
+            $type = (array) $type;
+        }
+        $path = parse_url($this->url(), PHP_URL_PATH);
+      
+        $acceptHeaders = explode(',', $this->env('HTTP_ACCEPT'));
+
+        foreach ($type as $needle) {
+            if (in_array($needle, $acceptHeaders)) { // does not find application/xml;q=0.9
+                return true;
+            }
+            $parts = explode('/', $needle);
+            $extensionNeedle =  end($parts);
+            if (strpos(strtolower($path), ".{$extensionNeedle}") !== false) {
+                return true;
+            }
+            if (isset($this->params[$extensionNeedle])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

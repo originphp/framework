@@ -51,14 +51,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testStatusCode()
     {
         $response  = new Response();
-        $response->statusCode(501);
-        $this->assertEquals(501, $response->statusCode());
+        $response->status(501);
+        $this->assertEquals(501, $response->status());
     }
 
     public function testSend()
     {
         $response  = new Response();
-        $response->statusCode(200);
+        $response->status(200);
         $response->header('Accept-Language', 'en-us,en;q=0.5');
         $this->assertNull($response->send()); // or $response->send()
     }

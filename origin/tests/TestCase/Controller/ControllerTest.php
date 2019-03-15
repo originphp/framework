@@ -309,7 +309,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $data = ['data'=>['game'=>'Dota 2']];
         $controller->renderJson($data, 201);
         $this->assertEquals(json_encode($data), $controller->response->body());
-        $this->assertEquals(201, $controller->response->statusCode());
+        $this->assertEquals(201, $controller->response->status());
         $this->assertEquals('application/json', $controller->response->type());
     }
 
@@ -329,7 +329,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
        
         $controller->renderXml($data, 201);
         $this->assertEquals($expected, $controller->response->body());
-        $this->assertEquals(201, $controller->response->statusCode());
+        $this->assertEquals(201, $controller->response->status());
         $this->assertEquals('application/xml', $controller->response->type());
     }
 
@@ -338,13 +338,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $response = $this->getMockBuilder('Origin\Controller\Response')
-           ->setMethods(['header', 'send','statusCode','stop'])
+           ->setMethods(['header', 'send','status','stop'])
            ->getMock();
 
         $controller = new Controller($request, $response);
 
         $response->expects($this->once())
-        ->method('statusCode')
+        ->method('status')
           ->with(302);
 
         $response->expects($this->once())

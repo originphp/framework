@@ -15,6 +15,7 @@
 namespace Origin\Controller;
 
 use Origin\Core\Cookie;
+use Origin\Exception\NotFoundException;
 
 class Response
 {
@@ -30,7 +31,7 @@ class Response
      *
      * @var int
      */
-    protected $statusCode = 200;
+    protected $status = 200;
 
     /**
      * holds an array of headers to be sent.
@@ -57,6 +58,7 @@ class Response
         'html' => 'text/html',
         'json' => 'application/json',
         'xml' => 'application/xml',
+        'txt' => 'text/plain',
     ];
     /**
      * Sets or gets the buffered output.
@@ -79,7 +81,7 @@ class Response
      */
     public function send()
     {
-        http_response_code($this->statusCode);
+        http_response_code($this->status);
 
         $this->sendCookies();
         $this->header('Content-Type', $this->contentType);
@@ -104,16 +106,16 @@ class Response
     /**
      * Sets or gets the status code for sending.
      *
-     * @param int $statusCode
+     * @param int $status
      *
-     * @return int statusCode
+     * @return int status
      */
-    public function statusCode(int $statusCode = null)
+    public function status(int $status = null)
     {
-        if ($statusCode === null) {
-            return $this->statusCode;
+        if ($status === null) {
+            return $this->status;
         }
-        $this->statusCode = $statusCode;
+        $this->status = $status;
     }
 
     /**
@@ -253,6 +255,21 @@ class Response
         }
 
         return false;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $filename
+     * @param array $options
+     * @return void
+     */
+    public function file(string $filename, array $options=[])
+    {
+        $options += ['name'=>null,'download'=>false];
+        if (!file_exists($filename)) {
+            throw new NotFoundException(sprintf('The requested file %s could not be found or read.'));
+        }
     }
 
     private function sendCookies()

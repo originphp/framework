@@ -172,10 +172,10 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->response = new Response();
         
-        $this->response->statusCode(200);
+        $this->response->status(200);
         $this->assertResponseOk();
 
-        $this->response->statusCode(204);
+        $this->response->status(204);
         $this->assertResponseOk();
     }
 
@@ -183,10 +183,10 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->response = new Response();
 
-        $this->response->statusCode(200);
+        $this->response->status(200);
         $this->assertResponseSuccess();
 
-        $this->response->statusCode(308);
+        $this->response->status(308);
         $this->assertResponseSuccess();
     }
 
@@ -194,10 +194,10 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->response = new Response();
        
-        $this->response->statusCode(400);
+        $this->response->status(400);
         $this->assertResponseError();
 
-        $this->response->statusCode(429);
+        $this->response->status(429);
         $this->assertResponseError();
     }
 
@@ -205,17 +205,17 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->response = new Response();
     
-        $this->response->statusCode(500);
+        $this->response->status(500);
         $this->assertResponseFailure();
 
-        $this->response->statusCode(505);
+        $this->response->status(505);
         $this->assertResponseFailure();
     }
 
     public function testResponseCode()
     {
         $this->response = new Response();
-        $this->response->statusCode(404);
+        $this->response->status(404);
         $this->assertResponseCode(404);
 
         $this->response = null;

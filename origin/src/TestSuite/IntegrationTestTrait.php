@@ -318,7 +318,7 @@ trait IntegrationTestTrait
 
     protected function assertStatus(int $min, int $max, string $errorMessage = 'Invalid status')
     {
-        $status = $this->response()->statusCode();
+        $status = $this->response()->status();
         $this->assertGreaterThanOrEqual($min, $status, $errorMessage);
         $this->assertLessThanOrEqual($max, $status, $errorMessage);
     }
@@ -331,7 +331,7 @@ trait IntegrationTestTrait
         if ($this->response === null) {
             $this->fail('No response');
         }
-        $status = $this->response->statusCode();
+        $status = $this->response->status();
         $this->assertEquals($code, $status, sprintf('Response code was %s', $code));
     }
     /**
