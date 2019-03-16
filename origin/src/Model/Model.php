@@ -102,7 +102,7 @@ class Model
     /**
      * Behavior registry object
      *
-     * @var BehaviorRegistry
+     * @var \Origin\Model\Behavior\BehaviorRegistry
      */
     protected $behaviorRegistry = null;
 
@@ -658,7 +658,7 @@ class Model
     /**
      * Gets the model validator object and stores.
      *
-     * @return ModelValidator
+     * @var \Origin\Model\ModelValidator
      */
     public function validator()
     {
@@ -1066,7 +1066,7 @@ class Model
      * @param int|string $id      id of record to fetch
      * @param array $options  (conditions, fields, joins, order,limit, group, callbacks,contain)
      *
-     * @return Entity
+     * @return \Origin\Model\Entity
      */
     public function get($id, array $options = [])
     {
@@ -1084,7 +1084,7 @@ class Model
      *
      * @param string $type  (first,all,count,list)
      * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,contain)
-     * @return Entity|array $resultSet
+     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $resultSet
      */
     public function find(string $type = 'first', $options = [])
     {
@@ -1263,7 +1263,7 @@ class Model
      *
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      *
-     * @return array results
+     * @return \Origin\Model\Collection
      */
     protected function finderAll($query)
     {
@@ -1454,7 +1454,7 @@ class Model
      *
      * @param array $data to build with entity with
      * @param array $options
-     * @return Entity
+     * @var \Origin\Model\Entity
      */
     public function create(array $data = [], array $options=[])
     {
@@ -1688,7 +1688,7 @@ class Model
      *
      * @param array $requestData
      * @param array $options parse default is set to true
-     * @return Entity
+    * @var \Origin\Model\Entity
      */
     public function newEntity(array $requestData = [], array $options=[])
     {
@@ -1704,7 +1704,7 @@ class Model
      *
      * @param array $data
      * @param array $options parse default is set to true
-     * @return Entity
+    * @var array
      */
     public function newEntities(array $requestData, array $options=[])
     {
@@ -1725,7 +1725,7 @@ class Model
      * @param Entity $entity
      * @param array  $requestData
      * @param array $options parse
-     * @return Entity
+     * @var \Origin\Model\Entity
      */
     public function patchEntity(Entity $entity, array $requestData, array $options=[])
     {
@@ -1736,7 +1736,7 @@ class Model
     /**
      * Gets the Marshaller object.
      *
-     * @return Marshaller
+     * @var \Origin\Model\Marshaller
      */
     protected function marshaller()
     {

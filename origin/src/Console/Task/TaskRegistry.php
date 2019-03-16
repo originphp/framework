@@ -28,7 +28,7 @@ class TaskRegistry extends ObjectRegistry
     /**
      * Injected Shell object
      *
-     * @var Shell
+     * @var \Origin\Console\Shell
      */
     protected $shell = null;
 
@@ -42,6 +42,13 @@ class TaskRegistry extends ObjectRegistry
         return Resolver::className($class, 'Console/Task');
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $class
+     * @param array $options
+     * @return \Origin\Console\Task\Task
+     */
     protected function createObject(string $class, array $options = [])
     {
         return new $class($this->shell, $options);
@@ -52,6 +59,11 @@ class TaskRegistry extends ObjectRegistry
         throw new MissingTaskException($object);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return \Origin\Console\Shell
+     */
     public function shell()
     {
         return $this->shell;

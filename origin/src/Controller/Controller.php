@@ -58,7 +58,7 @@ class Controller
     public $autoRender = true;
 
     /**
-     * Default layout.
+     * Default layout, set to false to not use a layout.
      *
      * @var string
      */
@@ -67,14 +67,14 @@ class Controller
     /**
      * Holds the request object.
      *
-     * @var object
+     * @var \Origin\Controller\Request
      */
     public $request = null;
 
     /**
      * Holds the response object.
      *
-     * @var object
+     * @var \Origin\Controller\Response
      */
     public $response = null;
 
@@ -86,7 +86,7 @@ class Controller
     /**
        * Holds the componentregistry object.
        *
-       * @var ComponentRegistry
+       * @var \Origin\Controller\Component\ComponentRegistry
        */
     protected $componentRegistry = null;
 
@@ -205,7 +205,7 @@ class Controller
      *
      * @param string $model
      * @param array $options
-     * @return Model
+     * @return \Origin\Model\Model
      */
     public function loadModel(string $model, array $options=[])
     {
@@ -389,10 +389,7 @@ class Controller
         if (is_string($options)) {
             $options = ['template'=>$options];
         }
-        
-        $this->autoRender = false; // Only render once
-        $this->beforeRender();
-
+ 
         $options += [
             'status' => 200,
             'type' => 'html'
@@ -400,22 +397,14 @@ class Controller
         $body = null;
 
         if (!empty($options['json'])) {
-            $options['type'] = 'json';
-            if (is_object($options['json']) and method_exists($options['json'], 'toJson')) {
-                $body = $options['json']->toJson();
-            } else {
-                $body = json_encode($options['json']);
-            }
-        } elseif (!empty($options['xml'])) {
-            $options['type'] = 'xml';
-            if (is_object($options['xml']) and method_exists($options['xml'], 'toXml')) {
-                $body = $options['xml']->toXml();
-            } elseif (is_array($options['xml'])) {
-                $body = Xml::fromArray($options['xml']);
-            } else {
-                $body = $options['xml'];
-            }
-        } elseif (!empty($options['text'])) {
+            return $this->renderJson($options['json'], $options['status']);
+        }
+        
+        if (!empty($options['xml'])) {
+            return $this->renderXml($options['xml'], $options['status']);
+        }
+        
+        if (!empty($options['text'])) {
             $options['type'] = 'text';
             $body = $options['text'];
         } elseif (!empty($options['file'])) {
@@ -462,7 +451,17 @@ class Controller
      */
     public function renderJson($data, int $status = 200)
     {
-        return $this->render(['json'=>$data,'status'=>$status]);
+        $this->autoRender = false; // Only render once
+        $this->beforeRender();
+        
+        if (is_object($data) and method_exists($data, 'toJson')) {
+            $body = $data->toJson();
+        } else {
+            $body = json_encode($data);
+        }
+        $this->response->type('json');   // 'json' or application/json
+        $this->response->status($status); // 200
+        $this->response->body($body); //
     }
 
     /**
@@ -486,7 +485,19 @@ class Controller
      */
     public function renderXml($data, int $status = 200)
     {
-        return $this->render(['xml'=>$data,'status'=>$status]);
+        $this->autoRender = false; // Disable for dispatcher
+        $this->beforeRender();
+        
+        if (is_object($data) and method_exists($data, 'toXml')) {
+            $body = $data->toXml();
+        } elseif (is_array($data)) {
+            $body = Xml::fromArray($data);
+        } else {
+            $body = $data;
+        }
+        $this->response->type('xml');   // 'xml' or application/xml
+        $this->response->status($status); // 200
+        $this->response->body($body);
     }
 
     /**
@@ -506,7 +517,6 @@ class Controller
     public function redirect($url, int $code = 302)
     {
         $this->autoRender = false;
-        
         $this->beforeRedirect();
 
         $this->response->status($code);
@@ -518,7 +528,7 @@ class Controller
     /**
      * Returns the request object
      *
-     * @return Request
+     * @return \Origin\Controller\Request
      */
     public function request()
     {
@@ -528,7 +538,7 @@ class Controller
     /**
      * Returns the response object
      *
-     * @return Response
+     * @return \Origin\Controller\Response
      */
     public function response()
     {
@@ -538,7 +548,7 @@ class Controller
     /**
      * Returns the component registry
      *
-     * @return ComponentRegistry
+     * @return \Origin\Controller\Component\ComponentRegistry
      */
     public function componentRegistry()
     {
@@ -549,7 +559,7 @@ class Controller
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Controller')
     {

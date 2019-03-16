@@ -37,7 +37,7 @@ class Shell
     /**
      * Holds the task registry
      *
-     * @var TaskRegistry
+     * @var \Origin\Console\Task\TaskRegistry
      */
     protected $taskRegistry = null;
 
@@ -45,7 +45,7 @@ class Shell
     /**
      * Holds the console Output Object
      *
-     * @var ConsoleOutput
+     * @var \Origin\Console\ConsoleOutput
      */
     public $output = null;
 
@@ -73,7 +73,8 @@ class Shell
      * Inject request and response
      *
      * @param array $arguments
-     * @param ConsoleOutput $consoleOutput
+     * @param \Origin\Console\ConsoleOutput $consoleOutput
+      * @param \Origin\Console\ConsoleInput $consoleInput
      * @return void
      */
     public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
@@ -194,7 +195,7 @@ class Shell
     *
     * @param string $model
     *
-    * @return Model
+    * @return \Origin\Model\Model
     */
     public function loadModel(string $model)
     {
@@ -215,6 +216,7 @@ class Shell
      *
      * @param string $name  Shell task name
      * @param array  $config array of config to be passed to shell task. Class name
+     * @return \Origin\Console\Task\Task
      */
     public function loadTask(string $name, array $config = [])
     {
@@ -281,7 +283,7 @@ class Shell
     /**
      * Gets the task registry object
      *
-     * @return TaskRegistry
+     * @return \Origin\Console\Task\TaskRegistry
      */
     public function taskRegistry()
     {
@@ -292,7 +294,7 @@ class Shell
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Shell')
     {

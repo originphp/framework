@@ -66,8 +66,8 @@ class Collection implements ArrayAccess, Iterator, Countable
 
     /**
      * Converts into Json
-     *
-     * @return void
+     * @see https://jsonapi.org/format/
+     * @return string
      */
     public function toJson()
     {
@@ -77,7 +77,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     /**
      * Converts into XML
      *
-     * @return void
+     * @return string
      */
     public function toXml()
     {

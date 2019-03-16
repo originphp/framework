@@ -63,27 +63,21 @@ class Dispatcher
     {
         if ($request->params) {
             $class = $this->getClass($request->params['controller'], $request->params['plugin']);
-
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params['controller']);
             }
             
             $this->controller = $this->buildController($class, $request, $response);
           
-            $this->invoke(
-              $this->controller,
-              $request->params['action'],
-              $request->params
-            );
+            $this->invoke($this->controller, $request->params['action'], $request->params);
       
             if ($this->controller->response instanceof Response) {
                 $this->controller->response->send();
             }
           
             return $this->controller;
-        } else {
-            throw new RouterException('No route found.', 404);
         }
+        throw new RouterException('No route found.', 404);
     }
 
     /**
@@ -110,7 +104,6 @@ class Dispatcher
         return $controller;
     }
 
-
     /**
      * Does the whole lifecylce
      */
@@ -120,7 +113,7 @@ class Dispatcher
        
         call_user_func_array(array($controller, $action), $arguments['pass']);
      
-        if ($controller->autoRender) {
+        if ($controller->autoRender and $controller->response->ready()) {
             $controller->render();
         }
 

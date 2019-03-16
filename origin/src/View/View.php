@@ -50,8 +50,17 @@ class View
      */
     public $params = [];
 
+    /**
+     * Request Object
+     *
+     * @var \Origin\Controller\Request
+     */
     public $request = null;
-
+    /**
+       * Response Object
+       *
+       * @var \Origin\Controller\Response
+       */
     public $response = null;
 
     /**
@@ -68,11 +77,10 @@ class View
      */
     public $scripts = '';
 
-
     /**
      * Holds the HelperRegistry object.
      *
-     * @var HelperRegistry
+     * @var \Origin\View\Helper\HelperRegistry
      */
     protected $helperRegistry = null;
 
@@ -356,7 +364,7 @@ class View
     /**
      * Returns the request object
      *
-     * @return Request
+     * @return \Origin\Controller\Request
      */
     public function request()
     {
@@ -367,7 +375,7 @@ class View
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'View')
     {

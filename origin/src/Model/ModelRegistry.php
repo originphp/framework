@@ -35,7 +35,7 @@ class ModelRegistry
      * @param string $model
      * @param array  $options
      *
-     * @return Model or bool
+     * @var \Origin\Model\Model
      */
     public static function get(string $alias, array $options = [])
     {
@@ -116,6 +116,13 @@ class ModelRegistry
         static::$config = static::$registry = [];
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $className
+     * @param [type] $options
+     * @var \Origin\Model\Model
+     */
     protected static function create(string $className, $options)
     {
         if (isset($options['className'])) {

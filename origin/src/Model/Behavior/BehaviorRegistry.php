@@ -25,6 +25,11 @@ use Origin\Model\Exception\MissingBehaviorException;
  */
 class BehaviorRegistry extends ObjectRegistry
 {
+    /**
+     * Model
+     *
+     * @var \Origin\Model\Model
+     */
     protected $model = null;
 
     public function __construct(Model $model)
@@ -37,6 +42,13 @@ class BehaviorRegistry extends ObjectRegistry
         return Resolver::className($class, 'Model/Behavior');
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $class
+     * @param array $options
+     * @return \Origin\Model\Behavior\Behavior
+     */
     protected function createObject(string $class, array $options = [])
     {
         return new $class($this->model, $options);

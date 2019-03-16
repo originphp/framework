@@ -1,13 +1,15 @@
 <?php
-/**
- * Controller
- */
-
-
 namespace App\Controller;
 
 class %controller%Controller extends AppController
 {
+    /**
+     * %model% Model
+     *
+     * @var \App\Model\%model%
+     */
+    public $%model% = null;
+
     public $paginate = [
       'limit' => 20,
     ];

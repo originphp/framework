@@ -25,13 +25,13 @@ class Task
     /**
      * Holds the shell object
      *
-     * @var Shell
+     * @var \Origin\Console\Shell
      */
     protected $shell = null;
     /**
      * Holds the Task Registry
      *
-     * @var TaskRegistry
+     * @var \Origin\Console\Task\TaskRegistry
      */
     protected $taskRegistry = null;
     
@@ -70,7 +70,7 @@ class Task
      *
      * @param string $task
      * @param array $config
-     * @return void
+     * @return \Origin\Console\Task\Task
      */
     public function loadTask(string $name, array $config = [])
     {
@@ -120,7 +120,7 @@ class Task
     /**
      * Returns the current shell where the task is loaded
      *
-     * @return void
+     * @return \Origin\Console\Shell
      */
     public function shell()
     {
@@ -130,7 +130,7 @@ class Task
     /**
     * Gets the componentRegistry
     *
-    * @return void
+    * @return \Origin\Console\Task\TaskRegistry
     */
     public function taskRegistry()
     {
@@ -154,7 +154,7 @@ class Task
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Task')
     {

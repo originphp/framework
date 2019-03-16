@@ -24,10 +24,10 @@ class Helper
 {
     use ConfigTrait;
     /**
-     * Holds a reference to the view object.
-     *
-     * @var object
-     */
+       * Request Object
+       *
+       * @var \Origin\View\View
+       */
     protected $view = null;
 
 
@@ -145,7 +145,7 @@ class Helper
     /**
      * Returns the View
     *
-    * @return View
+    * @return \Origin\View\View
     */
     public function view()
     {
@@ -155,7 +155,7 @@ class Helper
     /**
      * Returns the request object
      *
-     * @return Request
+     * @return \Origin\Controller\Request
      */
     public function request()
     {
@@ -165,7 +165,7 @@ class Helper
     /**
      * Returns the response object
      *
-     * @return Response
+     * @return \Origin\Controller\Response
      */
     public function response()
     {
@@ -177,7 +177,7 @@ class Helper
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Helper')
     {

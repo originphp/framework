@@ -41,10 +41,10 @@ You can also change the channel name as well
     $logger = $this->logger('AppController');
 ````
 
-Sometimes you might want to log to a separate file simply call the `setFilename` method.
+Sometimes you might want to log to a separate file simply call the `filename` method.
 
 ````php 
 $logger = new Logger('WeatherController')
-$logger->setFilename('/var/www/logs/other.log');
+$logger->filename('/var/www/logs/other.log');
 $logger->warning('Humidity not set');
 ````

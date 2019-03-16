@@ -28,7 +28,7 @@ class ComponentRegistry extends ObjectRegistry
     /**
      * Holds the controller object
      *
-     * @var Controller
+     * @var \Origin\Core\Controller
      */
     protected $controller = null;
 
@@ -42,6 +42,13 @@ class ComponentRegistry extends ObjectRegistry
         return Resolver::className($class, 'Controller/Component');
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $class
+     * @param array $options
+     * @return \Origin\Controller\Component\Component
+     */
     protected function createObject(string $class, array $options = [])
     {
         return new $class($this->controller, $options);

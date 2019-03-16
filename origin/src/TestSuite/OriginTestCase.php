@@ -31,7 +31,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      * @param array $methods methods to mock
      * @param array $options set the className to be used buy mockBuilder, these will also be passed
      * to model constructor as config
-     * @return void
+     * @return \Origin\Model\Model
      */
     public function getMockForModel(string $alias, array $methods = [], array $options =[])
     {

@@ -24,6 +24,11 @@ class Component
 {
     use ConfigTrait;
     
+    /**
+     * Controller Object
+     *
+     * @var \Origin\Controller\Controller
+     */
     protected $controller = null;
 
     /**
@@ -113,7 +118,7 @@ class Component
 
     /**
      * Returns the controller
-     * @return Controller
+     * @return \Origin\Controller\Controller
      */
     public function controller()
     {
@@ -123,7 +128,7 @@ class Component
     /**
      * Returns the request object
      *
-     * @return Request
+     * @return \Origin\Controller\Request
      */
     public function request()
     {
@@ -133,7 +138,7 @@ class Component
     /**
      * Returns the response object
      *
-     * @return Response
+    * @return \Origin\Controller\Response
      */
     public function response()
     {
@@ -144,7 +149,7 @@ class Component
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Component')
     {

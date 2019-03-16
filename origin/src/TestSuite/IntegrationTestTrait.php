@@ -31,19 +31,19 @@ trait IntegrationTestTrait
     /**
      * Holds the response object
      *
-     * @var Response
+     * @var \Origin\Controller\Response
      */
     protected $response = null;
     /**
      * Holds the response object
      *
-     * @var Request
+     * @var \Origin\Controller\Request
      */
     protected $request = null;
     /**
      * Holds the controller for the most recent request
      *
-     * @var Controller
+     * @var \Origin\Controller\Controller
      */
     protected $controller = null;
 

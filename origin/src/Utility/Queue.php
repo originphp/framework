@@ -213,7 +213,7 @@ class Queue
      * Fetches the next job from a queue and locks it. Remember to work with the queue in a try/catch block
      *
      * @param string $queue name of queue
-     * @return void
+     * @return \Origin\Model\Entity
      */
     public function fetch(string $queue)
     {
@@ -247,7 +247,7 @@ class Queue
     /**
     * Returns the Queue Job Model
     *
-    * @return Model
+    * @return \Origin\Model\Model
     */
     public function model() : Model
     {

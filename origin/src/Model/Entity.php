@@ -361,7 +361,7 @@ class Entity
 
     /**
      * Converts into Json
-     *
+     * @see $this->toArray()
      * @return void
      */
     public function toJson()

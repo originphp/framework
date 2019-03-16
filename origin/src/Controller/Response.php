@@ -60,6 +60,14 @@ class Response
         'xml' => 'application/xml',
         'txt' => 'text/plain',
     ];
+
+    /**
+     * The filename to send
+     *
+     * @var string
+     */
+    protected $file = null;
+
     /**
      * Sets or gets the buffered output.
      *
@@ -85,11 +93,24 @@ class Response
 
         $this->sendCookies();
         $this->header('Content-Type', $this->contentType);
-
         foreach ($this->headers as $name => $value) {
             $this->sendHeader($name, $value);
         }
-        echo $this->body;
+        if ($this->file) {
+            readfile($this->file);
+        } else {
+            echo $this->body;
+        }
+    }
+
+    /**
+     * Checks the status of the response object to see if its ready to be used.
+     * If body has already been sent or a file set then its nos longer in ready state.
+     * @return bool
+     */
+    public function ready() : bool
+    {
+        return empty($this->body) and empty($this->file);
     }
 
     /**
@@ -266,10 +287,26 @@ class Response
      */
     public function file(string $filename, array $options=[])
     {
-        $options += ['name'=>null,'download'=>false];
+        # Setup Options
+        $options += ['name'=>null,'download'=>false,'type'=>null];
         if (!file_exists($filename)) {
-            throw new NotFoundException(sprintf('The requested file %s could not be found or read.'));
+            throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $filename));
         }
+        if ($options['name']===null) {
+            $options['name'] = basename($filename);
+        }
+        if ($options['type']=== null) {
+            $options['type'] = mime_content_type($filename);
+        }
+        
+        if ($options['download']) {
+            $this->header('Content-Disposition', 'attachment; filename="' . $options['name'] . '"');
+        }
+        $this->type($options['type']);
+        //$this->header('Content-Transfer-Encoding', 'binary');
+        // $this->header('Content-Length', filesize($filename));
+     
+        $this->filename = $filename;
     }
 
     private function sendCookies()

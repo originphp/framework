@@ -1,13 +1,19 @@
 <?php
-
 namespace App\Controller;
 
 class BookmarksController extends AppController
 {
-    public $paginate = [
-      'limit' => 20,
-    ];
+    /**
+     * Bookmark Model
+     *
+     * @var \App\Model\Bookmark
+     */
+    public $Bookmark = null;
 
+    public $paginate = [
+        'limit' => 20,
+      ];
+        
     public function index()
     {
         $this->set('bookmarks', $this->paginate('Bookmark', [
@@ -20,7 +26,7 @@ class BookmarksController extends AppController
         $bookmark = $this->Bookmark->get($id, [
             'with'=>['User','Tag']
             ]);
-   
+
         $this->set('bookmark', $bookmark);
     }
 

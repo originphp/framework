@@ -40,7 +40,7 @@ class Cache
     /**
      * Undocumented variable
      *
-     * @var NullEngine
+     * @var \Origin\Cache\Engine\NullEngine
      */
     protected static $nullEngine = null;
 
@@ -48,7 +48,7 @@ class Cache
      * Gets the cache engine
      *
      * @param string $config
-     * @return CacheEngine
+     * @return Origin\Cache\CacheEngine
      */
     protected static function engine(string $name)
     {

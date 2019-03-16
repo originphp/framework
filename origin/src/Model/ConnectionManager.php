@@ -32,7 +32,7 @@ class ConnectionManager
      *
      * @param string $name default
      *
-     * @return Datasource
+     * @return \Origin\Model\Datasource
      */
     public static function get(string $name)
     {

@@ -104,7 +104,7 @@ class LoggerTest extends \PHPUnit\Framework\TestCase
     {
         $logger = new Logger('testFilename');
         $filename = sys_get_temp_dir() . DS . uniqid();
-        $logger->setFilename($filename);
+        $logger->filename($filename);
         $logger->debug('Something has gone Pete Tong');
         $this->assertContains('Something has gone Pete Tong', file_get_contents($filename));
     }

@@ -24,7 +24,9 @@ class Behavior
     use ConfigTrait;
     
     /**
-     * Holds the model for this behavior.
+     * Model for this behavior
+     *
+     * @var \Origin\Model\Model
      */
     protected $model = null;
 
@@ -88,7 +90,7 @@ class Behavior
     /**
      * Returns the model
      *
-     * @return Model
+     * @return \Origin\Model\Model
      */
     public function model()
     {
@@ -100,7 +102,7 @@ class Behavior
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Behavior')
     {

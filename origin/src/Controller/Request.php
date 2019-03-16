@@ -38,6 +38,7 @@ class Request
 
     /**
      * Holds the query data.
+     * @var array
      */
     public $query = [];
 
@@ -65,14 +66,14 @@ class Request
     /**
      * Session
      *
-     * @var Session
+     * @return \Origin\Core\Session
      */
     protected $session = null;
 
     /**
      * Cookie
      *
-     * @var Cookie
+     * @return \Origin\Core\Cookie
      */
     protected $cookie = null;
 
@@ -286,7 +287,7 @@ class Request
     /**
      * Lazy loads and returns the session object
      *
-     * @return Session
+     * @return \Origin\Core\Session
      */
     public function session()
     {
@@ -313,8 +314,6 @@ class Request
         }
         return $this->cookie;
     }
-
-
 
     protected function readInput()
     {

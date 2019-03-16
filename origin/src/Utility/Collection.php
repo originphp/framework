@@ -49,7 +49,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *    });
      *
      * @param string|function $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function extract($callback)
     {
@@ -69,7 +69,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *  });
      *
      * @param callable $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function each(callable $callback)
     {
@@ -91,7 +91,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *      return $value + 1;
      *   });
      * @param callable $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function map(callable $callback)
     {
@@ -115,7 +115,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     *
     * @param string $keyPath
     * @param string $valuePath
-    * @return Collection
+    * @return \Origin\Utility\Collection
     */
     public function combine(string $keyPath, string $valuePath, string $groupPath = null)
     {
@@ -161,7 +161,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *  $chunks = $collection->chunk(5)->toList();
      *
      * @param integer $chunkSize
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function chunk(int $chunkSize)
     {
@@ -188,7 +188,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *   });
      *
      * @param callable $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function filter(callable $callback)
     {
@@ -209,7 +209,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *   });
      *
      * @param callable $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function reject(callable $callback)
     {
@@ -275,7 +275,7 @@ class Collection implements ArrayAccess, Iterator, Countable
      *   });
      *
      * @param string|callable $callback
-     * @return Collection
+     * @return \Origin\Utility\Collection
      */
     public function sortBy($callback, $direction = SORT_DESC, $type = SORT_NUMERIC)
     {
@@ -309,7 +309,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     *   });
     *
     * @param string|callable $callback
-    * @return Collection
+    * @return \Origin\Utility\Collection
     */
     public function min($callback)
     {
@@ -327,7 +327,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     *   });
     *
     * @param string|callable $callback
-    * @return Collection
+    * @return \Origin\Utility\Collection
     */
     public function max($callback)
     {

@@ -47,19 +47,17 @@ class Logger
     }
     
     /**
-     * Sets the filename for the logger
+     * Sets or gets the filename for the logger
      *
      * @param string $filename
      * @return Logger
      */
-    public function setFilename(string $filename)
+    public function filename(string $filename = null)
     {
+        if ($filename === null) {
+            return $this->filename;
+        }
         $this->filename = $filename;
-    }
-
-    public function getFilename()
-    {
-        return $this->filename;
     }
 
     /**
