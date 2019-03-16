@@ -146,8 +146,8 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     {
         $Autoloader = new MockAutoloader(ROOT);
         $expected = '/var/www/someFolder';
-        $Autoloader->setFolder($expected);
-        $this->assertEquals($expected, $Autoloader->getFolder());
+        $Autoloader->directory($expected);
+        $this->assertEquals($expected, $Autoloader->directory());
     }
     public function testGetInstance()
     {

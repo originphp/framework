@@ -20,7 +20,7 @@
  *  or get a singleton instance
  *
  *  $autoloader = Autoloader::getInstance();
- *  $autoloader->setFolder(ROOT);  // this sets the project folder
+ *  $autoloader->directory(ROOT);  // this sets the project folder
  *
  * Tell the Autoloader where to find files for namespaces that you will use.
  *
@@ -79,13 +79,16 @@ class Autoloader
     }
 
     /**
-     * Sets the folder
+     * Sets or gets the project directory
      *
      * @param string $directory
      * @return void
      */
-    public function setFolder(string $directory)
+    public function directory(string $directory = null)
     {
+        if ($directory === null) {
+            return $this->directory;
+        }
         $this->directory = $directory;
     }
 
