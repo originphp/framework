@@ -85,9 +85,9 @@ class Bookmark extends AppModel
     /**
      * Takes related records and converts to string.
      *
-     * @param array $tags
+     * @param Origin\Model\Collection $tags
      */
-    protected function tagsToString(array $tags)
+    protected function tagsToString($tags)
     {
         $result = [];
         foreach ($tags as $tag) {

@@ -4,6 +4,13 @@ namespace App\Controller;
 
 class UsersController extends AppController
 {
+    /**
+     * User Model
+     *
+     * @var \App\Model\User
+     */
+    public $User = null;
+
     public $paginate = [
       'limit' => 20,
     ];
