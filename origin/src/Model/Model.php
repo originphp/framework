@@ -658,7 +658,7 @@ class Model
     /**
      * Gets the model validator object and stores.
      *
-     * @var \Origin\Model\ModelValidator
+     * @return \Origin\Model\ModelValidator
      */
     public function validator()
     {
@@ -1340,7 +1340,7 @@ class Model
             $query['fields'] = $this->fields();
         }
 
-        $query['with'] = $this->containConfig($query);
+        $query['with'] = $this->withConfig($query);
      
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
@@ -1387,7 +1387,7 @@ class Model
      * @param array $query
      * @return void
      */
-    protected function containConfig(array $query)
+    protected function withConfig(array $query)
     {
         $contain = [];
         foreach ((array) $query['with'] as $alias => $config) {
@@ -1449,12 +1449,13 @@ class Model
     }
 
     /**
-     * Transforms a single row (array) into an entity. Does not work with related
-     * and nor does it parse I18n
+     * Creates a new entity for this model, no parsing is carried out like
+     * in newEntity and if you pass data as an argument it will not process associated
+     * data (use newEntity).
      *
      * @param array $data to build with entity with
      * @param array $options
-     * @var \Origin\Model\Entity
+     * @return \Origin\Model\Entity
      */
     public function create(array $data = [], array $options=[])
     {
@@ -1688,7 +1689,7 @@ class Model
      *
      * @param array $requestData
      * @param array $options parse default is set to true
-    * @var \Origin\Model\Entity
+     * @return \Origin\Model\Entity
      */
     public function newEntity(array $requestData = [], array $options=[])
     {

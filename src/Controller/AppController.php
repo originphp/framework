@@ -14,9 +14,16 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
+
         $this->loadComponent('Auth');
-        $this->loadComponents(['Flash']);
-        $this->loadHelpers(['Html', 'Form', 'Flash', 'Number', 'Date']);
+        $this->loadComponent('Flash');
+        $this->loadComponent('Session');
+
+        $this->loadHelper('Html');
+        $this->loadHelper('Form');
+        $this->loadHelper('Flash');
+        $this->loadHelper('Number');
+        $this->loadHelper('Date');
 
         /*
          * Start I18n. This will autodetect locale and settings if you do not pass array

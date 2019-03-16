@@ -221,9 +221,8 @@ class Entity
     }
 
     /**
-     * Extracts data for selected properties, null values are
-     * important so we use array_key_exists
-     *
+     * Extracts data for selected properties
+     * @internal null values are important so we use array_key_exists
      * @param array $properties
      * @return array
      */
@@ -360,9 +359,9 @@ class Entity
 
 
     /**
-     * Converts into Json
-     * @see $this->toArray()
-     * @return void
+     * Converts this entity into Json
+     *
+     * @return string
      */
     public function toJson()
     {
@@ -370,9 +369,9 @@ class Entity
     }
 
     /**
-     * Converts into XML
+     * Converts this entity into XML
      *
-     * @return void
+     * @return string
      */
     public function toXml()
     {

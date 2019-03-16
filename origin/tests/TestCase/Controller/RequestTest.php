@@ -24,7 +24,7 @@ class MockRequest extends Request
     {
         $this->input = $input;
     }
-    protected function readInput()
+    protected function readInput() : ?string
     {
         return $this->input;
     }
@@ -85,7 +85,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     public function testEnv()
     {
         $request = new Request('articles/index');
-        $this->assertFalse($request->env('FOO'));
+        $this->assertNull($request->env('FOO'));
         $_SERVER['FOO'] = 'bar';
         $this->assertEquals('bar', $request->env('FOO'));
     }

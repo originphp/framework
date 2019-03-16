@@ -1,10 +1,12 @@
 <?php
-
 namespace App\Console;
 
 use App\Console\AppShell;
 use Origin\Exception\Exception;
 
+/**
+ * @property \App\Model\Bookmark $Bookmark
+ */
 class BookmarksShell extends AppShell
 {
     private $files = [

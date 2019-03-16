@@ -1,19 +1,15 @@
 <?php
 namespace App\Controller;
 
+/**
+ * @property \App\Model\Bookmark $Bookmark
+ */
 class BookmarksController extends AppController
 {
-    /**
-     * Bookmark Model
-     *
-     * @var \App\Model\Bookmark
-     */
-    public $Bookmark = null;
-
     public $paginate = [
         'limit' => 20,
       ];
-        
+    
     public function index()
     {
         $this->set('bookmarks', $this->paginate('Bookmark', [
@@ -33,7 +29,7 @@ class BookmarksController extends AppController
     public function add()
     {
         $bookmark = $this->Bookmark->newEntity();
-
+        
         if ($this->request->is(['post'])) {
             $bookmark = $this->Bookmark->newEntity($this->request->data);
             $bookmark->user_id = $this->Auth->user('id');
