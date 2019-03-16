@@ -104,37 +104,6 @@ class Number
     }
 
     /**
-     * Parses a localized string
-     * Use case converting user input.
-     *
-     * @example 123,456,789.25 -> 123456789.25
-     * @param string $string
-     * @param integer $format  NumberFormatter::DECIMAL, NumberFormatter::INT_32
-     * @return string
-     */
-
-    public static function parse(string $string, $type = NumberFormatter::DECIMAL)
-    {
-        $formatter = new NumberFormatter(static::$locale, $type);
-        return $formatter->parse($string);
-    }
-
-    public static function parseDecimal(string $string)
-    {
-        return static::parse($string, NumberFormatter::DECIMAL);
-    }
-
-    public static function parseInteger(string $string)
-    {
-        return static::parse($string, NumberFormatter::TYPE_INT32);
-    }
-
-    public static function parseFloat(string $string)
-    {
-        return static::parse($string, NumberFormatter::TYPE_DOUBLE);
-    }
-
-    /**
      * Formats a floating point number.
      *
      * @param float $value
@@ -170,6 +139,39 @@ class Number
         }
 
         return $options['before'].$formatted.$options['after'];
+    }
+
+
+
+    /**
+     * Parses a localized string
+     * Use case converting user input.
+     *
+     * @example 123,456,789.25 -> 123456789.25
+     * @param string $string
+     * @param integer $format  NumberFormatter::DECIMAL, NumberFormatter::INT_32
+     * @return string
+     */
+
+    public static function parse(string $string, $type = NumberFormatter::DECIMAL)
+    {
+        $formatter = new NumberFormatter(static::$locale, $type);
+        return $formatter->parse($string);
+    }
+
+    public static function parseDecimal(string $string)
+    {
+        return static::parse($string, NumberFormatter::DECIMAL);
+    }
+
+    public static function parseInteger(string $string)
+    {
+        return static::parse($string, NumberFormatter::TYPE_INT32);
+    }
+
+    public static function parseFloat(string $string)
+    {
+        return static::parse($string, NumberFormatter::TYPE_DOUBLE);
     }
 
     /**
