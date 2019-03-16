@@ -42,21 +42,21 @@ class FlashComponentTest extends \PHPUnit\Framework\TestCase
     public function testAddMessages()
     {
         $flashComponent = $this->FlashComponent;
-        $session = $flashComponent->request()->session();
+   
         $flashComponent->error('error called');
-        $this->assertEquals(['error called'], $session->read('Message.error'));
+        $this->assertEquals(['error called'], $flashComponent->Session->read('Message.error'));
         
         $flashComponent->success('success called');
-        $this->assertEquals(['success called'], $session->read('Message.success'));
+        $this->assertEquals(['success called'], $flashComponent->Session->read('Message.success'));
 
         $flashComponent->warning('warning called');
-        $this->assertEquals(['warning called'], $session->read('Message.warning'));
+        $this->assertEquals(['warning called'], $flashComponent->Session->read('Message.warning'));
 
         $flashComponent->info('info called');
-        $this->assertEquals(['info called'], $session->read('Message.info'));
+        $this->assertEquals(['info called'], $flashComponent->Session->read('Message.info'));
 
         // Test multiple messages
         $flashComponent->error('error called again');
-        $this->assertEquals(['error called','error called again'], $session->read('Message.error'));
+        $this->assertEquals(['error called','error called again'], $flashComponent->Session->read('Message.error'));
     }
 }

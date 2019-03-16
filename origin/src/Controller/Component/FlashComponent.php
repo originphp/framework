@@ -14,10 +14,13 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Core\Session;
-
+/**
+ * @property \App\Controller\Component\SessionComponent $Session
+ */
 class FlashComponent extends Component
 {
+    public $components = ['Session'];
+    
     public function error(string $message)
     {
         $this->addMessage('error', $message);
@@ -41,12 +44,12 @@ class FlashComponent extends Component
     public function addMessage(string $type, string $message)
     {
         $messages = [];
-        $sessionKey = "Message.{$type}";
-        $session = $this->request()->session();
-        if ($session->check($sessionKey)) {
-            $messages = $session->read($sessionKey);
+        $this->SessionKey = "Message.{$type}";
+       
+        if ($this->Session->check($this->SessionKey)) {
+            $messages = $this->Session->read($this->SessionKey);
         }
         $messages[] = $message;
-        $session->write($sessionKey, $messages);
+        $this->Session->write($this->SessionKey, $messages);
     }
 }

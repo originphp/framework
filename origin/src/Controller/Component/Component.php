@@ -16,9 +16,6 @@ namespace Origin\Controller\Component;
 
 use Origin\Controller\Controller;
 use Origin\Core\ConfigTrait;
-use Origin\Core\Logger;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
 
 class Component
 {
@@ -30,6 +27,14 @@ class Component
      * @var \Origin\Controller\Controller
      */
     protected $controller = null;
+
+
+    /**
+     * These are components that will be used within this component. Callbacks
+     *
+     * @var array
+     */
+    public $components = [];
 
     /**
      * Array of components and config. This poupulated by loadComponent
@@ -43,6 +48,19 @@ class Component
         $this->controller = $controller;
  
         $this->config($config);
+
+        // Deal components within components
+        foreach ($this->components as $name => $config) {
+            if (is_int($name)) {
+                $name = $config;
+                $config = [];
+            }
+            list($plugin, $component) = pluginSplit($name);
+            if (!isset($this->_components[$component])) {
+                $this->_components[$component] =  array_merge(['className' => $name . 'Component'], $config);
+            }
+        }
+      
         $this->initialize($config);
     }
 
@@ -59,39 +77,6 @@ class Component
             }
         }
         return null;
-    }
-
-    /**
-    * Sets another component to be loaded within this component. It will be
-    * lazy loaded when needed, startup/stutdown callbacks will not be called when loading
-    * components within components.
-    *
-    * @param string $component e.g Auth, Flash
-    * @param array $config
-    * @return void
-    */
-    public function loadComponent(string $name, array $config = [])
-    {
-        list($plugin, $component) = pluginSplit($name);
-        $config = array_merge(['className' => $name . 'Component'], $config);
-        $this->_components[$component] = $config;
-    }
-
-    /**
-     * Loads Multiple components through the loadComponent method
-     *
-     * @param array $components
-     * @return void
-     */
-    public function loadComponents(array $components)
-    {
-        foreach ($components as $component => $config) {
-            if (is_int($component)) {
-                $component = $config;
-                $config = [];
-            }
-            $this->loadComponent($component, $config);
-        }
     }
 
     /**
@@ -153,6 +138,6 @@ class Component
      */
     public function logger(string $channel = 'Component')
     {
-        return new Logger($channel);
+        return $this->controller->logger($channel);
     }
 }

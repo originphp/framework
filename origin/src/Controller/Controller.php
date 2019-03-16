@@ -26,8 +26,6 @@ use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
 use Origin\Core\Logger;
-use Origin\Exception\InvalidArgumentException;
-use Origin\Model\Entity;
 
 class Controller
 {
@@ -122,43 +120,6 @@ class Controller
         $this->componentRegistry = new ComponentRegistry($this);
 
         $this->initialize();
-    }
-
-    /**
-     * Load multiple components to be used in this controller.
-     *
-     * @param array $components array of components
-     */
-    public function loadComponents(array $components)
-    {
-        $this->loadObjects($components, 'loadComponent');
-    }
-
-    /**
-     * Load multiple helpers to be used in the view.
-     *
-     * @param array $components array of components
-     */
-    public function loadHelpers(array $helpers)
-    {
-        $this->loadObjects($helpers, 'loadHelper');
-    }
-
-    /**
-     * Background function for loading multiple Components/Helpers.
-     *
-     * @param array  $objects array of components or helpers
-     * @param string $method  which method to run them through
-     */
-    protected function loadObjects(array $objects, string $method)
-    {
-        foreach ($objects as $name => $config) {
-            if (is_int($name)) {
-                $name = $config;
-                $config = [];
-            }
-            $this->{$method}($name, $config);
-        }
     }
 
     /**

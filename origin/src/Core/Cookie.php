@@ -70,7 +70,7 @@ class Cookie
     public function delete(string $name)
     {
         unset($_COOKIE[$name]);
-        $this->write($name, null, time() - 3600);
+        $this->write($name, "", time() - 3600);
     }
 
     /**

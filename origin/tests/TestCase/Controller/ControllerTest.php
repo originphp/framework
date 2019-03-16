@@ -135,36 +135,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->loadComponent('Tron');
     }
 
-    public function testLoadComponents()
-    {
-        $request = new Request('tests/view/512');
-        $controller = new TestsController($request, new Response());
-
-        $controller = new TestsController($request, new Response());
-        $controller->loadComponents(['Tester' => ['className' => 'Origin\Test\Controller\TesterComponent']]);
-        $this->assertObjectHasAttribute('Tester', $controller);
-
-        $controller->loadComponents(['Flash']);
-        $this->assertObjectHasAttribute('Flash', $controller);
-    }
-
     public function testLoadHelper()
     {
         $request = new Request('tests/view/512');
         $controller = new TestsController($request, new Response());
         $controller->loadHelper('Tester', ['className' => 'Origin\Test\Controller\TesterHelper']);
         $this->assertArrayHasKey('Tester', $controller->viewHelpers);
-    }
-
-    public function testLoadHelpers()
-    {
-        $request = new Request('tests/view/512');
-        $controller = new TestsController($request, new Response());
-        $controller->loadHelpers(['Tester' => ['className' => 'Origin\Test\Controller\TesterHelper']]);
-        $this->assertArrayHasKey('Tester', $controller->viewHelpers);
-        // test no config passed
-        $controller->loadHelpers(['Form']);
-        $this->assertArrayHasKey('Form', $controller->viewHelpers);
     }
 
     public function testSet()

@@ -17,8 +17,6 @@ namespace Origin\View\Helper;
 use Origin\View\View;
 use Origin\Core\ConfigTrait;
 use Origin\Core\Logger;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
 
 class Helper
 {
@@ -30,7 +28,12 @@ class Helper
        */
     protected $view = null;
 
-
+    /**
+     * These are helpers which will be used by this helper
+     *
+     * @var array
+     */
+    public $helpers = [];
     /**
      * Array of helpers and config. This poupulated by loadHelper
      *
@@ -43,6 +46,19 @@ class Helper
         $this->view = $view;
         
         $this->config($config);
+
+        // Deal helpers within helpers
+        foreach ($this->helpers as $name => $config) {
+            if (is_int($name)) {
+                $name = $config;
+                $config = [];
+            }
+            list($plugin, $helper) = pluginSplit($name);
+            if (!isset($this->_helpers[$helper])) {
+                $this->_helpers[$helper] =  array_merge(['className' => $name . 'Helper'], $config);
+            }
+        }
+
         $this->initialize($config);
     }
 
@@ -60,39 +76,6 @@ class Helper
             if (isset($this->{$name})) {
                 return $this->{$name};
             }
-        }
-    }
-
-    /**
-    * Sets another helper to be loaded within this helper. It will be
-    * lazy loaded when needed, startup/stutdown callbacks will not be called when loading
-    * helpers within helpers.
-    *
-    * @param string $helper e.g Auth, Flash
-    * @param array $config
-    * @return Helper
-    */
-    public function loadHelper(string $name, array $config = [])
-    {
-        list($plugin, $helper) = pluginSplit($name);
-        $config = array_merge(['className' => $name . 'Helper'], $config);
-        $this->_helpers[$helper] = $config;
-    }
-
-    /**
-     * Loads Multiple helpers through the loadHelper method
-     *
-     * @param array $helpers
-     * @return void
-     */
-    public function loadHelpers(array $helpers)
-    {
-        foreach ($helpers as $helper => $config) {
-            if (is_int($helper)) {
-                $helper = $config;
-                $config = [];
-            }
-            $this->loadHelper($helper, $config);
         }
     }
 

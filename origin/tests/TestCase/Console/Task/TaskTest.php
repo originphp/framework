@@ -58,25 +58,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
             $this->MockTask->taskRegistry()
         );
     }
-    /**
-     * This will test task and tasks function which uses task function
-     *
-     * @return void
-     */
-    public function testLoadTasks()
-    {
-        $this->MockTask->loadTasks([
-            'Apple',
-            'Orange' => ['type'=>'Fruit']
-        ]);
-        $expected = [
-            'Apple' => ['className'=>'AppleTask'],
-            'Orange' => ['className'=>'OrangeTask','type'=>'Fruit'],
-        ];
-
-        $this->assertEquals($expected, $this->MockTask->getTasks());
-    }
-
+  
     public function testShell()
     {
         $this->assertEquals($this->MockShell, $this->MockTask->shell());
@@ -91,11 +73,6 @@ class TaskTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("Foo bar\n", stream_get_contents($stream));
     }
 
-    /**
-     * @depends testLoadTasks
-     *
-     * @return void
-     */
     public function testLoading()
     {
         $this->MockTask->taskRegistry()->set('Dummy', new DummyTask());

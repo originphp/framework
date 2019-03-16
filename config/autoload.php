@@ -2,7 +2,7 @@
 use Origin\Core\Autoloader;
 
 $autoloader = Autoloader::getInstance();
-$autoloader->setFolder(ROOT);
+$autoloader->directory(ROOT);
 
 $namespaces = [
     'App' => 'src',

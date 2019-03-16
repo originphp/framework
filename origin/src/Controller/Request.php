@@ -243,16 +243,16 @@ class Request
      * @param string|array $type
      * @return bool
      */
-    public function accepts($type) : bool
+    public function accepts($type=null) : bool
     {
-        if (!is_array($type)) {
-            $type = (array) $type;
-        }
         $path = parse_url($this->url(), PHP_URL_PATH);
       
-        $acceptHeaders = explode(',', $this->env('HTTP_ACCEPT'));
+        $acceptHeaders = $this->parseAcceptWith($this->env('HTTP_ACCEPT'));
+        if ($type === null) {
+            return $acceptHeaders;
+        }
 
-        foreach ($type as $needle) {
+        foreach ((array) $type as $needle) {
             if (in_array($needle, $acceptHeaders)) { // does not find application/xml;q=0.9
                 return true;
             }
@@ -269,23 +269,65 @@ class Request
     }
 
     /**
-     * Gets en enviroment variable from $_SERVER.
+     * Gets a list of accepted languages, checks if a specific language is accepted
+     *
+     * @param string $language
+     * @return array|bool
+     */
+    public function acceptLanguage(string $language = null)
+    {
+        $acceptedLanguages = [];
+        $languages = $this->parseAcceptWith($this->env('HTTP_ACCEPT_LANGUAGE'));
+        foreach ($languages as $lang) {
+            $acceptedLanguages[] = str_replace('-', '_', $lang);
+        }
+        
+        if ($language === null) {
+            return $acceptedLanguages;
+        }
+    
+        return in_array($language, $acceptedLanguages);
+    }
+
+    /**
+     * Parse accept headers into arrays
+     * example: en-GB,en;q=0.9,es;q=0.8 becomes [en-GB,en,es]
+     *
+     * @param string $header
+     * @return array
+     */
+    protected function parseAcceptWith(string $header) : array
+    {
+        $accepts = [];
+        $values = explode(',', $header);
+        foreach ($values as $value) {
+            $value = trim($value);
+            $pos = strpos($value, ';');
+            if ($pos !== false) {
+                $value = substr($value, 0, $pos);
+            }
+            $accepts[] = $value;
+        }
+        return $accepts;
+    }
+
+    /**
+     * Gets an enviroment variable from $_SERVER.
      *
      * @param string $key
-     *
-     * @return
+     * @return string|null
      */
-    public function env(string $key)
+    public function env(string $key) : ?string
     {
         if (isset($_SERVER[$key])) {
             return $_SERVER[$key];
         }
 
-        return false;
+        return null;
     }
 
     /**
-     * Lazy loads and returns the session object
+     * Returns the session
      *
      * @return \Origin\Core\Session
      */
@@ -298,24 +340,25 @@ class Request
     }
 
     /**
-     * Lazy loads and returns the cookie object. If a
-     * key is specified then it will return the value of that
-     * key.
+     * Reads a cookie value from the request. Cookies set
+     * using the response::cookie would not of been sent yet.
      *
-     * @return \Origin\Core\Cookie
+     * @return string|null
      */
-    public function cookie(string $key = null)
+    public function cookie(string $key) : ?string
     {
         if ($this->cookie === null) {
             $this->cookie = new Cookie();
         }
-        if ($key) {
-            return $this->cookie->read($key);
-        }
-        return $this->cookie;
+        return $this->cookie->read($key);
     }
 
-    protected function readInput()
+    /**
+     * Reads the php://input stream
+     *
+     * @return string
+     */
+    protected function readInput() : ?string
     {
         $fh = fopen('php://input', 'r');
         $contents = stream_get_contents($fh);

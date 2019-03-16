@@ -109,17 +109,6 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf('Origin\Test\View\TesterHelper', $view->Tester);
     }
 
-    public function testLoadHelpers()
-    {
-        $request = new Request('tests/edit/2048');
-        $controller = new TestsController($request, new Response());
-        $view = new MockView($controller);
-
-        $view->callMethod('loadHelpers', [['Tester' => ['className' => 'Origin\Test\View\TesterHelper']]]);
-
-        $this->assertObjectHasAttribute('Tester', $view);
-    }
-
     public function testViewFilename()
     {
         $request = new Request('tests/edit/2048');

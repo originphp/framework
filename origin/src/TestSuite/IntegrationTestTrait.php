@@ -243,7 +243,6 @@ trait IntegrationTestTrait
             $_SERVER[$key] = $value;
         }
             
-       
         $this->request = new Request($url);
         $this->request->session()->destroy();
        

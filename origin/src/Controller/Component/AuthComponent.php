@@ -15,7 +15,6 @@
 namespace Origin\Controller\Component;
 
 use Origin\Core\Router;
-use Origin\Core\Session;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
@@ -25,6 +24,9 @@ use Origin\Exception\ForbiddenException;
  * Authenticate, 'Form' and/Or 'Http' .
  * Login Action - Login Screen
  * Scope - Additional fields e.g active = 1.
+ */
+/**
+ * @property \App\Controller\Component\SessionComponent $Session
  */
 class AuthComponent extends Component
 {
@@ -71,9 +73,9 @@ class AuthComponent extends Component
      */
     public $request = null;
 
+    public $components = ['Flash','Session'];
     public function initialize(array $config)
     {
-        $this->loadComponent('Flash');
         $this->request =& $this->controller()->request;
     }
 
@@ -151,7 +153,8 @@ class AuthComponent extends Component
      */
     public function setUser(Entity $user)
     {
-        $this->request->session()->write('Auth.User', $user->toArray());
+        $this->Session = $this->Session;
+        $this->Session->write('Auth.User', $user->toArray());
     }
 
     /**
@@ -163,9 +166,9 @@ class AuthComponent extends Component
     public function redirectUrl()
     {
         $redirectUrl = $this->config['loginRedirect'];
-        if ($this->request->session()->check('Auth.redirect')) {
-            $redirectUrl = $this->request->session()->read('Auth.redirect');
-            $this->request->session()->delete('Auth.redirect');
+        if ($this->Session->check('Auth.redirect')) {
+            $redirectUrl = $this->Session->read('Auth.redirect');
+            $this->Session->delete('Auth.redirect');
         }
 
         return $redirectUrl;
@@ -181,7 +184,7 @@ class AuthComponent extends Component
      */
     public function logout()
     {
-        $this->request->session()->delete('Auth');
+        $this->Session->delete('Auth');
 
         $logoutRedirect = $this->config['loginAction'];
         if ($this->config['logoutRedirect']) {
@@ -199,7 +202,7 @@ class AuthComponent extends Component
      */
     public function user(string $property = null)
     {
-        $user = $this->request->session()->read('Auth.User');
+        $user = $this->Session->read('Auth.User');
         if ($user === null) {
             return null;
         }
@@ -284,7 +287,7 @@ class AuthComponent extends Component
 
     public function isLoggedIn()
     {
-        return $this->request->session()->check('Auth.User');
+        return $this->Session->check('Auth.User');
     }
 
     protected function isPrivateOrProtected(string $action)
@@ -338,7 +341,7 @@ class AuthComponent extends Component
 
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
-            $this->request->session()->write('Auth.redirect', $this->request->url());
+            $this->Session->write('Auth.redirect', $this->request->url());
             return $controller->redirect(Router::url($this->config['loginAction']));
         }
        

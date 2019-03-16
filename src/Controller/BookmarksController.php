@@ -3,6 +3,8 @@ namespace App\Controller;
 
 /**
  * @property \App\Model\Bookmark $Bookmark
+ * @property \Origin\Controller\Component\SessionComponent $Session
+ * @property \Origin\Controller\Component\CookieComponent $Cookie
  */
 class BookmarksController extends AppController
 {

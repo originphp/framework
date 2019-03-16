@@ -126,17 +126,6 @@ class View
         return $this->{$helper};
     }
 
-    protected function loadHelpers(array $helpers)
-    {
-        foreach ($helpers as $helper => $config) {
-            if (is_int($helper)) {
-                $helper = $config;
-                $config = [];
-            }
-            $this->loadHelper($helper, $config);
-        }
-    }
-
     public function element(string $name, array $vars = [])
     {
         $element__filename = $this->getElementFilename($name);

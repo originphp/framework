@@ -109,15 +109,6 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($mockTask, $shell->MockTask);
     }
 
-    public function testLoadTasks()
-    {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
-        $mockTask = new MockTask($shell);
-        $shell->taskRegistry()->set('MockTask', $mockTask);
-        $shell->loadTasks(['MockTask']);
-        $this->assertEquals($mockTask, $shell->MockTask);
-    }
-
     /**
      * @depends testLoadTask
      */

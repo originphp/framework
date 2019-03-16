@@ -15,10 +15,10 @@
 namespace Origin\Test\Controller\Component;
 
 use Origin\Controller\Component\Component;
-use Origin\Controller\Component\ComponentRegistry;
 use Origin\Controller\Controller;
-use Origing\Controller\Component\AuthComponent;
-use Origin\Controller\Component\Exception\MissingComponentException;
+use Origin\Controller\Request;
+use Origin\Controller\Response;
+use Origin\Controller\Logger;
 
 class MockComponent extends Component
 {
@@ -36,36 +36,18 @@ class ComponentTest extends \PHPUnit\Framework\TestCase
         $this->MockComponent = new MockComponent($Controller);
     }
 
-    public function testLoadComponents()
-    {
-        $MockComponent = $this->MockComponent;
-        $MockComponent->loadComponents([
-            'Apple',
-            'Orange' => ['type'=>'Fruit']
-        ]);
-        
-        $expected = [
-            'Apple' => ['className'=>'AppleComponent'],
-            'Orange' => ['className'=>'OrangeComponent','type'=>'Fruit'],
-        ];
-
-        $this->assertEquals($expected, $MockComponent->getComponents());
-    }
-
     public function testController()
     {
-        $this->assertInstanceOf('Origin\Controller\Controller', $this->MockComponent->controller());
+        $this->assertInstanceOf(Controller::class, $this->MockComponent->controller());
     }
 
-    /**
-     * @depends testLoadComponents
-     */
-    public function testLoading()
+    public function testRequest()
     {
-        $MockComponent = $this->MockComponent;
-        $MockComponent->loadComponent('Auth');
-  
-        $this->assertInstanceOf('Origin\Controller\Component\AuthComponent', $MockComponent->Auth);
-        $this->assertNull($MockComponent->nonExistant);
+        $this->assertInstanceOf(Request::class, $this->MockComponent->request());
+    }
+
+    public function testResponse()
+    {
+        $this->assertInstanceOf(Response::class, $this->MockComponent->response());
     }
 }

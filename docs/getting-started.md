@@ -11,7 +11,7 @@ Download the source code from [Git Hub](https://github.com/originphp/originphp) 
 If you have GIT installed, then you can run the following command from your source code folder to download the source into a folder called blog.
 
 ```bash
-$ git clone https://github.com/originphp/originphp.git blog.
+$ git clone https://github.com/originphp/originphp.git blog
 ```
 
 Download and install [Docker](https://www.docker.com/products/docker-desktop) and let this rock your world. Your app will be built within a docker container, which you can start and shutdown as needed. The Docker container is only intended for development, and it will act very similar to a real server.
@@ -48,16 +48,17 @@ FLUSH PRIVILEGES;
 
 NOTE: You can also acces the MySql server using any database management application using `localhost` port `3306`. Windows users can use [Sequel Pro](https://www.sequelpro.com/) or Mac users can use [Heidi SQL](https://www.heidisql.com/).
 
-In the config folder there is a file called `database.php.default`, save this as `database.php` in the `config` folder making sure that you set the username and password. To access the MySQL server from within the Docker container, we need to use its name which is `db` and not `localhost`.
+Open the `database.php.default` in your IDE, I recommend [Visual Studio Code](https://code.visualstudio.com/). Set the host, database, username and password as follows and then save a copy as `database.php`.
 
 ```php
 ConnectionManager::config('default', [
-    'host' => 'db',
+    'host' => 'db', // Docker MySQL container
     'database' => 'bookmarks',
     'username' => 'origin',
     'password' => 'secret'
 ]);
 ```
+NOTE: To access the MySQL server from within the Docker container, we need to use its name which is `db` and not `localhost`.
 
 If all went well when you go to [http://localhost:8000](http://localhost:8000)  it should now say that it is connected to the database.
 
@@ -66,3 +67,35 @@ Finally, we need to import the tables, this information is in a file called `sch
 ```bash
 $ bin/console schema import
 ```
+
+Now that this has been done  goto [http://localhost:8000/users/login](http://localhost:8000/users/login) use the username `demo@example.com` and password `origin` to login.
+
+The bookmarks app also has its own console application, which shows you some features of the CLI.
+
+Run the following command to show the available options, one of those is uninstall which you can use later to remove all the Bookmarks files. First you should look around the source and get a feel for everything.
+
+```bash
+$ bin/console bookmarks
+```
+
+To uninstall the bookmarks files
+
+```bash
+$ bin/console bookmarks uninstall
+```
+
+Once you have uninstalled, you can give the code generation a go. This will generate code using the database. You can easily customise the templates, the templates can be found in `plugins/generate/src/Template`. 
+
+To see the command line options:
+```bash
+$ bin/console generate
+```
+To generate code using the database
+
+```bash
+$ bin/console generate all
+```
+
+Now go to [http://localhost:8000/bookmarks](http://localhost:8000/bookmarks) to see the code in action.
+
+See the other guides for more information.

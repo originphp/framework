@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use Origin\Controller\Controller;
@@ -15,19 +14,46 @@ class AppController extends Controller
     {
         parent::initialize();
 
-        $this->loadComponent('Auth');
-        $this->loadComponent('Flash');
+        /**
+         * Core components to be loaded by default
+         */
         $this->loadComponent('Session');
+        $this->loadComponent('Cookie');
+        $this->loadComponent('Flash');
 
+        $this->loadComponent('Auth'); // For Bookmarks
+
+        /**
+         * Load Core Helpers (These are lazy loaded)
+         */
+        $this->loadHelper('Session');
+        $this->loadHelper('Cookie');
+        $this->loadHelper('Flash');
         $this->loadHelper('Html');
         $this->loadHelper('Form');
-        $this->loadHelper('Flash');
         $this->loadHelper('Number');
         $this->loadHelper('Date');
 
         /*
-         * Start I18n. This will autodetect locale and settings if you do not pass array
-         * with settings. e.g ['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']
+         * I18n (Numbers,Dates, Translation etc)
+         *
+         * Autodetect locale and language from browser:
+         *
+         * I18n::initialize();
+         *
+         * To manually set:
+         *
+         * I18n::initialize(['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']);
+         *
+         * Set for a logged in user
+         *
+         * if($this->Auth->isLoggedIn()){
+         *   I18n::initialize(
+         *      'locale' => $this->Auth->user('locale'),
+         *      'language' => $this->Auth->user('language'),
+         *      'timezone' => $this->Auth->user('timezone'),
+         *      );
+         * }
          */
         I18n::initialize();
     }
@@ -39,7 +65,6 @@ class AppController extends Controller
     {
     }
 
-
     /**
      * This is called after the after the action has been run before the view has
      * been rendered but beore the after filter.
@@ -49,7 +74,7 @@ class AppController extends Controller
     }
 
     /**
-     * This is called after the controller action is executed, and view has been generated
+     * This is called after the controller action is executed, and view has been rendered
      * but before it has been sent to the client.
      */
     public function afterFilter()

@@ -14,9 +14,11 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\Session;
 use Origin\View\TemplateTrait;
 
+/**
+ * @property \App\View\Helper\SessionHelper $Session
+ */
 class FlashHelper extends Helper
 {
     use TemplateTrait;
@@ -30,22 +32,23 @@ class FlashHelper extends Helper
     ),
   );
 
+    public $helpers = ['Session'];
+
     public function messages()
     {
-        $session = $this->request()->session();
-        if (!$session->check('Message')) {
+        if (!$this->Session->check('Message')) {
             return null;
         }
         $output = '';
 
-        foreach ($session->read('Message') as $template => $messages) {
+        foreach ($this->Session->read('Message') as $template => $messages) {
             if (isset($this->config['templates'][$template])) {
                 foreach ($messages as $message) {
                     $output .= sprintf($this->config['templates'][$template], $message);
                 }
             }
         }
-        $session->delete('Message');
+        $this->Session->delete('Message');
 
         return $output;
     }
