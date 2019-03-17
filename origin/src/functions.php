@@ -165,7 +165,7 @@ function now()
  * results).
  *
  * @param array $array
- * @return void
+ * @return \Origin\Utility\Collection
  */
 function collection($items)
 {
