@@ -58,13 +58,13 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
           'author' => array(
             'id' => 2048,
             'name' => 'Jon',
-            'created' => ['date'=>'22/01/2019','time'=>'01:42pm']
+            'created' => '2018-10-01 13:41:00'
           ),
           'tags' => array(
-            array('tag' => 'new', 'created' => ['date'=>'22/01/2019','time'=>'01:43pm']),
+            array('tag' => 'new', 'created' => '2018-10-01 13:42:00'),
             array('tag' => 'featured'),
           ),
-          'created' => ['date'=>'22/01/2019','time'=>'01:41pm']
+          'created' => '2018-10-01 13:43:00'
         );
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
@@ -77,21 +77,18 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Some article title', $entity->title);
         $this->assertTrue(is_array($entity->author));
         $this->assertTrue(is_array($entity->tags));
-        $this->assertEquals('2020-10-01 13:41:00', $entity->created);
+   
+        $this->assertEquals('2018-10-01 13:43:00', $entity->created);
 
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
         $Marshaller = new Marshaller($Article);
 
         $entity = $Marshaller->one($data, ['name' => 'Article']);
-        $this->assertEquals('2020-10-01 13:42:00', $entity->author->created);
-        $this->assertEquals('2020-10-01 13:43:00', $entity->tags[0]->created);
+        $this->assertEquals('2018-10-01 13:41:00', $entity->author->created);
+        $this->assertEquals('2018-10-01 13:42:00', $entity->tags[0]->created);
         $this->assertInstanceOf(Entity::class, $entity->author);
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
-
-        // Test no parsing (as no model spec)
-        $entity = $Marshaller->one($data);
-        $this->assertEquals('22/01/2019', $entity->created['date']);
     }
 
     /**

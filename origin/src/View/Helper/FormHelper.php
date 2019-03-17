@@ -423,19 +423,7 @@ class FormHelper extends Helper
     public function date(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-
         $options['type'] = 'text';
-
-        if (Configure::read('I18n.parse')) {
-            if (!isset($options['placeholder'])) {
-                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'));
-            }
-            
-            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
-                $options['value'] = Date::formatDate($options['value']);
-            }
-        }
-        
 
         return $this->template('input', $options);
     }
@@ -451,44 +439,7 @@ class FormHelper extends Helper
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
 
-        if (!Configure::read('I18n.parse')) {
-            return $this->template('input', $options);
-        }
-
-        $dateOptions = $timeOptions = $options;
-        $dateString = '';
-
-        // Parse datetime strings
-        if (isset($options['value'])) {
-            if (strpos($options['value'], ':') !== false) {
-                list($dateOptions['value'], $timeOptions['value']) = explode(' ', $options['value']);
-                // $timeOptions['value'] = substr($timeOptions['value'], 0, -3);
-            }
-        }
-        // Deal validtion errors
-        if (!isset($options['value']) and $this->data) {
-            $entity = $this->getEntity($this->data, $name);
-            $parts = explode('.', $name);
-            $last = end($parts);
-            if (isset($entity->{$last}) and is_array($entity->{$last})) {
-                $arrayData = $entity->{$last};
-                $dateOptions['value'] = $arrayData['date'] ?? '';
-                $timeOptions['value'] = $arrayData['time'] ?? '';
-            }
-        }
-
-        $dateOptions['name'] = $name .'[date]';
-        $date = $this->date($name, $dateOptions);
-
-        $tOptions = $this->prepareOptions($name.'_time', []); // Get Value
-        if (isset($tOptions['value'])) {
-            $timeOptions['value'] = $tOptions['value'];
-        }
-
-        $timeOptions['name'] = $name .'[time]';
-        $time = $this->time($name.'_time', $timeOptions);
-
-        return $date.$time;
+        return $this->template('input', $options);
     }
 
     /**
@@ -549,16 +500,6 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
-
-        if (Configure::read('I18n.parse')) {
-            if (!isset($options['placeholder'])) {
-                $options['placeholder'] = 'e.g. '.Date::format(date('H:i:s'));
-            }
-
-            if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
-                $options['value'] = Date::formatTime($options['value']);
-            }
-        }
          
         return $this->template('input', $options);
     }
@@ -567,10 +508,6 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
-   
-        if (!empty($options['value'])) {
-            $options['value'] = Number::format($options['value']);
-        }
 
         return $this->template('input', $options);
     }

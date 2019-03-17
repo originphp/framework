@@ -77,7 +77,15 @@ class Request
      */
     protected $cookie = null;
 
-    
+    /**
+     * Original Headers
+     *
+     * @var array
+     */
+    protected $headers = [];
+
+    protected $headersNames = [];
+
     /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
@@ -105,6 +113,13 @@ class Request
 
         $this->processGet($url);
         $this->processPost();
+
+        if (PHP_SAPI != 'cli') {
+            $this->headers = getallheaders();
+            foreach ($this->headers as $key => $value) {
+                $this->headersNames[strtolower($key)] = $key;
+            }
+        }
 
         Router::setRequest($this);
     }
@@ -227,11 +242,7 @@ class Request
         }
         throw new MethodNotAllowedException();
     }
-    protected $accepts = [
-        'json' => 'application/json',
-        'xml' => 'application/xml'
-    ];
-
+ 
     /**
      * Checks if the request accepts, this will search the HTTP accept, extension
      * being called.
@@ -247,7 +258,7 @@ class Request
     {
         $path = parse_url($this->url(), PHP_URL_PATH);
       
-        $acceptHeaders = $this->parseAcceptWith($this->env('HTTP_ACCEPT'));
+        $acceptHeaders = $this->parseAcceptWith($this->header('accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
@@ -277,7 +288,7 @@ class Request
     public function acceptLanguage(string $language = null)
     {
         $acceptedLanguages = [];
-        $languages = $this->parseAcceptWith($this->env('HTTP_ACCEPT_LANGUAGE'));
+        $languages = $this->parseAcceptWith($this->header('accept-language'));
         foreach ($languages as $lang) {
             $acceptedLanguages[] = str_replace('-', '_', $lang);
         }
@@ -327,6 +338,37 @@ class Request
     }
 
     /**
+     * Sets or gets a header
+     *
+     * @param string $name
+     * @param string $value
+     * @return string|null
+     */
+    public function header(string $name, string $value = null)
+    {
+        $normalized = strtolower($name); // psr thing
+        if ($value === null) {
+            if (isset($this->headersMap[$normalized])) {
+                $key = $this->headersMap[$normalized];
+                return $this->headers[$key];
+            }
+            return '';
+        }
+        $this->headers[$name] = $value;
+        $this->headersNames[$normalized] = $name;
+    }
+
+    /**
+     * Return all headers
+     *
+     * @return array
+     */
+    public function headers() : array
+    {
+        return $this->headers;
+    }
+
+    /**
      * Returns the session
      *
      * @return \Origin\Core\Session
@@ -343,12 +385,15 @@ class Request
      * Reads a cookie value from the request. Cookies set
      * using the response::cookie would not of been sent yet.
      *
-     * @return string|null
+     * @return string|array|null
      */
-    public function cookie(string $key) : ?string
+    public function cookie(string $key = null)
     {
         if ($this->cookie === null) {
             $this->cookie = new Cookie();
+        }
+        if ($key === null) {
+            return $_COOKIE;
         }
         return $this->cookie->read($key);
     }

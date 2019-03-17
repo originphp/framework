@@ -262,25 +262,19 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function testDate()
     {
         $FormHelper = $this->FormHelper;
-        $placeholder =  'e.g. '. Date::format(date('Y-m-d'));
-        $expected = "<input type=\"text\" name=\"date\" placeholder=\"{$placeholder}\">";
+        $expected = "<input type=\"text\" name=\"date\">";
         $this->assertEquals($expected, $FormHelper->date('date'));
     }
 
     public function testTime()
     {
         $FormHelper = $this->FormHelper;
-        $placeholder =  'e.g. '. Date::format(date('H:i:s'));
-        $expected = "<input type=\"text\" name=\"time\" placeholder=\"{$placeholder}\">";
+        $expected = "<input type=\"text\" name=\"time\">";
         $this->assertEquals($expected, $FormHelper->time('time'));
     }
 
     public function testDatetime()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-          );
-
         $FormHelper = $this->FormHelper;
 
         $expected = '<input type="text" name="datetime">';
