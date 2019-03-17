@@ -55,11 +55,8 @@ class BookmarksController extends AppController
         $bookmark = $this->Bookmark->get($id, [
            'associated' => ['Tag']
         ]);
-    
+
         if ($this->request->is(['post', 'put'])) {
-            pr($this->request->data);
-            pr($_POST);
-            die('x');
             $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data);
 
             if ($this->Bookmark->save($bookmark)) {

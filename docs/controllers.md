@@ -367,8 +367,8 @@ In every controller you will find a `request` and `response` object. The request
 To retrieve the full url including query string use `url` method, if you don't want the query string then pass false as an argument
 
 ```php
-$fullUrl = $request->url(); // url: /contacts/view/100?page=1
-$withoutQueryString = $request->url(false);// url: /contacts/view/100
+$url = $request->url(); // url: /contacts/view/100
+$withQuery = $request->url(true);// url: /contacts/view/100?page=1
 ```
 
 ### Determining the request method

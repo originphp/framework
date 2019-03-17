@@ -213,12 +213,13 @@ class Request
     }
 
     /**
-     * This will return the url of the request
-     * @example /contacts/view/100?page=1
-     * @param boolean $includeQuery
+     * This will return the url of the request without the query string unless you set includeQuery
+     * to true.
+     * @example /contacts/view/100
+     * @param boolean $includeQuery (default:false) /contacts/view/100?page=1
      * @return string
      */
-    public function url(bool $includeQuery = true)
+    public function url(bool $includeQuery = false)
     {
         $url = $this->url;
         if ($includeQuery and $this->query) {
