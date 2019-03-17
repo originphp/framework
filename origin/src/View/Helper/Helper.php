@@ -113,7 +113,7 @@ class Helper
         foreach ($attributes as $key => $value) {
             if ($value === true) {
                 $result[] = $key;
-            } else {
+            } elseif (is_scalar($value)) {
                 $result[] = "{$key}=\"{$value}\"";
             }
         }

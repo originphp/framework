@@ -58,7 +58,7 @@ class MockPaginatorComponent extends PaginatorComponent
 
 
 /**
- * @todo i think this test can be written without database access mocking fetchResults and check settings array is correct
+ * @todo i think this test can be written associatedout database access mocking fetchResults and check settings array is correct
  */
 class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 {
@@ -136,17 +136,17 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $Pet->Owner = new Owner();
 
         // Test foreign_keys
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['Owner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['Owner']]);
         $this->assertEquals(20, count($results));
 
-        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['Owner']]);
+        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['Owner']]);
         $this->assertEquals('asc', $results['order']['Owner.name']); // check alias.
 
         $Pet = new Pet();
         $Pet->belongsTo('MyOwner', ['foreignKey'=>'owner_id']);
         $Pet->MyOwner = new Model(['name'=>'MyOwner','alias'=>'MyOwner','table'=>'owners','datasource'=>'test']);
 
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','with'=>['MyOwner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['MyOwner']]);
         $this->assertEquals(20, count($results));
     }
 }

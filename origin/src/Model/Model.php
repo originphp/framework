@@ -1082,7 +1082,7 @@ class Model
              'page' => null,
              'offset' => null,
              'callbacks' => true,
-             'with' => []
+             'associated' => []
            );
 
         $options = array_merge($default, $options);
@@ -1324,11 +1324,11 @@ class Model
             $query['fields'] = $this->fields();
         }
 
-        $query['with'] = $this->withConfig($query);
+        $query['associated'] = $this->associatedConfig($query);
      
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
-                if (isset($query['with'][$alias]) === false) {
+                if (isset($query['associated'][$alias]) === false) {
                     continue;
                 }
 
@@ -1336,7 +1336,7 @@ class Model
                     throw new MissingModelException($config['className'].':'.$alias);
                 }
 
-                $config = array_merge($config, $query['with'][$alias]);
+                $config = array_merge($config, $query['associated'][$alias]);
               
                 $query['joins'][] = array(
                     'table' => $this->{$alias}->table,
@@ -1371,10 +1371,10 @@ class Model
      * @param array $query
      * @return void
      */
-    protected function withConfig(array $query)
+    protected function associatedConfig(array $query)
     {
         $contain = [];
-        foreach ((array) $query['with'] as $alias => $config) {
+        foreach ((array) $query['associated'] as $alias => $config) {
             if (is_int($alias)) {
                 $alias = $config;
                 $config = [];
@@ -1447,7 +1447,7 @@ class Model
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
-            if (isset($query['with'][$alias]) === false) {
+            if (isset($query['associated'][$alias]) === false) {
                 continue;
             }
 
@@ -1455,7 +1455,7 @@ class Model
                 throw new MissingModelException($config['className'].':'.$alias);
             }
 
-            $config = array_merge($config, $query['with'][$alias]);
+            $config = array_merge($config, $query['associated'][$alias]);
         
             if (empty($config['fields'])) {
                 $config['fields'] = $this->{$alias}->fields();
@@ -1476,7 +1476,7 @@ class Model
     protected function loadAssociatedHasAndBelongsToMany($query, $results)
     {
         foreach ($this->hasAndBelongsToMany as $alias => $config) {
-            if (isset($query['with'][$alias]) === false) {
+            if (isset($query['associated'][$alias]) === false) {
                 continue;
             }
 
@@ -1484,7 +1484,7 @@ class Model
                 throw new MissingModelException($config['className'] . ':' . $alias);
             }
 
-            $config = array_merge($config, $query['with'][$alias]);
+            $config = array_merge($config, $query['associated'][$alias]);
 
             $config['joins'][0] = array(
               'table' => $config['joinTable'],

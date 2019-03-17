@@ -186,6 +186,7 @@ class Request
 
         $this->processGet($url);
         $this->processPost();
+        $this->processFiles();
 
         if (PHP_SAPI != 'cli') {
             $this->headers = getallheaders();
@@ -247,27 +248,33 @@ class Request
      */
     protected function processPost()
     {
-        $data = [];
+        $data = (array) $_POST;
         if ($this->is(['put', 'patch', 'delete'])) {
             parse_str($this->readInput(), $data);
         }
         if ($this->is(['post'])) {
-            /**
-             * curl -i -X POST -H 'Content-Type: application/json' -d '{"title":"CNBC","url":"https://www.cnbc.com"}' http://localhost:8000/bookmarks/test
-             */
             if ($this->env('CONTENT_TYPE') === 'application/json') {
                 $data = json_decode($this->readInput(), true);
                 if (!is_array($data)) {
                     $data = [];
                 }
             }
-            if (!empty($_POST)) {
-                $data = $_POST;
-            }
         }
         $this->data = $data;
 
         return $data;
+    }
+
+    /**
+     * Process the files array
+     *
+     * @return void
+     */
+    protected function processFiles()
+    {
+        foreach ($_FILES as $name => $data) {
+            $this->data[$name] = $data;
+        }
     }
 
     /**

@@ -15,14 +15,14 @@ class BookmarksController extends AppController
     public function index()
     {
         $this->set('bookmarks', $this->paginate('Bookmark', [
-            'with' => ['User']
+           'associated' => ['User']
         ]));
     }
 
     public function view($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'with'=>['User','Tag']
+           'associated'=>['User','Tag']
             ]);
 
         $this->set('bookmark', $bookmark);
@@ -49,13 +49,17 @@ class BookmarksController extends AppController
         $this->set('categories', $this->Bookmark->categories);
     }
 
+
     public function edit($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'with' => ['Tag']
+           'associated' => ['Tag']
         ]);
     
         if ($this->request->is(['post', 'put'])) {
+            pr($this->request->data);
+            pr($_POST);
+            die('x');
             $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data);
 
             if ($this->Bookmark->save($bookmark)) {

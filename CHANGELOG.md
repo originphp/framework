@@ -34,7 +34,8 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
-- EntityToxml and toJson
+- params,data, args query and dynamic data getting.
+- Entity Toxml and toJson
 - Cookie object
 - Option to disable I18N date/number parsing
 - Cache system (Redis,Memcached,File,Apcu,Array and Null)
@@ -51,6 +52,9 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- getting associated data from find has been changed from with to assoicated and now matches up with saving.
+- Save now saves associated data
+- newEntity and patchEntity now have whitelist and associated now has to be specified
 - Entity changed hasProperty to has. 
 - Models now return collections for all 
 - Changed session from static to object and refactored. Now session is available from request.

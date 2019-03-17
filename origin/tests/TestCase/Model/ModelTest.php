@@ -500,14 +500,14 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('user', $objectVars);
         $this->assertArrayNotHasKey('comments', $objectVars);
 
-        $article = $Article->find('first', ['with'=>['User']]);
+        $article = $Article->find('first', ['associated'=>['User']]);
         $this->assertEquals('first-post', $article->slug);
 
         $this->assertTrue($article->has('user'));
         $this->assertFalse($article->has('comments'));
 
         // Fetch record with belongsTo/hasOne/and Has Many
-        $article = $Article->find('first', ['with'=>['User','Comment','Tag']]);
+        $article = $Article->find('first', ['associated'=>['User','Comment','Tag']]);
         $this->assertEquals('first-post', $article->slug);
         $objectVars = $article->properties();
 
@@ -519,7 +519,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(in_array('article', $objectVars));
 
         // Fetch record with belongsTo/hasOne/and Has many and related related
-        $article = $Article->find('first', ['with'=>['User','Comment'=>['with'=>['Article']],'Tag']]);
+        $article = $Article->find('first', ['associated'=>['User','Comment'=>['associated'=>['Article']],'Tag']]);
         $this->assertEquals('first-post', $article->slug);
         $objectVars = $article->properties();
         $this->assertContains('comments', $objectVars);

@@ -207,9 +207,9 @@ Each type of message will rendered in a div with its own class. The Flash compon
 - `error`
 
 ## Cookies
-You can work with cookies from controllers and views, The cookie object allows you easily work with cookies. All cookie values are stored as a json string and by default they are automatically encrypted.
+You can work with cookies from controllers and views, The cookie component allows you easily work with cookies. All cookie values are stored as a json string and by default they are automatically encrypted.
 
-Here are some examples how to use the Cookie component
+Here are some examples how to use it:
 
 ```php
 class ContactsController extends AppController
@@ -275,7 +275,8 @@ class ContactsController extends AppController
 }
 ```
 
- Remember there are quite a lot of status codes, including `418 I am a teapot`, so you might find it easier to work with a smaller group of them which can easily cover everything you need to do.
+ Remember there are quite a lot of status codes, including `418 I am a teapot`, many of the large enterpirses who have profesional apis only work with a small subset, these are a suggestion of the ones
+ which you should remember.
 
 | Status Code     | Definition                                                                                                |
 | ----------------|---------------------------------------------------------------------------------------------------------- |
