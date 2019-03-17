@@ -18,8 +18,8 @@ use Origin\Utility\Date;
 
 class DateHelper extends Helper
 {
-    public function format($dateString)
+    public function format(string $dateString, $format = null)
     {
-        return Date::format($dateString);
+        return Date::format($dateString, $format);
     }
 }

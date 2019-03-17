@@ -53,9 +53,9 @@ class NumberHelper extends Helper
      *
      * @return string 1234.56
      */
-    public function precision(float $value, int $precision = 2, array $options = [])
+    public function decimal(float $value, int $precision = 2, array $options = [])
     {
-        return Number::precision($value, $precision, $options);
+        return Number::decimal($value, $precision, $options);
     }
 
     /**
@@ -67,8 +67,8 @@ class NumberHelper extends Helper
      *
      * @return string 75.00%
      */
-    public function toPercentage(float $value, int $precision = 2, array $options = [])
+    public function percent(float $value, int $precision = 2, array $options = [])
     {
-        return Number::toPercentage($value, $precision, $options);
+        return Number::percent($value, $precision, $options);
     }
 }

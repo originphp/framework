@@ -47,14 +47,14 @@ class NumberTest extends \PHPUnit\Framework\TestCase
 
     public function testPrecision()
     {
-        $this->assertEquals('512.12', Number::precision(512.123456789, 2));
-        $this->assertEquals('512.12', Number::precision(512.123456789, 2));
+        $this->assertEquals('512.123', Number::decimal(512.123456789, 3));
+        $this->assertEquals('512.12', Number::decimal(512.123456789, 2));
     }
 
-    public function testToPercentage()
+    public function testpercent()
     {
-        $this->assertEquals('33.33%', Number::toPercentage(33.3333333));
-        $this->assertEquals('33.33%', Number::toPercentage(0.33333, 2, ['multiply' => true]));
+        $this->assertEquals('33.33%', Number::percent(33.3333333));
+        $this->assertEquals('33.33%', Number::percent(0.33333, 2, ['multiply' => true]));
     }
 
     public function testParse()

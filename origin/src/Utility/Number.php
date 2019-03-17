@@ -94,9 +94,9 @@ class Number
      *
      * @return string 75.00%
      */
-    public static function toPercentage(float $value, int $precision = 2, array $options = [])
+    public static function percent(float $value, int $precision = 2, array $options = [])
     {
-        if (isset($options['multiply']) and $options['multiply']) {
+        if (!empty($options['multiply'])) {
             $value = $value * 100;
         }
 
@@ -112,7 +112,7 @@ class Number
      *
      * @return string 1234.56
      */
-    public static function precision(float $value, int $precision = 2, array $options = [])
+    public static function decimal(float $value, int $precision = 2, array $options = [])
     {
         return static::format($value, ['precision' => $precision] + $options);
     }
@@ -140,8 +140,6 @@ class Number
 
         return $options['before'].$formatted.$options['after'];
     }
-
-
 
     /**
      * Parses a localized string
