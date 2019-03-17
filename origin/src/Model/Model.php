@@ -98,6 +98,12 @@ class Model
      */
     public $id = null;
 
+    /**
+     * Marshaller
+     *
+     * @var \Origin\Model\Marshaller
+     */
+    protected $marshaller = null;
 
     /**
      * Behavior registry object
@@ -360,16 +366,15 @@ class Model
      */
     public function hasOne(string $association, $options = [])
     {
-        $defaults = array(
+        $options += [
           'className' => $association,
           'foreignKey' => null,
           'conditions' => null,
           'fields' => null,
           'order' => null,
           'dependent' => false,
-        );
-        $options = array_merge($defaults, $options);
-
+        ];
+  
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscore($this->name).'_id';
         }
@@ -438,7 +443,7 @@ class Model
      */
     public function hasMany(string $association, $options = [])
     {
-        $defaults = array(
+        $options += [
           'className' => $association,
           'foreignKey' => null,
           'conditions' => [],
@@ -447,12 +452,10 @@ class Model
           'dependent' => false,
           'limit' => null,
           'offset' => null,
-        );
+        ];
 
-        $options = array_merge($defaults, $options);
-        $foreignKey = Inflector::underscore($this->name).'_id';
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = $foreignKey;
+            $options['foreignKey'] =  Inflector::underscore($this->name).'_id';
         }
 
         $this->hasMany[$association] = $options;
@@ -477,7 +480,7 @@ class Model
      */
     public function hasAndBelongsToMany(string $association, $options = [])
     {
-        $defaults = array(
+        $options += [
           'className' => $association,
           'joinTable' => null,
           'foreignKey' => null,
@@ -490,9 +493,7 @@ class Model
           'offset' => null,
           'through' => null,
           'mode' => 'replace',
-        );
-
-        $options = array_merge($defaults, $options);
+        ];
 
         if ($options['mode'] !== 'append') {
             $options['mode'] = 'replace';
@@ -510,12 +511,8 @@ class Model
         if (is_null($options['joinTable'])) {
             $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['through']));
         }
-
-        $foreignKey = Inflector::underscore($this->name).'_id';
-     
-
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = $foreignKey;
+            $options['foreignKey'] = Inflector::underscore($this->name).'_id';
         }
         if (is_null($options['associationForeignKey'])) {
             $options['associationForeignKey'] = Inflector::underscore($options['className']).'_id';
@@ -1680,48 +1677,35 @@ class Model
     }
 
     /**
-     * Returns a new Entity object, if an array of data is passed then it will marshal that data
-     * and dates,times,numbers will be parsed according to locale settings.
+     * Creates an instance of an Entity
      *
-     * options:
-     * parse - By default date/datetime/time/number
-     * fields will be parsed unless you set parse to false in the options.
      *
      * @param array $requestData
-     * @param array $options parse default is set to true
+     * @param array $options
      * @return \Origin\Model\Entity
      */
     public function newEntity(array $requestData = [], array $options=[])
     {
-        $options += ['name' => $this->alias,'new'=>true];
-        $marshaller = $this->marshaller();
-        
-        return $marshaller->one($requestData, $options);
+        $options += ['name' => $this->alias];
+        return $this->marshaller()->one($requestData, $options);
     }
 
     /**
-     * Creates many Entities from an array of data. The data goes through the marshalling process
-     * and dates,times,numbers are parsed according to locale.
+     * Creates many Entities from an array of data.
      *
      * @param array $data
      * @param array $options parse default is set to true
-    * @var array
+    * @var \Origin\Model\Collection
      */
     public function newEntities(array $requestData, array $options=[])
     {
-        $options += ['name' => $this->alias,'new'=>true];
-        $marshaller = $this->marshaller();
+        $options += ['name' => $this->alias];
 
-        return $marshaller->many($requestData, $options);
+        return new Collection($this->marshaller()->many($requestData, $options));
     }
 
     /**
-     * Merges data array into an entity. The data goes through the marshalling process
-     * and dates,times,numbers are parsed according to locale.
-     *
-     * options:
-     * parse - By default date/datetime/time/number
-     * fields will be parsed unless you set parse to false in the options.
+     * Merges data array into an entity.
      *
      * @param Entity $entity
      * @param array  $requestData
@@ -1730,8 +1714,7 @@ class Model
      */
     public function patchEntity(Entity $entity, array $requestData, array $options=[])
     {
-        $marshaller = $this->marshaller();
-        return $marshaller->patch($entity, $requestData, $options);
+        return $this->marshaller()->patch($entity, $requestData, $options);
     }
 
     /**
@@ -1741,7 +1724,7 @@ class Model
      */
     protected function marshaller()
     {
-        if (!isset($this->marshaller)) {
+        if ($this->marshaller === null) {
             $this->marshaller = new Marshaller($this);
         }
 
@@ -1801,7 +1784,7 @@ class Model
      * Returns a Logger Object
      *
      * @param string $channel
-     * @return Logger
+     * @return \Origin\Core\Logger
      */
     public function logger(string $channel = 'Model')
     {

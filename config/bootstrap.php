@@ -25,13 +25,6 @@ Cache::config('default', ['engine' => 'File']);
  */
 Configure::write('Security.salt', '-----ORIGIN PHP-----');
 
-/**
- * Recommended is true, if you don't want date,datetime,time or number fields to be parsed according
- * to the configured locale and timezone, then you can disable this. When you pass an array to newEntity or patchEntity
- * data goes through a marshalling process and this is where the parsing occurs.
- */
-Configure::write('I18n.parse', true);
-
 /*
  * Load your plugins here
  * @example Plugin::load('ContactManager');
