@@ -112,7 +112,7 @@ class Entity
      */
     public function __isset(string $property)
     {
-        return $this->hasProperty($property);
+        return $this->has($property);
     }
 
     /**
@@ -284,7 +284,7 @@ class Entity
      * @param string $property name of property
      * @return bool true of false
      */
-    public function hasProperty($property)
+    public function has($property)
     {
         return isset($this->_properties[$property]);
     }

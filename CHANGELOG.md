@@ -34,6 +34,8 @@ Delete tag:   git tag -d <tag_name>
 - Plugin config folder path moved so its consistent with rest of framework
 
 ### Added
+- EntityToxml and toJson
+- Cookie object
 - Option to disable I18N date/number parsing
 - Cache system (Redis,Memcached,File,Apcu,Array and Null)
 - Logger Object
@@ -49,6 +51,8 @@ Delete tag:   git tag -d <tag_name>
 - Templater now works with dot notation
 
 ### Changed
+- Entity changed hasProperty to has. 
+- Models now return collections for all 
 - Changed session from static to object and refactored. Now session is available from request.
 - Renamed controller startup/shutdown to before/after filter
 - Changed make plugin to generate
@@ -66,6 +70,8 @@ Delete tag:   git tag -d <tag_name>
 - Make controller delete action template changed to use object->id
 
 ### Removed
+- Parsing of I18n dates, numbers. Dates are a problem since the form helper works fine, but no solution for date picker, and there are sometimes issues with parsing invalid dates, returning wrong but valid dates. I don't think it  can be relied upon, and validating before parsing each date is going to be complicated. Some sort of hacking is required.
+- CookieComponent
 - Log Class
 - Deleted composer.lock
 - unused code in Entity and View

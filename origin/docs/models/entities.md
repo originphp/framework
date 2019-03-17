@@ -72,7 +72,7 @@ And for patching an existing entity
 
 or
 
-`$article->hasProperty('title')`
+`$article->has('title')`
 
 
 ## Set

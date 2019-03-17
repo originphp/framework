@@ -60,7 +60,7 @@ class BaseApplication
     }
 
     /**
-     * Loads a class as middleware
+     * Loads middleware using a class name
      *
      * Examples
      *

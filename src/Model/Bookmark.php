@@ -69,7 +69,7 @@ class Bookmark extends AppModel
      */
     public function beforeSave(Entity $entity, array $options = [])
     {
-        if ($entity->hasProperty('tag_string')) {
+        if ($entity->has('tag_string')) {
             $entity->tags = [];
             if ($entity->tag_string) {
                 $tags = explode(',', $entity->tag_string);

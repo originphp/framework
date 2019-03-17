@@ -666,37 +666,13 @@ class Model
         return $this->ModelValidator;
     }
 
-    /**
-     * Save model data to database, hasAndBelongsToMany will also be saved.
-     *
-     * # Options
-     *
-     * The options array can be passed with the following keys:
-     *
-     * - validate: wether to validate data or not
-     * - callbacks: call the callbacks duing each stage.  You can also put only before or after
-     * - transaction: wether to save through a database transaction (default:true)
-     *
-     * # Callbacks
-     *
-     * The following callbacks will called in this Model and enabled Behaviors
-     *
-     * - beforeValidate
-     * - afterValidate
-     * - beforeSave
-     * - afterSave
-     *
-     * @param entity $entity to save
-     * @param array  $options keys include:
-     *
-     * @return bool true or false
-     */
-    public function save(Entity $entity, array $options = [])
+  
+    protected function processSave(Entity $entity, array $options = [])
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
         $this->id = null;
-        if ($entity->hasProperty($this->primaryKey)) {
+        if ($entity->has($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
         }
 
@@ -829,9 +805,9 @@ class Model
                 $displayField = $this->{$association}->displayField;
 
                 // Either primaryKey or DisplayField must be set in data
-                if ($row->hasProperty($primaryKey)) {
+                if ($row->has($primaryKey)) {
                     $needle = $primaryKey;
-                } elseif ($row->hasProperty($displayField)) {
+                } elseif ($row->has($displayField)) {
                     $needle = $displayField;
                 } else {
                     return false;
@@ -896,27 +872,49 @@ class Model
     }
 
     /**
-     * Can save data with multiple associations.
-     *
-     * @param Entity $data    record
-     * @param array  $options (validate,callbacks,transaction)
-     *
-     * @return bool true or false
-     */
-    public function saveAssociated(Entity $data, $options = [])
+       * Save model data to database, hasAndBelongsToMany will also be saved.
+       *
+       * # Options
+       *
+       * The options array can be passed with the following keys:
+       *
+       * - validate: wether to validate data or not
+       * - callbacks: call the callbacks duing each stage.  You can also put only before or after
+       * - transaction: wether to save through a database transaction (default:true)
+       * - associated: an array of associated data to save as well
+       *
+       * # Callbacks
+       *
+       * The following callbacks will called in this Model and enabled Behaviors
+       *
+       * - beforeValidate
+       * - afterValidate
+       * - beforeSave
+       * - afterSave
+       *
+       * @param entity $entity to save
+       * @param array  $options keys include:
+       *
+       * @return bool true or false
+       */
+    public function save(Entity $data, $options = [])
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true,'associated'=>[]];
       
         $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
             $this->begin();
         }
+        $id = false;
         $result = true;
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
+            if (!in_array($alias, $options['associated'])) {
+                continue;
+            }
             $key = lcfirst($alias);
-            if ($data->hasProperty($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
+            if ($data->has($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
                 if (!$this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
                     break;
@@ -927,13 +925,16 @@ class Model
         }
 
         if ($result) {
-            $result = $this->save($data, $options);
+            $result = $this->processSave($data, $options);
         }
 
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
+                if (!in_array($alias, $options['associated'])) {
+                    continue;
+                }
                 $key = lcfirst($alias);
-                if ($data->hasProperty($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
+                if ($data->has($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
 
@@ -946,8 +947,11 @@ class Model
 
             // Save hasMany
             foreach ($this->hasMany as $alias => $config) {
+                if (!in_array($alias, $options['associated'])) {
+                    continue;
+                }
                 $key = Inflector::pluralize(lcfirst($alias));
-                if ($data->hasProperty($key)) {
+                if ($data->has($key)) {
                     $foreignKey = $this->hasMany[$alias]['foreignKey'];
                     foreach ($data->get($key) as $record) {
                         if ($record instanceof Entity and $record->modified()) {
@@ -1019,23 +1023,6 @@ class Model
         }
 
         return $result;
-    }
-
-    /**
-     * A wrappper for saveMany and saveAssociated.
-     *
-     * @param array|object $data   record or multiple records
-     * @param array        $params (validate|callbacks|transaction)
-     *
-     * @return bool true or false
-     */
-    public function saveAll($data, array $params = [])
-    {
-        if (is_object($data)) {
-            return $this->saveAssociated($data, $params);
-        }
-
-        return $this->saveMany($data, $params);
     }
 
     /**
@@ -1446,9 +1433,7 @@ class Model
     }
 
     /**
-     * Creates a new entity for this model, no parsing is carried out like
-     * in newEntity and if you pass data as an argument it will not process associated
-     * data (use newEntity).
+     * Creates a simple entity - no associated data
      *
      * @param array $data to build with entity with
      * @param array $options
@@ -1705,7 +1690,7 @@ class Model
     }
 
     /**
-     * Merges data array into an entity.
+     * Patches an existing entity with requested data
      *
      * @param Entity $entity
      * @param array  $requestData

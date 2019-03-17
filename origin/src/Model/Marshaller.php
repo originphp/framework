@@ -38,19 +38,50 @@ class Marshaller
      *
      * @return array
      */
-    protected function buildAssociationMap()
+    protected function buildAssociationMap($associated)
     {
         $map = [];
         $model = $this->model;
         foreach (array_merge($model->hasOne, $model->belongsTo) as $alias => $config) {
-            $map[lcfirst($alias)] = 'one';
+            if (in_array($alias, $associated)) {
+                $map[lcfirst($alias)] = 'one';
+            }
         }
         foreach (array_merge($model->hasMany, $model->hasAndBelongsToMany) as  $alias => $config) {
-            $key = Inflector::pluralize(lcfirst($alias));
-            $map[$key] = 'many';
+            if (in_array($alias, $associated)) {
+                $key = Inflector::pluralize(lcfirst($alias));
+                $map[$key] = 'many';
+            }
         }
-
+      
         return $map;
+    }
+
+   
+    public function prepareFieldOptions(array $options)
+    {
+        $associated = [];
+        if (isset($options['associated'])) {
+            $associated = $options['associated'];
+            unset($options['associated']);
+        }
+        return [$this->model->alias=>$options] + $associated;
+    }
+
+
+    protected function standardizeAssociated(array $array)
+    {
+        $result = [];
+       
+        foreach ($array as $key => $value) {
+            if (is_int($key)) {
+                $key = $value;
+                $value = [];
+            }
+            $value += ['fields'=>[]];
+            $result[$key] = $value;
+        }
+        return $result;
     }
 
     /**
@@ -61,26 +92,47 @@ class Marshaller
      *
      * @param array $data
      * @param array $options
-     * @return Entity
+     * @return \Origin\Model\
      */
     public function one(array $data, array $options=[])
     {
-        $options += ['name' => null];
+        $options += ['name' => null,'associated'=>[],'fields'=>[]];
 
-        $propertyMap = $this->buildAssociationMap($options);
-   
+        $options['associated'] = $this->standardizeAssociated($options['associated']);
+        $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
+        
         $entity = new Entity([], $options);
+
+        $properties = [];
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property]) and is_array($value)) {
                 $alias = $property;
+                $fields = [];
                 if ($propertyMap[$property] === 'many') {
                     $alias = Inflector::singularize($alias);
                 }
-                $entity->set($property, $this->{$propertyMap[$property]}($value, ['name'=>ucfirst($alias)]));
+                if (isset($options['associated'][$alias]['fields'])) {
+                    $fields = $options['associated'][$alias]['fields'];
+                    unset($options['associated'][$alias]);
+                }
+                $properties[$property] = $this->{$propertyMap[$property]}($value, [
+                    'name'=>ucfirst($alias),
+                    'fields' => $fields,
+                    'associated' => $options['associated'] // passing same data might
+                    ]);
             } else {
-                $entity->set($property, $value);
+                $properties[$property] = $value;
             }
         }
+        if ($options['fields']) {
+            foreach ($properties as $property => $value) {
+                if (in_array($property, $options['fields'])) {
+                    $entity->set($property, $value);
+                }
+            }
+            return $entity;
+        }
+        $entity->set($properties);
         return $entity;
     }
     
@@ -101,32 +153,57 @@ class Marshaller
     }
 
     /**
-     * Patches an existing entity, keeping track on changed fields (used by set, not actual value), this so
-     * when saving existing entities, we don't save non submited data
+     * Patches an existing entity, keeping track on changed fields (used by set, not actual value).
+     * NOTE: Associated data will create new entity, as related data can contain references to changed
+     * data.
      *
      * @param Entity $entity
      * @param array  $data
-     * @return Entity
+     * @return \Origin\Model\Entity
      */
     public function patch(Entity $entity, array $data, array $options=[])
     {
-        $options += ['name' => $entity->name()];
+        $options += ['name' => $entity->name(),'associated'=>[],'fields'=>[]];
         
         $entity->reset(); // reset modified
 
-        $propertyMap = $this->buildAssociationMap($options);
-        
+        $options['associated'] = $this->standardizeAssociated($options['associated']);
+        $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
+
+        $properties = [];
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property]) and is_array($value)) {
                 $alias = $property;
+                $fields = [];
                 if ($propertyMap[$property] === 'many') {
                     $alias = Inflector::singularize($alias);
                 }
-                $entity->set($property, $this->{$propertyMap[$property]}($value, ['name'=>ucfirst($alias)]));
+                if (isset($options['associated'][$alias]['fields'])) {
+                    $fields = $options['associated'][$alias]['fields'];
+                    unset($options['associated'][$alias]);
+                }
+
+                $properties[$property] = $this->{$propertyMap[$property]}($value, [
+                    'name'=>ucfirst($alias),
+                    'fields' => $fields,
+                    'associated' => $options['associated'] // passing same data might
+                    ]);
             } else {
-                $entity->set($property, $value);
+                $original = $entity->get($property);
+                if ($value !== $original) {
+                    $properties[$property] = $value;
+                }
             }
         }
+        if ($options['fields']) {
+            foreach ($properties as $property => $value) {
+                if (in_array($property, $options['fields'])) {
+                    $entity->set($property, $value);
+                }
+            }
+            return $entity;
+        }
+        $entity->set($properties);
         return $entity;
     }
 }

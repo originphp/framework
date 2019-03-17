@@ -174,7 +174,7 @@ class ModelCrudTest extends \PHPUnit\Framework\TestCase
     ));
 
         $User->begin();
-        $this->assertTrue($User->save($user));
+        $this->assertTrue($User->save($user, ['transaction'=>false]));
         $User->rollback();
 
         $params = array('conditions' => array('email' => 'tommy@example.com'));
@@ -194,7 +194,7 @@ class ModelCrudTest extends \PHPUnit\Framework\TestCase
         $params = array('conditions' => array('email' => 'claire@example.com'));
 
         $User->begin();
-        $this->assertTrue($User->save($user));
+        $this->assertTrue($User->save($user, ['transaction'=>false]));
         $User->commit();
         $this->assertEquals(1, $User->find('count', $params));
     }

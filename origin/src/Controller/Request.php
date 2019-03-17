@@ -50,6 +50,79 @@ class Request
     public $data = [];
 
     /**
+     * Returns all query data or value for a key
+     *
+     * @param string $key name of query
+     * @param mixed $default default value to return
+     * @return mixed
+     */
+    public function query(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->query;
+        }
+        if (isset($this->query[$key])) {
+            return $this->query[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Returns all data or value for a key
+     *
+     * @param string $key name of query
+     * @param mixed $default default value to return
+     * @return mixed
+     */
+    public function data(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->data;
+        }
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Returns all params data or value for a key
+     *
+     * @param string $key name of parameter
+     * @param mixed $default default value to return
+     * @return mixed
+     */
+    public function params(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->params;
+        }
+        if (isset($this->params[$key])) {
+            return $this->params[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Convienice method for getting passed arguments
+     *
+     * @return array
+     */
+    public function args() : args
+    {
+        return $this->params['pass'];
+    }
+
+
+    /**
+     * Getting data using dynamic properties
+     */
+    public function __get($name)
+    {
+        return $this->data($name);
+    }
+
+    /**
      * Address of request including base folder without Query params.
      *
      * @example /subfolder/controller/action

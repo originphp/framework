@@ -242,7 +242,7 @@ class FormHelper extends Helper
 
             if ($entity) {
                 $create = true;
-                if ($entity->hasProperty($meta['primaryKey'])) {
+                if ($entity->has($meta['primaryKey'])) {
                     $create = false;
                 }
                 $validator = $model->validator();

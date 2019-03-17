@@ -222,11 +222,10 @@ class ModelTest extends \PHPUnit\Framework\TestCase
       );
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
-        $Article->hasOne('Author');
-        $Entity = $Article->newEntity($data);
-
-        $this->assertTrue($Entity->hasProperty('author'));
-        $this->assertTrue($Entity->author->hasProperty('name'));
+        $Article->belongsTo('Author');
+        $Entity = $Article->newEntity($data, ['associated'=>['Author']]);
+        $this->assertTrue($Entity->has('author'));
+        $this->assertTrue($Entity->author->has('name'));
         $this->assertEquals('Amanda', $Entity->author->name);
     }
 
@@ -243,8 +242,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->Comment = new Model(array('name' => 'Comment', 'datasource' => 'test'));
         $Article->hasMany('Comment');
 
-        $Entity = $Article->newEntity($data);
-        $this->assertTrue($Entity->hasProperty('comments'));
+        $Entity = $Article->newEntity($data, ['associated'=>['Comment']]);
+        $this->assertTrue($Entity->has('comments'));
         $this->assertEquals(2, count($Entity->comments));
 
         $this->assertEquals('nice article', $Entity->comments[0]->comment);
@@ -504,8 +503,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $article = $Article->find('first', ['with'=>['User']]);
         $this->assertEquals('first-post', $article->slug);
 
-        $this->assertTrue($article->hasProperty('user'));
-        $this->assertFalse($article->hasProperty('comments'));
+        $this->assertTrue($article->has('user'));
+        $this->assertFalse($article->has('comments'));
 
         // Fetch record with belongsTo/hasOne/and Has Many
         $article = $Article->find('first', ['with'=>['User','Comment','Tag']]);
@@ -846,8 +845,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $data = $Article->newEntity(array(
         'id' => 1,
         'tags' => $tags,
-        ));
-
+        ), ['associated'=>['Tag']]);
+       
         $conditions = array(
           'conditions' => array('article_id' => 1),
         );
@@ -878,7 +877,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['id' => $tags[0]->id],
           ['id' => $tags[1]->id],
         ),
-      ));
+      ), ['associated'=>['Tag']]);
         $this->assertTrue($Article->save($data));
 
         $conditions = array(
@@ -908,7 +907,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['title' => 'HABTM Tag #1'],
           ['title' => 'HABTM Tag #2'],
         ),
-      ));
+      ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
         $Article->getConnection()->update('articles_tags', ['test' => 1]);
@@ -920,7 +919,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['title' => 'HABTM Tag #2'],
           ['title' => 'HABTM Tag #3'],
         ),
-      ));
+      ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
         $result = $Article->ArticlesTag->find('list', array('conditions' => $conditions, 'fields' => array('tag_id')));
@@ -948,7 +947,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['title' => 'HABTM Tag #1'],
           ['title' => 'HABTM Tag #2'],
         ),
-      ));
+      ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
         $Article->getConnection()->update('articles_tags', ['test' => 1]);
@@ -960,7 +959,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['title' => 'HABTM Tag #2'],
           ['title' => 'HABTM Tag #3'],
         ),
-      ));
+      ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
         $result = $Article->ArticlesTag->find('list', array('conditions' => $conditions, 'fields' => array('tag_id', 'test')));
@@ -982,9 +981,9 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           // user id will be inserted automatically
           'name' => 'Developer (SAHO)',
         ),
-      ));
+      ), ['associated'=>['Profile']]);
 
-        $this->assertTrue($User->saveAssociated($data));
+        $this->assertTrue($User->save($data, ['associated'=>['Profile']]));
         $this->assertTrue($User->exists($User->id));
         $this->assertTrue($User->Profile->exists($User->Profile->id));
     }
@@ -1003,9 +1002,9 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           'email' => 'claire@example.com',
           'password' => 'secret',
         ),
-      ));
+      ), ['associated'=>['User']]);
 
-        $this->assertTrue($Profile->saveAssociated($data));
+        $this->assertTrue($Profile->save($data, ['associated'=>['User']]));
         $this->assertTrue($Profile->exists($Profile->id));
         $this->assertTrue($Profile->User->exists($Profile->User->id));
     }
@@ -1027,9 +1026,9 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           array('body' => 'comment #2 for saveAssociated'),
           array('body' => 'comment #3 for saveAssociated'),
         ),
-      ));
+      ), ['associated'=>['Comment']]);
         $count = $Article->Comment->find('count');
-        $this->assertTrue($Article->saveAssociated($data));
+        $this->assertTrue($Article->save($data, ['associated'=>['Comment']]));
         $this->assertTrue($Article->exists($Article->id));
         $this->assertTrue($Article->Comment->exists($Article->Comment->id));
         $this->assertEquals($count + 3, $Article->Comment->find('count'));
@@ -1072,7 +1071,7 @@ lastname VARCHAR(30) NOT NULL
         $this->assertTrue($Article->query('DROP TABLE guests'));
     }
 
-    public function testSaveAll()
+    public function testSaveAssociated()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Comment = new Model(array('name' => 'Comment', 'datasource' => 'test'));
@@ -1089,14 +1088,13 @@ lastname VARCHAR(30) NOT NULL
           array('body' => 'comment #2 for deleteDependent'),
           array('body' => 'comment #3 for deleteDependentd'),
         ),
-      ));
-        $this->assertTrue($Article->saveAll($data));
-
+      ), ['associated'=>['Comment']]);
+        $this->assertTrue($Article->save($data, ['associated'=>['Comment']]));
         return $Article->id;
     }
 
     /**
-     * @depends testSaveAll
+     * @depends testSaveAssociated
      */
     public function testDeleteDependent($articleId)
     {
@@ -1107,7 +1105,7 @@ lastname VARCHAR(30) NOT NULL
           'dependent' => true,
         ));
         $params = array('conditions' => array('article_id' => $articleId));
-
+      
         $count = $Article->Comment->find('count', $params);
         $this->assertEquals(3, $count);
         $this->assertTrue($Article->delete($articleId, true));
@@ -1124,7 +1122,7 @@ lastname VARCHAR(30) NOT NULL
           'tags' => array(
             array('title' => 'DeleteHABTM'),
           ),
-        ));
+        ), ['associated'=>['Tag']]);
         $params = array(
          'conditions' => array('article_id' => 3),
          'fields' => array('tag_id'),
@@ -1157,7 +1155,7 @@ lastname VARCHAR(30) NOT NULL
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
-        $Entity = $Article->newEntity($data);
+        $Entity = $Article->newEntity($data, ['associated'=>['Author','Tag']]);
 
         $requestData = array(
         'title' => 'New Article Name',
@@ -1170,7 +1168,7 @@ lastname VARCHAR(30) NOT NULL
           array('tag' => 'top ten'),
         ),
       );
-        $patchedEntity = $Article->patchEntity($Entity, $requestData);
+        $patchedEntity = $Article->patchEntity($Entity, $requestData, ['associated'=>['Author','Tag']]);
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
         $this->assertEquals('published', $patchedEntity->tags[0]->tag);

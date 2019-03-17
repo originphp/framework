@@ -55,8 +55,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $entity->id = 1002;
         $this->assertTrue(isset($entity->id));
         $this->assertFalse(isset($entity->name));
-        $this->assertTrue($entity->hasProperty('id'));
-        $this->assertFalse($entity->hasProperty('name'));
+        $this->assertTrue($entity->has('id'));
+        $this->assertFalse($entity->has('name'));
     }
 
     /**
@@ -124,7 +124,7 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $article->toArray());
     }
 
-    public function testHasProperty()
+    public function testhas()
     {
         $data = array(
         'title' => 'Article Title',
@@ -133,9 +133,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
         $entity = new Entity($data);
 
-        $this->assertTrue($entity->hasProperty('title'));
-        $this->assertFalse($entity->hasProperty('author_id'));
-        $this->assertFalse($entity->hasProperty('undefined'));
+        $this->assertTrue($entity->has('title'));
+        $this->assertFalse($entity->has('author_id'));
+        $this->assertFalse($entity->has('undefined'));
     }
 
     public function testInvalidate()

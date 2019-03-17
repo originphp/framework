@@ -37,7 +37,8 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Article->hasAndBelongsToMany('Tag');
         $Marshaller = new MockMarkshaller($Article);
 
-        $result = $Marshaller->callMethod('buildAssociationMap');
+        $options = ['Author','Category','Comment','Tag'];
+        $result = $Marshaller->callMethod('buildAssociationMap', [$options]);
 
         $expected = [
         'author' => 'one',
@@ -72,24 +73,33 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Marshaller = new Marshaller($Article);
 
         $entity = $Marshaller->one($data, ['name' => 'Article']);
-          
+
         $this->assertEquals(1024, $entity->id);
         $this->assertEquals('Some article title', $entity->title);
         $this->assertTrue(is_array($entity->author));
         $this->assertTrue(is_array($entity->tags));
-   
         $this->assertEquals('2018-10-01 13:43:00', $entity->created);
+
+        // Mass Assignment prevention
+        $entity = $Marshaller->one($data, ['name' => 'Article','fields'=>['id','title']]);
+        $this->assertTrue($entity->has('id'));
+        $this->assertTrue($entity->has('title'));
+        $this->assertFalse($entity->has('description'));
 
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
         $Marshaller = new Marshaller($Article);
 
-        $entity = $Marshaller->one($data, ['name' => 'Article']);
+        $entity = $Marshaller->one($data, ['name' => 'Article', 'associated'=>['Author','Tag']]);
+      
         $this->assertEquals('2018-10-01 13:41:00', $entity->author->created);
         $this->assertEquals('2018-10-01 13:42:00', $entity->tags[0]->created);
         $this->assertInstanceOf(Entity::class, $entity->author);
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
     }
+
+
+
 
     /**
      * @d epends testNewEntity
@@ -131,7 +141,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
           array('tag' => 'top ten'),
         ),
       );
-        $patchedEntity = $Marshaller->patch($Entity, $requestData);
+        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['associated'=>['Author','Tag']]);
       
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
