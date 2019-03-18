@@ -18,7 +18,11 @@ use Origin\Utility\Date;
 
 class DateHelper extends Helper
 {
-    public function format(string $dateString, $format = null)
+	/**
+	*
+	*@internal must allow mixed input to prevent errors on null values
+	*/
+    public function format($dateString, $format = null)
     {
         return Date::format($dateString, $format);
     }
