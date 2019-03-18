@@ -1,7 +1,7 @@
 <?php
 /**
  * Application
- * Configure middleware here if not dont touch
+ * Configure any middleware here
  */
 namespace App;
 

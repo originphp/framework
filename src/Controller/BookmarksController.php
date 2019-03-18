@@ -33,7 +33,7 @@ class BookmarksController extends AppController
         $bookmark = $this->Bookmark->newEntity();
         
         if ($this->request->is(['post'])) {
-            $bookmark = $this->Bookmark->newEntity($this->request->data);
+            $bookmark = $this->Bookmark->newEntity($this->request->data());
             $bookmark->user_id = $this->Auth->user('id');
             if ($this->Bookmark->save($bookmark)) {
                 $this->Flash->success(__('Your bookmark has been created.'));
@@ -57,7 +57,7 @@ class BookmarksController extends AppController
         ]);
 
         if ($this->request->is(['post', 'put'])) {
-            $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data);
+            $bookmark = $this->Bookmark->patchEntity($bookmark, $this->request->data());
 
             if ($this->Bookmark->save($bookmark)) {
                 $this->Flash->success(__('Your bookmark has been updated.'));

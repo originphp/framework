@@ -25,7 +25,7 @@ class %controller%Controller extends AppController
         $%singularName% = $this->%model%->newEntity();
 
         if ($this->request->is(['post'])) {
-            $%singularName% = $this->%model%->newEntity($this->request->data);
+            $%singularName% = $this->%model%->newEntity($this->request->data());
 
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been created.'));
@@ -46,7 +46,7 @@ class %controller%Controller extends AppController
         $%singularName% = $this->%model%->get($id);
 
         if ($this->request->is(['post', 'put'])) {
-            $%singularName% = $this->%model%->patchEntity($%singularName%,$this->request->data);
+            $%singularName% = $this->%model%->patchEntity($%singularName%,$this->request->data());
 
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been updated.'));
