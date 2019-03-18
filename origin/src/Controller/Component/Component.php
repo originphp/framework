@@ -26,7 +26,7 @@ class Component
      *
      * @var \Origin\Controller\Controller
      */
-    protected $controller = null;
+    protected $_controller = null;
 
     /**
      * Array of components and config. This poupulated during construct and is used
@@ -38,7 +38,7 @@ class Component
 
     public function __construct(Controller $controller, array $config = [])
     {
-        $this->controller = $controller;
+        $this->_controller = $controller;
  
         $this->config($config);
       
@@ -109,7 +109,7 @@ class Component
      */
     public function controller()
     {
-        return $this->controller;
+        return $this->_controller;
     }
 
     /**
@@ -119,7 +119,7 @@ class Component
      */
     public function request()
     {
-        return $this->controller->request;
+        return $this->_controller->request;
     }
 
     /**
@@ -129,7 +129,7 @@ class Component
      */
     public function response()
     {
-        return $this->controller->response;
+        return $this->_controller->response;
     }
 
     /**
@@ -140,6 +140,6 @@ class Component
      */
     public function logger(string $channel = 'Component')
     {
-        return $this->controller->logger($channel);
+        return $this->_controller->logger($channel);
     }
 }

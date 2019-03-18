@@ -26,7 +26,7 @@ class Helper
        *
        * @var \Origin\View\View
        */
-    protected $view = null;
+    protected $_view = null;
 
     /**
      * Array of helpers and config. This poupulated by loadHelper
@@ -37,7 +37,7 @@ class Helper
 
     public function __construct(View $view, array $config = [])
     {
-        $this->view = $view;
+        $this->_view = $view;
         
         $this->config($config);
 
@@ -130,7 +130,7 @@ class Helper
     */
     public function view()
     {
-        return $this->view;
+        return $this->_view;
     }
 
     /**
@@ -140,7 +140,7 @@ class Helper
      */
     public function request()
     {
-        return $this->view->request;
+        return $this->_view->request;
     }
 
     /**
@@ -150,7 +150,7 @@ class Helper
      */
     public function response()
     {
-        return $this->view->response;
+        return $this->_view->response;
     }
 
 

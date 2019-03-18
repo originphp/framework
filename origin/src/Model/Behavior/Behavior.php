@@ -28,11 +28,11 @@ class Behavior
      *
      * @var \Origin\Model\Model
      */
-    protected $model = null;
+    protected $_model = null;
 
     public function __construct(Model $model, array $config = [])
     {
-        $this->model = $model;
+        $this->_model = $model;
 
         $this->config($config);
         $this->initialize($config);
@@ -94,7 +94,7 @@ class Behavior
      */
     public function model()
     {
-        return $this->model;
+        return $this->_model;
     }
 
 
