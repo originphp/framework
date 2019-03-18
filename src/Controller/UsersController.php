@@ -18,7 +18,7 @@ class UsersController extends AppController
     public function view($id = null)
     {
         $user = $this->User->get($id, [
-            'with'=>['Bookmark']
+            'associated'=>['Bookmark']
             ]);
         $this->set('user', $user);
     }

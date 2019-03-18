@@ -42,13 +42,7 @@ class View
      *
      * @var string
      */
-    public $content = null;
-
-    /**
-     * Request params. For access from view, @todo use __get to fetch
-     * from request.
-     */
-    public $params = [];
+    protected $content = null;
 
     /**
      * Request Object
@@ -64,26 +58,17 @@ class View
     public $response = null;
 
     /**
-     * Holds the CSS block.
-     *
-     * @var string
-     */
-    public $css = '';
-
-    /**
-     * Holds the Javascripts block.
-     *
-     * @var string
-     */
-    public $scripts = '';
-
-    /**
      * Holds the HelperRegistry object.
      *
      * @var \Origin\View\Helper\HelperRegistry
      */
     protected $helperRegistry = null;
 
+    /**
+     * There
+     *
+     * @var array
+     */
     protected $helpers = [];
 
     /**
@@ -99,7 +84,6 @@ class View
 
         $this->request =& $controller->request;
         $this->response =& $controller->response;
-        $this->params =& $controller->request->params;
         $this->vars =& $controller->viewVars;
 
         $this->helperRegistry = new HelperRegistry($this);
@@ -118,6 +102,13 @@ class View
         throw new Exception(sprintf('%sHelper is not loaded.', $name));
     }
 
+    /**
+     * Loads a helper
+     *
+     * @param string $name
+     * @param array $config
+     * @return \Origin\View\Helper\Helper
+     */
     public function loadHelper(string $name, array $config = [])
     {
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
@@ -253,8 +244,8 @@ class View
     protected function getViewPath($withControllerName = true)
     {
         $viewPath = $this->viewPath;
-        if (isset($this->params['plugin'])) {
-            $viewPath = PLUGINS . DS . $this->params['plugin'] . DS . 'src' . DS . 'View';
+        if (isset($this->request->params['plugin'])) {
+            $viewPath = PLUGINS . DS . $this->request->params['plugin'] . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
             $viewPath = $viewPath . DS . $this->name;
@@ -348,16 +339,6 @@ class View
     public function set(string $key, $value)
     {
         $this->vars[$key] = $value;
-    }
-
-    /**
-     * Returns the request object
-     *
-     * @return \Origin\Controller\Request
-     */
-    public function request()
-    {
-        return $this->request;
     }
 
     /**

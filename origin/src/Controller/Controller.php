@@ -487,26 +487,6 @@ class Controller
     }
 
     /**
-     * Returns the request object
-     *
-     * @return \Origin\Controller\Request
-     */
-    public function request()
-    {
-        return $this->request;
-    }
-    
-    /**
-     * Returns the response object
-     *
-     * @return \Origin\Controller\Response
-     */
-    public function response()
-    {
-        return $this->response;
-    }
-
-    /**
      * Returns the component registry
      *
      * @return \Origin\Controller\Component\ComponentRegistry

@@ -52,14 +52,14 @@ class Router
         $pattern = str_replace('*', '?(?P<greedy>.*)', $pattern);
 
         // Convert passed arguments to array
-        $pass = [];
+        $args = [];
         foreach ($params as $key => $value) {
             if (is_int($key)) {
-                $pass[] = $value;
+                $args[] = $value;
                 unset($params[$key]);
             }
         }
-        $params['pass'] = $pass;
+        $params['args'] = $args;
         $params['route'] = $route;
 
         $params = array_merge($defaults, $params);
@@ -90,7 +90,7 @@ class Router
         $template = array(
           'controller' => null,
           'action' => null,
-          'pass' => null,
+          'args' => null,
           'named' => null,
           'route' => null,
           'plugin' => null,
@@ -114,7 +114,7 @@ class Router
         if (!empty($params)) {
             // Parse Greedy results *
             if (!empty($params['greedy'])) {
-                $pass = $named = [];
+                $args = $named = [];
                 $parts = explode('/', $params['greedy']);
 
                 foreach ($parts as $paramater) {
@@ -122,10 +122,10 @@ class Router
                         list($key, $value) = explode(':', $paramater);
                         $named[$key] = urldecode($value);
                     } else {
-                        $pass[] = $paramater;
+                        $args[] = $paramater;
                     }
                 }
-                $params['pass'] = $pass;
+                $params['args'] = $args;
                 $params['named'] = $named;
             }
             unset($params['greedy']);

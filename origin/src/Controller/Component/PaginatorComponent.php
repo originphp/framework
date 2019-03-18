@@ -140,7 +140,7 @@ class PaginatorComponent extends Component
     {
         // merge with defaults
         $settings += $this->config;
-        $query = $this->controller()->request()->query;
+        $query = $this->controller()->request->query;
         if ($query) {
             $query = $this->filterArray($this->whitelist, $query);
             $settings = array_merge($settings, $query);

@@ -48,7 +48,7 @@ class PaginatorHelper extends Helper
         if ($text === null) {
             $text = Inflector::humanize($column);
         }
-        $query = $this->view()->request()->query;
+        $query = $this->request()->query;
         $paging = $this->params();
 
         $query['sort'] = $column;
@@ -62,7 +62,7 @@ class PaginatorHelper extends Helper
 
         $options = [
           'text' => $text,
-          'url' => $this->view()->request()->url.'?'.http_build_query($query),
+          'url' => $this->request()->url.'?'.http_build_query($query),
         ];
 
         return $this->templater()->format($template, $options);
@@ -89,7 +89,7 @@ class PaginatorHelper extends Helper
         }
 
         $output = '';
-        $query = $this->view()->request()->query;
+        $query = $this->request()->query;
         for ($i = $first; $i < $last + 1; ++$i) {
             $template = 'number';
             if ($current == $i) {
@@ -97,7 +97,7 @@ class PaginatorHelper extends Helper
             }
             $query['page'] = $i;
 
-            $options['url'] = $this->view()->request()->url.'?'.http_build_query($query);
+            $options['url'] = $this->request()->url.'?'.http_build_query($query);
             $options['text'] = $i;
             $output .= $this->templater()->format($template, $options);
         }
@@ -124,7 +124,7 @@ class PaginatorHelper extends Helper
         $defaults = ['active' => '', 'text' => $text, 'url' => '#', 'onclick' => 'return false;'];
         $options += $defaults;
 
-        $query = $this->view()->request()->query;
+        $query = $this->request()->query;
         $paging = $this->params();
 
         if (!isset($query['page'])) {
@@ -145,7 +145,7 @@ class PaginatorHelper extends Helper
                 $template = 'prev';
             }
         }
-        $options['url'] = $this->view()->request()->url.'?'.http_build_query($query);
+        $options['url'] = $this->request()->url.'?'.http_build_query($query);
 
         return $this->templater()->format($template, $options);
     }

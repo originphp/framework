@@ -252,7 +252,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
         $result = $AuthComponent->identify();
         $this->assertEquals('James', $result->name);
     }
@@ -262,7 +262,7 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
         $AuthComponent->config('scope', ['id'=>1024]);
-        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -272,7 +272,7 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
         $AuthComponent->config('model', 'Fozzy');
-        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
         $AuthComponent->identify();
     }
 
@@ -291,7 +291,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request->data = ['email'=>'james@example.com','password'=>'1234`'];
+        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'1234`'];
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -299,7 +299,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request->data = ['email'=>'mark.ronson@example.com','password'=>'funky'];
+        $AuthComponent->request()->data = ['email'=>'mark.ronson@example.com','password'=>'funky'];
         $this->assertFalse($AuthComponent->identify());
     }
 

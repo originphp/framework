@@ -73,10 +73,10 @@ class AuthComponent extends Component
      */
     public $request = null;
 
-    public $components = ['Flash','Session'];
     public function initialize(array $config)
     {
-        $this->request =& $this->controller()->request;
+        $this->loadComponent('Flash');
+        $this->loadComponent('Session');
     }
 
     /**
@@ -84,7 +84,7 @@ class AuthComponent extends Component
      */
     public function startup()
     {
-        $action = $this->request->params['action'];
+        $action = $this->request()->params['action'];
 
         if ($this->isLoggedIn()) {
             return null;
@@ -165,13 +165,12 @@ class AuthComponent extends Component
      */
     public function redirectUrl()
     {
-        $redirectUrl = $this->config['loginRedirect'];
-        if ($this->Session->check('Auth.redirect')) {
-            $redirectUrl = $this->Session->read('Auth.redirect');
+        if ($redirectUrl = $this->Session->read('Auth.redirect')) {
             $this->Session->delete('Auth.redirect');
+            return $redirectUrl;
         }
 
-        return $redirectUrl;
+        return $this->config['loginRedirect'];
     }
 
     /**
@@ -240,20 +239,16 @@ class AuthComponent extends Component
 
         if (in_array('Form', $this->config['authenticate'])) {
             $fields = $this->config['fields'];
-            if (isset($this->request->data[$fields['username']])) {
-                $username = $this->request->data[$fields['username']];
-            }
-            if (isset($this->request->data[$fields['password']])) {
-                $password = $this->request->data[$fields['password']];
-            }
+            $username = $this->request()->data($fields['username']);
+            $password = $this->request()->data($fields['password']);
             if ($username and $password) {
                 return ['username' => $username, 'password' => $password];
             }
         }
 
         if (in_array('Http', $this->config['authenticate'])) {
-            $username = $this->request->env('PHP_AUTH_USER');
-            $password = $this->request->env('PHP_AUTH_PW');
+            $username = $this->request()->env('PHP_AUTH_USER');
+            $password = $this->request()->env('PHP_AUTH_PW');
             if ($username and $password) {
                 return ['username' => $username, 'password' => $password];
             }
@@ -275,10 +270,10 @@ class AuthComponent extends Component
     {
         $loginUrl = Router::url($this->config['loginAction']);
         $params = Router::parse($loginUrl);
-        if ($params['controller'] != $this->request->params['controller']) {
+        if ($params['controller'] != $this->request()->params['controller']) {
             return false;
         }
-        if ($params['action'] === $this->request->params['action']) {
+        if ($params['action'] === $this->request()->params['action']) {
             return true;
         }
 
@@ -337,12 +332,10 @@ class AuthComponent extends Component
      */
     protected function unauthorize()
     {
-        $controller = $this->controller();
-
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
-            $this->Session->write('Auth.redirect', $this->request->url());
-            return $controller->redirect(Router::url($this->config['loginAction']));
+            $this->Session->write('Auth.redirect', $this->request()->url(true));
+            return $this->controller()->redirect(Router::url($this->config['loginAction']));
         }
        
         throw new ForbiddenException($this->config['authError']);

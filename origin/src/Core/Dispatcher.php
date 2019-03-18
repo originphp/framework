@@ -115,7 +115,7 @@ class Dispatcher
     {
         $controller->startupProcess();
        
-        call_user_func_array(array($controller, $action), $arguments['pass']);
+        call_user_func_array(array($controller, $action), $arguments['args']);
      
         if ($controller->autoRender and $controller->response->ready()) {
             $controller->render();

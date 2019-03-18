@@ -140,21 +140,16 @@ Array
 )
 */
 ```
-
 ## Session
 
-When you need to persist small amounts of data between requests, using Sessions makes it really easy. The session is object
-is available in controllers (and components) and views (and helpers).
-
-To get the session object you need to get it from the request object.
+When you need to persist small amounts of data between requests you typically would use sessions to access Session data from the controller you would use the Session component.
 
 Session data is stored using key value pairs, you can also use dot notation to deeper levels of an array. For example, `userProfile.id` would first look for the key would look for the key `userProfile` and if its value is an array and has the key `id` it will return the value. If it there is no key set then it will return a `null` value.
 
 ```php
 class ContactsController extends AppController {
   public function getUserId(){
-     $session = $this->request->session();
-     return $sesson->read('user_id');
+     return $this->Session->read('user_id');
   }
 }
 ```
@@ -164,8 +159,7 @@ To store data in the session:
 ```php
 class ContactsController extends AppController {
   public function setUserId($id){
-     $session = $this->request->session();
-     $sesson->write('user_id',$id);
+     $this->Session->write('user_id',$id);
   }
 }
 ```
@@ -175,13 +169,28 @@ To delete an item from the session
 ```php
 class ContactsController extends AppController {
   public function deleteUserId(){
-     $session = $this->request->session();
-     $sesson->delete('user_id');
+     $this->Session->delete('user_id');
   }
 }
 ```
 
 You can also reset the whole session using the `reset` method.
+
+The Session Component uses the session object which can be accessed from the request object at any time.
+
+```php
+class ContactsController extends AppController {
+  public function setUserId($id){
+      $session = $this->request->session();
+     $session->write('user_id',$id);
+  }
+}
+```
+
+## Components
+
+Components are objects which can be shared between controllers. The framework comes with a number of components and you can build your own.  For more information on this see the [components guide](components.md).
+
 
 ## Flash Component
 The Flash component enables you to display messages to the user either in the current request or on the next if redirecting.
@@ -243,6 +252,22 @@ NOTE: When you use the response for writing cookies the values wont be available
 
 ## Rendering Views
 By default, all views in your controller are rendered as html. Rendering takes place automatically for the controller and action. So if you if the user requests `/contacts/show/1` it will load the `View/Contacts/show.ctp` file.
+
+One of the jobs of the controller is to send data to view, so the view can display this.
+
+To send the data to the view, use the `set` method.
+```php
+class ContactsController extends AppController
+{
+    public function view($id)
+    {
+        $user = $this->User->get($id);
+        $this->set('user',$user);
+    }
+}
+```
+
+More information on how views work can be found in the [views guide](views.md).
 
 ### JSON Views
 You can quickly and easily render JSON data using results returned from find or get operations, arrays of data and strings. The controller will automatically call the `toJson` on the objects.
@@ -418,10 +443,13 @@ You can set and get headers through the response object,
 $this->response->header('Accept-Language', 'en-us,en;q=0.5');
 ```
 
-### Setting the Content Type
+### Setting and getting the Content Type
 
 ```php
 $type = $this->response->type();
+```
+
+```php
 $this->response->type('application/vnd.ms-powerpoint');
 ```
 

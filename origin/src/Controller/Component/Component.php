@@ -28,16 +28,9 @@ class Component
      */
     protected $controller = null;
 
-
     /**
-     * These are components that will be used within this component. Callbacks
-     *
-     * @var array
-     */
-    public $components = [];
-
-    /**
-     * Array of components and config. This poupulated by loadComponent
+     * Array of components and config. This poupulated during construct and is used
+     * for lazyloading.
      *
      * @var array
      */
@@ -48,20 +41,29 @@ class Component
         $this->controller = $controller;
  
         $this->config($config);
-
-        // Deal components within components
-        foreach ($this->components as $name => $config) {
-            if (is_int($name)) {
-                $name = $config;
-                $config = [];
-            }
-            list($plugin, $component) = pluginSplit($name);
-            if (!isset($this->_components[$component])) {
-                $this->_components[$component] =  array_merge(['className' => $name . 'Component'], $config);
-            }
-        }
       
         $this->initialize($config);
+    }
+
+    /**
+     * Loads a component, the component is not returned, but when you call it will be
+     * lazy loaded
+     *
+     * examples:
+     *
+     * Session
+     * MyPlugin.Session
+     *
+     * @param string $name
+     * @param array $config
+     * @return void
+     */
+    public function loadComponent(string $name, array $config=[])
+    {
+        list($plugin, $component) = pluginSplit($name);
+        if (!isset($this->_components[$component])) {
+            $this->_components[$component] =  array_merge(['className' => $name . 'Component'], $config);
+        }
     }
 
     /**
@@ -117,7 +119,7 @@ class Component
      */
     public function request()
     {
-        return $this->controller->request();
+        return $this->controller->request;
     }
 
     /**
@@ -127,7 +129,7 @@ class Component
      */
     public function response()
     {
-        return $this->controller->response();
+        return $this->controller->response;
     }
 
     /**

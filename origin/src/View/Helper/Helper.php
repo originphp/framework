@@ -29,12 +29,6 @@ class Helper
     protected $view = null;
 
     /**
-     * These are helpers which will be used by this helper
-     *
-     * @var array
-     */
-    public $helpers = [];
-    /**
      * Array of helpers and config. This poupulated by loadHelper
      *
      * @var array
@@ -47,19 +41,23 @@ class Helper
         
         $this->config($config);
 
-        // Deal helpers within helpers
-        foreach ($this->helpers as $name => $config) {
-            if (is_int($name)) {
-                $name = $config;
-                $config = [];
-            }
-            list($plugin, $helper) = pluginSplit($name);
-            if (!isset($this->_helpers[$helper])) {
-                $this->_helpers[$helper] =  array_merge(['className' => $name . 'Helper'], $config);
-            }
-        }
-
         $this->initialize($config);
+    }
+
+    /**
+     * Loads a helper -  the helper is not returned, but when you call it will be
+     * lazy loaded
+     *
+     * @param string $name
+     * @param array $config
+     * @return void
+     */
+    public function loadHelper(string $name, array $config=[])
+    {
+        list($plugin, $helper) = pluginSplit($name);
+        if (!isset($this->_helpers[$helper])) {
+            $this->_helpers[$helper] =  array_merge(['className' => $name . 'Helper'], $config);
+        }
     }
 
     /**

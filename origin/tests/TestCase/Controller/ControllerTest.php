@@ -371,12 +371,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testRequest()
     {
-        $this->assertInstanceOf(Request::class, $this->controller->request());
+        $this->assertInstanceOf(Request::class, $this->controller->request);
     }
 
     public function testResponse()
     {
-        $this->assertInstanceOf(Response::class, $this->controller->response());
+        $this->assertInstanceOf(Response::class, $this->controller->response);
     }
     public function testComponentRegistry()
     {

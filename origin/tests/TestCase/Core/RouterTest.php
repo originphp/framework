@@ -46,12 +46,12 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $result =MockRouter::parse('leads/edit/1000');
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('edit', $result['action']);
-        $this->assertEquals(array(1000), $result['pass']);
+        $this->assertEquals(array(1000), $result['args']);
 
         $result =MockRouter::parse('user_profiles/view/sort/256');
         $this->assertEquals('UserProfiles', $result['controller']);
         $this->assertEquals('view', $result['action']);
-        $this->assertEquals(array('sort', '256'), $result['pass']);
+        $this->assertEquals(array('sort', '256'), $result['args']);
 
         // Parse Named Params
         $result =MockRouter::parse('leads/home/sort:asc/limit:10');
@@ -86,7 +86,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('Pages', $result['controller']);
         $this->assertEquals('display', $result['action']);
-        $this->assertEquals(array('home'), $result['pass']);
+        $this->assertEquals(array('home'), $result['args']);
     }
 
     public function testRoutePage()
@@ -98,7 +98,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('Docs', $result['controller']);
         $this->assertEquals('view', $result['action']);
-        $this->assertEquals(array(256), $result['pass']);
+        $this->assertEquals(array(256), $result['args']);
     }
 
     public function testRenameController()

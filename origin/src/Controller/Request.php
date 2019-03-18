@@ -30,7 +30,7 @@ class Request
     public $params = array(
         'controller' => null,
         'action' => null,
-        'pass' => array(),
+        'args' => array(),
         'named' => array(),
         'plugin' => null,
         'route' => null
@@ -43,112 +43,25 @@ class Request
     public $query = [];
 
     /**
-     * Will contain form post data.
+     * Will contain form post data including from PUT/PATCH and delete
      *
      * @var array
      */
     public $data = [];
 
     /**
-     * Returns all query data or value for a key
+     * Array of actual cookies
      *
-     * @param string $key name of query
-     * @param mixed $default default value to return
-     * @return mixed
+     * @var array
      */
-    public function query(string $key = null, $default=null)
-    {
-        if ($key === null) {
-            return $this->query;
-        }
-        if (isset($this->query[$key])) {
-            return $this->query[$key];
-        }
-        return $default;
-    }
+    public $cookies = [];
 
     /**
-     * Returns all data or value for a key
-     *
-     * @param string $key name of query
-     * @param mixed $default default value to return
-     * @return mixed
-     */
-    public function data(string $key = null, $default=null)
-    {
-        if ($key === null) {
-            return $this->data;
-        }
-        if (isset($this->data[$key])) {
-            return $this->data[$key];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns all params data or value for a key
-     *
-     * @param string $key name of parameter
-     * @param mixed $default default value to return
-     * @return mixed
-     */
-    public function params(string $key = null, $default=null)
-    {
-        if ($key === null) {
-            return $this->params;
-        }
-        if (isset($this->params[$key])) {
-            return $this->params[$key];
-        }
-        return $default;
-    }
-
-    /**
-     * Convienice method for getting passed arguments
-     *
-     * @return array
-     */
-    public function args() : args
-    {
-        return $this->params['pass'];
-    }
-
-
-    /**
-     * Getting data using dynamic properties
-     */
-    public function __get($name)
-    {
-        return $this->data($name);
-    }
-
-    /**
-     * Address of request including base folder without Query params.
+     * Address of request including base folder WITHOUT Query params.
      *
      * @example /subfolder/controller/action
      */
     public $url = null;
-
-    /**
-     * Base.
-     *
-     * @todo subfolder
-     */
-    public $base = null;
-
-    /**
-     * Session
-     *
-     * @return \Origin\Core\Session
-     */
-    protected $session = null;
-
-    /**
-     * Cookie
-     *
-     * @return \Origin\Core\Cookie
-     */
-    protected $cookie = null;
 
     /**
      * Original Headers
@@ -158,6 +71,20 @@ class Request
     protected $headers = [];
 
     protected $headersNames = [];
+
+    /**
+     * Session object
+     *
+     * @var \Origin\Core\Session
+     */
+    protected $session = null;
+
+    /**
+     * Cookie object
+     *
+     * @var \Origin\Core\Cookie
+     */
+    protected $cookie = null;
 
     /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
@@ -196,6 +123,70 @@ class Request
         }
 
         Router::setRequest($this);
+    }
+
+    /**
+     * Returns all query data or value for a key
+     *
+     * @param string $key name of query
+     * @param mixed $default default value to return
+     * @return mixed
+     */
+    public function query(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->query;
+        }
+        if (isset($this->query[$key])) {
+            return $this->query[$key];
+        }
+        return $default;
+    }
+
+    /**
+      * Returns all data or value for a key
+      *
+      * @param string $key name of query
+      * @param mixed $default default value to return
+      * @return mixed
+      */
+    public function data(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->data;
+        }
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Returns all params data or value for a key
+     *
+     * @param string $key name of parameter
+     * @param mixed $default default value to return
+     * @return mixed
+     */
+    public function params(string $key = null, $default=null)
+    {
+        if ($key === null) {
+            return $this->params;
+        }
+        if (isset($this->params[$key])) {
+            return $this->params[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Convenience method for getting passed arguments
+     *
+     * @return array
+     */
+    public function args() : args
+    {
+        return $this->params['args'];
     }
 
     /**
