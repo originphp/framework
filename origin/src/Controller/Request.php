@@ -110,12 +110,13 @@ class Request
         }
 
         $this->params = Router::parse($url);
-
+      
         $this->processGet($url);
         $this->processPost();
         $this->processFiles();
 
         if (PHP_SAPI != 'cli') {
+            $this->cookies = $_COOKIE;
             $this->headers = getallheaders();
             foreach ($this->headers as $key => $value) {
                 $this->headersNames[strtolower($key)] = $key;
@@ -126,67 +127,82 @@ class Request
     }
 
     /**
-     * Returns all query data or value for a key
+     * Set/get the values in query
      *
-     * @param string $key name of query
-     * @param mixed $default default value to return
-     * @return mixed
+     *  $all = $request-query();
+     *  $value = $request->query('key');
+     *  $request->query('key','value');
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return mixed|null
      */
-    public function query(string $key = null, $default=null)
+    public function query(string $key = null, $value = null)
     {
+        if (func_num_args() === 2) {
+            $this->query[$key] = $value;
+            return;
+        }
         if ($key === null) {
             return $this->query;
         }
         if (isset($this->query[$key])) {
             return $this->query[$key];
         }
-        return $default;
+        return null;
     }
 
+
     /**
-      * Returns all data or value for a key
-      *
-      * @param string $key name of query
-      * @param mixed $default default value to return
-      * @return mixed
-      */
-    public function data(string $key = null, $default=null)
+     * Set/get the values in data
+     *
+     *  $all = $request->data();
+     *  $value = $request->data('key');
+     *  $request->data('key','value');
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function data(string $key = null, $value = null)
     {
+        if (func_num_args() === 2) {
+            $this->data[$key] = $value;
+            return;
+        }
         if ($key === null) {
             return $this->data;
         }
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
-        return $default;
+        return null;
     }
 
     /**
-     * Returns all params data or value for a key
+     * Set/get the values in params
      *
-     * @param string $key name of parameter
-     * @param mixed $default default value to return
-     * @return mixed
+     *  $all = $request->params();
+     *  $value = $request->params('key');
+     *  $request->params('key','value');
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return mixed|null
      */
-    public function params(string $key = null, $default=null)
+    public function params(string $key = null, $value = null)
     {
+        if (func_num_args() === 2) {
+            $this->params[$key] = $value;
+            return;
+        }
         if ($key === null) {
             return $this->params;
         }
         if (isset($this->params[$key])) {
             return $this->params[$key];
         }
-        return $default;
-    }
-
-    /**
-     * Convenience method for getting passed arguments
-     *
-     * @return array
-     */
-    public function args() : args
-    {
-        return $this->params['args'];
+        return null;
     }
 
     /**
