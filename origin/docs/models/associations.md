@@ -18,7 +18,7 @@ To load associated records for model, in the find options you pass an array of m
 
 ````php
   $user = $this->User->get($id, [
-            'with'=>['Task','Email'=>['fields'=>$fields],'Contact'=>['with'=>$nestedModels]]
+            'associated'=>['Task','Email'=>['fields'=>$fields],'Contact'=>['associated'=>$nestedModels]]
             ]);
 ````
 You can pass options for each model to be contained, these will overide what was set with the functions below. You can also load nested associated data, by passing the contain option for each model.
@@ -210,7 +210,7 @@ You can also pass an options array with any of the following keys.
       $this->hasAndBelongsToMany('Tag',array(
       'className' => 'Tag',
       'joinTable' => 'users_tags',
-      'through' => 'UsersTags'
+      'with' => 'UsersTags'
       'foreignKey' => 'user_id',
       'associationForeignKey' => 'tag_id',
       'fields' => array('User.name','User.email','Tag.title','Tag.created')

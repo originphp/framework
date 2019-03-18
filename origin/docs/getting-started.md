@@ -88,7 +88,7 @@ Edit the view action so you add the contain key to the options for get, and set 
     public function view($id = null)
     {
         $bookmark = $this->Bookmark->get($id, [
-            'with'=>['Tag']
+            'associated'=>['Tag']
             ]);
    
         $this->set('bookmark', $bookmark);

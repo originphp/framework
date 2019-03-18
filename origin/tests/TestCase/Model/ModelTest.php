@@ -410,7 +410,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
             'dependent' => null,
             'limit' => null,
             'offset' => null,
-            'through' => 'CandidatesJob',
+            'with' => 'CandidatesJob',
             'mode' => 'replace',
           );
         $this->assertEquals($expected, $relationship);
