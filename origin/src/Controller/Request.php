@@ -110,13 +110,13 @@ class Request
         }
 
         $this->params = Router::parse($url);
-      
+        $this->cookies = $_COOKIE;
+        
         $this->processGet($url);
         $this->processPost();
         $this->processFiles();
 
         if (PHP_SAPI != 'cli') {
-            $this->cookies = $_COOKIE;
             $this->headers = getallheaders();
             foreach ($this->headers as $key => $value) {
                 $this->headersNames[strtolower($key)] = $key;
