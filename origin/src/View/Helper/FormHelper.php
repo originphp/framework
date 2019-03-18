@@ -139,7 +139,7 @@ class FormHelper extends Helper
         $attributes = [];
 
         if ($model === null) {
-            $controller = $this->view()->request->params['controller'];
+            $controller = $this->view()->request->params('controller');
             $model = Inflector::camelize(Inflector::singularize($controller));
         }
         if (is_object($model)) {
@@ -659,7 +659,7 @@ class FormHelper extends Helper
                 }
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
-                $requestData = $this->view()->request->data;
+                $requestData = $this->view()->request->data();
                 if ($requestData) {
                     $dot = new Dot($requestData);
                     $value = $dot->get($name);

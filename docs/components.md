@@ -119,7 +119,7 @@ $response = $this->response();
 
 ## Accessing the controller
 
-When working with components you will occasionally need to access the controller, this can be easily done by calling the controller method.
+When working with components, you may need to access the controller, this can be easily done by calling the controller method.
 
 ```php
 $controller = $this->controller();

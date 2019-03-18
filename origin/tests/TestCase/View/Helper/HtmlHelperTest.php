@@ -18,6 +18,7 @@ use Origin\View\Helper\HtmlHelper;
 use Origin\View\View;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
+use Origin\Controller\Response;
 
 class ArticlesController extends Controller
 {
@@ -30,7 +31,7 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $request = new Request('articles/edit/2048');
-        $controller = new ArticlesController($request);
+        $controller = new ArticlesController($request, new Response());
         $View = new View($controller);
         $this->HtmlHelper = new MockHtmlHelper($View);
     }

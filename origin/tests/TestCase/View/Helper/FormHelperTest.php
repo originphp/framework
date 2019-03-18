@@ -18,10 +18,9 @@ use Origin\View\View;
 use Origin\View\Helper\FormHelper;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
+use Origin\Controller\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
-use Origin\Utility\Date;
-use Origin\Ultis\Time;
 
 class ViewTestsController extends Controller
 {
@@ -60,7 +59,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $request = new Request('widgets/edit');
-        $controller = new ViewTestsController($request);
+        $controller = new ViewTestsController($request, new Response());
         $View = new View($controller);
         $this->FormHelper = new MockFormHelper($View);
         $this->FormHelper->initialize([]);

@@ -135,7 +135,7 @@ class Request
      *
      * @param string $key
      * @param mixed $value
-     * @return mixed|null
+     * @return mixed
      */
     public function query(string $key = null, $value = null)
     {
@@ -162,7 +162,7 @@ class Request
      *
      * @param string $key
      * @param mixed $value
-     * @return void
+     * @return mixed
      */
     public function data(string $key = null, $value = null)
     {
@@ -188,7 +188,7 @@ class Request
      *
      * @param string $key
      * @param mixed $value
-     * @return mixed|null
+     * @return mixed
      */
     public function params(string $key = null, $value = null)
     {

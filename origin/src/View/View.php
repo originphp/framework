@@ -244,8 +244,9 @@ class View
     protected function getViewPath($withControllerName = true)
     {
         $viewPath = $this->viewPath;
-        if (isset($this->request->params['plugin'])) {
-            $viewPath = PLUGINS . DS . $this->request->params['plugin'] . DS . 'src' . DS . 'View';
+        $plugin = $this->request->params('plugin');
+        if ($plugin) {
+            $viewPath = PLUGINS . DS . $plugin . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
             $viewPath = $viewPath . DS . $this->name;

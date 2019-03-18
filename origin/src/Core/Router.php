@@ -159,7 +159,7 @@ class Router
         $output = '';
 
         if (static::$request) {
-            $params = static::$request->params;
+            $params = static::$request->params();
         }
         if ($url['plugin']) {
             $output .= '/' . Inflector::underscore($url['plugin']);

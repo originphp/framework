@@ -47,16 +47,16 @@ Lets look at this request:
 GET /bookmarks/view/1024
 ```
 
-You will need to get the params array from the request object, and this will contain information about the controller, action, the passed arguments (pass), named parameters, which route was matched and the plugin name.
+You will need to get the params array from the request object, and this will contain information about the controller, action, the passed arguments (args), named parameters, which route was matched and the plugin name.
 
 ```php
-print_r($this->request->params);
+print_r($this->request->params());
 /*
 Array
 (
     [controller] => Bookmarks
     [action] => view
-    [pass] => Array
+    [args] => Array
         (
             [0] => 1024
         )
@@ -77,7 +77,7 @@ GET /books/index/sort:desc/page:100
 ```
 
 ```php
-print_r($this->request->params['named']);
+print_r($this->request->params('named'));
 /*
 Array
 (

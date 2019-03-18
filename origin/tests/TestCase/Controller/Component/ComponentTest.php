@@ -32,7 +32,7 @@ class ComponentTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $Controller = new Controller();
+        $Controller = new Controller(new Request(), new Response());
         $this->MockComponent = new MockComponent($Controller);
     }
 

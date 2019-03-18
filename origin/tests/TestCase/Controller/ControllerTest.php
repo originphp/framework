@@ -92,18 +92,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->controller = new Controller($request, $response);
     }
 
-    public function testControllerName()
-    {
-        $request = new Request('user_profiles/edit/256');
-        $controller = new Controller($request, new Response());
-
-        $this->assertEquals('UserProfiles', $controller->name);
-        $this->assertEquals('UserProfile', $controller->modelName);
-
-        $controller = new TestsController();
-        $this->assertEquals('Tests', $controller->name);
-    }
-
     public function testConstruct()
     {
         $request = new Request('tests/view/512');
@@ -115,7 +103,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEmpty($controller->componentRegistry());
         $this->assertInstanceOf('Origin\Controller\Component\ComponentRegistry', $controller->componentRegistry());
-
+        $this->assertEquals('Tests', $controller->name);
         $this->assertEquals('Test', $controller->modelName);
 
         $this->assertTrue($controller->initialized);
@@ -349,15 +337,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             $Pet->save($Pet->newEntity(['name'=>'Pet' . $i]));
         }
         
-
-     
         $controller = new TestsController(
             new Request('pets/edit/2048'),
             new Response()
         );
         $controller->Paginator = new MockPaginator();
        
-    
+        $controller->Test = $Pet; // Set fake model using real model
         $results = $controller->paginate();
         $this->assertEquals(20, count($results));
 

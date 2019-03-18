@@ -22,7 +22,7 @@ class Helper
 {
     use ConfigTrait;
     /**
-       * Request Object
+       * View Object
        *
        * @var \Origin\View\View
        */

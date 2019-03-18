@@ -62,18 +62,18 @@ class Dispatcher
      */
     public function dispatch(Request $request, Response $response)
     {
-        if ($request->params) {
+        if ($request->params()) {
             $application = new Application($request, $response);
     
 
-            $class = $this->getClass($request->params['controller'], $request->params['plugin']);
+            $class = $this->getClass($request->params('controller'), $request->params('plugin'));
             if (!class_exists($class)) {
-                throw new MissingControllerException($request->params['controller']);
+                throw new MissingControllerException($request->params('controller'));
             }
             
             $this->controller = $this->buildController($class, $request, $response);
           
-            $this->invoke($this->controller, $request->params['action'], $request->params);
+            $this->invoke($this->controller, $request->params('action'), $request->params());
       
             if ($this->controller->response instanceof Response) {
                 $this->controller->response->send();
@@ -96,13 +96,13 @@ class Dispatcher
     protected function buildController(string $class, Request $request, Response $response)
     {
         $controller = new $class($request, $response);
-
-        if (!method_exists($controller, $request->params['action'])) {
-            throw new MissingMethodException([$controller->name, $request->params['action']]);
+        $action = $request->params('action');
+        if (!method_exists($controller, $action)) {
+            throw new MissingMethodException([$controller->name, $action]);
         }
 
-        if (!$controller->isAccessible($request->params['action'])) {
-            throw new PrivateMethodException([$controller->name, $request->params['action']]);
+        if (!$controller->isAccessible($action)) {
+            throw new PrivateMethodException([$controller->name, $action]);
         }
 
         return $controller;

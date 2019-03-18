@@ -95,26 +95,14 @@ class Controller
      */
     public $paginate = [];
 
-    public function __construct(Request $request = null, Response $response = null)
+    public function __construct(Request $request, Response $response)
     {
-        // Get Controller Name
-        if (isset($request->params['controller'])) {
-            $this->name = $request->params['controller'];
-        } else {
-            list($namespace, $name) = namespaceSplit(get_class($this));
-            $this->name = substr($name, 0, -10);
-        }
+        list($namespace, $name) = namespaceSplit(get_class($this));
+        $this->name = substr($name, 0, -10);
 
         $this->modelName = Inflector::singularize($this->name);
 
-        if ($request === null) {
-            $request = new Request();
-        }
         $this->request = $request;
-
-        if ($response === null) {
-            $response = new Response;
-        }
         $this->response = $response;
 
         $this->componentRegistry = new ComponentRegistry($this);
@@ -127,6 +115,7 @@ class Controller
      *
      * @param string $name   Component name e.g. Auth
      * @param array  $config array of config to be passed to component. Class name
+     * @return \Origin\Controller\Component\Component
      */
     public function loadComponent(string $name, array $config = [])
     {
@@ -287,7 +276,7 @@ class Controller
         if ($model === null) {
             $model = $this->modelName;
         }
-
+    
         $object = $this->loadModel($model);
 
         $this->loadComponent('Paginator');
@@ -345,7 +334,7 @@ class Controller
     public function render($options=[])
     {
         if (empty($options)) {
-            $options = $this->request->params['action'];
+            $options = $this->request->params('action');
         }
         if (is_string($options)) {
             $options = ['template'=>$options];

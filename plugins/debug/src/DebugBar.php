@@ -57,9 +57,9 @@ class DebugBar
         $debugVars = array(
       'debug_sql' => $log,
       'debug_request' => array(
-        'params' => $request->params,
-        'query' => $request->query,
-        'data' => $request->data,
+        'params' => $request->params(),
+        'query' => $request->query(),
+        'data' => $request->data(),
         'cookie' => $_COOKIE,
       ),
       'debug_vars' => array(

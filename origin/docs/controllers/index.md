@@ -39,7 +39,7 @@ Request data can be accessed via the Request object. This is available in the co
   class BookmarksController extends AppController {
 
     public function index(){
-      $requestData = $this->request->data;
+      $requestData = $this->request->data();
     }
   }
 

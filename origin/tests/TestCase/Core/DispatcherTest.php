@@ -47,6 +47,14 @@ class BlogPostsController extends Controller
     }
 }
 
+class MockRequest extends Request
+{
+    public function reset()
+    {
+        $this->params = [];
+    }
+}
+
 class MockDispatcher extends Dispatcher
 {
     protected function getClass(string $controller, string $plugin = null)
@@ -103,8 +111,8 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(RouterException::class);
         $Dispatcher = new MockDispatcher();
-        $request = new Request();
-        $request->params = []; // Skip Pages controller setup by default
+        $request = new MockRequest();
+        $request->reset(); // Skip Pages controller setup by default
         $Dispatcher->dispatch($request, new Response());
     }
 }

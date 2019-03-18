@@ -18,6 +18,7 @@ use Origin\View\Helper\PaginatorHelper;
 use Origin\View\View;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
+use Origin\Controller\Response;
 
 class PostsController extends Controller
 {
@@ -30,7 +31,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
     public function setup()
     {
         $request = new Request('articles/edit/2048');
-        $controller = new PostsController($request);
+        $controller = new PostsController($request, new Response());
         $View = new View($controller);
         $this->PaginatorHelper = new MockPaginatorHelper($View);
     }
@@ -47,7 +48,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
     public function testSortAsc()
     {
         $request = new Request('articles/edit/2048?sort=id&direction=asc');
-        $controller = new PostsController($request);
+        $controller = new PostsController($request, new Response());
         $View = new View($controller);
         $Paginator = new MockPaginatorHelper($View);
 
@@ -66,7 +67,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
     public function testSortDesc()
     {
         $request = new Request('articles/edit/2048?sort=id&direction=desc');
-        $controller = new PostsController($request);
+        $controller = new PostsController($request, new Response());
         $View = new View($controller);
         $Paginator = new MockPaginatorHelper($View);
 
