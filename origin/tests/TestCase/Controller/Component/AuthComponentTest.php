@@ -160,8 +160,8 @@ class AuthComponentTest extends OriginTestCase
     public function testGetCredentials()
     {
         $request = new Request('/users/login');
-        $request->data = ['user_name' => 'claire', 'passwd' => 'secret'];
-
+        $request->data('user_name', 'claire');
+        $request->data('passwd', 'secret');
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
 
@@ -252,7 +252,9 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+        
         $result = $AuthComponent->identify();
         $this->assertEquals('James', $result->name);
     }
@@ -262,7 +264,8 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
         $AuthComponent->config('scope', ['id'=>1024]);
-        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -272,7 +275,9 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
         $AuthComponent->config('model', 'Fozzy');
-        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'secret1'];
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+     
         $AuthComponent->identify();
     }
 
@@ -291,7 +296,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data = ['email'=>'james@example.com','password'=>'1234`'];
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', '1234');
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -299,7 +305,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data = ['email'=>'mark.ronson@example.com','password'=>'funky'];
+        $AuthComponent->request()->data('email', 'mark.ronson@example.com');
+        $AuthComponent->request()->data('password', 'funky');
         $this->assertFalse($AuthComponent->identify());
     }
 

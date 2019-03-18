@@ -27,7 +27,7 @@ class Request
      *
      * @var array
      */
-    public $params = array(
+    protected $params = array(
         'controller' => null,
         'action' => null,
         'args' => array(),
@@ -40,28 +40,28 @@ class Request
      * Holds the query data.
      * @var array
      */
-    public $query = [];
+    protected $query = [];
 
     /**
      * Will contain form post data including from PUT/PATCH and delete
      *
      * @var array
      */
-    public $data = [];
+    protected $data = [];
 
     /**
      * Array of actual cookies
      *
      * @var array
      */
-    public $cookies = [];
+    protected $cookies = [];
 
     /**
      * Address of request including base folder WITHOUT Query params.
      *
      * @example /subfolder/controller/action
      */
-    public $url = null;
+    protected $url = null;
 
     /**
      * Original Headers

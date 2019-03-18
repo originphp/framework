@@ -84,7 +84,7 @@ class AuthComponent extends Component
      */
     public function startup()
     {
-        $action = $this->request()->params['action'];
+        $action = $this->request()->params('action');
 
         if ($this->isLoggedIn()) {
             return null;
@@ -270,10 +270,10 @@ class AuthComponent extends Component
     {
         $loginUrl = Router::url($this->config['loginAction']);
         $params = Router::parse($loginUrl);
-        if ($params['controller'] != $this->request()->params['controller']) {
+        if ($params['controller'] != $this->request()->params('controller')) {
             return false;
         }
-        if ($params['action'] === $this->request()->params['action']) {
+        if ($params['action'] === $this->request()->params('action')) {
             return true;
         }
 
