@@ -68,7 +68,7 @@ trait TemplateTrait
     * if the templates key is a string, then it will fetch the default templates since they
     * were overwritten and load templates from file
      *
-     * @return Templater
+     * @return \Origin\View\Templater
      */
     public function templater()
     {

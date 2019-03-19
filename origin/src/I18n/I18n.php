@@ -12,10 +12,36 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Core;
+namespace Origin\I18n;
 
-use Origin\Utility\Date;
-use Origin\Utility\Number;
+/*
+         * I18n (Numbers,Dates, Translation etc)- set this in AppController::initialize
+         *
+         * Autodetect locale and language from browser:
+         *
+         * I18n::initialize();
+         *
+         * To manually set:
+         *
+         * I18n::initialize(['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']);
+         *
+         * Set for a logged in user
+         *
+         * if($this->Auth->isLoggedIn()){
+         *   I18n::initialize(
+         *      'locale' => $this->Auth->user('locale'),
+         *      'language' => $this->Auth->user('language'),
+         *      'timezone' => $this->Auth->user('timezone'),
+         *      );
+         * }
+         * else{
+         * I18n::initialize()
+         * }
+         *
+         * OR just call ;
+         */
+use Origin\I18n\Date;
+use Origin\I18n\Number;
 use NumberFormatter;
 use IntlTimeZone;
 use Locale;

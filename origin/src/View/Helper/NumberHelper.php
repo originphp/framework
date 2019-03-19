@@ -18,57 +18,67 @@ use Origin\Utility\Number;
 
 class NumberHelper extends Helper
 {
-
     /**
-     * Formats a number into a currency.
+     * Formats a currency number
      *
-     * @param float  $value
-     * @param string $currency EUR
-     * @param array  $options  precision|places|before|after|pattern
+     * $number->currency(1024,'USD'); // $1,024
      *
-     * @return string result $1,234.56
+     * @param string|float $value 1234567.43
+     * @param string $currency USD|EUR|GBP|AUD etc.
+     * @param array $options before,after,places,thousands,decimails
+     * @return string
      */
-    public function currency(float $value, string $currency = null, array $options = [])
+    public function currency($value, string $currency=null, array $options=[])
     {
         return Number::currency($value, $currency, $options);
     }
     /**
-     * Formats a number. This is used by other functions.
-     *
-     * @param float $value
-     * @param array $options precision|places|before|after|pattern
-     *
-     * @return string 1,234.56
-     */
-    public function format(float $value, array $options = [])
+    * Formats a percent number
+    *
+    *  $number->percent(50.55); // 50.55%
+    *
+    * @param string|float $value 1234567.43
+    * @param string $currency USD|EUR|GBP|AUD etc.
+    * @param array $options before,after,places,thousands,decimails
+    * @return string
+    */
+    
+    public function percent($value, int $precision = 2, $options = [])
     {
-        return Number::format($value, $options);
+        return Number::percent($value, $precision, $options);
     }
     /**
-     * Formats a floating point number.
-     *
-     * @param float $value
-     * @param int   $precision number of decimal places
-     * @param array $options   places|before|after|pattern
-     *
-     * @return string 1234.56
-     */
-    public function decimal(float $value, int $precision = 2, array $options = [])
+    * Formats a decimal number
+    *
+    *  $number->decimal(1024.10101010,4); // 1,024.1010
+    *
+    * @param string|float $value 1234567.43
+    * @param string $currency USD|EUR|GBP|AUD etc.
+    * @param array $options before,after,places,thousands,decimails
+    * @return string
+    */
+    public function decimal($value, int $precision = 2, $options = [])
     {
         return Number::decimal($value, $precision, $options);
     }
-
     /**
-     * Formats a number to a percentage.
+     * Formats a number
      *
-     * @param float $value
-     * @param int   $precision number of decimal places
-     * @param array $options   places|before|after|pattern|multiply
+     * $number->format(1024.512); // 1,024.51
      *
-     * @return string 75.00%
+     * Options include:
+     * before - something to be shown before
+     * after - something to be added after
+     * thousands - the thousands seperator
+     * decimals - the decimals seperator
+     * places - how many decimal points to show
+     *
+     * @param float|string $value
+     * @param array $options
+     * @return void
      */
-    public function percent(float $value, int $precision = 2, array $options = [])
+    public function format($value, array $options=[])
     {
-        return Number::percent($value, $precision, $options);
+        return Number::format($value, $options);
     }
 }

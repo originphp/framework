@@ -12,369 +12,219 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * Date Utility - This is non Intl version
+  */
+
 namespace Origin\Utility;
 
 use DateTime;
 use DateTimeZone;
-use IntlDateFormatter;
 
 class Date
 {
-    protected static $locale = 'en_US';
+    /**
+     * Default dateFormat to format and parse
+     *
+     * @var string
+     */
+    protected static $dateFormat = 'm/d/Y';
+    /**
+   * Default dateTimeFormat to format and parse
+   *
+   * @var string
+   */
+    protected static $dateTimeFormat = 'm/d/Y H:i:s';
+    /**
+     * Default timeFormat to format and parse
+     *
+     * @var string
+     */
+    protected static $timeFormat = 'd/m/Y';
 
+    /**
+      * Timezone to be used by this class, if you set anything other than UTC then dates/times will be
+      * converted when formating or parsing
+      *
+      * @var string
+      */
     protected static $timezone = 'UTC';
 
     /**
-     * Holds the default date format used by Date::format().
+     * Gets and sets the date format
      *
-     * @var string
+     * @param string $format e.g 'd/m/Y'
+     * @return string|null
      */
-    protected static $dateFormat = [IntlDateFormatter::SHORT, IntlDateFormatter::NONE];
-
-    /**
-     * Holds the default datetime format used by Date::format().
-     *
-     * @var string
-     */
-    protected static $datetimeFormat = [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT];
-
-    /**
-     * Holds the default time format used by Date::format().
-     *
-     * @var string
-     */
-    protected static $timeFormat = [IntlDateFormatter::NONE, IntlDateFormatter::SHORT];
-
-    /**
-     * Intializes the date Object.
-     *
-     * @param array $config locale|timezone
-     */
-    public static function initialize(array $config = [])
-    {
-        if (isset($config['locale'])) {
-            self::setLocale($config['locale']);
-        }
-        $timezone = date_default_timezone_get();
-        if (isset($config['timezone'])) {
-            $timezone = $config['timezone'];
-        }
-        self::setTimezone($timezone);
-    }
-
-    /**
-     * Sets the locale.
-     *
-     * @param string $locale
-     */
-    public static function setLocale(string $locale)
-    {
-        self::$locale = $locale;
-    }
-
-    public static function setTimezone(string $timezone)
-    {
-        self::$timezone = $timezone;
-    }
-
-    /**
-     * Sets the dateformat using pattern of intl settings.
-     *
-     * @param string|array $dateFormat 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
-     */
-    public static function setDateformat($dateFormat)
-    {
-        self::$dateFormat = $dateFormat;
-    }
-
-    /**
-     * Sets the datetimeformat using pattern of intl settings. Possible patterns can be found at http://userguide.icu-project.org/formatparse/datetime.
-     *
-     * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
-     */
-    public static function setDatetimeFormat($datetimeFormat)
-    {
-        self::$datetimeFormat = $datetimeFormat;
-    }
-
-    /**
-     * Sets the datetimeformat using pattern of intl settings.
-     *
-     * @param string|array $timeFormat 'H:mm' or [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]
-     */
-    public static function setTimeFormat($timeFormat)
-    {
-        self::$timeFormat = $timeFormat;
-    }
-
-    // # # # i18n # # #
-
-    /**
-     * Formats a strtotime() valid string to local time and translates it.
-     *
-     * @param string            $dateString
-     * @param null|array|string $format     we will autodetect
-     */
-    public static function format($dateString, $format = null)
+    public static function dateFormat(string $format = null)
     {
         if ($format === null) {
-            if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
-                $format = self::$datetimeFormat;
-            } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $dateString)) {
-                $format = self::$dateFormat;
-            } elseif (preg_match('/(\d{2}):(\d{2}):(\d{2})/', $dateString)) {
-                $format = self::$timeFormat;
-            } else {
-                return null;
+            return static::$dateFormat;
+        }
+        static::$dateFormat = $format;
+    }
+    /**
+   * Gets and sets the datetime format
+   *
+   * @param string $format e.g 'd/m/Y h:i:s'
+   * @return string|null
+   */
+    public static function dateTimeFormat(string $format = null)
+    {
+        if ($format === null) {
+            return static::$dateTimeFormat;
+        }
+        static::$dateTimeFormat = $format;
+    }
+
+    /**
+   * Gets and sets the date format
+   *
+   * @param string $format e.g 'd/m/Y'
+   * @return string|null
+   */
+    public static function timeFormat(string $format = null)
+    {
+        if ($format === null) {
+            return static::$timeFormat;
+        }
+        static::$timeFormat = $format;
+    }
+
+    /**
+     * Gets and sets the timezone to be used by this class
+     *
+     * @param string $format e.g 'Europe/London'
+     * @return string|null
+     */
+    public static function timezone(string $timezone = null)
+    {
+        if ($timezone === null) {
+            return static::$timezone;
+        }
+        static::$timezone= $timezone;
+    }
+
+    /**
+     * Formats a MySQL date to the user date format either by autodetection or a specific format
+     *
+     * @param string|null $value
+     * @param string|null $type date,datetime,time
+     * @return void
+     */
+    public static function format(string $dateString, string $format = null)
+    {
+        if ($format) {
+            if (static::$timezone != 'UTC') {
+                $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
             }
+            return date($format, strtotime($dateString));
         }
-
-        $formatter = self::formatter($format);
-
-        return $formatter->format(new DateTime($dateString));
-    }
-
-    /**
-     * Formats a date using date defaults.
-     *
-     * @param string $dateString
-     */
-    public static function formatDate(string $dateString)
-    {
-        return self::format($dateString, self::$dateFormat);
-    }
-
-    /**
-     * Formats a datetime using date defaults.
-     *
-     * @param string $dateString
-     */
-    public static function formatDatetime(string $dateString)
-    {
-        return self::format($dateString, self::$datetimeFormat);
-    }
-
-    /**
-     * Formats a datetime using date defaults.
-     *
-     * @param string $dateString
-     */
-    public static function formatTime(string $dateString)
-    {
-        return self::format($dateString, self::$timeFormat);
-    }
-
-    /**
-     * Parses a i18n datetime string and returns a strtotime() valid string in local time
-     * Default format is [IntlDateFormatter::SHORT,IntlDateFormatter::SHORT].
-     *
-     *  $date = Date::parse('12/27/18, 1:02 PM');
-     *  $date = Date::parse('27 Dec, 2018 15:00', 'dd MMM, y H:mm');
-     *  $date = Date::parse('12/27/2018', [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]));.
-     *
-     * @param string            $dateString
-     * @param null|string|array $format
-     *
-     * @return null|dateString strtotime() valid string
-     */
-    public static function parse(string $dateString, $format = null)
-    {
-        $formatter = self::formatter($format);
-        /**
-         * @link http://userguide.icu-project.org/formatparse/datetime
-         */
-        $pattern = $formatter->getPattern();
-        $hasDate = (stripos($pattern, 'y') !== false);
-        $hasTime = (stripos($pattern, 'h') !== false);
-   
-        $returnFormat = 'Y-m-d H:i:s';
-        if ($hasTime and !$hasDate) {
-            $returnFormat = 'H:i:s';
-        } elseif ($hasDate and !$hasTime) {
-            $returnFormat = 'Y-m-d';
-        }
-
-        $timestamp = $formatter->parse($dateString);
-        if ($timestamp !== false) {
-            return date($returnFormat, $timestamp);
+        if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
+            return static::formatDateTime($dateString);
+        } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $dateString)) {
+            return static::formatDate($dateString);
+        } elseif (preg_match('/(\d{2}):(\d{2}):(\d{2})/', $dateString)) {
+            return static::formatTime($dateString);
         }
 
         return null;
+    }
+
+    /**
+     * Formats a MySQL datestring into user date string (timezone conversion happens if timezone
+     * set to anything other than UTC)
+     *
+     * @param string $dateString
+     * @return string
+     */
+    public static function formatDate(string $dateString)
+    {
+        if (static::$timezone != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        }
+        return date(static::$dateFormat, strtotime($dateString));
+    }
+
+    /**
+     * Formats a MySQL datestring into user datetime string (timezone conversion happens if timezone
+     * set to anything other than UTC)
+     *
+     * @param string $dateString
+     * @return string
+     */
+    public static function formatDateTime(string $dateString)
+    {
+        if (static::$timezone != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        }
+        return date(static::$dateTimeFormat, strtotime($dateString));
+    }
+
+    /**
+     * Formats a MySQL datestring into user time string (timezone conversion happens if timezone
+     * set to anything other than UTC)
+     *
+     * @param string $dateString
+     * @return string
+     */
+    public static function formatTime(string $dateString)
+    {
+        if (strpos($dateString, ' ') === false) {
+            $dateString = "2019-01-01 {$dateString}"; // Add fictious date to work
+        }
+        if (static::$timezone != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        }
+        return date(static::$timeFormat, strtotime($dateString));
     }
 
     /**
      * Parses a date string
-     * Date::parseDate('27 Dec, 2018 15:00', 'dd MMM, y H:mm');
+     *
      * @param string $dateString
-     * @param [type] $format
      * @return void
      */
-    public static function parseDate(string $dateString, $format = null)
+    public static function parseDate(string $dateString)
     {
-        if ($format === null) {
-            $format = self::$dateFormat;
-        }
-        $formatter = self::formatter($format);
-
-        $timestamp = $formatter->parse($dateString);
-
-        if ($timestamp !== false) {
-            return date('Y-m-d', $timestamp);
-        }
-        return null;
-    }
-
-    public static function parseTime(string $dateString, $format = null)
-    {
-        if ($format === null) {
-            $format = self::$timeFormat;
-        }
-        $formatter = self::formatter($format);
-
-        $timestamp = $formatter->parse($dateString);
-
-        if ($timestamp !== false) {
-            return date('H:i:s', $timestamp);
-        }
-        return null;
-    }
-
-    public static function parseDatetime(string $dateString, $format = null)
-    {
-        if ($format === null) {
-            $format = self::$datetimeFormat;
-        }
-       
-        $formatter = self::formatter($format);
-
-        $timestamp = $formatter->parse($dateString);
-
-        if ($timestamp !== false) {
-            return date('Y-m-d H:i:s', $timestamp);
-        }
-
-        return null;
+        return static::convertFormat($dateString, static::$dateFormat, 'Y-m-d');
     }
 
     /**
-     * Returns a configured IntlDateFormatter used by both i18nFormat and parse.
-     *
-     * @param null|string|array $format
-     */
-    protected static function formatter($format = null)
-    {
-        $dateFormat = $timeFormat = $pattern = null;
-
-        if (is_array($format)) {
-            list($dateFormat, $timeFormat) = $format;
-        } elseif (is_numeric($format)) {
-            $dateFormat = $format;
-            $timeFormat = IntlDateFormatter::NONE;
-        } else {
-            $dateFormat = $timeFormat = IntlDateFormatter::SHORT;
-            $pattern = $format;
-        }
-
-        /**
-         * The Following calendars use Traditional vs Greg
-         *  Japanese,Buddhist,Chinese,Persian,Indian,Islamic,Hebrew,Coptic,Ethiopic.
-         * Non Gregorian calendars need to be speced in locale e.g fa_IR@calendar=PERSIAN”.
-         *
-         * @link https://twig-extensions.readthedocs.io/en/latest/intl.html
-         */
-        $calendar = IntlDateFormatter::GREGORIAN;
-        if (preg_match('/buddhist|chinese|coptic|ethiopic|hebrew|indian|islamic|japanese|/', self::$locale)) {
-            $calendar = IntlDateFormatter::TRADITIONAL;
-        }
-        $formatter = new IntlDateFormatter(
-            self::$locale,
-            $dateFormat,
-            $timeFormat,
-            self::$timezone,
-            $calendar,
-            $pattern
-        );
-
-        return $formatter;
-    }
-
-    /*
-26.12.18 - These are the Unique Date formats with intl
-   [0] => y-MM-dd
-    [3] => d/M/y
-    [5] => yy/MM/dd
-    [7] => dd/MM/y
-    [9] => d‏/M‏/y
-    [30] => d‏/M‏/y GGGGG
-    [38] => d-M-y
-    [42] => d/M/yy
-    [44] => dd.MM.yy
-    [51] => d.MM.yy
-    [57] => d.MM.yy 'г'.
-    [69] => M/d/yy
-    [71] => d.M.yy.
-    [92] => GGGGG y-MM-dd
-    [95] => dd/MM/yy
-    [112] => d.M.yy
-    [197] => d/MM/yy
-    [231] => y/MM/dd
-    [234] => yy-MM-dd
-    [241] => dd-MM-yy
-    [255] => MM/dd/yy
-    [266] => yy/M/d
-    [270] => y/M/d
-    [278] => d.M.y
-    [362] => dd. MM. y.
-    [363] => d. M. yy.
-    [367] => y. MM. dd.
-    [406] => dd/MM y
-    [416] => yy. M. d.
-    [419] => d-M-yy
-    [427] => d. M. y
-    [474] => dd.M.yy
-    [478] => y.MM.dd
-    [496] => dd.MM.y
-    [521] => d/MM/y
-    [540] => GGGGG y/M/d
-    [604] => d. MM. yy
-    [632] => dd-MM-y
-    [658] => d.MM.y
-*/
-    /*
-    Unique time patterns
-
-    [0] => HH:mm
-        [5] => h:mm a
-        [18] => H:mm
-        [38] => h.mm. a
-        [57] => H:mm 'ч'.
-        [97] => HH.mm
-        [118] => ཆུ་ཚོད་ h སྐར་མ་ mm a
-        [122] => a 'ga' h:mm
-        [155] => H.mm
-        [291] => HH 'h' mm
-        [346] => hh:mm a
-        [365] => H:mm 'hodź'.
-        [416] => a h:mm
-        [490] => B H:mm
-        [703] => ah:mm
-    */
-
-    /**
-     * Converts a strtotime() valid string to server time.
+     * Parses a time string
      *
      * @param string $dateString
-     * @param string $format     this how you want it to return datestring
+     * @return void
      */
-    public static function toServer(string $dateString, string $format = 'Y-m-d H:i:s')
+    public static function parseDateTime(string $dateString)
     {
-        $timezone = new DateTimeZone(self::$timezone);
-        $date = new DateTime($dateString, $timezone);
+        $dateString = static::convertFormat($dateString, static::$dateTimeFormat, 'Y-m-d H:i:s');
+        if ($dateString and static::$timezone != 'UTC') {
+            $dateString = static::convertTimezone($dateString, static::$timezone, 'UTC');
+        }
+        return $dateString;
+    }
 
-        $timezone = new DateTimeZone(date_default_timezone_get());
-        $date->setTimezone($timezone);
-
-        return $date->format($format);
+    /**
+     * Parses a time string and converts to a MySQL time string. PHP script
+     * should always be in UTC else you can expect undesirable results. If you really
+     * must store in local, then dont adjust timezone, if its a UTC then no conversions happen
+     *
+     * @param string $timeString
+     * @return void
+     */
+    public static function parseTime(string $timeString)
+    {
+        $timeString = static::convertFormat($timeString, static::$timeFormat, 'H:i:s');
+       
+        if ($timeString and static::$timezone != 'UTC') { // date_default_timezone_get()
+            if (strpos($timeString, ' ') === false) {
+                $timeString = "2019-01-01 {$timeString}"; // Add fictious date to work
+            }
+            $timeString = static::convertTimezone($timeString, static::$timezone, 'UTC');
+            $timeString = date('H:i:s', strtotime($timeString)); // Remove date from string
+        }
+        return $timeString;
     }
 
     /**
@@ -390,7 +240,6 @@ class Date
         if ($date) {
             return $date->format($toFormat);
         }
-
         return null;
     }
 

@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use Origin\Controller\Controller;
-use Origin\Core\I18n;
+use Origin\I18n\I18n;
 
 class AppController extends Controller
 {
@@ -33,29 +33,6 @@ class AppController extends Controller
         $this->loadHelper('Form');
         $this->loadHelper('Number');
         $this->loadHelper('Date');
-
-        /*
-         * I18n (Numbers,Dates, Translation etc)
-         *
-         * Autodetect locale and language from browser:
-         *
-         * I18n::initialize();
-         *
-         * To manually set:
-         *
-         * I18n::initialize(['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']);
-         *
-         * Set for a logged in user
-         *
-         * if($this->Auth->isLoggedIn()){
-         *   I18n::initialize(
-         *      'locale' => $this->Auth->user('locale'),
-         *      'language' => $this->Auth->user('language'),
-         *      'timezone' => $this->Auth->user('timezone'),
-         *      );
-         * }
-         */
-        I18n::initialize();
     }
 
     /**

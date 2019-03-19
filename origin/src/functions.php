@@ -14,7 +14,7 @@
 use Origin\Core\Debugger;
 use Origin\Core\Configure;
 use Origin\Utility\Collection;
-use Origin\Core\I18n;
+use Origin\I18n\I18n;
 use Origin\Core\Logger;
 
 /**

@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use Origin\Controller\Controller;
-use Origin\Core\I18n;
+use Origin\I18n\I18n;
 
 class AppController extends Controller
 {

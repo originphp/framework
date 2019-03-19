@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\I18n;
+use Origin\I18n\I18n;
 
 class MockI18n extends I18n
 {
