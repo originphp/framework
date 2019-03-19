@@ -96,7 +96,7 @@ GET /books/index?sort=asc&page=101
 ```
 
 ```php
-print_r($this->request->query);
+print_r($this->request->query());
 /*
 Array
 (
@@ -114,7 +114,7 @@ Post data is data which has been posted, we have taken this from the $_POST vari
 <input type="text" name="email" value="james@example.com" />
 ```
 ```php
-print_r($this->request->data);
+print_r($this->request->data());
 /*
 Array
 (
@@ -140,6 +140,10 @@ Array
 )
 */
 ```
+## Components
+
+Components are objects which can be shared between controllers. The framework comes with a number of components and you can also build your own. For more information on this see the [components guide](components.md).
+
 ## Session
 
 When you need to persist small amounts of data between requests you typically would use sessions to access Session data from the controller you would use the Session component.
@@ -176,7 +180,7 @@ class ContactsController extends AppController {
 
 You can also reset the whole session using the `reset` method.
 
-The Session Component uses the session object which can be accessed from the request object at any time.
+The Session Component uses the session object which can be accessed from the request object at any time (unlike a Component which can  only be accessed from the controller).
 
 ```php
 class ContactsController extends AppController {
@@ -186,10 +190,6 @@ class ContactsController extends AppController {
   }
 }
 ```
-
-## Components
-
-Components are objects which can be shared between controllers. The framework comes with a number of components and you can build your own.  For more information on this see the [components guide](components.md).
 
 
 ## Flash Component
@@ -417,6 +417,33 @@ public function delete($id = null)
 }
 ```
 
+### Request Headers
+To get all headers:
+
+```php
+$headers =  $this->request->headers();
+```
+
+To get a header
+
+```php
+$keepAlive = $this->request->header('Connection');
+```
+You can also modify the request headers.
+
+### Checking the accepts header
+
+```php
+public function view($id = null)
+{
+    if($this->request->accepts('application/json')){
+
+    }
+}
+```
+
+There is also a `acceptLanguage` which will return a list of languages that the request can accept.
+
 ### Reading values from cookies in the request
 In addition to getting the cookie object, from the request object you can read a value for a cookie.
 ```php
@@ -437,7 +464,7 @@ public function doSomething()
 
 ### Setting Custom Headers
 
-You can set and get headers through the response object,
+You can set and get headers through the response object.
 
 ```php
 $this->response->header('Accept-Language', 'en-us,en;q=0.5');
