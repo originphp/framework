@@ -46,7 +46,6 @@ class AppModel extends Model
      */
     public function afterValidate(Entity $entity)
     {
-        parent::afterValidate($entity);
     }
 
     /**

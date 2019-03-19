@@ -209,6 +209,7 @@ class Entity
 
     /**
      * Added & to prevent Indirect modification of overloaded property errors.
+     * @return mixed
      */
     public function &get(string $property)
     {

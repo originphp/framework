@@ -165,7 +165,7 @@ class Number
      *
      * @param string|float $value
      * @param array $options
-     * @return void
+     * @return string
      */
     public static function parse($value, array $options= [])
     {

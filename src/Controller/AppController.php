@@ -2,7 +2,6 @@
 namespace App\Controller;
 
 use Origin\Controller\Controller;
-use Origin\I18n\I18n;
 
 class AppController extends Controller
 {
@@ -24,7 +23,7 @@ class AppController extends Controller
         $this->loadComponent('Auth'); // For Bookmarks
 
         /**
-         * Load Core Helpers (These are lazy loaded)
+         * Load Core Helpers (Helpers will be lazy loaded)
          */
         $this->loadHelper('Session');
         $this->loadHelper('Cookie');
