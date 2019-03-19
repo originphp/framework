@@ -8,6 +8,12 @@ namespace App\Controller;
  */
 class BookmarksController extends AppController
 {
+    public function initialize()
+    {
+        $this->loadComponent('Auth'); // Load Authentication - placed here so we can uninstall
+        parent::initialize();
+    }
+
     public $paginate = [
         'limit' => 20,
       ];

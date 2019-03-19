@@ -12,23 +12,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utility;
+namespace Origin\Test\I18n;
 
+use Origin\I18n\I18n;
 use Origin\I18n\Date;
 use IntlDateFormatter;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConvertTimezone()
-    {
-        $result = Date::convertTimezone('2018-12-26 22:00:00', 'Europe/Madrid', 'UTC');
-        $this->assertEquals('2018-12-26 21:00:00', $result);
-
-        $result = Date::convertTimezone('2018-12-26 21:00:00', 'UTC', 'Europe/Madrid');
-        $this->assertEquals('2018-12-26 22:00:00', $result);
-        $this->assertNull(Date::convertTimezone('foo', 'UTC', 'Europe/Madrid'));
-    }
-
     public function testFormat()
     {
         // Test Locale Switching
@@ -137,12 +128,6 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(Date::parseTime('foo'));
     }
 
-    public function testToServer()
-    {
-        Date::setTimezone('Europe/Madrid'); // + 1 hour
-        $this->assertEquals('2018-12-27 10:56:00', Date::toServer('2018-12-27 11:56:00'));
-    }
-
     public function testFormatDate()
     {
         $this->assertEquals('2/24/19', Date::formatDate('2019-02-24 21:00'));
@@ -150,17 +135,13 @@ class DateTest extends \PHPUnit\Framework\TestCase
     }
     public function testFormatDateTime()
     {
+        Date::setLocale('en_US');
+        Date::setTimezone('Europe/Madrid');
         $this->assertEquals('2/24/19, 10:00 PM', Date::formatDateTime('2019-02-24 21:00'));
     }
     public function testFormatTime()
     {
         $this->assertEquals('10:00 PM', Date::formatTime('2019-02-24 21:00'));
         $this->assertEquals('10:00 PM', Date::formatTime('21:00'));
-    }
-
-    public function testConvertFormat()
-    {
-        $this->assertEquals('2019-02-25', Date::convertFormat('25/02/2019', 'd/m/Y', 'Y-m-d'));
-        $this->assertNull(Date::convertFormat('foo', 'd/m/Y', 'Y-m-d'));
     }
 }

@@ -10,6 +10,12 @@ class UsersController extends AppController
       'limit' => 20,
     ];
 
+    public function initialize()
+    {
+        $this->loadComponent('Auth'); // Load Authentication - placed here so we can uninstall
+        parent::initialize();
+    }
+
     public function index()
     {
         $this->set('users', $this->paginate('User'));

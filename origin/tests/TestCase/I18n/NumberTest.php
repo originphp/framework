@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utility;
+namespace Origin\Test\I18n;
 
 use Origin\I18n\Number;
 

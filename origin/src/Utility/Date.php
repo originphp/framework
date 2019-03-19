@@ -24,85 +24,42 @@ use DateTimeZone;
 class Date
 {
     /**
-     * Default dateFormat to format and parse
+     * Holds the locale config for date formating and parsing
      *
-     * @var string
+     * @var array
      */
-    protected static $dateFormat = 'm/d/Y';
-    /**
-   * Default dateTimeFormat to format and parse
-   *
-   * @var string
-   */
-    protected static $dateTimeFormat = 'm/d/Y H:i:s';
-    /**
-     * Default timeFormat to format and parse
-     *
-     * @var string
-     */
-    protected static $timeFormat = 'd/m/Y';
+    protected static $locale = [
+        'timezone' => 'UTC',
+        'date' => 'm/d/Y',
+        'datetime' => 'm/d/Y H:i',
+        'time' => 'H:i'
+    ];
 
     /**
-      * Timezone to be used by this class, if you set anything other than UTC then dates/times will be
-      * converted when formating or parsing
-      *
-      * @var string
-      */
-    protected static $timezone = 'UTC';
-
-    /**
-     * Gets and sets the date format
+     * Sets and gets the locale array
      *
-     * @param string $format e.g 'd/m/Y'
-     * @return string|null
-     */
-    public static function dateFormat(string $format = null)
-    {
-        if ($format === null) {
-            return static::$dateFormat;
-        }
-        static::$dateFormat = $format;
-    }
-    /**
-   * Gets and sets the datetime format
-   *
-   * @param string $format e.g 'd/m/Y h:i:s'
-   * @return string|null
-   */
-    public static function dateTimeFormat(string $format = null)
-    {
-        if ($format === null) {
-            return static::$dateTimeFormat;
-        }
-        static::$dateTimeFormat = $format;
-    }
-
-    /**
-   * Gets and sets the date format
-   *
-   * @param string $format e.g 'd/m/Y'
-   * @return string|null
-   */
-    public static function timeFormat(string $format = null)
-    {
-        if ($format === null) {
-            return static::$timeFormat;
-        }
-        static::$timeFormat = $format;
-    }
-
-    /**
-     * Gets and sets the timezone to be used by this class
+     * Date::locale([
+     *      'timezone' => 'UTC',
+     *      'date' => 'm/d/Y',
+      *     'datetime' => 'm/d/Y H:i',
+     *      'time' => 'H:i'
+      *    ]);
      *
-     * @param string $format e.g 'Europe/London'
-     * @return string|null
+     * @param array $locale
+     * @return array|null
      */
-    public static function timezone(string $timezone = null)
+    public static function locale(array $locale = null)
     {
-        if ($timezone === null) {
-            return static::$timezone;
+        if ($locale === null) {
+            return static::$locale;
         }
-        static::$timezone= $timezone;
+        $locale += [
+            'timezone' => 'UTC',
+            'date' => 'm/d/Y',
+            'datetime' => 'm/d/Y H:i',
+            'time' => 'H:i'
+        ];
+        static::$locale = $locale;
     }
 
     /**
@@ -115,8 +72,8 @@ class Date
     public static function format(string $dateString, string $format = null)
     {
         if ($format) {
-            if (static::$timezone != 'UTC') {
-                $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+            if (static::$locale['timezone'] != 'UTC') {
+                $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
             }
             return date($format, strtotime($dateString));
         }
@@ -140,10 +97,10 @@ class Date
      */
     public static function formatDate(string $dateString)
     {
-        if (static::$timezone != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        if (static::$locale['timezone'] != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
         }
-        return date(static::$dateFormat, strtotime($dateString));
+        return date(static::$locale['date'], strtotime($dateString));
     }
 
     /**
@@ -155,10 +112,10 @@ class Date
      */
     public static function formatDateTime(string $dateString)
     {
-        if (static::$timezone != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        if (static::$locale['timezone'] != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
         }
-        return date(static::$dateTimeFormat, strtotime($dateString));
+        return date(static::$locale['datetime'], strtotime($dateString));
     }
 
     /**
@@ -173,10 +130,10 @@ class Date
         if (strpos($dateString, ' ') === false) {
             $dateString = "2019-01-01 {$dateString}"; // Add fictious date to work
         }
-        if (static::$timezone != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$timezone);
+        if (static::$locale['timezone'] != 'UTC') {
+            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
         }
-        return date(static::$timeFormat, strtotime($dateString));
+        return date(static::$locale['time'], strtotime($dateString));
     }
 
     /**
@@ -187,7 +144,7 @@ class Date
      */
     public static function parseDate(string $dateString)
     {
-        return static::convertFormat($dateString, static::$dateFormat, 'Y-m-d');
+        return static::convertFormat($dateString, static::$locale['date'], 'Y-m-d');
     }
 
     /**
@@ -198,9 +155,9 @@ class Date
      */
     public static function parseDateTime(string $dateString)
     {
-        $dateString = static::convertFormat($dateString, static::$dateTimeFormat, 'Y-m-d H:i:s');
-        if ($dateString and static::$timezone != 'UTC') {
-            $dateString = static::convertTimezone($dateString, static::$timezone, 'UTC');
+        $dateString = static::convertFormat($dateString, static::$locale['datetime'], 'Y-m-d H:i:s');
+        if ($dateString and static::$locale['timezone'] != 'UTC') {
+            $dateString = static::convertTimezone($dateString, static::$locale['timezone'], 'UTC');
         }
         return $dateString;
     }
@@ -215,13 +172,13 @@ class Date
      */
     public static function parseTime(string $timeString)
     {
-        $timeString = static::convertFormat($timeString, static::$timeFormat, 'H:i:s');
+        $timeString = static::convertFormat($timeString, static::$locale['time'], 'H:i:s');
        
-        if ($timeString and static::$timezone != 'UTC') { // date_default_timezone_get()
+        if ($timeString and static::$locale['timezone'] != 'UTC') { // date_default_timezone_get()
             if (strpos($timeString, ' ') === false) {
                 $timeString = "2019-01-01 {$timeString}"; // Add fictious date to work
             }
-            $timeString = static::convertTimezone($timeString, static::$timezone, 'UTC');
+            $timeString = static::convertTimezone($timeString, static::$locale['timezone'], 'UTC');
             $timeString = date('H:i:s', strtotime($timeString)); // Remove date from string
         }
         return $timeString;

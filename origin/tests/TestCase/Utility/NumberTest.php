@@ -33,8 +33,8 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     }
     public function testPercentage()
     {
-        $this->assertEquals('99.00%', Number::percentage(99));
-        $this->assertEquals('50.00%', Number::percentage(.50, 2, ['multiply'=>true]));
+        $this->assertEquals('99.00%', Number::percent(99));
+        $this->assertEquals('50.00%', Number::percent(.50, 2, ['multiply'=>true]));
     }
     public function testCurrency()
     {

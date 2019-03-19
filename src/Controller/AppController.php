@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use Origin\Controller\Controller;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 
 class AppController extends Controller
 {
@@ -14,13 +16,11 @@ class AppController extends Controller
         parent::initialize();
 
         /**
-         * Core components to be loaded by default
+         * Core components to be loaded by default.
          */
         $this->loadComponent('Session');
         $this->loadComponent('Cookie');
         $this->loadComponent('Flash');
-
-        $this->loadComponent('Auth'); // For Bookmarks
 
         /**
          * Load Core Helpers (Helpers will be lazy loaded)
@@ -32,6 +32,13 @@ class AppController extends Controller
         $this->loadHelper('Form');
         $this->loadHelper('Number');
         $this->loadHelper('Date');
+
+        /**
+         * Set the default locale settings for dates and numbers. When dates and numbers
+         * are displayed or parsed (Date::parse) it will be assume they are in this format.
+         */
+        Date::locale(['timezone' => 'UTC','date' => 'm/d/Y','datetime' => 'm/d/Y H:i','time' => 'H:i']);
+        Number::locale(['currency'=>'USD','thousands'=>',','decimals'=>'.','places'=>2]);
     }
 
     /**
