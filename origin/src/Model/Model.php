@@ -1406,7 +1406,7 @@ class Model
 
     /**
      * Takes results from the datasource and converts into an entity. Different
-     * from model::newEntity which takes an array which can include hasMany
+     * from model::new which takes an array which can include hasMany
      * and converts.
      *
      * @param array $results results from datasource
@@ -1418,12 +1418,12 @@ class Model
         $buffer = [];
 
         foreach ($results as $record) {
-            $entity = $this->create($record[$this->alias], ['name'=>$this->alias,'exists'=>true]);
+            $entity = new Entity($record[$this->alias], ['name'=>$this->alias,'exists'=>true]);
             unset($record[$this->alias]);
 
             foreach ($record as $model => $data) {
                 $associated = Inflector::variable($model);
-                $entity->{$associated} = $this->create($data, ['name'=>$associated,'exists'=>true]);
+                $entity->{$associated} = new Entity($data, ['name'=>$associated,'exists'=>true]);
             }
 
             $buffer[] = $entity;
@@ -1431,19 +1431,7 @@ class Model
 
         return $buffer;
     }
-
-    /**
-     * Creates a simple entity - no associated data
-     *
-     * @param array $data to build with entity with
-     * @param array $options
-     * @return \Origin\Model\Entity
-     */
-    public function create(array $data = [], array $options=[])
-    {
-        return new Entity($data, $options);
-    }
-
+   
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
@@ -1669,7 +1657,7 @@ class Model
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function newEntity(array $requestData = [], array $options=[])
+    public function new(array $requestData = [], array $options=[])
     {
         $options += ['name' => $this->alias];
         return $this->marshaller()->one($requestData, $options);
@@ -1697,7 +1685,7 @@ class Model
      * @param array $options parse
      * @var \Origin\Model\Entity
      */
-    public function patchEntity(Entity $entity, array $requestData, array $options=[])
+    public function patch(Entity $entity, array $requestData, array $options=[])
     {
         return $this->marshaller()->patch($entity, $requestData, $options);
     }

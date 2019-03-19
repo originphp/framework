@@ -38,7 +38,7 @@ class Marshaller
      *
      * @return array
      */
-    protected function buildAssociationMap($associated)
+    protected function buildAssociationMap($associated) : array
     {
         $map = [];
         $model = $this->model;
@@ -57,19 +57,13 @@ class Marshaller
         return $map;
     }
 
-   
-    public function prepareFieldOptions(array $options)
-    {
-        $associated = [];
-        if (isset($options['associated'])) {
-            $associated = $options['associated'];
-            unset($options['associated']);
-        }
-        return [$this->model->alias=>$options] + $associated;
-    }
-
-
-    protected function standardizeAssociated(array $array)
+    /**
+     * Standardize the options for associated data
+     *
+     * @param array $array
+     * @return array
+     */
+    protected function standardizeAssociated(array $array) : array
     {
         $result = [];
        
@@ -92,9 +86,9 @@ class Marshaller
      *
      * @param array $data
      * @param array $options
-     * @return \Origin\Model\
+     * @return \Origin\Model\Entity
      */
-    public function one(array $data, array $options=[])
+    public function one(array $data, array $options=[]) : Entity
     {
         $options += ['name' => null,'associated'=>[],'fields'=>[]];
 
@@ -143,7 +137,7 @@ class Marshaller
      * @param array $options
      * @return array
      */
-    public function many(array $data, array $options=[])
+    public function many(array $data, array $options=[]) : array
     {
         $result = [];
         foreach ($data as $row) {
@@ -161,7 +155,7 @@ class Marshaller
      * @param array  $data
      * @return \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $data, array $options=[])
+    public function patch(Entity $entity, array $data, array $options=[]) : Entity
     {
         $options += ['name' => $entity->name(),'associated'=>[],'fields'=>[]];
         

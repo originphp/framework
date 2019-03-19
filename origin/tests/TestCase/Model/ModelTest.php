@@ -186,7 +186,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $displayField = $Article->displayField;
     }
 
-    public function testNewEntity()
+    public function testnew()
     {
         $data = [
           'id' => 1004,
@@ -194,7 +194,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         ];
 
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-        $Entity = $Article->newEntity($data);
+        $Entity = $Article->new($data);
         $this->assertEquals(1004, $Entity->id);
         $this->assertEquals('EntityName', $Entity->name);
         $this->assertEquals('Article', $Entity->name());
@@ -212,7 +212,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Entity 2', $entities[1]->name);
     }
 
-    public function testNewEntityBelongsTo()
+    public function testnewBelongsTo()
     {
         $data = array(
         'id' => 1005,
@@ -223,7 +223,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
         $Article->belongsTo('Author');
-        $Entity = $Article->newEntity($data, ['associated'=>['Author']]);
+        $Entity = $Article->new($data, ['associated'=>['Author']]);
         $this->assertTrue($Entity->has('author'));
         $this->assertTrue($Entity->author->has('name'));
         $this->assertEquals('Amanda', $Entity->author->name);
@@ -242,7 +242,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->Comment = new Model(array('name' => 'Comment', 'datasource' => 'test'));
         $Article->hasMany('Comment');
 
-        $Entity = $Article->newEntity($data, ['associated'=>['Comment']]);
+        $Entity = $Article->new($data, ['associated'=>['Comment']]);
         $this->assertTrue($Entity->has('comments'));
         $this->assertEquals(2, count($Entity->comments));
 
@@ -667,7 +667,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
     public function testSaveBadData()
     {
         $Article = new Article(['datasource' => 'test']);
-        $entity = $Article->newEntity(['title'=>'testSaveBadData']);
+        $entity = $Article->new(['title'=>'testSaveBadData']);
         $entity->user_id = [];
         $this->assertFalse($Article->save($entity));
     }
@@ -814,7 +814,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $methods = ['saveHABTM'];
         $Article = $this->getMockModel(Article::class, $methods);
         $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' =>  [
           ['title' => 'testSaveHABTMIsCalled'],
@@ -842,7 +842,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ['title' => 'HABTM Tag #1'],
           ['title' => 'HABTM Tag #2'],
         );
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' => $tags,
         ), ['associated'=>['Tag']]);
@@ -871,7 +871,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         //Save by ID
         $Article->ArticlesTag->deleteAll(['article_id' => 2]);
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 2,
         'tags' => array(
           ['id' => $tags[0]->id],
@@ -901,7 +901,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         $Article->query('ALTER TABLE articles_tags ADD id INT PRIMARY KEY AUTO_INCREMENT;');
         $Article->query('ALTER TABLE articles_tags ADD COLUMN test INT(1) default 0');
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' => array(
           ['title' => 'HABTM Tag #1'],
@@ -913,7 +913,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->getConnection()->update('articles_tags', ['test' => 1]);
         //$conditions['test'] = 1;
 
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' => array(
           ['title' => 'HABTM Tag #2'],
@@ -941,7 +941,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         $Article->ArticlesTag->deleteAll($conditions);
 
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' => array(
           ['title' => 'HABTM Tag #1'],
@@ -953,7 +953,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->getConnection()->update('articles_tags', ['test' => 1]);
         //$conditions['test'] = 1;
 
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'id' => 1,
         'tags' => array(
           ['title' => 'HABTM Tag #2'],
@@ -973,7 +973,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         $User->hasOne('Profile');
 
-        $data = $User->newEntity(array(
+        $data = $User->new(array(
         'name' => 'Dave',
         'email' => 'dave@example.com',
         'password' => 'secret',
@@ -995,7 +995,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         $Profile->belongsTo('User');
 
-        $data = $Profile->newEntity(array(
+        $data = $Profile->new(array(
         'name' => 'Developer (SABT)',
         'user' => array(
           'name' => 'Claire',
@@ -1016,7 +1016,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
 
         $Article->hasMany('Comment');
 
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'user_id' => 1,
         'title' => 'Save Associated Has Many',
         'slug' => 'save-associated-has-many',
@@ -1078,7 +1078,7 @@ lastname VARCHAR(30) NOT NULL
 
         $Article->hasMany('Comment');
 
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
         'user_id' => 1,
         'title' => 'Delete Dependent',
         'slug' => 'delete-dependent',
@@ -1117,7 +1117,7 @@ lastname VARCHAR(30) NOT NULL
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
         $Article->hasAndBelongsToMany('Tag');
-        $data = $Article->newEntity(array(
+        $data = $Article->new(array(
           'id' => 3,
           'tags' => array(
             array('title' => 'DeleteHABTM'),
@@ -1136,7 +1136,7 @@ lastname VARCHAR(30) NOT NULL
         //   $this->assertEquals(0,$Article->ArticlesTag->find('count',$params)); // Checks
     }
 
-    public function testPatchEntity()
+    public function testpatch()
     {
         $data = array(
         'id' => 1024,
@@ -1155,7 +1155,7 @@ lastname VARCHAR(30) NOT NULL
         $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
         $Article->belongsTo('Author');
         $Article->hasMany('Tag');
-        $Entity = $Article->newEntity($data, ['associated'=>['Author','Tag']]);
+        $Entity = $Article->new($data, ['associated'=>['Author','Tag']]);
 
         $requestData = array(
         'title' => 'New Article Name',
@@ -1168,7 +1168,7 @@ lastname VARCHAR(30) NOT NULL
           array('tag' => 'top ten'),
         ),
       );
-        $patchedEntity = $Article->patchEntity($Entity, $requestData, ['associated'=>['Author','Tag']]);
+        $patchedEntity = $Article->patch($Entity, $requestData, ['associated'=>['Author','Tag']]);
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
         $this->assertEquals('published', $patchedEntity->tags[0]->tag);
@@ -1196,9 +1196,9 @@ lastname VARCHAR(30) NOT NULL
     {
         $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
         $Article->validate('title', 'notBlank');
-        $entity = $Article->newEntity(['title'=>null]);
+        $entity = $Article->new(['title'=>null]);
         $this->assertFalse($Article->validates($entity));
-        $entity = $Article->newEntity(['title'=>'foo']);
+        $entity = $Article->new(['title'=>'foo']);
         $this->assertTrue($Article->validates($entity));
     }
 

@@ -22,10 +22,10 @@ class %controller%Controller extends AppController
 
     public function add()
     {
-        $%singularName% = $this->%model%->newEntity();
+        $%singularName% = $this->%model%->new();
 
         if ($this->request->is(['post'])) {
-            $%singularName% = $this->%model%->newEntity($this->request->data());
+            $%singularName% = $this->%model%->new($this->request->data());
 
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been created.'));
@@ -46,7 +46,7 @@ class %controller%Controller extends AppController
         $%singularName% = $this->%model%->get($id);
 
         if ($this->request->is(['post', 'put'])) {
-            $%singularName% = $this->%model%->patchEntity($%singularName%,$this->request->data());
+            $%singularName% = $this->%model%->patch($%singularName%,$this->request->data());
 
             if ($this->%model%->save($%singularName%)) {
                 $this->Flash->success(__('Your %singularHumanLower% has been updated.'));

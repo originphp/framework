@@ -50,7 +50,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testNewEntity()
+    public function testnew()
     {
         $data = array(
           'id' => 1024,
@@ -102,9 +102,9 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
 
 
     /**
-     * @d epends testNewEntity
+     * @d epends testnew
      */
-    public function testPatchEntity()
+    public function testpatch()
     {
         $data = array(
       'id' => 1024,

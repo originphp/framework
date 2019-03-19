@@ -217,7 +217,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
 
         $Article->loadBehavior('BehaviorTester');
 
-        $article = $Article->newEntity(array(
+        $article = $Article->new(array(
         'user_id' => 3, 'title' => 'testValidateCallbacks',
         'body' => 'testValidateCallbacks',
         'slug' => 'test-validate-callbacks',
@@ -250,7 +250,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
 
         $Article->loadBehavior('BehaviorTester');
 
-        $article = $Article->newEntity(array(
+        $article = $Article->new(array(
         'user_id' => 3, 'title' => 'testValidateCallbacksAbort',
         'body' => 'testValidateCallbacksAbort',
         'slug' => 'test-validate-callbacks-abort',
@@ -283,7 +283,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
 
         $Article->loadBehavior('BehaviorTester');
 
-        $article = $Article->newEntity(array(
+        $article = $Article->new(array(
        'user_id' => 3, 'title' => 'testSaveCallbacksAbort',
        'body' => 'testSaveCallbacksAbort',
        'slug' => 'test-save-callbacks-abor',
@@ -317,7 +317,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
 
         $Article->loadBehavior('BehaviorTester');
 
-        $article = $Article->newEntity(array(
+        $article = $Article->new(array(
           'user_id' => 3, 'title' => 'SaveCallbacks',
           'body' => 'SaveCallbacks',
           'slug' => 'test-save-callbacks',

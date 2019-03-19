@@ -74,7 +74,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
 
         $result = $FormHelper->create($widget);
         $expected = '<form method="post" accept-charset="utf-8" action="/widgets/edit">';
@@ -121,14 +121,14 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $FormHelper = $this->FormHelper;
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->name = 'foo';
 
-        $widget2 = $Widget->newEntity();
+        $widget2 = $Widget->new();
         $widget2->name = 'bar';
         $widget->related = $widget2;
 
-        $widget3 = $Widget->newEntity();
+        $widget3 = $Widget->new();
         $widget3->name = 'foo/bar';
         $widget->widgets = [$widget3];
 
@@ -151,16 +151,16 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $FormHelper = $this->FormHelper;
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->name = 'foo';
         $widget->setError('name', 'its not bar');
 
-        $widget2 = $Widget->newEntity();
+        $widget2 = $Widget->new();
         $widget2->name = 'bar';
         $widget2->setError('name', 'its not foo');
         $widget->related = $widget2;
 
-        $widget3 = $Widget->newEntity();
+        $widget3 = $Widget->new();
         $widget3->name = 'foo/bar';
         $widget3->setError('name', 'its messy');
 
@@ -204,7 +204,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $FormHelper->textarea('description', ['value' => 'some text here']));
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->description = 'a description that sells';
 
         $result = $FormHelper->create($widget);
@@ -250,7 +250,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published'], ['empty' => true, 'value' => null]));
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->status = 'new';
 
         $result = $FormHelper->create($widget);
@@ -299,7 +299,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $FormHelper->label('name', 'Custom'));
 
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->name = 'Widget Name';
 
         $result = $FormHelper->create($widget);
@@ -330,7 +330,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
         # Test values
         $Widget = new Widget();
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->active = true;
         $widget->in_stock = false;
         $result = $FormHelper->create($widget);
@@ -395,7 +395,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $Widget = new Widget();
         ModelRegistry::set('Widget', $Widget);
 
-        $widget = $Widget->newEntity();
+        $widget = $Widget->new();
         $widget->description = 'Widget Name';
         $widget->setError('description', 'invalid description');
 

@@ -19,12 +19,12 @@ class ContactsController extends AppController {
 }
 ```
 
-For example, if a user wants to create a new contact and in your application they would go to  `/contacts/create`, this will load the `ContactsController` and run the `create` method, this will then automatically render the `/src/View/Contacts/create.ctp` unless you tell it otherwise. In the method we will create a Contact entity, which is a object which represents a single row of data, and then we will send it to the view using `set`. We do this by calling the `newEntity` method on the Contact model.
+For example, if a user wants to create a new contact and in your application they would go to  `/contacts/create`, this will load the `ContactsController` and run the `create` method, this will then automatically render the `/src/View/Contacts/create.ctp` unless you tell it otherwise. In the method we will create a Contact entity, which is a object which represents a single row of data, and then we will send it to the view using `set`. We do this by calling the `new` method on the Contact model.
 
 ```php
 class ContactsController extends AppController {
   public function new(){
-      $contact = $this->Contact->newEntity();
+      $contact = $this->Contact->new();
 
       $contact->first_name = 'James';
       $contact->email = 'james@example.com';

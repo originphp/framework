@@ -31,10 +31,10 @@ class UsersController extends AppController
 
     public function add()
     {
-        $user = $this->User->newEntity();
+        $user = $this->User->new();
 
         if ($this->request->is(['post'])) {
-            $user = $this->User->newEntity($this->request->data);
+            $user = $this->User->new($this->request->data);
             if ($this->User->save($user)) {
                 $this->Flash->success('Your user has been created.');
 
@@ -51,7 +51,7 @@ class UsersController extends AppController
         $user = $this->User->get($id);
 
         if ($this->request->is(['post', 'put'])) {
-            $user = $this->User->newEntity($this->request->data);
+            $user = $this->User->new($this->request->data);
 
             $user->id = $id;
 

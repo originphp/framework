@@ -24,7 +24,7 @@ class TimestampBehaviorTest extends \PHPUnit\Framework\TestCase
         $Article = new Model(['name' => 'Article','datasource'=>'test']);
         $behavior = new TimestampBehavior($Article);
         $data = ['title'=>'Foo Bar'];
-        $entity = $Article->newEntity($data);
+        $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
         $behavior->beforeSave($entity);
         $this->assertEquals($timestamp, $entity->created);
@@ -35,7 +35,7 @@ class TimestampBehaviorTest extends \PHPUnit\Framework\TestCase
         $Article = new Model(['name' => 'Article','datasource'=>'test']);
         $behavior = new TimestampBehavior($Article);
         $data = ['title'=>'Foo Bar','created'=>'2019-03-02 20:00:00','modified'=>'2019-03-02 20:00:00'];
-        $entity = $Article->newEntity($data);
+        $entity = $Article->new($data);
     
         $timestamp = date('Y-m-d H:i:s');
         $behavior->beforeSave($entity);
@@ -43,7 +43,7 @@ class TimestampBehaviorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($timestamp, $entity->modified);
 
         $data = ['title'=>'Foo Bar'];
-        $entity = $Article->newEntity($data);
+        $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
         $behavior->beforeSave($entity);
         $this->assertEquals($timestamp, $entity->modified);

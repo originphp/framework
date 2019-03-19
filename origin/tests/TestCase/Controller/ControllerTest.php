@@ -334,7 +334,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $Pet = new Pet();
         ModelRegistry::set('Pet', $Pet);
         for ($i=0;$i<100;$i++) {
-            $Pet->save($Pet->newEntity(['name'=>'Pet' . $i]));
+            $Pet->save($Pet->new(['name'=>'Pet' . $i]));
         }
         
         $controller = new TestsController(

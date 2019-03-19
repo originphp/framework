@@ -2,33 +2,33 @@
 
 To save a record, it needs to be an [entity object](entities.md). 
 
-You can use the `newEntity` or `patchEntity` methods in the model to create the entity object for you.
+You can use the `new` or `patch` methods in the model to create the entity object for you.
 
 When creating the entity you can do so like this from within the model:
 
 ```php
-    $entity = $this->newEntity();
+    $entity = $this->new();
     $entity->name = 'foo';
 ```
 
 Or like this
 
 ```php
-  $entity = $this->newEntity(['name'=>'foo']);
+  $entity = $this->new(['name'=>'foo']);
 ```
 
 From the controller it would be
 
 ```php
-    $entity = $this->MyModel->newEntity(['name'=>'foo']);
+    $entity = $this->MyModel->new(['name'=>'foo']);
 ```
 
-The PatchEntity method is used for taking an existing entity and patching it with data from an array. When this entity is saved, only the modified fields will be saved the database.
+The patch method is used for taking an existing entity and patching it with data from an array. When this entity is saved, only the modified fields will be saved the database.
 
 From the controller patch entity is used like this:
 
 ```php
-    $entity = $this->MyModel->patchEntity($existing,$this->request->data);
+    $entity = $this->MyModel->patch($existing,$this->request->data);
 ```
 
 ## save(Entity $entity,array $options = [])
@@ -129,7 +129,7 @@ You can save records with with associated data such as `hasOne`,`BelongsTo` and 
         ['text' => 'bar'],
       ]
   ];
-  $entity = $this->Article->newEntity($article);
+  $entity = $this->Article->new($article);
   $this->Article->saveAssociated($entity);
 ```
 ## Saving HABTM records
@@ -148,7 +148,7 @@ You can save HABTM in two ways
       array('id' => 1),
       array('id' => 2)
     ));
-  $entity = $this->Article->newEntity($data);
+  $entity = $this->Article->new($data);
   $this->Article->save($data);
 
 ```
@@ -163,7 +163,7 @@ You can save HABTM in two ways
       array('name' => 'New'),
       array('name' => 'Featured')
     );
-  $entity = $this->Article->newEntity($data);
+  $entity = $this->Article->new($data);
   $this->Article->save($data);
 
 ```
@@ -173,7 +173,7 @@ If you wish to save extra data to the join table or use callbacks then you shoul
 
 ```php
 
-  $articlesTag = $this->Article->ArticlesTag->newEntity();
+  $articlesTag = $this->Article->ArticlesTag->new();
 
   $articleTag->article_id = 123
   $articleTag->tag_id = 456;

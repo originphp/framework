@@ -194,7 +194,7 @@ class Queue
         if (!preg_match('/^[a-z0-9_-]+$/i', $queue)) {
             throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores and hypens');
         }
-        $entity = $this->Job->newEntity();
+        $entity = $this->Job->new();
 
         $entity->queue = $queue;
         $entity->data = json_encode($data);

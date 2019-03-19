@@ -20,16 +20,16 @@ An entity is a single row from the database. Using find first or find all will r
 
 ```
 
-From within the controller you will want to create entity from request data, you do this by accessing the model methods `newEntity` and `patchEntity`. Arrays of data passed through these methods go through a marshalling process -  date, datetime and number fields will be parsed according to user locale.
+From within the controller you will want to create entity from request data, you do this by accessing the model methods `new` and `patch`. Arrays of data passed through these methods go through a marshalling process -  date, datetime and number fields will be parsed according to user locale.
 
 ````php 
-  $user = $this->User->newEntity($this->request->data);
+  $user = $this->User->new($this->request->data);
 ````
 
 To get a blank entity for a model do this:
 
 ````php 
-  $user = $this->User->newEntity();
+  $user = $this->User->new();
   $user->name = 'james'
   $user->email = 'james@example.com'
 ````
@@ -46,24 +46,24 @@ If you want to create multiple entities from form data it should be like this:
 
 This will create an array with two entities.
 
-If you are editing an existing record, then use `patchEntity`. Only fields that have been modified will be
+If you are editing an existing record, then use `patch`. Only fields that have been modified will be
 saved. The field will be classed as modified even if the value stays the same, since we are going patch the existing  entity with the data, in this case from the request.
 
 ````php 
-  $user = $this->User->patchEntity($existingEntity,$this->request->data);
+  $user = $this->User->patch($existingEntity,$this->request->data);
 ````
 
-*Important*: Any user submitted data should pass through the `newEntity` or `patchEntity` function, since the data will go through the marshalling process and fields like dates,time, and numbers are parsed according to user locale.
+*Important*: Any user submitted data should pass through the `new` or `patch` function, since the data will go through the marshalling process and fields like dates,time, and numbers are parsed according to user locale.
 
 You can disable parsing like this when creating a new Entity
 
 ````php 
-  $entity = $this->User->newEntity($data,['parse'=>false]);
+  $entity = $this->User->new($data,['parse'=>false]);
 ````
 And for patching an existing entity
 
 ````php 
-  $combined = $this->User->patchEntity($existingEntity,$this->request->data,['parse'=>false]);
+  $combined = $this->User->patch($existingEntity,$this->request->data,['parse'=>false]);
 ````
 
 ## Isset

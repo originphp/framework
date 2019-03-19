@@ -134,7 +134,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
             )");
         $Movie = new Movie();
         $Movie->datasource = 'default';
-        $entity = $Movie->newEntity(['name'=>'The Sound of Music','year'=>1965]);
+        $entity = $Movie->new(['name'=>'The Sound of Music','year'=>1965]);
         return $Movie->save($entity);
     }
    
