@@ -1,17 +1,16 @@
 # Callbacks
 
 ## beforeFind
-`beforeFind(array $query)`
 
 This is called before any find operation. The `query` array passed to the `beforeFind` callback contains information such as conditions, fields etc.
 
-If `beforeFind` returns `false` then the find operation is cancelled.  Return `true` or the modified `query`.
+If `beforeFind` returns `false` then the find operation is canceled.  Return `true` or the modified `query`.
 
 ```php
 
-  public function beforeFind(array $query){
+  public function beforeFind(array $query = []){
 
-    if(!parent::beforeFind()){
+    if(!parent::beforeFind($query)){
       return false;
     }
 
@@ -23,7 +22,6 @@ If `beforeFind` returns `false` then the find operation is cancelled.  Return `t
 ```
 
 ## afterFind
-`afterFind($results)`
 
 This is called after any find operation. Results from the find operation are passed to this function and needs to return back the results. Here you can modify data or carry out other tasks.
 
@@ -43,7 +41,6 @@ This is called after any find operation. Results from the find operation are pas
 ```
 
 ## beforeValidate
-`beforeValidate(Entity $entity)`
 
 This is called just before data is validated and must return true. Use this callback to modify data before validate
 
@@ -62,9 +59,8 @@ This is called just before data is validated and must return true. Use this call
 ```
 
 ## afterValidate
-`afterValidate(Entity $entity)`
 
-This is called just before data is validated and must return true. Use this callback to modify data before validate
+This is called after the data has been validated, even if validation fails this callback is executed. You can get the errors from the entity by calling `hasErrors` on the entity.
 
 ```php
 
@@ -80,11 +76,7 @@ This is called just before data is validated and must return true. Use this call
 
 
 ## beforeSave
-`beforeSave(Entity $entity,array $options =[])`
-
-This is called before any save operation. The `options` array is the same as the one passed to the save method.
-
-It must return `true` or save will fail.
+This is called before any save operation. The `options` array is the same as the one passed to the save method. The filter must return `true` or saving will stopped.
 
 ```php
 
@@ -102,8 +94,6 @@ It must return `true` or save will fail.
 ```
 
 ## afterSave
-`afterSave(Entity $entity,bool $created, array $options)`
-
 This is called after a save operation. If a record was created then `created` is set to `true`.
 
 ```php
@@ -125,9 +115,7 @@ This is called after a save operation. If a record was created then `created` is
 
 
 ## beforeDelete
-`beforeDelete(bool $cascade = true)`
-
-This is called just before a record is deleted must return true. Use this callback to carry out tasks.
+This is called just before a record is deleted must return `true`. Use this callback to carry out tasks before a record is deleted.
 
 ```php
 
@@ -145,9 +133,8 @@ This is called just before a record is deleted must return true. Use this callba
 ```
 
 ## afterDelete
-`afterDelete()`
 
-This is after a record is deleted.
+This is called after a record is deleted.
 
 ```php
 

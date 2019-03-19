@@ -196,6 +196,16 @@ class Entity
         }
         return null;
     }
+    /**
+     * Returns true or false if entity has errors
+     *
+     * @internal this handy for users e.g. inside afterValidate callback
+     * @return boolean
+     */
+    public function hasErrors()
+    {
+        return empty($this->_errors) === false;
+    }
 
     public function unset($properties)
     {

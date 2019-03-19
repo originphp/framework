@@ -24,26 +24,70 @@ use Origin\Model\Collection;
 
 class Model
 {
+    /**
+     * The name for this model, this generated automatically.
+     *
+     * @var string
+     */
     public $name = null;
+
+    /**
+     * The alias name for this model, again this generated automatically
+     *
+     * @var string
+     */
     public $alias = null;
 
     /**
-     * Database configuration to use by model.
+     * This is the Database configuration to used by model.
      *
      * @var string
      */
     public $datasource = 'default';
 
     /**
-     * Table name
+     * This is the table name for the model this will be generated automatically
+     * if you want to overide this then change this.
      *
      * @var string
      */
     public $table = null;
 
+    /**
+     * This really should be id, because
+     * 1. associations wont work without you telling which fields to use
+     * 2. not really fully tested using something else, but it should work ;).
+     * 3. it might get confusing later
+     * @var string
+     */
     public $primaryKey = null;
 
+    /**
+     * This is the main field on the model, for a contact, it would be contact_name. Things
+     * like name, title etc.
+     *
+     * @var string
+     */
     public $displayField = null;
+
+    /**
+     * Default order to used when finding.
+     *
+     * $order = 'Article.title ASC';
+     * $order = ['Article.title','Article.created ASC']
+     *
+     * @var string|array
+     */
+    public $order = null;
+
+
+    /**
+     * The ID of the last record created, updated, or deleted. When saving
+     * associated data, it would be of the main record not the associated.
+     *
+     * @var mixed
+     */
+    public $id = null;
 
     /**
      * belongsTo keys className, foreignKey, conditions, fields, order).
@@ -68,13 +112,7 @@ class Model
      */
     protected $hasAndBelongsToMany = [];
 
-    /**
-     * Default order when finding.
-     *
-     * @var string
-     */
-    public $order = null;
-
+ 
     /**
      * @todo change to ->associations();
      *
@@ -91,12 +129,6 @@ class Model
      */
     protected $schema = null;
 
-    /**
-     * The ID of the last record created or updated.
-     *
-     * @var mixed
-     */
-    public $id = null;
 
     /**
      * Marshaller
@@ -619,11 +651,7 @@ class Model
     public function schema(string $field = null)
     {
         if ($this->schema === null) {
-            $this->schema = [];
-
-            $connection = $this->getConnection();
-
-            $this->schema = $connection->schema($this->table);
+            $this->schema =  $this->connection()->schema($this->table);
         }
         if ($field === null) {
             return $this->schema;
@@ -639,17 +667,11 @@ class Model
      * Validates model data in the object.
      *
      * @param array $data
-     *
      * @return bool true or false
      */
     public function validates(Entity $data, bool $create = true)
     {
-        $Validator = $this->validator();
-        if ($Validator->validates($data, $create)) {
-            return true;
-        }
-
-        return false;
+        return $this->validator()->validates($data, $create);
     }
 
     /**
@@ -682,13 +704,14 @@ class Model
             if ($options['callbacks'] === true and !$this->triggerCallback('beforeValidate', [$entity])) {
                 return false;
             }
-
-            if ($this->validates($entity, !$exists) == false) {
-                return false;
-            }
-
+            $validated = $this->validates($entity, !$exists);
+            
             if ($options['callbacks'] === true) {
                 $this->triggerCallback('afterValidate', [$entity]);
+            }
+ 
+            if (!$validated) {
+                return false;
             }
         }
        
@@ -722,8 +745,8 @@ class Model
                 $entity->setError($key, 'Invalid data');
             }
         }
-   
-        if (empty($data) or $entity->errors()) {
+        
+        if (empty($data) or $entity->hasErrors()) {
             return false;
         }
 
@@ -731,7 +754,7 @@ class Model
 
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or !isset($data[$this->primaryKey])) {
-            $connection = $this->getConnection();
+            $connection = $this->connection();
             if ($exists) {
                 $result = $connection->update($this->table, $data, array(
                   $this->primaryKey => $this->id,
@@ -786,14 +809,12 @@ class Model
      */
     public function updateAll(array $data, array $conditions)
     {
-        $connection = $this->getConnection();
-
-        return $connection->update($this->table, $data, $conditions);
+        return $this->connection()->update($this->table, $data, $conditions);
     }
 
     protected function saveHABTM(array $hasAndBelongsToMany, bool $callbacks)
     {
-        $connection = $this->getConnection();
+        $connection = $this->connection();
 
         foreach ($hasAndBelongsToMany as $association => $data) {
             $config = $this->hasAndBelongsToMany[$association];
@@ -837,7 +858,7 @@ class Model
                 'fields' => array($config['associationForeignKey']),
               ));
 
-            $connection = $joinModel->getConnection();
+            $connection = $joinModel->connection();
             // By adding ID field we can do delete callbacks
             if ($config['mode'] === 'replace') {
                 $connection->delete($config['joinTable'], array(
@@ -1120,6 +1141,7 @@ class Model
         }
 
         $this->id = $id;
+
         if ($callbacks) {
             if (!$this->triggerCallback('beforeDelete', [$cascade])) {
                 return false;
@@ -1131,10 +1153,7 @@ class Model
             $this->deleteDependent($id);
         }
 
-        $conditions = array($this->primaryKey => $id);
-
-        $connection = $this->getConnection();
-        $result = $connection->delete($this->table, $conditions);
+        $result = $this->connection()->delete($this->table, [$this->primaryKey => $id]);
 
         if ($callbacks) {
             $this->triggerCallback('afterDelete');
@@ -1214,9 +1233,7 @@ class Model
             }
         }
 
-        $connection = $this->getConnection();
-
-        return $connection->delete($this->table, array($this->primaryKey => $ids));
+        return $this->connection()->delete($this->table, array($this->primaryKey => $ids));
     }
 
     /**
@@ -1379,6 +1396,11 @@ class Model
                 $alias = $config;
                 $config = [];
             }
+            if (isset($config['fields'])) {
+                foreach ($config['fields'] as $key => $value) {
+                    $config['fields'][$key] = "{$alias}.{$value}";
+                }
+            }
             $contain[$alias] = $config;
            
             if (!$this->findAssociation($alias)) {
@@ -1504,17 +1526,17 @@ class Model
     /**
      * Reads the datasource using query array and returns the result set.
      *
-     * @param string $type  [description]
+     * @param string $type
      * @param array  $query (conditions,joins,fields,order,limit etc)
      *
-     * @return [type] [description]
+     * @return array|\Origin\Model\Entity|\Origin\Model\Collection
      */
     protected function readDataSource(array $query, $type = 'model')
     {
         $QueryBuilder = new QueryBuilder($this->table, $this->alias);
         $sql = $QueryBuilder->selectStatement($query);
     
-        $connection = $this->getConnection();
+        $connection = $this->connection();
        
         $connection->execute($sql, $QueryBuilder->getValues());
 
@@ -1547,7 +1569,7 @@ class Model
      */
     public function query(string $sql, array $params = [])
     {
-        $connection = $this->getConnection();
+        $connection = $this->connection();
         $result = $connection->execute($sql, $params);
 
         if (preg_match('/^SELECT/i', $sql)) {
@@ -1560,9 +1582,9 @@ class Model
     /**
      * Returns the current data source.
      *
-     * @return DataSource
+     * @return \Origin\Model\Datasource
      */
-    public function getConnection()
+    public function connection() : Datasource
     {
         return ConnectionManager::get($this->datasource);
     }
@@ -1618,7 +1640,7 @@ class Model
     /**
      * Checks values in an entity are unique, this could be that a username is not already
      * taken or an email is not used twice
-     * @param Entity $entity
+     * @param \Origin\Model\Entity $entity
      * @param array  $fields array of fields to check values in entity
      *
      * @return bool
@@ -1636,17 +1658,17 @@ class Model
 
     public function begin()
     {
-        return $this->getConnection()->begin();
+        return $this->connection()->begin();
     }
 
     public function commit()
     {
-        return $this->getConnection()->commit();
+        return $this->connection()->commit();
     }
 
     public function rollback()
     {
-        return $this->getConnection()->rollBack();
+        return $this->connection()->rollBack();
     }
 
     /**

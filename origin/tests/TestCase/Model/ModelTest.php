@@ -910,7 +910,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
       ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
-        $Article->getConnection()->update('articles_tags', ['test' => 1]);
+        $Article->connection()->update('articles_tags', ['test' => 1]);
         //$conditions['test'] = 1;
 
         $data = $Article->new(array(
@@ -950,7 +950,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
       ), ['associated'=>['Tag']]);
 
         $this->assertTrue($Article->save($data));
-        $Article->getConnection()->update('articles_tags', ['test' => 1]);
+        $Article->connection()->update('articles_tags', ['test' => 1]);
         //$conditions['test'] = 1;
 
         $data = $Article->new(array(

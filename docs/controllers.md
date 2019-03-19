@@ -36,6 +36,8 @@ class ContactsController extends AppController {
 
 Any methods which are not supposed to be actions, should be set to `private` or `protected`.
 
+If you want to add logic when the controller is created, you can do so in the `intialize` method.
+
 ## Request
 
 When a request is made, a request is object is injected into the controller. GET, POST and FILES parameters are parsed and it also provides some functions to check the type of request or only allow a certain type of request.

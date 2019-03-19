@@ -176,7 +176,7 @@ class ModelValidator
             }
         }
       
-        return empty($entity->errors());
+        return ($entity->hasErrors() === false);
     }
 
     /**

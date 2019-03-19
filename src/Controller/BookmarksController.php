@@ -46,19 +46,17 @@ class BookmarksController extends AppController
             if ($this->Bookmark->save($bookmark)) {
                 $this->Flash->success(__('Your bookmark has been created.'));
 
-                return $this->redirect(['action' => 'view', $this->Bookmark->id]);
+                return $this->redirect(['action' => 'view', $bookmark->id]);
             }
             $this->Flash->error(__('Your bookmark could not be saved'));
         }
 
-        $users = $this->Bookmark->User->find('list');
-        $this->set(compact('users'));
         $this->set('bookmark', $bookmark);
         $this->set('categories', $this->Bookmark->categories);
     }
 
 
-    public function edit($id = null)
+    public function edit($id)
     {
         $bookmark = $this->Bookmark->get($id, [
            'associated' => ['Tag']
@@ -70,14 +68,12 @@ class BookmarksController extends AppController
             if ($this->Bookmark->save($bookmark)) {
                 $this->Flash->success(__('Your bookmark has been updated.'));
 
-                return $this->redirect(['action' => 'view', $this->Bookmark->id]);
+                return $this->redirect(['action' => 'view', $id]);
             }
-
+     
             $this->Flash->error(__('Your bookmark could not be saved'));
         }
 
-        $users = $this->Bookmark->User->find('list');
-        $this->set(compact('users'));
         $this->set('bookmark', $bookmark);
         $this->set('categories', $this->Bookmark->categories);
     }

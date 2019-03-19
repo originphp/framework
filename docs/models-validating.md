@@ -155,7 +155,7 @@ Checks that a value equals another value
 Checks that a value matches an array of extensions
 ```php
  $this->validate('filename',[
-    'rule' => array('extension',['csv','txt'])
+    'rule' => ['extension',['csv','txt']]
       'message' => 'Only csv or text files can be uploaded'
   ]);
 ```
@@ -166,7 +166,7 @@ Checks that a value is in a list.
 
 ```php
  $this->validate('status',[
-    'rule' => ['inList',['draft','new','authorised']]
+    'rule' => array('inList',['draft','new','authorised'])
     'message' => 'Invalid status'
   ]);
 ```
@@ -174,7 +174,7 @@ The default is case sensitive search, if you want to the search to be case insen
 
 ```php
  $this->validate('status',[
-    'rule' => ['inList',['draft','new','authorised'],true]
+    'rule' => array('inList',['draft','new','authorised'],true)
     'message' => 'Invalid status'
   ]);
 ```
@@ -205,7 +205,7 @@ You can also check multiple values
 
 ```php
  $this->validate('email',[
-      'rule' => ['isUnique',['username','email']],
+      'rule' => ['isUnique',array('username','email')],
       'message' => 'Email and username are not unique'
   ]);
 ```
