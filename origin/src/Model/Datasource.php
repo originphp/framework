@@ -316,7 +316,7 @@ class Datasource
      */
     protected function toModel(array $row, array $map)
     {
-        $result = array();
+        $result = [];
         foreach ($map as $index => $meta) {
             list($table, $column) = $meta;
 
@@ -480,11 +480,8 @@ class Datasource
     /**
      * Returns a query builder object.
      *
-     * @todo m
-     *
      * @param string $table [description]
-     *
-     * @return object QueryBuilder
+     * @return \Origin\Model\QueryBuilder QueryBuilder
      */
     public function queryBuilder(string $table)
     {

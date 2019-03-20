@@ -1424,19 +1424,29 @@ class Model
     protected function prepareResults(array $results)
     {
         $buffer = [];
-
         foreach ($results as $record) {
-            $entity = new Entity($record[$this->alias], ['name'=>$this->alias,'exists'=>true]);
+            $thisData = (isset($record[$this->alias])?$record[$this->alias]:[]); // Work with group and no fields from db
+            $entity = new Entity($thisData, ['name'=>$this->alias,'exists'=>true]);
             unset($record[$this->alias]);
-
+           
             foreach ($record as $model => $data) {
-                $associated = Inflector::variable($model);
-                $entity->{$associated} = new Entity($data, ['name'=>$associated,'exists'=>true]);
+                if (is_string($model)) {
+                    $associated = Inflector::variable($model);
+                    $entity->{$associated} = new Entity($data, ['name'=>$associated,'exists'=>true]);
+                } else {
+                    /**
+                     * Any data is here is not matched to model, e.g. group by and non existant fields
+                     * add them to model so we can put them in entity nicely. This seems to be cleanest solution
+                     * the resulting entity might not contain any real data from the entity.
+                     */
+                    foreach ($data as $k => $v) {
+                        $entity->{$k} = $v;
+                    }
+                }
             }
 
             $buffer[] = $entity;
         }
-
         return $buffer;
     }
    
@@ -1529,6 +1539,7 @@ class Model
         if ($type == 'list') {
             return $connection->fetchList();
         }
+        
 
         $results = $connection->fetchAll($type);
 

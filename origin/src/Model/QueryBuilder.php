@@ -149,6 +149,13 @@ class QueryBuilder
         'NOT BETWEEN', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN',
       );
 
+    /**
+     * We dont want to add table alias to sql alias fields
+     *
+     * @var array
+     */
+    protected $specialFields = [];
+
     public function __construct($table = null, $alias = null)
     {
         if (!empty($table)) {
@@ -161,6 +168,7 @@ class QueryBuilder
         $this->query = [];
         $this->i = 0;
         $this->values = [];
+        $this->specialFields = [];
     }
 
     public function getValues()
@@ -504,6 +512,12 @@ class QueryBuilder
             $fields = array($this->alias.'.*');
         }
 
+        foreach ($fields as $field) {
+            $position = stripos($field, ' as ') ;
+            if ($position) {
+                $this->specialFields[] = substr($field, $position + 4); // to assist group by having
+            }
+        }
         return implode(', ', $this->addAliases($fields));
     }
 
@@ -637,12 +651,14 @@ class QueryBuilder
     private function addAliases(array $fields)
     {
         foreach ($fields as $index => $column) {
+            if (in_array($column, $this->specialFields)) {
+                continue; // skip as field
+            }
             $fields[$index] = $this->addAlias($column);
             if (is_string($index)) {
                 $fields[$index] = "{$this->alias}.{$index} AS {$column}";
             }
         }
-
         return $fields;
     }
 
@@ -664,7 +680,12 @@ class QueryBuilder
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
             return $field;
         }
-
+        pr($field);
+        pr(in_array($field, $this->specialFields));
+        if (in_array($field, $this->specialFields)) {
+            return $field;
+        }
+        
         return "{$alias}.{$field}";
     }
 
