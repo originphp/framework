@@ -46,7 +46,7 @@ public function beforeValidate(Entity $entity){
 
 ## afterValidate
 
-This is called after the data has been validated, even if validation fails this callback is executed. You can get the validation errors from the entity by calling `hasErrors` on the entity.
+This is called after the data has been validated, even if validation fails this callback is executed. You can get the validation errors from the entity by calling `errors` on the entity.
 
 ```php
 public function afterValidate(Entity $entity,bool $success){

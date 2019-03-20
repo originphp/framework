@@ -742,11 +742,11 @@ class Model
          */
         foreach ($data as $key => $value) {
             if (is_array($value) or is_object($value)) {
-                $entity->setError($key, 'Invalid data');
+                $entity->invalidate($key, 'Invalid data');
             }
         }
         
-        if (empty($data) or $entity->hasErrors()) {
+        if (empty($data) or $entity->errors()) {
             return false;
         }
 

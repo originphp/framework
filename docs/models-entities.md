@@ -86,6 +86,7 @@ $title = article->get('title');
 ## Extract
 
 You can also get many properties at once
+
 ```php
 $extracted = article->extract(['title','status']);
 ```
@@ -103,13 +104,13 @@ To get all errors
 To get error(s) for a field
 
 ```php
-  $errors = $entity->getError('first_name');
+  $errors = $entity->errors('first_name');
 ```
 
 To set errors manually
 
 ```php
-  $entity->setError('email','invalid email address');
+  $entity->invalidate('email','invalid email address');
 ```
 
 ## Other Methods

@@ -130,7 +130,7 @@ class ModelValidator
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $requiredMessage;
                     }
-                    $entity->setError($field, $validationRule['message']);
+                    $entity->invalidate($field, $validationRule['message']);
                     continue;
                 }
 
@@ -154,13 +154,13 @@ class ModelValidator
                   
                     // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
                     if (is_object($value) or is_array($value)) {
-                        $entity->setError($field, $defaultMessage);
+                        $entity->invalidate($field, $defaultMessage);
                         continue;
                     }
                  
                     if ($validationRule['rule'] === 'notBlank') {
                         if (!$this->validate($value, $validationRule['rule'])) {
-                            $entity->setError($field, $validationRule['message']);
+                            $entity->invalidate($field, $validationRule['message']);
                         }
                         continue;
                     }
@@ -170,13 +170,13 @@ class ModelValidator
                     }
 
                     if (!$this->validate($value, $validationRule['rule'])) {
-                        $entity->setError($field, $validationRule['message']);
+                        $entity->invalidate($field, $validationRule['message']);
                     }
                 }
             }
         }
       
-        return ($entity->hasErrors() === false);
+        return empty($entity->errors());
     }
 
     /**

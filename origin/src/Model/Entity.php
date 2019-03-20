@@ -163,9 +163,12 @@ class Entity
             return $this->_errors;
         }
         if ($error === null) {
-            return $this->getError($field);
+            if (isset($this->_errors[$field])) {
+                return $this->_errors[$field];
+            }
+            return null;
         }
-        $this->setError($field, $error);
+        $this->invalidate($field, $error);
     }
 
     /**
@@ -175,36 +178,12 @@ class Entity
      * @param string $error
      * @return void
      */
-    public function setError(string $field, string $error)
+    public function invalidate(string $field, string $error)
     {
         if (!isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
         }
         $this->_errors[$field][] = $error;
-    }
-
-    /**
-     * Gets an error for field
-     *
-     * @param string $field
-     * @return void
-     */
-    public function getError(string $field)
-    {
-        if (isset($this->_errors[$field])) {
-            return $this->_errors[$field];
-        }
-        return null;
-    }
-    /**
-     * Returns true or false if entity has errors
-     *
-     * @internal this handy for users e.g. inside afterValidate callback
-     * @return boolean
-     */
-    public function hasErrors()
-    {
-        return empty($this->_errors) === false;
     }
 
     public function unset($properties)
