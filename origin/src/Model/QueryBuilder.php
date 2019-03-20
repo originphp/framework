@@ -680,8 +680,7 @@ class QueryBuilder
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
             return $field;
         }
-        pr($field);
-        pr(in_array($field, $this->specialFields));
+    
         if (in_array($field, $this->specialFields)) {
             return $field;
         }

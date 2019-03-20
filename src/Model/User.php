@@ -9,11 +9,8 @@ class User extends AppModel
     public function initialize(array $config)
     {
         parent::initialize($config);
-        $this->validate('name', [
-            ['rule' => 'notBlank'],
-            ['rule' => ['goal2',1,2,3]],
-        ]);
-        //  $this->validate('name', 'notBlank');
+ 
+        $this->validate('name', 'notBlank');
         $this->validate('email', [
             ['rule' => 'notBlank'],
             ['rule' => 'email'],
@@ -27,19 +24,6 @@ class User extends AppModel
         $this->validate('dob', 'date');
 
         $this->hasMany('Bookmark');
-    }
-
-    public function goal1()
-    {
-        pr('goal1');
-        pr(func_get_args());
-        return false;
-    }
-
-    public function goal2()
-    {
-        pr(func_get_args());
-        return false;
     }
 
 
