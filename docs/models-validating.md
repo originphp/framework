@@ -21,8 +21,8 @@ You can define a rule as a string, rule array, or array with multiple rules.
           ]);
           // multiple rules
          $this->validate('email', [
-            'rule1' =>  ['rule'=>'notBlank'],
-            'rule2' =>  ['rule'=>'email']
+            ['rule'=>'notBlank'],
+            ['rule'=>'email']
         ]);
     }
   }
@@ -33,7 +33,7 @@ A validation rule array consists of the following keys:
 - *rule* - this is the name of the rule to run
 - *message* - error message to display if validation fails
 - *on* - default is `null`. You can also set to `create` or `update` to only check validation rule when a record is created or updated.
-- *required* - default is `false`. If this is set to true then this means the data array must include the key regardless if it is empty or not.
+- *required* - default is `false`. If this is set to true then this means the data must include the key regardless if it is empty or not.
 
 ## Validation Rules
 
@@ -54,7 +54,7 @@ When setting the rules the name is usually as a string, however some validation 
     ]);
 ```
 
-### Boolean
+### boolean
 
 Checks if a value is a boolean true or false.
 
@@ -64,7 +64,43 @@ Checks if a value is a boolean true or false.
     ]);
 ```
 
-### Custom (Regex)
+
+### custom (Function)
+
+You can create your own functions in model which can be used to validate.
+
+```php
+public function initialize(array $config){
+  $this->validate('dob','birthdate');
+}
+
+
+public function birthdate($value){
+  if($value){
+    return true;
+  }
+  return false;
+}
+
+```
+You can also pass more arguments
+
+```php
+public function initialize(array $config){
+  $this->validate('status',[
+    'rule' => ['statusCheck','go']
+  ]);
+}
+
+
+public function statusCheck($value, $arg1){
+  return $value1 === $arg1;
+}
+
+```
+
+
+### custom (Regex)
 
 You use custom regex patterns to validate
 
@@ -75,7 +111,7 @@ You use custom regex patterns to validate
     ]);
 ```
 
-### Date
+### date
 
 Validates a date using a format compatible with the php date function. The default date format is `Y-m-d`.
 
@@ -95,7 +131,7 @@ or
   ]);
 ```
 
-### Datetime
+### datetime
 
 Validates a datetime using a format compatible with the php date function. The default datetime format is `Y-m-d H:i:s`.
 
@@ -116,7 +152,7 @@ or
     ]);
 ```
 
-### Decimal
+### decimal
 
 Checks if a value is a decimal. The value must have a decimal place in it.
 
@@ -127,7 +163,7 @@ Checks if a value is a decimal. The value must have a decimal place in it.
   ]);
 ```
 
-### Email
+### email
 
 Checks that a value is a valid email address, works with UTF8 email address.
 
@@ -139,7 +175,7 @@ Checks that a value is a valid email address, works with UTF8 email address.
 ```
 
 
-### EqualTo
+### equalTo
 
 Checks that a value equals another value
 
@@ -150,7 +186,7 @@ Checks that a value equals another value
   ]);
 ```
 
-### Extension
+### extension
 
 Checks that a value matches an array of extensions
 ```php
@@ -160,13 +196,13 @@ Checks that a value matches an array of extensions
   ]);
 ```
 
-### InList
+### inList
 
 Checks that a value is in a list.
 
 ```php
  $this->validate('status',[
-    'rule' => array('inList',['draft','new','authorised'])
+    'rule' => ['inList',['draft','new','authorised']]
     'message' => 'Invalid status'
   ]);
 ```
@@ -174,7 +210,7 @@ The default is case sensitive search, if you want to the search to be case insen
 
 ```php
  $this->validate('status',[
-    'rule' => array('inList',['draft','new','authorised'],true)
+    'rule' => ['inList',['draft','new','authorised'],true]
     'message' => 'Invalid status'
   ]);
 ```
@@ -289,7 +325,7 @@ Validates a time using a format compatible with the php date function. The defau
 
 Checks that a value is a valid url.
 
-By default a valid url has to have the protocol e.g. https://www.google.com.
+By default a valid url has to have the protocol e.g. `https://www.google.com`.
 
 ```php
  $this->validate('number',[
@@ -298,7 +334,7 @@ By default a valid url has to have the protocol e.g. https://www.google.com.
   ]);
 ```
 
-If you want to consider www.google.com a valid url (without the protocol)  then you would do so like this.
+If you want to consider `www.google.com` a valid url (without the protocol)  then you would do so like this.
 
 ```php
  $this->validate('number',[

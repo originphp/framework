@@ -34,7 +34,7 @@ class UsersController extends AppController
         $user = $this->User->new();
 
         if ($this->request->is(['post'])) {
-            $user = $this->User->new($this->request->data);
+            $user = $this->User->new($this->request->data());
             if ($this->User->save($user)) {
                 $this->Flash->success('Your user has been created.');
 
@@ -51,7 +51,7 @@ class UsersController extends AppController
         $user = $this->User->get($id);
 
         if ($this->request->is(['post', 'put'])) {
-            $user = $this->User->new($this->request->data);
+            $user = $this->User->new($this->request->data());
 
             $user->id = $id;
 
@@ -73,7 +73,7 @@ class UsersController extends AppController
 
         $user = $this->User->get($id);
 
-        if ($this->User->delete($id)) {
+        if ($this->User->delete($user)) {
             $this->Flash->success(__('The user %d has been deleted.', $id));
         } else {
             $this->Flash->error(__('The user could not be deleted.'));

@@ -160,7 +160,7 @@ class ModelCrudTest extends \PHPUnit\Framework\TestCase
     );
         $User->returnObject = true;
         $user = $User->find('first', $params);
-        $this->assertTrue($User->delete($user->id));
+        $this->assertTrue($User->delete($user));
         $this->assertEquals(0, $User->find('count', $params));
     }
 

@@ -677,7 +677,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $methods = array('beforeDelete', 'afterDelete', 'deleteDependent', 'deleteHABTM');
         $Article = $this->getMockModel(Article::class, $methods);
     
-        $this->assertTrue($Article->exists(1));
+        $entity = $Article->get(1);
 
         $Article->expects($this->once())
           ->method('beforeDelete')
@@ -695,7 +695,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
               ->method('afterDelete')
               ->willReturn(true);
 
-        $this->assertTrue($Article->delete(1, true));
+       
+        $this->assertTrue($Article->delete($entity, true));
         $this->assertFalse($Article->exists(1));
     }
 
@@ -708,7 +709,10 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           ->method('exists')
           ->willReturn(false);
 
-        $this->assertFalse($Article->delete(1));
+        $article = $Article->new();
+        $article->id = 1;
+
+        $this->assertFalse($Article->delete($article));
     }
 
     public function testDeleteCallbacksDisabled()
@@ -732,7 +736,10 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->expects($this->never())
           ->method('afterDelete');
 
-        $Article->delete(1, true, false);
+        $article = $Article->new();
+        $article->id = 1;
+
+        $Article->delete($article, true, false);
     }
 
     public function testDeleteCascadeDisabled()
@@ -750,14 +757,15 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article->expects($this->once())
           ->method('deleteHABTM');
 
-        $Article->delete(1, false, true);
+        $article = $Article->new();
+        $article->id = 1;
+
+        $Article->delete($article, false, true);
     }
 
     public function testDeleteAll()
     {
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-
-        $this->assertFalse($Article->deleteAll()); //
 
         $article = $Article->get(2);
         $this->assertNotEmpty($article);
@@ -1089,7 +1097,11 @@ lastname VARCHAR(30) NOT NULL
           array('body' => 'comment #3 for deleteDependentd'),
         ),
       ), ['associated'=>['Comment']]);
+        
         $this->assertTrue($Article->save($data, ['associated'=>['Comment']]));
+      
+        $params = array('conditions' => ['article_id' => $data->id]);
+        $this->assertEquals(3, $Article->Comment->find('count', $params));
         return $Article->id;
     }
 
@@ -1108,7 +1120,10 @@ lastname VARCHAR(30) NOT NULL
       
         $count = $Article->Comment->find('count', $params);
         $this->assertEquals(3, $count);
-        $this->assertTrue($Article->delete($articleId, true));
+        
+        $article = $Article->get($articleId);
+      
+        $this->assertTrue($Article->delete($article, true));
         $this->assertEquals(0, $Article->Comment->find('count', $params));
     }
 
@@ -1132,7 +1147,7 @@ lastname VARCHAR(30) NOT NULL
         $this->assertTrue($Article->save($data));
 
         $this->assertEquals(1, $Article->ArticlesTag->find('count', $params)); // Checks
-        $this->assertTrue($Article->delete(3, true));
+        $this->assertTrue($Article->delete($data, true));
         //   $this->assertEquals(0,$Article->ArticlesTag->find('count',$params)); // Checks
     }
 

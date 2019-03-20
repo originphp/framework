@@ -93,7 +93,7 @@ class Job
      */
     public function delete() : bool
     {
-        return $this->Job->delete($this->id);
+        return $this->Job->delete($this->entity);
     }
 
     /**

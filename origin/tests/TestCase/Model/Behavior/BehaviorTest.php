@@ -29,10 +29,6 @@ class Tester extends Model
 
 class BehaviorTesterBehavior extends Behavior
 {
-    public function initialize(array $config)
-    {
-    }
-
     public function beforeFind($query = array())
     {
         $query += ['return' => true];
@@ -42,46 +38,6 @@ class BehaviorTesterBehavior extends Behavior
         $query['beforeFind'] = true;
 
         return $query;
-    }
-
-    public function afterFind($results)
-    {
-        return $results;
-    }
-
-    /**
-     * This must return true;.
-     *
-     * @return bool true
-     */
-    public function beforeValidate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-     * Called after validating data.
-     */
-    public function afterValidate(Entity $entity)
-    {
-    }
-
-    public function beforeSave(Entity $entity, array $options = array())
-    {
-        return true;
-    }
-
-    public function afterSave(Entity $entity, $created, $options = array())
-    {
-    }
-
-    public function beforeDelete(bool $cascade = true)
-    {
-        return true;
-    }
-
-    public function afterDelete()
-    {
     }
 }
 
@@ -129,7 +85,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity(['name'=>'Foo']);
         $behavior = new Behavior(new Model(['name' => 'Post']));
-        $this->assertNull($behavior->afterValidate($entity));
+        $this->assertNull($behavior->afterValidate($entity, true));
     }
 
     public function testBeforeSave()
@@ -150,7 +106,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity(['name'=>'Foo']);
         $behavior = new Behavior(new Model(['name' => 'Post']));
-        $this->assertTrue($behavior->beforeDelete(true));
+        $this->assertTrue($behavior->beforeDelete($entity));
     }
 
 
@@ -158,7 +114,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity(['name'=>'Foo']);
         $behavior = new Behavior(new Model(['name' => 'Post']));
-        $this->assertNull($behavior->afterDelete());
+        $this->assertNull($behavior->afterDelete($entity, true));
     }
 
     public function testModel()
@@ -349,8 +305,8 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
-
-        $this->assertFalse($Article->delete(5));
+        $article = $Article->get(3);
+        $this->assertFalse($Article->delete($article));
     }
 
     public function testDeleteCallbacks()
@@ -374,7 +330,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
-
-        $this->assertTrue($Article->delete(5));
+        $article = $Article->get(3);
+        $this->assertTrue($Article->delete($article));
     }
 }

@@ -333,13 +333,18 @@ class Entity
     }
 
     /**
-     * Returns if exists or not (false or null for dont know)
+     * Sets and gets exists. If it returns null then it means it does not know. Even
+     * if the it says exists, record could of been deleted somewhere else. So its not
+     * definitve.
      *
      * @return null|bool
      */
-    public function exists()
+    public function exists(bool $exists = null)
     {
-        return $this->exists;
+        if ($exists === null) {
+            return $this->exists;
+        }
+        $this->exists = $exists;
     }
 
     /**

@@ -682,7 +682,7 @@ class Model
     public function validator()
     {
         if (!isset($this->ModelValidator)) {
-            $this->ModelValidator = new ModelValidator($this, $this->validate);
+            $this->ModelValidator = new ModelValidator($this);
         }
 
         return $this->ModelValidator;
@@ -707,7 +707,7 @@ class Model
             $validated = $this->validates($entity, !$exists);
             
             if ($options['callbacks'] === true) {
-                $this->triggerCallback('afterValidate', [$entity]);
+                $this->triggerCallback('afterValidate', [$entity,$validated]);
             }
  
             if (!$validated) {
@@ -782,7 +782,7 @@ class Model
     }
 
     /**
-     * Saves a single field on the current record. Must set $this->id for this work.
+     * Saves a single field on the current record.
      *
      * @params int|string $primaryKey the id for the record
      * @param string $fieldName
@@ -971,12 +971,15 @@ class Model
                 if (!in_array($alias, $options['associated'])) {
                     continue;
                 }
+                
                 $key = Inflector::pluralize(lcfirst($alias));
+               
                 if ($data->has($key)) {
                     $foreignKey = $this->hasMany[$alias]['foreignKey'];
+                    
                     foreach ($data->get($key) as $record) {
                         if ($record instanceof Entity and $record->modified()) {
-                            $record->$foreignKey = $this->id;
+                            $record->$foreignKey = $data->{$this->primaryKey};
                             if (!$this->{$alias}->save($record, $associatedOptions)) {
                                 $result = false;
                                 break;
@@ -1128,37 +1131,39 @@ class Model
     /**
      * Deletes a record.
      *
-     * @param integer/string $id
+     * @param \Origin\Model\Entity $entity
      * @param bool           $cascade   delete hasOne,hasMany, hasAndBelongsToMany records
      * @param bool           $callbacks call beforeDelete and afterDelete callbacks
      *
      * @return bool true or false
      */
-    public function delete($id, $cascade = true, $callbacks = true)
+    public function delete(Entity $entity, $cascade = true, $callbacks = true)
     {
-        if (empty($id) or !$this->exists($id)) {
+        $this->id = $entity->get($this->primaryKey);
+
+        if (empty($this->id) or !$this->exists($this->id)) {
             return false;
         }
 
-        $this->id = $id;
-
         if ($callbacks) {
-            if (!$this->triggerCallback('beforeDelete', [$cascade])) {
+            if (!$this->triggerCallback('beforeDelete', [$entity,$cascade])) {
                 return false;
             }
         }
 
-        $this->deleteHABTM($id);
+        $this->deleteHABTM($this->id);
         if ($cascade) {
-            $this->deleteDependent($id);
+            $this->deleteDependent($this->id);
         }
 
-        $result = $this->connection()->delete($this->table, [$this->primaryKey => $id]);
+        $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
 
         if ($callbacks) {
-            $this->triggerCallback('afterDelete');
+            $this->triggerCallback('afterDelete', [$entity,$result]);
         }
-
+        if ($result) {
+            $entity->exists(false);
+        }
         return $result;
     }
 
@@ -1171,8 +1176,15 @@ class Model
     {
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
-                $deleteConditions = array($config['foreignKey'] => $id);
-                $this->{$association}->deleteAll($deleteConditions);
+                $conditions = [$config['foreignKey'] => $id];
+                $ids = $this->{$association}->find('list', [ 'conditions' => $conditions]);
+                foreach ($ids as $id) {
+                    $conditions = [$this->{$association}->primaryKey => $id];
+                    $result = $this->{$association}->find('first', ['conditions'=>$conditions,'callbacks'=>false]);
+                    if ($result) {
+                        $this->{$association}->delete($result);
+                    }
+                }
             }
         }
     }
@@ -1185,55 +1197,29 @@ class Model
     protected function deleteHABTM($id)
     {
         foreach ($this->hasAndBelongsToMany as $association => $config) {
-            $deleteConditions = array($config['foreignKey'] => $id);
-            $this->{$config['with']}->deleteAll($deleteConditions, true, false);
+            $associatedModel = $config['with'];
+            $conditions = [$config['foreignKey'] => $id];
+            $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
+            foreach ($ids as $id) {
+                $conditions = [$this->{$associatedModel}->primaryKey => $id];
+                $result = $this->{$associatedModel}->find('first', ['conditions'=>$conditions,'callbacks'=>false]);
+                if ($result) {
+                    $this->{$associatedModel}->delete($result);
+                }
+            }
         }
     }
 
     /**
-     * Deletes multiple records.
+     * Bulk deletes records, does not delete associated data, use model::delete for that.
      *
      * @param array $conditions e.g ('Article.status' => 'draft')
-     * @param bool  $cascade    delete hasOne,hasMany records
-     * @param bool  $callbacks  call beforeDelete and afterDelete callbacks
      *
      * @return bool true or false
      */
-    public function deleteAll($conditions = [], $cascade = false, $callbacks = false)
+    public function deleteAll($conditions)
     {
-        if (empty($conditions)) {
-            return false;
-        }
-
-        $ids = $this->find(
-            'list',
-            array(
-          'fields' => array($this->primaryKey),
-          'conditions' => $conditions)
-        );
-
-        if (empty($ids)) {
-            return false;
-        }
-
-        if ($callbacks === true) {
-            foreach ($ids as $id) {
-                if (!$this->delete($id, $cascade, $callbacks)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        foreach ($ids as $id) {
-            $this->deleteHABTM($id);
-            if ($cascade) {
-                $this->deleteDependent($id);
-            }
-        }
-
-        return $this->connection()->delete($this->table, array($this->primaryKey => $ids));
+        return $this->connection()->delete($this->table, $conditions);
     }
 
     /**
@@ -1580,7 +1566,7 @@ class Model
     }
 
     /**
-     * Returns the current data source.
+     * Returns the current connection for this model
      *
      * @return \Origin\Model\Datasource
      */
@@ -1590,22 +1576,28 @@ class Model
     }
 
     /**
-     * Return either the query or true.
-     */
-    public function beforeFind($query = [])
+    * Before find callback. Must return either the query or true to continue
+    * @return array|bool query or bool
+    */
+    public function beforeFind(array $query = [])
     {
         return $query;
     }
 
+    /**
+     * After find callback, this should return the results
+     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $results
+     */
     public function afterFind($results)
     {
         return $results;
     }
 
     /**
-     * This must return true;.
+     * Before Validation takes places, must return true to continue
      *
-     * @return bool true
+     * @param \Origin\Model\Entity $entity
+     * @return bool
      */
     public function beforeValidate(Entity $entity)
     {
@@ -1613,27 +1605,59 @@ class Model
     }
 
     /**
-     * Called after validating data.
+     * Before Validation takes places, must return true to continue
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param bool $success validation result
+     * @return bool
      */
-    public function afterValidate(Entity $entity)
+    public function afterValidate(Entity $entity, bool $success)
     {
     }
 
+    /**
+     * Before save callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param array $options
+     * @return bool must return true to continue
+     */
     public function beforeSave(Entity $entity, array $options = [])
     {
         return true;
     }
 
+    /**
+     * After save callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param boolean $created if this is a new record
+     * @param array $options these were the options passed to save
+     * @return void
+     */
     public function afterSave(Entity $entity, bool $created, array $options = [])
     {
     }
 
-    public function beforeDelete(bool $cascade = true)
+    /**
+     * Before delete, must return true to continue
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param boolean $cascade
+     * @return bool
+     */
+    public function beforeDelete(Entity $entity, bool $cascade = true)
     {
         return true;
     }
-
-    public function afterDelete()
+    /**
+     * After delete
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param boolean $sucess wether or not it deleted the record
+     * @return bool
+     */
+    public function afterDelete(Entity $entity, bool $success)
     {
     }
 

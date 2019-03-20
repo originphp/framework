@@ -4,7 +4,7 @@
 Model is the M in MVC (Model View Controller). Model interacts with the database and contains logic for working with that data.
 
 ## Conventions
-Models are singular camel cased, for example the model for a user profile is `UserProfile` this you can access from the controller.
+Models are singular camel cased, for example the model for a user profile is `UserProfile` this you can access from the controller or from a related model.
 
 ```php
 
@@ -38,7 +38,6 @@ foreach($users as $user){
 ```
 
 If you add datetime fields called `created` and `modified`, then when you create a record the created field is set and each time you modify this the modified field will be updated.
-
 
 ## Creating a Model
 To create a model is easy, simply create a file in `src/Model` folder which is a subclass of the AppModel.
@@ -202,11 +201,12 @@ class ArticlesController extends AppController
 
 ### Deleting records
 
-Deleting records is a doddle, you can delete by an id number.
+To delete records just pass the entity to the delete method, if there is a primary key set
+it will attempt to delete it.
 
 ```php
-    $deleteChildRecords = true; // optional
-    $this->Article->delete(1243,$deleteChildRecords);
+    $article = $this->Article->get(1000);
+    $this->Article->delete($article);
 ```
 
 Or you can delete by conditions

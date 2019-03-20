@@ -429,7 +429,7 @@ class FormHelper extends Helper
     }
 
     /**
-     * The datetime widget is designed for datetime fields which require user input.
+     * The datetime widget
      *
      * @param string $name
      * @param array  $options

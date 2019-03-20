@@ -10,14 +10,16 @@ class User extends AppModel
     {
         parent::initialize($config);
         $this->validate('name', [
-            'rule' => 'notBlank', 'required' => true, 'on' => 'create'
-            ]);
+            ['rule' => 'notBlank'],
+            ['rule' => ['goal2',1,2,3]],
+        ]);
+        //  $this->validate('name', 'notBlank');
         $this->validate('email', [
-            ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
+            ['rule' => 'notBlank'],
             ['rule' => 'email'],
         ]);
         $this->validate('password', [
-            ['rule' => 'notBlank', 'required' => true, 'on' => 'create'],
+            ['rule' => 'notBlank'],
             ['rule' => 'alphaNumeric', 'message' => 'Alphanumeric characters only'],
             ['rule' => ['minLength', 6], 'message' => 'Min 6 characters'],
             ['rule' => ['maxLength', 8], 'message' => 'Max 8 characters'],
@@ -26,6 +28,20 @@ class User extends AppModel
 
         $this->hasMany('Bookmark');
     }
+
+    public function goal1()
+    {
+        pr('goal1');
+        pr(func_get_args());
+        return false;
+    }
+
+    public function goal2()
+    {
+        pr(func_get_args());
+        return false;
+    }
+
 
     /**
      * Hash the using the default password_hasher which is what the Auth component uses

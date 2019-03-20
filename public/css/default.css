@@ -104,7 +104,16 @@ input.form-control, select.form-control, textarea.form-control {
   background-color: #f1c40f;
 }
 
-div.date input,div.time input,div.datetime input {
+div.date input,div.time input {
+  width: 150px;
+  margin-right:5px;
+}
+div.datetime input {
+  width: 300px;
+}
+
+/*
+div.datetime input {
   width: 150px;
   margin-right:5px;
 }
@@ -115,7 +124,7 @@ div.datetime .form-control {
 div.datetime label {
   display: block;
 }
-
+*/
 .index .table th,.related .table th {
   background-color:#dee2e6;
 }

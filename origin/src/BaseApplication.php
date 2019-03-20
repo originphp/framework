@@ -51,7 +51,7 @@ class BaseApplication
      *
      * $this->addMiddleware(new FormSecurity());
      *
-     * @param Middleware $callable
+     * @param \Origin\Middleware\Middleware $object
      * @return void
      */
     public function addMiddleware(Middleware $object)
@@ -74,6 +74,6 @@ class BaseApplication
     public function loadMiddleware(string $name)
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware');
-        return $this->addMiddleware(new $className);
+        $this->addMiddleware(new $className);
     }
 }

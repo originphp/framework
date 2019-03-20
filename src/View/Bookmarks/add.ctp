@@ -25,6 +25,10 @@
                 echo $this->Form->control('category', ['options' => $categories, 'empty' => true]);
                 echo $this->Form->control('description', ['rows' => 5]);
                 echo $this->Form->button(__('Save'), ['class' => 'btn btn-primary']);
+
+
+                echo $this->Form->control('created');
+
                 echo $this->Form->end();
             ?>
     </div>
