@@ -38,6 +38,16 @@ Any methods which are not supposed to be actions, should be set to `private` or 
 
 If you want to add logic when the controller is created, you can do so in the `intialize` method.
 
+## Models
+
+By default the model for the controller (the singular name) will be lazy loaded when you call for it. However if you need to load a different model then you should call the `loadModel` method.
+
+For more information see our [Models Guide](models.md).
+
+```php
+$AnotherModel = $this->loadModel('Product');
+```
+
 ## Request
 
 When a request is made, a request is object is injected into the controller. GET, POST and FILES parameters are parsed and it also provides some functions to check the type of request or only allow a certain type of request.

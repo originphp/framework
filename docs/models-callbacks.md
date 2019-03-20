@@ -84,7 +84,6 @@ public function afterSave(Entity $entity,bool $created,array $options =[]){
 }
 ```
 
-
 ## beforeDelete
 This is called just before a record is deleted must return `true`. Use this callback to carry out tasks before a record is deleted.
 

@@ -1,7 +1,6 @@
 # Finding Data
 
-The examples below will relate to the following models and because the tables are setup using conventions
-we don't need to pass parameters.
+The examples below will relate to the following models and because the tables are setup using conventions, we don't need to pass parameters.
 
 ```php
 class Article extends AppModel
@@ -37,7 +36,7 @@ from the database and then transform it into objects which you can work with.
 
 ### Getting a single record using the primary key
 
-With `get` you can get a single record, also called an `Entity`.
+With `get` you can get a single record, also called an `Entity`. See the [Entities guide](models-entities.md) for information on these objects.
 
 ```php
 $article = $this->Article->get(1000);
@@ -102,6 +101,11 @@ $count = $this->Article->find('count',[
 
 ## Conditions
 To set conditions for the `find` or `get` you need to pass an array with the key `conditions`, which itself should be an array. When you fetching associated data, if you don't add an alias prefix to the field name it will be assumed that the condition is for the current model.
+
+```php
+$conditions = ['id'=>1234];
+$result = $this->Article->find('first',['conditions'=>$conditions]);
+```
 
 ### Equals
 
@@ -207,7 +211,132 @@ Lets say you want to search by article title or author:
     ];
 ```
 
-### Query
+## Find Options
+
+### Conditions
+
+The conditions key is what is used to generate the sql queries. You should always try to add the alias to the field.
+
+```php
+$conditions = ['Article.id'=>1234];
+$result = $this->Article->find('first',['conditions'=>$conditions]);
+```
+
+### Fields
+
+By default all fields are returned for each model, even if you don't use them. You can reduce the load on the server
+by selecting just the fields that you need.
+
+```php
+$result = $this->Article->find('first',['fields'=>['id','title','author_id']]);
+```
+
+To use also pass DISTINCT, MIN and MAX etc. When using those database functions remember to include AS then a unique
+field name.
+
+```php
+$conditions = ['fields'=>['DISTINCT (Author.name) AS author_name','title']];
+```
+
+### Order
+
+Use this option to order the results by fields. Make sure you add the alias prefix e.g. `Article.` to the field if you are working with associated data. The order option can be a string or an array.
+
+```php
+$result = $this->Article->find('all',[
+  'order'=>'Article.created DESC'
+  ]);
+
+$result = $this->Article->find('all',[
+  'order'=>['Article.title','Article.created ASC'
+  ]]); // ORDER BY Article.title,Article.created ASC
+```
+You can set the default sort order for a model in the model property `order`, any calls to find without order will use this as the natural order.
+
+### Group
+
+To run a group by query, any aliased fields that don't exist in the table will be added as a property to the
+entity of the current model regardless if it took the data from another table.
+
+```php
+$result = $this->Article->find('all',[
+  'fields'=>['COUNT(*) as total','category'],
+  'group'=>'category'
+  ]);
+```
+
+This will return something like this
+
+```php
+[0] => Origin\Model\Entity Object
+        (
+            [category] => 'How To'
+            [total] => 2
+        )
+```
+
+### Limit
+
+Limit is basically what it says it does, it limits the number of results.
+
+```php
+$result = $this->Article->find('first',['limit'=>5]);
+```
+
+## Eager Loading Associations
+
+Associated records are not fetched unless you tell find to do so. Providing you have set up the relationships e.g. `hasMany`,`hasOne`,`belongsTo`,`hasAndBelongsToMany`, you will be able to fetch related data by passing array with the models that you want to fetch data for.
+
+```php
+$result = $this->Article->find('first',[
+  'associated'=>['Author','Comment']
+  ]);
+```
+
+By default all fields for each the associated models will be fetched (or if you have configured the association to return only certain fields by default) unless you tell it otherwise.
+
+```php
+$result = $this->Article->find('first',[
+  'associated'=>[
+    'Author'=>[
+      'fields'=>['name','email']
+      ]
+    ]
+  ]);
+```
+
+## Joining Tables
+
+Sometimes you might want to do your own joins, this can easily be done by using the `joins` option when finding. This option should be an array of arrays, since you do multiple joins.
+
+```php
+  $conditions['joins'][] = [
+    'table' => 'authors',
+    'alias' => 'Author',
+    'type' => 'LEFT' , // this is defualt,
+    'conditions' => [
+      'Author.id = Article.author_id'
+    ]
+   ];
+```
+
+## Disabling Callbacks
+
+By default callbacks are enabled, you can disable them by passing false, then the `beforeFind` and `afterFind` will not be called.
+
+```php
+$result = $this->Article->find('first',['callbacks'=>false]);
+```
+
+## Finding out if a record exists
+
+If you need to find a record exists with a primary key you can use the `exists` method.
+
+```php
+$result = $this->Article->exists(1024);
+```
+
+## Running Raw SQL queries
 
 If you need to carry out a raw SQL query the you can use the `query` method.
 

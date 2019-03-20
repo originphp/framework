@@ -2,7 +2,7 @@
 
 ## How to use validation rules
 
-You define validation rules in your model in `initialize` .
+Validation rules are defined in the `initialize` method of your model.
 
 You can define a rule as a string, rule array, or array with multiple rules.
 
@@ -33,7 +33,7 @@ A validation rule array consists of the following keys:
 - *rule* - this is the name of the rule to run
 - *message* - error message to display if validation fails
 - *on* - default is `null`. You can also set to `create` or `update` to only check validation rule when a record is created or updated.
-- *required* - default is `false`. If this is set to true then this means the data must include the key regardless if it is empty or not.
+- *required* - default is `false`. If this is set to true then this means the data must include the key regardless if it is empty or not. For example you might want an owner id to always be present when creating a record. If you set required, then this means 
 
 ## Validation Rules
 
