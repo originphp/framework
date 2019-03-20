@@ -152,6 +152,7 @@ Array
 )
 */
 ```
+
 ## Components
 
 Components are objects which can be shared between controllers. The framework comes with a number of components and you can also build your own. For more information on this see the [components guide](components.md).
@@ -203,8 +204,8 @@ class ContactsController extends AppController {
 }
 ```
 
-
 ## Flash Component
+
 The Flash component enables you to display messages to the user either in the current request or on the next if redirecting.
 
 ```php

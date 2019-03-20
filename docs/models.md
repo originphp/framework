@@ -142,11 +142,12 @@ Models should only be used from within controllers or other models. However, if 
 ```
 
 
-## CRUD 
+## CRUD
 
 CRUD stands for Create Read Update and Delete.
 
 ### Create
+
 When you create a record you will usually take data from the request (i.e. when somebody submits a form) or if you need to create something on the fly. 
 ```php
 class ArticlesController extends AppController
@@ -299,7 +300,7 @@ When saving records you can pass an array of options
 - validate: default is true, whether to validate data
 - callbacks: whether to trigger callbacks such as beforeSave etc.
 - transaction: default is true, whether to wrap the save in a database transaction 
-- associated: here you can specify  an array of associated models that you want to save data for
+- associated: here you can specify an array of associated model names that you want to save data for
 
 ## Saving a field
 
@@ -359,3 +360,8 @@ Callbacks get called a certain moments during a certain lifecycle, such as creat
 You can find more information about these in the [Callbacks Guide](models-callbacks.md).
 
 Hint: If you are using a good ide like [Visual Studio Code](https://code.visualstudio.com/), when you type in the function name, it will autocomplete the function including the arguments.
+
+
+## Behaviors
+
+You can extend your models with behaviors and share these across models. Behaviors are similar to [components](components.md) and you can find more information by seeing the [behaviors guide](behaviors.md).

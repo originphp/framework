@@ -1820,4 +1820,25 @@ class Model
     {
         return new Logger($channel);
     }
+
+    /**
+     * Enables a behavior that has been disabled
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function enableBehavior(string $name)
+    {
+        return $this->behaviorRegistry->enable($name);
+    }
+    /**
+     * Disables a behavior
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function disableBehavior(string $name)
+    {
+        return $this->behaviorRegistry->disable($name);
+    }
 }
