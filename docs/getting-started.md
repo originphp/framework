@@ -16,7 +16,7 @@ $ git clone https://github.com/originphp/originphp.git blog
 
 Download and install [Docker](https://www.docker.com/products/docker-desktop) and let this rock your world. Your app will be built within a docker container, which you can start and shutdown as needed. The Docker container is only intended for development, and it will act very similar to a real server.
 
-The first time use the docker container, you will need to build this, which might take a few minutes.
+The first time that you use the docker container, you will need to build this, which might take a few minutes.
 
 ```bash
 $ cd bookmarks
