@@ -271,7 +271,7 @@ class Model
         foreach ($this->behaviorRegistry()->enabled() as $Behavior) {
             if (method_exists($this->behaviorRegistry()->{$Behavior}, $method)) {
                 return call_user_func_array(
-                  array($this->behaviorRegistry()->{$Behavior}, $method),
+                    [$this->behaviorRegistry()->{$Behavior}, $method],
                     $arguments
                 );
             }
@@ -288,12 +288,12 @@ class Model
     {
         $fields = array_keys($this->schema());
 
-        $needles = array(
+        $needles = [
           Inflector::underscore($this->name).'_name',
           'name',
           'title',
           $this->primaryKey,
-        );
+        ];
 
         foreach ($needles as $needle) {
             if (in_array($needle, $fields)) {
@@ -410,9 +410,9 @@ class Model
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscore($this->name).'_id';
         }
-        $conditions = array(
-          "{$this->alias}.id = {$association}.{$options['foreignKey']}",
-          );
+
+        $conditions = ["{$this->alias}.id = {$association}.{$options['foreignKey']}"];
+
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
@@ -435,23 +435,22 @@ class Model
      */
     public function belongsTo(string $association, $options = [])
     {
-        $defaults = array(
+        $defaults = [
           'className' => $association,
           'foreignKey' => null,
           'conditions' => null,
           'fields' => null,
           'order' => null,
           'type' => 'LEFT',
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscore($options['className']).'_id';
         }
-        $conditions = array(
-            "{$this->alias}.{$options['foreignKey']} = {$association}.id",
-        );
+        $conditions = ["{$this->alias}.{$options['foreignKey']} = {$association}.id"];
+
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
@@ -532,7 +531,7 @@ class Model
         }
 
         // join table in alphabetic order
-        $models = array($this->name, $options['className']);
+        $models = [$this->name, $options['className']];
         sort($models);
         $models = array_values($models);
 
@@ -549,9 +548,8 @@ class Model
         if (is_null($options['associationForeignKey'])) {
             $options['associationForeignKey'] = Inflector::underscore($options['className']).'_id';
         }
-        $conditions = array(
-          "{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id",
-        );
+        $conditions = ["{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id"];
+        
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
@@ -572,7 +570,7 @@ class Model
      *  ]);
      * $this->validate($validationRules);
      *
-     * @param string/array $field
+     * @param string|array $field
      * @param array $options
      * @return void
      *
@@ -759,9 +757,7 @@ class Model
         if (count($data) > 1 or !isset($data[$this->primaryKey])) {
             $connection = $this->connection();
             if ($exists) {
-                $result = $connection->update($this->table, $data, array(
-                  $this->primaryKey => $this->id,
-                ));
+                $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
             } else {
                 $result = $connection->insert($this->table, $data);
                 $this->id = $connection->lastInsertId();
@@ -1689,7 +1685,7 @@ class Model
                 $conditions[$field] = $entity->{$field};
             }
         }
-        return $this->find('count', array('conditions' => $conditions)) === 0;
+        return $this->find('count', ['conditions' => $conditions]) === 0;
     }
 
     public function begin()
@@ -1773,12 +1769,12 @@ class Model
      */
     protected function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
     {
-        $callbacks = array(
-            array($this, $callback),
-        );
+        $callbacks = [
+            [$this, $callback],
+        ];
 
         foreach ($this->behaviorRegistry()->enabled() as $behavior) {
-            $callbacks[] = array($this->{$behavior}, $callback);
+            $callbacks[] = [$this->{$behavior}, $callback];
         }
 
         foreach ($callbacks as $callable) {

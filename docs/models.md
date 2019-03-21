@@ -51,10 +51,11 @@ class Product extends AppModel
 }
 
 ```
-Then create the `product` table.
+
+Then create the `product` table, which should be lower case, underscored and plural.
 
 ```sql
-CREATE TABLE `product` (
+CREATE TABLE `products` (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(80) NOT NULL,
   description TEXT DEFAULT NULL
@@ -241,7 +242,9 @@ Once you have the record that you want to update use the save method on the mode
     $this->Article->save($article);
 ```
 
-If you are processing updated data from the request then the preferred way is using the model `patch` method, this will take the existing entity and then patch it using an array of data. The patch method marshalls the data, includes some security features and is clever enough to work with associated data as well. You can pass an array with the key `fields` and array of a fields which are whitelisted, this will filter out any non specified fields which protect you from mass assignment attacks.
+If you are processing updated data from the request then the preferred way is using the model `patch` method, this will take the existing entity and then patch it using an array of data, the primary key is automatically added.
+
+The patch method marshals the data, includes some security features and is clever enough to work with associated data as well. You can pass an array with the key `fields` and array of a fields which are whitelisted, this will filter out any non specified fields which protect you from mass assignment attacks.
 
 ```php
 class ArticlesController extends AppController
