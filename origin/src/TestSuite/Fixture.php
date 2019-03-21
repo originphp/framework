@@ -96,11 +96,11 @@ class Fixture
             throw new Exception('Undefined table');
         }
 
+        $connection = ConnectionManager::get($options['datasource']);
+        $schema = $connection->schema($options['table']);
+      
         $connection = ConnectionManager::get($this->datasource);
-        $Schema = new Schema();
-        $fields = $Schema->generate($options['table'], $options['datasource']);
-        $sql = $Schema->createTable($this->table, $fields);
-
+        $sql = $connection->driver()->createTable($this->table, $schema);
         return $connection->execute($sql);
     }
 
@@ -115,8 +115,7 @@ class Fixture
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
-        $Schema = new Schema();
-        $sql = $Schema->createTable($this->table, $this->fields);
+        $sql = $connection->driver()->createTable($this->table, $this->fields);
     
         return $connection->execute($sql);
     }

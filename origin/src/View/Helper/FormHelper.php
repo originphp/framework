@@ -18,12 +18,9 @@ use Origin\Model\ModelRegistry;
 use Origin\Core\Router;
 use Origin\Core\Inflector;
 use Origin\Model\Entity;
-use Origin\I18n\Date;
-use Origin\I18n\Number;
 
 use Origin\View\TemplateTrait;
 use Origin\Core\Dot;
-use Origin\Core\Configure;
 
 class FormHelper extends Helper
 {
@@ -92,27 +89,6 @@ class FormHelper extends Helper
      */
     protected $requiredFields = [];
 
-    protected $typeMap = array(
-          'char' => 'string',
-          'varchar' => 'string',
-          'int' => 'number',
-          'decimal' => 'number',
-          'float' => 'number',
-          'date' => 'date',
-          'datetime' => 'datetime',
-          'time' => 'time',
-          'boolean' => 'bool',
-          'tinyint' => 'bool',
-          'text' => 'text',
-          'tinytext' => 'text',
-          'mediumtext' => 'text',
-          'longtext' => 'text',
-          'blob' => 'binary',
-          'tinyblob' => 'binary',
-          'mediumblob' => 'binary',
-          'longblob' => 'binary',
-        );
-
     protected $controlMap = array(
           'string' => 'text',
           'text' => 'textarea',
@@ -120,7 +96,7 @@ class FormHelper extends Helper
           'date' => 'date',
           'datetime' => 'datetime',
           'time' => 'time',
-          'bool' => 'checkbox',
+          'boolean' => 'checkbox',
           'binary' => 'file',
         );
 
@@ -223,19 +199,16 @@ class FormHelper extends Helper
         $model = ModelRegistry::get($name);
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey;
-
             foreach ($model->schema() as $column => $row) {
-                $type = 'text';
-                if (isset($this->typeMap[$row['type']])) {
-                    $type = $this->typeMap[$row['type']];
-                }
-
+                $type = $row['type'];
+             
                 if (in_array($row['type'], ['float', 'integer', 'decimal'])) {
                     $type = 'number';
                 }
+        
                 $meta['columnMap'][$column] = $type;
            
-                if (empty($row['length']) == false and $type != 'bool') {
+                if (empty($row['length']) == false and $type != 'boolean') {
                     $meta['maxlength'][$column] = $row['length'];
                 }
             }
@@ -759,7 +732,6 @@ class FormHelper extends Helper
             }
             if (isset($this->meta[$model]['columnMap'][$column])) {
                 $type = $this->meta[$model]['columnMap'][$column];
-
                 return $this->controlMap[$type];
             }
         }

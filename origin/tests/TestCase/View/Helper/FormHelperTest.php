@@ -29,10 +29,10 @@ class ViewTestsController extends Controller
 class Widget extends Model
 {
     public $schema = array(
-    'id' => ['type' => 'int', 'length' => 11],
-    'name' => ['type' => 'varchar', 'length' => 80],
+    'id' => ['type' => 'integer', 'length' => 11],
+    'name' => ['type' => 'string', 'length' => 80],
     'description' => ['type' => 'text'],
-    'active' => ['type' => 'tinyint', 'length' => 1],
+    'active' => ['type' => 'boolean', 'length' => 1],
   );
 
     public function initialize(array $config)

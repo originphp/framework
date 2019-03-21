@@ -154,14 +154,12 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
         $schema = $Article->schema();
         $expected = array(
-            'type' => 'int',
+            'type' => 'integer',
             'length' => 11,
             'precision' => null,
             'default' => null,
-            'null' => null,
-            'key' => 'primary',
-            'autoIncrement' => true,
-            'unsigned' => false
+            'null' => false,
+            'key' => 'primary'
       );
         $this->assertEquals($expected, $schema['id']);
         $idSchema = $Article->schema('id');
@@ -534,6 +532,34 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $Article->find('all', ['conditions'=>['title'=>'Foo']]));
         $results = $Article->find('all');
         $this->assertEquals(3, count($results));
+
+        $Article = new Article(['datasource' => 'test']);
+        ModelRegistry::set('Article', $Article);
+        ModelRegistry::set('Comment', new Comment(array('datasource' => 'test')));
+
+        # Test Grouping and Haves
+        $options = [
+          'fields' => ['COUNT(*) as total','article_id'],
+          'group' => ['article_id']
+        ];
+        $comment = $Article->Comment->new();
+        $comment->article_id = 1234;
+        $comment->body = 'this is a test';
+        $this->assertTrue($Article->Comment->save($comment));
+        $result = $Article->Comment->find('all', $options);
+        $this->assertEquals(2, count($result));
+
+        $this->assertEquals(3, $result[0]->total);
+        $this->assertEquals(1, $result[0]->article_id);
+        $this->assertEquals(1, $result[1]->total);
+        $this->assertEquals(1234, $result[1]->article_id);
+        $options = [
+          'fields' => ['COUNT(*) as total','article_id'],
+          'group' => ['article_id'],
+          'having' => ['total > 1']
+        ];
+        $result = $Article->Comment->find('all', $options);
+        $this->assertEquals(1, count($result));
     }
 
     public function testExists()

@@ -697,7 +697,7 @@ class Model
         }
 
         $exists = $this->exists($this->id);
-   
+     
         if ($options['validate'] === true) {
             if ($options['callbacks'] === true and !$this->triggerCallback('beforeValidate', [$entity])) {
                 return false;

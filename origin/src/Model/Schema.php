@@ -17,6 +17,9 @@ namespace Origin\Model;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
+/**
+ * This will be redesigned to work with Drivers
+ */
 class Schema
 {
     /**
@@ -30,11 +33,12 @@ class Schema
             'string' => array('name' => 'VARCHAR', 'length' => 255),
             'text' => array('name' => 'TEXT'),
             'integer' => array('name' => 'INT'),
+            'biginteger' => array('name' => 'BIGINT'),
             'float' => array('name' => 'FLOAT', 'length' => 10, 'precision' => 0), // mysql defaults
             'decimal' => array('name' => 'DECIMAL', 'length' => 10, 'precision' => 0),
             'datetime' => array('name' => 'DATETIME'),
             'date' => array('name' => 'DATE'),
-        'time' => array('name' => 'TIME'),
+            'time' => array('name' => 'TIME'),
             'binary' => array('name' => 'BLOB'),
             'boolean' => array('name' => 'TINYINT', 'length' => 1),
         );
@@ -141,10 +145,11 @@ class Schema
 
         $connection = ConnectionManager::get($datasource);
         $schema = $connection->schema($table);
+       
         foreach ($schema as &$result) {
             $result['type'] = $reverseMapping[$result['type']];
             foreach (['key','unsigned','autoIncrement','length'] as $key) {
-                if ($result[$key] == false) {
+                if (array_key_exists($key, $result) and $result[$key] == false) {
                     unset($result[$key]);
                 }
             }

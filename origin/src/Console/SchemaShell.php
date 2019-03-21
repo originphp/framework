@@ -51,7 +51,7 @@ class SchemaShell extends Shell
         }
 
         foreach ($tables as $table) {
-            $data = $schema->generate($table, $datasource);
+            $data = $connection->schema($table);
             if (!$data) {
                 $this->Status->error($table);
                 continue;
@@ -79,7 +79,6 @@ class SchemaShell extends Shell
             $datasource = $this->params['datasource'];
         }
 
-        $schema = new Schema();
         $connection = ConnectionManager::get($datasource);
         $folder = CONFIG . DS . 'schema';
         $files = scandir($folder);
@@ -89,7 +88,7 @@ class SchemaShell extends Shell
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                 $table = pathinfo($file, PATHINFO_FILENAME);
-                $sql = $schema->createTable($table, $this->loadSchema($folder . DS . $file));
+                $sql = $connection->driver()->createTable($table, $this->loadSchema($folder . DS . $file));
                 if ($sql and $connection->execute($sql)) {
                     $this->Status->ok(sprintf('%s table created', $table));
                     continue;
@@ -204,9 +203,8 @@ class SchemaShell extends Shell
         $this->out('');
         $this->out('Commands:');
         $this->out("generate\tgenerates the config\schema\\table.php file or files");
-        $this->out("create\t\tcreates the tables using the schema file or files");
-        $this->out("dump\t\tdumps all the tables and records into an sql file");
-        $this->out("import\t\timports sql file or files");
+        $this->out("create\t\tcreates the tables using the schema .php file or files");
+        $this->out("import\t\timports raw SQL from file or files");
         $this->out('Options:');
         $this->out("-datasource=name\tto set a different datasource");
     }

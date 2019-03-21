@@ -22,6 +22,10 @@ use PDOException;
 
 class Datasource
 {
+    protected $drivers = [
+        'mysql' => 'Origin\Model\Driver\MySQLDriver',
+        'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
+    ];
     /**
      * Holds the connection to datasource.
      *
@@ -55,7 +59,12 @@ class Datasource
      */
     private $columnMap = [];
 
-    private $queryBuilder = null;
+    /**
+     * Holds the driver
+     *
+     * @var \Origin\Model\Driver\MySQLDriver
+     */
+    protected $driver=  null;
 
     /**
      * connects to database.
@@ -64,9 +73,14 @@ class Datasource
      */
     public function connect(array $config)
     {
-        extract($config);
-        $dsn = "mysql:host={$host};dbname={$database};charset=utf8mb4";
+        $config += ['engine'=>'mysql'];
+      
+        if (!isset($this->drivers[$config['engine']])) {
+            throw new DatasourceException('Unkown driver ' . $config['engine']);
+        }
 
+        $this->driver = new $this->drivers[$config['engine']]($this, $config);
+    
         $flags = array(
           PDO::ATTR_PERSISTENT => false,
           PDO::ATTR_EMULATE_PREPARES => false, // use real prepared statements
@@ -74,7 +88,12 @@ class Datasource
         );
 
         try {
-            $this->connection = new PDO($dsn, $username, $password, $flags);
+            $this->connection = new PDO(
+                $this->driver->dsn($config),
+                $config['username'],
+                $config['password'],
+                $flags
+            );
         } catch (PDOException $e) {
             throw new DatasourceException($e->getMessage());
         }
@@ -375,36 +394,7 @@ class Datasource
      */
     public function schema(string $table)
     {
-        $schema = array();
-        if ($this->execute("SHOW FULL COLUMNS FROM {$table};")) {
-            $result = $this->fetchAll();
-
-            foreach ($result as $column) {
-                $precision = $length = null;
-                $unsigned = false;
-                $type = str_replace(')', '', $column['Type']);
-                if (strpos($type, '(') !== false) {
-                    list($type, $length) = explode('(', $type);
-                    $unsigned = (bool) strpos($length, 'unsigned');
-                    if (strpos(',', $length) !== false) {
-                        list($length, $precision) = explode(',', $length);
-                    }
-                }
-                
-                $schema[$column['Field']] = array(
-                  'type' => $type,
-                  'length' => (int) $length,
-                  'precision' => (int) $precision,
-                  'default' => $column['Default'],
-                  'null' => ($column['Null'] === 'YES' ? true : false),
-                  'key' => ($column['Key'] === 'PRI' ? 'primary' : null),
-                  'autoIncrement' => ($column['Extra']==='auto_increment')?true:false,
-                  'unsigned' => $unsigned
-                );
-            }
-        }
-
-        return $schema;
+        return $this->driver->describe($table);
     }
 
     /**
@@ -414,14 +404,7 @@ class Datasource
      */
     public function tables()
     {
-        $tables = [];
-        if ($this->execute('SHOW TABLES;')) {
-            $result = $this->fetchAll();
-            foreach ($result as $value) {
-                $tables[] = current($value);
-            }
-        }
-        return $tables;
+        return $this->driver->tables();
     }
 
     /**
@@ -491,5 +474,15 @@ class Datasource
     public function log()
     {
         return $this->log;
+    }
+
+    /**
+     * Returns the database driver
+     *
+     * @return \Origin\Model\Driver\MySQLDriver
+     */
+    public function driver()
+    {
+        return $this->driver;
     }
 }
