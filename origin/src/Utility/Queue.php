@@ -61,7 +61,7 @@ class Job
      * @param boolean $array return as array instead of object
      * @return object|array
      */
-    public function getData(bool $array=false)
+    public function data(bool $array=false)
     {
         return json_decode($this->entity->data, $array);
     }

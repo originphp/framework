@@ -31,6 +31,7 @@ class Comment extends AppModel
 ```
 
 ## Retrieving data from the database
+
 To retrieve data from the database, the model class provides a function called find which will read the data
 from the database and then transform it into objects which you can work with.
 
@@ -347,5 +348,5 @@ $result = $this->Article->query('SELECT name from articles');
 To securely pass values when using sql statements, pass an array with key value pairs.
 
 ```php
-$result = $User->query('SELECT name FROM users WHERE id = :id',['id'=>1234]);
+$result = $this->User->query('SELECT name FROM users WHERE id = :id',['id'=>1234]);
 ```

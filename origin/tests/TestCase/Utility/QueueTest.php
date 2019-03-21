@@ -94,7 +94,7 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($id, $job->id);
         
-        $message = $job->getData();
+        $message = $job->data();
         $this->assertEquals(1234, $message->user_id);
         // Test is set to locked
         $job = $queue->model()->get($id);

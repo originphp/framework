@@ -62,7 +62,8 @@ class Collection implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * Go through each item of the collection, this does not modify data, use map for that.
+     * Go through each item of the collection, this does not modify data, use map for that. Return
+     * false to exit the loop
      *
      * $collection->each(function ($value, $key) {
      *      echo "{$key}:{$value}";
@@ -74,7 +75,10 @@ class Collection implements ArrayAccess, Iterator, Countable
     public function each(callable $callback)
     {
         foreach ($this->items as $key => $value) {
-            $callback($value, $key);
+            $result = $callback($value, $key);
+            if ($result === false) {
+                break;
+            }
         }
 
         return $this;

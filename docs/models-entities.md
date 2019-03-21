@@ -1,6 +1,8 @@
 # Entities
 
-An entity is a single row from the database. Using find first or find all will return either a entity object or an array of entity objects.
+An entity is a single row from the database. Using find first or find all will return either a entity object or a collection of entity objects. 
+
+Note: The collection object from a find all is not the same as the collection utility, it is a lighter version of this, you can still pass the results from find all to a collection object.
 
 ```php
   $article = $this->Article->find('first');
@@ -80,15 +82,7 @@ $article->set([
 
 ```php
 $title = $article->title;
-$title = article->get('title');
-```
-
-## Extract
-
-You can also get many properties at once
-
-```php
-$extracted = article->extract(['title','status']);
+$title = $article->get('title');
 ```
 
 ## Errors
@@ -119,7 +113,6 @@ To set errors manually
 
 This resets the modified property and any validation errors.
 
-
 ### modified
 
 Gets a list of fields that were modified.
@@ -127,3 +120,15 @@ Gets a list of fields that were modified.
 ### name
 
 Gets the model name of the entity.
+
+### properties
+
+Gets a list of properties from the object
+
+## toArray
+
+Converts the entity into an array
+
+## toJson
+
+Converts the entity a into json.

@@ -15,7 +15,6 @@
 namespace Origin\Utility;
 
 use DOMDocument;
-use DOMElement;
 use SimpleXMLElement;
 use Origin\Utility\Exception\XmlException;
 use Origin\Core\Configure;

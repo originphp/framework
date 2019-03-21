@@ -152,6 +152,7 @@ Templates are stored in the `View/Email` folder, use the template method to set 
         ->format('both')
     $Email->send();
 ````
+
 Here is how you use variables in the email templates:
 
 ````php
@@ -160,7 +161,7 @@ Here is how you use variables in the email templates:
 <p>How is your day so far?</p>
 ````
 
-Template files also accept plugin syntax, so to load a template from a plugin just add the plugin name.
+The template method also accepts plugin syntax, so to load a template from a plugin  folder just add the plugin name followed by a dot then the template name.
 
 ````php
 use Origin\Utility\Email;

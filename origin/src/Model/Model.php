@@ -734,7 +734,10 @@ class Model
          */
         $columns = array_intersect(array_keys($this->schema()), $entity->modified());
        
-        $data = $entity->extract($columns);
+        $data = [];
+        foreach ($columns as $column) {
+            $data[$column] = $entity->get($column);
+        }
         
         /**
          * Data should not be objects or arrays. Invalidate any objects or array data
@@ -1161,9 +1164,7 @@ class Model
         if ($callbacks) {
             $this->triggerCallback('afterDelete', [$entity,$result]);
         }
-        if ($result) {
-            $entity->exists(false);
-        }
+     
         return $result;
     }
 

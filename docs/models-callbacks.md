@@ -85,6 +85,7 @@ public function afterSave(Entity $entity,bool $created,array $options =[]){
 ```
 
 ## beforeDelete
+
 This is called just before a record is deleted must return `true`. Use this callback to carry out tasks before a record is deleted.
 
 Note: When saving (including creating) or deleting a record the primary key can be found on the id property of the model.

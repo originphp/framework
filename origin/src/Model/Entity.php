@@ -211,23 +211,6 @@ class Entity
     }
 
     /**
-     * Extracts data for selected properties
-     * @internal null values are important so we use array_key_exists
-     * @param array $properties
-     * @return array
-     */
-    public function extract(array $properties)
-    {
-        $result = [];
-        foreach ($properties as $property) {
-            if (array_key_exists($property, $this->_properties)) {
-                $result[$property] = $this->get($property);
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Sets a property/properties of the entity.
      *
      * @param string|array $property $properties
@@ -309,21 +292,6 @@ class Entity
     public function name()
     {
         return $this->_name;
-    }
-
-    /**
-     * Sets and gets exists. If it returns null then it means it does not know. Even
-     * if the it says exists, record could of been deleted somewhere else. So its not
-     * definitve.
-     *
-     * @return null|bool
-     */
-    public function exists(bool $exists = null)
-    {
-        if ($exists === null) {
-            return $this->exists;
-        }
-        $this->exists = $exists;
     }
 
     /**

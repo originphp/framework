@@ -151,20 +151,6 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['invalid title'], $entity->errors('title'));
     }
 
-    /**
-    * @depends testSet
-    */
-    public function testExtract()
-    {
-        $entity = new Entity();
-        $entity->id = 1024;
-        $entity->name = 'Foo';
-        
-        $expected = ['id'=>1024,'name'=>'Foo'];
-
-        $this->assertEquals($expected, $entity->extract(['id','name','nonExistant']));
-    }
-    
     public function testToString()
     {
         $entity = new Entity(['name'=>'1234']);

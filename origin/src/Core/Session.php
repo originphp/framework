@@ -21,12 +21,8 @@ class Session
 {
     protected $started = false;
 
-    protected $cli = false;
-
     public function __construct()
     {
-        $this->cli = (PHP_SAPI === 'cli');
-
         if ($this->started() === false) {
             $this->start();
         }
@@ -47,7 +43,7 @@ class Session
             return false;
         }
 
-        if ($this->cli) {
+        if (PHP_SAPI === 'cli') {
             return $this->started = true;
         }
 
@@ -168,7 +164,7 @@ class Session
         if (!$this->started()) {
             session_start();
         }
-        if ($this->cli === false) {
+        if (PHP_SAPI !== 'cli') {
             session_destroy();
         }
         $this->started = false;

@@ -67,7 +67,6 @@ class Number
 
     /**
      * Sets and gets the locale array
-     *
      * @param array $locale
      * @return array|null
      */
