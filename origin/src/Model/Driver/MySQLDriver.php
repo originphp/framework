@@ -41,6 +41,8 @@ class MySQLDriver
         'boolean' => ['name' => 'TINYINT', 'length' => 1],
     ];
 
+    public $escape = '`';
+
     public function __construct(Datasource $datasource, array $config=[])
     {
         $this->datasource = $datasource;
@@ -156,8 +158,6 @@ class MySQLDriver
             if (isset($settings['default'])) {
                 $output .= " DEFAULT {$settings['default']}";
             }
-
-            
 
             // When key is set as primary we automatically make it autoincrement
             if (!empty($settings['key']) and $settings['key'] === 'primary') {

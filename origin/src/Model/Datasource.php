@@ -64,7 +64,9 @@ class Datasource
      *
      * @var \Origin\Model\Driver\MySQLDriver
      */
-    protected $driver=  null;
+    protected $driver =  null;
+
+    protected $escape = '';
 
     /**
      * connects to database.
@@ -80,6 +82,7 @@ class Datasource
         }
 
         $this->driver = new $this->drivers[$config['engine']]($this, $config);
+        $this->escape = $this->driver->escape;
     
         $flags = array(
           PDO::ATTR_PERSISTENT => false,
@@ -364,7 +367,7 @@ class Datasource
         }
         $numberOfFields = $statement->columnCount();
         for ($i = 0; $i < $numberOfFields; ++$i) {
-            $column = $statement->getColumnMeta($i);
+            $column = $statement->getColumnMeta($i); // could be bottle neck on
             if (empty($column['table']) or $this->isVirtualField($column['name'])) {
                 $this->columnMap[$i] = array(0, $column['name']);
             } else {
@@ -466,9 +469,11 @@ class Datasource
      * @param string $table [description]
      * @return \Origin\Model\QueryBuilder QueryBuilder
      */
-    public function queryBuilder(string $table)
+    public function queryBuilder(string $table, $alias=null)
     {
-        return new QueryBuilder($table);
+        $builder = new QueryBuilder($table, $alias);
+        $builder->quote = $this->driver->escape;
+        return $builder;
     }
 
     public function log()

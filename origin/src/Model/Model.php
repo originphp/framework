@@ -1526,27 +1526,37 @@ class Model
      */
     protected function readDataSource(array $query, $type = 'model')
     {
-        $QueryBuilder = new QueryBuilder($this->table, $this->alias);
-        $sql = $QueryBuilder->selectStatement($query);
-    
         $connection = $this->connection();
+
+        $builder = $connection->queryBuilder($this->table, $this->alias);
+        
+        /*
+          A different way to map and solve problem with postgres due meta table actual table name
+            foreach ($query['fields'] as $k => $field) {
+            if (strpos($field, ' AS ') == false) {
+                $query['fields'][$k] = $field . ' AS ' . str_replace('.', '__', $field);
+             }
+            }
+          */
        
-        $connection->execute($sql, $QueryBuilder->getValues());
+        $sql = $builder->selectStatement($query);
+       
+        $connection->execute($sql, $builder->getValues());
+        
 
         if ($type == 'list') {
             return $connection->fetchList();
         }
         
-
         $results = $connection->fetchAll($type);
-
+  
         if ($results and $type === 'model') {
             $results = $this->prepareResults($results);
 
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
         }
-
+   
         unset($QueryBuilder,$sql,$connection);
 
         return $results;

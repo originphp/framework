@@ -5,31 +5,32 @@ use Origin\Model\Datasource;
 use Origin\Exception\Exception;
 
 /*
-In progress not working properly, user as its reserved word. This causes tons of problems:
-Cant quote join condition
-SELECT
-    Bookmark.id,
-    Bookmark.user_id,
-    Bookmark.title,
-    Bookmark.description,
-    Bookmark.url,
-    Bookmark.category,
-    Bookmark.created,
-    Bookmark.modified,
-    User.id,
-    User.name,
-    User.email,
-    User.password,
-    User.dob,
-    User.created,
-    User.modified
-FROM
-    `bookmarks` Bookmark
-    LEFT JOIN `users` as User ON (Bookmark.user_id = User.id)
-WHERE
-    Bookmark.id = '1'
-LIMIT 1
-Second problem is is from with back tick, although that ca easily be changed
+@Note this under development.
+21.March -
+Current Meta system not helpful, instead using virtual field syntax solves probem but breaks quoting.
+MySql
+    [native_type] => LONG
+    [pdo_type] => 1
+    [flags] => Array
+        (
+            [0] => not_null
+            [1] => multiple_key
+        )
+
+    [table] => Bookmark *PROBLEM
+    [name] => user_id
+    [len] => 11
+    [precision] => 0
+)
+POSTGRE
+[pgsql:oid] => 23
+    [pgsql:table_oid] => 16392
+    [table] => bookmarks *PROBLEM
+    [native_type] => int4
+    [name] => user_id
+    [len] => 4
+    [precision] => -1
+    [pdo_type] => 1
 */
 
 class PostgreSQLDriver
@@ -68,6 +69,9 @@ class PostgreSQLDriver
         'binary' => ['name' => 'BYTEA'],
         'boolean' => ['name' => 'BOOLEAN'],
     ];
+
+    public $escape = '"';
+
 
     public function __construct(Datasource $datasource, array $config=[])
     {

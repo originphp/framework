@@ -22,7 +22,7 @@ This builds SQL statements easily in multiple ways.
 
 ## Select
 
-$Builder = new SQLBuilder('users','User');
+$Builder = new QueryBuilder('users','User');
 
 $Builder->select(['id','user_name','country'])
         ->where(['group_id'=>1024,'active'=>true])
@@ -142,6 +142,8 @@ class QueryBuilder
 
     public $placeholder = null;
 
+    public $quote ='`';
+
     protected $i = 0;
 
     private $operators = array(
@@ -182,9 +184,9 @@ class QueryBuilder
             $table = $this->table;
             $alias = $this->alias;
         }
-        $tableReference = "`{$table}`";
+        $tableReference = "{$this->quote}{$table}{$this->quote}";
         if ($alias != $table) {
-            $tableReference .= " AS {$alias}";
+            $tableReference .= " AS {$this->quote}{$alias}{$this->quote}";
         }
 
         return $tableReference;
@@ -530,14 +532,8 @@ class QueryBuilder
      */
     public function joinToString(array $params)
     {
-        $default = array(
-        'type' => 'LEFT',
-        'table' => null,
-        'alias' => null,
-        'conditions' => null,
-      );
+        $default = ['type' => 'LEFT','table' => null,'alias' => null, 'conditions' => null];
         $params = array_merge($default, $params);
-
         if (empty($params['table']) or empty($params['alias']) or empty($params['conditions'])) {
             return;
         }
@@ -593,7 +589,7 @@ class QueryBuilder
         }
 
         if (isset($data['offset'])) {
-            return "{$data['offset']},{$data['limit']}";
+            return "{$data['limit']} OFFSET {$data['offset']}";
         }
 
         return "{$data['limit']}";
@@ -656,7 +652,7 @@ class QueryBuilder
             }
             $fields[$index] = $this->addAlias($column);
             if (is_string($index)) {
-                $fields[$index] = "{$this->alias}.{$index} AS {$column}";
+                $fields[$index] = "{$this->quote}{$this->alias}{$this->quote}.{$this->quote}{$index}{$this->quote} AS {$this->quote}{$column}{$this->quote}";
             }
         }
         return $fields;
@@ -678,14 +674,34 @@ class QueryBuilder
         // Ignore formulas, existing aliases or virtual fields by ensuring
         // it starts with letter, only contains letters, underscore and number
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
+            if (strpos($field, '.') !== false and strpos($field, ' ') === false) {
+                $field = $this->quote . str_replace('.', $this->quote.'.' . $this->quote, $field).$this->quote;
+            }
             return $field;
         }
-    
+        // these are adds we dont need to stress
         if (in_array($field, $this->specialFields)) {
             return $field;
         }
-        
-        return "{$alias}.{$field}";
+        return "{$this->quote}{$alias}{$this->quote}.{$this->quote}{$field}{$this->quote}";
+    }
+
+    /**
+     * Bookmark.user_id = User.id
+     *
+     * @param string $string
+     * @return string
+     */
+    public function quoteString(string $string)
+    {
+        preg_match_all('/[a-z._]*/i', $string, $results); //[A-Z][a-z_][._a-z]*/
+        if (isset($results[0])) {
+            foreach ($results[0] as $field) {
+                $with = $this->quote . str_replace('.', $this->quote.'.'.$this->quote, $field) . $this->quote;
+                $string = str_replace($field, $with, $string);
+            }
+        }
+        return $string;
     }
 
     /**
@@ -703,7 +719,7 @@ class QueryBuilder
         foreach ($conditions as $key => $value) {
             //array("Post.created = Post.modified")
             if (is_int($key) and is_string($value)) {
-                $block[] = $value;
+                $block[] = $this->quoteString($value);
                 continue;
             }
             //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
@@ -732,6 +748,7 @@ class QueryBuilder
                 $block[] = $start.implode(' ' . $key . ' ', $buffer).$end;
                 continue;
             }
+            
             // array('id'=>1234)
             if (is_string($key)) {
                 if (strpos($key, ' ') === false) {
