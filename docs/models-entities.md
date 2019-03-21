@@ -64,6 +64,7 @@ $result = $article->has('title')
 
 
 ## Set
+
 ```php
 $article->title = $title;
 $article->set('title',$title)
@@ -92,19 +93,19 @@ Validation errors are contained within the entities.
 To get all errors
 
 ```php
-  $errors = $entity->errors();
+$errors = $entity->errors();
 ```
 
 To get error(s) for a field
 
 ```php
-  $errors = $entity->errors('first_name');
+$errors = $entity->errors('first_name');
 ```
 
 To set errors manually
 
 ```php
-  $entity->invalidate('email','invalid email address');
+$entity->invalidate('email','invalid email address');
 ```
 
 ## Other Methods
@@ -113,22 +114,46 @@ To set errors manually
 
 This resets the modified property and any validation errors.
 
+```php
+$entity->reset();
+```
+
 ### modified
 
 Gets a list of fields that were modified.
+
+```php
+$fields = $entity->modified();
+```
 
 ### name
 
 Gets the model name of the entity.
 
+```php
+$modelName = $entity->name();
+```
+
 ### properties
 
-Gets a list of properties from the object
+Gets a list of properties from the object.
+
+```php
+$list = $entity->properties();
+```
 
 ### toArray
 
-Converts the entity into an array
+Converts the entity into an array.
+
+```php
+$array = $entity->toArray();
+```
 
 ### toJson
 
-Converts the entity a into json.
+Converts the entity into a json string.
+
+```php
+$json = $entity->toJson();
+```

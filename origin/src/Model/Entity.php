@@ -276,8 +276,8 @@ class Entity
     /**
      * Checks if a entity has a property SET (regardless if null).
      *
-     * @param string $property [description]
-     * @return bool [description]
+     * @param string $property
+     * @return bool
      */
     public function propertyExists(string $property)
     {
