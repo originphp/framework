@@ -125,10 +125,10 @@ Gets the model name of the entity.
 
 Gets a list of properties from the object
 
-## toArray
+### toArray
 
 Converts the entity into an array
 
-## toJson
+### toJson
 
 Converts the entity a into json.
