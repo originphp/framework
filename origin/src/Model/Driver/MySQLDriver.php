@@ -190,7 +190,6 @@ class MySQLDriver
         if (count($primaryKeys)>1) {
             $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
         }
-        pr("CREATE TABLE {$table} (\n".implode(",\n", $result)."\n)");
         return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n)";
     }
 }

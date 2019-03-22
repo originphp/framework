@@ -31,7 +31,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $expected = '`user`';
         $this->assertEquals($expected, $Builder->tableReference());
         $Builder = new QueryBuilder('user', 'User');
-        $expected = '`user` AS User';
+        $expected = '`user` AS `User`';
         $this->assertEquals($expected, $Builder->tableReference());
     }
 
@@ -39,7 +39,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $Builder = new QueryBuilder('user', 'User');
         $data = ['id', 'User.user_name', 'email', 'COUNT(*)', 'user.photo AS avatar'];
-        $expected = 'User.id, User.user_name, User.email, COUNT(*), user.photo AS avatar';
+        $expected = '`User`.`id`, `User`.`user_name`, `User`.`email`, COUNT(*), user.photo AS avatar'; //@todo think about adding quotes here
         $this->assertEquals($expected, $Builder->fieldsToString($data));
     }
 
@@ -51,7 +51,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       'alias' => 'UserRole',
       'conditions' => array('UserRole.id => User.role_id'),
     ];
-        $expected = 'LEFT JOIN `user_roles` AS UserRole ON (UserRole.id => User.role_id)';
+        $expected = 'LEFT JOIN `user_roles` AS `UserRole` ON (`UserRole`.`id` => `User`.`role_id`)';
         $this->assertEquals($expected, $Builder->joinToString($data));
 
         $Builder = new QueryBuilder('tag', 'Tag');
@@ -62,7 +62,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
             'ArticlesTag.tag_id = Tag.id',
             'ArticlesTag.article_id' => 1,
           ), ];
-        $expected = 'LEFT JOIN `articles_tags` AS ArticlesTag ON (ArticlesTag.tag_id = Tag.id AND ArticlesTag.article_id = :t0)';
+        $expected = 'LEFT JOIN `articles_tags` AS `ArticlesTag` ON (`ArticlesTag`.`tag_id` = `Tag`.`id` AND `ArticlesTag`.`article_id` = :t0)';
         $this->assertEquals($expected, $Builder->joinToString($data));
     }
 
@@ -70,7 +70,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $Builder = new QueryBuilder('user', 'User');
         $data = ['User.role_id', 'User.access'];
-        $expected = 'User.role_id, User.access';
+        $expected = '`User`.`role_id`, `User`.`access`';
         $this->assertEquals($expected, $Builder->groupToString($data));
     }
 
@@ -86,10 +86,10 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $Builder = new QueryBuilder('user', 'User');
         $data = ['User.country', 'User.user_name ASC'];
-        $expected = 'User.country,User.user_name ASC';
+        $expected = '`User`.`country`,User.user_name ASC';
         $this->assertEquals($expected, $Builder->orderToString($data));
         $data = ['User.country' => 'DESC'];
-        $expected = 'User.country DESC';
+        $expected = '`User`.`country` DESC';
         $this->assertEquals($expected, $Builder->orderToString($data));
     }
 
@@ -104,17 +104,17 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       'limit' => 10,
       'page' => 1,
     ];
-        $this->assertEquals('0,10', $Builder->limitToString($data));
+        $this->assertEquals('10 OFFSET 0', $Builder->limitToString($data));
         $data = [
       'limit' => 10,
       'page' => 2,
     ];
-        $this->assertEquals('10,10', $Builder->limitToString($data));
+        $this->assertEquals('10 OFFSET 10', $Builder->limitToString($data));
         $data = [
       'limit' => 25,
       'offset' => 50,
     ];
-        $this->assertEquals('50,25', $Builder->limitToString($data));
+        $this->assertEquals('25 OFFSET 50', $Builder->limitToString($data));
     }
 
     public function testExpression()
@@ -156,10 +156,10 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $Builder = new QueryBuilder('user');
         $Builder->select();
 
-        $this->assertSame('SELECT user.* FROM `user`', $Builder->write());
+        $this->assertSame('SELECT `user`.`*` FROM `user`', $Builder->write());
 
         $Builder->select(['id', 'name', 'email']);
-        $this->assertSame('SELECT user.id, user.name, user.email FROM `user`', $Builder->write());
+        $this->assertSame('SELECT `user`.`id`, `user`.`name`, `user`.`email` FROM `user`', $Builder->write());
     }
 
     public function testSelectColumnAliases()
@@ -168,10 +168,10 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $Builder = new QueryBuilder('user', 'User');
 
         $Builder->select(['id', 'name', 'email']);
-        $this->assertSame('SELECT User.id, User.name, User.email FROM `user` AS User', $Builder->write());
+        $this->assertSame('SELECT `User`.`id`, `User`.`name`, `User`.`email` FROM `user` AS `User`', $Builder->write());
 
         $Builder->select(['name' => 'userName', 'email_address' => 'email']);
-        $this->assertSame('SELECT User.name AS userName, User.email_address AS email FROM `user` AS User', $Builder->write());
+        $this->assertSame('SELECT `User`.`name` AS `userName`, `User`.`email_address` AS `email` FROM `user` AS `User`', $Builder->write());
     }
 
     public function testSelectWhere()
@@ -180,7 +180,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $Builder->select()
       ->where(['id' => 100]);
 
-        $this->assertSame('SELECT User.* FROM `user` AS User WHERE User.id = :u0', $Builder->write());
+        $this->assertSame('SELECT `User`.`*` FROM `user` AS `User` WHERE `User`.`id` = :u0', $Builder->write());
 
         $this->assertEquals(['u0' => '100'], $Builder->getValues());
 
@@ -188,7 +188,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
       ->where(['id' => 100])
       ->group(['role']);
 
-        $expected = 'SELECT User.* FROM `user` AS User WHERE User.id = :u0 GROUP BY User.role';
+        $expected = 'SELECT `User`.`*` FROM `user` AS `User` WHERE `User`.`id` = :u0 GROUP BY `User`.`role`';
         $this->assertSame($expected, $Builder->write());
     }
 
@@ -203,33 +203,33 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         'conditions' => ['User.role_id = UserRole.id'],
       ]);
 
-        $expected = 'SELECT User.* FROM `user` AS User LEFT JOIN `roles` AS UserRole ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $expected = 'SELECT `User`.`*` FROM `user` AS `User` LEFT JOIN `roles` AS `UserRole` ON (`User`.`role_id` = `UserRole`.`id`) WHERE `User`.`id` = :u0';
         $this->assertSame($expected, $Builder->write());
     }
 
     public function testConditionsEquals()
     {
         $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('Article.id = :a0', $Builder->conditions('Article', ['id' => 1]));
-        $this->assertEquals('Article.id IS NULL', $Builder->conditions('Article', ['id' => null]));
-        $this->assertEquals('Article.id IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id' => array(1, 2, 3)]));
+        $this->assertEquals('`Article`.`id` = :a0', $Builder->conditions('Article', ['id' => 1]));
+        $this->assertEquals('`Article`.`id` IS NULL', $Builder->conditions('Article', ['id' => null]));
+        $this->assertEquals('`Article`.`id` IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id' => array(1, 2, 3)]));
     }
 
     public function testConditionsNotEquals()
     {
         $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('Article.id != :a0', $Builder->conditions('Article', ['id !=' => 1]));
-        $this->assertEquals('Article.id IS NOT NULL', $Builder->conditions('Article', ['id !=' => null]));
-        $this->assertEquals('Article.id NOT IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id !=' => array(1, 2, 3)]));
+        $this->assertEquals('`Article`.`id` != :a0', $Builder->conditions('Article', ['id !=' => 1]));
+        $this->assertEquals('`Article`.`id` IS NOT NULL', $Builder->conditions('Article', ['id !=' => null]));
+        $this->assertEquals('`Article`.`id` NOT IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id !=' => array(1, 2, 3)]));
     }
 
     public function testConditionsOthers()
     {
         $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('Article.id > :a0', $Builder->conditions('Article', ['id >' => 1]));
-        $this->assertEquals('Article.id < :a1', $Builder->conditions('Article', ['id <' => 1]));
-        $this->assertEquals('Article.id <= :a2', $Builder->conditions('Article', ['id <=' => 1]));
-        $this->assertEquals('Article.id >= :a3', $Builder->conditions('Article', ['id >=' => 1]));
+        $this->assertEquals('`Article`.`id` > :a0', $Builder->conditions('Article', ['id >' => 1]));
+        $this->assertEquals('`Article`.`id` < :a1', $Builder->conditions('Article', ['id <' => 1]));
+        $this->assertEquals('`Article`.`id` <= :a2', $Builder->conditions('Article', ['id <=' => 1]));
+        $this->assertEquals('`Article`.`id` >= :a3', $Builder->conditions('Article', ['id >=' => 1]));
 
         //$this->expectException(InvalidArgumentException::class);
     }
@@ -237,9 +237,9 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     public function testConditionsBetween()
     {
         $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('( Article.id BETWEEN :a0 AND :a1 )', $Builder->conditions('Article', ['id BETWEEN' => array(1, 2)]));
+        $this->assertEquals('( `Article`.`id` BETWEEN :a0 AND :a1 )', $Builder->conditions('Article', ['id BETWEEN' => array(1, 2)]));
 
-        $this->assertEquals('( Article.id NOT BETWEEN :a2 AND :a3 )', $Builder->conditions('Article', ['id NOT BETWEEN' => array(1, 2)]));
+        $this->assertEquals('( `Article`.`id` NOT BETWEEN :a2 AND :a3 )', $Builder->conditions('Article', ['id NOT BETWEEN' => array(1, 2)]));
 
         $this->expectException(QueryBuilderException::class);
         $Builder->conditions('Article', ['Article.id BETWEEN' => null]);
@@ -248,9 +248,9 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     public function testConditionsLike()
     {
         $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('Article.id LIKE :a0', $Builder->conditions('Article', ['id LIKE' => '%100_']));
+        $this->assertEquals('`Article`.`id` LIKE :a0', $Builder->conditions('Article', ['id LIKE' => '%100_']));
 
-        $this->assertEquals('Article.id NOT LIKE :a1', $Builder->conditions('Article', ['id NOT LIKE' => '200%']));
+        $this->assertEquals('`Article`.`id` NOT LIKE :a1', $Builder->conditions('Article', ['id NOT LIKE' => '200%']));
 
         $this->expectException(QueryBuilderException::class);
         $Builder->conditions('Article', ['Article.id LIKE' => null]);
@@ -260,10 +260,10 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $Builder = new QueryBuilder('articles', 'Article');
 
-        $this->assertEquals('Article.id IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id IN' => 'SELECT STATEMENT']));
-        $this->assertEquals('Article.id NOT IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id NOT IN' => 'SELECT STATEMENT']));
-        $this->assertEquals('Article.id IN ( :a0, :a1, :a2 )', $Builder->conditions('Article', ['id IN' => array(1, 2, 3)]));
-        $this->assertEquals('Article.id NOT IN ( :a3, :a4, :a5 )', $Builder->conditions('Article', ['id NOT IN' => array(1, 2, 3)]));
+        $this->assertEquals('`Article`.`id` IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id IN' => 'SELECT STATEMENT']));
+        $this->assertEquals('`Article`.`id` NOT IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id NOT IN' => 'SELECT STATEMENT']));
+        $this->assertEquals('`Article`.`id` IN ( :a0, :a1, :a2 )', $Builder->conditions('Article', ['id IN' => array(1, 2, 3)]));
+        $this->assertEquals('`Article`.`id` NOT IN ( :a3, :a4, :a5 )', $Builder->conditions('Article', ['id NOT IN' => array(1, 2, 3)]));
 
         $this->expectException(QueryBuilderException::class);
         $Builder->conditions('Article', ['id IN' => null]);
@@ -278,7 +278,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
                 ['task'=> 1,'closed'=>0],
                 ['task'=> 0,'start_date <='=> '2019-01-29 09:30:00']
             ]];
-        $expected = 'Post.model = :p0 AND ((Post.task = :p1 AND Post.closed = :p2) OR (Post.task = :p3 AND Post.start_date <= :p4))';
+        $expected = '`Post`.`model` = :p0 AND ((`Post`.`task` = :p1 AND `Post`.`closed` = :p2) OR (`Post`.`task` = :p3 AND `Post`.`start_date` <= :p4))';
         
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
     }
@@ -287,21 +287,21 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $Builder = new QueryBuilder('post', 'Posts');
         $conditions = array('Post.title' => 'This is a post');
-        $expected = 'Post.title = :p0';
+        $expected = '`Post`.`title` = :p0';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array('Post.title !=' => 'This is a post');
-        $expected = 'Post.title != :p1';
+        $expected = '`Post`.`title` != :p1';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array('Post.title' => 'This is a post', 'Post.author_id' => 1);
-        $expected = 'Post.title = :p2 AND Post.author_id = :p3';
+        $expected = '`Post`.`title` = :p2 AND `Post`.`author_id` = :p3';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array(
         'Post.title' => array('First post', 'Second post', 'Third post'),
     );
-        $expected = 'Post.title IN ( :p4, :p5, :p6 )';
+        $expected = '`Post`.`title` IN ( :p4, :p5, :p6 )';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array(
@@ -309,14 +309,14 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
             'Post.title' => array('First post', 'Second post', 'Third post'),
         ),
     );
-        $expected = 'NOT (Post.title IN ( :p7, :p8, :p9 ))';
+        $expected = 'NOT (`Post`.`title` IN ( :p7, :p8, :p9 ))';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array('OR' => array(
           'Post.title' => array('First post', 'Second post', 'Third post'),
           'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
       ));
-        $expected = '(Post.title IN ( :p10, :p11, :p12 ) OR Post.created > :p13)';
+        $expected = '(`Post`.`title` IN ( :p10, :p11, :p12 ) OR `Post`.`created` > :p13)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $conditions = array(
@@ -326,12 +326,12 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
               'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
           ),
       );
-        $expected = 'Author.name = :p14 AND (Post.title LIKE :p15 OR Post.created > :p16)';
+        $expected = '`Author`.`name` = :p14 AND (`Post`.`title` LIKE :p15 OR `Post`.`created` > :p16)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         // Test adding a condition array without key
         $conditions[] = array('Post.appened_field' => 'zigzag');
-        $expected = 'Author.name = :p17 AND (Post.title LIKE :p18 OR Post.created > :p19) AND Post.appened_field = :p20';
+        $expected = '`Author`.`name` = :p17 AND (`Post`.`title` LIKE :p18 OR `Post`.`created` > :p19) AND `Post`.`appened_field` = :p20';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         // Looks the same but is not, SAME FIELD, extra array
@@ -339,7 +339,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         array('Post.title LIKE' => '%one%'),
         array('Post.title LIKE' => '%two%'),
       ));
-        $expected = '(Post.title LIKE :p21 OR Post.title LIKE :p22)';
+        $expected = '(`Post`.`title` LIKE :p21 OR `Post`.`title` LIKE :p22)';
         $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
 
         $Builder = new QueryBuilder('companies', 'Company');
@@ -355,7 +355,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
              ),
          );
 
-        $expected = '(Company.name = :c0 OR Company.city = :c1) AND (Company.status = :c2 AND Company.type IN ( :c3, :c4 ))';
+        $expected = '(`Company`.`name` = :c0 OR `Company`.`city` = :c1) AND (`Company`.`status` = :c2 AND `Company`.`type` IN ( :c3, :c4 ))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
 
         $conditions = array(
@@ -371,7 +371,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
               ),
           );
 
-        $expected = '(Company.name = :c5 OR Company.city = :c6) AND ((Company.status = :c7 OR Company.type IN ( :c8, :c9 )))';
+        $expected = '(`Company`.`name` = :c5 OR `Company`.`city` = :c6) AND ((`Company`.`status` = :c7 OR `Company`.`type` IN ( :c8, :c9 )))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
 
         $conditions = array(
@@ -390,7 +390,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
                 ),
             ),
         );
-        $expected = '(Company.name = :c10 OR Company.city = :c11) AND ((Company.status = :c12 OR NOT (Company.status IN ( :c13, :c14 ))))';
+        $expected = '(`Company`.`name` = :c10 OR `Company`.`city` = :c11) AND ((`Company`.`status` = :c12 OR NOT (`Company`.`status` IN ( :c13, :c14 ))))';
         $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
     }
 
@@ -455,7 +455,7 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $data['order'] = array('id ASC');
         $data['limit'] = 1;
 
-        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3 WHERE user.id = :u4 ORDER BY id ASC LIMIT 1';
+        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3 WHERE `user`.`id` = :u4 ORDER BY id ASC LIMIT 1';
         $this->assertEquals($expected, $Builder->updateStatement($data));
         $expected = array(
         'u0' => 85,
@@ -481,13 +481,13 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $Builder->deleteStatement($data));
 
         $data = ['conditions' => ['id' => 123456]];
-        $expected = 'DELETE FROM user WHERE user.id = :u0';
+        $expected = 'DELETE FROM user WHERE `user`.`id` = :u0';
         $this->assertEquals($expected, $Builder->deleteStatement($data));
 
         $data['order'] = array('id ASC');
         $data['limit'] = 1;
 
-        $expected = 'DELETE FROM user WHERE user.id = :u0 ORDER BY id ASC LIMIT 1';
+        $expected = 'DELETE FROM user WHERE `user`.`id` = :u0 ORDER BY id ASC LIMIT 1';
         $this->assertEquals($expected, $Builder->deleteStatement($data));
 
         $this->expectException(QueryBuilderException::class);

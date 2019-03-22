@@ -23,6 +23,12 @@ use Origin\Model\Exception\MissingModelException;
 
 class MockShell extends Shell
 {
+    public function initialize()
+    {
+        $this->addCommand('foo');
+        $this->addOption('bar');
+        $this->addOption('foo', ['value'=>'name']);
+    }
     public function publicMethod()
     {
     }
@@ -77,7 +83,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     }
     public function testConstruct()
     {
-        $arguments = ['foo','-bar','-foo=setting'];
+        $arguments = ['foo','--bar','--foo=setting'];
         $shell = new MockShell($arguments, $this->ConsoleOutput, $this->ConsoleInput);
         $this->assertNotEmpty($shell->taskRegistry());
         $this->assertInstanceOf('Origin\Console\Task\TaskRegistry', $shell->taskRegistry());

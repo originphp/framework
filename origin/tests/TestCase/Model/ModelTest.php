@@ -159,7 +159,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
             'precision' => null,
             'default' => null,
             'null' => false,
-            'key' => 'primary'
+            'key' => 'primary',
+            'autoIncrement' => true
       );
         $this->assertEquals($expected, $schema['id']);
         $idSchema = $Article->schema('id');

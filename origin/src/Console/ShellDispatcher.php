@@ -147,7 +147,7 @@ class ShellDispatcher
             // Generate helpscreen
             $shell = new $className($this->args, $this->output, new ConsoleInput());
             $shell->help();
-            return;
+            return $shell;
         }
 
         $object = $this->buildShell($className, $method);

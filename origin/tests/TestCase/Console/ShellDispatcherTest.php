@@ -45,17 +45,15 @@ class MockShellDispatcher extends ShellDispatcher
 
 class LemonPieShell extends Shell
 {
-    public function main()
-    {
-        $this->out('LemonPie Shell');
-    }
-
     private function privateMethod()
     {
         return 'secret';
     }
 
-    public function initialize(array $config)
+    public function start()
+    {
+    }
+    public function initialize()
     {
         $this->out('initialize called');
     }
@@ -105,10 +103,10 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchAndOut()
     {
         $ConsoleOutput =  new AnotherConsoleOutput('php://memory');
-        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie'], $ConsoleOutput);
+        $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','start'], $ConsoleOutput);
         $ShellDispatcher->start();
         $buffer =  $ConsoleOutput->read();
-        $this->assertContains('LemonPie Shell', $buffer);
+        
         $this->assertContains('initialize called', $buffer);
         $this->assertContains('startup called', $buffer);
         $this->assertContains('shutdown called', $buffer);
@@ -119,7 +117,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
-            ['pathTo/origin.php','make'],
+            ['pathTo/origin.php','make','main'],
             new AnotherConsoleOutput('php://memory')
         );
        
@@ -165,7 +163,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         // Test direct plugin call
         $ShellDispatcher = new MockShellDispatcher(
-             ['pathTo/origin.php','Make.make','help'],
+             ['pathTo/origin.php','Make.make','main'],
              new AnotherConsoleOutput('php://memory')
          );
         $result = $ShellDispatcher->start();

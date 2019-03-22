@@ -22,9 +22,4 @@ class MakeShell extends Shell
     {
         $this->out('Make Dummy Shell');
     }
-
-    public function help()
-    {
-        $this->out('Help goes here');
-    }
 }
