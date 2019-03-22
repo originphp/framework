@@ -2,6 +2,8 @@
 namespace App\Controller;
 /**
  * @property \App\Model\%model% $%model%
+ * @property \Origin\Controller\Component\SessionComponent $Session
+ * @property \Origin\Controller\Component\CookieComponent $Cookie
  */
 class %controller%Controller extends AppController
 {

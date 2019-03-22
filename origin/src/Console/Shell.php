@@ -24,6 +24,7 @@ use ReflectionClass;
 use ReflectionMethod;
 
 use Origin\Model\Exception\MissingModelException;
+use Origin\Exception\Exception;
 
 class Shell
 {
@@ -79,7 +80,6 @@ class Shell
      */
     public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
-        $this->parseArguments($arguments);
         $this->output = $consoleOutput;
         $this->input = $consoleInput;
 
@@ -87,7 +87,8 @@ class Shell
      
         $this->taskRegistry = new TaskRegistry($this);
 
-        $this->initialize($arguments);
+        $this->initialize();
+        $this->parseArguments($arguments);
     }
 
     /**
@@ -102,27 +103,49 @@ class Shell
      */
     protected function parseArguments(array $arguments)
     {
-        foreach ($arguments as $arg) {
-            if (substr($arg, 0, 2)==='--') {
-                $value = true;
-                $param = substr($arg, 2);
-                if (strpos($param, '=') !== false) {
-                    list($param, $value) = explode('=', $param);
-                }
-                $this->params[$param] = $value;
-            } else {
-                $this->args[] = $arg;
+        $map = [];
+        // Create map for shorts
+        foreach ($this->options as $option) {
+            if ($option['short']) {
+                $map[$option['short']] = $option['name'];
             }
+        }
+    
+        foreach ($arguments as $arg) {
+            if ($arg[0] !== '-') {
+                $this->args[] = $arg;
+                continue;
+            }
+
+            $value = true;
+
+            if (substr($arg, 0, 2)==='--') {
+                $param = substr($arg, 2);
+            } else {
+                $param = substr($arg, 1);
+                if (isset($map[$param])) {
+                    $param = $map[$param];
+                }
+            }
+            if (!empty($this->options[$param]['value']) and strpos($param, '=') === false) {
+                throw new Exception('Argument error' . $arg);
+            }
+            if (strpos($param, '=') !== false) {
+                list($param, $value) = explode('=', $param);
+            }
+            if (!isset($this->options[$param])) {
+                throw new Exception('Invalid argument ' . $arg);
+            }
+            $this->params[$param] = $value;
         }
     }
 
     /**
      * Called when the Shell is constructed
      *
-     * @param array $arguments from cli
      * @return void
      */
-    public function initialize(array $arguments)
+    public function initialize()
     {
     }
 
@@ -325,5 +348,65 @@ class Shell
             return $this->args[$index];
         }
         return null;
+    }
+
+    public $options = [];
+    public $commands = [];
+
+    /**
+     * Adds an available option
+     *
+     * @param string $name
+     * @param array $options
+     * @return void
+     */
+    public function addOption(string $name, array $options=[])
+    {
+        $options += ['name'=>$name,'short'=>null,'help'=>null];
+        $this->options[$name] = $options;
+    }
+
+    /**
+     * Adds a available
+     *
+     * @param string $name
+     * @param array $options
+     * @return void
+     */
+    public function addCommand(string $name, array $options=[])
+    {
+        $options += ['name'=>$name,'help'=>null];
+        $this->commands[$name] =  $options;
+    }
+
+    public function help()
+    {
+        $this->out('<yellow>Usage:</yellow>');
+        $this->out('  <white>command [options] [arguments]</white>');
+        $this->out('');
+        if ($this->options) {
+            $this->out('<yellow>Options:</yellow>');
+            foreach ($this->options as $option) {
+                $value = '';
+                if (!empty($option['value'])) {
+                    $value  = '=' . $option['value'];
+                }
+                $text = '--' . $option['name'] . $value;
+               
+                if ($option['short']) {
+                    $text = '-'. $option['short'] . ', ' . $text;
+                }
+                $this->out('  <white>' . $text . "</white>  <green>".$option['help'].'</green>');
+            }
+            $this->out('');
+        }
+        if ($this->commands) {
+            $this->out('<yellow>Available Commands:</yellow>');
+            $this->out('');
+            foreach ($this->commands as $command) {
+                $this->out("<white>{$command['name']}</white>  <green>{$command['help']}</green>");
+            }
+            $this->out('');
+        }
     }
 }

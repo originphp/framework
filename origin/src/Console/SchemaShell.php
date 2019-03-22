@@ -23,15 +23,19 @@ use Origin\Model\QueryBuilder;
  */
 class SchemaShell extends Shell
 {
+    public function initialize()
+    {
+        $this->addCommand('generate', ['help'=>'Generates the config\schema\\table.php file or file']);
+        $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
+        $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
+        $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
+        $this->loadTask('Status');
+    }
     public function startup()
     {
         $this->out('<yellow>Schema Shell</yellow>');
-        $this->loadTask('Status');
     }
-    public function main()
-    {
-        $this->help();
-    }
+
     public function generate()
     {
         $datasource = 'default';
@@ -195,17 +199,5 @@ class SchemaShell extends Shell
     {
         include $filename;
         return $schema;
-    }
-    public function help()
-    {
-        $this->out('Usage: schema [command]');
-        $this->out('Usage: schema [command] -datasource=[name]');
-        $this->out('');
-        $this->out('Commands:');
-        $this->out("generate\tgenerates the config\schema\\table.php file or files");
-        $this->out("create\t\tcreates the tables using the schema .php file or files");
-        $this->out("import\t\timports raw SQL from file or files");
-        $this->out('Options:');
-        $this->out("-datasource=name\tto set a different datasource");
     }
 }

@@ -9,10 +9,9 @@ class AppShell extends Shell
     /**
      * Called when the Shell is constructed
      *
-     * @param array $arguments from cli
      * @return void
      */
-    public function initialize(array $arguments)
+    public function initialize()
     {
     }
 

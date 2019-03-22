@@ -32,25 +32,12 @@ class BookmarksShell extends AppShell
         ROOT . DS . 'tests' . DS . 'TestCase' . DS  . 'Model' .DS . 'BookmarkTest.php',
     ];
 
-    public function main()
+
+    public function initialize()
     {
-        $this->out('Usage:');
-        $this->out('bin/console bookmarks <command>');
-        $this->out('');
-        $this->help();
-    }
-    /**
-     * Shows the help, commands are coloured using ConsoleOutput.
-     *
-     * @return void
-     */
-    public function help()
-    {
-        $this->out('Avaliable commands:');
-        $this->out('<cyan>help</cyan> - shows this');
-        $this->out('<cyan>list</cyan> - lists all the bookmarks');
-        $this->out('<cyan>exception</cyan> - throws an exception');
-        $this->out('<cyan>uninstall</cyan> - Deletes all the demo files and bookmarks');
+        $this->addCommand('list', ['help'=>'Fetch a list of bookmarks from the db']);
+        $this->addCommand('exception', ['help'=>'Throws an exception so you can see the debug magic']);
+        $this->addCommand('uninstall', ['help'=>'Uninstalls the bookmark demo files']);
     }
 
     public function list()

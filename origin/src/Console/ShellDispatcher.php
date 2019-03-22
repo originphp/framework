@@ -18,6 +18,7 @@ use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Exception\MissingShellException;
 use Origin\Console\Exception\MissingShellMethodException;
+use Origin\Console\Exception\MissingCommandException;
 
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
@@ -140,11 +141,15 @@ class ShellDispatcher
 
         $className = $base . $class;
     
-        $method = 'main';
         if ($this->args) {
             $method = array_shift($this->args);
+        } else {
+            // Generate helpscreen
+            $shell = new $className($this->args, $this->output, new ConsoleInput());
+            $shell->help();
+            return;
         }
-        
+
         $object = $this->buildShell($className, $method);
 
         return $this->invoke($object, $method);

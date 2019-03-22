@@ -49,7 +49,7 @@ class GenerateShell extends Shell
         $this->Generate->introspectDatabase();
         $this->meta = $this->Generate->build();
     }
-    public function initialize(array $arguments)
+    public function initialize()
     {
         if (!file_exists(CONFIG . DS . 'database.php')) {
             $this->out('<danger>No database configuration found. </danger>');
@@ -57,11 +57,9 @@ class GenerateShell extends Shell
             return;
         }
         $this->introspectDatabase();
+        $this->addOption('force');
     }
-    public function main()
-    {
-        $this->help();
-    }
+
     public function help()
     {
         $this->out('generate all');
