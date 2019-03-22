@@ -1,12 +1,15 @@
 # Controllers
 
 ## What is a Controller
+
 Controller is the C in MVC (Model View Controller). When a request is made, it is passed to the router then the router determines which controller to use. Most applications will receive the request, then get, create and or save data to the database through a model and then use a view to create the output to display to the user. It is considered a good practice to keep the controllers skinny, and should not contain business logic, the models should contain that.
 
 ## Controller Conventions
+
 The name of the controller. should be in plural camel case and it needs to end with Controller. For example, `UsersController`,`UserProfilesController` and `BookmarksController`. It is important that you follow the conventions so that you can use the default routing, you can always customise the routing rules later.
 
 ## Controller Methods and Actions
+
 When you create a controller it will extend the `AppController` and save this to the `src/Controller` folder. Your controller class will contain methods just like any other class, but only public methods will be treated as routeable actions.  When your application receives a request, the router will determine which controller and action to use, and then create an instance of the controller and run the action.
 
 ```php
@@ -53,6 +56,7 @@ $AnotherModel = $this->loadModel('Product');
 When a request is made, a request is object is injected into the controller. GET, POST and FILES parameters are parsed and it also provides some functions to check the type of request or only allow a certain type of request.
 
 ### Params
+
 Lets look at this request:
 
 ```
@@ -155,7 +159,15 @@ Array
 
 ## Components
 
-Components are objects which can be shared between controllers. The framework comes with a number of components and you can also build your own. For more information on this see the [components guide](components.md).
+Components are objects which can be shared between controllers. The framework comes with a number of components and you can also build your own. To load helpers call the `loadComponent` method in the `initialize` method of your controller.
+
+```php
+public function initialize(){
+    $this->loadComponent('Security');
+}
+```
+
+For more information on this see the [components guide](components.md).
 
 ## Session
 
@@ -228,7 +240,8 @@ Each type of message will rendered in a div with its own class. The Flash compon
 - `warning`
 - `error`
 
-## Cookies
+## Cookie Component
+
 You can work with cookies from controllers and views, The cookie component allows you easily work with cookies. All cookie values are stored as a json string and by default they are automatically encrypted.
 
 Here are some examples how to use it:
@@ -251,7 +264,7 @@ class ContactsController extends AppController
 
 You can also delete all cookies using the `destroy` method.
 
-Another way to work with cookies is to use the request and response objects. You can get cookie values from the request object and set them on the response object.
+Another way to work with cookies is to use the request and response objects. You can get cookie values from the `request` object and set them on the `response` object.
 
 ```php
 $value = $this->request->cookie('monster');
@@ -264,6 +277,7 @@ $this->response->cookie('keyToDelete','',strtotime('-60 minutes')); // to delete
 NOTE: When you use the response for writing cookies the values wont be available for reading until the next request, since they are only sent after everything has been rendered to the screen.
 
 ## Rendering Views
+
 By default, all views in your controller are rendered as html. Rendering takes place automatically for the controller and action. So if you if the user requests `/contacts/show/1` it will load the `View/Contacts/show.ctp` file.
 
 One of the jobs of the controller is to send data to view, so the view can display this.
@@ -283,6 +297,7 @@ class ContactsController extends AppController
 More information on how views work can be found in the [views guide](views.md).
 
 ### JSON Views
+
 You can quickly and easily render JSON data using results returned from find or get operations, arrays of data and strings. The controller will automatically call the `toJson` on the objects.
 
 ```php
@@ -312,8 +327,7 @@ class ContactsController extends AppController
     }
 }
 ```
-
- Remember there are quite a lot of status codes, including `418 I am a teapot`, many of the large enterpirses who have profesional apis only work with a small subset, these are a suggestion of the ones
+ Remember there are quite a lot of status codes, including `418 I am a teapot`, many of the large enterprises who have professional apis only work with a small subset, these are a suggestion of the ones
  which you should remember.
 
 | Status Code     | Definition                                                                                                |
@@ -326,6 +340,7 @@ class ContactsController extends AppController
 | 403             | Forbidden (For application level permissions)                                                             |
 
 ### XML Views
+
 To render a xml view, just pass a result from the database, an array or a xml string. Data is converted using the XML utility. If you need to wrap some data in cdata tags, then make sure to include `use Origin\Utility\Xml` at the top of your file so you can call it directly.
 
 ```php
@@ -364,9 +379,11 @@ class ContactsController extends AppController
 ```
 
 ## Filters
+
 The controller has filters which are run before and after actions, and even in-between such as before rendering or before redirecting. If you want the filters to be run in every controller, then add them to the `AppController` and all child controllers will run this. Just remember to call the parent one as well.
 
 ### Before Filter
+
 This is called before the action on the controller (but after initialize), here you can access or modify request data, check user permissions or session data. If you need too you can even stop the action from continuing by throwing an exception or redirecting to somewhere else.
 
 ```php
@@ -382,6 +399,7 @@ class PostsController extends AppController
 ```
 
 ### After Filter
+
 This is called after the controller action has been run and the view has been rendered, but before the response has been sent to the client.
 
 ```php
@@ -394,9 +412,11 @@ class PostsController extends AppController
 ```
 
 ### Other Filters
+
 There are two other filters in the controllers that you can use, and these are `beforeRender` and `beforeRedirect`.
 
 ## Request Object
+
 In every controller you will find a `request` and `response` object. The request object contains information on the request made and the response object represents what will be sent back to the client.
 
 ### Request Methods
@@ -458,7 +478,9 @@ public function view($id = null)
 There is also a `acceptLanguage` which will return a list of languages that the request can accept.
 
 ### Reading values from cookies in the request
+
 In addition to getting the cookie object, from the request object you can read a value for a cookie.
+
 ```php
 public function doSomething()
 {
@@ -492,8 +514,6 @@ $type = $this->response->type();
 ```php
 $this->response->type('application/vnd.ms-powerpoint');
 ```
-
-
 ### File Downloads
 
 Sometimes you will need to send a file which is different from rendering a page. You can also force it to download the file
@@ -504,6 +524,58 @@ $this->response->file('/tmp/transactions.pdf');
 $this->response->file('/tmp/originphp.tmp',['name'=>'transactions.pdf']);
 $this->response->file('/tmp/transactions.pdf',['download'=>true]);
 ```
+
+## Redirecting
+
+A common thing to do from a controller is to redirect. To redirect to a different url use the redirect method. You can pass either a string or an array.
+
+```php
+$this->redirect('/thanks');
+$this->redirect('https://www.wikipedia.org');
+```
+
+You can also use an array, if you dont specify a controller, it will assume you want to redirect to the same controller. The array function here for redirect works the same way elsewhere in the framework when using an array for a URL.
+
+```php
+$this->redirect([
+  'controller' => 'users',
+  'action' => 'view',
+  1024
+]);
+```
+
+To use a query string, pass a `?` key with the array.
+
+```php
+$this->redirect([
+  'controller' => 'users',
+  'action' => 'view',
+  1024,
+  '?' => ['sort'=>'ASC','page'=>1]
+]);
+```
+
+You can also use `#` for fragments, to scroll to a part of the page.
+
+```php
+['action'=>'index','#'=>'bottom']
+```
+
+OriginPHP also supports named parameters.
+
+```php
+$this->redirect([
+  'controller' => 'orders',
+  'action' => 'confirmation',
+  'product' => 'ebook',
+  'quantity' => 5
+]);
+```
+
+which will generate a URL like
+
+`/orders/confirmation/product:ebook/quantity:5`
+
 
 ## Logging
 
@@ -534,6 +606,7 @@ public function index()
 ```
 
 This will produce a line like this in the log:
+
 ```
 [2019-03-10 14:25:50] EmailsController WARNING: foo was null.
 ```

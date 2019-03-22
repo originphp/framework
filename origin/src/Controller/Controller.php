@@ -333,15 +333,16 @@ class Controller
      */
     public function render($options=[])
     {
+        $template = $this->request->params('action');
         if (empty($options)) {
-            $options = $this->request->params('action');
+            $options = $template;
         }
         if (is_string($options)) {
             $options = ['template'=>$options];
         }
  
         $options += [
-            'status' => 200,
+            'status' => $this->response->status(),
             'type' => 'html'
         ];
         $body = null;
@@ -361,8 +362,11 @@ class Controller
             $body = file_get_contents($options['file']);
         }
         if ($body === null) {
+            if (isset($options['template'])) {
+                $template =  $options['template'];
+            }
             $viewObject = new View($this);
-            $body = $viewObject->render($options['template'], $this->layout);
+            $body = $viewObject->render($template, $this->layout);
         }
     
         $this->response->type($options['type']);   // 'json' or application/json

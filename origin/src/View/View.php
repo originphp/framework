@@ -222,7 +222,7 @@ class View
     protected function getViewFilename(string $name)
     {
         $path = $this->getViewPath();
-        if (strpos($name, '/') !== false) {
+        if ($name[0] === '/') {
             $path = $this->getViewPath(false); // get without controller folder
         }
 

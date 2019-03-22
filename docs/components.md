@@ -38,6 +38,7 @@ To load a component from the controller, you should place this in the initialize
   }
 
 ```
+
 ## Using Components
 
  To use a component, you call it from within your controller methods.
@@ -55,7 +56,6 @@ To load a component from the controller, you should place this in the initialize
 If you want to use a component within a component then you call the `loadComponent` method, the component will then be lazy loaded when you next call it.
 
 ```php
-
 class MathComponent extends Component
 {
    public function initialize(array $config)
@@ -63,20 +63,6 @@ class MathComponent extends Component
       $this->loadComponent('Math',$config);
     }
 }
-
-```
-or use the `components` method to load many components.
-
-```php
-
-class MathComponent extends Component
-{
-   public function initialize(array $config)
-    {
-      $this->loadComponents(['Math']);
-    }
-}
-
 ```
 
 ## Initialize
@@ -84,23 +70,26 @@ class MathComponent extends Component
 After a component is created the `initialize` method will be called, this is where you can put any code
 that you need to be executed when a component is created. This is a hook so you don't need to override the `___construct()`.
 
-## Callbacks 
+## Callbacks
 
 There are two callbacks which Components use `startup` and `shutdown`. To use the callbacks, just create a method in your component with the callback name.
 
 ### Startup callback
+
 This called after the controller `beforeFilter` but before the controller action.
 
 ```php
     public function startup(){}
 ```
 
-### Stutdown callback
+### Shutdown callback
+
 This is called after the controller action but before the controller `afterFilter`.
 
 ```php
-    public function sthudown(){}
+    public function stutdown(){}
 ```
+
 ## Accessing the request object
 
 If you need to access the request object from within the component.
@@ -123,4 +112,45 @@ When working with components, you may need to access the controller, this can be
 
 ```php
 $controller = $this->controller();
+```
+
+## Component Config
+
+Components work with the `ConfigTrait`, so this means you that your component can have its own standardized configuration.
+
+
+To get a value from the config:
+
+```php
+ $value = $this->config('foo'); // bar
+```
+
+To all of the values from the config
+
+```php
+ $array = $this->config();
+```
+
+To set a value in the config:
+
+```php
+ $this->config('foo','bar');
+ $this->config(['foo'=>'bar']);
+```
+
+To set multiple values (not replace the array with the one passed)
+
+```php
+ $this->config(['foo'=>'bar']);
+```
+
+If you need your component to have a default configuration, then you can set the `$defaultConfig` array property, this will be merged with any config passed when loading a component.
+
+```php
+class Foocomponent extends component
+{
+    protected $defaultConfig = [
+        'foo' => 'bar'
+    ];
+}
 ```
