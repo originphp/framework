@@ -42,8 +42,6 @@ class GenerateShell extends Shell
      * @var array
      */
     protected $meta = [];
-    
-    protected $force = false;
 
     protected function introspectDatabase()
     {
@@ -59,12 +57,6 @@ class GenerateShell extends Shell
             return;
         }
         $this->introspectDatabase();
-        # handle forcing
-        $key = array_search('-force', $this->args);
-        if ($key !== false) {
-            unset($this->args[$key]);
-            $this->force = true;
-        }
     }
     public function main()
     {
@@ -88,7 +80,7 @@ class GenerateShell extends Shell
         if (empty($this->args)) {
             throw new Exception('You must speficify a plugin name');
         }
-        $plugin = $this->args[0];
+        $plugin = $this->args(0);
         $underscored = Inflector::underscore($plugin);
         
         $path = PLUGINS . DS. $underscored;
@@ -191,7 +183,7 @@ class GenerateShell extends Shell
             foreach ($models as $model) {
                 $this->out("<white>- {$model}</white>");
             }
-            $this->out('<yellow>hasAndBelongsToMany wont be listed here.</yellow>');
+    
             $result = $this->in('Do you want to continue?', ['y','n'], 'n');
             if ($result === 'n') {
                 return;
@@ -214,7 +206,7 @@ class GenerateShell extends Shell
 
     public function in(string $prompt, array $options = [], string $default = null)
     {
-        if ($this->force) {
+        if ($this->params('force')) {
             return 'y';
         }
         return parent::in($prompt, $options, $default);
@@ -222,8 +214,8 @@ class GenerateShell extends Shell
 
     public function controller(string $controller = null)
     {
-        if ($controller === null and isset($this->args[0])) {
-            $controller = $this->args[0];
+        if ($controller === null and $this->args(0)) {
+            $controller = $this->args(0);
         }
         if ($controller === null) {
             $this->showAvailable(true);
@@ -273,8 +265,8 @@ class GenerateShell extends Shell
 
     public function model(string $model = null)
     {
-        if ($model === null and isset($this->args[0])) {
-            $model = $this->args[0];
+        if ($model === null and $this->args(0)) {
+            $model = $this->args(0);
         }
         if ($model === null) {
             $this->showAvailable();
@@ -283,7 +275,7 @@ class GenerateShell extends Shell
         $options = $this->getAvailable();
         
         if (in_array($model, $options) === false) {
-            throw new Exception(sprintf('Invalid model %s', $this->args[0]));
+            throw new Exception(sprintf('Invalid model %s', $this->args(0)));
         }
 
         $filename = SRC . DS . 'Model' .DS .$model .'.php';
@@ -335,8 +327,8 @@ class GenerateShell extends Shell
 
     public function view(string $controller = null)
     {
-        if ($controller === null and isset($this->args[0])) {
-            $controller = $this->args[0];
+        if ($controller === null and $this->args(0)) {
+            $controller = $this->args(0);
         }
         if ($controller === null) {
             $this->showAvailable(true);
@@ -360,7 +352,7 @@ class GenerateShell extends Shell
 
         $model = Inflector::singularize($controller);
         $data = $this->getData($model);
-       
+    
         $data += [
             'controllerUnderscored' => Inflector::underscore($controller)
         ];
@@ -371,7 +363,9 @@ class GenerateShell extends Shell
             // create related lists
             if ($view === 'view') {
                 $associations = $this->meta['associations'][$model];
+            
                 $related = array_merge($associations ['hasMany'], $associations ['hasAndBelongsToMany']);
+      
                 $relatedList = '';
                 foreach ($related as $associated) {
                     $vars = $this->getData($associated);
@@ -387,8 +381,6 @@ class GenerateShell extends Shell
         }
         $this->status(sprintf('%s views', $controller), 'ok');
     }
-
-    
 
     protected $statusCodes = [
         'ok' => 'green',
@@ -406,12 +398,16 @@ class GenerateShell extends Shell
     protected function getData(string $model)
     {
         $data = $this->meta['vars'][$model];
+
         $data['primaryKey'] = $this->Generate->primaryKey($model);
+        
         $fields = array_keys($this->meta['schema'][$model]);
+        
         $key = array_search($data['primaryKey'], $fields);
         if ($key !== false) {
             unset($fields[$key]);
         }
+       
         /**
          * Create a block for each field
          */

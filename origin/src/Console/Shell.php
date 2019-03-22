@@ -283,4 +283,44 @@ class Shell
     {
         return new Logger($channel);
     }
+
+    /**
+     * Sets/gets the params
+     *
+     * @param string|array|null $key
+     * @param mixed $value
+     * @return array|string|null
+     */
+    public function params($key = null, $value=null){
+        if($key === null){
+            return $this->params;
+        }
+        if(is_array($key)){
+            return $this->params = $key;
+        }
+        if(func_num_args() === 2){
+            return $this->params[$key] = $value;
+        }
+        if(isset($this->params[$key])){
+            return $this->params[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Gets or sets the args
+     *
+     * @param integer $index
+     * @return mixed|null
+     */
+    public function args(int $index = null){
+        if($index === null){
+            return $this->args;
+        }
+        if(isset($this->args[$index])){
+            return $this->args[$index];
+        }
+        return null;
+    }
+
 }

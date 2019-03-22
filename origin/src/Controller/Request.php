@@ -154,25 +154,29 @@ class Request
 
 
     /**
-     * Set/get the values in data
+     * Set/get the values in data, can set individual or whole data array
      *
      *  $all = $request->data();
      *  $value = $request->data('key');
      *  $request->data('key','value');
+     *  $request->data($someArray);
      *
-     * @param string $key
+     * @param string|array $key
      * @param mixed $value
      * @return mixed
      */
-    public function data(string $key = null, $value = null)
+    public function data($key = null, $value = null)
     {
-        if (func_num_args() === 2) {
-            $this->data[$key] = $value;
-            return;
-        }
         if ($key === null) {
             return $this->data;
         }
+        if(is_array($key)){
+            return $this->data = $key;
+        }
+        if (func_num_args() === 2) {
+            return $this->data[$key] = $value;
+        }
+     
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }

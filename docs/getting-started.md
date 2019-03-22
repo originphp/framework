@@ -8,13 +8,13 @@ OriginPHP is a web application framework written in PHP that uses a number of we
 
 Download the source code from [Git Hub](https://github.com/originphp/originphp) and extract this into a new folder, call it bookmarks.
 
-If you have GIT installed, then you can run the following command from your source code folder to download the source into a folder called blog.
+If you have GIT installed, then you can run the following command from your source code folder to download the source into a folder called bookmarks.
 
 ```bash
-$ git clone https://github.com/originphp/originphp.git blog
+$ git clone https://github.com/originphp/originphp.git bookmarks
 ```
 
-Download and install [Docker](https://www.docker.com/products/docker-desktop) and let this rock your world. Your app will be built within a docker container, which you can start and shutdown as needed. The Docker container is only intended for development, and it will act very similar to a real server.
+Download and install [Docker](https://www.docker.com/products/docker-desktop) and let this rock your development world, no more ftping, or setting up a virtual machine or virtual host. Your app will be built within a docker container, which you can start and shutdown as needed. The Docker container is only intended for development, and it will act very similar to a real server.
 
 The first time that you use the docker container, you will need to build this, which might take a few minutes.
 
@@ -31,12 +31,14 @@ $ docker-compose up
 
 Then open your web browser and go to [http://localhost:8000](http://localhost:8000)  which will show you a status page that all is working okay.
 
-Lets create the database on the server, from the command line type in the following to access the container and MySQL client.
+Lets create the database on the server, from the command line type in the following to access the container and then the MySQL server.
 
 ```bash
 $ docker-compose run app bash
-$ mysql -uroot -p
+$ mysql -h db -uroot -p
 ```
+
+To access the MySQL server from within the docker the container, you need to use the host name `db`.
 
 When it asks you for the password type in **root**, then copy and paste the following sql to create the database called bookmarks and a user called origin with the password **secret**.
 
@@ -44,6 +46,7 @@ When it asks you for the password type in **root**, then copy and paste the foll
 CREATE DATABASE bookmarks CHARACTER SET utf8mb4;
 GRANT ALL ON bookmarks.* TO 'origin' IDENTIFIED BY 'secret';
 FLUSH PRIVILEGES;
+QUIT
 ```
 
 NOTE: You can also acces the MySql server using any database management application using `localhost` port `3306`. Windows users can use [Sequel Pro](https://www.sequelpro.com/) or Mac users can use [Heidi SQL](https://www.heidisql.com/).

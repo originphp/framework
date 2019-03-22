@@ -80,11 +80,11 @@ class GenerateTask extends Task
         foreach ($models as $model) {
             $associations[$model] = $template;
             $associations = $this->findBelongsTo($model, $associations);
-            $associations = $this->findHasMany($model, $associations);
             $associations = $this->findHasAndBelongsToMany($model, $associations);
+            $associations = $this->findHasMany($model, $associations); // callLast due to ignore
         }
         $validationRules = $this->validationRules();
-        
+     
         // Remove dynamic models jointable models
         foreach ($associations['ignore'] as $remove) {
             unset($associations[$remove]);
@@ -149,13 +149,13 @@ class GenerateTask extends Task
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
-            if ($otherModel === $model) {
+            if ($otherModel === $model or in_array($otherModel, $associations['ignore'])) {
                 continue;
             }
             $schema = $this->schema[$otherModel];
             $foreignKey = Inflector::underscore($model) . '_id';
-            $associatedForeignKey = Inflector::underscore($otherModel) . '_id';
-            if (isset($schema[$foreignKey])  and $schema[$foreignKey]['key'] !== 'primary') {
+            // primaryKey is now only used if its id and integer - conventions
+            if (isset($schema[$foreignKey]) and $schema[$foreignKey]['key'] !== 'primary') {
                 $associations[$model]['hasMany'][] = $otherModel;
             }
         }
