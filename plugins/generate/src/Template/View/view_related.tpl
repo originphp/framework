@@ -1,5 +1,5 @@
 <div class="row %pluralName% related">
-    <h4><?= __('%singularHuman%') ?></h4>
+    <h4><?= __('%pluralHuman%') ?></h4>
     <?php if (!empty($%currentModel%->%pluralName%)): ?>
     <table class="table">
         <tr>

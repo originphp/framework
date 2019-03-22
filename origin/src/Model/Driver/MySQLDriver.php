@@ -26,7 +26,7 @@ class MySQLDriver
      * @var array
      */
     protected $columns = [
-        'primary' => ['name' => 'AUTO_INCREMENT PRIMARY KEY'],
+        'autoIncrement' => ['name' => 'INT AUTO_INCREMENT'],
         'string' => ['name' => 'VARCHAR', 'length' => 255],
         'text' => ['name' => 'TEXT'],
         'integer' => ['name' => 'INT'],
@@ -71,7 +71,7 @@ class MySQLDriver
             foreach ($this->columns as $key => $value) {
                 $reverseMapping[strtolower($value['name'])] = $key;
             }
-    
+ 
             foreach ($result as $column) {
                 $precision = $length = null;
                 $type = str_replace(')', '', $column['Type']);
@@ -85,14 +85,16 @@ class MySQLDriver
                     $type = $reverseMapping[$type];
                     $schema[$column['Field']] = array(
                         'type' => $type,
-                        'length' => $length?(int) $length:null,
+                        'length' => ($length and $type !='boolean')?(int) $length:null,
                         'precision' => $precision?(int) $precision:null,
                         'default' => $column['Default'],
                         'null' => ($column['Null'] === 'YES' ? true : false),
-                        'key' => ($column['Field'] === 'id' and $type=='integer') ? 'primary' : null
                       );
-                    if ($type==='boolean') {
-                        $schema[$column['Field']]['length'] = null;
+                    if ($column['Key'] === 'PRI') {
+                        $schema[$column['Field']]['key'] = 'primary';
+                    }
+                    if ($column['Extra'] === 'auto_increment') {
+                        $schema[$column['Field']]['autoIncrement'] = true;
                     }
                 }
             }
@@ -128,7 +130,14 @@ class MySQLDriver
     public function createTable(string $table, array $data)
     {
         $result = [];
-   
+
+        $primaryKeys = [];
+        foreach ($data as $field => $settings) {
+            if (!empty($settings['key'])) {
+                $primaryKeys[] = $field;
+            }
+        }
+
         foreach ($data as $field => $settings) {
             if (is_string($settings)) {
                 $settings = ['type' => $settings];
@@ -146,7 +155,7 @@ class MySQLDriver
             $settings = $settings + $mapping;
 
             $output = "{$field} {$mapping['name']}";
-
+           
             if (!empty($settings['length'])) {
                 if (in_array($settings['type'], ['decimal', 'float'])) {
                     $output .= "({$settings['length']},{$settings['precision']})";
@@ -158,11 +167,18 @@ class MySQLDriver
             if (isset($settings['default'])) {
                 $output .= " DEFAULT {$settings['default']}";
             }
+            if (!empty($settings['autoIncrement'])) {
+                $output .= " AUTO_INCREMENT";
+            }
 
-            // When key is set as primary we automatically make it autoincrement
-            if (!empty($settings['key']) and $settings['key'] === 'primary') {
-                $output .= ' ' . $this->columns['primary']['name'];
-            } elseif (isset($settings['null'])) {
+            if (!empty($settings['key']) and count($primaryKeys)===1) {
+                $output .= " PRIMARY KEY";
+                if (!empty($settings['autoIncrement']) and $settings['autoIncrement']) {
+                    unset($settings['null']);
+                }
+            }
+        
+            if (isset($settings['null'])) {
                 if ($settings['null'] == true) {
                     $output .= ' NULL';
                 } else {
@@ -171,7 +187,10 @@ class MySQLDriver
             }
             $result[] = ' '.$output;
         }
-
+        if (count($primaryKeys)>1) {
+            $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
+        }
+        pr("CREATE TABLE {$table} (\n".implode(",\n", $result)."\n)");
         return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n)";
     }
 }

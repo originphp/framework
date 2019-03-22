@@ -55,7 +55,7 @@ class PostgreSQLDriver
      * @var array
      */
     protected $columns = [
-        'primary' => ['name' => 'SERIAL NOT NULL'],
+       // 'autoIncrement' => ['name' => 'SERIAL NOT NULL'],
         'string' => ['name' => 'VARCHAR', 'length' => 255],
         'text' => ['name' => 'TEXT'],
         'integer' => ['name' => 'INTEGER'],

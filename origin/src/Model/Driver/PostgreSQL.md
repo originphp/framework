@@ -2,8 +2,11 @@
 
 PostgreSQL is work in progress since and brings a number of challenges. 
 
+Issues
+======
 1. The getMetadata does not return the alias for table
 2. User is a reserved word and force escaping of everything
+3. Getting the primary key is a bit of mission.
 
 ```php
 ConnectionManager::config('default', array(

@@ -16,7 +16,9 @@ class %controller%Controller extends AppController
 
     public function view($id = null)
     {
-        $%singularName% = $this->%model%->get($id);
+        $%singularName% = $this->%model%->get($id,[
+            'associated' => [%associated%]
+            ]);
         $this->set('%singularName%', $%singularName%);
     }
 

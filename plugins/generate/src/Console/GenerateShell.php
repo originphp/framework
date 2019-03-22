@@ -240,7 +240,10 @@ class GenerateShell extends Shell
         $data = $this->getData($model);
        
         $belongsTo = $this->meta['associations'][$model]['belongsTo'];
-
+        $hasMany = $this->meta['associations'][$model]['hasMany'];
+        $hasAndBelongsToMany = $this->meta['associations'][$model]['hasAndBelongsToMany'];
+        $associated = array_merge($belongsTo, $hasMany, $hasAndBelongsToMany);
+        
         // Create Block Data Controller
         $data['blocks'] = []; // Controller Blocks
         $compact = [ $data['singularName'] ];
@@ -254,6 +257,10 @@ class GenerateShell extends Shell
             }
         }
         $data['compact'] = implode("','", $compact);
+        $data['associated'] = '';
+        if ($associated) {
+            $data['associated'] = "'" . implode("','", $associated)."'";
+        }
 
         $Templater = new GenerateTemplater();
         $result = $Templater->generate('controller', $data);

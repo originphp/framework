@@ -38,7 +38,7 @@ class GenerateTask extends Task
         foreach ($this->schema as $model => $schema) {
             $validationRules[$model] = [];
             foreach ($schema as $field => $meta) {
-                if ($meta['key'] === 'primary') {
+                if (isset($meta['key']) and $meta['key'] === 'primary') {
                     continue;
                 }
                 $validationRules[$model][$field] = [];
@@ -131,7 +131,7 @@ class GenerateTask extends Task
     {
         $fields = $this->schema[$model];
         foreach ($fields as $field => $schema) {
-            if (substr($field, -3) === '_id' and $schema['key'] !== 'primary') {
+            if (substr($field, -3) === '_id' and isset($schema['key']) and $schema['key'] !== 'primary') {
                 $associatedModel = Inflector::camelize(substr($field, 0, -3));
                 $associations[$model]['belongsTo'][] = $associatedModel;
             }
@@ -154,8 +154,8 @@ class GenerateTask extends Task
             }
             $schema = $this->schema[$otherModel];
             $foreignKey = Inflector::underscore($model) . '_id';
-            // primaryKey is now only used if its id and integer - conventions
-            if (isset($schema[$foreignKey]) and $schema[$foreignKey]['key'] !== 'primary') {
+       
+            if (isset($schema[$foreignKey]) and isset($schema[$foreignKey]['key']) and $schema[$foreignKey]['key'] !== 'primary') {
                 $associations[$model]['hasMany'][] = $otherModel;
             }
         }
@@ -193,7 +193,7 @@ class GenerateTask extends Task
         if (isset($this->schema[$model])) {
             $schema = $this->schema[$model];
             foreach ($schema as $field => $meta) {
-                if ($meta['key'] === 'primary') {
+                if (isset($meta['key']) and $meta['key'] === 'primary') {
                     return $field;
                 }
             }
