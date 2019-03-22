@@ -91,19 +91,21 @@ class Shell
     }
 
     /**
-     * A Simple argument parser which populates the $args and $parms
+     * A Simple argument parser which populates the $args and $params based
+     * upon standards.
      *
-     * -save  (the value will true)
-     * -datasource=test
+     * --save  (the value will true)
+     * --datasource=test
+     * @todo in future, setting up defaults will automatically show help and allow for short optiosn e.g -d which is short for --datasource
      * @param array $arguments
      * @return void
      */
     protected function parseArguments(array $arguments)
     {
         foreach ($arguments as $arg) {
-            if ($arg[0]==='-') {
+            if (substr($arg, 0, 2)==='--') {
                 $value = true;
-                $param = substr($arg, 1);
+                $param = substr($arg, 2);
                 if (strpos($param, '=') !== false) {
                     list($param, $value) = explode('=', $param);
                 }
@@ -291,17 +293,18 @@ class Shell
      * @param mixed $value
      * @return array|string|null
      */
-    public function params($key = null, $value=null){
-        if($key === null){
+    public function params($key = null, $value=null)
+    {
+        if ($key === null) {
             return $this->params;
         }
-        if(is_array($key)){
+        if (is_array($key)) {
             return $this->params = $key;
         }
-        if(func_num_args() === 2){
+        if (func_num_args() === 2) {
             return $this->params[$key] = $value;
         }
-        if(isset($this->params[$key])){
+        if (isset($this->params[$key])) {
             return $this->params[$key];
         }
         return null;
@@ -313,14 +316,14 @@ class Shell
      * @param integer $index
      * @return mixed|null
      */
-    public function args(int $index = null){
-        if($index === null){
+    public function args(int $index = null)
+    {
+        if ($index === null) {
             return $this->args;
         }
-        if(isset($this->args[$index])){
+        if (isset($this->args[$index])) {
             return $this->args[$index];
         }
         return null;
     }
-
 }

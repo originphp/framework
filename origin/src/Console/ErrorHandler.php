@@ -97,7 +97,7 @@ class ErrorHandler
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
         
-        $fullBacktrace = in_array('-backtrace', $_SERVER['argv']);
+        $fullBacktrace = in_array('--backtrace', $_SERVER['argv']);
         $this->render($debug, $fullBacktrace);
     }
 
@@ -148,7 +148,7 @@ class ErrorHandler
             }
         }
         if ($fullBacktrace === false and $i > 3) {
-            $this->out("\n<yellow>Use -backtrace to see the full backtrace.</yellow>\n");
+            $this->out("\n<yellow>Use --backtrace to see the full backtrace.</yellow>\n");
         }
     }
 

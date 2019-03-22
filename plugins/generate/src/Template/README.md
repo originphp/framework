@@ -1,6 +1,6 @@
 # Readme 
 
-You can customise all these templates before generating code, you can pass the -force argument
+You can customise all these templates before generating code, you can pass the --force argument
 to overwrite without prompting.
 
 All info is stored in GenerateShell::meta['vars'];

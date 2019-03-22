@@ -71,7 +71,7 @@ class GenerateShell extends Shell
         $this->out('generate view Contacts');
         $this->out('generate plugin ContactManager');
         $this->out('');
-        $this->out('You can use -force to not prompt');
+        $this->out('You can use --force to not prompt');
         //$this->out('generate test Lead'); /**@todo test */
     }
 
