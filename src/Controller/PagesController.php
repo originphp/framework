@@ -22,6 +22,6 @@ class PagesController extends Controller
             return $this->redirect('/');
         }
    
-        return $this->render('Pages/'.implode('/', $args));
+        return $this->render(implode('/', $args));
     }
 }
