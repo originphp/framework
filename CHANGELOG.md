@@ -55,7 +55,7 @@ Delete tag:   git tag -d <tag_name>
 - Cleaned up and simplyfied requests and data etc
 - getting associated data from find has been changed from with to assoicated and now matches up with saving.
 - Save now saves associated data
-- newEntity and patchEntity now have whitelist and associated now has to be specified
+- new and patch now have whitelist and associated now has to be specified
 - Entity changed hasProperty to has. 
 - Models now return collections for all 
 - Changed session from static to object and refactored. Now session is available from request.
