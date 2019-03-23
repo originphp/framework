@@ -106,7 +106,6 @@ When working with Helpers, you may need to access the view object, this can be e
 $view = $this->view();
 ```
 
-
 ## Config
 
 Helpers work with the `ConfigTrait`, so this means you that your helper can have its own standardized configuration.

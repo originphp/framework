@@ -16,6 +16,8 @@ namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
 use Origin\Model\Datasource;
+use Origin\Model\Driver\MySQLDriver;
+
 use PDOException;
 use Origin\Model\Exception\DatasourceException;
 
@@ -48,7 +50,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $config =  ConnectionManager::config('test');
         $config['password'] = 'fozzywozzy';
         $this->expectException(DatasourceException::class);
-        $ds = new Datasource();
+        $ds = new MySQLDriver();
         $ds->connect($config);
     }
 
@@ -62,7 +64,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     public function testDisconnect()
     {
         $config =  ConnectionManager::config('test');
-        $ds = new Datasource();
+        $ds = new MySQLDriver();
         $ds->connect($config);
         $this->assertNull($ds->disconnect());
     }
@@ -70,7 +72,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     public function testLog()
     {
         $config =  ConnectionManager::config('test');
-        $ds = new Datasource();
+        $ds = new MySQLDriver();
         $ds->connect($config);
         $ds->execute('SELECT id, name, description FROM authors LIMIT 1');
         $this->assertNotEmpty($ds->log());

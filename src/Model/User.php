@@ -26,7 +26,6 @@ class User extends AppModel
         $this->hasMany('Bookmark');
     }
 
-
     /**
      * Hash the using the default password_hasher which is what the Auth component uses
      * aswell. Default is blowfish and is considered the most secure. Length will be 60 but

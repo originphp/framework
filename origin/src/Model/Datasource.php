@@ -22,10 +22,6 @@ use PDOException;
 
 class Datasource
 {
-    protected $drivers = [
-        'mysql' => 'Origin\Model\Driver\MySQLDriver',
-        'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
-    ];
     /**
      * Holds the connection to datasource.
      *
@@ -59,12 +55,6 @@ class Datasource
      */
     private $columnMap = [];
 
-    /**
-     * Holds the driver
-     *
-     * @var \Origin\Model\Driver\MySQLDriver
-     */
-    protected $driver =  null;
 
     protected $escape = '';
 
@@ -76,13 +66,6 @@ class Datasource
     public function connect(array $config)
     {
         $config += ['engine'=>'mysql'];
-      
-        if (!isset($this->drivers[$config['engine']])) {
-            throw new DatasourceException('Unkown driver ' . $config['engine']);
-        }
-
-        $this->driver = new $this->drivers[$config['engine']]($this, $config);
-        $this->escape = $this->driver->escape;
     
         $flags = array(
           PDO::ATTR_PERSISTENT => false,
@@ -92,7 +75,7 @@ class Datasource
 
         try {
             $this->connection = new PDO(
-                $this->driver->dsn($config),
+                $this->dsn($config),
                 $config['username'],
                 $config['password'],
                 $flags
@@ -388,18 +371,24 @@ class Datasource
         return strpos($column, $this->virtualFieldSeperator) != false;
     }
 
+
+    public function dsn(array $config) : string
+    {
+    }
+
+    public function createTable(string $table, array $data) : string
+    {
+    }
+
     /**
-     * Returns the schema for a table.
+     * Gets the schema info and converts into standard to be used by framework
      *
      * @param string $table
-     *
-     * @return array (field = [type,length,default,null])
+     * @return void
      */
     public function schema(string $table)
     {
-        return $this->driver->describe($table);
     }
-
     /**
      * Gets a list of tables for the datasource
      *
@@ -407,7 +396,6 @@ class Datasource
      */
     public function tables()
     {
-        return $this->driver->tables();
     }
 
     /**
@@ -471,23 +459,11 @@ class Datasource
      */
     public function queryBuilder(string $table, $alias=null)
     {
-        $builder = new QueryBuilder($table, $alias);
-        $builder->quote = $this->driver->escape;
-        return $builder;
+        return new QueryBuilder($table, $alias);
     }
 
     public function log()
     {
         return $this->log;
-    }
-
-    /**
-     * Returns the database driver
-     *
-     * @return \Origin\Model\Driver\MySQLDriver
-     */
-    public function driver()
-    {
-        return $this->driver;
     }
 }

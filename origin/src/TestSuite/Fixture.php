@@ -100,7 +100,7 @@ class Fixture
         $schema = $connection->schema($options['table']);
       
         $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->driver()->createTable($this->table, $schema);
+        $sql = $connection->createTable($this->table, $schema);
         return $connection->execute($sql);
     }
 
@@ -115,7 +115,7 @@ class Fixture
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->driver()->createTable($this->table, $this->fields);
+        $sql = $connection->createTable($this->table, $this->fields);
     
         return $connection->execute($sql);
     }

@@ -92,7 +92,7 @@ class SchemaShell extends Shell
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                 $table = pathinfo($file, PATHINFO_FILENAME);
-                $sql = $connection->driver()->createTable($table, $this->loadSchema($folder . DS . $file));
+                $sql = $connection->createTable($table, $this->loadSchema($folder . DS . $file));
                 if ($sql and $connection->execute($sql)) {
                     $this->Status->ok(sprintf('%s table created', $table));
                     continue;

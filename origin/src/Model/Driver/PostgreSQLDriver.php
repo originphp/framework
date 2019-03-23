@@ -43,13 +43,6 @@ class PostgreSQLDriver
     protected $connection;
     
     /**
-     * Database name
-     *
-     * @var string
-     */
-    protected $database = null;
-
-    /**
      * Postgre column definitions
      *
      * @var array
@@ -71,13 +64,6 @@ class PostgreSQLDriver
     ];
 
     public $escape = '"';
-
-
-    public function __construct(Datasource $datasource, array $config=[])
-    {
-        $this->datasource = $datasource;
-        $this->database = $config['database'];
-    }
 
     /**
      * Returns the DSN string

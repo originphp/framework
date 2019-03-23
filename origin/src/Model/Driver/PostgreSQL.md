@@ -1,6 +1,6 @@
 # PostgreSQL setup
 
-PostgreSQL is work in progress since and brings a number of challenges. 
+PostgreSQL is work in progress since and brings a number of challenges. I not happy with previous concept of datasource injecting itself into driver and then storing driver on datasource. Not tested the postgre since this change.
 
 Issues
 ======

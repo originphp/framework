@@ -41,6 +41,19 @@ class Behavior
     public function initialize(array $config)
     {
     }
+
+    /**
+     * Callback that is triggered just before the request data is marshalled.
+     * This should return the requested data
+     *
+     * @param array $requestData
+     * @return array
+     */
+    public function beforeMarshal(array $requestData = [])
+    {
+        return $requestData;
+    }
+
     /**
       * Before find callback. Must return either the query or true to continue
       * @return array|bool query or bool

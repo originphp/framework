@@ -16,10 +16,17 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\MissingDatasourceException;
 use Origin\Core\StaticConfigTrait;
+use Origin\Model\Driver\MySQLDriver;
 
 class ConnectionManager
 {
     use StaticConfigTrait;
+
+    protected static $drivers = [
+        'mysql' => 'Origin\Model\Driver\MySQLDriver',
+        'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
+    ];
+   
     /**
      * Holds all the connections.
      *
@@ -44,17 +51,13 @@ class ConnectionManager
             throw new MissingDatasourceException($name);
         }
 
-        $datasource = new Datasource();
+        $datasource = new MySQLDriver();
 
-        $defaults = [
-            'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null
-        ];
+        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null];
         $config = array_merge($defaults, static::config($name));
         $datasource->connect($config);
 
-        static::$datasources[$name] = $datasource;
-
-        return $datasource;
+        return static::$datasources[$name] = $datasource;
     }
 
     public static function has(string $name)

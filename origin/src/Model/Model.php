@@ -14,6 +14,12 @@
 
 namespace Origin\Model;
 
+/**
+ * Multiple entities can be wrapped in array of Model\Collection, must work both ways so
+ * that entities with associated data can also be created manually.
+ *
+ */
+
 use Origin\Core\Inflector;
 use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\MissingModelException;
@@ -719,14 +725,23 @@ class Model
             }
         }
 
+        /**
+         * Extract HABTM data to prevent being marked as invalid
+         * When finding records from db, these are returned as Model\Collection. When marshalling
+         * or manually creating it would be array. So we need
+         */
         $hasAndBelongsToMany = [];
         foreach ($this->hasAndBelongsToMany as $alias => $habtm) {
             $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
-            if (isset($entity->{$needle}) and is_array($entity->{$needle})) {
+            if (!in_array($alias, $options['associated'])) {
+                continue;
+            }
+            $data = $entity->get($needle);
+            if (is_array($data) or $data instanceof Collection) {
                 $hasAndBelongsToMany[$alias] = $entity->{$needle};
             }
         }
-        
+
         /**
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
@@ -771,11 +786,21 @@ class Model
             }
         }
 
-        if ($hasAndBelongsToMany) {
-            $result = $this->saveHABTM($hasAndBelongsToMany, $options['callbacks']);
+        /**
+         * Save HABTM. It is here, because control is needed on false result from here
+         */
+        foreach ($hasAndBelongsToMany as $alias => $config) {
+            if (!$this->saveHABTM($alias, $entity->{$needle}, $options['callbacks'])) {
+                return false;
+            }
+            $result = true;
         }
 
         unset($data,$options);
+
+        if ($result) {
+            $entity->reset();
+        }
 
         return $result;
     }
@@ -811,84 +836,119 @@ class Model
         return $this->connection()->update($this->table, $data, $conditions);
     }
 
-    protected function saveHABTM(array $hasAndBelongsToMany, bool $callbacks)
+    /**
+     * Saves the hasAndBelongsToMany data
+     *
+     * @param string $association
+     * @param Collection|array $data
+     * @param boolean $callbacks
+     * @return void
+     */
+    protected function saveHABTM(string $association, $data, bool $callbacks)
     {
         $connection = $this->connection();
 
-        foreach ($hasAndBelongsToMany as $association => $data) {
-            $config = $this->hasAndBelongsToMany[$association];
-            $joinModel = $this->{$config['with']};
+        $config = $this->hasAndBelongsToMany[$association];
+        $joinModel = $this->{$config['with']};
 
-            $links = [];
-            foreach ($data as $row) {
-                $primaryKey = $this->{$association}->primaryKey;
-                $displayField = $this->{$association}->displayField;
-
-                // Either primaryKey or DisplayField must be set in data
-                if ($row->has($primaryKey)) {
-                    $needle = $primaryKey;
-                } elseif ($row->has($displayField)) {
-                    $needle = $displayField;
-                } else {
-                    return false;
-                }
-
-                $tag = $this->{$association}->find('first', array(
+        $links = [];
+        
+        foreach ($data as $row) {
+            $primaryKey = $this->{$association}->primaryKey;
+            $displayField = $this->{$association}->displayField;
+         
+            // Either primaryKey or DisplayField must be set in data
+            if ($row->has($primaryKey)) {
+                $needle = $primaryKey;
+            } elseif ($row->has($displayField)) {
+                $needle = $displayField;
+            } else {
+                return false;
+            }
+       
+            $tag = $this->{$association}->find('first', array(
                   'conditions' => array($needle => $row->get($needle)),
                   'callbacks' => false,
                 ));
-
-                if ($tag) {
-                    $links[] = $tag->get($primaryKey);
-                } else {
-                    if (!$this->{$association}->save($row, array(
+          
+            if ($tag) {
+                $links[] = $tag->get($primaryKey);
+            } else {
+                if (!$this->{$association}->save($row, array(
                       'callbacks' => $callbacks,
                       'transaction' => false,
                     ))) {
-                        return false;
-                    }
-                    $links[] = $this->{$association}->id;
+                    return false;
                 }
-
-                $joinModel = $this->{$config['with']};
+                $links[] = $this->{$association}->id;
             }
-            $existingJoins = $joinModel->find('list', array(
+          
+            $joinModel = $this->{$config['with']};
+        }
+        $existingJoins = $joinModel->find('list', array(
                 'conditions' => array($config['foreignKey'] => $this->id),
                 'fields' => array($config['associationForeignKey']),
               ));
 
-            $connection = $joinModel->connection();
-            // By adding ID field we can do delete callbacks
-            if ($config['mode'] === 'replace') {
-                $connection->delete($config['joinTable'], array(
+        $connection = $joinModel->connection();
+        // By adding ID field we can do delete callbacks
+        if ($config['mode'] === 'replace') {
+            $connection->delete($config['joinTable'], array(
                       $config['foreignKey'] => $this->id,
                   ));
-            } else {
-                $remove = array_diff($existingJoins, $links);
-                if (!empty($remove)) {
-                    $connection->delete($config['joinTable'], array(
+        } else {
+            $remove = array_diff($existingJoins, $links);
+            if (!empty($remove)) {
+                $connection->delete($config['joinTable'], array(
                   $config['foreignKey'] => $this->id,
                   $config['associationForeignKey'] => $remove,
                 ));
-                }
-            }
-
-            foreach ($links as $linkId) {
-                if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
-                    continue;
-                }
-                $insertData = array(
-                  $config['foreignKey'] => $this->id,
-                  $config['associationForeignKey'] => $linkId,
-                );
-
-                if (!$connection->insert($joinModel->table, $insertData)) {
-                    return false;
-                }
             }
         }
 
+        foreach ($links as $linkId) {
+            if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
+                continue;
+            }
+            $insertData = array(
+                  $config['foreignKey'] => $this->id,
+                  $config['associationForeignKey'] => $linkId,
+                );
+            
+            if (!$connection->insert($joinModel->table, $insertData)) {
+                return false;
+            }
+        }
         return true;
+    }
+
+    /**
+     * Returns an normalized array of ssociated settings for dealing with
+     * creating entities and saving data. Different than used by find
+     *
+     * [] = normalizeAssociated(false);
+     * $all = normalizeAssociated(true);
+     * $some = normalizeAssociated(['Tag','User']);
+     *
+     * @param array|bool $option
+     * @return void
+     */
+    protected function normalizeAssociated($option)
+    {
+        $associated = [];
+        if ($option === false) {
+            return [];
+        }
+        if (is_array($option)) {
+            $associated = $option;
+        }
+        // add keys if not set
+        if ($option === true) {
+            foreach ($this->associations() as $assocation) {
+                $associated = array_keys($this->{$assocation});
+            }
+        }
+        return $associated;
     }
 
     /**
@@ -901,7 +961,7 @@ class Model
        * - validate: wether to validate data or not
        * - callbacks: call the callbacks duing each stage.  You can also put only before or after
        * - transaction: wether to save through a database transaction (default:true)
-       * - associated: an array of associated data to save as well
+       * - associated: default true. boolean or an array of associated data to save as well
        *
        * # Callbacks
        *
@@ -919,14 +979,27 @@ class Model
        */
     public function save(Entity $data, $options = [])
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true,'associated'=>[]];
-      
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true,'associated'=>true];
+       
+        // Normalize
+        $associated = [];
+        if (is_array($options['associated'])) {
+            $associated = $options['associated'];
+        }
+
+        if ($options['associated'] === true) {
+            foreach ($this->associations() as $assocation) {
+                $associated = array_keys($this->{$assocation});
+            }
+        }
+        $options['associated'] = $associated;
+    
         $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
             $this->begin();
         }
-        $id = false;
+       
         $result = true;
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
@@ -945,6 +1018,11 @@ class Model
         }
 
         if ($result) {
+            /**
+             * This will save record and hasAndBelongsToMany records. This is because
+             * it can return false but HABTM is ok, and we need to capture false from
+             * callbacks.
+             */
             $result = $this->processSave($data, $options);
         }
 
@@ -999,7 +1077,7 @@ class Model
         if ($options['transaction']) {
             $this->rollback();
         }
-
+      
         return false;
     }
 
@@ -1594,6 +1672,18 @@ class Model
     }
 
     /**
+     * Callback that is triggered just before the request data is marshalled. This will
+     * be triggered when passing data through model::new, model::patch or model::newEntities
+     *
+     * @param array $requestData
+     * @return array
+     */
+    public function beforeMarshal(array $requestData = [])
+    {
+        return $requestData;
+    }
+
+    /**
     * Before find callback. Must return either the query or true to continue
     * @return array|bool query or bool
     */
@@ -1714,16 +1804,21 @@ class Model
     }
 
     /**
-     * Creates an instance of an Entity
-     *
+     * Creates an instance of an Entity. If you pass data as an argument this then it will
+     * go through the marshalling process.
      *
      * @param array $requestData
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function new(array $requestData = [], array $options=[])
+    public function new(array $requestData = null, array $options=[])
     {
-        $options += ['name' => $this->alias];
+        if ($requestData === null) {
+            return new Entity([], ['name'=>$this->alias]);
+        }
+        $options += ['name' => $this->alias,'associated'=>true];
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
+        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->one($requestData, $options);
     }
 
@@ -1736,9 +1831,10 @@ class Model
      */
     public function newEntities(array $requestData, array $options=[])
     {
-        $options += ['name' => $this->alias];
-
-        return new Collection($this->marshaller()->many($requestData, $options));
+        $options += ['name' => $this->alias,'associated'=>true];
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
+        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
+        return $this->marshaller()->many($requestData, $options);
     }
 
     /**
@@ -1751,6 +1847,9 @@ class Model
      */
     public function patch(Entity $entity, array $requestData, array $options=[])
     {
+        $options += ['associated'=>true];
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
+        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->patch($entity, $requestData, $options);
     }
 
@@ -1761,11 +1860,7 @@ class Model
      */
     protected function marshaller()
     {
-        if ($this->marshaller === null) {
-            $this->marshaller = new Marshaller($this);
-        }
-
-        return $this->marshaller;
+        return new Marshaller($this);
     }
 
     /**
@@ -1774,8 +1869,7 @@ class Model
      * @param string $callback   [description]
      * @param array  $arguments  [description]
      * @param bool   $passedArgs if result is array overwrite
-     *
-     * @return [type] [description]
+     * @return mixed
      */
     protected function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
     {

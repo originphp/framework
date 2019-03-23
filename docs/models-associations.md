@@ -187,7 +187,7 @@ Create a method in your model called `initialize` and this will be called when t
   }
 ```
 
-You can also pass an options array with any of the following keys.
+You can also pass an options array with any of the following keys. If you are following conventions most of these options are not necessary.
 
 - `className` is the name of the class that you want to load.
 - `joinTable` the name of the table used by this relationship
@@ -200,7 +200,9 @@ You can also pass an options array with any of the following keys.
 - `dependent` default is `false`, if set to true when delete is called with cascade it will related records.
 - `limit` default is `null`, set a value to limit how many rows to return
 - `offset` if you are using limit then set from where to start fetching
-- `unique` default is `true`, when adding records, all other relationships are deleted first. So it assumes one save contains all the joins. You can also set this to `keepExisting`, this should be set if you will store other data in the join table, as it wont delete relationships which it is adding back.
+- `mode` default mode is `replace`.
+    - `replace`: In replace, when adding records, all other relationships are deleted first. So it assumes one save contains all the joins. Typically the table will just have two fields, and a composite primary key.
+    - `append`: this should be set to append, if you will store other data in the join table, as it wont delete relationships which it is adding back. The table should have an id column and it should be set as the primary key.
 
 ```php
   class User extends AppModel
@@ -215,7 +217,7 @@ You can also pass an options array with any of the following keys.
       'associationForeignKey' => 'tag_id',
       'fields' => ['User.name','User.email','Tag.title','Tag.created'],
       'order' => ['Tag.created ASC'],
-      'unique' => true
+      'model' => 'append'
       'limit' => 50
       ]);
     }

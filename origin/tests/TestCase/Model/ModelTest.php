@@ -849,12 +849,13 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $methods = ['saveHABTM'];
         $Article = $this->getMockModel(Article::class, $methods);
         $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
-        $data = $Article->new(array(
-        'id' => 1,
-        'tags' =>  [
-          ['title' => 'testSaveHABTMIsCalled'],
-        ],
-       ));
+        $array = [
+          'id' => 1,
+          'tags' =>  [
+            ['title' => 'testSaveHABTMIsCalled'],
+          ],
+        ];
+        $data = $Article->new($array);
 
         $Article->expects($this->once())
           ->method('saveHABTM')
@@ -885,6 +886,7 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $conditions = array(
           'conditions' => array('article_id' => 1),
         );
+      
         $this->assertTrue($Article->save($data));
         $tags = $Article->Tag->find('all', array('conditions' => array('OR' => $tags)));
 

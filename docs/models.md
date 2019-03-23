@@ -150,6 +150,7 @@ CRUD stands for Create Read Update and Delete.
 ### Create
 
 When you create a record you will usually take data from the request (i.e. when somebody submits a form) or if you need to create something on the fly. 
+
 ```php
 class ArticlesController extends AppController
 {
@@ -180,7 +181,6 @@ class ArticlesController extends AppController
     }
 }
 ```
-
 
 
 ### Read
@@ -277,14 +277,13 @@ it will attempt to delete it.
     $this->Article->delete($article);
 ```
 
-If you want to delete all child records as well, you can set cascade to true. `hasAndBelongsToMany` are always deleted when you delete a record. You will need to set the `dependent` option when configuring the associations.
+By default dependent records are deleted, you can disable this by setting the second argument to false when deleting. `hasAndBelongsToMany` are always deleted when you delete a record. You will need to set the `dependent` option when configuring the associations.
 
 ```php
-    $this->Article->delete($article,true);
+    $this->Article->delete($article,false);
 ```
 
 To disable callbacks `beforeDelete` and `afterDelete` set the third argument to false.
-
 
 ```php
     $this->Article->delete($article,true,false);
@@ -296,14 +295,18 @@ Or you can delete in bulk but this wont trigger callbacks or delete related reco
     $this->Article->deleteAll(['rating'=>'rubbish','author !='=>'Jim']);
 ```
 
+## Saving Associated Data
+
+By default associated records will be saved, you can disable this by setting associated to false. And you can limit this to certain associations by passing an array with the names of the alias for the model that you want to save for.
+
 ## Save Options
 
 When saving records you can pass an array of options
 
 - validate: default is true, whether to validate data
-- callbacks: whether to trigger callbacks such as beforeSave etc.
+- callbacks: default is true. whether to trigger callbacks such as beforeSave etc.
 - transaction: default is true, whether to wrap the save in a database transaction 
-- associated: here you can specify an array of associated model names that you want to save data for
+- associated: default is true. here you can specify an array of associated model names that you want to save data for, or true or false. true will enable saving on the first level of assocations.
 
 ## Saving a field
 

@@ -121,7 +121,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
 
         $expected = SRC.'/View/Rest/json.ctp';
         $view->setFile($expected); // Prevent exception
-        $result = $view->callMethod('getViewFilename', ['Rest/json']);
+        $result = $view->callMethod('getViewFilename', ['/Rest/json']);
 
         $this->assertEquals($expected, $result);
     }

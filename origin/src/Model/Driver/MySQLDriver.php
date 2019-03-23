@@ -4,7 +4,7 @@ namespace Origin\Model\Driver;
 use Origin\Model\Datasource;
 use Origin\Exception\Exception;
 
-class MySQLDriver
+class MySQLDriver extends Datasource
 {
     /**
      * Holds the Connection
@@ -12,13 +12,6 @@ class MySQLDriver
      * @var Origin\Model\Connection
      */
     protected $connection;
-    
-    /**
-     * Database name
-     *
-     * @var string
-     */
-    protected $database = null;
     
     /**
      * MySQL column definitions
@@ -43,12 +36,6 @@ class MySQLDriver
 
     public $escape = '`';
 
-    public function __construct(Datasource $datasource, array $config=[])
-    {
-        $this->datasource = $datasource;
-        $this->database = $config['database'];
-    }
-
     /**
      * Returns the DSN string
      *
@@ -62,11 +49,11 @@ class MySQLDriver
     }
     
     
-    public function describe(string $table) : array
+    public function schema(string $table) : array
     {
         $schema = [];
-        if ($this->datasource->execute("SHOW FULL COLUMNS FROM {$table};")) {
-            $result = $this->datasource->fetchAll();
+        if ($this->execute("SHOW FULL COLUMNS FROM {$table};")) {
+            $result = $this->fetchAll();
             $reverseMapping = [];
             foreach ($this->columns as $key => $value) {
                 $reverseMapping[strtolower($value['name'])] = $key;
@@ -111,8 +98,8 @@ class MySQLDriver
     public function tables() : array
     {
         $tables = [];
-        if ($this->datasource->execute('SHOW TABLES;')) {
-            $result = $this->datasource->fetchAll();
+        if ($this->execute('SHOW TABLES;')) {
+            $result = $this->fetchAll();
             foreach ($result as $value) {
                 $tables[] = current($value);
             }
@@ -127,7 +114,7 @@ class MySQLDriver
      * @param array $data
      * @return string
      */
-    public function createTable(string $table, array $data)
+    public function createTable(string $table, array $data) : string
     {
         $result = [];
 

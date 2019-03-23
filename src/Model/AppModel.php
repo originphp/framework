@@ -13,6 +13,19 @@ class AppModel extends Model
     }
 
     /**
+     * Callback that is triggered just before the request data is marshalled, when calling
+     * model::new or model::patch and passing array
+     * This should return the requested data
+     *
+     * @param array $requestData
+     * @return array
+     */
+    public function beforeMarshal(array $requestData = [])
+    {
+        return $requestData;
+    }
+
+    /**
     * Before find callback. Must return either the query or true to continue
     * @return array|bool query or bool
     */

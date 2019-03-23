@@ -221,13 +221,13 @@ class View
      */
     protected function getViewFilename(string $name)
     {
-        $path = $this->getViewPath();
+        $path = $this->getViewPath() . DS ;
         if ($name[0] === '/') {
             $path = $this->getViewPath(false); // get without controller folder
         }
-
-        $filename = $path . DS . $name . '.ctp';
-
+        
+        $filename = $path .  $name . '.ctp';
+   
         if ($this->fileExists($filename)) {
             return $filename;
         }
