@@ -38,7 +38,7 @@
   <body>
     <div class="container">
 
-      <h1>Origin Framework</h1>
+      <h1>OriginPHP Framework</h1>
       <p>This is the test page to see that all is working ok. You can remove or change this by editing the <strong>config/Routes.php</strong>. This is the route that is used to show this page:</p>
       <pre>
           Router::add('/', ['controller' => 'pages', 'action' => 'display', 'home']);
@@ -66,9 +66,9 @@
         $databaseConfig = CONFIG.DS.'database.php';
 
         if (file_exists($databaseConfig)) {
-            success('config/Database.php found.');
+            success('config/database.php found.');
         } else {
-            warning('config/Database.php not found.');
+            warning('config/database.php not found.');
         }
       ?>
 
@@ -88,9 +88,9 @@
 
       <?php
         if (file_exists(CONFIG.DS.'server.php')) {
-            success('Config/Server.php found');
+            success('config/server.php found');
         } else {
-            info('Config/Server.php not found. You can optionally have different configurations for each deployment, e.g Development, Staging, Production.');
+            info('config/server.php not found. You can optionally have different configurations for each deployment, e.g Development, Staging, Production.');
         }
       ?>
 

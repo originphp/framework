@@ -11,8 +11,6 @@
         <?= $this->Form->create($user); ?>
         <h2><?= __('Add User'); ?></h2>
             <?php
-
-                echo $this->Form->create($user);
                 echo $this->Form->control('name');
                 echo $this->Form->control('email');
                 echo $this->Form->control('password');

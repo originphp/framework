@@ -15,7 +15,8 @@
                 <?= $this->Html->link(
                     __('List Users'),
                     ['action' => 'index'],
-                    ['class' => 'nav-link']);
+                    ['class' => 'nav-link']
+                );
                     ?>
             </li>
         </ul>
@@ -24,7 +25,6 @@
         <?= $this->Form->create($user); ?>
         <h2><?= __('Edit User'); ?></h2>
             <?php
-                echo $this->Form->create($user);
                 echo $this->Form->control('name');
                 echo $this->Form->control('email');
                 echo $this->Form->control('dob');

@@ -103,30 +103,24 @@ class FormHelper extends Helper
     protected $meta = [];
 
     /**
-     * Starts a form.
+     * Creates a form element
      *
-     * @param string|entity|bool $model   model name, entity object or false to no model
-     * @param array              $options
+     * @todo how to edit many records, non entity
      *
-     * @return string
+     * @param \Origin\Model\Entity|null $entity
+     * @param array $options
+     * @return void
      */
-    public function create($model = null, array $options = [])
+    public function create(Entity $entity = null, array $options = [])
     {
         $attributes = [];
 
-        if ($model === null) {
-            $controller = $this->view()->request->params('controller');
-            $model = Inflector::camelize(Inflector::singularize($controller));
-        }
-        if (is_object($model)) {
-            $this->data = $entity = $model;
+        if ($entity) {
+            $this->data = $entity;
             $this->modelName = $entity->name();
-        }
-
-        if ($this->modelName) {
             $this->introspectModel($this->modelName);
         }
-
+  
         $defaults = [
           'type' => 'post',
           'url' => $this->view()->request->url(true),
@@ -150,7 +144,7 @@ class FormHelper extends Helper
 
     public function button(string $name, array $options = [])
     {
-        $defaults = array('name' => $name, 'type' => 'submit');
+        $defaults = ['name' => $name, 'type' => 'submit'];
         $options = array_merge($defaults, $options);
 
         return $this->template('button', $options);
@@ -194,9 +188,10 @@ class FormHelper extends Helper
         ];
 
         $entity = $this->data;
-
+        
         //? Introspect related models as well?
         $model = ModelRegistry::get($name);
+       
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey;
             foreach ($model->schema() as $column => $row) {
@@ -213,16 +208,16 @@ class FormHelper extends Helper
                 }
             }
 
+            // Only work if entity is supplied
             if ($entity) {
                 $create = true;
                 if ($entity->has($meta['primaryKey'])) {
                     $create = false;
                 }
-                $validator = $model->validator();
-                $meta['requiredFields'] = $this->parseRequiredFields($validator->rules(), $create);
+                $meta['requiredFields'] = $this->parseRequiredFields($model->validator()->rules(), $create);
             }
         }
-
+      
         $this->meta[$name] = $meta;
 
         return $meta;
@@ -247,15 +242,19 @@ class FormHelper extends Helper
         return $result;
     }
 
+
     /**
-     * Creates a form control from the field name. Displays validation errors
-     * and other magic!
+     * Creates a form control and wraps with a div and label
      *
-     * @param string $name    field name
+     * ## Options
+     *
+     * type - this is the type such as text, number,date,checkbox etc
+     * label - this can be a string or an array with options passed to the label template
+     * before -
+     * after -
+     *
+     * @param string $name name, model.name or model.0.name
      * @param array  $options
-     *                        - type
-     *                        - label  can be string or array
-     *
      * @return string
      */
     public function control(string $name, array $options = [])
@@ -285,9 +284,12 @@ class FormHelper extends Helper
             if (isset($this->view()->vars[$models])) {
                 $selectOptions = $this->view()->vars[$models];
             }
+        } else {
+            $parts = explode('.', $label);
         }
-        $label = Inflector::humanize($label);
 
+        $label = Inflector::humanize(end($parts));
+             
         $options += array(
               'label' => $label,
               'id' => $this->domId($name),
@@ -489,12 +491,26 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'password';
-
         return $this->template('input', $options);
     }
 
+    /**
+     * Creates a link within a form to send a value, deafult is post
+     * but you can set to delete
+     *
+     * ## Options
+     *
+     * - method: post
+     * - confirm: a string message to confirm via the browser
+     *
+     * @param string $name
+     * @param [type] $url
+     * @param array $options
+     * @return void
+     */
     public function postLink(string $name, $url, $options = [])
     {
+        $options += ['method'=>'post','confirm'=>null];
         if (is_array($url)) {
             $url = Router::url($url);
         }
@@ -511,7 +527,7 @@ class FormHelper extends Helper
         ];
 
         $output = $this->template('formStart', $attributes);
-        $output .= $this->hidden('_method', ['value' => 'POST']);
+        $output .= $this->hidden('_method', ['value' => strtoupper($attributes['method'])]);
         $options['text'] = $name;
 
         if (empty($options['confirm'])) {
@@ -535,12 +551,25 @@ class FormHelper extends Helper
         $output = '';
 
         $radioId = $radioOptions['id'];
+        
+        $checked = null;
+        if (isset($radioOptions['value'])) {
+            $checked = $radioOptions['value'];
+            unset($radioOptions['value']);
+        }
 
         foreach ($options as $key => $value) {
             $radioOptions['id'] = $radioId.'-'.$key;
             $radioOptions['value'] = $key;
-            $radio = $this->template('radio', $radioOptions);
+            $additionalOptions = [];
+            if ($key === $checked) {
+                $additionalOptions = ['checked'=>true];
+            }
+            $radio = $this->template('radio', $radioOptions+$additionalOptions);
             $output .= $this->template('label', ['name' => $radioOptions['id'], 'text' => $radio.$value]);
+            if (isset($radioOptions['checked'])) {
+                unset($radioOptions['checked'],$radioOptions['value']);
+            }
         }
 
         return $output;

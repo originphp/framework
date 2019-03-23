@@ -15,7 +15,8 @@
                 <?= $this->Html->link(
                     __('List Bookmarks'),
                     ['action' => 'index'],
-                    ['class' => 'nav-link']);
+                    ['class' => 'nav-link']
+                );
                     ?>
             </li>
         </ul>
@@ -24,7 +25,6 @@
         <?= $this->Form->create($bookmark); ?>
         <h2><?= __('Edit Bookmark'); ?></h2>
             <?php
-                echo $this->Form->create($bookmark);
                 echo $this->Form->control('title');
                 echo $this->Form->control('url');
                 echo $this->Form->control('tag_string', ['label' => __('Tags')]);

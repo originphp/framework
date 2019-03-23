@@ -11,25 +11,19 @@
         <?= $this->Form->create($bookmark); ?>
         <h2><?= __('Add Bookmark'); ?></h2>
             <?php
-
-                echo $this->Form->create($bookmark);
                 echo $this->Form->control('title');
                 echo $this->Form->control('url');
                 echo $this->Form->control('tag_string', ['label' => __('Tags')]);
-                ?>
+            ?>
                 <small id="tagsHelpBlock" class="form-text text-muted">
                     Enter a list of comma separated tags.
                 </small>
-                <?php 
-
+            <?php 
                 echo $this->Form->control('category', ['options' => $categories, 'empty' => true]);
                 echo $this->Form->control('description', ['rows' => 5]);
                 echo $this->Form->button(__('Save'), ['class' => 'btn btn-primary']);
-
-
-                echo $this->Form->control('created');
-
                 echo $this->Form->end();
             ?>
     </div>
 </div>
+<?php
