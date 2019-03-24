@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <div class="%pluralName% view">
     <div class="page-header">
         <h2><?= __('%singularHuman%') ?></h2>

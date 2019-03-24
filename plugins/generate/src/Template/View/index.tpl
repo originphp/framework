@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <div class="%pluralName% index">
     <div class="page-header">
         <h2><?= __('%pluralHuman%') ?></h2>

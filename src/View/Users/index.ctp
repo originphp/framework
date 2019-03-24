@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <div class="row">
     <div class="col users index">
         <h3><?= __('Users'); ?></h3>

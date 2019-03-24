@@ -11,9 +11,12 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\View;
 
+/**
+ * @todo change protected properties to have _prefix to get out of sight during
+ * code completion views.
+ */
 use Origin\Controller\Controller;
 use Origin\Core\Inflector;
 use Origin\View\Helper\HelperRegistry;
@@ -25,6 +28,8 @@ use Origin\Core\Logger;
 
 class View
 {
+
+
     /**
      * Name of controller that created this view.
      */
@@ -89,6 +94,17 @@ class View
         $this->helperRegistry = new HelperRegistry($this);
 
         $this->helpers = $controller->viewHelpers;
+
+        $this->initialize();
+    }
+
+    /**
+     * Called during construct
+     *
+     * @return void
+     */
+    public function initialize()
+    {
     }
 
     /**
@@ -105,8 +121,8 @@ class View
     /**
      * Loads a helper
      *
-     * @param string $name
-     * @param array $config
+     * @param string $name Helper name e.g Session, Cookie
+     * @param array $config An array of config that you want to pass to the helper.
      * @return \Origin\View\Helper\Helper
      */
     public function loadHelper(string $name, array $config = [])
@@ -117,6 +133,13 @@ class View
         return $this->{$helper};
     }
 
+    /**
+     * Returns a rendered element
+     *
+     * @param string $name Name of the element e.g. math-widget, html_editor
+     * @param array $vars Variables that will be made available in the element
+     * @return string
+     */
     public function element(string $name, array $vars = [])
     {
         $element__filename = $this->getElementFilename($name);
@@ -154,10 +177,11 @@ class View
         }
         return null;
     }
+
     /**
      * Gets a property value
      *
-     * @param string $key vars,contents,params
+     * @param string $key Get view vars,contents,params
      *
      * @return
      */
@@ -202,6 +226,12 @@ class View
         return $this->helperRegistry;
     }
 
+    /**
+     * Gets the filename for the element
+     *
+     * @param string $name
+     * @return string
+     */
     protected function getElementFilename(string $name)
     {
         $filename = $this->getFilename($name, 'Element');
@@ -215,19 +245,23 @@ class View
     /**
      * Gets the view filename.
      *
-     * @param string $name action, /Folder/action
-     *
+     * @param string $name Template name e.g. controller_action, /Controller/action , Plugin.Controller/action
      * @return string filename
      */
     protected function getViewFilename(string $name)
     {
         $path = $this->getViewPath() . DS ;
-        if ($name[0] === '/') {
+        if ($name[0] === '/' or strpos($name, '.')!==false) {
             $path = $this->getViewPath(false); // get without controller folder
         }
         
+        if (strpos($name, '.')) {
+            list($plugin, $name) = explode('.', $name);
+            $path  .= '/'; // Add trailing
+        }
+       
         $filename = $path .  $name . '.ctp';
-   
+       
         if ($this->fileExists($filename)) {
             return $filename;
         }

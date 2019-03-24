@@ -18,7 +18,7 @@ use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
-use Origin\View\View;
+use App\View\AppView;
 use Origin\Controller\Component\ComponentRegistry;
 use Origin\Core\Inflector;
 use Origin\Core\Router;
@@ -365,13 +365,24 @@ class Controller
             if (isset($options['template'])) {
                 $template =  $options['template'];
             }
-            $viewObject = new View($this);
-            $body = $viewObject->render($template, $this->layout);
+        
+            $body = $this->viewObject()->render($template, $this->layout);
         }
     
         $this->response->type($options['type']);   // 'json' or application/json
         $this->response->status($options['status']); // 200
         $this->response->body($body); //
+    }
+
+    /**
+     * Creates a View object, overide if you want to use
+     * a custom class.
+     *
+     * @return AppView
+     */
+    protected function viewObject()
+    {
+        return new AppView($this);
     }
 
     /**

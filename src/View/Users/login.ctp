@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <h1>Login</h1>
 <?php 
    echo $this->Form->create();

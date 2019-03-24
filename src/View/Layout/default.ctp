@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ */
 use Debug\DebugBar;
 
 $DebugBar = new DebugBar();

@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <div class="page-header">
     <div class="float-right">
         <a href="/%controllerUnderscored%" class="btn btn-secondary" role="button"><?= __('Back') ?></a>

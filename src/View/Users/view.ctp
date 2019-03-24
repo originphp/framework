@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
 <div class="row">
     <div class="col-3 actions">
         <h3><?= __('Actions'); ?></h3>
