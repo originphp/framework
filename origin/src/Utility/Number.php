@@ -106,6 +106,7 @@ class Number
      */
     public static function decimal($value, int $precision = 2)
     {
+        $value = sprintf("%01.{$precision}f", $value);
         return static::format($value, ['places'=>$precision]);
     }
     

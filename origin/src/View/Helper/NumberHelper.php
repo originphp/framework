@@ -25,13 +25,14 @@ class NumberHelper extends Helper
      *
      * @param string|float $value 1234567.43
      * @param string $currency USD|EUR|GBP|AUD etc.
-     * @param array $options before,after,places,thousands,decimails
+     * @param array $options before,after,places,thousands,decimals
      * @return string
      */
     public function currency($value, string $currency=null, array $options=[])
     {
         return Number::currency($value, $currency, $options);
     }
+    
     /**
     * Formats a percent number
     *
@@ -53,7 +54,7 @@ class NumberHelper extends Helper
     *  $number->decimal(1024.10101010,4); // 1,024.1010
     *
     * @param string|float $value 1234567.43
-    * @param string $currency USD|EUR|GBP|AUD etc.
+    * @param string $precision max number of decimal places to show
     * @param array $options before,after,places,thousands,decimails
     * @return string
     */
@@ -66,7 +67,7 @@ class NumberHelper extends Helper
      *
      * $number->format(1024.512); // 1,024.51
      *
-     * Options include:
+     * ## Options
      * before - something to be shown before
      * after - something to be added after
      * thousands - the thousands seperator

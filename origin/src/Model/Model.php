@@ -945,69 +945,63 @@ class Model
         // add keys if not set
         if ($option === true) {
             foreach ($this->associations() as $assocation) {
-                $associated = array_keys($this->{$assocation});
+                $associated = array_merge($associated, array_keys($this->{$assocation}));
             }
         }
         return $associated;
     }
 
     /**
-       * Save model data to database, hasAndBelongsToMany will also be saved.
-       *
-       * # Options
-       *
-       * The options array can be passed with the following keys:
-       *
-       * - validate: wether to validate data or not
-       * - callbacks: call the callbacks duing each stage.  You can also put only before or after
-       * - transaction: wether to save through a database transaction (default:true)
-       * - associated: default true. boolean or an array of associated data to save as well
-       *
-       * # Callbacks
-       *
-       * The following callbacks will called in this Model and enabled Behaviors
-       *
-       * - beforeValidate
-       * - afterValidate
-       * - beforeSave
-       * - afterSave
-       *
-       * @param entity $entity to save
-       * @param array  $options keys include:
-       *
-       * @return bool true or false
-       */
+     * Save model data to database, it can save one level of associations.
+     *
+     * ## Options
+     *
+     * The options array can be passed with the following keys:
+     *
+     * - validate: wether to validate data or not
+     * - callbacks: call the callbacks duing each stage.  You can also put only before or after
+     * - transaction: wether to save through a database transaction (default:true)
+     * - associated: default true. boolean or an array of associated data to save as well
+     *
+     * # Callbacks
+     *
+     * The following callbacks will called in this Model and enabled Behaviors
+     *
+     * - beforeValidate
+     * - afterValidate
+     * - beforeSave
+     * - afterSave
+     *
+     * @param entity $entity to save
+     * @param array  $options keys include:
+     *
+     * @return bool true or false
+     */
     public function save(Entity $data, $options = [])
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true,'associated'=>true];
        
-        // Normalize
-        $associated = [];
-        if (is_array($options['associated'])) {
-            $associated = $options['associated'];
-        }
-
-        if ($options['associated'] === true) {
-            foreach ($this->associations() as $assocation) {
-                $associated = array_keys($this->{$assocation});
-            }
-        }
-        $options['associated'] = $associated;
+        $options['associated'] =$this->normalizeAssociated($options['associated']);
     
         $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
             $this->begin();
         }
-       
+      
         $result = true;
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
-            if (!in_array($alias, $options['associated'])) {
+            $key = lcfirst($alias);
+            if (!in_array($alias, $options['associated']) or !$data->has($key)) {
                 continue;
             }
-            $key = lcfirst($alias);
-            if ($data->has($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
+
+            if (!$data->{$key} instanceof Entity) {
+                throw new InvalidArgumentException($key .' is not an instance of entity.');
+            }
+          
+            if ($data->{$key}->modified()) {
                 if (!$this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
                     break;
@@ -1016,7 +1010,7 @@ class Model
                 $data->$foreignKey = $this->{$alias}->id;
             }
         }
-
+    
         if ($result) {
             /**
              * This will save record and hasAndBelongsToMany records. This is because
@@ -1028,11 +1022,14 @@ class Model
 
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
-                if (!in_array($alias, $options['associated'])) {
+                $key = lcfirst($alias);
+                if (!in_array($alias, $options['associated']) or !$data->has($key)) {
                     continue;
                 }
-                $key = lcfirst($alias);
-                if ($data->has($key) and $data->{$key} instanceof Entity and $data->{$key}->modified()) {
+                if (!$data->{$key} instanceof Entity) {
+                    throw new InvalidArgumentException($key .' is not an instance of entity.');
+                }
+                if ($data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
 
@@ -1045,22 +1042,23 @@ class Model
 
             // Save hasMany
             foreach ($this->hasMany as $alias => $config) {
-                if (!in_array($alias, $options['associated'])) {
+                $key = Inflector::pluralize(lcfirst($alias));
+                if (!in_array($alias, $options['associated']) or !$data->has($key)) {
                     continue;
                 }
                 
-                $key = Inflector::pluralize(lcfirst($alias));
-               
-                if ($data->has($key)) {
-                    $foreignKey = $this->hasMany[$alias]['foreignKey'];
+                $foreignKey = $this->hasMany[$alias]['foreignKey'];
                     
-                    foreach ($data->get($key) as $record) {
-                        if ($record instanceof Entity and $record->modified()) {
-                            $record->$foreignKey = $data->{$this->primaryKey};
-                            if (!$this->{$alias}->save($record, $associatedOptions)) {
-                                $result = false;
-                                break;
-                            }
+                foreach ($data->get($key) as $record) {
+                    if (!$record instanceof Entity) {
+                        throw new InvalidArgumentException($key .' is not an instance of entity.');
+                    }
+
+                    if ($record->modified()) {
+                        $record->$foreignKey = $data->{$this->primaryKey};
+                        if (!$this->{$alias}->save($record, $associatedOptions)) {
+                            $result = false;
+                            break;
                         }
                     }
                 }
@@ -1818,6 +1816,7 @@ class Model
         }
         $options += ['name' => $this->alias,'associated'=>true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
+      
         $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->one($requestData, $options);
     }

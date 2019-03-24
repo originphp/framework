@@ -44,10 +44,18 @@ class FormHelper extends Helper
         'datetime' => ['div' => 'form-group', 'class' => 'form-control'], // Date time appended
       ),
       'templates' => array(
-        'button' => '<button type="{type}"{attributes}>{name}</button>',
-        'checkbox' => '<input type="checkbox" name="{name}" value="{value}"{attributes}>',
+        // Controls
+       /*/ Maybe going forward
+        @todo a possible solution to use only templates. Issue is shared clas without complications. That said
+        currently when I need soemthing different i use the text and then customise with classes. So maybe priority should be to setting control class.
+        e.g:
+        'textControl' => '<div class="form-group {class} text{required}">{before}<input type="text" name="{name}"{attributes}>{after}</div>',
+        */
         'control' => '<div class="{class} {type}{required}">{before}{content}{after}</div>',
         'controlError' => '<div class="{class} {type}{required} error">{before}{content}{after}{error}</div>',
+        // HTML
+        'button' => '<button type="{type}"{attributes}>{name}</button>',
+        'checkbox' => '<input type="checkbox" name="{name}" value="{value}"{attributes}>',
         'div' => '<div{attributes}>{content}</div>',
         'error' => '<div class="error-message">{content}</div>',
         'file' => '<input type="file" name="{name}"{attributes}>',

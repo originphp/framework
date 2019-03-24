@@ -565,6 +565,57 @@ echo $this->Form->button('save');
 echo $this->Form->button('cancel',['type'=>'button','onclick'=>'back();']);
 ```
 
+## Controls for Associated Data
+
+To create a form for associated data you use `model.fieldName` for `hasOne` and `belongsTo`, or `models.0.fieldName` for `hasMany` and `hasAndBelongsToMany`. Remember model names should be in lowercase.
+
+```php
+// Create for the Article Model
+echo $this->Form->create($article);
+
+// $article->title
+echo $this->Form->control('title');
+
+// $article->author->name - BelongsTo and HasOne
+echo $this->Form->control('author.name');
+
+// HasMany and HasAndBelongsToMany
+echo $this->Form->control('tags.0.name');
+echo $this->Form->control('comments.0.text');
+echo $this->Form->control('comments.1.text');
+```
+
+When the form is posted the request data will look like this:
+
+```php
+Array
+(
+    [title] => How to save associated data
+    [author] => Array
+        (
+            [name] => Jon Snow
+        )
+    [tags] => Array
+        (
+            [0] => Array
+                (
+                    [name] => New
+                )
+        )
+    [comments] => Array
+        (
+            [0] => Array
+                (
+                    [text] => This is my first comment
+                )
+            [1] => Array
+                (
+                    [text] => This is my second comment
+                )
+        )
+)
+```
+
 ## Templates and defaults
 
 ### Control Defaults
@@ -616,4 +667,128 @@ You can also change individual templates at runtime
 
 ```php
 $this->Form->templates(['error'=>'<div class="omg">{content}</div>']);
+```
+
+## Date Helper
+
+The date helper makes it easy to format dates, in your `AppController` setup the default timezone, and date formats (using PHP date function style formats), and the date helper will automatically format dates and times unless you tell it to use a different format. The date helper uses the Date utility.
+
+```php
+use Origin\Utility\Date;
+public function initialize(){
+     Date::locale([
+         'timezone' => 'UTC',
+         'date' => 'm/d/Y',
+         'datetime' => 'm/d/Y H:i',
+         'time' => 'H:i'
+         ]);
+}
+```
+
+From within your view you would use like this, it will automatically format the date/time/datetime depending upon the field type. The date helper assumes that the date in the database is stored in MySQL date/time formats. If you set the timezone to anything other than UTC, then the date utility will automatically convert times etc. Setting the timezone does not change the PHP script timezone, it is only used by the date utility.
+
+```php
+echo $this->Date->format($article->created); // From 2019-01-01 13:45:00 to 01/01/2019 13:45
+```
+
+If you want to format it a different way, you can do so. Time values will still be converted to local time if you set the timezone to anything other than UTC.
+
+```php
+echo $this->Date->format($article->created,'F jS Y'); // January 1st 2019
+```
+
+### Parsing
+
+The date formatter assumes that the dates that you are formatting are in MySQL format, e.g. Y-m-d H:i:s. You can use the Date utility to delocalize to convert to this format and timezone.
+
+This can be done in middleware, the controller or model. The simplest way is to use the model callbacks such as `beforeValidate` or `beforeSave`.
+
+```php
+use Origin\Utility\Date;
+$entity->created_date = Date::parseDatetime($entity->created_date); //31/01/2019 10:00 AM -> 2019-01-31 09:00:00
+```
+
+## Number Helper
+
+The number helper provides a number of useful functions, you can configure the defaults in your `AppController` like this:
+
+```php
+use Origin\Utility\Number;
+public function initialize(){
+    Number::locale([
+        'currency'=>'USD', // default currency
+        'thousands'=>',',
+        'decimals'=>'.',
+        'places'=>2
+        ]);
+}
+```
+
+Once you have this configured whenever you use the number helper it will format based upon those defaults
+unless you tell it otherwise.
+
+## Formating numbers
+
+```php
+$this->Number->format('123456789.123456789'); // 123,456,789.12
+$this->Number->format('123456789.123456789',['places'=>4]); //123,456,789.1235
+```
+
+Options for the number formatting are these, currency, decimal and percentage use the number formatter so you can also pass these options to those methods as well.
+
+- before: Adds text before the string
+- after: adds text after the string
+- thousands: the thousands separator
+- decimals: the decimals separator
+- places: how many decimal points to show
+
+### Formating Currencies
+
+To format a currency you can do it like this, if you don't supply a currency as the second argument then
+it will use your default currency.
+
+```php
+echo $this->Number->currency('1000000'); // $1,000,000.00
+echo $this->Number->currency('1000000','GBP'); //£1,000,000.00
+echo $this->Number->currency('1000','USD',['places'=>'per group']);
+```
+
+By default the number helper can work with USD, GBP, EUR, CAD, AUD,CHF AND JPY out of the box. But you can also add your own currencies.
+
+```php
+public function initialize(){
+    Number::addCurrency('CNY',['before'=>'¥','name'=>'Chinese Yuan']);
+}
+```
+
+Then from your view just supply the currency code as the second argument.
+
+```php
+echo $this->Number->currency('1000000', 'CNY'); // ¥1,000,000.00
+```
+
+### Formating Decimals
+
+```php
+echo $this->Number->decimal('100'); // 100.00
+echo $this->Number->decimal('100.1',3); // 100.100
+```
+
+## Formating Percentages
+
+On top the number options, when formating percentages there is an additional option which is `multiply`, this will multiply the result, this is handy when you have the result in decimal format.
+
+```php
+echo $this->Number->percent(50); // 50.00%
+echo $this->Number->percent(0.3333333333, 2, ['multiply'=>true]);// 33.33%
+```
+
+### Parsing
+
+The number formatter assumes that the numbers are do not have a thousands separator and the decimal point is
+`.`. You can delocalize the data in the middleware, the controller or model. The simplest way is to use the model callbacks such as `beforeValidate` or `beforeSave`.
+
+```php
+use Origin\Utility\Number;
+$user->balance = Number::parse($user->balance); //1.000,23 -> 1000.23
 ```

@@ -29,7 +29,7 @@ class DateHelper extends Helper
      *
      * @param string|null $dateString
      * @param string $format date function compatiable string e.g 'H:i:s'
-     * @return void
+     * @return string
      */
     public function format($dateString, string $format = null)
     {

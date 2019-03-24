@@ -59,12 +59,12 @@ class Marshaller
     }
 
     /**
-     * Standardize the options for associated data
+     * normalize the options for associated data
      *
      * @param array $array
      * @return array
      */
-    protected function standardizeAssociated(array $array) : array
+    protected function normalizeAssociated(array $array) : array
     {
         $result = [];
        
@@ -93,12 +93,13 @@ class Marshaller
     {
         $options += ['name' => null,'associated'=>[],'fields'=>[]];
 
-        $options['associated'] = $this->standardizeAssociated($options['associated']);
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
         
         $entity = new Entity([], $options);
 
         $properties = [];
+     
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property]) and is_array($value)) {
                 $alias = $property;
@@ -106,9 +107,10 @@ class Marshaller
                 if ($propertyMap[$property] === 'many') {
                     $alias = Inflector::singularize($alias);
                 }
+              
                 if (isset($options['associated'][$alias]['fields'])) {
                     $fields = $options['associated'][$alias]['fields'];
-                    unset($options['associated'][$alias]);
+                    unset($options['associated'][$alias]); // only go one level
                 }
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
                     'name'=>ucfirst($alias),
@@ -162,7 +164,7 @@ class Marshaller
         
         $entity->reset(); // reset modified
 
-        $options['associated'] = $this->standardizeAssociated($options['associated']);
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
 
         $properties = [];
