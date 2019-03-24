@@ -584,20 +584,22 @@ Logs are stored in `logs` and make it easy to debug and keep track of what is go
 
 Each line in the log includes the date, channel, type of message and the message itself.
 
-To get logger from the controller.
+To get logger from the controller (and from models,views, helpers, etc).
 
-```php 
+```php
 $logger = $this->logger();
 $logger->error('something has gone wrong');
 ```
+
 That will produce a line like this in the log:
+
 ```
 [2019-03-10 13:37:49] Controller ERROR: something has gone wrong.
 ```
 
 If you need to change the channel, you do that when calling the logger object.
 
-```php 
+```php
 public function index()
 {
     $logger = $this->logger('EmailsController');

@@ -25,44 +25,22 @@ namespace Origin\View;
 trait TemplateTrait
 {
     /**
-     * Sets templates or gets a template or all templates
+     * Sets or gets templates
      *
-     *  $allTemplates = $this->templates();
-     *  $inputTemplate = $this->templates('input');
-     *  $this->templates(['input'=>'<input class="form-control">']);
+     * $templates = $this->templates();
+     * $this->templates(['input'=>'<input class="form-control">']);
      *
-     * @param string|array|null $template
-     * @return bool|string|array
+     * @param array|null $templates
+     * @return array|bool
      */
-    public function templates($template = null)
+    public function templates($templates=null)
     {
-        if (is_array($template)) {
-            return $this->setTemplate($template);
+        if (is_array($templates)) {
+            return $this->templater()->set($templates);
         }
-        return $this->getTemplate($template);
+        return $this->templater()->get($templates);
     }
     
-    /**
-     * Sets a template or templates at runtime.
-     * @param array $array ['input'=>'<input class="form-control">'])
-     * @return void
-     */
-    public function setTemplate($template)
-    {
-        $this->templater()->set($template);
-    }
-
-    /**
-     * Gets a template at run time
-     *
-     * @param string $template
-     * @return string|null
-     */
-    public function getTemplate(string $template= null)
-    {
-        return $this->templater()->get($template);
-    }
-
     /**
     * Gets the templater object if it exists, or it will create one
     * if the templates key is a string, then it will fetch the default templates since they

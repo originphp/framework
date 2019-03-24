@@ -79,13 +79,19 @@ class ArticlesController extends AppController
 }
 ```
 
-You can also render views in a different directory, you just have to start the name with a forward slash
+You can also render views in a different directory, you just have to start the name with a forward slash.
 
 ```php
-$this->render('/Bookmarks/latest')
+$this->render('/Bookmarks/latest');
 ```
 
-For example if you called render from the articles controller, `latest` would be the same as `/Articles/latest`.
+For example, if you called render from the articles controller, `latest` would be the same as `/Articles/latest`.
+
+To render views from `Plugins`, you can use dot notation , followed by the view folder (controller name) and then the action.
+
+```php
+$this->render('MyPlugin.Contacts/index');
+```
 
 ## Rendering Options
 
@@ -359,6 +365,7 @@ Will output:
     <input type="text" name="name" class="form-control" id="name">
 </div>
 ```
+
 ### Form Control options
 
 The options for control allow you to change the default settings.
@@ -529,14 +536,13 @@ echo $this->Form->password('secret');
 <input type="password" name="secret">
 ```
 
-### Date, Datetime Time and Number 
+### Date, Datetime Time and Number
 
-These are just text elements and are place to give flexability, the control method will generate html through these based the field type in the database. You can hook these as you see fit, or change the default templates for them.
+These are just text elements and are place to give flexibility, the control method will generate html through these based the field type in the database. You can hook these as you see fit, or change the default templates for them.
 
 ## PostLinks
 
-To create a link which when clicked on sends a post request. This is used in the framework during code generation for delete
-links, this allows you to ask the user to confirm and make sure people don't call the url manually.
+To create a link which when clicked on sends a post request. This is used in the framework during code generation for delete links, this allows you to ask the user to confirm and make sure people don't call the url manually.
 
 ```php
 echo $this->Form->postLink('delete','/contacts/delete/1234',['confirm'=>'Are you sure you want to delete this?']);
@@ -559,4 +565,55 @@ echo $this->Form->button('save');
 echo $this->Form->button('cancel',['type'=>'button','onclick'=>'back();']);
 ```
 
+## Templates and defaults
+
+### Control Defaults
+
+OriginPHP uses bootstrap for its front end, and the defaults for each control are configured accordingly.
+If you need to change these you can do by calling `controlDefaults` from your within view.
+
+```php
+$this->Form->controlDefaults([
+    'text' => ['div' => 'form-group', 'class' => 'form-control']
+    ]);
+```
+
+Or if you want to change them across the whole app or a particular controller, then set the `controlDefaults` option when loading the helper.
+
+```php
+  $this->loadHelper('Form', [
+      'controlDefaults'=>[
+        'text' => ['div' => 'input-field']
+      ]
+      ]);
+```
+
 ### Templates
+
+Depending upon the front end framework you are using you might need to adjust the default templates, for example wrapping a control in another div or changing how the template for an error message.
+
+You can create a file in your `config`  which should return an array.
+
+For example create add `config/myform-templates.php`  the following code:
+
+```php
+return [
+    'control' => '<div class="row"><div class="{class} {type}{required}">{before}{content}{after}</div></div>',
+    'controlError' => '<div class="{class} {type}{required} error">{before}{content}{after}{error}</div>',
+    'error' => ' <span class="helper-text" data-error="wrong" data-success="right">{content}</span>'
+];
+```
+
+Then when loading the Form Helper set the templates option, this will replace the default ones with the onces that you have defined.
+
+```php
+$this->loadHelper('Form',[
+    'templates'=>'myform-templates'
+    ]);
+```
+
+You can also change individual templates at runtime
+
+```php
+$this->Form->templates(['error'=>'<div class="omg">{content}</div>']);
+```

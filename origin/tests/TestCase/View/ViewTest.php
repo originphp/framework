@@ -123,6 +123,12 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getViewFilename', ['/Rest/json']);
 
+        $expected = PLUGINS. '/make' .DS .'/View/Rest/json.ctp';
+        $view->setFile($expected); // Prevent exception
+        $result = $view->callMethod('getViewFilename', ['Make.MyControler/action']);
+
+
+
         $this->assertEquals($expected, $result);
     }
 

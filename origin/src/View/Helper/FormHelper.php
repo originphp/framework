@@ -105,11 +105,9 @@ class FormHelper extends Helper
     /**
      * Creates a form element
      *
-     * @todo how to edit many records, non entity
-     *
      * @param \Origin\Model\Entity|null $entity
-     * @param array $options
-     * @return void
+     * @param array $options type, url and html attributes
+     * @return string
      */
     public function create(Entity $entity = null, array $options = [])
     {
@@ -139,17 +137,31 @@ class FormHelper extends Helper
         unset($options['type'],$options['url']);
         $attributes += $options;
      
-        return $this->template('formStart', $attributes);
+        return $this->formatTemplate('formStart', $attributes);
     }
 
+    /**
+     * Creates a button, the default type is submit.
+     *
+     * @param string $name This is the text to be displayed on the button
+     * @param array $options  Set type = button or attributes
+     * @return void
+     */
     public function button(string $name, array $options = [])
     {
         $defaults = ['name' => $name, 'type' => 'submit'];
         $options = array_merge($defaults, $options);
 
-        return $this->template('button', $options);
+        return $this->formatTemplate('button', $options);
     }
 
+    /**
+     * Creates a checkbox
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options checked and/or html attributes
+     * @return string
+     */
     public function checkbox(string $name, array $options = [])
     {
         $options = array_merge(['hiddenField' => true], $options);
@@ -163,10 +175,10 @@ class FormHelper extends Helper
         $hiddenField = $options['hiddenField'];
         unset($options['hiddenField']);
 
-        $checkbox = $this->template('checkbox', $options);
+        $checkbox = $this->formatTemplate('checkbox', $options);
 
         if ($hiddenField) {
-            $hiddenField = $this->template('hidden', ['value' => 0, 'name' => $options['name']]);
+            $hiddenField = $this->formatTemplate('hidden', ['value' => 0, 'name' => $options['name']]);
             unset($options['hiddenField']);
 
             return $hiddenField . $checkbox;
@@ -242,7 +254,6 @@ class FormHelper extends Helper
         return $result;
     }
 
-
     /**
      * Creates a form control and wraps with a div and label
      *
@@ -250,8 +261,8 @@ class FormHelper extends Helper
      *
      * type - this is the type such as text, number,date,checkbox etc
      * label - this can be a string or an array with options passed to the label template
-     * before -
-     * after -
+     * before - text/html to be displayed before input
+     * after - text/html to be displayed after html
      *
      * @param string $name name, model.name or model.0.name
      * @param array  $options
@@ -263,6 +274,10 @@ class FormHelper extends Helper
 
         if (!isset($options['type'])) {
             $options['type'] = $this->detectType($name);
+        }
+        
+        if (!empty($options['options'])) {
+            $options['type'] = 'select';
         }
 
         if (isset($this->config['controlDefaults'][$options['type']])) {
@@ -326,7 +341,7 @@ class FormHelper extends Helper
                 $labelOptions['text'] = $label;
             }
 
-            $labelOutput = $this->template('label', $labelOptions);
+            $labelOutput = $this->formatTemplate('label', $labelOptions);
             unset($options['label']);
         }
 
@@ -344,13 +359,13 @@ class FormHelper extends Helper
                 $model = $entity->name();
                 if ($entity->errors($column)) {
                     foreach ($entity->errors($column) as $error) {
-                        $errorOutput .= $this->template('error', ['content' => $error]);
+                        $errorOutput .= $this->formatTemplate('error', ['content' => $error]);
                     }
                     $template = 'controlError';
                 }
             }
         }
-      
+     
         
         // Check if field is required to add required class
         $required = false;
@@ -378,7 +393,7 @@ class FormHelper extends Helper
             $options['required'] = ' required';
         }
 
-        return $this->template($template, $options + [
+        return $this->formatTemplate($template, $options + [
             'type' => $type,
             'before' => $before,
             'after' => $after,
@@ -394,56 +409,81 @@ class FormHelper extends Helper
 
         return $this->meta[$model]['requiredFields'];
     }
-
+    /**
+     * Creates a date input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function date(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
 
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
 
     /**
-     * The datetime widget
+     * Creates a datetime input
      *
-     * @param string $name
-     * @param array  $options
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
      */
     public function datetime(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
 
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
 
     /**
      * Creates a file input. Form create must be set to multipart/form-data.
      *
-     * @param string $name    field name
-     * @param array  $options array of options
-     *
+     * @param string $name Field name
+     * @param array  $options html attributes
      * @return string html
      */
     public function file(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
 
-        return $this->template('file', $options);
+        return $this->formatTemplate('file', $options);
     }
 
+    /**
+     * Creates a hidden input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function hidden(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
 
-        return $this->template('hidden', $options);
+        return $this->formatTemplate('hidden', $options);
     }
 
+    /**
+     * Close the form
+     *
+     * @return string
+     */
     public function end()
     {
-        return $this->template('formEnd');
+        return $this->formatTemplate('formEnd');
     }
 
+    /**
+     * Creates a label
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function label(string $name, string $text = null, array $options = [])
     {
         $options['name'] = $name;
@@ -453,45 +493,78 @@ class FormHelper extends Helper
         }
         $options['text'] = $text;
 
-        return $this->template('label', $options);
+        return $this->formatTemplate('label', $options);
     }
 
+    /**
+     * Creates a text input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function text(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
 
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
-
+    /**
+     * Creates a text area
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function textarea(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
 
-        return $this->template('textarea', $options);
+        return $this->formatTemplate('textarea', $options);
     }
-
+    /**
+     * Creates a time input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function time(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
          
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
 
+    /**
+     * Creates a number input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function number(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
 
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
 
+    /**
+     * Creates a password input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options Html attributes
+     * @return string
+     */
     public function password(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'password';
-        return $this->template('input', $options);
+        return $this->formatTemplate('input', $options);
     }
 
     /**
@@ -504,9 +577,9 @@ class FormHelper extends Helper
      * - confirm: a string message to confirm via the browser
      *
      * @param string $name
-     * @param [type] $url
-     * @param array $options
-     * @return void
+     * @param string|array $url
+     * @param array $options confirm message and html attrbutes
+     * @return string
      */
     public function postLink(string $name, $url, $options = [])
     {
@@ -526,23 +599,31 @@ class FormHelper extends Helper
           'action' => $url,
         ];
 
-        $output = $this->template('formStart', $attributes);
+        $output = $this->formatTemplate('formStart', $attributes);
         $output .= $this->hidden('_method', ['value' => strtoupper($attributes['method'])]);
         $options['text'] = $name;
 
         if (empty($options['confirm'])) {
-            $options['onclick'] = $this->template('onclick', ['name' => $form]);
+            $options['onclick'] = $this->formatTemplate('onclick', ['name' => $form]);
         } else {
-            $options['onclick'] = $this->template('onclickConfirm', ['name' => $form, 'message' => $options['confirm']]);
+            $options['onclick'] = $this->formatTemplate('onclickConfirm', ['name' => $form, 'message' => $options['confirm']]);
         }
         unset($options['confirm']);
 
-        $output .= $this->template('formEnd');
-        $output .= $this->template('postLink', $options);
+        $output .= $this->formatTemplate('formEnd');
+        $output .= $this->formatTemplate('postLink', $options);
 
         return $output;
     }
 
+    /**
+     * Creates a radio input
+     *
+     * @param string $name field_name, Model.field_name, Model.0.Field_name
+     * @param array $options array of key values for the options
+     * @param array $radioOptions Html attributes
+     * @return string
+     */
     public function radio(string $name, array $options = [], array $radioOptions = [])
     {
         $radioOptions['id'] = true;
@@ -565,8 +646,8 @@ class FormHelper extends Helper
             if ($key === $checked) {
                 $additionalOptions = ['checked'=>true];
             }
-            $radio = $this->template('radio', $radioOptions+$additionalOptions);
-            $output .= $this->template('label', ['name' => $radioOptions['id'], 'text' => $radio.$value]);
+            $radio = $this->formatTemplate('radio', $radioOptions+$additionalOptions);
+            $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $radio.$value]);
             if (isset($radioOptions['checked'])) {
                 unset($radioOptions['checked'],$radioOptions['value']);
             }
@@ -576,13 +657,16 @@ class FormHelper extends Helper
     }
 
     /**
-     * Select form element
-     *
-     * @param string $name
-     * @param array $options
-     * @param array $selectOptions empty,value
-     * @return void
-     */
+       * Creates a radio input
+       *
+       * ## Options
+       * - empty bool or message
+       *
+       * @param string $name field_name, Model.field_name, Model.0.Field_name
+       * @param array $options array of key values for select
+       * @param array $selectOptions Html attributes
+       * @return string
+       */
     public function select(string $name, array $options = [], array $selectOptions = [])
     {
         $selectOptions = $this->prepareOptions($name, $selectOptions);
@@ -600,9 +684,44 @@ class FormHelper extends Helper
             unset($selectOptions['value']);
         }
 
-        return $this->template('select', $selectOptions);
+        return $this->formatTemplate('select', $selectOptions);
     }
 
+    /**
+     * Set and gets control defaults.
+     *
+     * @param string|array|null $defaults Use string or null to get and array of defaults to set
+     * @return void
+     */
+    public function controlDefaults($defaults=null)
+    {
+        if ($defaults===null) {
+            return $this->config['controlDefaults'];
+        }
+        if (is_string($defaults)) {
+            if (isset($this->config['controlDefaults'][$defaults])) {
+                return $this->config['controlDefaults'][$defaults];
+            }
+            return null;
+        }
+        foreach ($defaults as $key => $value) {
+            $this->config['controlDefaults'][$key] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Renders an error template
+     *
+     * @param string $message
+     * @param array $options
+     * @return string
+     */
+    public function error(string $message, array $options=[])
+    {
+        return $this->formatTemplate('error', ['content'=>$message]);
+    }
+    
     private function buildSelectOptions(array $options, array $selectOptions = [])
     {
         $output = '';
@@ -768,9 +887,9 @@ class FormHelper extends Helper
         return 'text';
     }
 
-    protected function template(string $name, array $options = [])
+    protected function formatTemplate(string $name, array $options = [])
     {
-        $template = $this->getTemplate($name);
+        $template = $this->templates($name);
 
         if (empty($options)) {
             return $template;
