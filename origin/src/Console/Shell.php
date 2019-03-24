@@ -12,6 +12,9 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * @todo a way to display errors without throwing exceptions .e.g invalid argument
+  */
 namespace Origin\Console;
 
 use Origin\Console\ConsoleInput;

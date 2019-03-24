@@ -131,7 +131,7 @@ class GenerateTask extends Task
     {
         $fields = $this->schema[$model];
         foreach ($fields as $field => $schema) {
-            if (substr($field, -3) === '_id' and isset($schema['key']) and $schema['key'] !== 'primary') {
+            if (substr($field, -3) === '_id' and empty($schema['key'])) {
                 $associatedModel = Inflector::camelize(substr($field, 0, -3));
                 $associations[$model]['belongsTo'][] = $associatedModel;
             }
@@ -155,7 +155,7 @@ class GenerateTask extends Task
             $schema = $this->schema[$otherModel];
             $foreignKey = Inflector::underscore($model) . '_id';
        
-            if (isset($schema[$foreignKey]) and isset($schema[$foreignKey]['key']) and $schema[$foreignKey]['key'] !== 'primary') {
+            if (isset($schema[$foreignKey]) and empty($schema['key'])) {
                 $associations[$model]['hasMany'][] = $otherModel;
             }
         }
