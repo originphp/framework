@@ -114,17 +114,20 @@ class ObjectRegistry
      * @param array $options
      * @return mixed
      */
-    public function load(string $name, array $options = array())
+    public function load(string $name, array $options = [])
     {
         if (isset($this->loaded[$name])) {
             return $this->loaded[$name];
         }
+        $options += ['enable'=>true];
 
         $object = $this->create($name, $options);
 
         $this->set($name, $object);
 
-        $this->enable($name);
+        if ($options['enable']) {
+            $this->enable($name);
+        }
 
         return $object;
     }

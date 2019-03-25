@@ -62,7 +62,7 @@ class Component
     {
         list($plugin, $component) = pluginSplit($name);
         if (!isset($this->_components[$component])) {
-            $this->_components[$component] =  array_merge(['className' => $name . 'Component'], $config);
+            $this->_components[$component] =  array_merge(['className' => $name . 'Component','enable'=>false], $config);
         }
     }
 

@@ -151,7 +151,7 @@ class AuthComponent extends Component
      *
      * @param Entity $user
      */
-    public function setUser(Entity $user)
+    public function login(Entity $user)
     {
         $this->Session = $this->Session;
         $this->Session->write('Auth.User', $user->toArray());

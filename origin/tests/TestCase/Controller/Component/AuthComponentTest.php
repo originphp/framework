@@ -180,17 +180,17 @@ class AuthComponentTest extends OriginTestCase
         $this->assertEquals($expected, $AuthComponent->callMethod('getCredentials'));
     }
 
-    public function testSetUser()
+    public function testlogin()
     {
         $data = ['username'=>'fred@smith.com','password'=>1234];
         $entity = new Entity($data);
-        $this->AuthComponent->setUser($entity);
+        $this->AuthComponent->login($entity);
    
         $this->assertEquals($data, $this->AuthComponent->Session->read('Auth.User'));
     }
 
     /**
-     * @depends testSetUser
+     * @depends testlogin
      *
      * @return void
      */
@@ -198,7 +198,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $data = ['username'=>'fred@smith.com','password'=>1234,'date'=>'2019-02-07'];
         $entity = new Entity($data);
-        $this->AuthComponent->setUser($entity);
+        $this->AuthComponent->login($entity);
         $this->assertEquals($data, $this->AuthComponent->user());
         $this->assertEquals('fred@smith.com', $this->AuthComponent->user('username'));
         $this->assertNull($this->AuthComponent->user('foo'));

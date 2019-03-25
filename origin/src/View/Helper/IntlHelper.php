@@ -81,7 +81,7 @@ class Intl extends Helper
      *
      * @return string 1,234.56
      */
-    public function format(float $value, array $options = [])
+    public function number(float $value, array $options = [])
     {
         return Number::format($value, $options);
     }
