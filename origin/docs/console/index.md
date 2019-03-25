@@ -6,40 +6,131 @@ It is easy to build console applications, use can be for cron jobs, running comp
 
 Shells are stored in the `Console` folder of your app. Here is an example of a simple shell
 
-````php
+```php
 namespace App\Console;
 
 use Origin\Console\Shell;
 
 class HelloShell extends Shell
 {
-    /**
-     * This will be called if no other args are put after the shell name
-     */
-    public function main(){
-
-    }
-
-    public function world()
+    public function run()
     {
         return $this->out('Hello world!'); // Outputs to screen
     }
-
 }
-````
-From within your project directory type `bin/console hello` to run the main method
-or `bin/console hello world` run the world method.
+```
+
+From within your project folder
+
+```linux
+bin/console hello run
+```
+
+You can also set a main method, which will be run by default if no command is supplied. Note: You cannot use 
 
 You can get additional arguments by checking out the args variable in the shell.
 
-`print_r($this->args)`
+```php
+print_r($this->args()); // or use pr() 
+```
+
+## Display Help
+
+To display help for your commands, this is displayed when no arguments are called from the command line, configure this 
+in the initialize method.
+
+
+```php
+ public function initialize()
+    {
+        $this->addCommand('purge', ['help'=>'Purges the temporary files']);
+    }
+```
+
+## Option parsing
+
+Sometimes you need to accept parameters from your console.
+
+Lets say you wanted to accept a dryRun option.
+
+```linux
+bin/console database clean --dryRun
+```
+
+To do so you need to configure this in your initialize method, at the same time you put the help text which will be displayed
+when the shell is called with no arguments.
+
+```php
+    public function initialize()
+    {
+        $this->addOption('dryRun', [
+            'help'=>'To simulate it being run no data is modified'
+            ]);
+    }
+```
+
+Which then can be accessed like this, these type of options will set the param as true.
+
+```php
+if($this->params('dryRun')){
+    ..
+}
+```
+
+Sometimes you might want to give a short name which is then accessed with a single dash , for example `-d`
+
+```php
+    public function initialize()
+    {
+        $this->addOption('dryRun', [
+            'help'=>'To simulate it being run no data is modified','short'=>'d'
+            ]);
+    }
+```
+
+If you need to take an input from the user then it will be done like this from the console.
+
+```linux
+bin/console database clean --datasource=test_database
+```
+
+To configure this, you set a value option with a slight description, this will appear in the help.
+
+```php
+    public function initialize()
+    {
+        $this->addOption('datasource', [
+            'help'=>'Name of the connection use','value'=>'name'
+            ]);
+    }
+```
+
+
+```php
+$connection = $this->params('datasource');
+```
+
+## Displaying Help
+
+When you create a console, in the initialize setup the commands which people can run this will then generate help
+when it is asked.
+
+```php
+    public function initialize()
+    {
+        $this->addCommand('generate', ['help'=>'Generates the config\schema\\table.php file or file']);
+        $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
+        $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
+        $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
+        $this->loadTask('Status');
+    }
+```
 
 ## Callbacks
 
-
 There are three callbacks which a Shell use `initialize`,`startup` and `shutdown`;
 
-````php
+```php
     /**
      * This is called when the shell is created during the construct.
      */
@@ -54,23 +145,28 @@ There are three callbacks which a Shell use `initialize`,`startup` and `shutdown
      * This is called after the shell method
      */
     public function shutdown(){}
-````
+```
 
 ## Methods
 
-### Shell::out(string $message)
+### out
 
 This outputs text to the console
 
-### Shell::in(string $prompt,array $options=[],string $default)
+```php
+$this->out('Hello world!');
+```
 
-Ask the user for input.
+### in
 
-`$selection = $this->in('Do you want to continue', ['yes','no'], 'yes');`
+The in method prompts the user for input, you can also supply a default option if they press return (without entering anything).
 
-Will show the user, with the default option being yes. The default option is triggered when the user presses enter without
-entering any text.
+```php
+$answer = $this->in('Do you want to continue', ['yes','no'], 'yes');
+```
 
-````
-Do you want to continue (yes/no) [yes]
-````
+This will output:
+
+```
+Do you want to continue? (yes/no) [yes]
+```

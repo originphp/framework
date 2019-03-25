@@ -286,10 +286,10 @@ To load a stylesheet located on the web.
 echo $this->Html->css('https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
 ```
 
-And to load a stylesheet from a plugin folder.
+And to load a stylesheet from a plugin folder, you must also provide the controller name.
 
 ```php
-echo $this->Html->css('MyPlugin.bootstrap.css');
+echo $this->Html->css('MyPlugin.Controller/bootstrap.css');
 ```
 
 ### Images
@@ -298,7 +298,7 @@ You can easily add images to your view, you must provide an extension and if the
 
 ```php
 echo $this->Html->img('spinner.png');
-echo $this->Html->img('/somewherelse/images/spinner.gif');
+echo $this->Html->img('/somewherelse/images/spinner.gif'); // from public folder
 ```
 
 ## Elements
@@ -699,7 +699,7 @@ echo $this->Date->format($article->created,'F jS Y'); // January 1st 2019
 
 ### Parsing
 
-The date formatter assumes that the dates that you are formatting are in MySQL format, e.g. Y-m-d H:i:s. You can use the Date utility to delocalize to convert to this format and timezone.
+The date formatter assumes that the dates that you are formatting are in MySQL format, e.g. Y-m-d H:i:s. You can use the Date utility to delocalize user submitted data to convert to this format and timezone.
 
 This can be done in middleware, the controller or model. The simplest way is to use the model callbacks such as `beforeValidate` or `beforeSave`.
 
@@ -786,7 +786,7 @@ echo $this->Number->percent(0.3333333333, 2, ['multiply'=>true]);// 33.33%
 ### Parsing
 
 The number formatter assumes that the numbers are do not have a thousands separator and the decimal point is
-`.`. You can delocalize the data in the middleware, the controller or model. The simplest way is to use the model callbacks such as `beforeValidate` or `beforeSave`.
+`.`. You can delocalize the user inputted data in the middleware, the controller or model. The simplest way is to use the model callbacks such as `beforeValidate` or `beforeSave`.
 
 ```php
 use Origin\Utility\Number;

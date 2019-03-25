@@ -12,6 +12,7 @@ Once the configuration is out the way, using the cache is pretty straightforward
 In all these examples,we are only configuring the default configuration, you can set different configuration names instead of default. When you use the caching functions the default configuration is used by default unless you say otherwise.
 
 ### File
+
 ```php
 Cache::config('default', [
     'engine' => 'File',
@@ -19,6 +20,7 @@ Cache::config('default', [
     'prefix' => 'cache_'
      ]);
 ```
+
 ### Apcu
 
 ```php
@@ -32,6 +34,7 @@ Cache::config('default', [
 ### Memcached
 
 This is a simple configuration for using Memcached.
+
 ```php
 Cache::config('default', [
         'engine' => 'Memcached',
@@ -41,7 +44,9 @@ Cache::config('default', [
         'prefix' => 'cache_'
      ]);
 ```
+
 If your Memcached server is configured with username and password then
+
 ```php
 Cache::config('default', [
         'engine' => 'Memcached',
@@ -53,20 +58,25 @@ Cache::config('default', [
         'prefix' => 'cache_'
      ]);
 ```
+
 If you are going to use socket then instead of setting host and port, then set the `path` key with the location
 of the socket.
+
 ```php
 Cache::config('default', [
          'engine' => 'Memcached',
         'path' => '/var/sockets/memcached',
      ]);
 ```
+
 You can also make connections persistent by setting the `persistent` key to true, or a string which will be the persistent id.
 
 Memcached supports server pools, if you are going to use them then set an array using the `servers` key instead of host and port. The array should be compatabile with [memcached addservers](http://php.net/manual/en/memcached.addservers.php).
 
 ### Redis
+
 This is a simple configuration for using Redis.
+
 ```php
 Cache::config('default', [
         'engine' => 'Redis',
@@ -77,7 +87,9 @@ Cache::config('default', [
         'prefix' => 'cache_'
      ]);
 ```
+
 If your Redis server is configured with a password then
+
 ```php
 Cache::config('default', [
         'engine' => 'Redis',
@@ -88,14 +100,17 @@ Cache::config('default', [
         'prefix' => 'cache_'
      ]);
 ```
+
 If you are going to use socket then instead of setting host and port, then set the `path` key with the location
 of the socket.
+
 ```php
 Cache::config('default', [
         'engine' => 'Redis',
         'path' => '/var/sockets/redis',
      ]);
 ```
+
 You can also make connections persistent by setting the `persistent` key to true, or a string which will be the persistent id.
 
 ```php
@@ -164,8 +179,10 @@ $value = Cache::read('key','long-duration');
 ```
 
 ### Check
+
 In most cases using read is good enough, however if you are going to store a boolean result in the cache, then
 check will tell you if the key exists. This is handy if the result is false.
+
 ```php
 Use Origin\Cache\Cache;
 
@@ -173,12 +190,12 @@ if(Cache::check('key')){
     $bool = Cache::read('key);
 }
 ```
+
 To use a different configuration
 
 ```php
 $result = Cache::check('key','long-duration');
 ```
-
 
 ### Delete
 
@@ -205,13 +222,14 @@ Cache::clear('long-duration');
 
 ### Enabling and disabling the cache
 
-Sometimes you will need to disable the cache, when you do we use the NullEngine and your program can
+Sometimes you will need to disable the cache, when you disable we switch the engine to the `NullEngine` and your program can
 work as normal.
 
 ```php
 Cache::disable();
 Cache::enable();
 ```
+
 ## Installing Cache Engines
 
 The command line instructions have been tested with Ubuntu 18.x.

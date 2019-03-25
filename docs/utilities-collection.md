@@ -1,6 +1,6 @@
 # Collections
 
-You can create a collection using arrays or the results such as from a find all (which is a object called collection, but its not the same).
+You can create a collection using arrays or the results such as from a find all (which is a different type of collection, `Origin\Model\Collection`.
 
 To create a collection:
 
@@ -14,6 +14,7 @@ There is also a a helper function which you can use.
 ```php
     $collection = collection($array);
 ```
+
 ## Collections
 
 After you have finished manipulating the data you can use `toArray` or `toList` to convert the collection. Some methods return a boolean (e.g. every) or number (e.g median, average etc.), however most will return a new collection, which then can be chained through other methods.

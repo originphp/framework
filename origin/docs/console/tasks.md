@@ -6,7 +6,7 @@ Tasks are a way to share code between your shells. When you create a task, you c
 
 Create the task file in the `Console\Task` folder.
 
-````php
+```php
 
 namespace App\Console\Task;
 use Origin\Console\Task;
@@ -22,12 +22,13 @@ class MathTask extends Task
   }
 }
 
-````
+```
+
 ## Loading Tasks
 
 To load a task
 
-````php
+```php
   class WidgetsShell extends AppShell
   {
     public function initialize(array $config)
@@ -37,12 +38,13 @@ To load a task
     }
   }
 
-````
+```
+
 ## Using Tasks
 
  To use a task, you call it from within your shell methods.
 
-````php
+```php
     class WidgetsShell extends AppShell
     {
       public function doSomething(){
@@ -50,11 +52,11 @@ To load a task
       }
     }
 
-````
+```
 
 If you want to use a task within a task then call the `loadTask` method.
 
-````php
+```php
 
 class MathTask extends Task
 {
@@ -64,10 +66,11 @@ class MathTask extends Task
     }
 }
 
-````
+```
+
 or use the `loadTasks` method to load many
 
-````php
+```php
 
 class MathTask extends Task
 {
@@ -77,13 +80,13 @@ class MathTask extends Task
     }
 }
 
-````
+```
 
-## Callbacks 
+## Callbacks
 
 There are three callbacks which Tasks use `initialize`,`startup` and `shutdown`;
 
-````php
+```php
 
     /**
      * This is called when task is loaded for the first time
@@ -99,20 +102,15 @@ There are three callbacks which Tasks use `initialize`,`startup` and `shutdown`;
      * This is called after the shell method but before the shell shutdown
      */
     public function shutdown(){}
-````
+```
 
 ## Methods
 
-### Task::shell()
+### shell
 
 This returns the controller that loaded the task. This is useful if you need to do something with a controller from within your task.
 
-
-### Task::loadTask(string $name,array $config=[])
+### loadTask
 
 Tells the lazy loader that you will be using another Task within this task. Once you do this you can
-access the task using `$this->AnotherTask->method()`; 
-
-### Task::loadTasks(array $names)
-
-Loads multiple tasks using the `loadTask` method.
+access the task using `$this->AnotherTask->method()`.

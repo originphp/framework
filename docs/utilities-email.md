@@ -4,7 +4,7 @@ The email class enables you to send emails easily through SMTP.
 
 You setup your email accounts in your `config/email.php` we have created a template for you, just rename the file and fill your details.
 
-````php
+```php
 use Origin\Utility\Email;
 
 Email::config(
@@ -17,7 +17,7 @@ Email::config(
         'tls' => false
         ]
     );
-````
+```
 
 The keys for the config are as follows:
 
@@ -34,20 +34,18 @@ You can also pass keys such as `from`,`to`,`cc`,`bcc`,`sender` and `replyTo` thi
 
 For example
 
-````php
+```php
     [
         'from' => 'james@originphp.com'
         'bcc' => ['someone@origin.php', 'Someone']
     ]
-````
+```
 
 If a config for `default` is found this will be used unless you specify something else with the `account`.
 
-
-
 To send a text email (default) it would look like this:
 
-````php
+```php
 use Origin\Utility\Email;
 
     $Email = new Email();
@@ -57,11 +55,11 @@ use Origin\Utility\Email;
         ->textMessage('This is the text content')
     $Email->send();
 
-````
+```
 
 To send a HTML email  (if you are going to send HTML you should send both, see below)
 
-````php
+```php
 use Origin\Utility\Email;
 
     $Email = new Email();
@@ -72,11 +70,11 @@ use Origin\Utility\Email;
         ->format('html');
     $Email->send();
 
-````
+```
 
 To send both HTML and text
 
-````php
+```php
 use Origin\Utility\Email;
 
     $Email = new Email();
@@ -88,11 +86,11 @@ use Origin\Utility\Email;
         ->format('both');
         $Email->send();
 
-````
+```
 
 To change the email account (accounts are setup using the Email::config() usually in the config/email.php)
 
-````php
+```php
 use Origin\Utility\Email;
 
     $Email = new Email();
@@ -103,11 +101,11 @@ use Origin\Utility\Email;
         ->account('gmail');
     $Email->send();
 
-````
+```
 
 You can also setup the config during the creation of the Email object.
 
-````php
+```php
 use Origin\Utility\Email;
     $config = [ 
         'host' => 'ssl://smtp.gmail.com',
@@ -118,12 +116,12 @@ use Origin\Utility\Email;
     $Email = new Email($config);
     
 
-````
+```
 
 
 To add attachments
 
-````php
+```php
 use Origin\Utility\Email;
 
     $Email = new Email();
@@ -135,13 +133,13 @@ use Origin\Utility\Email;
         ->addAttachment($filename2,'Logo.png');
     $Email->send();
 
-````
+```
 
 To use templates
 
 Templates are stored in the `View/Email` folder, use the template method to set the name and use the set method to send variables to the templates.
 
-````php
+```php
     use Origin\Utility\Email;
     $Email = new Email();
     $Email->to('somebody@originphp.com')
@@ -151,19 +149,19 @@ Templates are stored in the `View/Email` folder, use the template method to set 
         ->set(['first_name'=>'Frank'])
         ->format('both')
     $Email->send();
-````
+```
 
 Here is how you use variables in the email templates:
 
-````php
+```php
 // View/Email/html/welcome.ctp
 <p>Hi <?= $first_name ?></p>
 <p>How is your day so far?</p>
-````
+```
 
 The template method also accepts plugin syntax, so to load a template from a plugin  folder just add the plugin name followed by a dot then the template name.
 
-````php
+```php
 use Origin\Utility\Email;
 
 
@@ -175,4 +173,4 @@ use Origin\Utility\Email;
         ->format('both')
     $Email->send();
 
-````
+```

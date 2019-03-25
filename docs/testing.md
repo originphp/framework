@@ -8,22 +8,22 @@ The first thing to do is to create a test database, and setup the test database 
 
 To create the database and user you can use the following MySQL.
 
-````sql
+```sql
     CREATE DATABASE app_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     GRANT ALL ON app_test.* TO 'somebody' IDENTIFIED BY 'secret';
     FLUSH PRIVILEGES;
-````
+```
 
 In your `config/database.php` add database config.
 
-````php
+```php
     ConnectionManager::config('test', array(
     'host' => 'db', // Docker is db, or localhost or Ip address
     'database' => 'app_test',
     'username' => 'somebody',
     'password' => 'secret',
     ));
-````
+```
 
 ### Conventions
 
@@ -41,7 +41,7 @@ When you create the test files, the filename should end with `Test.php` and they
 
 You will create a test case class like this, defining the fixtures that you will use in testing (including models that are used by other models etc).
 
-````php
+```php
 namespace App\Test\TestCase\Model;
 
 use Origin\TestSuite\OriginTestCase;
@@ -64,14 +64,13 @@ class BookmarkTest extends OriginTestCase
 
 }
 
-````
+```
 
 If you are want to load a fixture from a plugin, then add the plugin name with the dot notation to list, e.g. `MyPlugin.Bookmark`.
 
 Create the fixtures in the `tests\Fixture` folder. You are most likely going to be testing existing models, so we can import the schema easily.
 
-
-````php
+```php
 namespace App\Test\Fixture;
 
 use Origin\TestSuite\Fixture;
@@ -81,11 +80,11 @@ class ArticleFixture extends Fixture
     public $import = ['model' =>'Article']
 }
 
-````
+```
 
 To set some test data set the `records` property.
 
-````php
+```php
 namespace App\Test\Fixture;
 
 use Origin\TestSuite\Fixture;
@@ -121,11 +120,11 @@ class ArticleFixture extends Fixture
          ),
      );
 }
-````
+```
 
 Sometimes you will want to use dynamic data, in this case you will modify the data using the `initialize` method.
 
-````php
+```php
     public function initialize() {
         $this->records = array(
             array(
@@ -140,13 +139,13 @@ Sometimes you will want to use dynamic data, in this case you will modify the da
         parent::initialize(); // always call parent
     }
 
-````
+```
 
-You can also manually specify the field data, the type field represents our own internal mapping, should we decide to add support PostgreSQL or other drivers later.
+You can also manually specify the field data, the type field represents our own internal mapping, which will help in future should we decide to integrate with other databases.
 
 Here is an example:
 
-````php
+```php
 namespace App\Test\Fixture;
 
 use Origin\TestSuite\Fixture;
@@ -171,9 +170,9 @@ class ArticleFixture extends Fixture
      );
 }
 
-````
+```
 
-You can generate the schema from your existing database using the SchemaShell using the following command:
+You can generate the schema from your existing database using the `SchemaShell` using the following command:
 
 `bin/console schema generate`
 
@@ -181,18 +180,19 @@ This will create a folder in your config folder, called schema with a PHP file f
 you make changes, but you will need to update the fixture file separately. 
 When you are first developing your app, using the import method makes the most sense, since it will just your current database at all times. As you start to get into beta and production, you can code the field data into the fixtures - but it is up to you.
 
-### Mocking Models 
+### Mocking Models
 
 To mock models extend your Test case by either `TestCase` or `ControllerTestCase` and then call the `getMockForModel` method. When the Model is mocked, we also add this to model registry. Remember if use the `tearDown` method in your test case, then call `parent::tearDown()`;
 
-`getMockForModel(string $alias, array $methods=[],array $options=[])`
+To get a mock model with the find method stubbed.
 
-- *alias* name of model 
-- *methods* array of methods to mock
-- *options* options to be passed to constructor, you can also pass the class name of the model using
-`className`
+```php
+$mock = $this->getMockForModel('Bookmark',['find']);
+```
 
-````php
+You can also pass an array of options, which are passed to the model constructor such as className etc.
+
+```php
 
 class BookmarkTest extends OriginTestCase
 {
@@ -209,13 +209,13 @@ class BookmarkTest extends OriginTestCase
 
 }
 
-````
+```
 
 ## Testing Private or Protected Methods or Properties
 
-There will be times you will want to test that protected or private methods or property, we have included a `TestTrait` to make this very easy.  There is a big debate on whether this should be done or just test the public methods and properties. I think it should be down to the specific case, for example if you look at our Email test, i wanted more control and each method to have its own test, I find this easier to write ,manage and maintain. 
+There will be times you will want to test that protected or private methods or property, we have included a `TestTrait` to make this very easy.  There is a big debate on whether this should be done or just test the public methods and properties. I think it should be down to the specific case, for example if you look at our Email test, I wanted more control and each method to have its own test, I find this easier to write, manage and maintain.
 
-````php
+```php
     public function testFrom()
     {
         $Email = new MockEmail();
@@ -230,11 +230,11 @@ There will be times you will want to test that protected or private methods or p
         $property = $Email->getProperty('from'); # TestTrait
         $this->assertEquals(['james@originphp.com','James'], $property);
     }
-````
+```
 
 An example of how you might use this:
 
-````php
+```php
 
 use Origin\TestSuite\TestTrait;
 
@@ -248,33 +248,40 @@ class BookmarkTest extends OriginTestCase
     }
 }
 
-````
+```
 
 There are 3 functions in the `TestTrait`
 
-### callMethod(string $method,$args...)
+### Call Method
 
-This will call a any method, private or protected .
+This will call a any method, private or protected, the second argument is an array of arguments that will be used
+when calling the method.
 
 For example:
 
-`$result = $this->callMethod('doSomething',$user, $password,...)`
+```php
+$result = $this->callMethod('doSomething',[$user,$password])
+```
 
-### getProperty(string $name)
+### Get Property
 
 This will get any property of the object
 
 For example:
 
-`$id = $this->getProperty('id')`
+```php
+$result = $this->getProperty('id');
+```
 
-### setProperty(string $name)
+### Set Property
 
 This will set any property of the object
 
 For example:
 
-`$this->setProperty('id',1234)`
+```php
+$result = $this->setProperty('id',1234);
+```
 
 # Testing Controllers
 
@@ -282,52 +289,68 @@ In the past testing controllers required quite a bit of code, however we have op
 
 In your controller test case add the `IntegrationTestTrait`
 
-````php
-
+```php
 use Origin\TestSuite\IntegrationTestTrait;
-
 class BookmarksControllerTest extends OriginTestCase
 {
     use IntegrationTestTrait;
-
     public function testIndex(){
         $this->get('/bookmarks/index');
         $this->assertResponseOk();
         $this->assertResponseContains('<h2>Bookmarks</h2>');
     }
 }
-
-````
+```
 
 ## Testing requests
+
 You can test various requests
 
-### get(string $url)
+### Get
 
 This will GET the url (get request)
 
-`$this->get('/bookmarks/index');`
+```php
+$this->get('/bookmarks/index');
+```
 
-### post(string $url,array $data)
+### Post
 
-This will post DATA to the url (post request)
+This will send a POST request using an array of data
 
-`$this->post('/bookmarks/index',['title'=>'bookmark name']);`
+```php
+$this->post('/bookmarks/index',['title'=>'bookmark name']);
+```
 
-### delete(string $url)
+### Delete
 
 This will send a DELETE request
 
-`$this->delete('/bookmarks/delete/1234');`
+```php
+$this->delete('/bookmarks/delete/1234');
+```
 
 You can also send PUT and PATCH requests.
 
-### put(string $url,array $data)
+### Put
+
+To send a request as a PUT request
+
+```php
+$this->put('/bookmarks/index',['title'=>'bookmark name']);
+```
+
 ### patch(string $url,array $data)
+
+To send a request as a PATCH request
+
+```php
+$this->patch('/bookmarks/index',['title'=>'bookmark name']);
+```
 
 ## Custom Assertations
 
-````php
+```php
 
 // Checks that response is 2xx
 $this->assertResponseOk();
@@ -371,41 +394,43 @@ $this->assertRedirectNotContains('/users/login');
 $this->assertHeaderContains('Content-Type', 'application/pdf');
 $this->assertHeaderNotContains('Cache-Control', 'no-cache, must-revalidate');
 
-````
-
+```
 
 ## Other methods
 
-### session(array $data)
+### Session
 
 Write data to session for the next request, one example is to test applications that require to be logged in.
 
-````php
+```php
     $this->session(['Auth.User.id' =>1000]);
-````
+```
 
-### header(string $header,string $value)
+### Header
 
 Set headers for the next request
 
-````php
+```php
     $this->header('PHP_AUTH_USER','james@originphp.com');
     $this->header('PHP_AUTH_PW','secret');
-````
+```
 
-### env(string $key , string $value)
+### ENV
 
 Sets server enviroment $_SERVER
 
-````php
+```php
     $this->env('HTTP_ACCEPT_LANGUAGE','en');
-````
+```
 
 ### controller()
+
 Returns the controller from the last request
 
 ### request()
+
 Returns the request object from the last request
 
 ### response()
+
 Returns the response object from the last request
