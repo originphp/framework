@@ -610,6 +610,7 @@ class FormHelper extends Helper
         $output = $this->formatTemplate('formStart', $attributes);
         $output .= $this->hidden('_method', ['value' => strtoupper($attributes['method'])]);
         $options['text'] = $name;
+        unset($options['method']);
 
         if (empty($options['confirm'])) {
             $options['onclick'] = $this->formatTemplate('onclick', ['name' => $form]);

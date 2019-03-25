@@ -86,7 +86,7 @@ trait IntegrationTestTrait
      * Sends a post request
      *
      * @param string $url
-     * @param array $data
+     * @param array $data data to send as post
      * @return void
      */
     public function post(string $url, array $data = [])
@@ -108,7 +108,7 @@ trait IntegrationTestTrait
      * Sends a PATCH request
      *
      * @param string $url
-     * @param array $data
+     * @param array $data array of data to send as patch request
      * @return void
      */
     public function patch(string $url, array $data = [])
@@ -120,7 +120,7 @@ trait IntegrationTestTrait
      * Sends a PUT request
      *
      * @param string $url
-     * @param array $data
+     * @param array $data array of data to send as put request
      * @return void
      */
     public function put(string $url, array $data = [])

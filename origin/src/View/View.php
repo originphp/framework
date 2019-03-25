@@ -251,21 +251,20 @@ class View
     protected function getViewFilename(string $name)
     {
         $path = $this->getViewPath() . DS ;
-        if ($name[0] === '/' or strpos($name, '.')!==false) {
+
+        if ($name[0] === '/') {
             $path = $this->getViewPath(false); // get without controller folder
-        }
-        
-        if (strpos($name, '.')) {
+        } elseif (strpos($name, '.')!==false) {
             list($plugin, $name) = explode('.', $name);
-            $path  .= '/'; // Add trailing
+            $path = PLUGINS . DS . Inflector::underscore($plugin) . '/src/View/';
         }
-       
+         
         $filename = $path .  $name . '.ctp';
        
         if ($this->fileExists($filename)) {
             return $filename;
         }
-   
+        pr([$name,$filename]);
         throw new MissingViewException([$this->name, $name]);
     }
 

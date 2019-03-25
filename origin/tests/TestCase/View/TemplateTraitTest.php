@@ -43,6 +43,6 @@ class TemplateTraitTest extends \PHPUnit\Framework\TestCase
         $object->config('templates', 'templates-test');
  
         $this->assertInstanceOf(Templater::class, $object->templater());
-        $this->assertEquals('<p>{text}</p>', $object->getTemplate('text'));
+        $this->assertEquals('<p>{text}</p>', $object->templates('text'));
     }
 }
