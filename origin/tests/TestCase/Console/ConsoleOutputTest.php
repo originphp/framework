@@ -57,19 +57,13 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
         $this->assertEquals("\033[33mhello world\033[0m", stream_get_contents($stream));
-
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->write('<primary>hello world</primary>');
-        $stream = $ConsoleOutput->getStream();
-        rewind($stream);
-        $this->assertEquals("\033[97;44;1mhello world\033[0m", stream_get_contents($stream));
     }
 
     public function testStyles()
     {
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $this->assertEquals($ConsoleOutput->getStyles(), $ConsoleOutput->styles());
-        $this->assertEquals(array('text' => 'white','background'=>'blue','bold' => true), $ConsoleOutput->styles('primary'));
+        $this->assertEquals(['text' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('error'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
