@@ -21,11 +21,14 @@ class MathComponent extends Component
     $result = $controller->method('xyz');
   }
 }
-
 ```
+
+After a component is created the component `initialize` method will be called, this is where you can put any code
+that you need to be executed when a component is created. This is a hook so you don't need to override the `___construct()`.
+
 ## Loading Components
 
-To load a component from the controller, you should place this in the initialize method so the the callbacks can be executed.
+To load a component in the controller, you call `loadComponent` from within the `initialize` method so the the callbacks can be executed.
 
 ```php
   class WidgetsController extends AppController
@@ -53,7 +56,7 @@ To load a component from the controller, you should place this in the initialize
 
 ```
 
-If you want to use a component within a component then you call the `loadComponent` method, the component will then be lazy loaded when you next call it.
+If you want to use a component within a component then you call the `loadComponent` method, the component will then be lazy loaded when you next call it. When you load a component within a component, this component will not have callbacks executed unless the component is already loaded in a controller.
 
 ```php
 class MathComponent extends Component
@@ -65,10 +68,7 @@ class MathComponent extends Component
 }
 ```
 
-## Initialize
 
-After a component is created the `initialize` method will be called, this is where you can put any code
-that you need to be executed when a component is created. This is a hook so you don't need to override the `___construct()`.
 
 ## Callbacks
 

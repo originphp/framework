@@ -6,19 +6,27 @@ You can also customise the templates, and then save them for future projects.
 
 The first thing to do is setup your database and config.
 
-Run the console command (this is a shell script in the bin folder)
+Run the console command (this is a shell script in the bin folder) and this will show the options that are available to you.
 
-`bin/console generate` and this will show the options that are available to you.
+```
+linux bin/console generate
+```
 
 So lets you are creating a contact app, and you have a `contacts` table setup
 
 We will need to create the Model, View and Controller (MVC);
 
-`bin/console generate controller Contacts`
+```linux
+bin/console generate controller Contacts
+```
 
-`bin/console generate model Contact`
+```linux
+bin/console generate model Contact
+```
 
-`bin/console generate view Contacts`
+```linux
+bin/console generate view Contacts
+```
 
 This will generate the following views
 - `/contacts/add` 
@@ -28,7 +36,9 @@ This will generate the following views
 
 You can also generate the Model,View,Controller (MVC) in one go
 
-`bin/console generate all Contact`
+```linux
+bin/console generate all Contact
+```
 
 If all went ok then you should be able to access your contacts app by `http://localhost:8000/contacts`
 
@@ -37,13 +47,13 @@ modify your html there, wrap up stuff in divs, add classes and then make the cod
 
 There are number of vars which are used, and in most cases you wont even need to use these as you will modifying the html structure in the templates.
 
-`%model%` - BookmarksTag
-`%controller%` - BookmarksTags
-`%singularName%` - bookmarksTag
-`%pluralName%` - bookmarksTags
-`%singularHuman%` - Bookmarks Tag
-`%pluralHuman%` - Bookmarks Tags
-`%singularHumanLower%` - bookmarks tag
-`%pluralHumanLower%` - bookmarks tags
-`%controllerUnderscored%` - bookmarks_tags
-`%primaryKey%` - id
+- `%model%` e.g. BookmarksTag
+- `%controller%` e.g. BookmarksTags
+- `%singularName%` e.g. bookmarksTag
+- `%pluralName%` e.g. bookmarksTags
+- `%singularHuman%` e.g. Bookmarks Tag
+- `%pluralHuman%` e.g. Bookmarks Tags
+- `%singularHumanLower%` e.g. bookmarks tag
+- `%pluralHumanLower%` e.g. bookmarks tags
+- `%controllerUnderscored%` e.g. bookmarks_tags
+- `%primaryKey%` e.g. id

@@ -157,6 +157,8 @@ Array
 */
 ```
 
+See the [routing guide](router.md) for more information on routing setup.
+
 ## Components
 
 Components are objects which can be shared between controllers. The framework comes with a number of components and you can also build your own. To load helpers call the `loadComponent` method in the `initialize` method of your controller.
@@ -514,6 +516,7 @@ $type = $this->response->type();
 ```php
 $this->response->type('application/vnd.ms-powerpoint');
 ```
+
 ### File Downloads
 
 Sometimes you will need to send a file which is different from rendering a page. You can also force it to download the file
@@ -625,3 +628,49 @@ You can call the following logging methods on the Logger object:
 | critical          | Critical conditions or events.                                                                    |
 | alert             | Actions that must be taken immediately.                                                           |
 | emergency         | The system is unusable.                                                                           |
+
+
+## Paginating Records
+
+When you are displaying multiple records to users, you will want paginate them, this is done in the background using the `PaginationComponent` and the `PaginationHelper`.
+
+From the controller action that you want use pagination, call the controller method `paginate` this will load the component and helper, and paginate the records for you.
+
+
+````php 
+class BookmarksController extends AppController
+{
+    // Default pagination settings to be used by all actions
+    public $paginate = [
+        'limit' => 20,
+    ];
+
+    function index(){
+         $this->set('bookmarks', $this->paginate('Bookmark'));
+    }
+}
+````
+
+By default it will look at the default pagination settings in the controller paginate attribute. But you can also pass settings through the paginate method.
+
+You can pass an array with the following keys, which are the same as used in Models.
+
+- **fields**: is an array of fields that you want to return in the query
+- **order**: is either a string or an array of how you want the data to be ordered.
+- **group**: is for the database group query results.
+- **limit**: this sets how many rows are returned.
+- **callbacks**: If this is set to true, before or after then it will call the model callbacks.
+- **contain**: An array of models that you want to load associated data for. You can also pass the model as key and array of config, e.g ['Tag'=>['fields'=>$field,'conditions'=>$conditions]]
+- **joins**:  An array of join settings to join a table.
+
+```php
+    $settings = [
+         'joins' =  [
+            [
+                'table' => 'authors',
+                'alias' => 'Author',
+                'type' => 'LEFT', 
+                'conditions' => [ 'Author.id = Article.author_id']
+            ]
+    ];
+```

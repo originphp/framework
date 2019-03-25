@@ -122,7 +122,6 @@ when it is asked.
         $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
         $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
         $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
-        $this->loadTask('Status');
     }
 ```
 
@@ -170,3 +169,30 @@ This will output:
 ```
 Do you want to continue? (yes/no) [yes]
 ```
+
+## Shell Tasks
+
+Shells also have tasks, similar to components which are used by controllers. Tasks allow you to share functionality between your shells.
+
+For more information see the [Tasks Guide](tasks.md).
+
+
+## Running Shells as Cron Jobs
+
+Many applications will need to run cron jobs on scripts, these can be to clean the database, send out emails, carry out tasks etc. You can run your shell scripts through cron by editing the cron file.
+
+On Ubunu or other Debian based flavors of unix use the crontab command.
+
+````linux
+    sudo crontab -u www-data -e
+````
+
+For Redhat or Redhat base distributions edit the `/etc/crontab` file, although at the time of writing Redhat does not officially support Php 7.0.
+
+To setup a cron to run the send_emails method in the users shell once each day
+
+````
+0 1 * * * cd /var/www/project && bin/console users send_emails
+````
+
+For help with cron schedule expressions, see [cron guru](https://crontab.guru).

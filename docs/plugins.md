@@ -30,8 +30,8 @@ The plugin name in load should be `CamelCase`, but the folder should be `undersc
 
 If you did not use the generate plugin then follow these steps.
 
-
 ## Setup Routing
+
 Then you will need to setup the routing (if you are going to use). In your plugin folder create `config/routes.php` and add:
 
 ```php
@@ -43,6 +43,7 @@ Router::add('/contact_manager/:controller/:action/*', ['plugin'=>'ContactManager
 ## Create AppController
 
 Create `ContactManagerAppController.php` in the `plugins/contact_manager/src/Controller` folder.
+
 ```php
 <?php 
 namespace ContactManager\Controller;
