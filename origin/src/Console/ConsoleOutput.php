@@ -24,7 +24,7 @@ class ConsoleOutput
     protected $stream = null;
 
 
-    protected $foregroundColors = array(
+    protected $foregroundColors = [
         'default' => 39,
         'black' => 30,
         'red' => 31,
@@ -42,10 +42,9 @@ class ConsoleOutput
         'lightMagenta' => 95,
         'lightCyan' => 96,
         'white' => 97
+    ];
 
-    );
-
-    protected $backgroundColors = array(
+    protected $backgroundColors = [
         'default' => 49,
         'black' => 40,
         'red' => 41,
@@ -63,31 +62,34 @@ class ConsoleOutput
         'lightMagenta' => 105,
         'lightCyan' => 106,
         'white' => 107
-    );
+    ];
 
-    protected $options = array(
+    protected $options = [
         'reset' => 0, // reset all
         'bold' => 1,
         'underline' => 4,
         'blink' => 5,
         'reverse' => 7,
-    );
+    ];
 
-    protected $styles = array(
-      'primary' => array('text' => 'white','background'=>'blue','bold' => true),
-      'success' => array('text' =>'white', 'background' => 'green','bold' => true),
-      'danger' => array('text' => 'white','background'=>'red','bold' => true),
-      'info' => array('text' => 'white','background' => 'cyan','bold' => true),
-      'warning' => array('text' => 'white','background' => 'yellow','bold' => true),
-      'prompt' => array('text' => 'cyan'),
-      'green' => array('text' => 'green'),
-      'blue' => array('text' => 'blue'),
-      'yellow' => array('text' => 'yellow'),
-      'red' => array('text' => 'red'),
-      'white' => array('text' => 'white'),
-      'magenta' => array('text'=>'magenta'),
-      'cyan' => array('text'=>'cyan')
-    );
+    protected $styles = [
+        'debug' => ['text'=>'cyan'],
+        'info' => ['text' => 'yellow'],
+        'notice' => ['text' => 'blue'],
+        'warning' => ['text' => 'yellow'],
+        'error' => ['text' => 'white','background'=>'lightRed'],
+        'critical' => ['text' => 'white','background'=>'lightRed'],
+        'alert' => ['text' => 'white','background'=>'lightRed'],
+        'prompt' => ['text' => 'blue'],
+        'notice' => ['text' => 'blue'],
+        'green' => ['text' => 'green'],
+        'blue' => ['text' => 'blue'],
+        'yellow' => ['text' => 'yellow'],
+        'red' => ['text' => 'red'],
+        'white' => ['text' => 'white'],
+        'magenta' => ['text'=>'magenta'],
+        'cyan' => ['text'=>'cyan']
+    ];
 
 
     /**
@@ -170,7 +172,7 @@ class ConsoleOutput
             }
         }
      
-        return "\033[" . implode($ansi, ';') . 'm' . $text . "\033[0m";
+        return "\033[" . implode(';', $ansi) . 'm' . $text . "\033[0m";
     }
 
     /**
