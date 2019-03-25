@@ -12,9 +12,6 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * @todo a way to display errors without throwing exceptions .e.g invalid argument
-  */
 namespace Origin\Console;
 
 use Origin\Console\ConsoleInput;
@@ -27,7 +24,6 @@ use ReflectionClass;
 use ReflectionMethod;
 
 use Origin\Model\Exception\MissingModelException;
-use Origin\Exception\Exception;
 
 class Shell
 {
@@ -81,17 +77,30 @@ class Shell
       * @param \Origin\Console\ConsoleInput $consoleInput
      * @return void
      */
-    public function __construct(array $arguments =[], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
+    public function __construct(ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
         $this->output = $consoleOutput;
         $this->input = $consoleInput;
 
         list($namespace, $this->name) = namespaceSplit(get_class($this));
-     
+        
         $this->taskRegistry = new TaskRegistry($this);
+    }
 
+    /**
+     * Runs the command on this shell, this is called by the shellDispatcher
+     *
+     * @param string $name
+     * @param array $args
+     * @return void
+     */
+    public function runCommand(string $name, array $args)
+    {
         $this->initialize();
-        $this->parseArguments($arguments);
+        $this->parseArguments($args);
+        $this->startupProcess();
+        $this->{$name}();
+        $this->shutdownProcess();
     }
 
     /**
@@ -113,7 +122,7 @@ class Shell
                 $map[$option['short']] = $option['name'];
             }
         }
-    
+ 
         foreach ($arguments as $arg) {
             if ($arg[0] !== '-') {
                 $this->args[] = $arg;
@@ -131,13 +140,13 @@ class Shell
                 }
             }
             if (!empty($this->options[$param]['value']) and strpos($param, '=') === false) {
-                throw new Exception('Argument error' . $arg);
+                $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
             }
             if (strpos($param, '=') !== false) {
                 list($param, $value) = explode('=', $param);
             }
             if (!isset($this->options[$param])) {
-                throw new Exception('Invalid argument ' . $arg);
+                $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
             }
             $this->params[$param] = $value;
         }
@@ -360,7 +369,7 @@ class Shell
      * Adds an available option
      *
      * @param string $name
-     * @param array $options
+     * @param array $options Options include help:help text short: short option e.g -ds
      * @return void
      */
     public function addOption(string $name, array $options=[])
@@ -411,5 +420,20 @@ class Shell
             }
             $this->out('');
         }
+    }
+
+    /**
+     * Styles an error message and then exits the script
+     *
+     * @param string $message
+     * @return void
+     */
+    public function error(string $title, string $message=null)
+    {
+        $this->out("<error> ERROR: </error> <yellow>{$title}</yellow>");
+        if ($message) {
+            $this->out('<white>' . $message . '</white>');
+        }
+        exit(-1);
     }
 }

@@ -25,7 +25,7 @@ class TaskRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->Shell = new Shell([], new ConsoleOutput(), new ConsoleInput());
+        $this->Shell = new Shell(new ConsoleOutput(), new ConsoleInput());
     }
     public function testLoad()
     {

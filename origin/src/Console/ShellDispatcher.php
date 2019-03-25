@@ -98,13 +98,7 @@ class ShellDispatcher
         }
     }
 
-    /**
-     * Dispatches the request base on the shell name
-     *
-     * @param string $shell shell_name or Plugin.shell_name
-     * @return void
-     */
-    protected function dispatch(string $shell)
+    protected function getClass(string $shell)
     {
         list($plugin, $class) = pluginSplit($shell);
         $base = '';
@@ -133,47 +127,43 @@ class ShellDispatcher
             $base = Inflector::camelize($plugin) .'\Console\\';
         }
 
-        $class = Inflector::camelize($class) . 'Shell';
- 
-        if (!class_exists($base . $class)) {
-            throw new MissingShellException($base . $class);
-        }
+        return $base . Inflector::camelize($class) . 'Shell';
+    }
 
-        $className = $base . $class;
-    
+    /**
+     * Dispatches the request base on the shell name
+     *
+     * @param string $shell shell_name or Plugin.shell_name
+     * @return void
+     */
+    protected function dispatch(string $shell)
+    {
+        $className = $this->getClass($shell);
+        if (!class_exists($className)) {
+            throw new MissingShellException($className);
+        }
+        $shell = new $className($this->output, new ConsoleInput());
+
+        $method = null;
         if ($this->args) {
             $method = array_shift($this->args);
+        }
+        // main
+        if ($method === null) {
+            $method = 'help';
+            if (method_exists($shell, 'main')) {
+                $method = 'main';
+            }
         } else {
-            // Generate helpscreen
-            $shell = new $className($this->args, $this->output, new ConsoleInput());
-            $shell->help();
-            return $shell;
+            if (!$shell->isAccessible($method)) {
+                throw new MissingShellMethodException([$className,$method]);
+            }
         }
 
-        $object = $this->buildShell($className, $method);
-
-        return $this->invoke($object, $method);
-    }
-    /**
-     * Create the ShellObject and check that method exists and is not private
-     * or protected
-     *
-     * @param string $class
-     * @param string $method
-     * @return Shell
-     */
-    protected function buildShell(string $class, string $method)
-    {
-        $shell = new $class($this->args, $this->output, new ConsoleInput());
-        if (!method_exists($shell, $method)) {
-            throw new MissingShellMethodException([$class,$method]);
-        }
-        if (!$shell->isAccessible($method)) {
-            throw new MissingShellMethodException([$class,$method]);
-        }
+        $shell->runCommand($method, $this->args);
         return $shell;
     }
-
+   
     /**
      * Gets a list of available shells
      *
@@ -215,21 +205,5 @@ class ShellDispatcher
         }
         
         return $result;
-    }
-    
-    /**
-     * Invokes the shell method and starts the startup and shutdown processes which
-     * trigger callbacks
-     *
-     * @param Shell $shell
-     * @param string $method
-     * @return void
-     */
-    protected function invoke(Shell $shell, string $method)
-    {
-        $shell->startupProcess();
-        $shell->{$method}();
-        $shell->shutdownProcess();
-        return $shell;
     }
 }

@@ -25,7 +25,7 @@ class MockShell extends Shell
 {
     public function initialize()
     {
-        $this->addCommand('foo');
+        $this->addCommand('dummy');
         $this->addOption('bar');
         $this->addOption('foo', ['value'=>'name']);
     }
@@ -36,6 +36,10 @@ class MockShell extends Shell
     {
     }
     private function privateMethod()
+    {
+    }
+
+    public function dummy()
     {
     }
 }
@@ -84,9 +88,13 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     public function testConstruct()
     {
         $arguments = ['foo','--bar','--foo=setting'];
-        $shell = new MockShell($arguments, $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell(new ConsoleOutput(), $this->ConsoleInput);
+
         $this->assertNotEmpty($shell->taskRegistry());
         $this->assertInstanceOf('Origin\Console\Task\TaskRegistry', $shell->taskRegistry());
+
+        $shell->runCommand('dummy', $arguments);
+
         $this->assertEquals('MockShell', $shell->name);
         $this->assertEquals(['foo'], $shell->args);
         $this->assertEquals(['bar'=>true,'foo'=>'setting'], $shell->params);
@@ -95,7 +103,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     {
         $mockModel = new MockModel();
         ModelRegistry::set('MockModel', $mockModel);
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
         // Test load from Registry
         $this->assertEquals($mockModel, $shell->loadModel('MockModel'));
 
@@ -108,7 +116,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadTask()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
         $mockTask = new MockTask($shell);
         $shell->taskRegistry()->set('MockTask', $mockTask);
         $shell->loadTask('MockTask');
@@ -120,7 +128,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
      */
     public function testCallbacks()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
         $mockTask = new MockTask($shell);
 
         $shell->taskRegistry()->set('MockTask', $mockTask);
@@ -135,7 +143,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
     public function testOut()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
         $shell->out('Hello World!');
         $this->assertEquals("Hello World!\n", file_get_contents(TMP . DS . 'shelltest.txt'));
     }
@@ -145,19 +153,19 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         // Test result
         $ConsoleInput = new DummyConsoleInput();
         $ConsoleInput->setResult('y');
-        $shell = new MockShell(array(), $this->ConsoleOutput, $ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $ConsoleInput);
         $result = $shell->in('Enter a something', ['y','n']);
         $this->assertEquals('y', $result);
 
         // Test default
         $ConsoleInput->setResult('');
-        $shell = new MockShell(array(), $this->ConsoleOutput, $ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $ConsoleInput);
         $result = $shell->in('Enter a something', ['y','n'], 'n');
         $this->assertEquals('n', $result);
     }
     public function testIsAccessible()
     {
-        $shell = new MockShell(array(), $this->ConsoleOutput, $this->ConsoleInput);
+        $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
         $this->assertTrue($shell->isAccessible('publicMethod'));
         $this->assertFalse($shell->isAccessible('initialize'));
         $this->assertFalse($shell->isAccessible('protectedMethod'));

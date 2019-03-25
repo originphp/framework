@@ -33,7 +33,7 @@ class StatusTaskTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->Shell = new Shell([], new ConsoleOutput('php://memory'), new ConsoleInput());
+        $this->Shell = new Shell(new ConsoleOutput('php://memory'), new ConsoleInput());
         $this->StatusTask = new MockStatusTask($this->Shell);
     }
 

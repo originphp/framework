@@ -48,7 +48,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->MockShell = new MockShell([], new MockConsoleOutput('php://memory'), new ConsoleInput());
+        $this->MockShell = new MockShell(new MockConsoleOutput('php://memory'), new ConsoleInput());
         $this->MockTask = new MockTask($this->MockShell);
     }
     public function testConstruct()
