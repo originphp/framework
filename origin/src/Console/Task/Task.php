@@ -75,7 +75,7 @@ class Task
     public function loadTask(string $name, array $config = [])
     {
         list($plugin, $task) = pluginSplit($name); // split so we can name properly
-        $config = array_merge(['className' => $name . 'Task'], $config);
+        $config = array_merge(['className' => $name . 'Task','enable'=>false], $config);
         $this->_tasks[$task] = $config;
     }
 
