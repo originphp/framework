@@ -19,66 +19,7 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
-### Fixed
-- Plugin folder loading
-- Plugin view path bug
-- Validation required bug fix
-- FileEngine cache
-- NullCache engine name
-- Issue with error folder in lower case (not picked up in docker)
-- Auth scope fixed
-- Bookmarks edit tags not listed
-- Bookmarks not validating URL
-- Fixed Make plugin related list issue and back button
-- Bookmarks creating null tags
-- Plugin config folder path moved so its consistent with rest of framework
 
-### Added
-- params,data, args query and dynamic data getting.
-- Entity Toxml and toJson
-- Cookie object
-- Option to disable I18N date/number parsing
-- Cache system (Redis,Memcached,File,Apcu,Array and Null)
-- Logger Object
-- Queue System
-- Basic console options parsing
-- Queue System for background jobs
-- Marshalling now has option to disable parsing of date/datetime/numbers etc
-- Debug function
-- Make plugin now creates PHPUnit xml configuration file
-- Added Collection documentation
-- setError,getError functions in Entity and refactored use of errors
-- Bookmarks demo tags
-- Templater now works with dot notation
-
-### Changed
-- Cleaned up and simplyfied requests and data etc
-- getting associated data from find has been changed from with to assoicated and now matches up with saving.
-- Save now saves associated data
-- new and patch now have whitelist and associated now has to be specified
-- Entity changed hasProperty to has. 
-- Models now return collections for all 
-- Changed session from static to object and refactored. Now session is available from request.
-- Renamed controller startup/shutdown to before/after filter
-- Changed make plugin to generate
-- Changed webroot to public
-- Changed configure has to check
-- Changed Utils folder to Utility
-- Removed irrelvant keys from schema generate
-- Changed location of schema files from config, to config/schema
-- backtrace() now works properly in CLI
-- Improved documentation
-- adjusted PR function to only show when debug is set
-- TestApp is now completely independent, tests modified as well.
-- Changed some public methods to protected or private
-- Moved Collections to Utils
-- Make controller delete action template changed to use object->id
-
+## [1.0.0-beta] - 2019-03-26
 ### Removed
-- Parsing of I18n dates, numbers. Dates are a problem since the form helper works fine, but no solution for date picker, and there are sometimes issues with parsing invalid dates, returning wrong but valid dates. I don't think it  can be relied upon, and validating before parsing each date is going to be complicated. Some sort of hacking is required.
-- CookieComponent
-- Log Class
-- Deleted composer.lock
-- unused code in Entity and View
-
-## [1.0.0-beta] - 2019-xx-xx
+- Reset changelog since there were too many changes going from alpha to beta to prevent confusion.
