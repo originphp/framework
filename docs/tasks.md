@@ -1,6 +1,6 @@
 # Tasks
 
-Tasks are a way to share code between your shells. When you create a task, you can use other tasks within the task and access the current shell.
+In your console apps you can use tasks to break up or share code with or console apps.
 
 ## Creating a Task
 

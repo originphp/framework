@@ -113,7 +113,6 @@ class ErrorHandler
         
         $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
        
-
         // Code Preview
         if (isset($stackFrames[0]['file'])) {
             $this->out("<cyan>". $this->shortenPath($stackFrames[0]['file'])."</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");

@@ -290,6 +290,7 @@ In the past testing controllers required quite a bit of code, however we have op
 In your controller test case add the `IntegrationTestTrait`
 
 ```php
+use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\IntegrationTestTrait;
 class BookmarksControllerTest extends OriginTestCase
 {
@@ -434,3 +435,52 @@ Returns the request object from the last request
 ### response()
 
 Returns the response object from the last request
+
+## Testing Console Shell Scripts
+
+Like controllers there is a console integration test trait which makes testing a breeze.
+
+```php
+use Origin\TestSuite\OriginTestCase;
+use Origin\TestSuite\ConsoleIntegrationTestTrait;
+use Origin\TestSuite\TestTrait;
+
+class CronShellTest extends OriginTestCase
+{
+    use ConsoleIntegrationTestTrait;
+    use TestTrait;
+
+    public function testCronDaily()
+    {
+        $this->exec('cron daily'); // the same bin/console cron daily
+        $this->assertExitSuccess();
+        $this->assertOutputContains('nothing to run');
+    }
+
+}
+
+```
+
+### Custom Assertations
+
+Lets look at the assertations.
+
+```php
+
+$this->assertExitSuccess(); // Asserts that the script was run without any problems
+$this->assertExitError(); //Asserts that an error was encounterd. Shell::error() was called
+
+$this->assertOutputContains('needle'); // checks that the output contains a string
+$this->assertOutputEmpty(); // asserts there was no output
+
+$this->assertErrorContains('needle'); // Checks the error message contains a string
+
+```
+
+### Accessing the shell
+
+If you need to access the shell
+
+```php
+$shell = $this->shell();
+```

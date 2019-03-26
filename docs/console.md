@@ -26,7 +26,7 @@ From within your project folder
 bin/console hello run
 ```
 
-You can also set a main method, which will be run by default if no command is supplied. Note: You cannot use 
+You can also set a main method, which will be run by default if no command is supplied.
 
 You can get additional arguments by checking out the args variable in the shell.
 

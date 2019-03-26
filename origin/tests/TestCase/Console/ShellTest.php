@@ -95,7 +95,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 
         $shell->runCommand('dummy', $arguments);
 
-        $this->assertEquals('MockShell', $shell->name);
+        $this->assertEquals('Mock', $shell->name);
         $this->assertEquals(['foo'], $shell->args);
         $this->assertEquals(['bar'=>true,'foo'=>'setting'], $shell->params);
     }

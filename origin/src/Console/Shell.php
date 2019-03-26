@@ -14,12 +14,16 @@
 
 namespace Origin\Console;
 
+use Origin\Console\Exception\StopExecutionException;
+
+use Origin\Console\Exception\ConsoleException;
+
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\TaskRegistry;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Logger;
-
+use Origin\Core\Inflector;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -30,7 +34,7 @@ class Shell
     /**
      * Name of this shell
      *
-     * @var [string
+     * @var string
      */
     public $name = null;
 
@@ -40,7 +44,6 @@ class Shell
      * @var \Origin\Console\Task\TaskRegistry
      */
     protected $taskRegistry = null;
-
 
     /**
      * Holds the console Output Object
@@ -70,6 +73,29 @@ class Shell
     public $params = [];
 
     /**
+     * Holds the description for this shell. This is displayed
+     * during help.
+     *
+     * @var string
+     */
+    public $description = '';
+
+    /**
+     * Holds the options for this shell
+     */
+
+    public $options = [
+        'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
+    ];
+
+    /**
+     * Holds the commands for this shell
+     *
+     * @var array
+     */
+    public $commands = [];
+
+    /**
      * Inject request and response
      *
      * @param array $arguments
@@ -82,7 +108,7 @@ class Shell
         $this->output = $consoleOutput;
         $this->input = $consoleInput;
 
-        list($namespace, $this->name) = namespaceSplit(get_class($this));
+        list($namespace, $this->name) = namespaceSplit(str_replace('Shell', '', get_class($this)));
         
         $this->taskRegistry = new TaskRegistry($this);
     }
@@ -116,6 +142,7 @@ class Shell
     protected function parseArguments(array $arguments)
     {
         $map = [];
+    
         // Create map for shorts
         foreach ($this->options as $option) {
             if ($option['short']) {
@@ -197,7 +224,7 @@ class Shell
     /**
      * Reads input from the console, use for prompts
      *
-     * @param string $prompt what
+     * @param string $prompt The question to ask
      * @param array $options ['yes','no']
      * @param string $default default value if user presses enter
      * @return void
@@ -362,9 +389,6 @@ class Shell
         return null;
     }
 
-    public $options = [];
-    public $commands = [];
-
     /**
      * Adds an available option
      *
@@ -393,11 +417,15 @@ class Shell
 
     public function help()
     {
-        $this->out('<yellow>Usage:</yellow>');
-        $this->out('  <white>command [options] [arguments]</white>');
+        if ($this->description) {
+            $this->out($this->description);
+            $this->out('');
+        }
+        $this->out('<info>Usage:</info>');
+        $this->out('  <comment> command [options] [arguments]</comment>');
         $this->out('');
         if ($this->options) {
-            $this->out('<yellow>Options:</yellow>');
+            $this->out('<info>Options:</info>');
             foreach ($this->options as $option) {
                 $value = '';
                 if (!empty($option['value'])) {
@@ -408,15 +436,16 @@ class Shell
                 if ($option['short']) {
                     $text = '-'. $option['short'] . ', ' . $text;
                 }
-                $this->out('  <white>' . $text . "</white>  <green>".$option['help'].'</green>');
+                $this->out('  <white>' . $text . "</white> ".$option['help']);
             }
             $this->out('');
         }
         if ($this->commands) {
-            $this->out('<yellow>Available Commands:</yellow>');
+            $this->out('<info>Available Commands:</info>');
             $this->out('');
+            
             foreach ($this->commands as $command) {
-                $this->out("<white>{$command['name']}</white>  <green>{$command['help']}</green>");
+                $this->out("<comment>{$command['name']}</comment> {$command['help']}");
             }
             $this->out('');
         }
@@ -430,10 +459,18 @@ class Shell
      */
     public function error(string $title, string $message=null)
     {
-        $this->out("<error> ERROR: </error> <yellow>{$title}</yellow>");
-        if ($message) {
-            $this->out('<white>' . $message . '</white>');
-        }
-        exit(-1);
+        $this->output->error($title, $message);
+        $this->stop($title);
+    }
+
+    /**
+     * Wrapper for exiting the shell script
+     *
+     * @param [type] $status
+     * @return void
+     */
+    protected function stop(string $title='Console stopped')
+    {
+        throw new StopExecutionException($title);
     }
 }

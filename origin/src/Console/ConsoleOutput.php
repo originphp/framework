@@ -23,7 +23,6 @@ class ConsoleOutput
      */
     protected $stream = null;
 
-
     protected $foregroundColors = [
         'default' => 39,
         'black' => 30,
@@ -74,14 +73,15 @@ class ConsoleOutput
 
     protected $styles = [
         'debug' => ['text'=>'cyan'],
-        'info' => ['text' => 'yellow'],
+        'info' => ['text' => 'lightYellow'],
         'notice' => ['text' => 'blue'],
         'warning' => ['text' => 'yellow'],
         'error' => ['text' => 'white','background'=>'lightRed'],
         'critical' => ['text' => 'white','background'=>'lightRed'],
         'alert' => ['text' => 'white','background'=>'lightRed'],
+        'success' => ['text' => 'white','background'=>'lightBlue'],
+        'comment' => ['text' => 'white'], // optional text
         'prompt' => ['text' => 'blue'],
-        'notice' => ['text' => 'blue'],
         'green' => ['text' => 'green'],
         'blue' => ['text' => 'blue'],
         'yellow' => ['text' => 'yellow'],
@@ -157,7 +157,7 @@ class ConsoleOutput
             return "<{$tag}>{$text}</{$tag}>";
         }
         $settings = $this->styles[$tag];
-       
+     
         $ansi = [];
         if (isset($settings['text']) and isset($this->foregroundColors[$settings['text']])) {
             $ansi[] = $this->foregroundColors[$settings['text']];
@@ -171,7 +171,7 @@ class ConsoleOutput
                 $ansi[] = $this->options[$option];
             }
         }
-     
+        
         return "\033[" . implode(';', $ansi) . 'm' . $text . "\033[0m";
     }
 
@@ -203,5 +203,83 @@ class ConsoleOutput
         }
         $this->styles[$name] = $values;
         return true;
+    }
+
+    /**
+     * Displays an error message
+     *
+     * @param string $title Name of error
+     * @param string $message An optional description
+     * @return void
+     */
+   
+
+    public function debug(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('debug', $title, $message);
+        $this->write($msg);
+    }
+
+    public function info(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('info', $title, $message);
+        $this->write($msg);
+    }
+
+    public function notice(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('notice', $title, $message);
+        $this->write($msg);
+    }
+    public function warning(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('warning', $title, $message);
+        $this->write($msg);
+    }
+
+    public function success(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('success', $title, $message);
+        $this->write($msg);
+    }
+
+    public function error(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('error', $title, $message);
+        $this->write($msg);
+    }
+
+    public function critical(string $title, string $message=null)
+    {
+        $msg = $this->buildMessage('critical', $title, $message);
+        $this->write($msg);
+    }
+
+   
+    /*
+
+        'info' => ['text' => 'yellow'],
+        'notice' => ['text' => 'blue'],
+        'warning' => ['text' => 'yellow'],
+        'error' => ['text' => 'white','background'=>'lightRed'],
+        'critical' => ['text' => 'white','background'=>'lightRed'],
+        'alert' => ['text' => 'white','background'=>'lightRed'],
+        */
+
+    /**
+     * Undocumented function
+     *
+     * @param string $type Type of message error, warning, critical, debug etc.
+     * @param string $title main error
+     * @param string $message an optional description
+     * @return string
+     */
+    protected function buildMessage(string $type, string $title, string $message=null) : string
+    {
+        $result = "<{$type}>" . strtoupper($type).  ":</{$type}> <info>{$title}</info>\n";
+        if ($message) {
+            $result .= "<comment>{$message}</comment>\n";
+        }
+        return $result ;
     }
 }

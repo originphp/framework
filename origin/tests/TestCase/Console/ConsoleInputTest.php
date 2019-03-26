@@ -34,12 +34,15 @@ class ConsoleInputTest extends \PHPUnit\Framework\TestCase
     
     public function testRead()
     {
-        $ConsoleInput = new MockConsoleInput();
-        
-        fwrite(STDERR, 'Testing console input. Press Enter to continue');
-        $this->assertEquals('', $ConsoleInput->read());
+        $ConsoleInput = $this->getMockBuilder(ConsoleInput::class)
+                        ->disableOriginalConstructor()
+                        ->setMethods(['read'])
+                        ->getMock();
 
-        fwrite(STDERR, 'Press q then Enter');
+        $ConsoleInput->expects($this->at(0))->method('read')->will($this->returnValue(''));
+        $ConsoleInput->expects($this->at(1))->method('read')->will($this->returnValue('q'));
+
+        $this->assertEquals('', $ConsoleInput->read());
         $this->assertEquals('q', $ConsoleInput->read());
     }
 

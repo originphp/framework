@@ -31,10 +31,6 @@ class SchemaShell extends Shell
         $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
         $this->loadTask('Status');
     }
-    public function startup()
-    {
-        $this->out('<yellow>Schema Shell</yellow>');
-    }
 
     public function generate()
     {

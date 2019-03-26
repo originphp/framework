@@ -19,6 +19,7 @@ use Origin\Console\ConsoleOutput;
 use Origin\Console\Exception\MissingShellException;
 use Origin\Console\Exception\MissingShellMethodException;
 use Origin\Console\Exception\MissingCommandException;
+use Origin\Console\Exception\StopExecutionException;
 
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
@@ -30,9 +31,16 @@ class ShellDispatcher
     /**
      * ConsoleOutput object
      *
-     * @var ConsoleOutput
+     * @var \Origin\Console\ConsoleOutput
      */
     protected $output = null;
+
+    /**
+     * ConsoleOutput object
+     *
+     * @var \Origin\Console\ConsoleInput
+     */
+    protected $input = null;
 
     /**
      * Holds the arguments called
@@ -41,12 +49,32 @@ class ShellDispatcher
      */
     protected $args = [];
 
+    /**
+     * Shell
+     *
+     * @var \Origin\Console\Shell
+     */
     protected $shell = null;
 
-    public function __construct(array $arguments = [], ConsoleOutput $consoleOutput)
+    /**
+     * Wether or not an error occured
+     *
+     * @var boolean
+     */
+    protected $errors = false;
+    public function error(bool $result = null)
+    {
+        if ($result !== null) {
+            $this->error = $result;
+        }
+        return $this->error;
+    }
+
+    public function __construct(array $arguments = [], ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
     {
         $this->args = array_slice($arguments, 1);
         $this->output = $consoleOutput;
+        $this->input = $consoleInput;
     }
 
     /**
@@ -80,17 +108,18 @@ class ShellDispatcher
 
     protected function showUsage()
     {
-        $this->out("Usage: console <yellow>shell</yellow>\n");
-        $this->out("       console <yellow>shell command</yellow>\n");
+        $this->out("<info>Usage:</info>\n");
+        $this->out("  <white>console shell</white>\n");
+        $this->out("  <white>console shell command</white>\n");
         $this->out("\033[0m\n"); // Reset
         $shells = $this->getShellList();
         if ($shells) {
-            $this->out("Available Shells:\n");
+            $this->out("<info>Available Shells:</info>\n");
             foreach ($shells as $namespace => $commands) {
                 if ($commands) {
                     $this->out("\n<white>{$namespace}</white>\n");
                     foreach ($commands as $command) {
-                        $this->out("<cyan>{$command}</cyan>\n");
+                        $this->out("  <blue>{$command}</cyan>\n");
                     }
                 }
             }
@@ -134,7 +163,7 @@ class ShellDispatcher
      * Dispatches the request base on the shell name
      *
      * @param string $shell shell_name or Plugin.shell_name
-     * @return void
+     * @return bool
      */
     protected function dispatch(string $shell)
     {
@@ -142,26 +171,41 @@ class ShellDispatcher
         if (!class_exists($className)) {
             throw new MissingShellException($className);
         }
-        $shell = new $className($this->output, new ConsoleInput());
+        $this->shell = new $className($this->output, $this->input);
 
         $method = null;
         if ($this->args) {
             $method = array_shift($this->args);
         }
-        // main
-        if ($method === null) {
+        if ($method === null and method_exists($this->shell, 'main')) {
+            $method = 'main';
+        }
+        
+        # This is spegetti, want it to work with main
+        if ($method === null or $method ==='--help' or $method ==='-h') {
             $method = 'help';
-            if (method_exists($shell, 'main')) {
-                $method = 'main';
-            }
         } else {
-            if (!$shell->isAccessible($method)) {
+            if (!$this->shell->isAccessible($method)) {
                 throw new MissingShellMethodException([$className,$method]);
             }
         }
 
-        $shell->runCommand($method, $this->args);
-        return $shell;
+        try {
+            $this->shell->runCommand($method, $this->args);
+        } catch (StopExecutionException $ex) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gets the shell used by the dispatcher
+     *
+     * @return \Origin\Console\Shell
+     */
+    public function shell()
+    {
+        return $this->shell;
     }
    
     /**
