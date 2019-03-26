@@ -604,11 +604,8 @@ That will produce a line like this in the log:
 You can also use place holders
 
 ```php
-public function index()
-{
-    $logger = $this->logger('EmailsController');
-    $logger->warning('{key} was null',['key'=>'foo']);
-}
+$logger = new Logger('EmailsController');
+$logger->warning('{key} was null',['key'=>'foo']);
 ```
 
 This will produce a line like this in the log:
@@ -616,6 +613,7 @@ This will produce a line like this in the log:
 ```
 [2019-03-10 14:25:50] EmailsController WARNING: foo was null.
 ```
+
 You can call the following logging methods on the Logger object:
 
 | Method            | Use case                                                                                          |
