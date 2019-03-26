@@ -25,7 +25,6 @@ use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Core\Logger;
 use Origin\Model\Collection;
 
 class Model
@@ -1908,17 +1907,6 @@ class Model
         }
 
         return true;
-    }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Model')
-    {
-        return new Logger($channel);
     }
 
     /**

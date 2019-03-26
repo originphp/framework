@@ -16,7 +16,6 @@ namespace Origin\View\Helper;
 
 use Origin\View\View;
 use Origin\Core\ConfigTrait;
-use Origin\Core\Logger;
 
 class Helper
 {
@@ -151,17 +150,5 @@ class Helper
     public function response()
     {
         return $this->_view->response;
-    }
-
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Helper')
-    {
-        return new Logger($channel);
     }
 }

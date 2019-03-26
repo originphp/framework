@@ -25,7 +25,6 @@ use Origin\Core\Router;
 use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
-use Origin\Core\Logger;
 
 class Controller
 {
@@ -499,16 +498,5 @@ class Controller
     public function componentRegistry()
     {
         return $this->componentRegistry;
-    }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Controller')
-    {
-        return new Logger($channel);
     }
 }

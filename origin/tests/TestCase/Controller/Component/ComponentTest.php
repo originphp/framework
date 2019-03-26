@@ -18,7 +18,6 @@ use Origin\Controller\Component\Component;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
-use Origin\Core\Logger;
 use Origin\Controller\Component\SessionComponent;
 
 class MockComponent extends Component
@@ -57,9 +56,5 @@ class ComponentTest extends \PHPUnit\Framework\TestCase
     public function testResponse()
     {
         $this->assertInstanceOf(Response::class, $this->MockComponent->response());
-    }
-    public function testLogger()
-    {
-        $this->assertInstanceOf(Logger::class, $this->MockComponent->logger());
     }
 }

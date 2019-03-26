@@ -131,15 +131,4 @@ class Component
     {
         return $this->_controller->response;
     }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Component')
-    {
-        return $this->_controller->logger($channel);
-    }
 }

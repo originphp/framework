@@ -16,7 +16,6 @@ namespace Origin\Console\Task;
 
 use Origin\Console\Shell;
 use Origin\Core\ConfigTrait;
-use Origin\Core\Logger;
 
 class Task
 {
@@ -148,16 +147,5 @@ class Task
     public function out(string $data, $newLine = true)
     {
         $this->shell()->out($data, $newLine);
-    }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Task')
-    {
-        return new Logger($channel);
     }
 }

@@ -24,7 +24,6 @@ use Origin\View\Exception\MissingViewException;
 use Origin\View\Exception\MissingElementException;
 use Origin\View\Exception\MissingLayoutException;
 use Origin\Exception\Exception;
-use Origin\Core\Logger;
 
 class View
 {
@@ -373,16 +372,5 @@ class View
     public function set(string $key, $value)
     {
         $this->vars[$key] = $value;
-    }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'View')
-    {
-        return new Logger($channel);
     }
 }

@@ -160,7 +160,7 @@ $success = Cache::write('key',$value);
 To use a different configuration
 
 ```php
-Cache::set('key',$value,'long-duration');
+Cache::write('key',$value,'long-duration');
 ```
 
 ### Read

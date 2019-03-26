@@ -2,7 +2,7 @@
 
 OriginPHP uses a minimialistic file logger based upon the PSR 3 standard.
 
-```php 
+```php
 use Origin\Core\Logger;
 $logger = new Logger('MathLib');
 $logger->error('Something has gone wrong.');
@@ -29,20 +29,6 @@ You can call the following logging methods on the Logger object
 - *critical*
 - *alert*
 - *emergency*
-
-From within a Controller, Component, Model, Behavior, View, Helper, Shell, Task you can
-call the following, this will return the Logger object with the channel set, e.g. if you call this
-from the controller, the channel will be the controller.
-
-```php 
-    $logger = $this->logger();
-```
-
-You can also change the channel name as well
-
-```php
-    $logger = $this->logger('AppController');
-```
 
 Sometimes you might want to log to a separate file simply call the `filename` method.
 

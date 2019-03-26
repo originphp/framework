@@ -585,12 +585,13 @@ which will generate a URL like
 Logs are stored in `logs` and make it easy to debug and keep track of what is going on.
  OriginPHP uses a minimalistic file logger based upon the PSR 3 standard.
 
-Each line in the log includes the date, channel, type of message and the message itself.
+Each line in the log includes the date, channel, type of message and the message itself. 
+You set the channel when creating the logger object.
 
-To get logger from the controller (and from models,views, helpers, etc).
 
 ```php
-$logger = $this->logger();
+use Origin\Core\Logger;
+$logger = new Logger('Controller');
 $logger->error('something has gone wrong');
 ```
 
@@ -600,7 +601,7 @@ That will produce a line like this in the log:
 [2019-03-10 13:37:49] Controller ERROR: something has gone wrong.
 ```
 
-If you need to change the channel, you do that when calling the logger object.
+You can also use place holders
 
 ```php
 public function index()
@@ -615,7 +616,6 @@ This will produce a line like this in the log:
 ```
 [2019-03-10 14:25:50] EmailsController WARNING: foo was null.
 ```
-
 You can call the following logging methods on the Logger object:
 
 | Method            | Use case                                                                                          |
@@ -628,7 +628,6 @@ You can call the following logging methods on the Logger object:
 | critical          | Critical conditions or events.                                                                    |
 | alert             | Actions that must be taken immediately.                                                           |
 | emergency         | The system is unusable.                                                                           |
-
 
 ## Paginating Records
 

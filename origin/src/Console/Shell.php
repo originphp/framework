@@ -22,8 +22,6 @@ use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\TaskRegistry;
 use Origin\Model\ModelRegistry;
-use Origin\Core\Logger;
-use Origin\Core\Inflector;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -335,17 +333,6 @@ class Shell
     public function taskRegistry()
     {
         return $this->taskRegistry;
-    }
-
-    /**
-     * Returns a Logger Object
-     *
-     * @param string $channel
-     * @return \Origin\Core\Logger
-     */
-    public function logger(string $channel = 'Shell')
-    {
-        return new Logger($channel);
     }
 
     /**

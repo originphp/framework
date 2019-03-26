@@ -19,6 +19,9 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Removed
+- Removed logger helper function
+
 ### Changed
 - Worked on unit testing. Coverage 80% (excluding schema and generate plugin)
 
