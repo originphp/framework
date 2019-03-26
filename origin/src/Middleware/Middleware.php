@@ -20,12 +20,12 @@ use Origin\Controller\Response;
 class Middleware
 {
     /**
-     * Processes the request, this must be implemented
-     *
-     * @param Request $request
-     * @param Response $response
-     * @return Response
-     */
+       * Processes the request, this must be implemented
+       *
+       * @param \Origin\Controller\Request $request
+       * @param \Origin\Controller\Response $response
+       * @return \Origin\Controller\Response
+       */
     public function process(Request $request, Response $response) : Response
     {
         // do something
