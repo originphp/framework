@@ -64,7 +64,7 @@ class MySQLDriver extends Datasource
                 $type = str_replace(')', '', $column['Type']);
                 if (strpos($type, '(') !== false) {
                     list($type, $length) = explode('(', $type);
-                    if (strpos(',', $length) !== false) {
+                    if (strpos($length, ',') !== false) {
                         list($length, $precision) = explode(',', $length);
                     }
                 }
@@ -152,7 +152,7 @@ class MySQLDriver extends Datasource
             }
 
             if (isset($settings['default'])) {
-                $output .= " DEFAULT {$settings['default']}";
+                $output .= " DEFAULT '{$settings['default']}'";
             }
             if (!empty($settings['autoIncrement'])) {
                 $output .= " AUTO_INCREMENT";

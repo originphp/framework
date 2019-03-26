@@ -338,7 +338,7 @@ class Entity
      */
     public function toXml()
     {
-        $root = Inflector::variable($this->_name);
+        $root = Inflector::variable($this->name??'Record');
         return Xml::fromArray([$root => $this->toArray()]);
     }
 }

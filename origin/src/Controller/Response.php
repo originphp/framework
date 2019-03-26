@@ -97,7 +97,9 @@ class Response
             $this->sendHeader($name, $value);
         }
         if ($this->file) {
+            // @codeCoverageIgnoreStart
             readfile($this->file);
+        // @codeCoverageIgnoreEnd
         } else {
             echo $this->body;
         }
@@ -202,7 +204,9 @@ class Response
         if ($value) {
             $header = "{$name}: {$value}";
         }
+        // @codeCoverageIgnoreStart
         header($header);
+        // @codeCoverageIgnoreEnd
     }
 
 
@@ -303,9 +307,7 @@ class Response
             $this->header('Content-Disposition', 'attachment; filename="' . $options['name'] . '"');
         }
         $this->type($options['type']);
-        //$this->header('Content-Transfer-Encoding', 'binary');
-        // $this->header('Content-Length', filesize($filename));
-     
+  
         $this->filename = $filename;
     }
 

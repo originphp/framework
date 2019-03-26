@@ -33,6 +33,9 @@ POSTGRE
     [pdo_type] => 1
 */
 
+/**
+ * @codeCoverageIgnore
+ */
 class PostgreSQLDriver
 {
     /**

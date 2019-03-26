@@ -26,6 +26,7 @@ use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Controller\Component\Exception\MissingComponentException;
 use Origin\Controller\Component\ComponentRegistry;
+use Origin\Model\Entity;
 
 class Pet extends Model
 {
@@ -251,19 +252,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
      */
     public function testRender()
     {
-        $tmpFolder = SRC . DS . 'View' . DS . 'Tests';
-        $expected = '<h1>Test Render<h1>';
-        mkdir($tmpFolder);
-        file_put_contents($tmpFolder.DS . 'edit.ctp', $expected);
-
-        $request = new Request('tests/edit/1024');
-        $controller = new TestsController($request, new Response());
+        $request = new Request('posts/index');
+        $controller = new \App\Controller\PostsController($request, new Response());
         $controller->layout = false;
         $controller->render();
 
-        $this->assertEquals($expected, $controller->response->body());
-        unlink($tmpFolder.DS . 'edit.ctp');
-        rmdir($tmpFolder);
+        $this->assertEquals('<h1>Posts Home Page</h1>', $controller->response->body());
     }
 
     public function testRenderJson()
@@ -271,10 +265,17 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/1024');
         $controller = new TestsController($request, new Response());
         $data = ['data'=>['game'=>'Dota 2']];
-        $controller->renderJson($data, 201);
+        $controller->render(['json'=>$data,'status'=>201]);
         $this->assertEquals(json_encode($data), $controller->response->body());
         $this->assertEquals(201, $controller->response->status());
         $this->assertEquals('application/json', $controller->response->type());
+
+
+        $controller = new TestsController($request, new Response());
+        $book = new Entity();
+        $book->name = 'How to use PHPUnit';
+        $controller->render(['json'=>$book]);
+        $this->assertEquals($book->toJson(), $controller->response->body());
     }
 
     public function testRenderXml()
@@ -289,14 +290,43 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ]
             ];
 
-        $expected = '<?xml version="1.0" encoding="UTF-8"?>' . "\n". '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>'."\n";
+        $xml = $expected = '<?xml version="1.0" encoding="UTF-8"?>' . "\n". '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>'."\n";
        
-        $controller->renderXml($data, 201);
+        $controller->render(['xml'=>$data,'status'=>201]);
         $this->assertEquals($expected, $controller->response->body());
         $this->assertEquals(201, $controller->response->status());
         $this->assertEquals('application/xml', $controller->response->type());
+
+        $controller = new TestsController($request, new Response());
+        $controller->render(['xml'=>$xml]); //xml string
+        $this->assertEquals($xml, $controller->response->body());
+
+        $controller = new TestsController($request, new Response());
+        $book = new Entity();
+        $book->name = 'How to use PHPUnit';
+        $controller->render(['xml'=>$book]);
+        $this->assertEquals($book->toXml(), $controller->response->body());
     }
 
+    public function testRenderText()
+    {
+        $request = new Request('tests/status');
+        $controller = new TestsController($request, new Response());
+        $controller->render(['text'=>'OK','status'=>201]);
+        $this->assertEquals('OK', $controller->response->body());
+        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals('text/plain', $controller->response->type());
+    }
+
+    public function testRenderFile()
+    {
+        $request = new Request('tests/status');
+        $controller = new TestsController($request, new Response());
+        $controller->render(['file'=>'/var/www/phpunit.xml','status'=>201]);
+        $this->assertEquals(file_get_contents('/var/www/phpunit.xml'), $controller->response->body());
+        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals('text/xml', $controller->response->type());
+    }
 
     public function testRedirect()
     {

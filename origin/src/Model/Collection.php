@@ -81,9 +81,9 @@ class Collection implements ArrayAccess, Iterator, Countable
      */
     public function toXml()
     {
-        $root = Inflector::variable(Inflector::pluralize($this->model));
+        $root = Inflector::variable(Inflector::pluralize($this->model??'Record'));
         $data = [$root => [
-            Inflector::variable($this->model) => $this->toArray()
+            Inflector::variable($this->model??'Record') => $this->toArray()
         ]];
         return Xml::fromArray($data);
     }

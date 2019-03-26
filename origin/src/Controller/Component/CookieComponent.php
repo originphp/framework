@@ -51,7 +51,7 @@ class CookieComponent extends Component
         return $this->cookie;
     }
     /**
-     * Reads a value of a cookie
+     * Reads a value of a cookie from request
      *
      * @param string $name
      * @return string|null
@@ -62,7 +62,7 @@ class CookieComponent extends Component
     }
 
     /**
-     * Writes a cookie
+     * Writes a cookie through response
      *
      *  $cookie->write('key',$value);
      *  $cookie->write('key',$value,strtotime('+1 day'));
@@ -74,7 +74,7 @@ class CookieComponent extends Component
      */
     public function write(string $name, $value, int $expire=0, $options=[])
     {
-        $this->cookie()->write($name, $value, $expire, $options);
+        $this->response()->cookie($name, $value, $expire, $options);
     }
 
     /**
@@ -85,7 +85,7 @@ class CookieComponent extends Component
      */
     public function delete(string $name)
     {
-        $this->cookie()->delete($name);
+        $this->response()->cookie($name, "", time() - 3600);
     }
 
     /**
@@ -106,6 +106,7 @@ class CookieComponent extends Component
      */
     public function destroy()
     {
-        $this->cookie()->destroy();
+        unset($_COOKIE);
+        $_COOKIE=[];
     }
 }

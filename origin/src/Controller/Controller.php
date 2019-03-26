@@ -356,10 +356,11 @@ class Controller
         }
         
         if (!empty($options['text'])) {
-            $options['type'] = 'text';
+            $options['type'] = 'txt';
             $body = $options['text'];
         } elseif (!empty($options['file'])) {
             $body = file_get_contents($options['file']);
+            $options['type'] = mime_content_type($options['file']);
         }
         if ($body === null) {
             if (isset($options['template'])) {

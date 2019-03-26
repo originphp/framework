@@ -264,7 +264,7 @@ class View
         if ($this->fileExists($filename)) {
             return $filename;
         }
-        pr([$name,$filename]);
+
         throw new MissingViewException([$this->name, $name]);
     }
 

@@ -19,6 +19,12 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Worked on unit testing. Coverage 80% (excluding schema and generate plugin)
+
+### Fixed
+- Fix bug with marshaller and extracting fields on associated records
+
 
 ## [1.0.0-beta] - 2019-03-26
 ### Removed

@@ -15,6 +15,7 @@
 namespace Origin\Test\Controller;
 
 use Origin\Controller\Response;
+use Origin\Exception\NotFoundException;
 
 class ResponseTest extends \PHPUnit\Framework\TestCase
 {
@@ -76,5 +77,18 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $mpeg = 'audio/mpeg';
         $this->assertEquals($mpeg, $response->Type($mpeg));
         $this->assertFalse($response->type('foo'));
+    }
+
+    public function testFile()
+    {
+        $response  = new Response();
+       
+       
+        $response->file('/var/www/README.md', ['download'=>true]);
+        $headers = $response->headers();
+        $this->assertEquals('attachment; filename="README.md"', $headers['Content-Disposition']);
+
+        $this->expectException(NotFoundException::class);
+        $response->file('/var/www/---does-not-exist.md', ['download'=>true]);
     }
 }

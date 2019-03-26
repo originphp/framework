@@ -14,7 +14,6 @@
 
 namespace Origin\Console;
 
-use Origin\Model\Schema;
 use Origin\Model\ConnectionManager;
 use Origin\Model\QueryBuilder;
 
@@ -38,8 +37,7 @@ class SchemaShell extends Shell
         if (!empty($this->params['datasource'])) {
             $datasource = $this->params['datasource'];
         }
-       
-        $schema = new Schema();
+  
         $connection = ConnectionManager::get($datasource);
         $tables = $connection->tables();
         if (!empty($this->args)) {

@@ -70,6 +70,11 @@ class Request
      */
     protected $headers = [];
 
+    /**
+     * Mapped names
+     *
+     * @var array
+     */
     protected $headersNames = [];
 
     /**
@@ -161,18 +166,16 @@ class Request
      *  $request->data('key','value');
      *  $request->data($someArray);
      *
-     * @param string|array $key
+     * @param string|array $key name of key to get,
      * @param mixed $value
      * @return mixed
      */
-    public function data($key = null, $value = null)
+    public function data(string $key = null, $value = null)
     {
         if ($key === null) {
             return $this->data;
         }
-        if(is_array($key)){
-            return $this->data = $key;
-        }
+ 
         if (func_num_args() === 2) {
             return $this->data[$key] = $value;
         }
@@ -340,13 +343,13 @@ class Request
      * being called.
      *
      * $request->accepts('application/json');
-     * $request->accepts(['application/xml','application/json]);
+     * $request->accepts(['application/xml','application/json']);
      *
      * @todo in future maybe something routing maybe without complicating things.
      * @param string|array $type
-     * @return bool
+     * @return bool|array
      */
-    public function accepts($type=null) : bool
+    public function accepts($type=null)
     {
         $path = parse_url($this->url(), PHP_URL_PATH);
       
@@ -364,6 +367,7 @@ class Request
             if (strpos(strtolower($path), ".{$extensionNeedle}") !== false) {
                 return true;
             }
+            // Not implemented
             if (isset($this->params[$extensionNeedle])) {
                 return true;
             }
@@ -430,18 +434,24 @@ class Request
     }
 
     /**
-     * Sets or gets a header
+     * Sets or gets a header (you can get in psr friendly way, lowercase)
      *
-     * @param string $name
-     * @param string $value
+     * $result= $request->header('www-Authenticate');
+     * $request->header('WWW-Authenticate', 'Negotiate');
+     *
+     * @param string $name name of header to get
+     * @param string $value value of header to set
      * @return string|null
      */
     public function header(string $name, string $value = null)
     {
         $normalized = strtolower($name); // psr thing
         if ($value === null) {
-            if (isset($this->headersMap[$normalized])) {
-                $key = $this->headersMap[$normalized];
+            $key = $name;
+            if (isset($this->headersNames[$normalized])) {
+                $key = $this->headersNames[$normalized];
+            }
+            if (isset($this->headers[$key])) {
                 return $this->headers[$key];
             }
             return '';

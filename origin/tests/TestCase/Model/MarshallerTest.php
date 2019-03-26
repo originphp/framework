@@ -96,6 +96,14 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-10-01 13:42:00', $entity->tags[0]->created);
         $this->assertInstanceOf(Entity::class, $entity->author);
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
+
+        $entity = $Marshaller->one($data, [
+          'name' => 'Article', 'associated'=>[
+            'Author'=>['fields'=>['id','name']]
+            ]]);
+ 
+        $this->assertTrue($entity->author->has('name'));
+        $this->assertFalse($entity->author->has('created'));
     }
 
 
@@ -128,24 +136,34 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Article->hasOne('Author');
         $Article->hasMany('Tag');
         $Marshaller = new Marshaller($Article);
+     
         $Entity = $Marshaller->one($data, ['name' => 'Article']);
-        
+
         $requestData = array(
-        'title' => 'New Article Name',
-        'unkown' => 'insert data',
-        'author' => array(
-          'name' => 'Claire',
-        ),
-        'tags' => array(
-          array('tag' => 'published'),
-          array('tag' => 'top ten'),
-        ),
-      );
+           'title' => 'New Article Name',
+           'unkown' => 'insert data',
+           'author' => array(
+             'name' => 'Claire',
+           ),
+           'tags' => array(
+             array('tag' => 'published'),
+             array('tag' => 'top ten'),
+           ),
+         );
+     
         $patchedEntity = $Marshaller->patch($Entity, $requestData, ['associated'=>['Author','Tag']]);
-      
+
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
         $this->assertEquals('published', $patchedEntity->tags[0]->tag);
         $this->assertEquals('top ten', $patchedEntity->tags[1]->tag);
+
+        $Entity = $Marshaller->one(['id'=>1234], ['name' => 'Article']);
+        $requestData['author']['location'] = 'New York';
+         
+        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['fields'=>['id'],'associated'=>['Author'=>['fields'=>['id','name']]]]);
+    
+        $this->assertTrue($patchedEntity->author->has('name'));
+        $this->assertFalse($patchedEntity->author->has('location'));
     }
 }

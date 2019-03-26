@@ -67,12 +67,13 @@ class Marshaller
     protected function normalizeAssociated(array $array) : array
     {
         $result = [];
-       
+      
         foreach ($array as $key => $value) {
             if (is_int($key)) {
                 $key = $value;
                 $value = [];
             }
+            
             $value += ['fields'=>[]];
             $result[$key] = $value;
         }
@@ -108,20 +109,24 @@ class Marshaller
                     $alias = Inflector::singularize($alias);
                 }
               
-                if (isset($options['associated'][$alias]['fields'])) {
-                    $fields = $options['associated'][$alias]['fields'];
-                    unset($options['associated'][$alias]); // only go one level
+                $model = ucfirst($alias);
+                if (isset($options['associated'][$model]['fields'])) {
+                    $fields = $options['associated'][$model]['fields'];
+                    unset($options['associated'][$model]['fields']);
                 }
+     
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
                     'name'=>ucfirst($alias),
                     'fields' => $fields,
-                    'associated' => $options['associated'] // passing same data might
+                    'associated' => $options['associated']
                     ]);
             } else {
                 $properties[$property] = $value;
             }
         }
-        if ($options['fields']) {
+       
+        if ($options['fields'] and is_array($options['fields'])) {
+            $options['fields'] = array_merge($options['fields'], array_keys($propertyMap));
             foreach ($properties as $property => $value) {
                 if (in_array($property, $options['fields'])) {
                     $entity->set($property, $value);
@@ -175,9 +180,11 @@ class Marshaller
                 if ($propertyMap[$property] === 'many') {
                     $alias = Inflector::singularize($alias);
                 }
-                if (isset($options['associated'][$alias]['fields'])) {
-                    $fields = $options['associated'][$alias]['fields'];
-                    unset($options['associated'][$alias]);
+
+                $model = ucfirst($alias);
+                if (isset($options['associated'][$model]['fields'])) {
+                    $fields = $options['associated'][$model]['fields'];
+                    unset($options['associated'][$model]['fields']);
                 }
 
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
@@ -192,7 +199,9 @@ class Marshaller
                 }
             }
         }
-        if ($options['fields']) {
+       
+        if ($options['fields'] and is_array($options['fields'])) {
+            $options['fields'] = array_merge($options['fields'], array_keys($propertyMap));
             foreach ($properties as $property => $value) {
                 if (in_array($property, $options['fields'])) {
                     $entity->set($property, $value);

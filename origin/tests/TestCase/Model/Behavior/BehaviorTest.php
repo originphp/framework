@@ -18,6 +18,7 @@ use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Behavior\Behavior;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Logger;
 
 class Tester extends Model
 {
@@ -332,5 +333,10 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->loadBehavior('BehaviorTester');
         $article = $Article->get(3);
         $this->assertTrue($Article->delete($article));
+    }
+    public function testLogger()
+    {
+        $behavior = new Behavior(new Model(['name' => 'Post']));
+        $this->assertInstanceOf(Logger::class, $behavior->logger());
     }
 }

@@ -371,32 +371,24 @@ class Datasource
         return strpos($column, $this->virtualFieldSeperator) != false;
     }
 
-
-    public function dsn(array $config) : string
-    {
-    }
-
-    public function createTable(string $table, array $data) : string
-    {
-    }
-
     /**
-     * Gets the schema info and converts into standard to be used by framework
-     *
-     * @param string $table
-     * @return void
-     */
+    ## Driver Stuff
+    public function dsn(array $config)
+    {
+    }
+
+    public function createTable(string $table, array $data)
+    {
+    }
+
     public function schema(string $table)
     {
     }
-    /**
-     * Gets a list of tables for the datasource
-     *
-     * @return void
-     */
+
     public function tables()
     {
     }
+     */
 
     /**
      * Inserts a row into the database.

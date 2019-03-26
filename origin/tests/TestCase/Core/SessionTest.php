@@ -74,4 +74,12 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->Session->write('Test.status', 'ok');
         $this->assertTrue($this->Session->check('Test.status'));
     }
+
+    public function testReset()
+    {
+        $this->Session->write('Test.status', 'ok');
+        $this->assertNotEmpty($_SESSION);
+        $this->Session->reset();
+        $this->assertEmpty($_SESSION);
+    }
 }

@@ -121,7 +121,6 @@ class Cookie
     {
         $value = json_encode($value);
         $value = base64_encode(Security::encrypt($value));
-
         return $value;
     }
 

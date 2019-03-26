@@ -90,7 +90,7 @@ class CookieTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($cookie->delete('notSet'));
     }
 
-    public function _testDestroy()
+    public function testDestroy()
     {
         $cookie = new MockCookie();
         $_COOKIE['testDestroy'] = 'PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv';
