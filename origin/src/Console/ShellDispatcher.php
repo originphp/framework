@@ -119,7 +119,7 @@ class ShellDispatcher
                 if ($commands) {
                     $this->out("\n<white>{$namespace}</white>\n");
                     foreach ($commands as $command) {
-                        $this->out("  <blue>{$command}</cyan>\n");
+                        $this->out("  <blue>{$command}</blue>\n");
                     }
                 }
             }
