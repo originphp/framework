@@ -16,7 +16,7 @@ namespace Origin\Test\Fixture;
 
 use Origin\TestSuite\Fixture;
 
-class ArticleFixture extends Fixture
+class PostFixture extends Fixture
 {
     public $datasource = 'test';
 
@@ -32,6 +32,7 @@ class ArticleFixture extends Fixture
            'type' => 'integer',
            'default' => '0',
            'null' => false,
+           
          ),
          'created' => 'datetime',
          'modified' => 'datetime',
@@ -40,24 +41,24 @@ class ArticleFixture extends Fixture
     public $records = array(
          array(
            'id' => 1,
-           'title' => 'First Article',
-           'body' => 'Article body goes here',
+           'title' => 'First Post',
+           'body' => 'Post body goes here',
            'published' => '1',
            'created' => '2018-12-19 13:29:10',
            'modified' => '2018-12-19 13:30:20',
          ),
          array(
            'id' => 2,
-           'title' => 'Second Article',
-           'body' => 'Article body goes here',
+           'title' => 'Second Post',
+           'body' => 'Post body goes here',
            'published' => '1',
            'created' => '2018-12-19 13:31:30',
            'modified' => '2018-12-19 13:32:40',
          ),
          array(
            'id' => 3,
-           'title' => 'Third Article',
-           'body' => 'Third Article Body',
+           'title' => 'Third Post',
+           'body' => 'Third Post Body',
            'published' => '1',
            'created' => '2018-12-19 13:33:50',
            'modified' => '2018-12-19 13:34:59',

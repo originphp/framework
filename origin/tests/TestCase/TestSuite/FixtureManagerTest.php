@@ -17,11 +17,10 @@ namespace Origin\Test\TestSuite;
 use Origin\TestSuite\Fixture;
 use Origin\TestSuite\FixtureManager;
 use Origin\TestSuite\TestTrait;
-use Origin\TestSuite\OriginTestCase;
 
 class MockTestCase
 {
-    public $fixtures = ['Framework.Article'];
+    public $fixtures = ['Framework.Post'];
 }
 
 class MockFixtureManager extends FixtureManager
@@ -43,19 +42,19 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
        
         // Load/unload first time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
         $this->assertNull($FixtureManager->unload($TestCase));
   
         // Load/unload second time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
         $this->assertNull($FixtureManager->unload($TestCase));
 
-        $FixtureManager->setDropTables('Framework.Article', true);
+        $FixtureManager->setDropTables('Framework.Post', true);
         $FixtureManager->load($TestCase);
         $FixtureManager->unload($TestCase);
 
-        $FixtureManager->setDropTables('Framework.Article', false);
+        $FixtureManager->setDropTables('Framework.Post', false);
         $FixtureManager->unload($TestCase);
 
         // set with Set
@@ -68,17 +67,17 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
        
         // Load/unload first time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Article'));
+        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
         $loaded = $FixtureManager->loaded();
-        $this->assertInstanceOf(Fixture::class, $loaded['Framework.Article']);
+        $this->assertInstanceOf(Fixture::class, $loaded['Framework.Post']);
     }
 
     public function testResolveFixture()
     {
         $FixtureManager = new MockFixtureManager();
 
-        $result = $FixtureManager->callMethod('resolveFixture', ['App.Article']);
-        $this->assertEquals('App\Test\Fixture\ArticleFixture', $result);
+        $result = $FixtureManager->callMethod('resolveFixture', ['App.Post']);
+        $this->assertEquals('App\Test\Fixture\PostFixture', $result);
 
         $result = $FixtureManager->callMethod('resolveFixture', ['Framework.Contact']);
         $this->assertEquals('Origin\Test\Fixture\ContactFixture', $result);
