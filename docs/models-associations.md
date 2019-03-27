@@ -214,7 +214,7 @@ You can also pass an options array with any of the following keys. If you are fo
       'associationForeignKey' => 'tag_id',
       'fields' => ['User.name','User.email','Tag.title','Tag.created'],
       'order' => ['Tag.created ASC'],
-      'model' => 'append'
+      'mode' => 'append'
       'limit' => 50
       ]);
     }

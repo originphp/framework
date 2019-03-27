@@ -157,7 +157,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $expected = array(
             'type' => 'integer',
             'length' => 11,
-            'precision' => null,
             'default' => null,
             'null' => false,
             'key' => 'primary',

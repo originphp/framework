@@ -42,7 +42,7 @@ When you create the test files, the filename should end with `Test.php` and they
 You will create a test case class like this, defining the fixtures that you will use in testing (including models that are used by other models etc).
 
 ```php
-namespace App\Test\TestCase\Model;
+namespace App\Test\Model;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\ModelRegistry;

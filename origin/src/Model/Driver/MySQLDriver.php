@@ -77,6 +77,17 @@ class MySQLDriver extends Datasource
                         'default' => $column['Default'],
                         'null' => ($column['Null'] === 'YES' ? true : false),
                       );
+              
+                    if (!in_array($type, ['float','decimal'])) {
+                        unset($schema[$column['Field']]['precision']);
+                    }
+                    if ($schema[$column['Field']]['length'] === null) {
+                        unset($schema[$column['Field']]['length']);
+                    }
+                    if ($type ==='timestamp') {
+                        unset($schema[$column['Field']]['default']);
+                    }
+                    
                     if ($column['Key'] === 'PRI') {
                         $schema[$column['Field']]['key'] = 'primary';
                     }
