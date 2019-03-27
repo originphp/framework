@@ -11,7 +11,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Core;
 
 /**
@@ -39,7 +38,7 @@ class Dot
      *
      * @var array
      */
-    public $items = array();
+    public $items = [];
 
     /**
      * Set the items to use or leave blank.
@@ -54,10 +53,10 @@ class Dot
     /**
      * Sets an item in the path.
      *
-     * @param string $key   Project, or Project.setting
-     * @param mixed  $mixed string,int,array
+     * @param string $key  The key to use, accepts also dot notation e.g. App.currency
+     * @param mixed  $mixed [string|array|integer]
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         $items = &$this->items;
         foreach (explode('.', $key) as $key) {
@@ -72,12 +71,11 @@ class Dot
     /**
      * Gets an item in the path.
      *
-     * @param string $key Project, or Project.setting
-     * @param $defaulValue this is what to return if not found e.g null, '' or array()
-     *
-     * @return mixed key value
+     * @param string $key The key to get, accepts also dot notation e.g. App.currency
+     * @param $defaulValue this is what to return if not found e.g null, '' or []
+     * @return mixed $value | $defaultValue
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, $defaultValue = null)
     {
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
@@ -110,7 +108,8 @@ class Dot
     /**
      * Deletes an item in the path.
      *
-     * @param string $key Project, or Project.setting
+     * @param string $key The key to delete, accepts also dot notation e.g. App.currency
+     * @return bool
      */
     public function delete($key)
     {
@@ -145,9 +144,10 @@ class Dot
     /**
      * Checks item in the path.
      *
-     * @param string $key Project, or Project.setting
+     * @param string $key The key to check, accepts also dot notation e.g. App.currency
+     * @return bool
      */
-    public function has($key)
+    public function has($key) : bool
     {
         if (array_key_exists($key, $this->items)) {
             return true;

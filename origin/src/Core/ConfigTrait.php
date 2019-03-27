@@ -44,7 +44,7 @@ trait ConfigTrait
      *  $setting = $this->config('setting');
      * @param null|array|string $key
      * @param mixed $value
-     * @return void
+     * @return mixed
      */
     public function config($key = null, $value = null)
     {

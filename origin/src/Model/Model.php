@@ -59,7 +59,7 @@ class Model
     public $table = null;
 
     /**
-     * This really should be id, because
+     * Each table should have a primary key and it should be id, because
      * 1. associations wont work without you telling which fields to use
      * 2. not really fully tested using something else, but it should work ;).
      * 3. it might get confusing later
@@ -84,7 +84,6 @@ class Model
      * @var string|array
      */
     public $order = null;
-
 
     /**
      * The ID of the last record created, updated, or deleted. When saving
@@ -119,8 +118,7 @@ class Model
 
  
     /**
-     * @todo change to ->associations();
-     *
+     * List of Associations
      * @var array
      */
     protected $associations = [
@@ -158,7 +156,6 @@ class Model
             'table' => $this->table,
         ];
        
-
         $config = array_merge($defaults, $config);
      
         extract($config);
@@ -362,13 +359,14 @@ class Model
     }
 
     /**
-     * This will load any model regardless if it is associated or
-     * not.
+     * This will load any model regardless if it is associated or not.
      * If you are loading a model with same name like in a plugin, then best set a unique
      * alias.
      * example:
+     *
      * $this->loadModel('CustomModel2',['className'=>'Plugin.CustomModel']);
      * $results = $this->CustomModel2->find('all');
+     *
      * @param string $model
      * @param array $config
      * @return Model
@@ -972,8 +970,7 @@ class Model
      * - afterSave
      *
      * @param entity $entity to save
-     * @param array  $options keys include:
-     *
+     * @param array  $options keys (validate,callbacks,transaction,associated)
      * @return bool true or false
      */
     public function save(Entity $data, $options = [])
@@ -1522,6 +1519,13 @@ class Model
         return $buffer;
     }
    
+    /**
+     * Holds the associated hasMany records
+     *
+     * @param array $query
+     * @param array $results
+     * @return array
+     */
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
@@ -1771,7 +1775,6 @@ class Model
      * taken or an email is not used twice
      * @param \Origin\Model\Entity $entity
      * @param array  $fields array of fields to check values in entity
-     *
      * @return bool
      */
     public function isUnique(Entity $entity, array $fields = [])

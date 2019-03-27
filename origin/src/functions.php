@@ -19,7 +19,6 @@ use Origin\Core\Logger;
 
 /**
  * Runs a backtrace.
- * @todo adjust to work in CLI
  */
 function backtrace()
 {

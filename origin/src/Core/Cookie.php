@@ -46,9 +46,10 @@ class Cookie
      * @param string $key
      * @param mixed $value
      * @param integer $expire unix timestamp
+     * @param array $options (path|domain|secure|httpOnly)
      * @return void
      */
-    public function write(string $name, $value, int $expire=0, $options=[])
+    public function write(string $name, $value, int $expire=0, array $options=[])
     {
         $options += [
             'path' => '/', // path on server

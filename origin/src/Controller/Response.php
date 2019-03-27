@@ -283,10 +283,15 @@ class Response
     }
 
     /**
-     * Undocumented function
+     * Renders a file either for download or inline
      *
-     * @param string $filename
-     * @param array $options
+     * ## Options
+     * - name: the filename to appear in browser
+     * - download: if true
+     * - type: mime content type (default autodetected )
+     *
+     * @param string $filename name and location of file
+     * @param array $options (name,download)
      * @return void
      */
     public function file(string $filename, array $options=[])
