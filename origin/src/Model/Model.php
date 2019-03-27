@@ -11,7 +11,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Model;
 
 /**
@@ -26,6 +25,7 @@ use Origin\Model\Exception\MissingModelException;
 use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Collection;
+use Origin\Exception\Exception;
 
 class Model
 {
@@ -240,13 +240,9 @@ class Model
             ModelRegistry::set($name, $object);
         }
 
-        if ($object) {
-            $this->{$name} = $object;
+        $this->{$name} = $object;
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -278,7 +274,7 @@ class Model
                 );
             }
         }
-        trigger_error('Call to undefined method '  .get_class($this) . '\\'.  $method .'()');
+        throw new Exception('Call to undefined method '  .get_class($this) . '\\'.  $method .'()');
     }
 
     /**
@@ -303,14 +299,13 @@ class Model
             }
         }
 
-        return null;
+        throw new Exception('Error getting display field, Set displayField or make sure at least a primary key like id is set.');
     }
 
     /**
      * Gets the association relationship from outside the model.
      *
      * @param string $name hasOne|belongsTo etc
-     *
      * @return array
      */
     public function association(string $name)
@@ -318,8 +313,7 @@ class Model
         if (in_array($name, $this->associations())) {
             return $this->{$name};
         }
-
-        return null;
+        throw new Exception('Unkown association ' . $name);
     }
 
     /**
@@ -397,7 +391,7 @@ class Model
      * options manually (even if you change the primary key setting).
      *
      * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey, conditions, fields, order, dependent)
+     * @param array  $options     (className, foreignKey, conditions, fields,  dependent)
      */
     public function hasOne(string $association, $options = [])
     {
@@ -406,7 +400,6 @@ class Model
           'foreignKey' => null,
           'conditions' => null,
           'fields' => null,
-          'order' => null,
           'dependent' => false,
         ];
   
@@ -434,7 +427,7 @@ class Model
      * The Current model contians the foreign key This.other_id
      *
      * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey, conditions, fields, order, type)
+     * @param array  $options     (className, foreignKey, conditions, fields, type)
      */
     public function belongsTo(string $association, $options = [])
     {
@@ -443,7 +436,6 @@ class Model
           'foreignKey' => null,
           'conditions' => null,
           'fields' => null,
-          'order' => null,
           'type' => 'LEFT',
         ];
 
@@ -571,27 +563,14 @@ class Model
      *   'notBlank' =>  ['rule' => 'notBlank'],
      *   'email' =>  ['rule' => 'email']
      *  ]);
-     * $this->validate($validationRules);
      *
-     * @param string|array $field
-     * @param array $options
+     * @param string|array $field Field name to validate
+     * @param array $options (rule name| array [rule|message|on|required])
      * @return void
      *
      */
-    public function validate($field, $options)
+    public function validate(string $field, $options)
     {
-        if (is_array($field)) {
-            foreach ($field as $key => $value) {
-                if (is_int($key)) {
-                    $key = $value;
-                    $value = [];
-                }
-
-                $this->validate($key, $value);
-            }
-
-            return;
-        }
         $this->validator()->setRule($field, $options);
     }
 
@@ -603,9 +582,6 @@ class Model
     public function fields($quote = true)
     {
         $schema = $this->schema();
-        if (empty($schema)) {
-            return null;
-        }
 
         if ($quote === true) {
             return $this->prepareFields(array_keys($schema));
@@ -730,12 +706,11 @@ class Model
         $hasAndBelongsToMany = [];
         foreach ($this->hasAndBelongsToMany as $alias => $habtm) {
             $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
-            if (!in_array($alias, $options['associated'])) {
-                continue;
-            }
-            $data = $entity->get($needle);
-            if (is_array($data) or $data instanceof Collection) {
-                $hasAndBelongsToMany[$alias] = $entity->{$needle};
+            if (in_array($alias, $options['associated'])) {
+                $data = $entity->get($needle);
+                if (is_array($data) or $data instanceof Collection) {
+                    $hasAndBelongsToMany[$alias] = $entity->{$needle};
+                }
             }
         }
 
@@ -1167,7 +1142,7 @@ class Model
      */
     public function find(string $type = 'first', $options = [])
     {
-        $default = array(
+        $default = [
              'conditions' => null,
              'fields' => [],
              'joins' => [],
@@ -1178,7 +1153,7 @@ class Model
              'offset' => null,
              'callbacks' => true,
              'associated' => []
-           );
+        ];
 
         $options = array_merge($default, $options);
 
@@ -1397,42 +1372,29 @@ class Model
         }
 
         $query['associated'] = $this->associatedConfig($query);
-     
+  
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
-                if (isset($query['associated'][$alias]) === false) {
-                    continue;
-                }
-
-                if (!isset($this->{$alias})) {
-                    throw new MissingModelException($config['className'].':'.$alias);
-                }
-
-                $config = array_merge($config, $query['associated'][$alias]);
+                if (isset($query['associated'][$alias])) {
+                    $config = array_merge($config, $query['associated'][$alias]);
               
-                $query['joins'][] = array(
-                    'table' => $this->{$alias}->table,
-                    'alias' => $alias,
-                    'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
-                    'conditions' => $config['conditions'],
-                    'datasource' => $this->datasource,
-                    );
-
-                if (!empty($config['order'])) {
-                    if ($query['order'] === null) {
-                        $query['order'] = [];
+                    $query['joins'][] = array(
+                        'table' => $this->{$alias}->table,
+                        'alias' => $alias,
+                        'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
+                        'conditions' => $config['conditions'],
+                        'datasource' => $this->datasource,
+                        );
+                    
+                    if (empty($config['fields'])) {
+                        $config['fields'] = $this->{$alias}->fields();
                     }
-                    $query['order'][] = $config['order'];
+                    // If throw an error, then it can be confusing to know source, so turn to array
+                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
                 }
-
-                if (empty($config['fields'])) {
-                    $config['fields'] = $this->{$alias}->fields();
-                }
-                // If throw an error, then it can be confusing to know source, so turn to array
-                $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
             }
         }
-
+ 
         return $query;
     }
 
@@ -1529,25 +1491,19 @@ class Model
     protected function loadAssociatedHasMany($query, $results)
     {
         foreach ($this->hasMany as $alias => $config) {
-            if (isset($query['associated'][$alias]) === false) {
-                continue;
-            }
-
-            if (!isset($this->{$alias})) {
-                throw new MissingModelException($config['className'].':'.$alias);
-            }
-
-            $config = array_merge($config, $query['associated'][$alias]);
+            if (isset($query['associated'][$alias])) {
+                $config = array_merge($config, $query['associated'][$alias]);
         
-            if (empty($config['fields'])) {
-                $config['fields'] = $this->{$alias}->fields();
-            }
+                if (empty($config['fields'])) {
+                    $config['fields'] = $this->{$alias}->fields();
+                }
             
-            foreach ($results as $index => &$result) {
-                if (isset($result->{$this->primaryKey})) {
-                    $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
-                    $models = Inflector::pluralize(Inflector::variable($alias));
-                    $result->{$models} = $this->{$alias}->find('all', $config);
+                foreach ($results as $index => &$result) {
+                    if (isset($result->{$this->primaryKey})) {
+                        $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                        $models = Inflector::pluralize(Inflector::variable($alias));
+                        $result->{$models} = $this->{$alias}->find('all', $config);
+                    }
                 }
             }
         }
@@ -1558,37 +1514,28 @@ class Model
     protected function loadAssociatedHasAndBelongsToMany($query, $results)
     {
         foreach ($this->hasAndBelongsToMany as $alias => $config) {
-            if (isset($query['associated'][$alias]) === false) {
-                continue;
-            }
+            if (isset($query['associated'][$alias])) {
+                $config = array_merge($config, $query['associated'][$alias]);
 
-            if (!isset($this->{$alias})) {
-                throw new MissingModelException($config['className'] . ':' . $alias);
-            }
-
-            $config = array_merge($config, $query['associated'][$alias]);
-
-            $config['joins'][0] = array(
-              'table' => $config['joinTable'],
-              'alias' => $config['with'],
-              'type' => 'INNER',
-              'conditions' => $config['conditions'],
-            );
-            $config['conditions'] = [];
-            if (empty($config['fields'])) {
-                $config['fields'] = array_merge(
-                $this->{$alias}->fields(),
-                $this->{$config['with']}->fields()
-              );
-            }
-
-            foreach ($results as $index => &$result) {
-                if (isset($result->{$this->primaryKey})) {
-                    $config['joins'][0]['conditions']["{$config['with']}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                $config['joins'][0] = array(
+                    'table' => $config['joinTable'],
+                    'alias' => $config['with'],
+                    'type' => 'INNER',
+                    'conditions' => $config['conditions'],
+                    );
+                $config['conditions'] = [];
+                if (empty($config['fields'])) {
+                    $config['fields'] = array_merge($this->{$alias}->fields(), $this->{$config['with']}->fields());
                 }
 
-                $models = Inflector::pluralize(Inflector::variable($alias));
-                $result->{$models} = $this->{$alias}->find('all', $config);
+                foreach ($results as $index => &$result) {
+                    if (isset($result->{$this->primaryKey})) {
+                        $config['joins'][0]['conditions']["{$config['with']}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                    }
+
+                    $models = Inflector::pluralize(Inflector::variable($alias));
+                    $result->{$models} = $this->{$alias}->find('all', $config);
+                }
             }
         }
 

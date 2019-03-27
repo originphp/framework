@@ -22,13 +22,14 @@ use Origin\Model\Entity;
 use Origin\Model\Behavior\Behavior;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Exception\NotFoundException;
+use Origin\Exception\Exception;
 
 class Article extends AppModel
 {
     public function initialize(array $config)
     {
         $this->hasMany('Comment');
-        $this->belongsTo('User');
+        $this->belongsTo('User', ['order'=>'email']);
         $this->hasAndBelongsToMany('Tag');
     }
 }
@@ -197,6 +198,9 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1004, $Entity->id);
         $this->assertEquals('EntityName', $Entity->name);
         $this->assertEquals('Article', $Entity->name());
+
+        $Entity = $Article->new($data, ['associated'=>false]); // reach normalized
+        $this->assertEquals(1004, $Entity->id);
     }
 
     public function testNewEntities()
@@ -260,7 +264,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $expected = array('Post.id = Comment.post_id');
         $this->assertEquals($expected, $relationship->conditions);
         $this->assertNull($relationship->fields);
-        $this->assertNull($relationship->order);
         $this->assertFalse($relationship->dependent);
     }
 
@@ -283,7 +286,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
             '1 == 1',
           ),
           'fields' => array('id', 'description'),
-          'order' => array('created ASC'),
           'dependent' => true,
         );
 
@@ -309,7 +311,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $expected = array('Post.user_id = User.id');
         $this->assertEquals($expected, $relationship->conditions);
         $this->assertNull($relationship->fields);
-        $this->assertNull($relationship->order);
         $this->assertEquals('LEFT', $relationship->type);
     }
 
@@ -336,7 +337,6 @@ class ModelTest extends \PHPUnit\Framework\TestCase
             '1 == 1',
           ),
           'fields' => array('id', 'name'),
-          'order' => array('created ASC'),
           'type' => 'INNER',
         );
 
@@ -840,7 +840,8 @@ class ModelTest extends \PHPUnit\Framework\TestCase
           new Entity(array('title' => 'title #1')),
           new Entity(array('title' => 'title #2')),
         );
-        $this->assertTrue($Article->saveMany($rows, array('transaction' => false)));
+        $this->assertFalse($Article->saveMany([]));
+        $this->assertTrue($Article->saveMany($rows));
         $this->assertEmpty($Article->validationErrors);
     }
 
@@ -1001,6 +1002,25 @@ class ModelTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($Article->save($data));
         $result = $Article->ArticlesTag->find('list', array('conditions' => $conditions, 'fields' => array('tag_id', 'test')));
         $this->assertEquals([4 => 1, 5 => 0], $result);
+    }
+
+    public function testSaveHABTMFail()
+    {
+        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
+
+        $Article->hasAndBelongsToMany('Tag', ['mode' => 'replace']);
+        $array = [
+          'id' => 1,
+          'tags' => [
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+          ],
+        ];
+        $data = $Article->new($array);
+        $this->assertFalse($Article->save($data));
+
+        $this->assertFalse($Article->save($data, ['associated'=>['Tag']])); // test fail cause field not recognised
     }
 
     public function testSaveAssociatedHasOne()
@@ -1250,5 +1270,77 @@ lastname VARCHAR(30) NOT NULL
     {
         $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
         $this->assertFalse(isset($Article->Foo));
+    }
+
+    public function testAssociation()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->hasOne('Author');
+        $this->assertNotEmpty($Article->association('hasOne'));
+
+        $Article->hasMany('Comment');
+        $this->assertNotEmpty($Article->association('hasMany'));
+
+        $Article->belongsTo('Website');
+        $this->assertNotEmpty($Article->association('belongsTo'));
+        $Article->hasAndBelongsToMany('Tag');
+        $this->assertNotEmpty($Article->association('hasAndBelongsToMany'));
+        $this->expectException(Exception::class);
+        $Article->association('doesNotBelongToAnyButMightDo');
+    }
+
+    public function testDisplayField()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $this->assertEquals('title', $Article->displayField);
+
+
+        $ArticlesTag = new Model(['name' => 'ArticlesTag', 'datasource' => 'test']);
+        $this->assertEquals('id', $ArticlesTag->displayField);
+
+        $ArticlesTag = new Model(['name' => 'ArticlesTag', 'datasource' => 'test']);
+        $ArticlesTag->primaryKey = 'foo';
+        $this->expectException(Exception::class);
+        $null = $ArticlesTag->displayField;
+    }
+
+    public function testEnableDisableBehavior()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->loadBehavior('Timestamp');
+        $this->assertTrue($Article->disableBehavior('Timestamp'));
+        $this->assertTrue($Article->enableBehavior('Timestamp'));
+    }
+
+    public function testUnkownModelException()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->belongsTo('Author');
+        $this->expectException(MissingModelException::class);
+        $result = $Article->Author->find('all');
+    }
+
+    public function testLoadBelongsToHasOneMissingModel()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->belongsTo('Owner');
+        $this->expectException(MissingModelException::class);
+        $result = $Article->find('first', ['associated'=>['Owner']]);
+    }
+
+    public function testLoadHasManyMissingModel()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->hasMany('Source');
+        $this->expectException(MissingModelException::class);
+        $result = $Article->find('first', ['associated'=>['Source']]);
+    }
+
+    public function testLoadHasAndBelongsToManyMissingModel()
+    {
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->hasMany('SuperTag');
+        $this->expectException(MissingModelException::class);
+        $result = $Article->find('first', ['associated'=>['SuperTag']]);
     }
 }

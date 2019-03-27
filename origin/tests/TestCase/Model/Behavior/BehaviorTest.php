@@ -39,6 +39,11 @@ class BehaviorTesterBehavior extends Behavior
 
         return $query;
     }
+
+    public function foo($a, $b, $c, $d)
+    {
+        return 'bar';
+    }
 }
 
 class BehaviorTest extends \PHPUnit\Framework\TestCase
@@ -332,5 +337,19 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->loadBehavior('BehaviorTester');
         $article = $Article->get(3);
         $this->assertTrue($Article->delete($article));
+    }
+
+    public function testMixin()
+    {
+        $article = new Model(['name' => 'Post']);
+        $behavior = new BehaviorTesterBehavior($article);
+
+        $article->behaviorRegistry()->set('BehaviorTester', $behavior);
+        $article->behaviorRegistry()->enable('BehaviorTester');
+
+        $this->assertEquals('bar', $article->foo(1, 2, 3, 4));
+
+        $this->expectException(\Origin\Exception\Exception::class);
+        $article->bar();
     }
 }

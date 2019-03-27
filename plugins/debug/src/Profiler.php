@@ -96,6 +96,6 @@ class Profiler
      */
     public function log(string $message)
     {
-        return file_put_contents(LOGS . DS . 'profile-' . $this->timestamp . '.log', $message);
+        return file_put_contents(LOGS . DS . 'profile-' . $this->timestamp . '.log', $message ."\n", FILE_APPEND | LOCK_EX);
     }
 }

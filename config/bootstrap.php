@@ -4,9 +4,9 @@ use Origin\Core\Plugin;
 use Origin\Cache\Cache;
 
 /*
- * This will go in your server.php file once your app has been developed.
+ * This will go in your config/server.php file once your app has been developed.
  */
-Configure::write('debug', true); // goes in server
+Configure::write('debug', true);
 
 /*
  * If you change namespace name then you will need to change:

@@ -28,6 +28,7 @@ $user = $this->User->get($id, [
 You can pass options for each model to be contained, these will overide what was set with the functions below. You can also load nested associated data, by passing the contain option for each model.
 
 ## Has One
+
 This is one-to-one relationship. The other model contains the foreign key.
 e.g. User has one Profile, the foreign key is in the other table, this would be `Profile.user_id`
 
@@ -51,7 +52,6 @@ You can also pass an options array with any of the following keys.
 - `foreignKey` the foreign key in the other model. The default value would be the underscored name of the current model suffixed with '\_id'.
 - `conditions` an array of additional conditions to the join
 - `fields` an array of fields to return from the join model, by default it returns all
-- `order` a string or array of how to order the result
 - `dependent` default is `false`, if set to true when delete is called with cascade it will related records.
 
 ```php
@@ -64,7 +64,6 @@ You can also pass an options array with any of the following keys.
           'foreignKey' => 'user_profile_id',
           'conditions' => ['UserProfile.active'=>true],
           'fields' => ['User.id','User.name','UserProfile.id','UserProfile.status'],
-          'order' => ['User.name ASC'],
           'dependent' => true]
           );
     }
@@ -95,7 +94,6 @@ You can also pass an options array with any of the following keys.
 - `foreignKey` the foreign key in the current model.  The default value would be the underscored name of the other model suffixed with '\_id'.
 - `conditions` an array of additional conditions to the join
 - `fields` an array of fields to return from the join model, by default it returns all
-- `order` a string or array of how to order the result
 - `type` default is `LEFT`, this is the join type used to fetch the associated record.
 
 ```php
@@ -108,8 +106,7 @@ You can also pass an options array with any of the following keys.
           'foreignKey' => 'user_id',
           'conditions' => ['SuperUser.email !='=> null],
           'fields' => ['SuperUser.id','SuperUser.name','Profile.id','Profile.name'],
-          'order' => ['SuperUser.group','SuperUser.name ASC'],
-          'dependent' => true
+          'dependent' => true,
           'type' => 'INNER'
       ]);
     }
