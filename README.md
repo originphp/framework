@@ -4,7 +4,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 ### Features
 
-- High Performance and low memory usage (The bookmarks demo with multiple database associations and callbacks uses about 850k of memory)
+- High Performance and low memory usage: The bookmarks demo with multiple database associations and callbacks uses about 800k without debug. The framework itself is 1.4mb without git data and frameworks unit tests.
 - MVC (Model View Controller) design pattern.
 - Built development server (using docker) - Highly Recommended!!! See the [getting started guide](docs/getting-started.md).
 - Console Apps: build console apps
