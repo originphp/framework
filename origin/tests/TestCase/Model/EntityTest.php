@@ -158,6 +158,13 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, (string) $entity);
     }
 
+    public function testProperties()
+    {
+        $data = ['foo'=>'bar','a'=>'b'];
+        $entity = new Entity($data);
+        $this->assertEquals(['foo','a'], $entity->properties());
+    }
+
     public function testPropertyExists()
     {
         $entity = new Entity(['name'=>'test']);

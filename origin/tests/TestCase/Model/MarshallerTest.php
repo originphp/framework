@@ -104,6 +104,10 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
  
         $this->assertTrue($entity->author->has('name'));
         $this->assertFalse($entity->author->has('created'));
+
+        $data = ['name'=>'Article','author'=>'bad data'];
+        $entity = $Marshaller->one($data, ['associated'=>['Author']]);
+        $this->assertNull($entity->author);
     }
 
 
@@ -161,9 +165,13 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Entity = $Marshaller->one(['id'=>1234], ['name' => 'Article']);
         $requestData['author']['location'] = 'New York';
          
-        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['fields'=>['id'],'associated'=>['Author'=>['fields'=>['id','name']]]]);
+        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['fields'=>['id','author'],'associated'=>['Author'=>['fields'=>['id','name']]]]);
     
         $this->assertTrue($patchedEntity->author->has('name'));
         $this->assertFalse($patchedEntity->author->has('location'));
+
+        $data = ['name'=>'Article','author'=>'bad data'];
+        $entity = $Marshaller->patch($Entity, $data, ['associated'=>['Author']]);
+        $this->assertNull($entity->author);
     }
 }

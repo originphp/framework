@@ -261,6 +261,7 @@ class Model
         if (isset($this->{$name})) {
             return $this->{$name};
         }
+        return null;
     }
 
     public function __call(string $method, array $arguments)
@@ -290,7 +291,7 @@ class Model
           Inflector::underscore($this->name).'_name',
           'name',
           'title',
-          $this->primaryKey,
+           $this->primaryKey,
         ];
 
         foreach ($needles as $needle) {
@@ -708,12 +709,13 @@ class Model
             $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
             if (in_array($alias, $options['associated'])) {
                 $data = $entity->get($needle);
+              
                 if (is_array($data) or $data instanceof Collection) {
                     $hasAndBelongsToMany[$alias] = $entity->{$needle};
                 }
             }
         }
-
+      
         /**
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
@@ -723,7 +725,7 @@ class Model
         foreach ($columns as $column) {
             $data[$column] = $entity->get($column);
         }
-       
+    
         /**
          * Data should not be objects or arrays. Invalidate any objects or array data
          * e.g. unvalidated datetime fields.
@@ -733,11 +735,11 @@ class Model
                 $entity->invalidate($key, 'Invalid data');
             }
         }
-        
+     
         if (empty($data) or $entity->errors()) {
             return false;
         }
-
+    
         $result = null;
       
         // Don't save if only field set is id (e.g savingHABTM)
@@ -757,7 +759,7 @@ class Model
                 $this->triggerCallback('afterSave', [$entity, !$exists, $options]);
             }
         }
-
+        
         /**
          * Save HABTM. It is here, because control is needed on false result from here
          */
@@ -824,7 +826,7 @@ class Model
         $joinModel = $this->{$config['with']};
 
         $links = [];
-        
+  
         foreach ($data as $row) {
             $primaryKey = $this->{$association}->primaryKey;
             $displayField = $this->{$association}->displayField;
@@ -838,13 +840,15 @@ class Model
                 return false;
             }
        
-            $tag = $this->{$association}->find('first', array(
-                  'conditions' => array($needle => $row->get($needle)),
+            $tag = $this->{$association}->find('first', [
+                  'conditions' => [$needle => $row->get($needle)],
                   'callbacks' => false,
-                ));
-          
+            ]);
+
             if ($tag) {
-                $links[] = $tag->get($primaryKey);
+                $id = $tag->get($primaryKey);
+                $links[] = $id;
+                $row->set($primaryKey, $id);
             } else {
                 if (!$this->{$association}->save($row, array(
                       'callbacks' => $callbacks,
@@ -857,39 +861,27 @@ class Model
           
             $joinModel = $this->{$config['with']};
         }
-        $existingJoins = $joinModel->find('list', array(
-                'conditions' => array($config['foreignKey'] => $this->id),
-                'fields' => array($config['associationForeignKey']),
-              ));
+        $existingJoins = $joinModel->find('list', [
+                'conditions' => [$config['foreignKey'] => $this->id],
+                'fields' => [$config['associationForeignKey']],
+        ]);
 
         $connection = $joinModel->connection();
         // By adding ID field we can do delete callbacks
         if ($config['mode'] === 'replace') {
-            $connection->delete($config['joinTable'], array(
-                      $config['foreignKey'] => $this->id,
-                  ));
-        } else {
-            $remove = array_diff($existingJoins, $links);
-            if (!empty($remove)) {
-                $connection->delete($config['joinTable'], array(
-                  $config['foreignKey'] => $this->id,
-                  $config['associationForeignKey'] => $remove,
-                ));
-            }
+            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->id]);
         }
 
         foreach ($links as $linkId) {
             if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
                 continue;
             }
-            $insertData = array(
+            $insertData = [
                   $config['foreignKey'] => $this->id,
                   $config['associationForeignKey'] => $linkId,
-                );
+            ];
             
-            if (!$connection->insert($joinModel->table, $insertData)) {
-                return false;
-            }
+            $connection->insert($joinModel->table, $insertData);
         }
         return true;
     }
@@ -964,14 +956,9 @@ class Model
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
             $key = lcfirst($alias);
-            if (!in_array($alias, $options['associated']) or !$data->has($key)) {
+            if (!in_array($alias, $options['associated']) or !$data->has($key) or !$data->{$key} instanceof Entity) {
                 continue;
             }
-
-            if (!$data->{$key} instanceof Entity) {
-                throw new InvalidArgumentException($key .' is not an instance of entity.');
-            }
-          
             if ($data->{$key}->modified()) {
                 if (!$this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
@@ -994,11 +981,8 @@ class Model
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
                 $key = lcfirst($alias);
-                if (!in_array($alias, $options['associated']) or !$data->has($key)) {
+                if (!in_array($alias, $options['associated']) or !$data->has($key) or !$data->{$key} instanceof Entity) {
                     continue;
-                }
-                if (!$data->{$key} instanceof Entity) {
-                    throw new InvalidArgumentException($key .' is not an instance of entity.');
                 }
                 if ($data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
@@ -1021,11 +1005,7 @@ class Model
                 $foreignKey = $this->hasMany[$alias]['foreignKey'];
                     
                 foreach ($data->get($key) as $record) {
-                    if (!$record instanceof Entity) {
-                        throw new InvalidArgumentException($key .' is not an instance of entity.');
-                    }
-
-                    if ($record->modified()) {
+                    if ($record instanceof Entity and $record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
                         if (!$this->{$alias}->save($record, $associatedOptions)) {
                             $result = false;
@@ -1068,19 +1048,16 @@ class Model
      */
     public function saveMany(array $data, array $options = [])
     {
-        if (empty($data)) {
-            return false;
-        }
-        $defaults = ['validate' => true, 'callbacks' => true, 'transaction' => true];
-        $options = array_merge($defaults, $options);
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
         if ($options['transaction']) {
             $this->begin();
         }
         $result = true;
-        foreach ($data as $key => $row) {
+        foreach ($data as $row) {
             if (!$this->save($row, array('transaction' => false) + $options)) {
                 $result = false;
+                break;
             }
         }
 

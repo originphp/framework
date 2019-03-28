@@ -102,7 +102,11 @@ class Marshaller
         $properties = [];
      
         foreach ($data as $property => $value) {
-            if (isset($propertyMap[$property]) and is_array($value)) {
+            if (isset($propertyMap[$property])) {
+                if (!is_array($value)) {
+                    $properties[$property] = null;// remove inconsistent data
+                    continue;
+                }
                 $alias = $property;
                 $fields = [];
                 if ($propertyMap[$property] === 'many') {
@@ -126,7 +130,6 @@ class Marshaller
         }
        
         if ($options['fields'] and is_array($options['fields'])) {
-            $options['fields'] = array_merge($options['fields'], array_keys($propertyMap));
             foreach ($properties as $property => $value) {
                 if (in_array($property, $options['fields'])) {
                     $entity->set($property, $value);
@@ -174,7 +177,11 @@ class Marshaller
 
         $properties = [];
         foreach ($data as $property => $value) {
-            if (isset($propertyMap[$property]) and is_array($value)) {
+            if (isset($propertyMap[$property])) {
+                if (!is_array($value)) {
+                    $properties[$property] = null;// remove inconsistent data
+                    continue;
+                }
                 $alias = $property;
                 $fields = [];
                 if ($propertyMap[$property] === 'many') {
@@ -201,7 +208,6 @@ class Marshaller
         }
        
         if ($options['fields'] and is_array($options['fields'])) {
-            $options['fields'] = array_merge($options['fields'], array_keys($propertyMap));
             foreach ($properties as $property => $value) {
                 if (in_array($property, $options['fields'])) {
                     $entity->set($property, $value);
