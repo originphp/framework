@@ -27,10 +27,9 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      * Creates a Mock model, and adds to Registry at the same time. It will load
      * config from registry to maintain fixture information.
      *
-     * @param string $alias name of model
+     * @param string $alias Name of model - Bookmark, MyPlugin.Contact
      * @param array $methods methods to mock
-     * @param array $options set the className to be used buy mockBuilder, these will also be passed
-     * to model constructor as config
+     * @param array $options (className,table,alias,datasource)
      * @return \Origin\Model\Model
      */
     public function getMockForModel(string $alias, array $methods = [], array $options =[])
@@ -41,9 +40,10 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
                 throw new MissingModelException($alias);
             }
         }
+    
         list($plugin, $alias) = pluginSplit($alias);
-        $options['alias'] = $alias;
-
+        $options += ['name' => $alias, 'alias' => $alias];
+       
         $existingConfig = ModelRegistry::config($alias);
         if ($existingConfig) {
             $options +=  $existingConfig;

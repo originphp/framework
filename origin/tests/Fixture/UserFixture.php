@@ -21,7 +21,7 @@ class UserFixture extends Fixture
     public $datasource = 'test';
 
     public $fields = array(
-         'id' => array('type' => 'integer', 'key' => 'primary'),
+         'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
          'name' => array(
            'type' => 'string',
            'length' => 255,
@@ -42,7 +42,7 @@ class UserFixture extends Fixture
      );
     public $records = array(
          array(
-           'id' => 1,
+           'id' => 1000,
            'name' => 'James',
            'email' => 'james@example.com',
            'password' => '$2y$10$V5RgkqQ6Onnxgz2rmEBJDuftS9DX7iD0qv8V3LlM0qDdTYK2Y3Fbq',
@@ -50,7 +50,7 @@ class UserFixture extends Fixture
            'created' => '2018-12-20 09:00:15',
          ),
          array(
-           'id' => 2,
+           'id' => 1001,
            'name' => 'Amanda',
            'email' => 'amanda@example.com',
            'password' => '$2y$10$YK3SO6y4O9ObgpLG6HH75e6o2uQFQxdQ3qbE8szwMCTpZxSao6H16',

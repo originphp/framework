@@ -723,7 +723,7 @@ class Model
         foreach ($columns as $column) {
             $data[$column] = $entity->get($column);
         }
-        
+       
         /**
          * Data should not be objects or arrays. Invalidate any objects or array data
          * e.g. unvalidated datetime fields.
@@ -739,7 +739,7 @@ class Model
         }
 
         $result = null;
-
+      
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or !isset($data[$this->primaryKey])) {
             $connection = $this->connection();
@@ -1158,7 +1158,13 @@ class Model
         $options = array_merge($default, $options);
 
         if ($options['callbacks'] === true) {
-            $options = $this->triggerCallback('beforeFind', [$options], true);
+            $result = $this->triggerCallback('beforeFind', [$options], true);
+            if ($result === false) {
+                return null;
+            }
+            if (is_array($result)) {
+                $options = $result;
+            }
         }
 
         $options = $this->prepareQuery($type, $options); // AutoJoin
@@ -1372,11 +1378,10 @@ class Model
         }
 
         $query['associated'] = $this->associatedConfig($query);
-  
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
-                    $config = array_merge($config, $query['associated'][$alias]);
+                    $config = array_merge($config, $query['associated'][$alias]); /// fields
               
                     $query['joins'][] = array(
                         'table' => $this->{$alias}->table,
@@ -1389,12 +1394,13 @@ class Model
                     if (empty($config['fields'])) {
                         $config['fields'] = $this->{$alias}->fields();
                     }
+                 
                     // If throw an error, then it can be confusing to know source, so turn to array
                     $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
                 }
             }
         }
- 
+
         return $query;
     }
 
@@ -1413,10 +1419,9 @@ class Model
                 $alias = $config;
                 $config = [];
             }
-            if (isset($config['fields'])) {
-                foreach ($config['fields'] as $key => $value) {
-                    $config['fields'][$key] = "{$alias}.{$value}";
-                }
+            $config += ['fields'=>[]];
+            foreach ($config['fields'] as $key => $value) {
+                $config['fields'][$key] = "{$alias}.{$value}";
             }
             $contain[$alias] = $config;
            
@@ -1480,7 +1485,7 @@ class Model
         }
         return $buffer;
     }
-   
+
     /**
      * Holds the associated hasMany records
      *
@@ -1566,7 +1571,7 @@ class Model
           */
        
         $sql = $builder->selectStatement($query);
-       
+    
         $connection->execute($sql, $builder->getValues());
         
 
@@ -1575,16 +1580,73 @@ class Model
         }
         
         $results = $connection->fetchAll($type);
-  
+        
+
         if ($results and $type === 'model') {
             $results = $this->prepareResults($results);
-
+            /**
+             * Here is where going recursive might go
+             *
+             */
+            $results = $this->loadAssociatedBelongsTo($query, $results);
+            $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
         }
    
         unset($QueryBuilder,$sql,$connection);
 
+        return $results;
+    }
+
+    /**
+     * Recursively load associatedBelongsTo
+     *
+     * @param array $query
+     * @param array $results
+     * @return array
+     */
+    protected function loadAssociatedBelongsTo($query, $results)
+    {
+        foreach ($query['associated'] as $model => $config) {
+            if (isset($config['associated']) and isset($this->belongsTo[$model])) {
+                $foreignKey = $this->belongsTo[$model]['foreignKey'];
+                $property = lcfirst($model);
+                foreach ($results as &$result) {
+                    if (isset($result->$foreignKey)) {
+                        $config['conditions'] = [$this->{$model}->primaryKey => $result->{$foreignKey}];
+                        $result->$property = $this->{$model}->find('first', $config);
+                    }
+                }
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Load Associated Has One
+     *
+     * @param [type] $query
+     * @param [type] $results
+     * @return void
+     */
+    public function loadAssociatedHasOne($query, $results)
+    {
+        foreach ($query['associated'] as $model => $config) {
+            if (isset($config['associated']) and isset($this->hasOne[$model])) {
+                $foreignKey = $this->hasOne[$model]['foreignKey']; // author_id
+                $property = lcfirst($model);
+                $primaryKey = $this->{$model}->primaryKey;
+                
+                foreach ($results as &$result) {
+                    if (isset($result->{$this->primaryKey})) { // Author id
+                        $config['conditions'] =   $this->hasOne[$model]['conditions'];
+                        $config['conditions'] = [$model . '.' . $foreignKey => $result->{$this->primaryKey}];
+                        $result->$property = $this->{$model}->find('first', $config);
+                    }
+                }
+            }
+        }
         return $results;
     }
 
@@ -1814,8 +1876,8 @@ class Model
     /**
      * triggerCallback.
      *
-     * @param string $callback   [description]
-     * @param array  $arguments  [description]
+     * @param string $callback
+     * @param array  $arguments
      * @param bool   $passedArgs if result is array overwrite
      * @return mixed
      */
