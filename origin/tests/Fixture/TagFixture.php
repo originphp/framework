@@ -41,7 +41,7 @@ class TagFixture extends Fixture
             'modified'=>'2019-03-27 13:11:00'
         ],
         [
-            'id'=>1003,
+            'id'=>1002,
             'title' => 'Tag #3',
             'created'=>'2019-03-27 13:12:00',
             'modified'=>'2019-03-27 13:10:00'
