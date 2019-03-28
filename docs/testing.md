@@ -182,7 +182,7 @@ When you are first developing your app, using the import method makes the most s
 
 ### Mocking Models
 
-To mock models extend your Test case by either `TestCase` or `ControllerTestCase` and then call the `getMockForModel` method. When the Model is mocked, we also add this to model registry. Remember if use the `tearDown` method in your test case, then call `parent::tearDown()`;
+To mock models extend your Test case by either `OriginTestCase` and then call the `getMockForModel` method. When the Model is mocked, we also add this to model registry. Remember if use the `tearDown` method in your test case, then call `parent::tearDown()`;
 
 To get a mock model with the find method stubbed.
 
