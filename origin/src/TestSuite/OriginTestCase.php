@@ -21,8 +21,15 @@ use Origin\Model\ModelRegistry;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Holds the Fixtures list
+     * examples
+     * Article, MyPlugin.Article, Framework.Article
+     *
+     * @var array
+     */
     public $fixtures = [];
-    
+
     /**
      * Creates a Mock model, and adds to Registry at the same time. It will load
      * config from registry to maintain fixture information.

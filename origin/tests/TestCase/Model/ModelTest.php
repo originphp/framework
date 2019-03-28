@@ -30,13 +30,15 @@ use Origin\Exception\Exception;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
 
+/**
+ * Used By Mocks
+ */
 class Article extends Model
 {
     public $datasource = 'test';
 }
 
-
-class ModelNewTest extends OriginTestCase
+class ModelTest extends OriginTestCase
 {
     public $fixtures = [
         'Framework.Article',
@@ -47,7 +49,6 @@ class ModelNewTest extends OriginTestCase
         'Framework.Tag',
         'Framework.Address',
     ];
-
 
     /**
      * Model

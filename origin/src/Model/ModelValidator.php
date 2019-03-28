@@ -71,6 +71,8 @@ class ModelValidator
      */
     public function validate($value, $ruleSet)
     {
+       
+        // ['extension',['csv','txt']]
         if (is_array($ruleSet)) {
             $rule = $ruleSet[0];
             $args = $ruleSet;
@@ -79,12 +81,12 @@ class ModelValidator
             $rule = $ruleSet;
             $args = [$value];
         }
-
+     
         // Validation methods here
         if (method_exists($this, $rule)) {
             return call_user_func_array(array($this, $rule), $args);
         }
-
+       
         // Validation methods in model
         if (method_exists($this->model, $rule)) {
             return call_user_func_array(array($this->model, $rule), $args);
@@ -139,9 +141,9 @@ class ModelValidator
                 }
 
                 if ($validationRule['rule'] === 'isUnique') {
-                    $validationRule['rule'] = ['isUnique',[$entity, $field]];
+                    $validationRule['rule'] = ['isUnique',[$field]];
                 }
-               
+
                 if (in_array($field, $entity->modified())) {
                     if ($validationRule['message'] === null) {
                         $validationRule['message'] = $defaultMessage;
@@ -169,6 +171,10 @@ class ModelValidator
                         continue;
                     }
 
+                    if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
+                        $value = $entity;
+                    }
+                
                     if (!$this->validate($value, $validationRule['rule'])) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
@@ -283,11 +289,6 @@ class ModelValidator
     public function ip($value, $options = null)
     {
         return (bool) filter_var($value, FILTER_VALIDATE_IP);
-    }
-
-    public function isUnique($value, $fields=[])
-    {
-        return $this->model->isUnique($value, $fields);
     }
 
     /**

@@ -1767,6 +1767,7 @@ class Model
     {
         $conditions = [];
         foreach ($fields as $field) {
+            $conditions[$field] = null;
             if (isset($entity->{$field})) {
                 $conditions[$field] = $entity->{$field};
             }

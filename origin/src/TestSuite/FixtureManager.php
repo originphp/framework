@@ -22,15 +22,6 @@ class FixtureManager
 {
     protected $loaded = [];
 
-    public function __construct()
-    {
-        $this->initialize();
-    }
-
-    public function initialize()
-    {
-    }
-
     /**
      * Loads fixtures defined in a test.
      *

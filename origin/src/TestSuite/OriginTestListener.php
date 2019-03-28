@@ -31,7 +31,7 @@ class OriginTestListener implements TestListener
 
     public function startTestSuite(TestSuite $suite): void
     {
-        $this->fixtureManager = new FixtureManager($suite);
+        $this->fixtureManager = new FixtureManager();
     }
 
     public function startTest(Test $test): void

@@ -14,10 +14,13 @@
 
 namespace Origin\Core\Test;
 
+use Origin\TestSuite\OriginTestCase;
+
 use Origin\Model\ModelValidator;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Exception\ValidatorException;
+use Origin\Model\ModelRegistry;
 
 class Widget extends Model
 {
@@ -39,12 +42,21 @@ class MockValidator extends ModelValidator
     }
 }
 
-class ModelValidatorTest extends \PHPUnit\Framework\TestCase
+class ModelValidatorTest extends OriginTestCase
 {
+    public $fixtures = ['Framework.Article'];
+
     public function setUp()
     {
         $Post = new Model(array('name' => 'Post'));
         $this->Validator = new MockValidator($Post);
+
+        // Add Non Existant Model to registry - if mock then create class above
+        $this->Article = new Model([
+            'name'=>'Article',
+            'datasource'=>'test'
+            ]);
+        ModelRegistry::set('Article', $this->Article);
     }
 
     /**
@@ -256,14 +268,6 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($Validator->ip('192.168.1.37'));
     }
 
-    public function testIsUnique()
-    {
-        $Article = new Model(array('name' => 'Article','datasource'=>'test'));
-        $validator = new MockValidator($Article);
-        $entity = new Entity(['id'=>1024,'title'=>'foo']);
-        $this->assertTrue($validator->isUnique($entity, ['id']));
-    }
-
     public function testValidateCustomRule()
     {
         $validator = new MockValidator(new Widget());
@@ -349,5 +353,46 @@ class ModelValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($Validator->url('ftp://www.google.com', false));
         $this->assertFalse($Validator->url('origin://www.google.com', false));
+    }
+
+    /**
+     * This is a bit of mess, so we have to test through model.
+     */
+    public function testIsUnique()
+    {
+        $this->Article->validate('id', ['rule'=> 'isUnique']);
+        $article = $this->Article->new();
+        $article->id = 1;
+        $this->assertTrue($this->Article->validates($article));
+
+        $article = $this->Article->new();
+        $article->id = 1000;
+        $this->assertFalse($this->Article->validates($article));
+
+        $this->Article->validate('id', ['rule'=> ['isUnique',['id','title']]]);
+        $article = $this->Article->new();
+        $article->id = 1000;
+        $article->title = 'Article #1';
+        $this->assertFalse($this->Article->validates($article));
+    }
+
+    /**
+     * Check multiple rule including blanks w
+     *
+     * @return void
+     */
+    public function testValidates()
+    {
+        $this->Article->validate('title', 'email');
+    
+        $article = $this->Article->new();
+        $article->title = '';
+        $this->assertTrue($this->Article->validates($article));
+        
+        $this->Article->validate('body', 'alphanumeric');
+        $article = $this->Article->new();
+        $article->title = '';
+        $article->body = ['bad data'];
+        $this->assertFalse($this->Article->validates($article));
     }
 }
