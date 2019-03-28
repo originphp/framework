@@ -182,6 +182,13 @@ class ArticlesController extends AppController
 }
 ```
 
+You can also whitelist fields (prevent mass assignment attacks) by telling new which fields are allowed.
+
+```php
+  $article = $this->Article->new($data,[
+      'fields'=> ['title','description']
+      );
+```
 
 ### Read
 
@@ -205,9 +212,11 @@ If you don't want that behavior then you would use the find method.
 ```
 
 To find the first the record use the first finder
+
 ```php
     $first = $this->Article->find('first');
 ```
+
 The all finder will return multiple records
 ```php
     $all = $this->Article->find('all',[
@@ -244,7 +253,7 @@ Once you have the record that you want to update use the save method on the mode
 
 If you are processing updated data from the request then the preferred way is using the model `patch` method, this will take the existing entity and then patch it using an array of data, the primary key is automatically added.
 
-The patch method marshals the data, includes some security features and is clever enough to work with associated data as well. You can pass an array with the key `fields` and array of a fields which are whitelisted, this will filter out any non specified fields which protect you from mass assignment attacks.
+The patch method marshals the data, includes some security features and is clever enough to work with associated data as well. 
 
 ```php
 class ArticlesController extends AppController
@@ -259,6 +268,16 @@ class ArticlesController extends AppController
     }
 }
 ```
+
+You can also whitelist fields (prevent mass assignment attacks) by telling patch which fields are allowed.
+
+```php
+  $article = $this->Article->patch($article,$this->request->data(),[
+      'fields'=> ['title','description']
+      );
+```
+
+
 
 You can also update in bulk but this wont trigger callbacks, the first array is of
 the fields you want to change and the second argument are the conditions.
@@ -297,7 +316,94 @@ Or you can delete in bulk but this wont trigger callbacks or delete related reco
 
 ## Saving Associated Data
 
-By default associated records will be saved, you can disable this by setting associated to false. And you can limit this to certain associations by passing an array with the names of the alias for the model that you want to save for.
+You can save records with with associated data such, simply pass an array to the new method on the article and this will build the entity object for you. 
+
+```php
+  $data = [
+    'title' => 'How to save data with associated data',
+    'author' => [         // belongsTo (singular)
+        'name' => 'Jane Smith',
+      ],
+    'approval' => [     // hasOne (singular)
+        'approved_by' => 'Tony'
+      ],
+    'comments' => [    // Has Many (plural)
+        ['text' => 'foo'],
+        ['text' => 'bar'],
+      ]
+  ];
+  $article = $this->Article->new($data);
+  $this->Article->save($article);
+```
+
+By default associated records will be saved, you can disable this by setting associated to false. 
+
+```php
+  $article = $this->Article->new($data,[
+      'associated'=>false]
+      );
+```
+
+And you can limit this to certain associations by passing an array with the names of the alias for the model that you want to save for.
+
+```php
+  $article = $this->Article->new($data,[
+      'associated'=>['Comment']]
+      );
+```
+
+You can also whitelist fields (prevent mass assignment attacks) by telling new or patch which fields to allow.
+
+```php
+  $article = $this->Article->new($data,[
+      'fields'=> ['title'],
+      'associated'=>[
+          'Author'=>[
+              'fields'=>['name']
+              ]
+            ]
+        ]
+      );
+```
+
+### Saving hasAndBelongsToMany
+
+
+You can save `hasAndBelongsToMany` in two ways
+
+1. Using the primary key of the associated model, e.g `id`
+
+```php
+
+  $data = [
+    'id' => 1000, // Article Id
+    'tags' => [
+        ['id' => 1001],
+        ['id' => 1002]
+     ]
+  ];
+ $article = $this->Article->new($data);
+ $this->Article->save($article);
+```
+
+2. Using the `displayField` of the associated model
+
+```php
+
+   $data = [
+    'id' => 1000, // Article Id
+    'tags' => [
+        ['name' => 'New'],
+        ['id' => 'Featured']
+     ]
+  ];
+  $entity = $this->Article->new($data);
+  $this->Article->save($data);
+
+```
+Saving data through this method is a quick and easy method to save `hasAndBelongsToMany` data. However callbacks are only called when creating the associated model, in this example the Tag model.
+
+If you wish to save extra data to the join table or use callbacks then you should make sure the table has a unique primary key field and then save and delete data directly from the join model.
 
 ## Save Options
 
