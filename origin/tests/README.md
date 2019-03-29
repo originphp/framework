@@ -25,10 +25,10 @@ serious performance issues, so in the docker container whilst it is installed, i
 
 To generate the code coverage you need to first enable xdebug in the container by editing the PHP.ini file. In docker these changes will not be kept once you restart.
 
-````linux
+```linux
 $ echo 'zend_extension="/usr/lib/php/20170718/xdebug.so"' >> /etc/php/7.2/cli/php.ini
 $ echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
-````
+```
 
 From the container and in the `origin/tests` folder run the following commands
 
