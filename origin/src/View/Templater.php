@@ -15,6 +15,7 @@
 namespace Origin\View;
 
 use Origin\Exception\Exception;
+use Origin\Core\Inflector;
 
 /**
  * Templater
@@ -81,7 +82,7 @@ class Templater
         $filename = CONFIG . DS . $name . '.php';
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            $filename = PLUGINS . DS . $plugin . DS . 'config' . DS . $name . '.php';
+            $filename = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'config' . DS . $name . '.php';
         }
 
         if (file_exists($filename)) {
@@ -92,9 +93,9 @@ class Templater
                 }
                 return true;
             }
-            throw new Exception("'{$name}.php' does not return an array");
         }
-        throw new Exception("'config/{$name}.php' does not exist.");
+        pr($filename);
+        throw new Exception("'config/{$name}.php' does not exist or does not return an array.");
     }
 
     /**

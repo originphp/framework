@@ -49,4 +49,19 @@ class TemplaterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $templater->format('foo', ['key'=>'value']);
     }
+
+    public function testLoad()
+    {
+        $templater = new Templater();
+        $this->assertTrue($templater->load('templates-test'));
+        $this->assertEquals('<p>{text}</p>', $templater->get('text'));
+
+        $templater = new Templater();
+        $this->assertTrue($templater->load('Widget.templates-test'));
+        $this->assertEquals('<p>{text}</p>', $templater->get('p'));
+
+        $templater = new Templater();
+        $this->expectException(Exception::class);
+        $templater->load('super-templates');
+    }
 }

@@ -468,6 +468,4 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         $expected = "\nSELECT\n  OrderDetails.id, SUM(quantity) AS items, SUM(price*quantity) AS total \nFROM\n  `items` AS `OrderDetails` \nGROUP BY\n  OrderDetails.id \nHAVING\n  total > :i0 AND items > :i1";
         $this->assertEquals($expected, $builder->writeFormatted());
     }
-    /*
-
 }

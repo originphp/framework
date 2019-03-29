@@ -181,14 +181,14 @@ class View
      * Gets a property value
      *
      * @param string $key Get view vars,contents,params
-     *
-     * @return
+     * @return mixed
      */
     public function fetch(string $key)
     {
         if (isset($this->{$key})) {
             return $this->{$key};
         }
+        return null;
     }
 
     /**
@@ -326,7 +326,7 @@ class View
      *
      * @param string $path index or Rest/json
      * @param array  $vars
-     *
+
      * @return string $buffer;
      */
     public function render(string $path, $layout = null)
@@ -355,7 +355,7 @@ class View
         if (!isset($this->vars['title'])) {
             $this->vars['title'] = Inflector::humanize(Inflector::underscore($this->name));
         }
-
+       
         extract($this->vars);
 
         ob_start();

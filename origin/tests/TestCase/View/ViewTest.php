@@ -20,6 +20,10 @@ use Origin\View\Helper\Helper;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
+use Origin\Exception\Exception;
+use Origin\View\Exception\MissingElementException;
+use Origin\View\Exception\MissingViewException;
+use Origin\View\Exception\MissingLayoutException;
 
 class TestsController extends Controller
 {
@@ -85,6 +89,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
+        $this->View = new View(new TestsController(new Request(), new Response()));
     }
 
     public function testConstruct()
@@ -193,5 +198,73 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $result = $view->callMethod('render', ['edit', 'layout']);
         $expected = '<h1>Layout Loaded<h1><h2>Action Loaded: edit</h2><span>Element Loaded</span>';
         $this->assertEquals($expected, str_replace("\n", '', $result));
+    }
+
+    /**
+     * New Tests - based upon new features such as testApp etc, these previously not avaiable.
+     *
+     */
+
+  
+
+    public function testViewRender()
+    {
+        $this->View->loadHelper('Flash');
+        $result = $this->View->render('/Posts/index', 'default');
+        $this->assertContains('<h1>Posts Home Page</h1>', $result); // view
+        $this->assertContains('<title>Tests</title>', $result); // Layout
+    }
+
+    public function testViewRenderPlugin()
+    {
+        $this->View->loadHelper('Flash');
+        $result = $this->View->render('Widget.Widgets/items', false);
+        $this->assertEquals('<h2>Widget Items</h2>', $result);
+
+
+        $request = new Request('tests/edit/2048');
+        $controller = new Controller($request, new Response());
+        $controller->name = 'Widgets';
+        $controller->request->params('controller', 'Widgets');
+        $controller->request->params('plugin', 'Widget');
+
+        $view = new View($controller);
+        $result =  $view->render('items');
+        $this->assertEquals('<h2>Widget Items</h2>', $result);
+    }
+
+    public function testTitle()
+    {
+        $this->assertNull($this->View->title());
+        $this->View->set('title', 'foo');
+        $this->assertEquals('foo', $this->View->title());
+    }
+
+    public function testFetch()
+    {
+        $this->assertIsArray($this->View->fetch('vars'));
+        $this->assertNull($this->View->fetch('foo'));
+    }
+
+    public function testMissingElementException()
+    {
+        $this->expectException(MissingElementException::class);
+        $this->View->element('i-dont-exist');
+    }
+    public function testMissingViewException()
+    {
+        $this->expectException(MissingViewException::class);
+        $this->View->render('i-dont-exist');
+    }
+    public function testMissingLayoutException()
+    {
+        $this->expectException(MissingLayoutException::class);
+        $this->View->render('/Posts/index', 'non-existant-layout');
+    }
+
+    public function testGetNonExistantHelper()
+    {
+        $this->expectException(Exception::class);
+        $this->View->IDontExist->foo();
     }
 }
