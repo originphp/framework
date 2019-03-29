@@ -1535,22 +1535,17 @@ class Model
     protected function readDataSource(array $query, $type = 'model')
     {
         $connection = $this->connection();
-
-        $builder = $connection->queryBuilder($this->table, $this->alias);
-        
+        $connection->select($this->table, $query+['alias'=>$this->alias]);
+     
         /*
-          A different way to map and solve problem with postgres due meta table actual table name
+          A different way to map and solve problem with postgres due meta table actual table name. Using virtual
+          field
             foreach ($query['fields'] as $k => $field) {
             if (strpos($field, ' AS ') == false) {
                 $query['fields'][$k] = $field . ' AS ' . str_replace('.', '__', $field);
              }
             }
           */
-       
-        $sql = $builder->selectStatement($query);
-    
-        $connection->execute($sql, $builder->getValues());
-        
 
         if ($type == 'list') {
             return $connection->fetchList();
@@ -1558,20 +1553,15 @@ class Model
         
         $results = $connection->fetchAll($type);
         
-
         if ($results and $type === 'model') {
             $results = $this->prepareResults($results);
-            /**
-             * Here is where going recursive might go
-             *
-             */
             $results = $this->loadAssociatedBelongsTo($query, $results);
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
         }
    
-        unset($QueryBuilder,$sql,$connection);
+        unset($sql,$connection);
 
         return $results;
     }

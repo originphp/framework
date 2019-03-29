@@ -390,6 +390,13 @@ class Datasource
     }
      */
 
+    public function select(string $table, array $options)
+    {
+        $builder = $this->queryBuilder($table, $options['alias']);
+        $sql = $builder->selectStatement($options);// How to handle this elegently without having to do same work as selct
+        return $this->execute($sql, $builder->getValues());
+    }
+
     /**
      * Inserts a row into the database.
      *
@@ -400,11 +407,11 @@ class Datasource
      */
     public function insert(string $table, array $data)
     {
-        $Query = $this->queryBuilder($table);
-        $sql = $Query->insert($data)
+        $builder = $this->queryBuilder($table);
+        $sql = $builder->insert($data)
                       ->write();
 
-        return $this->execute($sql, $Query->getValues());
+        return $this->execute($sql, $builder->getValues());
     }
 
     /**
@@ -418,12 +425,12 @@ class Datasource
      */
     public function update(string $table, array $data, array $conditions = [])
     {
-        $Query = $this->queryBuilder($table);
-        $sql = $Query->update($data)
+        $builder = $this->queryBuilder($table);
+        $sql = $builder->update($data)
                     ->where($conditions)
                     ->write();
 
-        return $this->execute($sql, $Query->getValues());
+        return $this->execute($sql, $builder->getValues());
     }
 
     /**
@@ -436,11 +443,11 @@ class Datasource
      */
     public function delete(string $table, array $conditions = [])
     {
-        $Query = $this->queryBuilder($table);
-        $sql = $Query->delete($conditions)
+        $builder = $this->queryBuilder($table);
+        $sql = $builder->delete($conditions)
                     ->write();
 
-        return $this->execute($sql, $Query->getValues());
+        return $this->execute($sql, $builder->getValues());
     }
 
     /**

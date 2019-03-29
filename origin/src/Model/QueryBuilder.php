@@ -16,7 +16,11 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\QueryBuilderException;
 
-/**# SQL Builder
+/*
+## SQL Builder
+SqlBuilder restored to just escaping table aliases and column aliases. This was changed
+to work with Postgre and using reservered words such as a table called users then trying to select it
+with an alias of User, which means it need to be quoted "User"."field" however in MySQL there is no need for that since it recognises aliases eg. User.count
 
 This builds SQL statements easily in multiple ways.
 
@@ -134,22 +138,62 @@ Array
  */
 class QueryBuilder
 {
+    /**
+     * Holds the query
+     *
+     * @var array
+     */
     protected $query = [];
+    /**
+     * Holds the values
+     *
+     * @var array
+     */
     protected $values = [];
 
+    /**
+     * The table name
+     *
+     * @var string
+     */
     protected $table = null;
+    /**
+     * The alias e.g. user, User.
+     *
+     * @var string
+     */
     protected $alias = null;
 
+    /**
+     * Holds the placeholder for this query
+     *
+     * @var string
+     */
     public $placeholder = null;
 
-    public $quote ='`';
-
+    /**
+     * Placeholder counter
+     *
+     * @var integer
+     */
     protected $i = 0;
 
-    private $operators = array(
+    /**
+     * The default quote symbol for escaping stuff
+     *
+     * @var string
+     */
+    public $quote ='`';
+
+    /**
+     * List of operators
+     *
+     * @var array
+     */
+    protected $operators = [
         '=', '!=', '>', '<', '>=', '<=', 'BETWEEN',
         'NOT BETWEEN', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN',
-      );
+    ];
 
     /**
      * We dont want to add table alias to sql alias fields
@@ -165,7 +209,12 @@ class QueryBuilder
         }
     }
 
-    private function clear()
+    /**
+     * Basically a reset, used between queries
+     *
+     * @return void
+     */
+    protected function clear()
     {
         $this->query = [];
         $this->i = 0;
@@ -173,12 +222,24 @@ class QueryBuilder
         $this->specialFields = [];
     }
 
-    public function getValues()
+    /**
+     * Returns the values used by the last query
+     *
+     * @return array
+     */
+    public function getValues() : array
     {
         return $this->values;
     }
 
-    public function tableReference($table = null, $alias = null)
+    /**
+     * Creates the table reference
+     *
+     * @param string  $table
+     * @param string $alias
+     * @return void
+     */
+    protected function tableReference(string $table = null, string $alias = null) : string
     {
         if ($table == null) {
             $table = $this->table;
@@ -192,7 +253,16 @@ class QueryBuilder
         return $tableReference;
     }
 
-    public function select(array $fields = [], array $conditions = [])
+    /**
+     * The select part of the query
+     *
+     * $builder->select(['id', 'name', 'email']);
+     *
+     * @param array $fields
+     * @param array $conditions
+     * @return \Origin\Model\QueryBuilder
+     */
+    public function select(array $fields = [], array $conditions = []) : QueryBuilder
     {//SELECT users.* FROM `users`
         $this->query = array(
           'type' => 'SELECT',
@@ -211,7 +281,13 @@ class QueryBuilder
         return $this;
     }
 
-    public function insert(array $data)
+    /**
+     * The insert part of the statement
+     *
+     * @param array $data
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function insert(array $data) : QueryBuilder
     {
         $this->clear();
 
@@ -223,7 +299,14 @@ class QueryBuilder
         return $this;
     }
 
-    public function update(array $data, array $conditions = [])
+    /**
+     * Update part of statement
+     *
+     * @param array $data
+     * @param array $conditions
+     * @return \Origin\Model\QueryBuilder
+     */
+    public function update(array $data, array $conditions = []) : QueryBuilder
     {
         $this->clear();
 
@@ -238,7 +321,13 @@ class QueryBuilder
         return $this;
     }
 
-    public function delete(array $conditions)
+    /**
+     * Delete Statement
+     *
+     * @param array $conditions
+     * @return \Origin\Model\QueryBuilder
+     */
+    public function delete(array $conditions=[]) : QueryBuilder
     {
         $this->clear();
 
@@ -252,7 +341,14 @@ class QueryBuilder
         return $this;
     }
 
-    public function from(string $table, string $alias = null)
+    /**
+     * Sets the from part of the query, this is set when creating the builder
+     *
+     * @param string $table
+     * @param string $alias
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function from(string $table, string $alias = null) : QueryBuilder
     {
         $this->table = $table;
 
@@ -260,16 +356,29 @@ class QueryBuilder
             $alias = $table;
         }
         $this->alias = $alias;
+        return $this;
     }
 
-    public function where(array $conditions)
+    /**
+     * Where part
+     *
+     * @param array $conditions
+     * @return \Origin\Model\QueryBuilder
+     */
+    public function where(array $conditions) : QueryBuilder
     {
         $this->query['conditions'] = $conditions;
 
         return $this;
     }
 
-    public function group(array $group)
+    /**
+     * Group
+     *
+     * @param array $group
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function group(array $group) : QueryBuilder
     {
         $this->query['group'] = $group;
 
@@ -277,20 +386,39 @@ class QueryBuilder
     }
 
     /**
-     * @param array $order
+     * Having (when you can use where conditions on aggregate columns)
      *
-     * @return $this
+     * @param array $having
+    * @return \Origin\Model\QueryBuilder
+    */
+    public function having(array $having) : QueryBuilder
+    {
+        $this->query['having'] = $having;
+
+        return $this;
+    }
+
+    /**
+     * Undocumented function
      *
-     * @example array('field1','field2 ASC') or array('field'=>'ASC')
+     * @param array $order array('field1','field2 ASC') or array('field'=>'ASC')
+    * @return \Origin\Model\QueryBuilder
      */
-    public function order(array $order)
+    public function order(array $order) : QueryBuilder
     {
         $this->query['order'] = $order;
 
         return $this;
     }
 
-    public function limit(int $limit, int $offset = null)
+    /**
+     * Limit
+     *
+     * @param integer $limit
+     * @param integer $offset
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function limit(int $limit, int $offset = null) : QueryBuilder
     {
         $this->query['limit'] = $limit;
         if ($offset !== null) {
@@ -300,14 +428,26 @@ class QueryBuilder
         return $this;
     }
 
-    public function page(int $page)
+    /**
+     * Sets pages
+     *
+     * @param integer $page
+     * @return \Origin\Model\QueryBuilder
+     */
+    public function page(int $page) : QueryBuilder
     {
         $this->query['page'] = $page;
 
         return $this;
     }
 
-    public function join(array $params)
+    /**
+     * Join
+     *
+     * @param array $params
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function join(array $params) : QueryBuilder
     {
         $defaults = [
               'table' => null,
@@ -328,29 +468,51 @@ class QueryBuilder
 
         return $this;
     }
-
-    public function leftJoin(array $params)
+    /**
+      * Left Join
+      *
+      * @param array $params
+     * @return \Origin\Model\QueryBuilder
+      */
+    public function leftJoin(array $params) : QueryBuilder
     {
         $params['type'] = 'LEFT';
 
         return $this->join($params);
     }
-
-    public function innerJoin(array $params)
+    /**
+      * Inner Join
+      *
+      * @param array $params
+     * @return \Origin\Model\QueryBuilder
+      */
+    public function innerJoin(array $params) : QueryBuilder
     {
         $params['type'] = 'INNER';
 
         return $this->join($params);
     }
 
-    public function rightJoin(array $params)
+    /**
+     * Right Join
+     *
+     * @param array $params
+    * @return \Origin\Model\QueryBuilder
+     */
+    public function rightJoin(array $params) : QueryBuilder
     {
         $params['type'] = 'RIGHT';
 
         return $this->join($params);
     }
-
-    public function fullJoin(array $params)
+    
+    /**
+      * Full Join
+      *
+      * @param array $params
+     * @return \Origin\Model\QueryBuilder
+      */
+    public function fullJoin(array $params) : QueryBuilder
     {
         $params['type'] = 'FULL';
 
@@ -361,10 +523,9 @@ class QueryBuilder
      * Converts an array of options into a insert statement.
      *
      * @param array $data (data)
-     *
      * @return string $sql
      */
-    public function insertStatement(array $params)
+    public function insertStatement(array $params) : string
     {
         if (empty($params) or !isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
@@ -388,13 +549,12 @@ class QueryBuilder
     }
 
     /**
-     * Converts an array of options into a update statement.
+     * Converts an array of options into an update statement
      *
-     * @param array $data (data / conditions / order / limit)
-     *
-     * @return string $sql
+     * @param array $params (data,conditions,order,limit)
+     * @return string
      */
-    public function updateStatement(array $params)
+    public function updateStatement(array $params) : string
     {
         if (empty($params) or !isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
@@ -429,13 +589,12 @@ class QueryBuilder
     }
 
     /**
-     * Converts an array of options into a delete statement.
+     * Converts an array of options into a delete statement
      *
-     * @param array $data (conditions / order / limit)
-     *
-     * @return string $sql
+     * @param array $params (conditions,order,limit)
+     * @return string
      */
-    public function deleteStatement(array $params)
+    public function deleteStatement(array $params) : string
     {
         if (empty($params) or !isset($params['conditions'])) {
             throw new QueryBuilderException('Data is empty');
@@ -460,15 +619,18 @@ class QueryBuilder
         return implode(' ', $statement);
     }
 
+
     /**
      * Converts an array of options into a statement.
      *
-     * @param array $data (fields / conditions /joins / group / having / order / limit / page)
-     *
-     * @return string $sql
+     * @param array $params (fields|conditions|joins|group|having|order|limit|page)
+     * @return string
      */
-    public function selectStatement(array $params)
+    public function selectStatement(array $params) : string
     {
+        if (empty($params) or !isset($params['fields'])) {
+            throw new QueryBuilderException('No Fields.');
+        }
         $statement = [];
         // SELECT
         $statement[] = "SELECT {$this->fieldsToString($params['fields'])} FROM {$this->tableReference()}";
@@ -505,19 +667,18 @@ class QueryBuilder
      *
      * @param array  $fields (id / user_name /email)
      * @param string $alias  User
-     *
      * @return string User.id, User.user_name, User.email
      */
-    public function fieldsToString(array $fields)
+    protected function fieldsToString(array $fields) : string
     {
         if (empty($fields)) {
             $fields = array($this->alias.'.*');
         }
 
         foreach ($fields as $field) {
-            $position = stripos($field, ' as ') ;
+            $position = stripos($field, ' AS ') ;
             if ($position) {
-                $this->specialFields[] = substr($field, $position + 4); // to assist group by having
+                $this->specialFields[] = substr($field, $position + 4); // e.g. SUM(quantity) AS items
             }
         }
         return implode(', ', $this->addAliases($fields));
@@ -527,16 +688,11 @@ class QueryBuilder
      * Takes a join.
      *
      * @param array $params (type,table,alias,conditions)
-     *
      * @return string LEFT JOIN users as User ON lead.owner_id = User.id
      */
-    public function joinToString(array $params)
+    protected function joinToString(array $params) : string
     {
-        $default = ['type' => 'LEFT','table' => null,'alias' => null, 'conditions' => null];
-        $params = array_merge($default, $params);
-        if (empty($params['table']) or empty($params['alias']) or empty($params['conditions'])) {
-            return;
-        }
+        $params += ['type' => 'LEFT','table' => null,'alias' => null, 'conditions' => null];
 
         $params['type'] = strtoupper($params['type']);
         $tableReference = $this->tableReference($params['table'], $params['alias']);
@@ -544,22 +700,21 @@ class QueryBuilder
         return "{$params['type']} JOIN {$tableReference} ON ({$this->conditions($params['alias'], $params['conditions'])})";
     }
 
-    public function groupToString($fields)
+    protected function groupToString($fields) : string
     {
         return implode(', ', $this->addAliases((array) $fields));
     }
 
-    public function havingToString(array $conditions)
+    protected function havingToString(array $conditions) : string
     {
         return $this->conditions($this->alias, $conditions);
     }
 
     /**
      * @param array $order [description]
-     *
-     * @return clause ORDER BY Country,UserName ASC
+     * @return string clause ORDER BY Country,UserName ASC
      */
-    public function orderToString($order)
+    protected function orderToString($order) : string
     {
         $array = [];
         foreach ((array) $order as $key => $value) {
@@ -575,15 +730,10 @@ class QueryBuilder
 
     /**
      * @param array $data (limit,offset or page)
-     *
      * @return string LIMIT 10,12
      */
-    public function limitToString(array $data)
+    protected function limitToString(array $data) : ? string
     {
-        if (!isset($data['limit'])) {
-            return;
-        }
-
         if (isset($data['page'])) {
             $data['offset'] = ($data['page'] * $data['limit']) - $data['limit'];
         }
@@ -596,31 +746,39 @@ class QueryBuilder
     }
 
     /**
-     * Generates the sql statement, can only be called once.
+     * Generates the Sql Statement
+     *
+     * @return string
      */
     public function write()
     {
+        $type = null;
         if (!empty($this->query)) {
-            switch ($this->query['type']) {
-              case 'SELECT':
-                return $this->selectStatement($this->query);
-              break;
-              case 'INSERT':
-                return $this->insertStatement($this->query);
-              break;
-              case 'UPDATE':
-                return $this->updateStatement($this->query);
-              break;
-              case 'DELETE':
-                return $this->deleteStatement($this->query);
-              break;
-            }
+            $type = $this->query['type'];
         }
-
-        return;
+        switch ($type) {
+            case 'SELECT':
+              return $this->selectStatement($this->query);
+            break;
+            case 'INSERT':
+              return $this->insertStatement($this->query);
+            break;
+            case 'UPDATE':
+              return $this->updateStatement($this->query);
+            break;
+            case 'DELETE':
+              return $this->deleteStatement($this->query);
+            break;
+          }
+        throw new QueryBuilderException('Nothing to write.');
     }
 
-    public function writeFormatted()
+    /**
+     * Writes a formatted SQL string
+     *
+     * @return string
+     */
+    public function writeFormatted() : string
     {
         $haystack = $this->write();
         $statements = ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT'];
@@ -643,16 +801,14 @@ class QueryBuilder
      *
      * @param array  $fields
      * @param string $alias
+     * @return array
      */
-    private function addAliases(array $fields)
+    protected function addAliases(array $fields) : array
     {
         foreach ($fields as $index => $column) {
-            if (in_array($column, $this->specialFields)) {
-                continue; // skip as field
-            }
             $fields[$index] = $this->addAlias($column);
             if (is_string($index)) {
-                $fields[$index] = "{$this->quote}{$this->alias}{$this->quote}.{$this->quote}{$index}{$this->quote} AS {$this->quote}{$column}{$this->quote}";
+                $fields[$index] = "{$this->alias}.{$index} AS {$this->quote}{$column}{$this->quote}";
             }
         }
         return $fields;
@@ -663,45 +819,24 @@ class QueryBuilder
      *
      * @param string $field id
      * @param string $alias User
-     *
      * @return string $aliasedField User.id
      */
-    public function addAlias(string $field, $alias = null)
+    protected function addAlias(string $field, $alias = null) : string
     {
         if ($alias == null) {
             $alias = $this->alias;
         }
+ 
         // Ignore formulas, existing aliases or virtual fields by ensuring
         // it starts with letter, only contains letters, underscore and number
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
-            if (strpos($field, '.') !== false and strpos($field, ' ') === false) {
-                $field = $this->quote . str_replace('.', $this->quote.'.' . $this->quote, $field).$this->quote;
-            }
             return $field;
         }
         // these are adds we dont need to stress
         if (in_array($field, $this->specialFields)) {
             return $field;
         }
-        return "{$this->quote}{$alias}{$this->quote}.{$this->quote}{$field}{$this->quote}";
-    }
-
-    /**
-     * Bookmark.user_id = User.id
-     *
-     * @param string $string
-     * @return string
-     */
-    public function quoteString(string $string)
-    {
-        preg_match_all('/[a-z._]*/i', $string, $results); //[A-Z][a-z_][._a-z]*/
-        if (isset($results[0])) {
-            foreach ($results[0] as $field) {
-                $with = $this->quote . str_replace('.', $this->quote.'.'.$this->quote, $field) . $this->quote;
-                $string = str_replace($field, $with, $string);
-            }
-        }
-        return $string;
+        return "{$alias}.{$field}";
     }
 
     /**
@@ -710,16 +845,16 @@ class QueryBuilder
      * @param array  $alias      alias which conditions are for
      * @param array  $conditions
      * @param string $join       AND,OR,NOT
-     *
      * @return string sql
      */
-    public function conditions(string $alias, array $conditions, string $join = 'AND')
+    protected function conditions(string $alias, array $conditions, string $join = 'AND') : string
     {
         $block = [];
+       
         foreach ($conditions as $key => $value) {
             //array("Post.created = Post.modified")
             if (is_int($key) and is_string($value)) {
-                $block[] = $this->quoteString($value);
+                $block[] = $value;
                 continue;
             }
             //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
@@ -776,11 +911,10 @@ class QueryBuilder
     /**
      * Gets the next placeholder, placeholders are unique to the table name is created on.
      *
-     * @return string placeholder
-     *
      * @example contact_tasks becomes :ct
+     * @return string placeholder
      */
-    public function nextPlaceholder()
+    protected function nextPlaceholder() : string
     {
         if (!$this->placeholder) {
             preg_match_all('/(?<=\s|_|^)[a-zA-Z]/i', $this->table, $matches);
@@ -790,7 +924,15 @@ class QueryBuilder
         return $this->placeholder.$this->i++;
     }
 
-    public function expression(string $field, string $expression, $value)
+    /**
+     * Undocumented function
+     *
+     * @param string $field
+     * @param string $expression
+     * @param mixed $value
+     * @return string
+     */
+    protected function expression(string $field, string $expression, $value) : string
     {
         // Handle Null Values
         if ($value === null) {
@@ -799,8 +941,6 @@ class QueryBuilder
                 return "{$field} IS NULL";
             } elseif ($expression == '!=') {
                 return "{$field} IS NOT NULL";
-            } else {
-                throw new QueryBuilderException('Bad paramaters'); // Null value for other operators?
             }
         }
         //(SELECT STATEMENT) or (value1, value2)
@@ -809,7 +949,7 @@ class QueryBuilder
         }
 
         if ($expression == 'BETWEEN' or $expression == 'NOT BETWEEN') {
-            if (count($value) != 2) {
+            if (!is_array($value) or count($value) !== 2) {
                 throw new QueryBuilderException('Bad paramaters');
             }
             $placeholder = $this->nextPlaceholder();
@@ -846,7 +986,7 @@ class QueryBuilder
         return "{$field} {$expression} ( ".$this->placeholdersToString(array_values($placeholders)).' )';
     }
 
-    public function placeholdersToString(array $placeholders)
+    protected function placeholdersToString(array $placeholders)
     {
         array_walk($placeholders, function (&$value, &$key) {
             $value = ":{$value}";

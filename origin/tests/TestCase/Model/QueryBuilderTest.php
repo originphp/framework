@@ -25,177 +25,232 @@ class MockQueryBuilder extends QueryBuilder
 
 class QueryBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testTableReference()
+    public function testSelect()
     {
-        $Builder = new QueryBuilder('user');
-        $expected = '`user`';
-        $this->assertEquals($expected, $Builder->tableReference());
-        $Builder = new QueryBuilder('user', 'User');
-        $expected = '`user` AS `User`';
-        $this->assertEquals($expected, $Builder->tableReference());
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','username','email'=>'user_email']);
+       
+        $expected = 'SELECT User.id, User.username, User.email AS `user_email` FROM `users` AS `User`';
+        $this->assertEquals($expected, $builder->write());
     }
 
-    public function testFieldsToString()
+    public function testCount()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = ['id', 'User.user_name', 'email', 'COUNT(*)', 'user.photo AS avatar'];
-        $expected = '`User`.`id`, `User`.`user_name`, `User`.`email`, COUNT(*), user.photo AS avatar'; //@todo think about adding quotes here
-        $this->assertEquals($expected, $Builder->fieldsToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['COUNT(*) AS total']);
+        $expected = 'SELECT COUNT(*) AS total FROM `users` AS `User`';
+        $this->assertEquals($expected, $builder->write());
     }
 
-    public function testJoinsToString()
+    public function testConditionsEquals()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = [
-      'table' => 'user_roles',
-      'alias' => 'UserRole',
-      'conditions' => array('UserRole.id => User.role_id'),
-    ];
-        $expected = 'LEFT JOIN `user_roles` AS `UserRole` ON (`UserRole`.`id` => `User`.`role_id`)';
-        $this->assertEquals($expected, $Builder->joinToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['id'=>1000,'name'=>['James','Rossi']]);
+        
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 AND User.name IN ( :u1, :u2 )';
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>1000,'u1'=>'James','u2'=>'Rossi'], $builder->getValues());
 
-        $Builder = new QueryBuilder('tag', 'Tag');
-        $data = [
-          'table' => 'articles_tags',
-          'alias' => 'ArticlesTag',
-          'conditions' => array(
-            'ArticlesTag.tag_id = Tag.id',
-            'ArticlesTag.article_id' => 1,
-          ), ];
-        $expected = 'LEFT JOIN `articles_tags` AS `ArticlesTag` ON (`ArticlesTag`.`tag_id` = `Tag`.`id` AND `ArticlesTag`.`article_id` = :t0)';
-        $this->assertEquals($expected, $Builder->joinToString($data));
+        $builder->select(['id','name','email'])
+        ->where(['id'=>null]);
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IS NULL';
+        $this->assertEquals($expected, $builder->write());
+    }
+    public function testConditionsNotEquals()
+    {
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['id !='=>1000,'name !='=>['James','Rossi']]);
+        
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id != :u0 AND User.name NOT IN ( :u1, :u2 )';
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>1000,'u1'=>'James','u2'=>'Rossi'], $builder->getValues());
+        
+        $builder->select(['id','name','email'])
+        ->where(['id !='=>null]);
+        
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IS NOT NULL';
+        $this->assertEquals($expected, $builder->write());
     }
 
-    public function testGroupToString()
+    public function testCondtionsComparing()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = ['User.role_id', 'User.access'];
-        $expected = '`User`.`role_id`, `User`.`access`';
-        $this->assertEquals($expected, $Builder->groupToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['id'=>1000,'created = modified']);
+        
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 AND created = modified';
+        $this->assertEquals($expected, $builder->write());
     }
 
-    public function testHavingToString()
+    public function testCondtionsArithmetic()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = ['COUNT(CustomerID) >' => 5];
-        $expected = 'COUNT(CustomerID) > :u0';
-        $this->assertEquals($expected, $Builder->havingToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['age >'=>18,'age <'=>33,'logins >='=>10,'logins <='=>20]);
+        
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.age > :u0 AND User.age < :u1 AND User.logins >= :u2 AND User.logins <= :u3';
+       
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>18,'u1'=>33,'u2'=>10,'u3'=>20], $builder->getValues());
     }
 
-    public function testOrderToString()
+    public function testConditionsBetween()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = ['User.country', 'User.user_name ASC'];
-        $expected = '`User`.`country`,User.user_name ASC';
-        $this->assertEquals($expected, $Builder->orderToString($data));
-        $data = ['User.country' => 'DESC'];
-        $expected = '`User`.`country` DESC';
-        $this->assertEquals($expected, $Builder->orderToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['age BETWEEN'=>[18,21],'logins NOT BETWEEN'=>[10,20]]);
+       
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE ( User.age BETWEEN :u0 AND :u1 ) AND ( User.logins NOT BETWEEN :u2 AND :u3 )';
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>18,'u1'=>21,'u2'=>10,'u3'=>20], $builder->getValues());
+
+        $this->expectException(QueryBuilderException::class);
+        $builder->select(['id','name','email'])
+            ->where(['age BETWEEN'=> 1]);
+        $builder->write();
     }
 
-    public function testLimitToString()
+    public function testConditionsLike()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $data = [
-      'limit' => 10,
-    ];
-        $this->assertEquals(10, $Builder->limitToString($data));
-        $data = [
-      'limit' => 10,
-      'page' => 1,
-    ];
-        $this->assertEquals('10 OFFSET 0', $Builder->limitToString($data));
-        $data = [
-      'limit' => 10,
-      'page' => 2,
-    ];
-        $this->assertEquals('10 OFFSET 10', $Builder->limitToString($data));
-        $data = [
-      'limit' => 25,
-      'offset' => 50,
-    ];
-        $this->assertEquals('25 OFFSET 50', $Builder->limitToString($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+            ->where(['name LIKE'=>'%A','name NOT LIKE'=>'%B']);
+       
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.name LIKE :u0 AND User.name NOT LIKE :u1';
+        
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>'%A','u1'=>'%B'], $builder->getValues());
+
+        $this->expectException(QueryBuilderException::class);
+        $builder->select(['id','name','email'])
+            ->where(['name LIKE'=> ['this','that%']]);
+        $builder->write();
     }
 
-    public function testExpression()
+    public function testConditionsInvalidOperator()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        //$result = $Builder->expression('COUNT(CustomerID)','>',5);
-
-        $this->assertSame('id = :u0', $Builder->expression('id', '=', 1));
-        $this->assertSame('id IN ( :u1, :u2, :u3 )', $Builder->expression('id', '=', array(1, 2, 3)));
-        $this->assertSame('id IS NULL', $Builder->expression('id', '=', null));
-
-        $this->assertSame('id != :u4', $Builder->expression('id', '!=', 1));
-        $this->assertSame('id NOT IN ( :u5, :u6, :u7 )', $Builder->expression('id', '!=', array(1, 2, 3)));
-        $this->assertSame('id IS NOT NULL', $Builder->expression('id', '!=', null));
-
-        $this->assertSame('name LIKE :u8', $Builder->expression('name', 'LIKE', '%dave%'));
-        $this->assertSame('name NOT LIKE :u9', $Builder->expression('name', 'NOT LIKE', '%dave%'));
-
-        $this->assertSame('( group_id BETWEEN :u10 AND :u11 )', $Builder->expression('group_id', 'BETWEEN', array(1, 10)));
-        $this->assertSame('( group_id NOT BETWEEN :u12 AND :u13 )', $Builder->expression('group_id', 'NOT BETWEEN', array(1, 10)));
-
-        $this->assertSame(
-      'category_id IN ( :u14, :u15, :u16 )',
-      $Builder->expression('category_id', 'IN', array(100, 200, 300))
-    );
-        $this->assertSame(
-      'category_id NOT IN ( :u17, :u18, :u19 )',
-      $Builder->expression('category_id', 'NOT IN', array(101, 201, 301))
-    );
-
-        $this->assertSame('User.level > :u20', $Builder->expression('User.level', '>', 1));
-        $this->assertSame('User.level >= :u21', $Builder->expression('User.level', '>=', 2));
-        $this->assertSame('User.level < :u22', $Builder->expression('User.level', '<', 3));
-        $this->assertSame('User.level <= :u23', $Builder->expression('User.level', '<=', 4));
+        //Post.due_date >= NOW()
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+            ->where(['name <o>'=>'invalid operator']);
+        $this->expectException(QueryBuilderException::class);
+        $builder->write();
     }
 
-    public function testSelectColumns()
+    public function testConditionsIn()
     {
-        $Builder = new QueryBuilder('user');
-        $Builder->select();
-
-        $this->assertSame('SELECT `user`.`*` FROM `user`', $Builder->write());
-
-        $Builder->select(['id', 'name', 'email']);
-        $this->assertSame('SELECT `user`.`id`, `user`.`name`, `user`.`email` FROM `user`', $Builder->write());
+        //SELECT STATEMENT
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+            ->where(['id IN'=>'SELECT STATEMENT']);
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IN ( SELECT STATEMENT )';
+        $this->assertEquals($expected, $builder->write());
     }
 
-    public function testSelectColumnAliases()
+    public function testConditionsOR()
     {
-        // Test alias
-        $Builder = new QueryBuilder('user', 'User');
-
-        $Builder->select(['id', 'name', 'email']);
-        $this->assertSame('SELECT `User`.`id`, `User`.`name`, `User`.`email` FROM `user` AS `User`', $Builder->write());
-
-        $Builder->select(['name' => 'userName', 'email_address' => 'email']);
-        $this->assertSame('SELECT `User`.`name` AS `userName`, `User`.`email_address` AS `email` FROM `user` AS `User`', $Builder->write());
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email','status'])
+            ->where(['name'=>'James',['OR'=>[
+                'email LIKE' => '%company.com',
+                'status' => 'verified'
+            ]]]);
+        $expected = 'SELECT User.id, User.name, User.email, User.status FROM `users` AS `User` WHERE User.name = :u0 AND (User.email LIKE :u1 OR User.status = :u2)';
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>'James','u1'=>'%company.com','u2'=>'verified'], $builder->getValues());
     }
 
-    public function testSelectWhere()
+    public function testConditionsORSameField()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $Builder->select()
-      ->where(['id' => 100]);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email','status'])
+            ->where(['name'=>'James',['OR'=>[
+                ['email LIKE' => 'james%'],
+                ['email LIKE' => '%james','status'=>'external'],
+            ]]]);
+        $expected = 'SELECT User.id, User.name, User.email, User.status FROM `users` AS `User` WHERE User.name = :u0 AND (User.email LIKE :u1 OR (User.email LIKE :u2 AND User.status = :u3))';
+        $this->assertEquals($expected, $builder->write());
+        $this->assertEquals(['u0'=>'James','u1'=>'james%','u2'=>'%james','u3'=>'external'], $builder->getValues());
+    }
 
-        $this->assertSame('SELECT `User`.`*` FROM `user` AS `User` WHERE `User`.`id` = :u0', $Builder->write());
+    public function testConditionsNot()
+    {
+        //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email','status'])
+            ->where(['NOT'=>['name'=>['Jon','Tony','Amanda'],'created >= NOW()']]);
+        $expected ='SELECT User.id, User.name, User.email, User.status FROM `users` AS `User` WHERE NOT (User.name IN ( :u0, :u1, :u2 ) NOT created >= NOW())';
+        $this->assertEquals($expected, $builder->write());
+    }
+    public function testConditionsMultiple()
+    {
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email','city','status'])
+            ->where([
+            'OR'=>[
+                'name'=>'Jon',
+                'email LIKE'=>'jon%'
+            ],
+            'AND'=>[
+                'status' => 'New',
+                'city' => 'London'
+            ]
+            ]);
+        $expected = 'SELECT User.id, User.name, User.email, User.city, User.status FROM `users` AS `User` WHERE (User.name = :u0 OR User.email LIKE :u1) AND (User.status = :u2 AND User.city = :u3)';
+        $this->assertEquals($expected, $builder->write());
+    }
 
-        $this->assertEquals(['u0' => '100'], $Builder->getValues());
+    public function testConditionsMultipleNesting()
+    {
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email','city','status'])
+            ->where([
+            'OR'=>[
+                'name'=>'Jon',
+                'email LIKE'=>'jon%'
+            ],
+            'AND'=>[
+                'OR'=> [
+                    'status' => 'New',
+                    'city' => 'London'
+                ]
+            ]
+            ]);
+        $expected = 'SELECT User.id, User.name, User.email, User.city, User.status FROM `users` AS `User` WHERE (User.name = :u0 OR User.email LIKE :u1) AND ((User.status = :u2 OR User.city = :u3))';
+        $this->assertEquals($expected, $builder->write());
+    }
 
-        $Builder->select()
+    public function testSelectHaving()
+    {
+        $builder = new QueryBuilder('orders', 'OrderDetails');
+        $builder->select(['id','SUM(quantity) AS items','SUM(price*quantity) AS total'])
+            ->group(['id'])
+            ->having(['total >' => 1000,'items >'=>25]);
+       
+        $expected = 'SELECT OrderDetails.id, SUM(quantity) AS items, SUM(price*quantity) AS total FROM `orders` AS `OrderDetails` GROUP BY OrderDetails.id HAVING total > :o0 AND items > :o1';
+        $this->assertEquals($expected, $builder->write());
+    }
+
+    public function testSelectJoin()
+    {
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select()
       ->where(['id' => 100])
-      ->group(['role']);
+      ->join([
+        'table' => 'roles',
+        'conditions' => ['User.role_id = UserRole.id'],
+      ]);
 
-        $expected = 'SELECT `User`.`*` FROM `user` AS `User` WHERE `User`.`id` = :u0 GROUP BY `User`.`role`';
-        $this->assertSame($expected, $Builder->write());
+        $expected = 'SELECT User.* FROM `users` AS `User` LEFT JOIN `roles` ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testSelectJoins()
+    public function testSelectJoinLeft()
     {
-        $Builder = new QueryBuilder('user', 'User');
-        $Builder->select()
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select()
       ->where(['id' => 100])
       ->leftJoin([
         'table' => 'roles',
@@ -203,386 +258,216 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
         'conditions' => ['User.role_id = UserRole.id'],
       ]);
 
-        $expected = 'SELECT `User`.`*` FROM `user` AS `User` LEFT JOIN `roles` AS `UserRole` ON (`User`.`role_id` = `UserRole`.`id`) WHERE `User`.`id` = :u0';
-        $this->assertSame($expected, $Builder->write());
+        $expected = 'SELECT User.* FROM `users` AS `User` LEFT JOIN `roles` AS `UserRole` ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsEquals()
+    public function testSelectJoinRight()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('`Article`.`id` = :a0', $Builder->conditions('Article', ['id' => 1]));
-        $this->assertEquals('`Article`.`id` IS NULL', $Builder->conditions('Article', ['id' => null]));
-        $this->assertEquals('`Article`.`id` IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id' => array(1, 2, 3)]));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select()
+      ->where(['id' => 100])
+      ->rightJoin([
+        'table' => 'roles',
+        'alias' => 'UserRole',
+        'conditions' => ['User.role_id = UserRole.id'],
+      ]);
+
+        $expected = 'SELECT User.* FROM `users` AS `User` RIGHT JOIN `roles` AS `UserRole` ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsNotEquals()
+    public function testSelectJoinInner()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('`Article`.`id` != :a0', $Builder->conditions('Article', ['id !=' => 1]));
-        $this->assertEquals('`Article`.`id` IS NOT NULL', $Builder->conditions('Article', ['id !=' => null]));
-        $this->assertEquals('`Article`.`id` NOT IN ( :a1, :a2, :a3 )', $Builder->conditions('Article', ['id !=' => array(1, 2, 3)]));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select()
+      ->where(['id' => 100])
+      ->innerJoin([
+        'table' => 'roles',
+        'alias' => 'UserRole',
+        'conditions' => ['User.role_id = UserRole.id'],
+      ]);
+
+        $expected = 'SELECT User.* FROM `users` AS `User` INNER JOIN `roles` AS `UserRole` ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsOthers()
+    public function testSelectJoinFull()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('`Article`.`id` > :a0', $Builder->conditions('Article', ['id >' => 1]));
-        $this->assertEquals('`Article`.`id` < :a1', $Builder->conditions('Article', ['id <' => 1]));
-        $this->assertEquals('`Article`.`id` <= :a2', $Builder->conditions('Article', ['id <=' => 1]));
-        $this->assertEquals('`Article`.`id` >= :a3', $Builder->conditions('Article', ['id >=' => 1]));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select()
+      ->where(['id' => 100])
+      ->fullJoin([
+        'table' => 'roles',
+        'alias' => 'UserRole',
+        'conditions' => ['User.role_id = UserRole.id'],
+      ]);
 
-        //$this->expectException(InvalidArgumentException::class);
+        $expected = 'SELECT User.* FROM `users` AS `User` FULL JOIN `roles` AS `UserRole` ON (User.role_id = UserRole.id) WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsBetween()
+    public function testSelectGroup()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('( `Article`.`id` BETWEEN :a0 AND :a1 )', $Builder->conditions('Article', ['id BETWEEN' => array(1, 2)]));
+        $builder = new QueryBuilder('customers', 'Customer');
+        $builder->select(['COUNT(customer_id)','country'])
+            ->group(['county']);
+        $expected = 'SELECT COUNT(customer_id), Customer.country FROM `customers` AS `Customer` GROUP BY Customer.county';
+        $this->assertSame($expected, $builder->write());
 
-        $this->assertEquals('( `Article`.`id` NOT BETWEEN :a2 AND :a3 )', $Builder->conditions('Article', ['id NOT BETWEEN' => array(1, 2)]));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['COUNT(*) AS total','country'])
+            ->where(['created < NOW()'])
+            ->group(['country']);
 
-        $this->expectException(QueryBuilderException::class);
-        $Builder->conditions('Article', ['Article.id BETWEEN' => null]);
+        $expected = 'SELECT COUNT(*) AS total, User.country FROM `users` AS `User` WHERE created < NOW() GROUP BY User.country';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsLike()
+    public function testSelectDistinct()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
-        $this->assertEquals('`Article`.`id` LIKE :a0', $Builder->conditions('Article', ['id LIKE' => '%100_']));
-
-        $this->assertEquals('`Article`.`id` NOT LIKE :a1', $Builder->conditions('Article', ['id NOT LIKE' => '200%']));
-
-        $this->expectException(QueryBuilderException::class);
-        $Builder->conditions('Article', ['Article.id LIKE' => null]);
+        //DISTINCT (Author.name) AS author_name','title'
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['DISTINCT (name) AS name','created'])
+            ->where(['created <' => date('Y-m-d H:i:s')]);
+        $expected = 'SELECT DISTINCT (name) AS name, User.created FROM `users` AS `User` WHERE User.created < :u0';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsIn()
+    public function testSelectOrder()
     {
-        $Builder = new QueryBuilder('articles', 'Article');
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['User.id'=>1000])
+                ->order(['name ASC']);
 
-        $this->assertEquals('`Article`.`id` IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id IN' => 'SELECT STATEMENT']));
-        $this->assertEquals('`Article`.`id` NOT IN ( SELECT STATEMENT )', $Builder->conditions('Article', ['id NOT IN' => 'SELECT STATEMENT']));
-        $this->assertEquals('`Article`.`id` IN ( :a0, :a1, :a2 )', $Builder->conditions('Article', ['id IN' => array(1, 2, 3)]));
-        $this->assertEquals('`Article`.`id` NOT IN ( :a3, :a4, :a5 )', $Builder->conditions('Article', ['id NOT IN' => array(1, 2, 3)]));
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 ORDER BY name ASC';
+        $this->assertSame($expected, $builder->write());
 
-        $this->expectException(QueryBuilderException::class);
-        $Builder->conditions('Article', ['id IN' => null]);
+        $builder->select(['id','name','email'])
+                ->where(['User.id'=>1000])
+                ->order(['name','created DESC']);
+
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 ORDER BY User.name,created DESC';
+        $this->assertSame($expected, $builder->write());
     }
-
-    public function testOr()
+   
+    public function testSelectLimit()
     {
-        $Builder = new QueryBuilder('post', 'Posts');
-        $conditions = [
-            'model' => 'Contact',
-            'OR' => [
-                ['task'=> 1,'closed'=>0],
-                ['task'=> 0,'start_date <='=> '2019-01-29 09:30:00']
-            ]];
-        $expected = '`Post`.`model` = :p0 AND ((`Post`.`task` = :p1 AND `Post`.`closed` = :p2) OR (`Post`.`task` = :p3 AND `Post`.`start_date` <= :p4))';
-        
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->where(['User.id'=>1000])
+                ->limit(5);
+      
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 LIMIT 5';
+        $this->assertSame($expected, $builder->write());
+
+        $builder->select(['id','name','email'])
+        ->where(['User.id'=>1000])
+        ->limit(10, 5);
+
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id = :u0 LIMIT 10 OFFSET 5';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testConditionsFull()
+    public function testInsert()
     {
-        $Builder = new QueryBuilder('post', 'Posts');
-        $conditions = array('Post.title' => 'This is a post');
-        $expected = '`Post`.`title` = :p0';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array('Post.title !=' => 'This is a post');
-        $expected = '`Post`.`title` != :p1';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array('Post.title' => 'This is a post', 'Post.author_id' => 1);
-        $expected = '`Post`.`title` = :p2 AND `Post`.`author_id` = :p3';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array(
-        'Post.title' => array('First post', 'Second post', 'Third post'),
-    );
-        $expected = '`Post`.`title` IN ( :p4, :p5, :p6 )';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array(
-        'NOT' => array(
-            'Post.title' => array('First post', 'Second post', 'Third post'),
-        ),
-    );
-        $expected = 'NOT (`Post`.`title` IN ( :p7, :p8, :p9 ))';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array('OR' => array(
-          'Post.title' => array('First post', 'Second post', 'Third post'),
-          'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
-      ));
-        $expected = '(`Post`.`title` IN ( :p10, :p11, :p12 ) OR `Post`.`created` > :p13)';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $conditions = array(
-          'Author.name' => 'Bob',
-          'OR' => array(
-              'Post.title LIKE' => '%magic%',
-              'Post.created >' => date('Y-m-d', strtotime('-2 weeks')),
-          ),
-      );
-        $expected = '`Author`.`name` = :p14 AND (`Post`.`title` LIKE :p15 OR `Post`.`created` > :p16)';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        // Test adding a condition array without key
-        $conditions[] = array('Post.appened_field' => 'zigzag');
-        $expected = '`Author`.`name` = :p17 AND (`Post`.`title` LIKE :p18 OR `Post`.`created` > :p19) AND `Post`.`appened_field` = :p20';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        // Looks the same but is not, SAME FIELD, extra array
-        $conditions = array('OR' => array(
-        array('Post.title LIKE' => '%one%'),
-        array('Post.title LIKE' => '%two%'),
-      ));
-        $expected = '(`Post`.`title` LIKE :p21 OR `Post`.`title` LIKE :p22)';
-        $this->assertEquals($expected, $Builder->conditions('Post', $conditions));
-
-        $Builder = new QueryBuilder('companies', 'Company');
-
-        $conditions = array(
-           'OR' => array(
-               array('Company.name' => 'Future Holdings'),
-               array('Company.city' => 'CA'),
-           ),
-             'AND' => array(
-               array('Company.status' => 'active'),
-               array('Company.type' => array('inactive', 'suspended')),
-             ),
-         );
-
-        $expected = '(`Company`.`name` = :c0 OR `Company`.`city` = :c1) AND (`Company`.`status` = :c2 AND `Company`.`type` IN ( :c3, :c4 ))';
-        $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
-
-        $conditions = array(
-            'OR' => array(
-                array('Company.name' => 'Future Holdings'),
-                array('Company.city' => 'CA'),
-            ),
-              'AND' => array(
-                      'OR' => array(
-                          array('Company.status' => 'active'),
-                          array('Company.type' => array('inactive', 'suspended')),
-                      ),
-              ),
-          );
-
-        $expected = '(`Company`.`name` = :c5 OR `Company`.`city` = :c6) AND ((`Company`.`status` = :c7 OR `Company`.`type` IN ( :c8, :c9 )))';
-        $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
-
-        $conditions = array(
-            'OR' => array(
-                array('Company.name' => 'Future Holdings'),
-                array('Company.city' => 'CA'),
-            ),
-            'AND' => array(
-                array(
-                    'OR' => array(
-                        array('Company.status' => 'active'),
-                        'NOT' => array(
-                            array('Company.status' => array('inactive', 'suspended')),
-                        ),
-                    ),
-                ),
-            ),
-        );
-        $expected = '(`Company`.`name` = :c10 OR `Company`.`city` = :c11) AND ((`Company`.`status` = :c12 OR NOT (`Company`.`status` IN ( :c13, :c14 ))))';
-        $this->assertEquals($expected, $Builder->conditions('Company', $conditions));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->insert(['name'=>'Jon Snow','email'=>'jon@example.com','status'=>'']);
+        $expected = 'INSERT INTO users ( name, email, status ) VALUES ( :u0, :u1, :u2 )';
+        $this->assertSame($expected, $builder->write());
+        $this->assertEquals(['u0'=>'Jon Snow','u1'=>'jon@example.com','u2'=>null], $builder->getValues());
     }
 
-    // move condition functions first, since if this fails then all will fail
-    public function testInsertStatement()
+    public function testUpdate()
     {
-        $Builder = new QueryBuilder('user');
-        $data = array(
-        'name' => 'Amanda Lee',
-        'email' => 'amanda@example.com',
-        'phone' => '+1 123 4567',
-        'description' => ''
-      );
-        $expected = 'INSERT INTO user ( name, email, phone, description ) VALUES ( :u0, :u1, :u2, :u3 )';
-        $this->assertEquals($expected, $Builder->insertStatement(array('data' => $data)));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->update(['name'=>'Jon Snow','email'=>'jon@example.com','status'=>''])
+                ->where(['id'=>100]);
 
-        $expected = array(
-            'u0' => 'Amanda Lee',
-            'u1' => 'amanda@example.com',
-            'u2' => '+1 123 4567',
-            'u3' => null
-        );
+        $expected = 'UPDATE users SET name = :u0, email = :u1, status = :u2 WHERE User.id = :u3';
+        $this->assertSame($expected, $builder->write());
 
-        $this->assertEquals($expected, $Builder->getValues());
 
-        $this->expectException(QueryBuilderException::class);
-        $Builder->insertStatement([]);
+        $builder->update(['name'=>'Jon Snow','email'=>'jon@example.com','status'=>''])
+                ->where(['id'=>100])
+                ->order(['name ASC'])
+                ->limit(10);
+
+        $expected = 'UPDATE users SET name = :u0, email = :u1, status = :u2 WHERE User.id = :u3 ORDER BY name ASC LIMIT 10';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testUpdateStatement()
+    public function testDelete()
     {
-        $Builder = new QueryBuilder('user');
-        $data = array(
-        'data' => array(
-          'id' => 85,
-          'name' => 'Amanda Lee',
-          'email' => 'amanda@example.com',
-          'phone' => '+1 123 4567',
-          'description' => ''
-        ),
-      );
-        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3, description = :u4';
-        $this->assertEquals($expected, $Builder->updateStatement($data));
+        $builder = new QueryBuilder('users', 'User');
+        $builder->delete()->where(['id'=>100]);
 
-        $data = array(
-            'data' => array(
-              'id' => 85,
-              'name' => 'Amanda Lee',
-              'email' => 'amanda@example.com',
-              'phone' => '+1 123 4567'
-            ),
-          );
+        $expected = 'DELETE FROM users WHERE User.id = :u0';
+        $this->assertSame($expected, $builder->write());
 
-        $expected = array(
-        'u0' => 85,
-        'u1' => 'Amanda Lee',
-        'u2' => 'amanda@example.com',
-        'u3' => '+1 123 4567',
-      );
-
-        $data['conditions'] = array('id' => 2048);
-        $data['order'] = array('id ASC');
-        $data['limit'] = 1;
-
-        $expected = 'UPDATE user SET id = :u0, name = :u1, email = :u2, phone = :u3 WHERE `user`.`id` = :u4 ORDER BY id ASC LIMIT 1';
-        $this->assertEquals($expected, $Builder->updateStatement($data));
-        $expected = array(
-        'u0' => 85,
-        'u1' => 'Amanda Lee',
-        'u2' => 'amanda@example.com',
-        'u3' => '+1 123 4567',
-        'u4' => 2048,
-      );
-
-        $this->assertEquals($expected, $Builder->getValues());
-
-        $this->expectException(QueryBuilderException::class);
-        $Builder->updateStatement([]);
+        $builder->delete()->where(['id'=>100])->order(['name ASC'])->limit(1);
+        $expected = 'DELETE FROM users WHERE User.id = :u0 ORDER BY name ASC LIMIT 1';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testDeleteStatement()
-    {
-        $Builder = new QueryBuilder('user');
-
-        // Delete entire contents of table
-        $data = ['conditions' => []];
-        $expected = 'DELETE FROM user';
-        $this->assertEquals($expected, $Builder->deleteStatement($data));
-
-        $data = ['conditions' => ['id' => 123456]];
-        $expected = 'DELETE FROM user WHERE `user`.`id` = :u0';
-        $this->assertEquals($expected, $Builder->deleteStatement($data));
-
-        $data['order'] = array('id ASC');
-        $data['limit'] = 1;
-
-        $expected = 'DELETE FROM user WHERE `user`.`id` = :u0 ORDER BY id ASC LIMIT 1';
-        $this->assertEquals($expected, $Builder->deleteStatement($data));
-
-        $this->expectException(QueryBuilderException::class);
-        $Builder->deleteStatement([]);
-    }
-
-    public function testFrom()
-    {
-        $builder = new MockQueryBuilder('user');
-        $builder->from('table', 'alias');
-        $this->assertEquals('table', $builder->getProperty('table'));
-        $this->assertEquals('alias', $builder->getProperty('alias'));
-    }
-
-    public function testWhere()
-    {
-        $builder = new MockQueryBuilder('user');
-        $builder->where(['foo'=>'bar']);
-        $query = $builder->getProperty('query');
-        $this->assertEquals(['foo'=>'bar'], $query['conditions']);
-    }
-    public function testGroup()
-    {
-        $builder = new MockQueryBuilder('user');
-        $builder->group(['status']);
-        $query = $builder->getProperty('query');
-        $this->assertEquals(['status'], $query['group']);
-    }
-    public function testOrder()
-    {
-        $builder = new MockQueryBuilder('user');
-        $builder->order(['field'=>'ASC']);
-        $query = $builder->getProperty('query');
-        $this->assertEquals(['field'=>'ASC'], $query['order']);
-    }
-    public function testLimit()
-    {
-        $builder = new MockQueryBuilder('user');
-        $builder->limit(100, 20);
-        $query = $builder->getProperty('query');
-        $this->assertEquals(100, $query['limit']);
-        $this->assertEquals(20, $query['offset']);
-    }
     public function testPage()
     {
-        $builder = new MockQueryBuilder('user');
-        $builder->page(10);
-        $query = $builder->getProperty('query');
-        $this->assertEquals(10, $query['page']);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+                ->page(3)
+                ->limit(10);
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` LIMIT 10 OFFSET 20';
+        $this->assertSame($expected, $builder->write());
     }
 
-    public function testJoin()
+    public function testSelectStatementException()
     {
-        $builder = new MockQueryBuilder('user');
-        $params = [
-            'table' => 'users',
-            'alias' => null,
-            'type' => 'INNER',
-            'conditions' => ['active'=>1],
-        ];
-        $builder->join($params);
-        $query = $builder->getProperty('query');
-        $params['alias'] = 'users';
-        $this->assertEquals($params, $query['joins'][0]);
+        $this->expectException(QueryBuilderException::class);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->selectStatement([]);
     }
-    public function testLeftJoin()
+    public function testInsertStatementException()
     {
-        $builder = new MockQueryBuilder('user');
-        $builder->leftJoin(['table'=>'users','alias'=>'users']);
-        $query = $builder->getProperty('query');
-        
-        $this->assertEquals('LEFT', $query['joins'][0]['type']);
+        $this->expectException(QueryBuilderException::class);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->insertStatement([]);
     }
-    public function testInnerJoin()
+    public function testUpdateStatementException()
     {
-        $builder = new MockQueryBuilder('user');
-        $builder->innerJoin(['table'=>'users','alias'=>'users']);
-        $query = $builder->getProperty('query');
-        
-        $this->assertEquals('INNER', $query['joins'][0]['type']);
+        $this->expectException(QueryBuilderException::class);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->updateStatement([]);
     }
-    public function testRightJoin()
+    public function testDeleteStatementException()
     {
-        $builder = new MockQueryBuilder('user');
-        $builder->rightJoin(['table'=>'users','alias'=>'users']);
-        $query = $builder->getProperty('query');
-        
-        $this->assertEquals('RIGHT', $query['joins'][0]['type']);
+        $this->expectException(QueryBuilderException::class);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->deleteStatement([]);
     }
-    public function testFullJoin()
+
+    public function testWriteException()
     {
-        $builder = new MockQueryBuilder('user');
-        $builder->fullJoin(['table'=>'users','alias'=>'users']);
-        $query = $builder->getProperty('query');
-        
-        $this->assertEquals('FULL', $query['joins'][0]['type']);
+        $this->expectException(QueryBuilderException::class);
+        $builder = new QueryBuilder('users', 'User');
+        $builder->write();
     }
+
+    public function testWriteFormat()
+    {
+        // ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT'];
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])->where(['id' => 1000])->order(['name ASC'])->limit(1);
+
+        $expected = "\nSELECT\n  User.id, User.name, User.email \nFROM\n  `users` AS `User` \nWHERE\n  User.id = :u0 \nORDER BY\n  name ASC \nLIMIT 1";
+
+        $builder = new QueryBuilder('items', 'OrderDetails');
+        $builder->select(['id','SUM(quantity) AS items','SUM(price*quantity) AS total'])
+        ->group(['id'])
+        ->having(['total >' => 1000,'items >'=>25]);
+        $expected = "\nSELECT\n  OrderDetails.id, SUM(quantity) AS items, SUM(price*quantity) AS total \nFROM\n  `items` AS `OrderDetails` \nGROUP BY\n  OrderDetails.id \nHAVING\n  total > :i0 AND items > :i1";
+        $this->assertEquals($expected, $builder->writeFormatted());
+    }
+    /*
+
 }
