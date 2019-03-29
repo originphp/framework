@@ -14,6 +14,29 @@
 
 namespace Origin\Test\View;
 
+use Origin\View\Helper\Helper;
+use Origin\View\View;
+use Origin\Controller\Response;
+use Origin\Controller\Request;
+use Origin\Controller\Controller;
+
 class HelperTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        $controller = new Controller(new Request(), new Response());
+        $this->Helper = new Helper(new View($controller));
+    }
+    public function testRequest()
+    {
+        $this->assertInstanceOf(Request::class, $this->Helper->request());
+    }
+    public function testResponse()
+    {
+        $this->assertInstanceOf(Response::class, $this->Helper->response());
+    }
+    public function testGet()
+    {
+        $this->assertNull($this->Helper->foo);
+    }
 }

@@ -14,6 +14,28 @@
 
 namespace Origin\Test\View\Helper;
 
+use Origin\View\Helper\HelperRegistry;
+use Origin\Controller\Response;
+use Origin\Controller\Request;
+use Origin\Controller\Controller;
+use Origin\View\View;
+use Origin\View\Exception\MissingHelperException;
+
 class HelperRegistryTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        $controller = new Controller(new Request(), new Response());
+        $this->HelperRegistry = new HelperRegistry(new View($controller));
+    }
+
+    public function testView()
+    {
+        $this->assertInstanceOf(View::class, $this->HelperRegistry->view());
+    }
+    public function testMissingHelper()
+    {
+        $this->expectException(MissingHelperException::class);
+        $this->HelperRegistry->load('Foo');
+    }
 }

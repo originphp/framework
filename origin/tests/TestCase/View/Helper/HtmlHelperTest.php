@@ -19,35 +19,72 @@ use Origin\View\View;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
+use Origin\Core\Plugin;
 
-class ArticlesController extends Controller
-{
-}
-class MockHtmlHelper extends HtmlHelper
-{
-}
 class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $request = new Request('articles/edit/2048');
-        $controller = new ArticlesController($request, new Response());
-        $View = new View($controller);
-        $this->HtmlHelper = new MockHtmlHelper($View);
+        $controller = new Controller(new Request(), new Response());
+        $this->Html = new HtmlHelper(new View($controller));
+        Plugin::load('Widget');
     }
 
     public function testLink()
     {
+        $this->Html->request()->params('controller', 'Articles');
+        
         $expected = '<a href="/">view</a>';
-        $result = $this->HtmlHelper->link('view', null);
+        $result = $this->Html->link('view', null);
         $this->assertEquals($expected, $result);
 
         $expected = '<a href="/articles/view/1024">view</a>';
-        $result = $this->HtmlHelper->link('view', ['action' => 'view', 1024]);
+        $result = $this->Html->link('view', ['action' => 'view', 1024]);
         $this->assertEquals($expected, $result);
 
         $expected = '<a href="/articles/view/2048" class="custom">view</a>';
-        $result = $this->HtmlHelper->link('view', ['action' => 'view', 2048], ['class' => 'custom']);
+        $result = $this->Html->link('view', ['action' => 'view', 2048], ['class' => 'custom']);
         $this->assertEquals($expected, $result);
+    }
+
+    public function testCss()
+    {
+        $expected = '<link rel="stylesheet" type="text/css" href="https://example.com/something.css" />';
+        $this->assertSame($expected, $this->Html->css('https://example.com/something.css'));
+
+        $expected = '<link rel="stylesheet" type="text/css" href="/css/form.css" />';
+        $this->assertSame($expected, $this->Html->css('form'));
+
+        $expected = '<link rel="stylesheet" type="text/css" href="/assets/css/form.css" />';
+        $this->assertSame($expected, $this->Html->css('/assets/css/form.css'));
+    
+        $expected = '<style>.plugin { color:#fff }</styles>';
+        $this->assertSame($expected, $this->Html->css('Widget.default.css'));
+    }
+
+    public function testJs()
+    {
+        $expected = '<script type="text/javascript" href="https://example.com/something.js"></script>';
+        $this->assertSame($expected, $this->Html->js('https://example.com/something.js'));
+
+        $expected = '<script type="text/javascript" href="/js/form.js"></script>';
+        $this->assertSame($expected, $this->Html->js('form'));
+
+        $expected = '<script type="text/javascript" href="/assets/js/form.js"></script>';
+        $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
+    
+        $this->assertContains(
+            file_get_contents('/var/www/origin/tests/TestApp/plugins/widget/public/js/default.js'),
+        $this->Html->js('Widget.default.js')
+    
+        );
+    }
+
+    public function testImg()
+    {
+        $expected = '<img src="logo.png/img/logo.png">';
+        $this->assertSame($expected, $this->Html->img('logo.png'));
+        $expected = '<img src="/assets/img/logo.png">';
+        $this->assertSame($expected, $this->Html->img('/assets/img/logo.png'));
     }
 }

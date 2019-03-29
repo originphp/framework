@@ -44,19 +44,19 @@ class FlashComponentTest extends \PHPUnit\Framework\TestCase
         $flashComponent = $this->FlashComponent;
    
         $flashComponent->error('error called');
-        $this->assertEquals(['error called'], $flashComponent->Session->read('Message.error'));
+        $this->assertEquals(['error called'], $flashComponent->Session->read('Flash.error'));
         
         $flashComponent->success('success called');
-        $this->assertEquals(['success called'], $flashComponent->Session->read('Message.success'));
+        $this->assertEquals(['success called'], $flashComponent->Session->read('Flash.success'));
 
         $flashComponent->warning('warning called');
-        $this->assertEquals(['warning called'], $flashComponent->Session->read('Message.warning'));
+        $this->assertEquals(['warning called'], $flashComponent->Session->read('Flash.warning'));
 
         $flashComponent->info('info called');
-        $this->assertEquals(['info called'], $flashComponent->Session->read('Message.info'));
+        $this->assertEquals(['info called'], $flashComponent->Session->read('Flash.info'));
 
         // Test multiple messages
         $flashComponent->error('error called again');
-        $this->assertEquals(['error called','error called again'], $flashComponent->Session->read('Message.error'));
+        $this->assertEquals(['error called','error called again'], $flashComponent->Session->read('Flash.error'));
     }
 }

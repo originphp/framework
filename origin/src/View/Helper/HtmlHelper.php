@@ -30,7 +30,7 @@ class HtmlHelper extends Helper
             'a' => '<a href="{url}"{attributes}>{text}</a>',
             'css' => '<link rel="stylesheet" type="text/css" href="{url}" />',
             'js' => '<script type="text/javascript" href="{url}"></script>',
-            'img' => '<img src="{src}"{attributes}">'
+            'img' => '<img src="{src}"{attributes}>'
         ]
     ];
 
@@ -104,7 +104,7 @@ class HtmlHelper extends Helper
     {
         // without path $html->css('https://example.com/something.css');
         if (strpos($path, '://') !== false) {
-            return $path;
+            return $this->templater()->format($options['ext'], ['url'=>$path]);
         }
         $plugin = null;
         list($a, $b) = pluginSplit($path);
@@ -123,6 +123,9 @@ class HtmlHelper extends Helper
 
         if ($plugin) {
             $filename = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
+            if ($options['ext']==='js') {
+                return '<script>' .$this->loadFile($filename) . '</script>';
+            }
             return '<style>' .$this->loadFile($filename) . '</styles>';
         }
         return $this->templater()->format($options['ext'], ['url'=>$path]);

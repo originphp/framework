@@ -211,7 +211,7 @@ class FormHelper extends Helper
         
         //? Introspect related models as well?
         $model = ModelRegistry::get($name);
-       
+      
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey;
             foreach ($model->schema() as $column => $row) {
@@ -230,11 +230,7 @@ class FormHelper extends Helper
 
             // Only work if entity is supplied
             if ($entity) {
-                $create = true;
-                if ($entity->has($meta['primaryKey'])) {
-                    $create = false;
-                }
-                $meta['requiredFields'] = $this->parseRequiredFields($model->validator()->rules(), $create);
+                $meta['requiredFields'] = $this->parseRequiredFields($model->validator()->rules());
             }
         }
       
@@ -411,11 +407,11 @@ class FormHelper extends Helper
 
     protected function requiredFields(string $model)
     {
-        if (!isset($this->meta[$model])) {
-            $this->introspectModel($model);
+        $result = null;
+        if (isset($this->meta[$model])) {
+            $result = $this->meta[$model]['requiredFields'];
         }
-
-        return $this->meta[$model]['requiredFields'];
+        return $result;
     }
     /**
      * Creates a date input
@@ -657,9 +653,6 @@ class FormHelper extends Helper
             }
             $radio = $this->formatTemplate('radio', $radioOptions+$additionalOptions);
             $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $radio.$value]);
-            if (isset($radioOptions['checked'])) {
-                unset($radioOptions['checked'],$radioOptions['value']);
-            }
         }
 
         return $output;

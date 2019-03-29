@@ -28,12 +28,12 @@ class ViewTestsController extends Controller
 
 class Widget extends Model
 {
-    public $schema = array(
-    'id' => ['type' => 'integer', 'length' => 11],
-    'name' => ['type' => 'string', 'length' => 80],
-    'description' => ['type' => 'text'],
-    'active' => ['type' => 'boolean', 'length' => 1],
-  );
+    public $schema = [
+        'id' => ['type' => 'integer', 'length' => 11,'key'=>'primary'],
+        'name' => ['type' => 'string', 'length' => 80],
+        'description' => ['type' => 'text'],
+        'active' => ['type' => 'boolean', 'length' => 1],
+    ];
 
     public function initialize(array $config)
     {
@@ -61,13 +61,13 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $request = new Request('widgets/edit');
         $controller = new ViewTestsController($request, new Response());
         $View = new View($controller);
-        $this->FormHelper = new MockFormHelper($View);
-        $this->FormHelper->initialize([]);
+        $this->Form = new MockFormHelper($View);
+        $this->Form->initialize([]);
     }
 
     public function testCreate()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $result = $FormHelper->create();
         $expected = '<form method="post" accept-charset="utf-8" action="/widgets/edit">';
@@ -95,7 +95,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testText()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="text" name="article">';
         $this->assertEquals($expected, $FormHelper->text('article'));
@@ -118,7 +118,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormValues()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $Widget = new Widget();
         $widget = $Widget->new();
@@ -148,7 +148,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormValidationErrors()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $Widget = new Widget();
         $widget = $Widget->new();
@@ -179,7 +179,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testPassword()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="password" name="password">';
         $this->assertEquals($expected, $FormHelper->password('password'));
@@ -187,7 +187,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHidden()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="hidden" name="id">';
         $this->assertEquals($expected, $FormHelper->hidden('id'));
@@ -195,7 +195,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testTextarea()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<textarea name="description"></textarea>';
         $this->assertEquals($expected, $FormHelper->textarea('description'));
@@ -214,7 +214,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSelect()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<select name="status"><option value="0">draft</option><option value="1">new</option><option value="2">published</option></select>';
         $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published']));
@@ -260,21 +260,21 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testDate()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
         $expected = "<input type=\"text\" name=\"date\">";
         $this->assertEquals($expected, $FormHelper->date('date'));
     }
 
     public function testTime()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
         $expected = "<input type=\"text\" name=\"time\">";
         $this->assertEquals($expected, $FormHelper->time('time'));
     }
 
     public function testDatetime()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="text" name="datetime">';
         $this->assertEquals($expected, $FormHelper->datetime('datetime'));
@@ -282,7 +282,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFile()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="file" name="submittedfile">';
         $this->assertEquals($expected, $FormHelper->file('submittedfile'));
@@ -290,7 +290,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLabel()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<label for="name">name</label>';
         $this->assertEquals($expected, $FormHelper->label('name'));
@@ -309,7 +309,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testButton()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<button type="submit">save</button>';
         $this->assertEquals($expected, $FormHelper->button('save'));
@@ -320,7 +320,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckbox()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<input type="hidden" name="agree" value="0"><input type="checkbox" name="agree" value="1">';
         $this->assertEquals($expected, $FormHelper->checkbox('agree'));
@@ -344,23 +344,31 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testRadio()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<label for="duplicates-0"><input type="radio" name="duplicates" value="0" id="duplicates-0">Create New</label><label for="duplicates-1"><input type="radio" name="duplicates" value="1" id="duplicates-1">Overwrite</label><label for="duplicates-2"><input type="radio" name="duplicates" value="2" id="duplicates-2">Delete</label>';
         $this->assertEquals($expected, $FormHelper->radio('duplicates', ['Create New', 'Overwrite', 'Delete']));
+
+        $result = $this->Form->radio('package', [123=>'Premium',456=>'Basic'], ['value'=>123]);
+        $expected ='<label for="package-123"><input type="radio" name="package" value="123" id="package-123" checked>Premium</label><label for="package-456"><input type="radio" name="package" value="456" id="package-456">Basic</label>';
+        $this->assertSame($expected, $result);
     }
 
     public function testPostLink()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
         $expected = '<form name="link_123456789" style="display:none" method="post" action="/articles/delete/123"><input type="hidden" name="_method" value="POST"></form><a href="#" onclick="document.link_123456789.submit();">delete</a>';
-        $result = $this->FormHelper->postLink('delete', '/articles/delete/123');
+        $result = $this->Form->postLink('delete', '/articles/delete/123');
 
         $result = preg_replace('/link_[a-zA-Z0-9]+/', 'link_123456789', $result);
         $this->assertEquals($expected, $result);
 
+        $newResult =$this->Form->postLink('delete', ['controller'=>'Articles','action'=>'delete',123]);
+        $newResult = preg_replace('/link_[a-zA-Z0-9]+/', 'link_123456789', $newResult);
+        $this->assertSame($result, $newResult);
+
         $expected = '<form name="link_123456789" style="display:none" method="post" action="/articles/delete/123"><input type="hidden" name="_method" value="POST"></form><a href="#" onclick="if (confirm(&quot;yes/no&quot;)) { document.link_123456789.submit(); } event.returnValue = false; return false;">delete</a>';
-        $result = $this->FormHelper->postLink('delete', '/articles/delete/123', ['confirm' => 'yes/no']);
+        $result = $this->Form->postLink('delete', '/articles/delete/123', ['confirm' => 'yes/no']);
 
         $result = preg_replace('/link_[a-zA-Z0-9]+/', 'link_123456789', $result);
         $this->assertEquals($expected, $result);
@@ -368,7 +376,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testControl()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
 
         $expected = '<div class="form-group text"><label for="title">Title</label><input type="text" name="title" class="form-control" id="title"></div>';
         $result = $FormHelper->control('title');
@@ -412,11 +420,40 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<div class="form-check checkbox"><input type="hidden" name="active" value="0"><input type="checkbox" name="active" value="1" class="form-check-input" id="active"><label for="active" class="form-check-label">Active</label></div>';
         $result = $FormHelper->control('active', ['type' => 'checkbox']);
         $this->assertEquals($expected, $result);
+
+        $result = $this->Form->control('my-select', ['options'=>[1=>'One',2=>'Two']]);
+        $expected = '<div class="form-group select"><label for="my-select">My-select</label><select name="my-select" class="form-control" id="my-select"><option value="1">One</option><option value="2">Two</option></select></div>';
+        $this->assertSame($expected, $result);
+
+        $this->Form->view()->set('owners', [1=>'One',2=>'Two']);
+        $result = $this->Form->control('owner_id');
+        $expected = '<div class="form-group select"><label for="owner-id">Owner</label><select name="owner_id" class="form-control" id="owner-id"><option value="1">One</option><option value="2">Two</option></select></div>';
+        $this->assertsame($expected, $result);
+
+        $expected = '<input type="hidden" name="id" id="id" maxlength="11">';
+        $this->assertSame($expected, $this->Form->control('id', ['type'=>'hidden']));
+        
+        $Widget = new Widget();
+        $widget = $Widget->new();
+        $widget->id = 1234;
+        $widget->name = 'foo';
+        $expected = '<input type="text" name="name" maxlength="80" value="foo">';
+        $this->Form->create($widget); // reach create=false for required fields
+        $this->assertSame($expected, $this->Form->text('name'));
+
+        $expected ='<div class="form-group password"><label for="password">Password</label><input type="password" name="password" class="form-control" id="password"></div>';
+        $this->assertSame($expected, $this->Form->control('password'));
+
+        $expected ='<input type="hidden" name="id" id="id" maxlength="11" value="1234">';
+        $this->assertSame($expected, $this->Form->control('id'));
+
+        $expected='<div class="form-group text"><label for="unkownmodel-id">Id</label><input type="text" name="unkownModel[id]" class="form-control" id="unkownmodel-id"></div>';
+        $this->assertSame($expected, $this->Form->control('unkownModel.id'));
     }
 
     public function testDomId()
     {
-        $FormHelper = $this->FormHelper;
+        $FormHelper = $this->Form;
         $options = ['id' => true];
 
         $expected = '<input type="text" name="article" id="article">';
@@ -430,4 +467,46 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<input type="text" name="article[0][title]" id="article-0-title">';
         $this->assertEquals($expected, $FormHelper->text('article.0.title', $options));
     }
+
+    public function testNumber()
+    {
+        $result = $this->Form->number('amount');
+        $expected = '<input type="text" name="amount">';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testError()
+    {
+        $result = $this->Form->error('Something wrong');
+        $expected = '<div class="error-message">Something wrong</div>';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testControlDefaults()
+    {
+        $defaults = $this->Form->controlDefaults();
+        $this->assertIsArray($defaults);
+
+        $this->Form->controlDefaults(['dz'=>['class'=>'new-class']]);
+        $defaults = $this->Form->controlDefaults();
+        
+        $this->assertEquals(['class'=>'new-class'], $this->Form->controlDefaults('dz'));
+        $this->assertNull($this->Form->controlDefaults('----'));
+    }
+
+    public function testRequestData()
+    {
+        $this->Form->request()->data('name', 'bobby');
+        $expected = '<input type="text" name="name" value="bobby">';
+        $this->assertSame($expected, $this->Form->text('name'));
+    }
+
+    public function testFormEnd()
+    {
+        $this->assertEquals('</form>', $this->Form->end());
+    }
+
+    /**
+     * I think all this can be re written to each senario, eg using control to create
+     */
 }

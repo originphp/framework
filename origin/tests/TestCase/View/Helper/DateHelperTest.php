@@ -18,20 +18,18 @@ use Origin\View\View;
 use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
-use Origin\View\Helper\FlashHelper;
+use Origin\View\Helper\DateHelper;
 
-class FlashHelperTest extends \PHPUnit\Framework\TestCase
+class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
         $controller = new Controller(new Request(), new Response());
-        $this->Flash = new FlashHelper(new View($controller));
+        $this->Date = new DateHelper(new View($controller));
     }
-    public function testMessages()
+    public function testFormat()
     {
-        $this->assertNull($this->Flash->messages());
-        $expected = '<div class="alert alert-danger" role="alert">holy moly</div>';
-        $this->Flash->Session->write('Flash', ['error'=>['holy moly']]);
-        $this->assertEquals($expected, $this->Flash->messages());
+        $this->assertNull($this->Date->format(null));
+        $this->assertEquals('01/03/2019', $this->Date->format('2019-03-01 16:26:00', 'd/m/Y'));
     }
 }
