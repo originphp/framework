@@ -81,9 +81,7 @@ class ErrorHandler
         if ($exception->getCode() === 404) {
             $errorCode = 404;
         }
-        if (ob_get_length()) {
-            ob_end_clean();
-        }
+        $this->cleanBuffer();
 
         if (Configure::read('debug')) {
             return $this->debugException($exception);
@@ -108,10 +106,8 @@ class ErrorHandler
             $errorCode = 404;
         }
       
-        if (ob_get_length()) {
-            ob_end_clean();
-        }
-
+        $this->cleanBuffer();
+        
         if (Configure::read('debug')) {
             $response = ['error' => ['message' => $exception->getMessage(),'code' => $exception->getCode()]];
             echo json_encode($response);
@@ -144,6 +140,11 @@ class ErrorHandler
         }
     }
 
+    /**
+     * Handles the debug output
+     * @param [type] $exception
+     * @return void
+     */
     public function debugException($exception)
     {
         $debugger = new Debugger();
@@ -152,5 +153,18 @@ class ErrorHandler
         include SRC . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
 
         exit();
+    }
+
+    /**
+     * Clean Buffer
+     *
+     * @internal when calling a function that does not exist on a helper from within an element it was still rendering
+     * page. So to allow for nested i have added the while loop.
+     */
+    protected function cleanBuffer()
+    {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
     }
 }
