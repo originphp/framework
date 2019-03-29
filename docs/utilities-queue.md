@@ -103,13 +103,13 @@ class UsersShell extends AppShell
 On Ubuntu to setup cron tab for the `www-data` user type in the following command:
 
 ```linux
-sudo crontab -u www-data -e
+$ sudo crontab -u www-data -e
 ```
 
 Then add the following line, assuming the source code is in the folder
 `/var/www/app.mydomain.com`.
 ```
-0 * * * * cd /var/www/app.mydomain.com && bin/console user hourly
+0 * * * * cd /var/www/app.mydomain.com && bin/console users hourly
 ```
 
 ## Accessing The Model

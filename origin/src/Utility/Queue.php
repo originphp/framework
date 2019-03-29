@@ -110,7 +110,7 @@ class Job
     }
 
     /**
-    * Will retry a job a maximum number of times or bury it
+    * Will retry a job a maximum number of times or bury it (it will be marked as failed)
     *
     * @param integer $tries
     * @param string $strtotime
@@ -123,7 +123,7 @@ class Job
             $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
             return $this->release();
         }
-        $this->bury();
+        $this->failed();
     }
 
     /**
