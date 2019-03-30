@@ -14,6 +14,36 @@
 
 namespace Origin\Test\Core;
 
+use Origin\Core\ErrorHandler;
+use Origin\Exception\Exception;
+
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @todo
+     */
+    public function testIt()
+    {
+        $stub = $this->createMock(ErrorHandler::class);
+        $stub->method('stop');
+
+        $this->assertNull($stub->register());
+        $result = $this->render($stub, 'exceptionHandler');
+   
+        // if stop is mocked, then it does not return text
+    }
+
+    protected function render($errorHandler, $method)
+    {
+        try {
+            throw new Exception('foo');
+        } catch (Exception $ex) {
+        }
+
+        ob_start();
+
+        $errorHandler->{$method}($ex);
+
+        return ob_get_clean();
+    }
 }

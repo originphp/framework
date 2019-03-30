@@ -24,11 +24,11 @@ class ErrorHandler
      */
     public function register()
     {
-        set_error_handler(array($this, 'errorHandler'));
-        set_exception_handler(array($this, 'exceptionHandler'));
+        set_error_handler([$this, 'errorHandler']);
+        set_exception_handler([$this, 'exceptionHandler']);
 
         if ($this->isAjax()) {
-            set_exception_handler(array($this, 'ajaxExceptionHandler'));
+            set_exception_handler([$this, 'ajaxExceptionHandler']);
         }
     }
 
@@ -54,7 +54,7 @@ class ErrorHandler
         if (isset($_SERVER['CONTENT_TYPE']) and $_SERVER['CONTENT_TYPE'] === 'application/json') {
             return true;
         }
-        $uri = $_SERVER['REQUEST_URI'];
+        $uri = $_SERVER['REQUEST_URI']??null;
         if (strpos($uri, '?') !== false) {
             list($uri, $query) = explode('?', $uri);
         }
@@ -152,7 +152,7 @@ class ErrorHandler
 
         include SRC . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
 
-        exit();
+        $this->stop();
     }
 
     /**
@@ -166,5 +166,10 @@ class ErrorHandler
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
+    }
+
+    public function stop()
+    {
+        exit();
     }
 }

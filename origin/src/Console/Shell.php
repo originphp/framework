@@ -122,9 +122,23 @@ class Shell
     {
         $this->initialize();
         $this->parseArguments($args);
+
+        // If no commands setup then allow any accesible method
+        if (empty($this->commands)) {
+            if (!$this->isAccessible($name)) {
+                return false;
+            }
+        }
+        // if commands are setup, then restrict to only those
+        if ($name !=='main' and empty($this->commands) === false and !isset($this->commands[$name])) {
+            return false;
+        }
+
         $this->startupProcess();
         $this->{$name}();
         $this->shutdownProcess();
+        
+        return true;
     }
 
     /**
@@ -147,29 +161,34 @@ class Shell
                 $map[$option['short']] = $option['name'];
             }
         }
- 
+  
         foreach ($arguments as $arg) {
+            // Commands
             if ($arg[0] !== '-') {
                 $this->args[] = $arg;
                 continue;
             }
 
+            // Extract value
             $value = true;
-
-            if (substr($arg, 0, 2)==='--') {
-                $param = substr($arg, 2);
-            } else {
-                $param = substr($arg, 1);
-                if (isset($map[$param])) {
-                    $param = $map[$param];
+            $option = $arg;
+            if (strpos($arg, '=') !== false) {
+                list($option, $value) = explode('=', $arg);
+            }
+       
+            // Convert short to long
+            if (substr($option, 0, 2) !== '--') {
+                $key = substr($option, 1);
+                if (isset($map[$key])) {
+                    $option  = '--' .  $map[$key];
                 }
             }
-            if (!empty($this->options[$param]['value']) and strpos($param, '=') === false) {
+            $param = substr($option, 2); // remove --
+      
+            if (($value !== true and empty($this->options[$param]['value'])) or ($value === true and !empty($this->options[$param]['value']))) {
                 $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
             }
-            if (strpos($param, '=') !== false) {
-                list($param, $value) = explode('=', $param);
-            }
+        
             if (!isset($this->options[$param])) {
                 $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
             }

@@ -17,8 +17,6 @@ namespace Origin\Console;
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Exception\MissingShellException;
-use Origin\Console\Exception\MissingShellMethodException;
-use Origin\Console\Exception\MissingCommandException;
 use Origin\Console\Exception\StopExecutionException;
 
 use Origin\Core\Configure;
@@ -48,6 +46,7 @@ class ShellDispatcher
      * @var array
      */
     protected $args = [];
+
 
     /**
      * Shell
@@ -173,25 +172,29 @@ class ShellDispatcher
         }
         $this->shell = new $className($this->output, $this->input);
 
+        /**
+         * bin/console cron - runs main method
+         * bin/console something - runs something method
+         * bin/console noExists - if command set and does not exist
+         */
+
         $method = null;
         if ($this->args) {
             $method = array_shift($this->args);
         }
+        
         if ($method === null and method_exists($this->shell, 'main')) {
             $method = 'main';
         }
-        
-        # This is spegetti, want it to work with main
+   
         if ($method === null or $method ==='--help' or $method ==='-h') {
             $method = 'help';
-        } else {
-            if (!$this->shell->isAccessible($method)) {
-                throw new MissingShellMethodException([$className,$method]);
-            }
         }
-
+    
         try {
-            $this->shell->runCommand($method, $this->args);
+            if (! $this->shell->runCommand($method, $this->args)) {
+                $this->shell->help();
+            }
         } catch (StopExecutionException $ex) {
             return false;
         }

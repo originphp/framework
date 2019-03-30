@@ -23,10 +23,26 @@ class HelloShell extends Shell
 From within your project folder
 
 ```linux
-bin/console hello run
+$ bin/console hello run
 ```
 
-You can also set a main method, which will be run by default if no command is supplied.
+You can also set a `main` method, which will be run by default if no command is supplied.
+
+```php
+ public function main()
+    {
+        $this->out('hello world!');
+    }
+```
+Then to run it, do so as follows:
+
+```linux
+$ bin/console hello
+```
+
+When using the `main` method, it cannot accept arguments, since the shell will think you are calling a command within the shell and main wont get executed. However `main` does accept `options`.
+
+## Arguments
 
 You can get additional arguments by checking out the args variable in the shell.
 
@@ -36,7 +52,7 @@ print_r($this->args()); // or use pr()
 
 ## Display Help
 
-To display help for your commands, this is displayed when no arguments are called from the command line, configure this 
+To display help for your commands, this is displayed when no arguments are called from the command line, configure this
 in the initialize method.
 
 
@@ -54,7 +70,7 @@ Sometimes you need to accept parameters from your console.
 Lets say you wanted to accept a dryRun option.
 
 ```linux
-bin/console database clean --dryRun
+$ bin/console database clean --dryRun
 ```
 
 To do so you need to configure this in your initialize method, at the same time you put the help text which will be displayed
@@ -91,7 +107,7 @@ Sometimes you might want to give a short name which is then accessed with a sing
 If you need to take an input from the user then it will be done like this from the console.
 
 ```linux
-bin/console database clean --datasource=test_database
+$ bin/console database clean --datasource=test_database
 ```
 
 To configure this, you set a value option with a slight description, this will appear in the help.
@@ -113,7 +129,9 @@ $connection = $this->params('datasource');
 ## Displaying Help
 
 When you create a console, in the initialize setup the commands which people can run this will then generate help
-when it is asked.
+when it is asked. 
+
+Note: If no commands are setup in the shell using `addCommand`, then any public method can be called. However, if you setup commands, then only those commands can be called.
 
 ```php
     public function initialize()
@@ -133,7 +151,7 @@ There are three callbacks which a Shell use `initialize`,`startup` and `shutdown
     /**
      * This is called when the shell is created during the construct.
      */
-    public function initialize(array $config){}
+    public function initialize(){}
 
     /**
      * This called before the shell method

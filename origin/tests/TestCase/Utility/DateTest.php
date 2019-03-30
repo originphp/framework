@@ -86,4 +86,15 @@ class DateTest extends \PHPUnit\Framework\TestCase
         Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']); // always 1 hour out
         $this->assertEquals('11:00:00', Date::parseTime('12:00 PM'));
     }
+
+    public function testLocale()
+    {
+        $this->assertIsArray(Date::locale());
+    }
+
+    public function testFormatDateConversion()
+    {
+        Date::locale(['date' => 'd/m/Y','timezone' => 'Europe/Madrid']);
+        $this->assertEquals('19/03/2019', Date::formatDate('2019-03-19 10:00:00')); // Still need to run through timezone
+    }
 }

@@ -174,7 +174,7 @@ class ArticleFixture extends Fixture
 
 You can generate the schema from your existing database using the `SchemaShell` using the following command:
 
-`bin/console schema generate`
+`$ bin/console schema generate`
 
 This will create a folder in your config folder, called schema with a PHP file for each table. You can run this anytime 
 you make changes, but you will need to update the fixture file separately. 

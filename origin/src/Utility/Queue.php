@@ -120,6 +120,7 @@ class Job
     {
         $job = $this->entity;
         if ($job->tries < $tries) {
+            $job->tries ++;
             $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
             return $this->release();
         }

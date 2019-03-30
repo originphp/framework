@@ -94,7 +94,7 @@ class Number
      */
     public static function addCurrency(string $symbol, $options=[])
     {
-        self::$currencies[$symbol] = $options + ['name'=>$symbol,'before'=>$symbol,'after'=>''];
+        self::$currencies[$symbol] = $options + ['name'=>$symbol,'before'=>$symbol . ' ','after'=>''];
     }
 
     /**

@@ -58,4 +58,12 @@ class ConsoleInputTest extends \PHPUnit\Framework\TestCase
         $ConsoleInput->close();
         $this->assertFalse(is_resource($ConsoleInput->getStream()));
     }
+
+    public function testReadAgain()
+    {
+        $name = uniqid();
+        file_put_contents('/tmp/'. $name, 'yes');
+        $consoleInput = new MockConsoleInput('file:///tmp/'. $name);
+        $this->assertEquals('yes', $consoleInput->read());
+    }
 }

@@ -20,7 +20,6 @@ use Origin\Console\ConsoleInput;
 use Origin\TestSuite\TestTrait;
 use Origin\Console\Shell;
 use Origin\Console\Exception\MissingShellException;
-use Origin\Console\Exception\MissingShellMethodException;
 
 class MockShellDispatcher extends ShellDispatcher
 {
@@ -187,30 +186,6 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         );
        
         $this->expectException(MissingShellException::class);
-        $ShellDispatcher->start();
-    }
-
-    public function testInvalidArg()
-    {
-        $ShellDispatcher = new MockShellDispatcher(
-            ['pathTo/origin.php','Origin\Test\Console\LemonPie','unknowMethod'],
-            new AnotherConsoleOutput('php://memory'),
-            new ConsoleInput()
-        );
-       
-        $this->expectException(MissingShellMethodException::class);
-        $ShellDispatcher->start();
-    }
-
-    public function testInvalidPrivateMethod()
-    {
-        $ShellDispatcher = new MockShellDispatcher(
-            ['pathTo/origin.php','Origin\Test\Console\LemonPie','privateMethod'],
-            new AnotherConsoleOutput('php://memory'),
-             new ConsoleInput()
-        );
-       
-        $this->expectException(MissingShellMethodException::class);
         $ShellDispatcher->start();
     }
 }

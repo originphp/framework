@@ -76,6 +76,41 @@ class QueueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $job->locked);
     }
 
+    public function testRelease()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $job->release();
+        $job = $queue->model()->get($job->id);
+
+        $this->assertEquals('queued', $job->status);
+    }
+
+    public function testRetry()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $queue->fetch('welcome_emails');
+        $job->retry(1);
+        $jobFromDb = $queue->model()->get($job->id);
+        $this->assertEquals(1, $jobFromDb->tries);
+        $this->assertEquals('queued', $jobFromDb->status);
+        $job->retry(1);
+        $this->assertEquals(1, $jobFromDb->tries);
+    }
+
+    public function testPurge()
+    {
+        $queue = new Queue(['datasource'=>'test']);
+        $queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->assertEquals(1, $queue->model()->find('count'));
+        $job = $queue->fetch('welcome_emails');
+        $job->executed();
+        $queue->purge('welcome_emails');
+        $this->assertEquals(0, $queue->model()->find('count'));
+    }
+
     public function testDelete()
     {
         $queue = new Queue(['datasource'=>'test']);

@@ -20,7 +20,9 @@ Lets say you want to create a contact manager plugin, you create the folder stru
 
 You can use the generate plugin to create the folder structure, routes and app controller and model.
 
-`bin/console generate plugin ContactManager` 
+```linux
+$ bin/console generate plugin ContactManager
+```
 
 Then in your `config/bootstrap.php` add:
 

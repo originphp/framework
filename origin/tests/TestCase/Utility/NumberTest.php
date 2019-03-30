@@ -42,6 +42,8 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('$1,234.57', Number::currency(1234.56789));
         $this->assertEquals('£1,234.57', Number::currency(1234.56789, 'GBP'));
         $this->assertEquals('DIR 1,234.57', Number::currency(1234.56789, 'DIR'));
+        Number::addCurrency('NOK');
+        $this->assertEquals('NOK 1,234.57', Number::currency(1234.56789, 'NOK'));
     }
     public function testParse()
     {

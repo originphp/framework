@@ -9,6 +9,11 @@ class DummyShell extends Shell
     {
     }
 
+    public function main()
+    {
+        $this->out('Dummy Shell');
+    }
+
     public function say()
     {
         $this->out('Hello world!');

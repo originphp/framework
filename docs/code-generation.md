@@ -8,8 +8,8 @@ The first thing to do is setup your database and config.
 
 Run the console command (this is a shell script in the bin folder) and this will show the options that are available to you.
 
-```
-linux bin/console generate
+```linux 
+$ bin/console generate
 ```
 
 So lets you are creating a contact app, and you have a `contacts` table setup
@@ -17,15 +17,15 @@ So lets you are creating a contact app, and you have a `contacts` table setup
 We will need to create the Model, View and Controller (MVC);
 
 ```linux
-bin/console generate controller Contacts
+$ bin/console generate controller Contacts
 ```
 
 ```linux
-bin/console generate model Contact
+$ bin/console generate model Contact
 ```
 
 ```linux
-bin/console generate view Contacts
+$ bin/console generate view Contacts
 ```
 
 This will generate the following views
@@ -37,7 +37,7 @@ This will generate the following views
 You can also generate the Model,View,Controller (MVC) in one go
 
 ```linux
-bin/console generate all Contact
+$ bin/console generate all Contact
 ```
 
 If all went ok then you should be able to access your contacts app by `http://localhost:8000/contacts`

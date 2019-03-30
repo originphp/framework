@@ -14,6 +14,7 @@
 namespace Origin\Test\Utility;
 
 use Origin\Model\Entity;
+use Origin\Model\Collection;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase
 {
@@ -58,6 +59,12 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         });
         global $testEachArray;
         $this->assertEquals($data, $testEachArray);
+
+        // reach the false
+        $data = [1,2,3];
+        $collection->each(function ($value, $key) {
+            return false;
+        });
     }
     public function testExtract()
     {
@@ -363,5 +370,45 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, count($first->toArray()));
         $this->assertEquals(2, count($second->toArray()));
         $this->assertFalse($first->toArray() === $second->toArray());
+    }
+
+    public function testDebugInfo()
+    {
+        $collection = collection($this->books);
+        $this->assertIsArray($collection->__debugInfo());
+    }
+    public function testArrayAccess()
+    {
+        $collection = collection($this->books);
+        $this->assertTrue(isset($collection[0]));
+        $item = $collection[0];
+        $collection[0] = $item;
+        $collection[] = 'test';
+        $this->assertEquals('test', $collection[5]);
+        unset($collection[0]);
+        $this->assertFalse(isset($collection[0]));
+    }
+    public function testCountable()
+    {
+        $collection = collection($this->books);
+        $this->assertEquals(5, count($collection));
+    }
+    public function testIterator()
+    {
+        $collection = collection($this->books);
+
+        foreach ($collection as $item) {
+            $this->assertInstanceOf(Entity::class, $item);
+        }
+        //Iterator
+    }
+    public function testToArray()
+    {
+        $objectCollection = new Collection($this->books);
+        $collection = collection($objectCollection);
+        $this->assertIsArray($collection->toArray());
+
+        $collection = collection($this->books);
+        $this->assertIsArray($collection->toArray());
     }
 }

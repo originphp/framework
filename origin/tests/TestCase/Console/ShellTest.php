@@ -21,8 +21,12 @@ use Origin\Console\Task\Task;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
+use Origin\Console\Exception\StopExecutionException;
+
 class MockShell extends Shell
 {
+    public $description ='MockShell';
+
     public function initialize()
     {
         $this->addCommand('dummy');
@@ -53,10 +57,12 @@ class MockTask extends Task
 {
     public function startup()
     {
+        parent::startup();
         $this->shell()->startupCalled = true;
     }
     public function shutdown()
     {
+        parent::shutdown();
         $this->shell()->shutdownCalled = true;
     }
 }
@@ -135,9 +141,8 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $shell->loadTask('MockTask');
         $shell->taskRegistry()->enable('MockTask');
 
-        $shell->startupProcess();
+        $shell->runCommand('dummy', []);
         $this->assertTrue($shell->startupCalled);
-        $shell->shutdownProcess();
         $this->assertTrue($shell->shutdownCalled);
     }
 
@@ -171,5 +176,128 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($shell->isAccessible('protectedMethod'));
         $this->assertFalse($shell->isAccessible('privateMethod'));
         $this->assertFalse($shell->isAccessible('unkownMethod'));
+    }
+
+    public function testParseArguments()
+    {
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $shell->addOption('option1', [
+            'name'=>'option1',
+            'help'=>'Option #1',
+            'value' => 'description'
+            ]);
+        $args = ['--option1=value1'];
+        $shell->runCommand('non-existant', $args);
+        $this->assertEquals('value1', $shell->params('option1'));
+
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+
+        $shell->addOption('option2', [
+            'name'=>'option2',
+            'help'=>'Option #2',
+            'short' => 'o',
+            'value' => 'description'
+            ]);
+        $args = ['-o=value2'];
+        $shell->runCommand('non-existant', $args);
+
+        $this->assertEquals('value2', $shell->params('option2'));
+
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $shell->addOption('option3', [
+                'help'=>'Option #3',
+                'short' => 'o3'
+                ]);
+        $args = ['-o3'];
+        $shell->runCommand('non-existant', $args);
+        
+        $this->assertTrue($shell->params('option3'));
+
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $shell->addOption('option4', [
+                'help'=>'Option #4'
+                ]);
+
+        $args = ['--option4'];
+        $shell->runCommand('non-existant', $args);
+                
+        $this->assertTrue($shell->params('option4'));
+
+        // Test Params
+        $this->assertNull($shell->params('option5'));
+        $this->assertIsArray($shell->params());
+        $shell->params('option6', 'value6');
+        $this->assertEquals('value6', $shell->params('option6'));
+        $shell->params(['key'=>'value']);
+        $this->assertEquals('value', $shell->params('key'));
+    }
+
+    /**
+     * This will fail because we are passing = with value and we
+     * did not set the the value key
+     *
+     * @return void
+     */
+    public function testParseArgumentsException1()
+    {
+        $this->expectException(StopExecutionException::class);
+
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $shell->addOption('option1', [
+            'name'=>'option1',
+            'help'=>'Option #1'
+            ]);
+        $args = ['--option1=value1'];
+        $shell->runCommand('non-existant', $args);
+    }
+
+    /**
+     * This will fail because we did not set the add option
+     *
+     * @return void
+     */
+    public function testParseArgumentsException2()
+    {
+        $this->expectException(StopExecutionException::class);
+
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $args = ['--option1'];
+        $shell->runCommand('non-existant', $args);
+    }
+
+    public function testArgs()
+    {
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
+        $args = ['command1','command2'];
+        $shell->runCommand('non-existant', $args);
+        $this->assertIsArray($shell->args());
+        $this->assertEquals('command1', $shell->args(0));
+        $this->assertNull($shell->args(10));
+    }
+
+    public function testHelp()
+    {
+        $file = '/tmp/' . uniqid();
+        $shell = new Shell(new ConsoleOutput('file://' . $file), $this->ConsoleInput);
+        $shell->addOption('option1', [
+            'name'=>'option1',
+            'help'=>'Option #1'
+            ]);
+        $shell->addOption('option2', [
+                'name'=>'option2',
+                'help'=>'Option #2',
+                'value' =>'description'
+                ]);
+
+        $shell->addCommand('my_action', ['help'=>'Description goes here']);
+        $shell->runCommand('non-existant', []);
+        $shell->help();
+        $buffer = file_get_contents($file);
+        $this->assertContains('Usage:', $buffer);
+        $this->assertContains('--option2=description', $buffer);
+        $this->assertContains('Option #2', $buffer);
+
+        $this->assertContains('my_action', $buffer);
+        $this->assertContains('Description goes here', $buffer);
     }
 }

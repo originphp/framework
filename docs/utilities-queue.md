@@ -7,7 +7,7 @@ First you need to import the SQL schema which is in the `config/schema/queue.sql
 Run the following command:
 
 ```linux
-bin/console schema import queue
+$ bin/console schema import queue
 ```
 
 ## Creating the Queue Object
