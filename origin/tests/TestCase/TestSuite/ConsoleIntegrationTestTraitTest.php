@@ -42,4 +42,10 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertExitError();
         $this->assertErrorContains('OMG! Its all Gone pete tong');
     }
+
+    public function testEmpty()
+    {
+        $this->exec('dummy do_nothing');
+        $this->assertOutputEmpty();
+    }
 }

@@ -79,23 +79,6 @@ class Task
     }
 
     /**
-     * Loads Multiple Tasks through the loadTask method
-     *
-     * @param array $tasks
-     * @return void
-     */
-    public function loadTasks(array $tasks)
-    {
-        foreach ($tasks as $task => $config) {
-            if (is_int($task)) {
-                $task = $config;
-                $config = [];
-            }
-            $this->loadTask($task, $config);
-        }
-    }
-
-    /**
      * This is called when task is loaded for the first time
      */
     public function initialize(array $config)

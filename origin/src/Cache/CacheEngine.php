@@ -129,7 +129,7 @@ class CacheEngine
      */
     protected function persistentId() : string
     {
-        if ($this->config['persistent'] == true) {
+        if ($this->config['persistent'] === true) {
             return 'origin-php';
         }
         return (string) $this->config['persistent'];

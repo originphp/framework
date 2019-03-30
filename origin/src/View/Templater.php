@@ -94,7 +94,7 @@ class Templater
                 return true;
             }
         }
-        pr($filename);
+
         throw new Exception("'config/{$name}.php' does not exist or does not return an array.");
     }
 

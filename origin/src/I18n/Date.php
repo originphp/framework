@@ -142,9 +142,12 @@ class Date
      *
      * @param string $dateString
      */
-    public static function formatDate(string $dateString)
+    public static function formatDate(string $dateString, $format = null)
     {
-        return self::format($dateString, self::$dateFormat);
+        if ($format === null) {
+            $format = self::$dateFormat;
+        }
+        return self::format($dateString, $format);
     }
 
     /**
@@ -152,9 +155,12 @@ class Date
      *
      * @param string $dateString
      */
-    public static function formatDatetime(string $dateString)
+    public static function formatDatetime(string $dateString, $format = null)
     {
-        return self::format($dateString, self::$datetimeFormat);
+        if ($format === null) {
+            $format = self::$datetimeFormat;
+        }
+        return self::format($dateString, $format);
     }
 
     /**
@@ -162,9 +168,12 @@ class Date
      *
      * @param string $dateString
      */
-    public static function formatTime(string $dateString)
+    public static function formatTime(string $dateString, $format = null)
     {
-        return self::format($dateString, self::$timeFormat);
+        if ($format === null) {
+            $format = self::$timeFormat;
+        }
+        return self::format($dateString, $format);
     }
 
     /**

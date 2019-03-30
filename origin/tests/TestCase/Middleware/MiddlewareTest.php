@@ -17,6 +17,23 @@ namespace Origin\Test\Middleware;
 use Origin\Middleware\Middleware;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
+use Origin\BaseApplication;
+
+class MyMiddleware extends Middleware
+{
+    public function process(Request $request, Response $response) : Response
+    {
+        $request->data('foo', 'bar');
+        return $response;
+    }
+}
+class Application extends BaseApplication
+{
+    public function initialize()
+    {
+        $this->addMiddleware(new MyMiddleware());
+    }
+}
 
 class MiddlwareTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,5 +41,11 @@ class MiddlwareTest extends \PHPUnit\Framework\TestCase
     {
         $middleware = new Middleware();
         $this->assertInstanceOf(Response::class, $middleware->process(new Request(), new Response()));
+    }
+    public function testExecution()
+    {
+        $request = new Request();
+        new Application($request, new Response());
+        $this->assertEquals('bar', $request->data('foo'));
     }
 }

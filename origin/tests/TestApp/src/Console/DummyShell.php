@@ -25,4 +25,8 @@ class DummyShell extends Shell
         $this->error('OMG! Its all Gone pete tong');
         $this->out('Finish');
     }
+
+    public function do_nothing()
+    {
+    }
 }

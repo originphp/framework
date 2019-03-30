@@ -16,6 +16,7 @@ namespace Origin\Test\Cache\Engine;
 
 use Origin\Cache\Engine\MemcachedEngine;
 use Memcached;
+use Origin\Exception\Exception;
 
 class MockMemcachedEngine extends MemcachedEngine
 {
@@ -125,5 +126,52 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
     {
         $cache = $this->engine();
         $cache->memcached()->flush();
+    }
+
+    public function testBadConnection()
+    {
+        $this->expectException(Exception::class);
+        new MockMemcachedEngine([
+            'host' => 'memcached-not-exist',
+            'duration' => 0,
+            'prefix' => 'origin_',
+            'persistent' => 'my-app'
+        ]);
+    }
+
+    public function testBadConnectionSocket()
+    {
+        $this->expectException(Exception::class);
+        new MockMemcachedEngine([
+            'path' => '/tmp/fake-socket',
+            'duration' => 0,
+            'prefix' => 'origin_'
+        ]);
+    }
+
+    public function testAddMultipleServers()
+    {
+        $servers = [
+            ['memcached', 11211],
+            ['memcached', 11211]
+        ];
+        $memcached = new MockMemcachedEngine([
+            'servers' => $servers,
+            'duration' => 0,
+            'prefix' => 'origin_'
+        ]);
+        $this->assertInstanceOf(MemcachedEngine::class, $memcached);
+    }
+
+    public function testAddUsernamePassword()
+    {
+        $this->expectException(Exception::class); // Dont have it configured.
+        $memcached = new MockMemcachedEngine([
+            'host' => 'memcached',
+            'username' => 'tony',
+            'password' => 'secret',
+            'duration' => 0,
+            'prefix' => 'origin_'
+        ]);
     }
 }

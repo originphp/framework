@@ -167,11 +167,6 @@ class Number
         return static::parse($string, NumberFormatter::TYPE_INT32);
     }
 
-    public static function parseFloat(string $string)
-    {
-        return static::parse($string, NumberFormatter::TYPE_DOUBLE);
-    }
-
     /**
      * Creates a NumberFormatter object and sets the attributes.
      */

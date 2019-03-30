@@ -75,6 +75,7 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testIncrement()
     {
         $cache = new ArrayEngine();
+        $this->assertEquals(1, $cache->increment('counter'));
         $cache->set('counter', 100);
         $this->assertEquals(101, $cache->increment('counter'));
         $this->assertEquals(110, $cache->increment('counter', 9));
@@ -82,6 +83,7 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testDecrement()
     {
         $cache = new ArrayEngine();
+        $this->assertEquals(-1, $cache->decrement('counter'));
         $cache->set('counter', 110);
         $this->assertEquals(109, $cache->decrement('counter'));
         $this->assertEquals(100, $cache->decrement('counter', 9));

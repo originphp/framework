@@ -17,7 +17,7 @@ namespace Origin\View\Helper;
 use Origin\I18n\Date;
 use Origin\I18n\Number;
 
-class Intl extends Helper
+class IntlHelper extends Helper
 {
     /**
      * Returns a localized date string according to locale settings

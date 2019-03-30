@@ -16,6 +16,7 @@ namespace Origin\Test\Cache\Engine;
 
 use Origin\Cache\Engine\RedisEngine;
 use Redis;
+use Origin\Exception\Exception;
 
 class MockRedisEngine extends RedisEngine
 {
@@ -126,5 +127,24 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
     {
         $cache = $this->engine();
         $cache->clear();
+    }
+
+    
+    /**
+     * Make sure it runs smothely
+     *
+     * @return void
+     */
+    public function testPersistent()
+    {
+        $redis = new MockRedisEngine([
+            'host' => 'redis',
+            'duration' => 0,
+            'prefix' => 'origin_',
+            'persistent' => 'persisten-id'
+        ]);
+    
+        $redis ->set('counter', 100);
+        $this->assertEquals(101, $redis->increment('counter'));
     }
 }

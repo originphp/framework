@@ -20,6 +20,7 @@ use Origin\Controller\Controller;
 use Origin\Controller\Request;
 use Origin\Controller\Response;
 use Origin\Core\Plugin;
+use Origin\Exception\NotFoundException;
 
 class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -60,6 +61,9 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
     
         $expected = '<style>.plugin { color:#fff }</styles>';
         $this->assertSame($expected, $this->Html->css('Widget.default.css'));
+
+        $this->expectException(NotFoundException::class);
+        $this->Html->css('Widget.does-not-exist.css');
     }
 
     public function testJs()
@@ -76,8 +80,9 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertContains(
             file_get_contents('/var/www/origin/tests/TestApp/plugins/widget/public/js/default.js'),
         $this->Html->js('Widget.default.js')
-    
         );
+        $this->expectException(NotFoundException::class);
+        $this->Html->js('Widget.does-not-exist.js');
     }
 
     public function testImg()

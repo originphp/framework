@@ -16,7 +16,7 @@ namespace Origin\Cache;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Cache\NullEngine;
+use Origin\Cache\Engine\NullEngine;
 
 class Cache
 {
