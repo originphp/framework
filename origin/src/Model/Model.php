@@ -763,8 +763,8 @@ class Model
         /**
          * Save HABTM. It is here, because control is needed on false result from here
          */
-        foreach ($hasAndBelongsToMany as $alias => $config) {
-            if (!$this->saveHABTM($alias, $entity->{$needle}, $options['callbacks'])) {
+        foreach ($hasAndBelongsToMany as $alias => $data) {
+            if (!$this->saveHABTM($alias, $data, $options['callbacks'])) {
                 return false;
             }
             $result = true;
