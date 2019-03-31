@@ -95,7 +95,9 @@ class PostgreSQLDriver
         if ($this->datasource->execute($sql)) {
             $results =  $this->datasource->fetchAll();
          
-           
+            /**
+             * @todo defaults should be type,length,default,null (remove length if empty)
+             */
             foreach ($results as $result) {
                 $data = ['type'=>null,'length'=>null,'precision'=>null];
                 $data['type'] = $this->column($result['type']);

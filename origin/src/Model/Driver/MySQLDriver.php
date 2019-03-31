@@ -58,7 +58,12 @@ class MySQLDriver extends Datasource
             foreach ($this->columns as $key => $value) {
                 $reverseMapping[strtolower($value['name'])] = $key;
             }
- 
+            /**
+             * @todo refactor to work similar to Postgres,not using reverse mapping. For cleanner
+             * code
+             */
+            $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
+
             foreach ($result as $column) {
                 $precision = $length = null;
                 $type = str_replace(')', '', $column['Type']);
@@ -68,25 +73,29 @@ class MySQLDriver extends Datasource
                         list($length, $precision) = explode(',', $length);
                     }
                 }
+
+
                 if (isset($reverseMapping[$type])) {
                     $type = $reverseMapping[$type];
-                    $schema[$column['Field']] = array(
+                    $schema[$column['Field']] = [
                         'type' => $type,
                         'length' => ($length and $type !='boolean')?(int) $length:null,
-                        'precision' => $precision?(int) $precision:null,
                         'default' => $column['Default'],
                         'null' => ($column['Null'] === 'YES' ? true : false),
-                      );
+                    ];
               
-                    if (!in_array($type, ['float','decimal'])) {
-                        unset($schema[$column['Field']]['precision']);
+                    if (in_array($type, ['float','decimal'])) {
+                        $schema[$column['Field']]['precision'] = $precision;
                     }
                     if ($schema[$column['Field']]['length'] === null) {
                         unset($schema[$column['Field']]['length']);
                     }
-                    if ($type ==='timestamp') {
-                        unset($schema[$column['Field']]['default']);
+                    if (in_array($type, ['timestamp','datetime'])) {
+                        $schema[$column['Field']]['default'] = null; // remove current_timestamp
                     }
+                    /**
+                     * @todo add back unsigined
+                     */
                     
                     if ($column['Key'] === 'PRI') {
                         $schema[$column['Field']]['key'] = 'primary';
