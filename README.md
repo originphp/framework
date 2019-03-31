@@ -24,6 +24,10 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 See the [getting started guide](docs/getting-started.md) or the framework [documentation](docs/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
 
+- [Model Guide](models.md)
+- [View Guide](views.md)
+- [Controller Guide](controllers.md)
+
 ## Acknowledgements
 
 This library is heavily inspired by CakePHP 2.x and CakePHP 3.x. (You might even call it CakePHP 5.0)
