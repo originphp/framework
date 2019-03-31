@@ -305,7 +305,6 @@ class Controller
      * $this->render(['json'=>$array,'status'=>403]);
      * $this->render(['text'=>'OK']);
      *
-     *
      * ### View Types
      * template - standard view
      * xml - takes an array and coverts to xml
@@ -328,6 +327,18 @@ class Controller
      *  401 - Unauthorized
      *  404 - Not Found
      *  403 - Forbidden (For application level permisions)
+     *
+     * @param string|array $options you can pass a string which is the template name this is the same
+     * as the current action, if it starts with / then it will look in a different folder. If you pass
+     * an array options, you can do so as follows:
+     *       Types:
+     *      - json: a string, array or object will be converted to json. E.g. $this->render(['json'=>$result]);
+     *      - xml: an xml string or an array which will be converted to XML
+     *      - text: For rendering plain text
+     *      - file: a filename, and file get contents will be used.
+     *      -template: default option, this will render the html template from the views folder.
+     *      Other
+     *      - status: the status code to return, e.g. 404
      */
     public function render($options=[])
     {
@@ -345,18 +356,22 @@ class Controller
         ];
         $body = null;
 
-        if (!empty($options['json'])) {
+        /**
+         * When working with json sometiems values can empty, for example autocomplete
+         * so array key exists better than isset.
+         */
+        if (array_key_exists('json', $options)) {
             return $this->renderJson($options['json'], $options['status']);
         }
         
-        if (!empty($options['xml'])) {
+        if (array_key_exists('xml', $options)) {
             return $this->renderXml($options['xml'], $options['status']);
         }
         
-        if (!empty($options['text'])) {
+        if (array_key_exists('text', $options)) {
             $options['type'] = 'txt';
             $body = $options['text'];
-        } elseif (!empty($options['file'])) {
+        } elseif (array_key_exists('file', $options)) {
             $body = file_get_contents($options['file']);
             $options['type'] = mime_content_type($options['file']);
         }
@@ -372,6 +387,7 @@ class Controller
         $this->response->status($options['status']); // 200
         $this->response->body($body); //
     }
+
 
     /**
      * Creates a View object, overide if you want to use
