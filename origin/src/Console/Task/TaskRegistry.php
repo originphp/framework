@@ -37,7 +37,7 @@ class TaskRegistry extends ObjectRegistry
         $this->shell = $shell;
     }
 
-    protected function className($class)
+    protected function className(string $class)
     {
         return Resolver::className($class, 'Console/Task');
     }

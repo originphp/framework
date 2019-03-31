@@ -37,7 +37,7 @@ class ComponentRegistry extends ObjectRegistry
         $this->controller = $controller;
     }
 
-    protected function className($class)
+    protected function className(string $class)
     {
         return Resolver::className($class, 'Controller/Component');
     }

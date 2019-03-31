@@ -32,7 +32,7 @@ class HelperRegistry extends ObjectRegistry
         $this->view = $view;
     }
 
-    protected function className($class)
+    protected function className(string $class)
     {
         return Resolver::className($class, 'View/Helper');
     }

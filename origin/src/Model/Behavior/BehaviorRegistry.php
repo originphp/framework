@@ -37,7 +37,7 @@ class BehaviorRegistry extends ObjectRegistry
         $this->model = $model;
     }
 
-    protected function className($class)
+    protected function className(string $class)
     {
         return Resolver::className($class, 'Model/Behavior');
     }
