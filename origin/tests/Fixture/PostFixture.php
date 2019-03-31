@@ -20,7 +20,7 @@ class PostFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = array(
+    public $schema = array(
          'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
          'title' => array(
            'type' => 'string',

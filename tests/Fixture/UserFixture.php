@@ -5,7 +5,45 @@ use Origin\TestSuite\Fixture;
 
 class UserFixture extends Fixture
 {
-    public $import = ['model'=>'User'];
+    public $schema = [
+        'id' =>  [
+        'type' => 'integer',
+        'length' => 11,
+        'default' => null,
+        'null' => false,
+        'key' => 'primary',
+        'autoIncrement' => true,
+        ],
+        'name' => [
+        'type' => 'string',
+        'length' => 120,
+        'null' => false,
+    ],
+        'email' => [
+        'type' => 'string',
+        'length' => 255,
+        'null' => false,
+    ],
+        'password' =>[
+        'type' => 'string',
+        'length' => 255,
+        'null' => false,
+    ],
+        'dob' =>  [
+        'type' => 'date',
+        'default' => null,
+        'null' => true,
+    ],
+        'created' => [
+        'type' => 'datetime',
+        'null' => false,
+    ],
+        'modified' => [
+        'type' => 'datetime',
+        'null' => false,
+    ]
+   ];
+
     public $records = [
         ['id' => 1000,
         'name' => 'Frank' ,

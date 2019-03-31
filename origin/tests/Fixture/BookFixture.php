@@ -20,7 +20,7 @@ class BookFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = [
+    public $schema = [
          'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
          'author_id' => ['type' => 'integer'],
          'title' => ['type' => 'string','length' => 255, 'null' => false],

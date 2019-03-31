@@ -24,7 +24,7 @@ class Movie extends Model
 }
 class MovieFixture extends Fixture
 {
-    public $fields = array(
+    public $schema = array(
         'id' => array('type' => 'integer', 'key' => 'primary'),
         'name' => array(
           'type' => 'string',

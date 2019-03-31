@@ -83,7 +83,7 @@ class Shell
      */
 
     public $options = [
-        'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
+       // 'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
     ];
 
     /**
@@ -428,9 +428,10 @@ class Shell
             $this->out('');
         }
         $this->out('<info>Usage:</info>');
-        $this->out('  <comment> command [options] [arguments]</comment>');
+        $this->out('  command [options] [arguments]');
         $this->out('');
         if ($this->options) {
+            $options = [];
             $this->out('<info>Options:</info>');
             foreach ($this->options as $option) {
                 $value = '';
@@ -442,18 +443,40 @@ class Shell
                 if ($option['short']) {
                     $text = '-'. $option['short'] . ', ' . $text;
                 }
-                $this->out('  <white>' . $text . "</white> ".$option['help']);
+
+                $options[$text] = $option['help'];
             }
+            $this->plotTable($options);
             $this->out('');
         }
         if ($this->commands) {
             $this->out('<info>Available Commands:</info>');
-            $this->out('');
-            
+            $options = [];
             foreach ($this->commands as $command) {
-                $this->out("<comment>{$command['name']}</comment> {$command['help']}");
+                $options[$command['name']] = $command['help'];
             }
+            $this->plotTable($options);
             $this->out('');
+        }
+    }
+
+    /**
+     * Draws the options/commands table
+     *
+     * @param array $data
+     * @return void
+     */
+    private function plotTable(array $data)
+    {
+        $maxLength = 0;
+        foreach ($data as $key => $value) {
+            if (strlen($key)> $maxLength) {
+                $maxLength = strlen($key);
+            }
+        }
+        foreach ($data as $key => $value) {
+            $key = str_pad($key, $maxLength);
+            $this->out("  {$key}\t{$value}");
         }
     }
 

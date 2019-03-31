@@ -20,7 +20,7 @@ class AddressFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = [
+    public $schema = [
          'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
          'author_id' => ['type' => 'integer'],
          'description' => 'text',

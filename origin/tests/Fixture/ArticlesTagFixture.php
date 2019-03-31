@@ -20,7 +20,7 @@ class ArticlesTagFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = [
+    public $schema = [
          'article_id' => ['type' => 'integer', 'key' => 'primary'],
          'tag_id' => ['type' => 'integer', 'key' => 'primary'],
     ];

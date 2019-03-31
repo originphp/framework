@@ -27,7 +27,7 @@ In your `config/database.php` add database config.
 
 ### Conventions
 
-When you create tests these will go in the `tests/TestCase` folder, and then depending upon the type it will be another sub folder and the file will end with the `Test.php`
+When you create tests these will go in the `tests/TestCase` folder, and then depending upon the type it will be another sub folder and the filename should end with  `Test.php`
 
 `tests/TestCase/Controller/BookmarksControllerTest.php`
 `tests/TestCase/Model/BookmarkTest.php`
@@ -93,32 +93,32 @@ class ArticleFixture extends Fixture
 {
     public $import = ['model' =>'Article'];
 
-      public $records = array(
-         array(
-           'id' => 1,
-           'title' => 'First Article',
-           'body' => 'Article body goes here',
-           'published' => '1',
-           'created' => '2018-12-19 13:29:10',
-           'modified' => '2018-12-19 13:30:20',
-         ),
-         array(
-           'id' => 2,
-           'title' => 'Second Article',
-           'body' => 'Article body goes here',
-           'published' => '1',
-           'created' => '2018-12-19 13:31:30',
-           'modified' => '2018-12-19 13:32:40',
-         ),
-         array(
-           'id' => 3,
-           'title' => 'Third Article',
-           'body' => 'Third Article Body',
-           'published' => '1',
-           'created' => '2018-12-19 13:33:50',
-           'modified' => '2018-12-19 13:34:59',
-         ),
-     );
+    public $records = [
+        [
+            'id' => 1,
+            'title' => 'Article #1',
+            'body' => 'Article body #1',
+            'published' => '1',
+            'created' => '2018-12-19 13:29:10',
+            'modified' => '2018-12-19 13:30:20',
+        ],
+        [
+            'id' => 2,
+            'title' => 'Article #2',
+            'body' => 'Article body #2',
+            'published' => '1',
+            'created' => '2018-12-19 13:31:30',
+            'modified' => '2018-12-19 13:32:40',
+        ],
+        [
+            'id' => 3,
+            'title' => 'Article #3',
+            'body' => 'Article body #3',
+            'published' => '1',
+            'created' => '2018-12-19 13:33:50',
+            'modified' => '2018-12-19 13:34:59',
+        ],
+    );
 }
 ```
 
@@ -126,22 +126,22 @@ Sometimes you will want to use dynamic data, in this case you will modify the da
 
 ```php
     public function initialize() {
-        $this->records = array(
-            array(
+        $this->records = [
+            [
                 'id' => 1,
                 'title' => 'First Article',
                 'body' => 'Article body goes here',
                 'published' => '1',
-                'created' => date('Y-m-d H:i:s'),
-                'modified' => date('Y-m-d H:i:s'),
-            ),
+                'created' => date('Y-m-d H:i:s'],
+                'modified' => date('Y-m-d H:i:s'],
+            ],
         );
         parent::initialize(); // always call parent
     }
 
 ```
 
-You can also manually specify the field data, the type field represents our own internal mapping, which will help in future should we decide to integrate with other databases.
+You can also manually specify the schema, the type field represents our own internal mapping, which will help in future should we decide to integrate with other databases.
 
 Here is an example:
 
@@ -152,19 +152,19 @@ use Origin\TestSuite\Fixture;
 
 class ArticleFixture extends Fixture
 {
-    public $fields = array(
-         'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
-         'title' => array(
+    public $schema = [
+         'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
+         'title' => [
            'type' => 'string',
            'length' => 255,
            'null' => false,
-         ),
+         ],
          'body' => 'text',
-         'published' => array(
+         'published' => [
            'type' => 'integer',
            'default' => '0',
            'null' => false,
-         ),
+         ],
          'created' => 'datetime',
          'modified' => 'datetime',
      );
@@ -174,7 +174,9 @@ class ArticleFixture extends Fixture
 
 You can generate the schema from your existing database using the `SchemaShell` using the following command:
 
-`$ bin/console schema generate`
+```linux
+$ bin/console schema generate
+```
 
 This will create a folder in your config folder, called schema with a PHP file for each table. You can run this anytime 
 you make changes, but you will need to update the fixture file separately. 

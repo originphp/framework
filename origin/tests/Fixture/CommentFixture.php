@@ -20,7 +20,7 @@ class CommentFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = [
+    public $schema = [
          'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
          'article_id' => ['type' => 'integer'],
          'description' => 'text',

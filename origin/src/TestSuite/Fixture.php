@@ -23,12 +23,32 @@ use Origin\Exception\Exception;
 
 class Fixture
 {
+    /**
+     * The datasource to use, should be test
+     *
+     * @var string
+     */
     public $datasource = 'test';
 
+    /**
+     * The table name
+     *
+     * @var [type]
+     */
     public $table = null;
 
-    public $fields = [];
+    /**
+     * Holds the schema for this fixture
+     *
+     * @var array
+     */
+    public $schema = [];
 
+    /**
+     * Records to insert
+     *
+     * @var array
+     */
     public $records = [];
 
     /**
@@ -76,7 +96,7 @@ class Fixture
             return;
         }
        
-        $defaults = ['datasource'=>'default','model'=>null,'table'=>null];
+        $defaults = ['datasource'=>'default','model'=>null,'table'=>null,'records'=>false];
 
         $options = array_merge($defaults, $this->import);
 
@@ -98,10 +118,23 @@ class Fixture
 
         $connection = ConnectionManager::get($options['datasource']);
         $schema = $connection->schema($options['table']);
+        $records = [];
+        if ($options['records']) {
+            $connection->execute('SELECT * from ' . $options['table']);
+            $records = $connection->fetchAll();
+        }
       
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->createTable($this->table, $schema);
-        return $connection->execute($sql);
+        $result = $connection->execute($sql);
+
+        if ($result) {
+            foreach ($records as $record) {
+                $connection->insert($options['table'], $record);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -115,9 +148,11 @@ class Fixture
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->createTable($this->table, $this->fields);
-    
-        return $connection->execute($sql);
+        if ($this->schema) {
+            $sql = $connection->createTable($this->table, $this->schema);
+            return $connection->execute($sql);
+        }
+        return false;
     }
 
     /**

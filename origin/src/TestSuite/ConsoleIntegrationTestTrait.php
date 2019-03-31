@@ -69,7 +69,7 @@ trait ConsoleIntegrationTestTrait
      * Executes a shell console command
      *
      * @param string $command schema generate
-     * @param array $input
+     * @param array $input array of input that will be used as response to prompts
      * @return void
      */
     public function exec(string $command, array $input = [])

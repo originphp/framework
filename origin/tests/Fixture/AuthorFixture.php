@@ -20,7 +20,7 @@ class AuthorFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = [
+    public $schema = [
          'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
          'name' => ['type' => 'string','length' => 255, 'null' => false],
          'description' => 'text',

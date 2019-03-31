@@ -20,7 +20,7 @@ class UserFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $fields = array(
+    public $schema = array(
          'id' => array('type' => 'integer', 'key' => 'primary','autoIncrement'=>true),
          'name' => array(
            'type' => 'string',
