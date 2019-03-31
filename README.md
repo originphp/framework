@@ -24,9 +24,10 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 See the [getting started guide](docs/getting-started.md) or the framework [documentation](docs/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
 
-- [Model Guide](models.md)
-- [View Guide](views.md)
-- [Controller Guide](controllers.md)
+The main guides are:
+- [Model Guide](docs/models.md)
+- [View Guide](docs/views.md)
+- [Controller Guide](docs/controllers.md)
 
 ## Acknowledgements
 
