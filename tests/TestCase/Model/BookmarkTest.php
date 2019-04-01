@@ -42,29 +42,6 @@ class BookmarkTest extends OriginTestCase
         $this->assertEquals(1003, $bookmark->tags[1]->id);
     }
 
-    public function xxtestSave()
-    {
-        $bookmark = $this->Bookmark->new(
-            [
-                'title'=> 'OriginPHP',
-                'user_id' => 1234,
-                'url'=> 'https://www.originphp.com',
-                'tag_string'=> 'new,framework',
-                'category'=> 'New',
-                'description'=> 'The best PHP framework'
-            ]
-        );
-        
-        
-        $model = $this->getMockForModel('Bookmark', ['beforeSave']);
-        $model->expects($this->once())
-            ->method('beforeSave')
-            ->will($this->returnValue(false));
-    
-        $result = $model->save($bookmark);
-        $this->assertFalse($result);
-    }
-
     public function tearDown()
     {
         parent::tearDown();

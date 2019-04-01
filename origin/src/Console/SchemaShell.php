@@ -24,8 +24,8 @@ class SchemaShell extends Shell
 {
     public function initialize()
     {
-        $this->addCommand('generate', ['help'=>'Generates the config\schema\\table.php file or file']);
-        $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
+        $this->addCommand('generate', ['help'=>'Generates the schema file or files.']);
+        $this->addCommand('create', ['help'=>'Creates the tables using the schema file or files']);
         $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
         $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
         $this->loadTask('Status');
