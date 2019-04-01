@@ -23,9 +23,14 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- If assocation is defined and data is not array then marshaller will remove data. This is to prevent issues
+elsewhere later.
+- When marshalling, assocation names are no longer merged with field list.
 - Worked on unit testing. Coverage 80% (excluding schema and generate plugin)
+- Improved documentation
 
 ### Fixed
+- Issue with exceptions called by helpers within elements which caused nested output buffering
 - Fix bug with marshaller and extracting fields on associated records
 
 
