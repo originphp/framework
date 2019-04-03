@@ -19,6 +19,9 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- Added Dom Utility which extends Dom to add javascript style selectors.
+
 ### Removed
 - Removed logger helper function
 
