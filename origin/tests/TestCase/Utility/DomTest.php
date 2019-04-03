@@ -100,4 +100,24 @@ class DomTest extends OriginTestCase
         $this->assertEquals('Error', $result[0]->textContent);
         $this->assertEquals('Message', $result[1]->textContent);
     }
+
+    /**
+    * This was a bug due to refactoring, no recursion was happening
+    * and as a result all spans we being found from root.
+    *
+    */
+    public function testDebug()
+    {
+        $html = '
+        <div class="main">
+            <div class="abc"><h4><span>one</span><span>two</span></h4></div>
+            <div class="def"><h4><span>three</span><span>four</span></h4></div>
+            <div class="ghi"><h4><span>four</span><span>five</span></h4></div>
+         </div>';
+        $dom = new Dom();
+        $dom->loadHtml($html);
+        $result = $dom->querySelectorAll('div.main div.def span:last-child');
+        $this->assertEquals(1, count($result));
+        $this->assertEquals('four', $result[0]->textContent);
+    }
 }

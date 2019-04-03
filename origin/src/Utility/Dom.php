@@ -76,7 +76,7 @@ use DOMElement;
         */
      public function querySelector(string $path)
      {
-         $result = $this->query($path, $this);
+         $result = $this->runQuery($path, $this);
          if ($result) {
              return $result[0];
          }
@@ -99,7 +99,7 @@ use DOMElement;
       */
      public function querySelectorAll(string $path)
      {
-         return $this->query($path);
+         return $this->runQuery($path);
      }
 
      /**
@@ -119,38 +119,19 @@ use DOMElement;
      }
 
      /**
-      * Deal with span:first-child
-      *
-      * @param string $path span:first-child
-      * @return array
-      */
-     protected function siblingsQuery(string $path)
-     {
-         list($tag, $n) =  explode(':', $path);
-         $elements = $this->getElementsByTagName($tag);
-    
-         if ($elements) {
-             // hanlde span:lastChild
-             if ($n === 'first-child') {
-                 $this->results[] = $elements[0];
-             } elseif ($n === 'last-child') {
-                 $this->results[] = $elements[count($elements)-1];
-             } elseif (is_numeric($n) and isset($elements[$n])) {
-                 $this->results[] = $elements[$n];
-             }
-         }
-         return $this->results;
-     }
-     /**
-      * This is the workhorse
-      *
+      * THis is the internal function do not call,
+      * @internal it is callable since it
       * @param string $path
       * @return array
       */
-     protected function query(string $path) : array
+     protected function runQuery(string $path, $dom =null) : array
      {
          $this->results = [];
- 
+       
+         if ($dom === null) {
+             $dom = $this;
+         }
+
          // Handle EITHER div.note, div.alert??
          if (strpos($path, ',') !== false) {
              return $this->multiQuery($path);
@@ -192,25 +173,40 @@ use DOMElement;
              $attrName = 'id';
              $attrValue = substr($path, 1);
          }
- 
+         
          // Handle last-child, first-child, nth etc
          if (strpos($path, ':') !== false) {
-             return $this->siblingsQuery($path);
-         }
-               
-         foreach ($this->getElementsByTagName($tag) as $element) {
-             if ($attrName) {
-                 if ($element->hasAttribute($attrName) and $element->getAttribute($attrName) === $attrValue) {
-                     $this->results[] =  $element;
+             list($tag, $n) =  explode(':', $path);
+             $elements = $dom->getElementsByTagName($tag);
+             if ($elements) {
+                 // hanlde span:lastChild
+                 if ($n === 'first-child') {
+                     $this->results[] = $elements[0];
+                 } elseif ($n === 'last-child') {
+                     $this->results[] = $elements[count($elements)-1];
+                 } elseif (is_numeric($n) and isset($elements[$n])) {
+                     $this->results[] = $elements[$n];
                  }
-             } elseif ($class === null or ($element->hasAttribute('class') and in_array($class, explode(' ', $element->getAttribute('class'))))) {
-                 if ($paths) {
-                     $this->query(implode(' ', $paths), $element);
-                 } else {
+             }
+         } else {
+             foreach ($dom->getElementsByTagName($tag) as $element) {
+                 if ($attrName) {
+                     if ($element->hasAttribute($attrName) and $element->getAttribute($attrName) === $attrValue) {
+                         $this->results[]=  $element;
+                     }
+                 } elseif ($class === null or ($element->hasAttribute('class') and in_array($class, explode(' ', $element->getAttribute('class'))))) {
                      $this->results[] =  $element;
                  }
              }
          }
+
+         # Go Next Level Down
+         if ($paths) {
+             foreach ($this->results as $result) {
+                 $this->runQuery(implode(' ', $paths), $result);
+             }
+         }
+         
          return $this->results;
      }
  }
