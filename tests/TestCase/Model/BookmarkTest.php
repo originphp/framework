@@ -1,5 +1,5 @@
 <?php
-namespace App\Test\TestCase\Model;
+namespace App\Test\Model;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\ModelRegistry;
