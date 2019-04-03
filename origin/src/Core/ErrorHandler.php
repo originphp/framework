@@ -12,6 +12,13 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * Using ajax post (e.g. $.post( url, data)), the content type for the request is 'application/x-www-form-urlencoded', instead of json. This causes
+  * any exceptions to not be rendered, just getting blank screen if cross origin request since its blocked due being html
+  * I think the problem is user,because not setting datatype to json (therefore Json). Framework will only
+  * render json errors when json type detected.
+  * Currently setting response->type json would not affect error handler
+  */
 namespace Origin\Core;
 
 use Origin\Core\Debugger;

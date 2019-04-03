@@ -29,6 +29,9 @@ The main guides are:
 - [View Guide](docs/views.md)
 - [Controller Guide](docs/controllers.md)
 
+The bookmarks demo app can be found here [https://bookmarks.originphp.com/users/login](https://bookmarks.originphp.com/users/login). You can get a feel for some of the features and performance. 
+The username is **`demo@example.com`** and the password is **`origin`**.
+
 ## Acknowledgements
 
 This library is heavily inspired by CakePHP 2.x and CakePHP 3.x. (You might even call it CakePHP 5.0)
