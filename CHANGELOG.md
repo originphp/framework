@@ -26,6 +26,7 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Connection manager error display
 - If assocation is defined and data is not array then marshaller will remove data. This is to prevent issues
 elsewhere later.
 - When marshalling, assocation names are no longer merged with field list.
@@ -33,6 +34,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Html helper script tag bug fix
 - Issue with exceptions called by helpers within elements which caused nested output buffering
 - Fix bug with marshaller and extracting fields on associated records
 

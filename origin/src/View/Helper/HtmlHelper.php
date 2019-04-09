@@ -29,7 +29,7 @@ class HtmlHelper extends Helper
         'templates' => [
             'a' => '<a href="{url}"{attributes}>{text}</a>',
             'css' => '<link rel="stylesheet" type="text/css" href="{url}" />',
-            'js' => '<script type="text/javascript" href="{url}"></script>',
+            'js' => '<script type="text/javascript" src="{url}"></script>',
             'img' => '<img src="{src}"{attributes}>'
         ]
     ];

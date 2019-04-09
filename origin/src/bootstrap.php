@@ -27,6 +27,7 @@ if (!defined('DS')) {
     define('ORIGIN', ROOT . DS . 'origin');
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
+    define('TESTS', ROOT . DS . 'tests');
     define('TMP', ROOT . DS . 'tmp');
     define('WEBROOT', ROOT . DS . 'public');
 }

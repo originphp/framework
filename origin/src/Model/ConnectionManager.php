@@ -48,7 +48,7 @@ class ConnectionManager
         }
 
         if (!static::config($name)) {
-            throw new MissingDatasourceException($name);
+            throw new MissingDatasourceException("No configuration for {$name} datasource.");
         }
 
         $datasource = new MySQLDriver();
