@@ -155,6 +155,9 @@ class Queue
      * Constructor - accepts same config as model
      *
      * @param array $config
+     *      - name: model name example Job
+     *      - table: table name for queue e.g. queue
+     *      - datasource: which datasource to use
      */
     public function __construct(array $config=[])
     {
