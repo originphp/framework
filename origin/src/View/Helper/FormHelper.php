@@ -276,18 +276,18 @@ class FormHelper extends Helper
     {
         $selectOptions = [];
 
-        if (!isset($options['type'])) {
+        if (empty($options['type']) and !empty($options['options'])) {
+            $options['type'] = 'select';
+        }
+        
+        if (empty($options['type'])) {
             $options['type'] = $this->detectType($name);
         }
         
-        if (!empty($options['options'])) {
-            $options['type'] = 'select';
-        }
-
         if (isset($this->config['controlDefaults'][$options['type']])) {
             $options += $this->config['controlDefaults'][$options['type']];
         }
-
+       
         $before = $options['before'] ?? null;
         $after = $options['after'] ?? null;
 
@@ -309,11 +309,11 @@ class FormHelper extends Helper
 
         $label = Inflector::humanize(end($parts));
              
-        $options += array(
+        $options += [
               'label' => $label,
               'id' => $this->domId($name),
               'div' => 'input',
-            );
+        ];
 
         $div = $options['div']; // Div for Group
         unset($options['div']);
@@ -325,7 +325,6 @@ class FormHelper extends Helper
         if (isset($options['options'])) {
             $selectOptions = $options['options'];
             unset($options['options']);
-            $type = 'select';
         }
 
         // Handle Label
@@ -377,8 +376,23 @@ class FormHelper extends Helper
             $required = true;
         }
 
-        if ($type === 'select' or $type === 'radio') {
-            $fieldOutput = $this->{$type}($name, $selectOptions, $options);
+        if ($type === 'select') {
+            $fieldOutput = $this->select($name, $selectOptions, $options);
+        } elseif ($type === 'radio') {
+            // $fieldOutput = $this->radio($name, $selectOptions, $options);
+            // Each radio needs to be in its own div
+            $output = '';
+    
+
+            foreach ($selectOptions as $key => $value) {
+                $output .= $this->formatTemplate($template, ['class'=>$div] + [
+                    'type' => $type,
+                    'before' => $before,
+                    'after' => $after,
+                    'content' => $this->radio($name, [ $key => $value], $options)
+                    ]);
+            }
+            return $output;
         } else {
             $fieldOutput = $this->{$type}($name, $options);
             if ($type === 'hidden') {
@@ -651,8 +665,8 @@ class FormHelper extends Helper
             if ($key === $checked) {
                 $additionalOptions = ['checked'=>true];
             }
-            $radio = $this->formatTemplate('radio', $radioOptions+$additionalOptions);
-            $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $radio.$value]);
+            $output .= $this->formatTemplate('radio', $radioOptions+$additionalOptions);
+            $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $value]);
         }
 
         return $output;

@@ -34,6 +34,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Form helper radio bug fixes, options overwriting type and control radio was not wrapping in div correctly.
 - Html helper script tag bug fix
 - Issue with exceptions called by helpers within elements which caused nested output buffering
 - Fix bug with marshaller and extracting fields on associated records
