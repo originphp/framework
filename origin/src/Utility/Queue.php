@@ -195,8 +195,8 @@ class Queue
      */
     public function add(string $queue = null, array $data = [], string $strtotime = 'now') :bool
     {
-        if (!preg_match('/^[a-z0-9_-]+$/i', $queue)) {
-            throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores and hypens');
+        if (!preg_match('/^[\w.-]+$/i', $queue)) {
+            throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores, hypens and dots.');
         }
         $entity = $this->Job->new();
 

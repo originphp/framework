@@ -33,7 +33,7 @@ class TimestampBehavior extends Behavior
     {
     }
 
-    public function beforeSave(Entity $entity, $options = [])
+    public function beforeSave(Entity $entity, array $options = [])
     {
         $model = $this->model();
         $timestamp = date('Y-m-d H:i:s');

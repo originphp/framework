@@ -26,6 +26,7 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Queue utility now accepts dot notation names
 - Connection manager error display
 - If assocation is defined and data is not array then marshaller will remove data. This is to prevent issues
 elsewhere later.
@@ -34,6 +35,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Model delete dependent on multiple assocations had id switched
 - Form helper radio bug fixes, options overwriting type and control radio was not wrapping in div correctly.
 - Html helper script tag bug fix
 - Issue with exceptions called by helpers within elements which caused nested output buffering

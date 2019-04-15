@@ -1173,7 +1173,7 @@ class Model
         if (empty($this->id) or !$this->exists($this->id)) {
             return false;
         }
-
+  
         if ($callbacks) {
             if (!$this->triggerCallback('beforeDelete', [$entity,$cascade])) {
                 return false;
@@ -1199,12 +1199,12 @@ class Model
      *
      * @var int|string
      */
-    protected function deleteDependent($id)
+    protected function deleteDependent($primaryKey)
     {
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
-                $conditions = [$config['foreignKey'] => $id];
-                $ids = $this->{$association}->find('list', [ 'conditions' => $conditions]);
+                $conditions = [$config['foreignKey'] => $primaryKey];
+                $ids = $this->{$association}->find('list', [ 'conditions' => $conditions,'fields'=>[$this->primaryKey]]);
                 foreach ($ids as $id) {
                     $conditions = [$this->{$association}->primaryKey => $id];
                     $result = $this->{$association}->find('first', ['conditions'=>$conditions,'callbacks'=>false]);
