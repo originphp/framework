@@ -248,7 +248,7 @@ class Request
      *
      * @return void
      */
-    public function referrer()
+    public function referer()
     {
         return $this->env('HTTP_REFERER'); // Misspelling is correct
     }
