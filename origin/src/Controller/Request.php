@@ -243,6 +243,16 @@ class Request
         return $url;
     }
 
+    /**
+     * Returns the referrer
+     *
+     * @return void
+     */
+    public function referrer()
+    {
+        return $this->env('HTTP_REFERER'); // Misspelling is correct
+    }
+
     protected function processGet($url)
     {
         // Build Query

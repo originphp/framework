@@ -129,15 +129,17 @@ class Job
 
     /**
      * Sets the status of a job (and automatically releases it)
-     *
      * @param string $status
      * @return boolean
      */
     public function setStatus(string $status)  : bool
     {
-        $job = $this->entity;
-        $job->status = $status;
-        $job->locked = 0;
+        // Don't use entity since tries updated at database level
+        $job = $this->Job->new([
+            'id' => $this->entity->id,
+            'status' => $status,
+            'locked' => 0,
+        ]);
         return $this->Job->save($job);
     }
 }

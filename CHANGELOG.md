@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added
+- Request referer method
 - Added Dom Utility which extends Dom to add javascript style selectors.
 
 ### Removed
@@ -35,6 +36,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Queue utility restoring number of tries
 - Model delete dependent on multiple assocations had id switched
 - Form helper radio bug fixes, options overwriting type and control radio was not wrapping in div correctly.
 - Html helper script tag bug fix
