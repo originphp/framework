@@ -552,7 +552,7 @@ class Email
         if (isset($account['client'])) {
             $host = $account['client'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
-            list($host, $port) = explode(':', $_SERVER['HTTP_HOST']);
+            list($host,) = explode(':', $_SERVER['HTTP_HOST']); // leave blank,
         }
         $this->sendCommand("EHLO {$host}", '250');
         if ($account['tls']) {

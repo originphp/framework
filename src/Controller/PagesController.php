@@ -7,11 +7,11 @@ namespace App\Controller;
  *
  *  Router::add('/pages/*', ['controller'=>'Pages','action'=>'display']);
  */
-use Origin\Controller\Controller;
+use App\Controller\AppController;
 
-class PagesController extends Controller
+class PagesController extends AppController
 {
-    public $layout = false;
+    public $layout = 'default';
 
     public function display()
     {

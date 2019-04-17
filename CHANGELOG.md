@@ -36,6 +36,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Email client detection on server undefined offset
 - Queue utility restoring number of tries
 - Model delete dependent on multiple assocations had id switched
 - Form helper radio bug fixes, options overwriting type and control radio was not wrapping in div correctly.
