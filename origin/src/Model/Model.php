@@ -951,7 +951,7 @@ class Model
         if ($options['transaction']) {
             $this->begin();
         }
-      
+
         $result = true;
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
@@ -968,7 +968,7 @@ class Model
                 $data->$foreignKey = $this->{$alias}->id;
             }
         }
-    
+       
         if ($result) {
             /**
              * This will save record and hasAndBelongsToMany records. This is because
@@ -1359,7 +1359,6 @@ class Model
             foreach ($this->{$association} as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
-              
                     $query['joins'][] = array(
                         'table' => $this->{$alias}->table,
                         'alias' => $alias,
@@ -1367,17 +1366,17 @@ class Model
                         'conditions' => $config['conditions'],
                         'datasource' => $this->datasource,
                         );
-                    
+                   
                     if (empty($config['fields'])) {
                         $config['fields'] = $this->{$alias}->fields();
                     }
-                 
+   
                     // If throw an error, then it can be confusing to know source, so turn to array
                     $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
                 }
             }
         }
-
+    
         return $query;
     }
 
@@ -1437,6 +1436,8 @@ class Model
     protected function prepareResults(array $results)
     {
         $buffer = [];
+      
+    
         foreach ($results as $record) {
             $thisData = (isset($record[$this->alias])?$record[$this->alias]:[]); // Work with group and no fields from db
             $entity = new Entity($thisData, ['name'=>$this->alias,'exists'=>true]);
@@ -1445,6 +1446,26 @@ class Model
             foreach ($record as $model => $data) {
                 if (is_string($model)) {
                     $associated = Inflector::variable($model);
+
+                    /**
+                    * Remove blank records. For example when loading a has one it is showing empty
+                    * entity fields because there is no record.
+                    * I am not really sure, should it return with key value set as null, empty entity etc
+                    * @todo investigate this.
+                    */
+                    $foreignKey = null;
+                    if (isset($this->belongsTo[$model])) {
+                        $foreignKey = $this->belongsTo[$model]['foreignKey'];
+                        if (empty($entity->{$foreignKey})) {
+                            continue;
+                        }
+                    } elseif (isset($this->hasOne[$model])) {
+                        $foreignKey= $this->hasOne[$model]['foreignKey'];
+                        if (empty($data[$foreignKey])) {
+                            continue;
+                        }
+                    }
+
                     $entity->{$associated} = new Entity($data, ['name'=>$associated,'exists'=>true]);
                 } else {
                     /**
@@ -1460,6 +1481,7 @@ class Model
 
             $buffer[] = $entity;
         }
+     
         return $buffer;
     }
 

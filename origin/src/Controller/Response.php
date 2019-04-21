@@ -312,8 +312,8 @@ class Response
             $this->header('Content-Disposition', 'attachment; filename="' . $options['name'] . '"');
         }
         $this->type($options['type']);
-  
-        $this->filename = $filename;
+      
+        $this->file = $filename;
     }
 
     private function sendCookies()

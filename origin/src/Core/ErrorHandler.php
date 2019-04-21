@@ -12,13 +12,13 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * Using ajax post (e.g. $.post( url, data)), the content type for the request is 'application/x-www-form-urlencoded', instead of json. This causes
-  * any exceptions to not be rendered, just getting blank screen if cross origin request since its blocked due being html
-  * I think the problem is user,because not setting datatype to json (therefore Json). Framework will only
-  * render json errors when json type detected.
-  * Currently setting response->type json would not affect error handler
-  */
+/**
+ * Using ajax post (e.g. $.post( url, data)), the content type for the request is 'application/x-www-form-urlencoded', instead of json. This causes
+ * any exceptions to not be rendered, just getting blank screen if cross origin request since its blocked due being html
+ * I think the problem is user,because not setting datatype to json (therefore Json). Framework will only
+ * render json errors when json type detected.
+ * Currently setting response->type json would not affect error handler
+ */
 namespace Origin\Core;
 
 use Origin\Core\Debugger;
@@ -61,7 +61,7 @@ class ErrorHandler
         if (isset($_SERVER['CONTENT_TYPE']) and $_SERVER['CONTENT_TYPE'] === 'application/json') {
             return true;
         }
-        $uri = $_SERVER['REQUEST_URI']??null;
+        $uri = $_SERVER['REQUEST_URI'] ?? null;
         if (strpos($uri, '?') !== false) {
             list($uri, $query) = explode('?', $uri);
         }
@@ -88,13 +88,13 @@ class ErrorHandler
         if ($exception->getCode() === 404) {
             $errorCode = 404;
         }
-        $this->cleanBuffer();
 
+        $this->logException($exception, $errorCode);
+
+        $this->cleanBuffer();
         if (Configure::read('debug')) {
             return $this->debugException($exception);
         }
-
-        $this->logException($exception, $errorCode);
 
         http_response_code($errorCode);
         include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
@@ -112,11 +112,11 @@ class ErrorHandler
         if ($exception->getCode() === 404) {
             $errorCode = 404;
         }
-      
+
         $this->cleanBuffer();
-        
+
         if (Configure::read('debug')) {
-            $response = ['error' => ['message' => $exception->getMessage(),'code' => $exception->getCode()]];
+            $response = ['error' => ['message' => $exception->getMessage(), 'code' => $exception->getCode()]];
             echo json_encode($response);
             return true;
         }
@@ -124,9 +124,9 @@ class ErrorHandler
         $this->logException($exception, $errorCode);
 
         http_response_code($errorCode);
-        $response = ['error' => ['message' => 'An Internal Error has Occured','code' => 500]];
+        $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => 500]];
         if ($errorCode === 404) {
-            $response = ['error' => ['message' => 'Not found','code' => 404]];
+            $response = ['error' => ['message' => 'Not found', 'code' => 404]];
         }
         echo json_encode($response);
     }
@@ -137,9 +137,9 @@ class ErrorHandler
         $message = $exception->getMessage();
         $line = $exception->getLine();
         $file =  str_replace(ROOT . DS, '', $exception->getFile());
-     
+
         $message = "{$class} {$message} in {$file}:{$line}";
-        $logger = new Logger('ErrorHandler');
+        $logger = new Logger('Http');
         if ($exception instanceof \ErrorException) {
             $logger->error($message);
         } else {

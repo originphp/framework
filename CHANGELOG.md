@@ -27,6 +27,7 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- ErrorHandlers log errors in console and debug mode
 - Queue utility now accepts dot notation names
 - Connection manager error display
 - If assocation is defined and data is not array then marshaller will remove data. This is to prevent issues
@@ -36,6 +37,8 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Issue wtih file download
+- Issue with merge controller vars
 - Email client detection on server undefined offset
 - Queue utility restoring number of tries
 - Model delete dependent on multiple assocations had id switched

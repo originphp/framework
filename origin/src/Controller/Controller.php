@@ -212,7 +212,7 @@ class Controller
             $data = [$name => $value];
         }
 
-        $this->viewVars = array_merge($data, $this->viewVars);
+        $this->viewVars = array_merge($this->viewVars, $data);
     }
 
     /**

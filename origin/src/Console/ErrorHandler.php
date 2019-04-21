@@ -16,6 +16,7 @@ namespace Origin\Console;
 
 use Origin\Core\Debugger;
 use Origin\Console\ConsoleOutput;
+use Origin\Core\Logger;
 
 /**
  * This is the error handler for Console
@@ -49,10 +50,10 @@ class ErrorHandler
     }
 
     protected $colourStyles = [
-        'redBackground' => ['text' => 'white','background'=>'lightRed'],
-        'yellowBackground' => ['text' => 'white','background'=>'lightYellow'],
-        'blueBackground' => ['text' => 'white','background'=>'blue'],
-        'yellow' => ['text'=>'lightYellow']
+        'redBackground' => ['text' => 'white', 'background' => 'lightRed'],
+        'yellowBackground' => ['text' => 'white', 'background' => 'lightYellow'],
+        'blueBackground' => ['text' => 'white', 'background' => 'blue'],
+        'yellow' => ['text' => 'lightYellow']
     ];
 
     /**
@@ -96,7 +97,16 @@ class ErrorHandler
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
-        
+
+        $logger = new Logger('Console');
+
+        $message = "{$debug['class']} {$debug['message']}";
+        if (isset($debug['stackFrames'][0]['file'])) {
+            $filename =  str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
+            $message .= " {$filename}:{$debug['stackFrames'][0]['line']}";
+        }
+        $logger->error($message);
+
         $fullBacktrace = in_array('--backtrace', $_SERVER['argv']);
         $this->render($debug, $fullBacktrace);
     }
@@ -107,28 +117,28 @@ class ErrorHandler
      * @param array $debug
      * @return void
      */
-    public function render(array $debug, $fullBacktrace=false)
+    public function render(array $debug, $fullBacktrace = false)
     {
         extract($debug);
-        
+
         $this->out("<redBackground> {$class} </redBackground> <yellow>{$message}</yellow>\n");
-       
+
         // Code Preview
         if (isset($stackFrames[0]['file'])) {
-            $this->out("<cyan>". $this->shortenPath($stackFrames[0]['file'])."</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");
+            $this->out("<cyan>" . $this->shortenPath($stackFrames[0]['file']) . "</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");
 
             $contents = file($debug['stackFrames'][0]['file']);
             $on = $debug['stackFrames'][0]['line'] - 1;
 
             foreach ($contents as $line => $data) {
-                if ($line >= ($on-5) and $line <= ($on+5)) {
+                if ($line >= ($on - 5) and $line <= ($on + 5)) {
                     $data = rtrim($data);
                     if ($line === $on) {
                         $data = "<redBackground>{$data}</redBackground>";
                     } else {
                         $data = "<white>{$data}</white>";
                     }
-                    $this->out('<blue>' .($line + 1) . '</blue> ' .  $data);
+                    $this->out('<blue>' . ($line + 1) . '</blue> ' .  $data);
                 }
             }
         }
@@ -139,11 +149,11 @@ class ErrorHandler
             if ($i > 2 and !$fullBacktrace) {
                 continue;
             }
-            $class = $stackFrame['class']?$stackFrame['class'] .' ':'';
+            $class = $stackFrame['class'] ? $stackFrame['class'] . ' ' : '';
             $this->out("\n<cyan>{$class}</cyan><green>{$stackFrame['function']}</green>");
-         
+
             if ($stackFrame['file']) {
-                $this->out("<white>".$this->shortenPath($stackFrame['file']). "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
+                $this->out("<white>" . $this->shortenPath($stackFrame['file']) . "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
             }
         }
         if ($fullBacktrace === false and $i > 3) {

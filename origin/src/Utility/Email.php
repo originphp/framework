@@ -552,7 +552,7 @@ class Email
         if (isset($account['client'])) {
             $host = $account['client'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
-            list($host,) = explode(':', $_SERVER['HTTP_HOST']); // leave blank,
+            list($host, $port) = explode(':', $_SERVER['HTTP_HOST']);
         }
         $this->sendCommand("EHLO {$host}", '250');
         if ($account['tls']) {
@@ -640,16 +640,17 @@ class Email
         set_error_handler([$this, 'connectionErrorHandler']);
         $server =  $account['protocol'] . '://' . $account['host'] . ':' . $account['port'];
         $this->socketLog('Connecting to ' . $server);
+
         $this->socket = stream_socket_client(
-                $server,
-                $errorNumber,
-                $errorString,
-                $account['timeout'],
-                STREAM_CLIENT_CONNECT,
-                stream_context_create($options)
+            $server,
+            $errorNumber,
+            $errorString,
+            $account['timeout'],
+            STREAM_CLIENT_CONNECT,
+            stream_context_create($options)
             );
         restore_error_handler();
- 
+     
         if (!$this->isConnected()) {
             $this->socketLog('Unable to connect to the SMTP server.');
             throw new Exception('Unable to connect to the SMTP server.');

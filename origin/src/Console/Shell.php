@@ -83,7 +83,7 @@ class Shell
      */
 
     public $options = [
-       // 'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
+        // 'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
     ];
 
     /**
@@ -98,7 +98,7 @@ class Shell
      *
      * @param array $arguments
      * @param \Origin\Console\ConsoleOutput $consoleOutput
-      * @param \Origin\Console\ConsoleInput $consoleInput
+     * @param \Origin\Console\ConsoleInput $consoleInput
      * @return void
      */
     public function __construct(ConsoleOutput $consoleOutput, ConsoleInput $consoleInput)
@@ -107,7 +107,7 @@ class Shell
         $this->input = $consoleInput;
 
         list($namespace, $this->name) = namespaceSplit(str_replace('Shell', '', get_class($this)));
-        
+
         $this->taskRegistry = new TaskRegistry($this);
     }
 
@@ -130,14 +130,14 @@ class Shell
             }
         }
         // if commands are setup, then restrict to only those
-        if ($name !=='main' and empty($this->commands) === false and !isset($this->commands[$name])) {
+        if ($name !== 'main' and empty($this->commands) === false and !isset($this->commands[$name])) {
             return false;
         }
 
         $this->startupProcess();
         $this->{$name}();
         $this->shutdownProcess();
-        
+
         return true;
     }
 
@@ -154,14 +154,14 @@ class Shell
     protected function parseArguments(array $arguments)
     {
         $map = [];
-    
+
         // Create map for shorts
         foreach ($this->options as $option) {
             if ($option['short']) {
                 $map[$option['short']] = $option['name'];
             }
         }
-  
+
         foreach ($arguments as $arg) {
             // Commands
             if ($arg[0] !== '-') {
@@ -175,7 +175,7 @@ class Shell
             if (strpos($arg, '=') !== false) {
                 list($option, $value) = explode('=', $arg);
             }
-       
+
             // Convert short to long
             if (substr($option, 0, 2) !== '--') {
                 $key = substr($option, 1);
@@ -183,14 +183,23 @@ class Shell
                     $option  = '--' .  $map[$key];
                 }
             }
+
+
             $param = substr($option, 2); // remove --
-      
-            if (($value !== true and empty($this->options[$param]['value'])) or ($value === true and !empty($this->options[$param]['value']))) {
-                $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
+
+            /**
+             * Backtrace is reserved. This allows for debugging to occur
+             */
+            if (in_array($param, ['backtrace'])) {
+                continue;
             }
-        
+
+            if (($value !== true and empty($this->options[$param]['value'])) or ($value === true and !empty($this->options[$param]['value']))) {
+                $this->error('Invalid Argument', 'The argument ' . $arg . ' is not valid');
+            }
+
             if (!isset($this->options[$param])) {
-                $this->error('Invalid Argument', 'The argument ' . $arg. ' is not valid');
+                $this->error('Invalid Argument', 'The argument ' . $arg . ' is not valid');
             }
             $this->params[$param] = $value;
         }
@@ -202,8 +211,7 @@ class Shell
      * @return void
      */
     public function initialize()
-    {
-    }
+    { }
 
     /**
      * Called before the shell method is called
@@ -211,17 +219,15 @@ class Shell
      * @return void
      */
     public function startup()
-    {
-    }
-    
+    { }
+
     /**
      * Called after the shell method is called
      *
      * @return void
      */
     public function shutdown()
-    {
-    }
+    { }
 
     /**
      * Outputs to the console text
@@ -246,14 +252,14 @@ class Shell
      * @param string $default default value if user presses enter
      * @return void
      */
-    public function in(string $prompt, array $options=[], string $default = null)
+    public function in(string $prompt, array $options = [], string $default = null)
     {
         $input =  $defaultString = '';
         $optionsString = implode('/', $options);
         if ($default) {
             $defaultString = "[{$default}]";
         }
-       
+
         // Check both uppercase and lower case input
         $options = array_merge(
             array_map('strtolower', $options),
@@ -270,14 +276,14 @@ class Shell
         return $input;
     }
 
-   
+
     /**
-    * Loads a model, uses from registry or creates a new one.
-    *
-    * @param string $model
-    *
-    * @return \Origin\Model\Model
-    */
+     * Loads a model, uses from registry or creates a new one.
+     *
+     * @param string $model
+     *
+     * @return \Origin\Model\Model
+     */
     public function loadModel(string $model)
     {
         if (isset($this->{$model})) {
@@ -325,12 +331,12 @@ class Shell
 
 
     /**
-    * Checks if an action on this shell is accesible
-    *
-    * @param string $action
-    *
-    * @return bool
-    */
+     * Checks if an action on this shell is accesible
+     *
+     * @param string $action
+     *
+     * @return bool
+     */
     public function isAccessible(string $method)
     {
         $shell = new ReflectionClass('Origin\Console\Shell');
@@ -361,7 +367,7 @@ class Shell
      * @param mixed $value
      * @return array|string|null
      */
-    public function params($key = null, $value=null)
+    public function params($key = null, $value = null)
     {
         if ($key === null) {
             return $this->params;
@@ -402,9 +408,9 @@ class Shell
      * @param array $options Options include help:help text short: short option e.g -ds
      * @return void
      */
-    public function addOption(string $name, array $options=[])
+    public function addOption(string $name, array $options = [])
     {
-        $options += ['name'=>$name,'short'=>null,'help'=>null];
+        $options += ['name' => $name, 'short' => null, 'help' => null];
         $this->options[$name] = $options;
     }
 
@@ -415,9 +421,9 @@ class Shell
      * @param array $options
      * @return void
      */
-    public function addCommand(string $name, array $options=[])
+    public function addCommand(string $name, array $options = [])
     {
-        $options += ['name'=>$name,'help'=>null];
+        $options += ['name' => $name, 'help' => null];
         $this->commands[$name] =  $options;
     }
 
@@ -439,9 +445,9 @@ class Shell
                     $value  = '=' . $option['value'];
                 }
                 $text = '--' . $option['name'] . $value;
-               
+
                 if ($option['short']) {
-                    $text = '-'. $option['short'] . ', ' . $text;
+                    $text = '-' . $option['short'] . ', ' . $text;
                 }
 
                 $options[$text] = $option['help'];
@@ -470,7 +476,7 @@ class Shell
     {
         $maxLength = 0;
         foreach ($data as $key => $value) {
-            if (strlen($key)> $maxLength) {
+            if (strlen($key) > $maxLength) {
                 $maxLength = strlen($key);
             }
         }
@@ -486,7 +492,7 @@ class Shell
      * @param string $message
      * @return void
      */
-    public function error(string $title, string $message=null)
+    public function error(string $title, string $message = null)
     {
         $this->output->error($title, $message);
         $this->stop($title);
@@ -498,7 +504,7 @@ class Shell
      * @param [type] $status
      * @return void
      */
-    protected function stop(string $title='Console stopped')
+    protected function stop(string $title = 'Console stopped')
     {
         throw new StopExecutionException($title);
     }

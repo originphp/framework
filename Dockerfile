@@ -7,12 +7,12 @@
 # portions of the Software.
 #
 # @copyright    Copyright (c) Jamiel Sharief
-# @link         https://www.originphp.com
+# @link          https://www.originphp.com
 # @license      https://opensource.org/licenses/mit-license.php MIT License
 #
 FROM ubuntu:18.04
 LABEL maintainer="Jamiel Sharief"
-LABEL version="1.0-beta"
+LABEL version="1.0-alpha"
 
 # Setup Enviroment
 
@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     mysql-client \
+    postgresql-client \
     nano \
     unzip \
     wget \
@@ -45,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     php-json \
     php-mbstring \
     php-mysql \
+    php-pgsql \
     php-opcache \
     php-pear \
     php-readline \
@@ -52,6 +54,7 @@ RUN apt-get update && apt-get install -y \
     php-xml \
     php-zip \
     php-dev \
+    php-memcached \
  && rm -rf /var/lib/apt/lists/*
 
 # Setup Web Server
@@ -81,6 +84,15 @@ RUN pecl install xdebug
 #RUN echo 'zend_extension="/usr/lib/php/20170718/xdebug.so"' >> /etc/php/7.2/cli/php.ini
 #RUN echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
 
+# Instructions to run xdebug temporarily i.e to generate code coverage
+# To enable until next restart run these commands in bash
+# echo 'zend_extension="/usr/lib/php/20170718/xdebug.so"' >> /etc/php/7.2/cli/php.ini
+# echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
+
 RUN echo 'apc.enable_cli=1' >>  /etc/php/7.2/cli/php.ini
+
+# Install Redis
+RUN pecl install redis
+RUN echo 'extension=redis.so' >> /etc/php/7.2/cli/php.ini
 
 CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
