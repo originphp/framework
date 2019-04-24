@@ -15,7 +15,7 @@ if [ -d update ]; then
     rm -rf origin
     rm -rf bin
     mv update/origin origin
-    mv update/bin bin
+    cp update/bin/* bin
 
     echo 'Deleting tmp files'
     rm -rf update
