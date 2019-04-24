@@ -64,30 +64,37 @@ class Entity
     /**
      * Constructor
      *
-     * List of options
-     * name: Model name
-     * exists: if the model exists in the database (set during find), null, means dont know
+     * List of options th
+     * - name: Model name
+     * - exists: if the model exists in the database (set during find), null, means dont know
+     * - markClean: mark the entity as clean after creation. This is useful for when loading records
+     * from the database.
+     * 
      * @param array $properties data
      * @param array $options
      */
     public function __construct(array $properties = [], array $options = [])
     {
-        $options += ['name'=>null,'exists'=>null];
+        $options += ['name' => null, 'exists' => null, 'markClean' => false];
 
         $this->_name = $options['name'];
-        
+        $this->_exists = $options['exists'];
+
         foreach ($properties as $property => $value) {
             $this->set($property, $value);
+        }
+        if ($options['markClean']) {
+            $this->reset();
         }
     }
 
     /**
-    * Magic method for setting data on inaccessible properties.
-    *
-    * @param string $property
-    * @param mixed $value
-    * @return void
-    */
+     * Magic method for setting data on inaccessible properties.
+     *
+     * @param string $property
+     * @param mixed $value
+     * @return void
+     */
     public function __set(string $property, $value)
     {
         $this->set($property, $value);
@@ -188,7 +195,7 @@ class Entity
 
     public function unset($properties)
     {
-        foreach ((array) $properties as $key) {
+        foreach ((array)$properties as $key) {
             unset($this->_properties[$key]);
             unset($this->_modified[$key]);
         }
@@ -204,7 +211,7 @@ class Entity
     {
         $result = null;
         if (isset($this->_properties[$property])) {
-            $result =& $this->_properties[$property];
+            $result = &$this->_properties[$property];
         }
 
         return $result;
@@ -338,7 +345,7 @@ class Entity
      */
     public function toXml()
     {
-        $root = Inflector::variable($this->name??'Record');
+        $root = Inflector::variable($this->name ?? 'Record');
         return Xml::fromArray([$root => $this->toArray()]);
     }
 }

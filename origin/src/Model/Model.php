@@ -116,13 +116,13 @@ class Model
      */
     protected $hasAndBelongsToMany = [];
 
- 
+
     /**
      * List of Associations
      * @var array
      */
     protected $associations = [
-      'belongsTo', 'hasMany','hasOne','hasAndBelongsToMany',
+        'belongsTo', 'hasMany', 'hasOne', 'hasAndBelongsToMany',
     ];
 
     /**
@@ -155,9 +155,9 @@ class Model
             'datasource' => $this->datasource,
             'table' => $this->table,
         ];
-       
+
         $config = array_merge($defaults, $config);
-     
+
         extract($config);
 
         if (is_null($name)) {
@@ -216,7 +216,7 @@ class Model
                 }
             }
         }
-        
+
         if ($className === null and $habtmModel === false) {
             return false;
         }
@@ -228,10 +228,10 @@ class Model
 
         if ($habtmModel) {
             $object = new Model(array(
-                        'name' => $className,
-                        'table' => $this->hasAndBelongsToMany[$alias]['joinTable'],
-                        'datasource' => $this->datasource,
-                      ));
+                'name' => $className,
+                'table' => $this->hasAndBelongsToMany[$alias]['joinTable'],
+                'datasource' => $this->datasource,
+            ));
 
             if (count($object->fields()) === 2) {
                 $object->primaryKey = $this->hasAndBelongsToMany[$alias]['foreignKey'];
@@ -275,7 +275,7 @@ class Model
                 );
             }
         }
-        throw new Exception('Call to undefined method '  .get_class($this) . '\\'.  $method .'()');
+        throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
     /**
@@ -288,10 +288,10 @@ class Model
         $fields = array_keys($this->schema());
 
         $needles = [
-          Inflector::underscore($this->name).'_name',
-          'name',
-          'title',
-           $this->primaryKey,
+            Inflector::underscore($this->name) . '_name',
+            'name',
+            'title',
+            $this->primaryKey,
         ];
 
         foreach ($needles as $needle) {
@@ -331,8 +331,7 @@ class Model
      * Hook to call just after model creation.
      */
     public function initialize(array $config)
-    {
-    }
+    { }
 
     public function behaviorRegistry()
     {
@@ -348,7 +347,7 @@ class Model
     public function loadBehavior(string $name, array $config = [])
     {
         list($plugin, $behavior) = pluginSplit($name);
-        $config = array_merge(['className' => $name.'Behavior'], $config);
+        $config = array_merge(['className' => $name . 'Behavior'], $config);
         $this->{$behavior} = $this->behaviorRegistry()->load($name, $config);
         return $this->{$behavior};
     }
@@ -366,7 +365,7 @@ class Model
      * @param array $config
      * @return Model
      */
-    public function loadModel(string $name, array $config=[])
+    public function loadModel(string $name, array $config = [])
     {
         list($plugin, $alias) = pluginSplit($name);
         $config = array_merge(['className' => $name], $config);
@@ -397,21 +396,21 @@ class Model
     public function hasOne(string $association, $options = [])
     {
         $options += [
-          'className' => $association,
-          'foreignKey' => null,
-          'conditions' => null,
-          'fields' => null,
-          'dependent' => false,
+            'className' => $association,
+            'foreignKey' => null,
+            'conditions' => null,
+            'fields' => null,
+            'dependent' => false,
         ];
-  
+
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->name).'_id';
+            $options['foreignKey'] = Inflector::underscore($this->name) . '_id';
         }
 
         $conditions = ["{$this->alias}.id = {$association}.{$options['foreignKey']}"];
 
         if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array) $options['conditions']);
+            $conditions = array_merge($conditions, (array)$options['conditions']);
         }
         $options['conditions'] = $conditions;
         $this->hasOne[$association] = $options;
@@ -433,22 +432,22 @@ class Model
     public function belongsTo(string $association, $options = [])
     {
         $defaults = [
-          'className' => $association,
-          'foreignKey' => null,
-          'conditions' => null,
-          'fields' => null,
-          'type' => 'LEFT',
+            'className' => $association,
+            'foreignKey' => null,
+            'conditions' => null,
+            'fields' => null,
+            'type' => 'LEFT',
         ];
 
         $options = array_merge($defaults, $options);
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($options['className']).'_id';
+            $options['foreignKey'] = Inflector::underscore($options['className']) . '_id';
         }
         $conditions = ["{$this->alias}.{$options['foreignKey']} = {$association}.id"];
 
         if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array) $options['conditions']);
+            $conditions = array_merge($conditions, (array)$options['conditions']);
         }
         $options['conditions'] = $conditions;
 
@@ -471,18 +470,18 @@ class Model
     public function hasMany(string $association, $options = [])
     {
         $options += [
-          'className' => $association,
-          'foreignKey' => null,
-          'conditions' => [],
-          'fields' => null,
-          'order' => null,
-          'dependent' => false,
-          'limit' => null,
-          'offset' => null,
+            'className' => $association,
+            'foreignKey' => null,
+            'conditions' => [],
+            'fields' => null,
+            'order' => null,
+            'dependent' => false,
+            'limit' => null,
+            'offset' => null,
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] =  Inflector::underscore($this->name).'_id';
+            $options['foreignKey'] =  Inflector::underscore($this->name) . '_id';
         }
 
         $this->hasMany[$association] = $options;
@@ -508,18 +507,18 @@ class Model
     public function hasAndBelongsToMany(string $association, $options = [])
     {
         $options += [
-          'className' => $association,
-          'joinTable' => null,
-          'foreignKey' => null,
-          'associationForeignKey' => null,
-          'conditions' => null,
-          'fields' => null,
-          'order' => null,
-          'dependent' => false,
-          'limit' => null,
-          'offset' => null,
-          'with' => null,
-          'mode' => 'replace',
+            'className' => $association,
+            'joinTable' => null,
+            'foreignKey' => null,
+            'associationForeignKey' => null,
+            'conditions' => null,
+            'fields' => null,
+            'order' => null,
+            'dependent' => false,
+            'limit' => null,
+            'offset' => null,
+            'with' => null,
+            'mode' => 'replace',
         ];
 
         if ($options['mode'] !== 'append') {
@@ -531,7 +530,7 @@ class Model
         sort($models);
         $models = array_values($models);
 
-        $with = Inflector::pluralize($models[0]).$models[1];
+        $with = Inflector::pluralize($models[0]) . $models[1];
         if (is_null($options['with'])) {
             $options['with'] = $with;
         }
@@ -539,15 +538,15 @@ class Model
             $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['with']));
         }
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->name).'_id';
+            $options['foreignKey'] = Inflector::underscore($this->name) . '_id';
         }
         if (is_null($options['associationForeignKey'])) {
-            $options['associationForeignKey'] = Inflector::underscore($options['className']).'_id';
+            $options['associationForeignKey'] = Inflector::underscore($options['className']) . '_id';
         }
         $conditions = ["{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id"];
-        
+
         if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array) $options['conditions']);
+            $conditions = array_merge($conditions, (array)$options['conditions']);
         }
         $options['conditions'] = $conditions;
         $this->hasAndBelongsToMany[$association] = $options;
@@ -666,7 +665,7 @@ class Model
         return $this->ModelValidator;
     }
 
-  
+
     protected function processSave(Entity $entity, array $options = [])
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
@@ -677,24 +676,25 @@ class Model
         }
 
         $exists = $this->exists($this->id);
-     
+
         if ($options['validate'] === true) {
             if ($options['callbacks'] === true and !$this->triggerCallback('beforeValidate', [$entity])) {
                 return false;
             }
             $validated = $this->validates($entity, !$exists);
-            
+
             if ($options['callbacks'] === true) {
-                $this->triggerCallback('afterValidate', [$entity,$validated]);
+                $this->triggerCallback('afterValidate', [$entity, $validated]);
             }
- 
+
             if (!$validated) {
                 return false;
             }
         }
-       
+
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (!$this->triggerCallback('beforeSave', [$entity, $options])) {
+                die('xx2');
                 return false;
             }
         }
@@ -709,23 +709,23 @@ class Model
             $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
             if (in_array($alias, $options['associated'])) {
                 $data = $entity->get($needle);
-              
+
                 if (is_array($data) or $data instanceof Collection) {
                     $hasAndBelongsToMany[$alias] = $entity->{$needle};
                 }
             }
         }
-      
+
         /**
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
         $columns = array_intersect(array_keys($this->schema()), $entity->modified());
-       
+
         $data = [];
         foreach ($columns as $column) {
             $data[$column] = $entity->get($column);
         }
-    
+
         /**
          * Data should not be objects or arrays. Invalidate any objects or array data
          * e.g. unvalidated datetime fields.
@@ -735,13 +735,13 @@ class Model
                 $entity->invalidate($key, 'Invalid data');
             }
         }
-     
+
         if (empty($data) or $entity->errors()) {
             return false;
         }
-    
+
         $result = null;
-      
+
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or !isset($data[$this->primaryKey])) {
             $connection = $this->connection();
@@ -759,7 +759,7 @@ class Model
                 $this->triggerCallback('afterSave', [$entity, !$exists, $options]);
             }
         }
-        
+
         /**
          * Save HABTM. It is here, because control is needed on false result from here
          */
@@ -770,7 +770,7 @@ class Model
             $result = true;
         }
 
-        unset($data,$options);
+        unset($data, $options);
 
         if ($result) {
             $entity->reset();
@@ -826,11 +826,11 @@ class Model
         $joinModel = $this->{$config['with']};
 
         $links = [];
-  
+
         foreach ($data as $row) {
             $primaryKey = $this->{$association}->primaryKey;
             $displayField = $this->{$association}->displayField;
-         
+
             // Either primaryKey or DisplayField must be set in data
             if ($row->has($primaryKey)) {
                 $needle = $primaryKey;
@@ -839,10 +839,10 @@ class Model
             } else {
                 return false;
             }
-       
+
             $tag = $this->{$association}->find('first', [
-                  'conditions' => [$needle => $row->get($needle)],
-                  'callbacks' => false,
+                'conditions' => [$needle => $row->get($needle)],
+                'callbacks' => false,
             ]);
 
             if ($tag) {
@@ -851,19 +851,20 @@ class Model
                 $row->set($primaryKey, $id);
             } else {
                 if (!$this->{$association}->save($row, array(
-                      'callbacks' => $callbacks,
-                      'transaction' => false,
-                    ))) {
+                    'callbacks' => $callbacks,
+                    'transaction' => false,
+                ))) {
                     return false;
                 }
                 $links[] = $this->{$association}->id;
             }
-          
+
             $joinModel = $this->{$config['with']};
         }
+
         $existingJoins = $joinModel->find('list', [
-                'conditions' => [$config['foreignKey'] => $this->id],
-                'fields' => [$config['associationForeignKey']],
+            'conditions' => [$config['foreignKey'] => $this->id],
+            'fields' => [$config['associationForeignKey']],
         ]);
 
         $connection = $joinModel->connection();
@@ -872,15 +873,17 @@ class Model
             $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->id]);
         }
 
+
+
         foreach ($links as $linkId) {
             if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
                 continue;
             }
             $insertData = [
-                  $config['foreignKey'] => $this->id,
-                  $config['associationForeignKey'] => $linkId,
+                $config['foreignKey'] => $this->id,
+                $config['associationForeignKey'] => $linkId,
             ];
-            
+
             $connection->insert($joinModel->table, $insertData);
         }
         return true;
@@ -942,10 +945,10 @@ class Model
      */
     public function save(Entity $data, $options = [])
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true,'associated'=>true];
-       
-        $options['associated'] =$this->normalizeAssociated($options['associated']);
-    
+        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true];
+
+        $options['associated'] = $this->normalizeAssociated($options['associated']);
+
         $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
@@ -968,13 +971,14 @@ class Model
                 $data->$foreignKey = $this->{$alias}->id;
             }
         }
-       
+
         if ($result) {
             /**
              * This will save record and hasAndBelongsToMany records. This is because
              * it can return false but HABTM is ok, and we need to capture false from
              * callbacks.
              */
+
             $result = $this->processSave($data, $options);
         }
 
@@ -1001,9 +1005,9 @@ class Model
                 if (!in_array($alias, $options['associated']) or !$data->has($key)) {
                     continue;
                 }
-                
+
                 $foreignKey = $this->hasMany[$alias]['foreignKey'];
-                    
+
                 foreach ($data->get($key) as $record) {
                     if ($record instanceof Entity and $record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
@@ -1026,7 +1030,7 @@ class Model
         if ($options['transaction']) {
             $this->rollback();
         }
-      
+
         return false;
     }
 
@@ -1035,8 +1039,8 @@ class Model
      *
      * @param entity|array $data    to save =
      *                              array(
-        *                              $entity,
-        *                              $entity
+     *                              $entity,
+     *                              $entity
      *                              );
      * @param array        $options keys include:
      *                              validate: wether to validate data or not
@@ -1085,10 +1089,10 @@ class Model
             return false;
         }
 
-        return (bool) $this->find('count', array(
-        'conditions' => array("{$this->alias}.{$this->primaryKey}" => $id),
-        'callbacks' => false
-      ));
+        return (bool)$this->find('count', array(
+            'conditions' => array("{$this->alias}.{$this->primaryKey}" => $id),
+            'callbacks' => false
+        ));
     }
 
     /**
@@ -1120,16 +1124,16 @@ class Model
     public function find(string $type = 'first', $options = [])
     {
         $default = [
-             'conditions' => null,
-             'fields' => [],
-             'joins' => [],
-             'order' => $this->order,
-             'limit' => null,
-             'group' => null,
-             'page' => null,
-             'offset' => null,
-             'callbacks' => true,
-             'associated' => []
+            'conditions' => null,
+            'fields' => [],
+            'joins' => [],
+            'order' => $this->order,
+            'limit' => null,
+            'group' => null,
+            'page' => null,
+            'offset' => null,
+            'callbacks' => true,
+            'associated' => []
         ];
 
         $options = array_merge($default, $options);
@@ -1146,7 +1150,7 @@ class Model
 
         $options = $this->prepareQuery($type, $options); // AutoJoin
 
-        $results = $this->{'finder'.ucfirst($type)}($options);
+        $results = $this->{'finder' . ucfirst($type)}($options);
 
         if ($options['callbacks'] === true) {
             $results = $this->triggerCallback('afterFind', [$results], true);
@@ -1173,9 +1177,9 @@ class Model
         if (empty($this->id) or !$this->exists($this->id)) {
             return false;
         }
-  
+
         if ($callbacks) {
-            if (!$this->triggerCallback('beforeDelete', [$entity,$cascade])) {
+            if (!$this->triggerCallback('beforeDelete', [$entity, $cascade])) {
                 return false;
             }
         }
@@ -1188,9 +1192,9 @@ class Model
         $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
 
         if ($callbacks) {
-            $this->triggerCallback('afterDelete', [$entity,$result]);
+            $this->triggerCallback('afterDelete', [$entity, $result]);
         }
-     
+
         return $result;
     }
 
@@ -1204,10 +1208,10 @@ class Model
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
                 $conditions = [$config['foreignKey'] => $primaryKey];
-                $ids = $this->{$association}->find('list', [ 'conditions' => $conditions,'fields'=>[$this->primaryKey]]);
+                $ids = $this->{$association}->find('list', ['conditions' => $conditions, 'fields' => [$this->primaryKey]]);
                 foreach ($ids as $id) {
                     $conditions = [$this->{$association}->primaryKey => $id];
-                    $result = $this->{$association}->find('first', ['conditions'=>$conditions,'callbacks'=>false]);
+                    $result = $this->{$association}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                     if ($result) {
                         $this->{$association}->delete($result);
                     }
@@ -1229,7 +1233,7 @@ class Model
             $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
             foreach ($ids as $id) {
                 $conditions = [$this->{$associatedModel}->primaryKey => $id];
-                $result = $this->{$associatedModel}->find('first', ['conditions'=>$conditions,'callbacks'=>false]);
+                $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                 if ($result) {
                     $this->{$associatedModel}->delete($result);
                 }
@@ -1289,7 +1293,7 @@ class Model
             return [];
         }
         // return $results;
-        return new Collection($results, ['name'=>$this->alias]);
+        return new Collection($results, ['name' => $this->alias]);
     }
 
     /**
@@ -1365,18 +1369,18 @@ class Model
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
                         'datasource' => $this->datasource,
-                        );
-                   
+                    );
+
                     if (empty($config['fields'])) {
                         $config['fields'] = $this->{$alias}->fields();
                     }
-   
+
                     // If throw an error, then it can be confusing to know source, so turn to array
-                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
+                    $query['fields'] = array_merge((array)$query['fields'], (array)$config['fields']);
                 }
             }
         }
-    
+
         return $query;
     }
 
@@ -1390,17 +1394,17 @@ class Model
     protected function associatedConfig(array $query)
     {
         $contain = [];
-        foreach ((array) $query['associated'] as $alias => $config) {
+        foreach ((array)$query['associated'] as $alias => $config) {
             if (is_int($alias)) {
                 $alias = $config;
                 $config = [];
             }
-            $config += ['fields'=>[]];
+            $config += ['fields' => []];
             foreach ($config['fields'] as $key => $value) {
                 $config['fields'][$key] = "{$alias}.{$value}";
             }
             $contain[$alias] = $config;
-           
+
             if (!$this->findAssociation($alias)) {
                 throw new InvalidArgumentException("{$this->name} is not associated with {$alias}.");
             }
@@ -1436,23 +1440,23 @@ class Model
     protected function prepareResults(array $results)
     {
         $buffer = [];
-      
-    
+
+
         foreach ($results as $record) {
-            $thisData = (isset($record[$this->alias])?$record[$this->alias]:[]); // Work with group and no fields from db
-            $entity = new Entity($thisData, ['name'=>$this->alias,'exists'=>true]);
+            $thisData = (isset($record[$this->alias]) ? $record[$this->alias] : []); // Work with group and no fields from db
+            $entity = new Entity($thisData, ['name' => $this->alias, 'exists' => true, 'markClean' => true]);
             unset($record[$this->alias]);
-           
+
             foreach ($record as $model => $data) {
                 if (is_string($model)) {
                     $associated = Inflector::variable($model);
 
                     /**
-                    * Remove blank records. For example when loading a has one it is showing empty
-                    * entity fields because there is no record.
-                    * I am not really sure, should it return with key value set as null, empty entity etc
-                    * @todo investigate this.
-                    */
+                     * Remove blank records. For example when loading a has one it is showing empty
+                     * entity fields because there is no record.
+                     * I am not really sure, should it return with key value set as null, empty entity etc
+                     * @todo investigate this.
+                     */
                     $foreignKey = null;
                     if (isset($this->belongsTo[$model])) {
                         $foreignKey = $this->belongsTo[$model]['foreignKey'];
@@ -1460,13 +1464,13 @@ class Model
                             continue;
                         }
                     } elseif (isset($this->hasOne[$model])) {
-                        $foreignKey= $this->hasOne[$model]['foreignKey'];
+                        $foreignKey = $this->hasOne[$model]['foreignKey'];
                         if (empty($data[$foreignKey])) {
                             continue;
                         }
                     }
 
-                    $entity->{$associated} = new Entity($data, ['name'=>$associated,'exists'=>true]);
+                    $entity->{$associated} = new Entity($data, ['name' => $associated, 'exists' => true, 'markClean' => true]);
                 } else {
                     /**
                      * Any data is here is not matched to model, e.g. group by and non existant fields
@@ -1481,7 +1485,7 @@ class Model
 
             $buffer[] = $entity;
         }
-     
+
         return $buffer;
     }
 
@@ -1497,11 +1501,11 @@ class Model
         foreach ($this->hasMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
                 $config = array_merge($config, $query['associated'][$alias]);
-        
+
                 if (empty($config['fields'])) {
                     $config['fields'] = $this->{$alias}->fields();
                 }
-            
+
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->primaryKey})) {
                         $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
@@ -1526,7 +1530,7 @@ class Model
                     'alias' => $config['with'],
                     'type' => 'INNER',
                     'conditions' => $config['conditions'],
-                    );
+                );
                 $config['conditions'] = [];
                 if (empty($config['fields'])) {
                     $config['fields'] = array_merge($this->{$alias}->fields(), $this->{$config['with']}->fields());
@@ -1557,8 +1561,8 @@ class Model
     protected function readDataSource(array $query, $type = 'model')
     {
         $connection = $this->connection();
-        $connection->select($this->table, $query+['alias'=>$this->alias]);
-     
+        $connection->select($this->table, $query + ['alias' => $this->alias]);
+
         /*
           A different way to map and solve problem with postgres due meta table actual table name. Using virtual
           field
@@ -1572,9 +1576,9 @@ class Model
         if ($type == 'list') {
             return $connection->fetchList();
         }
-        
+
         $results = $connection->fetchAll($type);
-        
+
         if ($results and $type === 'model') {
             $results = $this->prepareResults($results);
             $results = $this->loadAssociatedBelongsTo($query, $results);
@@ -1582,8 +1586,8 @@ class Model
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
         }
-   
-        unset($sql,$connection);
+
+        unset($sql, $connection);
 
         return $results;
     }
@@ -1626,7 +1630,7 @@ class Model
                 $foreignKey = $this->hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
                 $primaryKey = $this->{$model}->primaryKey;
-                
+
                 foreach ($results as &$result) {
                     if (isset($result->{$this->primaryKey})) { // Author id
                         $config['conditions'] =   $this->hasOne[$model]['conditions'];
@@ -1665,7 +1669,7 @@ class Model
      *
      * @return \Origin\Model\Datasource
      */
-    public function connection() : Datasource
+    public function connection(): Datasource
     {
         return ConnectionManager::get($this->datasource);
     }
@@ -1683,9 +1687,9 @@ class Model
     }
 
     /**
-    * Before find callback. Must return either the query or true to continue
-    * @return array|bool query or bool
-    */
+     * Before find callback. Must return either the query or true to continue
+     * @return array|bool query or bool
+     */
     public function beforeFind(array $query = [])
     {
         return $query;
@@ -1719,8 +1723,7 @@ class Model
      * @return bool
      */
     public function afterValidate(Entity $entity, bool $success)
-    {
-    }
+    { }
 
     /**
      * Before save callback
@@ -1743,8 +1746,7 @@ class Model
      * @return void
      */
     public function afterSave(Entity $entity, bool $created, array $options = [])
-    {
-    }
+    { }
 
     /**
      * Before delete, must return true to continue
@@ -1765,8 +1767,7 @@ class Model
      * @return bool
      */
     public function afterDelete(Entity $entity, bool $success)
-    {
-    }
+    { }
 
     /**
      * Checks values in an entity are unique, this could be that a username is not already
@@ -1810,14 +1811,14 @@ class Model
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function new(array $requestData = null, array $options=[])
+    public function new(array $requestData = null, array $options = [])
     {
         if ($requestData === null) {
-            return new Entity([], ['name'=>$this->alias]);
+            return new Entity([], ['name' => $this->alias]);
         }
-        $options += ['name' => $this->alias,'associated'=>true];
+        $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-      
+
         $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->one($requestData, $options);
     }
@@ -1827,11 +1828,11 @@ class Model
      *
      * @param array $data
      * @param array $options parse default is set to true
-    * @var \Origin\Model\Collection
+     * @var \Origin\Model\Collection
      */
-    public function newEntities(array $requestData, array $options=[])
+    public function newEntities(array $requestData, array $options = [])
     {
-        $options += ['name' => $this->alias,'associated'=>true];
+        $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->many($requestData, $options);
@@ -1845,9 +1846,9 @@ class Model
      * @param array $options parse
      * @var \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $requestData, array $options=[])
+    public function patch(Entity $entity, array $requestData, array $options = [])
     {
-        $options += ['associated'=>true];
+        $options += ['associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
         return $this->marshaller()->patch($entity, $requestData, $options);
@@ -1883,7 +1884,7 @@ class Model
 
         foreach ($callbacks as $callable) {
             $result = call_user_func_array($callable, $arguments);
-           
+
             if ($result === false) {
                 return false;
             }
@@ -1902,7 +1903,7 @@ class Model
             }
         }
         // Free Mem
-        unset($callbacks,$result);
+        unset($callbacks, $result);
 
         if ($passedArgs) {
             return $arguments[0]; // was if not exist return result

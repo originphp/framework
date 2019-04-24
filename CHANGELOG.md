@@ -37,6 +37,7 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Entities from find had all fields marked as modified. added markClean
 - Issue wtih file download
 - Issue with merge controller vars
 - Email client detection on server undefined offset
