@@ -3,8 +3,13 @@
 /config/email.php
 /config/server.php
 
-/logs/
-/tmp/
+/logs/*
+!/tmp/empty
+
+/tmp/*
+!/tmp/empty
+!/tmp/cache/empty
+!/tmp/sessions/empty
 
 /public/coverage
 
