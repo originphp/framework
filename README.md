@@ -11,7 +11,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Autoloading with Composer full integrated.
 - Easy to use Routing
 - ORM: Works with MySQL and has easy to use finders.
-- Cache:  supports file, APC, Memcached, Reddis out of the box.
+- Cache:  supports file, APCu, Memcached, Reddis out of the box.
 - Queue: Speed up processing time by running background jobs without having to install addtional servers such as beanstalk.
 - Helpers: View helpers include forms, date,number with an easy to use localization. If you want to use the Intl extention, there is a helper for that too.
 - Integration Testing - Test your controllers and console apps with minimal lines of code.
