@@ -5,7 +5,7 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 use Origin\Exception\Exception;
 
-class BookmarksControllerTest extends OriginTestCase
+class BookmarksShellTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
