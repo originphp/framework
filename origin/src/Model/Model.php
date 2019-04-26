@@ -1451,10 +1451,8 @@ class Model
                     $associated = Inflector::variable($model);
 
                     /**
-                     * Remove blank records. For example when loading a has one it is showing empty
-                     * entity fields because there is no record.
-                     * I am not really sure, should it return with key value set as null, empty entity etc
-                     * @todo investigate this.
+                     * Remove empty records. If the foreignKey is not present then the associated
+                     * data will not be present. This is correct. 
                      */
                     $foreignKey = null;
                     if (isset($this->belongsTo[$model])) {

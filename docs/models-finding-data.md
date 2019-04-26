@@ -296,11 +296,13 @@ $result = $this->Article->find('first',[
 
 By default all fields for each the associated models will be fetched (or if you have configured the association to return only certain fields by default) unless you tell it otherwise.
 
+NOTE: If you limit the fields that are returned, you must always ensure that `foreignKey` must be present, if not the final results wont include the records.
+
 ```php
 $result = $this->Article->find('first',[
   'associated'=>[
     'Author'=>[
-      'fields'=>['name','email']
+      'fields'=>['id','name','email']
       ]
     ]
   ]);

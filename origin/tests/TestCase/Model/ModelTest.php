@@ -595,7 +595,7 @@ class ModelTest extends OriginTestCase
 
         $this->assertTrue($result->author->address->has('created'));
         $result = $this->Article->find('first', [
-            'associated'=>['Author'=>['associated'=>['Address'=>['fields'=>['id','description']]]]]
+            'associated'=>['Author'=>['associated'=>['Address'=>['fields'=>['id','author_id','description']]]]]
             ]);
         $this->assertFalse($result->author->address->has('created'));
 
