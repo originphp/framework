@@ -81,12 +81,12 @@ class I18nTest extends \PHPUnit\Framework\TestCase
     public function testTimezones()
     {
         $timezones = MockI18n::timezones();
-        $this->assertEquals('GMT +00:00 - Europe/London', $timezones['Europe/London']);
+        $this->assertEquals('GMT -07:00 - America/Los Angeles', $timezones['America/Los_Angeles']);
     }
 
     public function testTranslate()
     {
-        MockI18n::initialize(['language'=>'es']);
+        MockI18n::initialize(['language' => 'es']);
         $this->assertEquals('Esto es una prueba.', MockI18n::translate('This is a test.'));
     }
 

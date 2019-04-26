@@ -141,7 +141,9 @@ class DateTest extends \PHPUnit\Framework\TestCase
     }
     public function testFormatTime()
     {
-        $this->assertEquals('10:00 PM', Date::formatTime('2019-02-24 21:00'));
-        $this->assertEquals('10:00 PM', Date::formatTime('21:00'));
+        Date::setTimezone('Asia/Dubai'); // No daylight saving time
+        $this->assertEquals('1:00 AM', Date::formatTime('2019-02-24 21:00'));
+        $this->assertEquals('1:00 AM', Date::formatTime('21:00'));
+        Date::setTimezone('UTC');
     }
 }
