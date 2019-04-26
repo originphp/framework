@@ -19,6 +19,7 @@ use Origin\Core\Inflector;
 use Origin\Exception\Exception; // @todo a different exception?
 use Generate\Utils\GenerateTemplater;
 use Origin\Utility\Xml;
+use Origin\Exception\InvalidArgumentException;
 
 /**
 *  Reference
@@ -68,6 +69,9 @@ class GenerateShell extends Shell
         $this->out('generate controller Contacts');
         $this->out('generate view Contacts');
         $this->out('generate plugin ContactManager');
+        $this->out('generate shell Contacts');
+        $this->out('generate middleware RequestModifier');
+
         $this->out('');
         $this->out('You can use --force to not prompt');
         //$this->out('generate test Lead'); /**@todo test */
@@ -128,7 +132,7 @@ class GenerateShell extends Shell
             throw new Exception('Error writing file');
         }
 
-        $this->status(sprintf('%s plugin', $plugin), 'ok');
+        $this->status('ok',sprintf('%s plugin', $plugin));
     }
 
     protected function phpunitXml()
@@ -265,7 +269,7 @@ class GenerateShell extends Shell
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
         }
-        $this->status(sprintf('%s controller', $controller), 'ok');
+        $this->status('ok',sprintf('%s controller', $controller));
     }
 
     public function model(string $model = null)
@@ -327,8 +331,9 @@ class GenerateShell extends Shell
         if (!file_put_contents($filename, $result)) {
             throw new Exception('Error writing file');
         }
-        $this->status(sprintf('%s model', $model), 'ok');
+        $this->status('ok',sprintf('%s model', $model));
     }
+
 
     public function view(string $controller = null)
     {
@@ -384,21 +389,72 @@ class GenerateShell extends Shell
                 throw new Exception('Error writing file');
             }
         }
-        $this->status(sprintf('%s views', $controller), 'ok');
+        $this->status('ok',sprintf('%s views', $controller));
     }
 
-    protected $statusCodes = [
-        'ok' => 'green',
-        'error' => 'red',
-        'ignore' => 'yellow'
-    ];
 
-    public function status(string $message, string $code)
-    {
-        $color = $this->statusCodes[$code];
-        $status = strtoupper($code);
-        $this->out("<white>[</white> <{$color}>{$status}</{$color}> <white>] {$message}</white>");
+    public function middleware(string $middleware=null){
+        if($middleware === null AND $this->args(0)){
+            $middleware = $this->args(0);
+        }
+        if($middleware === null){
+            $this->error('You must provide a name for the middleware');
+        }
+       
+        $filename = SRC . "/Middleware/{$middleware}Middleware.php";
+        if (file_exists($filename)) {
+            $result = $this->in(sprintf('%sMiddleware already exist, overwrite?', $middleware), ['y','n'], 'n');
+            if ($result === 'n') {
+                $this->status('skipped',sprintf('%sMiddleware', $middleware));
+                exit;
+            }
+        }
+
+        $Templater = new GenerateTemplater();
+        $result = $Templater->generate('middleware', ['middleware'=>$middleware]);
+        if(file_put_contents($filename,$result)){
+            $this->status('ok',sprintf('%sMiddleware', $middleware));
+        }
+        else{
+            $this->status('error',sprintf('%sMiddleware', $middleware));
+        }
+       
     }
+
+    /**
+     * Generates a ShellFile
+     *
+     * @param string $shell
+     * @return void
+     */
+    public function shell(string $shell=null){
+        if($shell === null AND $this->args(0)){
+            $shell = $this->args(0);
+        }
+        if($shell === null){
+            $this->error('You must provide a name for the shell');
+        }
+       
+        $filename = SRC . "/Console/{$shell}Shell.php";
+        if (file_exists($filename)) {
+            $result = $this->in(sprintf('%sShell already exist, overwrite?', $shell), ['y','n'], 'n');
+            if ($result === 'n') {
+                exit;
+            }
+        }
+
+        $Templater = new GenerateTemplater();
+        $result = $Templater->generate('shell', ['shell'=>$shell]);
+        if(file_put_contents($filename,$result)){
+            $this->status('ok',sprintf('%sShell', $shell));
+        }
+        else{
+            $this->status('error',sprintf('%sShell', $shell));
+        }
+       
+    }
+
+  
 
     protected function getData(string $model)
     {
