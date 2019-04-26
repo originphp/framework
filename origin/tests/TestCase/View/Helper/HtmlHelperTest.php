@@ -68,13 +68,13 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testJs()
     {
-        $expected = '<script type="text/javascript" href="https://example.com/something.js"></script>';
+        $expected = '<script type="text/javascript" src="https://example.com/something.js"></script>';
         $this->assertSame($expected, $this->Html->js('https://example.com/something.js'));
 
-        $expected = '<script type="text/javascript" href="/js/form.js"></script>';
+        $expected = '<script type="text/javascript" src="/js/form.js"></script>';
         $this->assertSame($expected, $this->Html->js('form'));
 
-        $expected = '<script type="text/javascript" href="/assets/js/form.js"></script>';
+        $expected = '<script type="text/javascript" src="/assets/js/form.js"></script>';
         $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
     
         $this->assertContains(

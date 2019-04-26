@@ -346,11 +346,11 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     {
         $FormHelper = $this->Form;
 
-        $expected = '<label for="duplicates-0"><input type="radio" name="duplicates" value="0" id="duplicates-0">Create New</label><label for="duplicates-1"><input type="radio" name="duplicates" value="1" id="duplicates-1">Overwrite</label><label for="duplicates-2"><input type="radio" name="duplicates" value="2" id="duplicates-2">Delete</label>';
+        $expected = '<input type="radio" name="duplicates" value="0" id="duplicates-0"><label for="duplicates-0">Create New</label><input type="radio" name="duplicates" value="1" id="duplicates-1"><label for="duplicates-1">Overwrite</label><input type="radio" name="duplicates" value="2" id="duplicates-2"><label for="duplicates-2">Delete</label>';
         $this->assertEquals($expected, $FormHelper->radio('duplicates', ['Create New', 'Overwrite', 'Delete']));
 
         $result = $this->Form->radio('package', [123=>'Premium',456=>'Basic'], ['value'=>123]);
-        $expected ='<label for="package-123"><input type="radio" name="package" value="123" id="package-123" checked>Premium</label><label for="package-456"><input type="radio" name="package" value="456" id="package-456">Basic</label>';
+        $expected ='<input type="radio" name="package" value="123" id="package-123" checked><label for="package-123">Premium</label><input type="radio" name="package" value="456" id="package-456"><label for="package-456">Basic</label>';
         $this->assertSame($expected, $result);
     }
 
@@ -471,7 +471,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function testNumber()
     {
         $result = $this->Form->number('amount');
-        $expected = '<input type="text" name="amount">';
+        $expected = '<input type="number" name="amount">';
         $this->assertSame($expected, $result);
     }
 
