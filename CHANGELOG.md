@@ -20,6 +20,8 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added
+- GeneratePlugin now generates middleware and shells
+- Shell status method (StatusTask being depreciated)
 - Request referer method
 - Added Dom Utility which extends Dom to add javascript style selectors.
 
@@ -48,7 +50,6 @@ elsewhere later.
 - Html helper script tag bug fix
 - Issue with exceptions called by helpers within elements which caused nested output buffering
 - Fix bug with marshaller and extracting fields on associated records
-
 
 ## [1.0.0-beta] - 2019-03-26
 ### Removed

@@ -94,6 +94,20 @@ class Shell
     public $commands = [];
 
     /**
+     * For the status function
+     *
+     * @var array
+     */
+    protected $statusCodes = [
+        'ok' => 'green',
+        'error' => 'red',
+        'ignore' => 'yellow',
+        'skipped' => 'cyan',
+        'started' => 'green',
+        'stopped' => 'yellow',
+    ];
+
+    /**
      * Inject request and response
      *
      * @param array $arguments
@@ -496,6 +510,24 @@ class Shell
     {
         $this->output->error($title, $message);
         $this->stop($title);
+    }
+
+    /**
+     * Displays a status
+     *
+     * @param string $code e.g. ok, error, ignore
+     * @param string $message
+     * @return void
+     */
+    public function status(string $code,string $message)
+    {
+        if(isset($this->statusCodes[$code])){
+            $color = $this->statusCodes[$code];
+            $status = strtoupper($code);
+            $this->out("<white>[</white> <{$color}>{$status}</{$color}> <white>] {$message}</white>");
+            return;
+        }
+       throw new ConsoleException(sprintf('Unkown status %s',$code));
     }
 
     /**

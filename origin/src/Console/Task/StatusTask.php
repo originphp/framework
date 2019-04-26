@@ -12,10 +12,18 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * This will be depreciated. This is more helper as it is for output.
+  */
 namespace Origin\Console\Task;
 
 class StatusTask extends Task
 {
+    public function initialize(array $config)
+    {
+        deprecationWarning('Status Task is being depreciated. Use shell::status');
+    }
+
     public function ok(string $message)
     {
         return $this->custom('OK', 'green', $message);
