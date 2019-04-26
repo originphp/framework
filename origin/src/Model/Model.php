@@ -694,7 +694,6 @@ class Model
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (!$this->triggerCallback('beforeSave', [$entity, $options])) {
-                die('xx2');
                 return false;
             }
         }
