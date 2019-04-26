@@ -70,34 +70,32 @@ class BookmarksShell extends AppShell
         $this->out('');
         $result = $this->in('Are you sure?', ['yes','no'], 'no');
         if ($result === 'yes') {
-            $this->out('');
-            $this->out('Deleting files');
-            $this->out('');
+            $this->out("\nDeleting Files\n");
             foreach ($this->files as $file) {
                 if (unlink($file)) {
-                    $this->out('<white>[</white> <green>OK</green> <white>] ' . $file . '</white>');
+                    $this->status('ok',$file);
                 } else {
-                    $this->out('<white>[</white> <red>ERROR</red> <white>] ' . $file . '</white>');
+                    $this->status('error',$file);
                 }
             }
-            $this->out('');
-            $this->out('Deleting Folders');
-            $this->out('');
+            $this->out("\nDeleting Folders\n");
             foreach ([ SRC . DS .  'View' . DS . 'Bookmarks', SRC . DS .  'View' . DS . 'Users'] as $folder) {
                 if (rmdir($folder)) {
-                    $this->out('<white>[</white> <green>OK</green> <white>] ' . $folder . '</white>');
+                    $this->status('ok',$folder);
                 } else {
-                    $this->out('<white>[</white> <red>ERROR</red> <white>] ' . $folder . '</white>');
+                    $this->status('error',$folder);
                 }
             }
+
+            $this->out("\nOther\n");
             $appController = SRC . DS .'Controller'.DS .'AppController.php';
         
             $contents =  file_get_Contents($appController);
             $contents = str_replace('$this->loadComponent(\'Auth\');', '', $contents);
             if (file_put_contents($appController, $contents)) {
-                $this->out('<white>[</white> <green>OK</green> <white>] modify AppController</white>');
+                $this->status('ok','Modify AppController');
             } else {
-                $this->out('<white>[</white> <red>ERROR</red> <white>] modify AppController</white>');
+                $this->status('error','Modify AppController');
             }
         }
     }
