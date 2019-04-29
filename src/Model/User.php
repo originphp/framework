@@ -36,7 +36,7 @@ class User extends AppModel
      */
     public function beforeSave(Entity $entity, array $options = [])
     {
-        if (isset($entity->password) and empty($entity->password) === false) {
+        if (!empty($entity->password)) {
             $entity->password = password_hash($entity->password, PASSWORD_DEFAULT);
         }
 
