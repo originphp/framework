@@ -19,9 +19,8 @@ if [ -d update ]; then
     echo 'updating framework'
     chown -R www-data:www-data update
     rm -rf origin
-    rm -rf bin
     mv update/origin origin
-    mv update/bin bin
+    cp update/bin/* bin/.
 
     echo 'deleting tmp files'
     rm -rf update
