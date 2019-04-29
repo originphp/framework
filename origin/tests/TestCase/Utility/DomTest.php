@@ -83,7 +83,8 @@ class DomTest extends OriginTestCase
         $dom->loadHtml($html);
         $this->assertEquals('three', $dom->querySelector('div.main span:last-child')->textContent);
         $this->assertEquals('one', $dom->querySelector('div.main span:first-child')->textContent);
-        $this->assertEquals('two', $dom->querySelector('div.main span:1')->textContent);
+        $this->assertEquals('two', $dom->querySelector('div.main span:nth-child(1)')->textContent);
+        $this->assertEquals('three', $dom->querySelector('div.main span:nth-child(2)')->textContent);
         $this->assertNull($dom->querySelector('div.main span:10'));
     }
  

@@ -35,8 +35,7 @@ use DOMElement;
   * - [attribute=value] - e.g. a[target='_blank'] will select all links with target = _blank
   * - :first-child - e.g. p:first-child will select the first child element from the p
   * - :last-child - e.g. p:last-child will select the last child element from the p
-  * - :n = e.g. p:3 will select the third child. This might be changed to nth-child(n) in future to match up
-  *    with the javascript version
+  * - :nth-child(3) = e.g. p:3 will select the third child. 
   *
   * It currently does not cover complex selectors like div.highlighted > p for now. (~>+^|$).
   *
@@ -49,6 +48,7 @@ use DOMElement;
   * $dom->querySelector('section.content h1.heading span');
   * $dom->querySelector('div.main span:first-child');
   * $dom->querySelector('div.main span:last-child');
+  * $dom->querySelector('div.main span:nth-child(3)');
   * $dom->querySelector('h1,h2');
   * $dom->querySelector('a[data-control-name="company-details"]);
   *
@@ -69,6 +69,7 @@ use DOMElement;
         * $dom->querySelector('section.content h1.heading span');
         * $dom->querySelector('div.main span:first-child');
         * $dom->querySelector('div.main span:last-child');
+        * $dom->querySelector('div.main span:nth-child(3)');
         * $dom->querySelector('h1,h2');
         * $dom->querySelector('a[data-control-name="company-details"]);
         * @param \DOMElement $dom
@@ -184,8 +185,10 @@ use DOMElement;
                      $this->results[] = $elements[0];
                  } elseif ($n === 'last-child') {
                      $this->results[] = $elements[count($elements)-1];
-                 } elseif (is_numeric($n) and isset($elements[$n])) {
-                     $this->results[] = $elements[$n];
+                 } elseif (preg_match('/nth-child\((\d+)\)/',$n,$matches)) {
+                    if(isset($matches[1]) AND isset($elements[$matches[1]])){
+                        $this->results[] = $elements[$matches[1]];
+                    }             
                  }
              }
          } else {
@@ -211,13 +214,14 @@ use DOMElement;
      }
  }
 
- /**
-  * Turbo charge the DOMDocument and DOM Element
-  */
- class DomElementX extends \DOMElement
- {
-     use QuerySelector;
- }
+/**
+* Turbo charge the DOMDocument and DOM Element
+* @internal dont want 2 extra files for a few lines of code
+*/
+class DomElementX extends \DOMElement
+{
+    use QuerySelector;
+}
 
 class Dom extends \DOMDocument
 {
