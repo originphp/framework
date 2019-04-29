@@ -20,7 +20,7 @@ if [ -d update ]; then
     chown -R www-data:www-data update
     rm -rf origin
     mv update/origin origin
-    cp update/bin/* bin/.
+    cp update/bin/* bin
 
     echo 'deleting tmp files'
     rm -rf update
