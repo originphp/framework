@@ -28,7 +28,6 @@ class SchemaShell extends Shell
         $this->addCommand('create', ['help'=>'Creates the tables using the schema file or files']);
         $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
         $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
-        $this->loadTask('Status');
     }
 
     public function generate()
@@ -51,16 +50,16 @@ class SchemaShell extends Shell
         foreach ($tables as $table) {
             $data = $connection->schema($table);
             if (!$data) {
-                $this->Status->error($table);
+                $this->status('error', $table);
                 continue;
             }
             
             $filename = $folder . DS . $table . '.php';
             $data = '<?php' . "\n" . '$schema = ' .var_export($data, true). ';';
             if (file_put_contents($filename, $data)) {
-                $this->Status->ok(sprintf('Generated schema for %s', $table));
+                $this->status('ok', sprintf('Generated schema for %s', $table));
             } else {
-                $this->Status->error(sprintf('Could not save to %s', $filename));
+                $this->status('error', sprintf('Could not save to %s', $filename));
             }
         }
     }
@@ -88,10 +87,10 @@ class SchemaShell extends Shell
                 $table = pathinfo($file, PATHINFO_FILENAME);
                 $sql = $connection->createTable($table, $this->loadSchema($folder . DS . $file));
                 if ($sql and $connection->execute($sql)) {
-                    $this->Status->ok(sprintf('%s table created', $table));
+                    $this->status('ok', sprintf('%s table created', $table));
                     continue;
                 }
-                $this->Status->error(sprintf('Could not create %s', $table));
+                $this->status('error', sprintf('Could not create %s', $table));
             }
         }
     }
@@ -114,7 +113,7 @@ class SchemaShell extends Shell
             $connection->execute("SHOW CREATE TABLE {$table}");
             $result = $connection->fetch();
             if (empty($result['Create Table'])) {
-                $this->Status->error($table);
+                $this->status('error', $table);
                 continue;
             }
             $dump[] = $result['Create Table'] .';';
@@ -142,14 +141,14 @@ class SchemaShell extends Shell
               
                 $records[] = $sql .';';
             }
-            $this->Status->ok(sprintf('Processed %s table with %d records ', $table, count($results)));
+            $this->status('ok', sprintf('Processed %s table with %d records ', $table, count($results)));
         }
         
         $result =  file_put_contents(TMP . DS . 'dump.sql', implode("\n\n", $dump) . "\n\n" . implode("\n", $records));
         if ($result) {
-            $this->Status->ok('Saved to tmp/dump.sql');
+            $this->status('ok', 'Saved to tmp/dump.sql');
         } else {
-            $this->Status->error('Could not save to tmp/dump.sql');
+            $this->status('error', 'Could not save to tmp/dump.sql');
         }
     }
     public function import()
@@ -167,7 +166,7 @@ class SchemaShell extends Shell
         $filename = CONFIG . DS .'schema'. DS . $default . '.sql';
         
         if (!file_exists($filename)) {
-            $this->Status->error('config/schema/'.$default. '.sql not found');
+            $this->status('error', 'config/schema/'.$default. '.sql not found');
             exit();
         }
 
@@ -181,9 +180,9 @@ class SchemaShell extends Shell
             if ($query != '' and $query != "\n") {
                 $query = trim($query) . ';';
                 if ($connection->execute($query)) {
-                    $this->Status->ok($query);
+                    $this->status('ok', $query);
                 } else {
-                    $this->Status->error($query);
+                    $this->status('error', $query);
                     return ;
                 }
             }
