@@ -445,12 +445,10 @@ Like controllers there is a console integration test trait which makes testing a
 ```php
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\TestSuite\TestTrait;
 
 class CronShellTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
-    use TestTrait;
 
     public function testCronDaily()
     {

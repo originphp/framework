@@ -16,6 +16,7 @@ namespace Origin\Console;
 
 use Origin\Model\ConnectionManager;
 use Origin\Model\QueryBuilder;
+use Origin\Core\Logger;
 
 /**
  * @todo think about importing generating plugin stuff. and option parsing
@@ -33,14 +34,14 @@ class SchemaShell extends Shell
     public function generate()
     {
         $datasource = 'default';
-        if (!empty($this->params['datasource'])) {
-            $datasource = $this->params['datasource'];
+        if (!empty($this->params('datasource'))) {
+            $datasource = $this->params('datasource');
         }
   
         $connection = ConnectionManager::get($datasource);
         $tables = $connection->tables();
-        if (!empty($this->args)) {
-            $tables = [$this->args[0]];
+        if ($this->args()) {
+            $tables = $this->args();
         }
         $folder = CONFIG . DS . 'schema';
         if (!file_exists($folder)) {
@@ -59,7 +60,7 @@ class SchemaShell extends Shell
             if (file_put_contents($filename, $data)) {
                 $this->status('ok', sprintf('Generated schema for %s', $table));
             } else {
-                $this->status('error', sprintf('Could not save to %s', $filename));
+                $this->error(sprintf('Could not save to %s', $filename));
             }
         }
     }
@@ -72,15 +73,15 @@ class SchemaShell extends Shell
     public function create()
     {
         $datasource = 'default';
-        if (!empty($this->params['datasource'])) {
-            $datasource = $this->params['datasource'];
+        if (!empty($this->params('datasource'))) {
+            $datasource = $this->params('datasource');
         }
 
         $connection = ConnectionManager::get($datasource);
         $folder = CONFIG . DS . 'schema';
         $files = scandir($folder);
-        if ($this->args) {
-            $files = [$this->args[0] .'.php'];
+        if ($this->args()) {
+            $files = [$this->args(0) .'.php'];
         }
         foreach ($files as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
@@ -94,82 +95,25 @@ class SchemaShell extends Shell
             }
         }
     }
-
-    public function dump()
-    {
-        $this->out('Schema Dump');
     
-        $datasource = 'default';
-        if (!empty($this->params['datasource'])) {
-            $datasource = $this->params['datasource'];
-        }
-        $connection = ConnectionManager::get($datasource);
-
-        
-        $dump = ["SET FOREIGN_KEY_CHECKS=0;"];
-        $records = [];
-        foreach ($connection->tables() as $table) {
-            # Create Table
-            $connection->execute("SHOW CREATE TABLE {$table}");
-            $result = $connection->fetch();
-            if (empty($result['Create Table'])) {
-                $this->status('error', $table);
-                continue;
-            }
-            $dump[] = $result['Create Table'] .';';
-
-            # Dump Records
-            $builder = new QueryBuilder($table);
-            $connection->execute("SELECT * FROM {$table}");
-            $results = $connection->fetchAll();
-            foreach ($results as $record) {
-                $sql = $builder->insert($record)
-                                ->write();
-
-                $values = $builder->getValues();
-                foreach ($values as $key => $value) {
-                    if ($value === null) {
-                        $replaceWith  = 'NULL';
-                    } elseif (is_integer($value) or is_double($value) or is_float($value) or is_numeric($value)) {
-                        $replaceWith  = $value;
-                    } else {
-                        $value = addslashes($value);
-                        $replaceWith  = "'{$value}'";
-                    }
-                    $sql = preg_replace("/\B:{$key}/", $replaceWith, $sql);
-                }
-              
-                $records[] = $sql .';';
-            }
-            $this->status('ok', sprintf('Processed %s table with %d records ', $table, count($results)));
-        }
-        
-        $result =  file_put_contents(TMP . DS . 'dump.sql', implode("\n\n", $dump) . "\n\n" . implode("\n", $records));
-        if ($result) {
-            $this->status('ok', 'Saved to tmp/dump.sql');
-        } else {
-            $this->status('error', 'Could not save to tmp/dump.sql');
-        }
-    }
     public function import()
     {
         $datasource = 'default';
-        if (!empty($this->params['datasource'])) {
-            $datasource = $this->params['datasource'];
+        if (!empty($this->params('datasource'))) {
+            $datasource = $this->params('datasource');
         }
+
         $connection = ConnectionManager::get($datasource);
 
         $default = 'schema';
-        if ($this->args) {
-            $default = $this->args[0];
+        if ($this->args()) {
+            $default = $this->args(0);
         }
         $filename = CONFIG . DS .'schema'. DS . $default . '.sql';
         
         if (!file_exists($filename)) {
-            $this->status('error', 'config/schema/'.$default. '.sql not found');
-            exit();
+            $this->error('config/schema/'.$default. '.sql not found');
         }
-
 
         $sql = preg_replace('!/\*.*?\*/!s', '', file_get_contents($filename)); // Remove comments
 

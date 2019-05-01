@@ -501,7 +501,7 @@ class Shell
     }
 
     /**
-     * Styles an error message and then exits the script
+     * Displays an error message and exits the console script
      *
      * @param string $message
      * @return void
@@ -531,13 +531,13 @@ class Shell
     }
 
     /**
-     * Wrapper for exiting the shell script
+     * Stops the current 
      *
-     * @param [type] $status
+     * @param string $status
      * @return void
      */
-    protected function stop(string $title = 'Console stopped')
+    protected function stop(string $message = 'Console stopped')
     {
-        throw new StopExecutionException($title);
+        throw new StopExecutionException($message);
     }
 }
