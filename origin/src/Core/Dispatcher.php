@@ -65,7 +65,6 @@ class Dispatcher
         if ($request->params()) {
             $application = new Application($request, $response);
     
-
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params('controller'));
@@ -74,10 +73,8 @@ class Dispatcher
             $this->controller = $this->buildController($class, $request, $response);
           
             $this->invoke($this->controller, $request->params('action'), $request->params());
-      
-            if ($this->controller->response instanceof Response) {
-                $this->controller->response->send();
-            }
+           
+            $this->controller->response->send();
           
             return $this->controller;
         }
@@ -113,15 +110,18 @@ class Dispatcher
      */
     protected function invoke(Controller $controller, string $action, array $arguments)
     {
-        $controller->startupProcess();
-       
+        $result = $controller->startupProcess();
+        if($result instanceof Response OR $controller->response->headers('Location')){
+            return $result;
+        }
+
         call_user_func_array(array($controller, $action), $arguments['args']);
      
         if ($controller->autoRender and $controller->response->ready()) {
             $controller->render();
         }
 
-        $controller->shutdownProcess();
+        return $controller->shutdownProcess();
     }
 
     /**

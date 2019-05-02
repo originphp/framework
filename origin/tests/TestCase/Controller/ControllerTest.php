@@ -267,7 +267,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $data = ['data'=>['game'=>'Dota 2']];
         $controller->render(['json'=>$data,'status'=>201]);
         $this->assertEquals(json_encode($data), $controller->response->body());
-        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('application/json', $controller->response->type());
 
 
@@ -294,7 +294,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
        
         $controller->render(['xml'=>$data,'status'=>201]);
         $this->assertEquals($expected, $controller->response->body());
-        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('application/xml', $controller->response->type());
 
         $controller = new TestsController($request, new Response());
@@ -314,7 +314,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $controller->render(['text'=>'OK','status'=>201]);
         $this->assertEquals('OK', $controller->response->body());
-        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('text/plain', $controller->response->type());
     }
 
@@ -324,7 +324,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $controller->render(['file'=>'/var/www/phpunit.xml','status'=>201]);
         $this->assertEquals(file_get_contents('/var/www/phpunit.xml'), $controller->response->body());
-        $this->assertEquals(201, $controller->response->status());
+        $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('text/xml', $controller->response->type());
     }
 
@@ -332,13 +332,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $response = $this->getMockBuilder('Origin\Controller\Response')
-           ->setMethods(['header', 'send','status','stop'])
+           ->setMethods(['header', 'send','statusCode','stop'])
            ->getMock();
 
         $controller = new Controller($request, $response);
 
         $response->expects($this->once())
-        ->method('status')
+        ->method('statusCode')
           ->with(302);
 
         $response->expects($this->once())
@@ -349,7 +349,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
            ->method('send');
 
         
-        $this->assertNull($controller->redirect(array('action' => 'view', 2048)));
+        $this->assertInstanceOf(Response::class,$controller->redirect([
+            'action' => 'view', 2048
+            ]));
     }
 
     public function testPaginate()

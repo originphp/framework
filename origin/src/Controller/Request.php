@@ -505,7 +505,11 @@ class Request
             $this->cookie = new Cookie();
         }
         if ($key === null) {
-            return $_COOKIE;
+            $decrypted = [];
+            foreach(array_keys($_COOKIE) as $key){
+                $decrypted[$key] = $this->cookie->read($key);
+            }
+            return $decrypted;
         }
         return $this->cookie->read($key);
     }

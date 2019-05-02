@@ -102,7 +102,7 @@ class AuthComponent extends Component
             return null;
         }
 
-        $this->unauthorize();
+        return $this->unauthorize();
     }
 
     /**

@@ -153,8 +153,12 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
     public function testCookie()
     {
-        $expected = $_COOKIE = ['foo'=>'PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv'];
-   
+        $_COOKIE = [
+            'foo'=>'T3JpZ2lu==.PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv'
+        ];
+        $expected = [
+            'foo' => 'This is a test'
+        ];
         $request = new MockRequest();
         $this->assertEquals($expected, $request->cookie());
         $this->assertEquals('This is a test', $request->cookie('foo'));

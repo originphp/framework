@@ -30,6 +30,8 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Redirect now returns the response object to return the object
+- Response::Status changed to statusCode
 - Added option to disable cookie encryption
 - ErrorHandlers log errors in console and debug mode
 - Queue utility now accepts dot notation names
@@ -41,6 +43,9 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Fixed test failures caused by recent changes to cookie encryption
+- Fixed issue with code still be run in integration tests after redirect
+- Reading cookies from request now decrypts whole array
 - Fixed issue with InegrationTesting and importing records. On subsequent tests imported records were not avilable.
 - Fixed PHPUnit\Framework\Exception: Argument #2 (No Value) of PHPUnit\Framework\Assert::assertContains()
 - issue with gitignore

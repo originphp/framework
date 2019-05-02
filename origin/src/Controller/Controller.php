@@ -247,15 +247,26 @@ class Controller
 
     public function startupProcess()
     {
-        $this->beforeFilter();
-        $this->componentRegistry()->call('startup');
+        $result = $this->beforeFilter();
+        if($result instanceof Response OR $this->response->headers('Location')){
+            return $this->response;
+        }
+        $result = $this->componentRegistry()->call('startup');
+        if($result instanceof Response OR $this->response->headers('Location')){
+            return $this->response;
+        }
     }
 
     public function shutdownProcess()
     {
-        $this->componentRegistry()->call('shutdown');
-        $this->afterFilter();
-
+        $result = $this->componentRegistry()->call('shutdown');
+        if($result instanceof Response OR $this->response->headers('Location')){
+            return $this->response;
+        }
+        $result = $this->afterFilter();
+        if($result instanceof Response OR $this->response->headers('Location')){
+            return $this->response;
+        }
         //# Free Mem for no longer used items
         $this->componentRegistry()->destroy();
         unset($this->componentRegistry);
@@ -351,7 +362,7 @@ class Controller
         }
  
         $options += [
-            'status' => $this->response->status(),
+            'status' => $this->response->statusCode(),
             'type' => 'html'
         ];
         $body = null;
@@ -384,7 +395,7 @@ class Controller
         }
     
         $this->response->type($options['type']);   // 'json' or application/json
-        $this->response->status($options['status']); // 200
+        $this->response->statusCode($options['status']); // 200
         $this->response->body($body); //
     }
 
@@ -440,7 +451,7 @@ class Controller
             $body = json_encode($data);
         }
         $this->response->type('json');   // 'json' or application/json
-        $this->response->status($status); // 200
+        $this->response->statusCode($status); // 200
         $this->response->body($body); //
     }
 
@@ -476,7 +487,7 @@ class Controller
             $body = $data;
         }
         $this->response->type('xml');   // 'xml' or application/xml
-        $this->response->status($status); // 200
+        $this->response->statusCode($status); // 200
         $this->response->body($body);
     }
 
@@ -492,17 +503,20 @@ class Controller
      *
      * @param string|array $url
      * @param int status code default 302
-     * @return void
+     * @return \Origin\Controller\Response
      */
     public function redirect($url, int $code = 302)
     {
         $this->autoRender = false;
         $this->beforeRedirect();
 
-        $this->response->status($code);
+        $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));
         $this->response->send();
         $this->response->stop();
+
+        // Return the response object once called
+        return $this->response; 
     }
 
     /**

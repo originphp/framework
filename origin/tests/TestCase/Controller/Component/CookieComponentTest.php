@@ -39,7 +39,7 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
     }
     public function testRead()
     {
-        $_COOKIE['foo'] = 'YzBaFBsYJ6R2WSWodtZ8pO882f+aFRoCdIXQ10ORzuI=';
+        $_COOKIE['foo'] = 'T3JpZ2lu==.YzBaFBsYJ6R2WSWodtZ8pO882f+aFRoCdIXQ10ORzuI=';
         $this->assertEquals('bar', $this->Cookie->read('foo'));
     }
     public function testDelete()

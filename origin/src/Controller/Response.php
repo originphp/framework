@@ -27,11 +27,11 @@ class Response
     protected $body = null;
 
     /**
-     * Status code to send.
+     * HTTP Status code to send.
      *
      * @var int
      */
-    protected $status = 200;
+    protected $statusCode = 200;
 
     /**
      * holds an array of headers to be sent.
@@ -89,7 +89,7 @@ class Response
      */
     public function send()
     {
-        http_response_code($this->status);
+        http_response_code($this->statusCode);
 
         $this->sendCookies();
         $this->header('Content-Type', $this->contentType);
@@ -130,26 +130,37 @@ class Response
      * Sets or gets the status code for sending.
      *
      * @param int $status
-     *
      * @return int status
      */
     public function status(int $status = null)
     {
-        if ($status === null) {
-            return $this->status;
-        }
-        $this->status = $status;
+        deprecationWarning('status has been depreciated use statusCode instead.');
+        return $this->statusCode($status);
     }
 
     /**
-     * Sets a header
+     * Sets or gets the HTTP status code for sending.
      *
+     * @param int $code
+     * @return int statusCode
+     */
+    public function statusCode(int $code = null)
+    {
+        if ($code === null) {
+            return $this->statusCode;
+        }
+        $this->statusCode = $code;
+    }
+
+    /**
+     * Sets a header. you can also pass an array of headers to set.
+     *
+     *  $response->header('HTTP/1.0 404 Not Found');
      *  $response->header('Accept-Language', 'en-us,en;q=0.5');
      *  $response->header(['Accept-Encoding'=>'gzip,deflate']);
      *
      * @param string|array $header []
      * @param mixed  $value
-     *
      * @return bool
      */
     public function header($header, $value = null)
@@ -166,13 +177,20 @@ class Response
     }
 
     /**
-     * Gets all the headers to be sent
+     * Gets all headers or a single header that will be sent
      *
-     * @return array headers
+     * @return string|null|array headers
      */
-    public function headers()
+    public function headers(string $header = null)
     {
-        return $this->headers;
+        if($header === null){
+            return $this->headers;
+        }
+
+        if(isset($this->headers[$header])){
+            return $this->headers[$header];
+        }
+        return null;
     }
 
     /**

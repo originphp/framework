@@ -66,8 +66,8 @@ class CookieTest extends \PHPUnit\Framework\TestCase
     {
         $cookie = new MockCookie();
 
-        // test cookie jar reading
-        $_COOKIE['testReadWrite'] = 'PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv';
+        // test cookie jar reading - decode cookie 
+        $_COOKIE['testReadWrite'] = 'T3JpZ2lu==.PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv';
         $this->assertEquals('This is a test', $cookie->read('testReadWrite'));
    
         $this->assertNull($cookie->read('notSet'));
