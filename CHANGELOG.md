@@ -29,6 +29,7 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Added option to disable cookie encryption
 - ErrorHandlers log errors in console and debug mode
 - Queue utility now accepts dot notation names
 - Connection manager error display
