@@ -338,7 +338,10 @@ trait IntegrationTestTrait
      */
     public function assertResponseContains(string $text)
     {
-        $body = $this->response()->body();
+        if ($this->response === null) {
+            $this->fail('No response');
+        }
+        $body = (string) $this->response()->body();
         $this->assertContains($text, $body);
     }
 
@@ -347,7 +350,10 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotContains(string $text)
     {
-        $body = $this->response()->body();
+        if ($this->response === null) {
+            $this->fail('No response');
+        }
+        $body =  (string) $this->response()->body();
         $this->assertNotContains($text, $body);
     }
 
@@ -356,7 +362,10 @@ trait IntegrationTestTrait
      */
     public function assertResponseEquals(string $expected)
     {
-        $body = $this->response()->body();
+        if ($this->response === null) {
+            $this->fail('No response');
+        }
+        $body =  (string) $this->response()->body();
         $this->assertEquals($expected, $body);
     }
 
@@ -365,7 +374,10 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotEquals(string $expected)
     {
-        $body = $this->response()->body();
+        if ($this->response === null) {
+            $this->fail('No response');
+        }
+        $body =  (string) $this->response()->body();
         $this->assertNotEquals($expected, $body);
     }
     /**
