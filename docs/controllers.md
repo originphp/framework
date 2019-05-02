@@ -264,6 +264,15 @@ class ContactsController extends AppController
 }
 ```
 
+If you don't want the values of the cookies to be encrypted, then you can disable this when writing the cookie value.
+
+```php
+$forever = 0;
+$this->Cookie->write('my_app','some_value',$forever,[
+    'encrypt'=>false
+    ]);
+```
+
 You can also delete all cookies using the `destroy` method.
 
 Another way to work with cookies is to use the request and response objects. You can get cookie values from the `request` object and set them on the `response` object.
@@ -276,7 +285,7 @@ $this->response->cookie('key','value',strtotime('+7 days'));
 $this->response->cookie('keyToDelete','',strtotime('-60 minutes')); // to delete
 ```
 
-NOTE: When you use the response for writing cookies the values wont be available for reading until the next request, since they are only sent after everything has been rendered to the screen.
+NOTE: When writing cookies the values wont be available for reading until the next request, since they are only sent after everything has been rendered to the screen.
 
 ## Rendering Views
 
