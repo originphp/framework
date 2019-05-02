@@ -24,6 +24,13 @@ use Origin\Utility\Security;
 class Cookie
 {
     /**
+     * Encrypted cookie values will start with this. It is base64 encoded string
+     * with a . appended to it. Originally this was an encrypted string but it was long. We
+     * just need an unique identifier. enc:1
+     */
+    const prefix =  'T3JpZ2lu==.';
+
+    /**
      * Reads a value of a cookie
      *
      * @param string $name
@@ -46,7 +53,7 @@ class Cookie
      * @param string $key
      * @param mixed $value
      * @param integer $expire unix timestamp
-     * @param array $options (path|domain|secure|httpOnly)
+     * @param array $options (encrypt|path|domain|secure|httpOnly)
      * @return void
      */
     public function write(string $name, $value, int $expire=0, array $options=[])
@@ -56,9 +63,11 @@ class Cookie
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
+            'encrypt' => true
         ];
+    
         extract($options);
-        $value = $this->pack($value);
+        $value = $this->pack($value, $options['encrypt']);
         $this->setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
@@ -118,10 +127,13 @@ class Cookie
      * @param mixed $value
      * @return string
      */
-    protected function pack($value)
+    protected function pack($value, $encrypt=true)
     {
         $value = json_encode($value);
-        $value = base64_encode(Security::encrypt($value));
+        if ($encrypt) {
+            $value = self::prefix . base64_encode(Security::encrypt($value));
+        }
+       
         return $value;
     }
 
@@ -133,7 +145,11 @@ class Cookie
      */
     protected function unpack(string $value)
     {
-        $value = Security::decrypt(base64_decode($value));
+        $length = strlen(self::prefix);
+        if (substr($value, 0, $length) === self::prefix) {
+            $value = substr($value, $length);
+            $value = Security::decrypt(base64_decode($value));
+        }
         return json_decode($value);
     }
 }

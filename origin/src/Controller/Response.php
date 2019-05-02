@@ -221,7 +221,7 @@ class Response
      * @param string $name
      * @param mixed $value
      * @param integer $expire
-     * @param array $options setcookie params: path,domain,secure,httpOnly
+     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return mixed
      */
     public function cookie(string $name, $value = null, int $expire=0, array $options = [])
@@ -240,7 +240,8 @@ class Response
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => $expire
+            'expire' => $expire,
+            'encrypt' => true
         ];
         
         $this->cookies[$name] = $options;
@@ -320,7 +321,7 @@ class Response
     {
         $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {
-            $cookie->write($name, $options['value'], $options['expire'], [$options['path'], $options['domain'], $options['secure'], $options['httpOnly']]);
+            $cookie->write($name, $options['value'], $options['expire'], $options);
         }
     }
 }
