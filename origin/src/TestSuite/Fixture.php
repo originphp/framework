@@ -33,7 +33,7 @@ class Fixture
     /**
      * The table name
      *
-     * @var [type]
+     * @var string
      */
     public $table = null;
 
@@ -99,7 +99,7 @@ class Fixture
         $defaults = ['datasource'=>'default','model'=>null,'table'=>null,'records'=>false];
 
         $options = array_merge($defaults, $this->import);
-
+     
         // Load information from model is specificied
         if ($options['model']) {
             $className = Resolver::className($options['model'], 'Model');
@@ -118,22 +118,19 @@ class Fixture
 
         $connection = ConnectionManager::get($options['datasource']);
         $schema = $connection->schema($options['table']);
-        $records = [];
+        
+        /**
+         * Imports records
+         */
         if ($options['records']) {
             $connection->execute('SELECT * from ' . $options['table']);
-            $records = $connection->fetchAll();
+            $this->records = $connection->fetchAll();
         }
       
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->createTable($this->table, $schema);
         $result = $connection->execute($sql);
-
-        if ($result) {
-            foreach ($records as $record) {
-                $connection->insert($options['table'], $record);
-            }
-        }
-
+          
         return $result;
     }
 
@@ -174,7 +171,6 @@ class Fixture
     public function drop()
     {
         $connection = ConnectionManager::get($this->datasource);
-
         return $connection->execute("DROP TABLE IF EXISTS {$this->table}");
     }
 
@@ -186,7 +182,6 @@ class Fixture
     public function truncate()
     {
         $connection = ConnectionManager::get($this->datasource);
-
         return $connection->execute("TRUNCATE {$this->table}");
     }
 }

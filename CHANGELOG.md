@@ -26,6 +26,7 @@ Delete tag:   git tag -d <tag_name>
 - Added Dom Utility which extends Dom to add javascript style selectors.
 
 ### Removed
+- Removed IntegrationTesting fails which were duplicated since refectoring
 - Removed logger helper function
 
 ### Changed
@@ -40,6 +41,8 @@ elsewhere later.
 - Improved documentation
 
 ### Fixed
+- Fixed issue with InegrationTesting and importing records. On subsequent tests imported records were not avilable.
+- Fixed PHPUnit\Framework\Exception: Argument #2 (No Value) of PHPUnit\Framework\Assert::assertContains()
 - issue with gitignore
 - Entities from find had all fields marked as modified. added markClean
 - Issue wtih file download

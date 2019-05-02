@@ -327,10 +327,7 @@ trait IntegrationTestTrait
      */
     public function assertResponseCode(int $code)
     {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
-        $status = $this->response->status();
+        $status = $this->response()->status();
         $this->assertEquals($code, $status, sprintf('Response code was %s', $code));
     }
     /**
@@ -338,9 +335,6 @@ trait IntegrationTestTrait
      */
     public function assertResponseContains(string $text)
     {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
         $body = (string) $this->response()->body();
         $this->assertContains($text, $body);
     }
@@ -350,9 +344,6 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotContains(string $text)
     {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
         $body =  (string) $this->response()->body();
         $this->assertNotContains($text, $body);
     }
@@ -362,9 +353,6 @@ trait IntegrationTestTrait
      */
     public function assertResponseEquals(string $expected)
     {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
         $body =  (string) $this->response()->body();
         $this->assertEquals($expected, $body);
     }
@@ -374,9 +362,6 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotEquals(string $expected)
     {
-        if ($this->response === null) {
-            $this->fail('No response');
-        }
         $body =  (string) $this->response()->body();
         $this->assertNotEquals($expected, $body);
     }
@@ -388,14 +373,14 @@ trait IntegrationTestTrait
     public function assertRedirect($url = null)
     {
         $headers = $this->response()->headers();
-        $this->assertArrayHasKey('Location', $headers);
+
+        $this->assertArrayHasKey('Location', $headers,'Location header not set');
 
         if ($url) {
             $this->assertEquals(Router::url($url), $headers['Location']);
         }
     }
 
-    
     /**
      * Asserts that the location header is empty
      */
