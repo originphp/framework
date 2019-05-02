@@ -62,22 +62,33 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB;
 ```
 
-In the above we created 3 fields. From the model we will create a new entity object like this
+In the above we created 3 fields. 
+
+To the create the entity object you can do so like this:
+
+```php
+    $product = $this->Product->new([
+        'name'=>'X500',
+        'description'=>'The latest model, with awesome new features.',
+        'catalog'= [
+            'name' => 'X Series'
+        ]
+        ]);
+
+```
+
+You can also do it this way, the difference is this below method does not marshal the data, it sets the data directly on the object.
 
 ```php
     $product = $this->Product->new();
     $product->name = 'X500';
     $product->description = 'The latest model, with awesome new features.';
+    
+    $catalog = $this->Product->Catalog->new();
+    $catalog->name = 'X Series';
+    $product->catalog = $catalog;
 ```
 
-Which is the same like this
-```php
-    $product = $this->Product->new([
-        'name'=>'X500',
-        'description'=>'The latest model, with awesome new features.']
-        );
-
-```
 See the [Entities guide](models-entities.md) for information.
 
 ## Using a different table name
