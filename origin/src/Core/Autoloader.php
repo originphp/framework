@@ -19,7 +19,7 @@
  *
  *  or get a singleton instance
  *
- *  $autoloader = Autoloader::getInstance();
+ *  $autoloader = Autoloader::instance();
  *  $autoloader->directory(ROOT);  // this sets the project folder
  *
  * Tell the Autoloader where to find files for namespaces that you will use.
@@ -65,7 +65,7 @@ class Autoloader
      *
      * @return Autoloader
      */
-    public static function getInstance()
+    public static function instance()
     {
         if (static::$instance === null) {
             static::$instance = new Autoloader();

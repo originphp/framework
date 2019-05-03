@@ -1,7 +1,7 @@
 <?php
 use Origin\Core\Autoloader;
 
-$autoloader = Autoloader::getInstance();
+$autoloader = Autoloader::instance();
 $autoloader->directory(ROOT);
 
 $namespaces = [

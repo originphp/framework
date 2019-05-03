@@ -89,7 +89,7 @@ class Plugin
      */
     protected static function autoload(string $plugin)
     {
-        $autoloader = Autoloader::getInstance();
+        $autoloader = Autoloader::instance();
         $options = static::$loaded[$plugin];
         $pluginPath = str_replace(ROOT .DS, '', $options['path']);
         $autoloader->addNamespaces([

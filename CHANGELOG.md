@@ -30,6 +30,7 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Autoloader/Plugin getInstance to instance
 - Redirect now returns the response object to return the object
 - Response::Status changed to statusCode
 - Added option to disable cookie encryption
