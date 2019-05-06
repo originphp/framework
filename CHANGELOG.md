@@ -32,6 +32,8 @@ Delete tag:   git tag -d <tag_name>
 - Removed logger helper function
 
 ### Changed
+- Changed Generate Plugin to work with commands and options parsing.
+- ConsoleException now extends StopExecutionException to work with console testing
 - Autoloader/Plugin getInstance to instance
 - Redirect now returns the response object to return the object
 - Response::Status changed to statusCode

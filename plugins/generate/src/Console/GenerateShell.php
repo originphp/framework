@@ -16,7 +16,7 @@ namespace Generate\Console;
 
 use Origin\Console\Shell;
 use Origin\Core\Inflector;
-use Origin\Exception\Exception; // @todo a different exception?
+use Origin\Console\Exception\ConsoleException; // @todo a different exception?
 use Generate\Utils\GenerateTemplater;
 use Origin\Utility\Xml;
 use Origin\Exception\InvalidArgumentException;
@@ -58,36 +58,77 @@ class GenerateShell extends Shell
             return;
         }
         $this->introspectDatabase();
-        $this->addOption('force');
+        $this->addOption('force',['help'=>'Will overwrite files and directories without prompting']);
+        
+        $this->addCommand('all',[
+            'help' => 'generates code model,view,controller',
+            'arguments' => [
+                'model' => ['help'=>'camelcase model name e.g. Contact']
+            ]
+        ]);
+        $this->addCommand('model',[
+            'help' => 'generates code for a model. e.g Contact',
+            'arguments' => [
+                'name' => [
+                    'help'=>'camelcase model name e.g. Contact',
+                    'required' => true
+                    ]
+            ]
+        ]);
+        $this->addCommand('controller',[
+            'help' => 'generates code for a controller. e.g Contacts',
+            'arguments' => [
+                'name' => [
+                    'help'=>'camelcase plural controller name e.g. Contacts',
+                    'required' => true
+                    ]
+            ]
+        ]);
+        $this->addCommand('view',[
+            'help' => 'generates view code for a controller. e.g Contacts',
+            'arguments' => [
+                'name' => [
+                    'help'=>'camelcase plural controller name e.g. Contacts',
+                    'required' => true
+                    ]
+            ]
+        ]);
+        $this->addCommand('plugin',[
+            'help' => 'generates base plugin code and structure. e.g. ContactManager',
+            'arguments' => [
+                'name' => [
+                    'help'=>'plugin name e.g. ContactManager',
+                    'required' => true
+                    ]
+            ]
+        ]);
+        $this->addCommand('console',[
+            'help' => 'generates a console app. e.g. Cron',
+            'arguments' => [
+                'name' => [
+                    'help'=>'shell name e.g. Cron',
+                    'required' => true
+                    ]
+            ]
+        ]);
+        $this->addCommand('middleware',[
+            'help' => 'generates a base middleware. e.g. RequestModifier',
+            'arguments' => [
+                'name' => [
+                    'help'=>'middleware name e.g. RequestModifier',
+                    'required' => true
+                    ]
+            ]
+        ]);
     }
-
-    public function help()
-    {
-        $this->out('generate all');
-        $this->out('generate all Contact');
-        $this->out('generate model Contact');
-        $this->out('generate controller Contacts');
-        $this->out('generate view Contacts');
-        $this->out('generate plugin ContactManager');
-        $this->out('generate shell Contacts');
-        $this->out('generate middleware RequestModifier');
-
-        $this->out('');
-        $this->out('You can use --force to not prompt');
-        //$this->out('generate test Lead'); /**@todo test */
-    }
-
     public function plugin()
     {
-        if (empty($this->args)) {
-            throw new Exception('You must speficify a plugin name');
-        }
         $plugin = $this->args(0);
         $underscored = Inflector::underscore($plugin);
         
         $path = PLUGINS . DS. $underscored;
         if (file_exists($path)) {
-            throw new Exception(sprintf('Plugin folder %s already exists', $underscored));
+            $this->error(sprintf('Plugin folder %s already exists', $underscored));
         }
         $folders = [
             $path,
@@ -106,7 +147,7 @@ class GenerateShell extends Shell
         ];
         foreach ($folders as $folder) {
             if (!mkdir($folder)) {
-                throw new Exception('Error creating folder');
+                throw new ConsoleException('Error creating folder');
             }
         }
         $data = [
@@ -117,19 +158,19 @@ class GenerateShell extends Shell
         $Templater = new GenerateTemplater();
         $result = $Templater->generate('plugin/routes', $data);
         if (!file_put_contents($path. DS . 'src' . DS .'config' . DS .'routes.php', $result)) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
         $result = $Templater->generate('plugin/controller', $data);
         if (!file_put_contents($path. DS . 'src' . DS .'Controller' . DS . $data['plugin']. 'AppController.php', $result)) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
         $result = $Templater->generate('plugin/model', $data);
         if (!file_put_contents($path. DS . 'src' . DS .'Model' . DS . $data['plugin']. 'AppModel.php', $result)) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
 
         if (!file_put_contents($path . DS . 'phpunit.xml', $this->phpunitXml())) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
 
         $this->status('ok',sprintf('%s plugin', $plugin));
@@ -201,7 +242,7 @@ class GenerateShell extends Shell
                 $this->model($model);
                 $this->view($controller);
             } else {
-                throw new Exception(sprintf('Invalid model name %s', $model));
+                throw new ConsoleException(sprintf('Invalid model name %s', $model));
             }
         }
     }
@@ -224,9 +265,11 @@ class GenerateShell extends Shell
             return ;
         }
         $options = $this->getAvailable(true);
-        
+        $model = Inflector::singularize($controller);
+
         if (in_array($controller, $options) === false) {
-            throw new Exception(sprintf('Invalid controller %s', $controller));
+            $table = Inflector::tableize($model);
+            $this->error(sprintf('Invalid controller %s',$controller),"Check that the table '{$table}' exists");
         }
         $controller =$controller;
 
@@ -238,7 +281,6 @@ class GenerateShell extends Shell
             }
         }
 
-        $model = Inflector::singularize($controller);
         $data = $this->getData($model);
        
         $belongsTo = $this->meta['associations'][$model]['belongsTo'];
@@ -267,7 +309,7 @@ class GenerateShell extends Shell
         $Templater = new GenerateTemplater();
         $result = $Templater->generate('controller', $data);
         if (!file_put_contents($filename, $result)) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
         $this->status('ok',sprintf('%s controller', $controller));
     }
@@ -284,7 +326,8 @@ class GenerateShell extends Shell
         $options = $this->getAvailable();
         
         if (in_array($model, $options) === false) {
-            throw new Exception(sprintf('Invalid model %s', $this->args(0)));
+            $table = Inflector::tableize($this->args(0));
+            $this->error(sprintf('Invalid model %s', $this->args(0)),"Check that the table '{$table}' exists");
         }
 
         $filename = SRC . DS . 'Model' .DS .$model .'.php';
@@ -329,7 +372,7 @@ class GenerateShell extends Shell
         $Templater = new GenerateTemplater();
         $result = $Templater->generate('model', $data);
         if (!file_put_contents($filename, $result)) {
-            throw new Exception('Error writing file');
+            throw new ConsoleException('Error writing file');
         }
         $this->status('ok',sprintf('%s model', $model));
     }
@@ -345,9 +388,10 @@ class GenerateShell extends Shell
             return ;
         }
         $options = $this->getAvailable(true);
-        
+        $model = Inflector::singularize($controller);
         if (in_array($controller, $options) === false) {
-            throw new Exception(sprintf('Invalid controller %s', $controller));
+            $table = Inflector::tableize($model);
+            $this->error(sprintf('Invalid controller %s',$controller),"Check that the table '{$table}' exists");
         }
 
         $folder = SRC . DS . 'View' . DS . $controller ;
@@ -360,7 +404,7 @@ class GenerateShell extends Shell
             mkdir($folder, 0775);
         }
 
-        $model = Inflector::singularize($controller);
+     
         $data = $this->getData($model);
     
         $data += [
@@ -386,7 +430,7 @@ class GenerateShell extends Shell
             }
    
             if (!file_put_contents($folder . DS . $view . '.ctp', $result)) {
-                throw new Exception('Error writing file');
+                throw new ConsoleException('Error writing file');
             }
         }
         $this->status('ok',sprintf('%s views', $controller));

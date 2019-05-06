@@ -14,8 +14,8 @@
 
 namespace Origin\Console\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Console\Exception\StopExecutionException;
 
-class ConsoleException extends Exception
+class ConsoleException extends StopExecutionException
 {
 }
