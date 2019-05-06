@@ -50,7 +50,7 @@ You can get additional arguments by checking out the args variable in the shell.
 print_r($this->args()); // or use pr() 
 ```
 
-## Display Help
+## Displaying Help for your Command
 
 To display help for your commands, this is displayed when no arguments are called from the command line, configure this
 in the initialize method.
@@ -128,19 +128,55 @@ $connection = $this->params('datasource');
 
 ## Displaying Help
 
-When you create a console, in the initialize setup the commands which people can run this will then generate help
-when it is asked. 
+When you create a console app, in the `initialize` method setup the commands which people can run, this will then generate help when it is asked. 
 
 Note: If no commands are setup in the shell using `addCommand`, then any public method can be called. However, if you setup commands, then only those commands can be called.
 
 ```php
-    public function initialize()
-    {
-        $this->addCommand('generate', ['help'=>'Generates the config\schema\\table.php file or file']);
-        $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
-        $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
-        $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
-    }
+public function initialize()
+{
+    $this->addCommand('generate', ['help'=>'Generates the config\schema\\table.php file or file']);
+    $this->addCommand('create', ['help'=>'Creates the tables using the schema .php file or files']);
+    $this->addCommand('import', ['help'=>'Imports raw SQL from file or files']);
+    $this->addOption('datasource', ['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
+}
+```
+
+## Commands Advanced
+
+When you need to create `options` or `arguments` for specific commands you can do so when adding a command.
+
+### Command Arguments
+
+Add the arguments key to the `addCommand` options, if the argument is required set a `required` key with `true`.
+
+```php
+    $this->addCommand('say',[
+        'help' => 'says a word',
+        'arguments' => [
+            'word' => [
+                'help'=>'the word to say',
+                'required'=>true
+                ]
+        ]
+    ]);
+```
+
+### Command Options
+
+To create `options` for specific commands then add an array of options.
+
+```php
+    $this->addCommand('generate',[
+            'help' => 'generates the code',
+            'options' => [
+                'datasource' => [
+                    'help'=>'the datasource to use',
+                    'short' => 'ds',
+                    'value' => 'datasource'
+                    ]
+            ]
+        ]);
 ```
 
 ## Callbacks

@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added
+- Added Console command specific help, arguments and options.
 - YAML utility
 - GeneratePlugin now generates middleware and shells
 - Shell status method (StatusTask being depreciated)

@@ -82,7 +82,7 @@ class ConsoleOutput
         'success' => ['text' => 'white','background'=>'lightBlue'],
         'comment' => ['text' => 'white'], // optional text
         'prompt' => ['text' => 'blue'],
-        'green' => ['text' => 'green'],
+        'green' => ['text' => 'lightGreen'], // linux green
         'blue' => ['text' => 'blue'],
         'yellow' => ['text' => 'yellow'],
         'red' => ['text' => 'red'],

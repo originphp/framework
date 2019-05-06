@@ -24,7 +24,7 @@ use Origin\Console\Task\TaskRegistry;
 use Origin\Model\ModelRegistry;
 use ReflectionClass;
 use ReflectionMethod;
-
+use Origin\Core\Inflector;
 use Origin\Model\Exception\MissingModelException;
 
 class Shell
@@ -83,7 +83,7 @@ class Shell
      */
 
     public $options = [
-        // 'help'=>['name'=>'help','help'=>'Displays this help.','short'=>'h']
+        'help'=>['name'=>'help','help'=>'Displays this help message','short'=>'h']
     ];
 
     /**
@@ -147,12 +147,52 @@ class Shell
         if ($name !== 'main' and empty($this->commands) === false and !isset($this->commands[$name])) {
             return false;
         }
+        /**
+         * Generate help for command
+         */
+        if($this->params('help')){
+            $this->displayCommandHelp($name);
+            return true; // return false will trigger help
+        }
+
+        /**
+         * Check required arguments
+         */
+        $requiredArguments = $this->getRequiredArguments($name);
+        
+        if($requiredArguments){
+            $argumentsRequired = count($requiredArguments);
+            if($argumentsRequired != count($this->args())){
+                $this->displayCommandHelp($name);
+                 return true; // return false will trigger help
+            }
+        }
 
         $this->startupProcess();
         $this->{$name}();
         $this->shutdownProcess();
 
         return true;
+    }
+
+    /**
+     * Returns the required arguments for a command
+     *
+     * @param string $command
+     * @return array
+     */
+    private function getRequiredArguments(string $command) : array
+    {
+        $requiredArgs = [];
+        if(isset($this->commands[$command]['arguments'])){
+            foreach($this->commands[$command]['arguments'] as $arg => $argConfig){
+               if(!empty($argConfig['required'])){
+                   $argConfig += ['name' => $arg,'help'=>''];
+                   $requiredArgs[$argConfig['name']] = $argConfig['help'];
+               }
+            }
+        }
+        return $requiredArgs;
     }
 
     /**
@@ -167,6 +207,7 @@ class Shell
      */
     protected function parseArguments(array $arguments)
     {
+       
         $map = [];
 
         // Create map for shorts
@@ -225,7 +266,8 @@ class Shell
      * @return void
      */
     public function initialize()
-    { }
+    {
+    }
 
     /**
      * Called before the shell method is called
@@ -233,7 +275,8 @@ class Shell
      * @return void
      */
     public function startup()
-    { }
+    {
+    }
 
     /**
      * Called after the shell method is called
@@ -241,7 +284,8 @@ class Shell
      * @return void
      */
     public function shutdown()
-    { }
+    {
+    }
 
     /**
      * Outputs to the console text
@@ -416,7 +460,7 @@ class Shell
     }
 
     /**
-     * Adds an available option
+     * Adds an available option or flag
      *
      * @param string $name
      * @param array $options Options include help:help text short: short option e.g -ds
@@ -437,43 +481,112 @@ class Shell
      */
     public function addCommand(string $name, array $options = [])
     {
-        $options += ['name' => $name, 'help' => null];
+        $options += ['name' => $name, 'help' => null,'options'=>[],'arguments'=>[]];
         $this->commands[$name] =  $options;
+    }
+
+    /**
+     * Displays the options part of the help
+     *
+     * @param array $options
+     * @return void
+     */
+    protected function displayOptions(array $options){
+        $_options = [];
+        $this->out('<info>Options:</info>');
+        foreach ($options as $option) {
+            $value = '';
+            if (!empty($option['value'])) {
+                $value  = '=' . $option['value'];
+            }
+            $text = '--' . $option['name'] . $value;
+
+            if ($option['short']) {
+                $text = '-' . $option['short'] . ', ' . $text;
+            }
+
+            $_options['<green>' . $text .'</green>'] = '<white>' . $option['help'] . '</white>';
+        }
+        $this->plotTable($_options);
+        $this->out('');
+    }
+
+    protected function displayCommandHelp(string $name){
+        $config = $this->commands[$name];
+        $shell = Inflector::underscore($this->name);
+        
+        $this->out("<info>Usage:</info>");
+        $arguments = $this->getRequiredArguments($name);
+        if($arguments){
+            $arg_string = implode(' ',array_keys($arguments));
+            $this->out("  <white>{$shell} {$name} {$arg_string} [options]</white>");
+        }
+        else{
+            $this->out("  <white>{$shell} {$name} [options]</white>");
+        }
+       
+       
+        $this->out('');
+        
+        if (!empty($config['description'])) {
+            $this->out("<white>{$config['description']}</white>");
+            $this->out('');
+        }
+
+        $arguments = [];
+        if(!empty($config['arguments'])){
+            $this->out('<info>Arguments:</info>');
+            foreach($config['arguments'] as $arg => $argConfig){
+                if(is_string($arg) AND is_array($argConfig)){
+                    $argConfig += ['name'=>$arg,'help'=>'','required'=>false];
+                    $arguments['<green>' . $argConfig['name'] .'</green>'] = '<white>' . $argConfig['help'] . '</white>';
+                }
+              
+            }
+            $this->plotTable($arguments);
+            $this->out('');
+        }
+
+        if (!empty($config['options'])) {
+            $options = [];
+            foreach($config['options'] as $optionName => $optionConfig){
+                if(is_string($optionName) AND is_array($optionConfig)){
+                    $options[] = array_merge(['name'=>$optionName], $optionConfig);
+                }
+            }
+            $this->displayOptions( $options);
+        }
+
+      
     }
 
     public function help()
     {
-        if ($this->description) {
-            $this->out($this->description);
-            $this->out('');
+        
+        $shell = Inflector::underscore($this->name);
+
+        $this->out("<info>Usage:</info>");
+        if(method_exists($this,'main')){
+            $this->out("  <white>{$shell} [options] [arguments]</white>");
         }
-        $this->out('<info>Usage:</info>');
-        $this->out('  command [options] [arguments]');
+        $this->out("  <white>{$shell} command [options] [arguments]</white>");
+      
         $this->out('');
-        if ($this->options) {
-            $options = [];
-            $this->out('<info>Options:</info>');
-            foreach ($this->options as $option) {
-                $value = '';
-                if (!empty($option['value'])) {
-                    $value  = '=' . $option['value'];
-                }
-                $text = '--' . $option['name'] . $value;
 
-                if ($option['short']) {
-                    $text = '-' . $option['short'] . ', ' . $text;
-                }
-
-                $options[$text] = $option['help'];
-            }
-            $this->plotTable($options);
+        if ($this->description) {
+            $this->out("<white>{$this->description}</white>");
             $this->out('');
         }
+
+        if ($this->options) {
+           $this->displayOptions($this->options);
+        }
+
         if ($this->commands) {
-            $this->out('<info>Available Commands:</info>');
+            $this->out('<info>Commands:</info>');
             $options = [];
             foreach ($this->commands as $command) {
-                $options[$command['name']] = $command['help'];
+                $options['<green>'.$command['name'].'</green>'] = '<white>'.$command['help'].'</white>';
             }
             $this->plotTable($options);
             $this->out('');
@@ -519,19 +632,19 @@ class Shell
      * @param string $message
      * @return void
      */
-    public function status(string $code,string $message)
+    public function status(string $code, string $message)
     {
-        if(isset($this->statusCodes[$code])){
+        if (isset($this->statusCodes[$code])) {
             $color = $this->statusCodes[$code];
             $status = strtoupper($code);
             $this->out("<white>[</white> <{$color}>{$status}</{$color}> <white>] {$message}</white>");
             return;
         }
-       throw new ConsoleException(sprintf('Unkown status %s',$code));
+        throw new ConsoleException(sprintf('Unkown status %s', $code));
     }
 
     /**
-     * Stops the current 
+     * Stops the current
      *
      * @param string $status
      * @return void

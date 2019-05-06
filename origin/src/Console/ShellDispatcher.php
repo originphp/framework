@@ -186,7 +186,10 @@ class ShellDispatcher
         if ($method === null and method_exists($this->shell, 'main')) {
             $method = 'main';
         }
-   
+        
+        /**
+         * Show help and list of subcommands available
+         */
         if ($method === null or $method ==='--help' or $method ==='-h') {
             $method = 'help';
         }
