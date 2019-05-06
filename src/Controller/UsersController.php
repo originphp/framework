@@ -12,7 +12,9 @@ class UsersController extends AppController
 
     public function initialize()
     {
-        $this->loadComponent('Auth'); // Load Authentication - placed here so we can uninstall
+        $this->loadComponent('Auth',[
+            'loginRedirect' => '/bookmarks'
+            ]); // Load Authentication - placed here so we can uninstall
         parent::initialize();
     }
 
