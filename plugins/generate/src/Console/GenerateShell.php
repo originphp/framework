@@ -50,6 +50,14 @@ class GenerateShell extends Shell
         $this->Generate->introspectDatabase();
         $this->meta = $this->Generate->build();
     }
+
+    protected function checkArgument(string $argument){
+        if(preg_match('/([A-Z]+[a-z0-9]+)+/',$argument)){
+            return true;
+        }
+        $this->error("Invalid argument","{$argument} is not camelcased");
+    }
+
     public function initialize()
     {
         if (!file_exists(CONFIG . DS . 'database.php')) {
@@ -70,8 +78,7 @@ class GenerateShell extends Shell
             'help' => 'generates code for a model. e.g Contact',
             'arguments' => [
                 'name' => [
-                    'help'=>'camelcase model name e.g. Contact',
-                    'required' => true
+                    'help'=>'camelcase model name e.g. Contact'
                     ]
             ]
         ]);
@@ -79,8 +86,7 @@ class GenerateShell extends Shell
             'help' => 'generates code for a controller. e.g Contacts',
             'arguments' => [
                 'name' => [
-                    'help'=>'camelcase plural controller name e.g. Contacts',
-                    'required' => true
+                    'help'=>'camelcase plural controller name e.g. Contacts'
                     ]
             ]
         ]);
@@ -88,8 +94,7 @@ class GenerateShell extends Shell
             'help' => 'generates view code for a controller. e.g Contacts',
             'arguments' => [
                 'name' => [
-                    'help'=>'camelcase plural controller name e.g. Contacts',
-                    'required' => true
+                    'help'=>'camelcase plural controller name e.g. Contacts'
                     ]
             ]
         ]);
@@ -102,8 +107,8 @@ class GenerateShell extends Shell
                     ]
             ]
         ]);
-        $this->addCommand('console',[
-            'help' => 'generates a console app. e.g. Cron',
+        $this->addCommand('shell',[
+            'help' => 'generates a console app shell. e.g. Cron',
             'arguments' => [
                 'name' => [
                     'help'=>'shell name e.g. Cron',
@@ -124,6 +129,7 @@ class GenerateShell extends Shell
     public function plugin()
     {
         $plugin = $this->args(0);
+        $this->checkArgument($plugin);
         $underscored = Inflector::underscore($plugin);
         
         $path = PLUGINS . DS. $underscored;
@@ -264,6 +270,8 @@ class GenerateShell extends Shell
             $this->showAvailable(true);
             return ;
         }
+        $this->checkArgument($controller);
+
         $options = $this->getAvailable(true);
         $model = Inflector::singularize($controller);
 
@@ -323,6 +331,8 @@ class GenerateShell extends Shell
             $this->showAvailable();
             return ;
         }
+        $this->checkArgument($model);
+
         $options = $this->getAvailable();
         
         if (in_array($model, $options) === false) {
@@ -387,6 +397,7 @@ class GenerateShell extends Shell
             $this->showAvailable(true);
             return ;
         }
+        $this->checkArgument($controller);
         $options = $this->getAvailable(true);
         $model = Inflector::singularize($controller);
         if (in_array($controller, $options) === false) {
@@ -444,7 +455,7 @@ class GenerateShell extends Shell
         if($middleware === null){
             $this->error('You must provide a name for the middleware');
         }
-       
+        $this->checkArgument($middleware);
         $filename = SRC . "/Middleware/{$middleware}Middleware.php";
         if (file_exists($filename)) {
             $result = $this->in(sprintf('%sMiddleware already exist, overwrite?', $middleware), ['y','n'], 'n');
@@ -478,7 +489,7 @@ class GenerateShell extends Shell
         if($shell === null){
             $this->error('You must provide a name for the shell');
         }
-       
+        $this->checkArgument($shell);
         $filename = SRC . "/Console/{$shell}Shell.php";
         if (file_exists($filename)) {
             $result = $this->in(sprintf('%sShell already exist, overwrite?', $shell), ['y','n'], 'n');
