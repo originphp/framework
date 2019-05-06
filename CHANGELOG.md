@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added
+- YAML utility
 - GeneratePlugin now generates middleware and shells
 - Shell status method (StatusTask being depreciated)
 - Request referer method

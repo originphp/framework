@@ -121,7 +121,7 @@ EOT;
                 ]
             ],
             'volumes' => [
-                'mysql' => null
+                'mysql' => 'abc' // leaving this blank is a problem. works with docker. but cant parse it
             ]
         ];
         $yaml = Yaml::fromArray($data);
@@ -134,10 +134,23 @@ services:
   memcached: 
     image: memcached
 volumes: 
-  mysql:
+  mysql: abc
 EOT;
 $this->assertContains($expected,$yaml);
     }
+
+    public function testParseIndexedList(){
+$yaml = <<< EOT
+---
+# List of fruits
+-
+  name: james
+-
+  name: amy
+EOT;
+            $expected = [['name'=>'james'],['name'=>'amy']];
+                $this->assertEquals($expected,Yaml::toArray($yaml));
+            }
 
     public function testParseList(){
 $yaml = <<< EOT
@@ -204,19 +217,6 @@ EOT;
 
     }
 
-    public function testParseAnchor(){
-$yaml = <<< EOT
-bill_to: &1000
-    name: jon
-ship_to: *1000
-EOT;
-        $expected = [
-            'bill_to' => ['name'=>'jon'],
-            'ship_to' => ['name'=>'jon']
-        ];
-        $this->assertSame($expected,Yaml::toArray($yaml)); 
-    }
-
     public function testComplicated(){
 $yaml = <<< EOT
 ---
@@ -242,5 +242,22 @@ description: |
 EOT;
                 $expected = '{"name":"James Anderson","job":"PHP developer","active":true,"fruits":["Apple","Banana"],"phones":{"home":"0207 123 4567","mobile":"123 456 567"},"addresses":[{"street":"2 Some road","city":"London"},{"street":"5 Some avenue","city":"Manchester"}],"description":"Lorem ipsum dolor sit amet,\nea eum nihil sapientem, timeam\nconstituto id per."}';
                 $this->assertEquals($expected,json_encode(Yaml::toArray($yaml)));     
+    }
+
+    public function testParseChildNumericalList()
+    {
+$yaml = <<< EOT
+# Employee record
+name: James
+addresses:
+    -
+      city: London
+    -
+      city: Liverpool
+EOT;
+                $expected =   [['city'=>'London'],['city'=>'Liverpool']];
+                $result = Yaml::toArray($yaml);
+                 
+                $this->assertSame($expected,$result['addresses']); 
     }
 }

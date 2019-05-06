@@ -13,10 +13,12 @@
  */
 
 /**
-* This utility is for reading and writing YAML files, it is does not cover the complete specification. 
-* The goal of this utility is to provide basic YAML functionality to read and write configuration files and data from the 
+* This utility is for reading and writing YAML files, note. it is does not cover the complete specification.
+* @see https://yaml.org/refcard.html
+*
+* The goal of this utility is to provide basic YAML functionality to read and write configuration files and data from the
 * database which can be read or edited in a user friendly way.
-* 
+*
 * It supports:
 * - scalar values
 * - comments
@@ -24,19 +26,23 @@
 * - dictonaries
 * - dictonary lists
 * - scalar blocks (plain, literal and folded)
-* - anchors (for parsing): this is added for reading an external file but It bloats the code.
-* 
+*
 * It currently does not support:
-* - multiline quoted scalars example 
+* - multiline quoted scalars example
 * quoted: "So does this
-* quoted scalar." # note a string with \n or \r\n works fine (use literal | or folded >)
+* quoted scalar."
+* However use description a string with \n or \r\n works fine (use literal | or folded >)
 * - multiple documents in a stream @see https://yaml.org/spec/current.html#id2502724
+* - Surround in-line series branch. e.g [ ]
+* - Surround in-line keyed branch. { }
 *
 * Known issues: parsing a docker compose file, the volumes for mysql-data is the value.
 * volumes:
 * mysql-data:
+* @see https://yaml.org/refcard.html
  */
 namespace Origin\Utility;
+
 use Origin\Utility\Exception\YamlException;
 
 class YamlParser
@@ -66,13 +72,6 @@ class YamlParser
      * @var integer
      */
     protected $i = 0;
-
-    /**
-     * Holds the anchor data
-     *
-     * @var array
-     */
-    protected $anchors = [];
 
     /**
      * Constructor
@@ -114,15 +113,17 @@ class YamlParser
         $spaces = strpos($this->lines[$from], ltrim($this->lines[$from]));
         
         $start = null;
-
+        
         for ($w=$from;$w<$lines;$w++) {
             $marker = ltrim($this->lines[$w]);
             if ($marker[0] === '-') {
-                if ($start) {
+                if ($start !== null) {
                     $results[$start] = $w - 1;
                 }
                 $start = $w;
-                $marker = substr($marker, 1);
+                if ($marker !== '-') {
+                    $marker = substr($marker, 1);
+                }
             }
             if (strpos($this->lines[$w], $marker) < $spaces) {
                 $results[$start] = $w -1;
@@ -154,24 +155,25 @@ class YamlParser
             /**
              * Stop after getting x rows
              */
-            if ($rows and $rows === ($lineNo + $rows) ) {
+            if ($rows and $rows === ($lineNo + $rows)) {
                 break;
             }
             $line = $this->lines[$i];
-
-            if($line[0] === "\t"){
-                throw new YamlException('YAML documents should not use tabs for indentation');
-            }
-            if($line === '...'){
-                throw new YamlException('Multiple document streams are not supported.');
-            }
             $marker = trim($line);
-
+       
             // Skip comments,empty lines  and directive
-            if ($marker[0] === '#' or $marker === '' OR $line ==='---' OR substr($line,0,'5') === '%YAML') {
+            if ($marker === '' or $marker[0] === '#' or $line ==='---' or substr($line, 0, '5') === '%YAML') {
                 $this->i = $i;
                 continue;
             }
+
+            if ($line[0] === "\t") {
+                throw new YamlException('YAML documents should not use tabs for indentation');
+            }
+            if ($line === '...') {
+                throw new YamlException('Multiple document streams are not supported.');
+            }
+            
             // Identify node level
             $spaces = strpos($line, $marker);
             if ($spaces > $lastSpaces) {
@@ -181,28 +183,27 @@ class YamlParser
             }
 
             // Walk forward for multi line data
-            if(!$this->isList($line) AND !$this->isScalar($line) AND !$this->isParent($line)){
+            if (!$this->isList($line) and !$this->isScalar($line) and !$this->isParent($line)) {
                 $parentLine = $this->lines[$i-1];
-                if(!$this->isParent($parentLine)){
+                if (!$this->isParent($parentLine)) {
                     continue; // Skip if there is no parent
                 }
-                $block = $line;
+                $block = trim($line);
                 for ($w=$i+1;$w<$lines;$w++) {
                     $nextLine = trim($this->lines[$w]);
-                    if(!$this->isList($nextLine) AND !$this->isScalar($nextLine) AND !$this->isParent($nextLine)){
+                    if (!$this->isList($nextLine) and !$this->isScalar($nextLine) and !$this->isParent($nextLine)) {
                         $block .= ' ' . $nextLine; // In the plain scalar,newlines become spaces
-                    }
-                    else{
+                    } else {
                         break;
                     }
                 }
                 $this->i = $i = $w - 1;
                 
-                $result['__pain_scalar__'] = $block;
+                $result['__plain_scalar__'] = $block;
                 continue;
             }
             // Walk Forward to handle multiline data folded and literal
-            if (substr($line, -1) === '|' or substr($line, -1) === '>' ) {
+            if (substr($line, -1) === '|' or substr($line, -1) === '>') {
                 list($key, $value) = explode(': ', ltrim($line));
                 $value = '';
                 /**
@@ -211,7 +212,7 @@ class YamlParser
                  * @see https://yaml.org/spec/current.html#id2539942
                  */
                 $break = "\n";
-                if(substr($line, -1) === '>'){
+                if (substr($line, -1) === '>') {
                     $break = ' ';
                 }
  
@@ -219,7 +220,7 @@ class YamlParser
                     $nextLine = trim($this->lines[$w]);
 
                     // Handle multilines which are on the last lastline
-                    if($w === $lines-1){
+                    if ($w === $lines-1) {
                         $value .= $nextLine . $break;
                     }
                     
@@ -234,11 +235,12 @@ class YamlParser
             }
             // Handle Lists
             if ($this->isList($line)) {
-                $line = ltrim(substr(ltrim($line), 2)); // work with any number of spaces;
-                if (!$this->isParent($line) and !$this->isScalar($line)) {
-                    $result[] = $line;
-                } elseif ($this->isParent($line)) {
-                    $key = substr(ltrim($line), 0, -1);
+                $trimmedLine = ltrim(substr(ltrim($line), 2)); // work with any number of spaces;
+               
+                if (trim($line) !== '-' and !$this->isParent($trimmedLine) and !$this->isScalar($trimmedLine)) {
+                    $result[] = $trimmedLine;
+                } elseif ($this->isParent($trimmedLine)) {
+                    $key = substr(ltrim($trimmedLine), 0, -1);
                     $result[$key] = $this->parse($i+1);
                     $i = $this->i;
                 } else {
@@ -246,17 +248,22 @@ class YamlParser
                      * Deal with list sets. Going to seperate from the rest. remove
                      * the - from the start each set and pass through the parser (is this a hack?)
                      */
-                    list($key, $value) = explode(': ', ltrim($line));
                     $sets = $this->findRecordSets($i);
                     foreach ($sets as $start => $finish) {
                         $setLines = [];
                         for ($ii=$start;$ii<$finish+1;$ii++) {
                             $setLine = $this->lines[$ii];
+                       
                             if ($ii === $start) {
-                                $setLine = str_replace('- ', '  ', $setLine);
+                                if (trim($setLine) === '-') {
+                                    continue;
+                                } else {
+                                    $setLine = str_replace('- ', '  ', $setLine); // Associate
+                                }
                             }
                             $setLines[] = $setLine;
                         }
+                 
                         $me = new YamlParser();
                         $me->lines($setLines);
                         $result[] = $me->toArray();
@@ -268,36 +275,16 @@ class YamlParser
                 $result[rtrim($key)] = $this->readValue($value);
             } elseif ($this->isParent($line)) {
                 $line = ltrim($line);
-                $anchor = null;
-                if(substr($line,-1) === ':'){
-                    $key = substr($line,0,-1);
-                }
-                else{
-                    list($key, $anchor) = explode(': ', ltrim($line)); // It is anchor reference
-                }
+                $key = substr($line, 0, -1);
+            
                 $key = rtrim($key);   // remove ending spaces e.g. invoice   :
-                if($anchor AND $anchor[0] === '*'){
-                    $result[$key] = [];
-                    if(isset($this->anchors[substr($anchor,1)])){
-                        $result[$key] = $this->anchors[substr($anchor,1)]; // get result for anchor
-                    }
-                    $this->i++; // tell the parser this was last line - fake parse
-                }
-                else{
-                    $result[$key] = $this->parse($i+1);
-                    // Walk backward
-                    if(isset($result[$key]['__pain_scalar__'])){
-                        $result[$key] = $result[$key]['__pain_scalar__'];
-                    }
+                $result[$key] = $this->parse($i+1);
+                // Walk backward
+                if (isset($result[$key]['__plain_scalar__'])) {
+                    $result[$key] = $result[$key]['__plain_scalar__'];
                 }
                 
                 $i = $this->i;
-
-                // Store result for anchor
-                if($anchor AND $anchor[0] === '&'){
-                    $this->anchors[substr($anchor,1)] = $result[$key];
-                }
-
             }
             $this->i = $i;
         }
@@ -311,8 +298,9 @@ class YamlParser
      * @param string $string
      * @return void
      */
-    protected function removeQuotes(string $string){
-        return trim($string,'"\'');
+    protected function removeQuotes(string $string)
+    {
+        return trim($string, '"\'');
     }
     /**
      * Converts a string into an array of lines
@@ -340,8 +328,8 @@ class YamlParser
      * @return boolean
      */
     protected function isParent(string $line): bool
-    {   
-        return (substr(trim($line), -1) === ':' OR preg_match('/(\s)&/',$line) OR strpos($line,': *') !== false);
+    {
+        return (substr(trim($line), -1) === ':');
     }
 
     /**
@@ -352,7 +340,7 @@ class YamlParser
      */
     protected function isScalar(string $line) :bool
     {
-        return (strpos(trim($line), ': ') !== false AND strpos($line,': &') === false AND strpos($line,': *') === false);
+        return (strpos(trim($line), ': ') !== false);
     }
 
     /**
@@ -364,7 +352,7 @@ class YamlParser
     protected function isList(string $line) : bool
     {
         $line = trim($line);
-        return (substr($line, 0, 2) === '- ') OR $line === '-';
+        return (substr($line, 0, 2) === '- ') or $line === '-';
     }
 
     /**
@@ -377,7 +365,13 @@ class YamlParser
         return $this->parse();
     }
 
-
+    /**
+     * Undocumented function
+     * Many types of bool
+     * @see https://yaml.org/type/bool.html
+     * @param [type] $value
+     * @return void
+     */
     protected function readValue($value)
     {
         switch ($value) {
@@ -392,7 +386,7 @@ class YamlParser
             break;
         }
        
-        return trim($value,'"\''); // remove quotes spaces etc
+        return trim($value, '"\''); // remove quotes spaces etc
     }
 }
 
