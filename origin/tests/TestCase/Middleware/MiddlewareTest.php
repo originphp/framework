@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Middleware;
 
-use Origin\Middleware\Middleware;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\BaseApplication;
+use Origin\Http\Middleware;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\BaseApplication;
 
 class MyMiddleware extends Middleware
 {

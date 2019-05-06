@@ -5,7 +5,7 @@
  */
 namespace App;
 
-use Origin\BaseApplication;
+use Origin\Http\BaseApplication;
 
 class Application extends BaseApplication
 {

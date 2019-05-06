@@ -19,8 +19,8 @@ use Origin\Controller\Exception\MissingControllerException;
 use Origin\Core\Configure;
 use Origin\Core\Autoloader;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\TestSuite\TestTrait;
 use PHPUnit\Framework\AssertionFailedError;
 

@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\Router;
+use Origin\Http\Router;
 use Origin\View\TemplateTrait;
 use Origin\Core\Plugin;
 use Origin\Core\Inflector;

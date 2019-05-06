@@ -115,7 +115,7 @@ class Component
     /**
      * Returns the request object
      *
-     * @return \Origin\Controller\Request
+     * @return \Origin\Http\Request
      */
     public function request()
     {
@@ -125,7 +125,7 @@ class Component
     /**
      * Returns the response object
      *
-    * @return \Origin\Controller\Response
+    * @return \Origin\Http\Response
      */
     public function response()
     {

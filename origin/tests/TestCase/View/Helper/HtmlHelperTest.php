@@ -17,8 +17,8 @@ namespace Origin\Test\View\Helper;
 use Origin\View\Helper\HtmlHelper;
 use Origin\View\View;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Core\Plugin;
 use Origin\Exception\NotFoundException;
 

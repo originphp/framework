@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\Router;
-use Origin\Controller\Request;
+use Origin\Http\Router;
+use Origin\Http\Request;
 
 class MockRouter extends Router
 {

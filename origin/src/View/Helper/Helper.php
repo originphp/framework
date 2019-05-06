@@ -135,7 +135,7 @@ class Helper
     /**
      * Returns the request object
      *
-     * @return \Origin\Controller\Request
+     * @return \Origin\Http\Request
      */
     public function request()
     {
@@ -145,7 +145,7 @@ class Helper
     /**
      * Returns the response object
      *
-     * @return \Origin\Controller\Response
+     * @return \Origin\Http\Response
      */
     public function response()
     {

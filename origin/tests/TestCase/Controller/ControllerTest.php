@@ -18,9 +18,9 @@ use Origin\Controller\Controller;
 use Origin\Model\ModelRegistry;
 use Origin\Controller\Component\Component;
 use Origin\View\Helper\Helper;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\Core\Router;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\Router;
 use Origin\Model\Model;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\MissingModelException;
@@ -331,7 +331,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     public function testRedirect()
     {
         $request = new Request('tests/edit/2048');
-        $response = $this->getMockBuilder('Origin\Controller\Response')
+        $response = $this->getMockBuilder(Response::class)
            ->setMethods(['header', 'send','statusCode','stop'])
            ->getMock();
 

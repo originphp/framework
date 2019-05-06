@@ -18,9 +18,9 @@ use Origin\View\View;
 use Origin\View\Helper\CookieHelper;
 use Origin\View\Helper\FormHelper;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\Core\Cookie;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\Cookie;
 
 class MockCookieHelper extends CookieHelper
 {
@@ -34,7 +34,7 @@ class MockCookieHelper extends CookieHelper
         return $this->cookie();
     }
 }
-class MockEngine extends \Origin\Core\Cookie
+class MockEngine extends \Origin\Http\Cookie
 {
     protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
     {

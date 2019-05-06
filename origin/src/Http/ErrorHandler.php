@@ -19,7 +19,7 @@
  * render json errors when json type detected.
  * Currently setting response->type json would not affect error handler
  */
-namespace Origin\Core;
+namespace Origin\Http;
 
 use Origin\Core\Debugger;
 use Origin\Core\Logger;

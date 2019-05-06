@@ -17,9 +17,9 @@ namespace Origin\Test\View\Helper;
 use Origin\View\View;
 use Origin\View\Helper\SessionHelper;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\Core\Session;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\Session;
 
 class MockSessionHelper extends SessionHelper
 {

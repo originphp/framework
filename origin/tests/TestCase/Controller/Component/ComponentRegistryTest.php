@@ -18,8 +18,8 @@ use Origin\Controller\Controller;
 use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
 use Origin\Controller\Component\Exception\MissingComponentException;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
 {

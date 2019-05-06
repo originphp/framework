@@ -16,9 +16,9 @@ namespace Origin\Test\Controller\Component;
 
 use Origin\Controller\Controller;
 use Origin\Controller\Component\FlashComponent;
-use Origin\Core\Session;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Session;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class MockFlashComponent extends FlashComponent
 {

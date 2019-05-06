@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\Cookie;
+use Origin\Http\Cookie;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class MockCookie extends Cookie
 {

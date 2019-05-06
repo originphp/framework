@@ -28,10 +28,11 @@ Delete tag:   git tag -d <tag_name>
 - Added Dom Utility which extends Dom to add javascript style selectors.
 
 ### Removed
-- Removed IntegrationTesting fails which were duplicated since refectoring
+- Removed IntegrationTesting fails which were duplicated since refactoring
 - Removed logger helper function
 
 ### Changed
+- Move Router,Request,Response,Session,Cookie,BaseApplication,Middleware, ErrorHandler from Core to Http folder
 - Changed Generate Plugin to work with commands and options parsing.
 - ConsoleException now extends StopExecutionException to work with console testing
 - Autoloader/Plugin getInstance to instance

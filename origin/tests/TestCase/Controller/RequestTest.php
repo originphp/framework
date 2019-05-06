@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Controller;
 
-use Origin\Controller\Request;
+use Origin\Http\Request;
 use Origin\Exception\MethodNotAllowedException;
 
 class MockRequest extends Request

@@ -12,11 +12,11 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Controller;
+namespace Origin\Http;
 
-use Origin\Core\Router;
-use Origin\Core\Session;
-use Origin\Core\Cookie;
+use Origin\Http\Router;
+use Origin\Http\Session;
+use Origin\Http\Cookie;
 
 use Origin\Exception\MethodNotAllowedException;
 
@@ -80,14 +80,14 @@ class Request
     /**
      * Session object
      *
-     * @var \Origin\Core\Session
+     * @var \Origin\Http\Session
      */
     protected $session = null;
 
     /**
      * Cookie object
      *
-     * @var \Origin\Core\Cookie
+     * @var \Origin\Http\Cookie
      */
     protected $cookie = null;
 
@@ -483,7 +483,7 @@ class Request
     /**
      * Returns the session
      *
-     * @return \Origin\Core\Session
+     * @return \Origin\Http\Session
      */
     public function session()
     {

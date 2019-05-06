@@ -18,7 +18,7 @@ use Origin\Core\ObjectRegistry;
 use Origin\Controller\Controller;
 use Origin\Core\Resolver;
 use Origin\Controller\Component\Exception\MissingComponentException;
-use Origin\Controller\Response;
+use Origin\Http\Response;
 /**
  * A quick and easy way to create models and add them to registry. Not sure if
  * this will be added.

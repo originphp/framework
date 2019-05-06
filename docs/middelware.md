@@ -6,18 +6,18 @@ Your middleware class will need the process method and it must return the respon
 
 ```php
 namespace App\Middleware;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\Middleware\Middleware;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\Middleware;
 
 class RequestModifierMiddleware extends Middleware
 {
     /**
      * Processes the request, this must be implemented
      *
-     * @param \Origin\Controller\Request $request
-     * @param \Origin\Controller\Response $response
-     * @return \Origin\Controller\Response
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @return \Origin\Http\Response
      */
     public function process(Request $request, Response $response) : Response
     {

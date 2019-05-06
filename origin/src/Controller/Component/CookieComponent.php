@@ -14,7 +14,7 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Core\Cookie;
+use Origin\Http\Cookie;
 
 /**
  * Cookie Component - for this and session code is being repeated, but this makes
@@ -34,14 +34,14 @@ class CookieComponent extends Component
     /**
      * Cookie Object
      *
-     * @var \Origin\Core\Cookie
+     * @var \Origin\Http\Cookie
      */
     protected $cookie = null;
 
     /**
      * Lazy loads the cookie object
      *
-     * @return \Origin\Core\Cookie
+     * @return \Origin\Http\Cookie
      */
     protected function cookie()
     {

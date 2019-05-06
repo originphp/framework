@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Controller;
 
-use Origin\Controller\Response;
+use Origin\Http\Response;
 use Origin\Exception\NotFoundException;
 
 class ResponseTest extends \PHPUnit\Framework\TestCase

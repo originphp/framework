@@ -16,7 +16,7 @@
  * Here you can configure your routes, the order which they are added is important.
  * The first match route will be used.
  */
-use Origin\Core\Router;
+use Origin\Http\Router;
 use Origin\Core\Plugin;
 
 /*

@@ -17,8 +17,8 @@ namespace Origin\Test\Controller\Component;
 use Origin\Controller\Component\PaginatorComponent;
 use Origin\TestSuite\TestTrait; // callMethod + getProperty
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;

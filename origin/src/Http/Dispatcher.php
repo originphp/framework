@@ -12,10 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Core;
+namespace Origin\Http;
 
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Controller\Controller;
 use Origin\Controller\Exception\MissingControllerException;
 use Origin\Controller\Exception\MissingMethodException;

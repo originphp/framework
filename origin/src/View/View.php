@@ -51,13 +51,13 @@ class View
     /**
      * Request Object
      *
-     * @var \Origin\Controller\Request
+     * @var \Origin\Http\Request
      */
     public $request = null;
     /**
        * Response Object
        *
-       * @var \Origin\Controller\Response
+       * @var \Origin\Http\Response
        */
     public $response = null;
 

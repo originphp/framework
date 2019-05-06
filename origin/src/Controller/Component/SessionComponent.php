@@ -14,7 +14,7 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Core\Session;
+use Origin\Http\Session;
 
 /**
  * Session Component - makes it easy to work with sessions, sessions are set using the response
@@ -26,14 +26,14 @@ class SessionComponent extends Component
     /**
      * Session Object
      *
-     * @var \Origin\Core\Session
+     * @var \Origin\Http\Session
      */
     protected $session = null;
 
     /**
      * Lazy loads the session object
      *
-     * @return \Origin\Core\Session
+     * @return \Origin\Http\Session
      */
     protected function session()
     {

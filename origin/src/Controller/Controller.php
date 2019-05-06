@@ -13,14 +13,14 @@
  */
 namespace Origin\Controller;
 
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use App\View\AppView;
 use Origin\Controller\Component\ComponentRegistry;
 use Origin\Core\Inflector;
-use Origin\Core\Router;
+use Origin\Http\Router;
 use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
@@ -63,14 +63,14 @@ class Controller
     /**
      * Holds the request object.
      *
-     * @var \Origin\Controller\Request
+     * @var \Origin\Http\Request
      */
     public $request = null;
 
     /**
      * Holds the response object.
      *
-     * @var \Origin\Controller\Response
+     * @var \Origin\Http\Response
      */
     public $response = null;
 
@@ -503,7 +503,7 @@ class Controller
      *
      * @param string|array $url
      * @param int status code default 302
-     * @return \Origin\Controller\Response
+     * @return \Origin\Http\Response
      */
     public function redirect($url, int $code = 302)
     {

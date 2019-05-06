@@ -15,7 +15,7 @@
 namespace Origin\View\Helper;
 
 use Origin\Model\ModelRegistry;
-use Origin\Core\Router;
+use Origin\Http\Router;
 use Origin\Core\Inflector;
 use Origin\Model\Entity;
 

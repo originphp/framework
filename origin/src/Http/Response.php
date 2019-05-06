@@ -12,9 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Controller;
+namespace Origin\Http;
 
-use Origin\Core\Cookie;
+use Origin\Http\Cookie;
 use Origin\Exception\NotFoundException;
 
 class Response

@@ -17,8 +17,8 @@ namespace Origin\Test\View\Helper;
 use Origin\View\View;
 use Origin\View\Helper\FormHelper;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
 

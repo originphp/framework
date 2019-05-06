@@ -58,7 +58,7 @@ require ROOT . '/vendor/autoload.php';
 if (PHP_SAPI === 'cli') {
     $ErrorHandler = new Origin\Console\ErrorHandler();
 } else {
-    $ErrorHandler = new Origin\Core\ErrorHandler();
+    $ErrorHandler = new Origin\Http\ErrorHandler();
 }
 $ErrorHandler->register();
 

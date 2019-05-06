@@ -16,8 +16,8 @@ namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
 use Origin\Controller\Controller;
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\View\Helper\IntlHelper;
 
 class IntlHelperTest extends \PHPUnit\Framework\TestCase

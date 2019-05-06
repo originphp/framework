@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Core;
+namespace Origin\Http;
 
 use Origin\Utility\Security;
 

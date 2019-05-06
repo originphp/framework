@@ -15,12 +15,12 @@
 
 namespace Origin\TestSuite;
 
-use Origin\Controller\Request;
-use Origin\Controller\Response;
-use Origin\Core\Dispatcher;
-use Origin\Core\Router;
-use Origin\Core\Session;
-use Origin\Core\Cookie;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Http\Dispatcher;
+use Origin\Http\Router;
+use Origin\Http\Session;
+use Origin\Http\Cookie;
 
 /**
  * A way to test controllers from a higher level
@@ -31,13 +31,13 @@ trait IntegrationTestTrait
     /**
      * Holds the response object
      *
-     * @var \Origin\Controller\Response
+     * @var \Origin\Http\Response
      */
     protected $response = null;
     /**
      * Holds the response object
      *
-     * @var \Origin\Controller\Request
+     * @var \Origin\Http\Request
      */
     protected $request = null;
     /**

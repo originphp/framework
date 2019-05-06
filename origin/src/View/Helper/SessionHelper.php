@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\Session;
+use Origin\Http\Session;
 
 /**
  * Session helper - makes it easy to work with sessions.
@@ -25,14 +25,14 @@ class SessionHelper extends Helper
     /**
      * Session Object
      *
-     * @var \Origin\Core\Session
+     * @var \Origin\Http\Session
      */
     protected $session = null;
 
     /**
      * Lazy loads the session object
      *
-     * @return \Origin\Core\Session
+     * @return \Origin\Http\Session
      */
     protected function session()
     {

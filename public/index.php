@@ -10,5 +10,5 @@ define('START_TIME', microtime(true));
  */
 require dirname(__DIR__) . '/origin/src/bootstrap.php';
 
-$Dispatcher = new Origin\Core\Dispatcher();
+$Dispatcher = new Origin\Http\Dispatcher();
 $Dispatcher->start();

@@ -12,9 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Core;
+namespace Origin\Http;
 
-use Origin\Controller\Request;
+use Origin\Core\Inflector;
+use Origin\Http\Request;
 
 class Router
 {

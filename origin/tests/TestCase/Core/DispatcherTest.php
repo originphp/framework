@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\Dispatcher;
+use Origin\Http\Dispatcher;
 use Origin\Controller\Controller;
 use Origin\TestSuite\TestTrait;
 
@@ -23,8 +23,8 @@ use Origin\Controller\Exception\MissingControllerException;
 use Origin\Controller\Exception\MissingMethodException;
 use Origin\Controller\Exception\PrivateMethodException;
 
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class BlogPostsController extends Controller
 {

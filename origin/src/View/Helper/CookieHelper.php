@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\Cookie;
+use Origin\Http\Cookie;
 
 /**
  * Cookie Helper - makes it easy to work with cookies, cookies are set using the response
@@ -26,14 +26,14 @@ class CookieHelper extends Helper
     /**
      * Cookie Object
      *
-     * @var \Origin\Core\Cookie
+     * @var \Origin\Http\Cookie
      */
     protected $cookie = null;
 
     /**
      * Lazy loads the cookie object
      *
-     * @return \Origin\Core\Cookie
+     * @return \Origin\Http\Cookie
      */
     protected function cookie()
     {

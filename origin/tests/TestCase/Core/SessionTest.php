@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\Session;
+use Origin\Http\Session;
 
 class SessionTest extends \PHPUnit\Framework\TestCase
 {

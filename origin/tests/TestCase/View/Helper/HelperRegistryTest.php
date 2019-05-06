@@ -15,8 +15,8 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\Helper\HelperRegistry;
-use Origin\Controller\Response;
-use Origin\Controller\Request;
+use Origin\Http\Response;
+use Origin\Http\Request;
 use Origin\Controller\Controller;
 use Origin\View\View;
 use Origin\View\Exception\MissingHelperException;

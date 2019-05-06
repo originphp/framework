@@ -11,16 +11,16 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin;
+namespace Origin\Http;
 
 /**
  * Web Application holder
  */
 
-use Origin\Controller\Request;
-use Origin\Controller\Response;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Exception\Exception;
-use Origin\Middleware\Middleware;
+use Origin\Http\Middleware;
 use Origin\Core\Resolver;
 
 class BaseApplication

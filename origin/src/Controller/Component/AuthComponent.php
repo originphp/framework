@@ -14,7 +14,7 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Core\Router;
+use Origin\Http\Router;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
