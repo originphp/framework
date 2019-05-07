@@ -19,8 +19,6 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\Router;
-use Origin\Http\Session;
-use Origin\Http\Cookie;
 
 /**
  * A way to test controllers from a higher level
@@ -374,7 +372,7 @@ trait IntegrationTestTrait
     {
         $headers = $this->response()->headers();
 
-        $this->assertArrayHasKey('Location', $headers,'Location header not set');
+        $this->assertArrayHasKey('Location', $headers, 'Location header not set');
 
         if ($url) {
             $this->assertEquals(Router::url($url), $headers['Location']);
