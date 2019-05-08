@@ -19,6 +19,8 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+## [1.0.0] - 2019-05-08
 ### Added
 - Added Console command specific help, arguments and options.
 - YAML utility
