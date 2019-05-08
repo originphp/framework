@@ -1,9 +1,6 @@
 {
-    "autoload": {
-        "psr-4": {
-             "Vendor\\": "vendor/"
-        }
-    },
+  "name": "originphp/originphp",
+  "description": "The OriginPHP Framework",
     "require": {
       "php": ">=7.0.0",
       "ext-intl": "*",
