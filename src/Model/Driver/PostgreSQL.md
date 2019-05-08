@@ -8,6 +8,14 @@ Issues
 2. User is a reserved word and force escaping of everything
 3. Getting the primary key is a bit of mission.
 
+
+## Thoughts
+
+Two ideas:
+
+1. Use oldschool mapping method datasource::mapResults
+2. Instead of using Model.column do Model__column for postgres. This is complicating things maybe just to use getColumnMeta. Although maybe doing this way on both MySQL and Postgre dont have to worry about quoting.
+
 ```php
 ConnectionManager::config('default', array(
   'host' => 'pg',

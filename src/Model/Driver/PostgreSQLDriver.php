@@ -7,7 +7,7 @@ use Origin\Exception\Exception;
 /*
 @Note this under development.
 21.March -
-Current Meta system not helpful, instead using virtual field syntax solves probem but breaks quoting.
+Current getColumnMeta not helpful. Adjusted model mapping using index and mapping.
 MySql
     [native_type] => LONG
     [pdo_type] => 1

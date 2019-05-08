@@ -19,6 +19,9 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Added custom meta mapping and changed model results to use this instead.
+
 
 ## [1.1.0] - 2019-05-08
 ### Changed

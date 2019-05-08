@@ -331,7 +331,8 @@ class Model
      * Hook to call just after model creation.
      */
     public function initialize(array $config)
-    { }
+    {
+    }
 
     public function behaviorRegistry()
     {
@@ -1379,7 +1380,6 @@ class Model
                 }
             }
         }
-
         return $query;
     }
 
@@ -1452,7 +1452,7 @@ class Model
 
                     /**
                      * Remove empty records. If the foreignKey is not present then the associated
-                     * data will not be present. This is correct. 
+                     * data will not be present. This is correct.
                      */
                     $foreignKey = null;
                     if (isset($this->belongsTo[$model])) {
@@ -1559,10 +1559,9 @@ class Model
     {
         $connection = $this->connection();
         $connection->select($this->table, $query + ['alias' => $this->alias]);
-
+      
         /*
-          A different way to map and solve problem with postgres due meta table actual table name. Using virtual
-          field
+          A different way to map and solve problem with postgres due meta table actual table name. Using virtual field
             foreach ($query['fields'] as $k => $field) {
             if (strpos($field, ' AS ') == false) {
                 $query['fields'][$k] = $field . ' AS ' . str_replace('.', '__', $field);
@@ -1570,13 +1569,20 @@ class Model
             }
           */
 
-        if ($type == 'list') {
+        if ($type === 'list') {
             return $connection->fetchList();
         }
+        // used by count
+        if($type === 'assoc'){
+            return $connection->fetchAll('assoc');
+        }
+ 
+        $results = $connection->fetchAll('num'); // change to num and enableMapResults 
 
-        $results = $connection->fetchAll($type);
-
-        if ($results and $type === 'model') {
+        if ($results) {
+            $results = $connection->mapNumericResults($results,$query['fields']); // use with Num instead of model
+            # If foreignKeys are missing data then objects wont be put together
+            # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);
             $results = $this->loadAssociatedBelongsTo($query, $results);
             $results = $this->loadAssociatedHasOne($query, $results);
@@ -1720,7 +1726,8 @@ class Model
      * @return bool
      */
     public function afterValidate(Entity $entity, bool $success)
-    { }
+    {
+    }
 
     /**
      * Before save callback
@@ -1743,7 +1750,8 @@ class Model
      * @return void
      */
     public function afterSave(Entity $entity, bool $created, array $options = [])
-    { }
+    {
+    }
 
     /**
      * Before delete, must return true to continue
@@ -1764,7 +1772,8 @@ class Model
      * @return bool
      */
     public function afterDelete(Entity $entity, bool $success)
-    { }
+    {
+    }
 
     /**
      * Checks values in an entity are unique, this could be that a username is not already

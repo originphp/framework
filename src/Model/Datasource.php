@@ -251,10 +251,10 @@ class Datasource
     }
 
     /**
-     * Fetches the next row from the database.
+     * Fetches the next row from the database. Model method does not work with postgresql
+     * cause meta for table does not return alias.
      *
      * @param string $type (num | assoc | model | object)
-     *
      * @return array row
      */
     protected function fetchResult(string $type = 'assoc')
@@ -337,9 +337,8 @@ class Datasource
 
     /**
      * Builds a map so that an assoc array can be setup.
-     *
+     * @internal getColumnMeta does not work with PostgreSql, table returns table name instead of alias
      * @param PDOStatement $statement
-     *
      * @return array $result
      */
     public function mapColumns(PDOStatement $statement = null)
@@ -369,6 +368,72 @@ class Datasource
     public function isVirtualField(string $column)
     {
         return strpos($column, $this->virtualFieldSeperator) != false;
+    }
+
+     /**
+     * Takes a numerical set results and maps to model. Originally was
+     * using getColumnMeta(), however the table result which is used to map
+     * does not work on postgresql. This will only work if all fields are quoted.
+     *
+     * @param array $records numerically index
+     * @param array fields
+     * @return array
+     */
+    public function mapNumericResults(array $records,array $fields) : array
+    {
+
+        $count = count($fields);
+        $index = $this->getColumnMetaData($fields);
+
+        $results = [];
+         foreach($records as $record){
+            $array = [];
+            for($i=0;$i<$count;$i++){
+                $model = $index[$i]['model'];
+                $field = $index[$i]['field'];
+                $array[$model][$field] = $record[$i];
+            }
+            $results[] = $array;
+        }
+
+        unset($records);
+        return $results;
+    }
+
+    /**
+     * Returns the column meta data form fields
+     *
+     * @param array $fields
+     * @return array
+     */
+    private function getColumnMetaData(array $fields) : array
+    {
+        $index = [];
+        $count = count($fields);
+    
+        /**
+         * Build an index
+         */
+        for($i=0;$i<$count;$i++){
+            $model = 0; // default value
+            $field = $fields[$i];
+            if(preg_match('/^[A-Za-z0-9]+\.[a-z0-9_]+$/i',$field)){
+                list($model,$field) = explode('.',$fields[$i]);
+            }
+            
+            $position  = stripos($fields[$i],' AS ');
+            if($position !== false){
+                $field = substr($field,$position + 4); 
+                if(strpos($field,'__') !== false){ 
+                    list($model,$field) = explode('__',$field);
+                }
+            }
+            $index[$i] = [
+                'model'=>$model,
+                'field'=>$field
+            ];
+        }
+        return $index;
     }
 
     /**
