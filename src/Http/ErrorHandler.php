@@ -23,6 +23,7 @@ namespace Origin\Http;
 
 use Origin\Core\Debugger;
 use Origin\Core\Logger;
+use Origin\Core\Configure;
 
 class ErrorHandler
 {

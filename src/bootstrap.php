@@ -19,12 +19,14 @@
 /**
  * Load the Paths constants, if not already set (e.g. Tests)
  */
+
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
-    define('ROOT', dirname(dirname(dirname(__FILE__))));
+
+    define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
     define('CONFIG', ROOT . DS . 'config');
     define('LOGS', ROOT . DS . 'logs');
-    define('ORIGIN', ROOT . DS . 'origin');
+    define('ORIGIN', ROOT . '/vendor/originphp/framework');
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
     define('TESTS', ROOT . DS . 'tests');
