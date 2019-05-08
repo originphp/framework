@@ -122,7 +122,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
             new ConsoleInput()
         );
        
-
+        
         $this->assertTrue($ShellDispatcher->start());
         $this->assertInstanceOf(Shell::class, $ShellDispatcher->shell());
     }

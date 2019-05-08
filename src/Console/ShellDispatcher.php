@@ -230,7 +230,7 @@ class ShellDispatcher
         foreach ($plugins as $plugin) {
             $shells[$plugin] = $this->scandir(PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Console');
         }
-    
+
         return $shells;
     }
 

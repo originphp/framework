@@ -78,7 +78,7 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
     
         $this->assertContains(
-            file_get_contents('/var/www/origin/tests/TestApp/plugins/widget/public/js/default.js'),
+            file_get_contents( ORIGIN . '/tests/TestApp/plugins/widget/public/js/default.js'),
         $this->Html->js('Widget.default.js')
         );
         $this->expectException(NotFoundException::class);
