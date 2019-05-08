@@ -18,6 +18,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Middleware: An easy to understand and use middleware system for those who must have it.
 - Code Generation: Generate your apps using existing database schema, effortlessly adjust the templates before generating them and bang! Its how you want it.
 - Plugins: build resuable apps within apps, called plugins.
+- Events: integrate events so that you can communicate between different parts of your web application.
 - Render JSON and XML views with no extra effort or files!
 - Includes annotations to help your IDE with code completion (and guide you to what things do). If you are not using [Visual Studio Code](https://code.visualstudio.com/) then i recommend you give it a go.
 - and much much more

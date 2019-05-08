@@ -28,6 +28,7 @@ Delete tag:   git tag -d <tag_name>
 - Added Dom Utility which extends Dom to add javascript style selectors.
 
 ### Removed
+- Removed docs, this has been migrated to own [repository](https://github.com/originphp/website). 
 - Removed IntegrationTesting fails which were duplicated since refactoring
 - Removed logger helper function
 
