@@ -20,6 +20,10 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-05-08
+### Changed
+- Restructured code to work with composer create-project
+
 ## [1.0.0] - 2019-05-08
 ### Added
 - Added Console command specific help, arguments and options.
