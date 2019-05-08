@@ -1,3 +1,0 @@
-#!/bin/bash
-ROOT=`pwd`
-exec php -q ${ROOT}/origin/src/Console/origin.php "$@"
