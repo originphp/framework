@@ -23,7 +23,9 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Includes annotations to help your IDE with code completion (and guide you to what things do). If you are not using [Visual Studio Code](https://code.visualstudio.com/) then i recommend you give it a go.
 - and much much more
 
-See the [documentation](https://www.originphp.com/docs/getting-started/)to find out more. If you want to help contribute make this even better then I would love to hear from you.
+See the [documentation](https://www.originphp.com/docs/getting-started/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
+
+## Demo Application
 
 The bookmarks demo app can be found here [https://bookmarks.originphp.com/users/login](https://bookmarks.originphp.com/users/login). You can get a feel for some of the features and performance. 
 The username is **`demo@example.com`** and the password is **`origin`**.
