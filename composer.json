@@ -14,7 +14,7 @@
     "autoload": {
         "psr-4": {
              "Origin\\": "src/",
-             "Origin\\Test": "tests/"
+             "Origin\\Test\\": "tests/"
         }
     },
     "require": {
