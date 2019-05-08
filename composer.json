@@ -1,7 +1,20 @@
 {
+  "name": "originphp/framework",
+    "description": "The OriginPHP framework",
+    "type": "library",
+    "keywords": ["originPHP", "framework", "mvc", "easy","simple", "convention over configuration", "orm","docker","rapid"],
+    "homepage": "https://www.originphp.com",
+    "license": "MIT",
+    "authors": [
+      {
+          "name": "Jamiel Sharief",
+          "email": "js@originphp.com"
+      }
+   ],
     "autoload": {
         "psr-4": {
-             "Vendor\\": "vendor/"
+             "Origin\\": "src/",
+             "Origin\\Test": "tests/"
         }
     },
     "require": {

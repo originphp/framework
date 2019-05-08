@@ -1,49 +1,50 @@
-<?php 
-namespace App\Test\Fixture;
+<?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2019 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+namespace Origin\Test\Fixture;
 
 use Origin\TestSuite\Fixture;
 
 class TagFixture extends Fixture
 {
+    public $datasource = 'test';
+
     public $schema = [
-      'id' => [
-        'type' => 'integer',
-        'length' => 11,
-        'default' => null,
-        'null' => false,
-        'key' => 'primary',
-        'autoIncrement' => true,
-      ],
-      'title' =>  [
-        'type' => 'string',
-        'length' => 255,
-        'default' => null,
-        'null' => true,
-      ],
-      'created' => [
-        'type' => 'datetime',
-        'default' => null,
-        'null' => false,
-      ],
-      'modified' => [
-        'type' => 'datetime',
-        'default' => null,
-        'null' => false,
-      ],
-   ];
-   
+         'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
+         'title' => ['type' => 'string'],
+         'created' => 'datetime',
+         'modified' => 'datetime',
+    ];
+
     public $records = [
         [
-            'id' => 1000,
-            'title' => 'New' ,
-            'created'=>'2019-01-18 09:53:00',
-            'modified'=>'2019-01-18 09:53:00'
+            'id'=>1000,
+            'title' => 'Tag #1',
+            'created'=>'2019-03-27 13:10:00',
+            'modified'=>'2019-03-27 13:12:00'
         ],
         [
-            'id' => 1001,
-            'title' => 'Top Rated' ,
-            'created'=>'2019-01-18 09:53:00',
-            'modified'=>'2019-01-18 09:53:00'
+            'id'=>1001,
+            'title' => 'Tag #2',
+            'created'=>'2019-03-27 13:11:00',
+            'modified'=>'2019-03-27 13:11:00'
+        ],
+        [
+            'id'=>1002,
+            'title' => 'Tag #3',
+            'created'=>'2019-03-27 13:12:00',
+            'modified'=>'2019-03-27 13:10:00'
         ],
     ];
 }
