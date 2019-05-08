@@ -1,4 +1,4 @@
-# OriginPHP Framework (Beta)
+# OriginPHP Framework
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and scalable.
 
