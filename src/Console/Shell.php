@@ -330,7 +330,7 @@ class Shell
             if($options){
                 $extra = " ({$optionsString}) {$defaultString}";
             }
-            $this->out("<question>{$prompt}</question>");
+            $this->out("<question>{$prompt}</question> {$extra}");
             $this->out("> ",false);
             $input = $this->input->read();
             if ($input === '' and $default) {
