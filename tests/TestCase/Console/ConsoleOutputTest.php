@@ -98,44 +98,44 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->debug('test');
-        $this->assertContains('<debug>DEBUG:</debug> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<debug> DEBUG </debug> <info>test</info>', $ConsoleOutput->getContents());
       
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->error('test', 'A comment about this error');
         $output = $ConsoleOutput->getContents();
-        $this->assertContains('<error>ERROR:</error> <info>test</info>', $output);
+        $this->assertContains('<error> ERROR </error> <info>test</info>', $output);
         $this->assertContains('A comment about this error', $output);
 
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->warning('test');
-        $this->assertContains('<warning>WARNING:</warning> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<warning> WARNING </warning> <info>test</info>', $ConsoleOutput->getContents());
      
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->info('test');
-        $this->assertContains('<info>INFO:</info> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<info> INFO </info> <info>test</info>', $ConsoleOutput->getContents());
         
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->notice('test');
-        $this->assertContains('<notice>NOTICE:</notice> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<notice> NOTICE </notice> <info>test</info>', $ConsoleOutput->getContents());
 
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->success('test');
-        $this->assertContains('<success>SUCCESS:</success> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<success> SUCCESS </success> <info>test</info>', $ConsoleOutput->getContents());
 
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->critical('test');
-        $this->assertContains('<critical>CRITICAL:</critical> <info>test</info>', $ConsoleOutput->getContents());
+        $this->assertContains('<critical> CRITICAL </critical> <info>test</info>', $ConsoleOutput->getContents());
     }
 }

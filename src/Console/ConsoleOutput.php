@@ -276,7 +276,7 @@ class ConsoleOutput
      */
     protected function buildMessage(string $type, string $title, string $message=null) : string
     {
-        $result = "<{$type}>" . strtoupper($type).  ":</{$type}> <info>{$title}</info>\n";
+        $result = "<{$type}> " . strtoupper($type).  " </{$type}> <info>{$title}</info>\n";
         if ($message) {
             $result .= "<comment>{$message}</comment>\n";
         }
