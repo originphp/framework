@@ -43,7 +43,7 @@ class SchemaShell extends Shell
         if ($this->args()) {
             $tables = $this->args();
         }
-        $folder = CONFIG . DS . 'schema';
+        $folder = CONFIG . DS . 'db';
         if (!file_exists($folder)) {
             mkdir($folder);
         }
@@ -112,7 +112,7 @@ class SchemaShell extends Shell
         $filename = CONFIG . DS .'db'. DS . $default . '.sql';
         
         if (!file_exists($filename)) {
-            $this->error('config/schema/'.$default. '.sql not found');
+            $this->error('config/db/'.$default. '.sql not found');
         }
 
         $sql = preg_replace('!/\*.*?\*/!s', '', file_get_contents($filename)); // Remove comments

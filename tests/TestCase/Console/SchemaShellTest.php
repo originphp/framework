@@ -39,7 +39,7 @@ class SchemaShellTest extends OriginTestCase
         
         $this->exec('schema import'); // the same bin/console cron daily
         $this->assertExitError();
-        $this->assertOutputContains('config/schema/schema.sql not found');
+        $this->assertOutputContains('config/db/schema.sql not found');
     }
 
     public function testGenerate(){

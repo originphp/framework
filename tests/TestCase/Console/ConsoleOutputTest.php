@@ -66,14 +66,14 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->write('<yellow>hello world</yellow>');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
-        $this->assertEquals("\033[33mhello world\033[0m", stream_get_contents($stream));
+        $this->assertEquals("\033[93mhello world\033[0m", stream_get_contents($stream));
     }
 
     public function testStyles()
     {
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $this->assertEquals($ConsoleOutput->getStyles(), $ConsoleOutput->styles());
-        $this->assertEquals(['text' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('error'));
+        $this->assertEquals(['text' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('alert'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
@@ -92,50 +92,15 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("\033[97;101;4mTest\033[0m", stream_get_contents($stream));
     }
 
-    public function testOutputTypes()
+    public function testOutputError()
     {
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->debug('test');
-        $this->assertContains('<debug> DEBUG </debug> <info>test</info>', $ConsoleOutput->getContents());
-      
+       
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->clearStyles();
 
         $ConsoleOutput->error('test', 'A comment about this error');
         $output = $ConsoleOutput->getContents();
-        $this->assertContains('<error> ERROR </error> <info>test</info>', $output);
+        $this->assertContains('<alert> ERROR </alert> <yellow>test</yellow>', $output);
         $this->assertContains('A comment about this error', $output);
-
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->warning('test');
-        $this->assertContains('<warning> WARNING </warning> <info>test</info>', $ConsoleOutput->getContents());
-     
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->info('test');
-        $this->assertContains('<info> INFO </info> <info>test</info>', $ConsoleOutput->getContents());
-        
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->notice('test');
-        $this->assertContains('<notice> NOTICE </notice> <info>test</info>', $ConsoleOutput->getContents());
-
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->success('test');
-        $this->assertContains('<success> SUCCESS </success> <info>test</info>', $ConsoleOutput->getContents());
-
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->critical('test');
-        $this->assertContains('<critical> CRITICAL </critical> <info>test</info>', $ConsoleOutput->getContents());
     }
 }

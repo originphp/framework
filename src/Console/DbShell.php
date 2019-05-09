@@ -97,7 +97,7 @@ class DbShell extends Shell
     }
 
     /**
-     * Runs the config/schema/seed.sql
+     * Runs the config/db/seed.sql
      *
      * @return void
      */
