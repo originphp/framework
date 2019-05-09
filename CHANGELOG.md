@@ -19,6 +19,8 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+## [1.1.1] - 2019-05-09
 ### Fixed
 - Fixed console colors
 - Fixed console input to accept input without options
@@ -36,7 +38,6 @@ Delete tag:   git tag -d <tag_name>
 - ConfigTrait delete if null passed
 - DB console shell app
 - Plugin install shell command
-
 
 ## [1.1.0] - 2019-05-08
 ### Changed
