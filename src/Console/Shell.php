@@ -325,8 +325,13 @@ class Shell
             array_map('strtoupper', $options)
         );
 
-        while ($input === '' || !in_array($input, $options)) {
-            $this->out("<prompt>{$prompt}</prompt> ({$optionsString}) {$defaultString}");
+        while ($input === '' OR ($options AND !in_array($input, $options))) {
+            $extra = '';
+            if($options){
+                $extra = " ({$optionsString}) {$defaultString}";
+            }
+            $this->out("<question>{$prompt}</question>");
+            $this->out("> ",false);
             $input = $this->input->read();
             if ($input === '' and $default) {
                 return $default;
@@ -497,7 +502,7 @@ class Shell
      */
     protected function displayOptions(array $options){
         $_options = [];
-        $this->out('<info>Options:</info>');
+        $this->out('<yellow>Options:</yellow>');
         
         foreach ($options as $option) {
             $value = '';
@@ -521,7 +526,7 @@ class Shell
         $shell = Inflector::underscore($this->name);
         
         // @todo maybe should display arguments
-        $this->out("<info>Usage:</info>");
+        $this->out("<yellow>Usage:</yellow>");
         $arguments = $this->getRequiredArguments($name);
         if($arguments){
             $arg_string = implode(' ',array_keys($arguments));
@@ -541,7 +546,7 @@ class Shell
 
         $arguments = [];
         if(!empty($config['arguments'])){
-            $this->out('<info>Arguments:</info>');
+            $this->out('<yellow>Arguments:</yellow>');
             foreach($config['arguments'] as $arg => $argConfig){
                 if(is_string($arg) AND is_array($argConfig)){
                     $argConfig += ['name'=>$arg,'help'=>'','required'=>false];
@@ -575,7 +580,7 @@ class Shell
         
         $shell = Inflector::underscore($this->name);
 
-        $this->out("<info>Usage:</info>");
+        $this->out("<yellow>Usage:</yellow>");
         if(method_exists($this,'main')){
             $this->out("  <white>{$shell} [options] [arguments]</white>");
         }
@@ -593,7 +598,7 @@ class Shell
         }
 
         if ($this->commands) {
-            $this->out('<info>Commands:</info>');
+            $this->out('<yellow>Commands:</yellow>');
             $options = [];
             foreach ($this->commands as $command) {
                 $options['<green>'.$command['name'].'</green>'] = '<white>'.$command['help'].'</white>';
@@ -623,6 +628,22 @@ class Shell
         }
     }
 
+    public function debug(string $message){
+        $this->out("<debug>{$message}</debug>");
+    }
+
+    public function info(string $message){
+        $this->out("<info>{$message}</info>");
+    }
+
+    public function notice(string $message){
+        $this->out("<notice>{$message}</notice>");
+    }
+
+    public function warning(string $message){
+        $this->out("<warning>{$message}</warning>");
+    }
+
     /**
      * Displays an error message and exits the console script
      *
@@ -634,6 +655,18 @@ class Shell
         $this->output->error($title, $message);
         $this->stop($title);
     }
+
+    
+    /*
+    'debug' =>['text' => 'white'],
+        'info' => ['text' => 'lightGreen'], 
+        'notice' => ['text' => 'cyan'], 
+        'warning' => ['text' => 'lightYellow'], 
+        'error' => ['text'=>'red'],
+        'critical' => ['text' => 'lightRed'],
+        'alert' => ['text' => 'white','background'=>'lightRed'],
+        'emergency' => ['text' => 'white','background'=>'lightRed','blink'=>true],
+        */
 
     /**
      * Displays a status
