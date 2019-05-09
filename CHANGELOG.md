@@ -22,6 +22,9 @@ Delete tag:   git tag -d <tag_name>
 ### Changed
 - Added custom meta mapping and changed model results to use this instead.
 
+### Added
+- Plugin install shell command
+
 
 ## [1.1.0] - 2019-05-08
 ### Changed

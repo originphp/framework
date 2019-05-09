@@ -476,7 +476,11 @@ class Shell
      * Adds a available
      *
      * @param string $name
-     * @param array $options
+     * @param array $options 
+     *   - name: name of the command
+     *   - help: the help description
+     *   - arguments: array of args [argName=>[help=>desc,required=>true]]
+     *   - options: array of args [argName=>[help=>desc,required=>true]]
      * @return void
      */
     public function addCommand(string $name, array $options = [])
@@ -515,14 +519,15 @@ class Shell
         $config = $this->commands[$name];
         $shell = Inflector::underscore($this->name);
         
+        // @todo maybe should display arguments
         $this->out("<info>Usage:</info>");
         $arguments = $this->getRequiredArguments($name);
         if($arguments){
             $arg_string = implode(' ',array_keys($arguments));
-            $this->out("  <white>{$shell} {$name} {$arg_string} [options]</white>");
+            $this->out("  <white>{$shell} {$name} {$arg_string} [options] [arguments]</white>");
         }
         else{
-            $this->out("  <white>{$shell} {$name} [options]</white>");
+            $this->out("  <white>{$shell} {$name} [options] [arguments]</white>");
         }
        
        
