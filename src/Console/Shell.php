@@ -588,11 +588,6 @@ class Shell
       
         $this->out('');
 
-        if ($this->description) {
-            $this->out("<white>{$this->description}</white>");
-            $this->out('');
-        }
-
         if ($this->options) {
            $this->displayOptions($this->options);
         }

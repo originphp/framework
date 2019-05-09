@@ -82,8 +82,11 @@ class ShellDispatcher
      * @param string $data
      * @return void
      */
-    public function out(string $data)
+    public function out(string $data,$newLine = true)
     {
+        if ($newLine) {
+            $data .= "\n";
+        }
         $this->output->write($data);
     }
 
@@ -93,8 +96,6 @@ class ShellDispatcher
      */
     public function start()
     {
-        $this->out("\033[2J\033[;H"); // clear screen
-        $this->out("<blue>OriginPHP Console v1.0</blue>\n\n");
 
         $shell = array_shift($this->args);
         if ($shell) {
@@ -107,22 +108,24 @@ class ShellDispatcher
 
     protected function showUsage()
     {
-        $this->out("<info>Usage:</info>\n");
-        $this->out("  <white>console shell</white>\n");
-        $this->out("  <white>console shell command</white>\n");
+        $this->out("<blue>OriginPHP Console v1.0</blue>");
+        $this->out("");
+        $this->out("<info>Usage:</info>");
+        $this->out("  <white>console shell</white>");
+        $this->out("  <white>console shell command</white>");
         $this->out("\033[0m\n"); // Reset
         $shells = $this->getShellList();
         if ($shells) {
-            $this->out("<info>Available Shells:</info>\n");
+            $this->out("<info>Available Shells:</info>");
             foreach ($shells as $namespace => $commands) {
                 if ($commands) {
-                    $this->out("\n<white>{$namespace}</white>\n");
+                    $this->out("\n<white>{$namespace}</white>");
                     foreach ($commands as $command) {
-                        $this->out("  <blue>{$command}</blue>\n");
+                        $this->out("  <blue>{$command}</blue>");
                     }
                 }
             }
-            $this->out("\n");
+            $this->out("");
         }
     }
 
@@ -172,6 +175,8 @@ class ShellDispatcher
         }
         $this->shell = new $className($this->output, $this->input);
 
+        $this->out("<green>{$this->shell->name}</green> <white>{$this->shell->description}</white>");
+        $this->out('');
         /**
          * bin/console cron - runs main method
          * bin/console something - runs something method
