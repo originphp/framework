@@ -71,6 +71,7 @@ class PluginShell extends Shell
                     return;
                 } else {
                     file_put_contents(CONFIG . '/bootstrap.php', "Plugin::load('{$package['name']}');\n", FILE_APPEND);
+                    exec("rm -rf {$pluginFolder}/.git");
                     $this->status('ok', "{$package['name']} Plugin installed");
                 }
             }
