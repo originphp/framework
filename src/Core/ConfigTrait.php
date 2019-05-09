@@ -70,6 +70,10 @@ trait ConfigTrait
             $config = [$key => $value];
         }
         foreach ($config as $key => $value) {
+            if($value === null){
+               unset( $this->config[$key]);
+               continue; 
+            }
             $this->config[$key] = $value;
         }
         return true;

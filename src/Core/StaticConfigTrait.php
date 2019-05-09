@@ -57,7 +57,7 @@ trait StaticConfigTrait
      * Sets the config
      *
      * @param string|array $key
-     * @param mixed $value
+     * @param mixed $value (set to null for delete)
      * @return void
      */
     public static function setConfig($key = null, $value = null)
@@ -70,7 +70,12 @@ trait StaticConfigTrait
         if (is_string($key)) {
             $config = [$key => $value];
         }
+
         foreach ($config as $key => $value) {
+            if($value === null){
+                unset(static::$config[$key]);
+                continue; // delete
+            }
             static::$config[$key] = $value;
         }
         return true;

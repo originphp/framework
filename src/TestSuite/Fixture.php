@@ -16,8 +16,6 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
-use Origin\Model\Schema;
-use Origin\Model\ModelRegistry;
 use Origin\Core\Resolver;
 use Origin\Exception\Exception;
 

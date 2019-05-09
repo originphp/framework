@@ -26,6 +26,7 @@ use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Collection;
 use Origin\Exception\Exception;
+use Origin\Model\ConnectionManager;
 
 class Model
 {

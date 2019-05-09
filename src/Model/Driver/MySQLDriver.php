@@ -45,7 +45,10 @@ class MySQLDriver extends Datasource
     public function dsn(array $config) : string
     {
         extract($config);
-        return  "{$engine}:host={$host};dbname={$database};charset=utf8mb4";
+        if($database){
+            return "{$engine}:host={$host};dbname={$database};charset=utf8mb4";
+        }
+        return  "{$engine}:host={$host};charset=utf8mb4";
     }
     
     

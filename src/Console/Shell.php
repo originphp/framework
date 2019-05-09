@@ -154,6 +154,7 @@ class Shell
             $this->displayCommandHelp($name);
             return true; // return false will trigger help
         }
+       
 
         /**
          * Check required arguments
@@ -162,7 +163,7 @@ class Shell
         
         if($requiredArguments){
             $argumentsRequired = count($requiredArguments);
-            if($argumentsRequired != count($this->args())){
+            if($argumentsRequired > count($this->args())){
                 $this->displayCommandHelp($name);
                  return true; // return false will trigger help
             }
@@ -475,12 +476,11 @@ class Shell
     /**
      * Adds a available
      *
-     * @param string $name
+     * @param string $name name of the command
      * @param array $options 
-     *   - name: name of the command
      *   - help: the help description
      *   - arguments: array of args [argName=>[help=>desc,required=>true]]
-     *   - options: array of args [argName=>[help=>desc,required=>true]]
+     *   - options: array of args [optName=>[help=>desc,value=what]]
      * @return void
      */
     public function addCommand(string $name, array $options = [])
@@ -498,6 +498,7 @@ class Shell
     protected function displayOptions(array $options){
         $_options = [];
         $this->out('<info>Options:</info>');
+        
         foreach ($options as $option) {
             $value = '';
             if (!empty($option['value'])) {
@@ -552,9 +553,13 @@ class Shell
             $this->out('');
         }
 
+        $configOptions = $this->options;
         if (!empty($config['options'])) {
+            $configOptions = array_merge($configOptions,$config['options']);
+        }
+        if ($configOptions) {
             $options = [];
-            foreach($config['options'] as $optionName => $optionConfig){
+            foreach($configOptions as $optionName => $optionConfig){
                 if(is_string($optionName) AND is_array($optionConfig)){
                     $options[] = array_merge(['name'=>$optionName], $optionConfig);
                 }
@@ -658,4 +663,6 @@ class Shell
     {
         throw new StopExecutionException($message);
     }
+
+    
 }

@@ -60,6 +60,26 @@ class ConnectionManager
         return static::$datasources[$name] = $datasource;
     }
 
+    public static function create(string $name,array $config){
+        self::config($name,$config);
+        return self::get($name);
+    }
+
+    /**
+     * Drops a connection
+     *
+     * @param string $name
+     * @return void
+     */
+    public static function drop(string $name){
+        if (isset(static::$datasources[$name])) {
+            static::config($name,null);
+            unset(static::$datasources[$name]);
+            return true;
+        }
+        return false;
+    }
+
     public static function has(string $name)
     {
         return isset(static::$datasources[$name]);

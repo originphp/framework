@@ -14,7 +14,6 @@
 
 namespace Origin\Console;
 
-use Origin\Core\Plugin;
 use Origin\Core\Inflector;
 /**
  * @todo think about importing generating plugin stuff. and option parsing

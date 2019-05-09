@@ -66,13 +66,12 @@ class Datasource
     public function connect(array $config)
     {
         $config += ['engine'=>'mysql'];
-    
-        $flags = array(
+       
+        $flags = [
           PDO::ATTR_PERSISTENT => false,
           PDO::ATTR_EMULATE_PREPARES => false, // use real prepared statements
           PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        );
-
+        ];
         try {
             $this->connection = new PDO(
                 $this->dsn($config),
@@ -99,7 +98,7 @@ class Datasource
             $start = microtime(true);
 
             $this->statement = $query = $this->connection->prepare($sql);
-
+ 
             $result = $query->execute($params);
             if (Configure::read('debug')) {
                 $this->log[] = [
@@ -242,7 +241,7 @@ class Datasource
             while ($row = $this->fetchResult($type)) {
                 $rows[] = $row;
             }
-
+ 
             return $rows;
         }
     

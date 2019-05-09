@@ -19,10 +19,17 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Fixed console shell options now show on sub commands
+- Fixed console showing help when using multiple required arguments
+
 ### Changed
+- Errors display
 - Added custom meta mapping and changed model results to use this instead.
 
 ### Added
+- ConfigTrait delete if null passed
+- DB console shell app
 - Plugin install shell command
 
 
