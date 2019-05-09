@@ -26,6 +26,7 @@ Delete tag:   git tag -d <tag_name>
 - Fixed console showing help when using multiple required arguments
 
 ### Changed
+- changed schema folder to db
 - Errors display
 - Added custom meta mapping and changed model results to use this instead.
 

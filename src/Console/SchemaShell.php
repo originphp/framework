@@ -78,7 +78,7 @@ class SchemaShell extends Shell
         }
 
         $connection = ConnectionManager::get($datasource);
-        $folder = CONFIG . DS . 'schema';
+        $folder = CONFIG . DS . 'db';
         $files = scandir($folder);
         if ($this->args()) {
             $files = [$this->args(0) .'.php'];
@@ -109,7 +109,7 @@ class SchemaShell extends Shell
         if ($this->args()) {
             $default = $this->args(0);
         }
-        $filename = CONFIG . DS .'schema'. DS . $default . '.sql';
+        $filename = CONFIG . DS .'db'. DS . $default . '.sql';
         
         if (!file_exists($filename)) {
             $this->error('config/schema/'.$default. '.sql not found');

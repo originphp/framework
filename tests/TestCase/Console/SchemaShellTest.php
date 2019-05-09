@@ -43,7 +43,7 @@ class SchemaShellTest extends OriginTestCase
     }
 
     public function testGenerate(){
-        $filename = CONFIG . '/schema/rocks.php';
+        $filename = CONFIG . '/db/rocks.php';
         if(file_exists($filename)){
             unlink($filename);
         }
