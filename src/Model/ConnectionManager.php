@@ -52,7 +52,7 @@ class ConnectionManager
         }
 
         $datasource = new MySQLDriver();
-
+  
         $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null];
         $config = array_merge($defaults, static::config($name));
         $datasource->connect($config);
@@ -60,8 +60,9 @@ class ConnectionManager
         return static::$datasources[$name] = $datasource;
     }
 
-    public static function create(string $name,array $config){
-        self::config($name,$config);
+    public static function create(string $name, array $config)
+    {
+        self::config($name, $config);
         return self::get($name);
     }
 
@@ -71,9 +72,10 @@ class ConnectionManager
      * @param string $name
      * @return void
      */
-    public static function drop(string $name){
+    public static function drop(string $name)
+    {
         if (isset(static::$datasources[$name])) {
-            static::config($name,null);
+            static::config($name, null);
             unset(static::$datasources[$name]);
             return true;
         }

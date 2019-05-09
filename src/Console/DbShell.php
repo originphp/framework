@@ -107,10 +107,13 @@ class DbShell extends Shell
         if($this->args(0)){
             $name = $this->args(0);   
         }
-        if( $this->Db->load($datasource,$name)){
-            return $this->status('ok','Database seeded');
+        if($this->Db->hasSQLFile($name)){
+            if( $this->Db->load($datasource,$name)){
+                return $this->status('ok','Database seeded');
+            }
+            return $this->status('error','Database not seeded');
         }
-        return $this->status('error','Error importing seed');
+        $this->status('skipped',"{$name} not found");
     }
 
    
@@ -142,10 +145,13 @@ class DbShell extends Shell
     }
 
     protected function schemaLoad($name,$datasource){
-        if( $this->Db->load($datasource,$name)){
-            return $this->status('ok','Schema loaded');
+        if($this->Db->hasSQLFile($name)){
+            if( $this->Db->load($datasource,$name)){
+                return $this->status('ok','Schema loaded');
+            }
+            return $this->status('error','Schema not loaded');
         }
-        return $this->status('error','Error loading schema');
+        $this->status('skipped',"{$name} not found");
     }
 
     protected function getDatasource(): string
