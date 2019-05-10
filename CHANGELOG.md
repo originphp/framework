@@ -19,6 +19,8 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- Added support for installing plugins via composer
 
 ## [1.1.1] - 2019-05-09
 ### Fixed

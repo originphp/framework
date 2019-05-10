@@ -58,6 +58,17 @@ class Plugin
             'bootstrap' => true,
             'path' => PLUGINS . DS . Inflector::underscore($plugin)
         ];
+
+        /**
+         * Check plugins loaded by composer
+         */
+        $composerPlugins = ROOT . DS . 'originphp-plugins.json';
+        if (!file_exists($options['path']) AND file_exists( $composerPlugins)) {
+            $composer = json_decode(file_get_contents($composerPlugins),true);
+            if(isset($composer[$plugin])){
+                $options['path'] = $composer[$plugin];
+            }
+        }
     
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
