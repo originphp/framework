@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS articles,articles_tags,comments,groups,profiles,tags,users;
+DROP TABLE IF EXISTS `articles`,`articles_tags`,`comments`,`groups`,`profiles`,`tags`,`users`;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(120) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE profiles (
     created DATETIME,
     modified DATETIME
 );
-CREATE TABLE groups (
+CREATE TABLE `groups` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(120) NOT NULL,
     created DATETIME,
@@ -70,10 +70,10 @@ VALUES
 INSERT INTO articles (user_id, title, slug, body, published, created, modified)
 VALUES
 (3, 'Third Post', 'third-post', 'This is the third post.', 0, now(), now());
-INSERT INTO groups (name, created, modified)
+INSERT INTO `groups` (name, created, modified)
 VALUES
 ('Male', NOW(), NOW());
-INSERT INTO groups (name, created, modified)
+INSERT INTO `groups` (name, created, modified)
 VALUES
 ('Female', NOW(), NOW());
 INSERT INTO comments (article_id,body, created, modified)

@@ -2,6 +2,8 @@
 
 This framework uses PHPUnit for unit testing, when you run the PHPUnit command it should be in the same folder where the `phpunit.xml` file is, which for the framework it is in `origin/tests`. The SRC folder for testing the framework is contained within TestApp, and therefore database configuration can be found there.
 
+The frameworks db config is in the TestApp folder as it is isolated.
+
 To run all tests
 
 ```linux

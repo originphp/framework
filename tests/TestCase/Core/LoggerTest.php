@@ -18,7 +18,7 @@ use Origin\Core\Logger;
 
 class LoggerTest extends \PHPUnit\Framework\TestCase
 {
-    private $filename = LOGS .DS . 'application.log';
+    private $filename = LOGS .DS . 'development.log';
 
     public function setUp()
     {

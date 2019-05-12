@@ -8,13 +8,13 @@ use Origin\Model\ConnectionManager;
 ConnectionManager::config('default', array(
   'host' => 'db',
   'database' => 'origin',
-  'username' => 'origin',
-  'password' => 'secret',
+  'username' => 'root',
+  'password' => 'root',
 ));
 
 ConnectionManager::config('test', array(
   'host' => 'db',
   'database' => 'origin_test',
-  'username' => 'origin',
-  'password' => 'secret',
+  'username' => 'root',
+  'password' => 'root',
 ));

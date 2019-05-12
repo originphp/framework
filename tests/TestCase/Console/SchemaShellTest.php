@@ -42,6 +42,9 @@ class SchemaShellTest extends OriginTestCase
         $this->assertOutputContains('config/db/schema.sql not found');
     }
 
+    /**
+     * @depends testImport
+     */
     public function testGenerate(){
         $filename = CONFIG . '/db/rocks.php';
         if(file_exists($filename)){
@@ -55,6 +58,9 @@ class SchemaShellTest extends OriginTestCase
         $this->assertEquals('7f17f699deb9cbd4b7bcd07c5451ee70',md5(file_get_contents($filename)));
     }
 
+    /**
+     * @depends testImport
+     */
     public function testCreate(){
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE rocks;');

@@ -419,6 +419,7 @@ class ModelTest extends OriginTestCase
 
     public function testFindFields()
     {
+       
         $result = $this->Article->find('first', ['fields'=>['id','title']])->toArray();
         $this->assertEquals(['id','title'], array_keys($result));
 
@@ -434,8 +435,8 @@ class ModelTest extends OriginTestCase
             'fields'=>['COUNT(*) as total','author_id'],
             'group'=>'author_id'
             ]);
-        $this->assertEquals(1000, $result[0]->author_id);
-        $this->assertEquals(2, $result[0]->total);
+        $this->assertEquals(1000, $result[1]->author_id);
+        $this->assertEquals(2, $result[1]->total);
     }
 
     public function testFindLimit()
@@ -447,6 +448,7 @@ class ModelTest extends OriginTestCase
     public function testFindJoin()
     {
         $conditions = [
+            'conditions' => ['id'=>1000],
             'fields' => ['Article.id','Article.title','Author.name'],
             'joins'=>[]
         ];
@@ -460,7 +462,8 @@ class ModelTest extends OriginTestCase
            ];
        
         $result = $this->Article->find('first', $conditions);
-        $this->assertEquals('Author #1', $result->author->name);
+       
+        $this->assertEquals('Author #2', $result->author->name);
     }
 
     public function testFindCount()
@@ -573,11 +576,13 @@ class ModelTest extends OriginTestCase
         $this->assertNull($result->author);
 
         $result = $this->Article->find('first', [
+            'conditions' => ['id'=>1000],
             'associated'=>['Author']
             ]);
-        $this->assertEquals(1000, $result->author_id);
-        $this->assertEquals(1000, $result->author->id);
-        $this->assertEquals('Author #1', $result->author->name);
+       
+        $this->assertEquals(1001, $result->author_id);
+        $this->assertEquals(1001, $result->author->id);
+        $this->assertEquals('Author #2', $result->author->name);
 
         $this->assertTrue($result->author->has('created'));
         $result = $this->Article->find('first', [
@@ -587,22 +592,27 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($result->author->has('created'));
 
         $result = $this->Article->find('first', [
+            'conditions' => ['id'=>1001],
             'associated'=>['Author'=>['associated'=>['Address']]]
             ]);
         $this->assertEquals(1000, $result->author_id);
         $this->assertEquals(1000, $result->author->id);
         $this->assertEquals(1000, $result->author->address->author_id);
 
+        // Article id, has author  1001 and this author has no address
         $this->assertTrue($result->author->address->has('created'));
         $result = $this->Article->find('first', [
+            'conditions' => ['id'=>1001],
             'associated'=>['Author'=>['associated'=>['Address'=>['fields'=>['id','author_id','description']]]]]
             ]);
         $this->assertFalse($result->author->address->has('created'));
 
         $result = $this->Article->Author->find('first', [
-            'associated'=>['Address'=>['associated'=>'Author']],'conditions'=>['id'=>1000]
+            'associated'=>['Address'=>['associated'=>'Author']],
+            'conditions'=>['id'=>1000] // author id
             ]);
-      
+
+    
         $this->assertEquals(1000, $result->id);
         $this->assertEquals(1000, $result->address->author_id);
         $this->assertEquals(1000, $result->address->author->id);
