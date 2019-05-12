@@ -107,7 +107,8 @@ class ErrorHandler
         }
         $logger->error($message);
 
-        $fullBacktrace = in_array('--backtrace', $_SERVER['argv']);
+     
+        $fullBacktrace = in_array('--backtrace', $_SERVER['argv']); // (in_array('--backtrace', $_SERVER['argv']) OR defined('PHPUNIT'));
         $this->render($debug, $fullBacktrace);
     }
 
