@@ -51,12 +51,17 @@ class MySQLDriver extends Datasource
         return  "{$engine}:host={$host};charset=utf8mb4";
     }
     
-    
+    /**
+     * @internal This code has been duplicated in new MysqlAdapter. Once that is
+     * ready this will be depreciated. Changes here should be made there as well.
+     */
     public function schema(string $table) : array
     {
         $schema = [];
-        if ($this->execute("SHOW FULL COLUMNS FROM {$table};")) {
-            $result = $this->fetchAll();
+        $this->execute("SHOW FULL COLUMNS FROM {$table};");
+        $results = $this->fetchAll();
+        if ($results) {
+            
             $reverseMapping = [];
             foreach ($this->columns as $key => $value) {
                 $reverseMapping[strtolower($value['name'])] = $key;
@@ -67,7 +72,7 @@ class MySQLDriver extends Datasource
              */
             $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
 
-            foreach ($result as $column) {
+            foreach ($results as $column) {
                 $precision = $length = null;
                 $type = str_replace(')', '', $column['Type']);
                 if (strpos($type, '(') !== false) {
@@ -121,9 +126,10 @@ class MySQLDriver extends Datasource
     public function tables() : array
     {
         $tables = [];
-        if ($this->execute('SHOW TABLES;')) {
-            $result = $this->fetchAll();
-            foreach ($result as $value) {
+        $this->execute('SHOW TABLES');
+        $results = $this->fetchAll();
+        if ($results) {
+            foreach ($results as $value) {
                 $tables[] = current($value);
             }
         }
