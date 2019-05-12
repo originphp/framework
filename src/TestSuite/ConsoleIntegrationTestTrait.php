@@ -141,7 +141,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorContains(string $message)
     {
-        if (preg_match("/<\/error>.*$/", $this->output->read(), $matches)) {
+        if (preg_match("/<alert> ERROR <\/alert>.*$/", $this->output->read(), $matches)) {
             $this->assertContains($message, $matches[0]);
         } else {
             $this->fail();
