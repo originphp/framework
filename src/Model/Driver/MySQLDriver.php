@@ -68,9 +68,11 @@ class MySQLDriver extends Datasource
             }
             /**
              * @todo refactor to work similar to Postgres,not using reverse mapping. For cleanner
-             * code
+             * code. These are temporary solutions.
              */
             $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
+            $reverseMapping['mediumtext'] = $reverseMapping['text']; // add missing type
+            $reverseMapping['longtext'] = $reverseMapping['text']; // add missing type
 
             foreach ($results as $column) {
                 $precision = $length = null;

@@ -19,6 +19,21 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- Added Migrations
+
+### Changed
+- Database schema files have been moved to ROOT/db
+- In debug mode log file is development.log
+
+### Fixed
+- Fixed issue when trying to save data to medium/long text fields
+- Fixed test issues caused by upgrading to MySQL 8
+- Fixed test issues caused by change in console ui
+
+## [1.1.2] - 2019-05-10
+
 ### Added
 - Added support for installing plugins via composer
 
