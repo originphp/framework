@@ -16,15 +16,19 @@
   * Migrations - This is designed for editing the schema, sometimes data might need to modified but
   * it should not be used to insert data. (if you have too then use connection manager)
   *
+  * @internal Originaly wanted change to automatically reverse changes, some changes to be reversed need
+  * actual schema, which means data needs to be stored somewhere.
+  *
   */
 namespace Origin\Migration;
 
 use Origin\Model\ConnectionManager;
 use Origin\Exception\Exception;
-use Origin\Migration\Driver\MySQLDriver;
+use Origin\Migration\Adapter\MysqlAdapter;
 use Origin\Core\Inflector;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\DatasourceException;
+use Origin\Migration\Exception\IrreversibleMigrationException;
 
 class Migration
 {
@@ -43,18 +47,12 @@ class Migration
     protected $statements = [];
     
     /**
-     * The SQL statements for UPs
-     *
+     * These are the statements magically detected to reverse
+     * @internal only works when you run the migration first time, rollback wont work since some schema information wont
+     * be available anymore
      * @var array
      */
-    protected $upStatements = [];
-
-    /**
-     * The SQL statements for down UPs
-     *
-     * @var array
-     */
-    protected $downStatements = [];
+    protected $reverseStatements = [];
 
     /**
      * The database adapter
@@ -62,6 +60,14 @@ class Migration
      * @var \Origin\Migration\Adapter\MysqlAdapter
      */
     protected $adapter = null;
+
+    /**
+     * holding info
+     *
+     * @var array
+     */
+    protected $pendingTables = [];
+    protected $pendingColumns = [];
 
     public function __construct(Adapter $adapter, array $options=[])
     {
@@ -87,8 +93,8 @@ class Migration
      *
      * @return void
      */
-    public function reversable(){
-
+    public function reversable()
+    {
     }
 
     /**
@@ -96,8 +102,8 @@ class Migration
      *
      * @return void
      */
-    public function up(){
-
+    public function up()
+    {
     }
 
     /**
@@ -105,11 +111,9 @@ class Migration
      *
      * @return void
      */
-    public function down(){
-
+    public function down()
+    {
     }
-
-
 
     /**
      * Migrates up and returns the statments executed
@@ -119,34 +123,34 @@ class Migration
     public function start() : array
     {
         $this->up();
-        $this->change();
-        if (empty($this->upStatements)) {
-            throw new Exception('Migration change does not do anything.');
+        $this->change(); // only run in start
+
+        if (empty($this->statements)) {
+            throw new Exception('Migration does not do anything.');
         }
-        $this->executeStatements($this->upStatements);
-        return $this->upStatements;
+        $this->executeStatements($this->statements);
+        return $this->statements;
     }
 
     /**
-     * Migrates down and returns the statments executed. It will runs the automatically reversable
-     * changes, the 
-     *
+     * Migrates down and returns the statments executed.
+     * @param array $statements - additional statement
      * @return array $statements
      */
-    public function rollback() : array
+    public function rollback($statements=[]) : array
     {
         $this->down();
-        $this->change();
-        $this->reversable();
-        if (empty($this->downStatements)) {
-            throw new Exception('Migration change does not do anything.');
+        $this->reversable(); // Do not run change here
+        $statements = array_merge($this->statements, $statements);
+        if (empty($statements)) {
+            throw new Exception('Migration does not do anything.');
         }
-        $statements = array_reverse($this->downStatements); // cant reverse normal
+   
         $this->executeStatements($statements);
         return $statements;
     }
 
-      /**
+    /**
      * Runs the migration statements
      *
      * @param array $statements
@@ -155,6 +159,7 @@ class Migration
     private function executeStatements(array $statements)
     {
         $this->connection()->begin();
+     
         foreach ($statements as $statement) {
             try {
                 $this->connection()->execute($statement);
@@ -186,14 +191,42 @@ class Migration
         return $this->adapter;
     }
     /**
-     * This executes an SQL statement (cannot be reversed)
+     * Executes a raw SQL statement, can only be run from up or down
      *
      * @param string $sql
      * @return string
      */
     public function execute(string $sql)
     {
-        return $this->upStatements[] = $sql;
+        if (!in_array($this->calledBy(), ['up','down'])) {
+            throw new Exception('Execute can only be called from up/down');
+        }
+        $this->statements[] = $sql;
+    }
+
+    /**
+     * Finds out which function called the function
+     *
+     * @return void
+     */
+    public function calledBy()
+    {
+        $result = debug_backtrace();
+        if (isset($result[2]['function'])) {
+            return $result[2]['function'];
+        }
+        return null;
+    }
+
+    /**
+     * Use this to tell Down that the migration cannot be reversed such as
+     * when deleting data.
+     *
+     * @return void
+     */
+    public function throwIrreversibleMigrationException()
+    {
+        throw new IrreversibleMigrationException();
     }
 
     /**
@@ -221,9 +254,16 @@ class Migration
         if ($options['id']) {
             $schema = array_merge([$options['primaryKey']=>'primaryKey'], $schema);
         }
-      
-        $this->upStatements[] =  $this->adapter()->createTable($name, $schema,$options);
-        $this->downStatements[] = $this->adapter()->dropTable($name);
+        
+        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        $this->pendingTables[] = $name;
+        $this->pendingColumns[$name] = array_keys($schema);
+
+        $this->statements[] =  $this->adapter()->createTable($name, $schema, $options);
+
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->dropTable($name);
+        }
     }
 
     /**
@@ -236,19 +276,27 @@ class Migration
      */
     public function createJoinTable(string $table1, string $table2, array $options=[])
     {
-        $options += ['id'=>false];
+        $options += ['id'=>false,'primaryKey'=>false];
         $tables =  [$table1,$table2 ];
         sort($tables);
         $tableName = implode('_', $tables);
         # This will create up and down
-        $this->createTable($tableName, [
+        $schema = [
             Inflector::singularize($tables[0]).'_id' => 'integer',
             Inflector::singularize($tables[1]).'_id'=> 'integer',
-        ], $options);
+        ];
+
+        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        $this->pendingTables[] = $tableName ;
+        $this->pendingColumns[$tableName ] = array_keys($schema);
+
+        $this->statements[] =  $this->adapter()->createTable($tableName, $schema, $options);
+
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->dropTable($tableName);
+        }
     }
 
-
-   
     /**
      * Drops a table from database
      *
@@ -257,9 +305,16 @@ class Migration
      */
     public function dropTable(string $table)
     {
-        $this->upStatements[] = $this->adapter()->dropTable($table);
-        $schema = $this->adapter()->schema($table);
-        $this->downStatements[] = $this->adapter()->createTable($table, $schema);
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        $this->statements[] = $this->adapter()->dropTable($table);
+
+        if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->schema($table);
+            $this->reverseStatements[] = $this->adapter()->createTable($table, $schema);
+        }
     }
 
     /**
@@ -271,15 +326,17 @@ class Migration
      */
     public function renameTable(string $from, string $to)
     {
-        $this->upStatements[] = $this->adapter()->renameTable($from, $to);
-        $this->downStatements[] = $this->adapter()->renameTable($to, $from);
+        $this->statements[] = $this->adapter()->renameTable($from, $to);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->renameTable($to, $from);
+        }
     }
 
-  /**
-     * Returns an list of tables
-     *
-     * @return array
-     */
+    /**
+       * Returns an list of tables
+       *
+       * @return array
+       */
     public function tables()
     {
         return $this->adapter()->tables();
@@ -312,34 +369,50 @@ class Migration
      */
     public function addColumn(string $table, string $name, string $type, array $options=[])
     {
-        $this->upStatements[] = $this->adapter()->addColumn($table, $name, $type, $options);
-        $this->downStatements[] = $this->adapter()->removeColumn($table, $name);
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        $this->pendingColumns[$table][] = $name;
+
+        $this->statements[] = $this->adapter()->addColumn($table, $name, $type, $options);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->removeColumn($table, $name);
+        }
     }
 
-     /**
-     * Changes a column according to the new definition
-     * @param string $table table name
-     * @param string $name column name
-     * @param string $table table name
-     * @param string $name column name
-     * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
-     * @param array $options The following options keys can be used:
-     *   - limit: limits the column length for string and bytes for text,binary,and integer
-     *   - default: the default value, use '' or nill for null
-     *   - null: allows or disallows null values to be used
-     *   - precision: the precision for the number (places to before the decimal point)
-     *   - scale: the numbers after the decimal point
-     */
+    /**
+    * Changes a column according to the new definition
+    * @param string $table table name
+    * @param string $name column name
+    * @param string $table table name
+    * @param string $name column name
+    * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
+    * @param array $options The following options keys can be used:
+    *   - limit: limits the column length for string and bytes for text,binary,and integer
+    *   - default: the default value, use '' or nill for null
+    *   - null: allows or disallows null values to be used
+    *   - precision: the precision for the number (places to before the decimal point)
+    *   - scale: the numbers after the decimal point
+    */
     public function changeColumn(string $table, string $name, string $type, array $options=[])
     {
-        $schema = $this->adapter()->schema($table);
-        if (empty($schema[$name])) {
-            throw new Exception('Column does not exist in the table');
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        if (!$this->columnExists($table, $name)) {
+            throw new Exception("{$name} does not exist in the {$table}");
         }
         
-        $this->upStatements[] = $this->adapter()->changeColumn($table, $name, $type, $options);
-        $options = $schema[$name];
-        $this->downStatements[] = $this->adapter()->changeColumn($table, $name, $options['type'], $options);
+        $this->statements[] = $this->adapter()->changeColumn($table, $name, $type, $options);
+
+        if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->schema($table);
+            $options = $schema[$name];
+            $this->reverseStatements[] = $this->adapter()->changeColumn($table, $name, $options['type'], $options);
+        }
     }
 
     /**
@@ -352,8 +425,21 @@ class Migration
      */
     public function renameColumn(string $table, string $from, string $to)
     {
-        $this->upStatements[] = $this->adapter()->renameColumn($table, $from, $to);
-        $this->downStatements[] = $this->adapter()->renameColumn($table, $to, $from);
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        if (!$this->columnExists($table, $from)) {
+            throw new Exception("{$from} column does not exist in the {$table}");
+        }
+       
+        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        $this->pendingColumns[$table][] = $to;
+
+        $this->statements[] = $this->adapter()->renameColumn($table, $from, $to);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->renameColumn($table, $to, $from);
+        }
     }
 
     /**
@@ -365,10 +451,19 @@ class Migration
      */
     public function removeColumn(string $table, string $column)
     {
-        $this->upStatements[] = $this->adapter()->removeColumn($table, $column);
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        if (!$this->columnExists($table, $column)) {
+            throw new Exception("{$column} does not exist in the {$table}");
+        }
 
         $schema = $this->adapter()->schema($table);
-        $this->downStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+        $this->statements[] = $this->adapter()->removeColumn($table, $column);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+        }
     }
 
     /**
@@ -380,16 +475,21 @@ class Migration
      */
     public function removeColumns(string $table, array $columns)
     {
-        $this->upStatements[] = $this->adapter()->removeColumns($table, $columns);
-        $schema = $this->adapter()->schema($table);
-
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
         foreach ($columns as $column) {
-            if (isset($schema[$column])) {
-                $this->downStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+            if (!$this->columnExists($table, $column)) {
+                throw new Exception("{$column} does not exist in the {$table}");
             }
         }
-    }
+        $schema = $this->adapter()->schema($table);
 
+        $this->statements[] = $this->adapter()->removeColumns($table, $columns);
+        foreach ($columns as $column) {
+            $this->reverseStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+        }
+    }
 
     /**
      * Returns an array of columns
@@ -417,32 +517,32 @@ class Migration
      */
     public function columnExists(string $table, string $column, array $options =[])
     {
-        if ($options) {
-            $schema = $this->adapter()->schema($table);
-  
-            if (!isset($schema[$column])) {
-                return false;
-            }
-         
-            if (isset($options['type']) and $schema[$column]['type'] !== $options['type']) {
-                return false;
-            }
-
-            if (isset($options['default']) and $schema[$column]['default'] !== $options['default']) {
-                return false;
-            }
-            if (isset($options['limit']) and isset($schema[$column]['limit']) and (int) $schema[$column]['limit'] !== (int) $options['limit']) {
-                return false;
-            }
-            if (isset($options['precision']) and isset($schema[$column]['precision']) and (int) $schema[$column]['precision'] !== (int) $options['precision']) {
-                return false;
-            }
-            if (isset($options['scale']) and isset($schema[$column]['scale']) and (int) $schema[$column]['scale'] !== (int) $options['scale']) {
-                return false;
-            }
-            return true;
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
         }
-        return $this->adapter()->columnExists($table, $column);
+       
+        $schema = $this->adapter()->schema($table);
+    
+        if (!isset($schema[$column])) {
+            return false;
+        }
+        if (isset($options['type']) and $schema[$column]['type'] !== $options['type']) {
+            return false;
+        }
+
+        if (isset($options['default']) and $schema[$column]['default'] !== $options['default']) {
+            return false;
+        }
+        if (isset($options['limit']) and isset($schema[$column]['limit']) and (int) $schema[$column]['limit'] !== (int) $options['limit']) {
+            return false;
+        }
+        if (isset($options['precision']) and isset($schema[$column]['precision']) and (int) $schema[$column]['precision'] !== (int) $options['precision']) {
+            return false;
+        }
+        if (isset($options['scale']) and isset($schema[$column]['scale']) and (int) $schema[$column]['scale'] !== (int) $options['scale']) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -455,78 +555,94 @@ class Migration
       * @param array $options
       *  - name: name of index
       */
-      public function addIndex(string $table, $column, array $options=[])
-      {
-          $options += ['unique'=>false,'name'=>null];
+    public function addIndex(string $table, $column, array $options=[])
+    {
+        if (!$this->tableExists($table) and !in_array($table, $this->pendingTables)) {
+            throw new Exception("{$table} table does not exist");
+        }
+        $options += ['unique'=>false,'name'=>null];
          
-          $options = $this->indexOptions($table,array_merge(['column'=>$column],$options));
-          $columnString = $options['column'];
-          if(is_array($columnString)){
-              $columnString  = implode(',',$columnString);
-          }
+        $options = $this->indexOptions($table, array_merge(['column'=>$column], $options));
+        $columnString = $options['column'];
+        if (is_array($columnString)) {
+            $columnString  = implode(',', $columnString);
+        }
       
-          $this->upStatements[] = $this->adapter()->addIndex($table, $columnString ,$options['name'], $options);
-          $this->downStatements[] = $this->adapter()->removeIndex($table,$options['name']);
-      }
+        $this->statements[] = $this->adapter()->addIndex($table, $columnString, $options['name'], $options);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->removeIndex($table, $options['name']);
+        }
+    }
   
-      /**
-       * Removes an index on table if it exists
-       *
-       * @param string $table
-       * @param string|array $options owner_id, [owner_id,tenant_id] or ['name'=>'index_name']
-       * @return string
-       */
-      public function removeIndex(string $table, $options)
-      {
-          $options = $this->indexOptions($table,$options);
+    /**
+     * Removes an index on table if it exists
+     *
+     * @param string $table
+     * @param string|array $options owner_id, [owner_id,tenant_id] or ['name'=>'index_name']
+     * @return string
+     */
+    public function removeIndex(string $table, $options)
+    {
+        if (!$this->tableExists($table)) {
+            throw new Exception("{$table} table does not exist");
+        }
+
+        $options = $this->indexOptions($table, $options);
   
-          $index = null;
-          foreach($this->indexes($table) as $index){
-              if($index['name'] === $options['name']){
-                  break;
-              }
-              $index = null;
-          }
-      
-          if($this->indexNameExists($table,$options['name'])){
-              $this->upStatements[] = $this->adapter()->removeIndex($table, $options['name']);
-              $this->downStatements[] = $this->adapter()->addIndex(
-                  $table, $options['column'],$options['name'],['unique'=>$index['unique']]
-              );
-          }
-      }
+        $index = null;
+        foreach ($this->indexes($table) as $index) {
+            if ($index['name'] === $options['name']) {
+                break;
+            }
+            $index = null;
+        }
+        $this->statements[] = $this->adapter()->removeIndex($table, $options['name']);
+
+        if ($this->indexNameExists($table, $options['name'])) {
+            if ($this->calledBy() === 'change') {
+                $this->reverseStatements[] = $this->adapter()->addIndex(
+                    $table,
+                    $options['column'],
+                    $options['name'],
+                    ['unique'=>$index['unique']]
+                    );
+            }
+        }
+    }
   
-      /**
-       * Preps index options
-       *
-       * @param string $table
-       * @param string|array $options 
-       * @return array
-       */
-      private function indexOptions(string $table,$options) : array
-      {
-          if(is_string($options) OR (!isset($options['name']) AND !isset($options['column']))){
-              $options = ['column' => $options];
-          }
-          if(!empty($options['column'])){
-              $options['name'] = $this->getIndexName($table,$options['column']);
-          }
-          return $options;
-      }
+    /**
+     * Preps index options
+     *
+     * @param string $table
+     * @param string|array $options
+     * @return array
+     */
+    private function indexOptions(string $table, $options) : array
+    {
+        if (is_string($options) or (!isset($options['name']) and !isset($options['column']))) {
+            $options = ['column' => $options];
+        }
+        if (!empty($options['column'])) {
+            $options['name'] = $this->getIndexName($table, $options['column']);
+        }
+        return $options;
+    }
   
-      /**
-       * Renames an index on a table
-       *
-       * @param string $table
-       * @param string $oldName name_of_index
-       * @param string $newName new_name_of_index
-       * @return void
-       */
-      public function renameIndex(string $table, string $oldName, string $newName)
-      {
-          $this->upStatements[] = $this->adapter()->renameIndex($table, $oldName, $newName);
-          $this->downStatements[] = $this->adapter()->renameIndex($table, $newName, $oldName);
-      }
+    /**
+     * Renames an index on a table
+     *
+     * @param string $table
+     * @param string $oldName name_of_index
+     * @param string $newName new_name_of_index
+     * @return void
+     */
+    public function renameIndex(string $table, string $oldName, string $newName)
+    {
+        $this->statements[] = $this->adapter()->renameIndex($table, $oldName, $newName);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->renameIndex($table, $newName, $oldName);
+        }
+    }
   
  
     /**
@@ -540,19 +656,19 @@ class Migration
         return $this->adapter()->indexes($table);
     }
 
-  /**
-     * Checks if an index exists
-     * @param string $table
-     * @param string|array $column owner_id, [owner_id,tenant_id]
-     * @param array $options
-     *  - name: name of index
-     *  - unique: default false bool
-     * @return bool
-     */
+    /**
+       * Checks if an index exists
+       * @param string $table
+       * @param string|array $column owner_id, [owner_id,tenant_id]
+       * @param array $options
+       *  - name: name of index
+       *  - unique: default false bool
+       * @return bool
+       */
     public function indexExists(string $table, $options)
     {
-        $options = $this->indexOptions($table,$options);
-        return $this->indexNameExists($table,$options['name']);
+        $options = $this->indexOptions($table, $options);
+        return $this->indexNameExists($table, $options['name']);
     }
 
     /**
@@ -562,11 +678,11 @@ class Migration
      * @param string $indexName table_column_name_index
      * @return bool
      */
-    public function indexNameExists(string $table,string $indexName):bool
+    public function indexNameExists(string $table, string $indexName):bool
     {
         $indexes = $this->indexes($table);
-        foreach($indexes as $index){
-            if($index['name'] === $indexName){
+        foreach ($indexes as $index) {
+            if ($index['name'] === $indexName) {
                 return true;
             }
         }
@@ -580,123 +696,134 @@ class Migration
      * @param string|array $column , [column_1,column_2]
      * @return string table_column_name_index
      */
-    private function getIndexName(string $table,$column) : string
+    private function getIndexName(string $table, $column) : string
     {
-        $name = implode('_',(array) $column);
-        return strtolower($table . '_' . $name ) .'_index';
+        $name = implode('_', (array) $column);
+        return strtolower($table . '_' . $name) .'_index';
     }
 
-      /**
-       * Adds a new foreignKey
-       *
-       * addForeignKey('articles','authors');
-       * addForeignKey('articles','users',['column'=>'author_id','primaryKey'=>'lng_id']);
-       *
-       * @param string $fromTable e.g articles
-       * @param string $toTable e.g. authors
-       * @param array $options Options are:
-       * - column: the foreignKey on the fromTable defaults toTable.singularized_id
-       * - primaryKey: the primary key defaults to id
-       * - name: the constraint name defaults to fk_origin_1234567891
-       * @return void
-       */
-      public function addForeignKey(string $fromTable, string $toTable, array $options=[])
-      {
-          $options += [
+    /**
+     * Adds a new foreignKey
+     *
+     * addForeignKey('articles','authors');
+     * addForeignKey('articles','users',['column'=>'author_id','primaryKey'=>'lng_id']);
+     *
+     * @param string $fromTable e.g articles
+     * @param string $toTable e.g. authors
+     * @param array $options Options are:
+     * - column: the foreignKey on the fromTable defaults toTable.singularized_id
+     * - primaryKey: the primary key defaults to id
+     * - name: the constraint name defaults to fk_origin_1234567891
+     * @return void
+     */
+    public function addForeignKey(string $fromTable, string $toTable, array $options=[])
+    {
+        if (!$this->tableExists($fromTable) and !in_array($fromTable, $this->pendingTables)) {
+            throw new Exception("{$fromTable} does not exist");
+        }
+
+        if (!$this->tableExists($toTable) and !in_array($toTable, $this->pendingTables)) {
+            throw new Exception("{$toTable} does not exist");
+        }
+
+        $options += [
               'column' => strtolower(Inflector::singularize($toTable)).'_id',
               'primaryKey' => 'id',
               'name' => null
           ];
   
-          // Get column name first
-          if ($options['name'] === null) {
-              $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
-          }
+        // Get column name first
+        if ($options['name'] === null) {
+            $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
+        }
          
-          $this->upStatements[] = $this->adapter()->addForeignKey($fromTable, $toTable, $options);
-          $this->downStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
-      }
+        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $toTable, $options);
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
+        }
+    }
   
-      /**
-       * removeForeignKey('accounts','owners'); // removes accounts.owner_id
-       * removeForeignKey('accounts',['column'=>'owner_id'];
-       * removeForeignKey('accounts',['name'=>'fk_origin_1234567891'];
-       *
-       * @param string $fromTable
-       * @param string|array $optionsOrToTable table name or array with any of the following options:
-       *  - column: the foreignKey on the fromTable defaults optionsOrToTable.singularized_id
-       *  - name: the constraint name defaults to fk_origin_1234567891
-       *  - primaryKey: the primary key defaults to id
-       * @return void
-       */
-      public function removeForeignKey(string $fromTable, $optionsOrToTable)
-      {
-          $options = $optionsOrToTable;
-          if (is_string( $options)) {
-              $options = [
+    /**
+     * removeForeignKey('accounts','owners'); // removes accounts.owner_id
+     * removeForeignKey('accounts',['column'=>'owner_id'];
+     * removeForeignKey('accounts',['name'=>'fk_origin_1234567891'];
+     *
+     * @param string $fromTable
+     * @param string|array $optionsOrToTable table name or array with any of the following options:
+     *  - column: the foreignKey on the fromTable defaults optionsOrToTable.singularized_id
+     *  - name: the constraint name defaults to fk_origin_1234567891
+     *  - primaryKey: the primary key defaults to id
+     * @return void
+     */
+    public function removeForeignKey(string $fromTable, $optionsOrToTable)
+    {
+        if (!$this->tableExists($fromTable)) {
+            throw new Exception("{$fromTable} does not exist");
+        }
+
+        $options = $optionsOrToTable;
+        if (is_string($options)) {
+            $options = [
                   'column' => strtolower(Inflector::singularize($options)).'_id',
               ];
-          }
-          $options += ['name'=> null,'column'=>null,'primaryKey' => 'id'];
+        }
+        $options += ['name'=> null,'column'=>null,'primaryKey' => 'id'];
   
-          if (empty($options['column']) and empty($options['name'])) {
-              throw new InvalidArgumentException('Column or name needs to be specified');
-          }
+        if (empty($options['column']) and empty($options['name'])) {
+            throw new InvalidArgumentException('Column or name needs to be specified');
+        }
   
-          $foreignKey = null;
-          $foreignKeys = $this->foreignKeys($fromTable);
+        $foreignKey = null;
+        $foreignKeys = $this->foreignKeys($fromTable);
           
-          foreach ($foreignKeys as $foreignKey) {
-              if ( $options['column'] AND $foreignKey['column_name'] === $options['column']) {
-                  $options['name'] = $foreignKey['constraint_name'];
-                  break;
-              }
-              if ( $options['name'] AND $foreignKey['constraint_name'] === $options['name']) {
-                  $options['column'] = $foreignKey['column_name'];
-                  break;
-              }
-              $foreignKey = null;
-          }
-        
-          if($foreignKey){
-              $this->upStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
-              $this->downStatements[] = $this->adapter()->addForeignKey($fromTable,$foreignKey['referenced_table_name'],$options);
-          }
-      }
+        foreach ($foreignKeys as $foreignKey) {
+            if ($options['column'] and $foreignKey['column_name'] === $options['column']) {
+                $options['name'] = $foreignKey['constraint_name'];
+                break;
+            }
+            if ($options['name'] and $foreignKey['constraint_name'] === $options['name']) {
+                $options['column'] = $foreignKey['column_name'];
+                break;
+            }
+            $foreignKey = null;
+        }
+        $this->statements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
+
+        if ($foreignKey) {
+            if ($this->calledBy() === 'change') {
+                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $foreignKey['referenced_table_name'], $options);
+            }
+        }
+    }
   
-      public function foreignKeys(string $table)
-      {
-          return $this->adapter()->foreignKeys($table);
-      }
+    public function foreignKeys(string $table)
+    {
+        return $this->adapter()->foreignKeys($table);
+    }
   
-      /**
-       * Checks if foreignKey exists
-       * @param string $fromTable
-       * @param string|array $optionsOrToTable either table name e.g. users or array of options
-       *  - column: column name
-       *  - name: foreignkey name
-       * @return void
-       */
-      /**
-       * Undocumented function
-       *
-       * @param string $fromTable
-       * @param string|array $columnOrOptions column name or array 
-       *  - name: foreignkey name
-       */
-      public function foreignKeyExists(string $fromTable, $columnOrOptions)
-      {
-  
-          // Its a table
-          if (is_string($columnOrOptions)) {
-              $columnOrOptions = ['column'=>$columnOrOptions];
-          }
-       
-          return $this->adapter()->foreignKeyExists($fromTable, $columnOrOptions);
-      }
+    /**
+     * Checks if foreignKey exists
+     * @param string $fromTable
+     * @param string|array $optionsOrToTable either table name e.g. users or array of options
+     *  - column: column name
+     *  - name: foreignkey name
+     * @return void
+     */
+    public function foreignKeyExists(string $fromTable, $columnOrOptions)
+    {
+        if (!$this->tableExists($fromTable)) {
+            throw new Exception("{$fromTable} does not exist");
+        }
+
+        // Its a table
+        if (is_string($columnOrOptions)) {
+            $columnOrOptions = ['column'=>$columnOrOptions];
+        }
+        return $this->adapter()->foreignKeyExists($fromTable, $columnOrOptions);
+    }
       
     /**
-    * Creates a unique foreignKeyName
+    * Creates a unique foreignKey name
     *
     * @param string $table
     * @param string $column
@@ -707,12 +834,12 @@ class Migration
         return hash('crc32', $table . '__' . $column);
     }
 
- /**
-     * Fetchs a single row from the database
-     *
-     * @param string $sql
-     * @return array|null
-     */
+    /**
+        * Fetchs a single row from the database
+        *
+        * @param string $sql
+        * @return array|null
+        */
     public function fetchRow(string $sql)
     {
         return $this->adapter()->fetchRow($sql);
@@ -729,7 +856,6 @@ class Migration
         return  $this->adapter()->fetchAll($sql);
     }
 
-    
     /**
      * Returns the SQL statements generate from the change
      *
@@ -737,7 +863,16 @@ class Migration
      */
     public function statements() : array
     {
-        return ['up'=>$this->upStatements,'down'=>$this->downStatements];
+        return $this->statements;
     }
 
+    /**
+     * Returns the magically detected reverse statements.
+     *
+     * @return array
+     */
+    public function reverseStatements() : array
+    {
+        return array_reverse($this->reverseStatements);
+    }
 }

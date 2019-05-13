@@ -28,7 +28,7 @@ class MysqlAdapter extends Adapter
 {
 /**
      * This is the map for database agnostic, if its not found here then
-     * use what user supplies
+     * use what user supplies. @important. This will allow using char and medium text when testing
      *
      * @var array
      */
@@ -131,7 +131,7 @@ class MysqlAdapter extends Adapter
     }
 
      /**
-     * Returns a MySQL string for creating a table
+     * Returns a MySQL string for creating a table.  Should be agnostic and non-agnostic.
      *
      * @param string $table
      * @param array $data
@@ -260,7 +260,6 @@ class MysqlAdapter extends Adapter
     public function renameIndex(string $table,string $oldName,string $newName){
         return "ALTER TABLE {$table} RENAME INDEX {$oldName} TO {$newName}";
     }
-
    
     public function addForeignKey(string $fromTable,string $toTable,array $options=[]){
         return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";
@@ -443,8 +442,6 @@ class MysqlAdapter extends Adapter
          return in_array($column,$this->columns($table));
      }
 
-   
-
     /**
      * Return column name
      *
@@ -474,11 +471,14 @@ class MysqlAdapter extends Adapter
             foreach ($this->columns as $key => $value) {
                 $reverseMapping[strtolower($value['name'])] = $key;
             }
-            /**
+             /**
              * @todo refactor to work similar to Postgres,not using reverse mapping. For cleanner
-             * code
+             * code. These are temporary solutions. 
+             * @see MySQL driver - duplicated there.
              */
             $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
+            $reverseMapping['mediumtext'] = $reverseMapping['text']; // add missing type
+            $reverseMapping['longtext'] = $reverseMapping['text']; // add missing type
 
             foreach ($results as $column) {
                 $decimals = $length = null;
@@ -524,7 +524,6 @@ class MysqlAdapter extends Adapter
                     }
                 }
             }
- 
         return $schema;
     }
 

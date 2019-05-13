@@ -14,48 +14,59 @@
 
 namespace Origin\Console;
 
+use Origin\Model\Model;
 use Origin\Core\Inflector;
-/**
- * @todo think about importing generating plugin stuff. and option parsing
- */
+use Origin\Migration\Adapter\MysqlAdapter;
+
 class DbShell extends Shell
 {
-
+    public $description = 'Database Shell';
     public function initialize()
     {
         $this->loadTask('Db');
-        $this->addOption('datasource',['help'=>'Use a different datasource','value'=>'name','short'=>'ds']);
+        $this->loadTask('Migration');
+
+        // General Option
+        $this->addOption('datasource', [
+            'help'=>'Use a different datasource','value'=>'name','short'=>'ds'
+            ]);
        
 
-        $this->addCommand('create',[
+        $this->addCommand('create', [
             'help' => 'Creates the database',
         ]);
-        $this->addCommand('drop',[
+        $this->addCommand('drop', [
             'help' => 'Drops the database',
         ]);
-        $this->addCommand('schema',[
+        $this->addCommand('schema', [
             'help' => 'Dumps and loads SQL schema files',
             'arguments' => [
                 'action' => ['help'=>'dump or load','required'=>true],
                 'file' => ['help'=>'schema or Plugin.schema']
             ]
         ]);
-        $this->addCommand('seed',[
+        $this->addCommand('seed', [
             'help' => 'Seeds the database with initial records',
             'arguments' => [
                 'file' => ['help'=>'seed or Plugin.seed']
             ]
         ]);
-        $this->addCommand('reset',[
+        $this->addCommand('reset', [
             'help' => 'Drops the database and then runs setup'
         ]);
-        $this->addCommand('setup',[
+        $this->addCommand('setup', [
             'help' => 'Creates the database,loads schema and seeds the database'
         ]);
 
-        
+        $this->addCommand('migrate', [
+            'help' => 'Run all migrations that have not been executed',
+            'arguments' => [
+                'version' => ['help'=>'a target version e.g. 20190511111934']
+            ]
+        ]);
     }
-
+ 
+    
     /**
      * Creates the database
      *
@@ -64,36 +75,38 @@ class DbShell extends Shell
     public function create()
     {
         $datasource = $this->getDatasource();
-        if( $this->Db->create($datasource)){
-            return $this->status('ok','Database created');
+        if ($this->Db->create($datasource)) {
+            return $this->status('ok', 'Database created');
         }
-        return $this->status('error','Error creating database');
+        return $this->status('error', 'Error creating database');
     }
 
-    public function setup(){
+    public function setup()
+    {
         $this->create();
         $datasource = $this->getDatasource();
-        $this->schemaLoad('schema',$datasource);
+        $this->schemaLoad('schema', $datasource);
         $this->seed();
     }
 
-    public function reset(){
+    public function reset()
+    {
         $this->drop();
         $this->setup();
     }
 
-     /**
-     * Creates the database
-     *
-     * @return void
-     */
+    /**
+    * Creates the database
+    *
+    * @return void
+    */
     public function drop()
     {
         $datasource = $this->getDatasource();
-        if( $this->Db->drop($datasource)){
-            return $this->status('ok','Database dropped');
+        if ($this->Db->drop($datasource)) {
+            return $this->status('ok', 'Database dropped');
         }
-        return $this->status('error','Error dropped database');
+        return $this->status('error', 'Error dropped database');
     }
 
     /**
@@ -101,19 +114,36 @@ class DbShell extends Shell
      *
      * @return void
      */
-    public function seed(){
+    public function seed()
+    {
         $datasource = $this->getDatasource();
         $name = 'seed';
-        if($this->args(0)){
-            $name = $this->args(0);   
+        if ($this->args(0)) {
+            $name = $this->args(0);
         }
-        if($this->Db->hasSQLFile($name)){
-            if( $this->Db->load($datasource,$name)){
-                return $this->status('ok','Database seeded');
+        if ($this->Db->hasSQLFile($name)) {
+            if ($this->Db->load($datasource, $name)) {
+                return $this->status('ok', 'Database seeded');
             }
-            return $this->status('error','Database not seeded');
+            return $this->status('error', 'Database not seeded');
         }
-        $this->status('skipped',"{$name} not found");
+        $this->status('skipped', "{$name} not found");
+    }
+
+
+    public function migrate()
+    {
+        $this->Migration->config(
+            'datasource', $this->getDatasource()
+        );
+        $version = $this->args(0);
+        $lastMigration = $this->Migration->lastMigration();
+        if($version === null OR $version > $lastMigration){
+            $this->Migration->migrate($version);
+        }
+        else{
+            $this->Migration->rollback($version);
+        }
     }
 
    
@@ -122,36 +152,37 @@ class DbShell extends Shell
      *
      * @return void
      */
-    public function schema() 
+    public function schema()
     {
         $datasource = $this->getDatasource();
 
         // Handle Dumping
-        if($this->args(0) === 'dump'){
-           if( $this->Db->dump($datasource)){
-               return $this->status('ok','Schema dumped');
-           }
-           return $this->status('error','Error dumping schema');
+        if ($this->args(0) === 'dump') {
+            if ($this->Db->dump($datasource)) {
+                return $this->status('ok', 'Schema dumped');
+            }
+            return $this->status('error', 'Error dumping schema');
         }
         // Handle loading
-        if($this->args(0) === 'load'){
+        if ($this->args(0) === 'load') {
             $name = 'schema';
-            if($this->args(1)){
-                $name = $this->args(1);   
+            if ($this->args(1)) {
+                $name = $this->args(1);
             }
-            return $this->schemaLoad($name,$datasource);
-         }
-         $this->error('Unkown action ' . $this->args(0));
+            return $this->schemaLoad($name, $datasource);
+        }
+        $this->error('Unkown action ' . $this->args(0));
     }
 
-    protected function schemaLoad($name,$datasource){
-        if($this->Db->hasSQLFile($name)){
-            if( $this->Db->load($datasource,$name)){
-                return $this->status('ok','Schema loaded');
+    protected function schemaLoad($name, $datasource)
+    {
+        if ($this->Db->hasSQLFile($name)) {
+            if ($this->Db->load($datasource, $name)) {
+                return $this->status('ok', 'Schema loaded');
             }
-            return $this->status('error','Schema not loaded');
+            return $this->status('error', 'Schema not loaded');
         }
-        $this->status('skipped',"{$name} not found");
+        $this->status('skipped', "{$name} not found");
     }
 
     protected function getDatasource(): string

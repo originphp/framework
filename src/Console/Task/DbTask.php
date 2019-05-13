@@ -79,7 +79,7 @@ class DbTask extends Task
             }
             $dump[] = $result['Create Table'] .';';
         }
-        if (!file_put_contents(CONFIG .'/db/schema.sql', implode("\n\n", $dump))) {
+        if (!file_put_contents(ROOT .'/db/schema.sql', implode("\n\n", $dump))) {
             $this->error('Error saving schema.sql');
         }
         return true;
@@ -111,9 +111,9 @@ class DbTask extends Task
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS . DS . Inflector::underscore($plugin) ."/config/db/{$file}.sql";
+            return PLUGINS . DS . Inflector::underscore($plugin) ."/db/{$file}.sql";
         }
-        return CONFIG . "/db/{$file}.sql";
+        return ROOT . "/db/{$file}.sql";
     }
 
     private function runSQL($statement, $datasource='default')
