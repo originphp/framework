@@ -24,7 +24,7 @@ class ConnectionManager
 
     protected static $drivers = [
         'mysql' => 'Origin\Model\Driver\MySQLDriver',
-        //'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
+        'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
     ];
     /**
      * Holds the driver
@@ -56,15 +56,16 @@ class ConnectionManager
             throw new MissingDatasourceException("No configuration for {$name} datasource.");
         }
 
-        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'driver'=>'mysql'];
+        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine'=>'mysql'];
         
         $config = array_merge($defaults, static::config($name));
-        if(!isset(static::$drivers[$config['driver']])){
+       
+        if(!isset(static::$drivers[$config['engine']])){
             throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
         }
-        static::$driver = $config['driver'];
-        
-        $class = static::$drivers[$config['driver']];
+        static::$driver = $config['engine'];
+      
+        $class = static::$drivers[$config['engine']];
         $datasource = new $class();
         $datasource->connect($config);
 

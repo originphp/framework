@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Origin\Model\Driver;
 
 use Origin\Model\Datasource;
@@ -36,7 +36,7 @@ POSTGRE
 /**
  * @codeCoverageIgnore
  */
-class PostgreSQLDriver
+class PostgreSQLDriver extends Datasource
 {
     /**
     * Holds the Connection
@@ -51,7 +51,7 @@ class PostgreSQLDriver
      * @var array
      */
     protected $columns = [
-       // 'autoIncrement' => ['name' => 'SERIAL NOT NULL'],
+        'autoIncrement' => ['name' => 'SERIAL'],
         'string' => ['name' => 'VARCHAR', 'length' => 255],
         'text' => ['name' => 'TEXT'],
         'integer' => ['name' => 'INTEGER'],
@@ -77,7 +77,10 @@ class PostgreSQLDriver
     public function dsn(array $config) : string
     {
         extract($config);
-        return "{$engine}:host={$host};dbname={$database};options='--client_encoding=UTF8'";
+        if($database){
+            return "{$engine}:host={$host};dbname={$database};options='--client_encoding=UTF8'";
+        }
+        return "{$engine}:host={$host};options='--client_encoding=UTF8'";
     }
     /**
      * Cache when not in debug mode
@@ -85,16 +88,16 @@ class PostgreSQLDriver
      * @param string $table
      * @return array
      */
-    public function describe(string $table) : array
+    public function schema(string $table) : array
     {
         $sql = 'SELECT DISTINCT column_name AS name, data_type AS type, character_maximum_length AS "char_length",numeric_precision AS "num_length",numeric_scale AS "num_precision", column_default AS default,  is_nullable AS "null",character_octet_length AS oct_length, ordinal_position AS position FROM information_schema.columns
-        WHERE table_name = \''.$table.'\' AND table_catalog = \''.$this->database.'\' ORDER BY position';
-         
+        WHERE table_name = \''.$table.'\' AND table_schema = \'public\'  ORDER BY position';
+      
         $schema = [];
 
-        if ($this->datasource->execute($sql)) {
-            $results =  $this->datasource->fetchAll();
-         
+        if ($this->execute($sql)) {
+            $results =  $this->fetchAll();
+    
             /**
              * @todo defaults should be type,length,default,null (remove length if empty)
              */
@@ -112,7 +115,7 @@ class PostgreSQLDriver
                 $schema[$result['name']] = $data;
             }
         }
-            
+          
         return $schema;
     }
 
@@ -161,8 +164,8 @@ class PostgreSQLDriver
     public function tables() : array
     {
         $sql = 'SELECT table_name as "table" FROM information_schema.tables WHERE table_catalog = \''.$this->database.'\' AND table_schema=\'public\'';
-        if ($this->datasource->execute($sql)) {
-            return $this->datasource->fetchList();
+        if ($this->execute($sql)) {
+            return $this->fetchList();
         }
         return [];
     }
