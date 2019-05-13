@@ -1,6 +1,12 @@
 # Readme 
 
-This framework uses PHPUnit for unit testing, when you run the PHPUnit command it should be in the same folder where the `phpunit.xml` file is, which for the framework it is in `origin/tests`. The SRC folder for testing the framework is contained within TestApp, and therefore database configuration can be found there.
+This framework uses PHPUnit 7.x for unit testing, when you run the PHPUnit command it should be in the same folder where the `phpunit.xml` file is, which for the framework it is in `origin/tests`. The SRC folder for testing the framework is contained within TestApp, and therefore database configuration can be found there.
+
+PHPUnit is installed in the Docker container, however if you want to benefit from code hinting then you should use the composer package.
+
+```linux
+$ composer require phpunit/phpunit ^7
+```
 
 The frameworks db config is in the TestApp folder as it is isolated.
 
