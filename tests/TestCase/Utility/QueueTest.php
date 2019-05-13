@@ -24,7 +24,7 @@ class QueueTest extends \PHPUnit\Framework\TestCase
         # Create the database, as we are not using mvc for this we wont use fixture
         $connection  = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS queue');
-        $statements = explode(";\n", file_get_contents(ROOT . DS . 'db/queue.sql'));
+        $statements = explode(";\n", file_get_contents(ROOT . '/db/queue.sql'));
         foreach ($statements as $statement) {
             $connection->execute($statement);
         }
