@@ -4,6 +4,12 @@ This framework uses PHPUnit for unit testing, when you run the PHPUnit command i
 
 The frameworks db config is in the TestApp folder as it is isolated.
 
+To create the test database
+
+```linux
+$ bin/console db create origin_test -ds=test
+```
+
 To run all tests
 
 ```linux
