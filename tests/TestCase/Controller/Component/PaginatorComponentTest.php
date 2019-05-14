@@ -140,7 +140,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(20, count($results));
 
         $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['Owner']]);
-        $this->assertEquals('asc', $results['order']['Owner.name']); // check alias.
+        $this->assertEquals('asc', $results['order']['owners.name']); // check alias.
 
         $Pet = new Pet();
         $Pet->belongsTo('MyOwner', ['foreignKey'=>'owner_id']);

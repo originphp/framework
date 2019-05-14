@@ -74,13 +74,15 @@ class PaginatorComponent extends Component
         // Enable sorting on related Fields. e.g author_id - this sort by Display Field
         if ($sort and substr($sort, -3) === '_id') {
             // Setup default sort if intra model fails
-            $settings['order'] = ["{$this->model->alias}.{$sort}" => $direction];
+            $tableAlias = Inflector::tableize($this->model->alias);
+            $settings['order'] = ["{$tableAlias}.{$sort}" => $direction];
             // intra model sorting by display field if configured
             $alias = $this->getModelFromField($sort);
             
             if (isset($this->model->{$alias})) {
                 if ($displayField = $this->model->{$alias}->displayField) {
-                    $settings['order'] = ["{$alias}.{$displayField}" => $direction];
+                    $tableAlias = Inflector::tableize($this->model->{$alias}->alias);
+                    $settings['order'] = ["{$tableAlias}.{$displayField}" => $direction];
                 }
             }
         }

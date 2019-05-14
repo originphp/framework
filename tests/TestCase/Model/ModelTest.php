@@ -124,12 +124,12 @@ class ModelTest extends OriginTestCase
         $fields = $this->Article->fields();
 
         $expected = [
-          'Article.id',
-          'Article.author_id',
-          'Article.title',
-          'Article.body',
-          'Article.created',
-          'Article.modified',
+          'articles.id',
+          'articles.author_id',
+          'articles.title',
+          'articles.body',
+          'articles.created',
+          'articles.modified',
         ];
         $this->assertEquals($expected, $fields);
 
@@ -195,7 +195,7 @@ class ModelTest extends OriginTestCase
         $this->assertEquals('Comment', $relationship->className);
 
         $this->assertEquals('post_id', $relationship->foreignKey);
-        $expected = array('Post.id = Comment.post_id');
+        $expected = array('posts.id = comments.post_id');
         $this->assertEquals($expected, $relationship->conditions);
         $this->assertNull($relationship->fields);
         $this->assertFalse($relationship->dependent);
@@ -206,7 +206,7 @@ class ModelTest extends OriginTestCase
         $User = new Model(array('name' => 'User'));
         $relationship = (object) $User->hasOne('Profile', array('className' => 'UserProfile'));
         $this->assertEquals('user_id', $relationship->foreignKey);
-        $expected = array('User.id = Profile.user_id');
+        $expected = array('users.id = profiles.user_id');
         $this->assertEquals($expected, $relationship->conditions);
     }
 
@@ -226,7 +226,7 @@ class ModelTest extends OriginTestCase
         // Test Merge went okay
         $relationship = $Post->hasOne('Comment', $hasOneConfig);
         $hasOneConfig['conditions'] = array(
-          'Post.id = Comment.funky_post_id',
+          'posts.id = comments.funky_post_id',
           '1 == 1',
         );
 
@@ -242,7 +242,7 @@ class ModelTest extends OriginTestCase
         $this->assertEquals('User', $relationship->className);
 
         $this->assertEquals('user_id', $relationship->foreignKey);
-        $expected = array('Post.user_id = User.id');
+        $expected = array('posts.user_id = users.id');
         $this->assertEquals($expected, $relationship->conditions);
         $this->assertNull($relationship->fields);
         $this->assertEquals('LEFT', $relationship->type);
@@ -255,7 +255,7 @@ class ModelTest extends OriginTestCase
         $relationship = (object) $Post->belongsTo('Owner', array('className' => 'User'));
 
         $this->assertEquals('user_id', $relationship->foreignKey);
-        $expected = array('Post.user_id = Owner.id');
+        $expected = array('posts.user_id = owners.id');
         $this->assertEquals($expected, $relationship->conditions);
     }
 
@@ -278,7 +278,7 @@ class ModelTest extends OriginTestCase
         $relationship = $Post->belongsTo('User', $belongsToConfig);
 
         $belongsToConfig['conditions'] = array(
-          'Post.owner_id = User.id',
+          'posts.owner_id = users.id',
           '1 == 1',
         );
 
@@ -314,7 +314,7 @@ class ModelTest extends OriginTestCase
           'className' => 'User',
           'foreignKey' => 'owner_id',
           'conditions' => array(
-            'Post.id = UserComment.post_id',
+            'posts.id = user_comments.post_id',
           ),
           'fields' => array('id', 'title'),
           'order' => array('created ASC'),
@@ -337,7 +337,7 @@ class ModelTest extends OriginTestCase
             'joinTable' => 'candidates_jobs',
             'foreignKey' => 'job_id',
             'associationForeignKey' => 'candidate_id',
-            'conditions' => array('CandidatesJob.candidate_id = Candidate.id'),
+            'conditions' => array('candidates_jobs.candidate_id = candidates.id'),
             'fields' => null,
             'order' => null,
             'dependent' => null,
@@ -350,7 +350,7 @@ class ModelTest extends OriginTestCase
         
         // Test Merging
         $relationship = $Candidate->hasAndBelongsToMany('Candidate', ['conditions'=>['Candidate.active'=>true]]);
-        $this->assertEquals('CandidatesJob.candidate_id = Candidate.id', $relationship['conditions'][0]);
+        $this->assertEquals('candidates_jobs.candidate_id = candidates.id', $relationship['conditions'][0]);
         $this->assertEquals(true, $relationship['conditions']['Candidate.active']);
     }
 
@@ -404,7 +404,7 @@ class ModelTest extends OriginTestCase
         $result = $this->Article->find('first', ['conditions'=>['id'=>1001]]);
         $this->assertEquals(1001, $result->id);
 
-        $result = $this->Article->find('first', ['conditions'=>['Article.id'=>1001]]);
+        $result = $this->Article->find('first', ['conditions'=>['articles.id'=>1001]]);
         $this->assertEquals(1001, $result->id);
     }
 
@@ -449,15 +449,15 @@ class ModelTest extends OriginTestCase
     {
         $conditions = [
             'conditions' => ['id'=>1000],
-            'fields' => ['Article.id','Article.title','Author.name'],
+            'fields' => ['articles.id','articles.title','authors.name'],
             'joins'=>[]
         ];
         $conditions['joins'][] = [
             'table' => 'authors',
-            'alias' => 'Author',
+            'alias' => 'authors',
             'type' => 'LEFT' , // this is defualt,
             'conditions' => [
-              'Author.id = Article.author_id'
+              'authors.id = articles.author_id'
             ]
            ];
        
@@ -595,6 +595,7 @@ class ModelTest extends OriginTestCase
             'conditions' => ['id'=>1001],
             'associated'=>['Author'=>['associated'=>['Address']]]
             ]);
+   
         $this->assertEquals(1000, $result->author_id);
         $this->assertEquals(1000, $result->author->id);
         $this->assertEquals(1000, $result->author->address->author_id);
@@ -1227,11 +1228,12 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->get(1000, ['associated'=>['Comment','Tag']]);
         $comments = count($article->comments);
         $tags = count($article->tags);
-
+        # test deleteDepenent False
         $this->assertTrue($this->Article->delete($article));
+    
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions'=>['article_id'=>1000]])); // did not delete
-       $this->assertNotEquals($tags, $this->Article->ArticlesTag->find('count', ['conditions'=>['article_id'=>1000]])); // Delete always
-
+        $this->assertNotEquals($tags, $this->Article->ArticlesTag->find('count', ['conditions'=>['article_id'=>1000]])); // Delete always
+     
        $this->Article->hasMany('Comment', ['dependent'=>true]);
         $article = $this->Article->get(1002, ['associated'=>['Comment','Tag']]);
         $this->assertGreaterThan(0, count($article->comments));

@@ -408,8 +408,9 @@ class Model
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscore($this->name) . '_id';
         }
-
-        $conditions = ["{$this->alias}.id = {$association}.{$options['foreignKey']}"];
+        $tableAlias = Inflector::tableize($this->alias);
+        $associationTableAlias = Inflector::tableize($association);
+        $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
 
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array)$options['conditions']);
@@ -446,7 +447,10 @@ class Model
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscore($options['className']) . '_id';
         }
-        $conditions = ["{$this->alias}.{$options['foreignKey']} = {$association}.id"];
+        $alias = Inflector::tableize($this->alias);
+        $associatedAlias = Inflector::tableize($association);
+
+        $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
 
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array)$options['conditions']);
@@ -545,7 +549,9 @@ class Model
         if (is_null($options['associationForeignKey'])) {
             $options['associationForeignKey'] = Inflector::underscore($options['className']) . '_id';
         }
-        $conditions = ["{$options['with']}.{$options['associationForeignKey']} = {$options['className']}.id"];
+        $withAlias = Inflector::tableize($options['with']);
+        $optionsClassAlias = Inflector::tableize($options['className']);
+        $conditions = ["{$withAlias}.{$options['associationForeignKey']} = {$optionsClassAlias}.id"];
 
         if (!empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array)$options['conditions']);
@@ -611,9 +617,10 @@ class Model
      */
     protected function prepareFields($fields)
     {
+        $alias = Inflector::tableize($this->alias);
         foreach ($fields as $index => $field) {
             if (strpos($field, ' ') === false and strpos($field, '.') === false and strpos($field, '(') === false) {
-                $fields[$index] = "{$this->alias}.{$field}";
+                $fields[$index] = "{$alias}.{$field}";
             }
         }
 
@@ -1089,11 +1096,11 @@ class Model
         if ($id === null) {
             return false;
         }
-
-        return (bool)$this->find('count', array(
-            'conditions' => array("{$this->alias}.{$this->primaryKey}" => $id),
+        $tableAlias = Inflector::tableize($this->alias);
+        return (bool)$this->find('count', [
+            'conditions' => ["{$tableAlias}.{$this->primaryKey}" => $id],
             'callbacks' => false
-        ));
+        ]);
     }
 
     /**
@@ -1232,6 +1239,7 @@ class Model
             $associatedModel = $config['with'];
             $conditions = [$config['foreignKey'] => $id];
             $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
+  
             foreach ($ids as $id) {
                 $conditions = [$this->{$associatedModel}->primaryKey => $id];
                 $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
@@ -1363,10 +1371,11 @@ class Model
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
+
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
                     $query['joins'][] = array(
                         'table' => $this->{$alias}->table,
-                        'alias' => $alias,
+                        'alias' => Inflector::tableize($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
                         'datasource' => $this->datasource,
@@ -1400,8 +1409,9 @@ class Model
                 $config = [];
             }
             $config += ['fields' => []];
+            $tableAlias = Inflector::tableize($alias);
             foreach ($config['fields'] as $key => $value) {
-                $config['fields'][$key] = "{$alias}.{$value}";
+                $config['fields'][$key] = "{$tableAlias}.{$value}";
             }
             $contain[$alias] = $config;
 
@@ -1441,16 +1451,17 @@ class Model
     {
         $buffer = [];
 
-
+        $alias = Inflector::tableize($this->alias);
+       
         foreach ($results as $record) {
-            $thisData = (isset($record[$this->alias]) ? $record[$this->alias] : []); // Work with group and no fields from db
-            $entity = new Entity($thisData, ['name' => $this->alias, 'exists' => true, 'markClean' => true]);
-            unset($record[$this->alias]);
+            $thisData = (isset($record[$alias ]) ? $record[$alias ] : []); // Work with group and no fields from db
+            $entity = new Entity($thisData, ['name' => $this->alias , 'exists' => true, 'markClean' => true]);
+            unset($record[$alias]);
 
-            foreach ($record as $model => $data) {
-                if (is_string($model)) {
+            foreach ($record as $tableAlias => $data) {
+                if (is_string($tableAlias)) {
+                    $model  = Inflector::classify($tableAlias);
                     $associated = Inflector::variable($model);
-
                     /**
                      * Remove empty records. If the foreignKey is not present then the associated
                      * data will not be present. This is correct.
@@ -1506,7 +1517,8 @@ class Model
 
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->primaryKey})) {
-                        $config['conditions']["{$alias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                        $tableAlias = Inflector::tableize($alias);
+                        $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
                         $models = Inflector::pluralize(Inflector::variable($alias));
                         $result->{$models} = $this->{$alias}->find('all', $config);
                     }
@@ -1525,7 +1537,7 @@ class Model
 
                 $config['joins'][0] = array(
                     'table' => $config['joinTable'],
-                    'alias' => $config['with'],
+                    'alias' => Inflector::tableize($config['with']),
                     'type' => 'INNER',
                     'conditions' => $config['conditions'],
                 );
@@ -1533,12 +1545,13 @@ class Model
                 if (empty($config['fields'])) {
                     $config['fields'] = array_merge($this->{$alias}->fields(), $this->{$config['with']}->fields());
                 }
-
+            
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->primaryKey})) {
-                        $config['joins'][0]['conditions']["{$config['with']}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
+                        $withAlias = Inflector::tableize($config['with']);
+                        $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
                     }
-
+        
                     $models = Inflector::pluralize(Inflector::variable($alias));
                     $result->{$models} = $this->{$alias}->find('all', $config);
                 }
@@ -1559,17 +1572,8 @@ class Model
     protected function readDataSource(array $query, $type = 'model')
     {
         $connection = $this->connection();
-        $connection->select($this->table, $query + ['alias' => $this->alias]);
-      
-        /*
-          A different way to map and solve problem with postgres due meta table actual table name. Using virtual field
-            foreach ($query['fields'] as $k => $field) {
-            if (strpos($field, ' AS ') == false) {
-                $query['fields'][$k] = $field . ' AS ' . str_replace('.', '__', $field);
-             }
-            }
-          */
-
+        $connection->select($this->table, $query + ['alias' => Inflector::tableize($this->alias)]);
+ 
         if ($type === 'list') {
             return $connection->fetchList();
         }
@@ -1634,11 +1638,11 @@ class Model
                 $foreignKey = $this->hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
                 $primaryKey = $this->{$model}->primaryKey;
-
+                $modelTableAlias = Inflector::tableize($model);
                 foreach ($results as &$result) {
                     if (isset($result->{$this->primaryKey})) { // Author id
                         $config['conditions'] =   $this->hasOne[$model]['conditions'];
-                        $config['conditions'] = [$model . '.' . $foreignKey => $result->{$this->primaryKey}];
+                        $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->primaryKey}];
                         $result->$property = $this->{$model}->find('first', $config);
                     }
                 }

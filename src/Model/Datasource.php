@@ -416,7 +416,7 @@ class Datasource
         for($i=0;$i<$count;$i++){
             $model = 0; // default value
             $field = $fields[$i];
-            if(preg_match('/^[A-Za-z0-9]+\.[a-z0-9_]+$/i',$field)){
+            if(preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i',$field)){
                 list($model,$field) = explode('.',$fields[$i]);
             }
             
