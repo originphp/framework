@@ -34,7 +34,13 @@ class MySQLDriver extends Datasource
         'boolean' => ['name' => 'TINYINT', 'length' => 1],
     ];
 
-    public $escape = '`';
+ 
+    /**
+     * What to escape table and column aliases
+     *
+     * @var string
+     */
+    protected $escape = '`';
 
     /**
      * Returns the DSN string

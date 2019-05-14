@@ -179,11 +179,12 @@ class QueryBuilder
     protected $i = 0;
 
     /**
-     * The default quote symbol for escaping stuff
+     * All table and column aliases are escaped using the tilde sign (`) by default. This
+     * is for MySQL or PostgreSQL using "
      *
      * @var string
      */
-    public $quote ='`';
+    public $escape ='`';
 
     /**
      * List of operators
@@ -202,10 +203,15 @@ class QueryBuilder
      */
     protected $specialFields = [];
 
-    public function __construct($table = null, $alias = null)
+    public function __construct($table = null, $alias = null,array $options =[])
     {
+        $options += ['escape'=>null];
+
         if (!empty($table)) {
             $this->from($table, $alias);
+        }
+        if($options['escape']){
+            $this->escape = $options['escape'];
         }
     }
 
@@ -245,9 +251,9 @@ class QueryBuilder
             $table = $this->table;
             $alias = $this->alias;
         }
-        $tableReference = "{$this->quote}{$table}{$this->quote}";
+        $tableReference = "{$this->escape}{$table}{$this->escape}";
         if ($alias != $table) {
-            $tableReference .= " AS {$this->quote}{$alias}{$this->quote}";
+            $tableReference .= " AS {$this->escape}{$alias}{$this->escape}";
         }
 
         return $tableReference;
@@ -808,7 +814,7 @@ class QueryBuilder
         foreach ($fields as $index => $column) {
             $fields[$index] = $this->addAlias($column);
             if (is_string($index)) {
-                $fields[$index] = "{$this->alias}.{$index} AS {$this->quote}{$column}{$this->quote}";
+                $fields[$index] = "{$this->alias}.{$index} AS {$this->escape}{$column}{$this->escape}";
             }
         }
         return $fields;

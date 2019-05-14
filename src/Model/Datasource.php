@@ -19,6 +19,7 @@ use Origin\Core\Logger;
 use Origin\Model\Exception\DatasourceException;
 use PDO;
 use PDOException;
+use Origin\Model\QueryBuilder;
 
 class Datasource
 {
@@ -56,6 +57,11 @@ class Datasource
     private $columnMap = [];
 
 
+    /**
+     * What to escape table and column aliases
+     *
+     * @var string
+     */
     protected $escape = '';
 
     /**
@@ -522,7 +528,9 @@ class Datasource
      */
     public function queryBuilder(string $table, $alias=null)
     {
-        return new QueryBuilder($table, $alias);
+        return new QueryBuilder($table, $alias,[
+            'escape'=>$this->escape
+            ]);
     }
 
     public function log()

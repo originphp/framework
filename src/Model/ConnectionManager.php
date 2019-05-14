@@ -16,13 +16,12 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\MissingDatasourceException;
 use Origin\Core\StaticConfigTrait;
-use Origin\Model\Driver\MySQLDriver;
 
 class ConnectionManager
 {
     use StaticConfigTrait;
 
-    protected static $drivers = [
+    protected static $engines = [
         'mysql' => 'Origin\Model\Driver\MySQLDriver',
         'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
     ];
@@ -60,12 +59,12 @@ class ConnectionManager
         
         $config = array_merge($defaults, static::config($name));
        
-        if(!isset(static::$drivers[$config['engine']])){
+        if(!isset(static::$engines[$config['engine']])){
             throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
         }
         static::$driver = $config['engine'];
       
-        $class = static::$drivers[$config['engine']];
+        $class = static::$engines[$config['engine']];
         $datasource = new $class();
         $datasource->connect($config);
 

@@ -66,7 +66,12 @@ class PostgreSQLDriver extends Datasource
         'boolean' => ['name' => 'BOOLEAN'],
     ];
 
-    public $escape = '"';
+       /**
+     * What to escape table and column aliases
+     *
+     * @var string
+     */
+    protected $escape = '"';
 
     /**
      * Returns the DSN string
