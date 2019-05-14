@@ -19,7 +19,11 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.2.3] - 2019-05-13
+### Fixed
+- Merged development into master :(
 
+## [1.2.0] - 2019-05-13
 ### Added
 - Added Migrations
 
