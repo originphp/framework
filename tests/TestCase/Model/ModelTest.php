@@ -148,10 +148,38 @@ class ModelTest extends OriginTestCase
 
     public function testSchema()
     {
+        $ds = $this->Article->connection();
+        if( $ds->engine() !== 'mysql'){
+            $this->markTestSkipped(
+                'Requires PostgreSQL'
+              );
+        }
         $schema = $this->Article->schema();
         $expected = [
             'type' => 'primaryKey',
             'limit' => 11,
+            'default' => null,
+            'null' => false,
+            'key' => 'primary',
+        ];
+        
+        $this->assertEquals($expected, $schema['id']);
+
+        $idSchema = $this->Article->schema('id');
+        $this->assertEquals($expected, $idSchema);
+    }
+
+    public function testSchemaPG(){
+        $ds = $this->Article->connection();
+        if( $ds->engine() !== 'pgsql'){
+            $this->markTestSkipped(
+                'Requires PostgreSQL'
+              );
+        }
+        $schema = $this->Article->schema();
+        $expected = [
+            'type' => 'primaryKey',
+            'limit' => null,
             'default' => null,
             'null' => false,
             'key' => 'primary',
@@ -178,9 +206,11 @@ class ModelTest extends OriginTestCase
         $this->Article->hasAndBelongsToMany('Tag');
         $this->assertEquals('article_id', $this->Article->ArticlesTag->displayField);
 
-        $sql = "CREATE TABLE foos (a VARCHAR(255) NOT NULL,b VARCHAR(255) NOT NULL,created DATETIME NOT NULL,modified DATETIME NOT NULL);";
-        $this->Article->query('DROP TABLE IF EXISTS foos;');
-        $this->Article->query($sql);
+
+        $ds = $this->Article->connection();
+        $ds->execute('DROP TABLE IF EXISTS foos');
+        $sql = $ds->createTable('foos',['not_id'=>'primaryKey','undetectable'=>'string']);
+        $ds->execute($sql);
         $dummy = new Model(['name'=>'Foo','datasource'=>'test']);
   
         $this->expectException(Exception::class);
@@ -388,7 +418,7 @@ class ModelTest extends OriginTestCase
         $result =  $this->Article->find('first');
         $this->assertInstanceOf(Entity::class, $result);
         
-        $result = $this->Article->find('first', ['conditions'=>['id'=>'does-not-exist']]);
+        $result = $this->Article->find('first', ['conditions'=>['id'=>123456789]]);
         $this->assertNull($result);
     }
 
@@ -397,7 +427,7 @@ class ModelTest extends OriginTestCase
         $result =  $this->Article->find('all');
         $this->assertInstanceOf(Collection::class, $result);
         
-        $result = $this->Article->find('all', ['conditions'=>['id'=>'does-not-exist']]);
+        $result = $this->Article->find('all', ['conditions'=>['id'=>123456789]]);
         $this->assertTrue(is_array($result));
     }
     public function testFindConditions()
@@ -472,7 +502,7 @@ class ModelTest extends OriginTestCase
         $result = $this->Article->find('count', ['fields'=>['really_does_not_matter']]);
         $this->assertEquals(3, $result);
 
-        $result = $this->Article->find('count', ['conditions'=>['id'=>'does-not-exist']]);
+        $result = $this->Article->find('count', ['conditions'=>['id'=>123456789]]);
         $this->assertEquals(0, $result);
     }
 
@@ -1114,20 +1144,23 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($this->Article->save($article));
      
         $data = [
-            'id' => 1000, // Article Id
+            'id' => 1000, # Article ID
             'tags' => [
                 ['title' => 'Tag #1'],
-                ['title' => 'Featured']
+                ['title' => 'Featured'],
+                ['title' => 'Featured Again']
              ]
           ];
         $article = $this->Article->new($data);
        
         $this->assertTrue($this->Article->save($article));
-        $this->assertEquals(1000, $article->tags[0]->id);
-        $this->assertEquals(1003, $article->tags[1]->id);
+        # Postgre returns different id numbers
+        $this->assertNotEmpty($article->tags[0]->id);
+        $this->assertNotEmpty($article->tags[1]->id);
+        $this->assertNotEquals($article->tags[0]->id,$article->tags[1]->id);
         
         $article = $this->Article->get($article->id, ['associated'=>['Tag']]);
-        $this->assertEquals(2, count($article->tags));
+        $this->assertEquals(3, count($article->tags));
     }
 
     public function testSaveAssociatedHasAndBelongsToManyUnkown()
@@ -1135,7 +1168,6 @@ class ModelTest extends OriginTestCase
         $this->Article->hasAndBelongsToMany('Tag');
         $this->Article->Tag->hasAndBelongsToMany('Tag');
         
-         
         $data = [
             'id' => 1000,
             'tags' => [
@@ -1242,19 +1274,30 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($this->Article->delete($article));
         $this->assertEquals(0, $this->Article->Comment->find('count', ['conditions'=>['article_id'=>1002]])); // did not delete
         
-        // Disable Cascade
-        $article = $this->Article->new(['id'=>1000,'title'=>'Adding Article Back','author_id'=>1234,'description'=>'Because it has comments']);
-        $this->assertTrue($this->Article->save($article));
-        $this->assertTrue($this->Article->delete($article, false));
+    }
+ 
+    public function testDeleteNoCascade()
+    {
+        $this->Article->hasMany('Comment');
+        $this->Article->hasAndBelongsToMany('Tag');
+
+        $article = $this->Article->get(1000, ['associated'=>['Comment','Tag']]);
+        $comments = count($article->comments);
+        $tags = count($article->tags);
+         $this->assertTrue($this->Article->delete($article, false));
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions'=>['article_id'=>1000]]));
         
+      
+    }
+
+    public function testDeleteNotExists(){
         // Test Delete Not Exists
 
         $article = $this->Article->new();
         $article->id = 124;
         $this->assertFalse($this->Article->delete($article));
     }
- 
+
     public function testDeleteCallbacks()
     {
         $article = $this->Article->find('first');

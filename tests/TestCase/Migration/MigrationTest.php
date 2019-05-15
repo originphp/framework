@@ -214,7 +214,7 @@ class MigrationTest extends OriginTestCase
         $migration->addColumn('articles', 'comment_5', 'string', ['null'=>true]);
 
         $reversableStatements = array_merge($migration->invokeStart(), $reversableStatements); # add to end
-
+    
         $this->assertTrue($migration->columnExists('articles', 'category_id'));
         $this->assertTrue($migration->columnExists('articles', 'opens', ['limit'=>3]));
         $this->assertTrue($migration->columnExists('articles', 'amount', ['precision'=>5,'scale'=>2]));
@@ -268,16 +268,23 @@ class MigrationTest extends OriginTestCase
 
     public function testRemoveColumns()
     {
+        # Prep
         $migration = $this->migration();
-        $migration->removeColumns('articles', ['title','created']);
-        
-        $reversableStatements = $migration->invokeStart();
-        $this->assertFalse($migration->columnExists('articles', 'title'));
-        $this->assertFalse($migration->columnExists('articles', 'created'));
+        $migration->addColumn('articles','remove_me','string',['null'=>true,'default'=>'test']);
+        $migration->addColumn('articles','remove_me_as_well','string',['null'=>true,'default'=>'test']);
+        $migration->start();
 
+        # Test Up
+        $migration = $this->migration();
+        $migration->removeColumns('articles', ['remove_me','remove_me_as_well']);
+        $reversableStatements = $migration->invokeStart();
+        $this->assertFalse($migration->columnExists('articles', 'remove_me'));
+        $this->assertFalse($migration->columnExists('articles', 'remove_me_as_well'));
+
+        # Test Down
         $migration->rollback($reversableStatements);
-        $this->assertTrue($migration->columnExists('articles', 'title'));
-        $this->assertTrue($migration->columnExists('articles', 'created'));
+        $this->assertTrue($migration->columnExists('articles', 'remove_me'));
+        $this->assertTrue($migration->columnExists('articles', 'remove_me_as_well'));
     }
 
 

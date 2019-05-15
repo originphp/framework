@@ -67,6 +67,12 @@ class BaseSchema
         if (isset($this->columns[$type])) {
             $real = $this->columns[$type];
             $type = strtoupper($this->columns[$type]['name']);
+            # Remove limit,precision, scale if user has sent them (postgre can use int limit)
+            foreach(['limit','precision','scale'] as $remove){
+                if(!isset($real[$remove]) AND isset($column[$remove])){
+                    $column[$remove] = null;
+                }
+            }
         }
      
         # Lengths
@@ -110,7 +116,7 @@ class BaseSchema
         } elseif ($column['null'] === false) {
             $output .= ' NOT NULL';
         }
-     
+      
         return $output;
     }
 
@@ -155,6 +161,12 @@ class BaseSchema
             $mapping = ['name'=>$settings['type']]; // non agnostic
             if (isset($this->columns[$settings['type']])) {
                 $mapping = $this->columns[$settings['type']];
+                // Remove these fields if they are not allowed per columns
+                foreach(['limit','precision','scale'] as $remove){
+                    if(!isset($mapping[$remove])){
+                        unset($settings[$remove]);
+                    }
+                }
             }
 
             $settings = $settings + $mapping;
@@ -164,7 +176,12 @@ class BaseSchema
             if (!empty($settings['limit'])) {
                 $output .= "({$settings['limit']})";
             } elseif (in_array($settings['type'], ['decimal', 'float'])) {
-                $output .= "({$settings['precision']},{$settings['scale']})";
+                if(isset($settings['scale'])){
+                    $output .= "({$settings['precision']},{$settings['scale']})";
+                }
+                elseif(isset($settings['precision'])){
+                    $output .= "({$settings['precision']})"; // postgres float
+                }
             }
 
             if (isset($settings['default'])) {

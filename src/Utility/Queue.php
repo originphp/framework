@@ -195,11 +195,12 @@ class Queue
      * @param string $schedule when to process
      * @return int $id
      */
-    public function add(string $queue = null, array $data = [], string $strtotime = 'now') :bool
+    public function add(string $queue = null, array $data = [], string $strtotime = 'now') 
     {
         if (!preg_match('/^[\w.-]+$/i', $queue)) {
             throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores, hypens and dots.');
         }
+    
         $entity = $this->Job->new();
 
         $entity->queue = $queue;
@@ -210,8 +211,10 @@ class Queue
         if (mb_strlen($entity->data) >= 65535) {
             throw new InvalidArgumentException('Data string is longer than 65,535');
         }
-        
-        return $this->Job->save($entity);
+        if($this->Job->save($entity)){
+            return $this->Job->id;
+        }
+        return false;
     }
 
 
@@ -223,7 +226,8 @@ class Queue
      */
     public function fetch(string $queue)
     {
-        $conditions = ['queue'=>$queue,'status'=>'queued','locked'=>0,'scheduled <=' => date('Y-m-d H:i:s')];
+        # Boolean fields on Postgre work differently and does not accept 0 only '0' 
+        $conditions = ['queue'=>$queue,'status'=>'queued','locked = \'0\' ','scheduled <=' => date('Y-m-d H:i:s')];
         if ($result = $this->Job->find('first', ['conditions'=>$conditions])) {
             if ($this->claim($result->id)) {
                 return new Job($this->Job, $result);
@@ -241,8 +245,8 @@ class Queue
     protected function claim($id)
     {
         $this->Job->begin();
-        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = {$id} AND locked = 0 FOR UPDATE;");
-        $this->Job->query("UPDATE {$this->Job->table} SET locked = 1 , tries = tries + 1, modified = '" . now() . "' WHERE id = {$id};");
+        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = {$id} AND locked = '0' FOR UPDATE;");
+        $this->Job->query("UPDATE {$this->Job->table} SET locked = '1' , tries = tries + 1, modified = '" . now() . "' WHERE id = {$id};");
         $this->Job->commit();
         if ($result) {
             return $result;

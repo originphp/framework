@@ -67,7 +67,7 @@ class FixtureManager
             $createTable = true;
         }
 
-        $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+       $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
 
         if ($createTable or $this->loaded[$fixture]->dropTables === true) {
             /* @todo waiting for sql schema to be migrated which also invovles rewriting tests to changes, once done this can be removed because unload fixture drops table. */

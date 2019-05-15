@@ -37,8 +37,8 @@ class PgsqlSchema extends BaseSchema
         'string' => ['name' => 'VARCHAR', 'limit' => 255],
         'text' => ['name' => 'TEXT'],
         'integer' => ['name' => 'INTEGER'],
-        'biginteger' => ['name' => 'BIGINT', 'limit' => 20],
-        'float' => ['name' => 'FLOAT', 'precision' => 10, 'scale' => 0], // mysql defaults
+        'bigint' => ['name' => 'BIGINT'],
+        'float' => ['name' => 'FLOAT'],  # Floats get complicated, float(2) converts to real(24).
         'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
         'datetime' => ['name' => 'TIMESTAMP'],
         'timestamp' => ['name' => 'TIMESTAMP'],
@@ -81,21 +81,33 @@ class PgsqlSchema extends BaseSchema
             /**
              * @todo defaults should be type,length,default,null (remove length if empty)
              */
+           
             foreach ($results as $result) {
-                $data = ['type'=>null,'limit'=>null,'precision'=>null];
+                $data = ['type'=>null,'limit'=>null,'default'=>null,'null'=>null];
                 $data['type'] = $this->column($result['type']);
                 if ($data['type'] === 'string' AND $result['type'] === 'character varying') {
                     $data['limit'] = $result['char_length'];
                 } elseif (in_array($data['type'], ['decimal','float'])) {
-                    $data['precision'] = $result['numeric_precision'];
-                    $data['scale'] = $result['numeric_scale'];
+                    if($result['numeric_precision']){
+                        $data['precision'] = $result['numeric_precision'];
+                    }
+                   if($result['numeric_scale']){
+                     $data['scale'] = $result['numeric_scale'];
+                   }
                 }
-                //
-                $data['default'] = null;
-                $position = strpos($data['default'], '::character varying');
-                if ($position !== false and strpos($data['default'], 'nextval') === false) {
-                    $data['default'] = trim(substr($data['default'], 0, $position), "'"); // parse 'foo'::character varying
+                       
+
+                $data['null'] = ($result['null'] === 'YES' ? true : false);
+                //nextval
+                $position = strpos($result['default'], '::character varying');
+                $isAuto = (strpos($result['default'], 'nextval') !== false);
+                if ($position !== false and !$isAuto) {
+                    $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
                 }
+                elseif(!empty($result['default']) AND !$isAuto){
+                    $data['default'] = $result['default'];
+                }
+                
                 /**
                  * Detect Primary Key
                  * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
@@ -108,7 +120,7 @@ class PgsqlSchema extends BaseSchema
                 $schema[$result['name']] = $data;
             }
         }
-    
+        
         return $schema;
     }
 
@@ -120,7 +132,7 @@ class PgsqlSchema extends BaseSchema
      */
     private function column(string $type)
     {
-        if (in_array($type, ['integer','text','date','time','boolean'])) {
+        if (in_array($type, ['integer','text','date','time','boolean','bigint'])) {
             return $type;
         }
         // Char and varchar
@@ -139,13 +151,11 @@ class PgsqlSchema extends BaseSchema
         if (strpos($type, 'bytea') !== false) {
             return 'binary';
         }
-        if ($type ==='bigint') {
-            return 'biginteger';
-        }
         
-        if (strpos($type, 'float') !== false or strpos($type, 'double') !== false) {
+        if (in_array($type,['float','real','double','double precision'])) {
             return 'float';
         }
+ 
         // How did you get here? maybe something was missed let me know
         return 'string';
     }

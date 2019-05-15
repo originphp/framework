@@ -114,6 +114,19 @@ abstract class Datasource
     }
 
     /**
+     * Checks if connected
+     *
+     * @return boolean
+     */
+    public function isConnected(){
+        if($this->connection === null){
+            return false;
+        }
+        
+        return is_object($this->connection);
+    }
+
+    /**
      * Gets the db engine e.g. mysql or pgsql
      *
      * @return string
@@ -154,7 +167,7 @@ abstract class Datasource
             $start = microtime(true);
 
             $this->statement = $query = $this->connection->prepare($sql);
- 
+         
             $result = $query->execute($params);
             if (Configure::read('debug')) {
                 $this->log[] = [
@@ -252,7 +265,7 @@ abstract class Datasource
     {
         if($this->connection){
             if($this->statement){
-                $this->statement->closeCursor;
+                $this->statement->closeCursor();
             }
         }
         $this->connection = null;

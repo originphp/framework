@@ -36,7 +36,7 @@ class MysqlSchema extends BaseSchema
         'primaryKey' => ['name' => 'INT NOT NULL AUTO_INCREMENT'],
         'string' => ['name' => 'varchar', 'limit' => 255],
         'text' => ['name' => 'text'],
-        'integer' => ['name' => 'int'],
+        'integer' => ['name' => 'int','limit'=>11],
         'bigint' => ['name' => 'bigint', 'limit' => 20], // chgabged
         'float' => ['name' => 'FLOAT', 'precision' => 10, 'scale' => 0], // mysql defaults
         'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],

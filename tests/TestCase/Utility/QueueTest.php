@@ -16,48 +16,50 @@ namespace Origin\Test\Utility;
 use Origin\Utility\Queue;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\InvalidArgumentException;
+use Origin\TestSuite\OriginTestCase;
 
-class QueueTest extends \PHPUnit\Framework\TestCase
+class QueueTest extends OriginTestCase
 {
+    public $fixtures = ['Origin.Queue'];
+
+    /**
+     * Undocumented variable
+     *
+     * @var \Origin\Utility\Queue
+     */
+    public $Queue = null;
+
     public function setUp()
     {
-        # Create the database, as we are not using mvc for this we wont use fixture
-        $connection  = ConnectionManager::get('test');
-        $connection->execute('DROP TABLE IF EXISTS queue');
-        $statements = explode(";\n", file_get_contents(ROOT . '/db/queue.sql'));
-        foreach ($statements as $statement) {
-            $connection->execute($statement);
-        }
+        $this->Queue = new Queue(['datasource'=>'test']);
     }
+   
     public function testAdd()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $this->assertNotNull($queue->add('welcome_emails', ['user_id'=>1234]));
-        $this->assertEquals(1, $queue->model()->find('count'));
+        $this->assertNotNull($this->Queue->add('welcome_emails', ['user_id'=>1234]));
+        $this->assertEquals(1, $this->Queue->model()->find('count'));
     }
 
     public function testAddFailQueueName()
     {
-        $queue = new Queue(['datasource'=>'test']);
         $this->expectException(InvalidArgumentException::class);
-        $queue->add('this has space', ['id'=>1234]);
+        $this->Queue->add('this has space', ['id'=>1234]);
     }
 
     public function testAddFailParamsOverload()
     {
-        $queue = new Queue(['datasource'=>'test']);
         $this->expectException(InvalidArgumentException::class);
-        $queue->add('overload', ['data'=>str_repeat('+', 65535)]);
+        $this->Queue->add('overload', ['data'=>str_repeat('+', 65535)]);
     }
 
     public function testExecuted()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+    
+        $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->executed());
-
-        $job = $queue->model()->get($job->id);
+     
+        $job = $this->Queue->model()->get($job->id);
 
         $this->assertEquals('executed', $job->status);
         $this->assertEquals(0, $job->locked);
@@ -65,12 +67,11 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 
     public function testFailed()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->failed());
 
-        $job = $queue->model()->get($job->id);
+        $job = $this->Queue->model()->get($job->id);
 
         $this->assertEquals('failed', $job->status);
         $this->assertEquals(0, $job->locked);
@@ -78,22 +79,20 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 
     public function testRelease()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $this->Queue->fetch('welcome_emails');
         $job->release();
-        $job = $queue->model()->get($job->id);
+        $job = $this->Queue->model()->get($job->id);
 
         $this->assertEquals('queued', $job->status);
     }
 
     public function testRetry()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $this->Queue->fetch('welcome_emails');
         $job->retry(1);
-        $jobFromDb = $queue->model()->get($job->id);
+        $jobFromDb = $this->Queue->model()->get($job->id);
         $this->assertEquals(1, $jobFromDb->tries);
         $this->assertEquals('queued', $jobFromDb->status);
         $job->retry(1);
@@ -102,39 +101,38 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 
     public function testPurge()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $this->assertEquals(1, $queue->model()->find('count'));
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->assertEquals(1, $this->Queue->model()->find('count'));
+        $job = $this->Queue->fetch('welcome_emails');
         $job->executed();
-        $queue->purge('welcome_emails');
-        $this->assertEquals(0, $queue->model()->find('count'));
+        $this->Queue->purge('welcome_emails');
+        $this->assertEquals(0, $this->Queue->model()->find('count'));
     }
 
     public function testDelete()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $queue->add('welcome_emails', ['user_id'=>1234]);
-        $job = $queue->fetch('welcome_emails');
+        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->delete());
-        $this->assertEquals(0, $queue->model()->find('count'));
+        $this->assertEquals(0, $this->Queue->model()->find('count'));
     }
 
     public function testFetch()
     {
-        $queue = new Queue(['datasource'=>'test']);
-        $id = $queue->add('welcome_emails', ['user_id'=>1234]);
-        // Test job entity
-        $job = $queue->fetch('welcome_emails');
-
-        $this->assertEquals($id, $job->id);
+        $id = $this->Queue->add('welcome_emails', ['user_id'=>1234]);
         
+        // Test job entity
+        $job = $this->Queue->fetch('welcome_emails');
+        
+        $this->assertEquals($id, $job->id);
+      
         $message = $job->data();
         $this->assertEquals(1234, $message->user_id);
         // Test is set to locked
-        $job = $queue->model()->get($id);
+
+        $job = $this->Queue->model()->get($id);
         $this->assertEquals(1, $job->locked);
 
-        $this->assertFalse($queue->fetch('welcome_emails'));
+        $this->assertFalse($this->Queue->fetch('welcome_emails'));
     }
 }

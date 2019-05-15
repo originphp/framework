@@ -18,6 +18,7 @@ use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Behavior\Behavior;
 use Origin\Model\ConnectionManager;
+use Origin\TestSuite\OriginTestCase;
 
 class Tester extends Model
 {
@@ -46,24 +47,10 @@ class BehaviorTesterBehavior extends Behavior
     }
 }
 
-class BehaviorTest extends \PHPUnit\Framework\TestCase
+class BehaviorTest extends OriginTestCase
 {
-    /**
-     * @todo migrate to Fixtures
-     */
-    public static function setUpBeforeClass()
-    {
-        $sql = file_get_contents(ORIGIN.DS.'tests'.DS.'TestCase/Model/schema.sql');
-        $statements = explode(";\n", $sql);
 
-        $connection = ConnectionManager::get('test');
-
-        foreach ($statements as $statement) {
-            if (!empty($statement)) {
-                $connection->execute($statement);
-            }
-        }
-    }
+    public $fixtures = ['Origin.Article'];
 
     public function testBeforeFind()
     {
@@ -310,7 +297,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
-        $article = $Article->get(3);
+        $article = $Article->get(1000);
         $this->assertFalse($Article->delete($article));
     }
 
@@ -335,7 +322,7 @@ class BehaviorTest extends \PHPUnit\Framework\TestCase
         $Article->behaviorRegistry()->enable('BehaviorTester');
 
         $Article->loadBehavior('BehaviorTester');
-        $article = $Article->get(3);
+        $article = $Article->get(1000);
         $this->assertTrue($Article->delete($article));
     }
 

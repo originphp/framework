@@ -21,29 +21,41 @@ use Origin\Model\Driver\MySQLDriver;
 use PDOException;
 use Origin\Model\Exception\DatasourceException;
 use Origin\Exception\Exception;
+use Origin\TestSuite\OriginTestCase;
 
-class DatasourceTest extends \PHPUnit\Framework\TestCase
+class DatasourceTest extends OriginTestCase
 {
-    public function setUp()
-    {
-        require CONFIG.DS.'database.php';
-
+    public $fixtures = ['Origin.Author','Origin.Article'];
+    
+    public function setUp(){
         $this->connection = ConnectionManager::get('test');
-
-        $this->createTables();
+       
     }
-
     public function testIsVirtualField()
     {
-        $this->assertTrue($this->connection->isVirtualField('Article__ref'));
+        $this->assertTrue($this->connection->isVirtualField('articles__ref'));
         $this->assertFalse($this->connection->isVirtualField('article_ref'));
     }
 
     public function testCreate()
     {
-        $sql = "INSERT INTO authors (name, description, created,modified)  VALUES ('Roger', 'New Author', NOW(),NOW());";
-        $this->assertTrue($this->connection->execute($sql));
-        $this->assertEquals(3, $this->connection->lastInsertId());
+
+        $data = [
+            'name' => 'Roger',
+            'description' => 'New Author',
+            'created' => now(),
+            'modified' => now()
+        ];
+        $this->assertTrue($this->connection->insert('authors',$data));
+
+        $data = [
+            'name' => 'Roger Again',
+            'description' => 'New Author',
+            'created' => now(),
+            'modified' => now()
+        ];
+        $this->assertTrue($this->connection->insert('authors',$data));
+        $this->assertTrue($this->connection->lastInsertId()>1);
     }
 
     public function testConnectionException()
@@ -62,21 +74,21 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->connection->execute('select * from funky table');
     }
 
-    public function testDisconnect()
+    public function _testDisconnect()
     {
-        $config =  ConnectionManager::config('test');
-        $ds = new MySQLDriver();
-        $ds->connect($config);
-        $this->assertNull($ds->disconnect());
+        $this->assertTrue($this->connection->isConnected());
+        $this->assertNull($this->connection->disconnect());
+        $this->assertFalse($this->connection->isConnected());
+       ConnectionManager::drop('test');
+  
     }
 
     public function testLog()
     {
-        $config =  ConnectionManager::config('test');
-        $ds = new MySQLDriver();
-        $ds->connect($config);
-        $ds->execute('SELECT id, name, description FROM authors LIMIT 1');
-        $this->assertNotEmpty($ds->log());
+  
+        
+        $this->connection->execute('SELECT id, name, description FROM authors LIMIT 1');
+        $this->assertNotEmpty( $this->connection->log());
     }
     /**
      * @depends testCreate
@@ -86,89 +98,102 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $sql = 'SELECT name FROM authors WHERE id = 1024';
         $this->connection->execute($sql);
         $this->assertNull($this->connection->fetch());
-
+ 
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array('id' => 1, 'name' => 'Tony', 'description' => 'a great guy');
+        $expected = array('id' => 1000, 'name' => 'Author #1', 'description' => 'Description about Author #1');
         $this->assertEquals($expected, $this->connection->fetch());
 
-        $sql = 'SELECT Author.id , Author.name, Author.description FROM authors AS Author LIMIT 1';
+        $sql = 'SELECT authors.id , authors.name, authors.description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array('Author' => ['id' => 1, 'name' => 'Tony', 'description' => 'a great guy']);
+        $expected = array('authors' => array('id' => 1000, 'name' => 'Author #1', 'description' => 'Description about Author #1'));
         $result = $this->connection->fetch('model');
 
         $this->assertEquals($expected, $result);
 
-        $sql = 'SELECT Article.id, Article.title,Author.id,Author.name, CONCAT(Article.id, ":", Author.name) AS Article__ref FROM `articles` AS Article LEFT JOIN `authors` AS Author ON ( Article.author_id = Author.id )  WHERE Article.id = 1 LIMIT 1';
+        $sql = 'SELECT articles.id, articles.title,authors.id,authors.name, CONCAT(articles.id, \':\', authors.name) AS articles__ref FROM articles LEFT JOIN authors  ON ( articles.author_id = authors.id )  WHERE articles.id = 1000 LIMIT 1';
+       
+      
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetch('model');
-
+        
         // Check Virtual fields
-        $this->assertArrayHasKey('Article', $result);
-        $this->assertArrayHasKey('ref', $result['Article']);
-        $this->assertEquals('1:Tony', $result['Article']['ref']);
+        $this->assertArrayHasKey('articles', $result);
+        $this->assertArrayHasKey('ref', $result['articles']);
+        $this->assertEquals('1000:Author #2', $result['articles']['ref']);
 
         // Check Join fields
-        $this->assertArrayHasKey('Author', $result);
-        $this->assertArrayHasKey('name', $result['Author']);
-        $this->assertEquals('Tony', $result['Author']['name']);
+        $this->assertArrayHasKey('authors', $result);
+        $this->assertArrayHasKey('name', $result['authors']);
+        $this->assertEquals('Author #2', $result['authors']['name']);
 
-        // Add This Again as it would of been dropped
-        $sql = "INSERT INTO authors (name, description, created,modified)  VALUES ('Roger', 'New Author', NOW(),NOW());";
-        $this->assertTrue($this->connection->execute($sql));
 
         // Read Many
         $sql = 'SELECT id, name, description FROM authors';
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetchAll();
-
+        
         $this->assertEquals(3, count($result));
-        $this->assertEquals('Tony', $result[0]['name']);
-        $this->assertEquals('Amanda', $result[1]['name']);
+        $this->assertEquals('Author #1', $result[0]['name']);
+        $this->assertEquals('Author #2', $result[1]['name']);
 
-        $sql = 'SELECT Author.id , Author.name, Author.description FROM authors AS Author';
+        $sql = 'SELECT authors.id , authors.name, authors.description FROM authors';
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetchAll('model');
 
         $this->assertEquals(3, count($result));
-        $this->assertEquals('Tony', $result[0]['Author']['name']);
-        $this->assertEquals('Amanda', $result[1]['Author']['name']);
+        $this->assertEquals('Author #1', $result[0]['authors']['name']);
+        $this->assertEquals('Author #2', $result[1]['authors']['name']);
 
-        $sql = 'SELECT Article.id, Article.title,Author.id,Author.name, CONCAT(Article.id, ":", Author.name) AS Article__ref FROM `articles` AS Article LEFT JOIN `authors` AS Author ON ( Article.author_id = Author.id )';
+
+        $sql = 'SELECT articles.id, articles.title,authors.id,authors.name, CONCAT(articles.id, \':\', authors.name) AS articles__ref FROM articles LEFT JOIN authors  ON ( articles.author_id = authors.id )';
+       
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetchAll('model');
 
         // Check Virtual fields
-        $this->assertArrayHasKey('ref', $result[0]['Article']);
-        $this->assertArrayHasKey('ref', $result[1]['Article']);
-        $this->assertArrayHasKey('ref', $result[2]['Article']);
+        $this->assertArrayHasKey('ref', $result[0]['articles']);
+        $this->assertArrayHasKey('ref', $result[1]['articles']);
+        $this->assertArrayHasKey('ref', $result[2]['articles']);
 
+        $timestamp = now();
         // Test Lists
-        $sql = "INSERT INTO authors (name, description, created,modified)  VALUES ('Sean', 'upcoming author', '2018-11-30 14:30:00','2018-11-30 14:30:00');";
+        $data = [
+            'name' => 'Sean',
+            'description' => 'upcoming author',
+            'created' =>  '2019-03-27 13:12:00' ,
+            'modified' => $timestamp 
+        ];
+        $this->assertTrue($this->connection->insert('authors',$data));
 
-        $this->assertTrue($this->connection->execute($sql));
+        $lastId = $this->connection->lastInsertId();
+
+        # Postgre and mysql returning different ids. 
+        $this->connection->update('authors',['id'=>999],['id'=>$lastId]);
+
         $sql = 'SELECT id FROM authors ORDER BY id DESC';
-        $expected = array(4, 3, 2, 1);
+        $expected = array(1002, 1001, 1000,999);
         $this->assertTrue($this->connection->execute($sql));
-        $this->assertEquals($expected, $this->connection->fetchList());
+         $this->assertEquals($expected, $this->connection->fetchList());
 
-        $sql = 'SELECT id,name FROM authors ORDER BY name';
-        $expected = array(2 => 'Amanda', 1 => 'Tony', 3 => 'Roger', 4 => 'Sean');
+        $sql = 'SELECT id,name FROM authors ORDER BY id DESC';
+        $expected = array(1002 => 'Author #3', 1001 => 'Author #2', 1000 => 'Author #1', 999=> 'Sean');
         $this->assertTrue($this->connection->execute($sql));
+  
         $this->assertEquals($expected, $this->connection->fetchList());
 
         $sql = 'SELECT id,name,created FROM authors ORDER BY name';
         $this->assertTrue($this->connection->execute($sql));
 
         $result = $this->connection->fetchList();
+       
+        $expected = array(1002 => 'Author #3', 999 => 'Sean');
+        $this->assertArrayHasKey( '2019-03-27 13:12:00', $result);
+        $this->assertEquals($expected, $result[ '2019-03-27 13:12:00']);
 
-        $expected = array(2 => 'Amanda', 1 => 'Tony');
-        $this->assertArrayHasKey('2018-11-23 12:30:00', $result);
-        $this->assertEquals($expected, $result['2018-11-23 12:30:00']);
-
-        $expected = array(4 => 'Sean');
-        $this->assertArrayHasKey('2018-11-30 14:30:00', $result);
-        $this->assertEquals($expected, $result['2018-11-30 14:30:00']);
+        $expected = array(1001 => 'Author #2');
+        $this->assertArrayHasKey('2019-03-27 13:11:00' , $result);
+        $this->assertEquals($expected, $result[ '2019-03-27 13:11:00' ]);
     }
 
     /**
@@ -176,9 +201,9 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteUpdate()
     {
-        $sql = "UPDATE authors SET name ='Anthony Robbins' WHERE name ='Tony'";
+        $sql = "UPDATE authors SET name ='Anthony Robbins' WHERE name ='Author #1'";
         $this->assertTrue($this->connection->execute($sql));
-        $sql = 'SELECT name FROM authors WHERE id = 1';
+        $sql = 'SELECT name FROM authors WHERE id = 1000';
         $this->connection->execute($sql);
         $result = $this->connection->fetch();
         $this->assertEquals('Anthony Robbins', $result['name']);
@@ -201,7 +226,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array(1, 'Tony', 'a great guy');
+        $expected = array(1000, 'Author #1', 'Description about Author #1');
         $result = $this->connection->fetch('num');
         $this->assertEquals($expected, $result);
     }
@@ -210,8 +235,14 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array('id' => 1, 'name' => 'Tony', 'description' => 'a great guy');
+       
+        $expected = [
+            'id' => 1000,
+            'name' => 'Author #1',
+            'description' => 'Description about Author #1'
+        ];
         $result = $this->connection->fetch('assoc');
+     
         $this->assertEquals($expected, $result);
     }
 
@@ -219,17 +250,24 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array('authors' => array('id' => 1, 'name' => 'Tony', 'description' => 'a great guy'));
-
+        $expected = [
+            'id' => 1000,
+            'name' => 'Author #1',
+            'description' => 'Description about Author #1'
+        ];
         $result = $this->connection->fetch('model');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals(['authors'=>$expected], $result);
     }
 
     public function testFetchObject()
     {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-        $expected = array('id' => 1, 'name' => 'Tony', 'description' => 'a great guy');
+       $expected = [
+            'id' => 1000,
+            'name' => 'Author #1',
+            'description' => 'Description about Author #1'
+        ];
         $result = $this->connection->fetch('obj');
         $this->assertEquals((object) $expected, $result);
     }
@@ -273,7 +311,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
             'description' => ['type'=>'text','null'=>false],
             'age' => ['type'=>'integer','default'=>1234],
             'bi' => ['type'=>'bigint'],
-            'fn' => ['type'=>'float','precision'=>2],
+            'fn' => ['type'=>'float','precision'=>2], // ignored by postgres
             'dn' => ['type'=>'decimal','precision'=>2],
             'dt' => ['type'=>'datetime'],
             'ts' => ['type'=>'timestamp'],
@@ -284,14 +322,22 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         ];
         $result = $this->connection->createTable('foo', $schema);
         $this->assertTrue($this->connection->execute($result));
+/*-
+CREATE TABLE bar (
+ bookmarks_id INTEGER,
+ tags_id INTEGER,
+ PRIMARY KEY (bookmarks_id,tags_id)
+)
 
+*/
         $schema = [
             'bookmarks_id' => ['type'=>'integer','key'=>'primary'],
             'tags_id' => ['type'=>'integer','key'=>'primary'],
         ];
         $result = $this->connection->createTable('bar', $schema);
-        $this->assertContains('bookmarks_id INT,', $result);
-        $this->assertContains('tags_id INT,', $result);
+   
+        $this->assertContains('bookmarks_id INT', $result);
+        $this->assertContains('tags_id INT', $result);
         $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $result);
     }
 
@@ -303,7 +349,7 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     public function testSchema()
     {
         $schema = $this->connection->schema('foo');
-     
+        $engine = $this->connection->engine();
         $this->assertEquals('primaryKey', $schema['id']['type']);
         $this->assertEquals('primary', $schema['id']['key']);
         $this->assertEquals('string', $schema['name']['type']);
@@ -313,51 +359,23 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1234, $schema['age']['default']);
         $this->assertEquals('bigint', $schema['bi']['type']);
         $this->assertEquals('float', $schema['fn']['type']);
-        $this->assertEquals(2, $schema['fn']['precision']);
+        if($engine === 'mysql'){
+            $this->assertEquals(2, $schema['fn']['precision']);
+        }
+        
         $this->assertEquals('decimal', $schema['dn']['type']);
         $this->assertEquals(2, $schema['dn']['precision']);
         $this->assertEquals('datetime', $schema['dt']['type']);
-        $this->assertEquals('timestamp', $schema['ts']['type']);
+        if ($engine === 'mysql') {
+            $this->assertEquals('timestamp', $schema['ts']['type']);
+        }
+        else{
+            $this->assertEquals('datetime', $schema['ts']['type']);
+        }
+        
         $this->assertEquals('date', $schema['d']['type']);
         $this->assertEquals('time', $schema['t']['type']);
         $this->assertEquals('binary', $schema['bf']['type']);
         $this->assertEquals('boolean', $schema['bool']['type']);
-    }
-
-    public function createTables()
-    {
-        $this->connection->execute('DROP TABLE IF EXISTS articles, authors');
-        // create tables, add data
-        $statements = $this->getStatements();
-        foreach ($statements as $statement) {
-            $this->connection->execute($statement);
-        }
-    }
-
-    private function getStatements()
-    {
-        $sql = "
-    CREATE TABLE articles (
-     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-     author_id INT(11) NOT NULL,
-     title VARCHAR(50),
-     body TEXT,
-     created DATETIME DEFAULT NULL,
-     modified DATETIME DEFAULT NULL
- );
- CREATE TABLE authors (
-     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-     name VARCHAR(50),
-     description TEXT,
-     created DATETIME DEFAULT NULL,
-     modified DATETIME DEFAULT NULL
- );
- INSERT INTO authors (name, description, created,modified)  VALUES ('Tony', 'a great guy', '2018-11-23 12:30:00',NOW());
- INSERT INTO authors (name, description, created,modified) VALUES ('Amanda', 'a great gal', '2018-11-23 12:30:00',NOW());
- INSERT INTO articles (author_id, title, body, created,modified) VALUES (1,'The title', 'This is the post body.', NOW(),NOW());
- INSERT INTO articles (author_id, title, body, created,modified) VALUES (2,'A title once again', 'And the post body follows.', NOW(),NOW());
- INSERT INTO articles (author_id, title, body, created,modified)  VALUES (1,'Title strikes back', 'This is really exciting! Not.', NOW(),NOW());";
-
-        return explode(";\n", $sql);
     }
 }

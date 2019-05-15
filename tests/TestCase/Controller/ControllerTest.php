@@ -359,8 +359,11 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         # Create Table
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
-        $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(20));');
-        
+        $sql = $connection->adapter()->createTable('pets',[
+            'id' => ['type'=>'primaryKey'],
+            'name' => ['type'=>'string','limit'=>20]
+        ]);
+        $connection->execute($sql);
 
         # Create Dummy Data
         $Pet = new Pet();

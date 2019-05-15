@@ -122,16 +122,19 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function createTableForImporting()
     {
         $connection = ConnectionManager::get('default');
-        $connection->execute("DROP TABLE IF EXISTS movies"); // TMP
+
         // if existing datasource has movives then crash
-        $connection->execute("CREATE TABLE movies (
-             id INT AUTO_INCREMENT PRIMARY KEY,
-             name VARCHAR(255) NOT NULL,
-             decsription TEXT,
-             year INT DEFAULT 0 NOT NULL,
-             created DATETIME,
-             modified DATETIME
-            )");
+        $connection->execute("DROP TABLE IF EXISTS movies"); // TMP
+        $sql = $connection->createTable('movies',[
+            'id' => 'primaryKey',
+            'name' => ['type'=>'string','null'=>false],
+            'description' => 'text',
+            'year' => ['type'=>'integer','default'=>0,'null'=>false],
+            'created' => 'datetime',
+            'modified' => 'datetime'
+        ]);
+    
+        $connection->execute($sql);
         $Movie = new Movie();
         $Movie->datasource = 'default';
         $entity = $Movie->new(['name'=>'The Sound of Music','year'=>1965]);

@@ -72,8 +72,19 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets,owners');
-        $connection->execute('CREATE TABLE IF NOT EXISTS pets ( id INT AUTO_INCREMENT PRIMARY KEY, owner_id INT NOT NULL,name VARCHAR(20));');
-        $connection->execute('CREATE TABLE IF NOT EXISTS owners ( id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20));');
+
+        $sql = $connection->adapter()->createTable('pets',[
+            'id' => ['type'=>'primaryKey'],
+            'owner_id' => ['type'=>'int','null'=>false],
+            'name' => ['type'=>'string','limit'=>20]
+        ]);
+        $connection->execute($sql);
+
+        $sql = $connection->adapter()->createTable('owners',[
+            'id' => ['type'=>'primaryKey'],
+            'name' => ['type'=>'string','limit'=>20]
+        ]);
+        $connection->execute($sql);
         
         # Create Dummy Data
         $this->Pet = new Pet();
