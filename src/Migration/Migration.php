@@ -24,11 +24,11 @@ namespace Origin\Migration;
 
 use Origin\Model\ConnectionManager;
 use Origin\Exception\Exception;
-use Origin\Migration\Adapter\MysqlAdapter;
 use Origin\Core\Inflector;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\DatasourceException;
 use Origin\Migration\Exception\IrreversibleMigrationException;
+use Origin\Model\Schema\BaseSchema;
 
 class Migration
 {
@@ -57,7 +57,7 @@ class Migration
     /**
      * The database adapter
      *
-     * @var \Origin\Migration\Adapter\MysqlAdapter
+     * @var \Origin\Model\Schema\BaseSchema
      */
     protected $adapter = null;
 
@@ -69,12 +69,15 @@ class Migration
     protected $pendingTables = [];
     protected $pendingColumns = [];
 
-    public function __construct(Adapter $adapter, array $options=[])
+    /**
+     * Constructor
+     *
+     * @param \Origin\Model\Schema\BaseSchema $adapter
+     */
+    public function __construct(BaseSchema $adapter)
     {
-        $options += ['datasource'=>'default'];
         $this->adapter = $adapter;
-        $this->adapter->datasource = $options['datasource']; // think about this
-        $this->datasource = $options['datasource'];
+        $this->datasource = $adapter->datasource();
     }
 
 
@@ -184,7 +187,7 @@ class Migration
     /**
      * Returns the database adapter
      *
-     * @return \Origin\Migration\Adapter\MysqlAdapter
+     * @return \Origin\Model\Schema\BaseSchema
      */
     public function adapter()
     {
@@ -258,9 +261,9 @@ class Migration
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
-
+  
         $this->statements[] =  $this->adapter()->createTable($name, $schema, $options);
-
+       
         if ($this->calledBy() === 'change') {
             $this->reverseStatements[] = $this->adapter()->dropTable($name);
         }
@@ -522,7 +525,7 @@ class Migration
         }
        
         $schema = $this->adapter()->schema($table);
-    
+
         if (!isset($schema[$column])) {
             return false;
         }

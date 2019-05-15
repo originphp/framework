@@ -21,8 +21,14 @@ use PDO;
 use PDOException;
 use Origin\Model\QueryBuilder;
 
-class Datasource
+abstract class Datasource
 {
+    /**
+     * The datasource name e.g mysql or pgsql
+     *
+     * @var string
+     */
+    protected $name = null;
     /**
      * Holds the connection to datasource.
      *
@@ -58,11 +64,28 @@ class Datasource
 
 
     /**
+     * Holds the connection config
+     *
+     * @var array
+     */
+    protected $config = [];
+    /**
      * What to escape table and column aliases
      *
      * @var string
      */
     protected $escape = '';
+
+    /**
+     * Holds the schema adapter
+     *
+     * @var \Origin\Model\Schema\BaseSchema
+     */
+    protected $adapter = null;
+
+    public function __construct(array $config = []){
+        $this->config = $config;
+    }
 
     /**
      * connects to database.
@@ -90,6 +113,33 @@ class Datasource
         }
     }
 
+    /**
+     * Gets the db engine e.g. mysql or pgsql
+     *
+     * @return string
+     */
+    public function engine() : string
+    {
+        return $this->name;
+    }
+
+
+    public function database()
+    {
+        if(isset($this->config['database'])){
+            return $this->config['database'];
+        }
+        return null;
+    }
+
+    /**
+     * Gets the quote identifier for this datasource
+     *
+     * @return string
+     */
+    public function quoteIdentifier(){
+        return $this->escape;
+    }
     /**
      * Executes a sql query.
      *
@@ -193,10 +243,20 @@ class Datasource
 
         return 0;
     }
-
+    /**
+     * Disconnects the database
+     *
+     * @return void
+     */
     public function disconnect()
     {
+        if($this->connection){
+            if($this->statement){
+                $this->statement->closeCursor;
+            }
+        }
         $this->connection = null;
+        $this->statement = null;
     }
 
     /**
@@ -442,24 +502,70 @@ class Datasource
     }
 
     /**
-    ## Driver Stuff
+     * Driver Specific
+     */
+    /**
+     * Gets the DSN string
+     *
+     * @param array $config
+     * @return string
+     */
     public function dsn(array $config)
     {
     }
 
-    public function createTable(string $table, array $data)
-    {
+ 
+    /**
+     * Returns the schema adapter
+     *
+     * @return \Origin\Model\Schema\BaseSchema
+     */
+    public function adapter(){
+        if(!$this->adapter){
+            $adapterClass = 'Origin\Model\Schema\\'. ucfirst($this->name) . 'Schema';
+            $this->adapter = new $adapterClass($this->config['datasource']);
+        }
+      
+        return $this->adapter;
     }
+
 
     public function schema(string $table)
     {
+       return $this->adapter()->schema($table);
     }
 
-    public function tables()
-    {
-    }
+    /**
+     * Returns an array of tables
+     *
+     * @return array
      */
+    public function tables() : array
+    {
+        return $this->adapter()->tables();
+    }
+    
+    public function enableForeignKeyConstraints(){
 
+    }
+
+
+    public function disableForeignKeyConstraints(){
+
+    }
+
+    /**
+     * Returns a MySQL string for creating a table
+     *
+     * @param string $table
+     * @param array $data
+     * @return string
+     */
+    public function createTable(string $table, array $data) : string
+    {
+        return $this->adapter()->createTable($table,$data);
+    }
+ 
     public function select(string $table, array $options)
     {
         $builder = $this->queryBuilder($table, $options['alias']);

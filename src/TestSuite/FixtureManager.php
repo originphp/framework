@@ -103,15 +103,12 @@ class FixtureManager
 
     protected function disableForeignKeyConstraints(string $datasource)
     {
-        $connection = ConnectionManager::get($datasource);
-        $connection->execute('SET foreign_key_checks = 0');
+        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
     }
-
 
     protected function enableForeignKeyConstraints(string $datasource)
     {
-        $connection = ConnectionManager::get($datasource);
-        $connection->execute('SET foreign_key_checks = 1');
+        ConnectionManager::get($datasource)->enableForeignKeyConstraints();        
     }
 
     protected function resolveFixture(string $fixture)

@@ -21,7 +21,7 @@ class ProfileFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-         'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
+        'id' => ['type' => 'primaryKey'],
          'user_id' => ['type' => 'integer'],
          'name' => ['type' => 'string'],
          'created' => 'datetime',

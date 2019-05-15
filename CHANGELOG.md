@@ -19,9 +19,15 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added 
+- PostgreSQL support
+
 ### Changed
 - ORM queries now use lowercase model alias as table alias
 
+### Removed
+- Status task
+- Schema shell
 
 ## [1.2.3] - 2019-05-13
 ### Fixed

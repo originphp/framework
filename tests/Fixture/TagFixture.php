@@ -21,7 +21,7 @@ class TagFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-         'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
+        'id' => ['type' => 'primaryKey'],
          'title' => ['type' => 'string'],
          'created' => 'datetime',
          'modified' => 'datetime',

@@ -268,11 +268,11 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->connection->execute('DROP TABLE IF EXISTS foo;');
 
         $schema = [
-            'id' => ['type'=>'integer','autoIncrement'=>true,'key'=>'primary'],
+            'id' => ['type'=>'primaryKey'],
             'name' => ['type'=>'string','default'=>'placeholder'],
             'description' => ['type'=>'text','null'=>false],
             'age' => ['type'=>'integer','default'=>1234],
-            'bi' => ['type'=>'biginteger'],
+            'bi' => ['type'=>'bigint'],
             'fn' => ['type'=>'float','precision'=>2],
             'dn' => ['type'=>'decimal','precision'=>2],
             'dt' => ['type'=>'datetime'],
@@ -293,12 +293,6 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('bookmarks_id INT,', $result);
         $this->assertContains('tags_id INT,', $result);
         $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $result);
-
-        $this->expectException(Exception::class);
-        $schema = [
-            'key' => ['type'=>'object']
-        ];
-        $result = $this->connection->createTable('foo/bar', $schema);
     }
 
     /**
@@ -309,15 +303,15 @@ class DatasourceTest extends \PHPUnit\Framework\TestCase
     public function testSchema()
     {
         $schema = $this->connection->schema('foo');
-        $this->assertEquals('integer', $schema['id']['type']);
+     
+        $this->assertEquals('primaryKey', $schema['id']['type']);
         $this->assertEquals('primary', $schema['id']['key']);
-        $this->assertTrue($schema['id']['autoIncrement']);
         $this->assertEquals('string', $schema['name']['type']);
         $this->assertEquals('placeholder', $schema['name']['default']);
         $this->assertEquals('text', $schema['description']['type']);
         $this->assertEquals('integer', $schema['age']['type']);
         $this->assertEquals(1234, $schema['age']['default']);
-        $this->assertEquals('biginteger', $schema['bi']['type']);
+        $this->assertEquals('bigint', $schema['bi']['type']);
         $this->assertEquals('float', $schema['fn']['type']);
         $this->assertEquals(2, $schema['fn']['precision']);
         $this->assertEquals('decimal', $schema['dn']['type']);

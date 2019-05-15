@@ -21,7 +21,7 @@ class AddressFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-         'id' => ['type' => 'integer', 'key' => 'primary','autoIncrement'=>true],
+         'id' => ['type' => 'primaryKey'],
          'author_id' => ['type' => 'integer'],
          'description' => 'text',
          'created' => 'datetime',

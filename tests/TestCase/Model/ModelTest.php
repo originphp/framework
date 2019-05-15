@@ -150,18 +150,19 @@ class ModelTest extends OriginTestCase
     {
         $schema = $this->Article->schema();
         $expected = [
-            'type' => 'integer',
-            'length' => 11,
+            'type' => 'primaryKey',
+            'limit' => 11,
             'default' => null,
             'null' => false,
             'key' => 'primary',
-            'autoIncrement' => true
         ];
+        
         $this->assertEquals($expected, $schema['id']);
 
         $idSchema = $this->Article->schema('id');
         $this->assertEquals($expected, $idSchema);
     }
+
 
     public function testHasField()
     {
@@ -720,7 +721,7 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($article->id);
         $this->assertNotEmpty($this->Article->id);
         $this->assertEmpty($article->modified());
-
+   
         # # # READ # # #
         $result = $this->Article->get($article->id);
         $this->assertEquals('Testing CRUD', $article->title);
@@ -963,6 +964,7 @@ class ModelTest extends OriginTestCase
             ];
        
         $author = $this->Author->new($data);
+    
         $this->Author->save($author, ['associated'=>false]);
         $this->assertNull($author->address->id);
     }

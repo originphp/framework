@@ -18,8 +18,10 @@
 namespace Origin\Console\Task;
 
 use Origin\Model\Model;
-use Origin\Migration\Adapter\MysqlAdapter;
-use Origin\Exception\Exception; 
+use Origin\Model\Schema\MysqlSchema;
+use Origin\Model\Schema\PgsqlSchema;
+
+use Origin\Exception\Exception;
 
 class MigrationTask extends Task
 {
@@ -27,8 +29,9 @@ class MigrationTask extends Task
 
     public function initialize(array $config)
     {
-        $this->Migration = new Model(['name'=>'Migration']); // Create a dynamic model
+        $this->Migration = new Model(['name'=>'Migration','datasource'=>$this->config('datasource')]); // Create a dynamic model
         $this->Migration->loadBehavior('Timestamp');
+ 
     }
 
     /**
@@ -36,42 +39,41 @@ class MigrationTask extends Task
      *
      * @return int|null
      */
-    public function lastMigration(){
-       $lastMigration = $this->Migration->find('first', ['order'=>'version DESC']);
-       if($lastMigration){
-           return $lastMigration->version;
-       }
-       return null;
+    public function lastMigration()
+    {
+        $lastMigration = $this->Migration->find('first', ['order'=>'version DESC']);
+        if ($lastMigration) {
+            return $lastMigration->version;
+        }
+        return null;
     }
 
-    public function rollback(string $version){
-
-        $migrations = $this->getMigrations($version,$this->lastMigration());
+    public function rollback(string $version)
+    {
+        $migrations = $this->getMigrations($version, $this->lastMigration());
         $migrations = array_reverse($migrations);
      
-        if(empty($migrations)){
+        if (empty($migrations)) {
             $this->out('<comment>No migrations found</comment>');
             return;
         }
         $start = time();
         foreach ($migrations as $object) {
-  
             $this->out("<red>{$object->name}</red> [<yellow>{$object->version}</yellow>]");
             try {
                 $migration = $this->createMigration($object);
-                $entity = $this->Migration->find('first',['conditions'=>['version'=>$object->version]]);
+                $entity = $this->Migration->find('first', ['conditions'=>['version'=>$object->version]]);
                 /**
                  * Do the magic
                  */
                 $reverse = [];
-                if($entity->rollback){
-                    $reverse = json_decode($entity->rollback,true);
+                if ($entity->rollback) {
+                    $reverse = json_decode($entity->rollback, true);
                 }
                 $this->verboseStatements($migration->rollback($reverse));
               
-                $this->Migration->delete($entity);          
-            }
-            catch(Exception $ex) {
+                $this->Migration->delete($entity);
+            } catch (Exception $ex) {
                 $this->shell()->error($ex->getMessage());
             }
         }
@@ -79,20 +81,25 @@ class MigrationTask extends Task
         $this->out(sprintf('Rollback complete. Took <white>%d</white> seconds', (time() - $start)));
     }
 
-    private function createMigration(object $object){
+    /**
+     * Creates the object
+     *
+     * @param object $object
+     * @return void
+     */
+    private function createMigration(object $object)
+    {
         include self::PATH . DIRECTORY_SEPARATOR . $object->filename;
-           
-        $migration = new $object->class(new MysqlAdapter(), [
-            'datasource' => $this->config('datasource'),
-            'version' => $object->version,
-            'name' => $object->name
-        ]);
+        
+        $adapter = $this->Migration->connection()->adapter();
+        $migration = new $object->class($adapter);
         return $migration;
     }
 
-    public function migrate(string $version = null){
-        $migrations = $this->getMigrations($this->lastMigration(),$version);
-        if(empty($migrations)){
+    public function migrate(string $version = null)
+    {
+        $migrations = $this->getMigrations($this->lastMigration(), $version);
+        if (empty($migrations)) {
             $this->out('<comment>No migrations found</comment>');
             return;
         }
@@ -103,31 +110,30 @@ class MigrationTask extends Task
                 $migration = $this->createMigration($object);
 
                 $this->verboseStatements($migration->start());
-               // pr($migration->reverseStatements());
+                // pr($migration->reverseStatements());
                 $entity = $this->Migration->new([
                     'version' => $object->version,
                     'rollback' => json_encode($migration->reverseStatements())
                 ]);
          
-                $this->Migration->save($entity);  
-                
-            }
-            catch(Exception $ex) {
+                $this->Migration->save($entity);
+            } catch (Exception $ex) {
                 $this->shell()->error($ex->getMessage());
             }
         }
         $this->out(sprintf('Migration complete. Took <white>%d</white> seconds', (time() - $start)));
     }
 
-    private function verboseStatements(array $statements){
+    private function verboseStatements(array $statements)
+    {
         $this->out("");
-        foreach($statements as $statement){
-            $this->out(sprintf("<green> > </green><comment>%s</comment>",$statement));
+        foreach ($statements as $statement) {
+            $this->out(sprintf("<green> > </green><comment>%s</comment>", $statement));
             $this->out("");
-        } 
+        }
     }
 
-      /**
+    /**
      * Returns an array of migrations
      *
      * @param integer $from
@@ -156,5 +162,4 @@ class MigrationTask extends Task
         }
         return $migrations;
     }
-
 }

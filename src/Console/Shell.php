@@ -436,10 +436,12 @@ class Shell
         if ($key === null) {
             return $this->params;
         }
+   
         if (is_array($key)) {
             return $this->params = $key;
         }
         if (func_num_args() === 2) {
+
             return $this->params[$key] = $value;
         }
         if (isset($this->params[$key])) {

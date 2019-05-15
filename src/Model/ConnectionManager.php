@@ -59,13 +59,15 @@ class ConnectionManager
         
         $config = array_merge($defaults, static::config($name));
        
+    
         if(!isset(static::$engines[$config['engine']])){
             throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
         }
         static::$driver = $config['engine'];
       
         $class = static::$engines[$config['engine']];
-        $datasource = new $class();
+        $datasource = new $class(['datasource'=>$name]+$config);
+
         $datasource->connect($config);
 
         return static::$datasources[$name] = $datasource;

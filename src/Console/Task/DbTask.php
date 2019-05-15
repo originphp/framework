@@ -12,9 +12,7 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * This will be depreciated. This is more helper as it is for output.
-  */
+
 namespace Origin\Console\Task;
 
 use Origin\Model\ConnectionManager;
@@ -66,24 +64,73 @@ class DbTask extends Task
      *
      * @return void
      */
-    public function dump($datasource='default')
+    public function dump($datasource='default',string $name = 'schema')
     {
         $connection = ConnectionManager::get($datasource);
-        $dump = ["SET FOREIGN_KEY_CHECKS=0;"];
-        foreach ($connection->tables() as $table) {
-            # Create Table
-            $connection->execute("SHOW CREATE TABLE {$table}");
-            $result = $connection->fetch();
-            if (empty($result['Create Table'])) {
-                $this->error("Error dumping {$table}");
-            }
-            $dump[] = $result['Create Table'] .';';
+        $dump = [];
+        if($connection->engine()==='mysql'){
+            $dump[] = "SET FOREIGN_KEY_CHECKS=0;";
         }
-        if (!file_put_contents(ROOT .'/db/schema.sql', implode("\n\n", $dump))) {
+        $filename = ROOT . DS . 'db' .DS . $name . '.sql';
+       
+        if(file_exists($filename)){
+            $input = $this->shell()->in('Schema file already exists, do you want to continue?',['y','n'],'n');
+            if($input === 'n'){
+                return false;
+            }
+        }
+        foreach ($connection->tables() as $table) {
+            $sql = $connection->adapter()->showCreateTable($table);
+            if($sql === null){
+                $this->shell()->error("Error dumping {$table}");
+            }
+
+            $dump[] = $sql  .';';
+        }
+        if (!file_put_contents($filename, implode("\n\n", $dump))) {
             $this->error('Error saving schema.sql');
         }
         return true;
     }
+
+    public function generate(string $datasource='default',string $name = 'schema'){
+
+        $connection = ConnectionManager::get($datasource);
+    
+        $tables = $connection->tables();
+        $folder = ROOT . DS . 'db' .DS . $name;
+        if (!file_exists($folder)) {
+            mkdir($folder);
+        }
+        foreach ($tables as $table) {
+            $data = $connection->schema($table);
+            if (!$data) {
+                $this->status('error', $table);
+                continue;
+            }
+            
+        
+            $schema = var_export($data, true);
+         
+            $schema = str_replace(
+                ['array (','),'," => \n",'=>   ['],
+                ['[','],'," => ",'=> ['],$schema);
+        
+            $schema = substr($schema,0,-1) . ']';
+            $data = '<?php' . "\n" . '$schema = ' . $schema . ';';
+
+            $filename = $folder . DS . $table . '.php';
+      
+            if (file_put_contents($filename,    $data )) {
+                $this->shell()->status('ok', sprintf('Generated schema for %s', $table));
+            } else {
+                $this->shell()->error(sprintf('Could not save to %s', $filename));
+            }
+
+        }
+        return true;
+    }
+    
 
     /**
      * This loads config/schema
@@ -92,7 +139,7 @@ class DbTask extends Task
      * @param string $name schema, structure, Model.schema
      * @return void
      */
-    public function load($datasource='default', $name='schema')
+    public function load(string $datasource='default', $name='schema')
     {
         $filename = $this->getSQLFile($name);
         if(file_exists($filename)){

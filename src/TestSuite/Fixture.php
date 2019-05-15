@@ -124,9 +124,10 @@ class Fixture
             $connection->execute('SELECT * from ' . $options['table']);
             $this->records = $connection->fetchAll();
         }
-      
+    
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->createTable($this->table, $schema);
+
         $result = $connection->execute($sql);
           
         return $result;

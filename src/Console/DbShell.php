@@ -24,7 +24,7 @@ class DbShell extends Shell
     public function initialize()
     {
         $this->loadTask('Db');
-        $this->loadTask('Migration');
+        $this->loadTask('Migration',['datasource'=>$this->getDatasource()]);
 
         // General Option
         $this->addOption('datasource', [
@@ -39,9 +39,9 @@ class DbShell extends Shell
             'help' => 'Drops the database',
         ]);
         $this->addCommand('schema', [
-            'help' => 'Dumps and loads SQL schema files',
+            'help' => 'Dumps and loads SQL files and generates schema.php files',
             'arguments' => [
-                'action' => ['help'=>'dump or load','required'=>true],
+                'action' => ['help'=>'dump,load or generate','required'=>true],
                 'file' => ['help'=>'schema or Plugin.schema']
             ]
         ]);
@@ -133,9 +133,7 @@ class DbShell extends Shell
 
     public function migrate()
     {
-        $this->Migration->config(
-            'datasource', $this->getDatasource()
-        );
+            
         $version = $this->args(0);
         $lastMigration = $this->Migration->lastMigration();
         if($version === null OR $version > $lastMigration){
@@ -156,19 +154,24 @@ class DbShell extends Shell
     {
         $datasource = $this->getDatasource();
 
+        $name = 'schema';
+        if ($this->args(1)) {
+            $name = $this->args(1);
+        }
+
         // Handle Dumping
         if ($this->args(0) === 'dump') {
-            if ($this->Db->dump($datasource)) {
+            if ($this->Db->dump($datasource,$name)) {
                 return $this->status('ok', 'Schema dumped');
             }
             return $this->status('error', 'Error dumping schema');
         }
+
+        if($this->args(0) === 'generate'){
+            return $this->Db->generate($datasource,$name);
+        }
         // Handle loading
         if ($this->args(0) === 'load') {
-            $name = 'schema';
-            if ($this->args(1)) {
-                $name = $this->args(1);
-            }
             return $this->schemaLoad($name, $datasource);
         }
         $this->error('Unkown action ' . $this->args(0));
@@ -187,10 +190,9 @@ class DbShell extends Shell
 
     protected function getDatasource(): string
     {
-        $datasource = 'default';
-        if (!empty($this->params('datasource'))) {
-            $datasource = $this->params('datasource');
+        if ($this->params('datasource')) {
+            return $this->params('datasource');
         }
-        return $datasource;
+        return 'default';
     }
 }

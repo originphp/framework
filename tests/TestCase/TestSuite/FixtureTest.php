@@ -25,7 +25,7 @@ class Movie extends Model
 class MovieFixture extends Fixture
 {
     public $schema = array(
-        'id' => array('type' => 'integer', 'key' => 'primary'),
+        'id' => ['type' => 'primaryKey'],
         'name' => array(
           'type' => 'string',
           'length' => 255,
@@ -158,7 +158,12 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture = new MovieFixture();
         $fixture->import = ['model'=>'Guest']; // convert to table
         
-        $sql = "CREATE TABLE guests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,firstname VARCHAR(30) NOT NULL)";
+        $sql = $connection->createTable('guests',[
+            'id' => 'primaryKey',
+            'firstname' => ['type'=>'string','limit'=>'30']
+        ]);
+        
+        //$sql = "CREATE TABLE guests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,firstname VARCHAR(30) NOT NULL)";
         $connection->execute($sql);
         $this->assertTrue($fixture->import());
     }

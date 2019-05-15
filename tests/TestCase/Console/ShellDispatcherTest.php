@@ -155,7 +155,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
-            ['pathTo/origin.php','schema'],
+            ['pathTo/origin.php','db'],
             new AnotherConsoleOutput('php://memory'),
             new ConsoleInput()
         );
