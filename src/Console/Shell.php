@@ -21,6 +21,7 @@ use Origin\Console\Exception\ConsoleException;
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\Task\TaskRegistry;
+use Origin\Console\Helper\HelperRegistry;
 use Origin\Model\ModelRegistry;
 use ReflectionClass;
 use ReflectionMethod;
@@ -42,6 +43,13 @@ class Shell
      * @var \Origin\Console\Task\TaskRegistry
      */
     protected $taskRegistry = null;
+
+        /**
+     * Holds the task registry
+     *
+     * @var \Origin\Console\Helper\HelperRegistry
+     */
+    protected $helperRegistry = null;
 
     /**
      * Holds the console Output Object
@@ -108,7 +116,7 @@ class Shell
     ];
 
     /**
-     * Inject request and response
+     * Inject io
      *
      * @param array $arguments
      * @param \Origin\Console\ConsoleOutput $consoleOutput
@@ -303,6 +311,7 @@ class Shell
         $this->output->write($data);
     }
 
+ 
     /**
      * Reads input from the console, use for prompts
      *
@@ -330,7 +339,7 @@ class Shell
             if($options){
                 $extra = " ({$optionsString}) {$defaultString}";
             }
-            $this->out("<question>{$prompt}</question> {$extra}");
+            $this->out("{$prompt} {$extra}");
             $this->out("> ",false);
             $input = $this->input->read();
             if ($input === '' and $default) {
@@ -375,6 +384,21 @@ class Shell
         $config = array_merge(['className' => $name . 'Task'], $config);
         $this->{$task} = $this->taskRegistry()->load($name, $config);
         return $this->{$task};
+    }
+
+     /**
+     * Loads a Task for use with the shell
+     *
+     * @param string $name  Shell task name
+     * @param array  $config array of config to be passed to shell task. Class name
+     * @return \Origin\Console\Helper\Helper;
+     */
+    public function loadHelper(string $name, array $config = [])
+    {
+        list($plugin, $helper) = pluginSplit($name); // split so we can name properly
+        $config = array_merge(['className' => $name . 'Helper'], $config);
+        $this->{$helper} = $this->helperRegistry()->load($name, $config);
+        return $this->{$helper};
     }
 
     public function startupProcess()
@@ -423,6 +447,17 @@ class Shell
     {
         return $this->taskRegistry;
     }
+
+     /**
+     * Gets the task registry object
+     *
+     * @return \Origin\Console\Helper\HelperRegistry
+     */
+    public function helperRegistry()
+    {
+        return $this->helperRegistry;
+    }
+
 
     /**
      * Sets/gets the params
@@ -528,7 +563,7 @@ class Shell
         $shell = Inflector::underscore($this->name);
         
         // @todo maybe should display arguments
-        $this->out("<yellow>Usage:</yellow>");
+        $this->out("<yellow>Usage:</yellow>"); // comment
         $arguments = $this->getRequiredArguments($name);
         if($arguments){
             $arg_string = implode(' ',array_keys($arguments));
@@ -579,7 +614,7 @@ class Shell
 
     public function help()
     {
-        
+
         $shell = Inflector::underscore($this->name);
 
         $this->out("<yellow>Usage:</yellow>");
@@ -625,18 +660,41 @@ class Shell
         }
     }
 
+    /**
+     * Displays styled debug text
+     *
+     * @param string $message
+     * @return void
+     */
     public function debug(string $message){
         $this->out("<debug>{$message}</debug>");
     }
-
+    /**
+     * Displays styled info text
+     *
+     * @param string $message
+     * @return void
+     */
     public function info(string $message){
         $this->out("<info>{$message}</info>");
     }
 
+    /**
+     * displays styled notices
+     *
+     * @param string $message
+     * @return void
+     */
     public function notice(string $message){
         $this->out("<notice>{$message}</notice>");
     }
 
+    /**
+     * Displays styled warnings
+     *
+     * @param string $message
+     * @return void
+     */
     public function warning(string $message){
         $this->out("<warning>{$message}</warning>");
     }
@@ -649,21 +707,13 @@ class Shell
      */
     public function error(string $title, string $message = null)
     {
-        $this->output->error($title, $message);
+        $msg = "<exception> ERROR </exception> <heading>{$title}</heading>\n";
+        if ($message) {
+            $msg  .= "<text>{$message}</text>\n";
+        }
+        $this->out($msg);
         $this->stop($title);
     }
-
-    
-    /*
-    'debug' =>['text' => 'white'],
-        'info' => ['text' => 'lightGreen'], 
-        'notice' => ['text' => 'cyan'], 
-        'warning' => ['text' => 'lightYellow'], 
-        'error' => ['text'=>'red'],
-        'critical' => ['text' => 'lightRed'],
-        'alert' => ['text' => 'white','background'=>'lightRed'],
-        'emergency' => ['text' => 'white','background'=>'lightRed','blink'=>true],
-        */
 
     /**
      * Displays a status

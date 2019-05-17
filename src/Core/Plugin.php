@@ -62,7 +62,7 @@ class Plugin
         /**
          * Check plugins loaded by composer
          */
-        $composerPlugins = ROOT . DS . 'originphp-plugins.json';
+        $composerPlugins = ROOT . DS . 'plugins.json';
         if (!file_exists($options['path']) AND file_exists( $composerPlugins)) {
             $composer = json_decode(file_get_contents($composerPlugins),true);
             if(isset($composer[$plugin])){

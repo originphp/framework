@@ -23,6 +23,7 @@ Delete tag:   git tag -d <tag_name>
 - PostgreSQL support
 
 ### Changed
+- plugins.json filename
 - ORM queries now use lowercase model alias as table alias
 
 ### Removed

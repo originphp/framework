@@ -20,7 +20,7 @@ use Origin\Migration\Adapter\MysqlAdapter;
 
 class DbShell extends Shell
 {
-    public $description = 'Database Shell';
+    public $description = '<green>DB Console Application</green>';
     public function initialize()
     {
         $this->loadTask('Db');

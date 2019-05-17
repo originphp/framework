@@ -71,32 +71,32 @@ class ConsoleOutput
         'reverse' => 7,
     ];
 
-    protected $styles = [
-        # Quick Styles
-        'debug' =>['text' => 'white'],
-        'info' => ['text' => 'lightGreen'], 
-        'notice' => ['text' => 'cyan'], 
-        'warning' => ['text' => 'lightYellow'], 
-        'error' => ['text'=>'red'],
-        'critical' => ['text' => 'lightRed'],
-        'alert' => ['text' => 'white','background'=>'lightRed'],
-        'emergency' => ['text' => 'white','background'=>'lightRed','blink'=>true],
-        'success' => ['text'=>'lightBlue','bold'=>true],
-        
-        # Others
-        'question' => ['text' => 'magenta'],
-        'comment' => ['text' => 'white'],
+    protected $styles = [   
+        'exception' => ['color' => 'white','background'=>'lightRed'],
 
-        # Colors
-        'green' => ['text' => 'lightGreen'], // linux green
-        'blue' => ['text' => 'blue'],
-        'yellow' => ['text' => 'lightYellow'],
-        'red' => ['text' => 'red'],
-        'white' => ['text' => 'white'],
-        'magenta' => ['text'=>'magenta'],
-        'cyan' => ['text'=>'cyan']
+        # Notifications
+        'debug' => ['color' => 'white'], 
+        'success' => ['color' => 'lightGreen'], 
+        'error' => ['color' => 'red'],
+        'warning'=> ['color' => 'yellow'],
+        'notice' => ['color' => 'cyan'],
+        'alert' => ['color' => 'white','background'=>'lightRed'],
+
+        # Standardize Outputs
+        'heading' => ['color'=>'lightYellow'],
+        'text' => ['color'=>'white'],
+        'info' => ['color' => 'blue'],
+        'code' => ['color' => 'lightGreen'],
+
+        # Standard Colors which make things just easier
+        'green' => ['color' => 'lightGreen'], // linux green
+        'blue' => ['color' => 'blue'],
+        'yellow' => ['color' => 'lightYellow'],
+        'red' => ['color' => 'red'],
+        'white' => ['color' => 'white'],
+        'magenta' => ['color'=>'magenta'],
+        'cyan' => ['color'=>'cyan']
     ];
-
 
     /**
      * Constructs a new instance
@@ -163,19 +163,34 @@ class ConsoleOutput
             return "<{$tag}>{$text}</{$tag}>";
         }
         $settings = $this->styles[$tag];
-     
+        
+        return $this->color($text,$settings);
+        
+    }
+    /**
+     * Colors a string
+     *
+     * @param string $text  'some random text'
+     * @param array $settings ['color'=>'blue','background'=>'red','blink'=>true]
+     * @return void
+     */
+    public function color(string $text,array $settings){
+      
         $ansi = [];
-        if (isset($settings['text']) and isset($this->foregroundColors[$settings['text']])) {
-            $ansi[] = $this->foregroundColors[$settings['text']];
+        if (isset($settings['color']) and isset($this->foregroundColors[$settings['color']])) {
+            $ansi[] = $this->foregroundColors[$settings['color']];
         }
         if (isset($settings['background']) and isset($this->backgroundColors[$settings['background']])) {
             $ansi[] = $this->backgroundColors[$settings['background']];
         }
-        unset($settings['text'], $settings['background']);
+        unset($settings['color'], $settings['background']);
         foreach ($settings as $option => $value) {
-            if ($value) {
+            if ($value AND isset($this->options[$option])) {
                 $ansi[] = $this->options[$option];
             }
+        }
+        if(empty($ansi)){
+            return $text;
         }
         
         return "\033[" . implode(';', $ansi) . 'm' . $text . "\033[0m";
@@ -189,7 +204,7 @@ class ConsoleOutput
      *  $ConsoleOutput->style('primary',false);
      *
      * @param string $name
-     * @param array $values array('text' => 'white','background'=>'blue','bold' => true) or false to delete
+     * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
      * @return void
      */
     public function styles(string $name = null, $values = null)
@@ -211,12 +226,4 @@ class ConsoleOutput
         return true;
     }
 
-    public function error(string $title, string $message=null)
-    {
-        $msg = "<alert> ERROR </alert> <yellow>{$title}</yellow>\n";
-        if ($message) {
-            $msg  .= "<white>{$message}</white>\n";
-        }
-        $this->write($msg);
-    }
 }

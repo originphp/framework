@@ -17,6 +17,8 @@ namespace Origin\TestSuite;
 use Origin\Console\ConsoleInput;
 use Origin\Console\ConsoleOutput;
 use Origin\Console\ShellDispatcher;
+use Origin\Console\ConsoleApplication;
+use Origin\Console\ConsoleIo;
 
 class BufferedConsoleOutput extends ConsoleOutput
 {
@@ -52,12 +54,20 @@ trait ConsoleIntegrationTestTrait
     protected $input = null;
 
     /**
-     * Shell
+     * This holds the legacy shell object
      *
      * @var \Origin\Console\Shell;
      */
     protected $shell = null;
-    
+
+
+    /**
+     * This is the command object
+     *
+     * @var \Origin\Console\Command
+     */
+    protected $command = null;
+
     /**
      * Holds the result from the exec
      *
@@ -65,6 +75,8 @@ trait ConsoleIntegrationTestTrait
      */
     protected $result = null;
 
+
+ 
     /**
      * Executes a shell console command
      *
@@ -84,11 +96,31 @@ trait ConsoleIntegrationTestTrait
             $this->input->expects($this->at($x))->method('read')->will($this->returnValue($data));
             $x++;
         }
-        $args = explode(' ', "console {$command}");
-        $dispatcher = new ShellDispatcher($args, $this->output, $this->input);
-        $this->result = $dispatcher->start();
-       
-        $this->shell = $dispatcher->shell();
+        
+        $argv = explode(' ', "console {$command}");
+        list($namespace,$class) = namespacesplit(get_class($this));
+
+        if(substr($class,-11) === 'CommandTest'){
+            $io = new ConsoleIo($this->output,$this->output,$this->input);
+            $application = new ConsoleApplication();
+            $this->result = $application->run($argv,$io);
+
+        }
+        else{
+            $dispatcher = new ShellDispatcher($argv, $this->output, $this->input);
+            $this->result = $dispatcher->start();
+            $this->shell = $dispatcher->shell();
+        }
+
+    
+    }
+    /**
+     * Gets the output from the command or shell. This is for debugging
+     *
+     * @return string
+     */
+    public function consoleOutput(){
+       return $this->output->read();
     }
 
     /**
@@ -141,7 +173,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorContains(string $message)
     {
-        if (preg_match("/<alert> ERROR <\/alert>.*$/", $this->output->read(), $matches)) {
+        if (preg_match("/<exception> ERROR <\/exception>.*$/", $this->output->read(), $matches)) {
             $this->assertContains($message, $matches[0]);
         } else {
             $this->fail();

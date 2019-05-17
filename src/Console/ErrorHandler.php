@@ -50,10 +50,17 @@ class ErrorHandler
     }
 
     protected $colourStyles = [
-        'redBackground' => ['text' => 'white', 'background' => 'lightRed'],
-        'yellowBackground' => ['text' => 'white', 'background' => 'lightYellow'],
-        'blueBackground' => ['text' => 'white', 'background' => 'blue'],
-        'yellow' => ['text' => 'lightYellow']
+        'redBackground' => ['color' => 'white', 'background' => 'lightRed'],
+        'yellowBackground' => ['color' => 'white', 'background' => 'lightYellow'],
+        'blueBackground' => ['color' => 'white', 'background' => 'blue'],
+        'yellow' => ['color' => 'lightYellow'],
+        'green' => ['color' => 'lightGreen'], // linux green
+        'blue' => ['color' => 'blue'],
+        'yellow' => ['color' => 'lightYellow'],
+        'red' => ['color' => 'red'],
+        'white' => ['color' => 'white'],
+        'magenta' => ['color'=>'magenta'],
+        'cyan' => ['color'=>'cyan']
     ];
 
     /**

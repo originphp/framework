@@ -110,7 +110,7 @@ class Task
     }
 
     /**
-    * Gets the componentRegistry
+    * Gets the TaskRegistry
     *
     * @return \Origin\Console\Task\TaskRegistry
     */

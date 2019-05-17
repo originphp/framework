@@ -21,6 +21,7 @@ use Origin\Core\Inflector;
  */
 class PluginShell extends Shell
 {
+    public $description = '<green>Plugin Console Application</green>';
     public function initialize()
     {
         $this->addCommand('install', [

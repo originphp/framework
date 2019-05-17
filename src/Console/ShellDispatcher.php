@@ -108,20 +108,20 @@ class ShellDispatcher
 
     protected function showUsage()
     {
-        $this->out("<blue>OriginPHP Console v1.0</blue>");
+        $this->out("<info>OriginPHP Console v1.0</info>");
         $this->out("");
-        $this->out("<info>Usage:</info>");
-        $this->out("  <white>console shell</white>");
-        $this->out("  <white>console shell command</white>");
+        $this->out("<heading>Usage:</heading>");
+        $this->out("  <text>console shell</text>");
+        $this->out("  <text>console shell command</text>");
         $this->out("\033[0m\n"); // Reset
         $shells = $this->getShellList();
         if ($shells) {
-            $this->out("<info>Available Shells:</info>");
+            $this->out("<heading>Available Shells:</heading>");
             foreach ($shells as $namespace => $commands) {
                 if ($commands) {
-                    $this->out("\n<white>{$namespace}</white>");
+                    $this->out("\n<text>{$namespace}</text>");
                     foreach ($commands as $command) {
-                        $this->out("  <blue>{$command}</blue>");
+                        $this->out("  <info>{$command}</info>");
                     }
                 }
             }
@@ -174,9 +174,13 @@ class ShellDispatcher
             throw new MissingShellException($className);
         }
         $this->shell = new $className($this->output, $this->input);
-
-        $this->out("<green>{$this->shell->name}</green> <white>{$this->shell->description}</white>");
+        $description = $this->shell->description;
+        if(!$description){
+            $description = "<text>{$this->shell->name}</text>";
+        }
+        $this->out($description);
         $this->out('');
+        
         /**
          * bin/console cron - runs main method
          * bin/console something - runs something method

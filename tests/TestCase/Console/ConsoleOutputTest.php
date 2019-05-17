@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Console;
+namespace Origin\Test\Console\ConsoleOutput;
 
 use Origin\Console\ConsoleOutput;
 
@@ -73,7 +73,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     {
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $this->assertEquals($ConsoleOutput->getStyles(), $ConsoleOutput->styles());
-        $this->assertEquals(['text' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('alert'));
+        $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
@@ -85,7 +85,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     public function testOutput()
     {
         $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->styles('complete', ['background'=>'lightRed','underline'=>true,'text'=>'white']);
+        $ConsoleOutput->styles('complete', ['background'=>'lightRed','underline'=>true,'color'=>'white']);
         $ConsoleOutput->write('<complete>Test</complete>');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
@@ -100,7 +100,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
 
         $ConsoleOutput->error('test', 'A comment about this error');
         $output = $ConsoleOutput->getContents();
-        $this->assertContains('<alert> ERROR </alert> <yellow>test</yellow>', $output);
+        $this->assertContains('<exception> ERROR </exception> <heading>test</heading>', $output);
         $this->assertContains('A comment about this error', $output);
     }
 }
