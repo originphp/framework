@@ -78,9 +78,7 @@ class ConsoleIo
      * @return void
      */
     public function out($message){
-        foreach((array) $message as $line){
-            $this->stdout->write($line ."\n");
-        }
+        $this->stdout->write($message);
     }
 
     /**
@@ -90,9 +88,7 @@ class ConsoleIo
      * @return void
      */
     public function write($message){
-        foreach((array) $message as $line){
-            $this->stdout->write($line);
-        }
+        $this->stdout->write($message,false);
     }
 
     /**
@@ -102,9 +98,7 @@ class ConsoleIo
      * @return void
      */
     public function err($message){
-        foreach((array) $message as $line){
-            $this->stderr->write($line ."\n");
-        }
+        $this->stderr->write($message);
     }
 
      /**
@@ -236,7 +230,7 @@ class ConsoleIo
      * @return void
      */
     protected function writeFormatted(string $text,array $options=[]){
-        $string = $this->formatString($text . "\r\n",$options);
+        $string = $this->formatString($text,$options);
         $this->stdout->write($string);
     }
 
@@ -346,7 +340,7 @@ class ConsoleIo
     }
 
     /**
-     * Generates a colourful alert 
+     * Generates a colourful padded alert 
      *
      * @param string|array $messages
      * @param array $options
@@ -369,8 +363,8 @@ class ConsoleIo
         $this->nl();
     }
 
-  /**
-     * Warps text in a colourful block
+   /**
+     * Wraps text in a colourful block
      *
      * @param string|array $messages
      * @param array $options
@@ -408,7 +402,7 @@ class ConsoleIo
    * @return void
    */
     public function nl($count=1){
-        $this->stdout->write(str_repeat("\n",$count));
+        $this->stdout->write(str_repeat("\n",$count),false);
     }
 
     /**
@@ -417,7 +411,7 @@ class ConsoleIo
      * @return void
      */
     public function clear(){
-        $this->out("\033c");
+        $this->stdout->write("\033c",false);
     }
 
     /**
@@ -435,7 +429,7 @@ class ConsoleIo
         }
 
         while ($input === '') {
-            $this->out($prompt);
+            $this->stdout->write($prompt);
             $this->stdout->write("> ");
             $input = $this->stdin->read();
             if ($input === '' and $default) {
@@ -470,7 +464,7 @@ class ConsoleIo
 
         while ($input === '' OR !in_array($input, $options)) {
             
-            $this->out("{$prompt} {$extra}");
+            $this->stdout->write("{$prompt} {$extra}");
             $this->stdout->write("> ");
             $input = $this->stdin->read();
             if ($input === '' and $default) {
@@ -481,7 +475,7 @@ class ConsoleIo
     }
 
     /**
-     * Creates a file
+     * Creates a file, and asks wether to overwrite
      *
      * @param string $filename
      * @param string $contents
@@ -521,13 +515,12 @@ class ConsoleIo
      */
     public function status(string $status, string $message)
     {
-        if (isset($this->statusCodes[status])) {
-            $color = $this->statusCodes[$status];
-            $status = strtoupper($status);
-            $this->out("<text>[</text> <{$color}>{$status}</{$color}> <text>] {$message}</text>");
-            return;
+        if (!isset($this->statusCodes[status])) {
+            throw new ConsoleException(sprintf('Unkown status %s', $status));
         }
-        throw new ConsoleException(sprintf('Unkown status %s', $status));
+        $color = $this->statusCodes[$status];
+        $status = strtoupper($status);
+        $this->out("<white>[</white> <{$color}>{$status}</{$color}> <white>] {$message}</white>");
     }
 
     

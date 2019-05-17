@@ -23,6 +23,7 @@ Delete tag:   git tag -d <tag_name>
 - PostgreSQL support
 
 ### Changed
+- Changed BufferedConsoleOutput to TestSuite\Stub
 - plugins.json filename
 - ORM queries now use lowercase model alias as table alias
 

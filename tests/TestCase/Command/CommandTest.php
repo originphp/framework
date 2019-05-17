@@ -15,22 +15,8 @@
 namespace Origin\Test\Command;
 
 use Origin\Console\ConsoleIo;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Command\Command;
-
-class MockConsoleOutput extends ConsoleOutput
-{
-    protected $data = '';
-    public function read()
-    {
-        return $this->data;
-    }
-
-    public function write(string $data)
-    {
-        $this->data .= $data;
-    }
-}
 
 class MockConsoleIo extends ConsoleIo
 {
@@ -48,14 +34,19 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         return new Command($io);
     }
    
-
+    
     public function testOutputError()
     {
-       
-        $object = $this->getObject();
+        $consoleOutput = new ConsoleOutput();
+        $io = new ConsoleIo($consoleOutput,$consoleOutput);
+          $mock = $this->getMockBuilder(Command::class)
+                        ->setConstructorArgs([$io])
+                         ->setMethods(['abort'])
+                         ->getMock();
+     
     
-        $object->error('test', 'A comment about this error');
-        $output = $object->getContents();
+        $mock->throwError('test', 'A comment about this error');
+        $output = $consoleOutput->read();
         $this->assertContains('<exception> ERROR </exception> <heading>test</heading>', $output);
         $this->assertContains('A comment about this error', $output);
     }

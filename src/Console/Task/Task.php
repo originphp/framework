@@ -123,11 +123,11 @@ class Task
     /**
          * Outputs to the console text
          *
-         * @param string $data
+         * @param string|Array $data
          * @param boolean $newLine
          * @return void
          */
-    public function out(string $data, $newLine = true)
+    public function out($data, $newLine = true)
     {
         $this->shell()->out($data, $newLine);
     }

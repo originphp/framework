@@ -15,23 +15,12 @@
 namespace Origin\TestSuite;
 
 use Origin\Console\ConsoleInput;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\ShellDispatcher;
 use Origin\Console\ConsoleApplication;
 use Origin\Console\ConsoleIo;
 
-class BufferedConsoleOutput extends ConsoleOutput
-{
-    protected $buffer = '';
-    public function write(string $data)
-    {
-        $this->buffer .= $data;
-    }
-    public function read()
-    {
-        return $this->buffer;
-    }
-}
+
 
 /**
  * A way to test controllers from a higher level
@@ -88,7 +77,7 @@ trait ConsoleIntegrationTestTrait
     {
         $this->shell = $this->result = null;
 
-        $this->output = new BufferedConsoleOutput();
+        $this->output = new ConsoleOutput();
         $this->input = $this->getMockBuilder(ConsoleInput::class)->disableOriginalConstructor()->setMethods(['read'])->getMock();
         
         $x = 0;

@@ -115,12 +115,18 @@ class ConsoleOutput
     /**
      * Writes to the stream
      *
-     * @param string $data
+     * @param string|array $data
      * @return void
      */
-    public function write(string $data)
+    public function write($data,$newLine = true)
     {
+        if(is_array($data)){
+            $data = implode("\n",$data);
+        }
         $data = $this->parseTags($data);
+        if($newLine){
+            $data .= "\n";
+        }
         return fwrite($this->stream, $data);
     }
 

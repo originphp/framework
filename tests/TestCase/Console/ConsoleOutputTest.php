@@ -51,7 +51,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->write('hello world');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
-        $this->assertEquals('hello world', stream_get_contents($stream));
+        $this->assertEquals("hello world\n", stream_get_contents($stream));
     }
 
     public function testTags()
@@ -60,13 +60,13 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->write('<unkown>hello world</unkown>');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
-        $this->assertEquals('<unkown>hello world</unkown>', stream_get_contents($stream));
+        $this->assertEquals("<unkown>hello world</unkown>\n", stream_get_contents($stream));
 
         $ConsoleOutput = new MockConsoleOutput('php://memory');
         $ConsoleOutput->write('<yellow>hello world</yellow>');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
-        $this->assertEquals("\033[93mhello world\033[0m", stream_get_contents($stream));
+        $this->assertContains("\033[93mhello world\033[0m\n", stream_get_contents($stream));
     }
 
     public function testStyles()
@@ -89,18 +89,6 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->write('<complete>Test</complete>');
         $stream = $ConsoleOutput->getStream();
         rewind($stream);
-        $this->assertEquals("\033[97;101;4mTest\033[0m", stream_get_contents($stream));
-    }
-
-    public function testOutputError()
-    {
-       
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $ConsoleOutput->clearStyles();
-
-        $ConsoleOutput->error('test', 'A comment about this error');
-        $output = $ConsoleOutput->getContents();
-        $this->assertContains('<exception> ERROR </exception> <heading>test</heading>', $output);
-        $this->assertContains('A comment about this error', $output);
+        $this->assertEquals("\033[97;101;4mTest\033[0m\n", stream_get_contents($stream));
     }
 }

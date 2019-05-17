@@ -303,12 +303,9 @@ class Shell
      * @param boolean $newLine
      * @return void
      */
-    public function out(string $data, $newLine = true)
+    public function out($data, $newLine = true)
     {
-        if ($newLine) {
-            $data .= "\n";
-        }
-        $this->output->write($data);
+        $this->output->write($data,$newLine);
     }
 
  

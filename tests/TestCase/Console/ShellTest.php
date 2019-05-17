@@ -149,8 +149,11 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     public function testOut()
     {
         $shell = new MockShell($this->ConsoleOutput, $this->ConsoleInput);
-        $shell->out('Hello World!');
-        $this->assertEquals("Hello World!\n", file_get_contents(TMP . DS . 'shelltest.txt'));
+
+        $date = time();
+        $shell->out('Hello World!' . $date);
+      
+        $this->assertContains("Hello World!{$date}", file_get_contents(TMP . DS . 'shelltest.txt'));
     }
 
     public function testIn()

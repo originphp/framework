@@ -15,21 +15,9 @@
 namespace Origin\Test\Console\ConsoleIo;
 
 use Origin\Console\ConsoleIo;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 
-class MockConsoleOutput extends ConsoleOutput
-{
-    protected $data = '';
-    public function read()
-    {
-        return $this->data;
-    }
 
-    public function write(string $data)
-    {
-        $this->data .= $data;
-    }
-}
 
 class MockConsoleIo extends ConsoleIo
 {
@@ -47,14 +35,4 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
     }
    
 
-    public function testOutputError()
-    {
-       
-        $io = $this->getConsoleIo();
-    
-        $io->error('test', 'A comment about this error');
-        $output = $io->getContents();
-        $this->assertContains('<exception> ERROR </exception> <heading>test</heading>', $output);
-        $this->assertContains('A comment about this error', $output);
-    }
 }
