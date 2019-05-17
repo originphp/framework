@@ -13,162 +13,117 @@
  */
 
 namespace Origin\Console;
+
+use Origin\Core\Resolver;
+use Origin\Command\Command;
 use Origin\Console\ConsoleIo;
 use Origin\Core\Inflector;
-use Origin\Core\Resolver;
 use Origin\Console\Exception\StopExecutionException;
-use Origin\Core\Plugin;
+
+/**
+ * Package commands into a script and run directly.
+ * 
+ * require dirname(__DIR__).'/bootstrap.php';
+ * use Origin\Console\ConsoleApplication;
+ * 
+ * $consoleApplication = new ConsoleApplication();
+ * $consoleApplication->addCommand(new CreateTableCommand());
+ * $consoleApplication->run();
+ */
 
 class ConsoleApplication
-
 {
+    /**
+     * Undocumented variable
+     *
+     * @var \Origin\Console\ConsoleIo
+     */
+    protected $io = null;
 
     /**
-     * 
+     * Holds the command list
      *
-     * Command naming structure
-     * multi-word
-     * multi-word:multi-function
-     * multi-word:multi-function:nested-:abc
-     * 
-     * @param array $args
-     * @param ConsoleIo $io
-     * @return void
+     * @var array
      */
-    public function run(array $args,ConsoleIo $io = null){
+    protected $commands = [];
+
+    public function __construct(ConsoleIo $io=null){
         if($io === null){
             $io = new ConsoleIo();
         }
-     
-       array_shift($args);
-       if(empty($args)){
-           $this->displayHelp($io );
-           return;
-       }
-      
-       $class = $this->findCommand($args[0]);
-      
-       if( $class){
-            array_shift($args);
-            try {
-                $command = new $class($io);
-                $command->run($args);
-            } catch (StopExecutionException $ex) {
-                return false;
-            }
-       }
-      
-       return false;
+        $this->io = $io;
+        $this->initialize();
     }
 
-    protected function displayHelp(ConsoleIo $io){
-        $commands = $this->discoverCommands();
-    
-        $out = [];
-        $out[] = "<info>OriginPHP</info>";
-        $out[] = "";
-        $out[] = "<text>These are the commands found that you can run.</text>";
-        $out[] = "";
-        foreach($commands as $group => $cmds){
-            $out[] = "<heading>{$group}</heading>";
-            foreach($cmds as $cmd => $description){
-                $cmd = str_pad($cmd,40,' ',STR_PAD_RIGHT);
-                $out[] = " <code>{$cmd}</code><text>{$description}</text>";
-            }
-            $out[] = "";
-        }
-       $io->out($out);
+    public function initialize(){
+
     }
 
     /**
-     * Undocumented function
-     * - multi-word
-     * - multi-word:multi-function
-     * - multi-word:multi-function:nested-:abc
-     * @param string $commandArg
-     * @return string
-     * @internal app-dev and app:dev load the same class. in theory this is correct.
-     */
-    protected function getClass(string $commandArg): string
-    {
-        $commands = explode(':',$commandArg);
-        foreach($commands as &$command){
-            $command = Inflector::camelize(str_replace('-','_',$command));
-        }
-        return implode('',$commands);
-    }
-
-
-    public function findCommand(string $commandArg){
-        $class =  $this->getClass($commandArg);
-        return Resolver::className($class,'Command','Command');
-    }
-
-
-    protected function commandSplit(string $name){
-        $command = null;
-        if (strpos($name, ':') !== false) {
-            list($command, $name) = explode(':', $name, 2);
-        }
-    
-        return [$command, $name];
-    }
-
-    /**
-     * Build an index of commands
+     * Runs the console application
      *
+     * @param array $args default is argv
+     * @return bool
+     */
+    public function run(array $args = null){
+       
+        if($args === null){
+            global $argv;
+            $args = $argv;
+        }
+        array_shift($args);
+        if(empty($this->commands)){
+            $this->io->error('No commands have been added to this application.');
+            return false;
+        }
+  
+        $command = array_shift($args);
+        if(!isset($this->{$command}) OR !$this->{$command} instanceof Command){
+            $this->io->error("Invalid command {$command}.");
+            return false;
+        }
+
+        return $this->{$command}->run($args);
+    }
+
+    /**
+     * Add a command to this application
+     *
+     * @param \Origin\Command\Command $command
      * @return void
      */
-    protected function discoverCommands(){
-        
-        $commands = [];
-      
-        $commands = $this->buildDescriptions($this->scandir(ORIGIN . DS. 'src' . DS . 'Command'),'Origin');
-        $commands =  array_merge_recursive($commands,$this->buildDescriptions($this->scandir(SRC . DS . 'Command'),'App'));
-        
-        $plugins = Plugin::loaded();
-        sort($plugins);
-       
-        foreach ($plugins as $plugin) {
-            $results = $this->scandir(PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'Command');
-            $commands =  array_merge_recursive($commands,$this->buildDescriptions($results ,$plugin));
-        }
-
-        return $commands;
+    public function addCommand(Command $command){
+       $name = $this->commandName(get_class($command));
+       $this->{$name} = $command;
+       $this->commands[] = $name;
     }
 
-    protected function buildDescriptions(array $results,string $namespacePrefix='Origin'){
-        $commands = [];
-        foreach($results as $class => $filename){
-            $class = "{$namespacePrefix}\Command\\{$class}";
-            $command = new $class();
-            list($app,$cmd) = $this->commandSplit($command->name());
-            if(!isset($commands[$app])){
-                $commands[$app] = [];
-            }
-            $commands[$app][$command->name()] = $command->description();
-        }
-
-        return $commands;
+    /**
+     * Gets the command name from the class
+     *
+     * @param string $className Full classname with namespace
+     * @return void
+     */
+    protected function commandName(string $className){
+        list($namespace,$class) = namespaceSplit($className);
+        $name = substr($class,0,-7); // remove Command
+        $name = Inflector::underscore($name); // convert to underscore
+        return str_replace('_','-',$name);
     }
 
-
-    protected function scandir(string $folder)
-    {
-        $ignore = ['Command.php'];
-    
-        $result = [];
-     
-        if (file_exists($folder)) {
-            $files = scandir($folder);
-            foreach ($files as $file) {
-                if (substr($file, -11) === 'Command.php' and !in_array($file, $ignore)) {
-                    $result[substr($file, 0, -4)] = $folder . DS . $file;
-                }
-            }
-        }
-        
-        return $result;
+     /**
+     * Loads commands using a name
+     *
+     * Examples
+     *
+     * $this->loadCommand('Hello');
+     * $this->loadCommand('App\Command\Db\CreateDatabaseCommand');
+     *
+     * @param string $name
+     * @return void
+     */
+    public function loadCommand(string $command){
+        $className = Resolver::className($command, 'Command', 'Command');
+        $this->addCommand(new $className);
     }
- 
 }

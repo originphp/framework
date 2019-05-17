@@ -13,9 +13,19 @@
  */
 
 namespace Origin\Console;
-use Origin\Console\ConsoleApplication;
-
 require dirname(__DIR__).'/bootstrap.php';
 
-$application = new ConsoleApplication();
-$application->run($argv);
+
+use Origin\Console\CommandRunner;
+$commandRunner = new CommandRunner();
+$commandRunner->run($argv);
+
+/*
+require dirname(__DIR__).'/bootstrap.php';
+use Origin\Console\ConsoleApplication;
+
+$consoleApplication = new ConsoleApplication();
+$consoleApplication->loadCommand('Dev');
+$consoleApplication->loadCommand('App\Command\App\CreateTableCommand');
+$consoleApplication->run();
+*/

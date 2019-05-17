@@ -108,6 +108,9 @@ class ArgumentParser
     public function help(string $name,$description = null){
         $out = [];
         if($description){
+            if(strpos($description,'/>') === false){
+                $description = "<text>{$description}</text>";
+            }
             $out[] = $description;
             $out[] = '';
         }
@@ -203,7 +206,9 @@ class ArgumentParser
                 $options[] = '--'.  $option['name'];
             }
         }
-
+     
+        $options[] = '[options]';
+        
         foreach($this->arguments as $arg){
             if(!empty($arg['required'])){
                 $arguments[] = $arg['name'];
@@ -212,12 +217,9 @@ class ArgumentParser
                 $arguments[] = "[{$arg['name']}]";
             }
         }
-
-        if(empty($arguments)){
-            $arguments = ['[arguments]'];
-        }
        
-    
+            $options[] = '[arguments]';
+     
         return '  ' . $command . ' ' .  implode(' ',array_merge($options,$arguments));
     }
 

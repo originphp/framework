@@ -213,7 +213,7 @@ class ConsoleIo
    
         foreach((array) $elements as $element){
            $string = str_repeat(' ',$options['indent']) . $options['bullet'] . ' '.  $element;
-           $this->formatString($string,$options);
+           $this->out($string);
         }
     }
 
@@ -229,16 +229,26 @@ class ConsoleIo
     }
 
     /**
-     * Formats a line by using array of options. such as color,background
+     * Formats and wrotes a line by using array of options. such as color,background
      *
      * @param string $text
      * @param array $options
      * @return void
      */
-    private function formatString(string $text,array $options=[]){
-     
-        $line = $this->stdout->color($text,$options) . "\n";
-        $this->stdout->write($line);
+    protected function writeFormatted(string $text,array $options=[]){
+        $string = $this->formatString($text . "\r\n",$options);
+        $this->stdout->write($string);
+    }
+
+     /**
+     * Formats a striung by using array of options. such as color,background
+     *
+     * @param string $text
+     * @param array $options (background,color,blink=true etc)
+     * @return string
+     */
+    public function formatString(string $text,array $options=[]){
+        return $this->stdout->color($text,$options);
     }
 
 
@@ -250,13 +260,8 @@ class ConsoleIo
      * @return void
      */
     public function warning($messages,array $options = []){
-        $options += ['background'=>'yellow','color'=>'black','large'=>false];
-        if($options['large']){
-           $this->alert($messages,$options);
-        }
-        else{
-            $this->block($messages,$options);
-        }
+        $options += ['background'=>'yellow','color'=>'black','bold'=>true];
+        $this->highlight($messages,$options);
     }
 
     /**
@@ -267,13 +272,20 @@ class ConsoleIo
      * @return void
      */
     public function success($messages,array $options = []){
-        $options += ['background'=>'cyan','color'=>'white','large'=>false];
-        if($options['large']){
-           $this->alert($messages,$options);
-        }
-        else{
-            $this->block($messages,$options);
-        }
+        $options += ['background'=>'green','color'=>'white','bold'=>true];
+        $this->highlight($messages,$options);
+    }
+
+    /**
+     * Displays a info
+     *
+     * @param string|array $messages line or array of lines
+     * @param array $options (background,color,blink,bold,underline)
+     * @return void
+     */
+    public function info($messages,array $options = []){
+        $options += ['background'=>'blue','color'=>'white','bold'=>true];
+        $this->highlight($messages,$options);
     }
 
     /**
@@ -284,13 +296,8 @@ class ConsoleIo
      * @return void
      */
     public function error($messages,array $options = []){
-        $options += ['background'=>'lightRed','color'=>'white','large'=>false];
-        if($options['large']){
-           $this->alert($messages,$options);
-        }
-        else{
-            $this->block($messages,$options);
-        }
+        $options += ['background'=>'lightRed','color'=>'white','bold'=>true];
+        $this->highlight($messages,$options);
     }
 
     /**
@@ -299,6 +306,7 @@ class ConsoleIo
      * @param integer $value
      * @param integer $max
      * @return void
+     * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
     public function progressBar(int $value,int $max) {
         $percent = floor(($value / $max) * 100);
@@ -319,6 +327,25 @@ class ConsoleIo
     }
 
     /**
+     * Highlights some text
+     *
+     * @param string $message
+     * @param string $bgColor
+     * @param string $textColor
+     * @return void
+     */
+    public function highlight($messages,array $options=[]){
+        $options += ['background'=>'black','color'=>'white'];
+  
+        if(!is_array($messages)){
+            $messages  = [$messages];
+        }
+        foreach($messages as $message){
+            $this->writeFormatted(' ' . $message .' ',$options);
+        }
+    }
+
+    /**
      * Generates a colourful alert 
      *
      * @param string|array $messages
@@ -334,11 +361,11 @@ class ConsoleIo
             $messages  = [$messages];
         }
        
-        $this->formatString(str_repeat(' ',80 ),$options);
+        $this->writeFormatted(str_repeat(' ',80 ),$options);
         foreach($messages as $message){
-            $this->formatString('  ' . str_pad($message ,80 - 2, " ", STR_PAD_RIGHT),$options);
+            $this->writeFormatted('  ' . str_pad($message ,80 - 2, " ", STR_PAD_RIGHT),$options);
         }
-        $this->formatString(str_repeat(' ',80 ),$options);
+        $this->writeFormatted(str_repeat(' ',80 ),$options);
         $this->nl();
     }
 
@@ -363,13 +390,13 @@ class ConsoleIo
         }
         $maxLength = $this->getMaxLength($messages) + ($options['padding'] * 2);
        
-        $this->formatString(str_repeat(' ',$maxLength ),$options);
+        $this->writeFormatted(str_repeat(' ',$maxLength ),$options);
         foreach($messages as $message){
             $padding = str_repeat(' ',$options['padding']);
             $message = $padding . $message . $padding;
-            $this->formatString(str_pad($message ,$maxLength, " ", $center ),$options);
+            $this->writeFormatted(str_pad($message ,$maxLength, " ", $center ),$options);
         }
-        $this->formatString(str_repeat(' ',$maxLength ),$options);
+        $this->writeFormatted(str_repeat(' ',$maxLength ),$options);
         $this->nl();
     }
 

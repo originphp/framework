@@ -19,6 +19,7 @@ use Origin\Console\Exception\StopExecutionException;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
+use Origin\Core\Inflector;
 
 class Command
 {
@@ -45,11 +46,11 @@ class Command
     public $io = null;
 
     /**
-     * Command name
+     * The name of the command
      *
      * @var string
      */
-    public $name = 'command';
+    protected $name = null;
     /**
      * Holds the description for this command
      *
@@ -68,18 +69,26 @@ class Command
      *
      * @var array
      */
-    protected $commandOptions = [
-        'help' => ['name'=>'help','short'=>'h','help'=>'Displays this help message.','boolean'=>true,'required'=>false]
-    ];
+    protected $commandOptions = [];
 
     protected $arguments = [];
+
     protected $options = [];
+
+    protected $verbose = false;
 
     public function __construct(ConsoleIo $io=null){
         if($io === null){
             $io = new ConsoleIo();
         }
         $this->io = $io;
+
+        $this->addOption('help', ['short'=>'h','help'=>'Displays this help message']);
+        $this->addOption('verbose',['short'=>'v','help'=>'Displays additional output (if available)']);
+   
+        if($this->name === null){
+            $this->name = $this->getCommandName(get_class($this));
+        }
     }
 
     /**
@@ -87,10 +96,7 @@ class Command
      *
      * @return void
      */
-    public function initialize(){
-        
-     
-    }
+    public function initialize(){}
 
     /**
      * Runs the command
@@ -110,6 +116,10 @@ class Command
         $this->options = $options;
         $this->arguments = $arguments;
 
+        // Enable verbosity
+        if($this->arguments('verbose')){
+            $this->verbose = true;
+        }
     
         if($this->options('help')){
             $this->displayHelp($argumentParser);
@@ -210,7 +220,7 @@ class Command
      * @return void
      */
     public function displayHelp(ArgumentParser $argumentParser){
-        $content = $argumentParser->help('command',$this->description);
+        $content = $argumentParser->help($this->name,$this->description);
         $this->io->out($content);
     }
 
@@ -236,15 +246,17 @@ class Command
         throw new StopExecutionException($message,$exitCode);
     }
 
-      /**
-     * Displays styled debug text
+    /**
+     * If verbose is enabled then out put passed here will be displayed
      *
      * @param string $message
      * @return void
      */
     public function debug(string $message){
-        $message = $this->addTags('debug',$message);
-        $this->out($message);
+        if($this->verbose){
+            $message = $this->addTags('debug',$message);
+            $this->out($message);
+        }
     }
     /**
      * Displays styled info text
@@ -368,5 +380,18 @@ class Command
             return $this->{$model};
         }
         throw new MissingModelException($model);
+    }
+
+    protected function getCommandName(string $className){
+        $pos = strpos($className,'\Command\\');
+        if($pos === false){
+            return null;
+        }
+        $parts = explode('\\',substr($className,$pos+9, -7));
+        $name = [];
+        foreach($parts as $p){
+            $name[] = str_replace('_','-',Inflector::underscore($p));
+        }
+        return implode(':',$name);
     }
 }
