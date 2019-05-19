@@ -198,15 +198,13 @@ class ConsoleIo
      * @param string|array $elements 'buy milk' or ['buy milk','read the paper']
      * @param array $options Defaults are
      *   - bullet: default *
-     *   - indent: level of identation default 2
-     *   + (color,background,etc)
      * @return void
      */
     public function list($elements,array $options=[]){
-        $options += ['bullet'=>'*','indent'=>2,'color'=>'white'];
+        $options += ['bullet'=>'*'];
    
         foreach((array) $elements as $element){
-           $string = str_repeat(' ',$options['indent']) . $options['bullet'] . ' '.  $element;
+           $string = str_repeat(' ',2) . $options['bullet'] . ' '.  $element;
            $this->out($string);
         }
     }
@@ -429,13 +427,14 @@ class ConsoleIo
         }
 
         while ($input === '') {
-            $this->stdout->write($prompt);
-            $this->stdout->write("> ");
+            $this->stdout->write("\033[32;49m" . $prompt);
+            $this->stdout->write("\033[97;49m> ",false);
             $input = $this->stdin->read();
             if ($input === '' and $default) {
                 return $default;
             }
         }
+        $this->stdout->write("\033[0m"); // reset + line break
         return $input;
     }
 
@@ -464,13 +463,14 @@ class ConsoleIo
 
         while ($input === '' OR !in_array($input, $options)) {
             
-            $this->stdout->write("{$prompt} {$extra}");
-            $this->stdout->write("> ");
+            $this->stdout->write("\033[32;49m{$prompt} {$extra}");
+            $this->stdout->write("\033[97;49m> ",false);
             $input = $this->stdin->read();
             if ($input === '' and $default) {
                 return $default;
             }
         }
+        $this->stdout->write("\033[0m"); // reset + line break
         return $input;
     }
 
@@ -515,7 +515,7 @@ class ConsoleIo
      */
     public function status(string $status, string $message)
     {
-        if (!isset($this->statusCodes[status])) {
+        if (!isset($this->statusCodes[$status])) {
             throw new ConsoleException(sprintf('Unkown status %s', $status));
         }
         $color = $this->statusCodes[$status];

@@ -20,12 +20,16 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added 
+- Generate Command
 - PostgreSQL support
 
 ### Changed
 - Changed BufferedConsoleOutput to TestSuite\Stub
 - plugins.json filename
 - ORM queries now use lowercase model alias as table alias
+
+### Fixed
+- console output style parser tag within tag bug
 
 ### Removed
 - Status task

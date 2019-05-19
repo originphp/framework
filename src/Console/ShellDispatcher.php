@@ -84,10 +84,7 @@ class ShellDispatcher
      */
     public function out(string $data,$newLine = true)
     {
-        if ($newLine) {
-            $data .= "\n";
-        }
-        $this->output->write($data);
+        $this->output->write($data,true);
     }
 
     /**
@@ -108,7 +105,7 @@ class ShellDispatcher
 
     protected function showUsage()
     {
-        $this->out("<info>OriginPHP Console v1.0</info>");
+        $this->out("<text>OriginPHP</text>");
         $this->out("");
         $this->out("<heading>Usage:</heading>");
         $this->out("  <text>console shell</text>");

@@ -560,7 +560,7 @@ class Shell
         $shell = Inflector::underscore($this->name);
         
         // @todo maybe should display arguments
-        $this->out("<yellow>Usage:</yellow>"); // comment
+        $this->out("<heading>Usage:</heading>"); // comment
         $arguments = $this->getRequiredArguments($name);
         if($arguments){
             $arg_string = implode(' ',array_keys($arguments));
@@ -574,13 +574,13 @@ class Shell
         $this->out('');
         
         if (!empty($config['description'])) {
-            $this->out("<white>{$config['description']}</white>");
+            $this->out("<text>{$config['description']}</text>");
             $this->out('');
         }
 
         $arguments = [];
         if(!empty($config['arguments'])){
-            $this->out('<yellow>Arguments:</yellow>');
+            $this->out('<heading>Arguments:</heading>');
             foreach($config['arguments'] as $arg => $argConfig){
                 if(is_string($arg) AND is_array($argConfig)){
                     $argConfig += ['name'=>$arg,'help'=>'','required'=>false];
@@ -704,9 +704,9 @@ class Shell
      */
     public function error(string $title, string $message = null)
     {
-        $msg = "<exception> ERROR </exception> <heading>{$title}</heading>\n";
+        $msg = "<exception> ERROR </exception> <heading>{$title}</heading>";
         if ($message) {
-            $msg  .= "<text>{$message}</text>\n";
+            $msg  .= "<text>{$message}</text>";
         }
         $this->out($msg);
         $this->stop($title);

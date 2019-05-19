@@ -149,10 +149,9 @@ class ConsoleOutput
     */
     public function parseTags($string)
     {
-        if (preg_match_all('/<([a-z0-9-_]+)>(.*?)<\/([a-z0-9-_]+)>/ims', $string, $matches)) {
-            foreach ($matches[1] as $key => $tag) {
+        if (preg_match_all('/<([a-z0-9]+)>(.*?)<\/(\1)>/ims', $string, $matches)) {
+             foreach ($matches[1] as $key => $tag) {
                 $text = $matches[2][$key];
-
                 $string = str_replace("<{$tag}>{$text}</{$tag}>", $this->style($tag, $text), $string);
             }
         }

@@ -54,7 +54,7 @@ class MigrationTask extends Task
         $migrations = array_reverse($migrations);
      
         if (empty($migrations)) {
-            $this->out('<comment>No migrations found</comment>');
+            $this->out('<text>No migrations found</text>');
             return;
         }
         $start = time();
@@ -90,7 +90,6 @@ class MigrationTask extends Task
     private function createMigration(object $object)
     {
         include self::PATH . DIRECTORY_SEPARATOR . $object->filename;
-        
         $adapter = $this->Migration->connection()->adapter();
         $migration = new $object->class($adapter);
         return $migration;
@@ -100,7 +99,7 @@ class MigrationTask extends Task
     {
         $migrations = $this->getMigrations($this->lastMigration(), $version);
         if (empty($migrations)) {
-            $this->out('<comment>No migrations found</comment>');
+            $this->out('<text>No migrations found</text>');
             return;
         }
         $start = time();
@@ -128,7 +127,7 @@ class MigrationTask extends Task
     {
         $this->out("");
         foreach ($statements as $statement) {
-            $this->out(sprintf("<green> > </green><comment>%s</comment>", $statement));
+            $this->out(sprintf("<green> > </green><text>%s</text>", $statement));
             $this->out("");
         }
     }

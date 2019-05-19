@@ -12,62 +12,67 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * @todo implment array and hashes
+  */
 namespace Origin\Console;
-use Origin\Console\ConsoleIo;
-use Origin\Core\Inflector;
-use Origin\Core\Resolver;
 use Origin\Console\Exception\ConsoleException;
+use Origin\Console\ConsoleHelpFormatter;
+
 class ArgumentParser
 {
-    /**
-     * Command argument configuration
-     *
-     * @var array
-     */
-    protected $arguments = [];
-   /**
-     * Command options configuration
-     *
-     * @var array
-     */
     protected $options = [];
-
-    
 
     protected $shortOptions = [];
 
-    protected $name = null;
-
-    public function __construct(string $name, array $arguments,array $options){
-        $this->arguments = $arguments;
-        $this->options = $options;
-
-        // Create the short options
-        foreach ($options as $option) {
-            if ($option['short']) {
-                $this->shortOptions[$option['short']] = $option;
-            }
-        }        
-
-        $lastArgument = null;
-        foreach($arguments as $argument){
-            if($lastArgument === null){
-                $lastArgument = $argument;
-                continue;
-            }
-            if($argument['required'] === true AND $lastArgument['required'] === false){
-                throw new ConsoleException('You cannot add a required argument after an optional one.');
-            }
-            $lastArgument = $argument;
+    protected $arguments = [];
+    /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param array $options
+     *  - short: the short command, this is with single -. e.g -f
+     *  - default: null
+     *  - required: default false
+     *  - type: string, numeric, boolean, array hash
+     * @return void
+     */
+    public function addOption(string $name,array $options=[]){
+        $options += ['name'=>$name,'short'=>null,'default'=>null,'required'=>false,'type'=>'string','description'=>''];
+        if($options['default'] AND $options['required']){
+            throw new ConsoleException("Option {$name} cannot be required and have default value");
         }
+        if(!in_array($options['type'],['string','boolean','integer','array','hash'])){
+            throw new ConsoleException("Option {$name} invalid type");
+        }
+        
+        if($options['short']){
+            $this->shortOptions[$options['short']] = $options;
+        }
+        $this->options[$name] = $options;
+    }
+
+    public function addArgument(string $name,array $options=[]){
+        $options += ['name'=>$name,'default'=>null,'required'=>false,'type'=>'string','description'=>''];
+        if($options['required'] AND $this->arguments){
+            $arg = end($this->arguments);
+            if($arg['required'] === false){
+                throw new ConsoleException("You cannot add a required argument after an optional one.");
+            }
+        }    
+        if($this->arguments){
+            $arg = end($this->arguments);
+            if( $arg['type'] === 'array' OR $arg['type'] ==='hash'){
+                throw new ConsoleException("You cannot add an argument after an array or hash argument");
+            }
+        } 
+        $this->arguments[$name] = $options;
     }
 
     public function parse(array $argv){
-        $options = $arguments = [];
-
-        $keys = array_keys($this->arguments);
-
-        foreach($argv as $arg){
+        $arguments = $options = [];
+        $args = [];
+        foreach($argv as $key => $arg){
             if($this->isLongOption($arg)){
                 $options = $this->parseLongOption($arg,$options);
             }
@@ -75,16 +80,15 @@ class ArgumentParser
                 $options = $this->parseShortOption($arg,$options);
             }
             else{
-                $next = count($arguments);
-                if(!isset($keys[$next])){
-                    throw new ConsoleException('Too many arguments');
-                }
-                $arguments[$keys[$next]] = $arg;
+                $args[] = $arg;
             }
         }
-        $help = isset($options['help']);
+
+        # Process Args 
+        $arguments = $this->parseArguments($args,$argv);
+
         foreach($this->options as $option){
-            if(!empty($option['required']) AND empty($options[$option['name']]) AND !$help){
+            if(!empty($option['required']) AND empty($options[$option['name']])){
                 throw new ConsoleException(sprintf('Missing required option `%s`',$option['name']));
             }
             if(!empty($option['default']) AND !isset($options[$option['name']])){
@@ -94,24 +98,166 @@ class ArgumentParser
 
         $requiredArguments = [];
         foreach($this->arguments as $argument){
-            if(!empty($argument['required']) AND !isset($arguments[$argument['name']]) AND !$help){
+            if(!empty($options['help'])){
+                break;
+            }
+            if(!empty($argument['required']) AND !isset($arguments[$argument['name']])){
                 throw new ConsoleException(sprintf('Missing required argument `%s`',$argument['name']));
             }
-            elseif(!empty($argument['choices']) AND isset($arguments[$argument['name']]) AND !in_array($arguments[$argument['name']],$argument['choices'])){
-                throw new ConsoleException(sprintf('Argument `%s` is not allowed',$argument['name']));
+        }
+        return [$options,$arguments];
+    }   
+
+    /**
+     * Undocumented function
+     *
+     * @param array $args extracted args
+     * @param array $argv argv array 
+     * @return void
+     */
+    protected function parseArguments(array $args,array $argv){
+        $keys = array_keys($this->arguments);
+        $arguments = [];
+        foreach($args as $key => $arg){
+            if(isset($keys[$key])){
+                $name = $keys[$key];
+                $type = $this->arguments[$name]['type'];
+                $values = [];
+                if($type === 'array'){
+                    for($i=$key;$i<count($argv);$i++){
+                        $values[] = $argv[$i];
+                    }
+                    $arguments[$name] = $values; 
+                    break;
+                }
+                elseif($type ==='hash'){
+                    for($i=$key;$i<count($argv);$i++){
+                        if(strpos($argv[$i],':') !== false){
+                            list($k,$v) = explode(':',$argv[$i]);
+                            $values[$k] = $v;
+                        }
+                        else{
+                            $values[] = $argv[$i];
+                        } 
+                    }
+                    $arguments[$name] = $values; 
+                    break;
+                }
+                $arguments[$name] = $this->value($type,$arg);
             }
         }
-        
-        return [$options,$arguments];
+        return $arguments;
     }
 
-    public function help(string $name,$description = null){
+    protected function value($type,$value){
+        if($type ==='boolean'){
+            return (bool) $value;
+        }
+        if($type ==='integer'){
+            return (int) $value;
+        }
+        return $value;
+    }
+
+    protected function parseOption($option,$options){
+      
+        $name = $this->getOptionName($option);
+        if($this->options[$name]['type'] === 'boolean'){
+            $options[$name] = true;
+            return $options;
+        }
+ 
+        $value = $this->options[$name]['default'];
+       
+        if (strpos($option, '=') !== false) {
+            list($option, $value) = explode('=', $option);
+        }
+      
+        if($this->options[$name]['type'] === 'boolean'){
+            $value = (bool) $value;
+        }
+        elseif($this->options[$name]['type'] === 'numeric'){
+            $value = (int) $value;
+        }
+
+
+        $options[$name] = $value;
+   
+        return $options;
+    }
+
+    protected function parseLongOption($arg,$options){
+        $option = substr($arg,2);
+        $name = $this->getOptionName($option);
+        if(!isset($this->options[$name])){
+            throw new ConsoleException(sprintf('Unkown option --%s', $name));
+        }
+        return $this->parseOption($option,$options);
+    }
+
+    protected function parseShortOption($arg,$options){
+        $option = substr($arg,1);
+        $name = $this->getOptionName($option);
+   
+        if(!isset($this->shortOptions[$name])){
+            throw new ConsoleException(sprintf('Unkown short option -%s', $name));
+        }
+        $option = $this->shortOptions[$name]['name'];
+        if(strpos($arg,'=') !== false){
+            list($k,$v) = explode('=',$arg);
+            $option .= "={$v}";
+        }
+        return $this->parseOption($option,$options);
+    }
+
+    protected function getOptionName($option){
+        if(strpos($option,'=') !== false){
+            list($option,$value) = explode('=',$option);
+        }
+        return $option;
+    }
+
+    protected function isLongOption(string $option){
+        return (substr($option,0,2) === '--');
+    }
+
+    protected function isShortOption(string $option){
+        return ($option[0] === '-' AND substr($option,0,2) != '--');
+    }
+
+    protected function formatDescription(string $left,$right){
+        $out = [];
+        $left = '  ' . $left;
+        foreach((array) $right as $row){
+            $row = "<text>{$row}</text>";
+            if(empty($out)){
+                $out[] = '<code>' .$left . '</code>' . $row;
+            }
+            else{
+                $out[] =  str_repeat(' ',strlen($left)) .  $row;
+            }
+           
+        }
+        return $out;
+    }
+
+    public function help(string $name,$description=null){
+        $formatter = new ConsoleHelpFormatter();
+        if($description){
+            $formatter->setDescription($description);
+        }
+        $formatter->setUsage($this->generateUsage($name));
+        $formatter->setArguments($this->getArguments());
+        $formatter->setOptions($this->getOptions());
+        return $formatter->generate();
+    }
+
+    public function helpOld(string $name,$description = null){
         $out = [];
         if($description){
-            if(strpos($description,'/>') === false){
-                $description = "<text>{$description}</text>";
+            foreach((array) $description as $row){
+                $out[] = $row;
             }
-            $out[] = $description;
             $out[] = '';
         }
         $out[] = "<heading>Usage:</heading>";
@@ -123,8 +269,11 @@ class ArgumentParser
             $arguments = $this->getArguments();
             $maxLength = $this->getMaxLength($arguments);
             foreach($arguments as $argument => $help){
-                $argument = str_pad($argument, $maxLength);
-                 $out[]  = "  <code>{$argument}</code>\t{$help}";
+                $argument = str_pad($argument, $maxLength + 5);
+                $description = $this->formatDescription($argument,$help);
+                foreach($description as $row){
+                    $out[] =  $row;
+                }
             }
             $out[] = "";
         }
@@ -158,11 +307,8 @@ class ArgumentParser
         $arguments = [];
         foreach($this->arguments as $argument){
             $description = '';
-            if($argument['help']){
-                $description = "<text>{$argument['help']}</text> ";
-            }
-            if($argument['choices']){
-                $description .= '<warning>[' .implode(', ',$argument['choices']) . ']</warning>';
+            if($argument['description']){
+                $description = $argument['description'];
             }
             $arguments[$argument['name']] = $description;
            
@@ -184,12 +330,20 @@ class ArgumentParser
             if ($option['short']) {
                 $text = '-' . $option['short']. ', ' . $text; 
             }
-            if($option['boolean'] === false){
+            if($option['type']  !== 'boolean'){
                 $text .=  '=' . strtoupper($option['name']) ;
             }
-            $help = "<text>{$option['help']}</text>";
+            $help = $option['description'];
             if(!empty($option['default'])){
-                $help .= " <warning>(default: {$option['default']})</warning>";
+              $default = " \033[93m(default: {$option['default']})\033[0m"; //  Append this without breaking color/multi line
+                if(is_array($help)){
+                    $rows = count($help);
+                    $help[$rows-1] .= $default;
+                }
+                else{
+                    $help .= $default;
+                }
+             
             }
 
             $options[$text] =  $help;
@@ -217,60 +371,13 @@ class ArgumentParser
                 $arguments[] = "[{$arg['name']}]";
             }
         }
+        // Dont duplicate
+        if(empty($arguments)){
+            $arguments[] = '[arguments]';
+        }
        
-            $options[] = '[arguments]';
      
         return '  ' . $command . ' ' .  implode(' ',array_merge($options,$arguments));
     }
 
-    protected function parseLongOption($arg,$options){
-        $option = substr($arg,2);
-        $name = $this->getOptionName($option);
-    
-        if(!isset($this->options[$name])){
-            throw new ConsoleException(sprintf('Unkown option --%s', $name));
-        }
-        return $this->parseOption($option,$options);
-    }
-
-    protected function parseShortOption($arg,$options){
-        $option = substr($arg,1);
-        $name = $this->getOptionName($option);
-        if(!isset($this->shortOptions[$name])){
-            throw new ConsoleException(sprintf('Unkown short option -%s', $name));
-        }
-        $option = $this->shortOptions[$name]['name'];
-        return $this->parseOption($option,$options);
-    }
-
-    protected function getOptionName($option){
-        if(strpos($option,'=') !== false){
-            list($option,$value) = explode('=',$option);
-        }
-        return $option;
-    }
-
-    protected function parseOption($option,$options){
-      
-        $name = $this->getOptionName($option);
-        if($this->options[$name]['boolean']){
-            $options[$name] = true;
-            return $options;
-        }
- 
-        $value = (string) $this->options[$name]['default'];
-        if (strpos($option, '=') !== false) {
-            list($option, $value) = explode('=', $option);
-        }
-        $options[$name] = $value;
-        return $options;
-    }
-
-    protected function isLongOption(string $option){
-        return (substr($option,0,2) === '--');
-    }
-
-    protected function isShortOption(string $option){
-        return ($option[0] === '-' AND substr($option,0,2) != '--');
-    }
 }

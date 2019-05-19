@@ -56,7 +56,7 @@ class Command
      *
      * @var string
      */
-    public $description = '';
+    protected $description = '';
 
     /**
      * Command argument configuration
@@ -77,17 +77,21 @@ class Command
 
     protected $verbose = false;
 
+    protected $argumentParser = null;
+
     public function __construct(ConsoleIo $io=null){
         if($io === null){
             $io = new ConsoleIo();
         }
         $this->io = $io;
 
-        $this->addOption('help', ['short'=>'h','help'=>'Displays this help message']);
-        $this->addOption('verbose',['short'=>'v','help'=>'Displays additional output (if available)']);
+        $this->argumentParser = new ArgumentParser();
+
+        $this->addOption('help', ['short'=>'h','description'=>'Displays this help message','type'=>'boolean']);
+        $this->addOption('verbose',['short'=>'v','description'=>'Displays additional output (if available)','type'=>'boolean']);
    
-        if($this->name === null){
-            $this->name = $this->getCommandName(get_class($this));
+        if (!preg_match('/^[a-z0-9-:]+$/',$this->name)) {
+            throw new ConsoleException('Invalid name format my-app:lower-case');
         }
     }
 
@@ -105,11 +109,11 @@ class Command
      * @return void
      */
     public function run(array $args){
-        $this->initialize();
+        $this->initialize($args);
 
         try {
-            $argumentParser = new ArgumentParser($this->name,$this->commandArguments,$this->commandOptions);
-            list($options,$arguments) = $argumentParser->parse($args);
+            
+            list($options,$arguments) = $this->argumentParser->parse($args);
         } catch (ConsoleException $ex) {
             $this->throwError($ex->getMessage());
         }
@@ -122,7 +126,7 @@ class Command
         }
     
         if($this->options('help')){
-            $this->displayHelp($argumentParser);
+            $this->displayHelp();
             return true;
         }
         $this->execute();
@@ -166,6 +170,7 @@ class Command
         if($name === null){
             return $this->name;
         }
+       
         $this->name = $name;
     }
     /**
@@ -189,14 +194,13 @@ class Command
      *  - help: the help description
      *  - short: short option when using -. e.g. -ds 
      *  - required: default false
-     *  - boolean: default true to false to get values eg. datasource=default
+     *  - type: string, integer, boolean, array, hash
      *  - default: default value
      * @return void
      */
     public function addOption(string $name, array $options = [])
     {
-        $options += ['name' => $name, 'short' => null, 'help' => null,'boolean'=>true,'required'=>false,'default'=>false];
-        $this->commandOptions[$name] = $options;
+        $this->argumentParser->addOption($name,$options);
     }
 
     /**
@@ -205,13 +209,13 @@ class Command
      * @param string $name name of the command
      * @param array $options 
      *   - help: the help description
+     *   - type: string, integer, array, hash
      *   - required: default false
      * @return void
      */
     public function addArgument(string $name, array $options = [])
     {
-        $options += ['name' => $name, 'help' => null,'required'=>false,'choices'=>[]];
-        $this->commandArguments[$name] =  $options;
+        $this->argumentParser->addArgument($name,$options);
     }
 
     /**
@@ -219,8 +223,9 @@ class Command
      *
      * @return void
      */
-    public function displayHelp(ArgumentParser $argumentParser){
-        $content = $argumentParser->help($this->name,$this->description);
+    public function displayHelp(){
+        $content = $this->argumentParser->help($this->name,$this->description);
+
         $this->io->out($content);
     }
 
@@ -302,7 +307,7 @@ class Command
         $this->out($message);
     }
 
-      /**
+    /**
      * Displays styled warnings
      *
      * @param string $message
@@ -382,16 +387,4 @@ class Command
         throw new MissingModelException($model);
     }
 
-    protected function getCommandName(string $className){
-        $pos = strpos($className,'\Command\\');
-        if($pos === false){
-            return null;
-        }
-        $parts = explode('\\',substr($className,$pos+9, -7));
-        $name = [];
-        foreach($parts as $p){
-            $name[] = str_replace('_','-',Inflector::underscore($p));
-        }
-        return implode(':',$name);
-    }
 }

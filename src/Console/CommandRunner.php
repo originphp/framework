@@ -8,246 +8,207 @@
  * portions of the Software.
  *
  * @copyright    Copyright (c) Jamiel Sharief
- * @link         https://www.originphp.com
+ *
+ * @see         https://www.originphp.com
+ *
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
 namespace Origin\Console;
+
 use Origin\Core\Plugin;
 use Origin\Core\Configure;
-
-use Origin\Console\ConsoleIo;
 use Origin\Core\Inflector;
-use Origin\Core\Resolver;
 use Origin\Console\Exception\StopExecutionException;
-
 
 class CommandRunner
 {
     protected $commands = [];
 
     /**
-     * Holds a list of namespaces in array ['namespace'=>'path']
+     * Holds a list of namespaces in array ['namespace'=>'path'].
      *
      * @var array
      */
     protected $namespaces = [];
 
-       /**
-     * Undocumented variable
+    /**
+     * Undocumented variable.
      *
      * @var \Origin\Console\ConsoleIo
      */
     protected $io = null;
 
-    public function __construct(ConsoleIo $io=null){
-        if($io === null){
+    protected $discovered = [];
+
+    public function __construct(ConsoleIo $io = null)
+    {
+        if ($io === null) {
             $io = new ConsoleIo();
         }
         $this->buildNamespaceMap();
+        $this->autoDiscover();
     }
 
-    protected function buildNamespaceMap(){
+    /**
+     * Builds a map of namespaces and directories.
+     */
+    protected function buildNamespaceMap()
+    {
         $this->namespaces = [
-            Configure::read('App.namespace') => SRC . DIRECTORY_SEPARATOR . 'Command',
-            'Origin' => ORIGIN . DIRECTORY_SEPARATOR . 'Command',
+            'Origin' => ORIGIN.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Command',
+            Configure::read('App.namespace') => SRC.DIRECTORY_SEPARATOR.'Command',
         ];
-       
+
         $plugins = Plugin::loaded();
-        foreach($plugins as $plugin){
-            $this->namespaces[$plugin] = PLUGINS . DS . Inflector::underscore($plugin) . DIRECTORY_SEPARATOR . 'src' . DS . 'Command';
+        foreach ($plugins as $plugin) {
+            $this->namespaces[$plugin] = PLUGINS.DS.Inflector::underscore($plugin).DIRECTORY_SEPARATOR.'src'.DS.'Command';
         }
     }
 
-    public function buildClassName(string $command){
-        $folders = [];
-        $commands = explode(':',$command);
-        foreach($commands as $command){
-            if($command){
-                $folders[] = Inflector::camelize(str_replace('-','_',$command));
-            }
+    /**
+     * Goes through discovery process.
+     */
+    protected function autoDiscover()
+    {
+        $this->discovered = [];
+        foreach ($this->namespaces as $namespace => $directory) {
+            $this->discovered = array_merge($this->discovered, $this->scanDirectory($directory, $namespace));
         }
-        return "Command\\" . implode('\\',$folders) . "Command";
     }
-    
-    public function run(array $args,ConsoleIo $io = null){
-        if($io === null){
+
+    /**
+     * Splits a command.
+     *
+     * @param string $command
+     */
+    protected function commandSplit(string $command)
+    {
+        $namespace = null;
+        if (strpos($command, ':') !== false) {
+            list($namespace, $command) = explode(':', $command, 2);
+        }
+
+        return [$namespace, $command];
+    }
+
+    protected function getDescriptions()
+    {
+        $results = [];
+        foreach ($this->discovered as $index => $command) {
+            $class = $command['namespace'].'\\'.$command['className'];
+
+            $object = new $class();
+            $name = $object->name();
+            $description = $object->description();
+
+            list($ns, $cmd) = $this->commandSplit($name);
+            $results[$ns][$name] = $object->description();
+        }
+
+        return $results;
+    }
+
+    public function run(array $args, ConsoleIo $io = null)
+    {
+        if ($io === null) {
             $io = new ConsoleIo();
         }
-        
+
         array_shift($args);
-        if(empty($args)){
+        if (empty($args)) {
             $this->displayHelp($io);
+
             return;
         }
 
-        $class = $this->findCommand($args[0]);
-      
-       if( $class){
+        $commands = $this->getCommandList();
 
-        array_shift($args);
+        if (isset($commands[$args[0]])) {
+            $class = $commands[$args[0]];
+            array_shift($args);
             try {
                 $command = new $class($io);
                 $command->run($args);
             } catch (StopExecutionException $ex) {
                 return false;
             }
-       }
-       else{
-           $io->error("Command {$args[0]} not found");
-       }
-      
-       return false;
-       
-    }
-    
-    /**
-     * Finds a class for 
-     *
-     * @param string $command
-     * @return void
-     */
-    public function findCommand(string $command){
-        $className = $this->buildClassName($command);
-        foreach($this->namespaces as $ns => $directory){
-            $needle = "{$ns}\\{$className}";
-            if(class_exists($needle)){
-                return $needle;
-            }
+        } else {
+            $io->error("Command {$args[0]} not found");
         }
-        return null;
+
+        return false;
     }
 
-    public function discoverCommands(){
-        $commands = [];
-    
-        # Level 1 
-        foreach($this->namespaces as $namespace => $directory){
-            $cmds = $this->getCommands($directory);
-            $results = $this->getCommandDescriptions($cmds,$namespace);
-            foreach($results as $cmd => $description){
-                $commands[null][$cmd] = $description;
-            }
-            # App Commands
-            $apps = $this->getApps($directory);
-            foreach($apps as $app => $appDirectory){
-                $cmdapp =  str_replace('_','-',Inflector::underscore($app));
-                $cmds = $this->getCommands($appDirectory);             
-                $results = $this->getCommandDescriptions($cmds,$namespace ,$app);
-                foreach($results as $cmd => $appDescription){
-                    $commands[$cmdapp][ $cmdapp .':' .$cmd] = $appDescription; 
-                }
-                $subApps = $this->getApps($appDirectory);
-                
-                # Sub Commands
-                foreach($subApps as $subApp => $subAppDirectory){
-                    $cmdSubApp =  str_replace('_','-',Inflector::underscore($subApp));
-                    $cmds = $this->getCommands($subAppDirectory);
-                  
-                    $results = $this->getCommandDescriptions($cmds, $namespace ,"{$app}\\{$subApp}");
-                 
-                    foreach($results as $cmd => $subAppDescription){
-                        $commands[$cmdapp][$cmdapp .':'. $cmdSubApp  .':' .$cmd] = $subAppDescription; 
-                    }
-                }
-            }
-        }
-        
-      
-        return $commands;
-    }
-
-    protected function getCommandDescriptions(array $commands,string $namespace,string $subNamespace =""){
+    protected function getCommandList()
+    {
         $results = [];
-       
-        if($subNamespace){
-            $subNamespace = "{$subNamespace}\\";
+        foreach ($this->discovered as $command) {
+            $class = $command['namespace'].'\\'.$command['className'];
+            $object = new $class();
+            $results[$object->name()] = $class;
         }
-        foreach($commands as $class => $directory){
-            $className = "{$namespace}\\Command\\{$subNamespace}{$class}";
-            $command = new $className($this->io);
-            $results[$this->classToCommand($class)] = $command->description();
-        }
+
         return $results;
     }
 
-    protected function classToCommand(string $class){
-        return str_replace('_','-',Inflector::underscore(substr($class,0,-7)));
-    }
+    protected function displayHelp(ConsoleIo $io)
+    {
+        $commands = $this->getDescriptions();
 
-    protected function displayHelp(ConsoleIo $io){
-        $commands = $this->discoverCommands();
-    
         $out = [];
-        $out[] = "<text>OriginPHP</text>";
-        $out[] = "";
-        $out[] = "<heading>Usage:</heading>";
-        $out[] = "  <text>origin <command> [options] [arguments]</text>";
-        $out[] = "";
+        $out[] = '<text>OriginPHP</text>';
+        $out[] = '';
+        $out[] = '<heading>Usage:</heading>';
+        $out[] = '  <text>console <command> [options] [arguments]</text>';
+        $out[] = '';
 
         $maxLength = 0;
-        foreach($commands as $group => $cmds){
-            foreach($cmds as $cmd => $description){
-                if(strlen($cmd) > $maxLength){
+        foreach ($commands as $group => $cmds) {
+            foreach ($cmds as $cmd => $description) {
+                if (strlen($cmd) > $maxLength) {
                     $maxLength = strlen($cmd);
                 }
             }
         }
 
-        foreach($commands as $group => $cmds){
-            foreach($cmds as $cmd => $description){
-                $cmd = str_pad($cmd,$maxLength + 2,' ',STR_PAD_RIGHT);
-                $out[] =  "<code>{$cmd}</code><text>{$description}</text>";
+        foreach ($commands as $group => $cmds) {
+            foreach ($cmds as $cmd => $description) {
+                $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
+                $out[] = "<code>{$cmd}</code><text>{$description}</text>";
             }
-            $out[] = "";
+            $out[] = '';
         }
-       $io->out($out);
-    }
-    /*
-    
-    }*/
-
-   
-
-    /**
-     * Gets a list of folders
-     *
-     * @param string $directory
-     * @return void
-     */
-    protected function getApps(string $directory){
-        $directories = [];
-        $results = glob($directory . '/*' , GLOB_ONLYDIR);
-        foreach($results as  $directory){
-        
-            $directories[basename($directory)] = $directory;
-        }
-        return $directories;
+        $io->out($out);
     }
 
     /**
-     * Gets commands from a directory
+     * Scans directory building up meta information for commands.
      *
      * @param string $directory
-     * @return array
+     * @param string $namespace
      */
-    protected function getCommands(string $directory){
-        $ignore = ['Command.php'];
-    
-        $result = [];
-     
-        if (file_exists($directory)) {
-            $files = scandir($directory);
-            foreach ($files as $file) {
-                if (substr($file, -11) === 'Command.php' and !in_array($file, $ignore)) {
-                    $result[substr($file, 0, -4)] = $directory . DS . $file;
-                }
+    public function scanDirectory(string $directory, string $namespace)
+    {
+        $results = [];
+        if (!file_exists($directory)) {
+            return [];
+        }
+        $files = scandir($directory);
+
+        foreach ($files as $file) {
+            if (substr($file, -4) !== '.php') {
+                continue;
+            }
+            if (substr($file, -11) === 'Command.php' and $file !== 'Command.php') {
+                $results[] = [
+                    'className' => substr($file, 0, -4),
+                    'namespace' => $namespace.'\\Command',
+                    'filename' => $directory.DS.$file,
+                ];
             }
         }
-        
-        return $result;
-    }
 
-  
-   
+        return $results;
+    }
 }
