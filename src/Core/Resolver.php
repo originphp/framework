@@ -31,7 +31,7 @@ class Resolver
         } else {
             $path = '\\'.str_replace('/', '\\', $objectType).'\\'.$class.$suffix;
         }
-
+       
         if (static::classExists($namespace.$path)) {
             return $namespace.$path;
         }

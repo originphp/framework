@@ -31,7 +31,6 @@ class DbShell extends Shell
             'help'=>'Use a different datasource','value'=>'name','short'=>'ds'
             ]);
        
-
         $this->addCommand('create', [
             'help' => 'Creates the database',
         ]);

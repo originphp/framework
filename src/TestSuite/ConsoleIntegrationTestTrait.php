@@ -91,9 +91,8 @@ trait ConsoleIntegrationTestTrait
 
         if(substr($class,-11) === 'CommandTest'){
             $io = new ConsoleIo($this->output,$this->output,$this->input);
-            $application = new ConsoleApplication();
-            $this->result = $application->run($argv,$io);
-
+            $commandRunner = new CommandRunner();
+            $this->result = $commandRunner->run($argv,$io);
         }
         else{
             $dispatcher = new ShellDispatcher($argv, $this->output, $this->input);

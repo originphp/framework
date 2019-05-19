@@ -167,7 +167,7 @@ abstract class Datasource
             $start = microtime(true);
 
             $this->statement = $query = $this->connection->prepare($sql);
-         
+
             $result = $query->execute($params);
             if (Configure::read('debug')) {
                 $this->log[] = [

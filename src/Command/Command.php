@@ -112,7 +112,6 @@ class Command
         $this->initialize($args);
 
         try {
-            
             list($options,$arguments) = $this->argumentParser->parse($args);
         } catch (ConsoleException $ex) {
             $this->throwError($ex->getMessage());

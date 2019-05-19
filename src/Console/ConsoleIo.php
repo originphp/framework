@@ -53,7 +53,6 @@ class ConsoleIo
         'stopped' => 'yellow',
     ];
 
-
     public function __construct(ConsoleOutput $out = null,ConsoleOutput $err = null,ConsoleInput $in = null){
        
         if($out === null){

@@ -77,21 +77,6 @@ class CommandRunner
         }
     }
 
-    /**
-     * Splits a command.
-     *
-     * @param string $command
-     */
-    protected function commandSplit(string $command)
-    {
-        $namespace = null;
-        if (strpos($command, ':') !== false) {
-            list($namespace, $command) = explode(':', $command, 2);
-        }
-
-        return [$namespace, $command];
-    }
-
     protected function getDescriptions()
     {
         $results = [];
@@ -102,7 +87,7 @@ class CommandRunner
             $name = $object->name();
             $description = $object->description();
 
-            list($ns, $cmd) = $this->commandSplit($name);
+            list($ns, $cmd) = commandSplit($name);
             $results[$ns][$name] = $object->description();
         }
 

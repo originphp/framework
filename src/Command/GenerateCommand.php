@@ -324,7 +324,6 @@ class GenerateCommand extends Command
                 $content = str_replace('%'.$key.'%', $value, $content);
             }
         }
-        pr($content);
 
         return $this->saveGeneratedCode($output, $content);
     }

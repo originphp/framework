@@ -89,7 +89,7 @@ class ConsoleHelpFormatter
 
         $maxWidth = $this->calculateWidth();
         if($this->commands){
-            $out[] = "<yellow>Available Commands:</yellow>";
+            $out[] = "<yellow>Commands:</yellow>";
             $out[] = $this->createTable($this->commands,$maxWidth);
             $out[] = '';
         }
@@ -110,7 +110,7 @@ class ConsoleHelpFormatter
             $out[] = $this->epilog;
             $out[] = '';
         }
-
+       
         return implode("\n",$out);
     }
 

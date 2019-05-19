@@ -247,50 +247,9 @@ class ArgumentParser
             $formatter->setDescription($description);
         }
         $formatter->setUsage($this->generateUsage($name));
-        $formatter->setArguments($this->getArguments());
-        $formatter->setOptions($this->getOptions());
+        $formatter->setArguments($this->generateArguments());
+        $formatter->setOptions($this->generateOptions());
         return $formatter->generate();
-    }
-
-    public function helpOld(string $name,$description = null){
-        $out = [];
-        if($description){
-            foreach((array) $description as $row){
-                $out[] = $row;
-            }
-            $out[] = '';
-        }
-        $out[] = "<heading>Usage:</heading>";
-        $out[] = '<text>'. $this->generateUsage($name).'</text>';
-        $out[] = "";
-
-        if($this->arguments){
-            $out[] = "<heading>Arguments:</heading>";
-            $arguments = $this->getArguments();
-            $maxLength = $this->getMaxLength($arguments);
-            foreach($arguments as $argument => $help){
-                $argument = str_pad($argument, $maxLength + 5);
-                $description = $this->formatDescription($argument,$help);
-                foreach($description as $row){
-                    $out[] =  $row;
-                }
-            }
-            $out[] = "";
-        }
-
-        if($this->options){
-            $out[] = "<heading>Options:</heading>";
-            $options = $this->getOptions();
-            $maxLength = $this->getMaxLength($options);
-            foreach($options as $option => $help){
-                $option = str_pad($option, $maxLength);
-                 $out[]  = "  <code>{$option}</code>\t{$help}";
-            }
-            $out[] = "";
-        }
-
-        return implode("\n",$out);
-
     }
 
     protected function getMaxLength(array $data){
@@ -303,7 +262,7 @@ class ArgumentParser
         return $maxLength;
     }
 
-    protected function getArguments(){
+    protected function generateArguments(){
         $arguments = [];
         foreach($this->arguments as $argument){
             $description = '';
@@ -321,7 +280,7 @@ class ArgumentParser
      *
      * @return array
      */
-    protected function getOptions(){
+    protected function generateOptions(){
         $options = [];
         foreach ($this->options as $option) {
    
@@ -345,7 +304,6 @@ class ArgumentParser
                 }
              
             }
-
             $options[$text] =  $help;
         }
         return $options;

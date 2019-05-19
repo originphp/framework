@@ -120,6 +120,22 @@ function pluginSplit($name)
 }
 
 /**
+ * Splits a command
+ *
+ * @param string $command app:create-user, 
+ * @return void
+ */
+function commandSplit(string $command)
+{
+    $namespace = null;
+    if (strpos($command, ':') !== false) {
+        list($namespace, $command) = explode(':', $command, 2);
+    }
+
+    return [$namespace, $command];
+}
+
+/**
  * Translate and format a string.
  *
  * @example __('Order with id %d by user %s...', $id, $name);
