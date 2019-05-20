@@ -101,7 +101,7 @@ class GenerateCommand extends Command
 
     protected function command(array $data)
     {
-        $data['custom'] = str_replace('_', '-', Inflector::underscore($data['namespace']).':'.$data['underscored']);
+        $data['custom'] = str_replace('_', '-', $data['underscored']);
 
         $this->generate(
             $this->getTemplateFilename('command'),

@@ -107,18 +107,17 @@ class CommandRunner
             return;
         }
 
-        $className = $this->findCommand($args[0]);
+        $command = $this->findCommand($args[0]);
 
-        if ($className) {
+        if ($command) {
             array_shift($args);
             try {
-                $command = new $className($io);
                 $command->run($args);
             } catch (StopExecutionException $ex) {
                 return false;
             }
         } else {
-            $io->error("Command {$args[0]} not found");
+            $io->error("Command `{$args[0]}` not found");
         }
 
         return false;
@@ -129,23 +128,24 @@ class CommandRunner
      * it will do autodiscovery.
      *
      * @param string $command
-     * @return void
+     * @return \Origin\Console\Command
      */
-    protected function findCommand(string $command){
+    public function findCommand(string $command){
         
         $namespace = Configure::read('App.namespace');
         $className = $namespace . '\\' . Inflector::camelize(preg_replace('/[:-]/','_',$command)) . 'Command';
         if(class_exists($className)){
-            $object = new $className();
+            $object = new $className($this->io);
             if($object->name() === $command){
-                return $className;
+                return $object;
             }
         }
 
         $this->autoDiscover();
         $commands = $this->getCommandList();
         if(isset($commands[$command])){
-            return $commands[$command];
+            $className = $commands[$command];
+            return new $className($this->io);
         }
         return null;
     }
@@ -182,8 +182,9 @@ class CommandRunner
                 }
             }
         }
-
+        ksort($commands);
         foreach ($commands as $group => $cmds) {
+            $out[]  = '<heading>' .  $group . '</heading>';
             foreach ($cmds as $cmd => $description) {
                 $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
                 $out[] = "<code>{$cmd}</code><text>{$description}</text>";

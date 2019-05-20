@@ -17,7 +17,7 @@ namespace Origin\TestSuite;
 use Origin\Console\ConsoleInput;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\ShellDispatcher;
-use Origin\Console\ConsoleApplication;
+use Origin\Console\CommandRunner;
 use Origin\Console\ConsoleIo;
 
 
@@ -91,16 +91,14 @@ trait ConsoleIntegrationTestTrait
 
         if(substr($class,-11) === 'CommandTest'){
             $io = new ConsoleIo($this->output,$this->output,$this->input);
-            $commandRunner = new CommandRunner();
-            $this->result = $commandRunner->run($argv,$io);
+            $commandRunner = new CommandRunner($io);
+            $this->result = $commandRunner->run($argv);
         }
         else{
             $dispatcher = new ShellDispatcher($argv, $this->output, $this->input);
             $this->result = $dispatcher->start();
             $this->shell = $dispatcher->shell();
         }
-
-    
     }
     /**
      * Gets the output from the command or shell. This is for debugging

@@ -77,27 +77,39 @@ class ArgumentParser
      *
      * @param string $name
      * @param array $options
+     *  - description: help text
      *  - short: the short command, this is with single -. e.g -f
      *  - default: null
      *  - required: default false
-     *  - type: string, numeric, boolean, array hash
+     *  - type: string, numeric, boolean
+     *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
      * @return void
      */
     public function addOption(string $name,array $options=[]){
-        $options += ['name'=>$name,'short'=>null,'default'=>null,'required'=>false,'type'=>'string','description'=>''];
+        $options += ['name'=>$name,'short'=>null,'default'=>null,'required'=>false,'type'=>'string','description'=>'','banner'=>strtoupper($name)];
         if($options['default'] AND $options['required']){
             throw new ConsoleException("Option {$name} cannot be required and have default value");
         }
         if(!in_array($options['type'],['string','boolean','integer','array','hash'])){
             throw new ConsoleException("Option {$name} invalid type");
         }
-        
+    
         if($options['short']){
             $this->shortOptions[$options['short']] = $options;
         }
         $this->options[$name] = $options;
     }
 
+      /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param array $options
+     *  - description: help text
+     *  - required: default false
+     *  - type: string, numeric, boolean, array hash
+     * @return void
+     */
     public function addArgument(string $name,array $options=[]){
         $options += ['name'=>$name,'default'=>null,'required'=>false,'type'=>'string','description'=>''];
         if($options['required'] AND $this->arguments){
@@ -347,11 +359,11 @@ class ArgumentParser
                 $text = '-' . $option['short']. ', ' . $text; 
             }
             if($option['type']  !== 'boolean'){
-                $text .=  '=' . strtoupper($option['name']) ;
+                $text .=  '=' . $option['banner'] ;
             }
             $help = $option['description'];
             if(!empty($option['default'])){
-              $default = " \033[93m(default: {$option['default']})\033[0m"; //  Append this without breaking color/multi line
+              $default = " \033[93m[default: {$option['default']}]\033[0m"; //  Append this without breaking color/multi line
                 if(is_array($help)){
                     $rows = count($help);
                     $help[$rows-1] .= $default;

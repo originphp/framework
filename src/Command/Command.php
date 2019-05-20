@@ -23,6 +23,7 @@ use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
 use SebastianBergmann\Environment\Console;
+use Origin\Console\CommandRunner;
 
 class Command
 {
@@ -91,7 +92,7 @@ class Command
      *
      * @var \Origin\Console\ArgumentParser;
      */
-    protected $argumentParser = null;
+    protected $parser = null;
 
     public function __construct(ConsoleIo $io = null)
     {
@@ -100,7 +101,7 @@ class Command
         }
         $this->io = $io;
 
-        $this->argumentParser = new ArgumentParser();
+        $this->parser = new ArgumentParser();
 
         $this->addOption('help', ['short' => 'h', 'description' => 'Displays this help message', 'type' => 'boolean']);
         $this->addOption('verbose', ['short' => 'v', 'description' => 'Displays additional output (if available)', 'type' => 'boolean']);
@@ -116,7 +117,36 @@ class Command
     }
 
     /**
-     * Runs the command.
+     * Runs another command from this command
+     *
+     * @param string $command
+     * @param array $args  array of options e.g 
+     *    $args = ['my_database','--datasource'=>'default','--help']
+     * @return void
+     */
+    public function runCommand(string $command,array $args){
+       $runner = new CommandRunner($this->io);
+       $command = $runner->findCommand($command);
+       if(!$command instanceof Command){
+           throw new ConsoleException(sprintf('Command `%s` was not found'));
+       }
+
+       // Convert args
+       $argv = [];
+       foreach($args as $key => $value){
+           if(is_int($key)){
+               $argv[] = $value;
+           }
+           else{
+               $argv[] = "{$key}={$value}"; 
+           }
+       }
+       return $command->run($argv);
+    }
+
+
+    /**
+     * Runs this command used by Command Runner
      *
      * @param array $args
      */
@@ -124,16 +154,16 @@ class Command
     {
         $this->initialize($args);
 
-        $this->argumentParser->setCommand($this->name);
-        $this->argumentParser->setDescription($this->description);
-        $this->argumentParser->setEpilog($this->epilog);
+        $this->parser->setCommand($this->name);
+        $this->parser->setDescription($this->description);
+        $this->parser->setEpilog($this->epilog);
 
         try {
-            list($options, $arguments) = $this->argumentParser->parse($args);
+            list($options, $arguments) = $this->parser->parse($args);
         } catch (ConsoleException $ex) {
             $this->io->err('<exception> ERROR </exception> <text>'.$ex->getMessage().'</text>');
             $this->io->nl();
-            $this->out($this->argumentParser->usage());
+            $this->out($this->parser->usage());
 
             return false;
         }
@@ -236,7 +266,7 @@ class Command
      */
     public function addOption(string $name, array $options = [])
     {
-        $this->argumentParser->addOption($name, $options);
+        $this->parser->addOption($name, $options);
     }
 
     /**
@@ -250,7 +280,7 @@ class Command
      */
     public function addArgument(string $name, array $options = [])
     {
-        $this->argumentParser->addArgument($name, $options);
+        $this->parser->addArgument($name, $options);
     }
 
     /**
@@ -258,7 +288,7 @@ class Command
      */
     public function displayHelp()
     {
-        $content = $this->argumentParser->help();
+        $content = $this->parser->help();
 
         $this->io->out($content);
     }
