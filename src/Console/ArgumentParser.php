@@ -26,6 +26,52 @@ class ArgumentParser
     protected $shortOptions = [];
 
     protected $arguments = [];
+
+    /**
+     * Command Name
+     *
+     * @var string
+     */
+    protected $command = null;
+
+    /**
+     * Description displayed before help
+     *
+     * @var string
+     */
+    protected $description = null;
+
+    /**
+     * Text displayed after help
+     *
+     * @var string
+     */
+    protected $epilog =  null;
+
+    public function __construct(string $name = 'command',string $description=null){
+        $this->name = $name;
+        $this->description = $description;
+    }
+
+    public function setCommand(string $command){
+        $this->command = $command;
+    }
+
+    public function setDescription($description){
+        if(is_array($description)){
+            $description = implode("\n",$description);
+        }
+        $this->description = $description;
+    }
+
+    public function setEpilog($epilog){
+        if(is_Array($epilog)){
+            $epilog = implode("\n",$epilog);
+        }
+        $this->epilog = $epilog;
+    }
+
+
     /**
      * Undocumented function
      *
@@ -180,7 +226,6 @@ class ArgumentParser
             $value = (int) $value;
         }
 
-
         $options[$name] = $value;
    
         return $options;
@@ -241,12 +286,24 @@ class ArgumentParser
         return $out;
     }
 
-    public function help(string $name,$description=null){
+    /**
+     * 
+     * Generats the usage only
+     * @param string $name
+     * @return void
+     */
+    public function usage(){
         $formatter = new ConsoleHelpFormatter();
-        if($description){
-            $formatter->setDescription($description);
+        $formatter->setUsage($this->generateUsage($this->name));
+        return $formatter->generate();
+    }
+
+    public function help(){
+        $formatter = new ConsoleHelpFormatter();
+        if($this->description){
+            $formatter->setDescription($this->description);
         }
-        $formatter->setUsage($this->generateUsage($name));
+        $formatter->setUsage($this->generateUsage($this->name));
         $formatter->setArguments($this->generateArguments());
         $formatter->setOptions($this->generateOptions());
         return $formatter->generate();
