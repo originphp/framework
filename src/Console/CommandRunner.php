@@ -46,12 +46,10 @@ class CommandRunner
         if ($io === null) {
             $io = new ConsoleIo();
         }
-        $this->buildNamespaceMap();
-        $this->autoDiscover();
     }
 
     /**
-     * Builds a map of namespaces and directories.
+     * Builds a map of namespaces and directories. First the framework then App.
      */
     protected function buildNamespaceMap()
     {
@@ -71,6 +69,8 @@ class CommandRunner
      */
     protected function autoDiscover()
     {
+        $this->buildNamespaceMap();
+
         $this->discovered = [];
         foreach ($this->namespaces as $namespace => $directory) {
             $this->discovered = array_merge($this->discovered, $this->scanDirectory($directory, $namespace));
@@ -107,13 +107,12 @@ class CommandRunner
             return;
         }
 
-        $commands = $this->getCommandList();
+        $className = $this->findCommand($args[0]);
 
-        if (isset($commands[$args[0]])) {
-            $class = $commands[$args[0]];
+        if ($className) {
             array_shift($args);
             try {
-                $command = new $class($io);
+                $command = new $className($io);
                 $command->run($args);
             } catch (StopExecutionException $ex) {
                 return false;
@@ -123,6 +122,32 @@ class CommandRunner
         }
 
         return false;
+    }
+
+    /**
+     * This will find the command, prioritizing main name space with conventions, if not 
+     * it will do autodiscovery.
+     *
+     * @param string $command
+     * @return void
+     */
+    protected function findCommand(string $command){
+        
+        $namespace = Configure::read('App.namespace');
+        $className = $namespace . '\\' . Inflector::camelize(preg_replace('/[:-]/','_',$command)) . 'Command';
+        if(class_exists($className)){
+            $object = new $className();
+            if($object->name() === $command){
+                return $className;
+            }
+        }
+
+        $this->autoDiscover();
+        $commands = $this->getCommandList();
+        if(isset($commands[$command])){
+            return $commands[$command];
+        }
+        return null;
     }
 
     protected function getCommandList()
@@ -139,6 +164,7 @@ class CommandRunner
 
     protected function displayHelp(ConsoleIo $io)
     {
+        $this->autoDiscover();
         $commands = $this->getDescriptions();
 
         $out = [];
