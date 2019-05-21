@@ -53,6 +53,13 @@ class ConsoleIo
         'stopped' => 'yellow',
     ];
 
+    /**
+     * Character length of 
+     *
+     * @var int
+     */
+    protected $lastWrittenLength = null;
+
     public function __construct(ConsoleOutput $out = null, ConsoleOutput $err = null, ConsoleInput $in = null)
     {
         if ($out === null) {
@@ -77,7 +84,7 @@ class ConsoleIo
      */
     public function out($message)
     {
-        $this->stdout->write($message);
+        $this->lastWrittenLength = $this->stdout->write($message,true);
     }
 
     /**
@@ -87,7 +94,32 @@ class ConsoleIo
      */
     public function write($message)
     {
-        $this->stdout->write($message, false);
+        $this->lastWrittenLength =  $this->stdout->write($message, false);
+    }
+
+    /**
+     * Overwrites the last text. Does not work if used new line after text
+     * 
+     * $io->write('downloading...');
+     * $io->overwrite('completed');
+     *
+     * @param string|array $message
+     * @return void
+     */
+    public function overwrite($message,$newLine = true){
+        if(is_array($message)){
+            $message = implode("\n",$message);
+        }
+       $this->stdout->write("\033[{$this->lastWrittenLength}D",false);
+    
+       $difference = strlen($message) - $this->lastWrittenLength;
+       if($difference){
+           $message .= str_repeat(' ',$difference);
+       }
+       if($newLine){
+           $message .= "\n";
+       }
+       $this->write($message);
     }
 
     /**
@@ -131,7 +163,7 @@ class ConsoleIo
      */
     public function text($text, array $options = [])
     {
-        $options += ['bullet' => '*', 'indent' => 2];
+        $options += ['indent' => 2];
         $text = (array) $text;
         foreach ($text as $line) {
             $this->out(str_repeat(' ', $options['indent']).$line);
@@ -144,7 +176,7 @@ class ConsoleIo
      * @param array $array
      * @param bool  $headers wether first row is headers
      */
-    public function table(array $array, $headers = false)
+    public function table(array $array, $headers = true)
     {
         // Calculate width of each column
         $widths = [];
@@ -176,7 +208,6 @@ class ConsoleIo
             }
             $out[] = $headers;
             $out[] = $seperator;
-
             array_shift($array);
         }
 
@@ -312,10 +343,10 @@ class ConsoleIo
             $pb2 = str_repeat("\033[30;40m \033[0m", floor($left / 2));
         }
 
-        $this->out("\033[0G\033[2K".$pb.$pb2."\033[92m{$percent}%", false);
+        $this->write("\033[0G\033[2K".$pb.$pb2."\033[92m{$percent}%");
         if ($percent == 100) {
             sleep(1);
-            $this->out("\033[0G\033[2K\033[0m", false);
+            $this->out("\033[0G\033[2K\033[0m");
         }
     }
 
@@ -535,5 +566,47 @@ class ConsoleIo
         }
 
         return $maxLength;
+    }
+
+     /**
+     * Sets or modifies existing styles
+     *  $styles = $io->styles();
+     *  $style = $io->style('primary');
+     *  $io->style('primary',$styleArray);
+     *  $io->style('primary',false);
+     *
+     * @param string $name
+     * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
+     * @return bool|array|null
+     */
+    public function styles(string $name = null, $values = null)
+    {
+        $this->stderr->styles($name,$values);
+        return $this->stdout->styles($name,$values);
+    }
+
+    /**
+     * Returns the error output object
+     *
+     * @return \Origin\Console\ConsoleOutput;
+     */
+    public function stderr(){
+        return $this->stderr;
+    }
+     /**
+     * Returns the output object
+     *
+     * @return \Origin\Console\ConsoleOutput;
+     */
+    public function stdout(){
+        return $this->stdout;
+    }
+    /**
+     * Returns the input object
+     *
+     * @return \Origin\Console\ConsoleInput;
+     */
+    public function stdin(){
+        return $this->stdin;
     }
 }

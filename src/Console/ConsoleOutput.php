@@ -116,7 +116,7 @@ class ConsoleOutput
      * Writes to the stream
      *
      * @param string|array $data
-     * @return void
+     * @return int 
      */
     public function write($data,$newLine = true)
     {
@@ -127,7 +127,8 @@ class ConsoleOutput
         if($newLine){
             $data .= "\n";
         }
-        return fwrite($this->stream, $data);
+        fwrite($this->stream, $data);
+        return strlen($data);
     }
 
     /**
@@ -210,7 +211,7 @@ class ConsoleOutput
      *
      * @param string $name
      * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
-     * @return void
+     * @return bool|array|null
      */
     public function styles(string $name = null, $values = null)
     {

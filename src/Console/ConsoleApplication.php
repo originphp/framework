@@ -30,6 +30,7 @@ use Origin\Core\LazyLoadContainer;
  * will be run automatically.
  * 
  * @example:
+ * #!/usr/bin/env php
  * require __DIR__ . '/vendor/originphp/originphp/src/bootstrap.php';
  * use Origin\Console\ConsoleApplication;
  *  

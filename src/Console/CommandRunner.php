@@ -109,23 +109,15 @@ class CommandRunner
         array_shift($args);
         if (empty($args)) {
             $this->displayHelp($io);
-
             return;
         }
-        // convert app:command:sub-command
-        $method = 'execute';
-        $cmdString = $args[0];
-        if (substr_count($cmdString, ':') === 2) {
-            $parts = explode(':', $cmdString);
-            $method = $parts[2];
-            $cmdString = $parts[0].':'.$parts[1]; // put backtogether
-        }
-        $command = $this->findCommand($cmdString);
+   
+        $command = $this->findCommand($args[0]);
 
-        if ($command and method_exists($command, $method)) {
+        if ($command) {
             array_shift($args);
             try {
-                $command->run($method, $args);
+                $command->run($args);
             } catch (StopExecutionException $ex) {
                 return false;
             }
@@ -199,6 +191,7 @@ class CommandRunner
                 }
             }
         }
+
         ksort($commands);
         foreach ($commands as $group => $cmds) {
             $out[] = '<heading>'.$group.'</heading>';
