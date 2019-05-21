@@ -19,8 +19,11 @@ use Origin\Command\Command;
 use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleHelpFormatter;
 use Origin\Console\ArgumentParser;
-
+use Origin\Core\Resolver;
 use Origin\Console\Exception\ConsoleException;
+use Origin\Command\Exception\MissingCommandException;
+use Origin\Core\Inflector;
+use Origin\Core\LazyLoadContainer;
 
 /** 
  * If you only add one command, by default it will become a single command application and the command
@@ -29,12 +32,13 @@ use Origin\Console\Exception\ConsoleException;
  * @example:
  * require __DIR__ . '/vendor/originphp/originphp/src/bootstrap.php';
  * use Origin\Console\ConsoleApplication;
- * 
- * use App\Command\CreateTableCommand;
- * use App\Command\DropTableCommand;
- * 
- * $consoleApplication = new ConsoleApplication('db',['DB application for creating and dropping tables']);
- * $consoleApplication->addCommand('create', new CreateTableCommand());
+ *  
+ * $consoleApplication = new ConsoleApplication();
+ * $consoleApplication->name('db');
+ * $consoleApplication->Description([
+ *  'DB application for creating and dropping tables'
+ * ])
+ * $consoleApplication->addCommand('create', 'CreateTable');
  * $consoleApplication->run();
  */
 
@@ -55,7 +59,7 @@ class ConsoleApplication
      *
      * @var string
      */
-    protected $desription = '';
+    protected $desription =  null;
 
      /**
      * Holds the command list
@@ -64,15 +68,25 @@ class ConsoleApplication
      */
     protected $commands = [];
 
+
     /**
-     * 
+     * Undocumented variable
+     *
+     * @var \Origin\Core\LazyLoadContainer
+     */
+    protected $commandRegistry = null;
+
+    /**
+     * Constructor
      *
      * @param string $name should be the same as the executable file as this will be used in help
      * @param string|array $desription description shown in help
      */
-    public function __construct(string $name = 'app',$desription = null){
-        $this->name = $name;
-        $this->desription = $desription;
+    public function __construct(ConsoleIo $io = null){
+   
+        if($io === null){
+            $this->io = new ConsoleIo();
+        }
 
         $this->argumentParser = new ArgumentParser();
 
@@ -81,10 +95,45 @@ class ConsoleApplication
             ]);
    
         $this->initialize();
+        
+        $this->commandRegistry = new LazyLoadContainer();
+
     }
 
     public function initialize(){
 
+    }
+
+     /**
+     * Sets the name for the application
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function name(string $name = null){
+        if($name === null){
+            return $this->name;
+        }
+        if(!preg_match('/^[a-z-]+$/',$name)){
+            throw new ConsoleException(sprintf('Command App name `%s` is invalid',$name));
+        }
+        $this->name = $name;
+    }
+
+    /**
+     * Sets the description
+     *
+     * @param string|array $description
+     * @return string|null
+     */
+    public function description($description =null){
+        if($description === null){
+            return $this->description;
+        }
+        if(is_array($description)){
+            $description = implode("\n",$description);
+        }
+        $this->description = $description;
     }
 
     /**
@@ -93,18 +142,17 @@ class ConsoleApplication
      * @param array $args default is argv
      * @return bool
      */
-    public function run(array $args = null,ConsoleIo $io=null){
+    public function run(array $args = null){
        
         if($args === null){
             global $argv;
             $args = $argv;
         }
 
-        if($io === null){
-            $io = new ConsoleIo();
-        }
         array_shift($args);
-        if(empty($this->commands)){
+        $commands = $this->commandRegistry->list();
+
+        if(empty($commands)){
             $this->io->error('No commands have been added to this application.');
             return false;
         }
@@ -112,54 +160,78 @@ class ConsoleApplication
         try {
             list($options,$arguments) = $this->argumentParser->parse($args);
         } catch (ConsoleException $ex) {
-            $this->throwError($ex->getMessage());
+            $this->io->error($ex->getMessage());
+            return false;
         }
 
+       
         # If its one command application load the first one by default
-        if(count($this->commands) === 1 AND empty($args)){
-            $args = [$this->commands[0]];
+        if(count($commands) === 1 AND empty($args)){
+            $args = [$commands[0]];
         }
 
-        if(isset($options['help']) OR empty($args)){
-            $this->displayHelp($io);
+        if(empty($args)){
+            $this->displayHelp();
             return true;
         }
 
         $command = array_shift($args);
-        if(!isset($this->{$command}) OR !$this->{$command} instanceof Command){
+
+        try{
+            $this->{$command} = $this->commandRegistry->get($command);
+          
+        }catch(Exception $ex){
             $this->io->error("Invalid command {$command}.");
             return false;
-        }
-
-        return $this->{$command}->run($args);
+        }   
+        
+        $this->{$command}->name($this->name . ' ' .$command);
+        return $this->{$command}->run('execute',$args);
     }
 
-    public function displayHelp(ConsoleIo $io){
+    /**
+     * Displays the help for this app
+     *
+     * @return void
+     */
+    public function displayHelp(){
         $formatter = new ConsoleHelpFormatter();
+      
         if($this->desription){
             $formatter->setDescription($this->desription);
         }
         $formatter->setUsage(["{$this->name} command [options] [arguments]"]);
         $commands = [];
-        foreach($this->commands as $name){
-            $commands[$name] = $this->{$name}->description();
+
+        foreach($this->commandRegistry->list() as $name){
+            $command = $this->commandRegistry->get($name);
+            $commands[$name] = $command->description();
         }
         $formatter->setCommands($commands);
-        $io->out($formatter->generate());
+        $this->io->out($formatter->generate());
     }
-
+    
     /**
-     * Registers a command
+     * A work in progress
      *
      * @param string $alias
-     * @param Command $command
+     * @param string $name
+     * @param array $config
      * @return void
      */
-    public function addCommand(string $alias, Command $command){
+    public function addCommand(string $alias, string $name,array $config=[])
+    {
+        if(!preg_match('/^[a-z-]+$/',$alias)){
+            throw new ConsoleException(sprintf('Alias `%s` is invalid',$alias));
+        }
 
-        $command->name($this->name . ' ' . $alias);
-
-       $this->{$alias} = $command;
-       $this->commands[] = $alias;
+        list($plugin, $command) = pluginSplit($name);
+        $config = array_merge(['className' => $name.'Command'], $config);
+        $class = Resolver::className($config['className'],'Command');
+        if($class === null){
+           throw new MissingCommandException($class);
+        }
+        
+        $this->commandRegistry->add($alias,$class);
     }
 }

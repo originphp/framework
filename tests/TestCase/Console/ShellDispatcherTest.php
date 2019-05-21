@@ -88,7 +88,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput =  new AnotherConsoleOutput('php://memory');
         $ShellDispatcher = new ShellDispatcher([], $ConsoleOutput, new ConsoleInput());
         $this->assertFalse($ShellDispatcher->start());
-        $this->assertContains('OriginPHP Console', $ConsoleOutput->read());
+        $this->assertContains('OriginPHP', $ConsoleOutput->read());
     }
 
     public function testGetShellList()
@@ -133,7 +133,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testPluginDispatchApp()
+    public function testDispatchApp()
     {
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
@@ -151,11 +151,12 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $result = $ShellDispatcher->start();
     }
 
-    public function testPluginDispatchCore()
+    public function testDispatchCore()
     {
+        $this->markTestSkipped('This has been removed and this feature is being depreciated');
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
-            ['pathTo/origin.php','db'],
+            ['pathTo/origin.php','shell'],
             new AnotherConsoleOutput('php://memory'),
             new ConsoleInput()
         );

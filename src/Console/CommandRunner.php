@@ -94,6 +94,12 @@ class CommandRunner
         return $results;
     }
 
+    /**
+     * This the workhorse, runs the command, displays help.
+     *
+     * @param array     $args
+     * @param ConsoleIo $io
+     */
     public function run(array $args, ConsoleIo $io = null)
     {
         if ($io === null) {
@@ -106,47 +112,58 @@ class CommandRunner
 
             return;
         }
+        // convert app:command:sub-command
+        $method = 'execute';
+        $cmdString = $args[0];
+        if (substr_count($cmdString, ':') === 2) {
+            $parts = explode(':', $cmdString);
+            $method = $parts[2];
+            $cmdString = $parts[0].':'.$parts[1]; // put backtogether
+        }
+        $command = $this->findCommand($cmdString);
 
-        $command = $this->findCommand($args[0]);
-
-        if ($command) {
+        if ($command and method_exists($command, $method)) {
             array_shift($args);
             try {
-                $command->run($args);
+                $command->run($method, $args);
             } catch (StopExecutionException $ex) {
                 return false;
             }
         } else {
-            $io->error("Command `{$args[0]}` not found");
+            $io->error("Command `{$args[0]}` not found"); // Original
         }
 
         return false;
     }
 
     /**
-     * This will find the command, prioritizing main name space with conventions, if not 
+     * This will find the command, prioritizing main name space with conventions, if not
      * it will do autodiscovery.
      *
      * @param string $command
-     * @return \Origin\Console\Command
+     *
+     * @return \Origin\Command\Command
      */
-    public function findCommand(string $command){
-        
+    public function findCommand(string $command)
+    {
         $namespace = Configure::read('App.namespace');
-        $className = $namespace . '\\' . Inflector::camelize(preg_replace('/[:-]/','_',$command)) . 'Command';
-        if(class_exists($className)){
+        $className = $namespace.'\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
+        if (class_exists($className)) {
             $object = new $className($this->io);
-            if($object->name() === $command){
+            if ($object->name() === $command) {
                 return $object;
             }
         }
 
         $this->autoDiscover();
         $commands = $this->getCommandList();
-        if(isset($commands[$command])){
+   
+        if (isset($commands[$command])) {
             $className = $commands[$command];
+
             return new $className($this->io);
         }
+
         return null;
     }
 
@@ -184,7 +201,7 @@ class CommandRunner
         }
         ksort($commands);
         foreach ($commands as $group => $cmds) {
-            $out[]  = '<heading>' .  $group . '</heading>';
+            $out[] = '<heading>'.$group.'</heading>';
             foreach ($cmds as $cmd => $description) {
                 $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
                 $out[] = "<code>{$cmd}</code><text>{$description}</text>";

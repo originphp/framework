@@ -150,14 +150,14 @@ class Command
      *
      * @param array $args
      */
-    public function run(array $args)
+    public function run(string $method = 'execute', array $args)
     {
         $this->initialize($args);
 
         $this->parser->setCommand($this->name);
         $this->parser->setDescription($this->description);
         $this->parser->setEpilog($this->epilog);
-
+       
         try {
             list($options, $arguments) = $this->parser->parse($args);
         } catch (ConsoleException $ex) {
@@ -180,7 +180,7 @@ class Command
 
             return true;
         }
-        $this->execute();
+        $this->{$method}();
     }
 
     /**
@@ -221,14 +221,20 @@ class Command
         return null;
     }
 
+    /**
+     * This will set or get the name. Note. Setting name here does not change the command name since name is taken after
+     * construction of the object without running any methods.
+     * @internal not validating name here. Changes here only affect help usage ouput e.g console app setting name
+     * requires spaces.
+     * @param string $name
+     * @return void
+     */
     public function name(string $name = null)
     {
         if ($name === null) {
             return $this->name;
         }
-
-        $this->validateName($name);
-
+        
         $this->name = $name;
     }
 
@@ -236,7 +242,7 @@ class Command
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
         if (!preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
-            throw new ConsoleException(sprintf('Command name %s is invalid.'));
+            throw new ConsoleException(sprintf('Command name `%s` is invalid',$name));
         }
     }
 
@@ -281,6 +287,17 @@ class Command
     public function addArgument(string $name, array $options = [])
     {
         $this->parser->addArgument($name, $options);
+    }
+
+    /**
+     * Add a method as a sub command. Execute will not longer work.
+     *
+     * @param string $name
+     * @param array $options
+     * @return void
+     */
+    public function addSubCommand(string $name, array $options = []){
+        $this->parser->addCommand($name, $options);
     }
 
     /**

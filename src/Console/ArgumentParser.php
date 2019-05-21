@@ -27,6 +27,8 @@ class ArgumentParser
 
     protected $arguments = [];
 
+    protected $commands = [];
+
     /**
      * Command Name
      *
@@ -49,7 +51,7 @@ class ArgumentParser
     protected $epilog =  null;
 
     public function __construct(string $name = 'command',string $description=null){
-        $this->name = $name;
+        $this->command = $name;
         $this->description = $description;
     }
 
@@ -70,7 +72,6 @@ class ArgumentParser
         }
         $this->epilog = $epilog;
     }
-
 
     /**
      * Undocumented function
@@ -98,6 +99,11 @@ class ArgumentParser
             $this->shortOptions[$options['short']] = $options;
         }
         $this->options[$name] = $options;
+    }
+
+    public function addCommand(string $name,array $options=[]){
+        $options += ['name'=>$name,'description'=>null];
+        $this->commands[$name] = $options;
     }
 
       /**
@@ -306,7 +312,7 @@ class ArgumentParser
      */
     public function usage(){
         $formatter = new ConsoleHelpFormatter();
-        $formatter->setUsage($this->generateUsage($this->name));
+        $formatter->setUsage($this->generateUsage($this->command));
         return $formatter->generate();
     }
 
@@ -315,9 +321,10 @@ class ArgumentParser
         if($this->description){
             $formatter->setDescription($this->description);
         }
-        $formatter->setUsage($this->generateUsage($this->name));
+        $formatter->setUsage($this->generateUsage($this->command));
         $formatter->setArguments($this->generateArguments());
         $formatter->setOptions($this->generateOptions());
+        $formatter->setCommands($this->generateCommands());
         return $formatter->generate();
     }
 
@@ -342,6 +349,19 @@ class ArgumentParser
            
         }
         return $arguments;
+    }
+
+    protected function generateCommands(){
+        $commands = [];
+        foreach($this->commands as $command){
+            $description = '';
+            if($command['description']){
+                $description = $command['description'];
+            }
+            $commands[$command['name']] = $description;
+           
+        }
+        return $commands;
     }
 
     /**
@@ -403,8 +423,11 @@ class ArgumentParser
             $arguments[] = '[arguments]';
         }
        
+        if(!empty($this->commands)){
+            $command .= " command";
+        }
      
-        return '  ' . $command . ' ' .  implode(' ',array_merge($options,$arguments));
+        return $command . ' ' .  implode(' ',array_merge($options,$arguments));
     }
 
 }
