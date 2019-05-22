@@ -106,8 +106,8 @@ EOF;
      * @return void
      */
     public function testRunError(){
-        $commandRunner = new CommandRunner();
-        $result = $commandRunner->run([
+
+        $result = $this->commandRunner()->run([
             '/path-to-script/script.php',
             'db:create',
         ]);
