@@ -107,7 +107,7 @@ class Command
             $io = new ConsoleIo();
         }
         $this->io = $io;
-
+        
         $this->parser = new ArgumentParser();
 
         $this->addOption('help', ['short' => 'h', 'description' => 'Displays this help message', 'type' => 'boolean']);
@@ -132,11 +132,12 @@ class Command
      *    $args = ['my_database','--datasource'=>'default','--help']
      * @return void
      */
-    public function runCommand(string $command,array $args){
+    public function runCommand(string $command,array $args=[]){
+
        $runner = new CommandRunner($this->io);
-       $command = $runner->findCommand($command);
-       if(!$command instanceof Command){
-           throw new ConsoleException(sprintf('Command `%s` was not found'));
+       $instance = $runner->findCommand($command);
+       if(! $instance instanceof Command){
+           throw new ConsoleException(sprintf('Command `%s` was not found',$command));
        }
 
        // Convert args
@@ -149,7 +150,8 @@ class Command
                $argv[] = "{$key}={$value}"; 
            }
        }
-       return $command->run($argv);
+   
+       return $instance->run($argv);
     }
 
 
@@ -165,7 +167,7 @@ class Command
         $this->parser->setCommand($this->name);
         $this->parser->setDescription($this->description);
         $this->parser->setEpilog($this->epilog);
-        
+      
         $method = 'execute';
         // Extract First Argument if sub command
         if($this->subCommands){
@@ -177,9 +179,9 @@ class Command
                 }
             }
 
-            if($subCommand AND in_array($subCommand,$this->subCommands)){
+            if($subCommand AND isset($this->subCommands[$subCommand])){
                 unset($args[$i]);
-                $method = str_replace('-','_',$subCommand);
+                $method = $this->subCommands[$subCommand];
             }
             else{
                 $args = ['--help']; // Force display help and disable execute
@@ -325,13 +327,15 @@ class Command
      * @param string $name lower case letters and hypens only, methods with hypens will be changed to underscore
      * @param array $options
      *  - description: the help description
+     *  - method: the method this command will call. defaults to underscored version of command name
      * @return void
      */
     public function addSubCommand(string $name, array $options = []){
+        $options += ['method'=>str_replace('-','_',$name)];
         if(!preg_match('/^[a-z-]+$/',$name)){
             throw new ConsoleException(sprintf('Invalid sub command name `%s`.',$name));
         }
-        $this->subCommands[] = $name;
+        $this->subCommands[$name] = $options['method'];
         $this->parser->addCommand($name, $options);
     }
 

@@ -28,7 +28,7 @@ class MockPaginatorHelper extends PaginatorHelper
 }
 class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setup()
+    public function setUp()
     {
         $request = new Request('articles/edit/2048');
         $controller = new PostsController($request, new Response());

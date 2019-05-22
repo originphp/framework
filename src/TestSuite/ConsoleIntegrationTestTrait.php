@@ -67,9 +67,9 @@ trait ConsoleIntegrationTestTrait
 
  
     /**
-     * Executes a shell console command
+     * Executes a console command
      *
-     * @param string $command schema generate
+     * @param string $command e.g. db:schema:load
      * @param array $input array of input that will be used as response to prompts
      * @return void
      */
@@ -131,7 +131,7 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-     * Asserts that the shell was run and was not halted using shell::error()
+     * Asserts that the command was run and was not halted using command::abort()
      *
      * @return void
      */
@@ -141,7 +141,7 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-    * Asserts that the shell was run was halted using shell::error()
+    * Asserts that the command was run was halted using command::abort()
     *
     * @return void
     */

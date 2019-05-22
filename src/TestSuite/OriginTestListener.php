@@ -27,6 +27,11 @@ use PHPUnit\Framework\AssertionFailedError;
 
 class OriginTestListener implements TestListener
 {
+    /**
+     * Undocumented variable
+     *
+     * @var \Origin\TestSuite\FixtureManager
+     */
     public $fixtureManager = null;
 
     public function startTestSuite(TestSuite $suite): void
@@ -37,6 +42,8 @@ class OriginTestListener implements TestListener
     public function startTest(Test $test): void
     {
         if ($test instanceof OriginTestCase) {
+            $test->initialize();
+            $test->startup();
             $this->fixtureManager->load($test);
         }
     }
@@ -44,6 +51,7 @@ class OriginTestListener implements TestListener
     public function endTest(Test $test, float $time): void
     {
         if ($test instanceof OriginTestCase) {
+            $test->shutdown();
             $this->fixtureManager->unload($test);
         }
     }

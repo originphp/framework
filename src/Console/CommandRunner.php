@@ -20,6 +20,7 @@ use Origin\Core\Plugin;
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Console\Exception\StopExecutionException;
+use Origin\Console\Exception\ConsoleException;
 
 class CommandRunner
 {
@@ -46,6 +47,7 @@ class CommandRunner
         if ($io === null) {
             $io = new ConsoleIo();
         }
+        $this->io = $io;
     }
 
     /**
@@ -75,6 +77,7 @@ class CommandRunner
         foreach ($this->namespaces as $namespace => $directory) {
             $this->discovered = array_merge($this->discovered, $this->scanDirectory($directory, $namespace));
         }
+
     }
 
     protected function getDescriptions()
@@ -98,31 +101,27 @@ class CommandRunner
      * This the workhorse, runs the command, displays help.
      *
      * @param array     $args
-     * @param ConsoleIo $io
      */
-    public function run(array $args, ConsoleIo $io = null)
+    public function run(array $args)
     {
-        if ($io === null) {
-            $io = new ConsoleIo();
-        }
-
-        array_shift($args);
+        array_shift($args); // first arg is the script that called it
         if (empty($args)) {
-            $this->displayHelp($io);
+            $this->displayHelp();
             return;
         }
-   
+  
         $command = $this->findCommand($args[0]);
-
+       
         if ($command) {
             array_shift($args);
             try {
                 $command->run($args);
+                return true;
             } catch (StopExecutionException $ex) {
                 return false;
             }
         } else {
-            $io->error("Command `{$args[0]}` not found"); // Original
+            $this->io->error("Command `{$args[0]}` not found"); // Original
         }
 
         return false;
@@ -139,7 +138,8 @@ class CommandRunner
     public function findCommand(string $command)
     {
         $namespace = Configure::read('App.namespace');
-        $className = $namespace.'\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
+        $className = $namespace.'\\Command\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
+
         if (class_exists($className)) {
             $object = new $className($this->io);
             if ($object->name() === $command) {
@@ -149,7 +149,7 @@ class CommandRunner
 
         $this->autoDiscover();
         $commands = $this->getCommandList();
-   
+     
         if (isset($commands[$command])) {
             $className = $commands[$command];
 
@@ -171,7 +171,7 @@ class CommandRunner
         return $results;
     }
 
-    protected function displayHelp(ConsoleIo $io)
+    protected function displayHelp()
     {
         $this->autoDiscover();
         $commands = $this->getDescriptions();
@@ -201,7 +201,7 @@ class CommandRunner
             }
             $out[] = '';
         }
-        $io->out($out);
+        $this->io->out($out);
     }
 
     /**
@@ -217,7 +217,7 @@ class CommandRunner
             return [];
         }
         $files = scandir($directory);
-
+       
         foreach ($files as $file) {
             if (substr($file, -4) !== '.php') {
                 continue;

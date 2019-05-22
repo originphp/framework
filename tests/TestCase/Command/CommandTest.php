@@ -73,17 +73,7 @@ class CacheCommand extends Command
         $this->out('Cache enabled');
     }
     public function disable(){
-        $this->out('Cache enabled');
-    }
-}
-
-
-
-class MockConsoleIo extends ConsoleIo
-{
-    public function getContents()
-    {
-        return $this->stdin->read();
+        $this->out('Cache disabled');
     }
 }
 
@@ -146,7 +136,6 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($command->callMethod('validateName',['foo-bar']));
         $this->assertNull($command->callMethod('validateName',['foo:bar']));
         $this->assertNull($command->callMethod('validateName',['foo-bar:bar-foo']));
-        $this->assertNull($command->callMethod('validateName',['foo-bar:bar-foo:foobar']));
         $this->expectException(ConsoleException::class);
         $command->callMethod('validateName',['foo bar']);
     }
@@ -156,6 +145,12 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $command = new BackupCommand($this->io());
         $command->run(['my_database']);
         $this->assertContains('The database my_database was backedup from the main datasource',$this->out->read());
+    }
+
+    public function testRunSubCommand(){
+        $command = new CacheCommand($this->io());
+        $command->run(['enable']);
+        $this->assertContains('Cache enabled',$this->out->read());
     }
 
     public function testRunArgumentParserError(){
@@ -221,7 +216,19 @@ EOF;
     }
 
     public function testRunCommand(){
+   
         $command = new MockCommand($this->io());
-       // $command->runCommand('cache:enable')
+        $command->runCommand('cache:reset');
+        $this->assertContains('Cache has been reset',$this->out->read());
+    }
+
+    public function testRunCommandWithArgs(){
+   
+        $command = new MockCommand($this->io());
+        $command->runCommand('say-hello',[
+            '--color=blue',
+            'jon'
+        ]);
+        $this->assertContains('<blue>Hello jon</blue>',$this->out->read());
     }
 }

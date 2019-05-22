@@ -18,7 +18,7 @@ use Origin\Cache\Engine\ApcuEngine;
 
 class ApcuEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         if (!extension_loaded('apcu')) {
             $this->markTestSkipped('Apcu extension not loaded');
@@ -27,28 +27,30 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         if (!ini_get('apc.enable_cli')) {
             $this->markTestSkipped('apc.enable_cli disabled');
         }
-  
+
         apcu_clear_cache();
     }
+
     /**
-     * Creates a the cache engine and initlaizes it
-     *
-     * @return void
+     * Creates a the cache engine and initlaizes it.
      */
     public function engine()
     {
         $engine = new ApcuEngine([
             'duration' => 3600,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
+
         return $engine;
     }
+
     public function testSet()
     {
         $cache = $this->engine();
         $this->assertTrue($cache->set('foo', 'bar'));
         $this->assertEquals('bar', apcu_fetch('origin_foo'));
     }
+
     /**
      * @depends testSet
      */
@@ -59,6 +61,7 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $cache->set('foo', 'bar');
         $this->assertEquals('bar', $cache->get('foo'));
     }
+
     /**
      * @depends testSet
      */
@@ -69,6 +72,7 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $cache->set('foo', 'bar');
         $this->assertTrue($cache->has('foo'));
     }
+
     /**
      * @depends testHas
      */
@@ -78,10 +82,11 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $cache->set('foo', 'bar');
         $this->assertTrue($cache->has('foo'));
         $this->assertTrue($cache->delete('foo'));
-        
+
         $this->assertFalse($cache->has('foo'));
         $this->assertFalse($cache->delete('foo'));
     }
+
     public function testClear()
     {
         $cache = $this->engine();
@@ -91,6 +96,7 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($cache->has('foo'));
         $this->assertFalse($cache->has('bar'));
     }
+
     public function testIncrement()
     {
         $cache = $this->engine();
@@ -98,6 +104,7 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(101, $cache->increment('counter'));
         $this->assertEquals(110, $cache->increment('counter', 9));
     }
+
     public function testDecrement()
     {
         $cache = $this->engine();

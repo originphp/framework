@@ -31,6 +31,45 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     public $fixtures = [];
 
     /**
+     * Intialize Hook. This is called before a test starts
+     *
+     * @return void
+     */
+    public function initialize(){
+       
+    }
+
+    /**
+     * This is called after initialize but before the tests starts
+     *
+     * @return void
+     */
+    public function startup(){
+
+    }
+
+    /**
+     * This is called after the test has run
+     *
+     * @return void
+     */
+    public function shutdown(){
+
+    }
+
+    /**
+     * Loads a fixture
+     *
+     * @param string $name Post or MyPlugin.Post
+     * @return void
+     */
+    public function loadFixture(string $name){
+        if(!in_array($name,$this->fixtures)){
+            $this->fixtures[] = $name;
+        }
+    }
+
+    /**
      * Creates a Mock model, and adds to Registry at the same time. It will load
      * config from registry to maintain fixture information.
      *
