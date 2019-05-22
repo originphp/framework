@@ -24,6 +24,7 @@ Delete tag:   git tag -d <tag_name>
 - PostgreSQL support
 
 ### Changed
+- Added loadFixture by injecting Fixture manager into the test, framework callbacks, initialize, startup,shutdown.
 - Changed BufferedConsoleOutput to TestSuite\Stub
 - plugins.json filename
 - ORM queries now use lowercase model alias as table alias

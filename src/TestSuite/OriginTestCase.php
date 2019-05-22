@@ -22,9 +22,15 @@ use Origin\Model\ModelRegistry;
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Fixture Manager Object
+     *
+     * @var \Origin\TestSuite\FixtureManager
+     */
+    protected $fixtureManager = null;
+    /**
      * Holds the Fixtures list
      * examples
-     * Article, MyPlugin.Article, Framework.Article
+     * Article, MyPlugin.Article, Origin.Article
      *
      * @var array
      */
@@ -40,7 +46,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * This is called after initialize but before the tests starts
+     * This is called after initialize and after fixtures have been loaded, but before the tests starts
      *
      * @return void
      */
@@ -58,14 +64,24 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Loads a fixture
+     * Loads a fixture (must be called from Initialize)
      *
      * @param string $name Post or MyPlugin.Post
      * @return void
      */
     public function loadFixture(string $name){
-        if(!in_array($name,$this->fixtures)){
-            $this->fixtures[] = $name;
+       $this->fixtureManager->loadFixture($name);
+    }
+
+    /**
+     * Loads multiple fixtures
+     *
+     * @param array $fixtures
+     * @return void
+     */
+    public function loadFixtures(array $fixtures){
+        foreach($fixtures as $fixture){
+            $this->loadFixture($fixture);
         }
     }
 
