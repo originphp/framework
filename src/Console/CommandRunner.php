@@ -8,9 +8,7 @@
  * portions of the Software.
  *
  * @copyright    Copyright (c) Jamiel Sharief
- *
- * @see         https://www.originphp.com
- *
+ * @link         https://www.originphp.com
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 

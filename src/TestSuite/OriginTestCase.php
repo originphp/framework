@@ -14,73 +14,61 @@
 
 namespace Origin\TestSuite;
 
-use PHPUnit\Framework\TestCase;
 use Origin\Core\Resolver;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * Fixture Manager Object
-     *
-     * @var \Origin\TestSuite\FixtureManager
-     */
-    protected $fixtureManager = null;
+
     /**
      * Holds the Fixtures list
      * examples
-     * Article, MyPlugin.Article, Origin.Article
+     * Article, MyPlugin.Article, Origin.Article.
      *
      * @var array
      */
     public $fixtures = [];
 
     /**
-     * Intialize Hook. This is called before a test starts
-     *
-     * @return void
+     * Intialize Hook. This is called before a test starts.
      */
-    public function initialize(){
-       
+    public function initialize()
+    {
     }
 
     /**
-     * This is called after initialize and after fixtures have been loaded, but before the tests starts
-     *
-     * @return void
+     * This is called after initialize and after fixtures have been loaded, but before the tests starts.
      */
-    public function startup(){
-
+    public function startup()
+    {
     }
 
     /**
-     * This is called after the test has run
-     *
-     * @return void
+     * This is called after the test has run.
      */
-    public function shutdown(){
-
+    public function shutdown()
+    {
     }
 
     /**
-     * Loads a fixture (must be called from Initialize)
+     * Loads a fixture (must be called from Initialize).
      *
      * @param string $name Post or MyPlugin.Post
-     * @return void
      */
-    public function loadFixture(string $name){
-       $this->fixtureManager->loadFixture($name);
+    public function loadFixture(string $name)
+    {
+        $this->fixtures[] = $name;
     }
 
     /**
-     * Loads multiple fixtures
+     * Loads multiple fixtures (only works from Initialize).
      *
      * @param array $fixtures
-     * @return void
      */
-    public function loadFixtures(array $fixtures){
-        foreach($fixtures as $fixture){
+    public function loadFixtures(array $fixtures)
+    {
+        foreach ($fixtures as $fixture) {
             $this->loadFixture($fixture);
         }
     }
@@ -89,12 +77,13 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      * Creates a Mock model, and adds to Registry at the same time. It will load
      * config from registry to maintain fixture information.
      *
-     * @param string $alias Name of model - Bookmark, MyPlugin.Contact
-     * @param array $methods methods to mock
-     * @param array $options (className,table,alias,datasource)
+     * @param string $alias   Name of model - Bookmark, MyPlugin.Contact
+     * @param array  $methods methods to mock
+     * @param array  $options (className,table,alias,datasource)
+     *
      * @return \Origin\Model\Model
      */
-    public function getMockForModel(string $alias, array $methods = [], array $options =[])
+    public function getMockForModel(string $alias, array $methods = [], array $options = [])
     {
         if (empty($options['className'])) {
             $options['className'] = Resolver::className($alias, 'Model');
@@ -102,30 +91,30 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
                 throw new MissingModelException($alias);
             }
         }
-    
+
         list($plugin, $alias) = pluginSplit($alias);
         $options += ['name' => $alias, 'alias' => $alias];
-       
+
         $existingConfig = ModelRegistry::config($alias);
         if ($existingConfig) {
-            $options +=  $existingConfig;
+            $options += $existingConfig;
         }
-     
+
         $mock = $this->getMock($options['className'], $methods, $options);
 
         ModelRegistry::set($alias, $mock);
+
         return $mock;
     }
 
     /**
-     * Creates Mock object using the Mockbuilder
+     * Creates Mock object using the Mockbuilder.
      *
      * @param string $className
-     * @param array $methods
-     * @param array $options
-     * @return void
+     * @param array  $methods
+     * @param array  $options
      */
-    public function getMock(string $className, array $methods=[], array $options = null)
+    public function getMock(string $className, array $methods = [], array $options = null)
     {
         if ($options) {
             return $this->getMockBuilder($className)
@@ -133,7 +122,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([$options])
             ->getMock();
         }
-        
+
         return $this->getMockBuilder($className)
             ->setMethods($methods)
              ->getMock();
@@ -143,7 +132,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
     }
-    
+
     public function tearDown()
     {
         parent::tearDown();

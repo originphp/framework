@@ -45,6 +45,4 @@ class MigrationFixture extends Fixture
           'null' => false,
         ],
     ];
-
-   
 }
