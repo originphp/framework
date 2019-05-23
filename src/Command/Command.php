@@ -210,7 +210,9 @@ class Command
 
             return true;
         }
+        $this->startup();
         $this->{$method}();
+        $this->shutdown();
         return true;
     }
 
@@ -467,10 +469,28 @@ class Command
     }
 
     /**
+     * This is called before the executed method
+     *
+     * @return void
+     */
+    public function startup(){
+
+    }
+
+    /**
      * Place the command logic here.
      */
     public function execute()
     {
+    }
+
+      /**
+     * This is called after executed method
+     *
+     * @return void
+     */
+    public function shutdown(){
+
     }
 
     /**

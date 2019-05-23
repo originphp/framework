@@ -42,7 +42,6 @@ class OriginTestListener implements TestListener
     public function startTest(Test $test): void
     {
         if ($test instanceof OriginTestCase) {
-            $test->fixtureManager = $this->fixtureManager;
             $test->initialize();
             $this->fixtureManager->load($test);
             $test->startup();
@@ -59,7 +58,7 @@ class OriginTestListener implements TestListener
 
     public function endTestSuite(TestSuite $suite): void
     {
-        unset($this->fixtureManager);
+        $this->fixtureManager->shutdown();
     }
     /**
      * @codeCoverageIgnore

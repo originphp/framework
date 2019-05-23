@@ -18,7 +18,7 @@ use Origin\Cache\Engine\ApcuEngine;
 
 class ApcuEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp() : void
+    public function setUp()
     {
         if (!extension_loaded('apcu')) {
             $this->markTestSkipped('Apcu extension not loaded');

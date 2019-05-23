@@ -48,8 +48,6 @@ class DbSchemaDumpCommand extends Command
         }
         $datasource = $this->options('datasource');
 
-       
-
         $type = $this->options('type');
 
         if(!in_array($type,['sql','php'])){
@@ -58,7 +56,7 @@ class DbSchemaDumpCommand extends Command
 
         $filename = $this->schemaFilename($name,$type);
         $this->io->info("Dumping schema to {$filename}");
-        if($type === 'mysql'){
+        if($type === 'sql'){
             $this->dump($datasource,$name);
         }
         else{
@@ -76,8 +74,8 @@ class DbSchemaDumpCommand extends Command
 
         $connection = ConnectionManager::get($datasource);
         $dump = [];
-        $filename = ROOT . DS . 'db' .DS . $name . '.php';
-       
+        $filename = $this->schemaFilename($name,'php');
+        
         /**
          * @internal if issues arrise with PostgreSQL then switch here to pg_dump
          */
@@ -114,8 +112,8 @@ class DbSchemaDumpCommand extends Command
         if($connection->engine()==='mysql'){
             $dump[] = "SET FOREIGN_KEY_CHECKS=0;";
         }
-        $filename = ROOT . DS . 'db' .DS . $name . '.sql';
-       
+        $filename = $this->schemaFilename($name,'sql');
+     
         /**
          * @internal if issues arrise with PostgreSQL then switch here to pg_dump
          */
@@ -123,6 +121,7 @@ class DbSchemaDumpCommand extends Command
             $dump[] = $connection->adapter()->showCreateTable($table) .';';
             $this->io->list($table);
         }
+   
         if (!$this->io->createFile($filename, implode("\n\n", $dump))) {
             $this->throwError('Error saving schema file');
         }

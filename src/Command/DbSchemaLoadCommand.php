@@ -45,12 +45,7 @@ class DbSchemaLoadCommand extends Command
         }
         $datasource = $this->options('datasource');
         $filename = $this->schemaFilename($name);
-        if(!file_exists($filename)){
-            $this->io->status('error',sprintf('The schema file %s could not be found',$filename));
-            $this->abort();
-        }
-        $this->io->info("Loading schema from {$filename}");
-        $this->loadSchema($name,$datasource);
+        $this->loadSchema($filename,$datasource);
     }
 
 }

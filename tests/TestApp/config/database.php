@@ -4,7 +4,7 @@
  * Add or remove connections here.
  */
 use Origin\Model\ConnectionManager;
-/*
+
 ConnectionManager::config('default', array(
   'host' => 'db',
   'database' => 'origin',
@@ -20,8 +20,8 @@ ConnectionManager::config('test', array(
   'password' => 'root',
   'engine' => 'mysql', 
 ));
-*/
 
+/*
 
 ConnectionManager::config('default', [
   'host' => 'pg',
@@ -39,3 +39,4 @@ ConnectionManager::config('test', [
   'engine' => 'pgsql'
 ]);
 
+*/

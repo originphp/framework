@@ -214,7 +214,7 @@ class Migration
      */
     public function calledBy()
     {
-        $result = debug_backtrace();
+        $result = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,3);
         if (isset($result[2]['function'])) {
             return $result[2]['function'];
         }

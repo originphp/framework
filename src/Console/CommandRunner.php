@@ -24,6 +24,14 @@ use Origin\Console\Exception\ConsoleException;
 
 class CommandRunner
 {
+
+    /**
+     * Holds the Command from RUN
+     *
+     * @var \Origin\Command\Command
+     */
+    protected $command = null;
+
     protected $commands = [];
 
     /**
@@ -110,12 +118,12 @@ class CommandRunner
             return;
         }
   
-        $command = $this->findCommand($args[0]);
+        $this->command = $this->findCommand($args[0]);
        
-        if ($command) {
+        if ($this->command) {
             array_shift($args);
             try {
-                $command->run($args);
+                $this->command->run($args);
                 return true;
             } catch (StopExecutionException $ex) {
                 return false;
@@ -125,6 +133,15 @@ class CommandRunner
         }
 
         return false;
+    }
+
+    /**
+     * Returns the Command object that was created
+     *
+     * @return \Origin\Command\Command
+     */
+    public function command(){
+        return $this->command;
     }
 
     /**

@@ -29,6 +29,7 @@ if (!defined('DS')) {
     define('ORIGIN', ROOT . '/vendor/originphp/originphp');
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
+    define('APP', ROOT);
     define('TESTS', ROOT . DS . 'tests');
     define('TMP', ROOT . DS . 'tmp');
     define('WEBROOT', ROOT . DS . 'public');

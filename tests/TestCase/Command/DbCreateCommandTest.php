@@ -34,7 +34,7 @@ class DbCreateCommandTest extends OriginTestCase
 
         $this->exec('db:create --datasource=dummy');
         $this->assertExitError();
-        $this->assertOutputContains('database "dummy" already exists');
+        $this->assertErrorContains('Can\'t create database \'dummy\'');
     }
 
     public function tearDown(){

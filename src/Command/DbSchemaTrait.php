@@ -18,33 +18,6 @@ use Origin\Core\Inflector;
 use Origin\Model\Exception\DatasourceException;
 trait DbSchemaTrait
 {
-    /**
-     * This loads config/schema
-     *
-     * @param string $datasource
-     * @param string $name schema, structure, Model.schema
-     * @return void
-     */
-    public function loadSchema(string $name,string $datasource)
-    {
-        $filename = $this->schemaFilename($name);
-        if(file_exists($filename)){
-            return $this->runSchema(file_get_contents($filename), $datasource);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a schema file exists
-     *
-     * @param string $name schema or Plugin.schema
-     * @return boolean
-     */
-    public function schemaExists(string $name){
-        
-        $filename = $this->schemaFilename($name);
-        return file_exists($filename);
-    }   
     
     /**
      * Gets the filename for the schema
@@ -56,9 +29,31 @@ trait DbSchemaTrait
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS . DS . Inflector::underscore($plugin) ."/db/{$file}.sql";
+            return PLUGINS . DS . Inflector::underscore($plugin) . DS . 'db' . DS .  $file . '.' . $extension;
         }
-        return ROOT . "/db/{$file}.{$extension}";
+        return APP . DS . 'db' . DS . $file . '.' . $extension;
+    }
+
+
+    /**
+     * Parses a SQL string into an array of statements
+     *
+     * @param string $sql
+     * @return array
+     */
+    public function parseSql(string $sql){
+         # Clean Up Soure Code
+         $sql = str_replace(";\r\n",";\n",$sql); // Convert windows line endings on STATEMENTS ONLY
+         $sql   = preg_replace('!/\*.*?\*/!s', '',$sql); 
+         $sql  = preg_replace('/^-- .*$/m','',$sql); // Remove Comment line starting with -- 
+         $sql  = preg_replace('/^#.*$/m','',$sql); // Remove Comments start with #
+  
+         $statements = [];
+         if($sql){
+            $statements = explode(";\n", $sql);
+         }
+      
+         return $statements;
     }
 
     /**
@@ -68,34 +63,33 @@ trait DbSchemaTrait
      * @param string $datasource
      * @return void
      */
-    public function runSchema(string $statement, string $datasource)
+    public function loadSchema(string $filename, string $datasource)
     {
-        $statement= preg_replace('!/\*.*?\*/!s', '', $statement); // Remove comments
-        $array = explode(";\n", $statement);
-        
+        if(!file_exists($filename)){
+            $this->throwError("File {$filename} not found");
+        }
+        $this->io->info("Loading {$filename}");
+       
         if(!ConnectionManager::config($datasource)){
             $this->throwError("{$datasource} datasource not found");
         }
-
         $connection = ConnectionManager::get($datasource);
-      
-        if(empty($array)){
-            $this->throwError("schema file is empty");
-        }
-
-        foreach ($array as $query) {
-            if ($query != '' and $query != "\n") {
-                $query = trim($query) . ';';
-                
+        
+        $statement = file_get_contents($filename);
+        $statements = $this->parseSql($statement);
+        foreach ($statements  as $query) {
+            $query = trim($query);
+            if ($query) {       
                 try {
                     $connection->execute($query);
                 } catch (DatasourceException $ex) {
                     $this->io->status('error',str_replace("\n",'',$query));
-                    $this->throwError($ex->getMessage());
+                    $this->throwError('Executing query failed',$ex->getMessage());
                 }
                 $this->io->status('ok',str_replace("\n",'',$query));
             }
         }
+        $this->io->success(sprintf('Executed %d statements',count($statements)));
         return true;
     }
 }

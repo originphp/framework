@@ -92,13 +92,28 @@ class FixtureManager
 
     public function unloadFixture(string $fixture)
     {
+        if(empty($this->loaded[$fixture])){
+            return;
+        }
         $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
         
-        if ($this->loaded[$fixture]->dropTables === true) {
-            $this->loaded[$fixture]->drop();
-        }
+        $this->loaded[$fixture]->truncate();
         
         $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+    }
+
+
+    /**
+     * End test shutdown process
+     *
+     * @return void
+     */
+    public function shutdown(){
+        foreach($this->loaded as $fixture){
+            $this->disableForeignKeyConstraints($fixture->datasource);
+            $fixture->drop();
+            $this->enableForeignKeyConstraints($fixture->datasource);
+        }
     }
 
     protected function disableForeignKeyConstraints(string $datasource)

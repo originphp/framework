@@ -46,15 +46,16 @@ class PluginInstallCommand extends Command
         if(file_exists($folder)){
             $this->throwError(sprintf('Plugin `%s` already exists',$plugin));
         }
+
         /**
          * Needs to show to user, incase requires username or password
          */
-         exec("git clone {$url} {$folder}");
+        shell_exec("git clone {$url} {$folder}");
  
          // Needs to show this for username/password
         if (file_exists($folder)) {
             $plugin = Inflector::camelize($plugin);
-            file_put_contents(CONFIG . '/bootstrap.php', "Plugin::load('{$plugin}');\n", FILE_APPEND);
+            file_put_contents(CONFIG . '/bootstrap.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
             $this->io->status('ok',sprintf('%s Plugin installed',$plugin));
             return;
         }

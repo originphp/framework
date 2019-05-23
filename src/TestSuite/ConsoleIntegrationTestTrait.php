@@ -8,7 +8,7 @@
  * portions of the Software.
  *
  * @copyright   Copyright (c) Jamiel Sharief
- * @link        https://www.originphp.com
+ * @link       https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -21,99 +21,91 @@ use Origin\Console\CommandRunner;
 use Origin\Console\ConsoleIo;
 
 
-
 /**
- * A way to test controllers from a higher level
+ * A way to test controllers from a higher level.
  */
-
 trait ConsoleIntegrationTestTrait
 {
     /**
-     * Holds the console output
+     * Holds the console output.
      *
      * @var \Origin\Console\ConsoleOutput
      */
     protected $output = null;
 
     /**
-    * Holds the console output
-    *
-    * @var \Origin\Console\ConsoleInput
-    */
+     * Holds the console output.
+     *
+     * @var \Origin\Console\ConsoleInput
+     */
     protected $input = null;
 
     /**
-     * This holds the legacy shell object
+     * This holds the legacy shell object.
      *
      * @var \Origin\Console\Shell;
      */
     protected $shell = null;
 
-
     /**
-     * This is the command object
+     * This is the command object.
      *
      * @var \Origin\Console\Command
      */
     protected $command = null;
 
     /**
-     * Holds the result from the exec
+     * Holds the result from the exec.
      *
      * @var bool
      */
     protected $result = null;
 
-
- 
     /**
-     * Executes a console command
+     * Executes a console command.
      *
      * @param string $command e.g. db:schema:load
-     * @param array $input array of input that will be used as response to prompts
-     * @return void
+     * @param array  $input   array of input that will be used as response to prompts
+     *
+     * @return string $output The messages from the console output
      */
     public function exec(string $command, array $input = [])
     {
         $this->shell = $this->result = null;
 
         $this->output = new ConsoleOutput();
-        $this->input = $this->getMockBuilder(ConsoleInput::class)->disableOriginalConstructor()->setMethods(['read'])->getMock();
-        
+        $this->input = $this->getMockBuilder(ConsoleInput::class)
+                        ->disableOriginalConstructor()
+                        ->setMethods(['read'])
+                        ->getMock();
+
         $x = 0;
         foreach ($input as $data) {
             $this->input->expects($this->at($x))->method('read')->will($this->returnValue($data));
-            $x++;
+            ++$x;
         }
-        
-        $argv = explode(' ', "console {$command}");
-        list($namespace,$class) = namespacesplit(get_class($this));
 
-        if(substr($class,-11) === 'CommandTest'){
-            $io = new ConsoleIo($this->output,$this->output,$this->input);
+        $argv = explode(' ', "console {$command}");
+        list($namespace, $class) = namespacesplit(get_class($this));
+
+        if (substr($class, -11) === 'CommandTest') {
+            $io = new ConsoleIo($this->output, $this->output, $this->input);
             $commandRunner = new CommandRunner($io);
             $this->result = $commandRunner->run($argv);
-        }
-        else{
+            $this->command = $commandRunner->command();
+        } else {
             $dispatcher = new ShellDispatcher($argv, $this->output, $this->input);
             $this->result = $dispatcher->start();
             $this->shell = $dispatcher->shell();
         }
-    }
-    /**
-     * Gets the output from the command or shell. This is for debugging
-     *
-     * @return string
-     */
-    public function consoleOutput(){
-       return $this->output->read();
+
+        return $this->output->read();
     }
 
     /**
-     * Asserts that console output contains text
+     * Asserts that console output contains text.
      *
      * @param string $needle The text that you want to assert that is in the output
-     * @return void
      */
     public function assertOutputContains(string $needle)
     {
@@ -121,9 +113,7 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-     * Asserts that console output is empty
-     *
-     * @return void
+     * Asserts that console output is empty.
      */
     public function assertOutputEmpty()
     {
@@ -131,9 +121,7 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-     * Asserts that the command was run and was not halted using command::abort()
-     *
-     * @return void
+     * Asserts that the command was run and was not halted using command::abort().
      */
     public function assertExitSuccess()
     {
@@ -141,21 +129,17 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-    * Asserts that the command was run was halted using command::abort()
-    *
-    * @return void
-    */
-
+     * Asserts that the command was run was halted using command::abort().
+     */
     public function assertExitError()
     {
         $this->assertFalse($this->result);
     }
 
     /**
-     * Assert an error contains
+     * Assert an error contains.
      *
      * @param string $message
-     * @return void
      */
     public function assertErrorContains(string $message)
     {
@@ -164,5 +148,13 @@ trait ConsoleIntegrationTestTrait
         } else {
             $this->fail();
         }
+    }
+
+    /**
+     * Returns the command.
+     */
+    public function command()
+    {
+        return $this->command;
     }
 }

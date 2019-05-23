@@ -62,7 +62,8 @@ class DbMigrateCommand extends Command
             return;
         }
         $start = microtime(true);
-    
+        
+        $count = 0;
         foreach ($migrations as $object) {
             $this->out("<notice>{$object->name}</notice> [<yellow>{$object->version}</yellow>]");
             try {
@@ -76,22 +77,25 @@ class DbMigrateCommand extends Command
                 ]);
          
                 $this->Migration->save($entity);
+                $count++;
             } catch (Exception $ex) {
                 $this->throwError($ex->getMessage());
             }
         }
-        $this->out(sprintf('Migration complete. Took <white>%d</white> ms', (microtime(true) - $start)));
+
+        $this->io->success(sprintf('Migration Complete. %d migrations in %d ms', $count,(microtime(true) - $start)));
     }
 
     protected function rollback(string $version)
     {
         $migrations = $this->getMigrations($version, $this->lastMigration());
         $migrations = array_reverse($migrations);
-     
+  
         if (empty($migrations)) {
             $this->io->warning('No migrations found');
             return;
         }
+        $count = 0;
         $start = microtime(true);
         foreach ($migrations as $object) {
             $this->out("<red>{$object->name}</red> [<yellow>{$object->version}</yellow>]");
@@ -108,12 +112,13 @@ class DbMigrateCommand extends Command
                 $this->verboseStatements($migration->rollback($reverse));
               
                 $this->Migration->delete($entity);
+                $count++;
             } catch (Exception $ex) {
                 $this->throwError($ex->getMessage());
             }
         }
+        $this->io->success(sprintf('Rollback Complete. %d migrations in %d ms', $count,(microtime(true) - $start)));
 
-        $this->out(sprintf('Rollback complete. Took <white>%d</white> ms', (microtime(true) - $start)));
     }
 
     /**
@@ -124,7 +129,7 @@ class DbMigrateCommand extends Command
      */
     private function createMigration(object $object)
     {
-        include self::PATH . DIRECTORY_SEPARATOR . $object->filename;
+        include_once self::PATH . DIRECTORY_SEPARATOR . $object->filename;
         $adapter = $this->Migration->connection()->adapter();
         $migration = new $object->class($adapter);
         return $migration;

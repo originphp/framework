@@ -60,15 +60,15 @@ class BaseApplication
     }
 
     /**
-     * Loads middleware using a class name
+     * Loads middleware using name, a class name
      *
      * Examples
      *
      * $this->loadMiddleware('FormSecurity');
      * $this->loadMiddleware('MyPlugin.User');
-     * $this->loadMiddleware('App\Middleware\FormSecurity');
+     * $this->loadMiddleware('App\Middleware\FormSecurityMiddleware');
      *
-     * @param string $name
+     * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Middleware\FormSecurityMiddleware
      * @return void
      */
     public function loadMiddleware(string $name)

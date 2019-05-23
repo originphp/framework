@@ -38,6 +38,15 @@ class DbSetupCommand extends Command
         if($name === null){
             $name = 'schema';
         }
+
+        # Create arguments
+        $schema = $name;
+        $seed = 'seed';
+        # Have to use seed here
+        list($plugin,$null) = pluginSplit($name);
+        if($plugin){
+            $seed = "{$plugin}.seed";
+        }
     
         $datasource = $this->options('datasource');
         $this->runCommand('db:create',[
@@ -48,18 +57,15 @@ class DbSetupCommand extends Command
         
         $this->runCommand('db:schema:load',[
             '--datasource' => $datasource,
-            $name
+            $schema
         ]);
         
         $this->io->nl();
 
-        // The best that can be done
-        list($plugin,$null) = pluginSplit($name);
-        if($plugin){
-            $name = "{$plugin}.seed";
-        }
+        
         $this->runCommand('db:seed',[
             '--datasource' => $datasource,
+            $seed
         ]);
     }
 }

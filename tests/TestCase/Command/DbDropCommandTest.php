@@ -34,11 +34,7 @@ class DbDropCommandTest extends OriginTestCase
     public function testExecuteSQLException(){
         $this->exec('db:drop --datasource=dummy');
         $this->assertExitError();
-        $this->assertOutputContains('database "dummy" does not exist');
+        $this->assertErrorContains('database doesn\'t exist');
     }
 
-    public function tearDown(){
-        $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS dummy');
-    }
 }
