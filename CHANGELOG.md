@@ -20,6 +20,10 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 
+## [1.3.1] - 2019-05-25
+### Fixed
+- Missing generator templates
+
 ## [1.3.0] - 2019-05-25
 ### Added 
 - Console Commands
