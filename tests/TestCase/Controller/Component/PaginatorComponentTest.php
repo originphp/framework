@@ -69,10 +69,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->Controller = new PetsController(new Request('pets/index'), new Response());
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
       
-        
         $connection = ConnectionManager::get('test');
-        $connection->execute('DROP TABLE IF EXISTS pets,owners');
-
         $sql = $connection->adapter()->createTable('pets',[
             'id' => ['type'=>'primaryKey'],
             'owner_id' => ['type'=>'int','null'=>false],
@@ -94,6 +91,12 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         for ($i=0;$i<100;$i++) {
             $this->Pet->save($this->Pet->new(['owner_id' => $i + 1000, 'name'=>'Pet' . $i]));
         }
+    }
+
+    public function tearDown(){
+        $connection = ConnectionManager::get('test');
+        $connection->execute('DROP TABLE IF EXISTS pets');
+        $connection->execute('DROP TABLE IF EXISTS owners');
     }
 
     /**

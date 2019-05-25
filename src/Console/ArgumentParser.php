@@ -50,6 +50,15 @@ class ArgumentParser
      */
     protected $epilog =  null;
 
+    /**
+     * Additional Long Help text
+     *
+     * @var string
+     */
+    protected $help = null;
+
+    protected $usage = null;
+
     public function __construct(string $name = 'command',string $description=null){
         $this->command = $name;
         $this->description = $description;
@@ -67,10 +76,24 @@ class ArgumentParser
     }
 
     public function setEpilog($epilog){
-        if(is_Array($epilog)){
+        if(is_array($epilog)){
             $epilog = implode("\n",$epilog);
         }
         $this->epilog = $epilog;
+    }
+
+    public function setHelp($help){
+        if(is_array($help)){
+            $help = implode("\n",$help);
+        }
+        $this->help = $help;
+    }
+
+    public function setUsage($usage){
+        if(is_array($usage)){
+            $usage = implode("\n",$usage);
+        }
+        $this->usage = $usage;
     }
 
     /**
@@ -82,7 +105,7 @@ class ArgumentParser
      *  - short: the short command, this is with single -. e.g -f
      *  - default: null
      *  - required: default false
-     *  - type: string, numeric, boolean
+     *  - type: string, integer, boolean
      *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
      * @return void
      */
@@ -113,7 +136,7 @@ class ArgumentParser
      * @param array $options
      *  - description: help text
      *  - required: default false
-     *  - type: string, numeric, boolean, array hash
+     *  - type: string, integer, boolean, array hash
      * @return void
      */
     public function addArgument(string $name,array $options=[]){
@@ -149,13 +172,16 @@ class ArgumentParser
         }
 
         # Process Args 
-        $arguments = $this->parseArguments($args,$argv);
+        $arguments = $this->parseArguments($args);
 
         foreach($this->options as $option){
             if(!empty($option['required']) AND empty($options[$option['name']])){
                 throw new ConsoleException(sprintf('Missing required option `%s`',$option['name']));
             }
-            if(!empty($option['default']) AND !isset($options[$option['name']])){
+            if($option['type'] === 'boolean' AND !isset($options[$option['name']])){
+                $options[$option['name']] = false;
+            }
+            elseif(!empty($option['default']) AND !isset($options[$option['name']])){
                 $options[$option['name']] = $option['default'];
             }
         }
@@ -176,32 +202,32 @@ class ArgumentParser
      * Undocumented function
      *
      * @param array $args extracted args
-     * @param array $argv argv array 
      * @return void
      */
-    protected function parseArguments(array $args,array $argv){
+    protected function parseArguments(array $args){
+
         $keys = array_keys($this->arguments);
         $arguments = [];
         foreach($args as $key => $arg){
             if(isset($keys[$key])){
                 $name = $keys[$key];
                 $type = $this->arguments[$name]['type'];
-                $values = [];
+                
                 if($type === 'array'){
-                    for($i=$key;$i<count($argv);$i++){
-                        $values[] = $argv[$i];
+                    for($i=$key;$i<count($args);$i++){
+                        $values[] = $args[$i];
                     }
                     $arguments[$name] = $values; 
                     break;
                 }
                 elseif($type ==='hash'){
-                    for($i=$key;$i<count($argv);$i++){
-                        if(strpos($argv[$i],':') !== false){
-                            list($k,$v) = explode(':',$argv[$i]);
+                    for($i=$key;$i<count($args);$i++){
+                        if(strpos($args[$i],':') !== false){
+                            list($k,$v) = explode(':',$args[$i]);
                             $values[$k] = $v;
                         }
                         else{
-                            $values[] = $argv[$i];
+                            $values[] = $args[$i];
                         } 
                     }
                     $arguments[$name] = $values; 
@@ -237,13 +263,8 @@ class ArgumentParser
             list($option, $value) = explode('=', $option);
         }
       
-        if($this->options[$name]['type'] === 'boolean'){
-            $value = (bool) $value;
-        }
-        elseif($this->options[$name]['type'] === 'numeric'){
-            $value = (int) $value;
-        }
-
+        $value = $this->value($this->options[$name]['type'],$value);
+ 
         $options[$name] = $value;
    
         return $options;
@@ -288,22 +309,6 @@ class ArgumentParser
         return ($option[0] === '-' AND substr($option,0,2) != '--');
     }
 
-    protected function formatDescription(string $left,$right){
-        $out = [];
-        $left = '  ' . $left;
-        foreach((array) $right as $row){
-            $row = "<text>{$row}</text>";
-            if(empty($out)){
-                $out[] = '<code>' .$left . '</code>' . $row;
-            }
-            else{
-                $out[] =  str_repeat(' ',strlen($left)) .  $row;
-            }
-           
-        }
-        return $out;
-    }
-
     /**
      * 
      * Generats the usage only
@@ -316,26 +321,35 @@ class ArgumentParser
         return $formatter->generate();
     }
 
+    /**
+     * Generates the help
+     *
+     * @return string
+     */
     public function help(){
         $formatter = new ConsoleHelpFormatter();
+       
         if($this->description){
-            $formatter->setDescription($this->description);
+              $formatter->setDescription($this->description);
         }
-        $formatter->setUsage($this->generateUsage($this->command));
+
+        $usages = $this->generateUsage($this->command);
+        if($this->usage){
+            $usages = $usages ."\n" . $this->usage;
+        }
+        $formatter->setUsage($usages);
+       
         $formatter->setArguments($this->generateArguments());
         $formatter->setOptions($this->generateOptions());
         $formatter->setCommands($this->generateCommands());
-        return $formatter->generate();
-    }
-
-    protected function getMaxLength(array $data){
-        $maxLength = 0;
-        foreach ($data as $key => $value) {
-            if (strlen($key) > $maxLength) {
-                $maxLength = strlen($key);
-            }
+        if($this->epilog){
+            $formatter->setEpilog($this->epilog);
         }
-        return $maxLength;
+        if($this->help){
+            $formatter->setHelp($this->help);
+        }
+
+        return $formatter->generate();
     }
 
     protected function generateArguments(){
@@ -383,7 +397,7 @@ class ArgumentParser
             }
             $help = $option['description'];
             if(!empty($option['default'])){
-              $default = " \033[93m[default: {$option['default']}]\033[0m"; //  Append this without breaking color/multi line
+              $default = " <yellow>[default: {$option['default']}]</yellow>"; 
                 if(is_array($help)){
                     $rows = count($help);
                     $help[$rows-1] .= $default;

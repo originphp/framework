@@ -46,10 +46,13 @@ class DbSchemaDumpCommand extends Command
         if($name === null){
             $name = 'schema';
         }
+
         $datasource = $this->options('datasource');
+        if(!ConnectionManager::config($datasource)){
+            $this->throwError("{$datasource} datasource not found");
+        }
 
         $type = $this->options('type');
-
         if(!in_array($type,['sql','php'])){
             $this->throwError(sprintf('The type `%s` is invalid',$type));
         }
@@ -68,9 +71,6 @@ class DbSchemaDumpCommand extends Command
 
     protected function dumpPhp(string $datasource,string $name)
     {
-        if(!ConnectionManager::config($datasource)){
-            $this->throwError("{$datasource} datasource not found");
-        }
 
         $connection = ConnectionManager::get($datasource);
         $dump = [];
@@ -103,10 +103,6 @@ class DbSchemaDumpCommand extends Command
 
     protected function dump(string $datasource,string $name)
     {
-        if(!ConnectionManager::config($datasource)){
-            $this->throwError("{$datasource} datasource not found");
-        }
-
         $connection = ConnectionManager::get($datasource);
         $dump = [];
         if($connection->engine()==='mysql'){

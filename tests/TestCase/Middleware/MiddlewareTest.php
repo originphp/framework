@@ -18,6 +18,7 @@ use Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\BaseApplication;
+use Origin\Exception\InvalidArgumentException;
 
 class MyMiddleware extends Middleware
 {
@@ -33,6 +34,10 @@ class Application extends BaseApplication
     {
         $this->addMiddleware(new MyMiddleware());
     }
+
+    public function getStack(){
+        return $this->middlewareStack;
+    }
 }
 
 class MiddlwareTest extends \PHPUnit\Framework\TestCase
@@ -47,5 +52,17 @@ class MiddlwareTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         new Application($request, new Response());
         $this->assertEquals('bar', $request->data('foo'));
+    }
+
+    public function testUnkownMiddleware(){
+        $application = new Application(new Request(), new Response());
+        $this->expectException(InvalidArgumentException::class);
+        $application->loadMiddleware('FormSecurity');
+    }
+
+    public function testLoadMiddleware(){
+        $application = new Application(new Request(), new Response());
+        $application->loadMiddleware('Origin\Test\Middleware\MyMiddleware');
+        $this->assertNotEmpty($application->getStack());
     }
 }

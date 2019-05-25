@@ -17,22 +17,16 @@ namespace Origin\TestSuite\Stub;
 use Origin\Console\ConsoleOutput as BaseConsoleOutput;
 class ConsoleOutput extends BaseConsoleOutput
 {
-    protected $out = [];
+    protected $mode = SELF::RAW;
 
-    public function write($data,$newLine = true)
-    {
-         if(!is_array($data)){
-            $data = [$data];
-        }
-        foreach($data as $line){
-            $this->out[] = $line;
-        }
+    protected $buffer = '';
+
+    protected function fwrite(string $data){
+        $this->buffer .= $data;
     }
 
     public function read(){
-        return implode("\n",$this->out);
+        return $this->buffer;
     }
-    public function messages(){
-        return $this->out;
-    }
+
 }

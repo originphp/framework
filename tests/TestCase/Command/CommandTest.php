@@ -147,12 +147,6 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('The database my_database was backedup from the main datasource',$this->out->read());
     }
 
-    public function testRunSubCommand(){
-        $command = new CacheCommand($this->io());
-        $command->run(['enable']);
-        $this->assertContains('Cache enabled',$this->out->read());
-    }
-
     public function testRunArgumentParserError(){
         $command = new BackupCommand($this->io());
         $command->run([]);
@@ -162,18 +156,11 @@ class CommandTest extends \PHPUnit\Framework\TestCase
 
     public function testRunHelp(){
         $command = new BackupCommand($this->io());
+        $command->addUsage('backup mydb backup.zip');
         $command->run(['--help']);
         $this->assertContains('backup [options] database [filename]',$this->out->read());
+        $this->assertcontains('backup mydb backup.zip',$this->out->read());
     }
-
-    public function testRunHelpSubCommands(){
-        $command = new CacheCommand($this->io());
-        $command->run(['--help']);
-        $this->assertContains('cache command [options] [arguments]',$this->out->read());
-  
-        $this->assertContains('<green>enable               </green><white>enables the cache</white>',$this->out->read());
-        $this->assertContains('<green>disable              </green><white>disables the cache</white>',$this->out->read());
-    }   
 
     public function testLoadModel(){
         $Post = new Model(['name'=>'Post','datasource'=>'test']);

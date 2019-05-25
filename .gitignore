@@ -12,6 +12,8 @@
 !/tmp/sessions/empty
 
 /public/coverage
+/src-old/*
+/testsold/*
 
 # ignore a file type
 #*.json

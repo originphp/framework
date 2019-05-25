@@ -403,4 +403,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
     }
+
+    public function tearDown(){
+        $connection = ConnectionManager::get('test');
+        $connection->execute('DROP TABLE IF EXISTS pets');
+    }
 }

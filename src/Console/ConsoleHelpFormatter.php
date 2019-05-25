@@ -58,9 +58,9 @@ class ConsoleHelpFormatter
 {
     protected $out = [];
 
-    protected $description = '';
+    protected $description = null;
 
-    protected $usage = '';
+    protected $usage = null;
 
     protected $commands = [];
 
@@ -68,12 +68,15 @@ class ConsoleHelpFormatter
 
     protected $options = [];
 
-    protected $epilog = '';
+    protected $epilog = null;
+
+    protected $help = null;
 
     const WIDTH = 72;
 
     public function generate(){
         $out = [];
+    
         if($this->description){
             $out[] = $this->description;
             $out[] = '';
@@ -104,11 +107,17 @@ class ConsoleHelpFormatter
             $out[] = '';
         }
 
+        if($this->help){
+            $out[] = "<yellow>Help:</yellow>";
+            $out[] = $this->help;
+            $out[] = '';
+        }
+
         if($this->epilog){
             $out[] = $this->epilog;
             $out[] = '';
         }
-       
+        
         return implode("\n",$out);
     }
 
@@ -131,17 +140,11 @@ class ConsoleHelpFormatter
      */
     public function setDescription($description)
     {
-        if(is_string($description)){
-            $description = [$description];
-        }
-        $this->description = '<white>' . implode("\n",$description) . '</white>';
+        $this->description = '<white>' . $this->toText($description) . '</white>';
     }
 
     public function setUsage($usage){
-        if(is_string($usage)){
-            $usage = [$usage];
-        }
-        $usage = implode("\n  ",$usage);
+        $usage =  $this->toText($usage,"\n  ");
         $this->usage = '<white>' . $this->wrapText($usage,2) .'</white>';
     }
 
@@ -168,12 +171,21 @@ class ConsoleHelpFormatter
     }
 
     public function setEpilog($epilog){
-        if(is_string($epilog)){
-            $epilog = [$epilog];
-        }
-        $this->epilog = '<white>' . implode("\n",$epilog) . '</white>';
+        $this->epilog = '<white>' . $this->toText($epilog) . '</white>';
     }
 
+    public function setHelp($help){
+        $help =  $this->toText($help,"\n  ");
+        $this->help = '<white>' . $this->wrapText($help,2) .'</white>';
+    }
+
+
+    protected function toText($mixed,$glue ="\n"){
+        if(is_string($mixed)){
+            $mixed = [$mixed];
+        }
+        return implode($glue,$mixed);
+    }
     /**
      * Pads columns for a table
      *

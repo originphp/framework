@@ -9,7 +9,7 @@ class DbCreateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp(){
+    public function initialize(){
         // Create copy
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
@@ -18,6 +18,7 @@ class DbCreateCommandTest extends OriginTestCase
 
     public function testExecute(){
         $this->exec('db:create --datasource=dummy');
+
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
     }
@@ -25,7 +26,7 @@ class DbCreateCommandTest extends OriginTestCase
     public function testExecuteInvalidDatasource(){
         $this->exec('db:create --datasource=foo');
         $this->assertExitError();
-        $this->assertOutputContains('foo datasource not found');
+        $this->assertErrorContains('foo datasource not found');
     }
 
     public function testExecuteSQLException(){
@@ -37,7 +38,7 @@ class DbCreateCommandTest extends OriginTestCase
         $this->assertErrorContains('Can\'t create database \'dummy\'');
     }
 
-    public function tearDown(){
+    public function shutdown(){
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS dummy');
     }

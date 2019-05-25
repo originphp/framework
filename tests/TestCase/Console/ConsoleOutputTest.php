@@ -14,7 +14,8 @@
 
 namespace Origin\Test\Console\ConsoleOutput;
 
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
+use Origin\Exception\InvalidArgumentException;
 
 class MockConsoleOutput extends ConsoleOutput
 {
@@ -47,33 +48,27 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     }
     public function testWrite()
     {
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
+        $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->write('hello world');
-        $stream = $ConsoleOutput->getStream();
-        rewind($stream);
-        $this->assertEquals("hello world\n", stream_get_contents($stream));
+        $this->assertEquals("hello world\n", $ConsoleOutput->read());
     }
 
     public function testTags()
     {
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
+        $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->write('<unkown>hello world</unkown>');
-        $stream = $ConsoleOutput->getStream();
-        rewind($stream);
-        $this->assertEquals("<unkown>hello world</unkown>\n", stream_get_contents($stream));
+          $this->assertEquals("<unkown>hello world</unkown>\n", $ConsoleOutput->read());
 
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->write('<yellow>hello world</yellow>');
-        $stream = $ConsoleOutput->getStream();
-        rewind($stream);
-        $this->assertContains("\033[93mhello world\033[0m\n", stream_get_contents($stream));
+        $this->assertContains("\033[93mhello world\033[39m\n", $ConsoleOutput->read());
     }
 
     public function testStyles()
     {
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
-        $this->assertEquals($ConsoleOutput->getStyles(), $ConsoleOutput->styles());
-        $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
+        $ConsoleOutput = new ConsoleOutput();
+         $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
@@ -84,11 +79,37 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
 
     public function testOutput()
     {
-        $ConsoleOutput = new MockConsoleOutput('php://memory');
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->styles('complete', ['background'=>'lightRed','underline'=>true,'color'=>'white']);
         $ConsoleOutput->write('<complete>Test</complete>');
-        $stream = $ConsoleOutput->getStream();
-        rewind($stream);
-        $this->assertEquals("\033[97;101;4mTest\033[0m\n", stream_get_contents($stream));
+        $this->assertEquals("\033[97;101;4mTest\033[39;49;24m\n", $ConsoleOutput->read());
+
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::COLOR);
+        $ConsoleOutput->write('<unkown>This is an unkown style</unkown>');
+        $this->assertContains('<unkown>This is an unkown style</unkown>',$ConsoleOutput->read());
+
+    }
+
+    public function testNestedStyle(){
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::COLOR);
+        $ConsoleOutput->write('<text>This is a <yellow>test</yellow></text>');
+        $this->assertEquals('494ad65c5fb334414d393d454f8d6d50',md5($ConsoleOutput->read()));
+    }
+
+    public function testModeException(){
+        $ConsoleOutput = new ConsoleOutput();
+        $this->expectException(InvalidArgumentException::class);
+        $ConsoleOutput->mode(007);
+    }
+
+    public function testEmptySet(){
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::COLOR);
+        $ConsoleOutput->styles('foo', ['foo'=>'bar']);
+        $ConsoleOutput->write('<foo>bar</foo>');
+        $this->assertEquals("bar\n",$ConsoleOutput->read());
     }
 }

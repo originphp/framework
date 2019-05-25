@@ -22,6 +22,7 @@ use Origin\Http\Response;
 use Origin\Exception\Exception;
 use Origin\Http\Middleware;
 use Origin\Core\Resolver;
+use Origin\Exception\InvalidArgumentException;
 
 class BaseApplication
 {
@@ -65,7 +66,7 @@ class BaseApplication
      * Examples
      *
      * $this->loadMiddleware('FormSecurity');
-     * $this->loadMiddleware('MyPlugin.User');
+     * $this->loadMiddleware('MyPlugin.FormSecurity');
      * $this->loadMiddleware('App\Middleware\FormSecurityMiddleware');
      *
      * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Middleware\FormSecurityMiddleware
@@ -74,6 +75,9 @@ class BaseApplication
     public function loadMiddleware(string $name)
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware');
+        if(empty($className)){
+            throw new InvalidArgumentException(sprintf("Unkown middleware %s",$name));
+        }
         $this->addMiddleware(new $className);
     }
 }

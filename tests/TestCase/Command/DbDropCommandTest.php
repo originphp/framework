@@ -28,7 +28,7 @@ class DbDropCommandTest extends OriginTestCase
     public function testExecuteInvalidDatasource(){
         $this->exec('db:drop --datasource=foo');
         $this->assertExitError();
-        $this->assertOutputContains('foo datasource not found');
+        $this->assertErrorContains('foo datasource not found');
     }
 
     public function testExecuteSQLException(){

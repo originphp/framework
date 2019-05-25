@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Console;
+use Origin\Console\Exception\ConsoleException;
 
 class ConsoleIo
 {
@@ -63,7 +64,6 @@ class ConsoleIo
         if ($out === null) {
             $out = new ConsoleOutput('php://stdout');
         }
-
         if ($err === null) {
             $err = new ConsoleOutput('php://stderr');
         }
@@ -96,6 +96,16 @@ class ConsoleIo
     }
 
     /**
+     * Outputs line or lines to the stderr.
+     *
+     * @param string|array $message
+     */
+    public function err($message)
+    {
+        $this->stderr->write($message);
+    }
+
+    /**
      * Overwrites the last text. Does not work if used new line after text
      * 
      * $io->write('downloading...');
@@ -108,10 +118,11 @@ class ConsoleIo
         if(is_array($message)){
             $message = implode("\n",$message);
         }
+        pr($this->lastWrittenLength);
        $this->stdout->write("\033[{$this->lastWrittenLength}D",false);
     
        $difference = strlen($message) - $this->lastWrittenLength;
-       if($difference){
+       if($difference > 0){
            $message .= str_repeat(' ',$difference);
        }
        if($newLine){
@@ -120,25 +131,16 @@ class ConsoleIo
        $this->write($message);
     }
 
-    /**
-     * Outputs line or lines to the stderr.
-     *
-     * @param string|array $message
-     */
-    public function err($message)
-    {
-        $this->stderr->write($message);
-    }
-
+    
     /**
      * A Title style.
      *
      * @param string $heading
      */
-    public function title(string $title)
+    public function title(string $title,string $style ='heading')
     {
-        $this->out($title);
-        $this->out(str_repeat('=', strlen($title)));
+        $this->out("<{$style}>{$title}</{$style}>");
+        $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
         $this->nl();
     }
 
@@ -147,24 +149,25 @@ class ConsoleIo
      *
      * @param string $heading1
      */
-    public function heading(string $heading)
+    public function heading(string $heading,string $style ='heading')
     {
-        $this->out($heading);
-        $this->out(str_repeat('-', strlen($heading)));
+        $this->out("<{$style}>{$heading}</{$style}>");
+        $this->out("<{$style}>".str_repeat('=', strlen($heading))."</{$style}>");
         $this->nl();
     }
 
     /**
      * This ouput texts for use with heading,title etc. Text will automatically be indented.
-     *
+     * 
      * @param string|array $text
+     * @param integer $indent
+     * @return void
      */
-    public function text($text, array $options = [])
+    public function text($text,int $indent=2)
     {
-        $options += ['indent' => 2];
         $text = (array) $text;
         foreach ($text as $line) {
-            $this->out(str_repeat(' ', $options['indent']).$line);
+            $this->out(str_repeat(' ', $indent).$line);
         }
     }
 
@@ -224,77 +227,28 @@ class ConsoleIo
      * Generates a list of list item.
      *
      * @param string|array $elements 'buy milk' or ['buy milk','read the paper']
-     * @param array        $options  Defaults are
-     *                               - bullet: default *
+     * @param string $bullet e.g * or -
+     * @param integer $indent indent amount
+     * @return void
      */
-    public function list($elements, array $options = [])
+    public function list($elements, string $bullet = '*', int $indent=2)
     {
-        $options += ['bullet' => '*'];
-
         foreach ((array) $elements as $element) {
-            $string = str_repeat(' ', 2).$options['bullet'].' '.$element;
-            $this->out($string);
+            $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
         }
-    }
+    } 
 
     /**
-     * Set a style.
-     *
-     * @param string $name    e.g fire
-     * @param array  $options ['color'=>'white','background'=>'red','blink'=>true]
-     */
-    public function style(string $name, array $options = [])
-    {
-        $this->stdout->style($name, $options);
-    }
-
-    /**
-     * Formats and wrotes a line by using array of options. such as color,background.
-     *
-     * @param string $text
-     * @param array  $options
-     */
-    protected function writeFormatted(string $text, array $options = [])
-    {
-        $string = $this->formatString($text, $options);
-        $this->stdout->write($string);
-    }
-
-    /**
-     * Formats a striung by using array of options. such as color,background.
+     * Formats a string by using array of options. such as color,background.
      *
      * @param string $text
      * @param array  $options (background,color,blink=true etc)
      *
      * @return string
      */
-    public function formatString(string $text, array $options = [])
+    public function format(string $text, array $options = [])
     {
         return $this->stdout->color($text, $options);
-    }
-
-    /**
-     * Displays a warning block or alert.
-     *
-     * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
-     */
-    public function warning($messages, array $options = [])
-    {
-        $options += ['background' => 'yellow', 'color' => 'black', 'bold' => true];
-        $this->highlight($messages, $options);
-    }
-
-    /**
-     * Displays a success block or alert.
-     *
-     * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
-     */
-    public function success($messages, array $options = [])
-    {
-        $options += ['background' => 'green', 'color' => 'white', 'bold' => true];
-        $this->highlight($messages, $options);
     }
 
     /**
@@ -310,6 +264,33 @@ class ConsoleIo
     }
 
     /**
+     * Displays a success block or alert.
+     *
+     * @param string|array $messages line or array of lines
+     * @param array        $options  (background,color,blink,bold,underline)
+     */
+    public function success($messages, array $options = [])
+    {
+        $options += ['background' => 'green', 'color' => 'white', 'bold' => true];
+        $this->highlight($messages, $options);
+    }
+
+     /**
+     * Displays a warning block or alert to stderr out
+     *
+     * @param string|array $messages line or array of lines
+     * @param array        $options  (background,color,blink,bold,underline)
+     */
+    public function warning($messages, array $options = [])
+    {
+        $options += ['background' => 'yellow', 'color' => 'black', 'bold' => true];
+        foreach((array) $messages as $message){
+            $string = $this->format($message, $options);
+            $this->stderr->write($string);
+        }
+    }
+
+    /**
      * Displays an error block or alert.
      *
      * @param string|array $messages line or array of lines
@@ -318,7 +299,10 @@ class ConsoleIo
     public function error($messages, array $options = [])
     {
         $options += ['background' => 'lightRed', 'color' => 'white', 'bold' => true];
-        $this->highlight($messages, $options);
+        foreach((array) $messages as $message){
+            $string = $this->format($message, $options);
+            $this->stderr->write($string);
+        }
     }
 
     /**
@@ -399,12 +383,10 @@ class ConsoleIo
      */
     public function block($messages, array $options = [])
     {
-        $options += ['background' => 'black', 'color' => 'white', 'center' => false, 'padding' => 4];
+        $options += ['background' => 'black', 'color' => 'white', 'padding' => 4];
 
         $center = STR_PAD_RIGHT;
-        if ($options['center']) {
-            $center = STR_PAD_BOTH;
-        }
+  
         $this->nl();
 
         if (!is_array($messages)) {
@@ -455,14 +437,13 @@ class ConsoleIo
             $prompt .= " [{$default}]";
         }
 
-        while ($input === '') {
-            $this->stdout->write("\033[32;49m".$prompt);
-            $this->stdout->write("\033[97;49m> ", false);
-            $input = $this->stdin->read();
-            if ($input === '' and $default) {
-                return $default;
-            }
+        $this->stdout->write("\033[32;49m".$prompt);
+        $this->stdout->write("\033[97;49m> ", false);
+        $input = $this->stdin->read();
+        if ($input === '' and $default) {
+            return $default;
         }
+
         $this->stdout->write("\033[0m"); // reset + line break
         return $input;
     }
@@ -488,13 +469,18 @@ class ConsoleIo
             array_map('strtolower', $options),
             array_map('strtoupper', $options)
         );
-
-        while ($input === '' or !in_array($input, $options)) {
+       
+      
+        while ($input === '' OR !in_array($input, $options)) {
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
             $input = $this->stdin->read();
             if ($input === '' and $default) {
                 return $default;
+            }
+            # Catch out errors caused by not sending data via ConsoleIntegratioTest::exec
+            if($input === null){
+                throw new ConsoleException(sprintf('No input for `%s`',$prompt));
             }
         }
         $this->stdout->write("\033[0m"); // reset + line break
@@ -510,7 +496,7 @@ class ConsoleIo
      */
     public function createFile(string $filename, string $contents, $forceOverwrite = false)
     {
-        if (file_exists($filename) and $forceOverwrite === false) {
+        if (file_exists($filename) and $forceOverwrite !== true) {
             $this->warning("File {$filename} already exists");
             $input = $this->askChoice('Do you want to overwrite?', ['y', 'n'], 'n');
             if ($input === 'n') {
@@ -569,9 +555,9 @@ class ConsoleIo
      /**
      * Sets or modifies existing styles
      *  $styles = $io->styles();
-     *  $style = $io->style('primary');
-     *  $io->style('primary',$styleArray);
-     *  $io->style('primary',false);
+     *  $style = $io->styles('primary');
+     *  $io->styles('primary',$styleArray);
+     *  $io->styles('primary',false);
      *
      * @param string $name
      * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
@@ -606,5 +592,17 @@ class ConsoleIo
      */
     public function stdin(){
         return $this->stdin;
+    }
+
+      /**
+     * Formats and writes a line by using array of options. such as color,background.
+     *
+     * @param string $text
+     * @param array  $options
+     */
+    protected function writeFormatted(string $text, array $options = [])
+    {
+        $string = $this->format($text, $options);
+        $this->stdout->write($string);
     }
 }

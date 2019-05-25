@@ -15,7 +15,7 @@
 namespace Origin\Test\Console;
 
 use Origin\Console\ShellDispatcher;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\ConsoleInput;
 use Origin\TestSuite\TestTrait;
 use Origin\Console\Shell;
@@ -67,15 +67,6 @@ class LemonPieShell extends Shell
     }
 }
 
-class AnotherConsoleOutput extends ConsoleOutput
-{
-    public function read()
-    {
-        $stream = $this->stream;
-        rewind($stream);
-        return stream_get_contents($stream);
-    }
-}
 
 class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -85,7 +76,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     public function testNewDispatcher()
     {
-        $ConsoleOutput =  new AnotherConsoleOutput('php://memory');
+        $ConsoleOutput =  new ConsoleOutput();
         $ShellDispatcher = new ShellDispatcher([], $ConsoleOutput, new ConsoleInput());
         $this->assertFalse($ShellDispatcher->start());
         $this->assertContains('OriginPHP', $ConsoleOutput->read());
@@ -93,7 +84,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testGetShellList()
     {
-        $ShellDispatcher = new MockShellDispatcher([], new AnotherConsoleOutput('php://memory'), new ConsoleInput());
+        $ShellDispatcher = new MockShellDispatcher([], new ConsoleOutput(), new ConsoleInput());
         $result = $ShellDispatcher->callMethod('getShellList');
         $this->assertArrayHasKey('App', $result);
         $this->assertArrayHasKey('Core', $result);
@@ -102,7 +93,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testDispatchAndOut()
     {
-        $ConsoleOutput =  new AnotherConsoleOutput('php://memory');
+        $ConsoleOutput =  new ConsoleOutput();
         $ShellDispatcher = new MockShellDispatcher(['pathTo/origin.php','Origin\Test\Console\LemonPie','start'], $ConsoleOutput, new ConsoleInput());
         $ShellDispatcher->start();
         $buffer =  $ConsoleOutput->read();
@@ -112,13 +103,12 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('shutdown called', $buffer);
     }
 
-   
     public function testPluginDispatchPluginSearch()
     {
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
             ['pathTo/origin.php','make','main'],
-            new AnotherConsoleOutput('php://memory'),
+            new ConsoleOutput(),
             new ConsoleInput()
         );
        
@@ -138,7 +128,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
             ['pathTo/origin.php','math'],
-            new AnotherConsoleOutput('php://memory'),
+            new ConsoleOutput(),
             new ConsoleInput()
         );
         $ShellDispatcher->setShellList([
@@ -157,7 +147,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         // Test Plugin Search
         $ShellDispatcher = new MockShellDispatcher(
             ['pathTo/origin.php','shell'],
-            new AnotherConsoleOutput('php://memory'),
+            new ConsoleOutput(),
             new ConsoleInput()
         );
 
@@ -170,7 +160,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         // Test direct plugin call
         $ShellDispatcher = new MockShellDispatcher(
              ['pathTo/origin.php','Make.make','main'],
-             new AnotherConsoleOutput('php://memory'),
+             new ConsoleOutput(),
              new ConsoleInput()
          );
   
@@ -182,7 +172,7 @@ class ShellDispatcherTest extends \PHPUnit\Framework\TestCase
         $ShellDispatcher = new MockShellDispatcher(
             [
             'pathTo/origin.php','NonExistantShellClass'],
-             new AnotherConsoleOutput('php://memory'),
+             new ConsoleOutput(),
              new ConsoleInput()
         );
        

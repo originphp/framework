@@ -8,7 +8,9 @@
  * portions of the Software.
  *
  * @copyright   Copyright (c) Jamiel Sharief
- * @link       https://www.originphp.com
+ *
+ * @see       https://www.originphp.com
+ *
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -20,25 +22,31 @@ use Origin\Console\ShellDispatcher;
 use Origin\Console\CommandRunner;
 use Origin\Console\ConsoleIo;
 
-
 /**
  * A way to test controllers from a higher level.
  */
 trait ConsoleIntegrationTestTrait
 {
     /**
-     * Holds the console output.
+     * Holds the standard console output.
      *
      * @var \Origin\Console\ConsoleOutput
      */
-    protected $output = null;
+    protected $stdout = null;
+
+    /**
+     * Holds the console output for errors.
+     *
+     * @var \Origin\Console\ConsoleOutput
+     */
+    protected $stderr = null;
 
     /**
      * Holds the console output.
      *
      * @var \Origin\Console\ConsoleInput
      */
-    protected $input = null;
+    protected $stdin = null;
 
     /**
      * This holds the legacy shell object.
@@ -62,6 +70,26 @@ trait ConsoleIntegrationTestTrait
     protected $result = null;
 
     /**
+     * Gets the stdout output (standard non errors)
+     *
+     * @return string
+     */
+    public function output()
+    {
+        return $this->stdout->read();
+    }
+
+    /**
+     * Gets the stderr output (Errors)
+     *
+     * @return string
+     */
+    public function errorOutput()
+    {
+        return $this->stderr->read();
+    }
+
+    /**
      * Executes a console command.
      *
      * @param string $command e.g. db:schema:load
@@ -73,33 +101,38 @@ trait ConsoleIntegrationTestTrait
     {
         $this->shell = $this->result = null;
 
-        $this->output = new ConsoleOutput();
-        $this->input = $this->getMockBuilder(ConsoleInput::class)
+        $this->stdout = new ConsoleOutput();
+        $this->stderr = new ConsoleOutput();
+        $this->stdin = $this->getMockBuilder(ConsoleInput::class)
                         ->disableOriginalConstructor()
                         ->setMethods(['read'])
                         ->getMock();
 
         $x = 0;
         foreach ($input as $data) {
-            $this->input->expects($this->at($x))->method('read')->will($this->returnValue($data));
+            $this->stdin->expects(
+                $this->at($x))
+                ->method('read')
+                ->will($this->returnValue($data)
+            );
             ++$x;
         }
 
         $argv = explode(' ', "console {$command}");
         list($namespace, $class) = namespacesplit(get_class($this));
 
-        if (substr($class, -11) === 'CommandTest') {
-            $io = new ConsoleIo($this->output, $this->output, $this->input);
+        // Handle Legacy
+        if (substr($class, -9) === 'ShellTest') {
+            $this->stderr = $this->stdout; // Fixture Issue
+            $dispatcher = new ShellDispatcher($argv, $this->stdout, $this->stdin);
+            $this->result = $dispatcher->start();
+            $this->shell = $dispatcher->shell();
+        } else {
+            $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
             $commandRunner = new CommandRunner($io);
             $this->result = $commandRunner->run($argv);
             $this->command = $commandRunner->command();
-        } else {
-            $dispatcher = new ShellDispatcher($argv, $this->output, $this->input);
-            $this->result = $dispatcher->start();
-            $this->shell = $dispatcher->shell();
         }
-
-        return $this->output->read();
     }
 
     /**
@@ -109,7 +142,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputContains(string $needle)
     {
-        $this->assertContains($needle, $this->output->read());
+        $this->assertContains($needle, $this->stdout->read());
     }
 
     /**
@@ -117,7 +150,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputEmpty()
     {
-        $this->assertContains('', $this->output->read());
+        $this->assertContains('', $this->stdout->read());
     }
 
     /**
@@ -125,6 +158,9 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitSuccess()
     {
+        if ($this->result === false) {
+            printf($this->stderr->read());
+        }
         $this->assertTrue($this->result);
     }
 
@@ -143,15 +179,13 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorContains(string $message)
     {
-        if (preg_match("/<exception> ERROR <\/exception>.*$/", $this->output->read(), $matches)) {
-            $this->assertContains($message, $matches[0]);
-        } else {
-            $this->fail();
-        }
+        $this->assertContains($message, $this->stderr->read());
     }
 
     /**
-     * Returns the command.
+     * Returns the Command Object.
+     *
+     * @return \Origin\Command\Command
      */
     public function command()
     {

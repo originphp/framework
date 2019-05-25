@@ -24,28 +24,28 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testExec()
     {
-        $this->exec('dummy say');
+        $this->exec('test say');
         $this->assertOutputContains('Hello world!');
         $this->assertExitSuccess();
     }
 
     public function testExecInput()
     {
-        $this->exec('dummy ask', ['no']);
+        $this->exec('test ask', ['no']);
         $this->assertOutputContains('You entered no');
         $this->assertExitSuccess();
     }
 
-    public function testAAA()
+    public function testExecError()
     {
-        $this->exec('dummy test');
+        $this->exec('test omg');
         $this->assertExitError();
         $this->assertErrorContains('OMG! Its all Gone pete tong');
     }
 
     public function testEmpty()
     {
-        $this->exec('dummy do_nothing');
+        $this->exec('test empty');
         $this->assertOutputEmpty();
     }
 }

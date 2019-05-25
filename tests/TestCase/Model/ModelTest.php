@@ -208,13 +208,18 @@ class ModelTest extends OriginTestCase
 
 
         $ds = $this->Article->connection();
-        $ds->execute('DROP TABLE IF EXISTS foos');
         $sql = $ds->createTable('foos',['not_id'=>'primaryKey','undetectable'=>'string']);
         $ds->execute($sql);
         $dummy = new Model(['name'=>'Foo','datasource'=>'test']);
   
         $this->expectException(Exception::class);
         $display = $dummy->displayField;
+        $ds->execute('DROP TABLE foos');
+    }
+
+    public function testDisplayFieldUndo(){
+        $ds = $this->Article->connection();
+        $this->assertTrue($ds->execute('DROP TABLE foos'));
     }
 
 

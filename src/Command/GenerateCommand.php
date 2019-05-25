@@ -26,15 +26,15 @@ class GenerateCommand extends Command
      * @var array
      */
     protected $generators = [
-        'behavior',
-        'command',
-        'component',
-        'controller',
-        'helper',
-        'model',
-        'middleware',
-        'migration',
-        'plugin',
+        'behavior' => 'Generates a behavior class',
+        'command' => 'Generates a command class',
+        'component' => 'Generates a component class',
+        'controller' => 'Generates a controller class',
+        'helper' => 'Generates a helper class',
+        'model' => 'Generates a model class',
+        'middleware' => 'Generates a middleware class',
+        'migration' => 'Generates a migration class',
+        'plugin' => 'Generates a plugin skeleton',
     ];
 
     public function initialize()
@@ -46,44 +46,62 @@ class GenerateCommand extends Command
         $this->addArgument('generator', [
             'description' => [
                 'The name of the generator. Generators include: behavior,command,component',
-                'controller, helper,model,middleware, migration and plugin'], 'required' => true, ]
+                'controller, helper,model,middleware, migration and plugin', ], ]
         );
         $this->addArgument('name', [
-            'description' => 'This is a mixed case name, e.g Contact,ContactAddress,Plugin.Product', 'required' => true, ]
+            'description' => 'This is a mixed case name, e.g Contact,ContactAddress,Plugin.Product', 'required' => false, ]
         );
         $this->addArgument('params', [
             'description' => [
                 'Additional params to be passed to generator. For controllers this will be action names',
-            'seperated by spaces. For models it coulmn:type also seperated by spaces.'],
+            'seperated by spaces. For models it coulmn:type also seperated by spaces.', ],
             'type' => 'array',
+        ]);
+        $this->addOption('force', [
+            'description' => 'Forces file overwriting',
+            'type' => 'boolean',
+            'default' => false,
         ]);
     }
 
     public function execute()
     {
         $generator = $this->arguments('generator');
+        $name = $this->arguments('name');
+
+        // Go Interactive
+        if (empty($this->arguments())) {
+            $this->out('<yellow>Generators:</yellow>');
+            foreach ($this->generators as $generator => $description) {
+                $generator = str_pad($generator, 20, ' ');
+                $this->io->text("<code>{$generator}</code> <white>{$description}</white>");
+            }
+            $this->out('');
+            $generator = $this->io->ask('Which generator?');
+
+            if ($this->isValidGenerator($generator)) {
+                $name = $this->io->ask('Enter a name e.g. Single,DoubleWord');
+            }
+            
+        }
+
         if (!$this->isValidGenerator($generator)) {
             $this->io->error("Unkown generator {$generator}");
-
-            $this->out('The available generators are:');
-            foreach ($this->generators as $generator) {
-                $this->io->list($generator);
-            }
             $this->abort();
         }
 
-        $name = $this->arguments('name');
         if (!$this->isValidName($name)) {
             $this->io->error('Invalid name format. Should be mixed case Product,ContactManager');
             $this->abort();
         }
 
-        list($plugin, $name) = pluginSplit($name);
+        list($plugin, $class) = pluginSplit($name);
 
         $data = [
-                'name' => $name,  // Product // StudlyCaps/PascalCase
+                'name' => $name,
+                'class' => $class,  // Product // StudlyCaps/PascalCase
                 'plugin' => $plugin,
-                'underscored' => Inflector::underscore($name),
+                'underscored' => Inflector::underscore($class),
                 'namespace' => $plugin ? $plugin : 'App',
             ];
 
@@ -94,7 +112,7 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('behavior'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Model'.DS.'Behavior'.DS."{$data['name']}Behavior.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Behavior'.DS."{$data['class']}Behavior.php",
             $data
         );
     }
@@ -102,24 +120,23 @@ class GenerateCommand extends Command
     protected function command(array $data)
     {
         $data['custom'] = str_replace('_', '-', $data['underscored']);
-
+    
         $this->generate(
             $this->getTemplateFilename('command'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Command'.DS."{$data['name']}Command.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Command'.DS."{$data['class']}Command.php",
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('command_test'),
-            $this->getBaseFolder($this->arguments('name'), self::TEST).DS.'Command'.DS."{$data['name']}CommandTest.php",
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Command'.DS."{$data['class']}CommandTest.php",
             $data
         );
     }
 
-    
     protected function controller(array $data)
     {
-        $data['model'] = Inflector::singularize($data['name']);
+        $data['model'] = Inflector::singularize($data['class']);
         $data['methods'] = '';
 
         $controllerMethods = $testMethods = '';
@@ -127,21 +144,23 @@ class GenerateCommand extends Command
         $params = $this->arguments('params');
         if ($params) {
             foreach ($params as $method) {
-                $controllerMethods .= "\tfunction {$method}(){\n\t}\n\n";
-                $testMethods .= "\tfunction test".ucfirst($method)."(){\n\t}\n\n";
+                if (preg_match('/^[a-z_0-9]+/', $method)) {
+                    $controllerMethods .= "    function {$method}(){\n    }\n\n";
+                    $testMethods .= '    function test'.ucfirst($method)."(){\n    }\n\n";
+                }
             }
         }
 
         $data['methods'] = $controllerMethods;
         $this->generate(
             $this->getTemplateFilename('controller'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Controller'.DS."{$data['name']}Controller.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS."{$data['class']}Controller.php",
             $data
         );
         $data['methods'] = $testMethods;
         $this->generate(
             $this->getTemplateFilename('controller_test'),
-            $this->getBaseFolder($this->arguments('name'), self::TEST).DS.'Controller'.DS."{$data['name']}ControllerTest.php",
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Controller'.DS."{$data['class']}ControllerTest.php",
             $data
         );
     }
@@ -150,7 +169,7 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('component'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Controller'.DS.'Component'.DS."{$data['name']}Component.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS.'Component'.DS."{$data['class']}Component.php",
             $data
         );
     }
@@ -159,7 +178,7 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('helper'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'View'.DS.'Helper'.DS."{$data['name']}Helper.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.'Helper'.DS."{$data['class']}Helper.php",
             $data
         );
     }
@@ -168,7 +187,7 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('middleware'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Middleware'.DS."{$data['name']}Middleware.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Middleware'.DS."{$data['class']}Middleware.php",
             $data
         );
     }
@@ -180,7 +199,7 @@ class GenerateCommand extends Command
         $version = date('Ymdhis');
         $this->generate(
             $this->getTemplateFilename('migration'),
-            ROOT.DS.'db'.DS.'migrate'.DS."{$version}{$data['name']}.php",
+            APP.DS.'db'.DS.'migrate'.DS."{$version}{$data['class']}.php",
             $data
         );
     }
@@ -197,27 +216,8 @@ class GenerateCommand extends Command
 
     protected function model(array $data)
     {
-        $this->generate(
-            $this->getTemplateFilename('model'),
-            $this->getBaseFolder($this->arguments('name'), self::SRC).DS.'Model'.DS."{$data['name']}.php",
-            $data
-        );
-
-        $this->generate(
-            $this->getTemplateFilename('model_test'),
-            $this->getBaseFolder($this->arguments('name'), self::TEST).DS.'Model'.DS."{$data['name']}Test.php",
-            $data
-        );
-        $fixtureFolder = str_replace('TestCase', 'Fixture', $this->getBaseFolder($this->arguments('name'), self::TEST));
-        $this->generate(
-            $this->getTemplateFilename('model_fixture'),
-            $this->getBaseFolder($this->arguments('name'), self::TEST).DS.'Model'.DS."{$data['name']}Fixture.php",
-            $data
-        );
-
-        // Create Migration
+         // Create Migration
         $params = $this->arguments('params');
-
         $schema = [];
         if ($params) {
             foreach ($params as $param) {
@@ -227,10 +227,32 @@ class GenerateCommand extends Command
                 list($key, $value) = explode(':', $param);
                 $schema[$key] = $value;
             }
-            $export = $this->varExport($schema);
-            $table = Inflector::tableize($data['name']);
+        }
 
-            $data['name'] = 'Create'.$data['name'].'Table';
+        $this->generate(
+            $this->getTemplateFilename('model'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS."{$data['class']}.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('model_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS."{$data['class']}Test.php",
+            $data
+        );
+        $fixtureFolder = str_replace('TestCase', 'Fixture', $this->getBaseFolder($data['name'], self::TEST));
+        $this->generate(
+            $this->getTemplateFilename('model_fixture'),
+            $fixtureFolder.DS."{$data['class']}Fixture.php",
+            $data
+        );
+
+        # Generate Migration
+        if ($schema) {
+            $export = $this->varExport($schema);
+            $table = Inflector::tableize($data['class']);
+
+            $data['class'] = 'Create'.$data['class'].'Table';
             $data['code'] = sprintf('$this->createTable(\'%s\',%s);', $table, $export);
             $this->migration($data);
         }
@@ -250,8 +272,9 @@ class GenerateCommand extends Command
             'tests',
             'db',
         ];
+        $pluginDirectory = APP.DS.'plugins';
 
-        $path = PLUGINS.DS.Inflector::underscore($data['name']);
+        $path = $pluginDirectory.DS.Inflector::underscore($data['class']);
         foreach ($structure as $folder) {
             $directory = $path.DS.$folder;
             if (!file_exists($directory)) {
@@ -259,27 +282,27 @@ class GenerateCommand extends Command
             }
         }
 
-        $directory = PLUGINS.DS.Inflector::underscore($data['name']).DS.'src';
+        $directory = $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'src';
 
         $this->generate(
             $this->getTemplateFilename('plugin_controller'),
-            $directory.DS.'Controller'.DS."{$data['name']}AppController.php",
+            $directory.DS.'Controller'.DS."{$data['class']}AppController.php",
             $data
         );
         $this->generate(
             $this->getTemplateFilename('plugin_model'),
-            $directory.DS.'Model'.DS."{$data['name']}AppModel.php",
+            $directory.DS.'Model'.DS."{$data['class']}AppModel.php",
             $data
         );
         $this->generate(
             $this->getTemplateFilename('plugin_routes'),
-            PLUGINS.DS.Inflector::underscore($data['name']).DS.'config'.DS.'routes.php',
+            $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'config'.DS.'routes.php',
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('phpunit'),
-            PLUGINS.DS.Inflector::underscore($data['name']).DS.'phpunit.xml',
+            $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'phpunit.xml',
             $data
         );
     }
@@ -292,6 +315,10 @@ class GenerateCommand extends Command
     protected function getBaseFolder(string $class, $src = true)
     {
         list($plugin, $name) = pluginsplit($class);
+        if($plugin){
+            $plugin = Inflector::underscore($plugin);
+        }
+        // Src
         if ($src === self::SRC) {
             if ($plugin) {
                 return PLUGINS.DS.$plugin.DS.'src';
@@ -299,6 +326,7 @@ class GenerateCommand extends Command
 
             return SRC;
         }
+        // Tests
         if ($plugin) {
             return PLUGINS.DS.$plugin.DS.'tests'.DS.'TestCase';
         }
@@ -315,15 +343,14 @@ class GenerateCommand extends Command
      */
     protected function generate(string $input, string $output, array $data)
     {
-        if (!file_exists($input)) {
-            $this->throwError("{$input} could not be found");
-        }
         $content = file_get_contents($input);
         foreach ($data as $key => $value) {
             if (is_scalar($value)) {
                 $content = str_replace('%'.$key.'%', $value, $content);
             }
         }
+
+        $this->debug("<cyan>{$output}</cyan>\n\n<code>{$content}</code>");
 
         return $this->saveGeneratedCode($output, $content);
     }
@@ -342,8 +369,8 @@ class GenerateCommand extends Command
 
     protected function saveGeneratedCode(string $filename, string $content)
     {
-        $result = $this->io->createFile($filename, $content);
-        $filename = str_replace(ROOT.DS, '', $filename);
+        $result = $this->io->createFile($filename, $content, $this->options('force'));
+
         if ($result) {
             $this->io->status('ok', $filename);
         } else {
@@ -360,7 +387,7 @@ class GenerateCommand extends Command
 
     protected function isValidGenerator(string $generator)
     {
-        return in_array($generator, $this->generators);
+        return isset($this->generators[$generator]);
     }
 
     protected function isValidName(string $name)

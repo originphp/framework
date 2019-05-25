@@ -20,7 +20,6 @@ use Origin\Console\Exception\StopExecutionException;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
-use SebastianBergmann\Environment\Console;
 use Origin\Console\CommandRunner;
 
 class Command
@@ -52,12 +51,13 @@ class Command
      * @var string
      */
     protected $name = null;
+
     /**
      * Holds the description for this command. This is shown before help.
      *
      * @var string|array
      */
-    protected $description = '';
+    protected $description = null;
 
     /**
      * This is displayed after help.
@@ -65,6 +65,20 @@ class Command
      * @var string|array
      */
     protected $epilog = null;
+
+    /**
+     * This is for showing full help for this command
+     *
+     * @var string|array
+     */
+    protected $help = null;
+
+   /**
+     * This to set additional usages
+     *
+     * @var string|array
+     */
+    protected $usages = [];
 
     /**
      * Command argument configuration.
@@ -85,13 +99,7 @@ class Command
 
     protected $verbose = false;
 
-    /**
-     * A list of methods used as subcommand
-     *
-     * @var array
-     */
-    protected $subCommands = [];
-
+ 
     /**
      * Undocumented variable.
      *
@@ -112,7 +120,6 @@ class Command
         $this->addOption('verbose', ['short' => 'v', 'description' => 'Displays additional output (if available)', 'type' => 'boolean']);
 
         $this->validateName($this->name);
-        $this->description($this->description); // Convert from array if set using this
     }
 
     /**
@@ -157,35 +164,19 @@ class Command
      * Runs this command used by Command Runner
      *
      * @param array $args
+     * @return bool $result
      */
-    public function run(array $args)
+    public function run(array $args) : bool
     {
         $this->initialize($args);
-
+      
+        # Configure Help
         $this->parser->setCommand($this->name);
         $this->parser->setDescription($this->description);
         $this->parser->setEpilog($this->epilog);
-      
-        $method = 'execute';
-        // Extract First Argument if sub command
-        if($this->subCommands){
-            $subCommand = null;
-            foreach($args as $i => $arg){
-                if($arg[0] !== '-'){
-                    $subCommand = $arg;
-                    break;
-                }
-            }
-
-            if($subCommand AND isset($this->subCommands[$subCommand])){
-                unset($args[$i]);
-                $method = $this->subCommands[$subCommand];
-            }
-            else{
-                $args = ['--help']; // Force display help and disable execute
-            }
-        }
-
+        $this->parser->setHelp($this->help);
+        $this->parser->setUsage($this->usages);
+     
         try {
             list($options, $arguments) = $this->parser->parse($args);
         } catch (ConsoleException $ex) {
@@ -205,12 +196,13 @@ class Command
 
         if ($this->options('help')) {
             $this->displayHelp();
-
             return true;
         }
+
         $this->startup();
-        $this->{$method}();
+        $this->execute();
         $this->shutdown();
+        
         return true;
     }
 
@@ -285,10 +277,17 @@ class Command
         if ($description === null) {
             return $this->description;
         }
-        if(is_array($description)){
-            $description = implode("\n",$description);
-        }
         $this->description = $description;
+    }
+
+    /**
+     * Adds extra Usage examples
+     *
+     * @param string $usage
+     * @return void
+     */
+    public function addUsage(string $usage){
+        $this->usages[] = $usage;
     }
 
     /**
@@ -319,24 +318,6 @@ class Command
     public function addArgument(string $name, array $options = [])
     {
         $this->parser->addArgument($name, $options);
-    }
-
-    /**
-     * Add a method as a sub command.
-     *
-     * @param string $name lower case letters and hypens only, methods with hypens will be changed to underscore
-     * @param array $options
-     *  - description: the help description
-     *  - method: the method this command will call. defaults to underscored version of command name
-     * @return void
-     */
-    public function addSubCommand(string $name, array $options = []){
-        $options += ['method'=>str_replace('-','_',$name)];
-        if(!preg_match('/^[a-z-]+$/',$name)){
-            throw new ConsoleException(sprintf('Invalid sub command name `%s`.',$name));
-        }
-        $this->subCommands[$name] = $options['method'];
-        $this->parser->addCommand($name, $options);
     }
 
     /**
@@ -378,7 +359,7 @@ class Command
     {
         if ($this->verbose) {
             $message = $this->addTags('debug', $message);
-            $this->out($message);
+            $this->io->out($message);
         }
     }
 
@@ -390,7 +371,7 @@ class Command
     public function info($message)
     {
         $message = $this->addTags('info', $message);
-        $this->out($message);
+        $this->io->out($message);
     }
 
     /**
@@ -401,18 +382,7 @@ class Command
     public function notice($message)
     {
         $message = $this->addTags('notice', $message);
-        $this->out($message);
-    }
-
-    /**
-     * Displays styled warnings.
-     *
-     * @param string|array $message
-     */
-    public function warning($message)
-    {
-        $message = $this->addTags('warning', $message);
-        $this->out($message);
+        $this->io->out($message);
     }
 
     /**
@@ -423,7 +393,18 @@ class Command
     public function success($message)
     {
         $message = $this->addTags('success', $message);
-        $this->out($message);
+        $this->io->out($message);
+    }
+
+     /**
+     * Displays styled warnings.
+     *
+     * @param string|array $message
+     */
+    public function warning($message)
+    {
+        $message = $this->addTags('warning', $message);
+        $this->io->err($message);
     }
 
     /**
@@ -434,7 +415,7 @@ class Command
     public function error($message)
     {
         $message = $this->addTags('error', $message);
-        $this->out($message);
+        $this->io->err($message);
     }
 
     protected function addTags(string $tag, $message)

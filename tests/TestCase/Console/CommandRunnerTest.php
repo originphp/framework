@@ -23,14 +23,6 @@ use App\Command\CacheResetCommand;
 
 use Origin\Console\Exception\StopExecutionException;
 
-class MockConsoleIo extends ConsoleIo
-{
-    public function getContents()
-    {
-        return $this->stdin->read();
-    }
-}
-
 class MockCommandRunner extends CommandRunner {
     function io(){
         return $this->io;

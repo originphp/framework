@@ -29,7 +29,7 @@ class DbSetupCommandTest extends OriginTestCase
     public function testExecutePluginPath(){
         $this->exec('db:setup --datasource=dummy MyPlugin.pschema');
         $this->assertExitError();
-        $this->assertOutputContains('/var/www/vendor/originphp/originphp/tests/TestApp/plugins/my_plugin/db/pschema.sql');
+        $this->assertErrorContains('/var/www/vendor/originphp/originphp/tests/TestApp/plugins/my_plugin/db/pschema.sql');
     }
 
     public function shutdown(){

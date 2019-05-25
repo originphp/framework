@@ -76,6 +76,6 @@ class LazyLoadContainer
             }
             return $this->objects[$alias];
         }
-        throw new Exception('%s was not found');
+        throw new Exception(sprintf('%s was not found',$alias));
     }
 }

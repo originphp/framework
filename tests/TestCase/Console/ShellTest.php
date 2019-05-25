@@ -16,7 +16,7 @@ namespace Origin\Test\Console;
 
 use Origin\Console\Shell;
 use Origin\Console\ConsoleInput;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\Task\Task;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
@@ -85,10 +85,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        if (file_exists(TMP . DS . 'shelltest.txt')) {
-            unlink(TMP . DS . 'shelltest.txt');
-        }
-        $this->ConsoleOutput = new ConsoleOutput(TMP . DS . 'shelltest.txt');
+        $this->ConsoleOutput = new ConsoleOutput();
         $this->ConsoleInput = new ConsoleInput();
     }
     public function testConstruct()
@@ -153,7 +150,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $date = time();
         $shell->out('Hello World!' . $date);
       
-        $this->assertContains("Hello World!{$date}", file_get_contents(TMP . DS . 'shelltest.txt'));
+        $this->assertContains("Hello World!{$date}", $this->ConsoleOutput->read());
     }
 
     public function testIn()
@@ -281,7 +278,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
     public function testHelp()
     {
         $file = '/tmp/' . uniqid();
-        $shell = new Shell(new ConsoleOutput('file://' . $file), $this->ConsoleInput);
+        $shell = new Shell($this->ConsoleOutput, $this->ConsoleInput);
         $shell->addOption('option1', [
             'name'=>'option1',
             'help'=>'Option #1'
@@ -295,7 +292,7 @@ class ShellTest extends \PHPUnit\Framework\TestCase
         $shell->addCommand('my_action', ['help'=>'Description goes here']);
         $shell->runCommand('non-existant', []);
         $shell->help();
-        $buffer = file_get_contents($file);
+        $buffer = $this->ConsoleOutput->read();
         $this->assertContains('Usage:', $buffer);
         $this->assertContains('--option2=description', $buffer);
         $this->assertContains('Option #2', $buffer);

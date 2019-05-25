@@ -322,14 +322,8 @@ class DatasourceTest extends OriginTestCase
         ];
         $result = $this->connection->createTable('foo', $schema);
         $this->assertTrue($this->connection->execute($result));
-/*-
-CREATE TABLE bar (
- bookmarks_id INTEGER,
- tags_id INTEGER,
- PRIMARY KEY (bookmarks_id,tags_id)
-)
 
-*/
+     
         $schema = [
             'bookmarks_id' => ['type'=>'integer','key'=>'primary'],
             'tags_id' => ['type'=>'integer','key'=>'primary'],
@@ -339,6 +333,9 @@ CREATE TABLE bar (
         $this->assertContains('bookmarks_id INT', $result);
         $this->assertContains('tags_id INT', $result);
         $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $result);
+
+        $this->assertTrue($this->connection->execute($result));
+        $this->connection->execute('DROP TABLE bar');
     }
 
     /**
@@ -377,5 +374,7 @@ CREATE TABLE bar (
         $this->assertEquals('time', $schema['t']['type']);
         $this->assertEquals('binary', $schema['bf']['type']);
         $this->assertEquals('boolean', $schema['bool']['type']);
+
+        $this->connection->execute('DROP TABLE foo');
     }
 }

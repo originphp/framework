@@ -42,9 +42,7 @@ class OriginTestListenerTest extends \PHPUnit\Framework\TestCase
         
         $listener->startTestSuite($testSuite);
         $this->assertTrue(isset($listener->fixtureManager));
-
-        $listener->endTestSuite($testSuite);
-        $this->assertFalse(isset($listener->fixtureManager));
+        $this->assertNull($listener->endTestSuite($testSuite));
     }
 
     public function testStartTest()

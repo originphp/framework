@@ -39,7 +39,7 @@ class DbMigrateCommandTest extends OriginTestCase
         $this->exec('db:migrate --datasource=test'); // Run Migrations
         $this->exec('db:migrate --datasource=test'); // Run Again (this time none)
         $this->assertExitSuccess();
-        $this->assertOutputContains('No migrations found');
+        $this->assertErrorContains('No migrations found'); // Its a warning
     }
 
     public function testNoMigrationsRollback(){
@@ -47,7 +47,7 @@ class DbMigrateCommandTest extends OriginTestCase
         $this->exec('db:migrate --datasource=test 20190520033226'); // Rollback
         $this->exec('db:migrate --datasource=test 20190520033226'); // Now there should be no migrations
         $this->assertExitSuccess();
-        $this->assertOutputContains('No migrations found');
+        $this->assertErrorContains('No migrations found');
     }
 
     public function testMigrateException(){

@@ -14,15 +14,12 @@
 
 namespace Origin\Console;
 
-
-use Origin\Command\Command;
 use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleHelpFormatter;
 use Origin\Console\ArgumentParser;
 use Origin\Core\Resolver;
+use Origin\Exception\Exception;
 use Origin\Console\Exception\ConsoleException;
-use Origin\Command\Exception\MissingCommandException;
-use Origin\Core\Inflector;
 use Origin\Core\LazyLoadContainer;
 
 /** 
@@ -36,9 +33,9 @@ use Origin\Core\LazyLoadContainer;
  *  
  * $consoleApplication = new ConsoleApplication();
  * $consoleApplication->name('db');
- * $consoleApplication->Description([
+ * $consoleApplication->description([
  *  'DB application for creating and dropping tables'
- * ])
+ * ]);
  * $consoleApplication->addCommand('create', 'CreateTable');
  * $consoleApplication->run();
  */
@@ -60,7 +57,7 @@ class ConsoleApplication
      *
      * @var string
      */
-    protected $desription =  null;
+    protected $description =  null;
 
      /**
      * Holds the command list
@@ -78,6 +75,13 @@ class ConsoleApplication
     protected $commandRegistry = null;
 
     /**
+     * Undocumented variable
+     *
+     * @var \Origin\Console\ConsoleIo
+     */
+    protected $io = null;
+
+    /**
      * Constructor
      *
      * @param string $name should be the same as the executable file as this will be used in help
@@ -86,8 +90,9 @@ class ConsoleApplication
     public function __construct(ConsoleIo $io = null){
    
         if($io === null){
-            $this->io = new ConsoleIo();
+            $io = new ConsoleIo();
         }
+        $this->io = $io;
 
         $this->argumentParser = new ArgumentParser();
 
@@ -148,14 +153,14 @@ class ConsoleApplication
         if($args === null){
             global $argv;
             $args = $argv;
+            array_shift($args); // Remove script that is running
         }
 
-        array_shift($args);
+
         $commands = $this->commandRegistry->list();
 
         if(empty($commands)){
-            $this->io->error('No commands have been added to this application.');
-            return false;
+           throw new ConsoleException('No commands have been added to this application.');
         }
   
         try {
@@ -180,14 +185,14 @@ class ConsoleApplication
 
         try{
             $this->{$command} = $this->commandRegistry->get($command);
-          
         }catch(Exception $ex){
             $this->io->error("Invalid command {$command}.");
             return false;
         }   
-        
-        $this->{$command}->name($this->name . ' ' .$command);
-        return $this->{$command}->run('execute',$args);
+        # Configure Command
+        $this->{$command}->io = $this->io;
+        $this->{$command}->name($this->name . ' ' .$command);  // Rename for help
+        return $this->{$command}->run($args);
     }
 
     /**
@@ -198,8 +203,8 @@ class ConsoleApplication
     public function displayHelp(){
         $formatter = new ConsoleHelpFormatter();
       
-        if($this->desription){
-            $formatter->setDescription($this->desription);
+        if($this->description){
+            $formatter->setDescription($this->description);
         }
         $formatter->setUsage(["{$this->name} command [options] [arguments]"]);
         $commands = [];
@@ -216,23 +221,16 @@ class ConsoleApplication
      * A work in progress
      *
      * @param string $alias
-     * @param string $name
-     * @param array $config
+     * @param string $name Cache,Plugin.Cache, App\Command\Custom\Cache
      * @return void
      */
-    public function addCommand(string $alias, string $name,array $config=[])
+    public function addCommand(string $alias, string $name)
     {
         if(!preg_match('/^[a-z-]+$/',$alias)){
             throw new ConsoleException(sprintf('Alias `%s` is invalid',$alias));
         }
 
-        list($plugin, $command) = pluginSplit($name);
-        $config = array_merge(['className' => $name.'Command'], $config);
-        $class = Resolver::className($config['className'],'Command');
-        if($class === null){
-           throw new MissingCommandException($class);
-        }
-        
-        $this->commandRegistry->add($alias,$class);
+        $className = Resolver::className($name, 'Command', 'Command');
+        $this->commandRegistry->add($alias,$className);
     }
 }

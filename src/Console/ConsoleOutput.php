@@ -14,6 +14,8 @@
 
 namespace Origin\Console;
 
+use Origin\Exception\InvalidArgumentException;
+
 class ConsoleOutput
 {
     /**
@@ -22,6 +24,12 @@ class ConsoleOutput
      * @var resource
      */
     protected $stream = null;
+
+    const RAW  = 0;
+    const PLAIN = 1;
+    const COLOR = 2;
+
+    protected $mode = SELF::COLOR;
 
     protected $foregroundColors = [
         'default' => 39,
@@ -71,6 +79,14 @@ class ConsoleOutput
         'reverse' => 7,
     ];
 
+    protected $optionsUnset = [
+        'reset' => 0, // reset all
+        'bold' => 22,
+        'underline' => 24,
+        'blink' => 25,
+        'reverse' => 27,
+    ];
+
     protected $styles = [   
         'exception' => ['color' => 'white','background'=>'lightRed'],
 
@@ -104,12 +120,26 @@ class ConsoleOutput
      */
     public function __construct(string $stream ='php://stdout')
     {
-        $this->stream = fopen($stream, 'w');
+        $this->stream = fopen($stream, 'r');
     }
     
     public function __destruct()
     {
         $this->close();
+    }
+
+
+    /**
+     * Sets the mode for output
+     *
+     * @param integer $mode
+     * @return void
+     */
+    public function mode(int $mode){
+        if(!in_array($mode,[self::RAW,self::PLAIN, self::COLOR])){
+            throw new InvalidArgumentException(sprintf('Invalid mode %s',$mode));
+        }
+        $this->mode = $mode;
     }
 
     /**
@@ -123,10 +153,28 @@ class ConsoleOutput
         if(is_array($data)){
             $data = implode("\n",$data);
         }
-        $data = $this->parseTags($data);
+        
+        if($this->mode === SELF::COLOR){
+            $data = $this->parseTags($data);
+        }
+        elseif($this->mode === SELF::PLAIN){
+            $tags = array_keys($this->styles);
+            $data = preg_replace('/<\/?(' . implode('|',$tags) . ')>/', '', $data);
+        }
+       
         if($newLine){
             $data .= "\n";
         }
+        return $this->fwrite($data);
+    }
+
+    /**
+     * Does the stuff
+     *
+     * @param string $data
+     * @return int bytes
+     */
+    protected function fwrite(string $data){
         fwrite($this->stream, $data);
         return strlen($data);
     }
@@ -150,9 +198,19 @@ class ConsoleOutput
     */
     public function parseTags($string)
     {
-        if (preg_match_all('/<([a-z0-9]+)>(.*?)<\/(\1)>/ims', $string, $matches)) {
+        $regex = '/<([a-z0-9]+)>(.*?)<\/(\1)>/ims';
+        if (preg_match_all($regex, $string, $matches)) {
+           
              foreach ($matches[1] as $key => $tag) {
                 $text = $matches[2][$key];
+               
+                # Handle Nested Colors, preserving previous colors
+               if(preg_match($regex,$text,$match)){
+                   $nestedText = "</{$tag}>{$match[0]}<{$tag}>" ;  // Wrap in parent tags (reverse)
+                   $string = str_replace($match[0], $nestedText,$string);
+                   $string = $this->parseTags($string);
+               }
+              
                 $string = str_replace("<{$tag}>{$text}</{$tag}>", $this->style($tag, $text), $string);
             }
         }
@@ -181,26 +239,30 @@ class ConsoleOutput
      * @return void
      */
     public function color(string $text,array $settings){
-      
-        $ansi = [];
+        $set = [];
+        $unset = [];
         if (isset($settings['color']) and isset($this->foregroundColors[$settings['color']])) {
-            $ansi[] = $this->foregroundColors[$settings['color']];
+            $set[] = $this->foregroundColors[$settings['color']];
+            $unset[] = 39;
         }
         if (isset($settings['background']) and isset($this->backgroundColors[$settings['background']])) {
-            $ansi[] = $this->backgroundColors[$settings['background']];
+            $set[] = $this->backgroundColors[$settings['background']];
+            $unset[] = 49;
         }
         unset($settings['color'], $settings['background']);
         foreach ($settings as $option => $value) {
             if ($value AND isset($this->options[$option])) {
-                $ansi[] = $this->options[$option];
+                $set[] = $this->options[$option];
+                $unset[] = $this->optionsUnset[$option];
             }
         }
-        if(empty($ansi)){
+        if(empty($set)){
             return $text;
         }
-        
-        return "\033[" . implode(';', $ansi) . 'm' . $text . "\033[0m";
+        return "\033[" . implode(';', $set) . 'm' . $text . "\033[" . implode(';', $unset) . 'm';
     }
+    
+ 
 
     /**
      * Sets or modifies existing styles
@@ -231,5 +293,4 @@ class ConsoleOutput
         $this->styles[$name] = $values;
         return true;
     }
-
 }

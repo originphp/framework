@@ -17,7 +17,7 @@ namespace Origin\Test\Console\Task;
 use Origin\Console\Shell;
 use Origin\Console\Task\Task;
 use Origin\Console\ConsoleInput;
-use Origin\Console\ConsoleOutput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockConsoleOutput extends ConsoleOutput
 {
@@ -48,7 +48,8 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $this->MockShell = new MockShell(new MockConsoleOutput('php://memory'), new ConsoleInput());
+        $this->ConsoleOutput = new ConsoleOutput();
+        $this->MockShell = new MockShell($this->ConsoleOutput, new ConsoleInput());
         $this->MockTask = new MockTask($this->MockShell);
     }
     public function testConstruct()
@@ -67,10 +68,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
     public function testOut()
     {
         $this->MockTask->out('Foo bar');
-
-        $stream = $this->MockTask->shell()->output->stream();
-        rewind($stream);
-        $this->assertEquals("Foo bar\n", stream_get_contents($stream));
+        $this->assertEquals("Foo bar\n", $this->ConsoleOutput->read());
     }
 
     public function testLoading()

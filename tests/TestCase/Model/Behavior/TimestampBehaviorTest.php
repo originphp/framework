@@ -16,9 +16,14 @@ namespace Origin\Test\Model;
 
 use Origin\Model\Behavior\TimestampBehavior;
 use Origin\Model\Model;
+use Origin\TestSuite\OriginTestCase;
 
-class TimestampBehaviorTest extends \PHPUnit\Framework\TestCase
+class TimestampBehaviorTest extends OriginTestCase
 {
+    public function initialize()
+    {
+        $this->loadFixture('Origin.Article');
+    }
     public function testBeforeSaveCreate()
     {
         $Article = new Model(['name' => 'Article','datasource'=>'test']);
