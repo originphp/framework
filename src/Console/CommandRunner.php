@@ -209,7 +209,10 @@ class CommandRunner
 
         ksort($commands);
         foreach ($commands as $group => $cmds) {
-            $out[] = '<heading>'.$group.'</heading>';
+            if($group){
+                $out[] = '<heading>'.$group.'</heading>';
+            }
+          
             foreach ($cmds as $cmd => $description) {
                 $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
                 $out[] = "<code>{$cmd}</code><text>{$description}</text>";

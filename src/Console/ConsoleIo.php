@@ -152,7 +152,7 @@ class ConsoleIo
     public function heading(string $heading,string $style ='heading')
     {
         $this->out("<{$style}>{$heading}</{$style}>");
-        $this->out("<{$style}>".str_repeat('=', strlen($heading))."</{$style}>");
+        $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
         $this->nl();
     }
 

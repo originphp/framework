@@ -20,7 +20,8 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 ### Added 
-- Generate Command
+- Console Commands
+- Generate, Db Commands
 - PostgreSQL support
 
 ### Changed

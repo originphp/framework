@@ -122,19 +122,31 @@ class GenerateCommandTest extends OriginTestCase
 
     public function testGenerateControllerWithActions()
     {
-        $this->exec('generate --force controller Dummies index action');
+        $this->exec('generate --force controller Dummies index get_user');
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Controller'.DS.'DummiesController.php';
         $this->assertOutputContains('src/Controller/DummiesController.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('8ba2c67426ed2014f687fd3c6fb4db86', $filename);
+        $this->assertFileHash('136dbf2be60889e47afd4602b26482a5', $filename);
+        unlink($filename);
+
+        $filename = SRC.DS.'View'.DS.'Dummies'.DS .'index.ctp';
+        $this->assertOutputContains('src/View/Dummies/index.ctp');
+        $this->assertTrue(file_exists($filename));
+        $this->assertFileHash('af90a7a0bfcd3a6ff30c0aac82c94c16', $filename);
+        unlink($filename);
+
+        $filename = SRC.DS.'View'.DS.'Dummies'.DS .'get_user.ctp';
+        $this->assertOutputContains('src/View/Dummies/get_user.ctp');
+        $this->assertTrue(file_exists($filename));
+        $this->assertFileHash('9263ed82c0e1859690365808dcd719b0', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Controller'.DS.'DummiesControllerTest.php';
         $this->assertOutputContains('tests/TestCase/Controller/DummiesControllerTest.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('5a026e1db91caf0caae236948ebdb64a', $filename);
+        $this->assertFileHash('9adf0228b86c271a6c4e625669c3d04e', $filename);
         unlink($filename);
     }
 
