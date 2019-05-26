@@ -19,6 +19,13 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- I18n class
+- Translation method and added plural support
+
+### Fixed 
+- bug with debug data output with when % is involed
+
 ### Removed
 - Dummy help data
 

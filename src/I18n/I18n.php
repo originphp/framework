@@ -14,7 +14,7 @@
 
 namespace Origin\I18n;
 use Origin\I18n\Exception\LocaleNotAvailableException;
-
+use Origin\Exception\Exception;
 use Locale;
 
 /**
@@ -68,12 +68,13 @@ class I18n
             return static::$locale;
         }
 
-        if(static::$locales AND !in_array($locale,static::$locales)){
+        if(static::$availableLocales AND !in_array($locale,static::$availableLocales)){
             throw new LocaleNotAvailableException($locale);
         }
 
-        set_locale(LC_ALL,$locale);
+        setlocale(LC_ALL,$locale);
         Locale::setDefault($locale); // PHP Intl Extension Friendly
+        static::language(Locale::getPrimaryLanguage($locale));
     }
 
     /**
@@ -86,7 +87,7 @@ class I18n
         if($language === null){
             return static::$language;
         }
-        static::$language = $language;
+          static::$language = $language;
         static::loadMessages($language);
     }
 
@@ -99,7 +100,7 @@ class I18n
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             return locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         }
-        return static::$defaultLocale;
+        return self::DEFAULT_LOCALE;
     }
 
     /**
@@ -127,35 +128,31 @@ class I18n
     {
         if (isset(static::$messages[$message])) {
             $message = static::$messages[$message];
-            // Handle plurals
-            if(strpos($message,'|') !== false AND isset($vars['%count%'])){
-                $messages = explode('|',$message);
-              
-                if($vars['%count%'] === 0){
-                    $message = $messages[0]; // 0 count
-                }
-                elseif((count($messages) == 2 AND $vars['%count%'] > 0) OR (count($messages) == 3 AND $vars['%count%'] === 1)){
-                    $message = $messages[1]; 
-                }
-                else{
-                    $message = $messages[2]; 
-                }
-                
-                if($vars['%count%'] > 1 AND count($message)==3){
-                    $message = $message[1];
-                }
-            }
-
-            $replace = [];
-            foreach ($replace as $key => $value) {
-                if (!is_array($value) and !is_object($value)) {
-                    $replace['%'. $key . '%'] = $value;
-                }
-            }
-
-            return strtr($message,$replace);
         }
-        return $message;
+
+        // Handle plurals
+        if(strpos($message,'|') !== false AND isset($vars['count'])){
+            $messages = explode('|',$message);
+     
+            if($vars['count'] === 0){
+                $message = $messages[0]; // 0 count
+            }
+            elseif((count($messages) === 2 AND $vars['count'] > 0) OR (count($messages) === 3 AND $vars['count'] === 1)){
+                $message = $messages[1]; 
+            }
+            else{
+                $message = $messages[2]; 
+            }
+        }         
+
+        $replace = [];
+        foreach ($vars as $key => $value) {
+            if (!is_array($value) and !is_object($value)) {
+                $replace['%'. $key . '%'] = $value;
+            }
+        }
+
+        return strtr($message,$replace);
     }
     /**
      * Loads the message file for
@@ -165,16 +162,21 @@ class I18n
      */
     protected static function loadMessages(string $language)
     {
-        $filename = SRC  . DS . 'Messages' . DS . $language . '.php';
-
+        $filename = SRC  . DS . 'Locale' . DS . $language . '.php';
+      
         if (file_exists($filename)) {
             $messages = include $filename;
 
-            if (is_array($messages)) {
-                static::$messages = $messages;
+            if (!is_array($messages)) {
+               
+                throw new Exception("{$language}.php does not return an array");
             }
-            throw new Exception("{$language}.php does not return an array");
+            
+            static::$messages = $messages;
+            
         }
         return false;
     }
 }
+
+I18n::locale(I18n::DEFAULT_LOCALE);

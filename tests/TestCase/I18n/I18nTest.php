@@ -26,20 +26,6 @@ class MockI18n extends I18n
 
 class I18nTest extends \PHPUnit\Framework\TestCase
 {
-    public function testInitialize()
-    {
-        MockI18n::initialize(['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']);
-        $config = MockI18n::config();
-        $expected = ['locale' => 'en_GB', 'language' => 'en','timezone' => 'Europe/London','currency' => 'GBP'];
-        $this->assertEquals($expected, $config);
-        MockI18n::reset();
-
-        MockI18n::initialize();
-        $config = MockI18n::config();
-        $expected = ['locale' => 'en_US', 'language' => 'en','timezone' => 'Etc/UTC','currency' => 'USD'];
-        $this->assertEquals($expected, $config);
-        MockI18n::reset();
-    }
 
     public function testDetectLocale()
     {
@@ -50,48 +36,9 @@ class I18nTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('en_US', MockI18n::detectLocale());
     }
 
-    public function testDefaultTimezone()
-    {
-        $this->assertEquals('Etc/UTC', MockI18n::defaultTimezone());
-    }
-
-    public function testDefaultLocale()
-    {
-        $this->assertEquals('en_US', MockI18n::defaultLocale());
-    }
-
-    public function testLanguage()
-    {
-        $this->assertEquals('en', MockI18n::language('en_GB'));
-    }
-
-    public function testGetLocales()
-    {
-        $locales = MockI18n::getLocales();
-        $this->assertEquals('en_GB', $locales[159]); // check one
-    }
-
-    public function testLocales()
-    {
-        MockI18n::config(['language'=>'en']);
-        $locales = MockI18n::locales();
-        $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // check one
-    }
-
-    public function testTimezones()
-    {
-        $timezones = MockI18n::timezones();
-        $this->assertEquals('GMT -07:00 - America/Los Angeles', $timezones['America/Los_Angeles']);
-    }
-
-    public function testTranslate()
-    {
-        MockI18n::initialize(['language' => 'es']);
-        $this->assertEquals('Esto es una prueba.', MockI18n::translate('This is a test.'));
-    }
 
     public function tearDown()
     {
-        MockI18n::initialize();
+   
     }
 }

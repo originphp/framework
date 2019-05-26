@@ -75,7 +75,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $io->heading('My Heading');
         $expected = [
             '<heading>My Heading</heading>',
-            '<heading>==========</heading>',
+            '<heading>----------</heading>',
             "\n"
         ];
 

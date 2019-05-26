@@ -38,11 +38,19 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $translate = __($expected); // no translation return as is
         $this->assertEquals('Nothing', $translate);
 
-        $translated = __('Your password is %s!', 'secret');
+        $translated = __('Your password is %password%!', ['password'=>'secret']);
         $this->assertEquals('Your password is secret!', $translated);
         
-        $translated = __('Your username is %email% and your password is %password%.', ['%email%'=>'jimbo@example.com', '%password%'=>'secret']);
+        $translated = __('Your username is %email% and your password is %password%.', [
+            'email'=>'jimbo@example.com',
+            'password'=>'secret'
+            ]);
         $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
+        $translate = 'You have no apples|You have one apple|You have %count% apples';
+        $this->assertEquals('You have no apples',__($translate,['count'=>0]));
+        $this->assertEquals('You have one apple',__($translate,['count'=>1]));
+        $this->assertEquals('You have 2 apples',__($translate,['count'=>2]));
+
     }
     public function testH()
     {

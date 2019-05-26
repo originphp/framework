@@ -22,11 +22,6 @@ class AppController extends Controller
         $this->loadHelper('Number');
         $this->loadHelper('Date');
 
-        /*
-         * Start I18n. This will autodetect locale and settings if you do not pass array
-         * with settings. e.g ['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']
-         */
-        I18n::initialize();
     }
 
     /**
