@@ -48,7 +48,7 @@ class Number
     }
 
     /**
-     * Sets the locale to be used
+     * Sets the locale to be used by this Number utility regardless of PHP locale setting.
      *
      * @param string $locale en_US en_GB etc
      */

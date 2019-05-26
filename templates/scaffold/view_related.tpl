@@ -18,7 +18,7 @@
             <td class="actions">
                 <?= $this->Html->link(__('Edit'), ['controller' => '%controller%', 'action' => 'edit', $%singularName%->id]) ?>
                 |
-                <?= $this->Form->postLink(__('Del'), ['controller' => '%controller%', 'action' => 'delete', $%singularName%->id], ['confirm' => __('Are you sure you want to delete # %d?', $%singularName%->%primaryKey%)]) ?>
+                <?= $this->Form->postLink(__('Del'), ['controller' => '%controller%', 'action' => 'delete', $%singularName%->id], ['confirm' => __('Are you sure you want to delete # %id%?', ['id'=>$%singularName%->%primaryKey%])]) ?>
             </td>
         </tr>
         <?php endforeach; ?>

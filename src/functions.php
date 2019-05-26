@@ -143,14 +143,10 @@ function commandSplit(string $command)
  * @param mixed arg1 arg2
  * @return string formatted
  */
-function __(string $string = null)
+function __(string $string = null,array $vars = [])
 {
     if ($string) {
-        $string = I18n::translate($string);
-
-        $arguments = array_slice(func_get_args(), 1);
-    
-        return vsprintf($string, $arguments);
+        return I18n::translate($string,$vars);
     }
     return null;
 }

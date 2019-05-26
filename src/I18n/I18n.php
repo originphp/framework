@@ -13,196 +13,147 @@
  */
 
 namespace Origin\I18n;
+use Origin\I18n\Exception\LocaleNotAvailableException;
 
-/*
-         * I18n (Numbers,Dates, Translation etc)- set this in AppController::initialize
-         *
-         * Autodetect locale and language from browser:
-         *
-         * I18n::initialize();
-         *
-         * To manually set:
-         *
-         * I18n::initialize(['locale' => 'en_GB','language'=>'en','timezone'=>'Europe/London']);
-         *
-         * Set for a logged in user
-         *
-         * if($this->Auth->isLoggedIn()){
-         *   I18n::initialize(
-         *      'locale' => $this->Auth->user('locale'),
-         *      'language' => $this->Auth->user('language'),
-         *      'timezone' => $this->Auth->user('timezone'),
-         *      );
-         * }
-         * else{
-         * I18n::initialize()
-         * }
-         *
-         * OR just call ;
-         */
-use Origin\I18n\Date;
-use Origin\I18n\Number;
-use NumberFormatter;
-use IntlTimeZone;
 use Locale;
-use ResourceBundle;
-use Origin\Core\StaticConfigTrait;
-use Origin\Exception\Exception;
+
+/**
+ * Removed Intl support due to number of issues ranging from bugs (getting info, parsing dates properly) or 
+ * impcomplete features (E.g. date picker support)
+ */
 
 class I18n
 {
-    use StaticConfigTrait;
+   
     /**
-     * Holds the messages
+     * The default locale to be used
+     *
+     * @var string
+     */
+    const DEFAULT_LOCALE = 'en_US';
+
+    /**
+     * Holds the locale to be used
+     *
+     * @var string
+     */
+    protected static $locale = null;
+
+    /**
+     * A whitelist of available locales
+     *
+     * @var array
+     */
+    protected static $availableLocales = [];
+
+
+    protected static $language = 'en';
+
+    /**
+     * Holds the messages for translation
      *
      * @var array
      */
     protected static $messages = [];
-    
+
     /**
-     * Initializes and configures I18N - use this configure or reconfigure
-     * - Dates set locale and timezone
-     * - Numbers sets locale and currency.
-     * - sets language
-     * @param array $config (locale,language,timezone,currency)
+     * Sets and gets the locale
+     *
+     * @param string $locale
+     * @return string|void
      */
-    public static function initialize(array $config = [])
-    {
-        if (!isset($config['locale'])) {
-            $config['locale'] = static::detectLocale();
+    public static function locale(string $locale=null){
+
+        if($locale === null){
+            return static::$locale;
         }
 
-        setlocale(LC_ALL, $config['locale']);
-        Locale::setDefault($config['locale']);
-
-        if (!isset($config['language'])) {
-            $config['language'] = static::language($config['locale']);
-        }
-        
-        $messages = static::loadMessages($config['language']);
-        if ($messages) {
-            static::$messages = $messages;
+        if(static::$locales AND !in_array($locale,static::$locales)){
+            throw new LocaleNotAvailableException($locale);
         }
 
-        if (!isset($config['timezone'])) {
-            $timezone = IntlTimeZone::createDefault();
-            $config['timezone'] = $timezone->getId();
-        }
-        
-        if (!isset($config['currency'])) {
-            $formatter = new NumberFormatter($config['locale'], NumberFormatter::CURRENCY);
-            $config['currency'] = $formatter->getTextAttribute(NumberFormatter::CURRENCY_CODE);
-        }
-
-        Date::initialize($config);
-        Number::initialize($config);
-        
-        static::config($config);
+        set_locale(LC_ALL,$locale);
+        Locale::setDefault($locale); // PHP Intl Extension Friendly
     }
 
     /**
-     * Attempts to detect the locale
+     * Sets or gets the language
+     *
+     * @param string $language
+     * @return void
+     */
+    public static function language(string $language = null){
+        if($language === null){
+            return static::$language;
+        }
+        static::$language = $language;
+        static::loadMessages($language);
+    }
+
+    /**
+     * Detects the locale from the accept language
      *
      * @return string
      */
-    public static function detectLocale()
-    {
+    public static function detectLocale(){
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             return locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         }
-        return 'en_US';
+        return static::$defaultLocale;
     }
 
     /**
-     * Returns the default timezone
+     * Sets and gets the available locales. Only use this if you want to limit locales which
+     * can be used. This forms a whitelist
      *
-     * @return string timezone
+     * @param array $locales ['en','es']
+     * @return array|void
      */
-    public static function defaultTimezone()
-    {
-        $timezone = IntlTimeZone::createDefault();
-        return $timezone->getId();
-    }
-    /**
-     * Returns the default locale
-     *
-     * @return string locale
-     */
-    public static function defaultLocale()
-    {
-        return Locale::getDefault();
-    }
-
-    /**
-     * Gets the langauge from the locale provided.
-     *
-     * @param string $locale
-     */
-    public static function language(string $locale)
-    {
-        return Locale::getPrimaryLanguage($locale);
-    }
-
-    /**
-     * Returns a numerical array of locales supported by the
-     * PHP INT extension.
-     */
-    public static function getLocales()
-    {
-        return ResourceBundle::getLocales('');
-    }
-
-    /**
-     * Returns a list of locale with display name in the current language
-     * if language is not set. Use this for a picklist in your app for locale selection.
-     *
-     * @example [[en_GB] => English (United Kingdom)]
-     *
-     * @param string $language
-     */
-    public static function locales(string $language = null)
-    {
-        $list = [];
-        if ($language === null) {
-            $language = static::getConfig('language', 'en');
+    public static function availableLocales(array $locales = null){
+        if($locales === null){
+            return static::$availableLocales;
         }
-        $locales = self::getLocales(); //locale_get_display_region($locale, 'es');
-        foreach ($locales as $locale) {
-            $list[$locale] = locale_get_display_name($locale, $language);
-        }
-
-        return $list;
+        static::$availableLocales = $locales;
     }
 
     /**
-     * Returns a list of timezones in English.
+     * Translates a string.
+     * For plurals, you need to use %count% 
      *
-     * @todo IntlTimeZone::getDisplayName
+     * @param string $message  'Hello %name% all went well', 'There are no apples|There are %count% apples'
+     * @return string
      */
-    public static function timezones()
-    {
-        $list = array();
-        $timestamp = time();
-        $originalTimeZone = date_default_timezone_get();
-        foreach (timezone_identifiers_list() as $key => $zone) {
-            date_default_timezone_set($zone);
-            $list[$zone] = 'GMT '.date('P', $timestamp).' - '. str_replace('_', ' ', $zone);
-        }
-        date_default_timezone_set($originalTimeZone);
-
-        return $list;
-    }
-
-    /**
-     * Translates a string
-     *
-     * @param string $message
-     * @return void
-     */
-    public static function translate(string $message)
+    public static function translate(string $message,array $vars=[])
     {
         if (isset(static::$messages[$message])) {
-            return static::$messages[$message];
+            $message = static::$messages[$message];
+            // Handle plurals
+            if(strpos($message,'|') !== false AND isset($vars['%count%'])){
+                $messages = explode('|',$message);
+              
+                if($vars['%count%'] === 0){
+                    $message = $messages[0]; // 0 count
+                }
+                elseif((count($messages) == 2 AND $vars['%count%'] > 0) OR (count($messages) == 3 AND $vars['%count%'] === 1)){
+                    $message = $messages[1]; 
+                }
+                else{
+                    $message = $messages[2]; 
+                }
+                
+                if($vars['%count%'] > 1 AND count($message)==3){
+                    $message = $message[1];
+                }
+            }
+
+            $replace = [];
+            foreach ($replace as $key => $value) {
+                if (!is_array($value) and !is_object($value)) {
+                    $replace['%'. $key . '%'] = $value;
+                }
+            }
+
+            return strtr($message,$replace);
         }
         return $message;
     }
@@ -215,12 +166,12 @@ class I18n
     protected static function loadMessages(string $language)
     {
         $filename = SRC  . DS . 'Messages' . DS . $language . '.php';
-       
+
         if (file_exists($filename)) {
             $messages = include $filename;
 
             if (is_array($messages)) {
-                return $messages;
+                static::$messages = $messages;
             }
             throw new Exception("{$language}.php does not return an array");
         }

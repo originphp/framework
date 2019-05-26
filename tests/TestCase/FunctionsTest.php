@@ -41,7 +41,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $translated = __('Your password is %s!', 'secret');
         $this->assertEquals('Your password is secret!', $translated);
         
-        $translated = __('Your username is %s and your password is %s.', 'jimbo@example.com', 'secret');
+        $translated = __('Your username is %email% and your password is %password%.', ['%email%'=>'jimbo@example.com', '%password%'=>'secret']);
         $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
     }
     public function testH()
