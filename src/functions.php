@@ -57,12 +57,12 @@ function debug($data, bool $isHtml = false)
         
         if (PHP_SAPI === 'cli') {
             $where = "{$filename} Line: {$line}";
-            $template =  sprintf("\n# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n\n", $where, $data);
+            $template =  sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
         } else {
             $where = "<p><strong>{$filename}</strong> Line: <strong>{$line}</strong></p>";
             $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
         }
-        printf($template);
+        printf("\n%s\n",$template); // allow to work with %s
     }
 }
 
