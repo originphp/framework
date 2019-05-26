@@ -21,10 +21,7 @@ class DbCreateCommand extends Command
 {
     protected $name = 'db:create';
     protected $description = 'Creates the database for the datasource';
-    protected $epilog = 'abc';
-
-    protected $help = 'SOme additional Help text';
-  
+    
     public function initialize(){
         $this->addOption('datasource', [
             'description'=>'Use a different datasource','short'=>'ds','default'=>'default'

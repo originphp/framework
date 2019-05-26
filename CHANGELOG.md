@@ -19,6 +19,8 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Removed
+- Dummy help data
 
 ## [1.3.1] - 2019-05-25
 ### Fixed
