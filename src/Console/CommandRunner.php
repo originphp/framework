@@ -92,6 +92,9 @@ class CommandRunner
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
 
+            if(!class_exists($class)){
+                throw new ConsoleException(sprintf('%s does not exist or cannot be found',$class));
+            }
             $object = new $class();
             $name = $object->name();
             $description = $object->description();
@@ -155,11 +158,14 @@ class CommandRunner
         $namespace = Configure::read('App.namespace');
         $className = $namespace.'\\Command\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
 
-        if (class_exists($className)) {
-            $object = new $className($this->io);
-            if ($object->name() === $command) {
-                return $object;
-            }
+
+        if(!class_exists($className)){
+            throw new ConsoleException(sprintf('%s does not exist or cannot be found',$className));
+        }
+
+        $object = new $className($this->io);
+        if ($object->name() === $command) {
+            return $object;
         }
 
         $this->autoDiscover();
@@ -178,9 +184,13 @@ class CommandRunner
     {
         $results = [];
         foreach ($this->discovered as $command) {
+            
             $class = $command['namespace'].'\\'.$command['className'];
-            $object = new $class();
-            $results[$object->name()] = $class;
+            if(class_exists($class)){
+                $object = new $class();
+                $results[$object->name()] = $class;
+            }
+          
         }
 
         return $results;
