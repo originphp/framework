@@ -62,15 +62,6 @@ class I18n
      */
     protected static $messages = null;
 
-    public static function initialize(array $config = [])
-    {
-        $config += ['locale' => static::$defaulLocale,'language'=>null,'timezone'=>null];
-        static::locale($config['locale']);
-        if($config['language']){
-            static::language($config['language']); // after locale which sets the language
-        }
-    }
-
     /**
      * Sets and gets the locale.
      *
@@ -90,9 +81,7 @@ class I18n
 
         setlocale(LC_ALL, $locale);
         Locale::setDefault($locale); // PHP Intl Extension Friendly
-
-        $localeFile = ORIGIN 
-
+        //@todo load locale from files if exists.
         static::language(Locale::getPrimaryLanguage($locale));
     }
 
@@ -199,7 +188,7 @@ class I18n
         $replace = [];
         foreach ($vars as $key => $value) {
             if (!is_array($value) and !is_object($value)) {
-                $replace['%'.$key.'%'] = $value;
+                $replace['{'.$key.'}'] = $value;
             }
         }
 

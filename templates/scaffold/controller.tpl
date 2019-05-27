@@ -74,7 +74,7 @@ class %controller%Controller extends AppController
         $%singularName% = $this->%model%->get($id);
 
         if ($this->%model%->delete($%singularName%)) {
-            $this->Flash->success(__('The %singularHumanLower% %id% has been deleted.', ['id'=>$%singularName%->id]));
+            $this->Flash->success(__('The %singularHumanLower% {id} has been deleted.', ['id'=>$%singularName%->id]));
         } else {
             $this->Flash->error(__('The %singularHumanLower% could not be deleted.'));
         }
