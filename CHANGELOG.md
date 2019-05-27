@@ -19,14 +19,20 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.4.0] - 2019-05-27
+
 ### Added
+- Translation method and added plural support
 - I18n locales generator command
 
 ### Changed
+- I18n Date/Number setter/getters setCurrency,setLocale etc to defaultCurrency, locale
+- Translation function __ now uses {placeholder} instead of sprintf
+- Renamed number helper and utility decimal method to precision.
 - I18n class
-- Translation method and added plural support
 
 ### Fixed 
+- Fixed Yaml parsing issue with null values
 - consoleio progress bar jitter fix
 - scaffolding bug fix
 - bug with debug data output with when % is involed
