@@ -340,7 +340,7 @@ class YamlParser
      */
     protected function isScalar(string $line) :bool
     {
-        return (strpos(trim($line), ': ') !== false);
+        return (strpos($line, ': ') !== false);
     }
 
     /**
@@ -419,8 +419,6 @@ class Yaml
         $output = '';
         $line = 0;
         foreach ($array as $key => $value) {
-            if ($key === 'skills') {
-            }
             if (is_array($value)) {
                 if (is_int($key)) {
                     $output .= self::dump($value, $indent, true);

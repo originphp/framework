@@ -49,8 +49,8 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
     }
     public function testDecimal()
     {
-        $this->assertSame('234,567,890.01', $this->Intl->decimal(234567890.0123));
-        $this->assertSame('100', $this->Intl->decimal(100)); // This is different behavior than wanted. Should be .00
+        $this->assertSame('234,567,890.01', $this->Intl->precision(234567890.0123));
+        $this->assertSame('100', $this->Intl->precision(100)); // This is different behavior than wanted. Should be .00
     }
     public function testPercent()
     {

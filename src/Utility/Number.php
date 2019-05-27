@@ -67,7 +67,11 @@ class Number
 
     /**
      * Sets and gets the locale array
-     * @param array $locale
+     * @param array $locale accepts the following keys
+     *  - currency: The ISO currency code e.g. USD, GBP
+     *  - thousands: the thousands seperator
+     *  - decimnals: the decimals seperator
+     *  - places: the default number of places
      * @return array|null
      */
     public static function locale(array $locale = null)
@@ -104,7 +108,7 @@ class Number
      * @param integer $precision
      * @return string
      */
-    public static function decimal($value, int $precision = 2)
+    public static function precision($value, int $precision = 2)
     {
         $value = sprintf("%01.{$precision}f", $value);
         return static::format($value, ['places'=>$precision]);
@@ -124,7 +128,7 @@ class Number
         if ($options['multiply']) {
             $value *= 100;
         }
-        return static::decimal($value, $precision) . '%';
+        return static::precision($value, $precision) . '%';
     }
     /**
      * Formats a number

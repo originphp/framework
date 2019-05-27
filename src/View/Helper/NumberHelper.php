@@ -49,18 +49,18 @@ class NumberHelper extends Helper
         return Number::percent($value, $precision, $options);
     }
     /**
-    * Formats a decimal number
+    * Formats a number with a specified level of precision
     *
-    *  $number->decimal(1024.10101010,4); // 1,024.1010
+    *  $number->precision(1024.10101010,4); // 1,024.1010
     *
     * @param string|float $value 1234567.43
     * @param string $precision max number of decimal places to show
     * @param array $options before,after,places,thousands,decimails
     * @return string
     */
-    public function decimal($value, int $precision = 2, $options = [])
+    public function precision($value, int $precision = 2, $options = [])
     {
-        return Number::decimal($value, $precision, $options);
+        return Number::precision($value, $precision, $options);
     }
     /**
      * Formats a number

@@ -155,17 +155,14 @@ class CommandRunner
      */
     public function findCommand(string $command)
     {
+        # Use Conventions - Faster
         $namespace = Configure::read('App.namespace');
         $className = $namespace.'\\Command\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
-
-
-        if(!class_exists($className)){
-            throw new ConsoleException(sprintf('%s does not exist or cannot be found',$className));
-        }
-
-        $object = new $className($this->io);
-        if ($object->name() === $command) {
-            return $object;
+        if(class_exists($className)){
+            $object = new $className($this->io);
+            if ($object->name() === $command) {
+                return $object;
+            }
         }
 
         $this->autoDiscover();

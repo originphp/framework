@@ -48,35 +48,31 @@ class Date
      */
     protected static $timeFormat = [IntlDateFormatter::NONE, IntlDateFormatter::SHORT];
 
-    /**
-     * Intializes the date Object.
-     *
-     * @param array $config locale|timezone
-     */
-    public static function initialize(array $config = [])
+   /**
+    * Sets or gets the locale
+    *
+    * @param string $locale
+    * @return string|void
+    */
+    public static function locale(string $locale = null)
     {
-        if (isset($config['locale'])) {
-            self::setLocale($config['locale']);
+        if($locale === null){
+            return self::$locale;
         }
-        $timezone = date_default_timezone_get();
-        if (isset($config['timezone'])) {
-            $timezone = $config['timezone'];
-        }
-        self::setTimezone($timezone);
-    }
-
-    /**
-     * Sets the locale.
-     *
-     * @param string $locale
-     */
-    public static function setLocale(string $locale)
-    {
         self::$locale = $locale;
     }
 
-    public static function setTimezone(string $timezone)
+    /**
+     * Sets or gets the timezone
+     *
+     * @param string $timezone
+     * @return string|void
+     */
+    public static function timezone(string $timezone=null)
     {
+        if($timezone === null){
+           return self::$timezone;
+        }
         self::$timezone = $timezone;
     }
 
@@ -186,7 +182,6 @@ class Date
      *
      * @param string            $dateString
      * @param null|string|array $format
-     *
      * @return null|dateString strtotime() valid string
      */
     public static function parse(string $dateString, $format = null)

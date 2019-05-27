@@ -25,7 +25,7 @@ use Origin\Utility\Yaml;
 class LocalesGeneratorCommand extends Command
 {
     protected $name = 'locales:generator';
-    protected $description = 'Generates the Locales configuration files';
+    protected $description = 'Generates the Locales defintion files';
 
     protected $dateMap = [
         'MMMM' => 'F',
@@ -51,37 +51,57 @@ class LocalesGeneratorCommand extends Command
         'hh' => 'h',
         'h' => 'g',
         'a' => 'a', // am pm
-        'mm' => 'i',
-
+        'mm' => 'i'
     ];
 
     public function initialize()
     {
         $this->addOption('expected',['description'=>'Adds the expected information','type'=>'boolean']);
+        $this->addOption('single-file',['description'=>'Put all definitions in a single file','type'=>'boolean']);
     }
     public function execute()
     {
         $types = [];
         $locales = ResourceBundle::getLocales('');
 
+        $path = ROOT . DS  .'locales';
+
+        if(file_exists($path)){
+            $this->io->warning('Locales defintions found in ' . $path);
+            if($this->io->askChoice('Do you want to continue?',['y','n'],'n') === 'no'){
+                $this->exit();
+            }
+        }
+
+        if(!file_Exists($path )){
+            mkdir($path);
+        }
+
         $results = [];
         $max = count($locales)-1;
-        $this->info('Generating locale configuration');
+        $this->info('Generating locales definitions');
         $i=0;
         //@todo where to put this. Should be part of source code, but cant add to vendor
         foreach ($locales as $locale) {
             $result = $this->parseLocale($locale);
-            $filename = ORIGIN . DS . 'src' . DS . 'I18n'. DS. 'Locale' . DS .$locale.'.yaml';
-            $this->io->createFile($filename,Yaml::fromArray($result),true);
+            $results[$locale] = $result;
+            if($this->options('single-file') === false){
+                $this->io->createFile($path . DS .$locale.'.yml',Yaml::fromArray($result),true);
+            }
+           
             if($i === 0 OR $i === $max OR $i % 2 === 0){
                 $this->io->progressBar($i,$max);
             }
+            
             $i++;
             
         }
-        $this->io->success('Generated!!');
-        
-        $this->io->createFile( ORIGIN . DS . 'src' . DS . 'I18n' . DS . 'locales.yaml',Yaml::fromArray($results),true);
+    
+        if($this->options('single-file')){
+            $this->io->createFile( $path . DS . 'locales.yml',Yaml::fromArray($results),true);
+        }
+
+        $this->io->success(sprintf('Generated %d locale defintions',count($results)));
     }
 
     /**
@@ -127,22 +147,23 @@ class LocalesGeneratorCommand extends Command
          $expected['currency'] = $fmt->format(1234567.890);
 
          //http://userguide.icu-project.org/formatparse/datetime
-        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, 'Europe/London', IntlDateFormatter::GREGORIAN);
+        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
     
         $config['date'] = $this->convertDate($fmt->getPattern());
         $expected['date'] = $fmt->format(new DateTime());
         
-        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, 'Europe/London', IntlDateFormatter::GREGORIAN);
+        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
         $config['time'] =  $this->convertTime($fmt->getPattern());
         $expected['time'] = $fmt->format(new DateTime());
         
-        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, 'Europe/London', IntlDateFormatter::GREGORIAN);
+        $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
         $config['datetime'] =  $this->convertDatetime($fmt->getPattern());
 
         $expected['datetime'] = $fmt->format(new DateTime());
         if($this->options('expected')){
             $config['expected'] = $config['expected'];
         }
+        
         return $config;
     }
 

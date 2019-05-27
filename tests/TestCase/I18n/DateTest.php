@@ -23,18 +23,18 @@ class DateTest extends \PHPUnit\Framework\TestCase
     public function testFormat()
     {
         // Test Locale Switching
-        Date::setLocale('fr_FR');
+        Date::locale('fr_FR');
         $this->assertEquals('27/12/2018 13:02', Date::format('2018-12-27 13:02:00'));
 
-        Date::setLocale('ko_KR');
+        Date::locale('ko_KR');
         $this->assertEquals('18. 12. 27. 오후 1:02', Date::format('2018-12-27 13:02:00'));
 
         // Test Timezone
-        Date::setTimezone('America/Los_Angeles');
-        Date::setLocale('en_US');
+        Date::timezone('America/Los_Angeles');
+        Date::locale('en_US');
         $this->assertEquals('12/27/18, 5:02 AM', Date::format('2018-12-27 13:02:00'));
 
-        Date::setTimezone('UTC');
+        Date::timezone('UTC');
 
         // Test Formatting
         $this->assertEquals('12/27/18, 1:02 PM', Date::format('2018-12-27 13:02:00', null));
@@ -83,17 +83,17 @@ class DateTest extends \PHPUnit\Framework\TestCase
 
     public function testParse()
     {
-        Date::setLocale('en_US');
-        Date::setTimezone('America/Los_Angeles');
+        Date::locale('en_US');
+        Date::timezone('America/Los_Angeles');
 
         $this->assertEquals('2018-12-27 21:02:00', Date::parse('12/27/18, 1:02 PM'));
 
-        Date::setLocale('en_GB');
-        Date::setTimezone('Europe/London');
+        Date::locale('en_GB');
+        Date::timezone('Europe/London');
         $this->assertEquals('2019-03-18 18:54:00', Date::parse('18/03/2019, 18:54 PM'));
         
-        Date::setLocale('en_US');
-        Date::setTimezone('UTC');
+        Date::locale('en_US');
+        Date::timezone('UTC');
         
         $this->assertEquals(
             '2018-12-27 15:00:00',
@@ -135,15 +135,15 @@ class DateTest extends \PHPUnit\Framework\TestCase
     }
     public function testFormatDateTime()
     {
-        Date::setLocale('en_US');
-        Date::setTimezone('Europe/Madrid');
+        Date::locale('en_US');
+        Date::timezone('Europe/Madrid');
         $this->assertEquals('2/24/19, 10:00 PM', Date::formatDateTime('2019-02-24 21:00'));
     }
     public function testFormatTime()
     {
-        Date::setTimezone('Asia/Dubai'); // No daylight saving time
+        Date::timezone('Asia/Dubai'); // No daylight saving time
         $this->assertEquals('1:00 AM', Date::formatTime('2019-02-24 21:00'));
         $this->assertEquals('1:00 AM', Date::formatTime('21:00'));
-        Date::setTimezone('UTC');
+        Date::timezone('UTC');
     }
 }

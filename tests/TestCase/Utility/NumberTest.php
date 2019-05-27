@@ -28,9 +28,9 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     }
     public function testPrecision()
     {
-        $this->assertEquals('100.00', Number::decimal(100));
-        $this->assertEquals('123,456,789.12', Number::decimal(123456789.12345678910));
-        $this->assertEquals('123,456,789.1231', Number::decimal(123456789.123123123, 4));
+        $this->assertEquals('100.00', Number::precision(100));
+        $this->assertEquals('123,456,789.12', Number::precision(123456789.12345678910));
+        $this->assertEquals('123,456,789.1231', Number::precision(123456789.123123123, 4));
     }
     public function testPercentage()
     {

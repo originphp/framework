@@ -33,37 +33,25 @@ class Number
     protected static $currency = 'USD';
 
     /**
-     * Intializes the date Object.
-     *
-     * @param array $config locale|timezone
-     */
-    public static function initialize(array $config = [])
-    {
-        if (isset($config['locale'])) {
-            self::setLocale($config['locale']);
-        }
-        if (isset($config['currency'])) {
-            self::setCurrency($config['currency']);
-        }
-    }
-
-    /**
      * Sets the locale to be used by this Number utility regardless of PHP locale setting.
      *
      * @param string $locale en_US en_GB etc
      */
-    public static function setLocale(string $locale)
+    public static function locale(string $locale)
     {
         self::$locale = $locale;
     }
 
     /**
-     * Sets the default currency.
+     * Sets/gets the default currency.
      *
      * @param string $locale EUR|USD|GBP
      */
-    public static function setCurrency(string $currency)
+    public static function defaultCurrency(string $currency = null)
     {
+        if($currency === null){
+            return self::$currency;
+        }
         self::$currency = $currency;
     }
 
@@ -112,7 +100,7 @@ class Number
      *
      * @return string 1234.56
      */
-    public static function decimal(float $value, int $precision = 2, array $options = [])
+    public static function precision(float $value, int $precision = 2, array $options = [])
     {
         return static::format($value, ['precision' => $precision] + $options);
     }
@@ -147,8 +135,8 @@ class Number
      *
      * @example 123,456,789.25 -> 123456789.25
      * @param string $string
-     * @param integer $format  NumberFormatter::DECIMAL, NumberFormatter::INT_32
-     * @return string
+     * @param integer $format  NumberFormatter::DECIMAL,NumberFormatter::CURRENCY,NumberFormatter::INT_32
+     * @return int|double
      */
 
     public static function parse(string $string, $type = NumberFormatter::DECIMAL)
@@ -157,6 +145,8 @@ class Number
         return $formatter->parse($string);
     }
 
+    /*
+    Parse seems to work fine. Not as intented.
     public static function parseDecimal(string $string)
     {
         return static::parse($string, NumberFormatter::DECIMAL);
@@ -166,6 +156,7 @@ class Number
     {
         return static::parse($string, NumberFormatter::TYPE_INT32);
     }
+    */
 
     /**
      * Creates a NumberFormatter object and sets the attributes.

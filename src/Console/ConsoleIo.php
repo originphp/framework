@@ -118,7 +118,6 @@ class ConsoleIo
         if(is_array($message)){
             $message = implode("\n",$message);
         }
-        pr($this->lastWrittenLength);
        $this->stdout->write("\033[{$this->lastWrittenLength}D",false);
     
        $difference = strlen($message) - $this->lastWrittenLength;

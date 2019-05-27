@@ -17,6 +17,7 @@ namespace Origin\I18n;
 use Origin\I18n\Exception\LocaleNotAvailableException;
 use Origin\Exception\Exception;
 use Locale;
+use Origin\Utility\Yaml;
 
 /**
  * Removed Intl support due to number of issues ranging from bugs (parsing dates properly) or
@@ -62,6 +63,38 @@ class I18n
      */
     protected static $messages = null;
 
+ 
+    public static function initialize(array $config = []){
+        $config += ['locale'=>static::defaultLocale(),'language'=>null,'timezone'=>'UTC'];
+        static::locale($config['locale']);
+        if($config['language'] === null){
+            $config['language'] = Locale::getPrimaryLanguage($config['locale']);
+        }
+        
+        // Configure Date Timezone
+        \Origin\Utility\Date::locale(['timezone'=>$config['timezone']]);
+
+        // Load Locale information from /locales if available
+        if(file_exists(ROOT . DS . 'locales' . DS . $config['locale'] .'.yml')){
+            $locale = Yaml::toArray(file_get_contents(ROOT . DS . 'locales' . DS . $config['locale'] .'.yml'));
+            extract( $locale);
+            \Origin\Utility\Date::locale(['timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime]);
+
+            if($currency){
+                \Origin\Utility\Number::addCurrency($currency,['before'=>$before,'after'=>$after]);
+            }
+            else{
+                unset($locale['currency']);
+            }
+            unset($locale['before'],$locale['after']);
+            \Origin\Utility\Number::locale($locale);
+        }
+
+        // Configure Intl Utilities
+        \Origin\I18n\Date::locale($config['locale']);
+        \Origin\I18n\Date::timezone($config['timezone']);
+    }
+    
     /**
      * Sets and gets the locale.
      *
@@ -128,7 +161,7 @@ class I18n
     public static function detectLocale()
     {
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            return locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         }
 
         return self::DEFAULT_LOCALE;
@@ -173,17 +206,14 @@ class I18n
             $messages = explode('|', $message);
 
             if (count($messages) === 2) {
-                array_unshift($messages, $messages[1]); // If zero not set use other.
+                array_unshift($messages, $messages[1]); // If zero not set use other as zero.
             }
-
-            if ($vars['count'] === 0) {
-                $message = $messages[0];
-            } elseif ($vars['count'] === 1) {
-                $message = $messages[1];
-            } elseif ($vars['count'] > 1) {
-                $message = $messages[2];
+            // use count number if set, if not use the last.
+            $message = $messages[2];
+            if(isset($messages[$vars['count']])){
+                $message = $messages[$vars['count']];
             }
-        }
+         }
 
         $replace = [];
         foreach ($vars as $key => $value) {

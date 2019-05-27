@@ -38,7 +38,7 @@ class NumberHelperTest extends \PHPUnit\Framework\TestCase
     }
     public function testDecimal()
     {
-        $this->assertSame('234,567,890.00', $this->Number->decimal(234567890));
+        $this->assertSame('234,567,890.00', $this->Number->precision(234567890));
     }
     public function testPercent()
     {
