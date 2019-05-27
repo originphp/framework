@@ -19,11 +19,16 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- I18n locales generator command
+
 ### Changed
 - I18n class
 - Translation method and added plural support
 
 ### Fixed 
+- consoleio progress bar jitter fix
+- scaffolding bug fix
 - bug with debug data output with when % is involed
 
 ### Removed

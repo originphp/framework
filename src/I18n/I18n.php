@@ -13,105 +13,149 @@
  */
 
 namespace Origin\I18n;
+
 use Origin\I18n\Exception\LocaleNotAvailableException;
 use Origin\Exception\Exception;
 use Locale;
 
 /**
- * Removed Intl support due to number of issues ranging from bugs (getting info, parsing dates properly) or 
- * impcomplete features (E.g. date picker support)
+ * Removed Intl support due to number of issues ranging from bugs (parsing dates properly) or
+ * impcomplete features (E.g. date picker support).
  */
 
 class I18n
 {
-   
+
+    const DEFAULT_LOCALE = 'en_US';
     /**
-     * The default locale to be used
+     * The default locale to be used.
      *
      * @var string
      */
-    const DEFAULT_LOCALE = 'en_US';
+    protected static $defaulLocale = null;
 
     /**
-     * Holds the locale to be used
+     * Holds the locale to be used.
      *
      * @var string
      */
     protected static $locale = null;
 
     /**
-     * A whitelist of available locales
+     * Holds the language e.g. en
+     *
+     * @var string
+     */
+    protected static $language = null;
+
+    /**
+     * A whitelist of available locales.
      *
      * @var array
      */
     protected static $availableLocales = [];
 
-
-    protected static $language = 'en';
-
     /**
-     * Holds the messages for translation
+     * Holds the messages for translation.
      *
      * @var array
      */
-    protected static $messages = [];
+    protected static $messages = null;
+
+    public static function initialize(array $config = [])
+    {
+        $config += ['locale' => static::$defaulLocale,'language'=>null,'timezone'=>null];
+        static::locale($config['locale']);
+        if($config['language']){
+            static::language($config['language']); // after locale which sets the language
+        }
+    }
 
     /**
-     * Sets and gets the locale
+     * Sets and gets the locale.
      *
      * @param string $locale
+     *
      * @return string|void
      */
-    public static function locale(string $locale=null){
-
-        if($locale === null){
+    public static function locale(string $locale = null)
+    {
+        if ($locale === null) {
             return static::$locale;
         }
 
-        if(static::$availableLocales AND !in_array($locale,static::$availableLocales)){
+        if (static::$availableLocales and !in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
 
-        setlocale(LC_ALL,$locale);
+        setlocale(LC_ALL, $locale);
         Locale::setDefault($locale); // PHP Intl Extension Friendly
+
+        $localeFile = ORIGIN 
+
         static::language(Locale::getPrimaryLanguage($locale));
     }
 
     /**
-     * Sets or gets the language
+     * Sets or gets the default locale
      *
-     * @param string $language
+     * @param string $locale
      * @return void
      */
-    public static function language(string $language = null){
-        if($language === null){
+    public static function defaultLocale(string $locale = null)
+    {
+        if ($locale === null) {
+            if(static::$defaulLocale === null){
+                static::$defaulLocale = self::DEFAULT_LOCALE;
+            }
+            return static::$defaulLocale;
+        }
+
+        if (static::$availableLocales and !in_array($locale, static::$availableLocales)) {
+            throw new LocaleNotAvailableException($locale);
+        }
+        static::$defaulLocale = $locale;
+    }
+
+    /**
+     * Sets or gets the language.
+     *
+     * @param string $language
+     */
+    public static function language(string $language = null)
+    {
+        if ($language === null) {
             return static::$language;
         }
-          static::$language = $language;
+        static::$language = $language;
         static::loadMessages($language);
     }
 
     /**
-     * Detects the locale from the accept language
+     * Detects the locale from the accept language.
      *
      * @return string
      */
-    public static function detectLocale(){
+    public static function detectLocale()
+    {
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             return locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         }
+
         return self::DEFAULT_LOCALE;
     }
 
     /**
      * Sets and gets the available locales. Only use this if you want to limit locales which
-     * can be used. This forms a whitelist
+     * can be used. This forms a whitelist.
      *
      * @param array $locales ['en','es']
+     *
      * @return array|void
      */
-    public static function availableLocales(array $locales = null){
-        if($locales === null){
+    public static function availableLocales(array $locales = null)
+    {
+        if ($locales === null) {
             return static::$availableLocales;
         }
         static::$availableLocales = $locales;
@@ -119,64 +163,70 @@ class I18n
 
     /**
      * Translates a string.
-     * For plurals, you need to use %count% 
+     * For plurals, you need to use %count%.
      *
-     * @param string $message  'Hello %name% all went well', 'There are no apples|There are %count% apples'
+     * @param string $message 'Hello %name% all went well', 'There are no apples|There are %count% apples'
+     * @param array  $vars    - to use plurals you must set count ['name'=>'jon', 'count'=>5]
+     *
      * @return string
      */
-    public static function translate(string $message,array $vars=[])
+    public static function translate(string $message, array $vars = [])
     {
+        if(static::$messages === null){
+            static::locale(static::defaultLocale());
+        }
         if (isset(static::$messages[$message])) {
             $message = static::$messages[$message];
         }
 
         // Handle plurals
-        if(strpos($message,'|') !== false AND isset($vars['count'])){
-            $messages = explode('|',$message);
-     
-            if($vars['count'] === 0){
-                $message = $messages[0]; // 0 count
+        if (strpos($message, '|') !== false and isset($vars['count'])) {
+            $messages = explode('|', $message);
+
+            if (count($messages) === 2) {
+                array_unshift($messages, $messages[1]); // If zero not set use other.
             }
-            elseif((count($messages) === 2 AND $vars['count'] > 0) OR (count($messages) === 3 AND $vars['count'] === 1)){
-                $message = $messages[1]; 
+
+            if ($vars['count'] === 0) {
+                $message = $messages[0];
+            } elseif ($vars['count'] === 1) {
+                $message = $messages[1];
+            } elseif ($vars['count'] > 1) {
+                $message = $messages[2];
             }
-            else{
-                $message = $messages[2]; 
-            }
-        }         
+        }
 
         $replace = [];
         foreach ($vars as $key => $value) {
             if (!is_array($value) and !is_object($value)) {
-                $replace['%'. $key . '%'] = $value;
+                $replace['%'.$key.'%'] = $value;
             }
         }
 
-        return strtr($message,$replace);
+        return strtr($message, $replace);
     }
+
     /**
-     * Loads the message file for
+     * Loads the message file for.
      *
      * @param string $locale
-     * @return void
      */
     protected static function loadMessages(string $language)
     {
-        $filename = SRC  . DS . 'Locale' . DS . $language . '.php';
-      
+        $filename = SRC.DS.'Locale'.DS.$language.'.php';
+        
+        static::$messages = [];
+
         if (file_exists($filename)) {
             $messages = include $filename;
 
             if (!is_array($messages)) {
-               
                 throw new Exception("{$language}.php does not return an array");
             }
-            
+
             static::$messages = $messages;
-            
         }
+
         return false;
     }
 }
-
-I18n::locale(I18n::DEFAULT_LOCALE);
