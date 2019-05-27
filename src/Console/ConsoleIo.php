@@ -317,11 +317,15 @@ class ConsoleIo
     {
         $percent = floor(($value / $max) * 100);
         $left = 100 - $percent;
+        
         $pb = $pb2 = '';
         if ($percent) {
             $pb = str_repeat("\033[102m \033[0m", floor($percent / 2));
         }
         if ($left) {
+            if($left %2 !== 0){
+                $left ++;
+            }
             $pb2 = str_repeat("\033[30;40m \033[0m", floor($left / 2));
         }
 
