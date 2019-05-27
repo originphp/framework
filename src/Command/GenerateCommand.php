@@ -455,6 +455,9 @@ class GenerateCommand extends Command
                     $fields = array_keys($meta['schema'][$associated]);
                     $blocks = [];
                     foreach ($fields as $field) {
+                        if($field === 'id'){
+                            continue; // Skip since we already use this
+                        }
                         $block = $data;
                         $block['field'] = $field;
                         $block['fieldName'] = Inflector::humanize(Inflector::underscore($field));
