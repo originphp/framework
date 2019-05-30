@@ -162,18 +162,24 @@ function h($text)
 }
 
 /**
- * Gets the originPHP enviroment
- *
- * @return string 
+ * Gets or sets an Environment variable
+ * 
+ * @param string $variable
+ * @return string|null
  */
-function env() : string
+function env(string $variable,string $value = null)
 {
-    $value = 'development';
-    if (isset($_SERVER['ORIGIN_ENV'])) {
-        $value = $_SERVER['ORIGIN_ENV'];
+    if($value === null){
+        if(isset($_SERVER[$variable])){
+            return $_SERVER[$variable];
+        }
+        if(isset($_ENV[$variable])){
+            return $_ENV[$variable];
+        }
+        return null;
     }
-    return $value;
-   
+
+    $_ENV[$variable] = $value;
 }
 
 /**

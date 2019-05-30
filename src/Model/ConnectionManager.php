@@ -99,4 +99,14 @@ class ConnectionManager
     {
         return isset(static::$datasources[$name]);
     }
+
+    /**
+     * Returns a list of datasources
+     *
+     * @return array
+     */
+    public static function datasources()
+    {
+        return array_keys(static::$config);
+    }
 }

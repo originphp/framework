@@ -72,8 +72,8 @@ require __DIR__ . '/functions.php';
  */
 require CONFIG . '/bootstrap.php';
 
-// Load Environment vars if avilable
-$environment = env();
+// Load environment
+$environment = env('ORIGIN_ENV')??'development';
 $filename = CONFIG . DIRECTORY_SEPARATOR . 'environments' . DS . $environment .'.php';
 if(file_exists($filename)){
     include $filename;
