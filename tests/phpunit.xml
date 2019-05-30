@@ -13,6 +13,7 @@
     </testsuites>
     <php>
         <const name="PHPUNIT" value="true"/>
+        <env name="ORIGIN_ENV" value="test"/>
     </php>
     <listeners>
         <listener

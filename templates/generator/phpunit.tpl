@@ -7,6 +7,7 @@
   </testsuites>
   <php>
     <const name="PHPUNIT" value="true"/>
+    <env name="ORIGIN_ENV" value="test"/>
   </php>
   <listeners>
     <listener class="Origin\TestSuite\OriginTestListener" file="../../vendor/originphphp/originphp/src/TestSuite/OriginTestListener.php"></listener>
