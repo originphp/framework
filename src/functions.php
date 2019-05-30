@@ -162,8 +162,8 @@ function h($text)
 }
 
 /**
- * Gets or sets an Environment variable
- * 
+ * Gets or sets an Environment variable.
+ * @internal this should set ENV. SERVER is what the server sets. ENV is for you and me.
  * @param string $variable
  * @return string|null
  */
