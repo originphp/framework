@@ -19,6 +19,13 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- env function and loading config/environments
+
+### Changed
+- Cookie no longer json encode non array values
+
 ## [1.4.0] - 2019-05-27
 
 ### Added

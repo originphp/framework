@@ -129,7 +129,10 @@ class Cookie
      */
     protected function pack($value, $encrypt=true)
     {
-        $value = json_encode($value);
+        if(is_array($value)){
+            $value = json_encode($value);
+        }
+       
         if ($encrypt) {
             $value = self::prefix . base64_encode(Security::encrypt($value));
         }
@@ -150,6 +153,9 @@ class Cookie
             $value = substr($value, $length);
             $value = Security::decrypt(base64_decode($value));
         }
-        return json_decode($value);
+        if(substr($value,0,1)==='{'){
+            $value = json_decode($value);
+        }
+        return $value;
     }
 }

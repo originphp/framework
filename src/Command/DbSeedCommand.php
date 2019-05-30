@@ -44,8 +44,14 @@ class DbSeedCommand extends Command
         }
         $datasource = $this->options('datasource');
         $filename = $this->schemaFilename($name);
-        $this->loadSchema($filename,$datasource);
+        if(file_exists($filename)){
+            $this->loadSchema($filename,$datasource);
        
+        }
+        else{
+            $this->io->status('skipped','Seed SQL file');
+        }
+        
     }
 
 }
