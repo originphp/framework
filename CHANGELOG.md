@@ -24,6 +24,7 @@ Delete tag:   git tag -d <tag_name>
 - env function and loading config/environments
 
 ### Changed
+- Email settings. Client is now domain and added SSL option
 - Cookie no longer json encode non array values
 
 ### Fixed

@@ -148,7 +148,8 @@ class Email
                 'username'=>null,
                 'password' => null,
                 'tls'=>false,
-                'client'=>null,
+                'ssl' => false,
+                'domain'=>null,
                 'timeout'=>30
             ];
             $this->account = array_merge($defaults, $config);
@@ -510,11 +511,7 @@ class Email
     protected function smtpSend()
     {
         $account = $this->account;
-        $account['protocol'] = 'tcp';
-        if (strpos($account['host'], '://') !== false) {
-            list($account['protocol'], $account['host']) = explode('://', $account['host']);
-        }
-     
+
         $this->openSocket($account);
         $this->connect($account);
 
@@ -549,10 +546,10 @@ class Email
         $this->sendCommand(null, '220');
 
         $host = 'localhost';
-        if (isset($account['client'])) {
-            $host = $account['client'];
+        if (isset($account['domain'])) {
+            $host = $account['domain'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
-            list($host,) = explode(':', $_SERVER['HTTP_HOST']);
+            list($host, ) = explode(':', $_SERVER['HTTP_HOST']);
         }
         $this->sendCommand("EHLO {$host}", '250');
         if ($account['tls']) {
@@ -638,7 +635,11 @@ class Email
     protected function openSocket(array $account, array $options=[])
     {
         set_error_handler([$this, 'connectionErrorHandler']);
-        $server =  $account['protocol'] . '://' . $account['host'] . ':' . $account['port'];
+        $protocol = 'tcp';
+        if($account['ssl']){
+            $protocol = 'ssl';
+        }
+        $server =  $protocol . '://' . $account['host'] . ':' . $account['port'];
         $this->socketLog('Connecting to ' . $server);
 
         $this->socket = stream_socket_client(

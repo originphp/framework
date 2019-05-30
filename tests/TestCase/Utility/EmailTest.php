@@ -539,7 +539,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         MockEmail::backup(); // Backup Original Config
 
-        $config = [  'host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret' ,'tls'=>true,'client'=>null,'timeout'=>30];
+        $config = [  'host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret' ,'tls'=>true,'domain'=>null,'timeout'=>30];
         $expected = [  'host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret' ,'tls'=>true];
         MockEmail::config('default', $config);
         $this->assertEquals($config, MockEmail::config('default'));
@@ -550,7 +550,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAccount()
     {
         $config = [  'host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret'];
-        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret','tls'=>false,'client'=>null,'timeout'=>30];
+        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret','tls'=>false,'domain'=>null,'timeout'=>30];
         $Email = new MockEmail($config);
         $this->assertEquals($expected, $Email->getProperty('account'));
         $this->assertEquals($expected, $Email->account());
