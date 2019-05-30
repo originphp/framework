@@ -75,7 +75,7 @@ class I18n
         \Origin\Utility\Date::locale(['timezone'=>$config['timezone']]);
 
         // Load Locale information from /locales if available
-        if(file_exists(ROOT . DS . 'locales' . DS . $config['locale'] .'.yml')){
+        if(file_exists(CONFIG . DS . 'locales' . DS . $config['locale'] .'.yml')){
             $locale = Yaml::toArray(file_get_contents(ROOT . DS . 'locales' . DS . $config['locale'] .'.yml'));
             extract( $locale);
             \Origin\Utility\Date::locale(['timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime]);

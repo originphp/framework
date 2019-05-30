@@ -26,6 +26,10 @@ Delete tag:   git tag -d <tag_name>
 ### Changed
 - Cookie no longer json encode non array values
 
+### Fixed
+- Connection issues now throw ConnectionException
+- Command runner error when description is an array
+
 ## [1.4.0] - 2019-05-27
 
 ### Added

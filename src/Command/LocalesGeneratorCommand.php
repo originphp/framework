@@ -64,7 +64,7 @@ class LocalesGeneratorCommand extends Command
         $types = [];
         $locales = ResourceBundle::getLocales('');
 
-        $path = ROOT . DS  .'locales';
+        $path = CONFIG . DS  .'locales';
 
         if(file_exists($path)){
             $this->io->warning('Locales defintions found in ' . $path);

@@ -162,6 +162,21 @@ function h($text)
 }
 
 /**
+ * Gets the originPHP enviroment
+ *
+ * @return string 
+ */
+function env() : string
+{
+    $value = 'development';
+    if (isset($_SERVER['ORIGIN_ENV'])) {
+        $value = $_SERVER['ORIGIN_ENV'];
+    }
+    return $value;
+   
+}
+
+/**
  * Love this.
  *
  * @return string date('Y-m-d H:i:s')

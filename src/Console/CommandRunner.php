@@ -221,8 +221,14 @@ class CommandRunner
             }
           
             foreach ($cmds as $cmd => $description) {
-                $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
-                $out[] = "<code>{$cmd}</code><text>{$description}</text>";
+                if(!is_array($description)){
+                    $description = [$description];
+                }
+                foreach($description as $desc){
+                    $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
+                    $out[] = "<code>{$cmd}</code><text>{$desc}</text>";
+                    $cmd = null;
+                }
             }
             $out[] = '';
         }

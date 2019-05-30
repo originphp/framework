@@ -20,6 +20,7 @@ use Origin\Model\Exception\DatasourceException;
 use PDO;
 use PDOException;
 use Origin\Model\QueryBuilder;
+use Origin\Model\Exception\ConnectionException;
 
 abstract class Datasource
 {
@@ -109,7 +110,7 @@ abstract class Datasource
                 $flags
             );
         } catch (PDOException $e) {
-            throw new DatasourceException($e->getMessage());
+            throw new ConnectionException([$config['host'],$config['database']]);
         }
     }
 

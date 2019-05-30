@@ -71,14 +71,24 @@ require __DIR__ . '/functions.php';
  * Load Config
  */
 require CONFIG . '/bootstrap.php';
-if (file_exists(CONFIG . '/server.php')) {
-    require CONFIG . '/server.php';
+
+// Load Environment vars if avilable
+$environment = env();
+$filename = CONFIG . DIRECTORY_SEPARATOR . 'environments' . DS . $environment .'.php';
+if(file_exists($filename)){
+    include $filename;
 }
+
+// Legacy, overide
+if (file_exists(CONFIG . '/server.php')) {
+    include CONFIG . '/server.php';
+}
+
 if (file_exists(CONFIG . '/email.php')) {
-    require CONFIG . '/email.php';
+    include CONFIG . '/email.php';
 }
 if (file_exists(CONFIG . '/database.php')) {
-    require CONFIG . '/database.php';
+    include CONFIG . '/database.php';
 }
 
 require CONFIG . '/routes.php';
