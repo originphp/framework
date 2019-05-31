@@ -95,7 +95,7 @@ class DotEnv
         }
 
         if ($capture) {
-            throw new Exception(sprintf('Invalid value for `%s` ',$capture));
+            throw new Exception(sprintf('Invalid value for `%s` ', $capture));
         }
         # Remove final quotes
         foreach ($env as $key => $value) {
@@ -110,7 +110,8 @@ class DotEnv
      * @param mixed $value
      * @return mixed
      */
-    protected function value($value){
+    protected function value($value)
+    {
         if ($value === 'null') {
             $value = null;
         } elseif ($value === 'true') {
