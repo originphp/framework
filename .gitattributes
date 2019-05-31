@@ -1,0 +1,4 @@
+# Remove these files when using git archive
+tests/Fixture export-ignore
+tests/TestApp export-ignore
+tests/TestCase export-ignore
