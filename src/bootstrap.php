@@ -72,23 +72,10 @@ require __DIR__ . '/functions.php';
  */
 require CONFIG . '/bootstrap.php';
 
-// Load environment
-$environment = env('ORIGIN_ENV')??'development';
-$filename = CONFIG . DIRECTORY_SEPARATOR . 'environments' . DS . $environment .'.php';
-if(file_exists($filename)){
-    include $filename;
-}
-
-// Legacy, overide
-if (file_exists(CONFIG . '/server.php')) {
-    include CONFIG . '/server.php';
-}
-
-if (file_exists(CONFIG . '/email.php')) {
-    include CONFIG . '/email.php';
-}
-if (file_exists(CONFIG . '/database.php')) {
-    include CONFIG . '/database.php';
+foreach(['server','database','email'] as $config){
+    if (file_exists(CONFIG . DS .  $config . '.php')) {
+        include CONFIG . DS .  $config . '.php';
+    }
 }
 
 require CONFIG . '/routes.php';

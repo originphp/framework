@@ -679,7 +679,7 @@ class Email
     /**
      * Returns the smtp log
      *
-     * @return void
+     * @return array
      */
     public function smtpLog()
     {
