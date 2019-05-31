@@ -20,6 +20,10 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 
+## [1.5.1] - 2019-05-31
+### Changed
+- The automatic loading of environment files has be changed to increased complexity in deployment
+
 ## [1.5.0] - 2019-05-31
 ### Added
 - added DotEnv class for .env file parsing
