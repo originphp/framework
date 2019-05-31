@@ -20,6 +20,7 @@ Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
 
+## [1.5.0] - 2019-05-31
 ### Added
 - added DotEnv class for .env file parsing
 - env function and loading config/environments
