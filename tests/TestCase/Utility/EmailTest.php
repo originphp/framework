@@ -701,4 +701,38 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = new MockEmail();
         $this->assertIsArray($Email->smtpLog());
     }
+    /**
+     * to test from the command line
+     *  GMAIL_USERNAME=username@gmail.com GMAIL_PASSWORD=secret phpunit TestCase/Utility/EmailTest.php 
+     *
+     * @return void
+     */
+    public function testSmtpSend()
+    {
+
+        if (!env('GMAIL_USERNAME') OR !env('GMAIL_PASSWORD')) {
+            $this->markTestSkipped(
+                'GMAIL username and password not setup'
+              );
+        }
+        $config = [
+            'host' => 'smtp.gmail.com',
+            'port' => 465,
+            'username' => env('GMAIL_USERNAME'),
+            'password' => env('GMAIL_PASSWORD'),
+            'ssl' => true,
+            'tls' => false
+            ];
+          
+        $email = new Email($config);
+        $email->to(env('GMAIL_USERNAME'))
+            ->subject('PHPUnit Test: ' . date('Y-m-d H:i:s'))
+            ->from(env('GMAIL_USERNAME'),'PHP Unit')
+            ->format('both')
+            ->htmlMessage('<p>This is an email test to ensure that the framework can send emails properly and can include this in code coverage.<p>')
+            ->textMessage('This is an email test to ensure that the framework can send emails properly and can include this in code coverage.');
+
+            $this->assertNotEmpty($email->send());
+    
+    }
 }
