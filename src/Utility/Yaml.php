@@ -397,19 +397,25 @@ class Yaml
     protected static $indent = 2;
     protected static $lines = [];
 
-    public static function toArray(string $string)
+    /**
+     * Converts a YAML string into an Array
+     *
+     * @param string $string
+     * @return array
+     */
+    public static function toArray(string $string) : array
     {
         $parser = new YamlParser($string);
         return $parser->toArray();
     }
   
     /**
-     * Undocumented function
+     * Converts an array into a YAML string
      *
      * @param array $array
      * @return string
      */
-    public static function fromArray(array $array)
+    public static function fromArray(array $array) : string
     {
         return self::dump($array);
     }

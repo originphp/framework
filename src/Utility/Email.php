@@ -89,10 +89,15 @@ class Email
      */
     protected $template = null;
 
+    /**
+     * Email format
+     *
+     * @var string
+     */
     protected $emailFormat = 'text';
 
     /**
-     * This is the headrers + body
+     * This is the headers + body
      *
      * @var array
      */
@@ -105,6 +110,11 @@ class Email
      */
     protected $viewVars = [];
 
+    /**
+     * Constructor
+     *
+     * @param string|array|null $config config name, or array of settings
+     */
     public function __construct($config = null)
     {
         if (extension_loaded('mbstring') === false) {
@@ -129,7 +139,7 @@ class Email
      * Use this to create configs on the fly or switch from default config etc
      *
      * @param string|array $config
-     * @return void
+     * @return \Origin\Utility\Email
      */
     public function account($config = null)
     {
@@ -182,7 +192,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function to(string $email, string $name = null)
     {
@@ -195,7 +205,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function addTo(string $email, string $name = null)
     {
@@ -204,11 +214,11 @@ class Email
     }
 
     /**
-     * cc
+     * Set a cc address
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function cc(string $email, string $name = null)
     {
@@ -221,7 +231,7 @@ class Email
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function addCc(string $email, string $name = null)
     {
@@ -230,11 +240,11 @@ class Email
     }
 
     /**
-     * bcc
+     * Sets the bcc
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function bcc(string $email, string $name = null)
     {
@@ -243,11 +253,11 @@ class Email
     }
 
     /**
-     * Add another cc address
+     * Add another bcc address
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function addBcc(string $email, string $name = null)
     {
@@ -256,11 +266,11 @@ class Email
     }
 
     /**
-     * From
+     * Sets the email from
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function from(string $email, string $name = null)
     {
@@ -269,11 +279,11 @@ class Email
     }
 
     /**
-    * Sender
+    * Sets the sender for the email
     *
     * @param string $email
     * @param string $name
-    * @return Email
+    * @return \Origin\Utility\Email
     */
     public function sender(string $email, string $name = null)
     {
@@ -282,11 +292,11 @@ class Email
     }
 
     /**
-     * Reply To
+     * Sets the reply-to
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function replyTo(string $email, string $name = null)
     {
@@ -295,11 +305,11 @@ class Email
     }
 
     /**
-     * Return Path
+     * Sets the return path
      *
      * @param string $email
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function returnPath(string $email, string $name = null)
     {
@@ -308,10 +318,10 @@ class Email
     }
 
     /**
-     * Sets the subject
+     * Sets the email subject
      *
      * @param string $subject
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function subject(string $subject)
     {
@@ -323,7 +333,7 @@ class Email
      * Sets the text version of email
      *
      * @param string $message
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function textMessage(string $message)
     {
@@ -336,7 +346,7 @@ class Email
      * Sets the html version of email
      *
      * @param string $message
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function htmlMessage(string $message)
     {
@@ -348,7 +358,7 @@ class Email
      * Sets the template to be loaded
      *
      * @param string $name
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function template(string $name)
     {
@@ -361,7 +371,7 @@ class Email
      * Sets the vars which will be set in template
      *
      * @param array $vars
-     * @return Email
+     * @return \Origin\Utility\Email
      */
     public function set(array $vars)
     {
@@ -636,7 +646,7 @@ class Email
     {
         set_error_handler([$this, 'connectionErrorHandler']);
         $protocol = 'tcp';
-        if($account['ssl']){
+        if ($account['ssl']) {
             $protocol = 'ssl';
         }
         $server =  $protocol . '://' . $account['host'] . ':' . $account['port'];
@@ -944,7 +954,8 @@ class Email
     /**
      * Gets/Sets the email format
      *
-     * @return string|null $type
+     * @param string|null $type html, text or both
+     * @return \Origin\Utility\Email
      */
     public function format($format = null)
     {
