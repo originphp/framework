@@ -285,8 +285,8 @@ class Response
             return $this->contentType;
         }
         if (is_array($contentType)) {
-            foreach ($contentType as $type => $defintion) {
-                $this->mimeTypes[$type] = $defintion;
+            foreach ($contentType as $type => $definition) {
+                $this->mimeTypes[$type] = $definition;
             }
             return $this->contentType;
         }

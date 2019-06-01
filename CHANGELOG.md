@@ -19,6 +19,8 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Typos in Locales Generator
 
 ## [1.5.1] - 2019-05-31
 ### Changed

@@ -25,7 +25,7 @@ use Origin\Utility\Yaml;
 class LocalesGeneratorCommand extends Command
 {
     protected $name = 'locales:generator';
-    protected $description = 'Generates the Locales defintion files';
+    protected $description = 'Generates the Locales definition files';
 
     protected $dateMap = [
         'MMMM' => 'F',
@@ -67,7 +67,7 @@ class LocalesGeneratorCommand extends Command
         $path = CONFIG . DS  .'locales';
 
         if(file_exists($path)){
-            $this->io->warning('Locales defintions found in ' . $path);
+            $this->io->warning('Locales definitions found in ' . $path);
             if($this->io->askChoice('Do you want to continue?',['y','n'],'n') === 'no'){
                 $this->exit();
             }
@@ -101,7 +101,7 @@ class LocalesGeneratorCommand extends Command
             $this->io->createFile( $path . DS . 'locales.yml',Yaml::fromArray($results),true);
         }
 
-        $this->io->success(sprintf('Generated %d locale defintions',count($results)));
+        $this->io->success(sprintf('Generated %d locale definitions',count($results)));
     }
 
     /**
