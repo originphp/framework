@@ -550,8 +550,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAccount()
     {
         $config = [  'host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret'];
-        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret','tls'=>false,'domain'=>null,'timeout'=>30];
+        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret','ssl'=>false,'tls'=>false,'domain'=>null,'timeout'=>30];
         $Email = new MockEmail($config);
+
         $this->assertEquals($expected, $Email->getProperty('account'));
         $this->assertEquals($expected, $Email->account());
 

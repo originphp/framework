@@ -22,6 +22,7 @@ use PDOException;
 use Origin\Model\Exception\DatasourceException;
 use Origin\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Exception\ConnectionException;
 
 class DatasourceTest extends OriginTestCase
 {
@@ -62,7 +63,7 @@ class DatasourceTest extends OriginTestCase
     {
         $config =  ConnectionManager::config('test');
         $config['password'] = 'fozzywozzy';
-        $this->expectException(DatasourceException::class);
+        $this->expectException(ConnectionException::class);
         $ds = new MySQLDriver();
         $ds->connect($config);
     }

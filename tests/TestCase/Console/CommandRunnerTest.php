@@ -48,7 +48,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
         $runner = $this->commandRunner();
         $runner->run([]);
         $this->assertContains('<code>say-hello          </code><text>A command to say something</text>',$this->out->read()); // App namespace
-        $this->assertEquals('a711bd63bfc7dcb0674b4e1e1de9df64',md5($this->out->read())); // rest
+        $this->assertEquals('9ad254b15b8452005bea380d94528d78',md5($this->out->read())); // rest
     
     }
 

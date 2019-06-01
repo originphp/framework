@@ -215,7 +215,7 @@ class GenerateCommandTest extends OriginTestCase
         $version = $match[0];
 
         $filename = APP.DS.'db'.DS.'migrate'.DS.$version.'Dummy.php';
-
+        
         $this->assertOutputContains("db/migrate/{$version}Dummy.php");
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('692f0f096c758b18dd3197f0ce1c6c2f', $filename);
@@ -241,7 +241,7 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'phpunit.xml';
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('05db1c7f346eea104b2af91c10c3c40e', $filename);
+        $this->assertFileHash('f1ce2a71cd543f31b89f0668198e91a7', $filename);
 
         $this->rmdir(APP.DS.'plugins'.DS.'dummy');
     }

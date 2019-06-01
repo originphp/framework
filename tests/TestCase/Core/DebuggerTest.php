@@ -31,7 +31,7 @@ class DebuggerTest extends \PHPUnit\Framework\TestCase
 
         $expected = [
             'file' => 'phar:///usr/local/bin/phpunit/phpunit/Framework/TestCase.php',
-            'line' => '1153',
+            'line' => '1154',
             'class' => 'Origin\Test\Core\DebuggerTest',
             'function' => 'testBacktrace',
             'args' => []
