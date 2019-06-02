@@ -19,6 +19,9 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Refactored CacheEngine to abstract class
+
 ### Fixed
 - Typos in Locales Generator
 
