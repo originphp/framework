@@ -109,13 +109,19 @@ class PluginInstallCommandTest extends OriginTestCase
         }
     }
 
-    function rmdir($dir) {
-        $files = array_diff(scandir($dir), array('.','..'));
-        foreach ($files as $file) {
-          (is_dir("$dir/$file")) ? $this->rmdir("$dir/$file") : unlink("$dir/$file");
+    public function rmdir(string $directory)
+    {
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if(is_dir($directory . DS . $filename)){
+                $this->rmdir($directory . DS . $filename);
+                continue;
+            }
+            unlink($directory . DS . $filename);
         }
-        return rmdir($dir);
-      }
+
+        return rmdir($directory);
+    }
       */
   
 }

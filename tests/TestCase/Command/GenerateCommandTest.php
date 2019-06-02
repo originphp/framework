@@ -246,14 +246,24 @@ class GenerateCommandTest extends OriginTestCase
         $this->rmdir(APP.DS.'plugins'.DS.'dummy');
     }
 
-    protected function rmdir($dir)
+    /**
+     * Recursively delete a directory
+     *
+     * @param string $directory
+     * @return bool
+     */
+    protected function rmdir(string $directory)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? $this->rmdir("$dir/$file") : unlink("$dir/$file");
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if(is_dir($directory . DS . $filename)){
+                $this->rmdir($directory . DS . $filename);
+                continue;
+            }
+            unlink($directory . DS . $filename);
         }
 
-        return rmdir($dir);
+        return rmdir($directory);
     }
 
     /*
