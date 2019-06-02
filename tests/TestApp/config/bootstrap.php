@@ -1,7 +1,7 @@
 <?php
 use Origin\Core\Configure;
 use Origin\Core\Plugin;
-use Origin\Cache\Cache;
+use Origin\Utility\Cache;
 
 /*
  * This will go in your server.php file once your app has been developed.

@@ -22,8 +22,8 @@ class ConnectionManager
     use StaticConfigTrait;
 
     protected static $engines = [
-        'mysql' => 'Origin\Model\Driver\MySQLDriver',
-        'pgsql' => 'Origin\Model\Driver\PostgreSQLDriver',
+        'mysql' => 'Origin\Engine\Datasource\MySQLEngine',
+        'pgsql' => 'Origin\Engine\Datasource\PostgreSQLEngine',
     ];
     /**
      * Holds the driver

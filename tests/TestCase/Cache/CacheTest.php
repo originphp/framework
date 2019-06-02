@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Cache;
 
-use Origin\Cache\Cache;
+use Origin\Utility\Cache;
 use Origin\Exception\InvalidArgumentException;
 
 class CacheTest extends \PHPUnit\Framework\TestCase

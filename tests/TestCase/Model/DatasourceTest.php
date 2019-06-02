@@ -16,7 +16,7 @@ namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
 use Origin\Model\Datasource;
-use Origin\Model\Driver\MySQLDriver;
+use Origin\Engine\Datasource\MySQLEngine;
 
 use PDOException;
 use Origin\Model\Exception\DatasourceException;
@@ -64,7 +64,7 @@ class DatasourceTest extends OriginTestCase
         $config =  ConnectionManager::config('test');
         $config['password'] = 'fozzywozzy';
         $this->expectException(ConnectionException::class);
-        $ds = new MySQLDriver();
+        $ds = new MySQLEngine();
         $ds->connect($config);
     }
 

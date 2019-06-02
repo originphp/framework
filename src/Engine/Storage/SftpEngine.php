@@ -17,7 +17,7 @@
  * $ apt-get install php-ssh2
  */
 namespace Origin\Engine\Storage;
-
+use Origin\Engine\StorageEngine;
 use Origin\Exception\Exception;
 use Origin\Exception\NotFoundException;
 

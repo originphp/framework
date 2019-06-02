@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Engine\Storage;
+use Origin\Engine\StorageEngine;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 use Origin\Exception\NotFoundException;
@@ -70,13 +71,12 @@ class DiskEngine extends StorageEngine
     {
         $filename = $this->path . DS . $name;
 
-        if(file_exists($name)){
+        if(file_exists($filename)){
             if(is_dir($filename)){
                 return $this->rmdir($filename);
             }
             return unlink($filename);
-        }
-     
+        }     
         throw new NotFoundException(sprintf('%s does not exist',$name));
     }
 
