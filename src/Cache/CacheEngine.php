@@ -16,7 +16,7 @@ namespace Origin\Cache;
 
 use Origin\Core\ConfigTrait;
 
-class CacheEngine
+abstract class CacheEngine
 {
     use ConfigTrait;
 
@@ -42,50 +42,37 @@ class CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
-    {
-        return true;
-    }
+    abstract function set(string $key, $value);
+    
     /**
      * Gets the value;
      * @todo returns false always
      * @param string $key
      * @return void
      */
-    public function get(string $key)
-    {
-        return false;
-    }
+    abstract function get(string $key);
+
     /**
      * Checks if a key exists in the cache
      *
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
-    {
-        return false;
-    }
+    abstract function has(string $key);
     /**
      * Deletes a key from the cache
      *
      * @param string $key
      * @return boolean
      */
-    public function delete(string $key) :bool
-    {
-        return true;
-    }
+    abstract function delete(string $key);
 
     /**
      * Clears the Cache
      *
      * @return boolean
      */
-    public function clear(): bool
-    {
-        return false;
-    }
+    abstract function clear();
 
     /**
      * Increases a value
@@ -94,10 +81,7 @@ class CacheEngine
      * @param integer $offset
      * @return integer
      */
-    public function increment(string $key, int $offset = 1)
-    {
-        return true;
-    }
+    abstract function increment(string $key, int $offset = 1);
 
     /**
      * Decreases a value
@@ -106,10 +90,7 @@ class CacheEngine
      * @param integer $offset
      * @return integer
      */
-    public function decrement(string $key, int $offset = 1)
-    {
-        return true;
-    }
+    abstract function decrement(string $key, int $offset = 1);
 
     /**
      * Creates a friendly key for use with caching engines

@@ -248,6 +248,7 @@ class Controller
     public function startupProcess()
     {
         $result = $this->beforeFilter();
+        // Check redirect has not been called
         if($result instanceof Response OR $this->response->headers('Location')){
             return $this->response;
         }
@@ -260,6 +261,7 @@ class Controller
     public function shutdownProcess()
     {
         $result = $this->componentRegistry()->call('shutdown');
+        // Check redirect has not been called
         if($result instanceof Response OR $this->response->headers('Location')){
             return $this->response;
         }

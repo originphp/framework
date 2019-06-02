@@ -12,20 +12,19 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Cache;
+namespace Origin\Utility;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Cache\Engine\NullEngine;
 
-class Cache
+class Storage
 {
     use StaticConfigTrait;
     protected static $defaultConfig = [
         'default' => [
-            'className' => 'Origin\Cache\Engine\FileEngine',
-            'duration' => 3600
-            ]
+            'className' => 'Origin\Engine\Storage\DiskEngine',
+            'path' => APP . DS . 'storage'
+        ]
     ];
 
     /**
@@ -34,28 +33,14 @@ class Cache
      * @var array
      */
     protected static $loaded = [];
-
-    protected static $disabled = false;
-
-    /**
-     * Undocumented variable
-     *
-     * @var \Origin\Cache\Engine\NullEngine
-     */
-    protected static $nullEngine = null;
-
     /**
      * Gets the cache engine
      *
      * @param string $config
-     * @return Origin\Cache\CacheEngine
+     * @return Origin\Engine\Storage\StorageEngine
      */
     public static function engine(string $name)
     {
-        if (static::$disabled) {
-            return static::$nullEngine;
-        }
-
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
         }
@@ -63,7 +48,7 @@ class Cache
         $config = static::getConfig($name);
         if ($config) {
             if (isset($config['engine'])) {
-                $config['className'] = "Origin\Cache\Engine\\{$config['engine']}Engine";
+                $config['className'] = "Origin\Engine\Storage\\{$config['engine']}Engine";
             }
             
             return static::$loaded[$name] = new $config['className']($config);
@@ -74,74 +59,61 @@ class Cache
     /**
      * Reads an item from the Cache
      *
-     * @param string $key
+     * @param string $name
      * @param string $config
      * @return mixed
      */
-    public static function read(string $key, string $config ='default')
+    public static function read(string $name, string $config ='default')
     {
-        $cache = static::engine($config);
-        return $cache->get($key);
+        return static::engine($config)->read($name);
     }
     /**
      * Writes an item from Cache
      *
-     * @param string $key
+     * @param string $name
      * @param mixed $value
      * @param string $config
      * @return bool
      */
-    public static function write(string $key, $value, $config='default'):bool
+    public static function write(string $name, $value, $config='default'):bool
     {
-        $cache = static::engine($config);
-        return $cache->set($key, $value);
+        return static::engine($config)->write($name,$value);
     }
 
     /**
      * Checks if an item is in the cache
      *
-     * @param string $key
+     * @param string $name
      * @param mixed $value
      * @param string $config
      * @return bool
      */
-    public static function check(string $key, $config='default'):bool
+    public static function exists(string $name, $config='default'):bool
     {
-        $cache = static::engine($config);
-        return $cache->has($key);
+        return static::engine($config)->exists($name);
     }
 
     /**
      * Deletes an item from the cache
      *
-     * @param string $key
+     * @param string $name
      * @param string $config
      * @return bool
      */
-    public static function delete(string $key, $config='default') :bool
+    public static function delete(string $name, $config='default') :bool
     {
-        $cache = static::engine($config);
-        return $cache->delete($key);
+        return static::engine($config)->delete($name);
     }
+
     /**
-     * Clears the cache
+     * Returns a list of items in the storage
      *
-     * @return void
+     * @param string $config images or public/images
+     * @return array
      */
-    public static function clear($config='default') :bool
+    public static function list(string $path = null,$config='default') :array
     {
-        $cache = static::engine($config);
-        return $cache->clear();
+        return static::engine($config)->list($path);
     }
-
-    public static function disable()
-    {
-        static::$nullEngine = new NullEngine();
-        static::$disabled =  true;
-    }
-
-    public static function enable()
-    {
-        static::$disabled =  false;
-    }
+  
 }
