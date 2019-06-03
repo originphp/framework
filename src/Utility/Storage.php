@@ -20,9 +20,10 @@ use Origin\Exception\InvalidArgumentException;
 class Storage
 {
     use StaticConfigTrait;
+
     protected static $defaultConfig = [
         'default' => [
-            'className' => 'Origin\Engine\Storage\DiskEngine',
+            'className' => 'Origin\Engine\Storage\LocalEngine',
             'path' => APP . DS . 'storage'
         ]
     ];
@@ -33,13 +34,21 @@ class Storage
      * @var array
      */
     protected static $loaded = [];
+
     /**
-     * Gets the cache engine
+     * Which storage config is being used
+     *
+     * @var string
+     */
+    protected static $use = 'default';
+    
+    /**
+     * Gets the  configured storage engine
      *
      * @param string $config
      * @return Origin\Engine\Storage\StorageEngine
      */
-    public static function engine(string $name)
+    public static function get(string $name)
     {
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
@@ -50,10 +59,27 @@ class Storage
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Engine\Storage\\{$config['engine']}Engine";
             }
-            
+
+            if(empty($config['className'])){
+                throw new InvalidArgumentException("Storage engine for {$name} could not be found");
+            }
             return static::$loaded[$name] = new $config['className']($config);
         }
         throw new InvalidArgumentException("{$config} config does not exist");
+    }
+
+    /**
+     * Changes the storage config that is being used. Use this when working with multiple.
+     * REMEMBER: to set even for default, if using in the same script.
+     *
+     * @param string $config
+     * @return void
+     */
+    public static function use(string $config){
+        if(!static::config($config)){
+            throw new InvalidArgumentException("{$config} config does not exist");
+        }
+        self::$use = $config;
     }
 
     /**
@@ -63,9 +89,9 @@ class Storage
      * @param string $config
      * @return mixed
      */
-    public static function read(string $name, string $config ='default')
+    public static function read(string $name)
     {
-        return static::engine($config)->read($name);
+        return static::get(self::$use)->read($name);
     }
     /**
      * Writes an item from Cache
@@ -75,9 +101,9 @@ class Storage
      * @param string $config
      * @return bool
      */
-    public static function write(string $name, $value, $config='default'):bool
+    public static function write(string $name, $value):bool
     {
-        return static::engine($config)->write($name,$value);
+        return static::get(self::$use)->write($name,$value);
     }
 
     /**
@@ -88,9 +114,9 @@ class Storage
      * @param string $config
      * @return bool
      */
-    public static function exists(string $name, $config='default'):bool
+    public static function exists(string $name):bool
     {
-        return static::engine($config)->exists($name);
+        return static::get(self::$use)->exists($name);
     }
 
     /**
@@ -100,9 +126,9 @@ class Storage
      * @param string $config
      * @return bool
      */
-    public static function delete(string $name, $config='default') :bool
+    public static function delete(string $name) :bool
     {
-        return static::engine($config)->delete($name);
+        return static::get(self::$use)->delete($name);
     }
 
     /**
@@ -111,9 +137,9 @@ class Storage
      * @param string $config images or public/images
      * @return array
      */
-    public static function list(string $path = null,$config='default') :array
+    public static function list(string $path = null) :array
     {
-        return static::engine($config)->list($path);
+        return static::get(self::$use)->list($path);
     }
   
 }

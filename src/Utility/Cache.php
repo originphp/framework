@@ -66,6 +66,9 @@ class Cache
                 $config['className'] = "Origin\Engine\Cache\\{$config['engine']}Engine";
             }
             
+            if(empty($config['className'])){
+                throw new InvalidArgumentException("Cache engine for {$name} could not be found");
+            }
             return static::$loaded[$name] = new $config['className']($config);
         }
         throw new InvalidArgumentException("{$config} config does not exist");

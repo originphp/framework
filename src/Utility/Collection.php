@@ -17,7 +17,7 @@ use ArrayAccess;
 use Iterator;
 use Countable;
 
-class Collection implements ArrayAccess, Iterator, Countable
+class Collection implements Iterator, Countable
 {
     protected $items = null;
     protected $position = 0;
@@ -609,30 +609,7 @@ class Collection implements ArrayAccess, Iterator, Countable
         }
         return $value;
     }
-    // ArrayAccess
-    public function offsetExists($key)
-    {
-        return array_key_exists($key, $this->items);
-    }
- 
-    public function offsetSet($key, $value)
-    {
-        if (is_null($key)) {
-            $this->items[] = $value;
-        } else {
-            $this->items[$key] = $value;
-        }
-    }
- 
-    public function offsetGet($key)
-    {
-        return $this->items[$key];
-    }
 
-    public function offsetUnset($key)
-    {
-        unset($this->items[$key]);
-    }
     // Interable
     public function rewind()
     {

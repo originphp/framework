@@ -7,26 +7,25 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software.
  *
- * @copyright    Copyright (c) Jamiel Sharief
+ * @copyright     Copyright (c) Jamiel Sharief
  * @link         https://www.originphp.com
- * @license      https://opensource.org/licenses/mit-license.php MIT License
+ * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
-/**
- * Installation
- *
- * This requires the ssh2 extension.
- *
- * $ apt-get install php-ssh2
- *
- * Alternatives are:
- * - phpseclib: Pure PHP implementation. This is is going to be slow
- * -
- */
+
 namespace Origin\Engine\Storage;
 
 use Origin\Engine\StorageEngine;
-use Origin\Exception\Exception;
 use Origin\Exception\NotFoundException;
+use Origin\Exception\Exception;
+
+use phpseclib\Net\SFTP;
+use phpseclib\Crypt\RSA;
+use Origin\Exception\InvalidArgumentException;
+
+/**
+ * To install phpseclib
+ * composer require phpseclib/phpseclib
+ */
 
 class SftpEngine extends StorageEngine
 {
@@ -34,251 +33,191 @@ class SftpEngine extends StorageEngine
         'host' => null,
         'username' => null,
         'password' => null,
-        'port' => null,
+        'port' => 22,
         'root' => null, // Must be absolute path
-        'public' => null, // path to public key file on server
-        'private' => null // path to private key on server
-     ];
+        'privateKey' => null, // path to public key file on server,
+        'timeout' => 10
+    ];
 
     /**
-     * SSH connection
+     * SFTP Object
      *
-     * @var Resource
+     * @var \phpseclib\Net\SFTP
      */
     protected $connection = null;
-    /**
-     * Sub System
-     *
-     * @var string
-     */
-    protected $sftp = null;
-
-
-    /**
-     * ssh2.sftp://{$sftp}/{folder}
-     *
-     * @var string
-     */
-    protected $string = null;
 
     public function initialize(array $config)
     {
-        if (!extension_loaded('ssh2')) {
-            throw new Exception('Ssh2 extension not loaded.');
+        //"phpseclib/phpseclib
+        if(!class_exists(SFTP::class)){
+            throw new Exception('phpseclib not installed.');
         }
-        if ($this->config('public') and !file_exists($this->config('public'))) {
-            throw new NotFoundException('Public key file could not be found.');
+        if($this->config('host') === null){
+            throw new InvalidArgumentException('No host set');
         }
-        if ($this->config('private') and !file_exists($this->config('private'))) {
-            throw new NotFoundException('Private key file could not be found.');
+
+        if($this->config('privateKey') AND !file_Exists($this->config('privateKey'))){
+            throw new NotFoundException(sprintf('%s could not be found'));
         }
+
+        $this->connection = new SFTP(
+            $this->config('host'),
+            $this->config('port'),
+            $this->config('timeout')
+        );
+       
+        $this->login();
+
+        // Set ROOT
+        if($this->config('root') === null){
+            $this->config('root',$this->connection->pwd());
+        }
+
     }
 
-    protected function connect(string $host, int $port, string $username, string $password = null)
-    {
-        $useSshKeys = ($this->config('public') and $this->config('private'));
-        try {
-            if ($useSshKeys) {
-                $this->connection = ssh2_connect($host, $port, ['hostkey'=>'ssh-rsa']);
-            } else {
-                $this->connection = ssh2_connect($host, $port);
+    protected function login(){
+        $config = $this->config();
+        extract($config);
+        if($this->config('privateKey')){
+            $password = new RSA();
+            if($this->config('password')){
+                $password->setPassword($this->config('password')); # Must be set before loadKey
             }
-        } catch (\Exception $ex) {
-            throw new Exception(sprintf('Error connecting to %s:%d', $host, $port));
+            $password ->loadKey(file_get_contents($this->config('privateKey')));             
         }
-
-        try {
-            if ($useSshKeys) {
-                ssh2_auth_pubkey_file(
-                    $this->connection,
-                    $username,
-                    $this->config('public'),
-                    $this->config('private'),
-                    $password
-                );
-            } else {
-                ssh2_auth_password($this->connection, $username, $password);
-            }
-        } catch (\Exception $ex) {
-            throw new Exception('Authentication Error');
+       
+        if (!$this->connection->login($username,$password)) {
+            throw new Exception('Invalid username or password');
         }
         
-        try {
-            $this->sftp = ssh2_sftp($this->connection);
-            $sftp = intval($this->sftp);
-            $this->string = "ssh2.sftp://{$sftp}" . $this->config('root');
-        } catch (\Exception $ex) {
-            throw new Exception('Error requesting the SFTP subsystem');
-        }
     }
-
-    public function __destruct()
-    {
-        if ($this->connection) {
-            /**
-             * Getting segmentation faults when using ssh2_disconnect($this->connection);
-             */
-            $this->connection = null;
-            //  unset($this->connection);
-        }
-    }
-
 
     /**
-     * Reads
+     * Reads a file from the storage
      *
      * @param string $name
-     * @return void
+     * @return string
      */
     public function read(string $name)
     {
-        $this->initConnection();
-      
-        $handle = @fopen("{$this->string}/{$name}", 'r'); // $string = 'ssh2.sftp://origindev:origin@gothamdc.dev:22/home/origindev/test.txt';
-        if (!$handle) {
-            throw new NotFoundException(sprintf('File %s does not exist', $name));
-        }
+        $filename = $this->addPathPrefix($name);
 
-        $contents = fread($handle, filesize("{$this->string}/{$name}"));
-        @fclose($handle);
-        return $contents;
+        if ($this->connection->is_file($filename))  {
+            return $this->connection->get($filename);
+        }
+        throw new NotFoundException(sprintf('File %s does not exist', $name));
     }
 
+    /**
+     * Writes to the disk
+     *
+     * @param string $name
+     * @param mixed $data that can be converted to string
+     * @return bool
+     */
     public function write(string $name, string $data)
     {
-        $this->initConnection();
+        $filename = $this->addPathPrefix($name);
 
-        $folder = pathinfo($this->string . DS . $name, PATHINFO_DIRNAME);
-        if (!file_exists($folder)) {
-            mkdir($folder, 0775, true);
+        $folder = pathinfo($filename, PATHINFO_DIRNAME);
+        if (!$this->connection->stat($folder)) {
+            $this->connection->mkdir($folder, 0744, true);
         }
 
-        $handle = @fopen("{$this->string}/{$name}", 'w');
-        if (!$handle) {
-            throw new Exception(sprintf('Error opening %s for writing', $name));
-        }
-       
-        $result = fwrite($handle, $data);
-            
-        @fclose($handle);
-
-        return $result;
+       return $this->connection->put($filename,$data);
     }
 
+    /**
+     * Deletes a file OR directory
+     *
+     * @param string $name
+     * @return boolean
+     */
     public function delete(string $name)
     {
-        $this->initConnection();
-        $what = "{$this->string}/{$name}";
-        if (file_exists($what)) {
-            if (is_dir($what)) {
-                return $this->rmdir($name);
-            }
-            return unlink($what);
+        $filename = $this->addPathPrefix($name);
+        if ($this->connection->stat($filename)) {
+            return$this->connection->delete($filename,true);
         }
         throw new NotFoundException(sprintf('%s does not exist', $name));
     }
 
     /**
-     * Recursive Delete
-     *
-     * @param string $directory
-     * @return void
-     */
-    protected function rmdir(string $directory)
-    {
-        $files = $this->scandir($directory);
-        foreach ($files as $filename) {
-            if (is_dir($filename)) {
-                pr('Is directory' . $filename);
-                $this->rmdir($filename);
-                continue;
-            }
-            unlink("{$this->string}/{$filename}");
-        }
-        return rmdir("{$this->string}/{$directory}");
-    }
-
-    /**
-     * Checks if file or directory exists
+     * Checks if file exists
      *
      * @param string $name
      * @return bool
      */
     public function exists(string $name)
     {
-        $this->initConnection();
-        return file_exists("{$this->string}/{$name}");
+      $filename = $this->addPathPrefix($name);
+      return (bool) $this->connection->stat( $filename );
     }
- 
+
     /**
-     * Lists all the files
+     * Gets a list of items on the disk
      *
-     * @param string $name
      * @return array
      */
     public function list(string $name = null)
     {
-        $this->initConnection();
-        if (file_exists("{$this->string}/{$name}")) {
-            return $this->scandir($name);
+        $directory = $this->addPathPrefix($name);
+
+        if(!$this->connection->is_dir($directory)){
+            throw new NotFoundException('directory does not exist');
         }
-        throw new NotFoundException(sprintf('%s does not exist', $name));
+        $this->base = $this->addPathPrefix($name);
+        return $this->scandir($name);
     }
 
-    /**
-     * Recursively Scans directory
-     *
-     * @param string $directory
-     * @return void
-     */
-    protected function scandir($directory)
-    {
-        $handle = @opendir($this->buildPath($directory));
-        if (!$handle) {
-            throw new Exception(sprintf('Error opening %s', $directory));
-        }
-       
-        $results = [];
-        while (false != ($entry = readdir($handle))) {
-            if (in_array($entry, ['.', '..'])) {
-                continue;
-            }
-            $prefix = null;
-            if ($directory) {
-                $prefix = ltrim($directory, '/') . '/';
-            }
-            if (is_dir($this->buildPath($directory).'/'. $entry)) {
-                $results  = array_merge($results, $this->scandir($directory . '/'. $entry));
-                continue;
-            }
+    protected function scandir(string $directory = null){
+        $location = $this->addPathPrefix($directory);
+        $files = [];
 
-            $results[] =  $prefix . $entry;
+        $contents = $this->connection->rawlist($location);
+
+        if($contents){
+            foreach($contents as $file => $info){
+                if (in_array($file, ['.', '..'])) {
+                    continue;
+                }
+               
+                if($info['type'] === 1){
+                    $files[] = [
+                        'name' => str_replace($this->base . DS,'', $location . DS .  $file),
+                        'timestamp' => $info['mtime'],
+                        'size' => $info['size']
+                    ];
+                }
+                elseif($info['type'] === 2){
+                    
+                    $subDirectory = $file;
+                    if ($directory) {
+                        $subDirectory = $directory . '/' . $file;
+                    }
+
+                    $recursiveFiles = $this->scandir( $subDirectory );
+                    foreach($recursiveFiles as $item){
+                        $files[] = $item;
+                    }
+                }
+            }
         }
-        @fclose($handle);
-        return $results;
+
+        return $files;
     }
 
-
-    /**
-     * For Scandir. Since it adds prefix /
+     /**
+     * Adds the prefix
      *
      * @param string $path
      * @return void
      */
-    protected function buildPath(string $path = null)
-    {
-        $p = $this->string;
-        if ($path) {
-            $p .= '/' . $path; // Need this
+    protected function addPathPrefix(string $path = null){
+        $location = $this->config('root');
+        if($path !== null){
+            $location .= DS . $path;
         }
-        return $p;
-    }
-
-    protected function initConnection()
-    {
-        if (!$this->connection) {
-            $config = $this->config();
-            $this->connect($config['host'], $config['port'], $config['username'], $config['password']??null);
-        }
+        return $location;
     }
 }

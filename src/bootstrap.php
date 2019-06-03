@@ -78,4 +78,7 @@ foreach(['server','database','email'] as $config){
     }
 }
 
+$dotEnv = new Origin\Core\DotEnv();
+$dotEnv->load(CONFIG . DS . '.env');
+
 require CONFIG . '/routes.php';

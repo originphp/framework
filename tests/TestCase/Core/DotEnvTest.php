@@ -19,20 +19,23 @@ use Origin\Core\DotEnv;
 class MockDotEnv extends DotEnv
 {
     protected $env = [];
-    protected function env(string $key,$value){
+    protected function env(string $key, $value)
+    {
         $this->env[$key] = $value;
     }
-    public function getEnv(){
+    public function getEnv()
+    {
         return $this->env;
     }
 }
 
 class DotEnvTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoad(){
-        $dotenv = new MockDotEnv();
-        $dotenv->load(CONFIG . DS  .'.env');
+    public function testLoad()
+    {
+        $dotenv = new MockDotEnv(CONFIG);
+        $dotenv->load();
         $results = $dotenv->getEnv();
-        $this->assertEquals('f9b287655e4decf548a20ae5ea5987af',md5(json_encode($results)));
+        $this->assertEquals('f9b287655e4decf548a20ae5ea5987af', md5(json_encode($results)));
     }
 }

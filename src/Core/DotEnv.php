@@ -24,14 +24,29 @@ use Origin\Exception\Exception;
 
 class DotEnv
 {
+    protected $directory = null;
+
+    /**
+     * The directory where the env file is
+     *
+     * @param string $directory
+     */
+    public function __construct(string $directory = null)
+    {
+        if ($directory === null) {
+            $directory = CONFIG;
+        }
+        $this->directory = $directory;
+    }
     /**
      * Loads an .env file
      *
-     * @param string $filename
      * @return bool
      */
-    public function load(string $filename)
+    public function load()
     {
+        $filename = $this->directory . DS .'.env';
+
         if (file_exists($filename)) {
             $lines = file($filename);
             $env = $this->parse($lines);
