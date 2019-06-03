@@ -14,23 +14,31 @@
 /**
  * Installation
  *
+ * This requires the ssh2 extension.
+ *
  * $ apt-get install php-ssh2
+ *
+ * Alternatives are:
+ * - phpseclib: Pure PHP implementation. This is is going to be slow
+ * -
  */
 namespace Origin\Engine\Storage;
+
 use Origin\Engine\StorageEngine;
 use Origin\Exception\Exception;
 use Origin\Exception\NotFoundException;
 
 class SftpEngine extends StorageEngine
 {
-
     protected $defaultConfig =[
         'host' => null,
         'username' => null,
         'password' => null,
         'port' => null,
-        'path' => null // Must be absolute path
-    ];
+        'root' => null, // Must be absolute path
+        'public' => null, // path to public key file on server
+        'private' => null // path to private key on server
+     ];
 
     /**
      * SSH connection
@@ -49,44 +57,57 @@ class SftpEngine extends StorageEngine
     /**
      * ssh2.sftp://{$sftp}/{folder}
      *
-     * @var [type]
+     * @var string
      */
     protected $string = null;
 
-    /**
-     * Constructor
-     *
-     * @param array $config
-     */
-    public function __construct(array $config=[])
+    public function initialize(array $config)
     {
-        $this->setConfig($config);
-        $this->initialize($config);
+        if (!extension_loaded('ssh2')) {
+            throw new Exception('Ssh2 extension not loaded.');
+        }
+        if ($this->config('public') and !file_exists($this->config('public'))) {
+            throw new NotFoundException('Public key file could not be found.');
+        }
+        if ($this->config('private') and !file_exists($this->config('private'))) {
+            throw new NotFoundException('Private key file could not be found.');
+        }
     }
 
-    protected function connect(string $host, int $port, string $username, string $password)
+    protected function connect(string $host, int $port, string $username, string $password = null)
     {
+        $useSshKeys = ($this->config('public') and $this->config('private'));
         try {
-            $this->connection = ssh2_connect($host, $port);
-        }
-        catch(\Exception $ex){
+            if ($useSshKeys) {
+                $this->connection = ssh2_connect($host, $port, ['hostkey'=>'ssh-rsa']);
+            } else {
+                $this->connection = ssh2_connect($host, $port);
+            }
+        } catch (\Exception $ex) {
             throw new Exception(sprintf('Error connecting to %s:%d', $host, $port));
         }
 
         try {
-            ssh2_auth_password($this->connection, $username, $password);
-        }
-        catch(\Exception $ex){
-            throw new Exception(sprtinf('Invalid username or password'));
+            if ($useSshKeys) {
+                ssh2_auth_pubkey_file(
+                    $this->connection,
+                    $username,
+                    $this->config('public'),
+                    $this->config('private'),
+                    $password
+                );
+            } else {
+                ssh2_auth_password($this->connection, $username, $password);
+            }
+        } catch (\Exception $ex) {
+            throw new Exception('Authentication Error');
         }
         
         try {
             $this->sftp = ssh2_sftp($this->connection);
             $sftp = intval($this->sftp);
-            $this->string = "ssh2.sftp://{$sftp}" . $this->config('path');
-
-        }
-        catch(\Exception $ex){
+            $this->string = "ssh2.sftp://{$sftp}" . $this->config('root');
+        } catch (\Exception $ex) {
             throw new Exception('Error requesting the SFTP subsystem');
         }
     }
@@ -98,13 +119,10 @@ class SftpEngine extends StorageEngine
              * Getting segmentation faults when using ssh2_disconnect($this->connection);
              */
             $this->connection = null;
-          //  unset($this->connection);
+            //  unset($this->connection);
         }
     }
 
-    public function initialize(array $config)
-    {
-    }
 
     /**
      * Reads
@@ -117,13 +135,13 @@ class SftpEngine extends StorageEngine
         $this->initConnection();
       
         $handle = @fopen("{$this->string}/{$name}", 'r'); // $string = 'ssh2.sftp://origindev:origin@gothamdc.dev:22/home/origindev/test.txt';
-        if(!$handle){
-            throw new NotFoundException(sprintf('File %s does not exist',$name));
+        if (!$handle) {
+            throw new NotFoundException(sprintf('File %s does not exist', $name));
         }
 
-        $contents = fread($handle, filesize("{$this->string}/{$name}"));      
+        $contents = fread($handle, filesize("{$this->string}/{$name}"));
         @fclose($handle);
-        return $contents; 
+        return $contents;
     }
 
     public function write(string $name, string $data)
@@ -131,16 +149,16 @@ class SftpEngine extends StorageEngine
         $this->initConnection();
 
         $folder = pathinfo($this->string . DS . $name, PATHINFO_DIRNAME);
-        if(!file_exists($folder)){
-            mkdir($folder,0775,true);
+        if (!file_exists($folder)) {
+            mkdir($folder, 0775, true);
         }
 
-        $handle = @fopen("{$this->string}/{$name}", 'w'); 
-        if(!$handle){
-            throw new Exception(sprintf('Error opening %s for writing',$name));
+        $handle = @fopen("{$this->string}/{$name}", 'w');
+        if (!$handle) {
+            throw new Exception(sprintf('Error opening %s for writing', $name));
         }
        
-        $result = fwrite($handle,$data);
+        $result = fwrite($handle, $data);
             
         @fclose($handle);
 
@@ -151,13 +169,13 @@ class SftpEngine extends StorageEngine
     {
         $this->initConnection();
         $what = "{$this->string}/{$name}";
-        if(file_exists($what)){
-            if(is_dir($what)){
+        if (file_exists($what)) {
+            if (is_dir($what)) {
                 return $this->rmdir($name);
             }
             return unlink($what);
         }
-        throw new NotFoundException(sprintf('%s does not exist',$name));
+        throw new NotFoundException(sprintf('%s does not exist', $name));
     }
 
     /**
@@ -166,16 +184,16 @@ class SftpEngine extends StorageEngine
      * @param string $directory
      * @return void
      */
-    protected function rmdir(string $directory){
+    protected function rmdir(string $directory)
+    {
         $files = $this->scandir($directory);
         foreach ($files as $filename) {
-            
-            if(is_dir($filename)){
+            if (is_dir($filename)) {
                 pr('Is directory' . $filename);
                 $this->rmdir($filename);
                 continue;
             }
-            unlink( "{$this->string}/{$filename}");
+            unlink("{$this->string}/{$filename}");
         }
         return rmdir("{$this->string}/{$directory}");
     }
@@ -201,10 +219,10 @@ class SftpEngine extends StorageEngine
     public function list(string $name = null)
     {
         $this->initConnection();
-        if(file_exists("{$this->string}/{$name}")){
+        if (file_exists("{$this->string}/{$name}")) {
             return $this->scandir($name);
         }
-        throw new NotFoundException(sprintf('%s does not exist',$name));
+        throw new NotFoundException(sprintf('%s does not exist', $name));
     }
 
     /**
@@ -213,27 +231,28 @@ class SftpEngine extends StorageEngine
      * @param string $directory
      * @return void
      */
-    protected function scandir($directory){
+    protected function scandir($directory)
+    {
         $handle = @opendir($this->buildPath($directory));
-        if(!$handle){
-            throw new Exception(sprintf('Error opening %s',$directory));
+        if (!$handle) {
+            throw new Exception(sprintf('Error opening %s', $directory));
         }
        
         $results = [];
-        while (false != ($entry = readdir($handle))){
-            if(in_array($entry,['.', '..'])){
+        while (false != ($entry = readdir($handle))) {
+            if (in_array($entry, ['.', '..'])) {
                 continue;
             }
             $prefix = null;
-            if($directory){
-                $prefix = ltrim($directory,'/') . '/';
+            if ($directory) {
+                $prefix = ltrim($directory, '/') . '/';
             }
-            if(is_dir($this->buildPath($directory).'/'. $entry )){
-                $results  = array_merge($results, $this->scandir($directory . '/'. $entry ));
+            if (is_dir($this->buildPath($directory).'/'. $entry)) {
+                $results  = array_merge($results, $this->scandir($directory . '/'. $entry));
                 continue;
             }
 
-           $results[] =  $prefix . $entry;
+            $results[] =  $prefix . $entry;
         }
         @fclose($handle);
         return $results;
@@ -246,18 +265,20 @@ class SftpEngine extends StorageEngine
      * @param string $path
      * @return void
      */
-    protected function buildPath(string $path = null){
+    protected function buildPath(string $path = null)
+    {
         $p = $this->string;
-        if($path){
+        if ($path) {
             $p .= '/' . $path; // Need this
         }
         return $p;
     }
 
-    protected function initConnection(){
-        if(!$this->connection){
+    protected function initConnection()
+    {
+        if (!$this->connection) {
             $config = $this->config();
-            $this->connect($config['host'],$config['port'],$config['username'],$config['password']);
+            $this->connect($config['host'], $config['port'], $config['username'], $config['password']??null);
         }
     }
 }
