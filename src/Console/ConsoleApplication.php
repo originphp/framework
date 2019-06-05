@@ -28,7 +28,7 @@ use Origin\Core\LazyLoadContainer;
  * 
  * @example:
  * #!/usr/bin/env php
- * require __DIR__ . '/vendor/originphp/originphp/src/bootstrap.php';
+ * require __DIR__ . '/vendor/originphp/framework/src/bootstrap.php';
  * use Origin\Console\ConsoleApplication;
  *  
  * $consoleApplication = new ConsoleApplication();

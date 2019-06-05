@@ -19,7 +19,15 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.6.2] - 2019-06-05
+### Fixed
+- Fixed path issues due to renaming of framework
 
+## [1.6.1] - 2019-06-05
+### Removed
+- removed old disk storage
+
+## [1.6.0] - 2019-06-05
 ### Added
 - Storage class with Local,FTP,and SFTP engines
 

@@ -26,7 +26,7 @@ if (!defined('DS')) {
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
     define('CONFIG', ROOT . DS . 'config');
     define('LOGS', ROOT . DS . 'logs');
-    define('ORIGIN', ROOT . '/vendor/originphp/originphp');
+    define('ORIGIN', ROOT . '/vendor/originphp/framework');
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
     define('APP', ROOT);

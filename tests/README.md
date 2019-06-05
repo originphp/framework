@@ -19,7 +19,7 @@ $ bin/console db create origin_test -ds=test
 When using composer create project, it does not download the framework tests, you must fetch these manually and then copy the tests folder.
 
 ```linux
-$ git clone https://github.com/originphp/originphp tmp
+$ git clone https://github.com/originphp/framework tmp
 $ cp -r tmp/tests <folder>
 ```
 

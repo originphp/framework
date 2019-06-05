@@ -25,8 +25,8 @@ class PluginInstallCommandTest extends OriginTestCase
     public function testGetUrl(){
         $cmd = new MockPluginInstallCommand();
         $this->assertEquals(
-            'https://github.com/originphp/originphp.git',
-            $cmd->callMethod('getUrl',['originphp/originphp'])
+            'https://github.com/originphp/framework.git',
+            $cmd->callMethod('getUrl',['originphp/framework'])
         );
     }
 
@@ -34,7 +34,7 @@ class PluginInstallCommandTest extends OriginTestCase
         $cmd = new MockPluginInstallCommand();
         $this->assertEquals(
             'user_management',
-            $cmd->callMethod('getPlugin',['https://github.com/originphp/originphp.git','UserManagement'])
+            $cmd->callMethod('getPlugin',['https://github.com/originphp/framework.git','UserManagement'])
         );
 
         $this->assertEquals(
@@ -56,7 +56,7 @@ class PluginInstallCommandTest extends OriginTestCase
         $bufferedOutput = new ConsoleOutput();
         $cmd->io = new ConsoleIo($bufferedOutput,new ConsoleOutput());
  
-        $cmd->run(['originphp/originphp','UserManagement']);
+        $cmd->run(['originphp/framework','UserManagement']);
         $this->assertContains('UserManagement Plugin installed',$bufferedOutput->read());
         $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
         file_put_contents(CONFIG . '/bootstrap.php',str_replace("\nPlugin::load('UserManagement');\n",'',$bootstrap));
@@ -75,8 +75,8 @@ class PluginInstallCommandTest extends OriginTestCase
         $bufferedOutput = new ConsoleOutput();
         $cmd->io = new ConsoleIo($bufferedOutput,$bufferedOutput);
  
-        $cmd->run(['originphp/originphp','UserManagement']);
-        $this->assertContains('Plugin not downloaded from `https://github.com/originphp/originphp.git`',$bufferedOutput->read());
+        $cmd->run(['originphp/framework','UserManagement']);
+        $this->assertContains('Plugin not downloaded from `https://github.com/originphp/framework.git`',$bufferedOutput->read());
     }
 
     public function testInvalidPluginName(){
@@ -93,7 +93,7 @@ class PluginInstallCommandTest extends OriginTestCase
 
     /*
     public function testExecute(){
-        $this->exec('plugin:install originphp/originphp DummyPlugin');
+        $this->exec('plugin:install originphp/framework DummyPlugin');
         $this->assertExitSuccess();
         $this->assertOutputContains('DummyPlugin Plugin installed');
         $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
