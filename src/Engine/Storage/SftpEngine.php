@@ -49,14 +49,14 @@ class SftpEngine extends StorageEngine
     public function initialize(array $config)
     {
         //"phpseclib/phpseclib
-        if(!class_exists(SFTP::class)){
+        if (!class_exists(SFTP::class)) {
             throw new Exception('phpseclib not installed.');
         }
-        if($this->config('host') === null){
+        if ($this->config('host') === null) {
             throw new InvalidArgumentException('No host set');
         }
 
-        if($this->config('privateKey') AND !file_Exists($this->config('privateKey'))){
+        if ($this->config('privateKey') and !file_Exists($this->config('privateKey'))) {
             throw new NotFoundException(sprintf('%s could not be found'));
         }
 
@@ -69,27 +69,30 @@ class SftpEngine extends StorageEngine
         $this->login();
 
         // Set ROOT
-        if($this->config('root') === null){
-            $this->config('root',$this->connection->pwd());
+        if ($this->config('root') === null) {
+            $this->config('root', $this->connection->pwd());
         }
-
     }
 
-    protected function login(){
+    protected function login()
+    {
         $config = $this->config();
         extract($config);
-        if($this->config('privateKey')){
+        if ($this->config('privateKey')) {
             $password = new RSA();
-            if($this->config('password')){
+            if ($this->config('password')) {
                 $password->setPassword($this->config('password')); # Must be set before loadKey
             }
-            $password ->loadKey(file_get_contents($this->config('privateKey')));             
+            $privateKey = $this->config('privateKey');
+            if (substr($privateKey, 0,5) !== '-----') {
+                $privateKey = file_get_contents(privateKey);
+            }
+            $password ->loadKey($privateKey);
         }
        
-        if (!$this->connection->login($username,$password)) {
+        if (!$this->connection->login($username, $password)) {
             throw new Exception('Invalid username or password');
         }
-        
     }
 
     /**
@@ -102,7 +105,7 @@ class SftpEngine extends StorageEngine
     {
         $filename = $this->addPathPrefix($name);
 
-        if ($this->connection->is_file($filename))  {
+        if ($this->connection->is_file($filename)) {
             return $this->connection->get($filename);
         }
         throw new NotFoundException(sprintf('File %s does not exist', $name));
@@ -124,7 +127,7 @@ class SftpEngine extends StorageEngine
             $this->connection->mkdir($folder, 0744, true);
         }
 
-       return $this->connection->put($filename,$data);
+        return $this->connection->put($filename, $data);
     }
 
     /**
@@ -137,7 +140,7 @@ class SftpEngine extends StorageEngine
     {
         $filename = $this->addPathPrefix($name);
         if ($this->connection->stat($filename)) {
-            return$this->connection->delete($filename,true);
+            return$this->connection->delete($filename, true);
         }
         throw new NotFoundException(sprintf('%s does not exist', $name));
     }
@@ -150,8 +153,8 @@ class SftpEngine extends StorageEngine
      */
     public function exists(string $name)
     {
-      $filename = $this->addPathPrefix($name);
-      return (bool) $this->connection->stat( $filename );
+        $filename = $this->addPathPrefix($name);
+        return (bool) $this->connection->stat($filename);
     }
 
     /**
@@ -163,41 +166,40 @@ class SftpEngine extends StorageEngine
     {
         $directory = $this->addPathPrefix($name);
 
-        if(!$this->connection->is_dir($directory)){
+        if (!$this->connection->is_dir($directory)) {
             throw new NotFoundException('directory does not exist');
         }
         $this->base = $this->addPathPrefix($name);
         return $this->scandir($name);
     }
 
-    protected function scandir(string $directory = null){
+    protected function scandir(string $directory = null)
+    {
         $location = $this->addPathPrefix($directory);
         $files = [];
 
         $contents = $this->connection->rawlist($location);
 
-        if($contents){
-            foreach($contents as $file => $info){
+        if ($contents) {
+            foreach ($contents as $file => $info) {
                 if (in_array($file, ['.', '..'])) {
                     continue;
                 }
                
-                if($info['type'] === 1){
+                if ($info['type'] === 1) {
                     $files[] = [
-                        'name' => str_replace($this->base . DS,'', $location . DS .  $file),
+                        'name' => str_replace($this->base . DS, '', $location . DS .  $file),
                         'timestamp' => $info['mtime'],
                         'size' => $info['size']
                     ];
-                }
-                elseif($info['type'] === 2){
-                    
+                } elseif ($info['type'] === 2) {
                     $subDirectory = $file;
                     if ($directory) {
                         $subDirectory = $directory . '/' . $file;
                     }
 
-                    $recursiveFiles = $this->scandir( $subDirectory );
-                    foreach($recursiveFiles as $item){
+                    $recursiveFiles = $this->scandir($subDirectory);
+                    foreach ($recursiveFiles as $item) {
                         $files[] = $item;
                     }
                 }
@@ -207,15 +209,16 @@ class SftpEngine extends StorageEngine
         return $files;
     }
 
-     /**
-     * Adds the prefix
-     *
-     * @param string $path
-     * @return void
-     */
-    protected function addPathPrefix(string $path = null){
+    /**
+    * Adds the prefix
+    *
+    * @param string $path
+    * @return string
+    */
+    protected function addPathPrefix(string $path = null)
+    {
         $location = $this->config('root');
-        if($path !== null){
+        if ($path !== null) {
             $location .= DS . $path;
         }
         return $location;

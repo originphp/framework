@@ -46,9 +46,9 @@ class Storage
      * Gets the  configured storage engine
      *
      * @param string $config
-     * @return Origin\Engine\Storage\StorageEngine
+     * @return \Origin\Engine\StorageEngine
      */
-    public static function get(string $name)
+    public static function engine(string $name)
     {
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
@@ -59,8 +59,7 @@ class Storage
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Engine\Storage\\{$config['engine']}Engine";
             }
-
-            if(empty($config['className'])){
+            if (empty($config['className'])) {
                 throw new InvalidArgumentException("Storage engine for {$name} could not be found");
             }
             return static::$loaded[$name] = new $config['className']($config);
@@ -75,8 +74,9 @@ class Storage
      * @param string $config
      * @return void
      */
-    public static function use(string $config){
-        if(!static::config($config)){
+    public static function use(string $config)
+    {
+        if (!static::config($config)) {
             throw new InvalidArgumentException("{$config} config does not exist");
         }
         self::$use = $config;
@@ -91,7 +91,7 @@ class Storage
      */
     public static function read(string $name)
     {
-        return static::get(self::$use)->read($name);
+        return static::engine(self::$use)->read($name);
     }
     /**
      * Writes an item from Cache
@@ -103,7 +103,7 @@ class Storage
      */
     public static function write(string $name, $value):bool
     {
-        return static::get(self::$use)->write($name,$value);
+        return static::engine(self::$use)->write($name, $value);
     }
 
     /**
@@ -116,7 +116,7 @@ class Storage
      */
     public static function exists(string $name):bool
     {
-        return static::get(self::$use)->exists($name);
+        return static::engine(self::$use)->exists($name);
     }
 
     /**
@@ -128,7 +128,7 @@ class Storage
      */
     public static function delete(string $name) :bool
     {
-        return static::get(self::$use)->delete($name);
+        return static::engine(self::$use)->delete($name);
     }
 
     /**
@@ -139,7 +139,6 @@ class Storage
      */
     public static function list(string $path = null) :array
     {
-        return static::get(self::$use)->list($path);
+        return static::engine(self::$use)->list($path);
     }
-  
 }

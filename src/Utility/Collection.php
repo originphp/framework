@@ -17,7 +17,7 @@ use ArrayAccess;
 use Iterator;
 use Countable;
 
-class Collection implements Iterator, Countable
+class Collection implements ArrayAccess, Iterator, Countable
 {
     protected $items = null;
     protected $position = 0;
@@ -465,7 +465,7 @@ class Collection implements Iterator, Countable
      *
      * @param string $path key, dotted notation
      * @param mixed $values
-     * @return void
+     * @return \Origin\Utility\Collection
      */
     public function insert(string $path, $values)
     {
@@ -492,20 +492,26 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Takes a number of items from the collection, the next time you
-     * call take, it will bring the next set of items
+     * Takes a number of items from the collection.
      *
-     * @param integer $count
-     * @return void
+     * @param integer $count how many items to take
+     * @param integer $from from which offset
+     * @return \Origin\Utility\Collection
      */
-    public function take(int $count)
+    public function take(int $count, int $from=0)
     {
         $items = [];
-        for ($i=0;$i<$count;$i++) {
-            $result = next($this->items);
-            if ($result) {
-                $items[] = $result;
+        $to = $from + $count - 1;
+
+        $i=0;
+        foreach ($this->items as $item) {
+            if ($i > $to) {
+                break;
             }
+            if ($i >= $from) {
+                $items[] = $item;
+            }
+            $i++;
         }
         return new Collection($items);
     }
@@ -609,7 +615,30 @@ class Collection implements Iterator, Countable
         }
         return $value;
     }
+    // ArrayAccess
+    public function offsetExists($key)
+    {
+        return array_key_exists($key, $this->items);
+    }
+ 
+    public function offsetSet($key, $value)
+    {
+        if (is_null($key)) {
+            $this->items[] = $value;
+        } else {
+            $this->items[$key] = $value;
+        }
+    }
+ 
+    public function offsetGet($key)
+    {
+        return $this->items[$key];
+    }
 
+    public function offsetUnset($key)
+    {
+        unset($this->items[$key]);
+    }
     // Interable
     public function rewind()
     {

@@ -21,33 +21,23 @@ namespace Origin\Core;
  * - Multilines can parsed
  */
 use Origin\Exception\Exception;
+use Origin\Exception\NotFoundException;
 
 class DotEnv
 {
-    protected $directory = null;
-
-    /**
-     * The directory where the env file is
-     *
-     * @param string $directory
-     */
-    public function __construct(string $directory = null)
-    {
-        if ($directory === null) {
-            $directory = CONFIG;
-        }
-        $this->directory = $directory;
-    }
     /**
      * Loads an .env file
      *
      * @return bool
      */
-    public function load()
+    public function load(string $filename = null)
     {
-        $filename = $this->directory . DS .'.env';
-
-        if (file_exists($filename)) {
+    
+        if($filename === null){
+            $filename  = CONFIG . '.env';
+        }   
+        
+        if(is_readable($filename)){
             $lines = file($filename);
             $env = $this->parse($lines);
             foreach ($env as $key => $value) {
@@ -55,7 +45,7 @@ class DotEnv
             }
             return true;
         }
-        return false;
+       throw new NotFoundException(sprintf('%s could not be found.',$filename));
     }
 
     /**

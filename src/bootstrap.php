@@ -72,13 +72,16 @@ require __DIR__ . '/functions.php';
  */
 require CONFIG . '/bootstrap.php';
 
-foreach(['server','database','email'] as $config){
+
+if(file_exists(CONFIG . DS . '.env')){
+  $dotEnv = new Origin\Core\DotEnv();
+  $dotEnv->load(CONFIG . DS . '.env');
+}
+
+foreach(['server','database','email','storage'] as $config){
     if (file_exists(CONFIG . DS .  $config . '.php')) {
         include CONFIG . DS .  $config . '.php';
     }
 }
-
-$dotEnv = new Origin\Core\DotEnv();
-$dotEnv->load(CONFIG . DS . '.env');
 
 require CONFIG . '/routes.php';

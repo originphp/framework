@@ -19,10 +19,18 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- Storage class with Local,FTP,and SFTP engines
+
 ### Changed
+- Datasource Engines moved to Engine\Datasource
+- Cache Engines moved to Engine\Cache
+- Cache Engine moved to Origin\Utility namespace
 - Refactored CacheEngine to abstract class
 
 ### Fixed
+- Collection take
+- Collection return type hinting
 - Typos in Locales Generator
 
 ## [1.5.1] - 2019-05-31

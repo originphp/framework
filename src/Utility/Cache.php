@@ -45,10 +45,10 @@ class Cache
     protected static $nullEngine = null;
 
     /**
-     * Gets the cache engine
+     * Gets the configfured cache engine
      *
      * @param string $config
-     * @return Origin\Utility\CacheEngine
+     * @return \Origin\Engine\CacheEngine
      */
     public static function engine(string $name)
     {
@@ -66,7 +66,7 @@ class Cache
                 $config['className'] = "Origin\Engine\Cache\\{$config['engine']}Engine";
             }
             
-            if(empty($config['className'])){
+            if (empty($config['className'])) {
                 throw new InvalidArgumentException("Cache engine for {$name} could not be found");
             }
             return static::$loaded[$name] = new $config['className']($config);

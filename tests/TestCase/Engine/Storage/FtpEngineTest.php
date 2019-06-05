@@ -16,47 +16,56 @@ namespace Origin\Test\Engine\Storage;
 
 use Origin\Utility\Storage;
 
-class LocalEngineTest extends \PHPUnit\Framework\TestCase
+class FtpEngineTest extends \PHPUnit\Framework\TestCase
 {
-
     public function setUp(){
-        Storage::use('default'); # Important
-    }
+        if(!env('FTP_USERNAME')){
+            $this->markTestSkipped('FTP env vars not set');
+        }
+        Storage::config('ftp',[ 
+            'engine' => 'ftp',
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD')
+        ]);
 
-    public function testConfig()
-    {
-        $config = Storage::config('default');
-        $this->assertEquals('Origin\Engine\Storage\LocalEngine',$config['className']);
-        $this->assertEquals(APP .DS . 'storage',$config['path']);
-      
+        Storage::use('ftp');
     }
-
     public function testReadWrite(){
         $id = uniqid();
 
-        $filename = APP . DS . 'storage' . DS  .'test.txt';
         Storage::write('test.txt', $id );
-        $this->assertEquals( $id ,file_get_contents($filename));
         Storage::write('folder/another-test.txt',$id );
         $this->assertEquals($id ,Storage::read('test.txt'));
         $this->assertEquals($id ,Storage::read('folder/another-test.txt'));
     }
 
+    /**
+     * @depends testReadWrite
+     */
     public function testList(){
         
         $contents = Storage::list();
-   
-        $this->assertEquals('folder/another-test.txt',$contents[0]['name']);
-        $this->assertEquals('test.txt',$contents[1]['name']);
-        $this->assertTrue($contents[0]['timestamp']>strtotime('-1 minute'));
-        $this->assertEquals(2,count($contents));
-        $this->assertEquals(13,$contents[1]['size']);
+  
+        $results = collection($contents)->filter(function($result){
+            return in_array($result['name'],['folder/another-test.txt','test.txt']);
+        })->toList();
+
+ 
+        $this->assertEquals('test.txt', $results[1]['name']);
+        $this->assertTrue($results[1]['timestamp']>strtotime('-1 minute'));
+       
+        $this->assertEquals('folder/another-test.txt',$results[0]['name']);
+        $this->assertEquals(13, $results[0]['size']);
 
         $contents = Storage::list('folder');
+
         $this->assertEquals('another-test.txt',$contents[0]['name']);
         $this->assertEquals(1,count($contents));
     }
-
+   /**
+     * @depends testReadWrite
+     */
     public function testExists(){
         $this->assertTrue(Storage::exists('test.txt'));
         $this->assertFalse(Storage::exists('tests.txt'));
@@ -73,12 +82,15 @@ class LocalEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(Storage::exists('folder/another-test.txt'));
 
     }
-
+   /**
+     * @depends testReadWrite
+     */
     public function testDeleteFolder(){
        
         Storage::write('delete_me/test.txt',uniqid());
+        $this->assertTrue(Storage::exists('delete_me'));
         $this->assertTrue(Storage::exists('delete_me/test.txt'));
         Storage::delete('delete_me');
-        $this->assertEquals([],Storage::list());
+        $this->assertFalse(Storage::exists('delete_me'));
     }
 }

@@ -366,7 +366,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     {
         $collection = collection($this->books);
         $first = $collection->take(2);
-        $second = $collection->take(2);
+        $second = $collection->take(2,2);
         $this->assertEquals(2, count($first->toArray()));
         $this->assertEquals(2, count($second->toArray()));
         $this->assertFalse($first->toArray() === $second->toArray());
@@ -377,6 +377,8 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $collection = collection($this->books);
         $this->assertIsArray($collection->__debugInfo());
     }
+    /*
+    @internal removed. Collection object should not be used as array.
     public function testArrayAccess()
     {
         $collection = collection($this->books);
@@ -387,7 +389,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $collection[5]);
         unset($collection[0]);
         $this->assertFalse(isset($collection[0]));
-    }
+    }*/
     public function testCountable()
     {
         $collection = collection($this->books);
