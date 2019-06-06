@@ -19,6 +19,12 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.6.3] - 2019-06-06
+### Fixed
+- Fixed some session check
+### Added
+- DotEnv now parses with export
+
 ### Depreciated
 - Session check
 - Cache check
@@ -26,7 +32,7 @@ Delete tag:   git tag -d <tag_name>
 ### Removed
 - Removed tests which were duplicated due to structure change
 
-## [1.6.2] - 2019-06-05
+## [1.6.2] - 2019-06-06
 ### Fixed
 - Fixed path issues due to renaming of framework
 

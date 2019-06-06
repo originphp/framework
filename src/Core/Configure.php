@@ -12,6 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace Origin\Core;
+use Origin\Exception\NotFoundException;
 
 use Origin\Core\Dot;
 
@@ -36,7 +37,29 @@ class Configure
         }
         return self::$dot;
     }
-
+ 
+    /**
+     * Loads values from a file e.g. config/application.php
+     *
+     * @param string $filename
+     * @return bool
+     */
+    /* @todo not implemented or tested
+    public static function load(string $filename){
+        if(is_readable($filename)){
+            $result = include $filename;
+            if(is_array($result)){
+                foreach($result as $key => $value){
+                    self::dot()->set($key, $value);
+                }
+                return true;
+            }
+            return false;
+        }
+        throw new NotFoundException(sprintf('%s could not be found.', $filename));
+    }
+    */
+   
     /**
      * Writes to global config
      *
@@ -69,7 +92,7 @@ class Configure
      * @param string $key The key to check, accepts also dot notation e.g. Session.timeout
      * @return bool
      */
-    public static function check(string $key = null) :bool
+    public static function exists(string $key = null) :bool
     {
         return self::dot()->has($key);
     }

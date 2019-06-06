@@ -65,32 +65,32 @@ class ConfigureTest extends \PHPUnit\Framework\TestCase
     public function testHas()
     {
         Configure::write('Test.value', 'ok');
-        $this->assertTrue(Configure::check('Test.value'));
-        $this->assertFalse(Configure::check('Test.bar'));
-        $this->assertFalse(Configure::check('nonExistant'));
+        $this->assertTrue(Configure::exists('Test.value'));
+        $this->assertFalse(Configure::exists('Test.bar'));
+        $this->assertFalse(Configure::exists('nonExistant'));
     }
 
     public function testDelete()
     {
         Configure::write('Name.key1', 'one');
-        $this->assertTrue(Configure::check('Name.key1'));
+        $this->assertTrue(Configure::exists('Name.key1'));
 
         Configure::write('Name.key2', 'two');
-        $this->assertTrue(Configure::check('Name.key2'));
+        $this->assertTrue(Configure::exists('Name.key2'));
 
         Configure::write('Name.key3', 'three');
-        $this->assertTrue(Configure::check('Name.key3'));
+        $this->assertTrue(Configure::exists('Name.key3'));
 
         Configure::delete('Name.key3');
-        $this->assertFalse(Configure::check('Name.key3'));
+        $this->assertFalse(Configure::exists('Name.key3'));
 
-        $this->assertTrue(Configure::check('Name.key1'));
-        $this->assertTrue(Configure::check('Name.key2'));
+        $this->assertTrue(Configure::exists('Name.key1'));
+        $this->assertTrue(Configure::exists('Name.key2'));
         
         Configure::delete('Name');
-        $this->assertFalse(Configure::check('Name.key1'));
-        $this->assertFalse(Configure::check('Name.key2'));
-        $this->assertFalse(Configure::check('Name'));
+        $this->assertFalse(Configure::exists('Name.key1'));
+        $this->assertFalse(Configure::exists('Name.key2'));
+        $this->assertFalse(Configure::exists('Name'));
     }
 
     /**
@@ -100,7 +100,7 @@ class ConfigureTest extends \PHPUnit\Framework\TestCase
     {
         $dot = MockConfigure::getDot();
         MockConfigure::setDot(null);
-        MockConfigure::check('foo');
+        MockConfigure::exists('foo');
         $this->assertInstanceOf(Dot::class, MockConfigure::getDot());
         MockConfigure::setDot($dot);// restore
     }

@@ -32,12 +32,11 @@ class DotEnv
      */
     public function load(string $filename = null)
     {
-    
-        if($filename === null){
+        if ($filename === null) {
             $filename  = CONFIG . '.env';
-        }   
+        }
         
-        if(is_readable($filename)){
+        if (is_readable($filename)) {
             $lines = file($filename);
             $env = $this->parse($lines);
             foreach ($env as $key => $value) {
@@ -45,7 +44,7 @@ class DotEnv
             }
             return true;
         }
-       throw new NotFoundException(sprintf('%s could not be found.',$filename));
+        throw new NotFoundException(sprintf('%s could not be found.', $filename));
     }
 
     /**
@@ -75,6 +74,10 @@ class DotEnv
             $row = trim($row);
             if ($row === null or $row ==='' or substr($row, 0, 1) === '#') {
                 continue;
+            }
+            
+            if (substr($row, 0, 7) === 'export ') {
+                $row = substr($row, 7);
             }
 
             # Comment Stripper

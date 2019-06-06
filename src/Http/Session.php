@@ -74,7 +74,7 @@ class Session
      */
     protected function timedOut($timeout = 3600) : bool
     {
-        if (Configure::check('Session.timeout')) {
+        if (Configure::exists('Session.timeout')) {
             $timeout = Configure::read('Session.timeout');
         }
         $lastActivity = $this->read('Session.lastActivity');
