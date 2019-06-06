@@ -49,7 +49,7 @@ require ORIGIN . '/src/Exception/Exception.php';
  * Load our own autoloader
  */
 require ORIGIN . '/src/Core/Autoloader.php';
-require CONFIG . '/autoload.php';
+
 /**
  * Load the composer autoloader
  */

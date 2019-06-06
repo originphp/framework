@@ -31,6 +31,24 @@ class Plugin
      */
     protected static $loaded = [];
 
+
+    /**
+     * Initializes the Plugin Object
+     * Will load the plugins installed by composer
+     */
+    public static function initialize(){
+        $composerPlugins = ROOT . DS . 'vendor' . DS . 'originphp-plugins.json';
+        if (file_exists( $composerPlugins)) {
+            $composer = json_decode(file_get_contents($composerPlugins),true);
+            foreach($composer as $plugin => $path){
+                static::load($plugin,[
+                    'path' => $path, // Put to verify exists
+                    'autoload'=>false
+                    ]);
+            }
+        }
+     }
+
     /**
      * Checks if a plugin is loaded or returns a list of loaded plugins
      *
@@ -45,6 +63,7 @@ class Plugin
         return array_keys(static::$loaded);
     }
 
+
     /**
      * Loads a plugin
      *
@@ -56,28 +75,20 @@ class Plugin
         $options += [
             'routes' => true,
             'bootstrap' => true,
-            'path' => PLUGINS . DS . Inflector::underscore($plugin)
+            'path' => PLUGINS . DS . Inflector::underscore($plugin),
+            'autoload' => true,
         ];
-
-        /**
-         * Check plugins loaded by composer
-         */
-        $composerPlugins = ROOT . DS . 'plugins.json';
-        if (!file_exists($options['path']) AND file_exists( $composerPlugins)) {
-            $composer = json_decode(file_get_contents($composerPlugins),true);
-            if(isset($composer[$plugin])){
-                $options['path'] = $composer[$plugin];
-            }
-        }
-    
         if (!file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
         }
+
         static::$loaded[$plugin] = $options;
 
         static::bootstrap($plugin);
- 
-        static::autoload($plugin);
+
+        if($options['autoload']){
+            static::autoload($plugin);
+        }
     }
 
     /**
