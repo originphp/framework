@@ -21,7 +21,7 @@ class NullEngineTest extends \PHPUnit\Framework\TestCase
     public function testSet()
     {
         $cache = new NullEngine();
-        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertTrue($cache->write('foo', 'bar'));
     }
     /**
      * @depends testSet
@@ -29,8 +29,8 @@ class NullEngineTest extends \PHPUnit\Framework\TestCase
     public function testGet()
     {
         $cache = new NullEngine();
-        $cache->set('foo', 'bar');
-        $this->assertFalse($cache->get('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertFalse($cache->read('foo'));
     }
     /**
      * @depends testSet
@@ -38,8 +38,8 @@ class NullEngineTest extends \PHPUnit\Framework\TestCase
     public function testHas()
     {
         $cache = new NullEngine();
-        $cache->set('foo', 'bar');
-        $this->assertFalse($cache->has('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertFalse($cache->exists('foo'));
     }
     /**
      * @depends testHas

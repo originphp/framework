@@ -19,6 +19,13 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Depreciated
+- Session check
+- Cache check
+
+### Removed
+- Removed tests which were duplicated due to structure change
+
 ## [1.6.2] - 2019-06-05
 ### Fixed
 - Fixed path issues due to renaming of framework

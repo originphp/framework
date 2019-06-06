@@ -27,7 +27,7 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     public function testSet()
     {
         $cache = new FileEngine();
-        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertTrue($cache->write('foo', 'bar'));
         $this->assertEquals('bar', unserialize(file_get_contents(TMP .'/cache/cache_foo')));
     }
     /**
@@ -36,9 +36,9 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     public function testGet()
     {
         $cache = new FileEngine();
-        $this->assertFalse($cache->get('foo'));
-        $cache->set('foo', 'bar');
-        $this->assertEquals('bar', $cache->get('foo'));
+        $this->assertFalse($cache->read('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertEquals('bar', $cache->read('foo'));
     }
     /**
      * @depends testSet
@@ -46,9 +46,9 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     public function testHas()
     {
         $cache = new FileEngine();
-        $this->assertFalse($cache->has('foo'));
-        $cache->set('foo', 'bar');
-        $this->assertTrue($cache->has('foo'));
+        $this->assertFalse($cache->exists('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertTrue($cache->exists('foo'));
     }
     /**
      * @depends testHas
@@ -56,21 +56,21 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     public function testDelete()
     {
         $cache = new FileEngine();
-        $cache->set('foo', 'bar');
-        $this->assertTrue($cache->has('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertTrue($cache->exists('foo'));
         $this->assertTrue($cache->delete('foo'));
         
-        $this->assertFalse($cache->has('foo'));
+        $this->assertFalse($cache->exists('foo'));
         $this->assertFalse($cache->delete('foo'));
     }
     public function testClear()
     {
         $cache = new FileEngine();
-        $cache->set('foo', 'bar');
-        $cache->set('bar', 'foo');
+        $cache->write('foo', 'bar');
+        $cache->write('bar', 'foo');
         $this->assertTrue($cache->clear());
-        $this->assertFalse($cache->has('foo'));
-        $this->assertFalse($cache->has('bar'));
+        $this->assertFalse($cache->exists('foo'));
+        $this->assertFalse($cache->exists('bar'));
     }
     public function testIncrement()
     {

@@ -27,7 +27,7 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testSet()
     {
         $cache = new MockArrayEngine();
-        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertTrue($cache->write('foo', 'bar'));
         $this->assertArrayHasKey('foo', $cache->getProperty('data'));
     }
     /**
@@ -36,9 +36,9 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testGet()
     {
         $cache = new ArrayEngine();
-        $this->assertFalse($cache->get('foo'));
-        $cache->set('foo', 'bar');
-        $this->assertEquals('bar', $cache->get('foo'));
+        $this->assertFalse($cache->read('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertEquals('bar', $cache->read('foo'));
     }
     /**
      * @depends testSet
@@ -46,9 +46,9 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testHas()
     {
         $cache = new ArrayEngine();
-        $this->assertFalse($cache->has('foo'));
-        $cache->set('foo', 'bar');
-        $this->assertTrue($cache->has('foo'));
+        $this->assertFalse($cache->exists('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertTrue($cache->exists('foo'));
     }
     /**
      * @depends testHas
@@ -56,27 +56,27 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     public function testDelete()
     {
         $cache = new ArrayEngine();
-        $cache->set('foo', 'bar');
-        $this->assertTrue($cache->has('foo'));
+        $cache->write('foo', 'bar');
+        $this->assertTrue($cache->exists('foo'));
         $this->assertTrue($cache->delete('foo'));
         
-        $this->assertFalse($cache->has('foo'));
+        $this->assertFalse($cache->exists('foo'));
         $this->assertFalse($cache->delete('foo'));
     }
     public function testClear()
     {
         $cache = new ArrayEngine();
-        $cache->set('foo', 'bar');
-        $cache->set('bar', 'foo');
+        $cache->write('foo', 'bar');
+        $cache->write('bar', 'foo');
         $this->assertTrue($cache->clear());
-        $this->assertFalse($cache->has('foo'));
-        $this->assertFalse($cache->has('bar'));
+        $this->assertFalse($cache->exists('foo'));
+        $this->assertFalse($cache->exists('bar'));
     }
     public function testIncrement()
     {
         $cache = new ArrayEngine();
         $this->assertEquals(1, $cache->increment('counter'));
-        $cache->set('counter', 100);
+        $cache->write('counter', 100);
         $this->assertEquals(101, $cache->increment('counter'));
         $this->assertEquals(110, $cache->increment('counter', 9));
     }
@@ -84,7 +84,7 @@ class ArrayEngineTest extends \PHPUnit\Framework\TestCase
     {
         $cache = new ArrayEngine();
         $this->assertEquals(-1, $cache->decrement('counter'));
-        $cache->set('counter', 110);
+        $cache->write('counter', 110);
         $this->assertEquals(109, $cache->decrement('counter'));
         $this->assertEquals(100, $cache->decrement('counter', 9));
     }

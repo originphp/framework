@@ -45,8 +45,8 @@ class SessionTest extends \PHPUnit\Framework\TestCase
     public function testCheck()
     {
         $this->Session->write('Test.status', 'ok');
-        $this->assertTrue($this->Session->check('Test.status'));
-        $this->assertFalse($this->Session->check('Test.password'));
+        $this->assertTrue($this->Session->exists('Test.status'));
+        $this->assertFalse($this->Session->exists('Test.password'));
     }
 
     public function testDelete()
@@ -62,7 +62,7 @@ class SessionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($this->Session->started());
         $this->Session->destroy();
-        $this->assertFalse($this->Session->check('Test.status'));
+        $this->assertFalse($this->Session->exists('Test.status'));
     }
     /**
      * @depends testDestroy
@@ -72,7 +72,7 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->Session->destroy();
         $this->Session->start();
         $this->Session->write('Test.status', 'ok');
-        $this->assertTrue($this->Session->check('Test.status'));
+        $this->assertTrue($this->Session->exists('Test.status'));
     }
 
     public function testReset()

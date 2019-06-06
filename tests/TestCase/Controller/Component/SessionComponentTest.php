@@ -33,9 +33,9 @@ class SessionComponentTest extends \PHPUnit\Framework\TestCase
     }
     public function testCheck()
     {
-        $this->assertFalse($this->Session->check('password'));
+        $this->assertFalse($this->Session->exists('password'));
         $this->Session->write('foo', 'bar');
-        $this->assertTrue($this->Session->check('foo'));
+        $this->assertTrue($this->Session->exists('foo'));
     }
     public function testRead()
     {
@@ -45,17 +45,17 @@ class SessionComponentTest extends \PHPUnit\Framework\TestCase
     public function testDelete()
     {
         $this->Session->write('foo', 'bar');
-        $this->assertTrue($this->Session->check('foo'));
+        $this->assertTrue($this->Session->exists('foo'));
 
         $this->Session->delete('foo');
-        $this->assertFalse($this->Session->check('foo'));
+        $this->assertFalse($this->Session->exists('foo'));
     }
 
     public function testdestroy()
     {
         $this->Session->write('foo', 'bar');
-        $this->assertTrue($this->Session->check('foo'));
+        $this->assertTrue($this->Session->exists('foo'));
         $this->Session->destroy();
-        $this->assertFalse($this->Session->check('foo'));
+        $this->assertFalse($this->Session->exists('foo'));
     }
 }
