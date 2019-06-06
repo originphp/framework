@@ -36,21 +36,21 @@ abstract class CacheEngine
     }
 
     /**
-     * Sets a value in the cache
+     * writes a value in the cache
      *
      * @param string $key
      * @param mixed $value
      * @return bool
      */
-    abstract function set(string $key, $value);
+    abstract function write(string $key, $value);
     
     /**
-     * Gets the value;
+     * reads the value;
      * @todo returns false always
      * @param string $key
      * @return void
      */
-    abstract function get(string $key);
+    abstract function read(string $key);
 
     /**
      * Checks if a key exists in the cache
@@ -58,7 +58,7 @@ abstract class CacheEngine
      * @param string $key
      * @return boolean
      */
-    abstract function has(string $key);
+    abstract function exists(string $key);
     /**
      * Deletes a key from the cache
      *

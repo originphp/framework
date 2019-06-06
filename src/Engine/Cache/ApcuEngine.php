@@ -42,23 +42,23 @@ class ApcuEngine extends CacheEngine
         }
     }
     /**
-     * Sets a value in the cache
+     * writes a value in the cache
      *
      * @param string $key
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         return apcu_store($this->key($key), $value, $this->config['duration']);
     }
     /**
-     * Gets the value;
+     * reads a value from the cache
      * @todo returns false always
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
         return apcu_fetch($this->key($key));
     }
@@ -68,7 +68,7 @@ class ApcuEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         return apcu_exists($this->key($key));
     }

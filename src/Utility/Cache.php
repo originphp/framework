@@ -35,7 +35,19 @@ class Cache
      */
     protected static $loaded = [];
 
+    /**
+     * Holds the enabled/disabled bool
+     *
+     * @var boolean
+     */
     protected static $disabled = false;
+
+   /**
+     * Which storage config is being used
+     *
+     * @var string
+     */
+    protected static $use = 'default';
 
     /**
      * Undocumented variable
@@ -73,31 +85,45 @@ class Cache
         }
         throw new InvalidArgumentException("{$config} config does not exist");
     }
+    
+     /**
+     * Changes the cache config that is being used. Use this when working with multiple cache configurations.
+     * REMEMBER: to even set for default when working with multiple configurations.
+     *
+     * @param string $config
+     * @return void
+     */
+    public static function use(string $config)
+    {
+        if (!static::config($config)) {
+            throw new InvalidArgumentException("{$config} config does not exist");
+        }
+        self::$use = $config;
+    }
+
 
     /**
      * Reads an item from the Cache
      *
      * @param string $key
-     * @param string $config
      * @return mixed
      */
-    public static function read(string $key, string $config ='default')
+    public static function read(string $key)
     {
-        $cache = static::engine($config);
-        return $cache->get($key);
+        $cache = static::engine(self::$use);
+        return $cache->read($key);
     }
     /**
      * Writes an item from Cache
      *
      * @param string $key
      * @param mixed $value
-     * @param string $config
      * @return bool
      */
-    public static function write(string $key, $value, $config='default'):bool
+    public static function write(string $key, $value):bool
     {
-        $cache = static::engine($config);
-        return $cache->set($key, $value);
+        $cache = static::engine(self::$use);
+        return $cache->write($key, $value);
     }
 
     /**
@@ -105,25 +131,36 @@ class Cache
      *
      * @param string $key
      * @param mixed $value
-     * @param string $config
      * @return bool
      */
-    public static function check(string $key, $config='default'):bool
+    public static function check(string $key):bool
     {
-        $cache = static::engine($config);
-        return $cache->has($key);
+        deprecationWarning('Cache::check is depreciated use cache::exists');
+        return static::exists($key);
+    }
+
+     /**
+     * Checks if an item is in the cache
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return bool
+     */
+    public static function exists(string $key):bool
+    {
+        $cache = static::engine(self::$use);
+        return $cache->exists($key);
     }
 
     /**
      * Deletes an item from the cache
      *
      * @param string $key
-     * @param string $config
      * @return bool
      */
     public static function delete(string $key, $config='default') :bool
     {
-        $cache = static::engine($config);
+        $cache = static::engine(self::$use);
         return $cache->delete($key);
     }
     /**
@@ -131,20 +168,31 @@ class Cache
      *
      * @return void
      */
-    public static function clear($config='default') :bool
+    public static function clear() :bool
     {
-        $cache = static::engine($config);
+        $cache = static::engine(self::$use);
         return $cache->clear();
     }
 
+    /**
+     * Disables the cache
+     *
+     * @return void
+     */
     public static function disable()
     {
         static::$nullEngine = new NullEngine();
         static::$disabled =  true;
     }
-
+    
+    /**
+     * Enables the Cache
+     *
+     * @return void
+     */
     public static function enable()
     {
+        static::$nullEngine = null;
         static::$disabled =  false;
     }
 }

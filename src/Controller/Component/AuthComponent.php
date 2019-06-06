@@ -282,7 +282,7 @@ class AuthComponent extends Component
 
     public function isLoggedIn()
     {
-        return $this->Session->check('Auth.User');
+        return $this->Session->exists('Auth.User');
     }
 
     protected function isPrivateOrProtected(string $action)

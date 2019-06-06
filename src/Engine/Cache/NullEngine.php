@@ -28,7 +28,7 @@ class NullEngine extends CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         return true;
     }
@@ -38,7 +38,7 @@ class NullEngine extends CacheEngine
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
         return false;
     }
@@ -48,7 +48,7 @@ class NullEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         return false;
     }

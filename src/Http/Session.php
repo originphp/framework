@@ -134,8 +134,19 @@ class Session
      */
     public function check(string $key = null) : bool
     {
-        $Dot = new Dot($_SESSION);
+        deprecationWarning('Session::check is depreciated use session:exists');
+        return $this->exists($key);
+    }
 
+    /**
+     * Checks if a key exists in the session
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function exists(string $key = null) : bool
+    {
+        $Dot = new Dot($_SESSION);
         return $Dot->has($key);
     }
     /**

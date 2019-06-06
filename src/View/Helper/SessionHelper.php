@@ -87,7 +87,19 @@ class SessionHelper extends Helper
      */
     public function check(string $name) : bool
     {
-        return $this->session()->check($name);
+        deprecationWarning('Session::check is depreciated use session:exists');
+        return $this->exists($name);
+    }
+
+    /**
+     * Checks if an item exists in session
+     *
+     * @param string $name
+     * @return void
+     */
+    public function exists(string $name) : bool
+    {
+        return $this->session()->exists($name);
     }
     
     /**

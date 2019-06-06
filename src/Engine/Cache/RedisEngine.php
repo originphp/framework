@@ -90,7 +90,7 @@ class RedisEngine extends CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         if ($this->config['duration'] === 0) {
             return $this->Redis->set($this->key($key), $value);
@@ -103,7 +103,7 @@ class RedisEngine extends CacheEngine
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
         return $this->Redis->get($this->key($key));
     }
@@ -113,7 +113,7 @@ class RedisEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         return $this->Redis->exists($this->key($key));
     }

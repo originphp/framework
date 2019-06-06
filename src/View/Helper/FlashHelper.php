@@ -39,7 +39,7 @@ class FlashHelper extends Helper
 
     public function messages()
     {
-        if (!$this->Session->check('Flash')) {
+        if (!$this->Session->exists('Flash')) {
             return null;
         }
         $output = '';

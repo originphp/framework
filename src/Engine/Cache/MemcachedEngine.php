@@ -115,7 +115,7 @@ class MemcachedEngine extends CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         return $this->Memcached->set($this->key($key), $value, $this->config['duration']);
     }
@@ -125,7 +125,7 @@ class MemcachedEngine extends CacheEngine
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
         return $this->Memcached->get($this->key($key));
     }
@@ -135,7 +135,7 @@ class MemcachedEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         $this->Memcached->get($this->key($key));
         return ($this->Memcached->getResultCode() === Memcached::RES_SUCCESS);

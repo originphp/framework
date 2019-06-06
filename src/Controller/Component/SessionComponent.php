@@ -88,7 +88,20 @@ class SessionComponent extends Component
      */
     public function check(string $name) : bool
     {
-        return $this->session()->check($name);
+        deprecationWarning('Session::check depreciated use session::exists');
+        return $this->exists($name);
+    }
+
+
+    /**
+     * Checks if a session exists
+     *
+     * @param string $name
+     * @return void
+     */
+    public function exists(string $name) : bool
+    {
+        return $this->session()->exists($name);
     }
     
     /**

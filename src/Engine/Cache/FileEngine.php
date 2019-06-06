@@ -25,7 +25,7 @@ class FileEngine extends CacheEngine
     protected $defaultConfig = [
         'path' => TMP . '/cache',
         'duration' => 3600,
-        'prefix' => 'cache_'
+        'prefix' => 'origin_'
     ];
 
     /**
@@ -35,7 +35,7 @@ class FileEngine extends CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         return file_put_contents($this->config['path'] . DS . $this->key($key), serialize($value));
     }
@@ -45,9 +45,9 @@ class FileEngine extends CacheEngine
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
-        if ($this->has($key)) {
+        if ($this->exists($key)) {
             $filename = $this->config['path'] . DS . $this->key($key);
             $expires = filemtime($filename) + $this->config['duration'];
             if ($expires > time()) {
@@ -62,7 +62,7 @@ class FileEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         return file_exists($this->config['path'] . DS . $this->key($key));
     }
@@ -74,7 +74,7 @@ class FileEngine extends CacheEngine
      */
     public function delete(string $key) :bool
     {
-        if ($this->has($key)) {
+        if ($this->exists($key)) {
             return unlink($this->config['path'] . DS . $this->key($key));
         }
         return false;

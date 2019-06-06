@@ -25,7 +25,7 @@ class ArrayEngine extends CacheEngine
     use ConfigTrait;
     
     protected $defaultConfig = [
-        'prefix' => ''
+        'prefix' => null
     ];
     
     protected $data = [];
@@ -37,7 +37,7 @@ class ArrayEngine extends CacheEngine
      * @param mixed $value
      * @return bool
      */
-    public function set(string $key, $value) :bool
+    public function write(string $key, $value) :bool
     {
         $this->data[$this->key($key)] = $value;
         return true;
@@ -48,10 +48,10 @@ class ArrayEngine extends CacheEngine
      * @param string $key
      * @return void
      */
-    public function get(string $key)
+    public function read(string $key)
     {
         $key = $this->key($key);
-        if ($this->has($key)) {
+        if ($this->exists($key)) {
             return $this->data[$key];
         }
         return false;
@@ -62,7 +62,7 @@ class ArrayEngine extends CacheEngine
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) :bool
+    public function exists(string $key) :bool
     {
         return isset($this->data[$this->key($key)]);
     }
@@ -75,7 +75,7 @@ class ArrayEngine extends CacheEngine
     public function delete(string $key) :bool
     {
         $key = $this->key($key);
-        if ($this->has($key)) {
+        if ($this->exists($key)) {
             unset($this->data[$key]);
             return true;
         }
@@ -103,7 +103,7 @@ class ArrayEngine extends CacheEngine
     public function increment(string $key, int $offset = 1): int
     {
         $key = $this->key($key);
-        if (!$this->has($key)) {
+        if (!$this->exists($key)) {
             $this->data[$key] = 0;
         }
         $this->data[$key] += $offset;
@@ -120,7 +120,7 @@ class ArrayEngine extends CacheEngine
     public function decrement(string $key, int $offset = 1): int
     {
         $key = $this->key($key);
-        if (!$this->has($key)) {
+        if (!$this->exists($key)) {
             $this->data[$key] = 0;
         }
         $this->data[$key] -= $offset;

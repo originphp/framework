@@ -49,7 +49,7 @@ class FlashComponent extends Component
         $messages = [];
         $this->SessionKey = "Flash.{$type}";
        
-        if ($this->Session->check($this->SessionKey)) {
+        if ($this->Session->exists($this->SessionKey)) {
             $messages = $this->Session->read($this->SessionKey);
         }
         $messages[] = $message;

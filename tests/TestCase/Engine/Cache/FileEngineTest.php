@@ -28,7 +28,7 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     {
         $cache = new FileEngine();
         $this->assertTrue($cache->write('foo', 'bar'));
-        $this->assertEquals('bar', unserialize(file_get_contents(TMP .'/cache/cache_foo')));
+        $this->assertEquals('bar', unserialize(file_get_contents(TMP .'/cache/origin_foo')));
     }
     /**
      * @depends testSet
