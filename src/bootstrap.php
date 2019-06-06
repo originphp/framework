@@ -72,7 +72,6 @@ require __DIR__ . '/functions.php';
  */
 require CONFIG . '/bootstrap.php';
 
-
 if(file_exists(CONFIG . DS . '.env')){
   $dotEnv = new Origin\Core\DotEnv();
   $dotEnv->load(CONFIG . DS . '.env');

@@ -222,7 +222,7 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
-    public function testPluginMigration()
+    public function testPlugin()
     {
         $this->exec('generate --force plugin Dummy');
         $this->assertExitSuccess();
@@ -241,7 +241,7 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'phpunit.xml';
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('f1ce2a71cd543f31b89f0668198e91a7', $filename);
+        $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
 
         $this->rmdir(APP.DS.'plugins'.DS.'dummy');
     }

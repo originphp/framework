@@ -19,9 +19,14 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.6.4] - 2019-06-06
+### Fixed
+- Fixed Plugin scaffolding template
+
 ## [1.6.3] - 2019-06-06
 ### Fixed
 - Fixed some session check
+
 ### Added
 - DotEnv now parses with export
 
