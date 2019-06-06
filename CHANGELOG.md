@@ -19,6 +19,9 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.7.2] - 2019-06-06
+### Fixed
+- Fixed added missing clear method to SessionHelper and SessionComponent
 
 ## [1.7.1] - 2019-06-06
 ### Fixed

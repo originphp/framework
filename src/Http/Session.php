@@ -209,6 +209,15 @@ class Session
         }
         return session_id();
     }
+
+    /**
+     * Clears the session data
+     *
+     * @return void
+     */
+    public function clear(){
+        $_SESSION = [];
+    }
     /**
      * Resets the session data
      *
@@ -216,6 +225,11 @@ class Session
      */
     public function reset()
     {
-        $_SESSION = [];
+        $this->clear();
+        $_SESSION = null;
+        if(!headers_sent()){
+            session_write_close();
+            $this->start();
+        }
     }
 }

@@ -68,8 +68,8 @@ class BaseSchema
             $real = $this->columns[$type];
             $type = strtoupper($this->columns[$type]['name']);
             # Remove limit,precision, scale if user has sent them (postgre can use int limit)
-            foreach(['limit','precision','scale'] as $remove){
-                if(!isset($real[$remove]) AND isset($column[$remove])){
+            foreach (['limit','precision','scale'] as $remove) {
+                if (!isset($real[$remove]) and isset($column[$remove])) {
                     $column[$remove] = null;
                 }
             }
@@ -100,7 +100,7 @@ class BaseSchema
             $output .= "({$column['precision']},{$column['scale']})";
         }
 
-        if (isset($column['default']) and ($column['default'] === '' or $column['default'] ==='nil')) {
+        if (isset($column['default']) and $column['default'] === '') {
             $column['default'] = null;
         }
        
@@ -162,8 +162,8 @@ class BaseSchema
             if (isset($this->columns[$settings['type']])) {
                 $mapping = $this->columns[$settings['type']];
                 // Remove these fields if they are not allowed per columns
-                foreach(['limit','precision','scale'] as $remove){
-                    if(!isset($mapping[$remove])){
+                foreach (['limit','precision','scale'] as $remove) {
+                    if (!isset($mapping[$remove])) {
                         unset($settings[$remove]);
                     }
                 }
@@ -176,10 +176,9 @@ class BaseSchema
             if (!empty($settings['limit'])) {
                 $output .= "({$settings['limit']})";
             } elseif (in_array($settings['type'], ['decimal', 'float'])) {
-                if(isset($settings['scale'])){
+                if (isset($settings['scale'])) {
                     $output .= "({$settings['precision']},{$settings['scale']})";
-                }
-                elseif(isset($settings['precision'])){
+                } elseif (isset($settings['precision'])) {
                     $output .= "({$settings['precision']})"; // postgres float
                 }
             }

@@ -103,6 +103,15 @@ class SessionComponent extends Component
     {
         return $this->session()->exists($name);
     }
+
+    /**
+     * Clears the session
+     *
+     * @return void
+     */
+    public function clear(){
+        $this->session()->clear();
+    }
     
     /**
      * Deletes all sessions
