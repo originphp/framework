@@ -21,7 +21,7 @@ use Origin\Core\Resolver;
 use Origin\Exception\Exception;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Core\LazyLoadContainer;
-
+use Origin\Exception\InvalidArgumentException;
 /** 
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
@@ -231,6 +231,9 @@ class ConsoleApplication
         }
 
         $className = Resolver::className($name, 'Command', 'Command');
+        if(!$className){
+            throw new InvalidArgumentException(sprintf('`%s` command not found.',$name));
+        }
         $this->commandRegistry->add($alias,$className);
     }
 }
