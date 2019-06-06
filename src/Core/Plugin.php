@@ -36,18 +36,19 @@ class Plugin
      * Initializes the Plugin Object
      * Will load the plugins installed by composer
      */
-    public static function initialize(){
+    public static function initialize()
+    {
         $composerPlugins = ROOT . DS . 'vendor' . DS . 'originphp-plugins.json';
-        if (file_exists( $composerPlugins)) {
-            $composer = json_decode(file_get_contents($composerPlugins),true);
-            foreach($composer as $plugin => $path){
-                static::load($plugin,[
-                    'path' => $path, // Put to verify exists
+        if (file_exists($composerPlugins)) {
+            $composer = json_decode(file_get_contents($composerPlugins), true);
+            foreach ($composer as $plugin => $path) {
+                static::load($plugin, [
+                    'path' => ROOT . $path, // Put to verify exists
                     'autoload'=>false
                     ]);
             }
         }
-     }
+    }
 
     /**
      * Checks if a plugin is loaded or returns a list of loaded plugins
@@ -86,7 +87,7 @@ class Plugin
 
         static::bootstrap($plugin);
 
-        if($options['autoload']){
+        if ($options['autoload']) {
             static::autoload($plugin);
         }
     }

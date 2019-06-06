@@ -19,6 +19,11 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+## [1.7.1] - 2019-06-06
+### Fixed
+- Fixed issue with composer plugins
+
 ## [1.7.0] - 2019-06-06
 ### Changed
 - bootstrap now autoloads, then loads application.php
