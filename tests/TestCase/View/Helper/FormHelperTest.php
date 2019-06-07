@@ -311,11 +311,11 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     {
         $FormHelper = $this->Form;
 
-        $expected = '<button type="submit">save</button>';
+        $expected = '<button type="button">save</button>';
         $this->assertEquals($expected, $FormHelper->button('save'));
 
-        $expected = '<button type="button">save</button>';
-        $this->assertEquals($expected, $FormHelper->button('save', array('type' => 'button')));
+        $expected = '<button type="submit">save</button>';
+        $this->assertEquals($expected, $FormHelper->button('save', array('type' => 'submit')));
     }
 
     public function testCheckbox()

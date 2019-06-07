@@ -19,6 +19,10 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.8.1] - 2019-06-07
+### Fixed
+- Added missing FormHelper function submit
+
 ## [1.8.0] - 2019-06-07
 ### Fixed
 - Typo in deprecation log

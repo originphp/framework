@@ -149,7 +149,7 @@ class FormHelper extends Helper
     }
 
     /**
-     * Creates a button, the default type is submit.
+     * Creates a button
      *
      * @param string $name This is the text to be displayed on the button
      * @param array $options  Set type = button or attributes
@@ -157,11 +157,25 @@ class FormHelper extends Helper
      */
     public function button(string $name, array $options = [])
     {
-        $defaults = ['name' => $name, 'type' => 'submit'];
+        $defaults = ['name' => $name, 'type' => 'button'];
         $options = array_merge($defaults, $options);
 
         return $this->formatTemplate('button', $options);
     }
+
+    /**
+     * Creates a submit button
+     *
+     * @param string $name This is the text to be displayed on the button
+     * @param array $options  Set type = button or attributes
+     * @return void
+     */
+    public function submit(string $name, array $options = [])
+    {
+        $options['type'] = 'submit';
+        return $this->button($name,$options);
+    }
+
 
     /**
      * Creates a checkbox
