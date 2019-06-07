@@ -19,8 +19,19 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.7.4] - 2019-06-07
+### Fixed
+- Cookie check functions were not renamed
+
+### Changed
+- CookieHelper,CookieComponent write accepts strtotime string by default
+- response cookie accepts strtotime string by default
+
+### Depreciated
+- Cookie check, use Cookie exists
+
 ## [1.7.3] - 2019-06-06
-### 
+### Removed
 - Removed duplicated tests due to restructing
 
 ### Fixed

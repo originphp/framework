@@ -183,11 +183,11 @@ class Response
      */
     public function headers(string $header = null)
     {
-        if($header === null){
+        if ($header === null) {
             return $this->headers;
         }
 
-        if(isset($this->headers[$header])){
+        if (isset($this->headers[$header])) {
             return $this->headers[$header];
         }
         return null;
@@ -233,16 +233,16 @@ class Response
      * to be sent, existing cookies wont show up here e.g. REQUEST)
      *
      *  $response->cookie('key',$value);
-     *  $response->cookie('key',$value,strtotime('+1 day'));
+     *  $response->cookie('key',$value,'+5 days');
      *  $value = $response->cookie('fruit');
      *
      * @param string $name
      * @param mixed $value
-     * @param integer $expire
+     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return mixed
      */
-    public function cookie(string $name, $value = null, int $expire=0, array $options = [])
+    public function cookie(string $name, $value = null, string $expire='+1 month', array $options = [])
     {
         // Getting
         if (func_num_args() === 1) {
@@ -258,7 +258,7 @@ class Response
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => $expire,
+            'expire' => strtotime($expire),
             'encrypt' => true
         ];
         

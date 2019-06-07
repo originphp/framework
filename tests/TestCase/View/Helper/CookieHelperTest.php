@@ -60,12 +60,20 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
     public function testRead()
     {
         $this->Cookie->write('foo', 'bar');
+        
+        $cookies = $this->Cookie->response()->cookies();
+        $_COOKIE['foo'] = $cookies['foo']['value'];
+
         $this->assertEquals('bar', $this->Cookie->read('foo'));
     }
-    public function testCheck()
+    public function testExists()
     {
         $this->Cookie->write('foo', 'bar');
-        $this->assertTrue($this->Cookie->check('foo'));
+
+        $cookies = $this->Cookie->response()->cookies();
+        $_COOKIE['foo'] = $cookies['foo']['value'];
+        
+        $this->assertTrue($this->Cookie->exists('foo'));
     }
     public function testDelete()
     {

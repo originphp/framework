@@ -52,11 +52,11 @@ class Cookie
      *
      * @param string $key
      * @param mixed $value
-     * @param integer $expire unix timestamp
-     * @param array $options (encrypt|path|domain|secure|httpOnly)
+     * @param int $expire unix time stamp
+     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, int $expire=0, array $options=[])
+    public function write(string $name, $value, int $expire = 0, array $options=[])
     {
         $options += [
             'path' => '/', // path on server
@@ -89,7 +89,7 @@ class Cookie
      * @param string $name
      * @return void
      */
-    public function check(string $name) : bool
+    public function exists(string $name) : bool
     {
         if (isset($_COOKIE[$name])) {
             return true;
@@ -129,7 +129,7 @@ class Cookie
      */
     protected function pack($value, $encrypt=true)
     {
-        if(is_array($value)){
+        if (is_array($value)) {
             $value = json_encode($value);
         }
        
@@ -153,7 +153,7 @@ class Cookie
             $value = substr($value, $length);
             $value = Security::decrypt(base64_decode($value));
         }
-        if(substr($value,0,1)==='{'){
+        if (substr($value, 0, 1)==='{') {
             $value = json_decode($value);
         }
         return $value;

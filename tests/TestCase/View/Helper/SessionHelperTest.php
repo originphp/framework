@@ -50,7 +50,7 @@ class SessionHelperTest extends \PHPUnit\Framework\TestCase
         $this->Session->write('foo', 'bar');
         $this->assertEquals('bar', $this->Session->read('foo'));
     }
-    public function testCheck()
+    public function testExists()
     {
         $this->Session->write('foo', 'bar');
         $this->assertTrue($this->Session->exists('foo'));

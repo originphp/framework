@@ -65,14 +65,15 @@ class CookieComponent extends Component
      * Writes a cookie through response
      *
      *  $cookie->write('key',$value);
-     *  $cookie->write('key',$value,strtotime('+1 day'));
+     *  $cookie->write('key',$value,'+1 month');
      *
      * @param string $key
      * @param mixed $value
-     * @param integer $expire unix timestamp
+     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
+     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, int $expire=0, $options=[])
+    public function write(string $name, $value, string $expire='+1 month', $options=[])
     {
         $this->response()->cookie($name, $value, $expire, $options);
     }
@@ -85,7 +86,7 @@ class CookieComponent extends Component
      */
     public function delete(string $name)
     {
-        $this->response()->cookie($name, "", time() - 3600);
+        $this->response()->cookie($name, '', '-60 minutes');
     }
 
     /**
@@ -96,9 +97,21 @@ class CookieComponent extends Component
      */
     public function check(string $name) : bool
     {
-        return $this->cookie()->check($name);
+        deprecationWarning('Cookie::check is depreciated use Cookie:exists');
+        return $this->exists($name);
     }
-    
+
+    /**
+    * Checks if a cookie exists
+    *
+    * @param string $name
+    * @return void
+    */
+    public function exists(string $name) : bool
+    {
+        return $this->cookie()->exists($name);
+    }
+
     /**
      * Deletes all cookies
      *

@@ -43,7 +43,7 @@ class CookieHelper extends Helper
         return $this->cookie;
     }
     /**
-     * Reads a value of a cookie
+     * Reads a value of a cookie from request
      *
      * @param string $name
      * @return string|null
@@ -54,19 +54,20 @@ class CookieHelper extends Helper
     }
 
     /**
-     * Writes a cookie
+     * Writes a cookie through response
      *
      *  $cookie->write('key',$value);
-     *  $cookie->write('key',$value,strtotime('+1 day'));
+     *  $cookie->write('key',$value,'+1 month');
      *
      * @param string $key
      * @param mixed $value
-     * @param integer $expire unix timestamp
+     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
+     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value)
+    public function write(string $name, $value, string $expire='+1 month', $options=[])
     {
-        $this->cookie()->write($name, $value);
+        $this->response()->cookie($name, $value, $expire, $options);
     }
 
     /**
@@ -77,7 +78,7 @@ class CookieHelper extends Helper
      */
     public function delete(string $name)
     {
-        $this->cookie()->delete($name);
+        $this->response()->cookie($name, '','-60 seconds');
     }
 
     /**
@@ -88,9 +89,21 @@ class CookieHelper extends Helper
      */
     public function check(string $name) : bool
     {
-        return $this->cookie()->check($name);
+        deprecationWarning('Cookie::check is depreciated use Cookie:exists');
+        return $this->exists($name);
     }
-    
+
+     /**
+     * Checks if a cookie exists
+     *
+     * @param string $name
+     * @return void
+     */
+    public function exists(string $name) : bool
+    {
+        return $this->cookie()->exists($name);
+    }
+
     /**
      * Deletes all cookies
      *
@@ -98,6 +111,7 @@ class CookieHelper extends Helper
      */
     public function destroy()
     {
-        $this->cookie()->destroy();
+        unset($_COOKIE);
+        $_COOKIE=[];
     }
 }

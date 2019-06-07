@@ -31,7 +31,7 @@ class SessionComponentTest extends \PHPUnit\Framework\TestCase
         $this->Session->write('foo', 'bar');
         $this->assertEquals('bar', $this->Session->request()->session()->read('foo'));
     }
-    public function testCheck()
+    public function testExists()
     {
         $this->assertFalse($this->Session->exists('password'));
         $this->Session->write('foo', 'bar');

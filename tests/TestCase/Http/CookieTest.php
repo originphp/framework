@@ -73,12 +73,12 @@ class CookieTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($cookie->read('notSet'));
     }
 
-    public function testCheck()
+    public function testExists()
     {
         $cookie = new MockCookie();
         $_COOKIE['foo'] = true;
-        $this->assertTrue($cookie->check('foo'));
-        $this->assertFalse($cookie->check('bar'));
+        $this->assertTrue($cookie->exists('foo'));
+        $this->assertFalse($cookie->exists('bar'));
     }
     public function testDelete()
     {

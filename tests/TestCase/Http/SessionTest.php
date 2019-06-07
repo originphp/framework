@@ -42,7 +42,7 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('ok', $this->Session->read('Test.status'));
     }
 
-    public function testCheck()
+    public function testExists()
     {
         $this->Session->write('Test.status', 'ok');
         $this->assertTrue($this->Session->exists('Test.status'));

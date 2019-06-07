@@ -31,11 +31,11 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
         $this->Cookie->write('foo', 'bar');
         $this->assertArrayHasKey('foo', $this->Cookie->response()->cookies());
     }
-    public function testCheck()
+    public function testExists()
     {
-        $this->assertFalse($this->Cookie->check('password'));
+        $this->assertFalse($this->Cookie->exists('password'));
         $_COOKIE['foo'] = '1234';
-        $this->AssertTrue($this->Cookie->check('foo'));
+        $this->AssertTrue($this->Cookie->exists('foo'));
     }
     public function testRead()
     {
@@ -52,9 +52,9 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
 
     public function testdestroy()
     {
-        $this->assertFalse($this->Cookie->check('secret'));
+        $this->assertFalse($this->Cookie->exists('secret'));
         $_COOKIE['secret'] = '12456789';
-        $this->assertTrue($this->Cookie->check('secret'));
+        $this->assertTrue($this->Cookie->exists('secret'));
         $this->Cookie->destroy();
         $this->assertEquals([], $_COOKIE);
     }
