@@ -160,19 +160,20 @@ class RequestTest extends \PHPUnit\Framework\TestCase
             'foo' => 'This is a test'
         ];
         $request = new MockRequest();
-        $this->assertEquals($expected, $request->cookie());
-        $this->assertEquals('This is a test', $request->cookie('foo'));
+        $this->assertEquals($expected, $request->cookies());
+        $this->assertEquals('This is a test', $request->cookies('foo'));
     }
     public function testHeaders()
     {
         $request = new MockRequest();
-        $request->header('WWW-Authenticate', 'Negotiate');
-        
-        $this->assertEquals('Negotiate', $request->header('WWW-Authenticate'));
-        $this->assertEquals('Negotiate', $request->header('www-Authenticate')); // PSR friendly
-        $this->assertEquals(['WWW-Authenticate'=>'Negotiate'], $request->headers());
+        $request->headers('WWW-Authenticate', 'Negotiate');
+        $request->headers('HTTP/1.0 404 Not Found',null);
 
-        $this->assertEquals('', $request->header('secret'));
+        $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
+        $this->assertEquals('Negotiate', $request->headers('www-authenticate')); // PSR friendly
+        $this->assertEquals(['WWW-Authenticate'=>'Negotiate','HTTP/1.0 404 Not Found'=>null], $request->headers());
+
+        $this->assertEquals(null, $request->headers('secret')); 
     }
 
     /**
@@ -181,7 +182,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     public function testAcceptLanguage()
     {
         $request = new MockRequest();
-        $request->header('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
+        $request->headers('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
         $this->assertTrue($request->acceptLanguage('en'));
         $this->assertEquals(['en_GB','en','es'], $request->acceptLanguage());
     }
@@ -199,7 +200,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($request->accepts('application/json'));
 
         $request = new MockRequest();
-        $request->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
+        $request->headers('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
         $accepts = $request->accepts();
         $this->assertEquals('text/html', $accepts[0]);
         $this->assertTrue($request->accepts(['application/xml','application/json']));

@@ -194,13 +194,19 @@ class Response
     }
 
     /**
-     * Gets all the cookies to be sent
+     * Gets all cookies or a single cookie that will be sent in this RESPONSE
      *
-     * @return array cookies
+     * @return string|null|array cookies
      */
-    public function cookies()
+    public function cookies(string $cookie = null)
     {
-        return $this->cookies;
+        if ($cookie === null) {
+            return $this->cookies;
+        }
+        if (isset($this->cookies[$cookie])) {
+            return $this->cookies[$cookie]['value'];
+        }
+        return null;
     }
 
     /**
@@ -227,14 +233,12 @@ class Response
         // @codeCoverageIgnoreEnd
     }
 
-
     /**
-     * Sets a cookie or gets a cookie value from RESPONSE (what is going
-     * to be sent, existing cookies wont show up here e.g. REQUEST)
+     * Sets a cookie in the RESPONSE (what is going
+     * to be sent
      *
      *  $response->cookie('key',$value);
      *  $response->cookie('key',$value,'+5 days');
-     *  $value = $response->cookie('fruit');
      *
      * @param string $name
      * @param mixed $value
@@ -242,16 +246,8 @@ class Response
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return mixed
      */
-    public function cookie(string $name, $value = null, string $expire='+1 month', array $options = [])
+    public function cookie(string $name, $value, string $expire='+1 month', array $options = [])
     {
-        // Getting
-        if (func_num_args() === 1) {
-            if (isset($this->cookies[$name])) {
-                return $this->cookies[$name]['value'];
-            }
-            return null;
-        }
-
         $options += [
             'value' => $value,
             'path' => '/', // path on server

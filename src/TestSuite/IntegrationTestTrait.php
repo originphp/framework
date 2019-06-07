@@ -19,6 +19,7 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\Router;
+use Origin\Http\Session;
 
 /**
  * A way to test controllers from a higher level
@@ -248,15 +249,16 @@ trait IntegrationTestTrait
                             ->setMethods(['send','stop'])
                             ->getMock();
 
+        // Write session data
+        foreach ($this->session as $key => $value) {
+            $this->request->session()->write($key, $value);
+        }
+
         // Send Headers
         foreach ($this->headers as $header => $value) {
             $this->response->header($header, $value);
         }
         
-        // Write session data
-        foreach ($this->session as $key => $value) {
-            $this->request->session()->write($key, $value);
-        }
         // Write cookie data for request
         foreach ($this->cookies as $name => $value) {
             $this->response->cookie($name, $value);

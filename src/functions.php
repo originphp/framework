@@ -242,7 +242,7 @@ function deprecationWarning(string $message)
         $message = sprintf('%s - %s %s', $message, str_replace(ROOT .DS, '', $trace[0]['file']), $trace[0]['line']);
     }
 
-    $logger = new Logger('depreciation');
+    $logger = new Logger('deprecation');
     $logger->warning($message);
 
     if (Configure::read('debug')) {

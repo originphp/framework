@@ -85,13 +85,6 @@ class Request
     protected $session = null;
 
     /**
-     * Cookie object
-     *
-     * @var \Origin\Http\Cookie
-     */
-    protected $cookie = null;
-
-    /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
@@ -115,11 +108,11 @@ class Request
         }
 
         $this->params = Router::parse($url);
-        $this->cookies = $_COOKIE;
-        
+       
         $this->processGet($url);
         $this->processPost();
         $this->processFiles();
+        $this->processCookies();
 
         if (PHP_SAPI != 'cli') {
             $this->headers = getallheaders();
@@ -363,7 +356,7 @@ class Request
     {
         $path = parse_url($this->url(), PHP_URL_PATH);
       
-        $acceptHeaders = $this->parseAcceptWith($this->header('accept'));
+        $acceptHeaders = $this->parseAcceptWith($this->headers('accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
@@ -394,7 +387,8 @@ class Request
     public function acceptLanguage(string $language = null)
     {
         $acceptedLanguages = [];
-        $languages = $this->parseAcceptWith($this->header('accept-language'));
+
+        $languages = $this->parseAcceptWith($this->headers('accept-language'));
         foreach ($languages as $lang) {
             $acceptedLanguages[] = str_replace('-', '_', $lang);
         }
@@ -413,9 +407,12 @@ class Request
      * @param string $header
      * @return array
      */
-    protected function parseAcceptWith(string $header) : array
+    protected function parseAcceptWith(string $header = null) : array
     {
         $accepts = [];
+        if($header === null){
+            return [];
+        }
         $values = explode(',', $header);
         foreach ($values as $value) {
             $value = trim($value);
@@ -455,8 +452,31 @@ class Request
      */
     public function header(string $name, string $value = null)
     {
+        deprecationWarning('Request:header is depreciated use request:headers');
+        if(func_num_args() === 1){
+            return $this->headers($name);
+        }
         $normalized = strtolower($name); // psr thing
-        if ($value === null) {
+        $this->headers[$name] = $value;
+        $this->headersNames[$normalized] = $name;
+    }
+
+    /**
+     * Sets and gets headers
+
+     * @param string $name
+     * @param string $value
+     * @return array|string|null
+     */
+    public function headers(string $name = null,string $value = null) 
+    {
+        if ($name === null) {
+            return $this->headers;
+        }
+
+        $normalized = strtolower($name); // psr thing
+
+        if(func_num_args() === 1){
             $key = $name;
             if (isset($this->headersNames[$normalized])) {
                 $key = $this->headersNames[$normalized];
@@ -464,26 +484,15 @@ class Request
             if (isset($this->headers[$key])) {
                 return $this->headers[$key];
             }
-            return '';
+            return null;
         }
+
         $this->headers[$name] = $value;
         $this->headersNames[$normalized] = $name;
     }
 
     /**
-     * Return all headers
-     *
-     * @return array
-     */
-    public function headers() : array
-    {
-        return $this->headers;
-    }
-
-    /**
-     * Returns the session
-     *
-     * @return \Origin\Http\Session
+     * Returns the session object
      */
     public function session()
     {
@@ -499,21 +508,28 @@ class Request
      *
      * @return string|array|null
      */
-    public function cookie(string $key = null)
+    public function cookies(string $key = null,string $value = null)
     {
-        if ($this->cookie === null) {
-            $this->cookie = new Cookie();
-        }
-        if ($key === null) {
-            $decrypted = [];
-            foreach(array_keys($_COOKIE) as $key){
-                $decrypted[$key] = $this->cookie->read($key);
-            }
-            return $decrypted;
-        }
-        return $this->cookie->read($key);
+       if($key === null){
+           return $this->cookies;
+       }
+    
+       if(func_num_args() === 1){
+           if(isset($this->cookies[$key])){
+               return $this->cookies[$key];
+           }
+           return null;
+       }
+       $this->cookies[$key] = $value;
     }
-
+    
+    protected function processCookies(){
+        $cookie = new Cookie();
+        $this->cookies = [];
+        foreach (array_keys($_COOKIE) as $key) {
+            $this->cookies[$key] = $cookie->read($key);
+        }
+    }
     /**
      * Reads the php://input stream
      *

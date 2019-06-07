@@ -137,7 +137,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo'=>'bar'], $this->getProperty('cookies'));
 
         $this->get('/posts/index');
-        $this->assertEquals('bar', $this->response->cookie('foo'));
+        $this->assertEquals('bar', $this->response->cookies('foo'));
     }
 
 

@@ -19,6 +19,15 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.8.0] - 2019-06-07
+### Fixed
+- Typo in deprecation log
+
+### Changed
+- Request headers/header cookies/cookie
+- Response headers/cookies
+- FormHelper button default button is no longer submit. Use FormHelper:submit or set type option
+
 ## [1.7.4] - 2019-06-07
 ### Fixed
 - Cookie check functions were not renamed

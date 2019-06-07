@@ -16,73 +16,53 @@ namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
 use Origin\View\Helper\CookieHelper;
-use Origin\View\Helper\FormHelper;
 use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Cookie;
 
-class MockCookieHelper extends CookieHelper
-{
-    public function initialize(array $config)
-    {
-        $this->cookie = new MockEngine();
-    }
-    public function getCookie()
-    {
-        $this->cookie = null;
-        return $this->cookie();
-    }
-}
-class MockEngine extends \Origin\Http\Cookie
-{
-    protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
-    {
-        $_COOKIE[$name] = $value;
-    }
-}
 class CookieHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        $controller = new Controller(new Request(), new Response());
-        $this->Cookie = new MockCookieHelper(new View($controller));
-    }
-
-    public function testEngine()
-    {
-        $this->assertInstanceOf(Cookie::class, $this->Cookie->getCookie());
+        $_COOKIE = null;
+        $_COOKIE = [];
+        $this->Cookie = new CookieHelper(new View(new Controller(new Request(), new Response())));
     }
     public function testWrite()
     {
-        $this->assertNull($this->Cookie->write('foo', 'bar'));
-    }
-    public function testRead()
-    {
         $this->Cookie->write('foo', 'bar');
-        
-        $cookies = $this->Cookie->response()->cookies();
-        $_COOKIE['foo'] = $cookies['foo']['value'];
-
-        $this->assertEquals('bar', $this->Cookie->read('foo'));
+        $this->assertArrayHasKey('foo', $this->Cookie->response()->cookies());
     }
     public function testExists()
     {
-        $this->Cookie->write('foo', 'bar');
-
-        $cookies = $this->Cookie->response()->cookies();
-        $_COOKIE['foo'] = $cookies['foo']['value'];
-        
-        $this->assertTrue($this->Cookie->exists('foo'));
+        $this->assertFalse($this->Cookie->exists('password'));
+        $this->Cookie->request()->cookies('foo','bar'); // Set in request
+        $this->AssertTrue($this->Cookie->exists('foo'));
+    }
+    public function testRead()
+    {
+        // This is failing to decrypt when running all tests together
+        $_COOKIE['ez'] = 'T3JpZ2lu==.J4pNTvNegB4yYV1wgUK6eazwy+DSQhgAeOqmIIo7oeQ=';
+        $_COOKIE['normal'] = 'hello';
+        $this->Cookie = new CookieHelper(new View(new Controller(new Request(), new Response())));
+        $this->assertEquals('hello',$this->Cookie->read('normal'));
+        $this->assertEquals('bar', $this->Cookie->read('ez'));
     }
     public function testDelete()
     {
-        $this->Cookie->write('foo', 'bar');
-        $this->assertNull($this->Cookie->delete('foo'));
+        $this->Cookie->delete('foo');
+        $cookies = $this->Cookie->response()->cookies();
+        $this->assertEquals('', $cookies['foo']['value']);
+        $this->assertTrue($cookies['foo']['expire'] < time());
     }
-    public function testDestroy()
+
+    public function testdestroy()
     {
-        $this->Cookie->write('foo', 'bar');
-        $this->assertNull($this->Cookie->destroy());
+        $this->assertFalse($this->Cookie->exists('secret'));
+        $this->Cookie->request()->cookies('secret','bar'); // Set in request
+        $this->assertTrue($this->Cookie->exists('secret'));
+        $this->Cookie->destroy();
+        $this->assertEquals([], $_COOKIE);
     }
 }

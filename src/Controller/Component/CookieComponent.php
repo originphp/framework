@@ -14,8 +14,6 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Http\Cookie;
-
 /**
  * Cookie Component - for this and session code is being repeated, but this makes
  * it easier to learn for new users, testing becomes simpler because the component/helper
@@ -31,25 +29,7 @@ use Origin\Http\Cookie;
 
 class CookieComponent extends Component
 {
-    /**
-     * Cookie Object
-     *
-     * @var \Origin\Http\Cookie
-     */
-    protected $cookie = null;
-
-    /**
-     * Lazy loads the cookie object
-     *
-     * @return \Origin\Http\Cookie
-     */
-    protected function cookie()
-    {
-        if ($this->cookie === null) {
-            $this->cookie = new Cookie();
-        }
-        return $this->cookie;
-    }
+ 
     /**
      * Reads a value of a cookie from request
      *
@@ -58,7 +38,7 @@ class CookieComponent extends Component
      */
     public function read(string $name)
     {
-        return $this->cookie()->read($name);
+        return $this->request()->cookies($name);
     }
 
     /**
@@ -109,7 +89,8 @@ class CookieComponent extends Component
     */
     public function exists(string $name) : bool
     {
-        return $this->cookie()->exists($name);
+        $cookies = $this->request()->cookies();
+        return isset($cookies[$name]);
     }
 
     /**
