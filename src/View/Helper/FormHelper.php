@@ -173,7 +173,7 @@ class FormHelper extends Helper
     public function submit(string $name, array $options = [])
     {
         $options['type'] = 'submit';
-        return $this->button($name,$options);
+        return $this->button($name, $options);
     }
 
 
@@ -263,7 +263,7 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['rule'] === 'notBlank') {
+                if ($validationRule['rule'] === 'required') {
                     $result[] = $field;
                 }
             }

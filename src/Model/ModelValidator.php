@@ -26,7 +26,7 @@ class ModelValidator
     /**
      * Contains the validation rules.
      */
-    protected $validationRules = array();
+    protected $validationRules = [];
 
     public function __construct(Model $model)
     {
@@ -52,12 +52,21 @@ class ModelValidator
     public function setRule(string $field, $params)
     {
         if (is_string($params)) {
-            $params = array(
-              $field => array('rule' => $params),
-            );
+            $params =['rule1' => ['rule' => $params]];
         }
         if (isset($params['rule'])) {
-            $params = array('rule1' => $params);
+            $params = ['rule1' => $params];
+        }
+
+        foreach ($params as $key => $value) {
+            $value += [
+                'rule' => null,
+                'message' => $key==='required'?'This field is required':'Invalid value',
+                'required' => false,
+                'on' => null,
+                'allowBlank' => false,
+            ];
+            $params[$key] = $value;
         }
         $this->validationRules[$field] = $params;
     }
@@ -116,68 +125,48 @@ class ModelValidator
 
     public function validates(Entity $entity, bool $create = true)
     {
-        $requiredMessage = 'This field is required';
-        $notBlankMessage = 'This field cannot be left blank';
-        $defaultMessage = 'Invalid value';
-     
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                $defaults = [
-                  'rule' => null, 'message' => null, 'required' => false, 'on' => null,
-                ];
-
-                $validationRule = array_merge($defaults, $validationRule);
-              
-                if ($validationRule['required'] and $this->runRule($create, $validationRule['on']) and !in_array($field, $entity->modified())) {
-                    if ($validationRule['message'] === null) {
-                        $validationRule['message'] = $requiredMessage;
-                    }
-                    $entity->invalidate($field, $validationRule['message']);
-                    continue;
-                }
-
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
 
+                $value = $entity->get($field);
+                  
+                // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
+                // @this is really to catch development issues
+                if (is_object($value) or is_array($value)) {
+                    $entity->invalidate($field, 'Invalid value');
+                    continue;
+                }
+
+                if ($validationRule['rule'] === 'required') {
+                    if (!$this->validate($value, 'notBlank')) {
+                        $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
+                    }
+                    continue;
+                }
+
+                // If allowBlank then skip on empty values, or invalidate the value
+                if(($value === '' or $value === null)){
+                    if($validationRule['allowBlank'] === true){
+                        continue;
+                    }
+                    $value = ''; // Ensure is string for validation
+                    //$entity->invalidate($field, 'Invalid value');
+                    //continue;
+                }
+
+                // Handle both types
                 if ($validationRule['rule'] === 'isUnique') {
                     $validationRule['rule'] = ['isUnique',[$field]];
                 }
-
-                if (in_array($field, $entity->modified())) {
-                    if ($validationRule['message'] === null) {
-                        $validationRule['message'] = $defaultMessage;
-                        if ($validationRule['rule'] === 'notBlank') {
-                            $validationRule['message'] = $notBlankMessage;
-                        }
-                    }
-
-                    $value = $entity->get($field);
-                  
-                    // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
-                    if (is_object($value) or is_array($value)) {
-                        $entity->invalidate($field, $defaultMessage);
-                        continue;
-                    }
-                 
-                    if ($validationRule['rule'] === 'notBlank') {
-                        if (!$this->validate($value, $validationRule['rule'])) {
-                            $entity->invalidate($field, $validationRule['message']);
-                        }
-                        continue;
-                    }
-
-                    if ($value === '' or $value === null) {
-                        continue;
-                    }
-
-                    if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
-                        $value = $entity;
-                    }
-                
-                    if (!$this->validate($value, $validationRule['rule'])) {
-                        $entity->invalidate($field, $validationRule['message']);
-                    }
+                if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
+                    $value = $entity;
+                }
+            
+                if (!$this->validate($value, $validationRule['rule'])) {
+                    $entity->invalidate($field, $validationRule['message']);
                 }
             }
         }

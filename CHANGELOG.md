@@ -19,6 +19,12 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Validation notBlank rule and required behavior
+
+### Fixed
+- Missing add button from related list template
+
 ## [1.8.1] - 2019-06-07
 ### Fixed
 - Added missing FormHelper function submit
