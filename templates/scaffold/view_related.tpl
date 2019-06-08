@@ -1,5 +1,11 @@
-<div class="row %pluralName% related">
-    <h4><?= __('%pluralHuman%') ?></h4>
+<div class="%pluralName% related">
+    <div>
+        <div class="float-right">
+            <?= $this->Html->link(__('Add'), ['controller' => '%controller%','action' => 'add'],['class'=>'btn btn-secondary']); ?>
+        </div>
+        <h4><?= __('%pluralHuman%') ?></h4>
+    </div>
+    
     <?php if (!empty($%currentModel%->%pluralName%)): ?>
     <table class="table">
         <tr>
