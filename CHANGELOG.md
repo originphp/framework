@@ -19,6 +19,13 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.9.1] - 2019-06-08
+### Fixed
+- Fixed order and multiple validation errors being displayed after empty required field
+- FormHelper required field indicator
+
+### Changed
+- Validation notBlank rule and required behavior
 ## [1.9.0] - 2019-06-08
 ### Changed
 - Validation notBlank rule and required behavior

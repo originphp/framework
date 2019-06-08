@@ -139,12 +139,12 @@ class ModelValidator
                     $entity->invalidate($field, 'Invalid value');
                     continue;
                 }
-
-                if ($validationRule['rule'] === 'required') {
+        
+                if ($validationRule['rule'] === 'required' OR $validationRule['required']) {
                     if (!$this->validate($value, 'notBlank')) {
                         $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
                     }
-                    continue;
+                    break; // dont run any more validation rules on this field if blank
                 }
 
                 // If allowBlank then skip on empty values, or invalidate the value
@@ -152,9 +152,10 @@ class ModelValidator
                     if($validationRule['allowBlank'] === true){
                         continue;
                     }
-                    $value = ''; // Ensure is string for validation
-                    //$entity->invalidate($field, 'Invalid value');
-                    //continue;
+
+                    // Ensure is string for validation
+                    $entity->invalidate($field, 'Invalid value');
+                    continue;
                 }
 
                 // Handle both types
