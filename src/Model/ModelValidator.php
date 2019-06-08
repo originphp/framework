@@ -59,13 +59,20 @@ class ModelValidator
         }
 
         foreach ($params as $key => $value) {
-            $value += [
+             $value += [
                 'rule' => null,
-                'message' => $key==='required'?'This field is required':'Invalid value',
+                'message' => null,
                 'required' => false,
                 'on' => null,
                 'allowBlank' => false,
             ];
+            if($value['message'] === null){
+                $value['message'] = 'Invalid value';
+                if($value['rule'] === 'required' OR $value['required']){
+                    $value['message'] = 'This field is required';
+                }
+            }
+           
             $params[$key] = $value;
         }
         $this->validationRules[$field] = $params;
@@ -130,7 +137,7 @@ class ModelValidator
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
-
+            
                 $value = $entity->get($field);
                   
                 // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
@@ -139,21 +146,29 @@ class ModelValidator
                     $entity->invalidate($field, 'Invalid value');
                     continue;
                 }
-        
-                if ($validationRule['rule'] === 'required' OR $validationRule['required']) {
+                
+                // If its required rule (which does not exist), check and break or continue
+                if($validationRule['rule'] === 'required'){
                     if (!$this->validate($value, 'notBlank')) {
                         $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
+                        break; // dont run any more validation rules on this field if blank
                     }
-                    break; // dont run any more validation rules on this field if blank
+                    continue; // goto next rule
                 }
-
+                // Break out if required and its blank, if not continue with validation
+                if ($validationRule['required']) {
+                    if (!$this->validate($value, 'notBlank')) {
+                        $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
+                        break; // dont run any more validation rules on this field if blank
+                    }                   
+                }
+              
                 // If allowBlank then skip on empty values, or invalidate the value
                 if(($value === '' or $value === null)){
                     if($validationRule['allowBlank'] === true){
                         continue;
                     }
-
-                    // Ensure is string for validation
+                    // Invalidate empty values
                     $entity->invalidate($field, 'Invalid value');
                     continue;
                 }
@@ -165,7 +180,7 @@ class ModelValidator
                 if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
-            
+         
                 if (!$this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
                 }

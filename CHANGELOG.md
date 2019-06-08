@@ -21,7 +21,7 @@ Delete tag:   git tag -d <tag_name>
 ## [Unreleased]
 ## [1.9.1] - 2019-06-08
 ### Fixed
-- Fixed order and multiple validation errors being displayed after empty required field
+- Fixed issues with multiple validation rules and fails
 - FormHelper required field indicator
 
 ### Changed
