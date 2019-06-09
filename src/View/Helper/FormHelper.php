@@ -121,12 +121,26 @@ class FormHelper extends Helper
     {
         $attributes = [];
        
-
         $model = $this->data = null;
 
+        /**
+         * 09.06.19 - Added this, to validate request data name of model is passed instead of entity.
+         * This will create the entity object and validate it. This enables form input type detection,
+         * and required fields.
+         */
         if (is_string($entity)) {
-            $model  = null;
-        } elseif ($entity instanceof Entity) {
+            $model  = $entity;
+            $requestData = $this->view()->request->data();
+            $entity = new Entity($requestData, ['name'=>$model]);
+            if ($requestData) {
+                $object = ModelRegistry::get($model);
+                if ($object) {
+                    $object->validates($entity);
+                }
+            }
+        }
+        
+        if ($entity instanceof Entity) {
             $this->data = $entity;
             $model = $entity->name();
         }
@@ -233,7 +247,7 @@ class FormHelper extends Helper
 
         //? Introspect related models as well?
         $model = ModelRegistry::get($name);
-
+       
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey;
             foreach ($model->schema() as $column => $row) {
@@ -249,7 +263,7 @@ class FormHelper extends Helper
                     $meta['maxlength'][$column] = $row['length'];
                 }
             }
-
+            
             // Only work if entity is supplied
             if ($entity) {
                 $meta['requiredFields'] = $this->parseRequiredFields($model->validator()->rules());
