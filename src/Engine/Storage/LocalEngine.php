@@ -61,7 +61,7 @@ class LocalEngine extends StorageEngine
         if (!file_exists($folder)) {
             mkdir($folder, 0744, true);
         }
-        return file_put_contents($filename, $data, LOCK_EX);
+        return (bool) file_put_contents($filename, $data, LOCK_EX);
     }
 
     /**

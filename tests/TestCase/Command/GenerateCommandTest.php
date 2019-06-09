@@ -7,21 +7,56 @@ use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class GenerateCommandTest extends OriginTestCase
 {
+
     use ConsoleIntegrationTestTrait;
 
-    public function testInvalidGenerator(){
+    public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag'];
+
+    public function testGenerateScaffold()
+    {
+   
+        $this->exec('generate --force scaffold Bookmark');
+        
+        $this->assertExitSuccess();
+       /**
+        * Run the generator on the bookmarks app and test its all working as accepted before changing Hashes
+        */
+        $this->assertFileHash('c871e290c6a3c66a82800231e58abc79',SRC . DS . 'Model' . DS . 'Bookmark.php');
+        unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
+
+        $this->assertFileHash('1e6187f77c1156f55da9fb97db036a54',SRC . DS . 'Controller' . DS . 'BookmarksController.php');
+        unlink(SRC . DS . 'Controller' . DS . 'BookmarksController.php');
+
+        $this->assertFileHash('a5dd94c570075bc9eb9339b65f8ffb2c',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
+        unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
+
+        $this->assertFileHash('328574e062cef0c52cf3c4b2310b2f6e',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
+        unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
+
+        $this->assertFileHash('e1ee56fedeb7936a4fa4c7d438ae9c94',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
+        unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
+
+        $this->assertFileHash('f1109b973aa26d24ad851400d6e7ca2e',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
+        unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
+    }
+
+
+    public function testInvalidGenerator()
+    {
         $this->exec('generate foo');
         $this->assertExitError();
         $this->assertErrorContains('Unkown generator foo');
     }
 
-    public function testInvalidName(){
+    public function testInvalidName()
+    {
         $this->exec('generate command bar-foo');
         $this->assertExitError();
         $this->assertErrorContains('Invalid name format');
     }
 
-    public function testInvalidSchema(){
+    public function testInvalidSchema()
+    {
         $this->exec('generate model Foo foo bar');
         $this->assertExitError();
         $this->assertErrorContains('Invalid format for foo, should be name:type');
@@ -43,7 +78,7 @@ class GenerateCommandTest extends OriginTestCase
      */
     public function testInteractive()
     {
-        $this->exec('generate',['behavior','Dummy']);
+        $this->exec('generate', ['behavior','Dummy']);
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Model'.DS.'Behavior'.DS.'DummyBehavior.php';
@@ -222,6 +257,9 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
+
+
+    
     public function testPlugin()
     {
         $this->exec('generate --force plugin Dummy');
@@ -256,7 +294,7 @@ class GenerateCommandTest extends OriginTestCase
     {
         $files = array_diff(scandir($directory), ['.', '..']);
         foreach ($files as $filename) {
-            if(is_dir($directory . DS . $filename)){
+            if (is_dir($directory . DS . $filename)) {
                 $this->rmdir($directory . DS . $filename);
                 continue;
             }

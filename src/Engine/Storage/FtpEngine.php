@@ -266,8 +266,8 @@ class FtpEngine extends StorageEngine
     {
         $files = ftp_nlist($this->connection,$directory);
         foreach ($files as $filename) {
-            if ($this->isDir($directory . DS . $filename)) {
-                $this->rmdir($directory . DS . $filename);
+            if ($this->isDir( $filename)) {
+                $this->rmdir($filename);
                 continue;
             }
             ftp_delete($this->connection,$filename);

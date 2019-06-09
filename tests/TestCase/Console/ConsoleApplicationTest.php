@@ -124,6 +124,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $consoleApplication->addCommand('enable',CacheEnableCommand::class);
         $consoleApplication->addCommand('disable',CacheDisableCommand::class);
         $this->assertTrue($consoleApplication->run(['enable']));
+
         $this->assertContains('OK Cache enabled' ,$this->output->read());
 
         $consoleApplication = $this->consoleApplication();

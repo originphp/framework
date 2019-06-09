@@ -22,15 +22,16 @@ use Origin\Exception\Exception;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Core\LazyLoadContainer;
 use Origin\Exception\InvalidArgumentException;
-/** 
+
+/**
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
- * 
+ *
  * @example:
  * #!/usr/bin/env php
  * require __DIR__ . '/vendor/originphp/framework/src/bootstrap.php';
  * use Origin\Console\ConsoleApplication;
- *  
+ *
  * $consoleApplication = new ConsoleApplication();
  * $consoleApplication->name('db');
  * $consoleApplication->description([
@@ -59,11 +60,11 @@ class ConsoleApplication
      */
     protected $description =  null;
 
-     /**
-     * Holds the command list
-     *
-     * @var array
-     */
+    /**
+    * Holds the command list
+    *
+    * @var array
+    */
     protected $commands = [];
 
 
@@ -87,9 +88,9 @@ class ConsoleApplication
      * @param string $name should be the same as the executable file as this will be used in help
      * @param string|array $desription description shown in help
      */
-    public function __construct(ConsoleIo $io = null){
-   
-        if($io === null){
+    public function __construct(ConsoleIo $io = null)
+    {
+        if ($io === null) {
             $io = new ConsoleIo();
         }
         $this->io = $io;
@@ -103,25 +104,25 @@ class ConsoleApplication
         $this->initialize();
         
         $this->commandRegistry = new LazyLoadContainer();
-
     }
 
-    public function initialize(){
-
+    public function initialize()
+    {
     }
 
-     /**
-     * Sets the name for the application
-     *
-     * @param string $name
-     * @return string|null
-     */
-    public function name(string $name = null){
-        if($name === null){
+    /**
+    * Sets the name for the application
+    *
+    * @param string $name
+    * @return string|null
+    */
+    public function name(string $name = null)
+    {
+        if ($name === null) {
             return $this->name;
         }
-        if(!preg_match('/^[a-z-]+$/',$name)){
-            throw new ConsoleException(sprintf('Command App name `%s` is invalid',$name));
+        if (!preg_match('/^[a-z-]+$/', $name)) {
+            throw new ConsoleException(sprintf('Command App name `%s` is invalid', $name));
         }
         $this->name = $name;
     }
@@ -132,12 +133,13 @@ class ConsoleApplication
      * @param string|array $description
      * @return string|null
      */
-    public function description($description =null){
-        if($description === null){
+    public function description($description =null)
+    {
+        if ($description === null) {
             return $this->description;
         }
-        if(is_array($description)){
-            $description = implode("\n",$description);
+        if (is_array($description)) {
+            $description = implode("\n", $description);
         }
         $this->description = $description;
     }
@@ -148,47 +150,44 @@ class ConsoleApplication
      * @param array $args default is argv
      * @return bool
      */
-    public function run(array $args = null){
-       
-        if($args === null){
+    public function run(array $args = null)
+    {
+        if ($args === null) {
             global $argv;
             $args = $argv;
             array_shift($args); // Remove script that is running
         }
 
-
         $commands = $this->commandRegistry->list();
-
-        if(empty($commands)){
-           throw new ConsoleException('No commands have been added to this application.');
-        }
-  
-        try {
-            list($options,$arguments) = $this->argumentParser->parse($args);
-        } catch (ConsoleException $ex) {
-            $this->io->error($ex->getMessage());
-            return false;
+        if (empty($commands)) {
+            throw new ConsoleException('No commands have been added to this application.');
         }
 
-       
-        # If its one command application load the first one by default
-        if(count($commands) === 1 AND empty($args)){
-            $args = [$commands[0]];
+         // Detect and extract Command
+        $command = null;
+        if (count($commands) === 1) {
+            $command = $commands[0]; # If its one command application load the first one by default
         }
-
-        if(empty($args)){
+        foreach($args as $i => $arg){
+            if($command === null AND substr($arg,0,1) !== '-'){
+                $command = $arg;
+                unset($args[$i]);
+                break;
+            }
+        }
+        
+        if (!$command) {
             $this->displayHelp();
             return true;
         }
 
-        $command = array_shift($args);
-
-        try{
+        try {
             $this->{$command} = $this->commandRegistry->get($command);
-        }catch(Exception $ex){
+        } catch (Exception $ex) {
             $this->io->error("Invalid command {$command}.");
             return false;
-        }   
+        }
+      
         # Configure Command
         $this->{$command}->io = $this->io;
         $this->{$command}->name($this->name . ' ' .$command);  // Rename for help
@@ -200,16 +199,17 @@ class ConsoleApplication
      *
      * @return void
      */
-    public function displayHelp(){
+    public function displayHelp()
+    {
         $formatter = new ConsoleHelpFormatter();
       
-        if($this->description){
+        if ($this->description) {
             $formatter->setDescription($this->description);
         }
         $formatter->setUsage(["{$this->name} command [options] [arguments]"]);
         $commands = [];
 
-        foreach($this->commandRegistry->list() as $name){
+        foreach ($this->commandRegistry->list() as $name) {
             $command = $this->commandRegistry->get($name);
             $commands[$name] = $command->description();
         }
@@ -226,14 +226,14 @@ class ConsoleApplication
      */
     public function addCommand(string $alias, string $name)
     {
-        if(!preg_match('/^[a-z-]+$/',$alias)){
-            throw new ConsoleException(sprintf('Alias `%s` is invalid',$alias));
+        if (!preg_match('/^[a-z-]+$/', $alias)) {
+            throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));
         }
 
         $className = Resolver::className($name, 'Command', 'Command');
-        if(!$className){
-            throw new InvalidArgumentException(sprintf('`%s` command not found.',$name));
+        if (!$className) {
+            throw new InvalidArgumentException(sprintf('`%s` command not found.', $name));
         }
-        $this->commandRegistry->add($alias,$className);
+        $this->commandRegistry->add($alias, $className);
     }
 }

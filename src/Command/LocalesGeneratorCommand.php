@@ -58,6 +58,7 @@ class LocalesGeneratorCommand extends Command
     {
         $this->addOption('expected',['description'=>'Adds the expected information','type'=>'boolean']);
         $this->addOption('single-file',['description'=>'Put all definitions in a single file','type'=>'boolean']);
+        $this->addOption('force',['description'=>'Force overwrite','type'=>'boolean']);
     }
     public function execute()
     {
@@ -66,7 +67,7 @@ class LocalesGeneratorCommand extends Command
 
         $path = CONFIG . DS  .'locales';
 
-        if(file_exists($path)){
+        if(file_exists($path) AND $this->options('force')===false){
             $this->io->warning('Locales definitions found in ' . $path);
             if($this->io->askChoice('Do you want to continue?',['y','n'],'n') === 'no'){
                 $this->exit();

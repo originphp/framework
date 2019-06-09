@@ -481,10 +481,6 @@ class BaseSchema
         $this->datasource = $datasource;
     }
 
-    public function execute(string $sql)
-    {
-        return $this->execute($sql);
-    }
     /**
         * Fetchs a single row from the database
         *
