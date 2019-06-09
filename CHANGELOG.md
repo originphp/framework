@@ -19,6 +19,21 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Added
+- CSV Utility
+- File Utility
+- Folder Utility
+
+### Changed
+- Form Helper now set model to instropect
+
+### Fixed
+- Console Application issue with subcommands and options were been parsed by wrong parser
+
+
+### Removed
+- Duplicate files due to previous refactoring 
+
 ## [1.9.1] - 2019-06-08
 ### Fixed
 - Fixed issues with multiple validation rules and fails

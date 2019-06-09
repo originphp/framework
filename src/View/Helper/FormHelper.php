@@ -113,17 +113,25 @@ class FormHelper extends Helper
     /**
      * Creates a form element
      *
-     * @param \Origin\Model\Entity|null $entity
+     * @param \Origin\Model\Entity|string|null $entity, null or Model name
      * @param array $options type, url and html attributes
      * @return string
      */
-    public function create(Entity $entity = null, array $options = [])
+    public function create($entity = null, array $options = [])
     {
         $attributes = [];
+       
 
-        if ($entity) {
+        $model = $this->data = null;
+
+        if (is_string($entity)) {
+            $model  = null;
+        } elseif ($entity instanceof Entity) {
             $this->data = $entity;
-            $this->modelName = $entity->name();
+            $model = $entity->name();
+        }
+        if ($model) {
+            $this->modelName = $model;
             $this->introspectModel($this->modelName);
         }
 
@@ -263,7 +271,7 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['rule'] === 'required' or $validationRule['required'] OR $validationRule['rule'] === 'notBlank') {
+                if ($validationRule['rule'] === 'required' or $validationRule['required'] or $validationRule['rule'] === 'notBlank') {
                     $result[] = $field;
                 }
             }

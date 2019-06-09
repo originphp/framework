@@ -4,6 +4,7 @@ namespace Origin\Test\Command;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
+use Origin\Utility\Folder;
 
 class GenerateCommandTest extends OriginTestCase
 {
@@ -123,7 +124,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('a3e958f578c2464757f9ae9f99d01b86', $filename);
         unlink($filename);
 
-        $this->rmdir(APP.DS.'plugins'.DS.'contact_manager');
+        Folder::delete(APP.DS.'plugins'.DS.'contact_manager',true);
     }
 
     public function testGenerateComponent()
@@ -281,29 +282,10 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
 
-        $this->rmdir(APP.DS.'plugins'.DS.'dummy');
+        Folder::delete(APP.DS.'plugins'.DS.'dummy',true);
     }
 
-    /**
-     * Recursively delete a directory
-     *
-     * @param string $directory
-     * @return bool
-     */
-    protected function rmdir(string $directory)
-    {
-        $files = array_diff(scandir($directory), ['.', '..']);
-        foreach ($files as $filename) {
-            if (is_dir($directory . DS . $filename)) {
-                $this->rmdir($directory . DS . $filename);
-                continue;
-            }
-            unlink($directory . DS . $filename);
-        }
-
-        return rmdir($directory);
-    }
-
+   
     /*
 
         'plugin' => 'Generates a plugin skeleton',
