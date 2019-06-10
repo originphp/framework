@@ -32,31 +32,29 @@ EOF;
             ['tony','tony@example.com']
         ];
         $this->assertEquals($expected, Csv::toArray($csv));
-       
     }
 
-    public function testToArrayHeaders(){
+    public function testToArrayHeaders()
+    {
         $expected = [
             ['jim','jim@example.com'],
             ['jon','jon@example.com'],
             ['tony','tony@example.com']
         ];
 
-$csv = <<<EOF
+        $csv = <<<EOF
 name,email
 jim,jim@example.com
 jon,jon@example.com
 tony,tony@example.com
 EOF;
-            // test skip line
-            $this->assertEquals($expected, Csv::toArray($csv, ['headers'=>true]));
-    
-           
+        // test skip line
+        $this->assertEquals($expected, Csv::toArray($csv, ['header'=>true]));
     }
 
-    public function testToArrayKeys(){
-
-$csv = <<<EOF
+    public function testToArrayKeys()
+    {
+        $csv = <<<EOF
 name,email
 jim,jim@example.com
 jon,jon@example.com
@@ -76,7 +74,7 @@ EOF;
                 'email'=>'tony@example.com'
             ]
         ];
-        $this->assertEquals($expected,Csv::toArray($csv, ['headers'=>true,'keys'=>true]));
+        $this->assertEquals($expected, Csv::toArray($csv, ['header'=>true,'keys'=>true]));
         $expected = [
             [
                 'First Name'=>'jim',
@@ -91,13 +89,14 @@ EOF;
                 'Email Address'=>'tony@example.com'
             ]
         ];
-        $this->assertEquals($expected,Csv::toArray($csv, ['headers'=>true,'keys'=>['First Name','Email Address']]));
+        $this->assertEquals($expected, Csv::toArray($csv, ['header'=>true,'keys'=>['First Name','Email Address']]));
        
         $this->expectException(InvalidArgumentException::class);
-        Csv::toArray($csv, ['headers'=>true,'keys'=>['Foo']]);
+        Csv::toArray($csv, ['header'=>true,'keys'=>['Foo']]);
     }
 
-    public function testFromArray(){
+    public function testFromArray()
+    {
         $data = [
             ['james','james@example.com'],
             ['tony','tony@example.com'],
@@ -111,11 +110,9 @@ EOF;
             ['name'=>'amanda','email'=>'amanda@example.com'],
         ];
         $expected = "name,email\njames,james@example.com\ntony,tony@example.com\namanda,amanda@example.com\n";
-        $this->assertEquals($expected,Csv::fromArray($data,['headers'=>true]));
+        $this->assertEquals($expected, Csv::fromArray($data, ['header'=>true]));
 
         $expected = "\"First Name\",\"Email Address\"\njames,james@example.com\ntony,tony@example.com\namanda,amanda@example.com\n";
-        $this->assertEquals($expected,Csv::fromArray($data,['headers'=>['First Name','Email Address']]));
+        $this->assertEquals($expected, Csv::fromArray($data, ['header'=>['First Name','Email Address']]));
     }
-
-
 }

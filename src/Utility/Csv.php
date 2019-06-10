@@ -23,13 +23,13 @@ class Csv
      *
       * @param string $csv
       * @param array $options The option keys are :
-      *  - headers: default false. If the csv file contains headers
+      *  - header: default false. If the csv file contains a header row
       *  - keys: array of keys to use or set to true to use headers from csv file
       * @return array
       */
     public static function toArray(string $csv, array $options=[]) : array
     {
-        $options += ['headers'=>false,'keys'=>null];
+        $options += ['header'=>false,'keys'=>null];
 
         $stream = fopen("php://temp", 'r+');
         fputs($stream, $csv);
@@ -38,12 +38,12 @@ class Csv
         $result = [];
         $i = 0;
         while (($data = fgetcsv($stream)) !== false) {
-            if ($i === 0 and $options['headers']) {
+            if ($i === 0 and $options['header']) {
                 if ($options['keys'] === true) {
                     $options['keys'] = $data;
                 }
             } else {
-                if ($options['keys'] AND is_array($options['keys'])) {
+                if ($options['keys'] and is_array($options['keys'])) {
                     if (count($options['keys']) !== count($data)) {
                         throw new InvalidArgumentException('Number of keys does not match columns');
                     }
@@ -63,20 +63,20 @@ class Csv
      * @param array $data
      * @param array $options
      * @param array $options The option keys are :
-     *  - headers: true to use keys from array as headers, or pass array of keys to use
+     *  - header: true to use keys from array as headers, or pass array of keys to use
      * @return string
      */
     public static function fromArray(array $data, array $options=[]) : string
     {
-        $options += ['headers'=>false];
+        $options += ['header'=>false];
 
         $stream = fopen("php://temp", 'r+');
   
-        if ($options['headers'] === true) {
-            $options['headers'] = array_keys(current($data));
+        if ($options['header'] === true) {
+            $options['header'] = array_keys(current($data));
         }
-        if (is_array($options['headers'])) {
-            fputcsv($stream, $options['headers']);
+        if (is_array($options['header'])) {
+            fputcsv($stream, $options['header']);
         }
     
         foreach ($data as $row) {

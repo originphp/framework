@@ -37,7 +37,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
         $tmp = sys_get_temp_dir() . DS  . uniqid();
         $this->assertTrue(File::write($tmp, 'foo'));
         $this->assertEquals('foo', file_get_Contents($tmp));
-        $this->assertFalse(File::write(sys_get_temp_dir() . DS . 'does-not-exist' . DS  .'file.txt','foo'));
+        $this->assertFalse(File::write(sys_get_temp_dir() . DS . 'does-not-exist' . DS  .'file.txt', 'foo'));
     }
  
     public function testAppend()
@@ -47,7 +47,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foo', file_get_Contents($tmp));
         $this->assertTrue(File::append($tmp, 'bar'));
         $this->assertEquals('foobar', file_get_Contents($tmp));
-        $this->assertFalse(File::append(sys_get_temp_dir() . DS . 'does-not-exist' . DS  .'file.txt','foo'));
+        $this->assertFalse(File::append(sys_get_temp_dir() . DS . 'does-not-exist' . DS  .'file.txt', 'foo'));
     }
 
     public function testExists()
@@ -78,6 +78,23 @@ class FileTest extends \PHPUnit\Framework\TestCase
         $filename = File::tmp($data);
         $this->assertTrue(strpos($filename, sys_get_temp_dir()) !== false);
         $this->assertEquals($data, file_get_contents($filename));
+    }
+
+    public function testInfo()
+    {
+        $data = base64_encode(openssl_random_pseudo_bytes(1000000));
+        $filename = uniqid() . '.txt';
+        $tmpfile = sys_get_temp_dir() . DS . $filename;
+        File::write($tmpfile, $data);
+        $expected = [
+            'path' => '/tmp',
+            'filename' => $filename,
+            'extension' => 'txt',
+            'type' => 'text/plain',
+            'size' => '1333336',
+            'timestamp' => fileatime($tmpfile)
+        ];
+        $this->assertEquals($expected, File::info($tmpfile));
     }
  
     /**
@@ -189,18 +206,18 @@ class FileTest extends \PHPUnit\Framework\TestCase
     public function testChmodException()
     {
         $this->expectException(NotFoundException::class);
-        File::chmod('/foo/file.txt',0775);
+        File::chmod('/foo/file.txt', 0775);
     }
 
     public function testChownException()
     {
         $this->expectException(NotFoundException::class);
-        File::chown('/foo/file.txt','some-user');
+        File::chown('/foo/file.txt', 'some-user');
     }
 
     public function testChgrpException()
     {
         $this->expectException(NotFoundException::class);
-        File::chgrp('/foo/file.txt','some-group');
+        File::chgrp('/foo/file.txt', 'some-group');
     }
 }

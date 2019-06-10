@@ -14,7 +14,6 @@
 
 namespace Origin\Utility;
 
-use Origin\Exception\InvalidArgumentException;
 use Origin\Exception\NotFoundException;
 
 class File
@@ -243,6 +242,28 @@ class File
     {
         if (self::exists($filename)) {
             return posix_getpwuid(filegroup($filename))['name'];
+        }
+        throw new NotFoundException(sprintf('%s could not be found', $filename));
+    }
+
+    /**
+     * Returns information about a file
+     *
+     * @param string $filename
+     * @return array
+     */
+    public static function info(string $filename) : array
+    {
+        if (self::exists($filename)) {
+           $pathinfo = pathinfo($filename);
+           return [
+               'path' => $pathinfo['dirname'],
+               'filename' => $pathinfo['basename'],
+               'extension' => $pathinfo['extension']??null,
+               'type' => mime_content_type($filename),
+               'size' => filesize($filename),
+               'timestamp' => filemtime($filename)
+           ];
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
