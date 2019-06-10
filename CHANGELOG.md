@@ -19,6 +19,13 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.11.0] - 2019-06-10
+### Fixed
+- Intl Helper get default language
+
+### Changed
+- Gone back to original design for model validation, notBlank and required.
+
 ## [1.10.3] - 2019-06-10
 ### Changed
 - Restored original behavior of model validation to only validate modified fields.

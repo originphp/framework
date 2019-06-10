@@ -285,7 +285,7 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['rule'] === 'required' or $validationRule['required'] or $validationRule['rule'] === 'notBlank') {
+                if ($validationRule['rule'] === 'notBlank' OR $validationRule['required']) {
                     $result[] = $field;
                 }
             }

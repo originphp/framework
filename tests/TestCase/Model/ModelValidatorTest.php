@@ -101,7 +101,7 @@ class ModelValidatorTest extends OriginTestCase
         $Validator = $this->Validator;
  
         $Validator->rules([
-            'name' => ['rule' => 'required']
+            'name' => ['rule' => 'notBlank']
             ]);
             
         $create = true;
@@ -113,7 +113,7 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
        
         $Validator->rules([
-            'name' => ['rule' => 'required','on' => 'create']
+            'name' => ['rule' => 'notBlank','on' => 'create']
             ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
@@ -122,7 +122,7 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->validates(new Entity(['name' => null]), $update));
 
         $Validator->rules([
-            'name' => ['rule' => 'required','on' => 'update']
+            'name' => ['rule' => 'notBlank','on' => 'update']
             ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
@@ -131,15 +131,25 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
     }
 
-    public function testValidateNotPresent(){
+    public function testValidateRequired(){
+
         $Validator = $this->Validator;
+        $Validator->rules([
+            'name' => 'alphaNumeric',
+            'email' => ['rule'=>'email','required'=>false]
+            ]);
+
+        $entity = new Entity(['name' => 'data']);
+        $this->assertTrue($Validator->validates($entity));
+
         $Validator->rules([
             'name' => 'alphaNumeric',
             'email' => ['rule'=>'email','required'=>true]
             ]);
+        $this->assertFalse($Validator->validates($entity));
 
-
-        $entity = new Entity(['name' => 'data']);
+        
+        $entity = new Entity(['name' => 'data','email'=>'js@example.com']);
         $this->assertTrue($Validator->validates($entity));
     }
 

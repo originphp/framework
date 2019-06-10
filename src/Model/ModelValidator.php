@@ -145,15 +145,15 @@ class ModelValidator
 
         foreach ($this->validationRules as $field => $ruleset) {
 
-            // Don't run validation rule on field if its not in the entity
-            if(in_array($field,$modified) === false){
-                continue;
-            }
-
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
+
+                // Don't run validation rule on field if its not in the entity
+                if(!$validationRule['required'] AND in_array($field,$modified) === false){
+                    continue;
+                 }
             
                 $value = $entity->get($field);
                   
@@ -164,22 +164,21 @@ class ModelValidator
                     continue;
                 }
                 
+                 // Break out if required and its blank, if not continue with validation
+                 if ($validationRule['required'] AND !$this->validate($value, 'notBlank')) {
+                    $entity->invalidate($field, 'This field is required');
+                    break; // dont run any more validation rules on this field if blank              
+                }
+
                 // If its required rule (which does not exist), check and break or continue
-                if($validationRule['rule'] === 'required'){
+                if($validationRule['rule'] === 'notBlank'){
                     if (!$this->validate($value, 'notBlank')) {
-                        $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
+                        $entity->invalidate($field,$validationRule['message']);
                         break; // dont run any more validation rules on this field if blank
                     }
                     continue; // goto next rule
                 }
-                // Break out if required and its blank, if not continue with validation
-                if ($validationRule['required']) {
-                    if (!$this->validate($value, 'notBlank')) {
-                        $entity->invalidate($field, $validationRule['required']?'This field is required':$validationRule['message']);
-                        break; // dont run any more validation rules on this field if blank
-                    }                   
-                }
-
+               
                 // If allowBlank then skip on empty values, or invalidate the value
                 if(($value === '' or $value === null)){
                     if($validationRule['allowBlank'] === true){

@@ -130,7 +130,7 @@ class IntlHelper extends Helper
     {
         $list = [];
         if ($language === null) {
-            $language = I18n::getConfig('language', 'en');
+            $language = I18n::language();
         }
 
         $locales = ResourceBundle::getLocales(''); //Returns a numerical array of locales supported by the PHP INT extension.

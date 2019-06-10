@@ -37,7 +37,7 @@ class Widget extends Model
 
     public function initialize(array $config)
     {
-        $this->validate('name', ['rule' => 'required']);
+        $this->validate('name', ['rule' => 'notBlank']);
     }
 
     public function setSchema($schema)

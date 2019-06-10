@@ -629,7 +629,7 @@ class Scaffold
                 }
                 $validationRules[$model][$field] = [];
                 if ($meta['null'] == false) {
-                    $validationRules[$model][$field][] = 'required';
+                    $validationRules[$model][$field][] = 'notBlank';
                 }
                 if ($field === 'email') {
                     $validationRules[$model][$field][] = 'email';
