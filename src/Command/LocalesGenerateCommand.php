@@ -22,9 +22,9 @@ use DateTime;
 use Locale;
 use Origin\Utility\Yaml;
 
-class LocalesGeneratorCommand extends Command
+class LocalesGenerateCommand extends Command
 {
-    protected $name = 'locales:generator';
+    protected $name = 'locales:generate';
     protected $description = 'Generates the Locales definition files';
 
     protected $dateMap = [
@@ -56,25 +56,28 @@ class LocalesGeneratorCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('expected',['description'=>'Adds the expected information','type'=>'boolean']);
-        $this->addOption('single-file',['description'=>'Put all definitions in a single file','type'=>'boolean']);
-        $this->addOption('force',['description'=>'Force overwrite','type'=>'boolean']);
+        $this->addOption('expected', ['description'=>'Adds the expected information','type'=>'boolean']);
+        $this->addOption('single-file', ['description'=>'Put all definitions in a single file','type'=>'boolean']);
+        $this->addOption('force', ['description'=>'Force overwrite','type'=>'boolean']);
+        $this->addArgument('locales', ['description'=>'The names of the locales you want to genreate seperated by space','type'=>'array']);
     }
     public function execute()
     {
         $types = [];
         $locales = ResourceBundle::getLocales('');
-
+        if($this->arguments('locales')){
+            $locales = $this->arguments('locales');
+        }
         $path = CONFIG . DS  .'locales';
 
-        if(file_exists($path) AND $this->options('force')===false){
+        if (file_exists($path) and $this->options('force')===false) {
             $this->io->warning('Locales definitions found in ' . $path);
-            if($this->io->askChoice('Do you want to continue?',['y','n'],'n') === 'no'){
+            if ($this->io->askChoice('Do you want to continue?', ['y','n'], 'n') === 'no') {
                 $this->exit();
             }
         }
 
-        if(!file_Exists($path )){
+        if (!file_Exists($path)) {
             mkdir($path);
         }
 
@@ -86,23 +89,22 @@ class LocalesGeneratorCommand extends Command
         foreach ($locales as $locale) {
             $result = $this->parseLocale($locale);
             $results[$locale] = $result;
-            if($this->options('single-file') === false){
-                $this->io->createFile($path . DS .$locale.'.yml',Yaml::fromArray($result),true);
+            if ($this->options('single-file') === false) {
+                $this->io->createFile($path . DS .$locale.'.yml', Yaml::fromArray($result), true);
             }
            
-            if($i === 0 OR $i === $max OR $i % 2 === 0){
-                $this->io->progressBar($i,$max);
+            if ($i === 0 or $i === $max or $i % 2 === 0) {
+                $this->io->progressBar($i, $max);
             }
             
             $i++;
-            
         }
     
-        if($this->options('single-file')){
-            $this->io->createFile( $path . DS . 'locales.yml',Yaml::fromArray($results),true);
+        if ($this->options('single-file')) {
+            $this->io->createFile($path . DS . 'locales.yml', Yaml::fromArray($results), true);
         }
 
-        $this->io->success(sprintf('Generated %d locale definitions',count($results)));
+        $this->io->success(sprintf('Generated %d locale definitions', count($results)));
     }
 
     /**
@@ -111,9 +113,10 @@ class LocalesGeneratorCommand extends Command
      * @param string $value
      * @return void
      */
-    protected function decode(string $value){
-        if(substr($value,0,2) == '\u'){
-            $value = str_replace('\u','\u{',$value) . '}';
+    protected function decode(string $value)
+    {
+        if (substr($value, 0, 2) == '\u') {
+            $value = str_replace('\u', '\u{', $value) . '}';
         }
         return $value;
     }
@@ -133,21 +136,20 @@ class LocalesGeneratorCommand extends Command
         $config['decimals'] = $fmt->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
         $config['thousands'] = $fmt->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
         $config['currency'] = $fmt->getTextAttribute(NumberFormatter::CURRENCY_CODE);
-         $symbol = $fmt->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
-         $config['before'] = $config['after'] = null;
+        $symbol = $fmt->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
+        $config['before'] = $config['after'] = null;
 
-         $symbol = $this->decode($symbol);
-         if( $fmt->getPattern() === '#,##0.00 ¤'){
+        $symbol = $this->decode($symbol);
+        if ($fmt->getPattern() === '#,##0.00 ¤') {
             $config['after'] = ' ' . $symbol;
-         }
-         else{
-             $config['before'] = $symbol;
-         }
+        } else {
+            $config['before'] = $symbol;
+        }
 
-         $expected = [];
-         $expected['currency'] = $fmt->format(1234567.890);
+        $expected = [];
+        $expected['currency'] = $fmt->format(1234567.890);
 
-         //http://userguide.icu-project.org/formatparse/datetime
+        //http://userguide.icu-project.org/formatparse/datetime
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
     
         $config['date'] = $this->convertDate($fmt->getPattern());
@@ -161,21 +163,24 @@ class LocalesGeneratorCommand extends Command
         $config['datetime'] =  $this->convertDatetime($fmt->getPattern());
 
         $expected['datetime'] = $fmt->format(new DateTime());
-        if($this->options('expected')){
+        if ($this->options('expected')) {
             $config['expected'] = $config['expected'];
         }
         
         return $config;
     }
 
-    public function convertDate(String $string){
-        return strtr($string,$this->dateMap);
+    public function convertDate(String $string)
+    {
+        return strtr($string, $this->dateMap);
     }
-    public function convertTime(String $string){
-        return strtr($string,$this->timeMap);
+    public function convertTime(String $string)
+    {
+        return strtr($string, $this->timeMap);
     }
-    public function convertDatetime(String $string){
+    public function convertDatetime(String $string)
+    {
         $string = $this->convertDate($string);
-        return strtr($string,$this->timeMap);
+        return strtr($string, $this->timeMap);
     }
 }
