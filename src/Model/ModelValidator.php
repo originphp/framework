@@ -130,9 +130,26 @@ class ModelValidator
         return false;
     }
 
+    /**
+     * Validates data
+     *
+     * @internal Data should only be validated if it is submmited, it will cause issues.
+     * 
+     * @param Entity $entity
+     * @param boolean $create
+     * @return void
+     */
     public function validates(Entity $entity, bool $create = true)
     {
+        $modified = $entity->modified();
+
         foreach ($this->validationRules as $field => $ruleset) {
+
+            // Don't run validation rule on field if its not in the entity
+            if(in_array($field,$modified) === false){
+                continue;
+            }
+
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
@@ -162,7 +179,7 @@ class ModelValidator
                         break; // dont run any more validation rules on this field if blank
                     }                   
                 }
-              
+
                 // If allowBlank then skip on empty values, or invalidate the value
                 if(($value === '' or $value === null)){
                     if($validationRule['allowBlank'] === true){

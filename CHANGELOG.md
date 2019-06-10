@@ -19,6 +19,10 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.10.3] - 2019-06-10
+### Changed
+- Restored original behavior of model validation to only validate modified fields.
+
 ## [1.10.2] - 2019-06-10
 ### Changed
 - renamed locales:generator to locales:generate

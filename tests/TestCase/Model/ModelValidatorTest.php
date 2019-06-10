@@ -96,75 +96,86 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->validates($data));
     }
 
-    public function testValidatesRequireOn()
+    public function testValidatesRequired()
     {
         $Validator = $this->Validator;
  
         $Validator->rules([
             'name' => ['rule' => 'required']
             ]);
-    
-        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), true));
-        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), false));
+            
+        $create = true;
+        $update = false;
 
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $update));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
        
         $Validator->rules([
             'name' => ['rule' => 'required','on' => 'create']
             ]);
     
-        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), true));
-        $this->assertTrue($Validator->validates(new Entity(['value' => 'some string']), false));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $update));
+        $this->assertTrue($Validator->validates(new Entity(['name' => null]), $update));
 
-        
         $Validator->rules([
             'name' => ['rule' => 'required','on' => 'update']
             ]);
     
-        $this->assertTrue($Validator->validates(new Entity(['value' => 'some string']), true));
-        $this->assertFalse($Validator->validates(new Entity(['value' => 'some string']), false));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $update));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
     }
 
-    public function testValidatesRequiredOn()
+    public function testValidateNotPresent(){
+        $Validator = $this->Validator;
+        $Validator->rules([
+            'name' => 'alphaNumeric',
+            'email' => ['rule'=>'email','required'=>true]
+            ]);
+
+
+        $entity = new Entity(['name' => 'data']);
+        $this->assertTrue($Validator->validates($entity));
+    }
+
+    public function testValidatesRequiredKey()
     {
         $Validator = $this->Validator;
  
         $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric','required' => true]
+            'name' => ['rule' => 'alphaNumeric','required'=>true]
+            ]);
+            
+        $create = true;
+        $update = false;
+
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
+       
+        $Validator->rules([
+            'name' => ['rule' => 'alphaNumeric','on' => 'create','required'=>true]
             ]);
     
-            $this->assertFalse($Validator->validates(new Entity(['name' => '']), true));
-            $this->assertFalse($Validator->validates(new Entity(['name' => '']), false));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+        $this->assertTrue($Validator->validates(new Entity(['name' => null]), $update));
 
-           
-            $Validator->rules([
-                'name' => ['rule' => 'alphaNumeric','required' => true,'on' => 'create']
-                ]);
-        
-            $this->assertFalse($Validator->validates(new Entity(['name' => '']), true));
-            $this->assertTrue($Validator->validates(new Entity(['name' => '']), false));
+        $Validator->rules([
+            'name' => ['rule' => 'alphaNumeric','on' => 'update','required'=>true]
+            ]);
     
-            
-            $Validator->rules([
-                'name' => ['rule' => 'alphaNumeric','required' => true,'on' => 'update']
-                ]);
-        
-            $this->assertTrue($Validator->validates(new Entity(['name' => '']), true));
-            $this->assertFalse($Validator->validates(new Entity(['name' => '']), false));
-    }
-
-    public function testValidatesOn()
-    {
-        $Validator = $this->Validator;
-        $validate = array(
-        'email' => array(
-            'rule' => 'email',
-            'on' => 'update'
-        ),
-      );
-        $Validator->rules($validate);
-        $data = new Entity(['email' => 'fozzy wozzy was a woman']);
-        $this->assertTrue($Validator->validates($data, true));
-        $this->assertFalse($Validator->validates($data, false));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => null]), $create));
+        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+        $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
     }
 
     public function testValidationRuleArray()
@@ -415,7 +426,7 @@ class ModelValidatorTest extends OriginTestCase
         $this->Article->validate('title', 'email');
     
         $article = $this->Article->new(['title'=>'']);
-         $this->assertFalse($this->Article->validates($article));
+        $this->assertFalse($this->Article->validates($article));
 
         $this->Article->validate('title', ['rule'=>'email','required'=>true]);
         $article = $this->Article->new(['title'=>'']);
