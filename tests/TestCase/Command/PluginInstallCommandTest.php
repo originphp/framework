@@ -58,13 +58,13 @@ class PluginInstallCommandTest extends OriginTestCase
  
         $cmd->run(['originphp/framework','UserManagement']);
         $this->assertContains('UserManagement Plugin installed',$bufferedOutput->read());
-        $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
-        file_put_contents(CONFIG . '/bootstrap.php',str_replace("\nPlugin::load('UserManagement');\n",'',$bootstrap));
+        $bootstrap = file_get_contents(CONFIG . '/application.php');
+        file_put_contents(CONFIG . '/application.php',str_replace("\nPlugin::load('UserManagement');\n",'',$bootstrap));
     }
 
     public function testRunError(){
         $cmd = $this->getMockBuilder(PluginInstallCommand::class)
-                     ->setMethods(['download','appendBootstrap'])
+                     ->setMethods(['download','appendApplication'])
                      ->getMock();
 
                      $cmd->expects($this->once())

@@ -19,6 +19,10 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.10.1] - 2019-06-10
+### Fixed
+- Plugin installer append application.php 
+
 ## [1.10.0] - 2019-06-10
 ### Added
 - CSV Utility
