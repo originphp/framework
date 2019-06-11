@@ -77,7 +77,6 @@ class FixtureManager
             $this->loaded[$fixture]->truncate();
         }
 
-        $this->loaded[$fixture]->initialize();
         $this->loaded[$fixture]->insert();
       
         // Config Model in Registry to use test datasource for this fixture

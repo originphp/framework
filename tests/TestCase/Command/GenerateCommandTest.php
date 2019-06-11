@@ -8,36 +8,35 @@ use Origin\Utility\Folder;
 
 class GenerateCommandTest extends OriginTestCase
 {
-
     use ConsoleIntegrationTestTrait;
 
     public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag'];
 
     public function testGenerateScaffold()
     {
-   
         $this->exec('generate --force scaffold Bookmark');
         
         $this->assertExitSuccess();
-       /**
-        * Run the generator on the bookmarks app and test its all working as accepted before changing Hashes
-        */
-        $this->assertFileHash('c871e290c6a3c66a82800231e58abc79',SRC . DS . 'Model' . DS . 'Bookmark.php');
+        /**
+         * Run the generator on the bookmarks app and test its all working as accepted before changing Hashes
+         */
+
+        $this->assertFileHash('9c9f3a586a45dac7a3edb8b0144877ed', SRC . DS . 'Model' . DS . 'Bookmark.php');
         unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
 
-        $this->assertFileHash('1e6187f77c1156f55da9fb97db036a54',SRC . DS . 'Controller' . DS . 'BookmarksController.php');
+        $this->assertFileHash('1e6187f77c1156f55da9fb97db036a54', SRC . DS . 'Controller' . DS . 'BookmarksController.php');
         unlink(SRC . DS . 'Controller' . DS . 'BookmarksController.php');
-
-        $this->assertFileHash('a5dd94c570075bc9eb9339b65f8ffb2c',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
+     
+        $this->assertFileHash('96ce7c43598ddc6db9b036c116c6e576', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
 
-        $this->assertFileHash('328574e062cef0c52cf3c4b2310b2f6e',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
+        $this->assertFileHash('aeae00069812ef1a457ce5363d5987e2', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
 
-        $this->assertFileHash('e1ee56fedeb7936a4fa4c7d438ae9c94',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
+        $this->assertFileHash('e1ee56fedeb7936a4fa4c7d438ae9c94', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
 
-        $this->assertFileHash('f1109b973aa26d24ad851400d6e7ca2e',SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
+        $this->assertFileHash('f1109b973aa26d24ad851400d6e7ca2e', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
     }
 
@@ -84,8 +83,9 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = SRC.DS.'Model'.DS.'Behavior'.DS.'DummyBehavior.php';
         $this->assertOutputContains('src/Model/Behavior/DummyBehavior.php');
+
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('867b015a8861035ef184cb4965771b9e', $filename);
+        $this->assertFileHash('aaf850b60f00e768c55ff6fc43f8a075', $filename);
         unlink($filename);
     }
 
@@ -124,7 +124,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('a3e958f578c2464757f9ae9f99d01b86', $filename);
         unlink($filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'contact_manager',true);
+        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', true);
     }
 
     public function testGenerateComponent()
@@ -282,7 +282,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'dummy',true);
+        Folder::delete(APP.DS.'plugins'.DS.'dummy', true);
     }
 
    

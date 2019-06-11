@@ -94,8 +94,8 @@ class Date
     }
 
     /**
-     * Formats a MySQL datestring into user date string (timezone conversion happens if timezone
-     * set to anything other than UTC)
+     * Formats a MySQL datestring into user date string and converts timezone if the timezone is different
+     * to server timezone
      *
      * @param string $dateString
      * @return string
@@ -103,9 +103,9 @@ class Date
     public static function formatDate(string $dateString)
     {
         if (static::convert()) {
-            $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
+            $dateString = static::convertTimezone($dateString .' 00:00:00', date_default_timezone_get(), static::$locale['timezone']);
         }
-        return date(static::$locale['date'], strtotime($dateString));
+         return date(static::$locale['date'], strtotime($dateString));
     }
 
     /**
@@ -214,7 +214,6 @@ class Date
      * @param string $datetime     Y-m-d H:i:s
      * @param string $fromTimezone
      * @param string $toTimezone
-     *
      * @return null|string Y-m-d H:i:s (new timezone)
      */
     public static function convertTimezone(string $datetime, string $fromTimezone, string $toTimezone)

@@ -23,47 +23,53 @@ use App\Command\CacheResetCommand;
 
 use Origin\Console\Exception\StopExecutionException;
 
-class MockCommandRunner extends CommandRunner {
-    function io(){
+class MockCommandRunner extends CommandRunner
+{
+    public function io()
+    {
         return $this->io;
     }
 }
 class CommandRunnerTest extends \PHPUnit\Framework\TestCase
 {
-
-    public function setUp(){
+    public function setUp()
+    {
         $this->out = new ConsoleOutput();
     }
 
-    public function commandRunner(){
-        return new CommandRunner(new ConsoleIo( $this->out, $this->out));
+    public function commandRunner()
+    {
+        return new CommandRunner(new ConsoleIo($this->out, $this->out));
     }
 
-    public function testConstructor(){
+    public function testConstructor()
+    {
         $runner = new MockCommandRunner();
-        $this->assertInstanceOf(ConsoleIo::class,$runner->io());
+        $this->assertInstanceOf(ConsoleIo::class, $runner->io());
     }
     
-    public function testRunNoArgs(){
+    public function testRunNoArgs()
+    {
         $runner = $this->commandRunner();
         $runner->run([]);
-        $this->assertContains('<code>say-hello          </code><text>A command to say something</text>',$this->out->read()); // App namespace
-        $this->assertEquals('9ad254b15b8452005bea380d94528d78',md5($this->out->read())); // rest
-    
+        $this->assertContains('<code>say-hello         </code><text>A command to say something</text>', $this->out->read()); // App namespace
+        $this->assertEquals('ee3e1649fc7586ec07bcfde90543b725', md5($this->out->read())); // rest
     }
 
-    public function testFindCommand(){
+    public function testFindCommand()
+    {
         $result = $this->commandRunner()->findCommand('say-hello');
-        $this->assertInstanceOf(SaySomethingCommand::class,$result);
-        $result = $this->commandRunner()->findCommand('db:create'); // standard name 
-        $this->assertInstanceOf(DbCreateCommand::class,$result);
+        $this->assertInstanceOf(SaySomethingCommand::class, $result);
+        $result = $this->commandRunner()->findCommand('db:create'); // standard name
+        $this->assertInstanceOf(DbCreateCommand::class, $result);
         $result = $this->commandRunner()->findCommand('cache:reset'); // standard name + in app folder
-        $this->assertInstanceOf(CacheResetCommand::class,$result);
+        $this->assertInstanceOf(CacheResetCommand::class, $result);
         $this->assertNull($this->commandRunner()->findCommand('purple-disco-machine:player'));
     }
 
-    public function testRun(){
-       $result = $this->commandRunner()->run([
+    public function testRun()
+    {
+        $result = $this->commandRunner()->run([
            '/vendor/somescript.php',
            'say-hello',
            '--color=blue',
@@ -71,10 +77,11 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
            ]);
 
         $this->assertTrue($result);
-        $this->assertContains('<blue>Hello jim</blue>',$this->out->read());
+        $this->assertContains('<blue>Hello jim</blue>', $this->out->read());
     }
 
-    public function testRunUnkownCommand(){
+    public function testRunUnkownCommand()
+    {
         $this->assertFalse($this->commandRunner()->run([
             '/vendor/somescript.php',
             'purple-disco-machine:player',
@@ -85,8 +92,8 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testRunError(){
-
+    public function testRunError()
+    {
         $result = $this->commandRunner()->run([
             '/path-to-script/script.php',
             'db:create',

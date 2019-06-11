@@ -45,6 +45,17 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(Date::convertFormat('foo', 'd/m/Y', 'Y-m-d'));
     }
     
+    public function testFormatArgs()
+    {
+        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A']);
+        $this->assertEquals('19/03/2019 11:54 AM', Date::format('2019-03-19 11:54:00'));
+        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00','d/m/Y'));
+
+        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','timezone' => 'Europe/Madrid']);
+        $this->assertEquals('19-03-2019 12:54 PM', Date::format('2019-03-19 11:54:00', 'd-m-Y g:i A'));
+        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00','d/m/Y'));
+    }
+
     public function testFormatDate()
     {
         Date::locale(['date' => 'd/m/Y']);
@@ -88,7 +99,7 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('12:00:00', Date::parseTime('12:00 PM'));
 
         // No Timezone conversion for times anymore
-        Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']); 
+        Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']);
         $this->assertEquals('12:00:00', Date::parseTime('12:00 PM'));
     }
 
@@ -100,6 +111,6 @@ class DateTest extends \PHPUnit\Framework\TestCase
     public function testFormatDateConversion()
     {
         Date::locale(['date' => 'd/m/Y','timezone' => 'Europe/Madrid']);
-        $this->assertEquals('19/03/2019', Date::formatDate('2019-03-19 10:00:00')); // Still need to run through timezone
+        $this->assertEquals('19/03/2019', Date::formatDate('2019-03-19')); // Still need to run through timezone
     }
 }

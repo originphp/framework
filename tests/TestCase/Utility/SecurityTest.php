@@ -23,6 +23,9 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     {
         Configure::write('Security.salt', 'B1816172FD2BA98F3AF520EF572E3A47');
     }
+    public function tearDown(){
+        Configure::write('Security.salt', '-----ORIGIN PHP-----');
+    }
     public function testHash()
     {
         $plain = 'The quick brown fox jumps over the lazy dog';

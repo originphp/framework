@@ -262,6 +262,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testDate()
     {
+        Date::locale(['date'=>'d/m/Y','time'=>'H:i','datetime'=>'d/m/Y H:i','timezone'=>'Europe/London']);
         $FormHelper = $this->Form;
         $expected = '<input type="text" name="date" placeholder="e.g. ' .Date::formatDate(date('Y-m-d H:i:s')) . '">';
         $this->assertEquals($expected, $FormHelper->date('date'));

@@ -262,8 +262,8 @@ class ModelValidatorTest extends OriginTestCase
     public function testDatetime()
     {
         $Validator = $this->Validator;
-        $this->assertTrue($Validator->datetime('2017-01-01 17:32:00'));
-        $this->assertFalse($Validator->datetime('2017-01-01 28:32:00'));
+        $this->assertTrue($Validator->datetime('2017-01-01 17:32'));
+        $this->assertFalse($Validator->datetime('2017-01-01 28:32'));
     }
 
     public function testDecimal()
