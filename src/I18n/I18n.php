@@ -26,7 +26,6 @@ use Origin\Utility\Yaml;
 
 class I18n
 {
-
     const DEFAULT_LOCALE = 'en_US';
     /**
      * The default locale to be used.
@@ -64,35 +63,64 @@ class I18n
     protected static $messages = null;
 
  
-    public static function initialize(array $config = []){
+    public static function initialize(array $config = [])
+    {
         $config += ['locale'=>static::defaultLocale(),'language'=>null,'timezone'=>'UTC'];
+
         static::locale($config['locale']);
-        if($config['language'] === null){
+
+        if ($config['language'] === null) {
             $config['language'] = Locale::getPrimaryLanguage($config['locale']);
         }
-        
+        self::language($config['language']);
+
         // Configure Date Timezone
         \Origin\Utility\Date::locale(['timezone'=>$config['timezone']]);
 
         // Load Locale information from /locales if available
-        if(file_exists(CONFIG . DS . 'locales' . DS . $config['locale'] .'.yml')){
-            $locale = Yaml::toArray(file_get_contents(ROOT . DS . 'locales' . DS . $config['locale'] .'.yml'));
-            extract( $locale);
-            \Origin\Utility\Date::locale(['timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime]);
+        $locale = static::loadLocale($config['locale']);
 
-            if($currency){
-                \Origin\Utility\Number::addCurrency($currency,['before'=>$before,'after'=>$after]);
-            }
-            else{
+        if ($locale) {
+            extract($locale);
+            \Origin\Utility\Date::locale([
+                'timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime
+                ]);
+
+            if ($currency) {
+                \Origin\Utility\Number::addCurrency($currency, ['before'=>$before,'after'=>$after]);
+            } else {
                 unset($locale['currency']);
             }
             unset($locale['before'],$locale['after']);
             \Origin\Utility\Number::locale($locale);
         }
-
+  
         // Configure Intl Utilities
         \Origin\I18n\Date::locale($config['locale']);
         \Origin\I18n\Date::timezone($config['timezone']);
+    }
+
+    /**
+     * Load locale configuration if it exists, if not try to fallback on language only
+     *
+     * @param string $locale
+     * @return array|null
+     */
+    protected static function loadLocale(string $locale)
+    {
+        $filename = null;
+        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.yml')) {
+            $filename = CONFIG . DS . 'locales' . DS . $locale .'.yml';
+        }
+        // Fallback, language only
+        if (!$filename and strpos($locale, '_')!==false) {
+            list($language, $l) = explode('_', $locale, 2);
+            $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
+        }
+        if ($filename) {
+            return Yaml::toArray(file_get_contents($filename));
+        }
+        return null;
     }
     
     /**
@@ -127,7 +155,7 @@ class I18n
     public static function defaultLocale(string $locale = null)
     {
         if ($locale === null) {
-            if(static::$defaulLocale === null){
+            if (static::$defaulLocale === null) {
                 static::$defaulLocale = self::DEFAULT_LOCALE;
             }
             return static::$defaulLocale;
@@ -194,7 +222,7 @@ class I18n
      */
     public static function translate(string $message, array $vars = [])
     {
-        if(static::$messages === null){
+        if (static::$messages === null) {
             static::locale(static::defaultLocale());
         }
         if (isset(static::$messages[$message])) {
@@ -210,10 +238,10 @@ class I18n
             }
             // use count number if set, if not use the last.
             $message = $messages[2];
-            if(isset($messages[$vars['count']])){
+            if (isset($messages[$vars['count']])) {
                 $message = $messages[$vars['count']];
             }
-         }
+        }
 
         $replace = [];
         foreach ($vars as $key => $value) {
