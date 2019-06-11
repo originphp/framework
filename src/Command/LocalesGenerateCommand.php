@@ -82,7 +82,8 @@ class LocalesGenerateCommand extends Command
         }
 
         $results = [];
-        $max = count($locales)-1;
+ 
+        $max = count($locales);
         $this->info('Generating locales definitions');
         $i=0;
         //@todo where to put this. Should be part of source code, but cant add to vendor

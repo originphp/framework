@@ -21,6 +21,8 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 
 class ViewTestsController extends Controller
 {
@@ -261,14 +263,14 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function testDate()
     {
         $FormHelper = $this->Form;
-        $expected = "<input type=\"text\" name=\"date\">";
+        $expected = '<input type="text" name="date" placeholder="e.g. ' .Date::formatDate(date('Y-m-d H:i:s')) . '">';
         $this->assertEquals($expected, $FormHelper->date('date'));
     }
 
     public function testTime()
     {
         $FormHelper = $this->Form;
-        $expected = "<input type=\"text\" name=\"time\">";
+        $expected = '<input type="text" name="time" placeholder="e.g. ' .Date::formatTime(date('Y-m-d H:i:s')) . '">';
         $this->assertEquals($expected, $FormHelper->time('time'));
     }
 
@@ -276,7 +278,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     {
         $FormHelper = $this->Form;
 
-        $expected = '<input type="text" name="datetime">';
+        $expected = '<input type="text" name="datetime" placeholder="e.g. ' .Date::formatDateTime(date('Y-m-d H:i:s')) . '">';
         $this->assertEquals($expected, $FormHelper->datetime('datetime'));
     }
 
@@ -471,7 +473,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
     public function testNumber()
     {
         $result = $this->Form->number('amount');
-        $expected = '<input type="number" name="amount">';
+        $expected = '<input type="text" name="amount">';
         $this->assertSame($expected, $result);
     }
 

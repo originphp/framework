@@ -64,7 +64,10 @@ class DateTest extends \PHPUnit\Framework\TestCase
         Date::locale(['time' => 'g:i A']);
         $this->assertEquals('11:54 AM', Date::format('11:54:00'));
         Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']);
-        $this->assertEquals('12:54 PM', Date::format('11:54:00'));
+        $this->assertEquals('11:54 AM', Date::format('11:54:00'));
+
+        Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']);
+        $this->assertEquals('12:54 PM', Date::formatTime('2019-01-01 11:54:00'));
     }
 
     public function testParseDate()
@@ -83,8 +86,10 @@ class DateTest extends \PHPUnit\Framework\TestCase
     {
         Date::locale(['time' => 'g:i A']);
         $this->assertEquals('12:00:00', Date::parseTime('12:00 PM'));
-        Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']); // always 1 hour out
-        $this->assertEquals('11:00:00', Date::parseTime('12:00 PM'));
+
+        // No Timezone conversion for times anymore
+        Date::locale(['time' => 'g:i A','timezone' => 'Europe/Madrid']); 
+        $this->assertEquals('12:00:00', Date::parseTime('12:00 PM'));
     }
 
     public function testLocale()

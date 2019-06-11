@@ -22,6 +22,9 @@ use Origin\Model\Entity;
 use Origin\View\TemplateTrait;
 use Origin\Core\Dot;
 
+use Origin\Utility\Date;
+use Origin\Utility\Number;
+
 class FormHelper extends Helper
 {
     use TemplateTrait;
@@ -285,7 +288,7 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['rule'] === 'notBlank' OR $validationRule['required']) {
+                if ($validationRule['rule'] === 'notBlank' or $validationRule['required']) {
                     $result[] = $field;
                 }
             }
@@ -316,10 +319,11 @@ class FormHelper extends Helper
             $options['type'] = 'select';
         }
 
+   
         if (empty($options['type'])) {
             $options['type'] = $this->detectType($name);
         }
-
+    
         if (isset($this->config['controlDefaults'][$options['type']])) {
             $options += $this->config['controlDefaults'][$options['type']];
         }
@@ -473,7 +477,22 @@ class FormHelper extends Helper
     public function date(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
+        $options += ['format'=>Date::locale()['date']];
         $options['type'] = 'text';
+
+        /**
+         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
+         */
+        if ($options['format']) {
+            if (empty($options['placeholder'])) {
+                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'), $options['format']);
+            }
+            
+            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
+                $options['value'] = Date::format($options['value'], $options['format']);
+            }
+            unset($options['format']);
+        }
 
         return $this->formatTemplate('input', $options);
     }
@@ -488,7 +507,22 @@ class FormHelper extends Helper
     public function datetime(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
+        $options += ['format'=>Date::locale()['datetime']];
         $options['type'] = 'text';
+
+        /**
+         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
+         */
+        if ($options['format']) {
+            if (empty($options['placeholder'])) {
+                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
+            }
+            
+            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+                $options['value'] = Date::format($options['value'], $options['format']);
+            }
+            unset($options['format']);
+        }
 
         return $this->formatTemplate('input', $options);
     }
@@ -586,8 +620,23 @@ class FormHelper extends Helper
      */
     public function time(string $name, array $options = [])
     {
+
         $options = $this->prepareOptions($name, $options);
+        $options += ['format'=>Date::locale()['time']];
         $options['type'] = 'text';
+
+        /**
+         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
+         */
+        if ($options['format']) {
+            if (empty($options['placeholder'])) {
+                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
+            }
+            if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+                $options['value'] = Date::format($options['value'], $options['format']); // Daylight saving issue with timefields
+            }
+            unset($options['format']);
+        }
 
         return $this->formatTemplate('input', $options);
     }
@@ -602,7 +651,15 @@ class FormHelper extends Helper
     public function number(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options['type'] = 'number';
+        $options += ['format' => true];
+        $options['type'] = 'text';
+
+        if ($options['format']) {            
+            if (!empty($options['value'])) {
+                $options['value'] = Number::format($options['value']);
+            }
+            unset($options['format']);
+        }
 
         return $this->formatTemplate('input', $options);
     }

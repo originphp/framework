@@ -138,7 +138,7 @@ function commandSplit(string $command)
 /**
  * Translate and format a string.
  *
- * @example __('Order with id %d by user %s...', $id, $name);
+ * @example __('Order with id {id} by user {name}...',['id'=>$user->id,'name'=>$user->name]);
  * @param string $string
  * @param mixed arg1 arg2
  * @return string formatted

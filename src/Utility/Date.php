@@ -30,8 +30,8 @@ class Date
      */
     protected static $locale = [
         'timezone' => 'UTC',
-        'date' => 'm/d/Y',
-        'datetime' => 'm/d/Y H:i',
+        'date' => 'Y-m-d',
+        'datetime' => 'Y-m-d H:i',
         'time' => 'H:i'
     ];
 
@@ -46,7 +46,7 @@ class Date
       *    ]);
      *
      * @param array $locale
-     * @return array|null
+     * @return array|void
      */
     public static function locale(array $locale = null)
     {
@@ -62,18 +62,23 @@ class Date
         static::$locale = $locale;
     }
 
+
+    protected static function convert(){
+        return (date_default_timezone_get() !== static::$locale['timezone']);
+    }
+
     /**
      * Formats a MySQL date to the user date format either by autodetection or a specific format
      *
      * @param string|null $value
      * @param string|null $type date,datetime,time
-     * @return void
+     * @return string|null
      */
     public static function format(string $dateString, string $format = null)
     {
         if ($format) {
-            if (static::$locale['timezone'] != 'UTC') {
-                $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
+            if (static::convert()) {
+                $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
             }
             return date($format, strtotime($dateString));
         }
@@ -97,8 +102,8 @@ class Date
      */
     public static function formatDate(string $dateString)
     {
-        if (static::$locale['timezone'] != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
+        if (static::convert()) {
+            $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
         return date(static::$locale['date'], strtotime($dateString));
     }
@@ -112,8 +117,8 @@ class Date
      */
     public static function formatDateTime(string $dateString)
     {
-        if (static::$locale['timezone'] != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
+        if (static::convert()) {
+            $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
         return date(static::$locale['datetime'], strtotime($dateString));
     }
@@ -122,16 +127,21 @@ class Date
      * Formats a MySQL datestring into user time string (timezone conversion happens if timezone
      * set to anything other than UTC)
      *
+     * @internal potential issues are daylight savings. Store as datetime, then display as time
      * @param string $dateString
      * @return string
      */
     public static function formatTime(string $dateString)
     {
-        if (strpos($dateString, ' ') === false) {
-            $dateString = "2019-01-01 {$dateString}"; // Add fictious date to work
+        $hasDate = (strpos($dateString, ' ') !== false);
+
+        // Add fictious date to work (careful of DST)
+        if (!$hasDate) {
+            $dateString = "2019-01-01 {$dateString}"; 
         }
-        if (static::$locale['timezone'] != 'UTC') {
-            $dateString = static::convertTimezone($dateString, 'UTC', static::$locale['timezone']);
+        // Only convert timezone if date is supplied.
+        if ($hasDate AND static::convert()) {
+            $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
         return date(static::$locale['time'], strtotime($dateString));
     }
@@ -140,7 +150,7 @@ class Date
      * Parses a date string
      *
      * @param string $dateString
-     * @return void
+     * @return string
      */
     public static function parseDate(string $dateString)
     {
@@ -151,35 +161,30 @@ class Date
      * Parses a time string
      *
      * @param string $dateString
-     * @return void
+     * @return string
      */
     public static function parseDateTime(string $dateString)
     {
         $dateString = static::convertFormat($dateString, static::$locale['datetime'], 'Y-m-d H:i:s');
-        if ($dateString and static::$locale['timezone'] != 'UTC') {
-            $dateString = static::convertTimezone($dateString, static::$locale['timezone'], 'UTC');
+        if ($dateString and static::convert()) {
+            $dateString = static::convertTimezone($dateString, static::$locale['timezone'], date_default_timezone_get());
         }
         return $dateString;
     }
 
     /**
-     * Parses a time string and converts to a MySQL time string. PHP script
-     * should always be in UTC else you can expect undesirable results. If you really
-     * must store in local, then dont adjust timezone, if its a UTC then no conversions happen
-     *
+     * Parses a time string and converts to a MySQL time string. 
+     * Timezone for times are not converted because without date its impossbile to know DST
+     *  
      * @param string $timeString
-     * @return void
+     * @return string
      */
     public static function parseTime(string $timeString)
     {
         $timeString = static::convertFormat($timeString, static::$locale['time'], 'H:i:s');
-       
-        if ($timeString and static::$locale['timezone'] != 'UTC') { // date_default_timezone_get()
-            if (strpos($timeString, ' ') === false) {
-                $timeString = "2019-01-01 {$timeString}"; // Add fictious date to work
-            }
-            $timeString = static::convertTimezone($timeString, static::$locale['timezone'], 'UTC');
-            $timeString = date('H:i:s', strtotime($timeString)); // Remove date from string
+    
+        if ($timeString) { 
+            $timeString = date('H:i:s', strtotime("2019-01-01 {$timeString}")); 
         }
         return $timeString;
     }
@@ -190,6 +195,7 @@ class Date
      * @param string $datetime
      * @param string $fromFormat
      * @param string $toFormat
+     * @return string|null
      */
     public static function convertFormat(string $datetime, string $fromFormat, string $toFormat)
     {
@@ -209,17 +215,15 @@ class Date
      * @param string $fromTimezone
      * @param string $toTimezone
      *
-     * @return string Y-m-d H:i:s (new timezone)
+     * @return null|string Y-m-d H:i:s (new timezone)
      */
     public static function convertTimezone(string $datetime, string $fromTimezone, string $toTimezone)
     {
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new DateTimeZone($fromTimezone));
         if ($date) {
             $date->setTimeZone(new DateTimeZone($toTimezone));
-
             return $date->format('Y-m-d H:i:s');
         }
-
         return null;
     }
 }

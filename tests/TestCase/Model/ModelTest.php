@@ -706,7 +706,7 @@ class ModelTest extends OriginTestCase
 
     public function testValidates()
     {
-        $this->Article->validate('title', 'required');
+        $this->Article->validate('title', 'notBlank');
         $article = $this->Article->new(['title'=>null]);
         $this->assertFalse($this->Article->validates($article));
         $article = $this->Article->new(['title'=>'Test']);
@@ -792,7 +792,7 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Article->save($article));
 
         $this->Article->validate('title', [
-            'rule'=>'required',
+            'rule'=>'notBlank',
             'required'=>true,
             'on'=>'create']);
         

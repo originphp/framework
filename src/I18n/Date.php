@@ -111,8 +111,10 @@ class Date
     /**
      * Formats a strtotime() valid string to local time and translates it.
      *
+     * @internal careful of DST with time formatting
      * @param string            $dateString
      * @param null|array|string $format     we will autodetect
+     * @return string
      */
     public static function format($dateString, $format = null)
     {
@@ -231,6 +233,13 @@ class Date
         return null;
     }
 
+    /**
+     * @internal Careful of dst
+     *
+     * @param string $dateString
+     * @param string $format
+     * @return void
+     */
     public static function parseTime(string $dateString, $format = null)
     {
         if ($format === null) {
@@ -267,6 +276,7 @@ class Date
      * Returns a configured IntlDateFormatter used by both i18nFormat and parse.
      *
      * @param null|string|array $format
+     * @return \IntlDateFormatter
      */
     protected static function formatter($format = null)
     {

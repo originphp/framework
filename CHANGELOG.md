@@ -19,6 +19,19 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.12.0] - 2019-06-11
+### Fixed
+- LocaleGenerator issue with progressbar when running one locale
+- Default validation error messages
+
+### Changed
+- Behavior scaffold includes default methods
+- Validator now uses locale settings for default date,time,datetime formats
+- FormHelper formats date,datetime,time and number fields
+
+### Added
+- Delocalize behavior
+
 ## [1.11.0] - 2019-06-10
 ### Fixed
 - Intl Helper get default language

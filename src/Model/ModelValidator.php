@@ -16,6 +16,7 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\ValidatorException;
 use DateTime;
+use Origin\Utility\Date;
 
 class ModelValidator
 {
@@ -28,9 +29,23 @@ class ModelValidator
      */
     protected $validationRules = [];
 
+    /**
+     * Holds the default date format for valdiation
+     *
+     * @var [type]
+     */
+    protected $dateFormat = null;
+    protected $datetimeFormat = null;
+    protected $timeFormat = null;
+
     public function __construct(Model $model)
     {
         $this->model = $model;
+        $locale = Date::locale();
+
+        $this->dateFormat = $locale['date'];
+        $this->datetimeFormat = $locale['datetime'];
+        $this->timeFormat = $locale['time'];
     }
 
     /**
@@ -68,7 +83,7 @@ class ModelValidator
             ];
             if($value['message'] === null){
                 $value['message'] = 'Invalid value';
-                if($value['rule'] === 'required' OR $value['required']){
+                if($value['rule'] === 'notBlank'){
                     $value['message'] = 'This field is required';
                 }
             }
@@ -165,7 +180,7 @@ class ModelValidator
                 }
                 
                  // Break out if required and its blank, if not continue with validation
-                 if ($validationRule['required'] AND !$this->validate($value, 'notBlank')) {
+                 if ($validationRule['required'] AND !in_array($field,$modified)) {
                     $entity->invalidate($field, 'This field is required');
                     break; // dont run any more validation rules on this field if blank              
                 }
@@ -178,17 +193,17 @@ class ModelValidator
                     }
                     continue; // goto next rule
                 }
-               
-                // If allowBlank then skip on empty values, or invalidate the value
-                if(($value === '' or $value === null)){
+
+                // If the value is not required and value is empty then don't validate
+                if($value === '' or $value === null){
                     if($validationRule['allowBlank'] === true){
                         continue;
                     }
                     // Invalidate empty values
-                    $entity->invalidate($field, 'Invalid value');
+                    $entity->invalidate($field, $validationRule['message']);
                     continue;
                 }
-
+         
                 // Handle both types
                 if ($validationRule['rule'] === 'isUnique') {
                     $validationRule['rule'] = ['isUnique',[$field]];
@@ -232,8 +247,11 @@ class ModelValidator
      *
      * @return bool
      */
-    public function date($value, $dateFormat = 'Y-m-d')
+    public function date($value, $dateFormat = null)
     {
+        if($dateFormat === null){
+            $dateFormat = $this->dateFormat;
+        }
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
@@ -250,8 +268,11 @@ class ModelValidator
      *
      * @return bool
      */
-    public function datetime($value, $dateFormat = 'Y-m-d H:i:s')
+    public function datetime($value, $dateFormat = null)
     {
+        if($dateFormat === null){
+            $dateFormat = $this->datetimeFormat;
+        }
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
@@ -374,9 +395,13 @@ class ModelValidator
      *
      * @return bool
      */
-    public function time($value, $timeFormat = 'H:i:s')
+    public function time($value, $timeFormat = null)
     {
+        if($timeFormat === null){
+            $timeFormat = $this->timeFormat;
+        }
         $dateTime = DateTime::createFromFormat($timeFormat, $value);
+    
         if ($dateTime !== false and $dateTime->format($timeFormat) === $value) {
             return true;
         }

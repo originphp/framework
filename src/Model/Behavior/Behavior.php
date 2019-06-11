@@ -37,6 +37,12 @@ class Behavior
         $this->initialize($config);
     }
 
+    /**
+     * Use this so you don't have to overide __construct.
+     *
+     * @param array $config
+     * @return void
+     */
     public function initialize(array $config)
     {
     }
