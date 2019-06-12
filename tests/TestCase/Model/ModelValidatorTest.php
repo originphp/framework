@@ -131,8 +131,8 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
     }
 
-    public function testValidateRequired(){
-
+    public function testValidateRequired()
+    {
         $Validator = $this->Validator;
         $Validator->rules([
             'name' => 'alphaNumeric',
@@ -262,8 +262,8 @@ class ModelValidatorTest extends OriginTestCase
     public function testDatetime()
     {
         $Validator = $this->Validator;
-        $this->assertTrue($Validator->datetime('2017-01-01 17:32'));
-        $this->assertFalse($Validator->datetime('2017-01-01 28:32'));
+        $this->assertTrue($Validator->datetime('2017-01-01 17:32:00'));
+        $this->assertFalse($Validator->datetime('2017-01-01 28:32:00'));
     }
 
     public function testDecimal()
@@ -370,7 +370,32 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->numeric(1));
         $this->assertTrue($Validator->numeric('1'));
         $this->assertFalse($Validator->numeric('one'));
-        $this->assertFalse($Validator->numeric(1.2));
+        $this->assertTrue($Validator->numeric(1.2));
+    }
+
+    public function testFloat()
+    {
+        $Validator = $this->Validator;
+        $this->assertTrue($Validator->float(123.45));
+        $this->assertTrue($Validator->float('123.45'));
+        $this->assertFalse($Validator->float(123456));
+        $this->assertFalse($Validator->float('one'));
+        $this->assertFalse($Validator->float('12345'));
+    }
+
+    public function testInteger()
+    {
+        $Validator = $this->Validator;
+        $this->assertTrue($Validator->integer(1));
+        $this->assertTrue($Validator->integer('1'));
+        $this->assertFalse($Validator->integer('one'));
+        $this->assertFalse($Validator->integer(1.2));
+        $this->assertFalse($Validator->integer('12-000'));
+        $this->assertFalse($Validator->integer('1234.56'));
+        $this->assertFalse($Validator->integer(10.00));
+        $this->assertFalse($Validator->integer('10.00'));
+        $this->assertFalse($Validator->integer(-10.00));
+        $this->assertFalse($Validator->integer('-10.00'));
     }
 
     public function testRange()

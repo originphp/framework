@@ -16,7 +16,6 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\ValidatorException;
 use DateTime;
-use Origin\Utility\Date;
 
 class ModelValidator
 {
@@ -41,12 +40,7 @@ class ModelValidator
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $locale = Date::locale();
-
-        $this->dateFormat = $locale['date'];
-        $this->datetimeFormat = $locale['datetime'];
-        $this->timeFormat = $locale['time'];
-    }
+     }
 
     /**
      * Sets and gets rules
@@ -217,7 +211,7 @@ class ModelValidator
                 }
             }
         }
-      
+   
         return empty($entity->errors());
     }
 
@@ -247,11 +241,8 @@ class ModelValidator
      *
      * @return bool
      */
-    public function date($value, $dateFormat = null)
+    public function date($value, $dateFormat = 'Y-m-d')
     {
-        if($dateFormat === null){
-            $dateFormat = $this->dateFormat;
-        }
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
@@ -268,12 +259,10 @@ class ModelValidator
      *
      * @return bool
      */
-    public function datetime($value, $dateFormat = null)
+    public function datetime($value, $dateFormat = 'Y-m-d H:i:s')
     {
-        if($dateFormat === null){
-            $dateFormat = $this->datetimeFormat;
-        }
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
+      
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
         }
@@ -281,9 +270,12 @@ class ModelValidator
         return false;
     }
 
+    /**
+     * This is alias for float
+     */
     public function decimal($value, $options = null)
     {
-        return filter_var($value, FILTER_VALIDATE_FLOAT) !== false and !is_integer($value);
+        return $this->float($value,$options);
     }
 
     /**
@@ -375,7 +367,33 @@ class ModelValidator
 
     public function numeric($value)
     {
-        return (bool) filter_var($value, FILTER_VALIDATE_INT);
+       return ($this->integer($value) or $this->float($value));
+    }
+
+    /**
+     * Finds whether the value is integer e.g. 123
+     *
+     * @param integer $value e.g. 154
+     * @return void
+     */
+    public function integer($value){
+        if(is_string($value)){
+            return (bool) filter_var($value, FILTER_VALIDATE_INT);
+        }
+        return is_int($value);
+    }
+
+   /**
+     * Finds whether the value is float e.g 123.56
+     *
+     * @param float $value
+     * @return void
+     */
+    public function float($value){
+        if(is_string($value)){
+            return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) AND filter_var($value, FILTER_VALIDATE_INT) === false;
+        }
+        return is_float($value);
     }
 
     public function range($value, $min = null, $max = null)
@@ -395,11 +413,8 @@ class ModelValidator
      *
      * @return bool
      */
-    public function time($value, $timeFormat = null)
+    public function time($value, $timeFormat = 'H:i:s')
     {
-        if($timeFormat === null){
-            $timeFormat = $this->timeFormat;
-        }
         $dateTime = DateTime::createFromFormat($timeFormat, $value);
     
         if ($dateTime !== false and $dateTime->format($timeFormat) === $value) {

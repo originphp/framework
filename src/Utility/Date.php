@@ -78,7 +78,11 @@ class Date
     {
         if ($format) {
             if (static::convert()) {
-                $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
+                if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
+                    $dateString = static::convertTimezone($dateString , date_default_timezone_get(), static::$locale['timezone']);
+                } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $dateString)) {
+                    $dateString = static::convertTimezone($dateString .' 00:00:00' , date_default_timezone_get(), static::$locale['timezone']);
+                }
             }
             return date($format, strtotime($dateString));
         }
@@ -102,8 +106,11 @@ class Date
      */
     public static function formatDate(string $dateString)
     {
+        if(strpos($dateString,':') === false){
+            $dateString .= ' 00:00:00';
+        }
         if (static::convert()) {
-            $dateString = static::convertTimezone($dateString .' 00:00:00', date_default_timezone_get(), static::$locale['timezone']);
+            $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
          return date(static::$locale['date'], strtotime($dateString));
     }
@@ -124,10 +131,8 @@ class Date
     }
 
     /**
-     * Formats a MySQL datestring into user time string (timezone conversion happens if timezone
-     * set to anything other than UTC)
-     *
-     * @internal potential issues are daylight savings. Store as datetime, then display as time
+     * Formats a MySQL datestring into user time string. Timestrings are not timezone converted unless a date
+     * is supplied. This is because there is no way of knowing if the date is in Daylight Saving
      * @param string $dateString
      * @return string
      */

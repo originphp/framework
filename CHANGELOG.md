@@ -23,13 +23,18 @@ Delete tag:   git tag -d <tag_name>
 ### Fixed
 - LocaleGenerator issue with progressbar when running one locale
 - Default validation error messages
+-
 
 ### Changed
+- Time fields are no longer converted to timezone unless date is present
+- Number format now detects if number is float or integer
+- I18n now looks for fallback language
 - Behavior scaffold includes default methods
 - Validator now uses locale settings for default date,time,datetime formats
 - FormHelper formats date,datetime,time and number fields
 
 ### Added
+- Float and integer validation
 - Delocalize behavior
 
 ## [1.11.0] - 2019-06-10

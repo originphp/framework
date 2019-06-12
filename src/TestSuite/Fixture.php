@@ -79,6 +79,7 @@ class Fixture
      */
     public function initialize()
     {
+       
     }
     
     /**

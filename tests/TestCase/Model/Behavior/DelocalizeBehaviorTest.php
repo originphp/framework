@@ -44,7 +44,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
             'created' => '11/06/2019 10:27',
             'confirmed' => '10:27'
         ]);
-        $behavior->beforeSave($deal);
+        $behavior->beforeValidate($deal);
 
         $this->assertEquals(1234567.89,$deal->amount);
         $this->assertEquals('2019-06-11',$deal->close_date);

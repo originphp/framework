@@ -248,7 +248,6 @@ class FormHelper extends Helper
 
         $entity = $this->data;
 
-        //? Introspect related models as well?
         $model = ModelRegistry::get($name);
        
         if ($model) {
@@ -481,8 +480,8 @@ class FormHelper extends Helper
         $options['type'] = 'text';
 
         /**
-         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
-         */
+           * Only format database values (if validation fails dont format)
+           */
         if ($options['format']) {
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'), $options['format']);
@@ -491,9 +490,8 @@ class FormHelper extends Helper
             if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
-            unset($options['format']);
         }
-
+        unset($options['format']);
         return $this->formatTemplate('input', $options);
     }
 
@@ -511,19 +509,17 @@ class FormHelper extends Helper
         $options['type'] = 'text';
 
         /**
-         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
+         * Only format database values (if validation fails dont format)
          */
         if ($options['format']) {
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
-            
             if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
-            unset($options['format']);
         }
-
+        unset($options['format']);
         return $this->formatTemplate('input', $options);
     }
 
@@ -620,13 +616,12 @@ class FormHelper extends Helper
      */
     public function time(string $name, array $options = [])
     {
-
         $options = $this->prepareOptions($name, $options);
         $options += ['format'=>Date::locale()['time']];
         $options['type'] = 'text';
 
         /**
-         * @internal This wont place nicely with INTL. Long term goal is have own locale files.
+         * Only format database values (if validation fails dont format)
          */
         if ($options['format']) {
             if (empty($options['placeholder'])) {
@@ -635,9 +630,8 @@ class FormHelper extends Helper
             if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']); // Daylight saving issue with timefields
             }
-            unset($options['format']);
         }
-
+        unset($options['format']);
         return $this->formatTemplate('input', $options);
     }
 
@@ -651,16 +645,18 @@ class FormHelper extends Helper
     public function number(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format' => true];
+        $options += ['format'=>true];
         $options['type'] = 'text';
-
-        if ($options['format']) {            
-            if (!empty($options['value'])) {
+        /**
+         * Only format database values (if validation fails dont format)
+         */
+  
+        if ($options['format']){
+            if(!empty($options['value']) AND $options['value'] == (string) (float) $options['value']){
                 $options['value'] = Number::format($options['value']);
             }
-            unset($options['format']);
         }
-
+        unset($options['format']);
         return $this->formatTemplate('input', $options);
     }
 

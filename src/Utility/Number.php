@@ -18,6 +18,8 @@
 
 namespace Origin\Utility;
 
+use Origin\Core\Logger;
+
 class Number
 {
     protected static $currencies = [
@@ -131,7 +133,8 @@ class Number
         return static::precision($value, $precision) . '%';
     }
     /**
-     * Formats a number
+     * Formats a number from database. If it does not have a decimal point then it 
+     * is assumed it is an integer, else it will use the locale places as default.
      *
      * @param string|float $value
      * @param array $options
@@ -139,15 +142,19 @@ class Number
      */
     public static function format($value, array $options=[])
     {
+        $logger = new Logger('Number');
+        
         $locale = static::$locale;
         $options += [
             'before' => '',
             'after'=>'',
-            'places' => $locale['places'],
+            'places' => preg_match('/^[0-9]+$/u',$value)?0:$locale['places'],
             'thousands' => $locale['thousands'],
             'decimals' => $locale['decimals']
         ];
-        $formatted = number_format($value, $options['places'], $options['decimals'], $options['thousands']);
+
+        $formatted = number_format( $value, $options['places'], $options['decimals'], $options['thousands']);
+    
         return $options['before'] .   $formatted  . $options['after'];
     }
 
