@@ -34,9 +34,6 @@
 
 namespace Origin\Core;
 
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
 class Autoloader
 {
     /**

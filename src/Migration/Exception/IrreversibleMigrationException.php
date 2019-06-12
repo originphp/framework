@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utility\Exception;
+namespace Origin\Migration\Exception;
 
 use Origin\Exception\Exception;
 

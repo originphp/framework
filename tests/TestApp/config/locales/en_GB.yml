@@ -1,0 +1,9 @@
+name: English (United Kingdom)
+decimals: .
+thousands: ,
+currency: GBP
+before: £
+after: 
+date: d/m/Y
+time: H:i
+datetime: d/m/Y, H:i

@@ -1,37 +1,36 @@
 # OriginPHP Framework
 
-OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and scalable.
+![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
+![build](https://img.shields.io/badge/build-passing-brightGreen.svg)
+![coverage](https://img.shields.io/badge/coverage-90%-green.svg)
+![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
+![memory](https://img.shields.io/badge/memory-800KB-green.svg)
+![diskspace](https://img.shields.io/badge/disk_space-1.4MB-green.svg)
 
-### Features
+OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
 
-- High Performance and low memory usage: The bookmarks demo with multiple database associations and callbacks uses about 800k without debug. The framework itself is 1.4mb without git data and frameworks unit tests.
-- MVC (Model View Controller) design pattern.
-- Dockerized Development Environment - Highly Recommended!!!
-- Console Apps: build console apps
-- Autoloading with Composer full integrated.
-- Easy to use Routing
-- ORM: Works with MySQL and has easy to use finders.
-- Cache:  supports file, APCu, Memcached, Reddis out of the box.
-- Queue: Speed up processing time by running background jobs without having to install addtional servers such as beanstalk.
-- Helpers: View helpers include forms, date,number with an easy to use localization. If you want to use the Intl extention, there is a helper for that too.
-- Integration Testing - Test your controllers and console apps with minimal lines of code.
-- Middleware: An easy to understand and use middleware system for those who must have it.
-- Code Generation: Generate your apps using existing database schema, effortlessly adjust the templates before generating them and bang! Its how you want it.
-- Plugins: build resuable apps within apps, called plugins.
-- Events: integrate events so that you can communicate between different parts of your web application.
-- Render JSON and XML views with no extra effort or files!
-- Includes annotations to help your IDE with code completion (and guide you to what things do). If you are not using [Visual Studio Code](https://code.visualstudio.com/) then i recommend you give it a go.
-- and much much more
+## Features
+
+- ORM database with support for MySQL and PostgreSQL.
+- Caching that supports APCu, Redis, Memcache and File based cached
+- Web Applications using MVC pattern
+- Console Applications
+- Middleware
+- Migrations - update your database using migrations
+- Code Generation and scaffolding
+- Integration Testing for Web and Console Applications
+- Queue System for background jobs
+- Form helper
+- Date,time,and number formating,validation and delocation support
+- Internationalization (I18n)
+- Events system based upon the observer pattern
+- Yaml reading and writing
+- CSV reading and writing
+- XML reading and writing
+- Storage system which supports local disk, FTP and SFTP
+- Email using SMTP
+- and much more
 
 See the [documentation](https://www.originphp.com/docs/getting-started/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
-
-## Demo Application
-
-The bookmarks demo app can be found here [https://bookmarks.originphp.com/users/login](https://bookmarks.originphp.com/users/login). You can get a feel for some of the features and performance. 
-The username is **`demo@example.com`** and the password is **`origin`**.
-
-## Acknowledgements
-
-This library is heavily inspired by CakePHP 2.x and CakePHP 3.x. (You might even call it CakePHP 5.0)
 
 Jamiel Sharief

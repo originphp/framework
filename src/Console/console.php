@@ -13,7 +13,7 @@
  */
 
 namespace Origin\Console;
-require dirname(__DIR__).'/bootstrap.php';
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use Origin\Console\CommandRunner;
 $commandRunner = new CommandRunner();

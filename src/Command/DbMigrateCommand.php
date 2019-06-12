@@ -23,7 +23,7 @@ class DbMigrateCommand extends Command
 
     protected $description = 'Runs and rolls back migrations';
 
-    const PATH = APP . '/db/migrate';
+    const PATH = APP . DS . 'db'. DS .'migrate';
 
     public function initialize(){
         $this->addOption('datasource', [

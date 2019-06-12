@@ -20,7 +20,7 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\Exception\Exception;
 use Origin\Core\Logger;
 use Origin\Model\ConnectionManager;
-
+use Origin\Migration\Exception\IrreversibleMigrationException;
 class CreateProductTableMigration extends Migration
 {
     public function up()
@@ -485,5 +485,35 @@ class MigrationTest extends OriginTestCase
         $migration = new DidNotReadTheManualMigration($this->adapter());
         $this->expectException(Exception::class);
         $migration->rollback();
+    }
+
+    public function testIrreversibleMigrationException(){
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(IrreversibleMigrationException::class);
+        $migration->throwIrreversibleMigrationException();
+    }
+
+
+    public function testStartDoesNotDoAnything()
+    {
+        $migration = new Migration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->start();
+    }
+    public function testRollbackDoesNotDoAnything()
+    {
+        $migration = new Migration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->rollback();
+    }
+
+    public function testTables(){
+        $migration = new Migration($this->adapter());
+        $this->assertIsArray($migration->tables());
+    }
+    public function testDropTableDoesNotExist(){
+        $migration = new Migration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->dropTable('foo');
     }
 }

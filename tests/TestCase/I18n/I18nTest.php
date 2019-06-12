@@ -27,6 +27,12 @@ class MockI18n extends I18n
 class I18nTest extends \PHPUnit\Framework\TestCase
 {
 
+    public function testInitialize(){
+        I18n::initialize(['locale'=>'en_GB']);
+        $this->assertEquals('en',I18n::language());
+        $this->assertEquals('en_GB',I18n::locale());
+    }
+
     public function testDetectLocale()
     {
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-GB,en;q=0.9,es;q=0.8';
@@ -35,6 +41,9 @@ class I18nTest extends \PHPUnit\Framework\TestCase
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $this->assertEquals('en_US', MockI18n::detectLocale());
     }
+
+
+
 
 
     public function tearDown()

@@ -77,32 +77,41 @@ class Date
     }
 
     /**
-     * Sets the dateformat using pattern of intl settings.
+     * Gets or sets the dateformat using pattern of intl settings.
      *
      * @param string|array $dateFormat 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
      */
-    public static function setDateformat($dateFormat)
+    public static function dateformat($dateFormat = null)
     {
+        if($dateFormat === null){
+            return self::$dateFormat;
+        }
         self::$dateFormat = $dateFormat;
     }
 
     /**
-     * Sets the datetimeformat using pattern of intl settings. Possible patterns can be found at http://userguide.icu-project.org/formatparse/datetime.
+     * Gets or sets the datetimeformat using pattern of intl settings. Possible patterns can be found at http://userguide.icu-project.org/formatparse/datetime.
      *
      * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
      */
-    public static function setDatetimeFormat($datetimeFormat)
+    public static function datetimeFormat($datetimeFormat=null)
     {
+        if($datetimeFormat === null){
+            return self::$datetimeFormat;
+        }
         self::$datetimeFormat = $datetimeFormat;
     }
 
     /**
-     * Sets the datetimeformat using pattern of intl settings.
+     * Gets or sets the datetimeformat using pattern of intl settings.
      *
      * @param string|array $timeFormat 'H:mm' or [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]
      */
-    public static function setTimeFormat($timeFormat)
+    public static function timeFormat($timeFormat = null)
     {
+        if($timeFormat === null){
+            return self::$timeFormat;
+        }
         self::$timeFormat = $timeFormat;
     }
 

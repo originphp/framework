@@ -69,7 +69,7 @@ class PluginInstallCommand extends Command
      */
     protected function appendApplication(string $plugin)
     {
-        file_put_contents(CONFIG . '/application.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
+        file_put_contents(CONFIG . DS . 'application.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
     }
  
     public function execute()

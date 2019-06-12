@@ -255,7 +255,7 @@ class View
             $path = $this->getViewPath(false); // get without controller folder
         } elseif (strpos($name, '.')!==false) {
             list($plugin, $name) = explode('.', $name);
-            $path = PLUGINS . DS . Inflector::underscore($plugin) . '/src/View/';
+            $path = PLUGINS . DS . Inflector::underscore($plugin) .  DS . 'src' .DS .'View' . DS;
         }
          
         $filename = $path .  $name . '.ctp';

@@ -118,7 +118,7 @@ class HtmlHelper extends Helper
         }
         // without path $html->css('form');
         if (!$plugin and $path[0] !== '/') {
-            $path = '/' .$options['ext'] . '/' . $path;
+            $path = DS .$options['ext'] . DS . $path;
         }
 
         if ($plugin) {

@@ -26,7 +26,7 @@ if (!defined('DS')) {
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
     define('CONFIG', ROOT . DS . 'config');
     define('LOGS', ROOT . DS . 'logs');
-    define('ORIGIN', ROOT . '/vendor/originphp/framework');
+    define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
     define('PLUGINS', ROOT . DS . 'plugins');
     define('SRC', ROOT . DS . 'src');
     define('APP', ROOT);
@@ -43,17 +43,17 @@ ini_set('error_log', LOGS);
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 
-require ORIGIN . '/src/Exception/Exception.php';
+require ORIGIN . DS . 'src' . DS . 'Exception' .DS  . 'Exception.php';
 
 /**
  * Load our own autoloader
  */
-require ORIGIN . '/src/Core/Autoloader.php';
+require ORIGIN . DS . 'src' . DS  .'Core' . DS .'Autoloader.php';
 
 /**
  * Load the composer autoloader
  */
-require ROOT . '/vendor/autoload.php';
+require ROOT . DS . 'vendor' .DS . 'autoload.php';
 
 /**
  * Error and Exception handling.
@@ -65,12 +65,12 @@ if (PHP_SAPI === 'cli') {
 }
 $ErrorHandler->register();
 
-require __DIR__ . '/functions.php';
+require __DIR__ . DS . 'functions.php';
 
 /**
  * Load Config
  */
-require CONFIG . '/bootstrap.php';
+require CONFIG . DS . 'bootstrap.php';
 
 if(file_exists(CONFIG . DS . '.env')){
   $dotEnv = new Origin\Core\DotEnv();
@@ -83,4 +83,4 @@ foreach(['server','database','email','storage'] as $config){
     }
 }
 
-require CONFIG . '/routes.php';
+require CONFIG . DS . 'routes.php';

@@ -28,6 +28,15 @@ class DateTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function testGettersAndSetters(){
+        Date::dateFormat('d/m/Y');
+        $this->assertEquals(Date::dateFormat(),'d/m/Y');
+        Date::datetimeFormat('d/m/Y H:i');
+        $this->assertEquals(Date::datetimeFormat(),'d/m/Y H:i');
+        Date::timeFormat('H:i a');
+        $this->assertEquals(Date::timeFormat(),'H:i a');
+    }
+
     public function testConvertTimezone()
     {
         $result = Date::convertTimezone('2018-12-26 22:00:00', 'Europe/Madrid', 'UTC');

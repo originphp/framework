@@ -20,6 +20,7 @@ use IntlDateFormatter;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
+    
     public function testFormat()
     {
         // Test Locale Switching
@@ -56,27 +57,27 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Feb 25, 2019', Date::format('2019-02-25 08:20:00', IntlDateFormatter::MEDIUM));
         
         // Test Overide settings
-        Date::setDateFormat([IntlDateFormatter::FULL, IntlDateFormatter::NONE]);
+        Date::dateFormat([IntlDateFormatter::FULL, IntlDateFormatter::NONE]);
         $this->assertEquals('Thursday, December 27, 2018', Date::format('2018-12-27'));
 
-        Date::setDateFormat('dd MMM y');
+        Date::dateFormat('dd MMM y');
         $this->assertEquals('27 Dec 2018', Date::format('2018-12-27'));
 
-        Date::setDatetimeFormat([IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM]);
+        Date::datetimeFormat([IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM]);
         $this->assertEquals('Dec 27, 2018, 1:02:00 PM', Date::format('2018-12-27 13:02:00'));
 
-        Date::setDatetimeFormat('dd MMM y H:mm');
+        Date::datetimeFormat('dd MMM y H:mm');
         $this->assertEquals('27 Dec 2018 13:02', Date::format('2018-12-27 13:02:00'));
 
-        Date::setTimeFormat([IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM]);
+        Date::timeFormat([IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM]);
         $this->assertEquals('1:02:00 PM', Date::format('13:02:00'));
 
-        Date::setTimeFormat('H:mm');
+        Date::timeFormat('H:mm');
         $this->assertEquals('13:02', Date::format('13:02:00'));
 
-        Date::setDateFormat([IntlDateFormatter::SHORT, IntlDateFormatter::NONE]); // Reset
-        Date::setDatetimeFormat([IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]); // Reset
-        Date::setTimeFormat([IntlDateFormatter::NONE, IntlDateFormatter::SHORT]); // Reset
+        Date::dateFormat([IntlDateFormatter::SHORT, IntlDateFormatter::NONE]); // Reset
+        Date::datetimeFormat([IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]); // Reset
+        Date::timeFormat([IntlDateFormatter::NONE, IntlDateFormatter::SHORT]); // Reset
 
         $this->assertNull(Date::format('foo'));
     }
@@ -145,5 +146,16 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('1:00 AM', Date::formatTime('2019-02-24 21:00'));
         $this->assertEquals('1:00 AM', Date::formatTime('21:00'));
         Date::timezone('UTC');
+    }
+
+    public function testSettersAndGetters(){
+        Date::dateFormat('dd MMM');
+        $this->assertEquals('dd MMM',Date::dateFormat());
+        Date::datetimeFormat('dd MMM y H:mm');
+        $this->assertEquals('dd MMM y H:mm',Date::datetimeFormat());
+        Date::timeFormat('H:mm');
+        $this->assertEquals('H:mm',Date::timeFormat());
+
+        //dd MMM y H:mm
     }
 }

@@ -215,10 +215,11 @@ class Migration
     public function calledBy()
     {
         $result = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,3);
+        $calledBy = null;
         if (isset($result[2]['function'])) {
-            return $result[2]['function'];
+            $calledBy = $result[2]['function'];
         }
-        return null;
+        return $calledBy;
     }
 
     /**
@@ -229,7 +230,7 @@ class Migration
      */
     public function throwIrreversibleMigrationException()
     {
-        throw new IrreversibleMigrationException();
+        throw new IrreversibleMigrationException('Irreversible Migration');
     }
 
     /**

@@ -23,7 +23,7 @@ use Origin\Exception\Exception;
 class FileEngine extends CacheEngine
 {
     protected $defaultConfig = [
-        'path' => TMP . '/cache',
+        'path' => TMP . DS . 'cache',
         'duration' => 3600,
         'prefix' => 'origin_'
     ];

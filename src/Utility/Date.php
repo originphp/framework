@@ -62,6 +62,48 @@ class Date
         static::$locale = $locale;
     }
 
+    /**
+     * Sets and gets the dateformat
+     *
+     * @param string $format
+     * @return string|null
+     */
+    public static function dateFormat(string $format = null)
+    {
+        if($format === null){
+            return static::$locale['date'];
+        }
+        static::$locale['date'] = $format;
+    }
+
+       /**
+     * Sets and gets the datetimeformat
+     *
+     * @param string $format
+     * @return string|null
+     */
+    public static function datetimeFormat(string $format = null)
+    {
+        if($format === null){
+            return static::$locale['datetime'];
+        }
+        static::$locale['datetime'] = $format;
+    }
+
+       /**
+     * Sets and gets the dateformat
+     *
+     * @param string $format
+     * @return string|null
+     */
+    public static function timeFormat(string $format = null)
+    {
+        if($format === null){
+            return static::$locale['time'];
+        }
+        static::$locale['time'] = $format;
+    }
+
 
     protected static function convert(){
         return (date_default_timezone_get() !== static::$locale['timezone']);

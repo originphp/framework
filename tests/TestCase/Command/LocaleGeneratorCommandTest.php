@@ -4,13 +4,15 @@ namespace Origin\Test\Command;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
-class LocalesGeneratorCommandTest extends OriginTestCase
+class LocaleGeneratorCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
   
     public function testRun(){
-        $this->exec('locales:generate --force');
+
+        $backup = file_get_contents(CONFIG . DS . 'locales' . DS . 'en_GB.yml');
+        $this->exec('locale:generate --force');
         $this->assertExitSuccess();
         $this->assertOutputContains('Generated 722 locale definitions');
              // Remove files
@@ -18,16 +20,17 @@ class LocalesGeneratorCommandTest extends OriginTestCase
              foreach($files as $file){
                  unlink(CONFIG . DS . 'locales' . DS . $file);
              }
+        file_put_contents(CONFIG . DS . 'locales' . DS . 'en_GB.yml',$backup);
     }
 
     public function testQualityCheck(){
-        $this->exec('locales:generate en_GB --force');
+        $this->exec('locale:generate en_GB --force');
         $this->assertExitSuccess();
         $this->assertOutputContains('Generated 1 locale definitions');
 
        // $hash = md5(file_get_contents('/var/www/config/locales/en_GB.yml'));
         $this->assertEquals('00c71cc38eec600727fd82e06e59a730',md5(file_get_contents(CONFIG . DS . 'locales' . DS . 'en_GB.yml')));
-        unlink(CONFIG . DS . 'locales' . DS . 'en_GB.yml');
+       # Dont DELETE THIS. This is required by
     }
   
 }

@@ -19,7 +19,7 @@ class GenerateCommand extends Command
      *
      * @var string
      */
-    protected $directory = ORIGIN.'/templates';
+    protected $directory = ORIGIN . DS . 'templates';
 
     /**
      * Generators array and list of templates they will process.

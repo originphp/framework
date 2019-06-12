@@ -62,7 +62,8 @@ class I18n
      */
     protected static $messages = null;
 
- 
+    protected static $definition = null;
+
     public static function initialize(array $config = [])
     {
         $config += ['locale'=>static::defaultLocale(),'language'=>null,'timezone'=>'UTC'];
@@ -79,7 +80,7 @@ class I18n
 
         // Load Locale information from /locales if available
         $locale = static::loadLocale($config['locale']);
-
+        
         if ($locale) {
             extract($locale);
             \Origin\Utility\Date::locale([
@@ -108,19 +109,22 @@ class I18n
      */
     protected static function loadLocale(string $locale)
     {
+        static::$definition = null;
+
         $filename = null;
         if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.yml')) {
             $filename = CONFIG . DS . 'locales' . DS . $locale .'.yml';
         }
-        // Fallback, language only
-        if (!$filename and strpos($locale, '_')!==false) {
-            list($language, $l) = explode('_', $locale, 2);
-            $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
+        elseif (strpos($locale, '_') !== false) {
+            list($language, $void) = explode('_', $locale, 2);
+            if(file_exists(CONFIG . DS . 'locales' . DS . $language .'.yml')){
+                $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
+            }
         }
         if ($filename) {
-            return Yaml::toArray(file_get_contents($filename));
+            static::$definition = Yaml::toArray(file_get_contents($filename));
         }
-        return null;
+        return static::$definition;
     }
     
     /**
@@ -139,7 +143,7 @@ class I18n
         if (static::$availableLocales and !in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
-
+        static::$locale = $locale;
         setlocale(LC_ALL, $locale);
         Locale::setDefault($locale); // PHP Intl Extension Friendly
         //@todo load locale from files if exists.

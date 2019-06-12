@@ -22,10 +22,10 @@ use DateTime;
 use Locale;
 use Origin\Utility\Yaml;
 
-class LocalesGenerateCommand extends Command
+class LocaleGenerateCommand extends Command
 {
-    protected $name = 'locales:generate';
-    protected $description = 'Generates the Locales definition files';
+    protected $name = 'locale:generate';
+    protected $description = 'Generates locale definition file or files';
 
     protected $dateMap = [
         'MMMM' => 'F',

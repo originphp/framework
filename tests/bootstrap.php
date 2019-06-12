@@ -5,15 +5,15 @@ ini_set('display_errors', true);
 
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT',dirname(dirname(dirname(dirname(__DIR__)))));
-define('CONFIG', ROOT . '/vendor/originphp/framework/tests/TestApp/config');
+define('CONFIG', ROOT . DS . 'vendor' . DS . 'originphp' . DS . 'framework' . DS . 'tests'. DS . 'TestApp' . DS .'config');
 define('LOGS', sys_get_temp_dir());
-define('ORIGIN', ROOT . '/vendor/originphp/framework');
-define('SRC', ORIGIN . '/tests/TestApp/src');
-define('TESTS', ORIGIN . '/tests/TestApp/tests');
-define('APP', ORIGIN . '/tests/TestApp');
-define('PLUGINS', ORIGIN . DS . 'tests/TestApp/plugins');
+define('ORIGIN', ROOT . DS . 'vendor'. DS .'originphp'. DS .'framework');
+define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'src');
+define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'tests');
+define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp');
+define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', sys_get_temp_dir());
-define('WEBROOT', ROOT . '/public');
+define('WEBROOT', ROOT . DS . 'public');
 
-@mkdir(TMP . '/cache');
-require ORIGIN . '/src/bootstrap.php';
+@mkdir(TMP . DS . 'cache');
+require ORIGIN . DS . 'src' . DS . 'bootstrap.php';
