@@ -2,10 +2,10 @@
 
 ![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
 ![build](https://img.shields.io/badge/build-passing-brightGreen.svg)
-![coverage](https://img.shields.io/badge/coverage-90%-green.svg)
+![coverage](https://img.shields.io/badge/coverage-90%25-green.svg)
+![memory](https://img.shields.io/badge/memory-800KB-brightGeen.svg)
+![diskspace](https://img.shields.io/badge/disk_space-1.4MB-brightGreen.svg)
 ![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
-![memory](https://img.shields.io/badge/memory-800KB-green.svg)
-![diskspace](https://img.shields.io/badge/disk_space-1.4MB-green.svg)
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
 
