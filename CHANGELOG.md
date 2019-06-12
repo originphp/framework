@@ -19,6 +19,7 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.12.1] - 2019-06-11
 ### Changed
 - Locales:generator command renamed to locale:generator
 - Console script is now PHP based
