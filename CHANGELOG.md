@@ -19,6 +19,7 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.14.0] - 2019-06-13
 ### Changed
 - Integration testing for controllers now includes more assertion methods
 - Response cookie getter now returns cookie array
