@@ -19,7 +19,6 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\Router;
-use Origin\Http\Session;
 
 /**
  * A way to test controllers from a higher level
@@ -193,7 +192,7 @@ trait IntegrationTestTrait
     /**
      * Gets the controller used in the request
      *
-     * @return Controller
+     * @return \Origin\Controller\Controller
      */
     public function controller()
     {
@@ -206,7 +205,7 @@ trait IntegrationTestTrait
     /**
      * Gets the Request object
      *
-     * @return Request
+     * @return \Origin\Http\Request
      */
     public function request()
     {
@@ -218,7 +217,7 @@ trait IntegrationTestTrait
     /**
      * Gets the response object
      *
-     * @return Response
+     * @return \Origin\Http\Response
      */
     public function response()
     {
@@ -283,13 +282,44 @@ trait IntegrationTestTrait
         $this->controller = $this->request = $this->response = null;
     }
 
+    /**
+    * Assert that the response has a 400 status code.
+    */
+    public function assertResponseBadRequest()
+    {
+        $this->assertResponseCode(400);
+    }
+    /**
+     * Assert that the response has a 401 status code.
+     */
+    public function assertResponseUnauthorized()
+    {
+        $this->assertResponseCode(401);
+    }
+
+    /**
+     * Asserts that the response has a 404 not found status code
+     *
+     * @return void
+     */
+    public function assertResponseNotFound()
+    {
+        $this->assertResponseCode(404);
+    }
+    /**
+    * Assert that the response has a 403 status code.
+    */
+    public function assertResponseForbidden()
+    {
+        $this->assertResponseCode(403);
+    }
 
     /**
      * Asserts that the response code is 2xx
      */
     public function assertResponseOk()
     {
-        $this->assertStatus(200, 204, 'Expected status code between 200 and 204');
+        $this->assertStatusBetween(200, 204, 'Expected status code between 200 and 204');
     }
 
     /**
@@ -297,7 +327,7 @@ trait IntegrationTestTrait
     */
     public function assertResponseError()
     {
-        $this->assertStatus(400, 429, 'Expected status code between 400 and 429');
+        $this->assertStatusBetween(400, 429, 'Expected status code between 400 and 429');
     }
 
     /**
@@ -305,17 +335,17 @@ trait IntegrationTestTrait
       */
     public function assertResponseSuccess()
     {
-        $this->assertStatus(200, 308, 'Expected status code between 200 and 308');
+        $this->assertStatusBetween(200, 308, 'Expected status code between 200 and 308');
     }
     /**
     * Asserts that the response code is 5xx
     */
     public function assertResponseFailure()
     {
-        $this->assertStatus(500, 505, 'Expected status code between 500 and 505');
+        $this->assertStatusBetween(500, 505, 'Expected status code between 500 and 505');
     }
 
-    protected function assertStatus(int $min, int $max, string $errorMessage = 'Invalid status')
+    protected function assertStatusBetween(int $min, int $max, string $errorMessage = 'Invalid status')
     {
         $status = $this->response()->statusCode();
         $this->assertGreaterThanOrEqual($min, $status, $errorMessage);
@@ -324,6 +354,17 @@ trait IntegrationTestTrait
 
     /**
      * Asserts a specific response code e.g. 200
+     *
+     *  200 - OK (Success)
+     *  400 - Bad Request (Failure - client side problem)
+     *  500 - Internal Error (Failure - server side problem)
+     *  401 - Unauthorized
+     *  404 - Not Found
+     *  403 - Forbidden (For application level permisions)
+     *
+     * @see https://www.restapitutorial.com/httpstatuscodes.html
+     * @param integer $statusCode
+     * @return void
      */
     public function assertResponseCode(int $code)
     {
@@ -353,7 +394,7 @@ trait IntegrationTestTrait
      */
     public function assertResponseEquals(string $expected)
     {
-        $body =  (string) $this->response()->body();
+        $body = (string) $this->response()->body();
         $this->assertEquals($expected, $body);
     }
 
@@ -362,20 +403,18 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotEquals(string $expected)
     {
-        $body =  (string) $this->response()->body();
+        $body = (string) $this->response()->body();
         $this->assertNotEquals($expected, $body);
     }
     /**
-     * Asserts that redirect has been called to a specific url
+     * Asserts that the location header is correct.
      *
-     * @param string|array $url
+     * @param string|array $url The url where the client is expected to goto. Leave null just to check location header exists
      */
     public function assertRedirect($url = null)
     {
         $headers = $this->response()->headers();
-
         $this->assertArrayHasKey('Location', $headers, 'Location header not set');
-
         if ($url) {
             $this->assertEquals(Router::url($url), $headers['Location']);
         }
@@ -418,19 +457,49 @@ trait IntegrationTestTrait
         $this->assertNotContains($text, $headers['Location']);
     }
 
+    /**
+     * Asserts that the response is empty
+     *
+     * @return void
+     */
     public function assertResponseEmpty()
     {
         $body = $this->response()->body();
         $this->assertEmpty($body);
     }
 
-
+    /**
+     * Asserts that response is not empty
+     *
+     * @return void
+     */
     public function assertResponseNotEmpty()
     {
         $body = $this->response()->body();
         $this->assertNotEmpty($body);
     }
 
+    /**
+     * Asserts a response header
+     *
+     * @param string $header
+     * @param string $value
+     * @return void
+     */
+    public function assertHeader(string $header, string $value)
+    {
+        $headers = $this->response()->headers();
+        $this->assertArrayHasKey($header, $headers);
+        $this->assertEquals($headers[$header], $value);
+    }
+
+    /**
+     * Asserts a response header contains a string
+     *
+     * @param string $header
+     * @param string $value
+     * @return void
+     */
     public function assertHeaderContains(string $header, string $value)
     {
         $headers = $this->response()->headers();
@@ -438,10 +507,31 @@ trait IntegrationTestTrait
         $this->assertContains($value, $headers[$header]);
     }
 
+    /**
+     * Asserts a response header does not contain a string
+     *
+     * @param string $header
+     * @param string $value
+     * @return void
+     */
     public function assertHeaderNotContains(string $header, string $value)
     {
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
         $this->assertNotContains($value, $headers[$header]);
+    }
+
+    /**
+     * Assert a cookie value
+     *
+     * @param string $cookie
+     * @param string $value
+     * @return void
+     */
+    public function assertCookie(string $cookie, string $value)
+    {
+        $cookies = $this->response()->cookies();
+        $this->assertArrayHasKey($cookie, $cookies);
+        $this->assertEquals($cookies[$cookie]['value'], $value);
     }
 }

@@ -19,6 +19,10 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Integration testing for controllers now includes more assertion methods
+- Response cookie getter now returns cookie array
+
 ## [1.12.1] - 2019-06-11
 ### Changed
 - Locales:generator command renamed to locale:generator

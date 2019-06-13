@@ -204,7 +204,7 @@ class Response
             return $this->cookies;
         }
         if (isset($this->cookies[$cookie])) {
-            return $this->cookies[$cookie]['value'];
+            return $this->cookies[$cookie];
         }
         return null;
     }

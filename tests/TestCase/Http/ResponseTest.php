@@ -42,7 +42,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     {
         $response  = new Response();
         $response->cookie('foo', 'bar');
-        $this->assertEquals('bar', $response->cookies('foo'));
+        $this->assertEquals('bar', $response->cookies('foo')['value']);
 
         $cookies = $response->cookies();
 

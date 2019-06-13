@@ -137,7 +137,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo'=>'bar'], $this->getProperty('cookies'));
 
         $this->get('/posts/index');
-        $this->assertEquals('bar', $this->response->cookies('foo'));
+        $this->assertEquals('bar', $this->response->cookies('foo')['value']);
     }
 
 
@@ -168,7 +168,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->get('/posts/index');
     }
 
-    public function testResponseOk()
+    public function testAssertResponseOk()
     {
         $this->response = new Response();
         
@@ -179,10 +179,9 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertResponseOk();
     }
 
-    public function testResponseSuccess()
+    public function testAssertResponseSuccess()
     {
         $this->response = new Response();
-
         $this->response->statusCode(200);
         $this->assertResponseSuccess();
 
@@ -190,10 +189,9 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertResponseSuccess();
     }
 
-    public function testResponseError()
+    public function testAssertResponseError()
     {
         $this->response = new Response();
-       
         $this->response->statusCode(400);
         $this->assertResponseError();
 
@@ -201,10 +199,9 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertResponseError();
     }
 
-    public function testResponseFailure()
+    public function testAssertResponseFailure()
     {
         $this->response = new Response();
-    
         $this->response->statusCode(500);
         $this->assertResponseFailure();
 
@@ -212,7 +209,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertResponseFailure();
     }
 
-    public function testResponseCode()
+    public function testAssertResponseCode()
     {
         $this->response = new Response();
         $this->response->statusCode(404);
@@ -223,27 +220,56 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('No response');
         $this->assertResponseCode(200);
     }
-    public function testResponseContains()
+
+    public function testAssertResponseBadRequest()
+    {
+        $this->response = new Response();
+        $this->response->statusCode(400);
+        $this->assertResponseBadRequest();
+    }
+    
+    public function testAssertResponseNotFound()
+    {
+        $this->response = new Response();
+        $this->response->statusCode(404);
+        $this->assertResponseNotFound();
+    }
+
+    public function testAssertResponseUnauthorized()
+    {
+        $this->response = new Response();
+        $this->response->statusCode(401);
+        $this->assertResponseUnauthorized();
+    }
+
+    public function testAssertResponseForbidden()
+    {
+        $this->response = new Response();
+        $this->response->statusCode(403);
+        $this->assertResponseForbidden();
+    }
+
+    public function testAssertResponseContains()
     {
         $this->get('/posts/index');
         $this->assertResponseContains('Posts Home Page');
     }
-    public function testResponseNotContains()
+    public function testAssertResponseNotContains()
     {
         $this->get('/posts/index');
         $this->assertResponseNotContains('Contacts Home Page');
     }
-    public function testResponseEquals()
+    public function testAssertResponseEquals()
     {
         $this->get('/posts/list');
         $this->assertResponseEquals('{"error":"Noting to list"}');
     }
-    public function testResponseNotEquals()
+    public function testAssertResponseNotEquals()
     {
         $this->get('/posts/list');
         $this->assertResponseNotEquals('{"data":{id:1234}}');
     }
-    public function testRedirect()
+    public function testAssertRedirect()
     {
         $this->header('Location', '/posts/agree');
         $this->get('/posts/list');
@@ -255,58 +281,72 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('No response');
         $this->assertRedirect();
     }
-    public function testNoRedirect()
+    public function testAssertNoRedirect()
     {
         $this->get('/posts/list');
         $this->assertNoRedirect();
     }
 
-    public function testRedirectContains()
+    public function testAssertRedirectContains()
     {
         $this->header('Location', '/posts/edit?user=1234');
         $this->get('/posts/list');
         $this->assertRedirectContains('1234');
     }
-    public function testRedirectContainsFail()
+    public function testAssertRedirectContainsFail()
     {
         $this->get('/posts/list');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('No location');
         $this->assertRedirectContains('1234');
     }
-    public function testRedirectNotContains()
+    public function testAssertRedirectNotContains()
     {
         $this->header('Location', '/posts/edit?user=1234');
         $this->get('/posts/list');
         $this->assertRedirectNotContains('5678');
     }
-    public function testRedirectNotContainsFail()
+    public function testAssertRedirectNotContainsFail()
     {
         $this->get('/posts/list');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('No location');
         $this->assertRedirectNotContains('1234');
     }
-    public function testResponseNotEmpty()
+    public function testAssertResponseNotEmpty()
     {
         $this->get('/posts/index');
         $this->assertResponseNotEmpty();
     }
-    public function testResponseEmpty()
+    public function testAssertResponseEmpty()
     {
         $this->response = new Response();
         $this->assertResponseEmpty();
     }
-    public function testHeaderContains()
+
+    public function testAssertHeader()
+    {
+        $this->header('Location', '/posts/edit/1024');
+        $this->get('/posts/list');
+        $this->assertHeader('Location', '/posts/edit/1024');
+    }
+    public function testAssertHeaderContains()
     {
         $this->header('Location', '/posts/edit/1024');
         $this->get('/posts/list');
         $this->assertHeaderContains('Location', '1024');
     }
-    public function testHeaderNotContains()
+    public function testAssertHeaderNotContains()
     {
         $this->header('Location', '/posts/edit/1024');
         $this->get('/posts/list');
         $this->assertHeaderNotContains('Location', '512');
+    }
+
+    public function testAssertCookie()
+    {
+        $this->response = new Response();
+        $this->response->cookie('key', 'value');
+        $this->assertCookie('key', 'value');
     }
 }
