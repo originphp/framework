@@ -24,6 +24,8 @@ namespace Origin\Http;
 use Origin\Core\Debugger;
 use Origin\Core\Logger;
 use Origin\Core\Configure;
+use Origin\Exception\HttpException;
+use Origin\Http\Router;
 
 class ErrorHandler
 {
@@ -34,10 +36,6 @@ class ErrorHandler
     {
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
-
-        if ($this->isAjax()) {
-            set_exception_handler([$this, 'ajaxExceptionHandler']);
-        }
     }
 
     /**
@@ -58,15 +56,11 @@ class ErrorHandler
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
             return true;
         }
-        // check if content type requted
-        if (isset($_SERVER['CONTENT_TYPE']) and $_SERVER['CONTENT_TYPE'] === 'application/json') {
-            return true;
+        $request = Router::request();
+        if ($request) {
+            return $request->type() === 'json';
         }
-        $uri = $_SERVER['REQUEST_URI'] ?? null;
-        if (strpos($uri, '?') !== false) {
-            list($uri, $query) = explode('?', $uri);
-        }
-        return substr(basename($uri), -5) === '.json';
+        return false;
     }
 
     /**
@@ -85,18 +79,21 @@ class ErrorHandler
 
     public function exceptionHandler($exception)
     {
+        if ($this->isAjax()) {
+            return $this->ajaxExceptionHandler($exception);
+        }
+
         $errorCode = 500;
         if ($exception->getCode() === 404) {
             $errorCode = 404;
         }
 
         $this->logException($exception, $errorCode);
-
         $this->cleanBuffer();
         if (Configure::read('debug')) {
             return $this->debugException($exception);
         }
-
+      
         http_response_code($errorCode);
         include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
     }
@@ -109,26 +106,24 @@ class ErrorHandler
      */
     public function ajaxExceptionHandler($exception)
     {
-        $errorCode = 500;
-        if ($exception->getCode() === 404) {
-            $errorCode = 404;
-        }
-
         $this->cleanBuffer();
-
-        if (Configure::read('debug')) {
-            $response = ['error' => ['message' => $exception->getMessage(), 'code' => $exception->getCode()]];
-            echo json_encode($response);
-            return true;
+        $errorCode = $exception->getCode();
+        $response = ['error'=>['message'=>$exception->getMessage(),'code' => $errorCode ]];
+  
+        if (Configure::read('debug') === false and !$exception instanceof HttpException) {
+            $errorCode = 500;
+            if ($exception->getCode() === 404) {
+                $errorCode = 404;
+            }
+            $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => 500]];
+            if ($errorCode === 404) {
+                $response = ['error' => ['message' => 'Not found', 'code' => 404]];
+            }
         }
 
         $this->logException($exception, $errorCode);
-
         http_response_code($errorCode);
-        $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => 500]];
-        if ($errorCode === 404) {
-            $response = ['error' => ['message' => 'Not found', 'code' => 404]];
-        }
+        
         echo json_encode($response);
     }
 
