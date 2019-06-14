@@ -167,13 +167,13 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     {
         $request = new MockRequest();
         $request->headers('WWW-Authenticate', 'Negotiate');
-        $request->headers('HTTP/1.0 404 Not Found',null);
+        $request->headers('HTTP/1.0 404 Not Found', null);
 
         $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
         $this->assertEquals('Negotiate', $request->headers('www-authenticate')); // PSR friendly
         $this->assertEquals(['WWW-Authenticate'=>'Negotiate','HTTP/1.0 404 Not Found'=>null], $request->headers());
 
-        $this->assertEquals(null, $request->headers('secret')); 
+        $this->assertEquals(null, $request->headers('secret'));
     }
 
     /**
@@ -195,8 +195,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($request->accepts('application/json'));
         $request = new MockRequest('/controller/action.json');
         $this->assertTrue($request->accepts('application/json'));
-        $request = new MockRequest();
-        $request->params('json', true);
+        $request = new MockRequest('/api/search.json');
         $this->assertTrue($request->accepts('application/json'));
 
         $request = new MockRequest();

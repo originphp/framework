@@ -24,6 +24,8 @@ use Origin\Http\Router;
 use ReflectionClass;
 use ReflectionMethod;
 use Origin\Utility\Xml;
+use Origin\Exception\NotFoundException;
+use Origin\Http\Serializer;
 
 class Controller
 {
@@ -107,6 +109,10 @@ class Controller
 
         $this->initialize();
     }
+
+   
+
+  
 
     /**
      * Loads a Component for use with the controller.
@@ -249,11 +255,11 @@ class Controller
     {
         $result = $this->beforeFilter();
         // Check redirect has not been called
-        if($result instanceof Response OR $this->response->headers('Location')){
+        if ($result instanceof Response or $this->response->headers('Location')) {
             return $this->response;
         }
         $result = $this->componentRegistry()->call('startup');
-        if($result instanceof Response OR $this->response->headers('Location')){
+        if ($result instanceof Response or $this->response->headers('Location')) {
             return $this->response;
         }
     }
@@ -262,11 +268,11 @@ class Controller
     {
         $result = $this->componentRegistry()->call('shutdown');
         // Check redirect has not been called
-        if($result instanceof Response OR $this->response->headers('Location')){
+        if ($result instanceof Response or $this->response->headers('Location')) {
             return $this->response;
         }
         $result = $this->afterFilter();
-        if($result instanceof Response OR $this->response->headers('Location')){
+        if ($result instanceof Response or $this->response->headers('Location')) {
             return $this->response;
         }
         //# Free Mem for no longer used items
@@ -355,14 +361,27 @@ class Controller
      */
     public function render($options=[])
     {
+        $autorender = false;
         $template = $this->request->params('action');
         if (empty($options)) {
             $options = $template;
+            $autorender = true;
         }
         if (is_string($options)) {
             $options = ['template'=>$options];
         }
- 
+
+        if ($autorender and in_array($this->request->type(), ['json','xml'])) {
+            if (isset($this->viewVars['serialize'])) {
+                $options['type'] = $this->request->type();
+                $serializer = new Serializer();
+                $options[$options['type']] = $serializer->serialize($this->viewVars['serialize'], $this->viewVars);
+                if ($options['type'] === 'xml' and count($options[$options['type']]) > 1) {
+                    $options[$options['type']] = ['response'=>$options[$options['type']]];
+                }
+            }
+        }
+      
         $options += [
             'status' => $this->response->statusCode(),
             'type' => 'html'
@@ -392,8 +411,10 @@ class Controller
             if (isset($options['template'])) {
                 $template =  $options['template'];
             }
-        
-            $body = $this->viewObject()->render($template, $this->layout);
+            $body = $this->viewObject()->render(
+                $template,
+                $options['type']=== 'html'?$this->layout:false
+            );
         }
     
         $this->response->type($options['type']);   // 'json' or application/json
@@ -403,10 +424,21 @@ class Controller
 
 
     /**
+     * Sets the key or keys of the viewVars to be serialized
+     *
+     * @param string|array $keyOrKeys
+     * @return void
+     */
+    public function serialize($keyOrKeys)
+    {
+        $this->viewVars['serialize'] = $keyOrKeys;
+    }
+
+    /**
      * Creates a View object, overide if you want to use
      * a custom class.
      *
-     * @return AppView
+     * @return \App\View\AppView
      */
     protected function viewObject()
     {
@@ -518,7 +550,7 @@ class Controller
         $this->response->stop();
 
         // Return the response object once called
-        return $this->response; 
+        return $this->response;
     }
 
     /**

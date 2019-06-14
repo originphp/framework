@@ -19,6 +19,19 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- Auth API authentication
+- Auth Component is authorized and controller authorization
+- Router: on method
+- HttpException, and made this parent class of some http errors
+- Added Serializer class
+- Added controller serialize
+
+### Changed
+- Error handler now uses request for content type
+- Router setRequest to request
+
 ## [1.14.0] - 2019-06-13
 ### Changed
 - Integration testing for controllers now includes more assertion methods

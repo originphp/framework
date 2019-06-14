@@ -272,13 +272,8 @@ class AuthComponentTest extends OriginTestCase
     public function testIdentifyMissingModel()
     {
         $this->expectException(MissingModelException::class);
-        $AuthComponent = $this->AuthComponent;
-        $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->config('model', 'Fozzy');
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
-     
-        $AuthComponent->identify();
+        $this->Controller = new UsersController(new Request(), new Response());
+        $this->AuthComponent = new MockAuthComponent($this->Controller, ['model'=>'Foo']);
     }
 
     public function testIdentifyHttp()
@@ -287,9 +282,18 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent->config('authenticate', ['Http']);
         $_SERVER['PHP_AUTH_USER'] = 'amanda@example.com';
         $_SERVER['PHP_AUTH_PW'] = 'secret2';
-        $result = $AuthComponent->identify();
-        $this->assertEquals('Amanda', $result->name);
+        $user = $AuthComponent->identify();
+        $this->assertEquals('Amanda', $user->name);
         unset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+    }
+
+    public function testIdentifyApi()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Api']);
+        $AuthComponent->request()->query('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
+        $user = $AuthComponent->identify();
+        $this->assertEquals('Amanda', $user->name);
     }
 
     public function testIdentifyInvalidPassword()

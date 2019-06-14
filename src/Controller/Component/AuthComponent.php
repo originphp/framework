@@ -19,6 +19,7 @@ use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
 use Origin\Exception\ForbiddenException;
+use Origin\Exception\Exception;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -53,9 +54,9 @@ class AuthComponent extends Component
         'plugin' => null,
       ],
       'model' => 'User',
-      'fields' => ['username' => 'email', 'password' => 'password'],
+      'fields' => ['username' => 'email', 'password' => 'password','api_token' => 'api_token'],
       'scope' => [], // Extra conditions for db . e.g User.active=1;
-      'unauthorizedRedirect' => true, // If false no redirect just exception e.g cli stuff
+      'unauthorizedRedirect' => true, // If false throw ForbiddenException
       'authError' => 'You are not authorized to access that location.',
     ];
 
@@ -75,6 +76,10 @@ class AuthComponent extends Component
 
     public function initialize(array $config)
     {
+        if (!ModelRegistry::get($this->config['model'])) {
+            throw new MissingModelException($this->config['model']);
+        }
+
         $this->loadComponent('Flash');
         $this->loadComponent('Session');
     }
@@ -86,19 +91,19 @@ class AuthComponent extends Component
     {
         $action = $this->request()->params('action');
 
-        if ($this->isLoggedIn()) {
+        if ($this->isPrivateOrProtected($action)) {
             return null;
         }
 
         if ($this->isAllowed($action)) {
             return null;
         }
-        
-        if ($this->isPrivateOrProtected($action)) {
+
+        if ($this->isLoginPage()) {
             return null;
         }
 
-        if ($this->isLoginPage()) {
+        if ($this->isAuthorized($this->getUser())) {
             return null;
         }
 
@@ -116,6 +121,30 @@ class AuthComponent extends Component
     }
 
     /**
+     * An additional layer
+     *
+     * @param [type] $user
+     * @return boolean
+     */
+    protected function isAuthorized($user)
+    {
+        if (empty($user)) {
+            return false;
+        }
+        if (in_array('Controller', $this->config['authenticate'])) {
+            $controller = $this->controller();
+            if (!method_exists($controller, 'isAuthorized')) {
+                throw new Exception(sprintf('%s does have an isAuthorized() method.', get_class($controller)));
+            }
+            if ($user instanceof Entity) {
+                $user = $user->toArray();
+            }
+            return $controller->isAuthorized($user);
+        }
+        return true;
+    }
+
+    /**
      * Hash password and use with verify password.
      *
      * @param string $password
@@ -128,6 +157,23 @@ class AuthComponent extends Component
     }
 
     /**
+     * Gets the user each from session, from by authenticating
+     *
+     * @return array|bool
+     */
+    public function getUser()
+    {
+        if ($this->user()) {
+            return $this->user();
+        }
+        $user = $this->identify();
+        if ($user) {
+            return $user->toArray();
+        }
+        return false;
+    }
+
+    /**
      * This will try to identify the user. Check if there are credentials
      * based upon auth methods (form, http).
      *
@@ -135,8 +181,29 @@ class AuthComponent extends Component
      */
     public function identify()
     {
-        $credentials = $this->getCredentials();
+        /**
+         * If API authentication method is enabled, then must throw exception if it can't log in
+         */
+        if (in_array('Api', $this->config['authenticate'])) {
+            $token = $this->request()->query($this->config['fields']['api_token']);
+            if ($token) {
+                $model = ModelRegistry::get($this->config['model']);
+                
+                $conditions = [$this->config['fields']['api_token'] => $token];
+                if (!empty($this->config['scope']) and is_array($this->config['scope'])) {
+                    $conditions = array_merge($conditions, $this->config['scope']);
+                }
+          
+                $user = $model->find('first', ['conditions' => $conditions]);
 
+                if ($user) {
+                    return $user;
+                }
+            }
+            $this->request()->type('json'); // Force all api usage as json
+            throw new ForbiddenException($this->config['authError']);
+        }
+        $credentials = $this->getCredentials();
         if ($credentials) {
             return $this->loadUser($credentials['username'], $credentials['password']);
         }
@@ -229,7 +296,6 @@ class AuthComponent extends Component
     
     /**
      * Gets the username and password from request
-     * This can be form or http request such as using curl.
      *
      * @return array ['username'=>x,'password'=>x];
      */
@@ -302,9 +368,7 @@ class AuthComponent extends Component
     protected function loadUser(string $username, string $password)
     {
         $model = ModelRegistry::get($this->config['model']);
-        if (!$model) {
-            throw new MissingModelException($model);
-        }
+ 
         $conditions = [
           $this->config['fields']['username'] => $username,
         ];

@@ -12,6 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+ /**
+  * Rest routing
+  * Router::add('/:controller', ['action'=>'index','method'=>'GET']);
+  * Router::add('/:controller/*', ['action'=>'view','method'=>'GET']);
+  * Router::add('/:controller', ['action'=>'add','method'=>'POST']);
+  * Router::add('/:controller/*', ['action'=>'edit','method'=>'PUT']);
+  * Router::add('/:controller/*', ['action'=>'edit','method'=>'PATCH']);
+  * Router::add('/:controller/*', ['action'=>'delete','method'=>'DELETE']);
+  */
+
 namespace Origin\Http;
 
 use Origin\Core\Inflector;
@@ -29,6 +39,27 @@ class Router
     protected static $request = null;
 
     /**
+     * Holds the default extensions to parse. e.g json, xml
+     *
+     * @var array
+     */
+    protected static $extensions = ['json','xml'];
+
+    /**
+     * Sets the extensions to parse
+     *
+     * @param array $extensions
+     * @return array|void
+     */
+    public static function extensions(array $extensions = null)
+    {
+        if ($extensions === null) {
+            return self::$extensions;
+        }
+        self::$extensions = $extensions;
+    }
+
+    /**
      * Creates a new route.
      *
      * @param string $route  '/contacts/view'
@@ -36,10 +67,13 @@ class Router
      */
     public static function add(string $route, array $params = [])
     {
-        $defaults = array(
+        $defaults = [
           'controller' => null,
           'action' => null,
-        );
+          'args' => null,
+          'route' => null,
+          'method' => null
+        ];
 
         // Create REGEX pattern
 
@@ -47,7 +81,7 @@ class Router
         $pattern = preg_replace('/\//', '\\/', trim($route, '/'));
 
         // Convert vars e.g. :controller :action
-        $pattern = preg_replace('/\:([a-z]+)/', '(?P<\1>[^.\/]+)', $pattern);//[^\/] [a-z0-9_.]
+        $pattern = preg_replace('/\:([a-z]+)/', '(?P<\1>[^\.\/]+)', $pattern);
 
         // Enable greedy capture
         $pattern = str_replace('*', '?(?P<greedy>.*)', $pattern);
@@ -64,8 +98,8 @@ class Router
         $params['route'] = $route;
 
         $params = array_merge($defaults, $params);
-
-        self::$routes["/^{$pattern}$/i"] = $params;
+        $params['pattern'] = "/^{$pattern}$/i";
+        self::$routes[] = $params;
     }
 
     /**
@@ -97,17 +131,27 @@ class Router
           'plugin' => null,
         );
 
-        foreach (self::$routes as $route => $routedParams) {
-            if (preg_match($route, $url, $matches)) {
-                $params = array_merge($template, $routedParams);
-
-                foreach ($matches as $key => $value) {
-                    if (is_string($key)) {
-                        $params[$key] = $value;
+        // Remove matching extensions, so it can be parsed
+        $extension = pathinfo($url, PATHINFO_EXTENSION);
+        if (in_array($extension, self::$extensions)) {
+            $template['ext'] = $extension;
+            $length = strlen($template['ext']) + 1;
+            $url = substr($url, 0, -$length);
+        }
+ 
+        foreach (self::$routes as $routedParams) {
+            if (preg_match($routedParams['pattern'], $url, $matches)) {
+                if (empty($routedParams['method']) or ($routedParams['method'] and strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
+                    unset($routedParams['method'],$routedParams['pattern']);
+                    $params = array_merge($template, $routedParams);
+                    foreach ($matches as $key => $value) {
+                        if (is_string($key)) {
+                            $params[$key] = $value;
+                        }
                     }
+                    $params['controller'] = Inflector::camelize($params['controller']);
+                    break;
                 }
-                $params['controller'] = Inflector::camelize($params['controller']);
-                break;
             }
         }
 
@@ -131,7 +175,6 @@ class Router
             }
             unset($params['greedy']);
         }
-   
         return $params;
     }
 
@@ -198,13 +241,27 @@ class Router
         return $output.$queryString;
     }
 
-    public static function setRequest(Request $request)
+    /**
+     * Sets or gets the request objects
+     *
+     * @param Request $request
+     * @return \Origin\Http\Request|null
+     */
+    public static function request(Request $request = null)
     {
+        if ($request === null) {
+            return static::$request;
+        }
         static::$request = $request;
     }
 
+    /**
+     * Gets the routes
+     *
+     * @return array
+     */
     public static function routes()
     {
-        return static::$routes;
+        return self::$routes;
     }
 }

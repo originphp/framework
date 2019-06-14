@@ -62,7 +62,7 @@ function debug($data, bool $isHtml = false)
             $where = "<p><strong>{$filename}</strong> Line: <strong>{$line}</strong></p>";
             $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
         }
-        printf("\n%s\n",$template); // allow to work with %s
+        printf("\n%s\n", $template); // allow to work with %s
     }
 }
 
@@ -122,7 +122,7 @@ function pluginSplit($name)
 /**
  * Splits a command
  *
- * @param string $command app:create-user, 
+ * @param string $command app:create-user,
  * @return void
  */
 function commandSplit(string $command)
@@ -143,10 +143,10 @@ function commandSplit(string $command)
  * @param mixed arg1 arg2
  * @return string formatted
  */
-function __(string $string = null,array $vars = [])
+function __(string $string = null, array $vars = [])
 {
     if ($string) {
-        return I18n::translate($string,$vars);
+        return I18n::translate($string, $vars);
     }
     return null;
 }
@@ -163,17 +163,17 @@ function h($text)
 
 /**
  * Gets or sets an Environment variable
- * 
+ *
  * @param string $variable
  * @return string|null
  */
-function env(string $variable,string $value = null)
+function env(string $variable, string $value = null)
 {
-    if($value === null){
-        if(isset($_SERVER[$variable])){
+    if ($value === null) {
+        if (isset($_SERVER[$variable])) {
             return $_SERVER[$variable];
         }
-        if(isset($_ENV[$variable])){
+        if (isset($_ENV[$variable])) {
             return $_ENV[$variable];
         }
         return null;
@@ -227,6 +227,18 @@ function uid($length=13)
 {
     $random = random_bytes(ceil($length/2));
     return substr(bin2hex($random), 0, $length);
+}
+
+
+/**
+ * The OriginPHP default password hasher
+ *
+ * @param string $password
+ * @return boolean
+ */
+function hashPassword(string $password)
+{
+    return password_hash($password, PASSWORD_DEFAULT);
 }
 
 /**

@@ -37,6 +37,10 @@ class UserFixture extends Fixture
            'length' => 255,
            'null' => false,
          ),
+         'api_token' => [
+           'type' => 'string',
+           'length' => 40
+         ],
          'created' => 'datetime',
          'modified' => 'datetime',
      );
@@ -46,6 +50,7 @@ class UserFixture extends Fixture
            'name' => 'James',
            'email' => 'james@example.com',
            'password' => '$2y$10$V5RgkqQ6Onnxgz2rmEBJDuftS9DX7iD0qv8V3LlM0qDdTYK2Y3Fbq',
+           'api_token' => '43cbd312fd6eaf3480a4572aa988ada0f4c6310b',
            'created' => '2018-12-20 09:00:00',
            'created' => '2018-12-20 09:00:15',
          ),
@@ -54,6 +59,7 @@ class UserFixture extends Fixture
            'name' => 'Amanda',
            'email' => 'amanda@example.com',
            'password' => '$2y$10$YK3SO6y4O9ObgpLG6HH75e6o2uQFQxdQ3qbE8szwMCTpZxSao6H16',
+           'api_token' => 'dea50af153b77b3f3b725517ba18b5f0619fa4da',
            'created' => '2018-12-20 09:01:00',
            'created' => '2018-12-20 09:00:30',
          ),

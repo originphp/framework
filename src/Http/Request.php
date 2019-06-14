@@ -85,6 +85,13 @@ class Request
     protected $session = null;
 
     /**
+     * Holds the requested format. e.g html,xml,json
+     *
+     * @var string
+     */
+    protected $format = null;
+
+    /**
      * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
@@ -120,8 +127,8 @@ class Request
                 $this->headersNames[strtolower($key)] = $key;
             }
         }
-
-        Router::setRequest($this);
+        $this->detectRequestType();
+        Router::request($this);
     }
 
     /**
@@ -246,6 +253,53 @@ class Request
         return $this->env('HTTP_REFERER'); // Misspelling is correct
     }
 
+    /**
+       * Sets and gets the type that should be rendered. html, json or xml
+       *
+       * @param string $type
+       * @return string|null
+       */
+    public function type(string $type = null)
+    {
+        if ($type === null) {
+            return $this->type;
+        }
+        $this->type = $type;
+    }
+  
+    /**
+     * This detects the type for the request.
+     *
+     * 1. If the route itself says it must be in a type, then use that first.
+     * 2. If the client requests using an extension then it is assumed that is what is to be delivered.
+     * 3. If the accept header is set as such
+     *
+     * This is all only relevant for autorendering.
+     *
+     * @return void
+     */
+    protected function detectRequestType()
+    {
+        $type = 'html';
+        if ($this->params('type') and in_array($this->params('type'), ['xml','json'])) {
+            $type = $this->params('type');
+        }
+        $extension = $this->params('ext');
+        if ($extension and in_array($extension, ['html','json','xml'])) {
+            $type = $extension;
+        } else {
+            $accepts = $this->accepts();
+            if ($accepts) {
+                if ($accepts[0] === 'application/json') {
+                    $type = 'json';
+                } elseif (in_array($accepts[0], ['application/xml','text/xml'])) {
+                    $type =  'xml';
+                }
+            }
+        }
+        return $this->type($type);
+    }
+
     protected function processGet($url)
     {
         // Build Query
@@ -342,41 +396,39 @@ class Request
     }
  
     /**
-     * Checks if the request accepts, this will search the HTTP accept, extension
-     * being called.
+     * Checks if the request accepts, this will search the HTTP accept headers and if the
+     * router has passed an ext parameter
      *
      * $request->accepts('application/json');
      * $request->accepts(['application/xml','application/json']);
      *
-     * @todo in future maybe something routing maybe without complicating things.
      * @param string|array $type
      * @return bool|array
      */
     public function accepts($type=null)
     {
         $path = parse_url($this->url(), PHP_URL_PATH);
-      
+    
         $acceptHeaders = $this->parseAcceptWith($this->headers('accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
-
+     
+        // If router extension set and its valid.
+        $extension = $this->params('ext');
+        if ($extension and in_array($extension, ['html','json','xml'])) {
+            return true;
+        }
+        
         foreach ((array) $type as $needle) {
-            if (in_array($needle, $acceptHeaders)) { // does not find application/xml;q=0.9
-                return true;
-            }
-            $parts = explode('/', $needle);
-            $extensionNeedle =  end($parts);
-            if (strpos(strtolower($path), ".{$extensionNeedle}") !== false) {
-                return true;
-            }
-            // Not implemented
-            if (isset($this->params[$extensionNeedle])) {
+            if (in_array($needle, $acceptHeaders)) {
                 return true;
             }
         }
+
         return false;
     }
+
 
     /**
      * Gets a list of accepted languages, checks if a specific language is accepted
@@ -410,7 +462,7 @@ class Request
     protected function parseAcceptWith(string $header = null) : array
     {
         $accepts = [];
-        if($header === null){
+        if ($header === null) {
             return [];
         }
         $values = explode(',', $header);
@@ -453,7 +505,7 @@ class Request
     public function header(string $name, string $value = null)
     {
         deprecationWarning('Request:header is depreciated use request:headers');
-        if(func_num_args() === 1){
+        if (func_num_args() === 1) {
             return $this->headers($name);
         }
         $normalized = strtolower($name); // psr thing
@@ -468,7 +520,7 @@ class Request
      * @param string $value
      * @return array|string|null
      */
-    public function headers(string $name = null,string $value = null) 
+    public function headers(string $name = null, string $value = null)
     {
         if ($name === null) {
             return $this->headers;
@@ -476,7 +528,7 @@ class Request
 
         $normalized = strtolower($name); // psr thing
 
-        if(func_num_args() === 1){
+        if (func_num_args() === 1) {
             $key = $name;
             if (isset($this->headersNames[$normalized])) {
                 $key = $this->headersNames[$normalized];
@@ -508,22 +560,23 @@ class Request
      *
      * @return string|array|null
      */
-    public function cookies(string $key = null,string $value = null)
+    public function cookies(string $key = null, string $value = null)
     {
-       if($key === null){
-           return $this->cookies;
-       }
+        if ($key === null) {
+            return $this->cookies;
+        }
     
-       if(func_num_args() === 1){
-           if(isset($this->cookies[$key])){
-               return $this->cookies[$key];
-           }
-           return null;
-       }
-       $this->cookies[$key] = $value;
+        if (func_num_args() === 1) {
+            if (isset($this->cookies[$key])) {
+                return $this->cookies[$key];
+            }
+            return null;
+        }
+        $this->cookies[$key] = $value;
     }
     
-    protected function processCookies(){
+    protected function processCookies()
+    {
         $cookie = new Cookie();
         $this->cookies = [];
         foreach (array_keys($_COOKIE) as $key) {

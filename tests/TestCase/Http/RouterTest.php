@@ -105,7 +105,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         MockRouter::reset();
         MockRouter::add(
-        '/developers/:action/*',
+            '/developers/:action/*',
             array('controller' => 'users')
     );
         $result =MockRouter::parse('/developers/directory');
@@ -130,7 +130,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         MockRouter::reset();
         MockRouter::add('/:controller/:action/*');
-        MockRouter::setRequest(new Request('articles/view/100'));
+        MockRouter::request(new Request('articles/view/100'));
 
         $expected = '/articles/edit/100';
         $this->assertEquals($expected, MockRouter::url($expected));
