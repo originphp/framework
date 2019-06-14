@@ -14,15 +14,6 @@
 
 namespace Origin\Exception;
 
-use Origin\Exception\HttpException;
-
-class BadRequestException extends HttpException
+class HttpException extends Exception
 {
-    public function __construct($message = null, $code = 400)
-    {
-        if ($message === null) {
-            $message = 'Bad Request';
-        }
-        parent::__construct($message, $code);
-    }
 }

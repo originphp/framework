@@ -14,7 +14,9 @@
 
 namespace Origin\Exception;
 
-class ForbiddenException extends Exception
+use Origin\Exception\HttpException;
+
+class ForbiddenException extends HttpException
 {
     public function __construct($message = null, $code = 403)
     {
