@@ -260,6 +260,26 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('<h1>Posts Home Page</h1>', $controller->response->body());
     }
 
+    public function testRenderSerializeArrays()
+    {
+        // test single
+        $request = new Request('posts/index.json');
+        $controller = new \App\Controller\PostsController($request, new Response());
+        $controller->set(['user'=>['name'=>'jim']]);
+        $controller->serialize('user');
+        $controller->render();
+        $this->assertEquals('{"name":"jim"}', $controller->response->body());
+     
+        // Test multi
+        $controller = new \App\Controller\PostsController(new Request('posts/index.xml'), new Response());
+        $controller->set(['user'=>['name'=>'jim'],'profile'=>['name'=>'admin']]);
+        $controller->serialize(['user','profile']);
+        $controller->render();
+  
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><user><name>jim</name></user><profile><name>admin</name></profile></response>\n", $controller->response->body());
+    }
+
+
     public function testRenderJson()
     {
         $request = new Request('tests/edit/1024');
@@ -349,7 +369,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
            ->method('send');
 
         
-        $this->assertInstanceOf(Response::class,$controller->redirect([
+        $this->assertInstanceOf(Response::class, $controller->redirect([
             'action' => 'view', 2048
             ]));
     }
@@ -359,7 +379,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         # Create Table
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
-        $sql = $connection->adapter()->createTable('pets',[
+        $sql = $connection->adapter()->createTable('pets', [
             'id' => ['type'=>'primaryKey'],
             'name' => ['type'=>'string','limit'=>20]
         ]);
@@ -404,7 +424,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
     }
 
-    public function tearDown(){
+    public function tearDown()
+    {
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
     }

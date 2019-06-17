@@ -124,7 +124,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('a3e958f578c2464757f9ae9f99d01b86', $filename);
         unlink($filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', true);
+        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', ['recursive'=>true]);
     }
 
     public function testGenerateComponent()
@@ -282,7 +282,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'dummy', true);
+        Folder::delete(APP.DS.'plugins'.DS.'dummy', ['recursive'=>true]);
     }
 
    

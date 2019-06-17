@@ -249,6 +249,7 @@ class Response
     public function cookie(string $name, $value, string $expire='+1 month', array $options = [])
     {
         $options += [
+            'name' => $name,
             'value' => $value,
             'path' => '/', // path on server
             'domain' => '', // domains cookie will be available on

@@ -21,16 +21,20 @@ Delete tag:   git tag -d <tag_name>
 ## [Unreleased]
 
 ### Added
+- Http Utility
 - Auth API authentication
 - Auth Component is authorized and controller authorization
 - Router: on method
 - HttpException, and made this parent class of some http errors
 - Added Serializer class
 - Added controller serialize
+- Helper functions, contains,left,right,length,begins,lower
+- File/Folder perms alias
 
 ### Changed
 - Error handler now uses request for content type
 - Router setRequest to request
+- File/folder options recursive etc
 
 ## [1.14.0] - 2019-06-13
 ### Changed

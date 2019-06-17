@@ -133,9 +133,6 @@ class File
     public static function move(string $source, string $destination) : bool
     {
         if (self::exists($source)) {
-            if (is_uploaded_file($source)) {
-                return move_uploaded_file($source, $destination);
-            }
             return @rename($source, $destination);
         }
         throw new NotFoundException(sprintf('%s could not be found', $source));
@@ -211,7 +208,7 @@ class File
      * @param int $mode e.g 0755 (remember 0 infront)
      * @return bool|string
      */
-    public static function permissions(string $filename)
+    public static function mode(string $filename)
     {
         if (self::exists($filename)) {
             return (string) substr(sprintf("%o", fileperms($filename)), -4);
@@ -219,6 +216,18 @@ class File
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
     
+
+    /**
+     * Alias for mode. Gets the mode for a file aka permissions
+     *
+     * @param string $filename
+     * @return string
+     */
+    public static function perms(string $filename)
+    {
+        return static::mode($filename);
+    }
+
     /**
      * Gets the owner of a file
      *
@@ -255,8 +264,8 @@ class File
     public static function info(string $filename) : array
     {
         if (self::exists($filename)) {
-           $pathinfo = pathinfo($filename);
-           return [
+            $pathinfo = pathinfo($filename);
+            return [
                'path' => $pathinfo['dirname'],
                'filename' => $pathinfo['basename'],
                'extension' => $pathinfo['extension']??null,

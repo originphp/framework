@@ -14,7 +14,6 @@
 
 namespace Origin\Utility;
 
-use Origin\Exception\InvalidArgumentException;
 use Origin\Exception\NotFoundException;
 
 class Folder
@@ -29,13 +28,17 @@ class Folder
      * Undocumented function
      *
      * @param string $directory
+     * @param array $options
+     *  - recursive: default false. like -p creates all directories in one go
+     *  - mode: default 0744. Folder permissions
      * @param boolean $recursive like -p creates all directories in one go
      * @param integer $mode e.g 0744
      * @return boolean
      */
-    public static function create(string $directory, bool $recursive = false, int $mode = 0744) : bool
+    public static function create(string $directory, array $options = []) : bool
     {
-        return @mkdir($directory, $mode, $recursive); # use@ No such file or directory
+        $options += ['recursive'=>false,'mode'=>0744];
+        return @mkdir($directory, $options['mode'], $options['recursive']); # use@ No such file or directory
     }
 
     /**
@@ -53,16 +56,18 @@ class Folder
      * Includes a list of files
      *
      * @param string $directory
-     * @param boolean $includeDirectories
+     * @param array $options Options keys are
+     *  - directories: default false, includes directories
      * @return void
      */
-    public static function list(string $directory, bool $includeDirectories=false)
+    public static function list(string $directory, array $options= [])
     {
+        $options += ['directories'=>false];
         if (self::exists($directory)) {
             $results = [];
             $files = array_diff(scandir($directory), ['.', '..']);
             foreach ($files as $file) {
-                if (!$includeDirectories and !is_file($directory . DS . $file)) {
+                if (!$options['directories'] and !is_file($directory . DS . $file)) {
                     continue;
                 }
                 $stats = stat($directory . DS . $file);
@@ -84,17 +89,19 @@ class Folder
      * will delete files etc.
      *
      * @param string $directory
-     * @param boolean $recursive If set to true, it will delete all contents and sub folders
+     * @param array options (recursive default false)
+     *  - recursive: If set to true, it will delete all contents and sub folders
      * @return void
      */
-    public static function delete(string $directory, bool $recursive = false) : bool
+    public static function delete(string $directory, array $options = []) : bool
     {
+        $options += ['recursive'=>false];
         if (self::exists($directory)) {
-            if ($recursive) {
+            if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
                 foreach ($files as $filename) {
                     if (is_dir($directory . DS . $filename)) {
-                        self::delete($directory . DS . $filename, true);
+                        self::delete($directory . DS . $filename, $options);
                         continue;
                     }
                     @unlink($directory . DS . $filename);
@@ -177,12 +184,23 @@ class Folder
     * @param string $directory filename with full path
     * @return string
     */
-    public static function permissions(string $directory) : string
+    public static function mode(string $directory)
     {
         if (self::exists($directory)) {
-            return (string) substr(sprintf("%o", fileperms($directory)), -4);
+            return  (string) substr(sprintf("%o", fileperms($directory)), -4);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
+    }
+
+    /**
+    * Alias for mode. Gets the mode for a file aka permissions
+    *
+    * @param string $filename
+    * @return string
+    */
+    public static function perms(string $directory) : string
+    {
+        return static::mode($directory);
     }
 
     /**
@@ -218,17 +236,20 @@ class Folder
     *
     * @param string $directory filename with full path
     * @param int $mode e.g 0755 (remember 0 infront)
-    * @param bool  $recursive if set to true will process all subfolders and files
+     * @param array options (recursive default false)
+     *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool|string
     */
-    public static function chmod(string $directory, int $mode, bool $recursive = false)
+    public static function chmod(string $directory, int $mode, array $options = [])
     {
+        $options += ['recursive'=>false];
+
         if (self::exists($directory)) {
-            if ($recursive) {
+            if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
                 foreach ($files as $filename) {
                     if (is_dir($directory . DS . $filename)) {
-                        self::chmod($directory . DS . $filename, $mode, $recursive);
+                        self::chmod($directory . DS . $filename, $mode, $options);
                         continue;
                     }
                     @chmod($directory . DS . $filename, $mode);
@@ -244,19 +265,22 @@ class Folder
      *
      * @param string $directory filename with full path
      * @param string $user  e.g. root, www-data
+     * @param array options (recursive default false)
+     *  - recursive: If set to true, it will delete all contents and sub folders
      * @return bool
      */
-    public static function chown(string $directory, string $user, bool $recursive = false)
+    public static function chown(string $directory, string $user, array $options =[])
     {
+        $options += ['recursive'=>false];
         if (self::exists($directory)) {
-            if ($recursive) {
+            if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
                 foreach ($files as $filename) {
                     if (is_dir($directory . DS . $filename)) {
-                        self::chown($directory . DS . $filename, $user, true);
+                        self::chown($directory . DS . $filename, $user, $options);
                         continue;
                     }
-                    @chown($directory, $user);
+                    @chown($directory . DS . $filename, $user);
                 }
             }
             return @chown($directory, $user);
@@ -269,19 +293,22 @@ class Folder
     *
     * @param string $directory filename with full path
     * @param string $user  e.g. root, www-data
+    * @param array options (recursive default false)
+    *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool
     */
-    public static function chgrp(string $directory, string $group = null, bool $recursive = false)
+    public static function chgrp(string $directory, string $group = null, array $options=[])
     {
+        $options += ['recursive'=>false];
         if (self::exists($directory)) {
-            if ($recursive) {
+            if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
                 foreach ($files as $filename) {
                     if (is_dir($directory . DS . $filename)) {
-                        self::chgrp($directory . DS . $filename, $group, true);
+                        self::chgrp($directory . DS . $filename, $group, $options);
                         continue;
                     }
-                    @chgrp($directory, $group);
+                    @chgrp($directory . DS . $filename, $group);
                 }
             }
             return @chgrp($directory, $group);

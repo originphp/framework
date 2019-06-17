@@ -32,6 +32,13 @@ class FileTest extends \PHPUnit\Framework\TestCase
         File::read('/foo/bar.txt');
     }
  
+
+    public function testInfoException()
+    {
+        $this->expectException(NotFoundException::class);
+        File::info('/foo/bar.txt');
+    }
+
     public function testWrite()
     {
         $tmp = sys_get_temp_dir() . DS  . uniqid();
@@ -152,22 +159,22 @@ class FileTest extends \PHPUnit\Framework\TestCase
         File::move('/foo/bar.txt', 'fozzy.txt');
     }
     
-    public function testPermissions()
+    public function testPerms()
     {
         $data = 'Not really important';
         $filename = File::tmp($data);
      
-        $this->assertEquals('0644', File::permissions($filename));
+        $this->assertEquals('0644', File::perms($filename));
 
         $this->assertTrue(File::chmod($filename, 0775));
         clearstatcache(); // stat stuff is cached, so for next assert to work clear cache
-        $this->assertEquals('0775', File::permissions($filename));
+        $this->assertEquals('0775', File::perms($filename));
     }
 
-    public function testPermissionsException()
+    public function testPermsException()
     {
         $this->expectException(NotFoundException::class);
-        File::permissions('/foo/bar.txt');
+        File::perms('/foo/bar.txt');
     }
 
 

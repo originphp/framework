@@ -2,7 +2,7 @@
 
 ![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
 ![build](https://img.shields.io/badge/build-passing-brightGreen.svg)
-![coverage](https://img.shields.io/badge/coverage-90%25-green.svg)
+![coverage](https://img.shields.io/badge/coverage-91%25-green.svg)
 ![memory](https://img.shields.io/badge/memory-800KB-brightGeen.svg)
 ![diskspace](https://img.shields.io/badge/disk_space-1.4MB-brightGreen.svg)
 ![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
@@ -24,6 +24,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Date,time,and number formating,validation and delocalization support
 - Internationalization (I18n)
 - Events system based upon the observer pattern
+- Http utility for making get,post,patch,put and delete requests
 - Yaml reading and writing
 - CSV reading and writing
 - XML reading and writing

@@ -47,10 +47,9 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
         $translate = 'You have no apples|You have one apple|You have {count} apples';
-        $this->assertEquals('You have no apples',__($translate,['count'=>0]));
-        $this->assertEquals('You have one apple',__($translate,['count'=>1]));
-        $this->assertEquals('You have 2 apples',__($translate,['count'=>2]));
-
+        $this->assertEquals('You have no apples', __($translate, ['count'=>0]));
+        $this->assertEquals('You have one apple', __($translate, ['count'=>1]));
+        $this->assertEquals('You have 2 apples', __($translate, ['count'=>2]));
     }
     public function testH()
     {
@@ -71,5 +70,49 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertRegExp('/^([a-z0-9]*){13}$/', uid());
         $this->assertRegExp('/^([a-z0-9]*){5}$/', uid(5));
+    }
+
+    public function testBegins()
+    {
+        $this->assertTrue(begins('foo', 'foobar'));
+        $this->assertFalse(begins('foo', 'barfoo'));
+    }
+    public function testEnds()
+    {
+        $this->assertFalse(ends('foo', 'foobar'));
+        $this->assertTrue(ends('foo', 'barfoo'));
+    }
+    public function testLeft()
+    {
+        $this->assertEquals('foo', left(':', 'foo:bar'));
+        $this->assertNull(left('x', 'foo:bar'));
+        $this->assertNull(left('', ''));
+    }
+    public function testRight()
+    {
+        $this->assertEquals('bar', right(':', 'foo:bar'));
+        $this->assertNull(left('x', 'foo:bar'));
+        $this->assertNull(left('', ''));
+    }
+    public function testContains()
+    {
+        $this->assertTrue(contains('foo', 'foobar'));
+        $this->assertTrue(contains('foo', 'barfoo'));
+        $this->assertTrue(contains('foo', 'xfoox'));
+        $this->assertFalse(contains('moo', 'barfoo'));
+    }
+    public function testUpLo()
+    {
+        $this->assertEquals(strtoupper('foo'), upper('foo'));
+        $this->assertEquals(strtolower('FOO'), lower('FOO'));
+    }
+    public function testReplace()
+    {
+        $this->assertEquals('foo', replace('bar', '', 'foobar'));
+        $this->assertEquals('foo', replace('bar', '', 'fooBAR', ['insensitive'=>true]));
+    }
+    public function testLen()
+    {
+        $this->assertEquals(3, length('foo'));
     }
 }

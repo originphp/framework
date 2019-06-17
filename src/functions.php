@@ -261,3 +261,140 @@ function deprecationWarning(string $message)
         trigger_error($message, E_USER_DEPRECATED);
     }
 }
+
+/**
+ * Helper Functions
+ */
+
+
+/**
+* Checks if a string contains a substring
+*
+* @param string $needle
+* @param string $haystack
+* @return bool
+*/
+function contains(string $needle, string $haystack) : bool
+{
+    if (!empty($needle)) {
+        return (strpos($haystack, $needle) !== false);
+    }
+    return false;
+}
+
+
+/**
+ * Gets part of the string from the left part of characters
+ *
+ * @param string $characters   :
+ * @param string $string    key:value
+ * @return string|null      key
+ */
+function left(string $characters, string $string) : ?string
+{
+    if (!empty($characters)) {
+        $position = strpos($string, $characters);
+        if ($position === false) {
+            return null;
+        }
+        return substr($string, 0, $position);
+    }
+    return null;
+}
+
+/**
+ * Gets part of the string from the right part of characters
+ *
+ * @param string $characters   :
+ * @param string $string    key:value
+ * @return string|null     value
+ */
+function right(string $characters, string $string) : ?string
+{
+    if (!empty($characters)) {
+        $position = strpos($string, $characters);
+        if ($position === false) {
+            return null;
+        }
+        return substr($string, $position + strlen($characters));
+    }
+    return null;
+}
+
+/**
+ * Checks if a string starts with another string
+ *
+ * @param string $needle
+ * @param string $haystack
+ * @return boolean
+ */
+function begins(string $needle, string $haystack) : bool
+{
+    $length = strlen($needle);
+    return (substr($haystack, 0, $length) == $needle);
+}
+
+/**
+ * Checks if a string ends with another string
+ *
+ * @param string $needle
+ * @param string $haystack
+ * @return boolean
+ */
+function ends(string $needle, string $haystack) : bool
+{
+    $length = strlen($needle);
+    return (substr($haystack, -$length, $length) == $needle);
+}
+
+/**
+ * Replaces text in strings.
+ *
+ * @param string $needle
+ * @param string $with
+ * @param string $haystack
+ * @param array $options (insensitive = false)
+ *  - insensitive: default false. case-insensitive replace
+ * @return string
+ */
+function replace(string $needle, string $with, string $haystack, array $options=[]) : string
+{
+    $options += ['insensitive'=>false];
+    if ($options['insensitive']) {
+        return str_ireplace($needle, $with, $haystack);
+    }
+    return str_replace($needle, $with, $haystack);
+}
+
+/**
+ * Returns the length of a string
+ *
+ * @param string $string
+ * @return integer
+ */
+function length(string $string) : int
+{
+    return strlen($string);
+}
+
+/**
+ * Converts a string to lower case
+ *
+ * @param string $string
+ * @return string
+ */
+function lower(string $string) :string
+{
+    return strtolower($string);
+}
+
+/**
+ * Converts a stirng to uppercase
+ *
+ * @param string $string
+ * @return string
+ */
+function upper(string $string) :string
+{
+    return strtoupper($string);
+}

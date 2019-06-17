@@ -89,6 +89,13 @@ class Controller
     protected $componentRegistry = null;
 
     /**
+     * Array keys to be serialized
+     *
+     * @var array
+     */
+    protected $serialize = [];
+
+    /**
      * Paginator Settings.
      *
      * @var array (limit,order,fields,conditions)
@@ -109,10 +116,6 @@ class Controller
 
         $this->initialize();
     }
-
-   
-
-  
 
     /**
      * Loads a Component for use with the controller.
@@ -350,14 +353,14 @@ class Controller
      * @param string|array $options you can pass a string which is the template name this is the same
      * as the current action, if it starts with / then it will look in a different folder. If you pass
      * an array options, you can do so as follows:
-     *       Types:
-     *      - json: a string, array or object will be converted to json. E.g. $this->render(['json'=>$result]);
-     *      - xml: an xml string or an array which will be converted to XML
-     *      - text: For rendering plain text
-     *      - file: a filename, and file get contents will be used.
-     *      -template: default option, this will render the html template from the views folder.
-     *      Other
-     *      - status: the status code to return, e.g. 404
+     *   Types:
+     *   - json: a string, array or object will be converted to json. E.g. $this->render(['json'=>$result]);
+     *   - xml: an xml string or an array which will be converted to XML
+     *   - text: For rendering plain text
+     *   - file: a filename, and file get contents will be used.
+     *   -template: default option, this will render the html template from the views folder.
+     *   Other
+     *   - status: the status code to return, e.g. 404
      */
     public function render($options=[])
     {
@@ -372,10 +375,10 @@ class Controller
         }
 
         if ($autorender and in_array($this->request->type(), ['json','xml'])) {
-            if (isset($this->viewVars['serialize'])) {
+            if ($this->serialize) {
                 $options['type'] = $this->request->type();
                 $serializer = new Serializer();
-                $options[$options['type']] = $serializer->serialize($this->viewVars['serialize'], $this->viewVars);
+                $options[$options['type']] = $serializer->serialize($this->serialize, $this->viewVars);
                 if ($options['type'] === 'xml' and count($options[$options['type']]) > 1) {
                     $options[$options['type']] = ['response'=>$options[$options['type']]];
                 }
@@ -429,9 +432,12 @@ class Controller
      * @param string|array $keyOrKeys
      * @return void
      */
-    public function serialize($keyOrKeys)
+    public function serialize($keyOrKeys = null)
     {
-        $this->viewVars['serialize'] = $keyOrKeys;
+        if ($keyOrKeys === null) {
+            return $this->serialize;
+        }
+        $this->serialize = $keyOrKeys;
     }
 
     /**
