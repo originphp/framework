@@ -19,7 +19,7 @@ Upload:       git push origin --tags
 Delete tag:   git tag -d <tag_name>
 
 ## [Unreleased]
-
+## [1.15.0] - 2019-06-17
 ### Added
 - Http Utility
 - Auth API authentication
