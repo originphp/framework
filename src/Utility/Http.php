@@ -67,15 +67,15 @@ class Http
      * - query: appends query to field
      * - headers
      * - cookies array
-     * - form (array of fields)
+     * - fields (array of fields)
      *
      * @param array $config
      */
     public function __construct(array $config = [])
     {
-        $config += ['cookieJar' => true];
         $this->config($config);
-        if ($config['cookieJar'] === true) {
+
+        if ($this->config('cookieJar') === true) {
             $this->persistCookies = true;
         }
     }
@@ -103,66 +103,140 @@ class Http
     * Sends a GET request
     *
     * @param string $url
-    * @param array $options
-    * @return \Origin\Utility\Http
+    * @param array $options The option keys are :
+     * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+     * - userAgent: the name of the user agent to use e.g. 'originPHP'
+     * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+     * - redirect: default true. set to false to not follow redirects
+     * - timeout: default timeout is 30 seconds
+     * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+     * - type: request and accept content type (json xml) e.g. 'json'
+     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+     * - proxy: proxy server details. An array with proxy, username, password.
+     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+     * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+     *  @return \Origin\Utility\Http\Request
     */
     public function get(string $url, array $options = [])
     {
         return $this->request('GET', $url, $options);
     }
+
     /**
-      * Sends a HEAD request
-      *
-      * @param string $url
-      * @return \Origin\Utility\Http
-      */
-    public function head(string $url, array $query = [], array $options = [])
+    * Sends a HEAD request
+    *
+    * @param string $url
+    * @param array $options
+    * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+    * - userAgent: the name of the user agent to use e.g. 'originPHP'
+    * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+    * - redirect: default true. set to false to not follow redirects
+    * - timeout: default timeout is 30 seconds
+    * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+    * - type: request and accept content type (json xml) e.g. 'json'
+    * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+    * - proxy: proxy server details. An array with proxy, username, password.
+    * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    *  @return \Origin\Utility\Http\Request
+    */
+    public function head(string $url, array $options = [])
     {
         return $this->request('HEAD', $url, $options);
     }
 
     /**
-      * Sends a POST request
-      *
-      * @param string $url
-      * @param array $data data to be posted
-      * @param array $options
-      * @return \Origin\Utility\Http
-      */
-    public function post(string $url, array $data = [], array $options = [])
+    * Sends a POST request
+    *
+    * @param string $url
+    * @param array $options The option keys are :
+    * - fields: An array of fields to be posted  e.g. ['title'=>'Article #1','description'=>'An article']
+    * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+    * - userAgent: the name of the user agent to use e.g. 'originPHP'
+    * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+    * - redirect: default true. set to false to not follow redirects
+    * - timeout: default timeout is 30 seconds
+    * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+    * - type: request and accept content type (json xml) e.g. 'json'
+    * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+    * - proxy: proxy server details. An array with proxy, username, password.
+    * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    *  @return \Origin\Utility\Http\Request
+    */
+    public function post(string $url, array $options = [])
     {
-        return $this->request('POST', $url, $options += ['form' => $data]);
+        return $this->request('POST', $url, $options);
+    }
+
+    /**
+    * Sends a PUT request
+    *
+    * @param string $url
+    * @param array $options The option keys are :
+    * - fields: An array of fields to be posted  e.g. ['title'=>'Article #1','description'=>'An article']
+    * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+    * - userAgent: the name of the user agent to use e.g. 'originPHP'
+    * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+    * - redirect: default true. set to false to not follow redirects
+    * - timeout: default timeout is 30 seconds
+    * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+    * - type: request and accept content type (json xml) e.g. 'json'
+    * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+    * - proxy: proxy server details. An array with proxy, username, password.
+    * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    *  @return \Origin\Utility\Http\Request
+    */
+    public function put(string $url, array $options = [])
+    {
+        return $this->request('PUT', $url, $options);
     }
     /**
-      * Sends a PUT request
-      *
-      * @param string $url
-      * @param array $data data to be posted
-      * @param array $options
-      * @return \Origin\Utility\Http
-      */
-    public function put(string $url, array $data =[], array $options = [])
-    {
-        return $this->request('PUT', $url, $options+= ['form' => $data]);
-    }
-    /**
-      * Sends a PATCH request
-      *
-      * @param string $url
-      * @param array $options
-      * @return \Origin\Utility\Http
-      */
+    * Sends a PATCH request
+    *
+    * @param string $url
+    * @param array $options The option keys are :
+    * - fields: An array of fields to be posted  e.g. ['title'=>'Article #1','description'=>'An article']
+    * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+    * - userAgent: the name of the user agent to use e.g. 'originPHP'
+    * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+    * - redirect: default true. set to false to not follow redirects
+    * - timeout: default timeout is 30 seconds
+    * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+    * - type: request and accept content type (json xml) e.g. 'json'
+    * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+    * - proxy: proxy server details. An array with proxy, username, password.
+    * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    */
     public function patch(string $url, array $options = [])
     {
         return $this->request('PATCH', $url, $options);
     }
     /**
-     * Sends a DELETE request
-     *
-     * @param string $url
-     * @param array $options
-     * @return \Origin\Utility\Http
-     */
+    * Sends a DELETE request
+    *
+    * @param string $url
+    * @param array $options The option keys are :
+    * - query: appends vars to the query. e.g ['api_token'=>'1234-1234-1234-1234']
+    * - userAgent: the name of the user agent to use e.g. 'originPHP'
+    * - referer: default null. The url of the referer e.g. 'https://www.example.com/search'
+    * - redirect: default true. set to false to not follow redirects
+    * - timeout: default timeout is 30 seconds
+    * - cookieJar: file to save and read cookies from. e.g. '/var/www/data/cookies.data'
+    * - type: request and accept content type (json xml) e.g. 'json'
+    * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
+    * - proxy: proxy server details. An array with proxy, username, password.
+    * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
+    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    */
     public function delete(string $url, array $options = [])
     {
         return $this->request('DELETE', $url, $options);
@@ -226,7 +300,7 @@ class Http
      * @param array $options
      * @return \Origin\Utility\Http
      */
-    public function request(string $method, string $url, array $options=[])
+    protected function request(string $method, string $url, array $options=[])
     {
         $options = $this->mergeOptions($options);
         $url = $this->buildUrl($url, $options);
@@ -248,12 +322,18 @@ class Http
         return new CURLFile($filename, $mime, $name);
     }
 
+    /**
+     * Build the headers for the request
+     *
+     * @param array $options
+     * @return array
+     */
     protected function buildRequestHeaders(array $options)
     {
         // Process headers
         $headers = [];
         $cookies = [];
-        if ($this->persistCookies) {
+        if ($options['cookieJar'] === true) {
             $cookies = [];
             foreach ($this->cookies as $cookie) {
                 $cookies[] = sprintf("%s=%s", rawurlencode($cookie['name']), rawurlencode($cookie['value']));
@@ -262,9 +342,7 @@ class Http
         if (!empty($options['cookies']) and is_array($options['cookies'])) {
             foreach ($options['cookies'] as $name => $value) {
                 $cookies[] = sprintf("%s=%s", rawurlencode($name), rawurlencode($value));
-                if ($this->persistCookies) {
-                    $this->cookies[$name] = ['name'=>$name,'value'=>$value];
-                }
+                $this->cookies[$name] = ['name'=>$name,'value'=>$value];
             }
         }
         if ($cookies) {
@@ -288,6 +366,14 @@ class Http
         return $headers;
     }
 
+    /**
+     * Builds the curl options
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     * @return array
+     */
     protected function buildOptions(string $method, string $url, array $options)
     {
         $out = [
@@ -332,24 +418,24 @@ class Http
         }
 
         if (in_array($method, ['POST','PUT','PATCH'])) {
-            if (!empty($options['form']) and is_array($options['form'])) {
-                foreach ($options['form'] as $key => $value) {
+            if (!empty($options['fields']) and is_array($options['fields'])) {
+                foreach ($options['fields'] as $key => $value) {
                     if (is_string($value) and substr($value, 0, 1) === '@') {
-                        $options['form'][$key] = Http::file(substr($value, 1));
+                        $options['fields'][$key] = Http::file(substr($value, 1));
                     }
                 }
                 if (!empty($options['type']) and $options['type']==='json') {
-                    $out[CURLOPT_POSTFIELDS] = json_encode($options['form']);
+                    $out[CURLOPT_POSTFIELDS] = json_encode($options['fields']);
                 } else {
                     // Passing an array to CURLOPT_POSTFIELDS will encode the data as multipart/form-data,
                     // while passing a URL-encoded string will encode the data as application/x-www-form-urlencoded.
                     // Post not working on the other. Probably missing header?
-                    $out[CURLOPT_POSTFIELDS] = http_build_query($options['form']);
+                    $out[CURLOPT_POSTFIELDS] = http_build_query($options['fields']);
                 }
             }
         }
 
-        if ($this->persistCookies === false and !empty($options['cookieJar'])) {
+        if (!empty($options['cookieJar']) and is_string($options['cookieJar'])) {
             $out[CURLOPT_COOKIEFILE] = $options['cookieJar'];
             $out[CURLOPT_COOKIEJAR] = $options['cookieJar'];
         }

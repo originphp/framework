@@ -141,23 +141,28 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->post('https://www.example.com/posts', [
-            'title'=>'Article title','body' => 'Article body'
+           'fields' => [ 'title'=>'Article title','body' => 'Article body']
             ]);
         $this->assertEquals('title=Article+title&body=Article+body', $http->options(CURLOPT_POSTFIELDS));
 
-        $http->post('https://www.example.com/posts', [ 'title'=>'Article title','body' => 'Article body'], [
+        $http->post('https://www.example.com/posts', [
+            'fields' => [ 'title'=>'Article title','body' => 'Article body'],
             'type'=>'json'
         ]);
         $this->assertEquals('{"title":"Article title","body":"Article body"}', $http->options(CURLOPT_POSTFIELDS));
 
-        $http->post('https://www.example.com/upload', ['file' => '@' . ROOT . DS . 'README.md']);
-        $this->assertEquals(
-            'file%5Bname%5D=%2Fvar%2Fwww%2FREADME.md&file%5Bmime%5D=text%2Fplain&file%5Bpostname%5D=README.md',
+        $http->post('https://www.example.com/upload', [
+            'fields' => ['file' => '@' . ROOT . DS . 'README.md']
+        ]);
+        $this->assertContains(
+            '%2FREADME.md&file%5Bmime%5D=text%2Fplain&file%5Bpostname%5D=README.md',
             $http->options(CURLOPT_POSTFIELDS)
         );
 
         $this->expectException(NotFoundException::class);
-        $http->post('https://www.example.com/upload', ['file' => '@/does_not_exist/passwords.txt']);
+        $http->post('https://www.example.com/upload', [
+            'fields' => ['file' => '@/does_not_exist/passwords.txt']
+        ]);
     }
 
     public function testBuildOptionsCookieJar()
@@ -248,7 +253,9 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http = new Http();
         $data = ['title'=>'curl post test','body'=>'A simple test for curl posting','userId'=>1234];
         
-        $response = $http->post('https://jsonplaceholder.typicode.com/posts', $data);
+        $response = $http->post('https://jsonplaceholder.typicode.com/posts', [
+            'fields' => $data
+        ]);
  
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->success());
@@ -264,7 +271,7 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http = new Http();
         $data = ['title'=>'curl put test','body'=>'A simple test for curl putting','userId'=>1234];
         
-        $response = $http->put('https://jsonplaceholder.typicode.com/posts/1', $data);
+        $response = $http->put('https://jsonplaceholder.typicode.com/posts/1', ['fields'=>$data]);
         $this->assertInstanceOf(Response::class, $response);
       
         $result = json_decode($response->body()); // test using body
@@ -279,7 +286,7 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http = new Http();
         $data = ['title'=>'curl patch test'];
         
-        $response = $http->patch('https://jsonplaceholder.typicode.com/posts/1', ['form'=>$data]);
+        $response = $http->patch('https://jsonplaceholder.typicode.com/posts/1', ['fields'=>$data]);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->success());
         $result = json_decode($response->body()); // test using body

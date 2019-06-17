@@ -47,15 +47,15 @@ class StaticConfigTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGet()
     {
-        $this->assertEquals('on', StaticMockObject::getConfig('setting'));
+        $this->assertEquals('on', StaticMockObject::config('setting'));
         StaticMockObject::reset();
 
-        StaticMockObject::setConfig('foo', 'bar');
-        StaticMockObject::setConfig(['foo/bar'=>'bar/foo']);
+        StaticMockObject::config('foo', 'bar');
+        StaticMockObject::config(['foo/bar'=>'bar/foo']);
 
-        $this->assertEquals('on', StaticMockObject::getConfig('setting'));
-        $this->assertEquals('none', StaticMockObject::getConfig('settingz', 'none'));
-        $this->assertEquals('bar', StaticMockObject::getConfig('foo'));
-        $this->assertEquals('bar/foo', StaticMockObject::getConfig('foo/bar'));
+        $this->assertEquals('on', StaticMockObject::config('setting'));
+        $this->assertTrue(StaticMockObject::config('settingz', 'none'));
+        $this->assertEquals('bar', StaticMockObject::config('foo'));
+        $this->assertEquals('bar/foo', StaticMockObject::config('foo/bar'));
     }
 }

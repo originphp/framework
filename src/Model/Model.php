@@ -1371,7 +1371,6 @@ class Model
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
-
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
                     $query['joins'][] = array(
                         'table' => $this->{$alias}->table,
@@ -1578,14 +1577,14 @@ class Model
             return $connection->fetchList();
         }
         // used by count
-        if($type === 'assoc'){
+        if ($type === 'assoc') {
             return $connection->fetchAll('assoc');
         }
  
-        $results = $connection->fetchAll('num'); // change to num and enableMapResults 
+        $results = $connection->fetchAll('num'); // change to num and enableMapResults
 
         if ($results) {
-            $results = $connection->mapNumericResults($results,$query['fields']); // use with Num instead of model
+            $results = $connection->mapNumericResults($results, $query['fields']); // use with Num instead of model
             # If foreignKeys are missing data then objects wont be put together
             # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);

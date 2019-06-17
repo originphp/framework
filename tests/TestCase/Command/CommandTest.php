@@ -23,7 +23,6 @@ use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
 use Origin\Model\Exception\MissingModelException;
 
-
 class MockCommand extends Command
 {
     use TestTrait;
@@ -31,7 +30,8 @@ class MockCommand extends Command
     
     protected $description = ['Mock command'];
 
-    public function execute(){
+    public function execute()
+    {
         $this->out('This is a mock command');
     }
 }
@@ -45,13 +45,14 @@ class BackupCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource',['short'=>'ds','description'=>'Which datasource to use','default'=>'main']);
-        $this->addArgument('database',['required'=>true,'description'=>'The database to backup']);
-        $this->addArgument('filename',['description'=>'The filename to output too']);
+        $this->addOption('datasource', ['short'=>'ds','description'=>'Which datasource to use','default'=>'main']);
+        $this->addArgument('database', ['required'=>true,'description'=>'The database to backup']);
+        $this->addArgument('filename', ['description'=>'The filename to output too']);
     }
 
-    public function execute(){
-        $msg = sprintf('The database %s was backedup from the %s datasource',$this->arguments('database') ,$this->options('datasource'));
+    public function execute()
+    {
+        $msg = sprintf('The database %s was backedup from the %s datasource', $this->arguments('database'), $this->options('datasource'));
         $this->out($msg);
     }
 }
@@ -65,27 +66,30 @@ class CacheCommand extends Command
 
     public function initialize()
     {
-        $this->addSubCommand('enable',['description'=>'enables the cache']);
-        $this->addSubCommand('disable',['description'=>'disables the cache']);
+        $this->addSubCommand('enable', ['description'=>'enables the cache']);
+        $this->addSubCommand('disable', ['description'=>'disables the cache']);
     }
 
-    public function enable(){
+    public function enable()
+    {
         $this->out('Cache enabled');
     }
-    public function disable(){
+    public function disable()
+    {
         $this->out('Cache disabled');
     }
 }
 
 class CommandTest extends \PHPUnit\Framework\TestCase
 {
-
-    public function setUp(){
+    public function setUp()
+    {
         $this->out = new ConsoleOutput();
     }
 
-    public function io(){
-        return new ConsoleIo( $this->out, $this->out);
+    public function io()
+    {
+        return new ConsoleIo($this->out, $this->out);
     }
   
     public function testOutputError()
@@ -103,77 +107,87 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('A comment about this error', $output);
     }
 
-    public function testName(){
+    public function testName()
+    {
         $command = new MockCommand();
         $command->name('hello');
-        $this->assertEquals('hello',$command->name());
+        $this->assertEquals('hello', $command->name());
     }
 
-    public function testDescription(){
+    public function testDescription()
+    {
         $command = new MockCommand();
         $command->description('A quick brown fox...');
-        $this->assertEquals('A quick brown fox...',$command->description());
+        $this->assertEquals('A quick brown fox...', $command->description());
     }
 
-    public function testArguments(){
+    public function testArguments()
+    {
         $command = new MockCommand();
-        $command->setProperty('arguments',['name'=>'foo']);
-        $this->assertEquals('foo',$command->arguments('name'));
-        $this->assertEquals(['name'=>'foo'],$command->arguments());
+        $command->setProperty('arguments', ['name'=>'foo']);
+        $this->assertEquals('foo', $command->arguments('name'));
+        $this->assertEquals(['name'=>'foo'], $command->arguments());
         $this->assertNull($command->arguments('got'));
     }
-    public function testOptions(){
+    public function testOptions()
+    {
         $command = new MockCommand();
-        $command->setProperty('options',['name'=>'foo']);
-        $this->assertEquals('foo',$command->options('name'));
-        $this->assertEquals(['name'=>'foo'],$command->options());
+        $command->setProperty('options', ['name'=>'foo']);
+        $this->assertEquals('foo', $command->options('name'));
+        $this->assertEquals(['name'=>'foo'], $command->options());
         $this->assertNull($command->options('got'));
     }
 
-    public function testValidateName(){
+    public function testValidateName()
+    {
         $command = new MockCommand();
-        $this->assertNull($command->callMethod('validateName',['foo']));
-        $this->assertNull($command->callMethod('validateName',['foo-bar']));
-        $this->assertNull($command->callMethod('validateName',['foo:bar']));
-        $this->assertNull($command->callMethod('validateName',['foo-bar:bar-foo']));
+        $this->assertNull($command->callMethod('validateName', ['foo']));
+        $this->assertNull($command->callMethod('validateName', ['foo-bar']));
+        $this->assertNull($command->callMethod('validateName', ['foo:bar']));
+        $this->assertNull($command->callMethod('validateName', ['foo-bar:bar-foo']));
         $this->expectException(ConsoleException::class);
-        $command->callMethod('validateName',['foo bar']);
+        $command->callMethod('validateName', ['foo bar']);
     }
 
  
-    public function testRun(){
+    public function testRun()
+    {
         $command = new BackupCommand($this->io());
         $command->run(['my_database']);
-        $this->assertContains('The database my_database was backedup from the main datasource',$this->out->read());
+        $this->assertContains('The database my_database was backedup from the main datasource', $this->out->read());
     }
 
-    public function testRunArgumentParserError(){
+    public function testRunArgumentParserError()
+    {
         $command = new BackupCommand($this->io());
         $command->run([]);
-        $this->assertContains('<exception> ERROR </exception> <text>Missing required argument `database`</text>',$this->out->read());
+        $this->assertContains('<exception> ERROR </exception> <text>Missing required argument `database`</text>', $this->out->read());
     }
 
 
-    public function testRunHelp(){
+    public function testRunHelp()
+    {
         $command = new BackupCommand($this->io());
         $command->addUsage('backup mydb backup.zip');
         $command->run(['--help']);
-        $this->assertContains('backup [options] database [filename]',$this->out->read());
-        $this->assertcontains('backup mydb backup.zip',$this->out->read());
+        $this->assertContains('backup [options] database [filename]', $this->out->read());
+        $this->assertcontains('backup mydb backup.zip', $this->out->read());
     }
 
-    public function testLoadModel(){
+    public function testLoadModel()
+    {
         $Post = new Model(['name'=>'Post','datasource'=>'test']);
-        ModelRegistry::set('Post',$Post);
+        ModelRegistry::set('Post', $Post);
         $command = new MockCommand();
-        $this->assertInstanceOf(Model::class,$command->loadModel('Post'));
-        $this->assertInstanceOf(Model::class,$command->Post);
-        $this->assertInstanceOf(Model::class,$command->loadModel('Post')); // Test loading from property
+        $this->assertInstanceOf(Model::class, $command->loadModel('Post'));
+        $this->assertInstanceOf(Model::class, $command->Post);
+        $this->assertInstanceOf(Model::class, $command->loadModel('Post')); // Test loading from property
         $this->ExpectException(MissingModelException::class);
         $command->loadModel('Foo');
     }
 
-    public function testInfoWarningEtc(){
+    public function testInfoWarningEtc()
+    {
         $command = new MockCommand($this->io());
         $command->info(['Task was done']);
         $command->warning('It took too long');
@@ -182,7 +196,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $command->success('All good');
         $command->error('Some error');
 
-$expected = <<<EOF
+        $expected = <<<EOF
 <info>Task was done</info>
 <warning>It took too long</warning>
 <notice>Took 10 seconds</notice>
@@ -190,32 +204,33 @@ $expected = <<<EOF
 <error>Some error</error>
 EOF;
 
-        $this->assertContains($expected,$this->out->read());
+        $this->assertContains($expected, $this->out->read());
     }
 
-    public function testDebugVerbose(){
+    public function testDebugVerbose()
+    {
         $command = new MockCommand($this->io());
         $command->debug('hbm24 = x411'); // Verbose disabled
-        $this->assertNotContains('hbm24 = x411',$this->out->read());
+        $this->assertNotContains('hbm24 = x411', $this->out->read());
         $command->run(['--verbose']);
         $command->debug('x345 = 1234'); // Verbose enabled
-        $this->assertContains('<debug>x345 = 1234</debug>',$this->out->read());
+        $this->assertContains('<debug>x345 = 1234</debug>', $this->out->read());
     }
 
-    public function testRunCommand(){
-   
+    public function testRunCommand()
+    {
         $command = new MockCommand($this->io());
         $command->runCommand('cache:reset');
-        $this->assertContains('Cache has been reset',$this->out->read());
+        $this->assertContains('Cache has been reset', $this->out->read());
     }
 
-    public function testRunCommandWithArgs(){
-   
+    public function testRunCommandWithArgs()
+    {
         $command = new MockCommand($this->io());
-        $command->runCommand('say-hello',[
+        $command->runCommand('say-hello', [
             '--color=blue',
             'jon'
         ]);
-        $this->assertContains('<blue>Hello jon</blue>',$this->out->read());
+        $this->assertContains('<blue>Hello jon</blue>', $this->out->read());
     }
 }

@@ -42,11 +42,11 @@ class Cache
      */
     protected static $disabled = false;
 
-   /**
-     * Which storage config is being used
-     *
-     * @var string
-     */
+    /**
+      * Which storage config is being used
+      *
+      * @var string
+      */
     protected static $use = 'default';
 
     /**
@@ -72,7 +72,7 @@ class Cache
             return static::$loaded[$name];
         }
        
-        $config = static::getConfig($name);
+        $config = static::config($name);
         if ($config) {
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Engine\Cache\\{$config['engine']}Engine";
@@ -86,13 +86,13 @@ class Cache
         throw new InvalidArgumentException("{$config} config does not exist");
     }
     
-     /**
-     * Changes the cache config that is being used. Use this when working with multiple cache configurations.
-     * REMEMBER: to even set for default when working with multiple configurations.
-     *
-     * @param string $config
-     * @return void
-     */
+    /**
+    * Changes the cache config that is being used. Use this when working with multiple cache configurations.
+    * REMEMBER: to even set for default when working with multiple configurations.
+    *
+    * @param string $config
+    * @return void
+    */
     public static function use(string $config)
     {
         if (!static::config($config)) {
@@ -139,13 +139,13 @@ class Cache
         return static::exists($key);
     }
 
-     /**
-     * Checks if an item is in the cache
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return bool
-     */
+    /**
+    * Checks if an item is in the cache
+    *
+    * @param string $key
+    * @param mixed $value
+    * @return bool
+    */
     public static function exists(string $key):bool
     {
         $cache = static::engine(self::$use);

@@ -60,7 +60,7 @@ trait ConfigTrait
      * @param mixed $value
      * @return void
      */
-    public function setConfig($key, $value = null)
+    protected function setConfig($key, $value = null)
     {
         if ($this->config === null) {
             $this->initConfig();
@@ -70,9 +70,9 @@ trait ConfigTrait
             $config = [$key => $value];
         }
         foreach ($config as $key => $value) {
-            if($value === null){
-               unset( $this->config[$key]);
-               continue; 
+            if ($value === null) {
+                unset($this->config[$key]);
+                continue;
             }
             $this->config[$key] = $value;
         }
@@ -85,7 +85,7 @@ trait ConfigTrait
      * @param mixed $default default value to return
      * @return void
      */
-    public function getConfig(string $key = null, $default =null)
+    protected function getConfig(string $key = null, $default =null)
     {
         if ($this->config === null) {
             $this->initConfig();

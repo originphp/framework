@@ -54,7 +54,7 @@ class Storage
             return static::$loaded[$name];
         }
        
-        $config = static::getConfig($name);
+        $config = static::config($name);
         if ($config) {
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Engine\Storage\\{$config['engine']}Engine";

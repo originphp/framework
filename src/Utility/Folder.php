@@ -196,9 +196,9 @@ class Folder
     * Alias for mode. Gets the mode for a file aka permissions
     *
     * @param string $filename
-    * @return string
+    * @return string|null
     */
-    public static function perms(string $directory) : string
+    public static function perms(string $directory)
     {
         return static::mode($directory);
     }
@@ -207,9 +207,9 @@ class Folder
       * Gets the owner of directory
       *
       * @param string $directory filename with full path
-      * @return string
+      * @return string|null
       */
-    public static function owner(string $directory) : string
+    public static function owner(string $directory)
     {
         if (self::exists($directory)) {
             return posix_getpwuid(fileowner($directory))['name'];
@@ -221,9 +221,9 @@ class Folder
      * Gets the group that the directory belongs to.
      *
      * @param string $directory filename with full path
-     * @return string
+     * @return string|null
      */
-    public static function group(string $directory) : string
+    public static function group(string $directory)
     {
         if (self::exists($directory)) {
             return posix_getpwuid(filegroup($directory))['name'];

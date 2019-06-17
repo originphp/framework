@@ -27,19 +27,19 @@ abstract class StorageEngine
      */
     public function __construct(array $config=[])
     {
-        $this->setConfig($config);
+        $this->config($config);
         $this->initialize($config);
     }
 
-    abstract function initialize(array $config);
+    abstract public function initialize(array $config);
 
-    abstract function read(string $name);
+    abstract public function read(string $name);
 
-    abstract function write(string $name,string $data);
+    abstract public function write(string $name, string $data);
 
-    abstract function delete(string $name);
+    abstract public function delete(string $name);
 
-    abstract function exists(string $name);
+    abstract public function exists(string $name);
  
-    abstract function list(string $name = null);
+    abstract public function list(string $name = null);
 }

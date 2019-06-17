@@ -27,7 +27,7 @@ abstract class CacheEngine
      */
     public function __construct(array $config=[])
     {
-        $this->setConfig($config);
+        $this->config($config);
         $this->initialize($config);
     }
 
@@ -42,7 +42,7 @@ abstract class CacheEngine
      * @param mixed $value
      * @return bool
      */
-    abstract function write(string $key, $value);
+    abstract public function write(string $key, $value);
     
     /**
      * reads the value;
@@ -50,7 +50,7 @@ abstract class CacheEngine
      * @param string $key
      * @return void
      */
-    abstract function read(string $key);
+    abstract public function read(string $key);
 
     /**
      * Checks if a key exists in the cache
@@ -58,21 +58,21 @@ abstract class CacheEngine
      * @param string $key
      * @return boolean
      */
-    abstract function exists(string $key);
+    abstract public function exists(string $key);
     /**
      * Deletes a key from the cache
      *
      * @param string $key
      * @return boolean
      */
-    abstract function delete(string $key);
+    abstract public function delete(string $key);
 
     /**
      * Clears the Cache
      *
      * @return boolean
      */
-    abstract function clear();
+    abstract public function clear();
 
     /**
      * Increases a value
@@ -81,7 +81,7 @@ abstract class CacheEngine
      * @param integer $offset
      * @return integer
      */
-    abstract function increment(string $key, int $offset = 1);
+    abstract public function increment(string $key, int $offset = 1);
 
     /**
      * Decreases a value
@@ -90,7 +90,7 @@ abstract class CacheEngine
      * @param integer $offset
      * @return integer
      */
-    abstract function decrement(string $key, int $offset = 1);
+    abstract public function decrement(string $key, int $offset = 1);
 
     /**
      * Creates a friendly key for use with caching engines

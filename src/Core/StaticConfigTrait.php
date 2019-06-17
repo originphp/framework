@@ -60,7 +60,7 @@ trait StaticConfigTrait
      * @param mixed $value (set to null for delete)
      * @return void
      */
-    public static function setConfig($key = null, $value = null)
+    protected static function setConfig($key = null, $value = null)
     {
         if (static::$config === null) {
             static::initConfig();
@@ -72,7 +72,7 @@ trait StaticConfigTrait
         }
 
         foreach ($config as $key => $value) {
-            if($value === null){
+            if ($value === null) {
                 unset(static::$config[$key]);
                 continue; // delete
             }
@@ -90,7 +90,7 @@ trait StaticConfigTrait
      */
  
 
-    public static function getConfig(string $key = null, $default = null)
+    protected static function getConfig(string $key = null, $default = null)
     {
         if (static::$config === null) {
             static::initConfig();

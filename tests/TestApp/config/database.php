@@ -10,7 +10,7 @@ ConnectionManager::config('default', array(
   'database' => 'origin',
   'username' => 'root',
   'password' => 'root',
-  'engine' => 'mysql', 
+  'engine' => 'mysql',
 ));
 
 ConnectionManager::config('test', array(
@@ -18,7 +18,7 @@ ConnectionManager::config('test', array(
   'database' => 'origin_test',
   'username' => 'root',
   'password' => 'root',
-  'engine' => 'mysql', 
+  'engine' => 'mysql',
 ));
 
 /*

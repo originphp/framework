@@ -83,8 +83,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     {
         $response  = new Response();
        
-       
-        $response->file('/var/www/README.md', ['download'=>true]);
+        $response->file(ROOT . DS . 'README.md', ['download'=>true]);
         $headers = $response->headers();
         $this->assertEquals('attachment; filename="README.md"', $headers['Content-Disposition']);
 
