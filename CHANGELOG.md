@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
+## [1.16.0] - 2019-06-18
 ### Added
 - Html2Text utility
 
