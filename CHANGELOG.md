@@ -26,18 +26,15 @@ Delete tag: git tag -d <tag_name>
 - Html2Text utility
 
 ### Changed
-
 - Default email format BOTH
 - Email utility now converts HTML to texts for both
 
 ### Deprecated
-
 - [ ] Shell
 
 ## [1.15.0] - 2019-06-17
 
 ### Added
-
 - Http Utility
 - Auth API authentication
 - Auth Component is authorized and controller authorization
