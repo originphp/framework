@@ -20,6 +20,7 @@ use Origin\Core\Inflector;
 use Origin\Utility\Exception\MissingTemplateException;
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Utility\Html2Text;
 
 class Email
 {
@@ -52,10 +53,10 @@ class Email
     protected $headers = [];
 
     protected $messageId = null;
-    
+
     protected $boundary = null;
 
-    protected $attachments =[];
+    protected $attachments = [];
 
     protected $additionalHeaders = [];
 
@@ -90,11 +91,12 @@ class Email
     protected $template = null;
 
     /**
-     * Email format
+     * Email format. 
+     * The best practice is send both HTML and text
      *
      * @var string
      */
-    protected $emailFormat = 'text';
+    protected $emailFormat = 'both';
 
     /**
      * This is the headers + body
@@ -122,7 +124,7 @@ class Email
         }
         $this->charset = Configure::read('App.encoding');
         mb_internal_encoding($this->charset); // mb_list_encodings()
-        
+
         if ($config === null) {
             $config = static::config('default');
         }
@@ -153,20 +155,20 @@ class Email
 
         if (is_array($config)) {
             $defaults = [
-                'host'=>'localhost',
-                'port'=>25,
-                'username'=>null,
+                'host' => 'localhost',
+                'port' => 25,
+                'username' => null,
                 'password' => null,
-                'tls'=>false,
+                'tls' => false,
                 'ssl' => false,
-                'domain'=>null,
-                'timeout'=>30
+                'domain' => null,
+                'timeout' => 30
             ];
             $this->account = array_merge($defaults, $config);
             $this->applyConfig();
             return $this;
         }
-        
+
         throw new Exception(sprintf('Unkown email configuration %s', $config));
     }
 
@@ -179,10 +181,10 @@ class Email
      */
     protected function applyConfig()
     {
-        $methods = ['to','from','sender','bcc','cc','replyTo'];
+        $methods = ['to', 'from', 'sender', 'bcc', 'cc', 'replyTo'];
         foreach ($this->account as $method => $args) {
             if (in_array($method, $methods)) {
-                call_user_func_array([$this,$method], (array) $args);
+                call_user_func_array([$this, $method], (array)$args);
             }
         }
     }
@@ -279,12 +281,12 @@ class Email
     }
 
     /**
-    * Sets the sender for the email
-    *
-    * @param string $email
-    * @param string $name
-    * @return \Origin\Utility\Email
-    */
+     * Sets the sender for the email
+     *
+     * @param string $email
+     * @param string $name
+     * @return \Origin\Utility\Email
+     */
     public function sender(string $email, string $name = null)
     {
         $this->setEmailSingle('sender', $email, $name);
@@ -363,7 +365,7 @@ class Email
     public function template(string $name)
     {
         $this->template = $name;
-        
+
         return $this;
     }
 
@@ -384,24 +386,31 @@ class Email
         list($plugin, $template) = pluginSplit($name);
         $path = SRC . DS . 'View' . DS . 'Email';
         if ($plugin) {
-            $path = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View'. DS . 'Email';
+            $path = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View' . DS . 'Email';
         }
-        if ($this->format() === 'text' or $this->format() ==='both') {
-            $filename = $path . DS . 'text' . DS . $template . '.ctp';
-            if (file_exists($filename) === false) {
-                throw new MissingTemplateException(sprintf('Template %s not found', $filename));
-            }
-            $this->textMessage($this->renderTemplate($filename));
-        }
-        if ($this->format() === 'html' or $this->format() ==='both') {
+
+        if ($this->format() === 'html' or $this->format() === 'both') {
             $filename = $path . DS . 'html' . DS . $template . '.ctp';
             if (file_exists($filename) === false) {
                 throw new MissingTemplateException(sprintf('Template %s not found', $filename));
             }
             $this->htmlMessage($this->renderTemplate($filename));
         }
+
+        if ($this->format() === 'text' or $this->format() === 'both') {
+            $filename = $path . DS . 'text' . DS . $template . '.ctp';
+            if (file_exists($filename) === false) {
+                if ($this->format() === 'both') {
+                    $this->textMessage = Html2Text::convert($this->htmlMessage);
+                } else {
+                    throw new MissingTemplateException(sprintf('Template %s not found', $filename));
+                }
+            } else {
+                $this->textMessage($this->renderTemplate($filename));
+            }
+        }
     }
-    
+
     protected function renderTemplate(string $template__filename)
     {
         extract($this->viewVars);
@@ -468,25 +477,30 @@ class Email
         if (empty($this->from)) {
             throw new Exception('From email is not set.');
         }
-        
+
         if (empty($this->to)) {
             throw new Exception('To email is not set.');
         }
 
         if ($content) {
+            $this->format('text');
             $this->textMessage = $content;
         }
-        
+
         if ($this->template) {
             $this->loadTemplate($this->template);
         }
-        
-        if (($this->format() ==='text' or $this->format() ==='both') and empty($this->textMessage)) {
-            throw new Exception('Text Message not set.');
+
+        if (($this->format() === 'html' or $this->format() === 'both') and empty($this->htmlMessage)) {
+            throw new Exception('Html Message not set.');
         }
 
-        if (($this->format() ==='html' or $this->format() ==='both') and empty($this->htmlMessage)) {
-            throw new Exception('Html Message not set.');
+        if (($this->format() === 'text' or $this->format() === 'both') and empty($this->textMessage)) {
+            if ($this->format() === 'both') {
+                $this->textMessage = Html2Text::convert($this->htmlMessage);
+            } else {
+                throw new Exception('Text Message not set.');
+            }
         }
 
         if ($this->account === null) {
@@ -495,13 +509,13 @@ class Email
 
         $this->content = $this->render();
 
-        if (!isset($this->account['debug']) or $this->account['debug']===false) {
+        if (!isset($this->account['debug']) or $this->account['debug'] === false) {
             $this->smtpSend();
         }
 
         return $this->content;
     }
-    
+
     protected function render()
     {
         $headers = '';
@@ -509,7 +523,7 @@ class Email
             $headers .= "{$header}: {$value}" . self::CRLF;
         }
         $message = implode(self::CRLF, $this->buildMessage());
-        
+
         return $headers . self::CRLF . self::CRLF . $message;
     }
 
@@ -534,11 +548,11 @@ class Email
         }
 
         $this->sendCommand('DATA', '354');
-        
-        $this->sendCommand($this->content . self::CRLF.self::CRLF.self::CRLF .'.', '250');
-       
+
+        $this->sendCommand($this->content . self::CRLF . self::CRLF . self::CRLF . '.', '250');
+
         $this->sendCommand('QUIT', '221');
-       
+
         $this->closeSocket();
     }
 
@@ -559,7 +573,7 @@ class Email
         if (isset($account['domain'])) {
             $host = $account['domain'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
-            list($host, ) = explode(':', $_SERVER['HTTP_HOST']);
+            list($host,) = explode(':', $_SERVER['HTTP_HOST']);
         }
         $this->sendCommand("EHLO {$host}", '250');
         if ($account['tls']) {
@@ -597,7 +611,7 @@ class Email
             $buffer = @fgets($this->socket, 515);
             $this->socketLog(rtrim($buffer));
             $response .= $buffer;
-         
+
             /**
              * RFC5321 S4.1 + S4.2
              * @see https://tools.ietf.org/html/rfc5321
@@ -614,11 +628,11 @@ class Email
                 throw new Exception('SMTP timeout.');
             }
         }
-        
+
         if (preg_match("/^($code)/i", $response)) {
             return $code; // Return response code
         }
-        
+
         throw new Exception(sprintf('SMTP Error: %s', $response));
     }
 
@@ -642,7 +656,7 @@ class Email
      * @param array $account
      * @return void
      */
-    protected function openSocket(array $account, array $options=[])
+    protected function openSocket(array $account, array $options = [])
     {
         set_error_handler([$this, 'connectionErrorHandler']);
         $protocol = 'tcp';
@@ -659,15 +673,15 @@ class Email
             $account['timeout'],
             STREAM_CLIENT_CONNECT,
             stream_context_create($options)
-            );
+        );
         restore_error_handler();
-     
+
         if (!$this->isConnected()) {
             $this->socketLog('Unable to connect to the SMTP server.');
             throw new Exception('Unable to connect to the SMTP server.');
         }
         $this->socketLog('Connected to SMTP server.');
-     
+
         /**
          * Does not time out just an array returned by stream_get_meta_data() with the key timed_out
          */
@@ -705,13 +719,13 @@ class Email
     protected function addEmail(string $var, string $email = null, string $name = null)
     {
         $this->validateEmail($email);
-        $this->{$var}[] = array($email,$name);
+        $this->{$var}[] = array($email, $name);
     }
 
     protected function setEmailSingle(string $var, string $email = null, string $name = null)
     {
         $this->validateEmail($email);
-        $this->{$var} = array($email,$name);
+        $this->{$var} = array($email, $name);
     }
 
     /**
@@ -727,7 +741,7 @@ class Email
         }
         throw new Exception(sprintf('Invalid email address %s', $email));
     }
-    
+
     /**
      * Builds an array of headers for the email
      *
@@ -738,7 +752,7 @@ class Email
         $headers = [];
 
         $headers['MIME-Version'] = '1.0';
-        $headers['Date'] = date('r');//RFC 2822
+        $headers['Date'] = date('r'); //RFC 2822
         $headers['Message-ID'] = $this->getMessageId();
 
         foreach ($this->additionalHeaders as $header => $value) {
@@ -747,7 +761,7 @@ class Email
 
         $headers['Subject'] = $this->getSubject();
 
-        $optionals = ['sender'=>'Sender','replyTo'=>'Reply-To','returnPath'=>'Return-Path'];
+        $optionals = ['sender' => 'Sender', 'replyTo' => 'Reply-To', 'returnPath' => 'Return-Path'];
         foreach ($optionals as $var => $header) {
             if ($this->{$var}) {
                 $headers[$header] =  $this->formatAddress($this->{$var});
@@ -756,12 +770,12 @@ class Email
 
         $headers['From'] = $this->formatAddress($this->from);
 
-        foreach (['to','cc','bcc'] as $var) {
+        foreach (['to', 'cc', 'bcc'] as $var) {
             if ($this->{$var}) {
                 $headers[ucfirst($var)] =  $this->formatAddresses($this->{$var});
             }
         }
-        
+
         $headers['Content-Type'] = $this->getContentType();
         if ($this->needsEncoding() and empty($this->attachments) and $this->format() !== 'both') {
             $headers['Content-Transfer-Encoding'] = 'quoted-printable';
@@ -781,15 +795,15 @@ class Email
         $emailFormat = $this->format();
         $needsEncoding = $this->needsEncoding();
         $altBoundary = $boundary =  $this->getBoundary();
-       
 
-        if ($this->attachments and ($emailFormat ==='html' or $emailFormat ==='text')) {
-            $message[] = '--'.$boundary;
+
+        if ($this->attachments and ($emailFormat === 'html' or $emailFormat === 'text')) {
+            $message[] = '--' . $boundary;
             if ($emailFormat == 'text') {
-                $message[] = 'Content-Type: text/plain; charset="' . $this->charset .'"';
+                $message[] = 'Content-Type: text/plain; charset="' . $this->charset . '"';
             }
             if ($emailFormat == 'html') {
-                $message[] = 'Content-Type: text/html; charset="' . $this->charset .'"';
+                $message[] = 'Content-Type: text/html; charset="' . $this->charset . '"';
             }
             if ($needsEncoding) {
                 $message[] = 'Content-Transfer-Encoding: quoted-printable';
@@ -800,14 +814,14 @@ class Email
         if ($this->attachments and $emailFormat == 'both') {
             $altBoundary = 'alt-' . $boundary;
             $message[] = '--' . $boundary;
-            $message[] = 'Content-Type: multipart/alternative; boundary="' . $altBoundary .'"';
+            $message[] = 'Content-Type: multipart/alternative; boundary="' . $altBoundary . '"';
             $message[] = '';
         }
 
         if ($this->textMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
-                $message[] = 'Content-Type: text/plain; charset="' . $this->charset .'"';
+                $message[] = 'Content-Type: text/plain; charset="' . $this->charset . '"';
                 if ($needsEncoding) {
                     $message[] = 'Content-Transfer-Encoding: quoted-printable';
                 }
@@ -820,7 +834,7 @@ class Email
         if ($this->htmlMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
-                $message[] = 'Content-Type: text/html; charset="' . $this->charset .'"';
+                $message[] = 'Content-Type: text/html; charset="' . $this->charset . '"';
                 if ($needsEncoding) {
                     $message[] = 'Content-Transfer-Encoding: quoted-printable';
                 }
@@ -829,11 +843,11 @@ class Email
             $message[] = $this->formatMessage($this->htmlMessage, $needsEncoding);
             $message[] = '';
         }
-  
+
         if ($this->attachments) {
             foreach ($this->attachments as $filename => $name) {
                 $mimeType = mime_content_type($filename);
-                $message[] = '--'. $boundary;
+                $message[] = '--' . $boundary;
                 $message[] = "Content-Type: {$mimeType}; name=\"{$name}\"";
                 $message[] = 'Content-Disposition: attachment';
                 $message[] = 'Content-Transfer-Encoding: base64';
@@ -845,10 +859,10 @@ class Email
         if ($emailFormat == 'both' or $this->attachments) {
             $message[] = '--' . $boundary . '--';
         }
-       
+
         return $message;
     }
-   
+
     /**
      * Standardizes the line endings and encodes if needed
      *
@@ -885,7 +899,7 @@ class Email
             $bytes[8] = chr(ord($bytes[8]) & 0x3f | 0x80); // set bits 6-7 to 10
             $this->messageId = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
         }
-        
+
         return $this->messageId . '@' . $this->getDomain();
     }
 
@@ -902,7 +916,7 @@ class Email
         }
         return $domain;
     }
- 
+
 
     /**
      * Gets the boundary to be used in the email, if not set it will generate a unique id
@@ -938,17 +952,17 @@ class Email
     protected function getContentType()
     {
         if ($this->attachments) {
-            return 'multipart/mixed; boundary="'.$this->getBoundary() .'"';
+            return 'multipart/mixed; boundary="' . $this->getBoundary() . '"';
         }
         $emailFormat = $this->format();
-        
+
         if ($emailFormat === 'both') {
-            return 'multipart/alternative; boundary="'.$this->getBoundary() .'"';
+            return 'multipart/alternative; boundary="' . $this->getBoundary() . '"';
         }
         if ($emailFormat === 'html') {
-            return 'text/html; charset="' . $this->charset .'"';
+            return 'text/html; charset="' . $this->charset . '"';
         }
-        return 'text/plain; charset="' . $this->charset .'"';
+        return 'text/plain; charset="' . $this->charset . '"';
     }
 
     /**
@@ -962,7 +976,7 @@ class Email
         if ($format === null) {
             return $this->emailFormat;
         }
-        if (!in_array($format, ['text','html','both'])) {
+        if (!in_array($format, ['text', 'html', 'both'])) {
             throw new InvalidArgumentException('Invalid email format');
         }
         $this->emailFormat = $format;
@@ -979,10 +993,10 @@ class Email
             return true;
         }
         $emailFormat = $this->format();
-        if (($emailFormat  == 'text' or $emailFormat  =='both') and mb_check_encoding($this->textMessage, 'ASCII') === false) {
+        if (($emailFormat  == 'text' or $emailFormat  == 'both') and mb_check_encoding($this->textMessage, 'ASCII') === false) {
             return true;
         }
-        if (($emailFormat  == 'html' or $emailFormat  =='both') and mb_check_encoding($this->htmlMessage, 'ASCII') === false) {
+        if (($emailFormat  == 'html' or $emailFormat  == 'both') and mb_check_encoding($this->htmlMessage, 'ASCII') === false) {
             return true;
         }
         return false;

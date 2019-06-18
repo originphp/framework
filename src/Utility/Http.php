@@ -114,7 +114,7 @@ class Http
      * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
      * - proxy: proxy server details. An array with proxy, username, password.
      * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-     * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+     * - headers: an array of headers to set. e.g ['header'=>'value']
      * - cookies: an array of cookies to set. e.g. ['name'=>'value']
      *  @return \Origin\Utility\Http\Request
     */
@@ -138,7 +138,7 @@ class Http
     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
     * - proxy: proxy server details. An array with proxy, username, password.
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
     *  @return \Origin\Utility\Http\Request
     */
@@ -163,7 +163,7 @@ class Http
     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
     * - proxy: proxy server details. An array with proxy, username, password.
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
     *  @return \Origin\Utility\Http\Request
     */
@@ -188,7 +188,7 @@ class Http
     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
     * - proxy: proxy server details. An array with proxy, username, password.
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
     *  @return \Origin\Utility\Http\Request
     */
@@ -212,7 +212,7 @@ class Http
     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
     * - proxy: proxy server details. An array with proxy, username, password.
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
     */
     public function patch(string $url, array $options = [])
@@ -234,7 +234,7 @@ class Http
     * - auth: authtentication details. An array with username, password, and type (basic|digest|nltm)
     * - proxy: proxy server details. An array with proxy, username, password.
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
-    * - headers: an array of headers to set. e.g ['header'=>'value','header: value']
+    * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
     */
     public function delete(string $url, array $options = [])
@@ -331,38 +331,35 @@ class Http
     protected function buildRequestHeaders(array $options)
     {
         // Process headers
-        $headers = [];
         $cookies = [];
         if ($options['cookieJar'] === true) {
-            $cookies = [];
             foreach ($this->cookies as $cookie) {
-                $cookies[] = sprintf("%s=%s", rawurlencode($cookie['name']), rawurlencode($cookie['value']));
+                $cookies[] = rawurlencode($cookie['name']) . '=' . rawurlencode($cookie['value']);
             }
         }
         if (!empty($options['cookies']) and is_array($options['cookies'])) {
             foreach ($options['cookies'] as $name => $value) {
-                $cookies[] = sprintf("%s=%s", rawurlencode($name), rawurlencode($value));
+                $cookies[] = rawurlencode($name) . '=' . rawurlencode($value);
                 $this->cookies[$name] = ['name'=>$name,'value'=>$value];
             }
         }
+
         if ($cookies) {
-            $headers[] = 'Cookie: ' . implode('; ', $cookies);
-        }
-     
-        if (!empty($options['headers'])) {
-            foreach ($options['headers'] as $header => $value) {
-                if (is_int($header)) {
-                    $headers[] = $value;
-                } else {
-                    $headers[] = "{$header}: {$value}";
-                }
-            }
-        }
-        if (!empty($options['type']) and in_array($options['type'], ['json','xml'])) {
-            $headers[] = 'Accept: application/' . $options['type'];
-            $headers[] = 'Content-Type: application/' . $options['type'];
+            $options['headers']['Cookie'] = implode('; ', $cookies);
         }
 
+        if (!empty($options['type']) and in_array($options['type'], ['json','xml'])) {
+            $type = 'application/' . $options['type'];
+            $options['headers']['Content-Type'] = $options['headers']['Accept'] = $type;
+        }
+        
+        $headers = [];
+        if (!empty($options['headers'])) {
+            foreach ($options['headers'] as $header => $value) {
+                $headers[] = "{$header}: {$value}";
+            }
+        }
+        
         return $headers;
     }
 
@@ -524,6 +521,7 @@ class Http
     /**
      * Parses the value of a Set-Cookie: heder
      *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
      * @param string $header line e.g. Set-Cookie: foo=bar;
      * @return array
      */
@@ -531,15 +529,23 @@ class Http
     {
         list($void, $cookie) = explode('Set-Cookie: ', $header);
         $cookie = explode('; ', $cookie);
+        // Parse the name and value
         list($name, $value) = explode('=', array_shift($cookie), 2);
-        $out = ['name'=>$name,'value'=>$value,'expires'=>null,'path'=>null,'domain'=>null];
+        $out = [
+            'name' => $name,
+            'value' => rawurldecode($value),
+            'expires' => null,
+            'path' => null,
+            'domain' => null
+        ];
+        // Parse additional settings. e.g Domain,Path,Expires etc
         foreach ($cookie as $attr) {
             if (strpos($attr, '=') !== false) {
                 list($key, $v) = explode('=', $attr, 2);
                 if ($key === 'expires') {
-                    $v =strtotime($v);
+                    $v = strtotime($v);
                 }
-                $out[$key] = $v;
+                $out[strtolower($key)] = $v;
             } else {
                 $out[] = $attr;
             }

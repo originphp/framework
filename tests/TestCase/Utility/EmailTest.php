@@ -24,7 +24,7 @@ class MockEmail extends Email
     use TestTrait;
     protected $boundary = '0000000000000000000000000000';
     public static $backup = [];
-    
+
     public static function backup()
     {
         static::$backup = static::$config;
@@ -46,11 +46,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->to('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('to');
-        $this->assertEquals(['james@originphp.com',null], $property[0]);
+        $this->assertEquals(['james@originphp.com', null], $property[0]);
 
         $Email = $Email->to('james@originphp.com', 'James');
         $property = $Email->getProperty('to');
-        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+        $this->assertEquals(['james@originphp.com', 'James'], $property[0]);
     }
     public function testFrom()
     {
@@ -59,11 +59,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('from');
 
-        $this->assertEquals(['james@originphp.com',null], $property);
+        $this->assertEquals(['james@originphp.com', null], $property);
 
         $Email = $Email->from('james@originphp.com', 'James');
         $property = $Email->getProperty('from');
-        $this->assertEquals(['james@originphp.com','James'], $property);
+        $this->assertEquals(['james@originphp.com', 'James'], $property);
     }
 
     public function testSender()
@@ -72,11 +72,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->sender('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('sender');
-        $this->assertEquals(['james@originphp.com',null], $property);
+        $this->assertEquals(['james@originphp.com', null], $property);
 
         $Email = $Email->sender('james@originphp.com', 'James');
         $property = $Email->getProperty('sender');
-        $this->assertEquals(['james@originphp.com','James'], $property);
+        $this->assertEquals(['james@originphp.com', 'James'], $property);
     }
 
     public function testReplyTo()
@@ -85,11 +85,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->replyTo('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('replyTo');
-        $this->assertEquals(['james@originphp.com',null], $property);
+        $this->assertEquals(['james@originphp.com', null], $property);
 
         $Email = $Email->replyTo('james@originphp.com', 'James');
         $property = $Email->getProperty('replyTo');
-        $this->assertEquals(['james@originphp.com','James'], $property);
+        $this->assertEquals(['james@originphp.com', 'James'], $property);
     }
 
     public function testReturnPath()
@@ -98,11 +98,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->returnPath('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('returnPath');
-        $this->assertEquals(['james@originphp.com',null], $property);
+        $this->assertEquals(['james@originphp.com', null], $property);
 
         $Email = $Email->returnPath('james@originphp.com', 'James');
         $property = $Email->getProperty('returnPath');
-        $this->assertEquals(['james@originphp.com','James'], $property);
+        $this->assertEquals(['james@originphp.com', 'James'], $property);
     }
 
     public function testBcc()
@@ -111,11 +111,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->bcc('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('bcc');
-        $this->assertEquals(['james@originphp.com',null], $property[0]);
+        $this->assertEquals(['james@originphp.com', null], $property[0]);
 
         $Email = $Email->bcc('james@originphp.com', 'James');
         $property = $Email->getProperty('bcc');
-        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+        $this->assertEquals(['james@originphp.com', 'James'], $property[0]);
     }
 
     public function testCc()
@@ -124,23 +124,23 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->cc('james@originphp.com');
         $this->assertInstanceOf(Email::class, $Email);
         $property = $Email->getProperty('cc');
-        $this->assertEquals(['james@originphp.com',null], $property[0]);
+        $this->assertEquals(['james@originphp.com', null], $property[0]);
 
         $Email = $Email->cc('james@originphp.com', 'James');
         $property = $Email->getProperty('cc');
-        $this->assertEquals(['james@originphp.com','James'], $property[0]);
+        $this->assertEquals(['james@originphp.com', 'James'], $property[0]);
     }
 
     /**
-    * @depends testTo
-    */
+     * @depends testTo
+     */
     public function testAddTo()
     {
         $Email = new MockEmail();
         $Email = $Email->to('james@originphp.com', 'James');
         $Email = $Email->addTo('guest@originphp.com', 'Guest');
         $property = $Email->getProperty('to');
-        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+        $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
     }
 
     /**
@@ -152,7 +152,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->cc('james@originphp.com', 'James');
         $Email = $Email->addCc('guest@originphp.com', 'Guest');
         $property = $Email->getProperty('cc');
-        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+        $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
     }
 
     /**
@@ -164,7 +164,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = $Email->bcc('james@originphp.com', 'James');
         $Email = $Email->addBcc('guest@originphp.com', 'Guest');
         $property = $Email->getProperty('bcc');
-        $this->assertEquals(['guest@originphp.com','Guest'], $property[1]);
+        $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
     }
 
     public function testSubject()
@@ -202,9 +202,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testSetVars()
     {
         $Email = new MockEmail();
-        $Email = $Email->set(['foo'=>'bar']);
+        $Email = $Email->set(['foo' => 'bar']);
         $this->assertInstanceOf(Email::class, $Email);
-        $this->assertEquals(['foo'=>'bar'], $Email->getProperty('viewVars'));
+        $this->assertEquals(['foo' => 'bar'], $Email->getProperty('viewVars'));
     }
 
     public function testAddHeader()
@@ -212,20 +212,20 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $Email = new MockEmail();
         $Email = $Email->addHeader('X-mailer', 'OriginPHP');
         $this->assertInstanceOf(Email::class, $Email);
-        $this->assertEquals(['X-mailer'=>'OriginPHP'], $Email->getProperty('additionalHeaders'));
+        $this->assertEquals(['X-mailer' => 'OriginPHP'], $Email->getProperty('additionalHeaders'));
     }
 
     public function testAddAttachment()
     {
         $Email = new MockEmail();
-        $Email = $Email->addAttachment(ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css');
+        $Email = $Email->addAttachment(ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css');
         $this->assertInstanceOf(Email::class, $Email);
 
-        $Email->addAttachment(ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css', 'Debugger.css');
-        
+        $Email->addAttachment(ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css', 'Debugger.css');
+
         $expected = [
-            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css' => 'default.css',
-            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css' => 'default.css',
+            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
         ];
         $this->assertSame($expected, $Email->getProperty('attachments'));
 
@@ -240,16 +240,16 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->addAttachments([
-            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css',
-            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css',
+            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
         ]);
         $this->assertInstanceOf(Email::class, $Email);
 
         $expected = [
-            ROOT . DS . 'public' . DS  .'css'  . DS. 'default.css' => 'default.css',
-            ROOT . DS . 'public' . DS  .'css' . DS. 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css' => 'default.css',
+            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
         ];
-        
+
         $this->assertSame($expected, $Email->getProperty('attachments'));
     }
 
@@ -257,15 +257,16 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #1')
-              ->textMessage('this is a test');
-        
+            ->from('mailer@originphp.com')
+            ->subject('test #1')
+            ->format('text')
+            ->textMessage('this is a test');
+
         $headers = $Email->callMethod('buildHeaders');
-    
+
         $this->assertEquals('1.0', $headers['MIME-Version']);
         $this->assertEquals(date('r'), $headers['Date']);
-        $validUUID = (bool) preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}@originphp.com$/i', $headers['Message-ID']);
+        $validUUID = (bool)preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}@originphp.com$/i', $headers['Message-ID']);
         $this->assertTrue($validUUID);
         $this->assertEquals('test #1', $headers['Subject']);
         $this->assertEquals('mailer@originphp.com', $headers['From']);
@@ -274,7 +275,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         // Adjust data
         $Email->to('james@originphp.com', 'James')
-              ->from('mailer@originphp.com', 'OriginPHP Mailer');
+            ->from('mailer@originphp.com', 'OriginPHP Mailer');
         $headers = $Email->callMethod('buildHeaders');
 
         $this->assertEquals('OriginPHP Mailer <mailer@originphp.com>', $headers['From']);
@@ -285,19 +286,19 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #2')
-              ->textMessage('this is a test');
+            ->from('mailer@originphp.com')
+            ->subject('test #2')
+            ->textMessage('this is a test');
 
         $Email->addHeader('X-mailer', 'OriginPHP');
-        
+
         $Email->bcc('guest1@originphp.com');
         $Email->addBcc('guest2@originphp.com', 'Guest 2');
 
         $Email->cc('guest3@originphp.com');
         $Email->addCc('guest4@originphp.com', 'Guest 4');
 
-        
+
         $headers = $Email->callMethod('buildHeaders');
         $this->assertEquals('OriginPHP', $headers['X-mailer']);
         $this->assertEquals('guest1@originphp.com, Guest 2 <guest2@originphp.com>', $headers['Bcc']);
@@ -309,11 +310,12 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         // Check subject and names of headers are encoded
         $Email = new MockEmail();
         $Email->to('ragnar@originphp.com', 'Ragnarr Loþbrók')
-              ->from('mailer@originphp.com')
-              ->subject('Valhöll')
-              ->textMessage('this is a test');
+            ->from('mailer@originphp.com')
+            ->subject('Valhöll')
+            ->textMessage('this is a test')
+            ->format('text');
         $headers = $Email->callMethod('buildHeaders');
-       
+
         $this->assertEquals('=?UTF-8?B?VmFsaMO2bGw=?=', $headers['Subject']);
         $this->assertEquals('Ragnarr =?UTF-8?B?TG/DvmJyw7Nr?= <ragnar@originphp.com>', $headers['To']);
         $this->assertFalse(isset($headers['Content-Transfer-Encoding'])); // Dont encode message
@@ -321,9 +323,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         // If we have UTF8 chars in message we need the header ContentTransferEncoding
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #2')
-              ->textMessage('Are you in Valhöll?');
+            ->from('mailer@originphp.com')
+            ->subject('test #2')
+            ->textMessage('Are you in Valhöll?')
+            ->format('text');
 
         $headers = $Email->callMethod('buildHeaders');
         $this->assertEquals('quoted-printable', $headers['Content-Transfer-Encoding']);
@@ -333,32 +336,32 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #1')
-              ->textMessage('this is a test');
-        
+            ->from('mailer@originphp.com')
+            ->subject('test #1')
+            ->textMessage('this is a test')
+            ->format('text');
+
         $headers = $Email->callMethod('buildHeaders');
 
         $this->assertEquals('text/plain; charset="UTF-8"', $headers['Content-Type']);
 
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #1')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('html');
-        
+            ->from('mailer@originphp.com')
+            ->subject('test #1')
+            ->htmlMessage('<p>this is a test</p>')
+            ->format('html');
+
         $headers = $Email->callMethod('buildHeaders');
-      
+
         $this->assertEquals('text/html; charset="UTF-8"', $headers['Content-Type']);
 
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('test #1')
-              ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('both');
+            ->from('mailer@originphp.com')
+            ->subject('test #1')
+            ->textMessage('this is a test')
+            ->htmlMessage('<p>this is a test</p>');
 
         $headers = $Email->callMethod('buildHeaders');
 
@@ -370,9 +373,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test');
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->format('text');
         $result = $this->messageToString($Email->callMethod('buildMessage'));
         $this->assertEquals("this is a test\r\n", $result);
     }
@@ -381,10 +385,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test');
-        
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->format('text');
+
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');
 
@@ -393,7 +398,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
         $this->assertEquals($expected, $headers['Content-Type']);
         $result = $this->messageToString($Email->callMethod('buildMessage'));
-  
+
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
         $this->assertEquals($expected, $result);
     }
@@ -402,10 +407,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('html test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('html');
+            ->from('mailer@originphp.com')
+            ->subject('html test')
+            ->htmlMessage('<p>this is a test</p>')
+            ->format('html');
         $result = $this->messageToString($Email->callMethod('buildMessage'));
         $this->assertEquals("<p>this is a test</p>\r\n", $result);
     }
@@ -414,11 +419,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('html');
-        
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->htmlMessage('<p>this is a test</p>')
+            ->format('html');
+
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');
 
@@ -427,7 +432,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
         $this->assertEquals($expected, $headers['Content-Type']);
         $result = $this->messageToString($Email->callMethod('buildMessage'));
-    
+
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
         $this->assertEquals($expected, $result);
     }
@@ -436,26 +441,25 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('both');
-        
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->htmlMessage('<p>this is a test</p>');
+
         $result = $this->messageToString($Email->callMethod('buildMessage'));
-       
+
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
 
         $this->assertEquals($expected, $result);
 
         // Check Encoding is added when needed
         $Email->to('ragnar@originphp.com')
-              ->textMessage('Are you in Valhöll?')
-              ->htmlMessage('<p>Are you in Valhöll?</p>');
+            ->textMessage('Are you in Valhöll?')
+            ->htmlMessage('<p>Are you in Valhöll?</p>');
         $result = $this->messageToString($Email->callMethod('buildMessage'));
         //pr(str_replace("\r\n", '\r\n', $result));
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\nAre you in Valh=C3=B6ll?\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n<p>Are you in Valh=C3=B6ll?</p>\r\n\r\n--0000000000000000000000000000--";
-     
+
         $this->assertEquals($expected, $result);
     }
 
@@ -464,12 +468,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('both');
-        
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->htmlMessage('<p>this is a test</p>');
+
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');
 
@@ -478,7 +481,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
         $this->assertEquals($expected, $headers['Content-Type']);
         $result = $this->messageToString($Email->callMethod('buildMessage'));
-        
+
         $expected = "--0000000000000000000000000000\r\nContent-Type: multipart/alternative; boundary=\"alt-0000000000000000000000000000\"\r\n\r\n--alt-0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--alt-0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
         $this->assertEquals($expected, $result);
     }
@@ -490,10 +493,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test');
-        
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->format('text');
+
         // Needs a unique filename
         $tempfile = tempnam(sys_get_temp_dir(), 'tmp');
         file_put_contents($tempfile, 'foo/bar');
@@ -507,7 +511,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $expected = 'multipart/mixed; boundary="0000000000000000000000000000"';
         $this->assertEquals($expected, $headers['Content-Type']);
         $result = $this->messageToString($Email->callMethod('buildMessage'));
-  
+
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test1.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/plain; name=\"test2.txt\"\r\nContent-Disposition: attachment\r\nContent-Transfer-Encoding: base64\r\n\r\nZm9vL2Jhcg==\r\n\r\n\r\n--0000000000000000000000000000--";
         $this->assertEquals($expected, $result);
     }
@@ -539,8 +543,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         MockEmail::backup(); // Backup Original Config
 
-        $config = [  'host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret' ,'tls'=>true,'domain'=>null,'timeout'=>30];
-        $expected = [  'host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret' ,'tls'=>true];
+        $config = ['host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret', 'tls' => true, 'domain' => null, 'timeout' => 30];
+        $expected = ['host' => 'ssl://smtp.gmail.com', 'port' => 465, 'username' => 'test@originphp.com', 'password' => 'secret', 'tls' => true];
         MockEmail::config('default', $config);
         $this->assertEquals($config, MockEmail::config('default'));
         $this->assertNull(MockEmail::config('gmail'));
@@ -549,8 +553,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testAccount()
     {
-        $config = [  'host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret'];
-        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret','ssl'=>false,'tls'=>false,'domain'=>null,'timeout'=>30];
+        $config = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret'];
+        $expected = ['host' => 'smtp.example.com', 'port' => 25, 'username' => 'test@example.com', 'password' => 'secret', 'ssl' => false, 'tls' => false, 'domain' => null, 'timeout' => 30];
         $Email = new MockEmail($config);
 
         $this->assertEquals($expected, $Email->getProperty('account'));
@@ -570,39 +574,64 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testSendWithoutSmtp()
     {
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('text test')
-              ->textMessage('this is a test')
-              ->htmlMessage('<p>this is a test</p>')
-              ->format('both');
+            ->from('mailer@originphp.com')
+            ->subject('text test')
+            ->textMessage('this is a test')
+            ->htmlMessage('<p>this is a test</p>')
+            ->format('both');
 
         $result = $Email->send();
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
         $this->assertContains($expected, $result);
     }
 
+    public function testSendBothNoText()
+    {
+        $Email = new MockEmail(['debug' => true]);
+        $Email->to('james@originphp.com')
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->htmlMessage('<h1>Welcome Frank</h1>');
+        $result = $Email->send();
+        $this->assertContains("# Welcome Frank", $result);
+        $this->assertContains("<h1>Welcome Frank</h1>", $result);
+    }
+
+    public function testCreateMessageTemplateNoText()
+    {
+        $Email = new MockEmail(['debug' => true]);
+        $Email->to('james@originphp.com')
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->set(['first_name' => 'Frank'])
+            ->template('welcome');
+        $result = $Email->send();
+        $this->assertContains("# Welcome Frank", $result);
+        $this->assertContains("<h1>Welcome Frank</h1>", $result);
+    }
+
     public function testCreateMessageTemplate()
     {
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('template test')
-              ->format('both')
-              ->set(['first_name'=>'Frank'])
-              ->template('demo');
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->format('both')
+            ->set(['first_name' => 'Frank'])
+            ->template('demo');
         $result = $Email->send();
         $this->assertContains("Hi Frank,\r\nHow is your day so far?", $result);
         $this->assertContains("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
 
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('template test')
-              ->format('both')
-              ->set(['first_name'=>'Tony'])
-              ->template('Widget.how-are-you');
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->format('both')
+            ->set(['first_name' => 'Tony'])
+            ->template('Widget.how-are-you');
         $result = $Email->send();
         $this->assertContains("Hi Tony,\r\nHow are you?", $result);
         $this->assertContains("<p>Hi Tony</p>\r\n<p>How are you?</p>", $result);
@@ -611,25 +640,25 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testCreateMessageTemplateTextException()
     {
         $this->expectException(MissingTemplateException::class);
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-        ->from('mailer@originphp.com')
-        ->subject('template test')
-        ->format('text')
-        ->set(['first_name'=>'Frank'])
-        ->template('text-exception');
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->format('text')
+            ->set(['first_name' => 'Frank'])
+            ->template('text-exception');
         $result = $Email->send();
     }
     public function testCreateMessageTemplateHtmlException()
     {
         $this->expectException(MissingTemplateException::class);
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-        ->from('mailer@originphp.com')
-        ->subject('template test')
-        ->format('html')
-        ->set(['first_name'=>'Frank'])
-        ->template('html-exception');
+            ->from('mailer@originphp.com')
+            ->subject('template test')
+            ->format('html')
+            ->set(['first_name' => 'Frank'])
+            ->template('html-exception');
         $result = $Email->send();
     }
 
@@ -638,10 +667,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new Email();
         $Email->to('james@originphp.com')
-        ->subject('template test')
-        ->format('html')
-        ->set(['first_name'=>'Frank'])
-        ->template('html-exception');
+            ->subject('template test')
+            ->format('html')
+            ->set(['first_name' => 'Frank'])
+            ->template('html-exception');
         $result = $Email->send();
     }
     public function testSendNoToAddress()
@@ -649,19 +678,19 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new Email();
         $Email->from('james@originphp.com')
-        ->subject('template test')
-        ->format('html')
-        ->set(['first_name'=>'Frank'])
-        ->template('html-exception');
+            ->subject('template test')
+            ->format('html')
+            ->set(['first_name' => 'Frank'])
+            ->template('html-exception');
         $result = $Email->send();
     }
 
     public function testSendMessageArg()
     {
-        $Email = new MockEmail(['debug'=>true]);
+        $Email = new MockEmail(['debug' => true]);
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('send arg');
+            ->from('mailer@originphp.com')
+            ->subject('send arg');
         $result = $Email->send("Yo Adrian!\nRocky");
         $this->assertContains("Yo Adrian!\r\nRocky", $result);
     }
@@ -671,8 +700,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new Email();
         $Email->from('james@originphp.com')
-        ->subject('exception testt')
-        ->format('text');
+            ->subject('exception testt')
+            ->format('text');
         $Email->send();
     }
 
@@ -681,8 +710,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new Email();
         $Email->from('james@originphp.com')
-        ->subject('exception test')
-        ->format('html');
+            ->subject('exception test')
+            ->format('html');
         $Email->send();
     }
 
@@ -691,8 +720,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $Email = new MockEmail();
         $Email->to('james@originphp.com')
-              ->from('mailer@originphp.com')
-              ->subject('send arg');
+            ->from('mailer@originphp.com')
+            ->subject('send arg');
         $Email->send("Yo Adrian!\nRocky");
     }
 
@@ -710,10 +739,10 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testSmtpSend()
     {
 
-        if (!env('GMAIL_USERNAME') OR !env('GMAIL_PASSWORD')) {
+        if (!env('GMAIL_USERNAME') or !env('GMAIL_PASSWORD')) {
             $this->markTestSkipped(
                 'GMAIL username and password not setup'
-              );
+            );
         }
         $config = [
             'host' => 'smtp.gmail.com',
@@ -722,17 +751,16 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             'password' => env('GMAIL_PASSWORD'),
             'ssl' => true,
             'tls' => false
-            ];
-          
+        ];
+
         $email = new Email($config);
         $email->to(env('GMAIL_USERNAME'))
             ->subject('PHPUnit Test: ' . date('Y-m-d H:i:s'))
-            ->from(env('GMAIL_USERNAME'),'PHP Unit')
+            ->from(env('GMAIL_USERNAME'), 'PHP Unit')
             ->format('both')
             ->htmlMessage('<p>This is an email test to ensure that the framework can send emails properly and can include this in code coverage.<p>')
             ->textMessage('This is an email test to ensure that the framework can send emails properly and can include this in code coverage.');
 
-            $this->assertNotEmpty($email->send());
-    
+        $this->assertNotEmpty($email->send());
     }
 }

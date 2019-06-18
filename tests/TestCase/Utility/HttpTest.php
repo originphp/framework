@@ -69,10 +69,10 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testBuildOptionsHeaders()
     {
         $http = new MockHttp();
-        $options = ['headers'=>['Foo'=>'bar','Bar: foo']];
+        $options = ['headers'=>['Foo'=>'bar']];
         $http->get('https://www.example.com/posts', $options);
         $this->assertNotEmpty($http->options(CURLOPT_HTTPHEADER));
-        $this->assertEquals(['Foo: bar','Bar: foo'], $http->options(CURLOPT_HTTPHEADER));
+        $this->assertEquals(['Foo: bar'], $http->options(CURLOPT_HTTPHEADER));
     }
     public function testBuildOptionsCookies()
     {
