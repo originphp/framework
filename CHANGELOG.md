@@ -21,6 +21,21 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+
+## [1.17.0] - 2019-06-20
+Getting ready for initial release announcement. After the version 1.0.0 was released, I decided to add more functionality and change some design, this led to a number of breaking changes, this only happened as I had not announced the release to the world. 
+
+### Changed
+- Middleware design changed
+- Request data,query and params
+
+### Added
+- CSRF Protection Middleware  
+- FormHelper CSRF token support
+- Dispatcher Middleware
+- MiddlewareRunner
+
 ## [1.16.0] - 2019-06-18
 ### Added
 - Html2Text utility

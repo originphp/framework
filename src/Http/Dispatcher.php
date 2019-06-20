@@ -27,11 +27,31 @@ use App\Application;
 class Dispatcher
 {
     /**
+     * Singleton Instance of the Dispatcher
+     *
+     * @var Dispatcher
+     */
+    protected static $instance = null;
+    /**
      * Controller object
      *
      * @var Controller
      */
     protected $controller = null;
+
+    /**
+       * Returns a single instance of the object
+       *
+       * @return Autoloader
+       */
+    public static function instance()
+    {
+        if (static::$instance === null) {
+            static::$instance = new Dispatcher();
+        }
+        return static::$instance;
+    }
+
 
     /**
      * Starts the disatch process by creating the request and response objects
@@ -41,7 +61,8 @@ class Dispatcher
      */
     public function start(string $url = null)
     {
-        return $this->dispatch(new Request($url), new Response());
+        $response = $this->dispatch(new Request($url), new Response());
+        $response->send();
     }
 
     protected function getClass(string $controller, string $plugin = null)
@@ -58,13 +79,11 @@ class Dispatcher
      *
      * @param Request $request
      * @param Response $response
-     * @return Controller
+     * @return Response
      */
     public function dispatch(Request $request, Response $response)
     {
         if ($request->params()) {
-            $application = new Application($request, $response);
-    
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params('controller'));
@@ -73,10 +92,8 @@ class Dispatcher
             $this->controller = $this->buildController($class, $request, $response);
           
             $this->invoke($this->controller, $request->params('action'), $request->params());
-           
-            $this->controller->response->send();
-          
-            return $this->controller;
+
+            return $this->controller->response;
         }
         throw new RouterException('No route found.', 404);
     }
@@ -111,7 +128,7 @@ class Dispatcher
     protected function invoke(Controller $controller, string $action, array $arguments)
     {
         $result = $controller->startupProcess();
-        if($result instanceof Response OR $controller->response->headers('Location')){
+        if ($result instanceof Response or $controller->response->headers('Location')) {
             return $result;
         }
 

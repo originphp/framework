@@ -21,24 +21,26 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Exception\Exception;
 use Origin\Http\Middleware;
+use Origin\Http\MiddlewareRunner;
 use Origin\Core\Resolver;
 use Origin\Exception\InvalidArgumentException;
 
 class BaseApplication
 {
-    protected $middlewareStack = [];
+    protected $runner = null;
 
-    public function __construct(Request $request, Response $response)
+    public function __construct(Request $request, Response $response, MiddlewareRunner $runner = null)
     {
-        $this->initialize();
-        foreach ($this->middlewareStack as $callable) {
-            $response = $callable->process($request, $response);
-            if (! $response instanceof Response) {
-                throw new Exception('Middleware did not return a response object');
-            }
+        if ($runner === null) {
+            $runner = new MiddlewareRunner();
         }
-        unset($this->middlewareStack);
+        $this->runner = $runner;
+
+        $this->initialize();
+        $this->loadMiddleware('Dispatcher'); # By running last it will run process/shutdown first
+        $this->runner->run($request, $response);
     }
+
 
     /**
      * This is where middleware is setup
@@ -57,7 +59,7 @@ class BaseApplication
      */
     public function addMiddleware(Middleware $object)
     {
-        $this->middlewareStack[] = $object;
+        $this->runner->add($object);
     }
 
     /**
@@ -75,8 +77,8 @@ class BaseApplication
     public function loadMiddleware(string $name)
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware');
-        if(empty($className)){
-            throw new InvalidArgumentException(sprintf("Unkown middleware %s",$name));
+        if (empty($className)) {
+            throw new InvalidArgumentException(sprintf("Unkown Middleware %s", $name));
         }
         $this->addMiddleware(new $className);
     }

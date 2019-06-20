@@ -17,52 +17,36 @@ namespace Origin\Test\Middleware;
 use Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\BaseApplication;
-use Origin\Exception\InvalidArgumentException;
 
 class MyMiddleware extends Middleware
 {
-    public function process(Request $request, Response $response) : Response
+    public function startup(Request $request)
     {
         $request->data('foo', 'bar');
-        return $response;
     }
-}
-class Application extends BaseApplication
-{
-    public function initialize()
+    public function shutdown(Request $request, Response $response)
     {
-        $this->addMiddleware(new MyMiddleware());
-    }
-
-    public function getStack(){
-        return $this->middlewareStack;
+        $response->header('Accept', 'application/foo');
     }
 }
 
 class MiddlwareTest extends \PHPUnit\Framework\TestCase
 {
-    public function testMiddleware()
+    public function testInvoke()
     {
         $middleware = new Middleware();
-        $this->assertInstanceOf(Response::class, $middleware->process(new Request(), new Response()));
+        $this->assertInstanceOf(Response::class, $middleware(new Request(), new Response()));
     }
+
     public function testExecution()
     {
         $request = new Request();
-        new Application($request, new Response());
+        $response = new Response();
+        $middleware = new MyMiddleware();
+        $middleware->startup($request);
+        $middleware->shutdown($request, $response);
+
         $this->assertEquals('bar', $request->data('foo'));
-    }
-
-    public function testUnkownMiddleware(){
-        $application = new Application(new Request(), new Response());
-        $this->expectException(InvalidArgumentException::class);
-        $application->loadMiddleware('FormSecurity');
-    }
-
-    public function testLoadMiddleware(){
-        $application = new Application(new Request(), new Response());
-        $application->loadMiddleware('Origin\Test\Middleware\MyMiddleware');
-        $this->assertNotEmpty($application->getStack());
+        $this->assertEquals('application/foo', $response->headers('Accept'));
     }
 }

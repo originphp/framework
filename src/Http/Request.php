@@ -27,14 +27,14 @@ class Request
      *
      * @var array
      */
-    protected $params = array(
+    protected $params =[
         'controller' => null,
         'action' => null,
-        'args' => array(),
-        'named' => array(),
+        'args' => [],
+        'named' => [],
         'plugin' => null,
         'route' => null
-    );
+    ];
 
     /**
      * Holds the query data.
@@ -138,19 +138,25 @@ class Request
      *  $value = $request->query('key');
      *  $request->query('key','value');
      *
-     * @param string $key
+     * @param string|array|null $key
      * @param mixed $value
      * @return mixed
      */
-    public function query(string $key = null, $value = null)
+    public function query($key = null, $value = null)
     {
+        if ($key === null) {
+            return $this->query;
+        }
+
+        if (is_array($key)) {
+            $this->query = $key;
+            return;
+        }
         if (func_num_args() === 2) {
             $this->query[$key] = $value;
             return;
         }
-        if ($key === null) {
-            return $this->query;
-        }
+       
         if (isset($this->query[$key])) {
             return $this->query[$key];
         }
@@ -164,16 +170,21 @@ class Request
      *  $all = $request->data();
      *  $value = $request->data('key');
      *  $request->data('key','value');
-     *  $request->data($someArray);
+     *  $request->data($someArray); // Will replace all data
      *
-     * @param string|array $key name of key to get,
+     * @param string|array|null $key
      * @param mixed $value
      * @return mixed
      */
-    public function data(string $key = null, $value = null)
+    public function data($key = null, $value = null)
     {
         if ($key === null) {
             return $this->data;
+        }
+
+        if (is_array($key)) {
+            $this->data = $key;
+            return;
         }
  
         if (func_num_args() === 2) {
@@ -193,19 +204,26 @@ class Request
      *  $value = $request->params('key');
      *  $request->params('key','value');
      *
-     * @param string $key
+     * @param string|array|null $key
      * @param mixed $value
      * @return mixed
      */
-    public function params(string $key = null, $value = null)
+    public function params($key = null, $value = null)
     {
+        if ($key === null) {
+            return $this->params;
+        }
+
+        if (is_array($key)) {
+            $this->params = $key;
+            return;
+        }
+
         if (func_num_args() === 2) {
             $this->params[$key] = $value;
             return;
         }
-        if ($key === null) {
-            return $this->params;
-        }
+       
         if (isset($this->params[$key])) {
             return $this->params[$key];
         }
@@ -310,7 +328,7 @@ class Request
         }
 
         $this->url = '/'.$url;
-        $this->query = $query;
+        $this->query($query);
     }
 
     /**
@@ -332,8 +350,7 @@ class Request
                 }
             }
         }
-        $this->data = $data;
-
+        $this->data($data);
         return $data;
     }
 
@@ -555,17 +572,21 @@ class Request
     }
 
     /**
-     * Reads a cookie value from the request. Cookies set
-     * using the response::cookie would not of been sent yet.
+     * Sets and gets cookies values for the request
      *
      * @return string|array|null
      */
-    public function cookies(string $key = null, string $value = null)
+    public function cookies($key = null, string $value = null)
     {
         if ($key === null) {
             return $this->cookies;
         }
     
+        if (is_array($key)) {
+            $this->cookies = $key;
+            return;
+        }
+
         if (func_num_args() === 1) {
             if (isset($this->cookies[$key])) {
                 return $this->cookies[$key];
@@ -578,10 +599,11 @@ class Request
     protected function processCookies()
     {
         $cookie = new Cookie();
-        $this->cookies = [];
+        $cookies = [];
         foreach (array_keys($_COOKIE) as $key) {
-            $this->cookies[$key] = $cookie->read($key);
+            $cookies[$key] = $cookie->read($key);
         }
+        $this->cookies($cookies);
     }
     /**
      * Reads the php://input stream

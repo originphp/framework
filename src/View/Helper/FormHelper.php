@@ -170,7 +170,7 @@ class FormHelper extends Helper
         unset($options['type'], $options['url']);
         $attributes += $options;
 
-        return $this->formatTemplate('formStart', $attributes) . $this->csrfField();
+        return $this->formatTemplate('formStart', $attributes) . $this->csrf();
     }
 
     /**
@@ -706,7 +706,7 @@ class FormHelper extends Helper
             'action' => $url,
         ];
 
-        $output = $this->formatTemplate('formStart', $attributes) . $this->csrfField();
+        $output = $this->formatTemplate('formStart', $attributes) . $this->csrf();
         $output .= $this->hidden('_method', ['value' => strtoupper($attributes['method'])]);
         $options['text'] = $name;
         unset($options['method']);
@@ -1020,11 +1020,11 @@ class FormHelper extends Helper
     }
 
     /**
-     * Creates the csrfField for the Form
+     * Creates a CSRF form field
      *
      * @return string|null
      */
-    protected function csrfField()
+    protected function csrf()
     {
         $token = $this->request()->params('csrfToken');
         if ($token === null) {

@@ -22,21 +22,24 @@ use Origin\Http\Middleware;
 class CsrfProtectionMiddleware extends Middleware
 {
     /**
-     * Cookie name for generated CSRF token
-     *
-     * @var string
+     * A secure long CSRF token, and its to params to make it available to app and sets a cookie
+     * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
      */
-    protected $cookieName = 'CSRF-Token';
+    protected $token = null;
+
+    protected $defaultConfig = [
+        'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
+        'expires' => '+60 minutes' // Expiry time defaults to 60 minutes like sessions
+    ];
+
+    public function initialize(array $config)
+    {
+        $this->token = hash('sha512', random_bytes(64));
+    }
 
     /**
-     * The expiry time, defaults to 60 minutes
-     * like sessions.
+     * This handles the request
      *
-     * @var string
-     */
-    protected $expires = '+60 minutes';
-
-    /**
      * If the request is a post request, it will validate the csrf token then create a new one.
      * If the request is a get request, it just generates the csrf token.
      *
@@ -44,9 +47,9 @@ class CsrfProtectionMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return \Origin\Http\Response
      */
-    public function process(Request $request, Response $response) : Response
+    public function startup(Request $request)
     {
-        if ($request->is(['post','put','patch','delete']) or $request->data()) {
+        if ($request->is(['post', 'put', 'patch', 'delete']) or $request->data()) {
             if ($request->params('csrfProtection') !== false) {
                 $this->validateToken($request);
             }
@@ -55,23 +58,32 @@ class CsrfProtectionMiddleware extends Middleware
             unset($post['csrfToken']);
             $request->data($post);
         }
-        $this->createToken($request, $response);
-        return $response;
+
+        $request->params('csrfToken', $this->token);
     }
 
     /**
-     * Creates a secure long csrf token, and its to params to make it available to app and sets a cookie
-     * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
+     * Processes the response
      *
-     * @param Request $request
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
      * @return void
      */
-    protected function createToken(Request $request, Response $response)
+    public function shutdown(Request $request, Response $response)
     {
-        $token = hash('sha512', random_bytes(64));
-        $request->params('csrfToken', $token);
-        $response->cookie($this->cookieName, $token, $this->expires);
+        $response->cookie($this->config('cookieName'), $this->token, $this->config('expires'));
     }
+
+    /**
+     * Checks if in test environment
+     *
+     * @return void
+     */
+    protected function isTestEnvironment()
+    {
+        return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
+    }
+
 
     /**
      * Validates the CSRF token using either the cookie or the header
@@ -81,13 +93,20 @@ class CsrfProtectionMiddleware extends Middleware
      */
     protected function validateToken(Request $request)
     {
-        $cookie = $request->cookies($this->cookieName);
-        
+        /**
+         * Disable for UnitTesting
+         */
+        if ($this->isTestEnvironment()) {
+            return;
+        }
+
+        $cookie = $request->cookies($this->config('cookieName'));
+
         if (!$cookie) {
             throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
         }
-
-        if ($cookie !== $request->data('csrfToken') and $cookie !== $request->header('X-CSRF-Token')) {
+ 
+        if ($cookie !== $request->data('csrfToken') and $cookie !== $request->headers('X-CSRF-Token')) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
     }

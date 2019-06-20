@@ -29,10 +29,20 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     use IntegrationTestTrait;
     use TestTrait;
     
+
     public function testGet()
     {
         $this->get('/posts/index');
         $this->assertEquals('GET', $_SERVER['REQUEST_METHOD']);
+    }
+
+    public function testGetDisabledMiddleware()
+    {
+        $this->useMiddleware(false);
+        
+        $this->get('/posts/index');
+        $this->assertEquals('GET', $_SERVER['REQUEST_METHOD']);
+        $this->assertInstanceOf(Controller::class, $this->controller());
     }
     public function testPost()
     {

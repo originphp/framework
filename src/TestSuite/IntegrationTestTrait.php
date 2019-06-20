@@ -19,6 +19,7 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\Router;
+use App\Application;
 
 /**
  * A way to test controllers from a higher level
@@ -70,6 +71,25 @@ trait IntegrationTestTrait
      * @var array
      */
     protected $env = [];
+
+    /**
+     * Flag on how to handle with middleware
+     *
+     * @var boolean
+     */
+    protected $testWithMiddleware = true;
+
+    /**
+     * Enables and disables testing with middleware
+     *
+     * @param boolean $bool
+     * @return void
+     */
+    public function useMiddleware(bool $bool)
+    {
+        $this->testWithMiddleware = $bool;
+    }
+
     /**
      * Sends a GET request
      *
@@ -78,7 +98,7 @@ trait IntegrationTestTrait
      */
     public function get(string $url)
     {
-        $this->sendRequest($url, 'GET');
+        $this->sendRequest('GET', $url);
     }
     /**
      * Sends a post request
@@ -89,7 +109,7 @@ trait IntegrationTestTrait
      */
     public function post(string $url, array $data = [])
     {
-        $this->sendRequest($url, 'POST', $data);
+        $this->sendRequest('POST', $url, $data);
     }
     
     /**
@@ -100,7 +120,7 @@ trait IntegrationTestTrait
      */
     public function delete(string $url)
     {
-        $this->sendRequest($url, 'DELETE');
+        $this->sendRequest('DELETE', $url);
     }
     /**
      * Sends a PATCH request
@@ -111,7 +131,7 @@ trait IntegrationTestTrait
      */
     public function patch(string $url, array $data = [])
     {
-        $this->sendRequest($url, 'PATCH', $data);
+        $this->sendRequest('PATCH', $url, $data);
     }
   
     /**
@@ -123,7 +143,7 @@ trait IntegrationTestTrait
      */
     public function put(string $url, array $data = [])
     {
-        $this->sendRequest($url, 'PUT', $data);
+        $this->sendRequest('PUT', $url, $data);
     }
     
 
@@ -227,7 +247,15 @@ trait IntegrationTestTrait
         return $this->response;
     }
 
-    protected function sendRequest($url, $method, $data = [])
+    /**
+     * Sends the request for the test
+     *
+     * @param string $method
+     * @param string|array $url
+     * @param array $data
+     * @return void
+     */
+    protected function sendRequest(string $method, $url, array $data = [])
     {
         $_SERVER['REQUEST_METHOD'] = $method;
 
@@ -262,15 +290,18 @@ trait IntegrationTestTrait
         foreach ($this->cookies as $name => $value) {
             $this->response->cookie($name, $value);
         }
-    
-        $this->controller = $this->dispatchRequest();
+
+        if ($this->testWithMiddleware) {
+            $application = new Application($this->request, $this->response);
+            $this->controller = Dispatcher::instance()->controller();
+        } else {
+            $dispatcher = new Dispatcher();
+            $dispatcher->dispatch($this->request, $this->response);
+            $this->controller = $dispatcher->controller();
+        }
     }
 
-    protected function dispatchRequest()
-    {
-        $dispatcher = new Dispatcher();
-        return $dispatcher->dispatch($this->request, $this->response);
-    }
+
 
     /**
      * IMPORTANT:: call parent::tearDown

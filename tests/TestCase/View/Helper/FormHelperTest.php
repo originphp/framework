@@ -509,6 +509,13 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('</form>', $this->Form->end());
     }
 
+
+    public function testFormCsrfField()
+    {
+        $this->Form->request()->params('csrfToken', '* ORIGINPHP *');
+        $result = $this->Form->create();
+        $this->assertContains('<input type="hidden" name="csrfToken" value="* ORIGINPHP *">', $result);
+    }
     /**
      * I think all this can be re written to each senario, eg using control to create
      */

@@ -238,7 +238,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Middleware'.DS.'DummyMiddleware.php';
         $this->assertOutputContains('src/Middleware/DummyMiddleware.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('6500ed5e5f09fbfe3d5849f86db2df92', $filename);
+        $this->assertFileHash('79b5a3c6d032c8ea5ba2942313b0c439', $filename);
         unlink($filename);
     }
 
