@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Http;
+namespace Origin\Test\Middleware;
 
 use Origin\Http\Middleware;
 use Origin\Http\Request;
@@ -62,7 +62,7 @@ class MiddlwareTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadMiddleware(){
         $application = new Application(new Request(), new Response());
-        $application->loadMiddleware('Origin\Test\Http\MyMiddleware');
+        $application->loadMiddleware('Origin\Test\Middleware\MyMiddleware');
         $this->assertNotEmpty($application->getStack());
     }
 }

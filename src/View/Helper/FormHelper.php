@@ -170,7 +170,7 @@ class FormHelper extends Helper
         unset($options['type'], $options['url']);
         $attributes += $options;
 
-        return $this->formatTemplate('formStart', $attributes);
+        return $this->formatTemplate('formStart', $attributes) . $this->csrfField();
     }
 
     /**
@@ -651,8 +651,8 @@ class FormHelper extends Helper
          * Only format database values (if validation fails dont format)
          */
   
-        if ($options['format']){
-            if(!empty($options['value']) AND $options['value'] == (string) (float) $options['value']){
+        if ($options['format']) {
+            if (!empty($options['value']) and $options['value'] == (string) (float) $options['value']) {
                 $options['value'] = Number::format($options['value']);
             }
         }
@@ -706,7 +706,7 @@ class FormHelper extends Helper
             'action' => $url,
         ];
 
-        $output = $this->formatTemplate('formStart', $attributes);
+        $output = $this->formatTemplate('formStart', $attributes) . $this->csrfField();
         $output .= $this->hidden('_method', ['value' => strtoupper($attributes['method'])]);
         $options['text'] = $name;
         unset($options['method']);
@@ -1017,5 +1017,19 @@ class FormHelper extends Helper
         // Remaining items in options are attributes
         $data['attributes'] = $this->attributesToString($options);
         return $this->templater()->format($name, $data);
+    }
+
+    /**
+     * Creates the csrfField for the Form
+     *
+     * @return string|null
+     */
+    protected function csrfField()
+    {
+        $token = $this->request()->params('csrfToken');
+        if ($token === null) {
+            return null;
+        }
+        return $this->formatTemplate('hidden', ['name'=>'csrfToken','value'=>$token]);
     }
 }
