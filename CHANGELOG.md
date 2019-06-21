@@ -33,7 +33,7 @@ Getting ready for initial release announcement. After the version 1.0.0 was rele
 - Request data,query and params
 
 ### Added
-- CSRF Protection Middleware  
+- CSRF Protection Middleware
 - FormHelper CSRF token support
 - Dispatcher Middleware
 - MiddlewareRunner
