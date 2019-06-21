@@ -29,7 +29,7 @@ class MockAutoloader extends Autoloader
         $this->mockFiles = $files;
     }
 
-    protected function requireFile($file)
+    protected function requireFile(string $file)
     {
         return in_array($file, $this->mockFiles);
     }
@@ -83,13 +83,13 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
         ));
 
         $this->autoloader->addNamespace(
-          'Origin',
-          'src'
+            'Origin',
+            'src'
         );
 
         $this->autoloader->addNamespace(
-          'Elements\Database',
-          'vendor/elements/src/Database'
+            'Elements\Database',
+            'vendor/elements/src/Database'
         );
     }
 

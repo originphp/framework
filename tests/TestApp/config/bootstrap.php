@@ -2,10 +2,10 @@
 use Origin\Core\Autoloader;
 
 $autoloader = Autoloader::instance();
-$autoloader->directory(ROOT);
+$autoloader->directory(APP);
 
 $namespaces = [
-    'App' => 'vendor/originphp/framework/tests/TestApp/src'
+    'App' => 'src'
 ];
 
 $autoloader->addNamespaces($namespaces);

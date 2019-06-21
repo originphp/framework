@@ -16,6 +16,7 @@ namespace Origin\Test\Engine\Storage;
 
 use Origin\Engine\Storage\SftpEngine;
 use Origin\Test\Engine\Storage\EngineTestTrait;
+use phpseclib\Net\SFTP;
 
 include_once 'EngineTestTrait.php';
 
@@ -23,17 +24,22 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
 
-    public function setUp(){
-        if(!env('SFTP_USERNAME')){
+    public function setUp()
+    {
+        if (!env('SFTP_USERNAME')) {
             $this->markTestSkipped('SFTP env vars not set');
+        }
+        if (!class_exists(SFTP::class)) {
+            $this->markTestSkipped('phpseclib not installed.');
         }
     }
 
     public $engine = null;
 
-    public function engine(){
-        if($this->engine === null){
-            $this->engine =  new SftpEngine([ 
+    public function engine()
+    {
+        if ($this->engine === null) {
+            $this->engine =  new SftpEngine([
                 'host' => env('SFTP_HOST'),
                 'username' => env('SFTP_USERNAME'),
                 'password' => env('SFTP_PASSWORD')
@@ -41,15 +47,15 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
         }
         return $this->engine;
     }
-    public function testConfig(){
-    
+    public function testConfig()
+    {
         $config = $this->engine()->config();
 
         $this->assertNotEmpty($config['host']);
         $this->assertNotEmpty($config['username']);
         $this->assertNotEmpty($config['password']);
-        $this->assertEquals(22,$config['port']);
+        $this->assertEquals(22, $config['port']);
         $this->assertNotEmpty($config['root']);
-        $this->assertEquals(10,$config['timeout']);      
-    }  
+        $this->assertEquals(10, $config['timeout']);
+    }
 }

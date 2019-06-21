@@ -10,7 +10,9 @@ PHPUnit is installed in the Docker container, however if you want to benefit fro
 $ composer require phpunit/phpunit ^7
 ```
 
-The frameworks db config is in the TestApp folder as it is isolated.
+> Running PHPUnit 7.5 with PHP 7.3 will cause segmentation fault 11 on MAC OS.
+
+The frameworks' db config is in the TestApp folder as it is isolated.
 
 To create the test database
 

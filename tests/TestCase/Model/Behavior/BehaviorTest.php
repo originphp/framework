@@ -30,7 +30,7 @@ class Tester extends Model
 
 class BehaviorTesterBehavior extends Behavior
 {
-    public function beforeFind($query = array())
+    public function beforeFind(array $query = array())
     {
         $query += ['return' => true];
         if (is_bool($query['return'])) {
@@ -49,7 +49,6 @@ class BehaviorTesterBehavior extends Behavior
 
 class BehaviorTest extends OriginTestCase
 {
-
     public $fixtures = ['Origin.Article'];
 
     public function testBeforeFind()

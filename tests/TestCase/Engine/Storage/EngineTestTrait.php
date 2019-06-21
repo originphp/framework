@@ -18,18 +18,20 @@ use Origin\Exception\NotFoundException;
 
 trait EngineTestTrait
 {
-    public function testWrite(){
+    public function testWrite()
+    {
         $data = 'local-engine' . (string) time();
 
-       $this->assertTrue($this->engine()->write('foo.txt',$data));
-       $this->assertTrue($this->engine()->write('folder/bar.txt',$data));
-       $this->assertTrue($this->engine()->write('folder/subfolder/foobar.txt',$data)); 
-       return $data;
+        $this->assertTrue($this->engine()->write('foo.txt', $data));
+        $this->assertTrue($this->engine()->write('folder/bar.txt', $data));
+        $this->assertTrue($this->engine()->write('folder/subfolder/foobar.txt', $data));
+        return $data;
     }
     /**
      * @depends testWrite
      */
-    public function testExists($data){
+    public function testExists($data)
+    {
         $this->assertTrue($this->engine()->exists('foo.txt'));
         $this->assertTrue($this->engine()->exists('folder/bar.txt'));
         $this->assertTrue($this->engine()->exists('folder/subfolder/foobar.txt'));
@@ -38,44 +40,46 @@ trait EngineTestTrait
     /**
      * @depends testWrite
      */
-    public function testRead($data){
-        $this->assertEquals($data,$this->engine()->read('foo.txt'));
-        $this->assertEquals($data,$this->engine()->read('folder/bar.txt'));
-        $this->assertEquals($data,$this->engine()->read('folder/subfolder/foobar.txt'));
+    public function testRead($data)
+    {
+        $this->assertEquals($data, $this->engine()->read('foo.txt'));
+        $this->assertEquals($data, $this->engine()->read('folder/bar.txt'));
+        $this->assertEquals($data, $this->engine()->read('folder/subfolder/foobar.txt'));
     }
 
-    public function testList(){
+    public function testList()
+    {
         $files = $this->engine()->list();
 
         // Test Format
-        $foo = $this->getFile('foo.txt',$files);
+        $foo = $this->getFile('foo.txt', $files);
         $expected = [
             'name' => 'foo.txt',
             'timestamp' => 1559996145,
             'size' => 22,
         ];
-        $this->assertEquals($expected,$foo);
+        $this->assertEquals($expected, $foo);
         // Test Contents
-        $this->assertHasFileInList('foo.txt',$files);
-        $this->assertHasFileInList('folder/bar.txt',$files);
-        $this->assertHasFileInList('folder/subfolder/foobar.txt',$files);
+        $this->assertHasFileInList('foo.txt', $files);
+        $this->assertHasFileInList('folder/bar.txt', $files);
+        $this->assertHasFileInList('folder/subfolder/foobar.txt', $files);
 
         
         $files = $this->engine()->list('folder');
-        $this->assertHasFileInList('bar.txt',$files);
-        $this->assertHasFileInList('subfolder/foobar.txt',$files);
+        $this->assertHasFileInList('bar.txt', $files);
+        $this->assertHasFileInList('subfolder/foobar.txt', $files);
 
                 
         $files = $this->engine()->list('folder/subfolder');
-        $this->assertHasFileInList('foobar.txt',$files);
-
+        $this->assertHasFileInList('foobar.txt', $files);
     }
 
     /**
      * @depends testExists
      *
      */
-    public function testDelete(){
+    public function testDelete()
+    {
         $this->assertTrue($this->engine()->delete('foo.txt'));
         $this->assertTrue($this->engine()->delete('folder/bar.txt'));
         $this->assertTrue($this->engine()->delete('folder/subfolder/foobar.txt'));
@@ -92,36 +96,45 @@ trait EngineTestTrait
      * @depends testDelete
      *
      */
-    public function testDeleteFolder(){
+    public function testDeleteFolder()
+    {
         $loremipsum = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.';
-        $this->assertTrue($this->engine()->write('docs/foo.txt',$loremipsum )); 
-        $this->assertTrue($this->engine()->write('docs/bar.txt',$loremipsum )); 
-        $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt',$loremipsum )); 
-        $this->assertTrue($this->engine()->write('docs/dota2/lion.txt',$loremipsum ));
+        $this->assertTrue($this->engine()->write('docs/foo.txt', $loremipsum));
+        $this->assertTrue($this->engine()->write('docs/bar.txt', $loremipsum));
+        $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt', $loremipsum));
+        $this->assertTrue($this->engine()->write('docs/dota2/lion.txt', $loremipsum));
         
-        $this->assertTrue($this->engine()->delete('docs/dota2'));
+        // test non recursive. Delete empty folder
+        $this->assertTrue($this->engine()->write('dm1/foo.txt', $loremipsum));
+        $this->assertFalse($this->engine()->delete('dm1'));
+        $this->assertTrue($this->engine()->delete('dm1/foo.txt'));
+        $this->assertTrue($this->engine()->delete('dm1'));
+
+        $this->assertTrue($this->engine()->delete('docs/dota2', ['recursive'=>true]));
         $this->assertFalse($this->engine()->exists('docs/dota2/natures_profit.txt'));
 
         // Add back to test deeper deleting
-        $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt',$loremipsum )); 
-        $this->assertTrue($this->engine()->delete('docs'));
+        $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt', $loremipsum));
+        $this->assertTrue($this->engine()->delete('docs', ['recursive'=>true]));
         $this->assertFalse($this->engine()->exists('docs/dota2/natures_profit.txt'));
     }
 
 
-    protected function assertHasFileInList(string $filename,array $files){
-        foreach($files as $file){
-            if($file['name'] == $filename){
+    protected function assertHasFileInList(string $filename, array $files)
+    {
+        foreach ($files as $file) {
+            if ($file['name'] == $filename) {
                 return true;
             }
         }
         return false;
     }
 
-    protected function getFile(string $filename,array $files){
-        foreach($files as $file){
-            if($file['name'] == $filename){
-                if($file['timestamp']>strtotime('-1 minute')){
+    protected function getFile(string $filename, array $files)
+    {
+        foreach ($files as $file) {
+            if ($file['name'] == $filename) {
+                if ($file['timestamp']>strtotime('-1 minute')) {
                     $file['timestamp'] = 1559996145; // Standardize
                 }
                 return $file;
@@ -129,6 +142,4 @@ trait EngineTestTrait
         }
         return null;
     }
-
-   
 }

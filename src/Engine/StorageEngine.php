@@ -37,7 +37,7 @@ abstract class StorageEngine
 
     abstract public function write(string $name, string $data);
 
-    abstract public function delete(string $name);
+    abstract public function delete(string $name, array $options=[]);
 
     abstract public function exists(string $name);
  

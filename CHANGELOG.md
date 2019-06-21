@@ -21,7 +21,9 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
+## Changed
+- Storage delete, changed default recursive delete to false and added option
+- Worked on changing how unit tests for framework work, so they can be run indepentanly.
 
 ## [1.17.0] - 2019-06-20
 Getting ready for initial release announcement. After the version 1.0.0 was released, I decided to add more functionality and change some design, this led to a number of breaking changes, this only happened as I had not announced the release to the world. 

@@ -342,8 +342,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/status');
         $controller = new TestsController($request, new Response());
-        $controller->render(['file'=> ROOT . DS  .'phpunit.xml','status'=>201]);
-        $this->assertEquals(file_get_contents(ROOT . DS  .'phpunit.xml'), $controller->response->body());
+        $controller->render(['file'=> ROOT . DS  . 'tests' . DS .'phpunit.xml','status'=>201]);
+        $this->assertEquals(file_get_contents(ROOT . DS  . 'tests' . DS .'phpunit.xml'), $controller->response->body());
         $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('text/xml', $controller->response->type());
     }

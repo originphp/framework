@@ -218,14 +218,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAddAttachment()
     {
         $Email = new MockEmail();
-        $Email = $Email->addAttachment(ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css');
+        $Email = $Email->addAttachment(ROOT . DS . 'tests' . DS  . 'phpunit.xml');
         $this->assertInstanceOf(Email::class, $Email);
 
-        $Email->addAttachment(ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css', 'Debugger.css');
+        $Email->addAttachment(ROOT . DS . 'tests' . DS  . 'README.md', 'Important.md');
 
         $expected = [
-            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css' => 'default.css',
-            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml' => 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ];
         $this->assertSame($expected, $Email->getProperty('attachments'));
 
@@ -240,14 +240,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->addAttachments([
-            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css',
-            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ]);
         $this->assertInstanceOf(Email::class, $Email);
 
         $expected = [
-            ROOT . DS . 'public' . DS  . 'css'  . DS . 'default.css' => 'default.css',
-            ROOT . DS . 'public' . DS  . 'css' . DS . 'debug.css' => 'Debugger.css'
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml' => 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ];
 
         $this->assertSame($expected, $Email->getProperty('attachments'));
@@ -732,13 +732,12 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     }
     /**
      * to test from the command line
-     *  GMAIL_USERNAME=username@gmail.com GMAIL_PASSWORD=secret phpunit TestCase/Utility/EmailTest.php 
+     *  GMAIL_USERNAME=username@gmail.com GMAIL_PASSWORD=secret phpunit TestCase/Utility/EmailTest.php
      *
      * @return void
      */
     public function testSmtpSend()
     {
-
         if (!env('GMAIL_USERNAME') or !env('GMAIL_PASSWORD')) {
             $this->markTestSkipped(
                 'GMAIL username and password not setup'

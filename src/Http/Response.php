@@ -19,6 +19,7 @@ use Origin\Exception\NotFoundException;
 
 class Response
 {
+
     /**
      * Holds the buffered output.
      *

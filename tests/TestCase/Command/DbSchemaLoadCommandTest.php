@@ -34,7 +34,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     public function testExecuteInvalidSchemaFile(){
         $this->exec('db:schema:load --datasource=test dummy');
         $this->assertExitError();
-        $this->assertErrorContains('File /var/www/vendor/originphp/framework/tests/TestApp/db/dummy.sql not found'); # Using normal output for this
+        $this->assertErrorContains('File ' . ROOT . '/tests/TestApp/db/dummy.sql not found'); # Using normal output for this
     }
 
     public function testExecuteInvalidDatasource(){

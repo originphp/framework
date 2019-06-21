@@ -22,9 +22,9 @@ class DbResetCommandTest extends OriginTestCase
         $this->exec('db:reset --datasource=dummy');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
-        $this->assertOutputContains('Loading /var/www/vendor/originphp/framework/tests/TestApp/db/schema.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema.sql');
         $this->assertOutputContains('Executed 2 statements');
-        $this->assertOutputContains('Loading /var/www/vendor/originphp/framework/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
 

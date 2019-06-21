@@ -84,7 +84,7 @@ class SftpEngine extends StorageEngine
                 $password->setPassword($this->config('password')); # Must be set before loadKey
             }
             $privateKey = $this->config('privateKey');
-            if (substr($privateKey, 0,5) !== '-----') {
+            if (substr($privateKey, 0, 5) !== '-----') {
                 $privateKey = file_get_contents(privateKey);
             }
             $password ->loadKey($privateKey);
@@ -132,15 +132,21 @@ class SftpEngine extends StorageEngine
 
     /**
      * Deletes a file OR directory
-     *
+     * @internal issue with phpseclib not deleting empty directories without recursive probably due to ./..
      * @param string $name
+     * @param array $options (recursive: default false)
      * @return boolean
      */
-    public function delete(string $name)
+    public function delete(string $name, array $options = [])
     {
+        $options += ['recursive'=>false];
         $filename = $this->addPathPrefix($name);
         if ($this->connection->stat($filename)) {
-            return$this->connection->delete($filename, true);
+            // Delete files and recursive
+            if (!$this->connection->is_dir($filename) or $options['recursive'] or empty($this->list($name))) {
+                return $this->connection->delete($filename, true);
+            }
+            return false;
         }
         throw new NotFoundException(sprintf('%s does not exist', $name));
     }

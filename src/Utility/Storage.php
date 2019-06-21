@@ -29,7 +29,7 @@ class Storage
     ];
 
     /**
-     * Holds the cache engines
+     * Holds the storage engines
      *
      * @var array
      */
@@ -83,7 +83,7 @@ class Storage
     }
 
     /**
-     * Reads an item from the Cache
+     * Reads an item from the Storage
      *
      * @param string $name
      * @param string $config
@@ -94,7 +94,7 @@ class Storage
         return static::engine(self::$use)->read($name);
     }
     /**
-     * Writes an item from Cache
+     * Writes an item from Storage
      *
      * @param string $name
      * @param mixed $value
@@ -107,7 +107,7 @@ class Storage
     }
 
     /**
-     * Checks if an item is in the cache
+     * Checks if an item is in the Storage
      *
      * @param string $name
      * @param mixed $value
@@ -120,15 +120,15 @@ class Storage
     }
 
     /**
-     * Deletes an item from the cache
+     * Deletes a file OR directory
      *
      * @param string $name
-     * @param string $config
-     * @return bool
+     * @param array $options (recursive: default false)
+     * @return boolean
      */
-    public static function delete(string $name) :bool
+    public static function delete(string $name, array $options=[]) :bool
     {
-        return static::engine(self::$use)->delete($name);
+        return static::engine(self::$use)->delete($name, $options);
     }
 
     /**

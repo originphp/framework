@@ -4,10 +4,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', true);
 
 define('DS', DIRECTORY_SEPARATOR);
-define('ROOT',dirname(dirname(dirname(dirname(__DIR__)))));
-define('CONFIG', ROOT . DS . 'vendor' . DS . 'originphp' . DS . 'framework' . DS . 'tests'. DS . 'TestApp' . DS .'config');
+define('ROOT', dirname(__DIR__));
+define('ORIGIN', dirname(__DIR__));
+define('CONFIG', ORIGIN . DS . 'tests'. DS . 'TestApp' . DS .'config');
 define('LOGS', sys_get_temp_dir());
-define('ORIGIN', ROOT . DS . 'vendor'. DS .'originphp'. DS .'framework');
+
 define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'src');
 define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'tests');
 define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp');

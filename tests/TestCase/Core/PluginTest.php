@@ -45,7 +45,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Make'], MockPlugin::loaded());
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
-        $this->assertEquals(ROOT . DS . 'vendor' . DS . 'originphp' . DS . 'framework' . DS . 'tests' . DS . 'TestApp' . DS . 'plugins' . DS . 'make', $config['Make']['path']);
+        $this->assertEquals(ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'plugins' . DS . 'make', $config['Make']['path']);
         $this->assertTrue($config['Make']['routes']);
         $this->assertTrue($config['Make']['bootstrap']);
         

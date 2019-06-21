@@ -37,37 +37,37 @@ class FtpEngine extends StorageEngine
 
     public function initialize(array $config)
     {
-        if($this->config('host') === null){
+        if ($this->config('host') === null) {
             throw new InvalidArgumentException('No host set');
         }
 
         $this->login();
 
         // Set ROOT
-        if($this->config('root') === null){
-            $this->config('root',ftp_pwd($this->connection));
+        if ($this->config('root') === null) {
+            $this->config('root', ftp_pwd($this->connection));
         }
     }
 
 
-    protected function login(){
+    protected function login()
+    {
         $config = $this->config();
         extract($config);
-        if($this->config('ssl')){
-            $this->connection = @ftp_ssl_connect($host,$port, $timeout);
-        }
-        else{
-            $this->connection = @ftp_connect($host,$port, $timeout);
-        }
-
-        if(!$this->connection){
-            throw new Exception(sprintf('Error connecting to %s.',$this->config('host')));
+        if ($this->config('ssl')) {
+            $this->connection = @ftp_ssl_connect($host, $port, $timeout);
+        } else {
+            $this->connection = @ftp_connect($host, $port, $timeout);
         }
 
-        if(!@ftp_login($this->connection,$username,$password)){
+        if (!$this->connection) {
+            throw new Exception(sprintf('Error connecting to %s.', $this->config('host')));
+        }
+
+        if (!@ftp_login($this->connection, $username, $password)) {
             throw new Exception('Invalid username or password');
         }
-        ftp_pasv($this->connection,$passive);    
+        ftp_pasv($this->connection, $passive);
     }
 
     /**
@@ -81,12 +81,12 @@ class FtpEngine extends StorageEngine
         $filename = $this->addPathPrefix($name);
 
         $stream = fopen('php://temp', 'w+b'); // +b force binary
-        $result = @ftp_fget($this->connection, $stream,$filename,FTP_BINARY);
+        $result = @ftp_fget($this->connection, $stream, $filename, FTP_BINARY);
         rewind($stream);
         $data = stream_get_contents($stream);
         fclose($stream);
 
-        if($result){
+        if ($result) {
             return $data;
         }
 
@@ -105,13 +105,13 @@ class FtpEngine extends StorageEngine
         $filename = $this->addPathPrefix($name);
 
         $path = pathinfo($filename, PATHINFO_DIRNAME);
-        if (!@ftp_chdir($this->connection,$path)) {
+        if (!@ftp_chdir($this->connection, $path)) {
             $this->mkdir($path);
         }
         $stream = fopen('php://temp', 'w+b'); // +b force binary
         fwrite($stream, $data);
         rewind($stream);
-        $result = @ftp_fput($this->connection,$filename, $stream,FTP_BINARY);
+        $result = @ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
         fclose($stream);
         return $result;
         /*
@@ -124,17 +124,19 @@ class FtpEngine extends StorageEngine
      * Deletes a file OR directory
      *
      * @param string $name
+     * @param array $options (recursive: default false)
      * @return boolean
      */
-    public function delete(string $name)
+    public function delete(string $name, array $options = [])
     {
+        $options += ['recursive'=>false];
         $filename = $this->addPathPrefix($name);
 
-        if($this->isDir($filename)){
-            return $this->rmdir($filename);
+        if ($this->isDir($filename)) {
+            return $this->rmdir($filename, $options['recursive']);
         }
-        if($this->fileExists($filename)){
-            return ftp_delete($this->connection,$filename);
+        if ($this->fileExists($filename)) {
+            return ftp_delete($this->connection, $filename);
         }
     
         throw new NotFoundException(sprintf('%s does not exist', $name));
@@ -150,7 +152,7 @@ class FtpEngine extends StorageEngine
     {
         $filename = $this->addPathPrefix($name);
 
-        if($this->isDir($filename)){
+        if ($this->isDir($filename)) {
             return true;
         }
         
@@ -158,7 +160,7 @@ class FtpEngine extends StorageEngine
     }
 
 
-      /**
+    /**
      * Gets a list of items on the disk
      *
      * @return array
@@ -167,19 +169,20 @@ class FtpEngine extends StorageEngine
     {
         $directory = $this->addPathPrefix($name);
 
-        if(!$this->isDir($directory)){
+        if (!$this->isDir($directory)) {
             throw new NotFoundException('directory does not exist');
         }
-        ftp_chdir($this->connection,$this->config('root'));
+        ftp_chdir($this->connection, $this->config('root'));
 
         $this->base = $this->addPathPrefix($name);
         return $this->scandir($name);
     }
 
-    protected function fileExists(string $filename){
+    protected function fileExists(string $filename)
+    {
         $path = pathinfo($filename, PATHINFO_DIRNAME);
-        $list = ftp_nlist($this->connection,$path);
-        if(is_array($list) AND in_array($filename,$list)){
+        $list = ftp_nlist($this->connection, $path);
+        if (is_array($list) and in_array($filename, $list)) {
             return true;
         }
         return false;
@@ -192,18 +195,19 @@ class FtpEngine extends StorageEngine
      * @param string $path
      * @return void
      */
-    protected function mkdir(string $path){
-        @ftp_chdir($this->connection, $this->config('root')); 
+    protected function mkdir(string $path)
+    {
+        @ftp_chdir($this->connection, $this->config('root'));
 
-        $parts = array_filter(explode('/',$path)); 
-        foreach($parts as $part){
-            if(!@ftp_chdir($this->connection, $part)){
+        $parts = array_filter(explode('/', $path));
+        foreach ($parts as $part) {
+            if (!@ftp_chdir($this->connection, $part)) {
                 ftp_mkdir($this->connection, $part);
                 ftp_chmod($this->connection, 0744, $part);
                 ftp_chdir($this->connection, $part);
             }
         }
-        @ftp_chdir($this->connection, $this->config('root')); 
+        @ftp_chdir($this->connection, $this->config('root'));
     }
 
     /**
@@ -212,40 +216,41 @@ class FtpEngine extends StorageEngine
      * @param string $directory
      * @return boolean
      */
-    protected function isDir(string $directory){
-        if(!@ftp_chdir($this->connection, $directory)){
+    protected function isDir(string $directory)
+    {
+        if (!@ftp_chdir($this->connection, $directory)) {
             return false;
         }
-        ftp_chdir($this->connection,$this->config('root'));
+        ftp_chdir($this->connection, $this->config('root'));
         return true;
     }
 
-    protected function scandir(string $directory = null){
+    protected function scandir(string $directory = null)
+    {
         $location = $this->addPathPrefix($directory);
         $files = [];
 
-        $contents = ftp_rawlist($this->connection, $directory,true);
+        $contents = ftp_rawlist($this->connection, $directory, true);
 
-        if($contents){
-            foreach($contents as $item){
+        if ($contents) {
+            foreach ($contents as $item) {
                 $result = preg_split("/[\s]+/", $item, 9);
                 $file = $result[8];
                 // Directory
-                if(substr($result[0],0,1) === 'd'){
+                if (substr($result[0], 0, 1) === 'd') {
                     $subDirectory = $file;
                     if ($directory) {
                         $subDirectory = $directory . '/' . $file;
                     }
 
-                    $recursiveFiles = $this->scandir( $subDirectory );
-                    foreach($recursiveFiles as $item){
+                    $recursiveFiles = $this->scandir($subDirectory);
+                    foreach ($recursiveFiles as $item) {
                         $files[] = $item;
                     }
-                }
-                else{
+                } else {
                     $files[] = [
-                        'name' => ltrim(str_replace($this->base . DS,'', $location . DS .  $file),'/'),
-                        'timestamp' => ftp_mdtm($this->connection,$location . DS . $file),
+                        'name' => ltrim(str_replace($this->base . DS, '', $location . DS .  $file), '/'),
+                        'timestamp' => ftp_mdtm($this->connection, $location . DS . $file),
                         'size' => $result[4]
                     ];
                 }
@@ -262,32 +267,34 @@ class FtpEngine extends StorageEngine
      * @param string $directory
      * @return bool
      */
-    protected function rmdir(string $directory)
+    protected function rmdir(string $directory, bool $recursive = true)
     {
-        $files = ftp_nlist($this->connection,$directory);
-        foreach ($files as $filename) {
-            if ($this->isDir( $filename)) {
-                $this->rmdir($filename);
-                continue;
+        if ($recursive) {
+            $files = ftp_nlist($this->connection, $directory);
+            foreach ($files as $filename) {
+                if ($this->isDir($filename)) {
+                    $this->rmdir($filename, true);
+                    continue;
+                }
+                ftp_delete($this->connection, $filename);
             }
-            ftp_delete($this->connection,$filename);
         }
-
-        return ftp_rmdir($this->connection,$directory);
+        return @ftp_rmdir($this->connection, $directory);
     }
 
-     /**
-     * Adds the prefix
-     *
-     * @param string $path
-     * @return string
-     */
-    protected function addPathPrefix(string $path = null){
+    /**
+    * Adds the prefix
+    *
+    * @param string $path
+    * @return string
+    */
+    protected function addPathPrefix(string $path = null)
+    {
         $location = $this->config('root');
-        if($path){
+        if ($path) {
             $location .= DS . $path;
         }
-        $location = str_replace('//','/',$location); // Temp 
+        $location = str_replace('//', '/', $location); // Temp
         return $location;
     }
 }

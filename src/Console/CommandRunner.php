@@ -83,7 +83,6 @@ class CommandRunner
         foreach ($this->namespaces as $namespace => $directory) {
             $this->discovered = array_merge($this->discovered, $this->scanDirectory($directory, $namespace));
         }
-
     }
 
     protected function getDescriptions()
@@ -92,8 +91,8 @@ class CommandRunner
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
 
-            if(!class_exists($class)){
-                throw new ConsoleException(sprintf('%s does not exist or cannot be found',$class));
+            if (!class_exists($class)) {
+                throw new ConsoleException(sprintf('%s does not exist or cannot be found', $class));
             }
             $object = new $class();
             $name = $object->name();
@@ -141,7 +140,8 @@ class CommandRunner
      *
      * @return \Origin\Command\Command
      */
-    public function command(){
+    public function command()
+    {
         return $this->command;
     }
 
@@ -158,7 +158,7 @@ class CommandRunner
         # Use Conventions - Faster
         $namespace = Configure::read('App.namespace');
         $className = $namespace.'\\Command\\'.Inflector::camelize(preg_replace('/[:-]/', '_', $command)).'Command';
-        if(class_exists($className)){
+        if (class_exists($className)) {
             $object = new $className($this->io);
             if ($object->name() === $command) {
                 return $object;
@@ -181,13 +181,11 @@ class CommandRunner
     {
         $results = [];
         foreach ($this->discovered as $command) {
-            
             $class = $command['namespace'].'\\'.$command['className'];
-            if(class_exists($class)){
+            if (class_exists($class)) {
                 $object = new $class();
                 $results[$object->name()] = $class;
             }
-          
         }
 
         return $results;
@@ -216,15 +214,15 @@ class CommandRunner
 
         ksort($commands);
         foreach ($commands as $group => $cmds) {
-            if($group){
+            if ($group) {
                 $out[] = '<heading>'.$group.'</heading>';
             }
           
             foreach ($cmds as $cmd => $description) {
-                if(!is_array($description)){
+                if (!is_array($description)) {
                     $description = [$description];
                 }
-                foreach($description as $desc){
+                foreach ($description as $desc) {
                     $cmd = str_pad($cmd, $maxLength + 2, ' ', STR_PAD_RIGHT);
                     $out[] = "<code>{$cmd}</code><text>{$desc}</text>";
                     $cmd = null;

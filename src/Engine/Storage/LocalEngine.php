@@ -27,7 +27,6 @@ class LocalEngine extends StorageEngine
 
     public function initialize(array $config)
     {
- 
     }
 
     /**
@@ -65,18 +64,20 @@ class LocalEngine extends StorageEngine
     }
 
     /**
-     * Deletes a file OR directory
-     *
-     * @param string $name
-     * @return boolean
-     */
-    public function delete(string $name)
+    * Deletes a file OR directory
+    *
+    * @param string $name
+    * @param array $options (recursive: default false)
+    * @return boolean
+    */
+    public function delete(string $name, array $options = [])
     {
+        $options += ['recursive'=>false];
         $filename = $this->addPathPrefix($name);
 
         if (file_exists($filename)) {
             if (is_dir($filename)) {
-                return $this->rmdir($filename);
+                return $this->rmdir($filename, $options['recursive']);
             }
             return unlink($filename);
         }
@@ -118,7 +119,6 @@ class LocalEngine extends StorageEngine
                     'timestamp' =>  $file->getMTime(),
                     'size' => $file->getSize()
                 ];
-              
             }
             return $files;
         }
@@ -131,29 +131,31 @@ class LocalEngine extends StorageEngine
      * @param string $directory
      * @return bool
      */
-    protected function rmdir(string $directory)
+    protected function rmdir(string $directory, bool $recursive = true)
     {
-        $files = array_diff(scandir($directory), ['.', '..']);
-        foreach ($files as $filename) {
-            if (is_dir($directory . DS . $filename)) {
-                $this->rmdir($directory . DS . $filename);
-                continue;
+        if ($recursive) {
+            $files = array_diff(scandir($directory), ['.', '..']);
+            foreach ($files as $filename) {
+                if (is_dir($directory . DS . $filename)) {
+                    $this->rmdir($directory . DS . $filename, true);
+                    continue;
+                }
+                unlink($directory . DS . $filename);
             }
-            unlink($directory . DS . $filename);
         }
-
-        return rmdir($directory);
+        return @rmdir($directory);
     }
 
-     /**
-     * Adds the prefix
-     *
-     * @param string $path
-     * @return string
-     */
-    protected function addPathPrefix(string $path = null){
+    /**
+    * Adds the prefix
+    *
+    * @param string $path
+    * @return string
+    */
+    protected function addPathPrefix(string $path = null)
+    {
         $location = $this->config('root');
-        if($path){
+        if ($path) {
             $location .= DS . $path;
         }
         return $location;
