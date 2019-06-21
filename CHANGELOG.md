@@ -21,6 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.18.0] - 2019-06-21
 ## Changed
 - Storage delete. Added safeguard from accidentally deleting folder.
 - Worked on changing how unit tests for framework work, so they can be run independently.
