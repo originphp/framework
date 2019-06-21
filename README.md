@@ -34,4 +34,6 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 See the [documentation](https://www.originphp.com/docs/getting-started/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
 
+You can send an email to <js@originphp.com>.
+
 Jamiel Sharief
