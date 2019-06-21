@@ -123,12 +123,11 @@ class Storage
      * Deletes a file OR directory
      *
      * @param string $name
-     * @param array $options (recursive: default false)
      * @return boolean
      */
-    public static function delete(string $name, array $options=[]) :bool
+    public static function delete(string $name) :bool
     {
-        return static::engine(self::$use)->delete($name, $options);
+        return static::engine(self::$use)->delete($name);
     }
 
     /**

@@ -104,18 +104,12 @@ trait EngineTestTrait
         $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt', $loremipsum));
         $this->assertTrue($this->engine()->write('docs/dota2/lion.txt', $loremipsum));
         
-        // test non recursive. Delete empty folder
-        $this->assertTrue($this->engine()->write('dm1/foo.txt', $loremipsum));
-        $this->assertFalse($this->engine()->delete('dm1'));
-        $this->assertTrue($this->engine()->delete('dm1/foo.txt'));
-        $this->assertTrue($this->engine()->delete('dm1'));
-
-        $this->assertTrue($this->engine()->delete('docs/dota2', ['recursive'=>true]));
+        $this->assertTrue($this->engine()->delete('docs/dota2'));
         $this->assertFalse($this->engine()->exists('docs/dota2/natures_profit.txt'));
 
         // Add back to test deeper deleting
         $this->assertTrue($this->engine()->write('docs/dota2/natures_profit.txt', $loremipsum));
-        $this->assertTrue($this->engine()->delete('docs', ['recursive'=>true]));
+        $this->assertTrue($this->engine()->delete('docs'));
         $this->assertFalse($this->engine()->exists('docs/dota2/natures_profit.txt'));
     }
 

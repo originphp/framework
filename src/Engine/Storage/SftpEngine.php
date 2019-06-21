@@ -132,21 +132,22 @@ class SftpEngine extends StorageEngine
 
     /**
      * Deletes a file OR directory
+     *
      * @internal issue with phpseclib not deleting empty directories without recursive probably due to ./..
      * @param string $name
-     * @param array $options (recursive: default false)
      * @return boolean
      */
-    public function delete(string $name, array $options = [])
+    public function delete(string $name)
     {
-        $options += ['recursive'=>false];
         $filename = $this->addPathPrefix($name);
-        if ($this->connection->stat($filename)) {
-            // Delete files and recursive
-            if (!$this->connection->is_dir($filename) or $options['recursive'] or empty($this->list($name))) {
-                return $this->connection->delete($filename, true);
-            }
+
+        // Prevent accidentally deleting a folder
+        if (substr($name, -1) === '/') {
             return false;
+        }
+        
+        if ($this->connection->stat($filename)) {
+            return $this->connection->delete($filename, true);
         }
         throw new NotFoundException(sprintf('%s does not exist', $name));
     }

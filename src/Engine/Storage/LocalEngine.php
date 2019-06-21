@@ -67,17 +67,20 @@ class LocalEngine extends StorageEngine
     * Deletes a file OR directory
     *
     * @param string $name
-    * @param array $options (recursive: default false)
     * @return boolean
     */
-    public function delete(string $name, array $options = [])
+    public function delete(string $name)
     {
-        $options += ['recursive'=>false];
         $filename = $this->addPathPrefix($name);
+
+        // Prevent accidentally deleting a folder
+        if (substr($name, -1) === '/') {
+            return false;
+        }
 
         if (file_exists($filename)) {
             if (is_dir($filename)) {
-                return $this->rmdir($filename, $options['recursive']);
+                return $this->rmdir($filename, true);
             }
             return unlink($filename);
         }
