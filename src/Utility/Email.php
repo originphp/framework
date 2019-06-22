@@ -91,7 +91,7 @@ class Email
     protected $template = null;
 
     /**
-     * Email format. 
+     * Email format.
      * The best practice is send both HTML and text
      *
      * @var string
@@ -573,7 +573,7 @@ class Email
         if (isset($account['domain'])) {
             $host = $account['domain'];
         } elseif (isset($_SERVER['HTTP_HOST'])) {
-            list($host,) = explode(':', $_SERVER['HTTP_HOST']);
+            list($host, ) = explode(':', $_SERVER['HTTP_HOST']);
         }
         $this->sendCommand("EHLO {$host}", '250');
         if ($account['tls']) {
@@ -731,6 +731,7 @@ class Email
     /**
      * Validates an email
      *
+     * @internal this validation process also checks for newlines which is important in email header injection attacks
      * @param string $email
      * @return void
      */
@@ -740,6 +741,17 @@ class Email
             return true;
         }
         throw new Exception(sprintf('Invalid email address %s', $email));
+    }
+
+    /**
+     * Validates a header line to prevent Email Header Injections
+     *
+     * @param string $input
+     * @return void
+     */
+    protected function validateHeader(string $input = null)
+    {
+        return ($input === str_ireplace(["\r", "\n", '%0A', '%0D'], '', $input));
     }
 
     /**
@@ -776,10 +788,20 @@ class Email
             }
         }
 
+        /**
+        * Look Email Header Injection
+        */
+        foreach ($headers as $header) {
+            if (!$this->validateHeader($header)) {
+                throw new Exception(sprintf('Possible Email Header Injection `%s`'));
+            }
+        }
+
         $headers['Content-Type'] = $this->getContentType();
         if ($this->needsEncoding() and empty($this->attachments) and $this->format() !== 'both') {
             $headers['Content-Transfer-Encoding'] = 'quoted-printable';
         }
+
         return $headers;
     }
 

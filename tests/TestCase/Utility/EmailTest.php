@@ -762,4 +762,28 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEmpty($email->send());
     }
+
+
+    /**
+     * Ensure that the Email part is fine
+     *
+     * @return void
+     */
+    public function testEmailValidationAgainstHeaderInjection()
+    {
+        $Email = new MockEmail();
+        $this->expectException(Exception::class);
+        $Email->callMethod('validateEmail', ["mailer@originphp.com\nOmg: injected"]);
+    }
+
+    public function testEmailHeaderInjectionHeaders()
+    {
+        $Email = new MockEmail();
+        $this->expectException(Exception::class);
+        $Email = new MockEmail();
+        $Email->to('james@originphp.com')
+            ->from('mailer@originphp.com')
+            ->subject("Its rocky!\nBcc: apollo@boxers.io");
+        $Email->send("Yo Adrian!\nRocky");
+    }
 }

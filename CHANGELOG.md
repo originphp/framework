@@ -25,3 +25,4 @@ Delete tag: git tag -d <tag_name>
 ## Security
 - Form Helper changed to escape values
 - Adjusted h function work better for security
+- Improved Email Utility for protection against Email Header Injection Attacks
