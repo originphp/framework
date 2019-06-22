@@ -18,6 +18,7 @@ use Origin\Middleware\Exception\InvalidCsrfTokenException;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Middleware;
+use Origin\Utility\Security;
 
 class CsrfProtectionMiddleware extends Middleware
 {
@@ -106,7 +107,7 @@ class CsrfProtectionMiddleware extends Middleware
             throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
         }
  
-        if ($cookie !== $request->data('csrfToken') and $cookie !== $request->headers('X-CSRF-Token')) {
+        if (!Security::compare($cookie, $request->data('csrfToken')) and !Security::compare($cookie, $request->headers('X-CSRF-Token'))) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
     }

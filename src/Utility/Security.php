@@ -44,6 +44,18 @@ class Security
     }
 
     /**
+     * Compares two strings are equal in a safe way.
+     * @see https://blog.ircmaxell.com/2014/11/its-all-about-time.html
+     * @param string $original
+     * @param string $compare
+     * @return bool
+     */
+    public static function compare(string $original, string $compare) : bool
+    {
+        return hash_equals($original, $compare);
+    }
+
+    /**
      * Encrypts a string using openssl encrypt
      *
      * If a key is not provided, then the Security.salt will be used.  Changing the salt would

@@ -67,4 +67,14 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $decrypted2 = Security::decrypt($encrypted2, $key); // test wrong key
         $this->assertEquals($plain, $decrypted2);
     }
+
+    public function testCompare()
+    {
+        $expected  = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
+        $correct   = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
+        $incorrect = crypt('67890', '$2a$07$areallylongstringthatwillbeusedasasalt$');
+
+        $this->assertTrue(Security::compare($expected, $correct));
+        $this->assertFalse(Security::compare($expected, $incorrect));
+    }
 }

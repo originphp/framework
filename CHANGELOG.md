@@ -21,6 +21,8 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## Added
+- Security compare for comparing hashed strings to protect against timing attacks
 
 ## Fixed 
 - Removed not used argument description
@@ -31,6 +33,7 @@ Delete tag: git tag -d <tag_name>
 - Removed unnecessary array access from collections
 
 ## Security
+- CSRF Protection Middleware, added protection against timing attacks
 - File Utility switched to internal uid function for unique id generation
 - Form Helper changed to escape values
 - Adjusted h function work better for security
