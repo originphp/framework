@@ -16,6 +16,7 @@ namespace Origin\Test\Utility;
 
 use Origin\Core\Configure;
 use Origin\Utility\Security;
+use Origin\Exception\Exception;
 
 class SecurityTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +24,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     {
         Configure::write('Security.salt', 'B1816172FD2BA98F3AF520EF572E3A47');
     }
-    public function tearDown(){
+    public function tearDown()
+    {
         Configure::write('Security.salt', '-----ORIGIN PHP-----');
     }
     public function testHash()
@@ -42,6 +44,9 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         Configure::write('Security.salt', 'OriginPHP');
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
         $this->assertEquals($expected, Security::hash($plain, 'sha1', true));
+
+        $this->expectException(Exception::class);
+        Security::hash($plain, 'saltandpepper');
     }
 
     public function testEncryptDecrypt()

@@ -15,6 +15,7 @@
 namespace Origin\Utility;
 
 use Origin\Core\Configure;
+use Origin\Exception\Exception;
 
 class Security
 {
@@ -26,15 +27,20 @@ class Security
     * @param boolean|string $salt
     * @return boolean
     */
-    public static function hash(string $string, string $type ='sha1', $salt = false)
+    public static function hash(string $string, string $algorithm ='sha1', $salt = false)
     {
+        $algorithm = strtolower($algorithm);
+
+        if ($salt === true) {
+            $salt = Configure::read('Security.salt');
+        }
         if ($salt) {
-            if ($salt === true) {
-                $salt = Configure::read('Security.salt');
-            }
             $string = $salt . $string;
         }
-        return hash(strtolower($type), $string);
+        if (!in_array($algorithm, hash_algos())) {
+            throw new Exception('Invalid hashing algorithm');
+        }
+        return hash($algorithm, $string);
     }
 
     /**

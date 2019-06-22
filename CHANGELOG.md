@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ## Changed
+- Security hash now throws exception if Algo is not known
 - Html2Text now supports more headings, lists, definitions, blockquotes
 - Removed unnecessary array access from collections
 
