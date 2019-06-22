@@ -28,11 +28,13 @@ Delete tag: git tag -d <tag_name>
 - Removed not used argument description
 
 ## Changed
+- Security encrypt returns base64 encoded string, a decrypt expects that.
 - Security hash now throws exception if Algo is not known
 - Html2Text now supports more headings, lists, definitions, blockquotes
 - Removed unnecessary array access from collections
 
 ## Security
+- Refactored Security::encrypt/decrypt added protection against timing attacks
 - CSRF Protection Middleware, added protection against timing attacks
 - File Utility switched to internal uid function for unique id generation
 - Form Helper changed to escape values

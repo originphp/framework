@@ -16,6 +16,7 @@ namespace Origin\Utility;
 
 use Origin\Core\Configure;
 use Origin\Exception\Exception;
+use Origin\Exception\InvalidArgumentException;
 
 class Security
 {
@@ -50,61 +51,65 @@ class Security
      * @param string $compare
      * @return bool
      */
-    public static function compare(string $original, string $compare) : bool
+    public static function compare(string $original = null, string $compare = null) : bool
     {
+        if (!is_string($original) or !is_string($compare)) {
+            return false;
+        }
         return hash_equals($original, $compare);
     }
 
     /**
-     * Encrypts a string using openssl encrypt
+     * Generates a secure 256 bits (32 bytes) key
      *
-     * If a key is not provided, then the Security.salt will be used.  Changing the salt would
-     * be like providing a different key and you will not be able to decrypt data. The best way
-     * to generate a key would be to use openssl_random_pseudo_bytes.
-     * All keys are hashed to 32bytes. A new initialization vector 16 bytes for AES-256-CBC is securely
-     * created using random bytes for each string that is encrypted. The iv is then added to the string so
-     * during decryption it can be obtained easily.
-     * To store the encrypted string in the database you would have make sure type is binary or
-     * base64 encode etc.
-     * @see http://php.net/manual/en/function.openssl-encrypt.php
-     * @param string $string
-     * @param string $key
-     * @return binary
+     * @return string
      */
-    public static function encrypt(string $string, string $key=null)
+    public static function generateKey() : string
     {
-        if (is_null($key)) {
-            $key = Configure::read('Security.salt');
-        }
-        $key = hash('sha256', $key);
-        
-        $length = openssl_cipher_iv_length('AES-256-CBC');
-        $initializationVector  = openssl_random_pseudo_bytes($length);
-        
-        return $initializationVector . openssl_encrypt($string, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $initializationVector);
+        return bin2hex(openssl_random_pseudo_bytes(16));
     }
 
     /**
-    * Decrypts a Security::encrypt encrypted string
+     * Encrypts a string using your key. The key should be secure use. generateKey
+     *
+     * @see http://php.net/manual/en/function.openssl-encrypt.php
+     * @param string $string
+     * @param string $key must must be at least 256 bits (32 bytes)
+     * @return string
+     */
+    public static function encrypt(string $string, string $key)
+    {
+        if (strlen($key) < 32) {
+            throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
+        }
+        $length = openssl_cipher_iv_length('AES-128-CBC');
+        $iv = openssl_random_pseudo_bytes($length);
+        $raw = openssl_encrypt($string, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $raw, $key, true);
+        return base64_encode($iv . $hmac . $raw);
+    }
 
-    * The first 16 bytes are to be the initialization vector and the rest of the string to be the encrypted
-    * data. See openssl_cipher_iv_length('AES-256-CBC') for initialization vector length
+    /**
+    * Decrypts an encrypted string
     *
     * @param string $string
-    * @param string $key
+    * @param string $key must must be at least 256 bits (32 bytes)
     * @return string encrypted string
     */
     public static function decrypt(string $string, string $key=null)
     {
-        if (is_null($key)) {
-            $key = Configure::read('Security.salt');
+        if (strlen($key) < 32) {
+            throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
         }
-        $key = hash('sha256', $key);
-
-        $length = openssl_cipher_iv_length('AES-256-CBC');
-        $initializationVector = mb_substr($string, 0, $length, '8bit');
-        $encryptedString = mb_substr($string, $length, null, '8bit');
-        
-        return openssl_decrypt($encryptedString, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $initializationVector);
+        $string = base64_decode($string);
+        $length = openssl_cipher_iv_length('AES-128-CBC');
+        $iv = substr($string, 0, $length);
+        $hmac = substr($string, $length, 32);
+        $raw = substr($string, $length + 32);
+        $expected = hash_hmac('sha256', $raw, $key, true);
+        if (!static::compare($expected, $hmac)) {
+            return false;
+        }
+        return openssl_decrypt($raw, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
     }
 }

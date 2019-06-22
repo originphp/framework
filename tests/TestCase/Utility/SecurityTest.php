@@ -49,25 +49,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         Security::hash($plain, 'saltandpepper');
     }
 
-    public function testEncryptDecrypt()
-    {
-        $plain = 'The quick brown fox jumps over the lazy dog';
-        $encrypted = Security::encrypt($plain);
-        $this->assertTrue($encrypted != $plain);
-        $decrypted = Security::decrypt($encrypted);
-        $this->assertEquals($plain, $decrypted);
-
-        $key = '----- KEY BLOCK -----';
-        $encrypted2 = Security::encrypt($plain, $key);
-        $this->assertTrue($encrypted != $encrypted2);
-        
-        $decrypted2 = Security::decrypt($encrypted2); // test wrong key
-        $this->assertFalse($decrypted2 === $plain);
-
-        $decrypted2 = Security::decrypt($encrypted2, $key); // test wrong key
-        $this->assertEquals($plain, $decrypted2);
-    }
-
     public function testCompare()
     {
         $expected  = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
@@ -76,5 +57,16 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(Security::compare($expected, $correct));
         $this->assertFalse(Security::compare($expected, $incorrect));
+    }
+
+    public function testEncryptDecrypt()
+    {
+        $plain = 'The quick brown fox jumps over the lazy dog';
+        $key = 'c535ec4e94eaee1278c4e31ad1af46eef6fa8c1bea9976ba0d180b1edf1626d2';
+
+        $encrypted = Security::encrypt($plain, $key);
+        $decrypted = Security::decrypt($encrypted, $key);
+        $this->assertEquals($plain, $decrypted);
+        $this->assertFalse(Security::decrypt($encrypted, $key.'x')); // test wrong key
     }
 }
