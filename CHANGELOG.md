@@ -28,6 +28,7 @@ Delete tag: git tag -d <tag_name>
 - Removed not used argument description
 
 ## Changed
+- Changed Cookie classes to work with refactored security utility
 - Security encrypt returns base64 encoded string, a decrypt expects that.
 - Security hash now throws exception if Algo is not known
 - Html2Text now supports more headings, lists, definitions, blockquotes

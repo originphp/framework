@@ -15,6 +15,7 @@
 namespace Origin\Http;
 
 use Origin\Utility\Security;
+use Origin\Core\Configure;
 
 /**
  * Cookie Component - makes it easy to work with cookies, cookies are set using the response
@@ -29,6 +30,16 @@ class Cookie
      * just need an unique identifier. enc:1
      */
     const prefix =  'T3JpZ2lu==.';
+
+    protected $key = null;
+
+    /**
+     * Constructor - Create key to be used by encryption
+     */
+    public function __construct()
+    {
+        $this->key = hash('sha256', Configure::read('salt'));
+    }
 
     /**
      * Reads a value of a cookie
@@ -134,7 +145,7 @@ class Cookie
         }
        
         if ($encrypt) {
-            $value = self::prefix . base64_encode(Security::encrypt($value));
+            $value = self::prefix . Security::encrypt($value, $this->key);
         }
        
         return $value;
@@ -151,7 +162,7 @@ class Cookie
         $length = strlen(self::prefix);
         if (substr($value, 0, $length) === self::prefix) {
             $value = substr($value, $length);
-            $value = Security::decrypt(base64_decode($value));
+            $value = Security::decrypt($value, $this->key);
         }
         if (substr($value, 0, 1)==='{') {
             $value = json_decode($value);

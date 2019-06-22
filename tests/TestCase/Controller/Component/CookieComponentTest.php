@@ -34,12 +34,12 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
     public function testExists()
     {
         $this->assertFalse($this->Cookie->exists('password'));
-        $this->Cookie->request()->cookies('foo','bar'); // Set in request
+        $this->Cookie->request()->cookies('foo', 'bar'); // Set in request
         $this->AssertTrue($this->Cookie->exists('foo'));
     }
     public function testRead()
     {
-        $_COOKIE['encrypted'] = 'T3JpZ2lu==.J4pNTvNegB4yYV1wgUK6eazwy+DSQhgAeOqmIIo7oeQ=';
+        $_COOKIE['encrypted'] = 'T3JpZ2lu==.Hh+COplGWNym2Xa+mhTS5hAh32OB4x6Rv0LflOdNx+cGLBJG9r0Ga1iP0XRPncRDPZ9jf5cv5IWoQm/JDNEIHg==';
         $this->Cookie = new CookieComponent(new Controller(new Request(), new Response()));
         $this->assertEquals('bar', $this->Cookie->read('encrypted'));
     }
@@ -54,7 +54,7 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
     public function testdestroy()
     {
         $this->assertFalse($this->Cookie->exists('secret'));
-        $this->Cookie->request()->cookies('secret','bar'); // Set in request
+        $this->Cookie->request()->cookies('secret', 'bar'); // Set in request
         $this->assertTrue($this->Cookie->exists('secret'));
         $this->Cookie->destroy();
         $this->assertEquals([], $_COOKIE);
