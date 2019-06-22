@@ -22,6 +22,9 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+## Changed
+- Removed unnecessary array access from collections
+
 ## Security
 - Form Helper changed to escape values
 - Adjusted h function work better for security
