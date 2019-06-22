@@ -516,6 +516,19 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $result = $this->Form->create();
         $this->assertContains('<input type="hidden" name="csrfToken" value="* ORIGINPHP *">', $result);
     }
+
+
+    public function testFormEscapeValues()
+    {
+        $this->Form->request()->data('email', '"><script>alert(1)</script><"');
+        $expected = '<input type="text" name="email" value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;&quot;">';
+        $this->assertSame($expected, $this->Form->text('email'));
+       
+        $this->Form->request()->data('name', '>Foo');
+        $expected = '<input type="text" name="name" value=">Foo">';
+        $this->assertSame($expected, $this->Form->text('name', ['escape'=>false]));
+    }
+
     /**
      * I think all this can be re written to each senario, eg using control to create
      */

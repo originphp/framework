@@ -470,7 +470,12 @@ class FormHelper extends Helper
      * Creates a date input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function date(string $name, array $options = [])
@@ -499,7 +504,12 @@ class FormHelper extends Helper
      * Creates a datetime input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function datetime(string $name, array $options = [])
@@ -584,7 +594,12 @@ class FormHelper extends Helper
      * Creates a text input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function text(string $name, array $options = [])
@@ -598,20 +613,29 @@ class FormHelper extends Helper
      * Creates a text area
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function textarea(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-
         return $this->formatTemplate('textarea', $options);
     }
     /**
      * Creates a time input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function time(string $name, array $options = [])
@@ -639,7 +663,12 @@ class FormHelper extends Helper
      * Creates a number input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function number(string $name, array $options = [])
@@ -664,7 +693,12 @@ class FormHelper extends Helper
      * Creates a password input
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
-     * @param array $options Html attributes
+     * @param array $options include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function password(string $name, array $options = [])
@@ -729,7 +763,12 @@ class FormHelper extends Helper
      *
      * @param string $name field_name, Model.field_name, Model.0.Field_name
      * @param array $options array of key values for the options
-     * @param array $radioOptions Html attributes
+     * @param array $radioOptions include:
+     *  - id: the id for the input
+     *  - name: the name for the input
+     *  - value: the value for the input
+     *  - escape: default true. Escape values
+     *  - any other HTML attribute
      * @return string
      */
     public function radio(string $name, array $options = [], array $radioOptions = [])
@@ -995,6 +1034,7 @@ class FormHelper extends Helper
     protected function formatTemplate(string $name, array $options = [])
     {
         $template = $this->templates($name);
+        $options += ['escape'=>true];
 
         if (empty($options)) {
             return $template;
@@ -1014,6 +1054,17 @@ class FormHelper extends Helper
                 $data[$mergeVar] = $mergeValue;
             }
         }
+        // To prevent XSS attacks escape all output
+        if ($options['escape']) {
+            if (isset($data['value'])) {
+                $data['value'] = h($data['value']);
+            }
+            if (isset($options['value'])) {
+                $options['value'] = h($options['value']);
+            }
+        }
+        unset($options['escape'],$data['escape']);
+
         // Remaining items in options are attributes
         $data['attributes'] = $this->attributesToString($options);
         return $this->templater()->format($name, $data);
