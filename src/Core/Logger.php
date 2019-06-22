@@ -13,7 +13,9 @@
  */
 
 namespace Origin\Core;
+
 use Origin\Core\Configure;
+
 /**
  * A minimalistic PSR friendly logger- which currently just works with files.
  */
@@ -39,12 +41,11 @@ class Logger
      * Constructor function
      *
      * @param string $channel  a simple descriptive name which logs are related to
-     * @param string $filename full path and filename
      */
     public function __construct(string $channel)
     {
         $this->channel = $channel;
-        if(Configure::read('debug')){
+        if (Configure::read('debug')) {
             $this->filename = LOGS . DS .  'development.log';
         }
     }
