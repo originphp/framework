@@ -26,6 +26,7 @@ Delete tag: git tag -d <tag_name>
 - Removed unnecessary array access from collections
 
 ## Security
+- File Utility switched to internal uid function for unique id generation
 - Form Helper changed to escape values
 - Adjusted h function work better for security
 - Improved Email Utility for protection against Email Header Injection Attacks

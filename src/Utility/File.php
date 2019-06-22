@@ -98,7 +98,7 @@ class File
      */
     public static function tmp(string $data = null)
     {
-        $filename = sys_get_temp_dir() . DS . uniqid();
+        $filename = sys_get_temp_dir() . DS . uid();
         if ($data) {
             file_put_contents($filename, $data);
         }
