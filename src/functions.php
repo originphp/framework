@@ -152,13 +152,15 @@ function __(string $string = null, array $vars = [])
 }
 
 /**
- * htmlspecialchars.
+ * Wrapper for html
  *
- * @param mixed $text
+ * @param string $text
+ * @param string $encoding
+ * @return void
  */
-function h($text)
+function h(string $text = null, $encoding = 'UTF-8')
 {
-    return htmlspecialchars($text);
+    return htmlspecialchars($text, ENT_QUOTES, $encoding);
 }
 
 /**
