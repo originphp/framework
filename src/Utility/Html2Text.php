@@ -12,100 +12,101 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 /**
- * I wrote this a few years ago,
+ * A quick and dirty HTML to text convertor. It used by the Email Utility. Its almost markdown, the differences
+ * being bold and images.
  */
 namespace Origin\Utility;
 
+use DOMDocument;
+
 class Html2Text
 {
-    public static function convert($html)
+    /**
+     * Converts basic HTML into text format similar to markdown
+     *
+     * @param string $html
+     * @return string
+     */
+    public static function convert(string $html) :string
     {
-        $html = preg_replace("[\r\n|\n|\r]", '', $html); // remove all line endings
+        /**
+         * PHP BUG
+         *  $html = '<h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3>';
+        * $xml = new DOMDocument();
+        * @$xml->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        * $html = $xml->saveHTML(); // Clean HTML for parsing
+        * debug($html); // gives <h1>Heading 1<h2>Heading 2</h2><h3>Heading 3</h3></h1>
+         */
+        $xml = new DOMDocument();
+        @$xml->loadHTML($html, LIBXML_HTML_NODEFDTD); // bug  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        $html = $xml->saveHTML(); // Clean HTML for parsing
+     
+        $html = preg_replace("[\r\n|\n|\r]", '\r\n', $html); // convert line endings to temporary marker
 
         $html = preg_replace('/(\>)\s*(\<)/m', '$1$2', $html); // remove white space between tags
         #@ to process blockquotes you need to add > before each <p>. split lines
-        $html = preg_replace('/<p>/i', "\n<p>", $html);  // add new line endings
-        $html = preg_replace('/<p /i', "\n<p ", $html);  // add new line endings
-        $html = preg_replace('/<\/p>/i', "</p>\n", $html);  // add new line endings
+
+        $html = preg_replace('/<p.*?>(.*?)<\/p>/i', "\n" . '$1' ."\n", $html); // add new line endings
         $html = preg_replace('/<br\s*\/?>/i', "<br />\n", $html); // <br> or <br />
 
         $html = preg_replace('/<\/th>/i', '</th> ', $html); // space after each th
         $html = preg_replace('/<\/td>/i', '</td> ', $html); // space after each td
         $html = preg_replace('/<\/tr>/i', "</tr>\n", $html); // space after each td
 
-        $html = preg_replace('/<\/h1>/i', "</h1>\n\n", $html); // space after each h1
-        $html = preg_replace('/<h1>/i', "# <h1>", $html); // space after each h1
+        $html = preg_replace('/<h1.*?>(.*?)<\/h1>/i', '# $1' ."\n\n", $html);
+        $html = preg_replace('/<h2.*?>(.*?)<\/h2>/i', '## $1' ."\n\n", $html);
+        $html = preg_replace('/<h3.*?>(.*?)<\/h3>/i', '### $1' ."\n\n", $html);
+        $html = preg_replace('/<h4.*?>(.*?)<\/h4>/i', '#### $1' ."\n\n", $html);
+        $html = preg_replace('/<h5.*?>(.*?)<\/h5>/i', '##### $1' ."\n\n", $html);
+        $html = preg_replace('/<h6.*?>(.*?)<\/h6>/i', '###### $1' ."\n\n", $html);
 
-        $html = preg_replace('/<\/h2>/i', "</h2>\n\n", $html); // space after each h2
-        $html = preg_replace('/<h2>/i', "## <h2>", $html); // space after each h12
+        $html = preg_replace('/<li.*?>(.*?)<\/li>/i', '- $1' ."\n", $html);
+        $html = preg_replace('/<strong.*?>(.*?)<\/strong>/i', '*$1*', $html);
+        $html = preg_replace('/<em.*?>(.*?)<\/em>/i', '_$1_', $html);
+        $html = preg_replace('/<i.*?>(.*?)<\/i>/i', '_$1_', $html);
+       
+        if (preg_match('/<blockquote.*?>(.*?)<\/blockquote>/i', $html, $matches)) {
+            preg_match_all('/<blockquote.*?>(.*?)<\/blockquote>/i', $html, $matches);
+            foreach ($matches as $match) {
+                $replace = str_replace('\r\n', '</blockquote><blockquote>', $match[0]);
+                $html = str_replace($match[0], $replace, $html);
+            }
+        }
+        $html = preg_replace('/<blockquote.*?>(.*?)<\/blockquote>/', '  > $1' ."\n", $html);
 
-        $html = preg_replace('/<\/h3>/i', "</h3>\n\n", $html); // space after each h2
-        $html = preg_replace('/<h3>/i', "### <h3>", $html); // space after each h1
-
+        $html = preg_replace('/<code.*?>(.*?)<\/code>/', '`$1`' ."\n", $html);
+        $html = preg_replace('/<dt.*?>(.*?)<\/dt>/i', '$1' ."\n", $html);
+        $html = preg_replace('/<dd.*?>(.*?)<\/dd>/', ':  $1' ."\n", $html);
         $html = preg_replace("/&nbsp;/i", ' ', $html);
+        $html = str_replace('\r\n', '', $html); // remove temporary marker
 
-        # Change <strong>Name</strong> to *Name*
-        if (preg_match_all('/<strong>([^>]*)<\/strong>/i', $html, $matches)) {
-            foreach ($matches[0] as $i => $needle) {
-                $html = str_replace($needle, '*' . $matches[1][$i] . '*', $html);
+        //Loop through each <a> and </a> tag in the dom and add it to the link array
+        foreach ($xml->getElementsByTagName('img') as $element) {
+            $filename = $element->getAttribute('src');
+            $string = "[image: {$filename}]";
+            if ($element->hasAttribute('alt')) {
+                $alt = $element->getAttribute('alt');
+                $string = "[image: {$alt} {$filename}]";
             }
+            $needle = $xml->saveHtml($element);
+            $html = str_replace($needle, $string, $html);
         }
 
-        # Change Italic
-        if (preg_match_all('/<em>([^>]*)<\/em>/i', $html, $matches)) {
-            foreach ($matches[0] as $i => $needle) {
-                $html = str_replace($needle, '_' . $matches[1][$i] . '_', $html);
+        foreach ($xml->getElementsByTagName('a') as $element) {
+            $title = $element->textContent;
+            $link = $element->getAttribute('href');
+            if (preg_match('/(?:tel|skype|mailto):([^"]*)"/i', $link, $m)) {
+                $link = $m[1]; # ?: non capture group
             }
+            if ($element->hasAttribute('title')) {
+                $title = $element->getAttribute('title');
+            }
+            $string = "[{$title}]($link)";
+            $needle = $xml->saveHtml($element);
+            $html = str_replace($needle, $string, $html);
         }
 
-        # Change images to markers using alt e.g [image: some image title from alt]
-        if (preg_match_all('/<img\s[^>]*>/i', $html, $matches)) {
-            foreach ($matches[0] as $i => $match) {
-                $alt = $filename = '';
-                if (preg_match('/alt ?= ?"([^"]*)"/i', $match, $m)) {
-                    $alt = $m[1];
-                }
-                if (preg_match('/src ?= ?"([^"]*)"/i', $match, $m)) {
-                    $filename = $m[1];
-                }
-                $string = "[image: {$filename}]";
-                if ($alt) {
-                    $string = "[image: {$alt} {$filename}]";
-                }
-                $html = str_replace($match, $string, $html);
-            }
-        }
-
-        /**
-         * All links now captured
-         */
-        if (preg_match_all('/<a\s[^>]*href\s*=\s*(\"??)([^\" >]*?)\\1[^>]*>(.*)<\/a>/siU', $html, $matches)) {
-            foreach ($matches[0] as $i => $match) {
-                $link = $title = '';
-
-                if (preg_match('/<a\s[^>]*>(.*)<\/a>/siU', $match, $m)) {
-                    $title = $m[1];
-                }
-
-                if (preg_match('/href ?= ?"(?:tel|skype|mailto):([^"]*)"/i', $match, $m)) {
-                    $link = $m[1]; # ?: non capture group
-                }
-
-                if (preg_match('/href ?= ?"([^"]*)"/i', $match, $m)) {
-                    $link = $m[1];
-                }
-
-                if (preg_match('/title ?= ?"([^"]*)"/i', $match, $m)) {
-                    $title = $m[1];
-                }
-                $string = $link;
-                if ($title) {
-                    $string = "[{$title}]($link)";
-                }
-                $html = str_replace($match, $string, $html);
-            }
-        }
-        $html = rtrim($html);
-        return strip_tags($html);
+        $html =  strip_tags($html);
+        return rtrim($html);
     }
 }

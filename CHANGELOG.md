@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ## Changed
+- Html2Text now supports more headings, lists, definitions, blockquotes
 - Removed unnecessary array access from collections
 
 ## Security
