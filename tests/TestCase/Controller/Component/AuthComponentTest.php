@@ -63,23 +63,6 @@ class AuthComponentTest extends OriginTestCase
         $this->AuthComponent = new MockAuthComponent($this->Controller);
     }
 
-    public function testHashPassword()
-    {
-        $AuthComponent = $this->AuthComponent;
-        $result = $AuthComponent->hashPassword('secret');
-        $this->assertContains('$2y$10', $result);
-    }
-
-    /**
-     * @depends testHashPassword
-     */
-    public function testVerifyPassword()
-    {
-        $AuthComponent = $this->AuthComponent;
-        $result = $AuthComponent->hashPassword('secret');
-        $this->assertTrue($AuthComponent->verifyPassword('secret', $result));
-    }
-
     public function testAllow()
     {
         $AuthComponent = $this->AuthComponent;

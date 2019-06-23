@@ -20,6 +20,7 @@ use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
 use Origin\Exception\ForbiddenException;
 use Origin\Exception\Exception;
+use Origin\Utility\Security;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -280,19 +281,6 @@ class AuthComponent extends Component
         }
         return null;
     }
-
-    /**
-     * Verifies a password against a hash. use with Auth->hashPassword().
-     *
-     * @param string $password
-     * @param string $hash
-     *
-     * @return bool true or false
-     */
-    public function verifyPassword(string $password, string $hash)
-    {
-        return password_verify($password, $hash);
-    }
     
     /**
      * Gets the username and password from request
@@ -382,7 +370,7 @@ class AuthComponent extends Component
         if (empty($result)) {
             return false;
         }
-        if ($this->verifyPassword($password, $result->get($this->config['fields']['password']))) {
+        if (Security::verifyPassword($password, $result->get($this->config['fields']['password']))) {
             return $result;
         }
 
