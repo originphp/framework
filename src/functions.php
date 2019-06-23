@@ -123,7 +123,7 @@ function pluginSplit($name)
  * Splits a command
  *
  * @param string $command app:create-user,
- * @return void
+ * @return array
  */
 function commandSplit(string $command)
 {
@@ -152,11 +152,11 @@ function __(string $string = null, array $vars = [])
 }
 
 /**
- * Wrapper for html
+ * Convenient function for htmlspecialchars.
  *
  * @param string $text
  * @param string $encoding
- * @return void
+ * @return string
  */
 function h(string $text = null, $encoding = 'UTF-8')
 {
@@ -236,10 +236,11 @@ function uid($length=13)
  * The OriginPHP default password hasher
  *
  * @param string $password
- * @return boolean
+ * @return string
  */
 function hashPassword(string $password)
 {
+    deprecationWarning('Deprecated: Use Security::hashPassword instead');
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
@@ -279,7 +280,7 @@ function deprecationWarning(string $message)
 function contains(string $needle, string $haystack) : bool
 {
     if (!empty($needle)) {
-        return (strpos($haystack, $needle) !== false);
+        return (mb_strpos($haystack, $needle) !== false);
     }
     return false;
 }
@@ -295,11 +296,11 @@ function contains(string $needle, string $haystack) : bool
 function left(string $characters, string $string) : ?string
 {
     if (!empty($characters)) {
-        $position = strpos($string, $characters);
+        $position = mb_strpos($string, $characters);
         if ($position === false) {
             return null;
         }
-        return substr($string, 0, $position);
+        return mb_substr($string, 0, $position);
     }
     return null;
 }
@@ -314,11 +315,11 @@ function left(string $characters, string $string) : ?string
 function right(string $characters, string $string) : ?string
 {
     if (!empty($characters)) {
-        $position = strpos($string, $characters);
+        $position = mb_strpos($string, $characters);
         if ($position === false) {
             return null;
         }
-        return substr($string, $position + strlen($characters));
+        return mb_substr($string, $position + mb_strlen($characters));
     }
     return null;
 }
@@ -332,8 +333,8 @@ function right(string $characters, string $string) : ?string
  */
 function begins(string $needle, string $haystack) : bool
 {
-    $length = strlen($needle);
-    return (substr($haystack, 0, $length) == $needle);
+    $length = mb_strlen($needle);
+    return (mb_substr($haystack, 0, $length) == $needle);
 }
 
 /**
@@ -345,13 +346,14 @@ function begins(string $needle, string $haystack) : bool
  */
 function ends(string $needle, string $haystack) : bool
 {
-    $length = strlen($needle);
-    return (substr($haystack, -$length, $length) == $needle);
+    $length = mb_strlen($needle);
+    return (mb_substr($haystack, -$length, $length) == $needle);
 }
 
 /**
  * Replaces text in strings.
  *
+ * @internal str_replace works with multibyte string see https://php.net/manual/en/ref.mbstring.php#109937
  * @param string $needle
  * @param string $with
  * @param string $haystack
@@ -376,7 +378,7 @@ function replace(string $needle, string $with, string $haystack, array $options=
  */
 function length(string $string) : int
 {
-    return strlen($string);
+    return mb_strlen($string);
 }
 
 /**
@@ -387,7 +389,7 @@ function length(string $string) : int
  */
 function lower(string $string) :string
 {
-    return strtolower($string);
+    return mb_strtolower($string);
 }
 
 /**
@@ -398,5 +400,5 @@ function lower(string $string) :string
  */
 function upper(string $string) :string
 {
-    return strtoupper($string);
+    return mb_strtoupper($string);
 }

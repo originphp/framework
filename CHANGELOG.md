@@ -25,7 +25,8 @@ Delete tag: git tag -d <tag_name>
 - Security hashPassword, verifyPassword
 - Security compare for comparing hashed strings to protect against timing attacks
 
-## Fixed 
+## Fixed
+- String functions contains,begins,ends, length etc changed to multibyte
 - Removed not used argument description
 
 ## Changed
