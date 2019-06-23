@@ -22,12 +22,15 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ## Added
+- Security hashPassword, verifyPassword
 - Security compare for comparing hashed strings to protect against timing attacks
 
 ## Fixed 
 - Removed not used argument description
 
 ## Changed
+- Security::hash now uses array of options
+- Refactored Auth component to work with Security::verifyPassword
 - Changed Cookie classes to work with refactored security utility
 - Security encrypt returns base64 encoded string, a decrypt expects that.
 - Security hash now throws exception if Algo is not known
@@ -35,9 +38,10 @@ Delete tag: git tag -d <tag_name>
 - Removed unnecessary array access from collections
 
 ## Security
+- Switched to random_bytes from openssl_random_pseudo_bytes
 - Refactored Security::encrypt/decrypt added protection against timing attacks
 - CSRF Protection Middleware, added protection against timing attacks
 - File Utility switched to internal uid function for unique id generation
-- Form Helper changed to escape values
+- Form Helper changed to escape values for protection against Cross-Site Scripting (XSS) attacks
 - Adjusted h function work better for security
 - Improved Email Utility for protection against Email Header Injection Attacks
