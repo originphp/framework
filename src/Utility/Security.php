@@ -66,7 +66,7 @@ class Security
      */
     public static function generateKey() : string
     {
-        return bin2hex(openssl_random_pseudo_bytes(16));
+        return bin2hex(random_bytes(16));
     }
 
     /**
@@ -83,7 +83,7 @@ class Security
             throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
         }
         $length = openssl_cipher_iv_length('AES-128-CBC');
-        $iv = openssl_random_pseudo_bytes($length);
+        $iv = random_bytes($length);
         $raw = openssl_encrypt($string, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $raw, $key, true);
         return base64_encode($iv . $hmac . $raw);
