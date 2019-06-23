@@ -21,27 +21,53 @@ use Origin\Exception\InvalidArgumentException;
 class Security
 {
     /**
-    * Hashes a string
+    * Hashes a string. This is not for passwords.
     *
     * @param string $string
-    * @param string $type sha1,sha256,sha512 etc see hash_algos()
-    * @param boolean|string $salt
-    * @return boolean
-    */
-    public static function hash(string $string, string $algorithm ='sha1', $salt = false)
+     * @param string $string
+     * @param array $options options keys are
+     * - salt: (default:false). Set to true to use Security.salt or set a string to use
+     * - type: (default:sha256)
+     * @return string
+     */
+    public static function hash(string $string, array $options=[]) : string
     {
-        $algorithm = strtolower($algorithm);
+        $options += ['salt'=>false,'type'=>'sha256'];
+        $algorithm = strtolower($options['type']);
 
-        if ($salt === true) {
-            $salt = Configure::read('Security.salt');
+        if ($options['salt'] === true) {
+            $options['salt'] = Configure::read('Security.salt');
         }
-        if ($salt) {
-            $string = $salt . $string;
+        if ($options['salt']) {
+            $string = $options['salt'] . $string;
         }
         if (!in_array($algorithm, hash_algos())) {
             throw new Exception('Invalid hashing algorithm');
         }
         return hash($algorithm, $string);
+    }
+
+    /**
+     * Hashes a password using the current best practice which is Bcrypt
+     *
+     * @param string $password
+     * @return string
+     */
+    public static function hashPassword(string $password) : string
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    /**
+     * Verifies a password against a hash created with hashPassword
+     *
+     * @param string $password
+     * @param string $hash
+     * @return boolean
+     */
+    public static function verifyPassword(string $password, string $hash) : bool
+    {
+        return password_verify($password, $hash);
     }
 
     /**
@@ -77,7 +103,7 @@ class Security
      * @param string $key must must be at least 256 bits (32 bytes)
      * @return string
      */
-    public static function encrypt(string $string, string $key)
+    public static function encrypt(string $string, string $key) : string
     {
         if (strlen($key) < 32) {
             throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
@@ -94,7 +120,7 @@ class Security
     *
     * @param string $string
     * @param string $key must must be at least 256 bits (32 bytes)
-    * @return string encrypted string
+    * @return string|bool encrypted string
     */
     public static function decrypt(string $string, string $key=null)
     {

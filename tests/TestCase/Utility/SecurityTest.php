@@ -33,20 +33,35 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $plain = 'The quick brown fox jumps over the lazy dog';
         $expected = '2fd4e1c67a2d28fced849ee1bb76e7391b93eb12';
        
-        $this->assertEquals($expected, Security::hash($plain));
+        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1']));
    
         $expected = 'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592';
-        $this->assertEquals($expected, Security::hash($plain, 'sha256'));
+        $this->assertEquals($expected, Security::hash($plain));
         
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, 'sha1', 'OriginPHP'));
+        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','salt'=>'OriginPHP']));
 
         Configure::write('Security.salt', 'OriginPHP');
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, 'sha1', true));
+        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','salt'=>true]));
 
         $this->expectException(Exception::class);
-        Security::hash($plain, 'saltandpepper');
+        Security::hash($plain, ['type'=>'unkownHashType']);
+    }
+
+    public function testHashPassword()
+    {
+        $result = Security::hashPassword('secret');
+        $this->assertContains('$2y$10', $result);
+    }
+
+    /**
+     * @depends testHashPassword
+     */
+    public function testVerifyPassword()
+    {
+        $result = Security::hashPassword('secret');
+        $this->assertTrue(Security::verifyPassword('secret', $result));
     }
 
     public function testCompare()
