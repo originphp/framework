@@ -43,7 +43,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
     public function testRead()
     {
         // This is failing to decrypt when running all tests together
-        $_COOKIE['ez'] = 'T3JpZ2lu==.AC3jMXsv4xDAHvdbbj9qTzIedmDcdIcaN1w/FPpji2XGP4iU1dSMTUPWB1HWf5anBj8y7zvZEmA8kyEMbJCGBw==';
+        $_COOKIE['ez'] = 'T3JpZ2lu==.1GGI3h6SzWOySKqiDv3IX0+pcfDWWDb7BO4x/1fMltjk+3jKbpuODa4zNqjoetxDHMnmT6xCQ1iWToderGmNhQ==';
         $_COOKIE['normal'] = 'hello';
         $this->Cookie = new CookieHelper(new View(new Controller(new Request(), new Response())));
         $this->assertEquals('hello', $this->Cookie->read('normal'));

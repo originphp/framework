@@ -39,7 +39,7 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
     }
     public function testRead()
     {
-        $_COOKIE['encrypted'] = 'T3JpZ2lu==.AC3jMXsv4xDAHvdbbj9qTzIedmDcdIcaN1w/FPpji2XGP4iU1dSMTUPWB1HWf5anBj8y7zvZEmA8kyEMbJCGBw==';
+        $_COOKIE['encrypted'] = 'T3JpZ2lu==.kP0v9J9WkslW5qU9YszzOVLBOpXtxhQUFkSklzbcZ/kJZpXORabtaSHSeSabFkuiSv90FoNo4dVSSZbRARz9rw==';
         $this->Cookie = new CookieComponent(new Controller(new Request(), new Response()));
         $this->assertEquals('bar', $this->Cookie->read('encrypted'));
     }
