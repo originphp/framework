@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Console;
+
 use Origin\Console\Exception\ConsoleException;
 
 class ConsoleIo
@@ -53,7 +54,7 @@ class ConsoleIo
     ];
 
     /**
-     * Character length of 
+     * Character length of
      *
      * @var int
      */
@@ -82,7 +83,7 @@ class ConsoleIo
      */
     public function out($message)
     {
-        $this->lastWrittenLength = $this->stdout->write($message,true);
+        $this->lastWrittenLength = $this->stdout->write($message, true);
     }
 
     /**
@@ -107,27 +108,28 @@ class ConsoleIo
 
     /**
      * Overwrites the last text. Does not work if used new line after text
-     * 
+     *
      * $io->write('downloading...');
      * $io->overwrite('completed');
      *
      * @param string|array $message
      * @return void
      */
-    public function overwrite($message,$newLine = true){
-        if(is_array($message)){
-            $message = implode("\n",$message);
+    public function overwrite($message, $newLine = true)
+    {
+        if (is_array($message)) {
+            $message = implode("\n", $message);
         }
-       $this->stdout->write("\033[{$this->lastWrittenLength}D",false);
+        $this->stdout->write("\033[{$this->lastWrittenLength}D", false);
     
-       $difference = strlen($message) - $this->lastWrittenLength;
-       if($difference > 0){
-           $message .= str_repeat(' ',$difference);
-       }
-       if($newLine){
-           $message .= "\n";
-       }
-       $this->write($message);
+        $difference = strlen($message) - $this->lastWrittenLength;
+        if ($difference > 0) {
+            $message .= str_repeat(' ', $difference);
+        }
+        if ($newLine) {
+            $message .= "\n";
+        }
+        $this->write($message);
     }
 
     
@@ -136,7 +138,7 @@ class ConsoleIo
      *
      * @param string $heading
      */
-    public function title(string $title,string $style ='heading')
+    public function title(string $title, string $style ='heading')
     {
         $this->out("<{$style}>{$title}</{$style}>");
         $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
@@ -148,7 +150,7 @@ class ConsoleIo
      *
      * @param string $heading1
      */
-    public function heading(string $heading,string $style ='heading')
+    public function heading(string $heading, string $style ='heading')
     {
         $this->out("<{$style}>{$heading}</{$style}>");
         $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
@@ -157,12 +159,12 @@ class ConsoleIo
 
     /**
      * This ouput texts for use with heading,title etc. Text will automatically be indented.
-     * 
+     *
      * @param string|array $text
      * @param integer $indent
      * @return void
      */
-    public function text($text,int $indent=2)
+    public function text($text, int $indent=2)
     {
         $text = (array) $text;
         foreach ($text as $line) {
@@ -235,7 +237,7 @@ class ConsoleIo
         foreach ((array) $elements as $element) {
             $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
         }
-    } 
+    }
 
     /**
      * Formats a string by using array of options. such as color,background.
@@ -274,16 +276,16 @@ class ConsoleIo
         $this->highlight($messages, $options);
     }
 
-     /**
-     * Displays a warning block or alert to stderr out
-     *
-     * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
-     */
+    /**
+    * Displays a warning block or alert to stderr out
+    *
+    * @param string|array $messages line or array of lines
+    * @param array        $options  (background,color,blink,bold,underline)
+    */
     public function warning($messages, array $options = [])
     {
         $options += ['background' => 'yellow', 'color' => 'black', 'bold' => true];
-        foreach((array) $messages as $message){
+        foreach ((array) $messages as $message) {
             $string = $this->format($message, $options);
             $this->stderr->write($string);
         }
@@ -298,7 +300,7 @@ class ConsoleIo
     public function error($messages, array $options = [])
     {
         $options += ['background' => 'lightRed', 'color' => 'white', 'bold' => true];
-        foreach((array) $messages as $message){
+        foreach ((array) $messages as $message) {
             $string = $this->format($message, $options);
             $this->stderr->write($string);
         }
@@ -307,31 +309,51 @@ class ConsoleIo
     /**
      * Draws a progress bar.
      *
-     * @param int $value
-     * @param int $max
-     *
+     * thank you!
+     * @param integer $value
+     * @param integer $max
+     * @param array $options (color) e.g. [color=>cyan]
+     * @return void
      * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
-    public function progressBar(int $value, int $max)
+    public function progressBar(int $value, int $max, array $options=[])
     {
+        $options += ['color'=>'green'];
+        
+        $progressBar = '';
+        $full = '#';
+        $empty = ' ';
+
         $percent = floor(($value / $max) * 100);
         $left = 100 - $percent;
-        
-        $pb = $pb2 = '';
+
+        $ansi = $this->stdout->supportsAnsi();
+
+        if ($ansi) {
+            $full = $this->format(' ', ['background'=>$options['color']]);
+            $empty = "\033[30;40m \033[0m";
+        }
         if ($percent) {
-            $pb = str_repeat("\033[102m \033[0m", floor($percent / 2));
+            $progressBar = str_repeat($full, floor($percent / 2));
         }
         if ($left) {
-            if($left %2 !== 0){
+            if ($left %2 !== 0) {
                 $left ++;
             }
-            $pb2 = str_repeat("\033[30;40m \033[0m", floor($left / 2));
+            $progressBar .= str_repeat($empty, floor($left / 2));
         }
+        
+        $progress = $percent . '%';
+        if ($ansi) {
+            $progress = $this->format($progress, $options);
+        } else {
+            $progressBar = "[{$progressBar}]";
+        }
+        
+        $this->write("\r{$progressBar} {$progress}");
 
-        $this->write("\033[0G\033[2K".$pb.$pb2."\033[92m{$percent}%");
         if ($percent == 100) {
-            sleep(1);
-            $this->out("\033[0G\033[2K\033[0m");
+            $this->write("\n");
         }
     }
 
@@ -474,7 +496,7 @@ class ConsoleIo
         );
        
       
-        while ($input === '' OR !in_array($input, $options)) {
+        while ($input === '' or !in_array($input, $options)) {
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
             $input = $this->stdin->read();
@@ -482,8 +504,8 @@ class ConsoleIo
                 return $default;
             }
             # Catch out errors caused by not sending data via ConsoleIntegratioTest::exec
-            if($input === null){
-                throw new ConsoleException(sprintf('No input for `%s`',$prompt));
+            if ($input === null) {
+                throw new ConsoleException(sprintf('No input for `%s`', $prompt));
             }
         }
         $this->stdout->write("\033[0m"); // reset + line break
@@ -555,21 +577,21 @@ class ConsoleIo
         return $maxLength;
     }
 
-     /**
-     * Sets or modifies existing styles
-     *  $styles = $io->styles();
-     *  $style = $io->styles('primary');
-     *  $io->styles('primary',$styleArray);
-     *  $io->styles('primary',false);
-     *
-     * @param string $name
-     * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
-     * @return bool|array|null
-     */
+    /**
+    * Sets or modifies existing styles
+    *  $styles = $io->styles();
+    *  $style = $io->styles('primary');
+    *  $io->styles('primary',$styleArray);
+    *  $io->styles('primary',false);
+    *
+    * @param string $name
+    * @param array $values array('color' => 'white','background'=>'blue','bold' => true) or false to delete
+    * @return bool|array|null
+    */
     public function styles(string $name = null, $values = null)
     {
-        $this->stderr->styles($name,$values);
-        return $this->stdout->styles($name,$values);
+        $this->stderr->styles($name, $values);
+        return $this->stdout->styles($name, $values);
     }
 
     /**
@@ -577,15 +599,17 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleOutput;
      */
-    public function stderr(){
+    public function stderr()
+    {
         return $this->stderr;
     }
-     /**
-     * Returns the output object
-     *
-     * @return \Origin\Console\ConsoleOutput;
-     */
-    public function stdout(){
+    /**
+    * Returns the output object
+    *
+    * @return \Origin\Console\ConsoleOutput;
+    */
+    public function stdout()
+    {
         return $this->stdout;
     }
     /**
@@ -593,11 +617,12 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleInput;
      */
-    public function stdin(){
+    public function stdin()
+    {
         return $this->stdin;
     }
 
-      /**
+    /**
      * Formats and writes a line by using array of options. such as color,background.
      *
      * @param string $text

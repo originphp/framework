@@ -87,12 +87,12 @@ class ConsoleOutput
         'reverse' => 27,
     ];
 
-    protected $styles = [   
+    protected $styles = [
         'exception' => ['color' => 'white','background'=>'lightRed'],
 
         # Notifications
-        'debug' => ['color' => 'white'], 
-        'success' => ['color' => 'lightGreen'], 
+        'debug' => ['color' => 'white'],
+        'success' => ['color' => 'lightGreen'],
         'error' => ['color' => 'red'],
         'warning'=> ['color' => 'yellow'],
         'notice' => ['color' => 'cyan'],
@@ -121,6 +121,10 @@ class ConsoleOutput
     public function __construct(string $stream ='php://stdout')
     {
         $this->stream = fopen($stream, 'r');
+        // Check that Ansi Escape Sequences are supported
+        if (!$this->supportsAnsi()) {
+            $this->mode = SELF::PLAIN;
+        }
     }
     
     public function __destruct()
@@ -128,16 +132,29 @@ class ConsoleOutput
         $this->close();
     }
 
-
     /**
-     * Sets the mode for output
+     * Checks for Ansi Support
      *
-     * @param integer $mode
      * @return void
      */
-    public function mode(int $mode){
-        if(!in_array($mode,[self::RAW,self::PLAIN, self::COLOR])){
-            throw new InvalidArgumentException(sprintf('Invalid mode %s',$mode));
+    public function supportsAnsi()
+    {
+        return function_exists('posix_isatty') and posix_isatty($this->stream);
+    }
+
+    /**
+     * Sets and gets the mode for output
+     *
+     * @param integer $mode
+     * @return int|void
+     */
+    public function mode(int $mode = null)
+    {
+        if ($mode === null) {
+            return $this->mode;
+        }
+        if (!in_array($mode, [self::RAW,self::PLAIN, self::COLOR])) {
+            throw new InvalidArgumentException(sprintf('Invalid mode %s', $mode));
         }
         $this->mode = $mode;
     }
@@ -146,23 +163,22 @@ class ConsoleOutput
      * Writes to the stream
      *
      * @param string|array $data
-     * @return int 
+     * @return int
      */
-    public function write($data,$newLine = true)
+    public function write($data, $newLine = true)
     {
-        if(is_array($data)){
-            $data = implode("\n",$data);
+        if (is_array($data)) {
+            $data = implode("\n", $data);
         }
         
-        if($this->mode === SELF::COLOR){
+        if ($this->mode === SELF::COLOR) {
             $data = $this->parseTags($data);
-        }
-        elseif($this->mode === SELF::PLAIN){
+        } elseif ($this->mode === SELF::PLAIN) {
             $tags = array_keys($this->styles);
-            $data = preg_replace('/<\/?(' . implode('|',$tags) . ')>/', '', $data);
+            $data = preg_replace('/<\/?(' . implode('|', $tags) . ')>/', '', $data);
         }
        
-        if($newLine){
+        if ($newLine) {
             $data .= "\n";
         }
         return $this->fwrite($data);
@@ -174,7 +190,8 @@ class ConsoleOutput
      * @param string $data
      * @return int bytes
      */
-    protected function fwrite(string $data){
+    protected function fwrite(string $data)
+    {
         fwrite($this->stream, $data);
         return strlen($data);
     }
@@ -200,16 +217,15 @@ class ConsoleOutput
     {
         $regex = '/<([a-z0-9]+)>(.*?)<\/(\1)>/ims';
         if (preg_match_all($regex, $string, $matches)) {
-           
-             foreach ($matches[1] as $key => $tag) {
+            foreach ($matches[1] as $key => $tag) {
                 $text = $matches[2][$key];
                
                 # Handle Nested Colors, preserving previous colors
-               if(preg_match($regex,$text,$match)){
-                   $nestedText = "</{$tag}>{$match[0]}<{$tag}>" ;  // Wrap in parent tags (reverse)
-                   $string = str_replace($match[0], $nestedText,$string);
-                   $string = $this->parseTags($string);
-               }
+                if (preg_match($regex, $text, $match)) {
+                    $nestedText = "</{$tag}>{$match[0]}<{$tag}>" ;  // Wrap in parent tags (reverse)
+                    $string = str_replace($match[0], $nestedText, $string);
+                    $string = $this->parseTags($string);
+                }
               
                 $string = str_replace("<{$tag}>{$text}</{$tag}>", $this->style($tag, $text), $string);
             }
@@ -228,8 +244,7 @@ class ConsoleOutput
         }
         $settings = $this->styles[$tag];
         
-        return $this->color($text,$settings);
-        
+        return $this->color($text, $settings);
     }
     /**
      * Colors a string
@@ -238,7 +253,8 @@ class ConsoleOutput
      * @param array $settings ['color'=>'blue','background'=>'red','blink'=>true]
      * @return void
      */
-    public function color(string $text,array $settings){
+    public function color(string $text, array $settings)
+    {
         $set = [];
         $unset = [];
         if (isset($settings['color']) and isset($this->foregroundColors[$settings['color']])) {
@@ -251,12 +267,12 @@ class ConsoleOutput
         }
         unset($settings['color'], $settings['background']);
         foreach ($settings as $option => $value) {
-            if ($value AND isset($this->options[$option])) {
+            if ($value and isset($this->options[$option])) {
                 $set[] = $this->options[$option];
                 $unset[] = $this->optionsUnset[$option];
             }
         }
-        if(empty($set)){
+        if (empty($set)) {
             return $text;
         }
         return "\033[" . implode(';', $set) . 'm' . $text . "\033[" . implode(';', $unset) . 'm';

@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Changed
+- Console progress bar now works with and without ansi support
 - Renamed phpunit.xml to phpunit.xml.dist
 - Prepared cookie for Cookie.key
 
