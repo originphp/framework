@@ -22,6 +22,7 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Database exception errors when connecting were not being logged
 - Issues with test hashes caused by last refactor Security.salt renamed to Security.pepper
 
 ## [1.18.2] - 2019-06-24
