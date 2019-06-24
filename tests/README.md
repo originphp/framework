@@ -29,7 +29,9 @@ $ cp -r tmp/tests <folder>
 
 In the tests/TestApp/config, the database settings will need to be configured there. There is also .env-template that needs to be filled for testing external services directly such SFTP. If you need the Docker configuration for these services send me an email, i will send you my setup.
 
-To run all tests
+You need to rename the `phpunit.xml.dist` to just `phpunit.xml`
+
+To run all tests.
 
 ```linux
 $ phpunit

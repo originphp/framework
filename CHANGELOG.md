@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Changed
+- Renamed phpunit.xml to phpunit.xml.dist
 - Prepared cookie for Cookie.key
 
 ### Fixed
