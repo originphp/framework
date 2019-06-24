@@ -21,6 +21,10 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Changed
+- Prepared cookie for Cookie.key
+
 ### Fixed
 - Database exception errors when connecting were not being logged
 - Issues with test hashes caused by last refactor Security.salt renamed to Security.pepper

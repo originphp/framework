@@ -38,7 +38,11 @@ class Cookie
      */
     public function __construct()
     {
-        $this->key = md5(Configure::read('Security.pepper')); // Create a 32 byte key using the pepper
+        // Create a 32 byte key using the pepper
+        $this->key = md5(Configure::read('Security.pepper')); // Fallback for now
+        if (Configure::exists('Cookie.key')) {
+            $this->key = Configure::read('Cookie.key');
+        }
     }
 
     /**
