@@ -21,6 +21,9 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Issues with test hashes caused by last refactor Security.salt renamed to Security.pepper
+
 ## [1.18.2] - 2019-06-24
 ### Fixed
 - Cookie tests
