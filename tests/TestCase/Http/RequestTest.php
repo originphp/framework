@@ -154,7 +154,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     public function testCookie()
     {
         $_COOKIE = [
-            'foo'=>'T3JpZ2lu==.BYm029TnSQJwJoXkM46IRTyWA//2CXOtrcG8+ri+sWNt8HDIQhHor0QHin1tFmDAWZRzAfFPQ1XdjmfBU7MVjA=='
+            'foo'=>'T3JpZ2lu==.hFYfdszSgetA5NYSqcfTorccTmL2jKE6/cp/bP2WNfgehMKCc7/LZOI0I1qqUj5H0xo37W9s88Gby9/LsGlxnQ=='
         ];
         $expected = [
             'foo' => 'This is a test'
