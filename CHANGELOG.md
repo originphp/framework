@@ -31,6 +31,7 @@ Delete tag: git tag -d <tag_name>
 - Removed not used argument description
 
 ## Changed
+- Security encrypt/decrypt cipher changed to AES-256-CBC from AES-128-CBC
 - Composer.json - cleaned this up and improved
 - CSRF Protection Middleware token changed to use the Security::hash function
 - Security::hash now uses array of options

@@ -77,11 +77,14 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     public function testEncryptDecrypt()
     {
         $plain = 'The quick brown fox jumps over the lazy dog';
-        $key = 'c535ec4e94eaee1278c4e31ad1af46eef6fa8c1bea9976ba0d180b1edf1626d2';
-
+        $key = '58024d70eb647a3d0654d5211af2ebfd';
+  
         $encrypted = Security::encrypt($plain, $key);
         $decrypted = Security::decrypt($encrypted, $key);
         $this->assertEquals($plain, $decrypted);
+        $this->assertFalse(Security::decrypt($encrypted, str_replace('7', 'a', $key))); // test wrong key
+
+        $this->expectException(Exception::class);
         $this->assertFalse(Security::decrypt($encrypted, $key.'x')); // test wrong key
     }
 }

@@ -20,6 +20,8 @@ use Origin\Exception\InvalidArgumentException;
 
 class Security
 {
+    const CIPHER = 'AES-256-CBC';
+ 
     /**
     * Hashes a string. This is not for passwords.
     *
@@ -35,12 +37,16 @@ class Security
         $options += ['salt'=>false,'type'=>'sha256'];
         $algorithm = strtolower($options['type']);
 
+        /**
+         * Correct terminology is pepper but the widely known and used is salt
+         */
         if ($options['salt'] === true) {
             $options['salt'] = Configure::read('Security.salt');
         }
         if ($options['salt']) {
             $string = $options['salt'] . $string;
         }
+
         if (!in_array($algorithm, hash_algos())) {
             throw new Exception('Invalid hashing algorithm');
         }
@@ -100,17 +106,19 @@ class Security
      *
      * @see http://php.net/manual/en/function.openssl-encrypt.php
      * @param string $string
-     * @param string $key must must be at least 256 bits (32 bytes)
+     * @param string $key must must be 256 bits (32 bytes)
      * @return string
      */
     public static function encrypt(string $string, string $key) : string
     {
-        if (strlen($key) < 32) {
-            throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
+        if (mb_strlen($key) !== 32) {
+            debug(mb_strlen($key));
+            die();
+            throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
         }
-        $length = openssl_cipher_iv_length('AES-128-CBC');
+        $length = openssl_cipher_iv_length(self::CIPHER);
         $iv = random_bytes($length);
-        $raw = openssl_encrypt($string, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        $raw = openssl_encrypt($string, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $raw, $key, true);
         return base64_encode($iv . $hmac . $raw);
     }
@@ -119,16 +127,16 @@ class Security
     * Decrypts an encrypted string
     *
     * @param string $string
-    * @param string $key must must be at least 256 bits (32 bytes)
+    * @param string $key must must be 256 bits (32 bytes)
     * @return string|bool encrypted string
     */
-    public static function decrypt(string $string, string $key=null)
+    public static function decrypt(string $string, string $key)
     {
-        if (strlen($key) < 32) {
-            throw new InvalidArgumentException('Invalid Key. Key must be at least 256 bits (32 bytes)');
+        if (mb_strlen($key) !== 32) {
+            throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
         }
         $string = base64_decode($string);
-        $length = openssl_cipher_iv_length('AES-128-CBC');
+        $length = openssl_cipher_iv_length(self::CIPHER);
         $iv = substr($string, 0, $length);
         $hmac = substr($string, $length, 32);
         $raw = substr($string, $length + 32);
@@ -136,6 +144,6 @@ class Security
         if (!static::compare($expected, $hmac)) {
             return false;
         }
-        return openssl_decrypt($raw, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
     }
 }
