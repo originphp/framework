@@ -218,13 +218,13 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAddAttachment()
     {
         $Email = new MockEmail();
-        $Email = $Email->addAttachment(ROOT . DS . 'tests' . DS  . 'phpunit.xml');
+        $Email = $Email->addAttachment(ROOT . DS . 'tests' . DS  . 'phpunit.xml.dist');
         $this->assertInstanceOf(Email::class, $Email);
 
         $Email->addAttachment(ROOT . DS . 'tests' . DS  . 'README.md', 'Important.md');
 
         $expected = [
-            ROOT . DS . 'tests' . DS  . 'phpunit.xml' => 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml.dist' => 'phpunit.xml.dist',
             ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ];
         $this->assertSame($expected, $Email->getProperty('attachments'));
@@ -240,13 +240,13 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     {
         $Email = new MockEmail();
         $Email = $Email->addAttachments([
-            ROOT . DS . 'tests' . DS  . 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml.dist',
             ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ]);
         $this->assertInstanceOf(Email::class, $Email);
 
         $expected = [
-            ROOT . DS . 'tests' . DS  . 'phpunit.xml' => 'phpunit.xml',
+            ROOT . DS . 'tests' . DS  . 'phpunit.xml.dist' => 'phpunit.xml.dist',
             ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md'
         ];
 
