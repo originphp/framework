@@ -21,9 +21,16 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.18.2] - 2019-06-24
+### Fixed
+- Cookie tests
+- Accidentally committed debug code
 
 ### Deprecated
 - Security.salt and Security::hash option salt. This is now renamed to `pepper` as per the correct terminology
+
+#### Security
+- Cookie key was larger than openssl function would use and was truncated
 
 ## [1.18.1] - 2019-06-24
 ### Added
