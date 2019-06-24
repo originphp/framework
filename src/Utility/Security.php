@@ -117,8 +117,6 @@ class Security
     public static function encrypt(string $string, string $key) : string
     {
         if (mb_strlen($key) !== 32) {
-            debug(mb_strlen($key));
-            die();
             throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
         }
         $length = openssl_cipher_iv_length(self::CIPHER);
