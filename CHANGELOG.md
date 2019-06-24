@@ -30,6 +30,7 @@ Delete tag: git tag -d <tag_name>
 - Removed not used argument description
 
 ## Changed
+- Composer.json - cleaned this up and improved
 - CSRF Protection Middleware token changed to use the Security::hash function
 - Security::hash now uses array of options
 - Refactored Auth component to work with Security::verifyPassword
