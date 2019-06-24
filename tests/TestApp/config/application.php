@@ -23,7 +23,7 @@ Cache::config('default', ['engine' => 'File']);
  * Generate a random string such as md5(time()) and place
  * here. This is used with hashing and key generation by Security.
  */
-Configure::write('Security.salt', '-----ORIGIN PHP-----');
+Configure::write('Security.pepper', '-----ORIGIN PHP-----');
 
 /**
  * Recommended is true, if you don't want date,datetime,time or number fields to be parsed according
