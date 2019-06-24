@@ -475,6 +475,7 @@ class FormHelper extends Helper
      *  - name: the name for the input
      *  - value: the value for the input
      *  - escape: default true. Escape values
+     *  - format: default true. Can be string of date format. Formats a date using the Date formatter
      *  - any other HTML attribute
      * @return string
      */
@@ -509,6 +510,7 @@ class FormHelper extends Helper
      *  - name: the name for the input
      *  - value: the value for the input
      *  - escape: default true. Escape values
+     *  - format: default true. Can be string of datetime format. Formats a datetime using the Date formatter
      *  - any other HTML attribute
      * @return string
      */
@@ -635,13 +637,14 @@ class FormHelper extends Helper
      *  - name: the name for the input
      *  - value: the value for the input
      *  - escape: default true. Escape values
+     *  - format: default true. Can be string of time format. Formats a time using the Date formatter
      *  - any other HTML attribute
      * @return string
      */
     public function time(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format'=>Date::locale()['time']];
+        $options += ['format' => Date::locale()['time']];
         $options['type'] = 'text';
 
         /**
@@ -668,6 +671,7 @@ class FormHelper extends Helper
      *  - name: the name for the input
      *  - value: the value for the input
      *  - escape: default true. Escape values
+     *  - format: default true. Formats a number using the Number formatter
      *  - any other HTML attribute
      * @return string
      */
