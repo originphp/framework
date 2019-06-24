@@ -21,6 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.18.1] - 2019-06-24
 ## Added
 - Security hashPassword, verifyPassword
 - Security compare for comparing hashed strings to protect against timing attacks
