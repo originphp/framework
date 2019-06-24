@@ -38,7 +38,7 @@ class Cookie
      */
     public function __construct()
     {
-        $this->key = hash('sha256', Configure::read('salt'));
+        $this->key = md5(Configure::read('Security.pepper')); // Create a 32 byte key using the pepper
     }
 
     /**
