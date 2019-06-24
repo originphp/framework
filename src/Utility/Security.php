@@ -28,23 +28,28 @@ class Security
     * @param string $string
      * @param string $string
      * @param array $options options keys are
-     * - salt: (default:false). Set to true to use Security.salt or set a string to use
+     * - pepper: (default:false). Set to true to use Security.pepper or set a string to use.
      * - type: (default:sha256)
      * @return string
      */
     public static function hash(string $string, array $options=[]) : string
     {
-        $options += ['salt'=>false,'type'=>'sha256'];
+        $options += ['pepper'=>false,'type'=>'sha256'];
         $algorithm = strtolower($options['type']);
 
         /**
-         * Correct terminology is pepper but the widely known and used is salt
+         * The correct terminology is pepper.
          */
-        if ($options['salt'] === true) {
-            $options['salt'] = Configure::read('Security.salt');
+        if (isset($options['salt'])) {
+            deprecationWarning('salt option is deprecated. use pepper and rename config to Security.pepper');
+            $options['pepper'] = $options['salt']??false;
         }
-        if ($options['salt']) {
-            $string = $options['salt'] . $string;
+
+        if ($options['pepper'] === true) {
+            $options['pepper'] = Configure::read('Security.pepper');
+        }
+        if ($options['pepper']) {
+            $string = $options['pepper'] . $string;
         }
 
         if (!in_array($algorithm, hash_algos())) {

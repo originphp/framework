@@ -22,11 +22,11 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {
-        Configure::write('Security.salt', 'B1816172FD2BA98F3AF520EF572E3A47');
+        Configure::write('Security.pepper', 'B1816172FD2BA98F3AF520EF572E3A47');
     }
     public function tearDown()
     {
-        Configure::write('Security.salt', '-----ORIGIN PHP-----');
+        Configure::write('Security.pepper', '-----ORIGIN PHP-----');
     }
     public function testHash()
     {
@@ -39,11 +39,11 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, Security::hash($plain));
         
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','salt'=>'OriginPHP']));
+        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','pepper'=>'OriginPHP']));
 
-        Configure::write('Security.salt', 'OriginPHP');
+        Configure::write('Security.pepper', 'OriginPHP');
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','salt'=>true]));
+        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','pepper'=>true]));
 
         $this->expectException(Exception::class);
         Security::hash($plain, ['type'=>'unkownHashType']);

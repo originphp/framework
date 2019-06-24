@@ -21,16 +21,20 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Deprecated
+- Security.salt and Security::hash option salt. This is now renamed to `pepper` as per the correct terminology
+
 ## [1.18.1] - 2019-06-24
-## Added
+### Added
 - Security hashPassword, verifyPassword
 - Security compare for comparing hashed strings to protect against timing attacks
 
-## Fixed
+### Fixed
 - String functions contains,begins,ends, length etc changed to multibyte
 - Removed not used argument description
 
-## Changed
+### Changed
 - Composer.json - cleaned this up and improved
 - CSRF Protection Middleware token changed to use the Security::hash function
 - Security::hash now uses array of options
@@ -41,7 +45,7 @@ Delete tag: git tag -d <tag_name>
 - Html2Text now supports more headings, lists, definitions, blockquotes
 - Removed unnecessary array access from collections
 
-## Security
+### Security
 - Switched to random_bytes from openssl_random_pseudo_bytes
 - Refactored Security::encrypt/decrypt added protection against timing attacks
 - CSRF Protection Middleware, added protection against timing attacks
