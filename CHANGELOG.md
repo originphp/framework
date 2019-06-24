@@ -30,6 +30,7 @@ Delete tag: git tag -d <tag_name>
 - Removed not used argument description
 
 ## Changed
+- CSRF Protection Middleware token changed to use the Security::hash function
 - Security::hash now uses array of options
 - Refactored Auth component to work with Security::verifyPassword
 - Changed Cookie classes to work with refactored security utility

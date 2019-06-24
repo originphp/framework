@@ -35,7 +35,7 @@ class CsrfProtectionMiddleware extends Middleware
 
     public function initialize(array $config)
     {
-        $this->token = hash('sha512', random_bytes(64));
+        $this->token = Security::hash(random_bytes(64), ['type'=>'sha512']);
     }
 
     /**
@@ -95,7 +95,7 @@ class CsrfProtectionMiddleware extends Middleware
     protected function validateToken(Request $request)
     {
         /**
-         * Disable for UnitTesting
+         * Disable when runing unit tests
          */
         if ($this->isTestEnvironment()) {
             return;
