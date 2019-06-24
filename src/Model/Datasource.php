@@ -84,7 +84,8 @@ abstract class Datasource
      */
     protected $adapter = null;
 
-    public function __construct(array $config = []){
+    public function __construct(array $config = [])
+    {
         $this->config = $config;
     }
 
@@ -110,6 +111,8 @@ abstract class Datasource
                 $flags
             );
         } catch (PDOException $e) {
+            $logger = new Logger('Datasource');
+            $logger->alert($e->getMessage());
             throw new ConnectionException([$config['host'],$config['database']]);
         }
     }
@@ -119,8 +122,9 @@ abstract class Datasource
      *
      * @return boolean
      */
-    public function isConnected(){
-        if($this->connection === null){
+    public function isConnected()
+    {
+        if ($this->connection === null) {
             return false;
         }
         
@@ -140,7 +144,7 @@ abstract class Datasource
 
     public function database()
     {
-        if(isset($this->config['database'])){
+        if (isset($this->config['database'])) {
             return $this->config['database'];
         }
         return null;
@@ -151,7 +155,8 @@ abstract class Datasource
      *
      * @return string
      */
-    public function quoteIdentifier(){
+    public function quoteIdentifier()
+    {
         return $this->escape;
     }
     /**
@@ -264,8 +269,8 @@ abstract class Datasource
      */
     public function disconnect()
     {
-        if($this->connection){
-            if($this->statement){
+        if ($this->connection) {
+            if ($this->statement) {
                 $this->statement->closeCursor();
             }
         }
@@ -449,25 +454,24 @@ abstract class Datasource
         return strpos($column, $this->virtualFieldSeperator) != false;
     }
 
-     /**
-     * Takes a numerical set results and maps to model. Originally was
-     * using getColumnMeta(), however the table result which is used to map
-     * does not work on postgresql. This will only work if all fields are quoted.
-     *
-     * @param array $records numerically index
-     * @param array fields
-     * @return array
-     */
-    public function mapNumericResults(array $records,array $fields) : array
+    /**
+    * Takes a numerical set results and maps to model. Originally was
+    * using getColumnMeta(), however the table result which is used to map
+    * does not work on postgresql. This will only work if all fields are quoted.
+    *
+    * @param array $records numerically index
+    * @param array fields
+    * @return array
+    */
+    public function mapNumericResults(array $records, array $fields) : array
     {
-
         $count = count($fields);
         $index = $this->getColumnMetaData($fields);
 
         $results = [];
-         foreach($records as $record){
+        foreach ($records as $record) {
             $array = [];
-            for($i=0;$i<$count;$i++){
+            for ($i=0;$i<$count;$i++) {
                 $model = $index[$i]['model'];
                 $field = $index[$i]['field'];
                 $array[$model][$field] = $record[$i];
@@ -493,18 +497,18 @@ abstract class Datasource
         /**
          * Build an index
          */
-        for($i=0;$i<$count;$i++){
+        for ($i=0;$i<$count;$i++) {
             $model = 0; // default value
             $field = $fields[$i];
-            if(preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i',$field)){
-                list($model,$field) = explode('.',$fields[$i]);
+            if (preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i', $field)) {
+                list($model, $field) = explode('.', $fields[$i]);
             }
             
-            $position  = stripos($fields[$i],' AS ');
-            if($position !== false){
-                $field = substr($field,$position + 4); 
-                if(strpos($field,'__') !== false){ 
-                    list($model,$field) = explode('__',$field);
+            $position  = stripos($fields[$i], ' AS ');
+            if ($position !== false) {
+                $field = substr($field, $position + 4);
+                if (strpos($field, '__') !== false) {
+                    list($model, $field) = explode('__', $field);
                 }
             }
             $index[$i] = [
@@ -534,8 +538,9 @@ abstract class Datasource
      *
      * @return \Origin\Model\Schema\BaseSchema
      */
-    public function adapter(){
-        if(!$this->adapter){
+    public function adapter()
+    {
+        if (!$this->adapter) {
             $adapterClass = 'Origin\Model\Schema\\'. ucfirst($this->name) . 'Schema';
             $this->adapter = new $adapterClass($this->config['datasource']);
         }
@@ -546,7 +551,7 @@ abstract class Datasource
 
     public function schema(string $table)
     {
-       return $this->adapter()->schema($table);
+        return $this->adapter()->schema($table);
     }
 
     /**
@@ -559,13 +564,13 @@ abstract class Datasource
         return $this->adapter()->tables();
     }
     
-    public function enableForeignKeyConstraints(){
-
+    public function enableForeignKeyConstraints()
+    {
     }
 
 
-    public function disableForeignKeyConstraints(){
-
+    public function disableForeignKeyConstraints()
+    {
     }
 
     /**
@@ -577,7 +582,7 @@ abstract class Datasource
      */
     public function createTable(string $table, array $data) : string
     {
-        return $this->adapter()->createTable($table,$data);
+        return $this->adapter()->createTable($table, $data);
     }
  
     public function select(string $table, array $options)
@@ -648,7 +653,7 @@ abstract class Datasource
      */
     public function queryBuilder(string $table, $alias=null)
     {
-        return new QueryBuilder($table, $alias,[
+        return new QueryBuilder($table, $alias, [
             'escape'=>$this->escape
             ]);
     }
