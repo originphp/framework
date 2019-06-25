@@ -250,7 +250,7 @@ class File
     public static function group(string $filename)
     {
         if (self::exists($filename)) {
-            return posix_getpwuid(filegroup($filename))['name'];
+            return posix_getgrgid(filegroup($filename))['name'];
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
