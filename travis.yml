@@ -1,0 +1,15 @@
+language: php
+php:
+  - 7.2
+  - 7.3
+env:
+   matrix:
+      - DB_USERNAME=mysql DB_ENGINE=mysql DB_HOST=127.0.0.1
+      - DB_USERNAME=postgres DB_ENGINE=pgsql DB_HOST=127.0.0.1
+services:
+  - mysql
+  - postgresql
+
+before_install:
+  - if [ DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
+  - if [ DB_ENGINE = 'pgsql' ]; then psql -c 'CREATE DATABASE origin_test;' -U postgres; fi

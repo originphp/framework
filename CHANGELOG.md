@@ -21,7 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+###
+- Added Travis.yml
+
 ### Changed
+- Move phpunit.xml to root in preparation for travis
 - Changed the composer.json to suggest memcached
 
 ## [1.18.3] - 2019-06-25
