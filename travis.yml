@@ -9,7 +9,8 @@ env:
 services:
   - mysql
   - postgresql
-
 before_install:
   - if [ DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
   - if [ DB_ENGINE = 'pgsql' ]; then psql -c 'CREATE DATABASE origin_test;' -U postgres; fi
+before_script:
+  - composer install --prefer-source --no-interaction
