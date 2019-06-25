@@ -1,4 +1,4 @@
-/tests/phpunit.xml
+/phpunit.xml
 
 # ignore a file type
 #*.json
