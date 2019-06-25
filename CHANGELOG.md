@@ -21,6 +21,9 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Changed
+- Changed the composer.json to suggest memcached
+
 ## [1.18.3] - 2019-06-25
 ### Changed
 - Refactored phpunit settings to work with env vars

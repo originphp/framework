@@ -41,7 +41,9 @@
   "require-dev": {
     "phpunit/phpunit": "7.5.2",
     "phpseclib/phpseclib": "*",
-    "ext-curl": "*",
-    "ext-memcached": "*"
+    "ext-curl": "*"
+  },
+  "suggest": {
+    "php-memcached": "To test the Memcached Cache engine"
   }
 }
