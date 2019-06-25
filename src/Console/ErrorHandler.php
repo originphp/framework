@@ -89,7 +89,7 @@ class ErrorHandler
      */
     protected function out(string $message, $newLine = true)
     {
-        return $this->consoleOutput()->write($message,$newLine);
+        return $this->consoleOutput()->write($message, $newLine);
     }
     /**
      * Renders the cli exception. Initial version.
