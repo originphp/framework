@@ -4,7 +4,7 @@ php:
 dist: xenial
 env:
   matrix:
-    - DB_USERNAME=mysql DB_ENGINE=mysql DB_HOST=localhost
+    - DB_USERNAME=root DB_ENGINE=mysql DB_HOST=localhost
 services:
   - mysql
   - postgresql
