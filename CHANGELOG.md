@@ -28,6 +28,8 @@ Delete tag: git tag -d <tag_name>
 - Prepared cookie for Cookie.key
 
 ### Fixed
+- Fixed File::group/Folder::group returning null on non linux systems
+- NumberTest,DebugerTest, LocalesGeneratorTest, FolderTest fixed fails on different os
 - Database exception errors when connecting were not being logged
 - Issues with test hashes caused by last refactor Security.salt renamed to Security.pepper
 
