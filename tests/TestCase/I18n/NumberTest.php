@@ -81,8 +81,8 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     */
     public function testFormat()
     {
-        Number::locale('fr-FR');
-        $this->assertEquals('1 024,66', Number::format(1024.66));
+        Number::locale('es-ES');
+        $this->assertSame('1.024,66', Number::format(1024.66));
 
         $this->assertEquals('1,024.66', Number::format(1024.66, ['locale'=>'en_GB']));
 
