@@ -85,15 +85,15 @@ class PgsqlSchema extends BaseSchema
             foreach ($results as $result) {
                 $data = ['type'=>null,'limit'=>null,'default'=>null,'null'=>null];
                 $data['type'] = $this->column($result['type']);
-                if ($data['type'] === 'string' AND $result['type'] === 'character varying') {
+                if ($data['type'] === 'string' and $result['type'] === 'character varying') {
                     $data['limit'] = $result['char_length'];
                 } elseif (in_array($data['type'], ['decimal','float'])) {
-                    if($result['numeric_precision']){
+                    if ($result['numeric_precision']) {
                         $data['precision'] = $result['numeric_precision'];
                     }
-                   if($result['numeric_scale']){
-                     $data['scale'] = $result['numeric_scale'];
-                   }
+                    if ($result['numeric_scale']) {
+                        $data['scale'] = $result['numeric_scale'];
+                    }
                 }
                        
 
@@ -103,8 +103,7 @@ class PgsqlSchema extends BaseSchema
                 $isAuto = (strpos($result['default'], 'nextval') !== false);
                 if ($position !== false and !$isAuto) {
                     $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
-                }
-                elseif(!empty($result['default']) AND !$isAuto){
+                } elseif (!empty($result['default']) and !$isAuto) {
                     $data['default'] = $result['default'];
                 }
                 
@@ -113,7 +112,7 @@ class PgsqlSchema extends BaseSchema
                  * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
                  * @todo This wont work for join tables with two primary keys
                  */
-                if($result['name']==='id' and $data['type'] === 'integer'){
+                if ($result['name']==='id' and $data['type'] === 'integer') {
                     $data['key'] = 'primary'; // Assume id is primary key
                     $data['type'] = 'primaryKey';
                 }
@@ -152,7 +151,7 @@ class PgsqlSchema extends BaseSchema
             return 'binary';
         }
         
-        if (in_array($type,['float','real','double','double precision'])) {
+        if (in_array($type, ['float','real','double','double precision'])) {
             return 'float';
         }
  
@@ -221,6 +220,20 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
+     * Renames a column name
+     *
+     * @param string $table
+     * @param string $from
+     * @param string $to
+     * @return string
+     */
+    public function renameColumn(string $table, string $from, string $to)
+    {
+        return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
+    }
+
+
+    /**
      * Removes an index on table
      *
      * @param string $table
@@ -272,6 +285,6 @@ class PgsqlSchema extends BaseSchema
     public function showCreateTable(string $table)
     {
         $schema = $this->schema($table);
-        return $this->createTable($table,$schema);
+        return $this->createTable($table, $schema);
     }
 }
