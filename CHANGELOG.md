@@ -21,15 +21,19 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-###
+### Added
 - Added Travis.yml
 
 ### Fixed
+- Fixed issue with with view that plugin name was not being underscored
+- Fixed DbSchemaDumpCommandTest to work with older versions of MYSQL
+- Fixed ModelTest fail on older version of MySQL due to order
 - Fixed Folder/file testing on different systems
 - Fixed bug in testGenerateScaffold where it was using default datasource instead of test
-- Issue with Http test failing when running on different ip address
+- Fixed issue with Http test failing when running on different ip address
 
 ### Changed
+- Migration renameColumn now compatible with versions less than 8.0
 - Database Connection Exception message now displayed in error, it is needed.
 - Move phpunit.xml to root in preparation for travis
 - Changed the composer.json to suggest memcached
