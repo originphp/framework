@@ -139,7 +139,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
     public function testPersistent()
     {
         $redis = new MockRedisEngine([
-            'host' => 'redis',
+            'host' => env('REDIS_HOST'),
             'duration' => 0,
             'prefix' => 'origin_',
             'persistent' => 'persisten-id'

@@ -153,8 +153,8 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
     public function testAddMultipleServers()
     {
         $servers = [
-            ['memcached', 11211],
-            ['memcached', 11211]
+            [env('MEMCACHED_HOST'), 11211],
+            [env('MEMCACHED_HOST'), 11211]
         ];
         $memcached = new MockMemcachedEngine([
             'servers' => $servers,
