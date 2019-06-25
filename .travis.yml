@@ -7,7 +7,7 @@ env:
     - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
     - REDIS_HOST=localhost REDIS_PORT=6379
   matrix:
-    - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
+    - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
 services:
   - mysql
   - postgresql
