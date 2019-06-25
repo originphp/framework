@@ -1,5 +1,7 @@
 # Readme 
 
+> This is the old file for running tests from within the Docker image
+
 This framework uses PHPUnit 7.x for unit testing, when you run the PHPUnit command it should be in the same folder where the `phpunit.xml` file is, which for the framework it is in `origin/tests`. The SRC folder for testing the framework is contained within TestApp, and therefore database configuration can be found there.
 
 > Currently the tests for the framework need to be run in the Docker container as in some of the tests, paths were hardcoded such /var/www/somefile.txt
@@ -59,7 +61,7 @@ $ echo 'zend_extension="/usr/lib/php/20170718/xdebug.so"' >> /etc/php/7.2/cli/ph
 $ echo 'xdebug.default_enable=0' >> /etc/php/7.2/cli/php.ini
 ```
 
-From the container and in the `origin/tests` folder run the following commands
+From the container and in the `framework` folder run the following commands
 
 ```linux
 $ phpunit --coverage-html /var/www/public/coverage
