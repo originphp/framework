@@ -21,6 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.18.4] - 2019-06-26
 ### Added
 - Added Travis.yml
 
@@ -33,6 +34,7 @@ Delete tag: git tag -d <tag_name>
 - Fixed issue with Http test failing when running on different ip address
 
 ### Changed
+- Memcached/Redis tests now use ENV vars for configuration
 - Migration renameColumn now compatible with versions less than 8.0
 - Database Connection Exception message now displayed in error, it is needed.
 - Move phpunit.xml to root in preparation for travis
