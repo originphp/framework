@@ -21,6 +21,7 @@ use Origin\Exception\Exception;
 use Origin\Core\Logger;
 use Origin\Model\ConnectionManager;
 use Origin\Migration\Exception\IrreversibleMigrationException;
+
 class CreateProductTableMigration extends Migration
 {
     public function up()
@@ -122,12 +123,12 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
 
-       $extra = 'ENGINE=InnoDB DEFAULT CHARSET=utf8';
-       $index = 'PRIMARY';
-       if($migration->connection()->engine() === 'pgsql'){
-        $extra = '/* comment goes here */';
-        $index = 'products_pkey';
-       }
+        $extra = 'ENGINE=InnoDB DEFAULT CHARSET=utf8';
+        $index = 'PRIMARY';
+        if ($migration->connection()->engine() === 'pgsql') {
+            $extra = '/* comment goes here */';
+            $index = 'products_pkey';
+        }
 
         $migration->createTable('products', [
             'name' => 'string',
@@ -200,7 +201,7 @@ class MigrationTest extends OriginTestCase
 
         $migration = $this->migration();
         $migration->addColumn('articles', 'category_id', 'integer');
-        $migration->addColumn('articles', 'opens', 'integer',['limit'=>3]); // #! changed
+        $migration->addColumn('articles', 'opens', 'integer', ['limit'=>3]); // #! changed
         $migration->addColumn('articles', 'amount', 'decimal', ['precision'=>5,'scale'=>2]);
         $migration->addColumn('articles', 'balance', 'decimal'); // use defaults
         $migration->addColumn('articles', 'comment_1', 'string', ['default'=>'no comment']);
@@ -270,8 +271,8 @@ class MigrationTest extends OriginTestCase
     {
         # Prep
         $migration = $this->migration();
-        $migration->addColumn('articles','remove_me','string',['null'=>true,'default'=>'test']);
-        $migration->addColumn('articles','remove_me_as_well','string',['null'=>true,'default'=>'test']);
+        $migration->addColumn('articles', 'remove_me', 'string', ['null'=>true,'default'=>'test']);
+        $migration->addColumn('articles', 'remove_me_as_well', 'string', ['null'=>true,'default'=>'test']);
         $migration->start();
 
         # Test Up
@@ -487,7 +488,8 @@ class MigrationTest extends OriginTestCase
         $migration->rollback();
     }
 
-    public function testIrreversibleMigrationException(){
+    public function testIrreversibleMigrationException()
+    {
         $migration = new CreateProductTableMigration($this->adapter());
         $this->expectException(IrreversibleMigrationException::class);
         $migration->throwIrreversibleMigrationException();
@@ -507,11 +509,13 @@ class MigrationTest extends OriginTestCase
         $migration->rollback();
     }
 
-    public function testTables(){
+    public function testTables()
+    {
         $migration = new Migration($this->adapter());
         $this->assertIsArray($migration->tables());
     }
-    public function testDropTableDoesNotExist(){
+    public function testDropTableDoesNotExist()
+    {
         $migration = new Migration($this->adapter());
         $this->expectException(Exception::class);
         $migration->dropTable('foo');
