@@ -3,9 +3,9 @@ php:
   - 7.2
   - 7.3
 env:
-   matrix:
-      - DB_USERNAME=mysql DB_ENGINE=mysql DB_HOST=127.0.0.1
-      - DB_USERNAME=postgres DB_ENGINE=pgsql DB_HOST=127.0.0.1
+  matrix:
+    - DB_USERNAME=mysql DB_ENGINE=mysql DB_HOST=localhost
+    - DB_USERNAME=postgres DB_ENGINE=pgsql DB_HOST=localhost
 services:
   - mysql
   - postgresql
