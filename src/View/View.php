@@ -251,6 +251,7 @@ class View
     {
         $path = $this->getViewPath() . DS ;
 
+        
         if ($name[0] === '/') {
             $path = $this->getViewPath(false); // get without controller folder
         } elseif (strpos($name, '.')!==false) {
@@ -259,11 +260,10 @@ class View
         }
          
         $filename = $path .  $name . '.ctp';
-       
         if ($this->fileExists($filename)) {
             return $filename;
         }
-        debug($filename);
+ 
         throw new MissingViewException([$this->name, $name]);
     }
 
@@ -278,7 +278,7 @@ class View
         $viewPath = $this->viewPath;
         $plugin = $this->request->params('plugin');
         if ($plugin) {
-            $viewPath = PLUGINS . DS . $plugin . DS . 'src' . DS . 'View';
+            $viewPath = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
             $viewPath = $viewPath . DS . $this->name;
