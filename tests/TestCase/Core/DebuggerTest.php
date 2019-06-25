@@ -41,8 +41,12 @@ class DebuggerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('code', $result);
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('stackFrames', $result);
-        
-        $this->assertEquals($expected, $result['stackFrames'][0]);
+        $frame = $result['stackFrames'][0];
+        $this->assertContains('/Framework/TestCase.php', $frame['file']);
+        $this->assertNotNull($frame['line']); // This changes between systems or versions
+        $this->assertEquals('Origin\Test\Core\DebuggerTest', $frame['class']);
+        $this->assertEquals('testBacktrace', $frame['function']);
+        $this->assertEquals([], $frame['args']);
     }
     public function testNamespaceSplit()
     {
