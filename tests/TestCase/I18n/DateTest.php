@@ -20,7 +20,14 @@ use IntlDateFormatter;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
-    
+    public function setUp()
+    {
+        Date::locale('en_US');
+    }
+    public function tearDown()
+    {
+        Date::locale('en_US');
+    }
     public function testFormat()
     {
         // Test Locale Switching
@@ -148,13 +155,14 @@ class DateTest extends \PHPUnit\Framework\TestCase
         Date::timezone('UTC');
     }
 
-    public function testSettersAndGetters(){
+    public function testSettersAndGetters()
+    {
         Date::dateFormat('dd MMM');
-        $this->assertEquals('dd MMM',Date::dateFormat());
+        $this->assertEquals('dd MMM', Date::dateFormat());
         Date::datetimeFormat('dd MMM y H:mm');
-        $this->assertEquals('dd MMM y H:mm',Date::datetimeFormat());
+        $this->assertEquals('dd MMM y H:mm', Date::datetimeFormat());
         Date::timeFormat('H:mm');
-        $this->assertEquals('H:mm',Date::timeFormat());
+        $this->assertEquals('H:mm', Date::timeFormat());
 
         //dd MMM y H:mm
     }

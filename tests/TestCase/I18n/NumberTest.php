@@ -18,6 +18,14 @@ use Origin\I18n\Number;
 
 class NumberTest extends \PHPUnit\Framework\TestCase
 {
+    public function setUp()
+    {
+        Number::locale('en_US');
+    }
+    public function tearDown()
+    {
+        Number::locale('en_US');
+    }
     public function testCurrency()
     {
         $this->assertEquals('$1,234.56', Number::currency(1234.56));
