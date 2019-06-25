@@ -628,7 +628,7 @@ class Model
     }
 
     /**
-     * loads the schema for this model or specificied field.
+     * loads the schema for this model or specified field.
      *
      * @param string $field
      *

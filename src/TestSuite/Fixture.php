@@ -99,7 +99,7 @@ class Fixture
 
         $options = array_merge($defaults, $this->import);
      
-        // Load information from model is specificied
+        // Load information from model is specified
         if ($options['model']) {
             $className = Resolver::className($options['model'], 'Model');
             if ($className) {
@@ -110,7 +110,7 @@ class Fixture
                 $options['table'] = Inflector::tableize($options['model']); // for dynamic models fall back
             }
         }
-        // Table is not specificied or could not find model
+        // Table is not specified or could not find model
         if (empty($options['table'])) {
             throw new Exception('Undefined table');
         }
