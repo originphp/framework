@@ -11,10 +11,6 @@
             <directory>./TestCase/</directory>
         </testsuite>
     </testsuites>
-    <php>
-        <const name="PHPUNIT" value="true"/>
-        <env name="ORIGIN_ENV" value="test"/>
-    </php>
     <listeners>
         <listener
             class="Origin\TestSuite\OriginTestListener"
@@ -32,4 +28,29 @@
             </exclude>
         </whitelist>
     </filter>
+    <php>
+       <const name="PHPUNIT" value="true"/>
+       <env name="ORIGIN_ENV" value="test"/>
+
+        <!-- # Database Settings mysql/pgsql
+            <env name="DB_HOST" value="localhost" />
+            <env name="DB_USERNAME" value="username" />
+            <env name="DB_PASSWORD" value="password" />
+            <env name="DB_ENGINE" value="mysql" />
+        -->
+        <!-- # Email Testing
+            <env name="GMAIL_USERNAME" value="james@example.com"/>
+            <env name="GMAIl_PASSWORD" value="secret"/>
+        -->
+        <!-- # Storage (SFTP) Testing
+            <env name="SFTP_HOST" value="192.168.0.7"/>
+            <env name="SFTP_USERNAME" value="username"/>
+            <env name="SFTP_PASSWORD" value="password"/>
+        -->
+        <!-- # Storage (FTP) Testing
+            <env name="FTP_HOST" value="192.168.0.7"/>
+            <env name="FTP_USERNAME" value="username"/>
+            <env name="FTP_PASSWORD" value="password"/>
+        -->
+    </php>
 </phpunit>
