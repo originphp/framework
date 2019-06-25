@@ -96,21 +96,22 @@ class MysqlSchema extends BaseSchema
                       $schema[$column['Field']]['default'] = null; // remove current_timestamp
                   }
                         
-                  if ($column['Key'] === 'PRI' AND $column['Extra'] === 'auto_increment') {
-                    $schema[$column['Field']]['type'] = 'primaryKey';
+                  if ($column['Key'] === 'PRI' and $column['Extra'] === 'auto_increment') {
+                      $schema[$column['Field']]['type'] = 'primaryKey';
                   }
                   /**
                    * @todo in postgresql cant get this work yet.
                    */
-                  if($column['Key'] === 'PRI'){
-                    $schema[$column['Field']]['key'] = 'primary';
+                  if ($column['Key'] === 'PRI') {
+                      $schema[$column['Field']]['key'] = 'primary';
                   }
               }
           }
         return $schema;
     }
 
-    public function tables(){
+    public function tables()
+    {
         $tables = [];
         $results = $this->fetchAll('SHOW TABLES');
         if ($results) {
@@ -140,7 +141,6 @@ class MysqlSchema extends BaseSchema
 
     public function renameTable(string $from, string $to)
     {
-        // ALTER TABLE tableName CHANGE `oldcolname` `newcolname` datatype(length); work with 5,7
         return  "RENAME TABLE {$from} TO {$to}";
     }
 
@@ -157,6 +157,48 @@ class MysqlSchema extends BaseSchema
         $definition = $this->buildColumn(array_merge(['name'=>$name,'type'=>$type], $options));
         return "ALTER TABLE {$table} MODIFY COLUMN {$definition}";
     }
+
+
+    /**
+    * Renames a column name
+    * @internal Changed to be compatable with older versions of MySQL e.g 5.x
+    * @param string $table
+    * @param string $from
+    * @param string $to
+    * @return string
+    */
+    public function renameColumn(string $table, string $from, string $to)
+    {
+        $tableSchema = $this->schema($table);
+        $definition = '';
+
+        $schema = null;
+
+        /**
+         * Make it reversable
+         */
+        if (isset($tableSchema[$from])) {
+            $schema = $tableSchema[$from];
+        } elseif (isset($tableSchema[$to])) {
+            $schema = $tableSchema[$to];
+        }
+
+        if ($schema) {
+            $data = $this->columns[$schema['type']];
+            $definition = strtoupper($data['name']);
+            if (strpos($definition, ' ') !== false) {
+                list($definition, $void) = explode(' ', $definition);
+            }
+            if (!empty($schema['limit'])) {
+                $definition .= "({$schema['limit']})";
+            } elseif (!empty($data['precision'])) {
+                $definition .= "({$schema['precision']},{$schema['scale']})";
+            }
+        }
+       
+        return "ALTER TABLE {$table} CHANGE {$from} {$to} {$definition}";
+    }
+
 
     /**
      * Removes an index on table
@@ -207,7 +249,7 @@ class MysqlSchema extends BaseSchema
     public function showCreateTable(string $table)
     {
         $result = $this->fetchRow("SHOW CREATE TABLE {$table}");
-        if(!empty($result['Create Table'])){
+        if (!empty($result['Create Table'])) {
             return $result['Create Table'];
         }
         return null;
