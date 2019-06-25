@@ -3,6 +3,9 @@ php:
   - 7.2
 dist: xenial
 env:
+  global:
+    - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
+    - REDDIS_HOST=localhost REDDIS_PORT=6379
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root 
 services:

@@ -45,7 +45,8 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
     public function engine()
     {
         return new MockMemcachedEngine([
-            'host' => 'memcached',
+            'host' => env('MEMCACHED_HOST'),
+            'port' => env('MEMCACHED_PORT'),
             'duration' => 3600,
             'prefix' => 'origin_'
         ]);

@@ -42,6 +42,14 @@
             <env name="GMAIL_USERNAME" value="james@example.com"/>
             <env name="GMAIl_PASSWORD" value="secret"/>
         -->
+        <!-- # Redis Testing
+            <env name="REDIS_HOST" value="localhost"/>
+            <env name="REDIS_PORT" value="6379"/>
+        -->
+        <!-- # Memcached Testing
+            <env name="MEMCACHED_HOST" value="localhost"/>
+            <env name="MEMCACHED_PORT" value="11211"/>
+        -->
         <!-- # Storage (SFTP) Testing
             <env name="SFTP_HOST" value="192.168.0.7"/>
             <env name="SFTP_USERNAME" value="username"/>

@@ -46,7 +46,8 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
     public function engine()
     {
         return new MockRedisEngine([
-            'host' => 'redis',
+            'host' => env('REDIS_HOST'),
+            'port' => env('REDIS_PORT'),
             'duration' => 3600,
             'prefix' => 'origin_'
         ]);
