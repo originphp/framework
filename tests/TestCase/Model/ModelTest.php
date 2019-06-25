@@ -149,7 +149,7 @@ class ModelTest extends OriginTestCase
     public function testSchema()
     {
         $ds = $this->Article->connection();
-        if( $ds->engine() !== 'mysql'){
+        if ($ds->engine() !== 'mysql') {
             $this->markTestSkipped(
                 'Requires PostgreSQL'
               );
@@ -169,9 +169,10 @@ class ModelTest extends OriginTestCase
         $this->assertEquals($expected, $idSchema);
     }
 
-    public function testSchemaPG(){
+    public function testSchemaPG()
+    {
         $ds = $this->Article->connection();
-        if( $ds->engine() !== 'pgsql'){
+        if ($ds->engine() !== 'pgsql') {
             $this->markTestSkipped(
                 'Requires PostgreSQL'
               );
@@ -208,7 +209,7 @@ class ModelTest extends OriginTestCase
 
 
         $ds = $this->Article->connection();
-        $sql = $ds->createTable('foos',['not_id'=>'primaryKey','undetectable'=>'string']);
+        $sql = $ds->createTable('foos', ['not_id'=>'primaryKey','undetectable'=>'string']);
         $ds->execute($sql);
         $dummy = new Model(['name'=>'Foo','datasource'=>'test']);
   
@@ -217,7 +218,8 @@ class ModelTest extends OriginTestCase
         $ds->execute('DROP TABLE foos');
     }
 
-    public function testDisplayFieldUndo(){
+    public function testDisplayFieldUndo()
+    {
         $ds = $this->Article->connection();
         $this->assertTrue($ds->execute('DROP TABLE foos'));
     }
@@ -407,12 +409,12 @@ class ModelTest extends OriginTestCase
         $Ingredient = new Model(array('name' => 'Ingredient'));
         $Ingredient->hasAndBelongsToMany('Recipe');
         $this->assertEquals(
-        'ingredient_id',
-        $Ingredient->hasAndBelongsToMany['Recipe']['foreignKey']
+            'ingredient_id',
+            $Ingredient->hasAndBelongsToMany['Recipe']['foreignKey']
       );
         $this->assertEquals(
-        'recipe_id',
-        $Ingredient->hasAndBelongsToMany['Recipe']['associationForeignKey']
+            'recipe_id',
+            $Ingredient->hasAndBelongsToMany['Recipe']['associationForeignKey']
       );
     }
 
@@ -455,7 +457,6 @@ class ModelTest extends OriginTestCase
 
     public function testFindFields()
     {
-       
         $result = $this->Article->find('first', ['fields'=>['id','title']])->toArray();
         $this->assertEquals(['id','title'], array_keys($result));
 
@@ -469,10 +470,12 @@ class ModelTest extends OriginTestCase
 
         $result = $this->Article->find('all', [
             'fields'=>['COUNT(*) as total','author_id'],
-            'group'=>'author_id'
+            'group'=>'author_id','order'=>'author_id ASC' //mysql 8/5 return in different order
             ]);
-        $this->assertEquals(1000, $result[1]->author_id);
-        $this->assertEquals(2, $result[1]->total);
+        $this->assertEquals(1000, $result[0]->author_id);
+        $this->assertEquals(2, $result[0]->total);
+        $this->assertEquals(1001, $result[1]->author_id);
+        $this->assertEquals(1, $result[1]->total);
     }
 
     public function testFindLimit()
@@ -1162,7 +1165,7 @@ class ModelTest extends OriginTestCase
         # Postgre returns different id numbers
         $this->assertNotEmpty($article->tags[0]->id);
         $this->assertNotEmpty($article->tags[1]->id);
-        $this->assertNotEquals($article->tags[0]->id,$article->tags[1]->id);
+        $this->assertNotEquals($article->tags[0]->id, $article->tags[1]->id);
         
         $article = $this->Article->get($article->id, ['associated'=>['Tag']]);
         $this->assertEquals(3, count($article->tags));
@@ -1278,7 +1281,6 @@ class ModelTest extends OriginTestCase
         $this->assertGreaterThan(0, count($article->comments));
         $this->assertTrue($this->Article->delete($article));
         $this->assertEquals(0, $this->Article->Comment->find('count', ['conditions'=>['article_id'=>1002]])); // did not delete
-        
     }
  
     public function testDeleteNoCascade()
@@ -1289,13 +1291,12 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->get(1000, ['associated'=>['Comment','Tag']]);
         $comments = count($article->comments);
         $tags = count($article->tags);
-         $this->assertTrue($this->Article->delete($article, false));
+        $this->assertTrue($this->Article->delete($article, false));
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions'=>['article_id'=>1000]]));
-        
-      
     }
 
-    public function testDeleteNotExists(){
+    public function testDeleteNotExists()
+    {
         // Test Delete Not Exists
 
         $article = $this->Article->new();
