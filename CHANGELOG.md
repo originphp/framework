@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
+## [1.18.3] - 2019-06-25
 ### Changed
 - Refactored phpunit settings to work with env vars
 - Console progress bar now works with and without ansi support
