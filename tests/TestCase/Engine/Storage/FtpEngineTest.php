@@ -23,17 +23,19 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
 
-    public function setUp(){
-        if(!env('FTP_USERNAME')){
+    public function setUp()
+    {
+        if (!env('FTP_HOST')) {
             $this->markTestSkipped('FTP env vars not set');
         }
     }
 
     public $engine = null;
 
-    public function engine(){
-        if($this->engine === null){
-            $this->engine =  new FtpEngine([ 
+    public function engine()
+    {
+        if ($this->engine === null) {
+            $this->engine =  new FtpEngine([
                 'host' => env('FTP_HOST'),
                 'username' => env('FTP_USERNAME'),
                 'password' => env('FTP_PASSWORD')
@@ -41,8 +43,8 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
         }
         return $this->engine;
     }
-    public function testConfig(){
-    
+    public function testConfig()
+    {
         $expected = [
             'host' => 'ftp',
             'username' => 'ftp',
@@ -54,8 +56,6 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
             'passive' => false,
         ];
 
-        $this->assertEquals($expected,$this->engine()->config());
+        $this->assertEquals($expected, $this->engine()->config());
     }
-
-   
 }
