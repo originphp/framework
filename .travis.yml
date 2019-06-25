@@ -5,10 +5,11 @@ dist: xenial
 env:
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root 
-    - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres 
 services:
   - mysql
   - postgresql
+  - memcached
+  - redis-server
 before_install:
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin;'; fi
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
