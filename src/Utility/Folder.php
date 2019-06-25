@@ -226,7 +226,7 @@ class Folder
     public static function group(string $directory)
     {
         if (self::exists($directory)) {
-            return posix_getpwuid(filegroup($directory))['name'];
+            return posix_getgrgid(filegroup($directory))['name'];
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
     }
