@@ -28,6 +28,7 @@ Delete tag: git tag -d <tag_name>
 - Prepared cookie for Cookie.key
 
 ### Fixed
+- Fixed .gitignore to reflect properly since splitting into composer packages
 - Added Locale reset to Intl Number/Date tests
 - Fixed File::group/Folder::group returning null on non linux systems
 - NumberTest,DebugerTest, LocalesGeneratorTest, FolderTest fixed fails on different os
