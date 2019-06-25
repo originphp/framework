@@ -5,9 +5,10 @@ dist: xenial
 env:
   global:
     - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
-    - REDDIS_HOST=localhost REDDIS_PORT=6379
+    - REDIS_HOST=localhost REDIS_PORT=6379
   matrix:
-    - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root 
+    - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
+    - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
 services:
   - mysql
   - postgresql
@@ -25,4 +26,5 @@ before_install:
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
 before_script:
+  - phpenv config-rm xdebug.ini
   - composer install --prefer-source --no-interaction
