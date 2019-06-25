@@ -5,21 +5,21 @@
  */
 use Origin\Model\ConnectionManager;
 
-ConnectionManager::config('default', array(
-  'host' => 'db',
+ConnectionManager::config('default', [
+  'host' => env('DB_HOST'),
   'database' => 'origin',
-  'username' => 'root',
-  'password' => 'root',
-  'engine' => 'mysql',
-));
+  'username' => env('DB_USERNAME'),
+  'password' => env('DB_PASSWORD'),
+  'engine' => env('DB_ENGINE')
+]);
 
-ConnectionManager::config('test', array(
-  'host' => 'db',
+ConnectionManager::config('test', [
+  'host' => env('DB_HOST'),
   'database' => 'origin_test',
-  'username' => 'root',
-  'password' => 'root',
-  'engine' => 'mysql',
-));
+  'username' => env('DB_USERNAME'),
+  'password' => env('DB_PASSWORD'),
+  'engine' => env('DB_ENGINE')
+]);
 
 /*
 
