@@ -57,10 +57,10 @@ class BaseSchema
       ];
   
         if (empty($column['name'])) {
-            throw new Exception('Column name not specificied');
+            throw new Exception('Column name not specified');
         }
         if (empty($column['type'])) {
-            throw new Exception('Column type not specificied');
+            throw new Exception('Column type not specified');
         }
         $real = [];
         $type = $column['type'];
@@ -356,7 +356,6 @@ class BaseSchema
      */
     public function renameColumn(string $table, string $from, string $to)
     {
-        return  "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
     }
 
     /**
