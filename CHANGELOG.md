@@ -24,6 +24,9 @@ Delete tag: git tag -d <tag_name>
 ###
 - Added Travis.yml
 
+### Fixed
+- Fixed bug in testGenerateScaffold where it was using default datasource instead of test
+
 ### Changed
 - Database Connection Exception message now displayed in error, it is needed.
 - Move phpunit.xml to root in preparation for travis

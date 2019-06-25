@@ -10,11 +10,11 @@ class GenerateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag'];
+    public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
 
     public function testGenerateScaffold()
     {
-        $this->exec('generate --force scaffold Bookmark');
+        $this->exec('generate --force --datasource=test scaffold Bookmark');
         
         $this->assertExitSuccess();
         /**
