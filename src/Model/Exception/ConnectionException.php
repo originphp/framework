@@ -18,5 +18,5 @@ use Origin\Exception\Exception;
 
 class ConnectionException extends Exception
 {
-    protected $template = 'Error connecting to host `%s` or database `%s`.';
+    protected $template = 'Could not connect to the database: %s';
 }

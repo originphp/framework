@@ -113,7 +113,7 @@ abstract class Datasource
         } catch (PDOException $e) {
             $logger = new Logger('Datasource');
             $logger->alert($e->getMessage());
-            throw new ConnectionException([$config['host'],$config['database']]);
+            throw new ConnectionException($e->getMessage());
         }
     }
 

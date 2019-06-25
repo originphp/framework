@@ -25,6 +25,7 @@ Delete tag: git tag -d <tag_name>
 - Added Travis.yml
 
 ### Changed
+- Database Connection Exception message now displayed in error, it is needed.
 - Move phpunit.xml to root in preparation for travis
 - Changed the composer.json to suggest memcached
 
