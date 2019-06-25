@@ -311,6 +311,6 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http = new Http();
         $response = $http->get('http://www.cnbc.com');
         $cookies = $response->cookies();
-        $this->assertEquals('WORLD', $cookies['region']['value']);
+        $this->assertNotEmpty($cookies['region']['value']);
     }
 }
