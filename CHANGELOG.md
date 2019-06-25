@@ -25,7 +25,9 @@ Delete tag: git tag -d <tag_name>
 - Added Travis.yml
 
 ### Fixed
+- Fixed Folder/file testing on different systems
 - Fixed bug in testGenerateScaffold where it was using default datasource instead of test
+- Issue with Http test failing when running on different ip address
 
 ### Changed
 - Database Connection Exception message now displayed in error, it is needed.
