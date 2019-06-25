@@ -163,12 +163,8 @@ class FileTest extends \PHPUnit\Framework\TestCase
     {
         $data = 'Not really important';
         $filename = File::tmp($data);
-     
+        $this->assertTrue(chmod($filename, 0644));
         $this->assertEquals('0644', File::perms($filename));
-
-        $this->assertTrue(File::chmod($filename, 0775));
-        clearstatcache(); // stat stuff is cached, so for next assert to work clear cache
-        $this->assertEquals('0775', File::perms($filename));
     }
 
     public function testPermsException()

@@ -148,12 +148,16 @@ class FolderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('0775', Folder::perms($tmp));
     }
 
+    /**
+     * Use 0644 , since 0664.
+     *
+     */
     public function testPermsRecursive()
     {
         $tmp = sys_get_temp_dir() . DS . uniqid() . DS;
         Folder::create($tmp . 'docs' . DS  .'archive', ['recursive'=>true]);
         $this->assertTrue((bool) file_put_contents($tmp . 'docs' . DS  .'archive'. DS . 'test.txt', 'foo'));
-        
+        $this->assertTrue(chmod($tmp . 'docs' . DS  .'archive'. DS . 'test.txt', 0644));
 
         $this->assertEquals('0744', Folder::perms($tmp . 'docs'));
         $this->assertEquals('0744', Folder::perms($tmp . 'docs' . DS  .'archive'));
