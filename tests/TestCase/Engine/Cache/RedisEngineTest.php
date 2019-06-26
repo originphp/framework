@@ -33,6 +33,10 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         if (!extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension not loaded');
         }
+
+        if (!env('REDIS_HOST') or !env('REDIS_PORT')) {
+            $this->markTestSkipped('Redis settings not found');
+        }
      
         $cache = $this->engine();
         $cache->clear();
