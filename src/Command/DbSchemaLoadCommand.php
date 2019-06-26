@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -22,30 +23,29 @@ class DbSchemaLoadCommand extends Command
 {
     use DbSchemaTrait;
     protected $name = 'db:schema:load';
-
     protected $description = 'Loads the schema from a sql file';
 
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
             'default' => 'default'
             ]);
-        $this->addArgument('name',[
+        $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
             'default' => 'schema'
         ]);
-
     }
  
-    public function execute(){
+    public function execute()
+    {
         $name = $this->arguments('name');
-        if($name === null){
+        if ($name === null) {
             $name = 'schema';
         }
         $datasource = $this->options('datasource');
         $filename = $this->schemaFilename($name);
-        $this->loadSchema($filename,$datasource);
+        $this->loadSchema($filename, $datasource);
     }
-
 }

@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -25,56 +26,54 @@ class DbSchemaDumpCommand extends Command
 
     protected $description = 'Dumps the schema to a sql file';
 
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
             'default' => 'default'
             ]);
-        $this->addOption('type',[
+        $this->addOption('type', [
             'description' => 'How the schema will be dumped, in sql or php',
             'default' => 'sql'
         ]);
-        $this->addArgument('name',[
+        $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
             'default' => 'schema'
         ]);
     }
  
-    public function execute(){
+    public function execute()
+    {
         $name = $this->arguments('name');
-        if($name === null){
+        if ($name === null) {
             $name = 'schema';
         }
 
         $datasource = $this->options('datasource');
-        if(!ConnectionManager::config($datasource)){
+        if (!ConnectionManager::config($datasource)) {
             $this->throwError("{$datasource} datasource not found");
         }
 
         $type = $this->options('type');
-        if(!in_array($type,['sql','php'])){
-            $this->throwError(sprintf('The type `%s` is invalid',$type));
+        if (!in_array($type, ['sql','php'])) {
+            $this->throwError(sprintf('The type `%s` is invalid', $type));
         }
 
-        $filename = $this->schemaFilename($name,$type);
+        $filename = $this->schemaFilename($name, $type);
         $this->io->info("Dumping schema to {$filename}");
-        if($type === 'sql'){
-            $this->dump($datasource,$name);
+        if ($type === 'sql') {
+            $this->dump($datasource, $name);
+        } else {
+            $this->dumpPhp($datasource, $name);
         }
-        else{
-            $this->dumpPhp($datasource,$name);
-        }
-       
     }
 
-
-    protected function dumpPhp(string $datasource,string $name)
+    protected function dumpPhp(string $datasource, string $name)
     {
-
         $connection = ConnectionManager::get($datasource);
         $dump = [];
-        $filename = $this->schemaFilename($name,'php');
+        $filename = $this->schemaFilename($name, 'php');
         
         /**
          * @internal if issues arrise with PostgreSQL then switch here to pg_dump
@@ -86,7 +85,7 @@ class DbSchemaDumpCommand extends Command
         }
         $data = '<?php' . "\n" . '$schema = ' . $this->varExport($schema) . ';';
 
-        if(!$this->io->createFile($filename,$data)){
+        if (!$this->io->createFile($filename, $data)) {
             $this->throwError('Error saving schema file');
         }
     }
@@ -96,19 +95,18 @@ class DbSchemaDumpCommand extends Command
         $schema = var_export($data, true);
         $schema = str_replace(
             ['array (', '),', " => \n", '=>   ['],
-            ['[', '],', ' => ', '=> ['], $schema);
+            ['[', '],', ' => ', '=> ['],
+            $schema
+        );
 
         return substr($schema, 0, -1).']';
     }
 
-    protected function dump(string $datasource,string $name)
+    protected function dump(string $datasource, string $name)
     {
         $connection = ConnectionManager::get($datasource);
         $dump = [];
-        if($connection->engine()==='mysql'){
-            $dump[] = "SET FOREIGN_KEY_CHECKS=0;";
-        }
-        $filename = $this->schemaFilename($name,'sql');
+        $filename = $this->schemaFilename($name, 'sql');
      
         /**
          * @internal if issues arrise with PostgreSQL then switch here to pg_dump
@@ -117,10 +115,9 @@ class DbSchemaDumpCommand extends Command
             $dump[] = $connection->adapter()->showCreateTable($table) .';';
             $this->io->list($table);
         }
-   
+
         if (!$this->io->createFile($filename, implode("\n\n", $dump))) {
             $this->throwError('Error saving schema file');
         }
     }
-
 }

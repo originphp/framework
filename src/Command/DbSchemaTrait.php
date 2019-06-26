@@ -13,9 +13,11 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Model\ConnectionManager;
 use Origin\Core\Inflector;
 use Origin\Model\Exception\DatasourceException;
+
 trait DbSchemaTrait
 {
     
@@ -25,7 +27,7 @@ trait DbSchemaTrait
      * @param string $name schema or Plugin.schema
      * @return string
      */
-    public function schemaFilename(string $name,string $extension='sql') : string
+    public function schemaFilename(string $name, string $extension='sql') : string
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
@@ -41,19 +43,20 @@ trait DbSchemaTrait
      * @param string $sql
      * @return array
      */
-    public function parseSql(string $sql){
-         # Clean Up Soure Code
-         $sql = str_replace(";\r\n",";\n",$sql); // Convert windows line endings on STATEMENTS ONLY
-         $sql   = preg_replace('!/\*.*?\*/!s', '',$sql); 
-         $sql  = preg_replace('/^-- .*$/m','',$sql); // Remove Comment line starting with -- 
-         $sql  = preg_replace('/^#.*$/m','',$sql); // Remove Comments start with #
+    public function parseSql(string $sql)
+    {
+        # Clean Up Soure Code
+         $sql = str_replace(";\r\n", ";\n", $sql); // Convert windows line endings on STATEMENTS ONLY
+         $sql   = preg_replace('!/\*.*?\*/!s', '', $sql);
+        $sql  = preg_replace('/^-- .*$/m', '', $sql); // Remove Comment line starting with --
+         $sql  = preg_replace('/^#.*$/m', '', $sql); // Remove Comments start with #
   
          $statements = [];
-         if($sql){
+        if ($sql) {
             $statements = explode(";\n", $sql);
-         }
+        }
       
-         return $statements;
+        return $statements;
     }
 
     /**
@@ -65,12 +68,12 @@ trait DbSchemaTrait
      */
     public function loadSchema(string $filename, string $datasource)
     {
-        if(!file_exists($filename)){
+        if (!file_exists($filename)) {
             $this->throwError("File {$filename} not found");
         }
         $this->io->info("Loading {$filename}");
        
-        if(!ConnectionManager::config($datasource)){
+        if (!ConnectionManager::config($datasource)) {
             $this->throwError("{$datasource} datasource not found");
         }
         $connection = ConnectionManager::get($datasource);
@@ -79,17 +82,17 @@ trait DbSchemaTrait
         $statements = $this->parseSql($statement);
         foreach ($statements  as $query) {
             $query = trim($query);
-            if ($query) {       
+            if ($query) {
                 try {
                     $connection->execute($query);
                 } catch (DatasourceException $ex) {
-                    $this->io->status('error',str_replace("\n",'',$query));
-                    $this->throwError('Executing query failed',$ex->getMessage());
+                    $this->io->status('error', str_replace("\n", '', $query));
+                    $this->throwError('Executing query failed', $ex->getMessage());
                 }
-                $this->io->status('ok',str_replace("\n",'',$query));
+                $this->io->status('ok', str_replace("\n", '', $query));
             }
         }
-        $this->io->success(sprintf('Executed %d statements',count($statements)));
+        $this->io->success(sprintf('Executed %d statements', count($statements)));
         return true;
     }
 }
