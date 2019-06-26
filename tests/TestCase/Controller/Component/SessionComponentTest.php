@@ -21,7 +21,7 @@ use Origin\Http\Response;
 
 class SessionComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $_SESSION = [];
         $this->Session = new SessionComponent(new Controller(new Request(), new Response()));

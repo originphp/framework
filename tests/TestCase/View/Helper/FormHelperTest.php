@@ -58,7 +58,7 @@ class MockFormHelper extends FormHelper
 
 class FormHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $request = new Request('widgets/edit');
         $controller = new ViewTestsController($request, new Response());

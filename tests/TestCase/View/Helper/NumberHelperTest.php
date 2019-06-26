@@ -22,7 +22,7 @@ use Origin\View\Helper\NumberHelper;
 
 class NumberHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->Number = new NumberHelper(new View($controller));

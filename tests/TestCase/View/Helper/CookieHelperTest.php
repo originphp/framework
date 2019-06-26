@@ -23,7 +23,7 @@ use Origin\Http\Cookie;
 
 class CookieHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $_COOKIE = null;
         $_COOKIE = [];

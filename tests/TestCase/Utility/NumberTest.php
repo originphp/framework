@@ -20,8 +20,9 @@ class NumberTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormat()
     {
-        $this->assertEquals('1,200.23', Number::format(1200.2345));
         $backup = Number::locale();
+        $this->assertEquals('1,200.23', Number::format(1200.2345));
+
         Number::locale(['currency' => 'USD', 'thousands' => '.','decimals' => ',','places' => 3]);
         $this->assertEquals('1.200,235', Number::format(1200.2345));
         Number::locale($backup);

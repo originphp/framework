@@ -20,11 +20,11 @@ use Origin\Exception\Exception;
 
 class SecurityTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Configure::write('Security.pepper', 'B1816172FD2BA98F3AF520EF572E3A47');
     }
-    public function tearDown()
+    protected function tearDown(): void
     {
         Configure::write('Security.pepper', '-----ORIGIN PHP-----');
     }

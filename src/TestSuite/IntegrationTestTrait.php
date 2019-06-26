@@ -306,7 +306,7 @@ trait IntegrationTestTrait
     /**
      * IMPORTANT:: call parent::tearDown
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::teardown();
         $this->session = $this->headers = $this->cookies = $this->env = [];

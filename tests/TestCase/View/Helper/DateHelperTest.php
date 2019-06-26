@@ -22,7 +22,7 @@ use Origin\View\Helper\DateHelper;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->Date = new DateHelper(new View($controller));

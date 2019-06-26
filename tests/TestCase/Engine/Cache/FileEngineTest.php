@@ -19,7 +19,7 @@ use Origin\Exception\Exception;
 
 class FileEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $cache = new FileEngine();
         $cache->clear();

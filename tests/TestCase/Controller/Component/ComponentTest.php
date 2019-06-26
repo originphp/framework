@@ -30,7 +30,7 @@ class MockComponent extends Component
 
 class ComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $Controller = new Controller(new Request(), new Response());
         $this->MockComponent = new MockComponent($Controller);

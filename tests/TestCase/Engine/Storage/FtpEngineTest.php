@@ -23,7 +23,7 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
 
-    public function setUp()
+    protected function setUp(): void
     {
         if (!env('FTP_HOST')) {
             $this->markTestSkipped('FTP env vars not set');

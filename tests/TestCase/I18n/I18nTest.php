@@ -46,7 +46,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
 
 
 
-    public function tearDown()
+    protected function tearDown(): void
     {
    
     }

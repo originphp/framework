@@ -46,7 +46,7 @@ class ModelValidatorTest extends OriginTestCase
 {
     public $fixtures = ['Framework.Article'];
 
-    public function setUp()
+    protected function setUp(): void
     {
         $Post = new Model(array('name' => 'Post'));
         $this->Validator = new MockValidator($Post);

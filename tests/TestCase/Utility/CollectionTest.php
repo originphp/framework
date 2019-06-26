@@ -18,7 +18,7 @@ use Origin\Model\Collection;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->books = [];
         $book = new Entity(['id'=>1001,'name'=>'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success','category'=>'Business','in_stock'=>true]);

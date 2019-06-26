@@ -23,7 +23,7 @@ use Origin\Http\Response;
 
 class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->Controller = new Controller(new Request(), new Response());
     }

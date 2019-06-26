@@ -87,7 +87,7 @@ class MockView extends View
 
 class ViewTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->View = new View(new TestsController(new Request(), new Response()));
     }

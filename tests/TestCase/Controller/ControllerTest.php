@@ -85,7 +85,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 {
     public $controller = null;
 
-    public function setUp()
+    protected function setUp(): void
     {
         Router::add('/:controller/:action/*');
         $request = new Request('articles/store/100');
@@ -424,7 +424,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');

@@ -11,7 +11,7 @@ class DbMigrateCommandTest extends OriginTestCase
 
     public $fixtures = ['Origin.Migration'];
 
-    protected function tearDown()
+    protected function tearDown() : void
     {
         parent::tearDown();
         $ds = ConnectionManager::get('test');

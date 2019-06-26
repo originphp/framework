@@ -56,7 +56,7 @@ class UsersController extends Controller
 class AuthComponentTest extends OriginTestCase
 {
     public $fixtures = ['Framework.User'];
-    public function setUp()
+    protected function setUp(): void
     {
         $request = new Request('/users/login');
         $this->Controller = new UsersController($request, new Response());

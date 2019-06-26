@@ -136,13 +136,13 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
              ->getMock();
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         $this->startup();
     }
 
-    protected function tearDown()
+    protected function tearDown() : void
     {
         parent::tearDown();
         $this->shutdown();

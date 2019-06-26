@@ -62,7 +62,7 @@ class MockPaginatorComponent extends PaginatorComponent
  */
 class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -93,7 +93,8 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function tearDown(){
+    protected function tearDown(): void
+    {
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
         $connection->execute('DROP TABLE IF EXISTS owners');

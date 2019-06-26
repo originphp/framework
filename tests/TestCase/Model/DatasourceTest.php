@@ -28,7 +28,7 @@ class DatasourceTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Author','Origin.Article'];
     
-    public function setUp(){
+    protected function setUp(): void{
         $this->connection = ConnectionManager::get('test');
        
     }

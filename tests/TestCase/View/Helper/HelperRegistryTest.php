@@ -23,7 +23,7 @@ use Origin\View\Exception\MissingHelperException;
 
 class HelperRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->HelperRegistry = new HelperRegistry(new View($controller));

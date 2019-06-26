@@ -31,7 +31,7 @@ class MockSessionHelper extends SessionHelper
 
 class SessionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->Session = new MockSessionHelper(new View($controller));

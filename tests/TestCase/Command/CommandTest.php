@@ -82,7 +82,7 @@ class CacheCommand extends Command
 
 class CommandTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->out = new ConsoleOutput();
     }

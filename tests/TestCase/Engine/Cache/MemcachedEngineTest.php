@@ -28,7 +28,7 @@ class MockMemcachedEngine extends MemcachedEngine
 
 class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         if (!extension_loaded('memcached')) {
             $this->markTestSkipped('Memcached extension not loaded');
@@ -126,7 +126,7 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $cache->decrement('counter', 9));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $cache = $this->engine();
         $cache->memcached()->flush();

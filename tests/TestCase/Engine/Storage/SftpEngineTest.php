@@ -24,7 +24,7 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
 
-    public function setUp()
+    protected function setUp(): void
     {
         if (!env('SFTP_USERNAME')) {
             $this->markTestSkipped('SFTP env vars not set');

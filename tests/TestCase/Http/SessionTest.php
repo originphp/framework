@@ -18,7 +18,7 @@ use Origin\Http\Session;
 
 class SessionTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->Session = new Session();
     }

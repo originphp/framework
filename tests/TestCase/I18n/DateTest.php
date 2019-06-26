@@ -20,11 +20,11 @@ use IntlDateFormatter;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Date::locale('en_US');
     }
-    public function tearDown()
+    protected function tearDown(): void
     {
         Date::locale('en_US');
     }

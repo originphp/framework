@@ -22,7 +22,7 @@ use Origin\Console\ConsoleOutput;
 class MockErrorHandler extends ErrorHandler
 {
     use TestTrait;
-    public function setUp()
+    public function setup()
     {
         $this->consoleOutput = new MockConsoleOutputErrorHandler();
     }
@@ -59,7 +59,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $ErrorHandler = new MockErrorHandler();
         $ErrorHandler->register();
-        $ErrorHandler->setUp();
+        $ErrorHandler->setup();
         $this->expectException(Exception::class);
         throw new Exception('Something went wrong');
     }
@@ -70,7 +70,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         } catch (Exception $ex) {
         }
         $ErrorHandler = new MockErrorHandler();
-        $ErrorHandler->setUp();
+        $ErrorHandler->setup();
         $ErrorHandler->exceptionHandler($ex);
         $message = $ErrorHandler->read();
 
@@ -95,7 +95,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $ErrorHandler = new MockErrorHandler();
         $ErrorHandler->register();
-        $ErrorHandler->setUp();
+        $ErrorHandler->setup();
         @unlink('someFileThatDoesNotExist'); //
         $this->assertTrue(true); // if we get here all is ok!
     }

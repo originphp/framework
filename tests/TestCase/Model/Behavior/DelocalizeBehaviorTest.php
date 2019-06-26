@@ -25,17 +25,15 @@ class DelocalizeBehaviorTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Deal'];
 
-    public function initialize()
+    protected function setUp() : void
     {
-       $this->loadFixture('Origin.Deal');
-       $this->Deal = new Model(['name' => 'Deal','datasource'=>'test']); // Create model Dynamically
-       Date::locale(['date'=>'d/m/Y','time'=>'H:i','datetime'=>'d/m/Y H:i','timezone'=>'Europe/London']);
-       Number::locale(['currency'=>'USD','thousands'=>',','decimals'=>'.']);
+        $this->Deal = new Model(['name' => 'Deal','datasource'=>'test']); // Create model Dynamically
+        Date::locale(['date'=>'d/m/Y','time'=>'H:i','datetime'=>'d/m/Y H:i','timezone'=>'Europe/London']);
+        Number::locale(['currency'=>'USD','thousands'=>',','decimals'=>'.']);
     }
  
     public function testBehavior()
     {
-        
         $behavior = new DelocalizeBehavior($this->Deal);
 
         $deal = new Entity([
@@ -46,18 +44,18 @@ class DelocalizeBehaviorTest extends OriginTestCase
         ]);
         $behavior->beforeValidate($deal);
 
-        $this->assertEquals(1234567.89,$deal->amount);
-        $this->assertEquals('2019-06-11',$deal->close_date);
-        $this->assertEquals('2019-06-11 09:27:00',$deal->created);
+        $this->assertEquals(1234567.89, $deal->amount);
+        $this->assertEquals('2019-06-11', $deal->close_date);
+        $this->assertEquals('2019-06-11 09:27:00', $deal->created);
        
         /**
          * This is correct. Without date, can't convert time due to DST
          */
-        $this->assertEquals('10:27:00',$deal->confirmed);
-       
+        $this->assertEquals('10:27:00', $deal->confirmed);
     }
 
-    public function shutdown(){
+    public function shutdown()
+    {
         Date::locale([
             'timezone' => 'UTC',
             'date' => 'Y-m-d',
@@ -65,5 +63,4 @@ class DelocalizeBehaviorTest extends OriginTestCase
             'time' => 'H:i'
         ]);
     }
-    
 }

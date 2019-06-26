@@ -9,7 +9,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         // Create copy
         $ds = ConnectionManager::get('test');
@@ -70,7 +70,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     }
 
  
-    protected function tearDown()
+    protected function tearDown() : void
     {
         parent::tearDown();
         $ds = ConnectionManager::get('test');

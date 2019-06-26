@@ -18,7 +18,7 @@ use Origin\Engine\Cache\ApcuEngine;
 
 class ApcuEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         if (!extension_loaded('apcu')) {
             $this->markTestSkipped('Apcu extension not loaded');
@@ -113,7 +113,7 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $cache->decrement('counter', 9));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         apcu_clear_cache();
     }

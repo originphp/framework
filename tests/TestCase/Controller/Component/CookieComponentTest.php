@@ -21,7 +21,7 @@ use Origin\Http\Response;
 
 class CookieComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $_COOKIE = [];
         $this->Cookie = new CookieComponent(new Controller(new Request(), new Response()));

@@ -26,7 +26,7 @@ class MockRouter extends Router
 }
 class RouterTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         // Add Default Routes
         MockRouter::add('/:controller/:action/*');

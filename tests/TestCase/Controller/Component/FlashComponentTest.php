@@ -34,7 +34,7 @@ class ApplesController extends Controller
 }
 class FlashComponentTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $request = new Request('/apples/index');
         $this->FlashComponent = new MockFlashComponent(new ApplesController($request, new Response()));

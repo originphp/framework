@@ -28,7 +28,7 @@ class MockRedisEngine extends RedisEngine
 
 class RedisEngineTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         if (!extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension not loaded');
@@ -128,7 +128,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $cache->decrement('counter', 9));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $cache = $this->engine();
         $cache->clear();

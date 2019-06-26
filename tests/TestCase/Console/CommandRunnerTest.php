@@ -32,7 +32,7 @@ class MockCommandRunner extends CommandRunner
 }
 class CommandRunnerTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->out = new ConsoleOutput();
     }

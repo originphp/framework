@@ -29,7 +29,7 @@ class QueueTest extends OriginTestCase
      */
     public $Queue = null;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->Queue = new Queue(['datasource'=>'test']);
     }

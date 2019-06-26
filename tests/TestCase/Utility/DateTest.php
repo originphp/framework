@@ -18,7 +18,7 @@ use Origin\Utility\Date;
 
 class DateTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Date::locale([
             'timezone' => 'UTC',

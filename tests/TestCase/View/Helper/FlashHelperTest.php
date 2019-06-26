@@ -22,7 +22,7 @@ use Origin\View\Helper\FlashHelper;
 
 class FlashHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->Flash = new FlashHelper(new View($controller));

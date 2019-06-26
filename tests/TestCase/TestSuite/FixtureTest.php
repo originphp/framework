@@ -67,7 +67,7 @@ class MovieFixture extends Fixture
 }
 class FixtureTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $connection = ConnectionManager::get('test');
         $connection->execute("DROP TABLE IF EXISTS movies");

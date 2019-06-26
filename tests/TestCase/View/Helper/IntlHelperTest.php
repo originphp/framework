@@ -22,7 +22,7 @@ use Origin\View\Helper\IntlHelper;
 
 class IntlHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $controller = new Controller(new Request(), new Response());
         $this->Intl = new IntlHelper(new View($controller));

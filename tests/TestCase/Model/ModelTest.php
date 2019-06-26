@@ -57,7 +57,7 @@ class ModelTest extends OriginTestCase
      */
     public $Article = null;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->Article = new Model([
             'name'=>'Article',

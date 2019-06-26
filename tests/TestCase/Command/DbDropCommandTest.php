@@ -9,7 +9,7 @@ class DbDropCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         $config = ConnectionManager::config('test');
@@ -17,7 +17,7 @@ class DbDropCommandTest extends OriginTestCase
         ConnectionManager::config('dummy', $config);
     }
 
-    protected function tearDown()
+    protected function tearDown() : void
     {
         parent::tearDown();
         ConnectionManager::drop('dummy'); // # PostgreIssues

@@ -20,7 +20,7 @@ class LoggerTest extends \PHPUnit\Framework\TestCase
 {
     private $filename = LOGS .DS . 'development.log';
 
-    public function setUp()
+    protected function setUp(): void
     {
         if (file_exists($this->filename)) {
             unlink($this->filename);
