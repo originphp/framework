@@ -31,6 +31,6 @@ before_script:
 cache:
   directories:
     - $HOME/.composer/cache/files
-deploy 
- on:
-   tags: true
+deploy
+  on:
+    tags: true
