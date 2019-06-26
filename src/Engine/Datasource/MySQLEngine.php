@@ -42,13 +42,50 @@ class MySQLEngine extends Datasource
         return  "{$engine}:host={$host};charset=utf8mb4";
     }
 
-    public function enableForeignKeyConstraints(){
+    public function enableForeignKeyConstraints()
+    {
         $this->execute('SET foreign_key_checks = 1');
     }
 
 
-    public function disableForeignKeyConstraints(){
+    public function disableForeignKeyConstraints()
+    {
         $this->execute('SET foreign_key_checks = 0');
     }
-    
+
+    /**
+     * Gets a list of tables
+     * @todo when this is refactored test each item individually.
+     * @return array
+     */
+    public function tables() : array
+    {
+        $tables = [];
+        $this->execute('SHOW TABLES;');
+        $results = $this->fetchAll();
+        if ($results) {
+            foreach ($results as $value) {
+                $tables[] = current($value);
+            }
+        }
+        return $tables;
+    }
+
+    /**
+    * Gets a list of tables
+    *
+    * @return array
+    */
+    public function databases() : array
+    {
+        $out = [];
+        $this->execute('SHOW DATABASES;');
+        $results = $this->fetchAll();
+        if ($results) {
+            foreach ($results as $value) {
+                $out[] = current($value);
+            }
+        }
+        return $out;
+    }
 }

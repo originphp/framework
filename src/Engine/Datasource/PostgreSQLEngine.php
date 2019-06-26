@@ -20,11 +20,11 @@ class PostgreSQLEngine extends Datasource
 {
     protected $name = 'pgsql';
 
-     /**
-     * What to escape table and column aliases
-     *
-     * @var string
-     */
+    /**
+    * What to escape table and column aliases
+    *
+    * @var string
+    */
     protected $escape = '"';
 
     /**
@@ -36,17 +36,56 @@ class PostgreSQLEngine extends Datasource
     public function dsn(array $config) : string
     {
         extract($config);
-        if($database){
+        if ($database) {
             return "{$engine}:host={$host};dbname={$database};options='--client_encoding=UTF8'";
         }
         return "{$engine}:host={$host};options='--client_encoding=UTF8'";
     }
     
-    public function enableForeignKeyConstraints(){
+    public function enableForeignKeyConstraints()
+    {
         $this->execute('SET CONSTRAINTS ALL IMMEDIATE');
     }
 
-    public function disableForeignKeyConstraints(){
+    public function disableForeignKeyConstraints()
+    {
         $this->execute('SET CONSTRAINTS ALL DEFERRED');
+    }
+
+    /**
+     * Gets a list of tables
+     *
+     * @return array
+     */
+    public function tables() : array
+    {
+        $sql = 'SELECT table_name as "table" FROM information_schema.tables WHERE table_schema=\'public\'';
+       
+        $out = [];
+        if ($this->execute($sql)) {
+            $list = $this->fetchList();
+            if ($list) {
+                $out = $list;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Returns a list of databases
+     *
+     * @return array
+     */
+    public function databases() : array
+    {
+        $sql = 'SELECT datname FROM pg_database WHERE datistemplate = false;';
+        $out = [];
+        if ($this->execute($sql)) {
+            $list = $this->fetchList();
+            if ($list) {
+                $out = $list;
+            }
+        }
+        return $out;
     }
 }
