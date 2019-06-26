@@ -563,6 +563,10 @@ abstract class Datasource
     {
         return $this->adapter()->tables();
     }
+
+    public function databases() : array
+    {
+    }
     
     public function enableForeignKeyConstraints()
     {
