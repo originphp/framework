@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -22,29 +23,35 @@ class DbCreateCommand extends Command
     protected $name = 'db:create';
     protected $description = 'Creates the database for the datasource';
     
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
             'description'=>'Use a different datasource','short'=>'ds','default'=>'default'
             ]);
     }
  
-    public function execute(){
+    public function execute()
+    {
         $datasource = $this->options('datasource');
-        $config = ConnectionManager::config( $datasource);
-        if(!$config){
+        $config = ConnectionManager::config($datasource);
+        if (!$config) {
             $this->throwError("{$datasource} datasource not found");
         }
         $database = $config['database'];
         $config['database'] = null;
         $connection = ConnectionManager::create('tmp', $config); // add without database so we can connect
+
+        if (in_array($database, $connection->databases())) {
+            $this->io->status('error', sprintf('Database `%s` already exists', $database));
+            $this->abort();
+        }
         try {
             $connection->execute("CREATE DATABASE {$database}");
             // Bug Cannot execute queries while other unbuffered queries are active , despite no results can be fetched.
             ConnectionManager::drop('tmp');
-            $this->io->status('ok', sprintf('Database `%s` created',$database));
+            $this->io->status('ok', sprintf('Database `%s` created', $database));
         } catch (DatasourceException $ex) {
-            $this->throwError($ex->getMessage());
+            $this->throwError('DatasourceException', $ex->getMessage());
         }
     }
-
 }

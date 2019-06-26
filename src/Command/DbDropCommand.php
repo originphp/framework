@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -23,7 +24,8 @@ class DbDropCommand extends Command
 
     protected $description = 'Drops the database for the datasource';
 
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
@@ -31,24 +33,27 @@ class DbDropCommand extends Command
             ]);
     }
  
-    public function execute(){
+    public function execute()
+    {
         $datasource = $this->options('datasource');
         $config = ConnectionManager::config($datasource);
-        if(!$config){
+        if (!$config) {
             $this->throwError("{$datasource} datasource not found");
         }
 
         $database = $config['database'];
         $config['database'] = null;
         $connection = ConnectionManager::create('tmp', $config); //
-        
+        if (!in_array($database, $connection->databases())) {
+            $this->io->status('error', sprintf('Database `%s` does not exist', $database));
+            $this->abort();
+        }
         try {
             $result = $connection->execute("DROP DATABASE {$database};");
             ConnectionManager::drop('tmp');
-            $this->io->status('ok', sprintf('Database `%s` dropped',$database));
+            $this->io->status('ok', sprintf('Database `%s` dropped', $database));
         } catch (DatasourceException $ex) {
-            $this->throwError($ex->getMessage());
+            $this->throwError('DatasourceException', $ex->getMessage());
         }
     }
-
 }
