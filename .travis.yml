@@ -1,6 +1,7 @@
 language: php
 php:
   - 7.2
+  - 7.3
 dist: xenial
 env:
   global:
@@ -8,6 +9,7 @@ env:
     - REDIS_HOST=localhost REDIS_PORT=6379
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
+    - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
 services:
   - mysql
   - postgresql

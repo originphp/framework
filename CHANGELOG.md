@@ -21,6 +21,13 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.18.5] - 2019-06-26
+### Changed
+- Updated travis CI settings
+- Database engines now have databases and tables
+- Refactored DB command unit tests to work test on both mysql and pgsql
+- Memcached/Redis unit tests now skip if incomplete settings are provided
+
 ## [1.18.4] - 2019-06-26
 ### Added
 - Added Travis.yml
