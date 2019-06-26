@@ -34,6 +34,30 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 See the [documentation](https://www.originphp.com/docs/getting-started/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
 
+## Testing
+
+Download the source code
+
+```linux
+$ git clone https://github.com/originphp/framework.git originphp
+```
+
+Run composer install
+
+```linux
+$ composer install
+```
+
+Rename the `phpunit.xml.dist` and edit the settings for the database connection and other services.
+
+Create two databases `origin_test` and `origin` which are used by testing.
+
+Then run PHPUnit
+
+```linux
+$ phpunit
+```
+
 You can send an email to <js@originphp.com>.
 
 Jamiel Sharief
