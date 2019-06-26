@@ -45,6 +45,7 @@ $ git clone https://github.com/originphp/framework.git originphp
 Run composer install
 
 ```linux
+$ cd originphp
 $ composer install
 ```
 
