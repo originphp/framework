@@ -18,7 +18,8 @@ class DbMigrateCommandTest extends OriginTestCase
         $ds->execute('DROP table IF EXISTS foobar');
     }
 
-    public function testMigrate(){
+    public function testMigrate()
+    {
         $this->exec('db:migrate --datasource=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Migration Complete. 3 migrations in 0 ms');
@@ -27,7 +28,8 @@ class DbMigrateCommandTest extends OriginTestCase
     /**
      * @depends testMigrate
      */
-    public function testRollback(){
+    public function testRollback()
+    {
         $this->exec('db:migrate --datasource=test'); // Inject data
 
         $this->exec('db:migrate --datasource=test 20190520033225');
@@ -35,14 +37,16 @@ class DbMigrateCommandTest extends OriginTestCase
         $this->assertOutputContains('Rollback Complete. 3 migrations in 0 ms');
     }
 
-    public function testNoMigrations(){
+    public function testNoMigrations()
+    {
         $this->exec('db:migrate --datasource=test'); // Run Migrations
         $this->exec('db:migrate --datasource=test'); // Run Again (this time none)
         $this->assertExitSuccess();
         $this->assertErrorContains('No migrations found'); // Its a warning
     }
 
-    public function testNoMigrationsRollback(){
+    public function testNoMigrationsRollback()
+    {
         $this->exec('db:migrate --datasource=test'); // Inject data
         $this->exec('db:migrate --datasource=test 20190520033226'); // Rollback
         $this->exec('db:migrate --datasource=test 20190520033226'); // Now there should be no migrations
@@ -50,15 +54,16 @@ class DbMigrateCommandTest extends OriginTestCase
         $this->assertErrorContains('No migrations found');
     }
 
-    public function testMigrateException(){
+    public function testMigrateException()
+    {
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE TABLE foo (id INT)');
         $this->exec('db:migrate --datasource=test'); // Inject data
         $this->assertExitError();
-        $this->assertErrorContains('Table \'foo\' already exists');
     }
 
-    public function testMigrateRollbackException(){
+    public function testMigrateRollbackException()
+    {
         $this->exec('db:migrate --datasource=test'); // Inject data
 
         $ds = ConnectionManager::get('test');
@@ -66,8 +71,5 @@ class DbMigrateCommandTest extends OriginTestCase
 
         $this->exec('db:migrate --datasource=test 20190520033225'); // Rollback
         $this->assertExitError();
-        $this->assertErrorContains('Unknown table \'origin_test.foo\'');
-
     }
-
 }

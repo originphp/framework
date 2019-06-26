@@ -13,15 +13,13 @@ class DbSeedCommandTest extends OriginTestCase
     {
         $this->loadFixture('Origin.Post');
         $ds = ConnectionManager::get('test');
-
     }
 
-    public function testExecute(){
+    public function testExecute()
+    {
         $this->exec('db:seed --datasource=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
-
-  
 }

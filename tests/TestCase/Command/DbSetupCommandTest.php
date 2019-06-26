@@ -9,15 +9,25 @@ class DbSetupCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-
-    public function initialize()
+    public function setUp()
     {
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
-        ConnectionManager::config('dummy',$config);
+        ConnectionManager::drop('dummy'); // # PostgreIssues
+        ConnectionManager::config('dummy', $config);
+        $ds = ConnectionManager::get('test');
+        $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
-    public function testExecute(){
+    
+
+    public function testExecuteMySql()
+    {
+        if (ConnectionManager::get('test')->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for MySQL');
+        }
+        
         $this->exec('db:setup --datasource=dummy');
+        
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
         $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema.sql');
@@ -26,16 +36,26 @@ class DbSetupCommandTest extends OriginTestCase
         $this->assertOutputContains('Executed 3 statements');
     }
 
-    public function testExecutePluginPath(){
+    public function testExecutePostgres()
+    {
+        if (ConnectionManager::get('test')->engine() !== 'pgsql') {
+            $this->markTestSkipped('This test is for PostgreSQL');
+        }
+        
+        $this->exec('db:setup --datasource=dummy schema-pg');
+      
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Database `dummy` created');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema-pg.sql');
+        $this->assertOutputContains('Executed 2 statements');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Executed 3 statements');
+    }
+
+    public function testExecutePluginPath()
+    {
         $this->exec('db:setup --datasource=dummy MyPlugin.pschema');
         $this->assertExitError();
         $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/db/pschema.sql');
     }
-
-    public function shutdown(){
-        $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS dummy');
-    }
-
-  
 }

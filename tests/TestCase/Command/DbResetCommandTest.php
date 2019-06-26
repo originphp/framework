@@ -14,11 +14,18 @@ class DbResetCommandTest extends OriginTestCase
     {
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
-        ConnectionManager::config('dummy',$config);
+        ConnectionManager::config('dummy', $config);
     }
-    public function testExecute(){
+
+
+    public function testExecuteMySQL()
+    {
+        if (ConnectionManager::get('test')->engine() !=='mysql') {
+            $this->markTestSkipped('This test is for mysql');
+        }
         $ds = ConnectionManager::get('test');
-        $ds->execute('CREATE DATABASE dummy');
+        $ds->execute('CREATE DATABASE dummy;');
+      
         $this->exec('db:reset --datasource=dummy');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
@@ -28,10 +35,26 @@ class DbResetCommandTest extends OriginTestCase
         $this->assertOutputContains('Executed 3 statements');
     }
 
-    public function shutdown(){
+    public function testExecutePostgreSQL()
+    {
+        if (ConnectionManager::get('test')->engine() !=='pgsql') {
+            $this->markTestSkipped('This test is for pgsql');
+        }
+        $ds = ConnectionManager::get('test');
+        $ds->execute('CREATE DATABASE dummy;');
+      
+        $this->exec('db:reset --datasource=dummy schema-pg');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Database `dummy` dropped');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema-pg.sql');
+        $this->assertOutputContains('Executed 2 statements');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Executed 3 statements');
+    }
+
+    public function setUp()
+    {
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
-
-  
 }

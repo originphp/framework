@@ -9,14 +9,16 @@ class DbDropCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp(){
+    public function setUp()
+    {
         // Create copy
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
-        ConnectionManager::config('dummy',$config);
+        ConnectionManager::config('dummy', $config);
     }
 
-    public function testExecute(){
+    public function testExecute()
+    {
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE DATABASE dummy');
 
@@ -25,16 +27,23 @@ class DbDropCommandTest extends OriginTestCase
         $this->assertOutputContains('Database `dummy` dropped');
     }
 
-    public function testExecuteInvalidDatasource(){
+    public function testExecuteInvalidDatasource()
+    {
         $this->exec('db:drop --datasource=foo');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found');
     }
 
-    public function testExecuteSQLException(){
+    public function testExecuteDatabaseDoesNotExist()
+    {
         $this->exec('db:drop --datasource=dummy');
         $this->assertExitError();
-        $this->assertErrorContains('database doesn\'t exist');
+        $this->assertOutputContains('Database `dummy` does not exist');
     }
 
+    public function shutdown()
+    {
+        $ds = ConnectionManager::get('test');
+        $ds->execute('DROP DATABASE IF EXISTS dummy');
+    }
 }
