@@ -1,7 +1,6 @@
 language: php
 php:
   - 7.2
-  - 7.3
 dist: xenial
 env:
   global:
@@ -29,3 +28,6 @@ before_install:
 before_script:
   - phpenv config-rm xdebug.ini
   - composer install --prefer-source --no-interaction
+cache:
+  directories:
+    - $HOME/.composer/cache/files
