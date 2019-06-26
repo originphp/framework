@@ -16,11 +16,8 @@ $ composer require phpunit/phpunit ^7
 
 The frameworks' db config is in the TestApp folder as it is isolated.
 
-To create the test database
+To create the test database, origin_test
 
-```linux
-$ bin/console db create origin_test -ds=test
-```
 
 When using composer create project, it does not download the framework tests, you must fetch these manually and then copy the tests folder.
 
