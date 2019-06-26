@@ -9,12 +9,18 @@ class DbSetupCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp()
+    protected function setUp()
     {
+        parent::setUp();
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
-        ConnectionManager::drop('dummy'); // # PostgreIssues
         ConnectionManager::config('dummy', $config);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        ConnectionManager::drop('dummy'); // # PostgreIssues
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS dummy');
     }

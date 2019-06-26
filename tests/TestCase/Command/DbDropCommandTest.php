@@ -9,12 +9,20 @@ class DbDropCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp()
+    protected function setUp()
     {
-        // Create copy
+        parent::setUp();
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
         ConnectionManager::config('dummy', $config);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        ConnectionManager::drop('dummy'); // # PostgreIssues
+        $ds = ConnectionManager::get('test');
+        $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
 
     public function testExecute()
@@ -39,11 +47,5 @@ class DbDropCommandTest extends OriginTestCase
         $this->exec('db:drop --datasource=dummy');
         $this->assertExitError();
         $this->assertOutputContains('Database `dummy` does not exist');
-    }
-
-    public function shutdown()
-    {
-        $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
 }

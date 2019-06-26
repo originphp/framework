@@ -9,9 +9,11 @@ class DbMigrateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function initialize()
+    public $fixtures = ['Origin.Migration'];
+
+    protected function tearDown()
     {
-        $this->loadFixture('Origin.Migration');
+        parent::tearDown();
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP table IF EXISTS foo');
         $ds->execute('DROP table IF EXISTS bar');

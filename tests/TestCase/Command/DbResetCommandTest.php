@@ -9,14 +9,21 @@ class DbResetCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-
-    public function initialize()
+    protected function setUp()
     {
+        parent::setUp();
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
         ConnectionManager::config('dummy', $config);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+        ConnectionManager::drop('dummy'); // # PostgreIssues
+        $ds = ConnectionManager::get('test');
+        $ds->execute('DROP DATABASE IF EXISTS dummy');
+    }
 
     public function testExecuteMySQL()
     {
@@ -50,11 +57,5 @@ class DbResetCommandTest extends OriginTestCase
         $this->assertOutputContains('Executed 2 statements');
         $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
-    }
-
-    public function setUp()
-    {
-        $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
 }

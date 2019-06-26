@@ -9,12 +9,8 @@ class DbSeedCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function initialize()
-    {
-        $this->loadFixture('Origin.Post');
-        $ds = ConnectionManager::get('test');
-    }
-
+    public $fixtures = ['Origin.Post'];
+  
     public function testExecute()
     {
         $this->exec('db:seed --datasource=test');

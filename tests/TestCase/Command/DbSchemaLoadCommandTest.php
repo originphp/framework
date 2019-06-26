@@ -9,7 +9,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create copy
         $ds = ConnectionManager::get('test');
@@ -70,8 +70,9 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     }
 
  
-    public function tearDown()
+    protected function tearDown()
     {
+        parent::tearDown();
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS authors');
         $ds->execute('DROP DATABASE IF EXISTS posts');

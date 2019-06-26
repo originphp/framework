@@ -9,10 +9,8 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function initialize()
-    {
-        $this->loadFixture('Origin.Post');
-    }
+    public $fixtures = ['Origin.Post'];
+
     protected function deleteFile(string $filename)
     {
         if (file_exists($filename)) {
