@@ -67,7 +67,7 @@ class FixtureManager
             $createTable = true;
         }
 
-       $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+        $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
 
         if ($createTable or $this->loaded[$fixture]->dropTables === true) {
             /* @todo waiting for sql schema to be migrated which also invovles rewriting tests to changes, once done this can be removed because unload fixture drops table. */
@@ -91,7 +91,7 @@ class FixtureManager
 
     public function unloadFixture(string $fixture)
     {
-        if(empty($this->loaded[$fixture])){
+        if (empty($this->loaded[$fixture])) {
             return;
         }
         $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
@@ -107,8 +107,9 @@ class FixtureManager
      *
      * @return void
      */
-    public function shutdown(){
-        foreach($this->loaded as $fixture){
+    public function shutdown()
+    {
+        foreach ($this->loaded as $fixture) {
             $this->disableForeignKeyConstraints($fixture->datasource);
             $fixture->drop();
             $this->enableForeignKeyConstraints($fixture->datasource);
@@ -122,7 +123,7 @@ class FixtureManager
 
     protected function enableForeignKeyConstraints(string $datasource)
     {
-        ConnectionManager::get($datasource)->enableForeignKeyConstraints();        
+        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
     }
 
     protected function resolveFixture(string $fixture)

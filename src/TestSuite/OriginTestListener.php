@@ -42,16 +42,13 @@ class OriginTestListener implements TestListener
     public function startTest(Test $test): void
     {
         if ($test instanceof OriginTestCase) {
-            $test->initialize();
             $this->fixtureManager->load($test);
-            $test->startup();
         }
     }
 
     public function endTest(Test $test, float $time): void
     {
         if ($test instanceof OriginTestCase) {
-            $test->shutdown();
             $this->fixtureManager->unload($test);
         }
     }

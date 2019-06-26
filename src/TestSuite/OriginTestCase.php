@@ -30,6 +30,12 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      */
     public $fixtures = [];
 
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->initialize();
+    }
+
     /**
      * Intialize Hook. This is called before a test starts.
      */
@@ -58,7 +64,9 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      */
     public function loadFixture(string $name)
     {
-        $this->fixtures[] = $name;
+        if (!in_array($name, $this->fixtures)) {
+            $this->fixtures[] = $name;
+        }
     }
 
     /**
@@ -128,14 +136,15 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
              ->getMock();
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
+        $this->startup();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
-        ModelRegistry::clear();
+        $this->shutdown();
     }
 }
