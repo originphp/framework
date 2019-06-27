@@ -91,19 +91,25 @@ class ConsoleOutput
         'exception' => ['color' => 'white','background'=>'lightRed'],
 
         # Notifications
-        'debug' => ['color' => 'white'],
-        'success' => ['color' => 'lightGreen'],
+        /**
+         * POSIX Levels. Works with logger as well
+         */
+        'emergency' => ['color' => 'white','background'=>'lightRed','blink'=>true],
+        'alert' => ['color' => 'white','background'=>'lightRed'],
+        'critical' => ['color' => 'white','background'=>'lightRed'],
         'error' => ['color' => 'red'],
         'warning'=> ['color' => 'yellow'],
         'notice' => ['color' => 'cyan'],
-        'alert' => ['color' => 'white','background'=>'lightRed'],
+        'info' => ['color' => 'blue'],
+        'debug' => ['color' => 'white'],
+       
+        'success' => ['color' => 'lightGreen'],
 
         # Standardize Outputs
         'heading' => ['color'=>'lightYellow'],
         'text' => ['color'=>'white'],
-        'info' => ['color' => 'blue'],
         'code' => ['color' => 'lightGreen'],
-
+      
         # Standard Colors which make things just easier
         'green' => ['color' => 'lightGreen'], // linux green
         'blue' => ['color' => 'blue'],
