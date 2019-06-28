@@ -41,6 +41,7 @@ use Origin\Exception\InvalidArgumentException;
  * $consoleApplication->run();
  */
 
+use Origin\Console\Exception\StopExecutionException;
 
 class ConsoleApplication
 {
@@ -163,13 +164,13 @@ class ConsoleApplication
             throw new ConsoleException('No commands have been added to this application.');
         }
 
-         // Detect and extract Command
+        // Detect and extract Command
         $command = null;
         if (count($commands) === 1) {
             $command = $commands[0]; # If its one command application load the first one by default
         }
-        foreach($args as $i => $arg){
-            if($command === null AND substr($arg,0,1) !== '-'){
+        foreach ($args as $i => $arg) {
+            if ($command === null and substr($arg, 0, 1) !== '-') {
                 $command = $arg;
                 unset($args[$i]);
                 break;
@@ -191,7 +192,12 @@ class ConsoleApplication
         # Configure Command
         $this->{$command}->io = $this->io;
         $this->{$command}->name($this->name . ' ' .$command);  // Rename for help
-        return $this->{$command}->run($args);
+
+        try {
+            return $this->{$command}->run($args);
+        } catch (StopExecutionException $ex) {
+            return false;
+        }
     }
 
     /**
