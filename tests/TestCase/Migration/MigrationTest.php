@@ -18,7 +18,7 @@ use Origin\Migration\Migration;
 use Origin\Model\Schema\MysqlSchema;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Exception\Exception;
-use Origin\Core\Logger;
+use Origin\Log\Log;
 use Origin\Model\ConnectionManager;
 use Origin\Migration\Exception\IrreversibleMigrationException;
 
