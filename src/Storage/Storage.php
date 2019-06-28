@@ -12,10 +12,11 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Utility;
+namespace Origin\Storage;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Storage\Engine\BaseEngine;
 
 class Storage
 {
@@ -29,21 +30,32 @@ class Storage
     ];
 
     /**
-     * Holds the storage engines
+     * Holds the Storage Engines
      *
      * @var array
      */
     protected static $loaded = [];
 
     /**
-     * Which storage config is being used
-     *
+     * The default storage to use
+     * @internal whilst use is being deprecated
      * @var string
      */
-    protected static $use = 'default';
-    
+    protected static $default = 'default';
+
     /**
-     * Gets the  configured storage engine
+     * Alias for Storage::engine. Gets the configured engine
+     *
+     * @param string $config
+     * @return \Origin\Cache\Engine\BaseEngine
+     */
+    public static function volume(string $name)
+    {
+        return static::engine($name);
+    }
+
+    /**
+     * Gets the configured Storage Engine
      *
      * @param string $config
      * @return \Origin\Engine\BaseEngine
@@ -53,16 +65,28 @@ class Storage
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
         }
-       
+
+        return static::$loaded[$name] = static::buildEngine($name);
+    }
+
+    /**
+     * Builds an engine using the configuration
+     *
+     * @param string $name
+     * @throws \Origin\Exception\InvalidArgumentException
+     * @return \Origin\Cache\Engine\BaseEngine
+     */
+    protected static function buildEngine(string $name) : BaseEngine
+    {
         $config = static::config($name);
         if ($config) {
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Storage\Engine\\{$config['engine']}Engine";
             }
             if (empty($config['className'])) {
-                throw new InvalidArgumentException("Storage engine for {$name} could not be found");
+                throw new InvalidArgumentException("Storage Engine for {$name} could not be found");
             }
-            return static::$loaded[$name] = new $config['className']($config);
+            return new $config['className']($config);
         }
         throw new InvalidArgumentException("{$config} config does not exist");
     }
@@ -76,34 +100,41 @@ class Storage
      */
     public static function use(string $config)
     {
+        deprecationWarning('Storage::use is deprecated use Storage::volume() or pass options.');
         if (!static::config($config)) {
             throw new InvalidArgumentException("{$config} config does not exist");
         }
-        self::$use = $config;
+        self::$default = $config;
     }
 
     /**
      * Reads an item from the Storage
      *
      * @param string $name
-     * @param string $config
+     * @param array $options You can pass an array of options with the folling keys :
+     *   - config: default:default the name of the config to use
      * @return mixed
      */
-    public static function read(string $name)
+    public static function read(string $name, array $options = [])
     {
-        return static::engine(self::$use)->read($name);
+        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $engine = static::engine($options['config']);
+        return $engine->read($name);
     }
     /**
      * Writes an item from Storage
      *
      * @param string $name
      * @param mixed $value
-     * @param string $config
+     * @param array $options You can pass an array of options with the folling keys :
+     *   - config: default:default the name of the config to use
      * @return bool
      */
-    public static function write(string $name, $value):bool
+    public static function write(string $name, $value, array $options = []) : bool
     {
-        return static::engine(self::$use)->write($name, $value);
+        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $engine = static::engine($options['config']);
+        return $engine->write($name, $value);
     }
 
     /**
@@ -111,33 +142,44 @@ class Storage
      *
      * @param string $name
      * @param mixed $value
-     * @param string $config
+     * @param array $options You can pass an array of options with the folling keys :
+     *   - config: default:default the name of the config to use
      * @return bool
      */
-    public static function exists(string $name):bool
+    public static function exists(string $name, array $options = []) : bool
     {
-        return static::engine(self::$use)->exists($name);
+        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $engine = static::engine($options['config']);
+        return $engine->exists($name);
     }
 
     /**
      * Deletes a file OR directory
      *
      * @param string $name
+     * @param array $options You can pass an array of options with the folling keys :
+     *   - config: default:default the name of the config to use
      * @return boolean
      */
-    public static function delete(string $name) :bool
+    public static function delete(string $name, array $options = []) : bool
     {
-        return static::engine(self::$use)->delete($name);
+        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $engine = static::engine($options['config']);
+        return $engine->delete($name);
     }
 
     /**
      * Returns a list of items in the storage
      *
-     * @param string $config images or public/images
+     * @param string $path images or public/images
+     * @param array $options You can pass an array of options with the folling keys :
+     *   - config: default:default the name of the config to use
      * @return array
      */
-    public static function list(string $path = null) :array
+    public static function list(string $path = null, array $options = []) : array
     {
-        return static::engine(self::$use)->list($path);
+        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $engine = static::engine($options['config']);
+        return $engine->list($path);
     }
 }
