@@ -17,7 +17,7 @@
  * @todo investigate using pcntl_signal/ pcntl_alarm for timing out tasks
  */
 
-namespace Origin\Utility;
+namespace Origin\Queue;
 
 use Origin\Model\Entity;
 use Origin\Model\Model;
@@ -195,7 +195,7 @@ class Queue
      * @param string $schedule when to process
      * @return int $id
      */
-    public function add(string $queue = null, array $data = [], string $strtotime = 'now') 
+    public function add(string $queue = null, array $data = [], string $strtotime = 'now')
     {
         if (!preg_match('/^[\w.-]+$/i', $queue)) {
             throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores, hypens and dots.');
@@ -211,7 +211,7 @@ class Queue
         if (mb_strlen($entity->data) >= 65535) {
             throw new InvalidArgumentException('Data string is longer than 65,535');
         }
-        if($this->Job->save($entity)){
+        if ($this->Job->save($entity)) {
             return $this->Job->id;
         }
         return false;
@@ -226,7 +226,7 @@ class Queue
      */
     public function fetch(string $queue)
     {
-        # Boolean fields on Postgre work differently and does not accept 0 only '0' 
+        # Boolean fields on Postgre work differently and does not accept 0 only '0'
         $conditions = ['queue'=>$queue,'status'=>'queued','locked = \'0\' ','scheduled <=' => date('Y-m-d H:i:s')];
         if ($result = $this->Job->find('first', ['conditions'=>$conditions])) {
             if ($this->claim($result->id)) {
