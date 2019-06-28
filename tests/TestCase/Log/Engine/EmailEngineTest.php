@@ -29,9 +29,9 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultConfig()
     {
-        Email::config('default', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo@example.com']);
-        $this->assertEquals('default', $engine->config('account'));
+        Email::config('demo', ['debug'=>true]);
+        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo@example.com','account'=>'demo']);
+        $this->assertEquals('demo', $engine->config('account'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
     }
@@ -54,24 +54,24 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
     public function testAccountFromNotSet()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('default', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','account'=>'default']);
+        Email::config('demo', ['debug'=>true]);
+        $engine = new MockEmailEngine(['to'=>'foo@example.com','account'=>'demo']);
     }
 
     public function testAccountFromInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('default', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo','account'=>'default']);
+        Email::config('demo', ['debug'=>true]);
+        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo','account'=>'demo']);
     }
    
     public function testLog()
     {
-        Email::config('default', ['debug'=>true]);
+        Email::config('demo', ['debug'=>true]);
         $engine = new MockEmailEngine([
             'to'=>'foo@example.com',
             'from'=>'foo@example.com',
-            'account'=>'default'
+            'account'=>'demo'
             ]);
         $id = uniqid();
         $engine->log('error', 'Error code {value}', ['value'=>$id]);
