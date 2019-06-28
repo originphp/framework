@@ -12,11 +12,11 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Engine;
+namespace Origin\Storage\Engine;
 
 use Origin\Core\ConfigTrait;
 
-abstract class StorageEngine
+abstract class BaseEngine
 {
     use ConfigTrait;
 

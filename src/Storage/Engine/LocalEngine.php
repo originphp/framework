@@ -12,14 +12,14 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Engine\Storage;
+namespace Origin\Storage\Engine;
 
-use Origin\Engine\StorageEngine;
+use Origin\Storage\Engine\BaseEngine;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 use Origin\Exception\NotFoundException;
 
-class LocalEngine extends StorageEngine
+class LocalEngine extends BaseEngine
 {
     protected $defaultConfig =[
         'root' => APP . DS . 'storage'

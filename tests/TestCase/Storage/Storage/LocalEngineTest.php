@@ -11,10 +11,10 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Engine\Storage;
+namespace Origin\Test\Storage\Engine;
 
-use Origin\Engine\Storage\LocalEngine;
-use Origin\Test\Engine\Storage\EngineTestTrait;
+use Origin\Storage\Engine\LocalEngine;
+use Origin\Test\Storage\Engine\EngineTestTrait;
 
 include_once 'EngineTestTrait.php';
 

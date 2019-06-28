@@ -12,14 +12,14 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Engine\Storage;
+namespace Origin\Storage\Engine;
 
-use Origin\Engine\StorageEngine;
+use Origin\Storage\Engine\BaseEngine;
 
 use Origin\Exception\NotFoundException;
 use Origin\Exception\Exception;
 
-class FtpEngine extends StorageEngine
+class FtpEngine extends BaseEngine
 {
     protected $defaultConfig =[
         'host' => null,
