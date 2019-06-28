@@ -221,7 +221,8 @@ class Log
      * Gets a particular engine
      *
      * @param string $name
-     * @return \Origin\Log\BaseEngine|null
+     * @throws \Origin\Exception\InvalidArgumentException
+     * @return \Origin\Log\BaseEngine
      */
     public static function engine(string $name) : ?BaseEngine
     {
@@ -231,7 +232,7 @@ class Log
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
         }
-        return null;
+        throw new InvalidArgumentException("{$name} config does not exist");
     }
 
     /**
