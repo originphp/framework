@@ -27,6 +27,13 @@ abstract class BaseEngine
     protected $defaultConfig =  [];
 
     /**
+     * Holds the channel
+     *
+     * @var string
+     */
+    protected $channel = 'application';
+
+    /**
      * Constructor
      *
      * @param array $config  duration,prefix,path
@@ -44,6 +51,20 @@ abstract class BaseEngine
      */
     public function initialize(array $config)
     {
+    }
+
+    /**
+     * Sets or gets the channel
+     *
+     * @param string $channel
+     * @return string|void
+     */
+    public function channel(string $channel = null)
+    {
+        if ($channel === null) {
+            return $this->channel;
+        }
+        $this->channel = $channel;
     }
 
     /**
@@ -221,6 +242,7 @@ abstract class BaseEngine
      */
     protected function format(string $level, string $message, array $context) : string
     {
+        
         // Get Values to replace
         $replace = [];
         foreach ($context as $key => $value) {
@@ -230,17 +252,13 @@ abstract class BaseEngine
             }
         }
 
-        # Channel
-        $context += ['channel' => 'application'];
-        $channel = $context['channel'];
-        unset($context['channel']);
-
         $message = $this->interpolate($message, $replace);
 
+        // Encode remaining data
         if ($context) {
             $message .= ' ' . json_encode($context);
         }
 
-        return sprintf('[%s] %s %s: %s', date('Y-m-d G:i:s'), $channel, strtoupper($level), $message);
+        return sprintf('[%s] %s %s: %s', date('Y-m-d G:i:s'), $this->channel(), strtoupper($level), $message);
     }
 }

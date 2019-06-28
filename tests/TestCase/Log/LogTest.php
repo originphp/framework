@@ -124,6 +124,31 @@ class LogTest extends \PHPUnit\Framework\TestCase
         $this->assertContains("[{$date}] custom DEBUG: Some system message", Log::engine('default')->getLog());
     }
 
+    public function testLevelsRestriction()
+    {
+        Log::config('default', [
+            'className' => 'Origin\Test\Log\NullEngine',
+            'levels' => ['critical']
+        ]);
+        Log::debug('This will not be logged');
+        $this->assertEmpty(Log::engine('default')->getLog());
+        Log::critical('This will be logged');
+        $this->assertContains('This will be logged', Log::engine('default')->getLog());
+    }
+
+    public function testChannelsRestriction()
+    {
+        Log::config('default', [
+            'className' => 'Origin\Test\Log\NullEngine',
+            'channels' => ['payments']
+        ]);
+        Log::debug('This will not be logged', ['channel'=>'application']);
+        $this->assertEmpty(Log::engine('default')->getLog());
+        Log::critical('This will be logged', ['channel'=>'payments']);
+        $this->assertContains('This will be logged', Log::engine('default')->getLog());
+    }
+
+
     public function testCustomData()
     {
         Log::info('User registered', ['username'=>'pinkpotato','channel'=>'custom']);

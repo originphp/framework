@@ -168,11 +168,18 @@ class Log
      *  - info: informational message
      *  - debug: debug-level message
      * @param string $message message and you can use placeholders {key}
-     * @param array $context array with key value for placeholders
+     * @param array $context this is an array which can contain
+     *  - context: array with key value for placeholders PSR3 style
+     *  - channel: name of the channel
+     *  - array: any other data will be converted to a json string
      * @return void
      */
     public static function write(string $level, string $message, array $context = [])
     {
+        $context += ['channel' => 'application'];
+        $channel = $context['channel'];
+        unset($context['channel']);
+
         if (static::$loaded === null) {
             static::loadEngines();
         }
@@ -187,9 +194,10 @@ class Log
                 continue;
             }
             $channels = $logger->channels();
-            if (!empty($channels) and !in_array($level, $channels)) {
+            if (!empty($channels) and !in_array($channel, $channels)) {
                 continue;
             }
+            $logger->channel($channel);
             $logger->{$level}($message, $context);
         }
     }
@@ -199,9 +207,8 @@ class Log
         $engines = static::config();
         foreach ($engines as $name => $config) {
             if (isset($config['engine'])) {
-                $config['className'] = __NAMESPACE__  . "\\{$config['engine']}Engine";
+                $config['className'] = __NAMESPACE__  . "\Engine\\{$config['engine']}Engine";
             }
-            
             if (empty($config['className']) or !class_exists($config['className'])) {
                 throw new InvalidArgumentException("Log engine for {$name} could not be found");
             }
