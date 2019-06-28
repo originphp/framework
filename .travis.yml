@@ -29,12 +29,13 @@ before_script:
   - phpenv config-rm xdebug.ini
   - composer install --prefer-source --no-interaction
 script:
-  - phpdbg -qrr vendor/bin/phpunit --coverage-clover=clover.xml
+  - vendor/bin/phpunit --coverage-clover=clover.xml
 cache:
   directories:
     - $HOME/.composer/cache/files
 deploy:
   on:
+    branch: master
     tags: true
 after_success:
   - bash <(curl -s https://codecov.io/bash)
