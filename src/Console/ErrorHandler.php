@@ -16,7 +16,7 @@ namespace Origin\Console;
 
 use Origin\Core\Debugger;
 use Origin\Console\ConsoleOutput;
-use Origin\Core\Logger;
+use Origin\Log\Log;
 
 /**
  * This is the error handler for Console
@@ -102,16 +102,13 @@ class ErrorHandler
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
 
-        $logger = new Logger('Console');
-
         $message = "{$debug['class']} {$debug['message']}";
         if (isset($debug['stackFrames'][0]['file'])) {
             $filename =  str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
             $message .= " {$filename}:{$debug['stackFrames'][0]['line']}";
         }
-        $logger->error($message);
+        Log::error($message);
 
-     
         $fullBacktrace = in_array('--backtrace', $_SERVER['argv']); // (in_array('--backtrace', $_SERVER['argv']) OR defined('PHPUNIT'));
         $this->render($debug, $fullBacktrace);
     }

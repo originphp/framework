@@ -48,6 +48,7 @@ class Logger
         if (Configure::read('debug')) {
             $this->filename = LOGS . DS .  'development.log';
         }
+        deprecationWarning('Logger has been deprecated use Log\Log instead');
     }
     
     /**

@@ -15,7 +15,7 @@
 namespace Origin\Model;
 
 use Origin\Core\Configure;
-use Origin\Core\Logger;
+use Origin\Log\Log;
 use Origin\Model\Exception\DatasourceException;
 use PDO;
 use PDOException;
@@ -111,8 +111,7 @@ abstract class Datasource
                 $flags
             );
         } catch (PDOException $e) {
-            $logger = new Logger('Datasource');
-            $logger->alert($e->getMessage());
+            Log::alert($e->getMessage());
             throw new ConnectionException($e->getMessage());
         }
     }
@@ -189,8 +188,7 @@ abstract class Datasource
                 return false;
             }
         } catch (PDOException $e) {
-            $logger = new Logger('Datasource');
-            $logger->debug($this->unprepare($sql, $params));
+            Log::debug($this->unprepare($sql, $params));
             throw new DatasourceException($e->getMessage());
         }
 

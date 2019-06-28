@@ -22,7 +22,7 @@
 namespace Origin\Http;
 
 use Origin\Core\Debugger;
-use Origin\Core\Logger;
+use Origin\Log\Log;
 use Origin\Core\Configure;
 use Origin\Exception\HttpException;
 use Origin\Http\Router;
@@ -135,11 +135,11 @@ class ErrorHandler
         $file =  str_replace(ROOT . DS, '', $exception->getFile());
 
         $message = "{$class} {$message} in {$file}:{$line}";
-        $logger = new Logger('Http');
+        
         if ($exception instanceof \ErrorException) {
-            $logger->error($message);
+            Log::error($message);
         } else {
-            $logger->critical($message);
+            Log::critical($message);
         }
     }
 

@@ -15,7 +15,7 @@ use Origin\Core\Debugger;
 use Origin\Core\Configure;
 use Origin\Utility\Collection;
 use Origin\I18n\I18n;
-use Origin\Core\Logger;
+use Origin\Log\Log;
 
 /**
  * Runs a backtrace.
@@ -257,8 +257,7 @@ function deprecationWarning(string $message)
         $message = sprintf('%s - %s %s', $message, str_replace(ROOT .DS, '', $trace[0]['file']), $trace[0]['line']);
     }
 
-    $logger = new Logger('deprecation');
-    $logger->warning($message);
+    Log::warning($message);
 
     if (Configure::read('debug')) {
         trigger_error($message, E_USER_DEPRECATED);

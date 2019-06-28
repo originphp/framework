@@ -22,6 +22,8 @@ class LoggerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $this->markTestSkipped('Logger is being deprecated');
+
         if (file_exists($this->filename)) {
             unlink($this->filename);
         }
