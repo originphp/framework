@@ -11,9 +11,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Utility;
+namespace Origin\Test\Queue;
 
-use Origin\Utility\Queue;
+use Origin\Queue\Queue;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\InvalidArgumentException;
 use Origin\TestSuite\OriginTestCase;
@@ -25,7 +25,7 @@ class QueueTest extends OriginTestCase
     /**
      * Undocumented variable
      *
-     * @var \Origin\Utility\Queue
+     * @var \Origin\Queue\Queue
      */
     public $Queue = null;
 
