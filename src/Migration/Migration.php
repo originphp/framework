@@ -354,7 +354,7 @@ class Migration
      */
     public function tableExists(string $name)
     {
-        return $this->adapter()->tableExists($name);
+        return in_array($name, $this->tables());
     }
 
     /**
