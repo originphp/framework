@@ -12,16 +12,25 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 /**
- * NullCache is for disabling cache
+ * This cache is for use in test suites
  */
 
-namespace Origin\Engine\Cache;
+namespace Origin\Cache\Engine;
 
-use Origin\Engine\CacheEngine;
+use Origin\Cache\Engine\BaseEngine;
+use Origin\Core\ConfigTrait;
 
-class NullEngine extends CacheEngine
+class ArrayEngine extends BaseEngine
 {
-        /**
+    use ConfigTrait;
+    
+    protected $defaultConfig = [
+        'prefix' => null
+    ];
+    
+    protected $data = [];
+
+    /**
      * Sets a value in the cache
      *
      * @param string $key
@@ -30,16 +39,21 @@ class NullEngine extends CacheEngine
      */
     public function write(string $key, $value) :bool
     {
+        $this->data[$this->key($key)] = $value;
         return true;
     }
     /**
      * Gets the value;
      * @todo returns false always
      * @param string $key
-     * @return void
+     * @return mixed
      */
     public function read(string $key)
     {
+        $key = $this->key($key);
+        if ($this->exists($key)) {
+            return $this->data[$key];
+        }
         return false;
     }
     /**
@@ -50,18 +64,24 @@ class NullEngine extends CacheEngine
      */
     public function exists(string $key) :bool
     {
-        return false;
+        return isset($this->data[$this->key($key)]);
     }
     /**
-     * Deletes a key from the cache
+     * Deletes a kehy from the cache
      *
      * @param string $key
      * @return boolean
      */
     public function delete(string $key) :bool
     {
-        return true;
+        $key = $this->key($key);
+        if ($this->exists($key)) {
+            unset($this->data[$key]);
+            return true;
+        }
+        return false;
     }
+
     /**
      * Clears the Cache
      *
@@ -69,8 +89,10 @@ class NullEngine extends CacheEngine
      */
     public function clear(): bool
     {
-        return false;
+        $this->data = [];
+        return true;
     }
+
     /**
      * Increases a value
      *
@@ -78,10 +100,16 @@ class NullEngine extends CacheEngine
      * @param integer $offset
      * @return integer
      */
-    public function increment(string $key, int $offset = 1)
+    public function increment(string $key, int $offset = 1): int
     {
-        return true;
+        $key = $this->key($key);
+        if (!$this->exists($key)) {
+            $this->data[$key] = 0;
+        }
+        $this->data[$key] += $offset;
+        return $this->data[$key];
     }
+
     /**
      * Decreases a value
      *
@@ -89,8 +117,13 @@ class NullEngine extends CacheEngine
      * @param integer $offset
      * @return integer
      */
-    public function decrement(string $key, int $offset = 1)
+    public function decrement(string $key, int $offset = 1): int
     {
-        return true;
+        $key = $this->key($key);
+        if (!$this->exists($key)) {
+            $this->data[$key] = 0;
+        }
+        $this->data[$key] -= $offset;
+        return $this->data[$key];
     }
 }

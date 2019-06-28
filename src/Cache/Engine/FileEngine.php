@@ -15,12 +15,12 @@
  * File cache should only be used for storing large objects or sets of data
  */
 
-namespace Origin\Engine\Cache;
+namespace Origin\Cache\Engine;
 
-use Origin\Engine\CacheEngine;
+use Origin\Cache\Engine\BaseEngine;
 use Origin\Exception\Exception;
 
-class FileEngine extends CacheEngine
+class FileEngine extends BaseEngine
 {
     protected $defaultConfig = [
         'path' => TMP . DS . 'cache',
@@ -43,7 +43,7 @@ class FileEngine extends CacheEngine
      * Gets the value;
      *
      * @param string $key
-     * @return void
+     * @return mixed
      */
     public function read(string $key)
     {

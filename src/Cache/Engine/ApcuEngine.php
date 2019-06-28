@@ -14,13 +14,13 @@
 /**
  * echo 'apc.enable_cli=1' >>  /etc/php/7.2/cli/php.ini
  */
-namespace Origin\Engine\Cache;
+namespace Origin\Cache\Engine;
 
-use Origin\Engine\CacheEngine;
+use Origin\Cache\Engine\BaseEngine;
 
 use Origin\Exception\Exception;
 
-class ApcuEngine extends CacheEngine
+class ApcuEngine extends BaseEngine
 {
     protected $defaultConfig = [
         'duration' => 3600,
@@ -56,7 +56,7 @@ class ApcuEngine extends CacheEngine
      * reads a value from the cache
      * @todo returns false always
      * @param string $key
-     * @return void
+     * @return mixed
      */
     public function read(string $key)
     {

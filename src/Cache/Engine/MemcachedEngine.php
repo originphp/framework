@@ -34,14 +34,14 @@
  * If you are working in Docker, then you will need to adjust the docker file and build it again using docker-compose build
  */
 
-namespace Origin\Engine\Cache;
+namespace Origin\Cache\Engine;
 
 use Origin\Core\ConfigTrait;
 use Origin\Exception\Exception;
-use Origin\Engine\CacheEngine;
+use Origin\Cache\Engine\BaseEngine;
 use Memcached;
 
-class MemcachedEngine extends CacheEngine
+class MemcachedEngine extends BaseEngine
 {
     use ConfigTrait;
 
@@ -123,7 +123,7 @@ class MemcachedEngine extends CacheEngine
      * Gets the value;
      * @todo returns false always
      * @param string $key
-     * @return void
+     * @return mixed
      */
     public function read(string $key)
     {

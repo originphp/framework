@@ -23,14 +23,14 @@
  * echo 'extension=redis.so' >> /etc/php/7.2/cli/php.ini
  */
 
-namespace Origin\Engine\Cache;
+namespace Origin\Cache\Engine;
 
 use Origin\Core\ConfigTrait;
 use Origin\Exception\Exception;
-use Origin\Engine\CacheEngine;
+use Origin\Cache\Engine\BaseEngine;
 use Redis;
 
-class RedisEngine extends CacheEngine
+class RedisEngine extends BaseEngine
 {
     use ConfigTrait;
 
@@ -101,7 +101,7 @@ class RedisEngine extends CacheEngine
      * Gets the value;
      * @todo returns false always
      * @param string $key
-     * @return void
+     * @return false
      */
     public function read(string $key)
     {

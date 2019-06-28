@@ -12,11 +12,11 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Engine;
+namespace Origin\Cache\Engine;
 
 use Origin\Core\ConfigTrait;
 
-abstract class CacheEngine
+abstract class BaseEngine
 {
     use ConfigTrait;
 
@@ -48,7 +48,7 @@ abstract class CacheEngine
      * reads the value;
      * @todo returns false always
      * @param string $key
-     * @return void
+     * @return mixed
      */
     abstract public function read(string $key);
 
