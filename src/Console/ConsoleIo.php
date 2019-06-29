@@ -351,9 +351,9 @@ class ConsoleIo
         }
         
         $this->write("\r{$progressBar} {$progress}");
-
+        
         if ($percent == 100) {
-            $this->write("\n");
+            $this->write("\r" . str_repeat($empty, 60) . "\r"); // should be \n or \r
         }
     }
 
@@ -518,8 +518,9 @@ class ConsoleIo
      * @param string $filename
      * @param string $contents
      * @param bool   $forceOverwrite
+     * @return bool
      */
-    public function createFile(string $filename, string $contents, $forceOverwrite = false)
+    public function createFile(string $filename, string $contents, $forceOverwrite = false) : bool
     {
         if (file_exists($filename) and $forceOverwrite !== true) {
             $this->warning("File {$filename} already exists");
@@ -534,9 +535,8 @@ class ConsoleIo
             if (!file_exists($directory)) {
                 mkdir($directory, 0777, true);
             }
-
-            return file_put_contents($filename, $contents);
-        } catch (Exception $e) {
+            return (bool) file_put_contents($filename, $contents);
+        } catch (\Exception $e) {
             return false;
         }
     }
