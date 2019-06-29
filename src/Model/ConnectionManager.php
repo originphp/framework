@@ -22,8 +22,8 @@ class ConnectionManager
     use StaticConfigTrait;
 
     protected static $engines = [
-        'mysql' => 'Origin\Engine\Datasource\MySQLEngine',
-        'pgsql' => 'Origin\Engine\Datasource\PostgreSQLEngine',
+        'mysql' => __NAMESPACE__ . '\Engine\MySQLEngine',
+        'pgsql' => __NAMESPACE__ . '\Engine\PostgreSQLEngine',
     ];
     /**
      * Holds the driver
@@ -60,7 +60,7 @@ class ConnectionManager
         $config = array_merge($defaults, static::config($name));
        
     
-        if(!isset(static::$engines[$config['engine']])){
+        if (!isset(static::$engines[$config['engine']])) {
             throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
         }
         static::$driver = $config['engine'];

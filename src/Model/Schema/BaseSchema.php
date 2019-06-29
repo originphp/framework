@@ -22,14 +22,30 @@ namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
 use Origin\Exception\Exception;
+use Origin\Model\Datasource;
 
-class BaseSchema
+abstract class BaseSchema
 {
+    /**
+     * Holds the datasource name
+     *
+     * @var string
+     */
     public $datasource = null;
 
+    /**
+     * Holds the column mapping information
+     *
+     * @var array
+     */
     protected $columns = [];
 
-    public function __construct(string $datasource='default')
+    /**
+     * Constructor
+     *
+     * @param string $datasource
+     */
+    public function __construct(string $datasource = 'default')
     {
         $this->datasource = $datasource;
     }
@@ -44,9 +60,9 @@ class BaseSchema
      *  - precision: for decimals and floasts
      *  - default: default value use '' or nill for null value
      *  - null: allow null values
-     * @return void
+     * @return string
      */
-    public function buildColumn(array $column)
+    public function buildColumn(array $column) : string
     {
         $column += [
           'name' => null,
@@ -121,7 +137,16 @@ class BaseSchema
     }
 
     /**
-    * Returns a MySQL string for creating a table.  Should be agnostic and non-agnostic.
+     * This gets the createTable information from a table name
+     *
+     * @param string $table
+     * @param array $data
+     * @return void
+     */
+    abstract public function showCreateTable(string $table);
+
+    /**
+    * Returns a MySQL string for creating a table. Should be agnostic and non-agnostic.
     *
     * @param string $table
     * @param array $data
@@ -203,8 +228,9 @@ class BaseSchema
         return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n){$append}";
     }
 
+
     /**
-     * Adds a column to an existing table
+     * returns SQL statement for adding a column to an existing table
      *
     * @param string $table table name
      * @param string $name column name
@@ -215,15 +241,16 @@ class BaseSchema
      *   - null: allows or disallows null values to be used
      *   - precision: the precision for the number (places to before the decimal point)
      *   - scale: the numbers after the decimal point
+     * @return string
      */
-    public function addColumn(string $table, string $name, string $type, array $options=[])
+    public function addColumn(string $table, string $name, string $type, array $options=[]) : string
     {
         $definition = $this->buildColumn(array_merge(['name'=>$name,'type'=>$type], $options));
         return "ALTER TABLE {$table} ADD COLUMN {$definition}";
     }
 
     /**
-     * Removes an index on table
+     * returns SQL statement for removing an index on table
      *
      * @param string $table
      * @param string|array $column owner_id, [owner_id,tenant_id]
@@ -240,7 +267,7 @@ class BaseSchema
     }
 
     /**
-     * Removes an index on table
+     * Returns a string for removing an index on table
      *
      * @param string $table
      * @param string|array $column owner_id, [owner_id,tenant_id]
@@ -248,9 +275,7 @@ class BaseSchema
      *  - name: name of index
      * @return string
      */
-    public function removeIndex(string $table, string $name)
-    {
-    }
+    abstract public function removeIndex(string $table, string $name);
 
     /**
      * Renames an index
@@ -261,15 +286,29 @@ class BaseSchema
      * @param string $newName
      * @return void
      */
-    public function renameIndex(string $table, string $oldName, string $newName)
-    {
-    }
+    abstract public function renameIndex(string $table, string $oldName, string $newName);
  
-    public function addForeignKey(string $fromTable, string $toTable, array $options=[])
+    /**
+     * Returns SQL for adding a foreignKey
+     *
+     * @param string $fromTable
+     * @param string $toTable
+     * @param array $options
+     * @return string
+     */
+    public function addForeignKey(string $fromTable, string $toTable, array $options=[]) : string
     {
         return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";
     }
 
+    /**
+     * Returns SQL for removing a foreignKey
+     *
+     * @param string $fromTable
+     * @param string $toTable
+     * @param array $options
+     * @return string
+     */
     public function removeForeignKey(string $fromTable, $constraint)
     {
         return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
@@ -281,13 +320,9 @@ class BaseSchema
      * @param string $table
      * @return void
      */
-    public function foreignKeys(string $table)
-    {
-    }
+    abstract public function foreignKeys(string $table);
 
-    public function indexes(string $table)
-    {
-    }
+    abstract public function indexes(string $table);
 
     /**
      * Checks if a foreignKey exists
@@ -320,43 +355,37 @@ class BaseSchema
      * @param array $options
      * @return string
      */
-    public function changeColumn(string $table, string $name, string $type, array $options=[])
-    {
-    }
+    abstract public function changeColumn(string $table, string $name, string $type, array $options=[]);
 
     /**
-       * Drops a table from database
-       *
-       * @param string $table
-       * @return string
-       */
-    public function dropTable(string $table)
+     * Returns a SQL statement for dropping a table
+     *
+     * @param string $table
+     * @return string
+     */
+    public function dropTable(string $table) : string
     {
         return "DROP TABLE {$table}";
     }
 
     /**
-     * Renames a table
+     * Gets a SQL statement for renaming a table
      *
      * @param string $from
      * @param string $to
      * @return string
      */
-    public function renameTable(string $from, string $to)
-    {
-    }
+    abstract public function renameTable(string $from, string $to);
 
     /**
-     * Renames a column name
+     * Gets a SQL statement for renaming a table
      *
      * @param string $table
      * @param string $from
      * @param string $to
      * @return string
      */
-    public function renameColumn(string $table, string $from, string $to)
-    {
-    }
+    abstract public function renameColumn(string $table, string $from, string $to);
 
     /**
      * Removes a column from the table§
@@ -365,7 +394,7 @@ class BaseSchema
      * @param string $column
      * @return string
      */
-    public function removeColumn(string $table, string $column)
+    public function removeColumn(string $table, string $column) : string
     {
         return "ALTER TABLE {$table} DROP COLUMN {$column}";
     }
@@ -377,7 +406,7 @@ class BaseSchema
      * @param array $columns
      * @return string
      */
-    public function removeColumns(string $table, array $columns)
+    public function removeColumns(string $table, array $columns) : string
     {
         $sql = "ALTER TABLE {$table}";
         foreach ($columns as $column) {
@@ -387,12 +416,13 @@ class BaseSchema
     }
 
     /**
-     * Returns an list of tables
+     * Returns a list of tables
      *
      * @return array
      */
-    public function tables()
+    public function tables() : array
     {
+        return $this->connection()->tables();
     }
 
     /**
@@ -404,17 +434,6 @@ class BaseSchema
     public function tableExists(string $name)
     {
         return in_array($name, $this->tables());
-    }
-
-
-    /**
-     * Undocumented function
-     *
-     * @param string $table
-     * @return string
-     */
-    public function showCreateTable(string $table)
-    {
     }
 
     /**
@@ -445,13 +464,19 @@ class BaseSchema
      * Return column name
      *
      * @param string $name
-     * @return void
+     * @return string
      */
-    public function columnName(string $name)
+    public function columnName(string $name) : string
     {
         return $name;
     }
 
+    /**
+     * Prepares a column value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
     public function columnValue($value)
     {
         if ($value === null) {
@@ -463,9 +488,14 @@ class BaseSchema
         return "'{$value}'";
     }
 
-    public function schema(string $table)
-    {
-    }
+    /**
+     * Gets the schema for a table
+     *
+     * @param string $table
+     * @return array
+     */
+    abstract public function schema(string $table);
+
     /**
      * Sets and gets the datasource
      *
@@ -481,25 +511,24 @@ class BaseSchema
     }
 
     /**
-        * Fetchs a single row from the database
-        *
-        * @param string $sql
-        * @return array|null
-        */
-    public function fetchRow(string $sql)
+     * An internal helper function for fetch
+     *
+     * @param string $sql
+     * @return array
+     */
+    protected function fetchRow(string $sql) : array
     {
         $connection = $this->connection();
         $connection->execute($sql);
         return $connection->fetch();
     }
-
     /**
-    * Fetchs all rows from database
-    *
-    * @param string $sql
-    * @return array
-    */
-    public function fetchAll(string $sql)
+     * An internal helper function for fetchAll
+     *
+     * @param string $sql
+     * @return array
+     */
+    protected function fetchAll(string $sql) : array
     {
         $connection = $this->connection();
         $connection->execute($sql);
@@ -511,11 +540,11 @@ class BaseSchema
     }
 
     /**
-     * Returns the ConnectionManager
+     * Returns the datasource
      *
-     * @return \Origin\Model\ConnectionManager
+     * @return \Origin\Model\Datasource
      */
-    public function connection()
+    public function connection() : Datasource
     {
         return ConnectionManager::get($this->datasource);
     }

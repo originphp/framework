@@ -84,6 +84,11 @@ abstract class Datasource
      */
     protected $adapter = null;
 
+    /**
+     * Constructor
+     *
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
@@ -94,7 +99,7 @@ abstract class Datasource
      *
      * @param array $config
      */
-    public function connect(array $config)
+    public function connect(array $config) : void
     {
         $config += ['engine'=>'mysql'];
        
@@ -121,7 +126,7 @@ abstract class Datasource
      *
      * @return boolean
      */
-    public function isConnected()
+    public function isConnected() : bool
     {
         if ($this->connection === null) {
             return false;
@@ -140,8 +145,12 @@ abstract class Datasource
         return $this->name;
     }
 
-
-    public function database()
+    /**
+     * Gets the database that its connected to
+     *
+     * @return void
+     */
+    public function database() : ?string
     {
         if (isset($this->config['database'])) {
             return $this->config['database'];
@@ -163,10 +172,9 @@ abstract class Datasource
      *
      * @param string $sql    statement
      * @param array  $params array('name'=>'John') or array('p1'=>'John')
-     *
      * @return bool result
      */
-    public function execute(string $sql, array $params = [])
+    public function execute(string $sql, array $params = []) :bool
     {
         try {
             $start = microtime(true);
@@ -195,7 +203,7 @@ abstract class Datasource
         return true;
     }
 
-    protected function unprepare($sql, $params)
+    protected function unprepare($sql, $params) : string
     {
         foreach ($params as $needle => $replace) {
             if (is_string($replace)) {
@@ -212,7 +220,7 @@ abstract class Datasource
      *
      * @return bool
      */
-    public function hasResults()
+    public function hasResults() :bool
     {
         return is_a($this->statement, 'PDOStatement') and $this->statement->rowCount() > 0;
     }
@@ -222,7 +230,7 @@ abstract class Datasource
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function begin()
+    public function begin() :bool
     {
         return $this->connection->beginTransaction();
     }
@@ -232,7 +240,7 @@ abstract class Datasource
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function commit()
+    public function commit() :void
     {
         $this->connection->commit();
     }
@@ -242,7 +250,7 @@ abstract class Datasource
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function rollback()
+    public function rollback() :void
     {
         $this->connection->rollBack();
     }
@@ -252,7 +260,12 @@ abstract class Datasource
         return $this->connection->lastInsertId();
     }
 
-    public function lastAffected()
+    /**
+     * Return last affected
+     *
+     * @return integer
+     */
+    public function lastAffected() :int
     {
         if ($this->hasResults()) {
             return $this->statement->rowCount();
@@ -265,7 +278,7 @@ abstract class Datasource
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect() : void
     {
         if ($this->connection) {
             if ($this->statement) {
@@ -280,7 +293,6 @@ abstract class Datasource
      * Fetchs a single record.
      *
      * @param string $type (num,assoc,model,object)
-     *
      * @return mixed record
      */
     public function fetch(string $type = 'assoc')
@@ -296,7 +308,12 @@ abstract class Datasource
         return null;
     }
 
-    public function fetchList()
+    /**
+     * Returns a list
+     *
+     * @return array|null
+     */
+    public function fetchList() : ?array
     {
         if ($this->hasResults()) {
             return $this->toList($this->statement->fetchAll(PDO::FETCH_NUM));
@@ -309,10 +326,9 @@ abstract class Datasource
      * Fetches multiple records.
      *
      * @param string $type (num,assoc,model,object)
-     *
-     * @return mixed record
+     * @return array|null
      */
-    public function fetchAll(string $type = 'assoc')
+    public function fetchAll(string $type = 'assoc') : ?array
     {
         if ($this->hasResults()) {
             $rows = [];
@@ -327,8 +343,6 @@ abstract class Datasource
  
             return $rows;
         }
-    
-
         return null;
     }
 
@@ -366,11 +380,12 @@ abstract class Datasource
      * 3 different list types ['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']] depending upon how many columns are selected. If more than 3 columns selected it returns ['a'=>'b'].
      *
      * @param array $rows fetchAll rows
-     *
-     * @return array list
+     * @param array $rows
+     * @return array
      */
-    protected function toList(array $rows)
+    protected function toList(array $rows) : array
     {
+        $result = [];
         $columnCount = count($rows[0]);
         foreach ($rows as $row) {
             if ($columnCount == 1) {
@@ -398,10 +413,9 @@ abstract class Datasource
      *
      * @param array $row
      * @param array $map array(model,column)
-     *
-     * @return result $row
+     * @return array
      */
-    protected function toModel(array $row, array $map)
+    protected function toModel(array $row, array $map) : array
     {
         $result = [];
         foreach ($map as $index => $meta) {
@@ -421,9 +435,9 @@ abstract class Datasource
      * Builds a map so that an assoc array can be setup.
      * @internal getColumnMeta does not work with PostgreSql, table returns table name instead of alias
      * @param PDOStatement $statement
-     * @return array $result
+     * @return void
      */
-    public function mapColumns(PDOStatement $statement = null)
+    public function mapColumns(PDOStatement $statement = null) : void
     {
         $this->columnMap = [];
         if ($statement == null) {
@@ -444,10 +458,9 @@ abstract class Datasource
      * Checks if a column is a virtual field.
      *
      * @param string $column
-     *
      * @return bool
      */
-    public function isVirtualField(string $column)
+    public function isVirtualField(string $column) : bool
     {
         return strpos($column, $this->virtualFieldSeperator) != false;
     }
@@ -518,20 +531,6 @@ abstract class Datasource
     }
 
     /**
-     * Driver Specific
-     */
-    /**
-     * Gets the DSN string
-     *
-     * @param array $config
-     * @return string
-     */
-    public function dsn(array $config)
-    {
-    }
-
- 
-    /**
      * Returns the schema adapter
      *
      * @return \Origin\Model\Schema\BaseSchema
@@ -539,54 +538,56 @@ abstract class Datasource
     public function adapter()
     {
         if (!$this->adapter) {
-            $adapterClass = 'Origin\Model\Schema\\'. ucfirst($this->name) . 'Schema';
+            $adapterClass = __NAMESPACE__ . '\Schema\\'. ucfirst($this->name) . 'Schema';
             $this->adapter = new $adapterClass($this->config['datasource']);
         }
       
         return $this->adapter;
     }
 
-
-    public function schema(string $table)
+    /**
+     * Gets the schema for a table
+     *
+     * @param string $table
+     * @return array
+     */
+    public function schema(string $table) : array
     {
         return $this->adapter()->schema($table);
     }
 
     /**
-     * Returns an array of tables
+     * Gets the DSN string
+     *
+     * @param array $config
+     * @return string
+     */
+    abstract public function dsn(array $config);
+
+    /**
+     * Gets a list of database
      *
      * @return array
      */
-    public function tables() : array
-    {
-        return $this->adapter()->tables();
-    }
-
-    public function databases() : array
-    {
-    }
+    abstract public function databases();
+    /**
+     * Gets a list of tables
+     *
+     * @return array
+     */
+    abstract public function tables();
     
-    public function enableForeignKeyConstraints()
-    {
-    }
+    abstract public function enableForeignKeyConstraints();
 
-
-    public function disableForeignKeyConstraints()
-    {
-    }
+    abstract public function disableForeignKeyConstraints();
 
     /**
-     * Returns a MySQL string for creating a table
+     * Executes a select statement
      *
      * @param string $table
-     * @param array $data
-     * @return string
+     * @param array $options
+     * @return void
      */
-    public function createTable(string $table, array $data) : string
-    {
-        return $this->adapter()->createTable($table, $data);
-    }
- 
     public function select(string $table, array $options)
     {
         $builder = $this->queryBuilder($table, $options['alias']);
@@ -599,10 +600,9 @@ abstract class Datasource
      *
      * @param string $table
      * @param array  $data
-     *
-     * @return bool true or false
+     * @return bool
      */
-    public function insert(string $table, array $data)
+    public function insert(string $table, array $data) : bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->insert($data)
@@ -617,10 +617,9 @@ abstract class Datasource
      * @param string $table
      * @param array  $data
      * @param array  $conditions
-     *
-     * @return bool true or false
+     * @return bool
      */
-    public function update(string $table, array $data, array $conditions = [])
+    public function update(string $table, array $data, array $conditions = []) : bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->update($data)
@@ -635,10 +634,9 @@ abstract class Datasource
      *
      * @param string $table
      * @param array  $conditions
-     *
-     * @return bool true or false
+     * @return bool
      */
-    public function delete(string $table, array $conditions = [])
+    public function delete(string $table, array $conditions = []) : bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->delete($conditions)
@@ -653,14 +651,19 @@ abstract class Datasource
      * @param string $table [description]
      * @return \Origin\Model\QueryBuilder QueryBuilder
      */
-    public function queryBuilder(string $table, $alias=null)
+    public function queryBuilder(string $table, $alias=null) :QueryBuilder
     {
         return new QueryBuilder($table, $alias, [
             'escape'=>$this->escape
             ]);
     }
 
-    public function log()
+    /**
+     * Returns the log
+     *
+     * @return array
+     */
+    public function log() : array
     {
         return $this->log;
     }

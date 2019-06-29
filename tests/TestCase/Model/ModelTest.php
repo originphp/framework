@@ -209,7 +209,7 @@ class ModelTest extends OriginTestCase
 
 
         $ds = $this->Article->connection();
-        $sql = $ds->createTable('foos', ['not_id'=>'primaryKey','undetectable'=>'string']);
+        $sql = $ds->adapter()->createTable('foos', ['not_id'=>'primaryKey','undetectable'=>'string']);
         $ds->execute($sql);
         $dummy = new Model(['name'=>'Foo','datasource'=>'test']);
   

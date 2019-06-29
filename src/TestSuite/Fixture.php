@@ -79,7 +79,6 @@ class Fixture
      */
     public function initialize()
     {
-       
     }
     
     /**
@@ -127,11 +126,8 @@ class Fixture
         }
     
         $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->createTable($this->table, $schema);
-
-        $result = $connection->execute($sql);
-          
-        return $result;
+        $sql = $connection->adapter()->createTable($this->table, $schema);
+        return $connection->execute($sql);
     }
 
     /**
@@ -146,7 +142,7 @@ class Fixture
         }
         $connection = ConnectionManager::get($this->datasource);
         if ($this->schema) {
-            $sql = $connection->createTable($this->table, $this->schema);
+            $sql = $connection->adapter()->createTable($this->table, $this->schema);
             return $connection->execute($sql);
         }
         return false;

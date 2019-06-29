@@ -47,22 +47,7 @@ class PgsqlSchema extends BaseSchema
         'binary' => ['name' => 'BYTEA'],
         'boolean' => ['name' => 'BOOLEAN'],
     ];
- 
-    /**
-     * Returns an list of tables
-     *
-     * @return array
-     */
-    public function tables()
-    {
-        $sql = 'SELECT table_name as "table" FROM information_schema.tables WHERE table_schema=\'public\'';
-        $connection = $this->connection();
-        if ($connection->execute($sql)) {
-            return $connection->fetchList();
-        }
-        return [];
-    }
- 
+  
     /**
      * Gets the schema
      * @internal postgre
@@ -271,7 +256,14 @@ class PgsqlSchema extends BaseSchema
       
         return $results;
     }
-    public function removeForeignKey(string $fromTable, $constraint)
+    /**
+     * Undocumented function
+     *
+     * @param string $fromTable
+     * @param [type] $constraint
+     * @return string
+     */
+    public function removeForeignKey(string $fromTable, $constraint) : string
     {
         return "ALTER TABLE {$fromTable} DROP CONSTRAINT {$constraint}";
     }
@@ -280,9 +272,9 @@ class PgsqlSchema extends BaseSchema
      * No easy way to do is pgsql. Pref is to use pgdump command
      *
      * @param string $table
-     * @return void
+     * @return string
      */
-    public function showCreateTable(string $table)
+    public function showCreateTable(string $table) : string
     {
         $schema = $this->schema($table);
         return $this->createTable($table, $schema);

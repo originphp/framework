@@ -15,12 +15,9 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
-use Origin\Model\Datasource;
-use Origin\Engine\Datasource\MySQLEngine;
+use Origin\Model\Engine\MySQLEngine;
 
-use PDOException;
 use Origin\Model\Exception\DatasourceException;
-use Origin\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Exception\ConnectionException;
 
@@ -28,9 +25,9 @@ class DatasourceTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Author','Origin.Article'];
     
-    protected function setUp(): void{
+    protected function setUp(): void
+    {
         $this->connection = ConnectionManager::get('test');
-       
     }
     public function testIsVirtualField()
     {
@@ -40,14 +37,13 @@ class DatasourceTest extends OriginTestCase
 
     public function testCreate()
     {
-
         $data = [
             'name' => 'Roger',
             'description' => 'New Author',
             'created' => now(),
             'modified' => now()
         ];
-        $this->assertTrue($this->connection->insert('authors',$data));
+        $this->assertTrue($this->connection->insert('authors', $data));
 
         $data = [
             'name' => 'Roger Again',
@@ -55,7 +51,7 @@ class DatasourceTest extends OriginTestCase
             'created' => now(),
             'modified' => now()
         ];
-        $this->assertTrue($this->connection->insert('authors',$data));
+        $this->assertTrue($this->connection->insert('authors', $data));
         $this->assertTrue($this->connection->lastInsertId()>1);
     }
 
@@ -80,16 +76,13 @@ class DatasourceTest extends OriginTestCase
         $this->assertTrue($this->connection->isConnected());
         $this->assertNull($this->connection->disconnect());
         $this->assertFalse($this->connection->isConnected());
-       ConnectionManager::drop('test');
-  
+        ConnectionManager::drop('test');
     }
 
     public function testLog()
     {
-  
-        
         $this->connection->execute('SELECT id, name, description FROM authors LIMIT 1');
-        $this->assertNotEmpty( $this->connection->log());
+        $this->assertNotEmpty($this->connection->log());
     }
     /**
      * @depends testCreate
@@ -163,19 +156,19 @@ class DatasourceTest extends OriginTestCase
             'name' => 'Sean',
             'description' => 'upcoming author',
             'created' =>  '2019-03-27 13:12:00' ,
-            'modified' => $timestamp 
+            'modified' => $timestamp
         ];
-        $this->assertTrue($this->connection->insert('authors',$data));
+        $this->assertTrue($this->connection->insert('authors', $data));
 
         $lastId = $this->connection->lastInsertId();
 
-        # Postgre and mysql returning different ids. 
-        $this->connection->update('authors',['id'=>999],['id'=>$lastId]);
+        # Postgre and mysql returning different ids.
+        $this->connection->update('authors', ['id'=>999], ['id'=>$lastId]);
 
         $sql = 'SELECT id FROM authors ORDER BY id DESC';
         $expected = array(1002, 1001, 1000,999);
         $this->assertTrue($this->connection->execute($sql));
-         $this->assertEquals($expected, $this->connection->fetchList());
+        $this->assertEquals($expected, $this->connection->fetchList());
 
         $sql = 'SELECT id,name FROM authors ORDER BY id DESC';
         $expected = array(1002 => 'Author #3', 1001 => 'Author #2', 1000 => 'Author #1', 999=> 'Sean');
@@ -189,11 +182,11 @@ class DatasourceTest extends OriginTestCase
         $result = $this->connection->fetchList();
        
         $expected = array(1002 => 'Author #3', 999 => 'Sean');
-        $this->assertArrayHasKey( '2019-03-27 13:12:00', $result);
+        $this->assertArrayHasKey('2019-03-27 13:12:00', $result);
         $this->assertEquals($expected, $result[ '2019-03-27 13:12:00']);
 
         $expected = array(1001 => 'Author #2');
-        $this->assertArrayHasKey('2019-03-27 13:11:00' , $result);
+        $this->assertArrayHasKey('2019-03-27 13:11:00', $result);
         $this->assertEquals($expected, $result[ '2019-03-27 13:11:00' ]);
     }
 
@@ -264,7 +257,7 @@ class DatasourceTest extends OriginTestCase
     {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
-       $expected = [
+        $expected = [
             'id' => 1000,
             'name' => 'Author #1',
             'description' => 'Description about Author #1'
@@ -302,6 +295,12 @@ class DatasourceTest extends OriginTestCase
         $this->assertTrue(in_array('articles', $tables));
     }
 
+    /**
+     * Originally create table was part of Datasource
+     * @todo write test for each adapter, and then rely on that for testin
+     *
+     * @return void
+     */
     public function testCreateTable()
     {
         $this->connection->execute('DROP TABLE IF EXISTS foo;');
@@ -321,21 +320,21 @@ class DatasourceTest extends OriginTestCase
             'bf' => ['type'=>'binary'],
             'bool' => ['type'=>'boolean'],
         ];
-        $result = $this->connection->createTable('foo', $schema);
-        $this->assertTrue($this->connection->execute($result));
-
-     
+        $sql = $this->connection->adapter()->createTable('foo', $schema);
+        
+        $this->assertTrue($this->connection->execute($sql));
+    
         $schema = [
             'bookmarks_id' => ['type'=>'integer','key'=>'primary'],
             'tags_id' => ['type'=>'integer','key'=>'primary'],
         ];
-        $result = $this->connection->createTable('bar', $schema);
-   
-        $this->assertContains('bookmarks_id INT', $result);
-        $this->assertContains('tags_id INT', $result);
-        $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $result);
+        $sql = $this->connection->adapter()->createTable('bar', $schema);
+  
+        $this->assertContains('bookmarks_id INT', $sql);
+        $this->assertContains('tags_id INT', $sql);
+        $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $sql);
 
-        $this->assertTrue($this->connection->execute($result));
+        $this->assertTrue($this->connection->execute($sql));
         $this->connection->execute('DROP TABLE bar');
     }
 
@@ -348,6 +347,7 @@ class DatasourceTest extends OriginTestCase
     {
         $schema = $this->connection->schema('foo');
         $engine = $this->connection->engine();
+
         $this->assertEquals('primaryKey', $schema['id']['type']);
         $this->assertEquals('primary', $schema['id']['key']);
         $this->assertEquals('string', $schema['name']['type']);
@@ -357,7 +357,7 @@ class DatasourceTest extends OriginTestCase
         $this->assertEquals(1234, $schema['age']['default']);
         $this->assertEquals('bigint', $schema['bi']['type']);
         $this->assertEquals('float', $schema['fn']['type']);
-        if($engine === 'mysql'){
+        if ($engine === 'mysql') {
             $this->assertEquals(2, $schema['fn']['precision']);
         }
         
@@ -366,8 +366,7 @@ class DatasourceTest extends OriginTestCase
         $this->assertEquals('datetime', $schema['dt']['type']);
         if ($engine === 'mysql') {
             $this->assertEquals('timestamp', $schema['ts']['type']);
-        }
-        else{
+        } else {
             $this->assertEquals('datetime', $schema['ts']['type']);
         }
         

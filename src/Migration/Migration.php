@@ -846,7 +846,7 @@ class Migration
         */
     public function fetchRow(string $sql)
     {
-        return $this->adapter()->fetchRow($sql);
+        return $this->connection()->fetchRow($sql);
     }
 
     /**
@@ -857,7 +857,7 @@ class Migration
     */
     public function fetchAll(string $sql)
     {
-        return  $this->adapter()->fetchAll($sql);
+        return  $this->connection()->fetchAll($sql);
     }
 
     /**

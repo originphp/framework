@@ -23,15 +23,16 @@ namespace Origin\Model\Schema;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\Exception;
 use Origin\Model\Schema\BaseSchema;
+use PHPUnit\Framework\Error\Deprecated;
 
 class MysqlSchema extends BaseSchema
 {
     /**
-         * This is the map for database agnostic, if its not found here then
-         * use what user supplies. @important. This will allow using char and medium text when testing
-         *
-         * @var array
-         */
+     * This is the map for database agnostic, if its not found here then
+     * use what user supplies. @important. This will allow using char and medium text when testing
+     *
+     * @var array
+     */
     protected $columns = [
         'primaryKey' => ['name' => 'INT NOT NULL AUTO_INCREMENT'],
         'string' => ['name' => 'varchar', 'limit' => 255],
@@ -48,11 +49,17 @@ class MysqlSchema extends BaseSchema
         'boolean' => ['name' => 'TINYINT', 'limit' => 1],
     ];
 
+    /**
+     * Returns the schema for the table
+     *
+     * @param string $table
+     * @return array
+     */
     public function schema(string $table) : array
     {
         $schema = [];
         $results = $this->fetchAll("SHOW FULL COLUMNS FROM {$table}");
-
+    
         $reverseMapping = [];
         foreach ($this->columns as $key => $value) {
             $reverseMapping[strtolower($value['name'])] = $key;
@@ -108,18 +115,6 @@ class MysqlSchema extends BaseSchema
               }
           }
         return $schema;
-    }
-
-    public function tables()
-    {
-        $tables = [];
-        $results = $this->fetchAll('SHOW TABLES');
-        if ($results) {
-            foreach ($results as $value) {
-                $tables[] = current($value);
-            }
-        }
-        return $tables;
     }
 
     public function indexes(string $table)

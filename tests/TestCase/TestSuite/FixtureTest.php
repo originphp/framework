@@ -125,7 +125,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
 
         // if existing datasource has movives then crash
         $connection->execute("DROP TABLE IF EXISTS movies"); // TMP
-        $sql = $connection->createTable('movies',[
+        $sql = $connection->adapter()->createTable('movies', [
             'id' => 'primaryKey',
             'name' => ['type'=>'string','null'=>false],
             'description' => 'text',
@@ -161,7 +161,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture = new MovieFixture();
         $fixture->import = ['model'=>'Guest']; // convert to table
         
-        $sql = $connection->createTable('guests',[
+        $sql = $connection->adapter()->createTable('guests', [
             'id' => 'primaryKey',
             'firstname' => ['type'=>'string','limit'=>'30']
         ]);
