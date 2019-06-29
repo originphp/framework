@@ -12,5 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 # Deprecated from v1.20
+// @codeCoverageIgnoreStart
 class_alias('Origin\Queue\Queue', 'Origin\Utility\Queue');
 deprecationWarning('Use Origin\Queue\Queue instead of Origin\Utility\Queue.');
+// @codeCoverageIgnoreEnd

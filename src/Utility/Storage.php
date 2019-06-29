@@ -12,5 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 # Deprecated from v1.20
+// @codeCoverageIgnoreStart
 class_alias('Origin\Storage\Storage', 'Origin\Utility\Storage');
 deprecationWarning('Use Origin\Storage\Storage instead of Origin\Utility\Storage.');
+// @codeCoverageIgnoreEnd

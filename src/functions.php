@@ -234,7 +234,7 @@ function uid($length=13)
 
 /**
  * The OriginPHP default password hasher
- *
+ * @codeCoverageIgnore
  * @param string $password
  * @return string
  */

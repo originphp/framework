@@ -12,6 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+
 namespace Origin\Core;
 
 use Origin\Core\Configure;
@@ -19,7 +20,9 @@ use Origin\Core\Configure;
 /**
  * A minimalistic PSR friendly logger- which currently just works with files.
  */
-
+/**
+ * @codeCoverageIgnore
+ */
 class Logger
 {
     /**
@@ -39,7 +42,6 @@ class Logger
 
     /**
      * Constructor function
-     *
      * @param string $channel  a simple descriptive name which logs are related to
      */
     public function __construct(string $channel)

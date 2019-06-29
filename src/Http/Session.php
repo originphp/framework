@@ -128,7 +128,7 @@ class Session
 
     /**
      * Checks if a key exists in the session
-     *
+     * @codeCoverageIgnore
      * @param string $key
      * @return boolean
      */
@@ -215,7 +215,8 @@ class Session
      *
      * @return void
      */
-    public function clear(){
+    public function clear()
+    {
         $_SESSION = [];
     }
     /**
@@ -227,7 +228,7 @@ class Session
     {
         $this->clear();
         $_SESSION = null;
-        if(!headers_sent()){
+        if (!headers_sent()) {
             session_write_close();
             $this->start();
         }

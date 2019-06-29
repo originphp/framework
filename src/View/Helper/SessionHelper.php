@@ -81,7 +81,7 @@ class SessionHelper extends Helper
 
     /**
      * Checks if a session exists
-     *
+     * @codeCoverageIgnore
      * @param string $name
      * @return void
      */
@@ -107,7 +107,8 @@ class SessionHelper extends Helper
      *
      * @return void
      */
-    public function clear(){
+    public function clear()
+    {
         $this->session()->clear();
     }
     

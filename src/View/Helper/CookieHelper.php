@@ -21,12 +21,12 @@ namespace Origin\View\Helper;
 
 class CookieHelper extends Helper
 {
-  /**
-     * Reads a value of a cookie from request
-     *
-     * @param string $name
-     * @return string|null
-     */
+    /**
+       * Reads a value of a cookie from request
+       *
+       * @param string $name
+       * @return string|null
+       */
     public function read(string $name)
     {
         return $this->request()->cookies($name);
@@ -62,7 +62,7 @@ class CookieHelper extends Helper
 
     /**
      * Checks if a cookie exists
-     *
+     * @codeCoverageIgnore
      * @param string $name
      * @return void
      */

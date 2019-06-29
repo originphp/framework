@@ -514,7 +514,7 @@ class Request
      *
      * $result= $request->header('www-Authenticate');
      * $request->header('WWW-Authenticate', 'Negotiate');
-     *
+     * @codeCoverageIgnore
      * @param string $name name of header to get
      * @param string $value value of header to set
      * @return string|null

@@ -82,7 +82,7 @@ class SessionComponent extends Component
 
     /**
      * Checks if a session exists
-     *
+     * @codeCoverageIgnore
      * @param string $name
      * @return void
      */
@@ -109,7 +109,8 @@ class SessionComponent extends Component
      *
      * @return void
      */
-    public function clear(){
+    public function clear()
+    {
         $this->session()->clear();
     }
     

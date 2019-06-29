@@ -129,7 +129,7 @@ class Response
 
     /**
      * Sets or gets the status code for sending.
-     *
+     * @codeCoverageIgnore
      * @param int $status
      * @return int status
      */

@@ -71,7 +71,7 @@ class CookieComponent extends Component
 
     /**
      * Checks if a cookie exists
-     *
+     * @codeCoverageIgnore
      * @param string $name
      * @return void
      */
