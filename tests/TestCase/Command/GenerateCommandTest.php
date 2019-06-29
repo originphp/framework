@@ -12,6 +12,13 @@ class GenerateCommandTest extends OriginTestCase
 
     public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
 
+
+    public function testScaffoldUnkownModel()
+    {
+        $this->exec('generate --force --datasource=test scaffold Foo');
+        $this->assertExitError();
+        $this->assertErrorContains('Unkown model Foo');
+    }
     public function testGenerateScaffold()
     {
         $this->exec('generate --force --datasource=test scaffold Bookmark');
@@ -53,6 +60,13 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate command bar-foo');
         $this->assertExitError();
         $this->assertErrorContains('Invalid name format');
+    }
+
+    public function testNoName()
+    {
+        $this->exec('generate command');
+        $this->assertExitError();
+        $this->assertErrorContains('You must provide a name e.g. Single,DoubleWord');
     }
 
     public function testInvalidSchema()
@@ -152,6 +166,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = TESTS.DS.'TestCase'.DS.'Controller'.DS.'DummiesControllerTest.php';
         $this->assertOutputContains('tests/TestCase/Controller/DummiesControllerTest.php');
         $this->assertTrue(file_exists($filename));
+
         $this->assertFileHash('077245575da91a0fc8ac4517052f95d5', $filename);
         unlink($filename);
     }

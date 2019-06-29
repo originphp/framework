@@ -40,16 +40,18 @@ class DbDropCommand extends Command
         if (!$config) {
             $this->throwError("{$datasource} datasource not found");
         }
-
+     
+        // Create tmp Connection
         $database = $config['database'];
         $config['database'] = null;
-        $connection = ConnectionManager::create('tmp', $config); //
+        $connection = ConnectionManager::create('tmp', $config);
+
         if (!in_array($database, $connection->databases())) {
             $this->io->status('error', sprintf('Database `%s` does not exist', $database));
             $this->abort();
         }
         try {
-            $result = $connection->execute("DROP DATABASE {$database};");
+            $connection->execute("DROP DATABASE {$database}");
             ConnectionManager::drop('tmp');
             $this->io->status('ok', sprintf('Database `%s` dropped', $database));
         } catch (DatasourceException $ex) {

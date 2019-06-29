@@ -13,6 +13,7 @@
  */
 
 namespace Origin\Command;
+
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -25,33 +26,36 @@ class DbSeedCommand extends Command
 
     protected $description = 'Seeds the database with initial records';
 
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
             'default' => 'default'
             ]);
-        $this->addArgument('name',[
+        $this->addArgument('name', [
             'description' => 'seed or Plugin.seed',
         ]);
-
     }
  
-    public function execute(){
+    /**
+     * Seed needs to skip if file does not exist
+     */
+    public function execute()
+    {
         $name = $this->arguments('name');
-        if($name === null){
+        if ($name and !file_exists($this->schemaFilename($name))) {
+            $this->throwError(sprintf('Seed file `%s` could not be found', $this->schemaFilename($name)));
+        }
+        if ($name === null) {
             $name = 'seed';
         }
         $datasource = $this->options('datasource');
         $filename = $this->schemaFilename($name);
-        if(file_exists($filename)){
-            $this->loadSchema($filename,$datasource);
-       
+        if (file_exists($filename)) {
+            $this->loadSchema($filename, $datasource);
+        } else {
+            $this->io->status('skipped', 'Seed SQL file');
         }
-        else{
-            $this->io->status('skipped','Seed SQL file');
-        }
-        
     }
-
 }

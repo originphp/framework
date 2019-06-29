@@ -45,12 +45,16 @@ class GenerateCommand extends Command
         if (file_exists($directory)) {
             $this->directory = $directory;
         }
-        $this->addArgument('generator', [
+        $this->addArgument(
+            'generator',
+            [
             'description' => [
                 'The name of the generator. Generators include: behavior,command,component',
                 'controller, helper,model,middleware, migration and plugin', ], ]
         );
-        $this->addArgument('name', [
+        $this->addArgument(
+            'name',
+            [
             'description' => 'This is a mixed case name, e.g Contact,ContactAddress,Plugin.Product', 'required' => false, ]
         );
         $this->addArgument('params', [
@@ -65,7 +69,7 @@ class GenerateCommand extends Command
             'default' => false,
         ]);
 
-        $this->addOption('datasource',[
+        $this->addOption('datasource', [
             'description' => 'The datasource to use for the database',
             'default' => 'default'
         ]);
@@ -89,7 +93,6 @@ class GenerateCommand extends Command
             if ($this->isValidGenerator($generator)) {
                 $name = $this->io->ask('Enter a name e.g. Single,DoubleWord');
             }
-            
         }
 
         if (!$this->isValidGenerator($generator)) {
@@ -97,7 +100,7 @@ class GenerateCommand extends Command
             $this->abort();
         }
 
-        if(!$name){
+        if (!$name) {
             $this->io->error("You must provide a name e.g. Single,DoubleWord");
             $this->abort();
         }
@@ -172,11 +175,11 @@ class GenerateCommand extends Command
         );
 
         if ($params) {
-            foreach($params as $method){
-                  $this->generate(
-                    $this->getTemplateFilename('view'),
-                    $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.$data['class'] .DS. "{$method}.ctp",
-                    ['action' => Inflector::humanize($method)] + $data
+            foreach ($params as $method) {
+                $this->generate(
+                      $this->getTemplateFilename('view'),
+                      $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.$data['class'] .DS. "{$method}.ctp",
+                      ['action' => Inflector::humanize($method)] + $data
                 );
             }
         }
@@ -233,14 +236,16 @@ class GenerateCommand extends Command
         $schema = var_export($data, true);
         $schema = str_replace(
             ['array (', '),', " => \n", '=>   ['],
-            ['[', '],', ' => ', '=> ['], $schema);
+            ['[', '],', ' => ', '=> ['],
+            $schema
+        );
 
         return substr($schema, 0, -1).']';
     }
 
     protected function model(array $data)
     {
-         // Create Migration
+        // Create Migration
         $params = $this->arguments('params');
         $schema = [];
         if ($params) {
@@ -342,25 +347,25 @@ class GenerateCommand extends Command
 %controllerUnderscored% e.g. bookmarks_tags
 %primaryKey% e.g. id
 */
-    public function scaffold(array $data){
-       
+    public function scaffold(array $data)
+    {
         $datasource = $this->options('datasource');
         $scaffold = new Scaffold($datasource);
 
         $model = $data['class'];
         $meta = $scaffold->meta();
         $models = array_keys($meta['schema']);
-        if(!in_array($data['class'],$models)){
-            $this->io->error(sprintf("Unkown model %s",$data['class']));
+        if (!in_array($data['class'], $models)) {
+            $this->io->error(sprintf("Unkown model %s", $data['class']));
             $this->abort();
         }
         # Prepare Data
         $vars = $meta['vars'][$model];
-         $belongsTo = $meta['associations'][$model]['belongsTo'];
-         $hasMany = $meta['associations'][$model]['hasMany'];
-         $hasAndBelongsToMany = $meta['associations'][$model]['hasAndBelongsToMany'];
-         $associated = array_merge($belongsTo, $hasMany, $hasAndBelongsToMany);
-         $templateFolder = $this->directory.DS. 'scaffold';
+        $belongsTo = $meta['associations'][$model]['belongsTo'];
+        $hasMany = $meta['associations'][$model]['hasMany'];
+        $hasAndBelongsToMany = $meta['associations'][$model]['hasAndBelongsToMany'];
+        $associated = array_merge($belongsTo, $hasMany, $hasAndBelongsToMany);
+        $templateFolder = $this->directory.DS. 'scaffold';
         
         # Build Controller
         $template = file_get_contents($templateFolder . DS . 'controller.tpl');
@@ -378,17 +383,17 @@ class GenerateCommand extends Command
                 ];
             }
         }
-        $vars['compact'] = implode("','",  $vars['compact']);
+        $vars['compact'] = implode("','", $vars['compact']);
         $vars['associated'] = '';
         if ($associated) {
             $vars['associated'] = "'" . implode("','", $associated)."'";
         }
-        $template = $this->buildBlocks($template,$blocks);
-        $template = $this->format($template,$vars);
+        $template = $this->buildBlocks($template, $blocks);
+        $template = $this->format($template, $vars);
        
         $controller = Inflector::pluralize($model);
         $filename = $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS."{$controller}Controller.php";
-        $this->saveGeneratedCode($filename,$template);
+        $this->saveGeneratedCode($filename, $template);
         unset($vars['compact'],$vars['associated']);
        
         # Build Model
@@ -420,8 +425,8 @@ class GenerateCommand extends Command
             }
         }
         $filename = $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS."{$model}.php";
-        $template = $this->format($template,$vars);
-        $this->saveGeneratedCode($filename,$template);
+        $template = $this->format($template, $vars);
+        $this->saveGeneratedCode($filename, $template);
 
        
         # View
@@ -438,24 +443,24 @@ class GenerateCommand extends Command
         }
       
         $directory = $this->getBaseFolder($data['name'], self::SRC) . DS .'View'.DS. $controller;
-        foreach(['add','edit','index','view'] as $view){
+        foreach (['add','edit','index','view'] as $view) {
             $template = file_get_contents($templateFolder . DS . 'view_' . $view. '.tpl');
-            $template = $this->format($template,$vars);
-            $template = $this->buildBlocks($template,$blocks);
+            $template = $this->format($template, $vars);
+            $template = $this->buildBlocks($template, $blocks);
 
             # Build Related
-            if($view === 'view'){
+            if ($view === 'view') {
                 $related = array_merge($associations ['hasMany'], $associations ['hasAndBelongsToMany']);
                 $relatedLists = [];
                 foreach ($related as $associated) {
                     $v = $meta['vars'][$associated];
                     $v['currentModel'] = lcfirst($model); // This for records
                     $t = file_get_contents($templateFolder . DS . 'view_related.tpl');
-                    $t = $this->format($t,$v);
+                    $t = $this->format($t, $v);
                     $fields = array_keys($meta['schema'][$associated]);
                     $blocks = [];
                     foreach ($fields as $field) {
-                        if($field === 'id'){
+                        if ($field === 'id') {
                             continue; // Skip since we already use this
                         }
                         $block = $data;
@@ -463,12 +468,12 @@ class GenerateCommand extends Command
                         $block['fieldName'] = Inflector::humanize(Inflector::underscore($field));
                         $blocks[] = $block;
                     }
-                    $relatedLists[] = $this->buildBlocks($t,$blocks);
+                    $relatedLists[] = $this->buildBlocks($t, $blocks);
                 }
-                $template = str_replace('%relatedLists%', implode("\n\n",$relatedLists), $template);//One off tag this allows user to wrap in div etc
+                $template = str_replace('%relatedLists%', implode("\n\n", $relatedLists), $template);//One off tag this allows user to wrap in div etc
             }
 
-            $this->saveGeneratedCode($directory . DS . $view . '.ctp',$template);
+            $this->saveGeneratedCode($directory . DS . $view . '.ctp', $template);
         }
     }
 
@@ -481,7 +486,7 @@ class GenerateCommand extends Command
     protected function getBaseFolder(string $class, $src = true)
     {
         list($plugin, $name) = pluginsplit($class);
-        if($plugin){
+        if ($plugin) {
             $plugin = Inflector::underscore($plugin);
         }
         // Src
@@ -509,7 +514,7 @@ class GenerateCommand extends Command
      */
     protected function generate(string $input, string $output, array $data)
     {
-        $content = $this->format(file_get_contents($input),$data);
+        $content = $this->format(file_get_contents($input), $data);
         return $this->saveGeneratedCode($output, $content);
     }
 
@@ -596,14 +601,13 @@ class Scaffold
 
     protected $meta = [];
 
-    public function schema(){
-        return $this->schema;
-    }
-    public function meta(){
+    public function meta()
+    {
         return $this->meta;
     }
 
-    public function __construct(string $datasource){
+    public function __construct(string $datasource)
+    {
         $this->introspectDatabase($datasource);
         $this->build();
     }

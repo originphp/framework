@@ -22,7 +22,7 @@ use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
 use Origin\Console\CommandRunner;
 
-class Command
+abstract class Command
 {
     /**
      * Default error code.
@@ -73,11 +73,11 @@ class Command
      */
     protected $help = null;
 
-   /**
-     * This to set additional usages
-     *
-     * @var string|array
-     */
+    /**
+      * This to set additional usages
+      *
+      * @var string|array
+      */
     protected $usages = [];
 
     /**
@@ -133,30 +133,29 @@ class Command
      * Runs another command from this command
      *
      * @param string $command
-     * @param array $args  array of options e.g 
+     * @param array $args  array of options e.g
      *    $args = ['my_database','--datasource'=>'default','--help']
      * @return void
      */
-    public function runCommand(string $command,array $args=[]){
+    public function runCommand(string $command, array $args=[])
+    {
+        $runner = new CommandRunner($this->io);
+        $instance = $runner->findCommand($command);
+        if (! $instance instanceof Command) {
+            throw new ConsoleException(sprintf('Command `%s` was not found', $command));
+        }
 
-       $runner = new CommandRunner($this->io);
-       $instance = $runner->findCommand($command);
-       if(! $instance instanceof Command){
-           throw new ConsoleException(sprintf('Command `%s` was not found',$command));
-       }
-
-       // Convert args
-       $argv = [];
-       foreach($args as $key => $value){
-           if(is_int($key)){
-               $argv[] = $value;
-           }
-           else{
-               $argv[] = "{$key}={$value}"; 
-           }
-       }
+        // Convert args
+        $argv = [];
+        foreach ($args as $key => $value) {
+            if (is_int($key)) {
+                $argv[] = $value;
+            } else {
+                $argv[] = "{$key}={$value}";
+            }
+        }
    
-       return $instance->run($argv);
+        return $instance->run($argv);
     }
 
 
@@ -263,7 +262,7 @@ class Command
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
         if (!preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
-            throw new ConsoleException(sprintf('Command name `%s` is invalid',$name));
+            throw new ConsoleException(sprintf('Command name `%s` is invalid', $name));
         }
     }
 
@@ -286,7 +285,8 @@ class Command
      * @param string $usage
      * @return void
      */
-    public function addUsage(string $usage){
+    public function addUsage(string $usage)
+    {
         $this->usages[] = $usage;
     }
 
@@ -351,7 +351,7 @@ class Command
     }
 
     /**
-     * If verbose is enabled then out put passed here will be displayed.
+     * If verbose is enabled then output passed here will be displayed.
      *
      * @param string|array $message
      */
@@ -396,11 +396,11 @@ class Command
         $this->io->out($message);
     }
 
-     /**
-     * Displays styled warnings.
-     *
-     * @param string|array $message
-     */
+    /**
+    * Displays styled warnings.
+    *
+    * @param string|array $message
+    */
     public function warning($message)
     {
         $message = $this->addTags('warning', $message);
@@ -452,24 +452,22 @@ class Command
      *
      * @return void
      */
-    public function startup(){
-
+    public function startup()
+    {
     }
 
     /**
      * Place the command logic here.
      */
-    public function execute()
-    {
-    }
+    abstract public function execute();
 
-      /**
+    /**
      * This is called after executed method
      *
      * @return void
      */
-    public function shutdown(){
-
+    public function shutdown()
+    {
     }
 
     /**

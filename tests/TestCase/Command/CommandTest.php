@@ -22,6 +22,8 @@ use Origin\Console\Exception\ConsoleException;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Console\Exception\StopExecutionException;
+use Origin\Console\Exception\Exception;
 
 class MockCommand extends Command
 {
@@ -70,6 +72,9 @@ class CacheCommand extends Command
         $this->addSubCommand('disable', ['description'=>'disables the cache']);
     }
 
+    public function execute()
+    {
+    }
     public function enable()
     {
         $this->out('Cache enabled');
@@ -85,6 +90,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->out = new ConsoleOutput();
+        $this->out->mode(ConsoleOutput::RAW);
     }
 
     public function io()
@@ -224,6 +230,13 @@ EOF;
         $this->assertContains('Cache has been reset', $this->out->read());
     }
 
+    public function testRunCommandDoesNotExist()
+    {
+        $this->expectException(ConsoleException::class);
+        $command = new MockCommand($this->io());
+        $command->runCommand('does-not-exist');
+    }
+
     public function testRunCommandWithArgs()
     {
         $command = new MockCommand($this->io());
@@ -232,5 +245,19 @@ EOF;
             'jon'
         ]);
         $this->assertContains('<blue>Hello jon</blue>', $this->out->read());
+    }
+
+    public function testAbort()
+    {
+        $this->expectException(StopExecutionException::class);
+        $command = new MockCommand($this->io());
+        $command->abort();
+    }
+    
+    public function testExit()
+    {
+        $this->expectException(StopExecutionException::class);
+        $command = new MockCommand($this->io());
+        $command->exit();
     }
 }

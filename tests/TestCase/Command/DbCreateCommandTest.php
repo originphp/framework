@@ -4,6 +4,7 @@ namespace Origin\Test\Command;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Exception\DatasourceException;
 
 class DbCreateCommandTest extends OriginTestCase
 {
@@ -62,6 +63,16 @@ class DbCreateCommandTest extends OriginTestCase
         $this->exec('db:create --datasource=dummy');
         $this->assertExitError();
         $this->assertOutputContains('Database `dummy` already exists');
+    }
+
+    public function testDatasourceException()
+    {
+        $config = ConnectionManager::config('test');
+        $config['database'] = '<invalid-database-name>';
+        ConnectionManager::config('dummy', $config);
+        $this->exec('db:create --datasource=dummy');
+        $this->assertExitError();
+        $this->assertErrorContains('DatasourceException');
     }
 
     public function shutdown()

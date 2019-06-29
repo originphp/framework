@@ -35,6 +35,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->out = new ConsoleOutput();
+        $this->out->mode(ConsoleOutput::RAW);
     }
 
     public function commandRunner()

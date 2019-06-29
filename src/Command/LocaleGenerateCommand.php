@@ -65,17 +65,10 @@ class LocaleGenerateCommand extends Command
     {
         $types = [];
         $locales = ResourceBundle::getLocales('');
-        if($this->arguments('locales')){
+        if ($this->arguments('locales')) {
             $locales = $this->arguments('locales');
         }
         $path = CONFIG . DS  .'locales';
-
-        if (file_exists($path) and $this->options('force')===false) {
-            $this->io->warning('Locales definitions found in ' . $path);
-            if ($this->io->askChoice('Do you want to continue?', ['y','n'], 'n') === 'no') {
-                $this->exit();
-            }
-        }
 
         if (!file_Exists($path)) {
             mkdir($path);
@@ -85,42 +78,30 @@ class LocaleGenerateCommand extends Command
  
         $max = count($locales);
         $this->info('Generating locales definitions');
-        $i=0;
+
+        $this->io->progressBar(0, $max);
+        
+        $i=1;
+
         //@todo where to put this. Should be part of source code, but cant add to vendor
         foreach ($locales as $locale) {
             $result = $this->parseLocale($locale);
             $results[$locale] = $result;
             if ($this->options('single-file') === false) {
-                $this->io->createFile($path . DS .$locale.'.yml', Yaml::fromArray($result), true);
+                $this->io->createFile($path . DS .$locale.'.yml', Yaml::fromArray($result), $this->options('force'));
             }
            
-            if ($i === 0 or $i === $max or $i % 2 === 0) {
-                $this->io->progressBar($i, $max);
-            }
+            $this->io->progressBar($i, $max);
             
             $i++;
         }
     
         if ($this->options('single-file')) {
-            $this->io->createFile($path . DS . 'locales.yml', Yaml::fromArray($results), true);
+            $this->io->createFile($path . DS . 'locales.yml', Yaml::fromArray($results), $this->options('force'));
         }
-
         $this->io->success(sprintf('Generated %d locale definitions', count($results)));
     }
 
-    /**
-     * Decodes unicode characters
-     *
-     * @param string $value
-     * @return void
-     */
-    protected function decode(string $value)
-    {
-        if (substr($value, 0, 2) == '\u') {
-            $value = str_replace('\u', '\u{', $value) . '}';
-        }
-        return $value;
-    }
     /**
      * Undocumented function
      *
@@ -140,7 +121,6 @@ class LocaleGenerateCommand extends Command
         $symbol = $fmt->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
         $config['before'] = $config['after'] = null;
 
-        $symbol = $this->decode($symbol);
         if ($fmt->getPattern() === '#,##0.00 ¤') {
             $config['after'] = ' ' . $symbol;
         } else {
@@ -165,7 +145,7 @@ class LocaleGenerateCommand extends Command
 
         $expected['datetime'] = $fmt->format(new DateTime());
         if ($this->options('expected')) {
-            $config['expected'] = $config['expected'];
+            $config['expected'] = $expected;
         }
         
         return $config;
