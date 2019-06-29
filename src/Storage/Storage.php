@@ -83,7 +83,7 @@ class Storage
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Storage\Engine\\{$config['engine']}Engine";
             }
-            if (empty($config['className'])) {
+            if (empty($config['className']) or !class_exists($config['className'])) {
                 throw new InvalidArgumentException("Storage Engine for {$name} could not be found");
             }
             return new $config['className']($config);
@@ -94,7 +94,7 @@ class Storage
     /**
      * Changes the storage config that is being used. Use this when working with multiple.
      * REMEMBER: to set even for default, if using in the same script.
-     *
+     * @codeCoverageIgnore
      * @param string $config
      * @return void
      */
