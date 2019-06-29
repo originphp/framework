@@ -55,6 +55,13 @@ class CacheTest extends \PHPUnit\Framework\TestCase
         Cache::store('somewhere-outthere');
     }
 
+    public function testClassNotExists()
+    {
+        Cache::config('foo', ['className'=>'Void\MegaCache']);
+        $this->expectException(InvalidArgumentException::class);
+        Cache::store('foo');
+    }
+
     public function testIncrementDecrement()
     {
         if (!extension_loaded('apcu')) {

@@ -128,6 +128,21 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $cache->decrement('counter', 9));
     }
 
+    /**
+     * Call destruct during test
+     */
+    public function testCloseConnection()
+    {
+        $cache = new MockRedisEngine([
+            'host' => env('REDIS_HOST'),
+            'port' => env('REDIS_PORT'),
+            'duration' => 3600,
+            'prefix' => 'origin_',
+            'persistent' => false
+        ]);
+        $this->assertTrue($cache->closeConnection());
+    }
+
     protected function tearDown(): void
     {
         $cache = $this->engine();
@@ -151,5 +166,33 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
     
         $redis ->write('counter', 100);
         $this->assertEquals(101, $redis->increment('counter'));
+    }
+
+    public function testSocketException()
+    {
+        $this->expectException(Exception::class);
+        $redis = new MockRedisEngine([
+            'engine' => 'Redis',
+            'path' => '/var/sockets/redis',
+         ]);
+    }
+
+    public function testNonPersisentException()
+    {
+        $this->expectException(Exception::class);
+        $engine = new MockRedisEngine([
+            'host' => 'foo',
+            'port' => 1234
+        ]);
+    }
+
+    public function testInvalidPassword()
+    {
+        $this->expectException(Exception::class);
+        $engine =  new MockRedisEngine([
+            'host' => env('REDIS_HOST'),
+            'port' => env('REDIS_PORT'),
+            'password' => 'secret'
+        ]);
     }
 }

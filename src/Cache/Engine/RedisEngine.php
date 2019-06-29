@@ -29,6 +29,7 @@ use Origin\Core\ConfigTrait;
 use Origin\Exception\Exception;
 use Origin\Cache\Engine\BaseEngine;
 use Redis;
+use RedisException;
 
 class RedisEngine extends BaseEngine
 {
@@ -59,27 +60,35 @@ class RedisEngine extends BaseEngine
      */
     public function initialize(array $config)
     {
-        if (!extension_loaded('redis')) {
-            throw new Exception('Redis extension not loaded.');
+        $msg = 'Redis extension not loaded.';
+        if (extension_loaded('redis')) {
+            $this->Redis = new Redis();
+            if ($this->connect()) {
+                return;
+            }
+            $msg = 'Error connecting to Redis server.';
         }
-        $this->Redis = new Redis();
-        if (!$this->connect()) {
-            throw new Exception('Error connecting to Redis server.');
-        }
+        throw new Exception($msg);
     }
 
     protected function connect()
     {
         $result = false;
-        if ($this->config['path']) {
-            $result = $this->Redis->connect($this->config['path']);
-        } elseif ($this->config['persistent']) {
-            $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
-        } else {
-            $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
+        try {
+            if (!empty($this->config['path'])) {
+                $result = $this->Redis->connect($this->config['path']);
+            } elseif (!empty($this->config['persistent'])) {
+                $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
+            } else {
+                $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
+            }
+        } catch (RedisException $e) {
+            return false;
         }
-        if ($result and isset($this->config['password'])) {
-            $result = $this->Redis->auth($this->config['password']);
+        if ($result) {
+            if (isset($this->config['password'])) {
+                return $this->Redis->auth($this->config['password']);
+            }
         }
         return $result;
     }
@@ -143,11 +152,18 @@ class RedisEngine extends BaseEngine
         return !in_array(false, $result);
     }
 
+    public function closeConnection() : bool
+    {
+        if ($this->Redis instanceof Redis and !$this->config['persistent']) {
+            $this->Redis->close();
+            return true;
+        }
+        return false;
+    }
+
     public function __destruct()
     {
-        if (!$this->config['persistent'] and $this->Redis instanceof Redis) {
-            $this->Redis->close();
-        }
+        $this->closeConnection();
     }
 
     /**

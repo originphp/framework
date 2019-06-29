@@ -71,32 +71,31 @@ class MemcachedEngine extends BaseEngine
      */
     public function initialize(array $config)
     {
-        if (!extension_loaded('memcached')) {
-            throw new Exception('Memcached extension not loaded.');
+        $msg = 'Memcached extension not loaded.';
+        if (extension_loaded('memcached')) {
+            $id = null;
+            if ($this->config['persistent']) {
+                $id = $this->persistentId();
+            }
+            $this->Memcached = new Memcached($id);
+            $msg = 'Error connecting to Memcached server(s).';
+            if ($this->connect()) {
+                // Login
+                if ($this->config['username'] and $this->config['password']) {
+                    $this->Memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
+                    $this->Memcached->setSaslAuthData($this->config['username'], $this->config['password']);
+                }
+                if ($this->Memcached->set('---origin-php---', true, 1)) {
+                    return true;
+                }
+            }
         }
-        if ($this->config['persistent']) {
-            $this->Memcached = new Memcached($this->persistentId());
-        } else {
-            $this->Memcached = new Memcached();
-        }
-        
-        if (!$this->connect()) {
-            throw new Exception('Error adding Memcached server(s).');
-        }
-
-        // Login
-        if ($this->config['username'] and $this->config['password']) {
-            $this->Memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
-            $this->Memcached->setSaslAuthData($this->config['username'], $this->config['password']);
-        }
-        if (!$this->Memcached->set('---origin-php---', true, 1)) {
-            throw new Exception('Error connecting to Memcached server(s).');
-        }
+        throw new Exception($msg);
     }
 
     protected function connect()
     {
-        if ($this->config['servers']) {
+        if (!empty($this->config['servers'])) {
             return $this->Memcached->addServers($this->config['servers']);
         }
         extract($this->config);

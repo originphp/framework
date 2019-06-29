@@ -12,5 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 # Deprecated from v1.20
+// @codeCoverageIgnoreStart
 class_alias('Origin\Cache\Cache', 'Origin\Utility\Cache');
 deprecationWarning('Use Origin\Cache\Cache instead of Origin\Utility\Cache.');
+// @codeCoverageIgnoreEnd

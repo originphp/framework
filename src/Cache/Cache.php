@@ -111,7 +111,7 @@ class Cache
     /**
     * Changes the cache config that is being used. Use this when working with multiple cache configurations.
     * REMEMBER: to even set for default when working with multiple configurations.
-    *
+    * @codeCoverageIgnore
     * @param string $config
     * @return void
     */
@@ -157,7 +157,7 @@ class Cache
 
     /**
      * Checks if an item is in the cache
-     *
+     * @codeCoverageIgnore
      * @param string $key
      * @return bool
      */
