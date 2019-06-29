@@ -43,4 +43,11 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidArgumentException::class);
         Storage::volume('somewhere-out-there');
     }
+
+    public function testClassNotExists()
+    {
+        Storage::config('foo', ['className'=>'Void\MegaStorage']);
+        $this->expectException(InvalidArgumentException::class);
+        Storage::volume('foo');
+    }
 }
