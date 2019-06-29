@@ -80,13 +80,24 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
+    * Gets the stderr output (Errors)
+    *
+    * @return string
+    */
+    public function error()
+    {
+        return $this->stderr->read();
+    }
+
+    /**
      * Gets the stderr output (Errors)
      *
      * @return string
      */
     public function errorOutput()
     {
-        return $this->stderr->read();
+        deprecationWarning('ConsoleIntegrationTestTrait::errorOutput deprecated use ConsoleIntegrationTestTrait::error instead');
+        return $this->error();
     }
 
     /**
@@ -111,9 +122,11 @@ trait ConsoleIntegrationTestTrait
         $x = 0;
         foreach ($input as $data) {
             $this->stdin->expects(
-                $this->at($x))
+                $this->at($x)
+            )
                 ->method('read')
-                ->will($this->returnValue($data)
+                ->will(
+                    $this->returnValue($data)
             );
             ++$x;
         }
