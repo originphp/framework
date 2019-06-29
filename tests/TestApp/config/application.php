@@ -24,16 +24,10 @@ Cache::config('default', ['engine' => 'File']);
  * here. This is used with hashing and key generation by Security.
  */
 Configure::write('Security.pepper', '-----ORIGIN PHP-----');
-
-/**
- * Recommended is true, if you don't want date,datetime,time or number fields to be parsed according
- * to the configured locale and timezone, then you can disable this. When you pass an array to new or patch
- * data goes through a marshalling process and this is where the parsing occurs.
- */
-Configure::write('I18n.parse', true);
-
+Configure::write('Cookie.key', md5('-----ORIGIN PHP-----')); // For testing
 /*
  * Load your plugins here
  * @example Plugin::load('ContactManager');
  */
+Plugin::initialize();
 Plugin::load('Make'); // This is for code gen you can remove
