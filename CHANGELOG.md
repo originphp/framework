@@ -34,7 +34,11 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - Rename references `Origin\Utility\Storage` to `Origin\Storage\Storage`
 - Rename references `Origin\Utility\Queue` to `Origin\Storage\Queue`
 - If you have used logger `Core\Logger`, then use the new `Log\Log` library.
-- Find references of `Cache::use` or `Store::use` if you have used them then adjust to use `Cache::store` or `Storage::volume`
+
+- If you have used `Cache::use` them then adjust to use `Cache::store`
+- If you have used `Storage::use` then adjust to use `Storage::volume`
+
+- In your console integration tests methods `$this->errorOutput(` to `$this->error(`
 
 ### Deprecated
 
@@ -44,9 +48,10 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - `Utility\Queue` been deprecated use `Queue\Queue` instead
 - `Cache::use` deprecated use `Cache::store` instead
 - `Storage:use` deprecated use `Storage::volume` instead
+- `ConsoleIntegrationTestTrait::errorOutput` deprecated use `ConsoleIntegrationTestTrait::error` instead
 
 ### Changed
-
+- Cleaned up and refactored Database engines
 - Cache can now pass array of options
 - Storage can now pass array of options
 
@@ -57,7 +62,8 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - Added all styles for POSIX levels in ConsoleOutput
 
 ### Fixed
-
+- Fixed issue with console ProgressBar not being cleared
+- Fixed Locale Generator prompting overwrite on files not just directory
 - Fixed issue #55 - ConsoleApp Stop Execution Not Caught
 
 ## [1.19.0] - 2019-06-26
