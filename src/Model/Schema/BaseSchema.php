@@ -363,10 +363,14 @@ abstract class BaseSchema
      * Returns a SQL statement for dropping a table
      *
      * @param string $table
+     * @param array options (ifExists)
      * @return string
      */
-    public function dropTable(string $table) : string
+    public function dropTable(string $table, array $options=[]) : string
     {
+        if (!empty($options['ifExists'])) {
+            return "DROP TABLE IF EXISTS {$table}";
+        }
         return "DROP TABLE {$table}";
     }
 

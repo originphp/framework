@@ -581,6 +581,10 @@ abstract class Datasource
 
     abstract public function disableForeignKeyConstraints();
 
+    abstract public function dropTable(string $table);
+    
+    abstract public function truncateTable(string $table);
+
     /**
      * Executes a select statement
      *

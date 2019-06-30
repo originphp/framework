@@ -171,7 +171,6 @@ class MysqlSchemaTest extends OriginTestCase
     public function testCreateTable()
     {
         $adapter = new MysqlSchema('test');
-        $expected = '';
         $schema = [
             'id' => ['type'=>'primaryKey'],
             'name' => ['type'=>'string','default'=>'placeholder'],
@@ -273,7 +272,7 @@ class MysqlSchemaTest extends OriginTestCase
         $expected =[
             'name' => 'PRIMARY',
             'column' => 'id',
-            'unique' => 1
+            'unique' => true
         ];
         $this->assertEquals($expected, $indexes[0]);
     }
@@ -416,22 +415,9 @@ class MysqlSchemaTest extends OriginTestCase
     public function testTables()
     {
         $adapter = new MysqlSchema('test');
-        $schema = [
-            'id' => ['type'=>'primaryKey'],
-            'name' => ['type'=>'string','default'=>'placeholder'],
-            'description' => ['type'=>'text','null'=>false],
-            'age' => ['type'=>'integer','default'=>1234],
-            'bi' => ['type'=>'bigint'],
-            'fn' => ['type'=>'float','precision'=>2], // ignored by postgres
-            'dn' => ['type'=>'decimal','precision'=>2],
-            'dt' => ['type'=>'datetime'],
-            'ts' => ['type'=>'timestamp'],
-            't' => ['type'=>'time'],
-            'd' => ['type'=>'date'],
-            'bf' => ['type'=>'binary'],
-            'bool' => ['type'=>'boolean'],
-        ];
-        $sql = $adapter->createTable('foo', $schema);
-        $this->assertEquals('ae3d1532b74ce7b899b92ab647112a25', md5($sql));
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for mysql');
+        }
+        $this->assertEquals(['articles','posts','users'], $adapter->tables());
     }
 }

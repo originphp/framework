@@ -167,7 +167,7 @@ class Fixture
     public function drop()
     {
         $connection = ConnectionManager::get($this->datasource);
-        return $connection->execute("DROP TABLE IF EXISTS {$this->table}");
+        return $connection->dropTable($this->table);
     }
 
     /**
@@ -178,6 +178,6 @@ class Fixture
     public function truncate()
     {
         $connection = ConnectionManager::get($this->datasource);
-        return $connection->execute("TRUNCATE {$this->table}");
+        return $connection->truncateTable($this->table);
     }
 }

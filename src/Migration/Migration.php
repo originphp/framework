@@ -305,15 +305,17 @@ class Migration
      * Drops a table from database
      *
      * @param string $table
+     * @param array $options Options are:
+     *   - ifExists: default false
      * @return void
      */
-    public function dropTable(string $table)
+    public function dropTable(string $table, array $options=[])
     {
         if (!$this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
         }
 
-        $this->statements[] = $this->adapter()->dropTable($table);
+        $this->statements[] = $this->adapter()->dropTable($table, $options);
 
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->schema($table);

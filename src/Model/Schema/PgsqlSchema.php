@@ -158,7 +158,7 @@ class PgsqlSchema extends BaseSchema
         $sql = "SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = 'r' AND t.relname = '{$table}' ORDER BY t.relname, i.relname";
         $results = $this->fetchAll($sql);
         foreach ($results as $result) {
-            $result['unique'] = $result['unique'] === 'TRUE' ? true : false;
+            $result['unique'] = strtolower($result['unique']) === 'true' ? true : false;
         }
         return $results;
     }
@@ -187,11 +187,12 @@ class PgsqlSchema extends BaseSchema
     {
         if (isset($this->columns[$type])) {
             $options = array_merge($this->columns[$type], $options);
+            $agnoType = $type;
             $type = $this->columns[$type]['name'];
 
             if ($type === 'decimal' or $type === 'float') {
                 $type = "{$type}({$options['precsion']},{$options['scale']})";
-            } elseif (!empty($options['limit'])) {
+            } elseif (in_array($agnoType, ['string']) and !empty($options['limit'])) {
                 $type = "{$type}({$options['limit']})";
             }
         }

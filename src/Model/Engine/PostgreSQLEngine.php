@@ -78,6 +78,7 @@ class PostgreSQLEngine extends Datasource
                 $out = $list;
             }
         }
+        sort($out); // why sort with db server
         return $out;
     }
 
@@ -97,5 +98,27 @@ class PostgreSQLEngine extends Datasource
             }
         }
         return $out;
+    }
+
+    /**
+     * Drops a table
+     *
+     * @param string $table
+     * @return bool
+     */
+    public function dropTable(string $table) : bool
+    {
+        return $this->execute("DROP TABLE IF EXISTS {$table} CASCADE");
+    }
+
+    /**
+     * Truncates a table
+     *
+     * @param string $table
+     * @return boolean
+     */
+    public function truncateTable(string $table) : bool
+    {
+        return $this->execute("TRUNCATE TABLE {$table} CASCADE");
     }
 }
