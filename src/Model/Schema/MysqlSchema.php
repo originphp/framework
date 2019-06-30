@@ -257,7 +257,7 @@ class MysqlSchema extends BaseSchema
         return $results;
     }
     /**
-    * Returns a remove foreignKey constraint SQL statement
+     * Returns a remove foreignKey constraint SQL statement
      *
      * @param string $fromTable
      * @param [type] $constraint

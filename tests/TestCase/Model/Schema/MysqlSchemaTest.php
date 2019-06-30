@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Model;
+namespace Origin\Test\Model\Schema;
 
 use Origin\Model\Schema\MysqlSchema;
 use Origin\Model\Datasource;
@@ -211,7 +211,7 @@ class MysqlSchemaTest extends OriginTestCase
         $expected = 'DROP TABLE foo';
         $result = $adapter->dropTable('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-
+        $this->assertEquals('DROP TABLE IF EXISTS foo', $adapter->dropTable('foo', ['ifExists'=>true]));
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($result));
         }
