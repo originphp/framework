@@ -23,7 +23,6 @@
 namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
-use Origin\Exception\Exception;
 use Origin\Model\Schema\BaseSchema;
 
 class PgsqlSchema extends BaseSchema
