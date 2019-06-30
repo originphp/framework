@@ -53,9 +53,12 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
             'root' => '/',
             'timeout' => 10,
             'ssl' => false,
-            'passive' => false,
+            'passive' => true
         ];
-
-        $this->assertEquals($expected, $this->engine()->config());
+        $engine = new FtpEngine([
+            'host'=>'ftp','username'=>'ftp','password'=>'ftp'
+            ]);
+    
+        $this->assertEquals($expected, $engine->config());
     }
 }

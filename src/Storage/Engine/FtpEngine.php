@@ -18,6 +18,7 @@ use Origin\Storage\Engine\BaseEngine;
 
 use Origin\Exception\NotFoundException;
 use Origin\Exception\Exception;
+use Origin\Exception\InvalidArgumentException;
 
 class FtpEngine extends BaseEngine
 {
@@ -29,7 +30,7 @@ class FtpEngine extends BaseEngine
         'root' => null, // Must be absolute path
         'timeout' => 10,
         'ssl' => false,
-        'passive' => false,
+        'passive' => true, // passive is the default mode used. e.g.  WinSCP
         'root' => null
     ];
 

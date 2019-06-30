@@ -51,6 +51,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - `ConsoleIntegrationTestTrait::errorOutput` deprecated use `ConsoleIntegrationTestTrait::error` instead
 
 ### Changed
+
 - Cleaned up and refactored Database engines
 - Cache can now pass array of options
 - Storage can now pass array of options
@@ -62,6 +63,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - Added all styles for POSIX levels in ConsoleOutput
 
 ### Fixed
+- Storage FTP engine changed default mode to passive (default used nowdays)
 - CommandTest changed output to RAW
 - Fixed Fixture manager default behavior was not dropping tables between tests
 - Fixed issue with console ProgressBar not being cleared

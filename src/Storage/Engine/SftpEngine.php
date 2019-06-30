@@ -78,6 +78,7 @@ class SftpEngine extends BaseEngine
     {
         $config = $this->config();
         extract($config);
+    
         if ($this->config('privateKey')) {
             $password = new RSA();
             if ($this->config('password')) {
