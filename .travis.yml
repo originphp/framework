@@ -26,8 +26,9 @@ before_install:
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
 before_script:
+#  - phpenv config-rm xdebug.ini
   - composer install --prefer-source --no-interaction
- script:
+script:
    - vendor/bin/phpunit --coverage-clover=clover.xml
 cache:
   directories:
