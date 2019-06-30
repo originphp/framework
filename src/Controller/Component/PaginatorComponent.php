@@ -153,7 +153,13 @@ class PaginatorComponent extends Component
 
     protected function prepareSort($settings)
     {
-        // Make sure field exists to prevent errors
+        /**
+         * Security issues to consider
+         * - Users trying to inject code through query params
+         *
+         * 1. Check field exists to prevent injections
+         * 2. Use pre-defined values for sort
+         */
         if (isset($settings['sort']) and !$this->model->hasField($settings['sort'])) {
             unset($settings['sort']);
 
