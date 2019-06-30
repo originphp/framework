@@ -58,7 +58,7 @@ abstract class BaseSchema
      *  - type: integer,bigint,float,decimail,datetime,date,binary or boolean
      *  - limit: length of field
      *  - precision: for decimals and floasts
-     *  - default: default value use '' or nill for null value
+     *  - default: default value use '' or null value
      *  - null: allow null values
      * @return string
      */
@@ -116,19 +116,18 @@ abstract class BaseSchema
             $output .= "({$column['precision']},{$column['scale']})";
         }
 
-        if (isset($column['default']) and $column['default'] === '') {
-            $column['default'] = null;
-        }
-       
+    
         /**
          * First handle defaults, then nulls
          */
         if (isset($column['default']) and $column['null'] === false) {
             $output .= ' DEFAULT ' . $this->columnValue($column['default']) .' NOT NULL';
         } elseif (isset($column['default'])) {
-            $output .= ' DEFAULT ' . $this->columnValue($column['default']);
-        } elseif ($column['null']) {
-            $output .= ' DEFAULT NULL';
+            if ($column['default'] === '') {
+                $output .= ' DEFAULT NULL';
+            } else {
+                $output .= ' DEFAULT ' . $this->columnValue($column['default']);
+            }
         } elseif ($column['null'] === false) {
             $output .= ' NOT NULL';
         }
@@ -237,7 +236,7 @@ abstract class BaseSchema
      * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
      * @param array $options The following options keys can be used:
      *   - limit: limits the column length for string and bytes for text,binary,and integer
-     *   - default: the default value, use '' or nill for null
+     *   - default: the default value, use '' or null
      *   - null: allows or disallows null values to be used
      *   - precision: the precision for the number (places to before the decimal point)
      *   - scale: the numbers after the decimal point
@@ -258,8 +257,11 @@ abstract class BaseSchema
      *  - name: name of index
      * @return string
      */
-    public function addIndex(string $table, string $column, string $name, array $options=[]) : string
+    public function addIndex(string $table, $column, string $name, array $options=[]) : string
     {
+        if (is_array($column)) {
+            $column = implode(', ', $column);
+        }
         if (!empty($options['unique'])) {
             return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";
         }
@@ -294,6 +296,9 @@ abstract class BaseSchema
      * @param string $fromTable
      * @param string $toTable
      * @param array $options
+     *  - name: name of the fk constrain
+     *  - column: the column it references
+     *  - primaryKey: the name of the primary key
      * @return string
      */
     public function addForeignKey(string $fromTable, string $toTable, array $options=[]) : string
@@ -309,11 +314,8 @@ abstract class BaseSchema
      * @param array $options
      * @return string
      */
-    public function removeForeignKey(string $fromTable, $constraint)
-    {
-        return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
-    }
-
+    abstract public function removeForeignKey(string $fromTable, string $constraint);
+   
     /**
      * Gets a list of foreignKeys
      *
@@ -461,7 +463,7 @@ abstract class BaseSchema
     }
 
     /**
-     * Return column name
+     * Formats the column name
      *
      * @param string $name
      * @return string

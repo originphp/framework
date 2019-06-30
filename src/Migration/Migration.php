@@ -365,7 +365,7 @@ class Migration
      * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
      * @param array $options The following options keys can be used:
      *   - limit: limits the column length for string and bytes for text,binary,and integer
-     *   - default: the default value, use '' or nill for null
+     *   - default: the default value, use '' or null
      *   - null: allows or disallows null values to be used
      *   - precision: the precision for the number (places to before the decimal point)
      *   - scale: the numbers after the decimal point
@@ -395,7 +395,7 @@ class Migration
     * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
     * @param array $options The following options keys can be used:
     *   - limit: limits the column length for string and bytes for text,binary,and integer
-    *   - default: the default value, use '' or nill for null
+    *   - default: the default value, use '' or null
     *   - null: allows or disallows null values to be used
     *   - precision: the precision for the number (places to before the decimal point)
     *   - scale: the numbers after the decimal point
