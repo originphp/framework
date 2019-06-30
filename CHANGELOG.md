@@ -62,6 +62,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - Added all styles for POSIX levels in ConsoleOutput
 
 ### Fixed
+- Fixed Fixture manager default behavior was not dropping tables between tests
 - Fixed issue with console ProgressBar not being cleared
 - Fixed Locale Generator prompting overwrite on files not just directory
 - Fixed issue #55 - ConsoleApp Stop Execution Not Caught

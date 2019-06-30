@@ -57,11 +57,11 @@ class Fixture
     public $import = null;
 
     /**
-     * Drops and recreates tables between tests.
-     *
+     * Drops and recreates tables between tests. Default
+     * behavior is always drop tables.
      * @var bool
      */
-    public $dropTables = false;
+    public $dropTables = true;
 
     public function __construct()
     {
