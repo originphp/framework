@@ -63,6 +63,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - Added all styles for POSIX levels in ConsoleOutput
 
 ### Fixed
+- Fixed Dropping tables using Pgsql when foreignKeys are involved
 - Storage FTP engine changed default mode to passive (default used nowdays)
 - CommandTest changed output to RAW
 - Fixed Fixture manager default behavior was not dropping tables between tests
