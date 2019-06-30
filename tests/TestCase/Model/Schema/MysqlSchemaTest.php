@@ -335,12 +335,18 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRenameColumn()
     {
         $adapter = new MysqlSchema('test');
+        /**
+         * For MySQL comptability with older versions it needs to run some statements
+         * this test for MySQL pgsql is a simple command
+         */
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for mysql');
+        }
+
         $expected = 'ALTER TABLE articles CHANGE author_id user_id INT(11)';
         $result = $adapter->renameColumn('articles', 'author_id', 'user_id');
         $this->assertEquals($expected, $result);
-        if ($adapter->connection()->engine() === 'mysql') {
-            $this->assertTrue($adapter->connection()->execute($result));
-        }
+        $this->assertTrue($adapter->connection()->execute($result));
     }
 
     /**
@@ -376,6 +382,9 @@ class MysqlSchemaTest extends OriginTestCase
     public function testSchema()
     {
         $adapter = new MysqlSchema('test');
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for mysql');
+        }
         $result = $adapter->schema('articles');
         $expected = '642b0690d11a2147cbb322ebd7fed3ad'; // Any slight change, needs to be investigated
         $this->assertEquals($expected, md5(json_encode($result)));
