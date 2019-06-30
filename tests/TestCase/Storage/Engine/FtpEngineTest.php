@@ -45,20 +45,18 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
     }
     public function testConfig()
     {
-        $expected = [
-            'host' => 'ftp',
-            'username' => 'ftp',
-            'password' => 'ftp',
-            'port' => '21',
-            'root' => '/',
-            'timeout' => 10,
-            'ssl' => false,
-            'passive' => true
-        ];
-        $engine = new FtpEngine([
-            'host'=>'ftp','username'=>'ftp','password'=>'ftp'
-            ]);
-    
-        $this->assertEquals($expected, $engine->config());
+        $config = $this->engine()->config();
+        $this->assertEquals(env('FTP_HOST'), $config['host']);
+        $this->assertEquals(env('FTP_USERNAME'), $config['username']);
+        $this->assertEquals(env('FTP_PASSWORD'), $config['password']);
+
+        $this->assertNotEmpty($config['host']);
+        $this->assertNotEmpty($config['username']);
+        $this->assertNotEmpty($config['password']);
+        $this->assertEquals(21, $config['port']);
+        $this->assertNotEmpty($config['root']);
+        $this->assertEquals(10, $config['timeout']);
+        $this->assertFalse($config['ssl']);
+        $this->assertTrue($config['passive']);
     }
 }
