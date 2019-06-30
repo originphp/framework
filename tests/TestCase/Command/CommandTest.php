@@ -101,6 +101,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
     public function testOutputError()
     {
         $consoleOutput = new ConsoleOutput();
+        $consoleOutput->mode(ConsoleOutput::RAW);
         $io = new ConsoleIo($consoleOutput, $consoleOutput);
         $mock = $this->getMockBuilder(MockCommand::class)
                         ->setConstructorArgs([$io])
