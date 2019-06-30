@@ -24,7 +24,9 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
-The focus now will resume on increasing code coverage closer to 100%, bug fixes, if any, testing for security vulnerabilities, adding SQLite engine.
+## [1.20.0] - 2019-06-30
+Some internal reorganization occurred, moving Cache,Storage and Queue, and rewriting Logger. (See migration guide, to upgrade)
+The focus now will resume on increasing code coverage closer to 100%, bug fixes, if any, testing for security vulnerabilities, maybe adding SQLite engine.
 
 ### Migration Guide to 1.20
 
@@ -38,7 +40,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - If you have used `Cache::use` them then adjust to use `Cache::store`
 - If you have used `Storage::use` then adjust to use `Storage::volume`
 
-- In your console integration tests methods `$this->errorOutput(` to `$this->error(`
+- In your console integration testsc change methods `$this->errorOutput(` to `$this->error(`
 
 ### Deprecated
 
