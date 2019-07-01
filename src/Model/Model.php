@@ -1798,17 +1798,32 @@ class Model
         return $this->find('count', ['conditions' => $conditions]) === 0;
     }
 
-    public function begin()
+    /**
+     * Starts a database transaction
+     *
+     * @return bool
+     */
+    public function begin() : bool
     {
         return $this->connection()->begin();
     }
 
-    public function commit()
+    /**
+     * Commits a database transaction
+     *
+     * @return boolean
+     */
+    public function commit() : bool
     {
         return $this->connection()->commit();
     }
-
-    public function rollback()
+    
+    /**
+     * Rollsback a database transaction
+     *
+     * @return boolean
+     */
+    public function rollback(): bool
     {
         return $this->connection()->rollBack();
     }

@@ -24,10 +24,13 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Changed
+- Schema::buildColumn now can create mediumtext,longtext columns
 - notices, warning etc will no longer throw exception
 - Created Json/Xml view objects
 
 ### Fixed
+- Fixed transaction already started errors
+- Fixed Schema adding null when creating table
 - Fixed entity:toXml of using incorrect name property
 
 

@@ -84,6 +84,14 @@ abstract class Datasource
      */
     protected $adapter = null;
 
+    
+    /**
+     * If transaction has been started on this datasource
+     *
+     * @var bool
+     */
+    protected $transactionStarted = false;
+
     /**
      * Constructor
      *
@@ -232,7 +240,10 @@ abstract class Datasource
      */
     public function begin() :bool
     {
-        return $this->connection->beginTransaction();
+        if ($this->transactionStarted === false) {
+            $this->transactionStarted = $this->connection->beginTransaction();
+        }
+        return $this->transactionStarted;
     }
 
     /**
@@ -240,9 +251,13 @@ abstract class Datasource
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function commit() :void
+    public function commit() :bool
     {
-        $this->connection->commit();
+        if ($this->transactionStarted) {
+            $this->transactionStarted = false;
+            return $this->connection->commit();
+        }
+        return false;
     }
 
     /**
@@ -250,12 +265,21 @@ abstract class Datasource
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function rollback() :void
+    public function rollback() :bool
     {
-        $this->connection->rollBack();
+        if ($this->transactionStarted) {
+            $this->transactionStarted = false;
+            return $this->connection->rollBack();
+        }
+        return false;
     }
 
-    public function lastInsertId()
+    /**
+     * Returns the ID of the last inserted row or sequence value
+     *
+     * @return string
+     */
+    public function lastInsertId() : string
     {
         return $this->connection->lastInsertId();
     }
