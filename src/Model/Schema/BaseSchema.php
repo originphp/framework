@@ -83,6 +83,23 @@ abstract class BaseSchema
         if (isset($this->columns[$type])) {
             $real = $this->columns[$type];
             $type = strtoupper($this->columns[$type]['name']);
+
+            /**
+                 * Convert Limits for MySQL
+                 * @todo how this be implemented in MySQL schema without duplicating
+                 * code
+                 */
+            if ($column['type'] === 'text' and isset($column['limit'])) {
+                $limit = $column['limit'];
+                $type  = 'TEXT';
+                if ($limit === 16777215) {
+                    $type  = 'MEDIUMTEXT';
+                } elseif ($limit === 4294967295) {
+                    $type  = 'LONGTEXT';
+                }
+            }
+
+            //list($namespace, $class) = namespaceSplit(get_class($this));
             # Remove limit,precision, scale if user has sent them (postgre can use int limit)
             foreach (['limit','precision','scale'] as $remove) {
                 if (!isset($real[$remove]) and isset($column[$remove])) {
@@ -185,6 +202,7 @@ abstract class BaseSchema
             $mapping = ['name'=>$settings['type']]; // non agnostic
             if (isset($this->columns[$settings['type']])) {
                 $mapping = $this->columns[$settings['type']];
+
                 // Remove these fields if they are not allowed per columns
                 foreach (['limit','precision','scale'] as $remove) {
                     if (!isset($mapping[$remove])) {
@@ -194,9 +212,11 @@ abstract class BaseSchema
             }
 
             $settings = $settings + $mapping;
-
-            $output = $field . ' ' .  strtoupper($mapping['name']);
+            $output = $this->buildColumn(['name'=>$field] + $settings);
          
+            /*
+            $output = $field . ' ' .  strtoupper($mapping['name']);
+
             if (!empty($settings['limit'])) {
                 $output .= "({$settings['limit']})";
             } elseif (in_array($settings['type'], ['decimal', 'float'])) {
@@ -217,7 +237,7 @@ abstract class BaseSchema
                 } else {
                     $output .= ' NOT NULL';
                 }
-            }
+            }*/
             $result[] = ' '.$output;
         }
       

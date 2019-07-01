@@ -74,6 +74,21 @@ class MysqlSchemaTest extends OriginTestCase
             $result = $adapter->addColumn('articles', 'category', 'string', ['default'=>'new','limit'=>40]);
             $this->assertTrue($adapter->connection()->execute($result));
         }
+
+        # Test MySQL specials
+        $expected = 'ALTER TABLE apples ADD COLUMN description TEXT';
+        $result = $adapter->addColumn('apples', 'description', 'text');
+        $this->assertEquals($expected, $result);
+
+        $expected = 'ALTER TABLE apples ADD COLUMN description MEDIUMTEXT';
+        $result = $adapter->addColumn('apples', 'description', 'text', ['limit'=>16777215]);
+        $this->assertEquals($expected, $result);
+
+        $expected = 'ALTER TABLE apples ADD COLUMN description LONGTEXT';
+        $result = $adapter->addColumn('apples', 'description', 'text', ['limit'=>4294967295]);
+        $this->assertEquals($expected, $result);
+
+        # Test MySQL specials
     }
 
     public function testAddForeignKey()
@@ -178,7 +193,7 @@ class MysqlSchemaTest extends OriginTestCase
             'age' => ['type'=>'integer','default'=>1234],
             'bi' => ['type'=>'bigint'],
             'fn' => ['type'=>'float','precision'=>2], // ignored by postgres
-            'dn' => ['type'=>'decimal','precision'=>2],
+            'dn' => ['type'=>'decimal','precision'=>8,'scale'=>2],
             'dt' => ['type'=>'datetime'],
             'ts' => ['type'=>'timestamp'],
             't' => ['type'=>'time'],
@@ -187,7 +202,8 @@ class MysqlSchemaTest extends OriginTestCase
             'bool' => ['type'=>'boolean'],
         ];
         $result = $adapter->createTable('foo', $schema);
-        $expected = 'ae3d1532b74ce7b899b92ab647112a25';
+  
+        $expected = 'f7b0aee6659379a452b3ee6d1a2d75eb';
       
         $this->assertEquals($expected, md5($result));
 

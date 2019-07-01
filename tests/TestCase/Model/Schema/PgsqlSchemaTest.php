@@ -177,7 +177,7 @@ class PgsqlSchemaTest extends OriginTestCase
             'age' => ['type'=>'integer','default'=>1234],
             'bi' => ['type'=>'bigint'],
             'fn' => ['type'=>'float','precision'=>2], // ignored by postgres
-            'dn' => ['type'=>'decimal','precision'=>2],
+            'dn' => ['type'=>'decimal','precision'=>8,'scale'=>2],
             'dt' => ['type'=>'datetime'],
             'ts' => ['type'=>'timestamp'],
             't' => ['type'=>'time'],
@@ -186,7 +186,8 @@ class PgsqlSchemaTest extends OriginTestCase
             'bool' => ['type'=>'boolean'],
         ];
         $result = $adapter->createTable('foo', $schema);
-        $expected = '8114dde12e2c09f76fe3a086dd70c26e';
+      
+        $expected = '3968d2da444049afd19926cebcbf2aae';
         $this->assertEquals($expected, md5($result));
 
         # Sanity check
@@ -401,7 +402,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         $result = $adapter->showCreateTable('articles');
-        $expected = "CREATE TABLE articles (\n id SERIAL NOT NULL,\n author_id INTEGER NULL,\n title VARCHAR(255) NOT NULL,\n body TEXT NULL,\n created TIMESTAMP NULL,\n modified TIMESTAMP NULL,\n PRIMARY KEY (id)\n)"; // Any slight change, needs to be investigated
+        $expected = "CREATE TABLE articles (\n id SERIAL NOT NULL,\n author_id INTEGER,\n title VARCHAR(255) NOT NULL,\n body TEXT,\n created TIMESTAMP,\n modified TIMESTAMP,\n PRIMARY KEY (id)\n)";
+ 
         $this->assertContains($expected, $result);
     }
 
@@ -421,6 +423,9 @@ class PgsqlSchemaTest extends OriginTestCase
         if ($adapter->connection()->engine() !== 'pgsql') {
             $this->markTestSkipped('This test is for pgsql');
         }
-        $this->assertEquals(['articles','posts','users'], $adapter->tables());
+       
+        $tables = $adapter->tables();
+
+        $this->assertEquals(['articles','posts','users'], $tables); // assert equals crashing phpunit
     }
 }

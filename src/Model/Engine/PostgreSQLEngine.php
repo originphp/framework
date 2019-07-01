@@ -77,8 +77,8 @@ class PostgreSQLEngine extends Datasource
             if ($list) {
                 $out = $list;
             }
+            sort($out); // why sort with db server
         }
-        sort($out); // why sort with db server
         return $out;
     }
 

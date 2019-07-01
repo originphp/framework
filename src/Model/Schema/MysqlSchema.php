@@ -278,4 +278,27 @@ class MysqlSchema extends BaseSchema
         $result = $this->fetchRow("SHOW CREATE TABLE {$table}");
         return $result['Create Table'];
     }
+
+    /**
+     * Prepares a column value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function columnValue($value)
+    {
+        if ($value === null) {
+            $value = 'NULL';
+        }
+        if (is_bool($value)) {
+            if ($value === true) {
+                return 1;
+            }
+            return 0;
+        }
+        if (is_int($value)) {
+            return $value;
+        }
+        return "'{$value}'";
+    }
 }

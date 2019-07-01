@@ -295,4 +295,30 @@ class PgsqlSchema extends BaseSchema
         $schema = $this->schema($table);
         return $this->createTable($table, $schema);
     }
+
+    /**
+     * Prepares a column value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function columnValue($value)
+    {
+        if ($value === null) {
+            $value = 'NULL';
+        }
+        if (is_bool($value)) {
+            if ($value == true) {
+                return 'TRUE';
+            }
+            return 'FALSE';
+        }
+        /**
+         * For booleans as integers, you need to pass '0' not just 0.
+         */
+        if (is_int($value)) {
+            return $value;
+        }
+        return "'{$value}'";
+    }
 }
