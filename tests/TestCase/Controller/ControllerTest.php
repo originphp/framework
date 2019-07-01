@@ -296,6 +296,16 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $book->name = 'How to use PHPUnit';
         $controller->render(['json'=>$book]);
         $this->assertEquals($book->toJson(), $controller->response->body());
+
+        // test serialize and request
+        $controller = new TestsController($request, new Response());
+        $book = new Entity();
+        $book->name = 'How to use PHPUnit';
+        $controller->set('book', $book);
+        $controller->serialize('book');
+        $request->type('json');
+        $controller->render();
+        $this->assertEquals($book->toJson(), $controller->response->body());
     }
 
     public function testRenderXml()
@@ -326,6 +336,17 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $book->name = 'How to use PHPUnit';
         $controller->render(['xml'=>$book]);
         $this->assertEquals($book->toXml(), $controller->response->body());
+
+        // test serialize and request
+        $controller = new TestsController($request, new Response());
+        $book = new Entity(['name'=>'book']);
+        $book->name = 'How to use PHPUnit';
+        $controller->set('book', $book);
+        $controller->serialize('book');
+        $request->type('xml');
+        $controller->render();
+        $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><name>How to use PHPUnit</name></response>\n";
+        $this->assertEquals($expected, $controller->response->body());
     }
 
     public function testRenderText()

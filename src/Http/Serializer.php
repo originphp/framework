@@ -13,6 +13,8 @@
  */
 namespace Origin\Http;
 
+use Origin\Model\Entity;
+
 class Serializer
 {
     public function serialize($keys, $data)

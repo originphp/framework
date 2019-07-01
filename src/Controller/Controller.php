@@ -23,9 +23,8 @@ use Origin\Core\Inflector;
 use Origin\Http\Router;
 use ReflectionClass;
 use ReflectionMethod;
-use Origin\Utility\Xml;
-use Origin\Exception\NotFoundException;
-use Origin\Http\Serializer;
+use Origin\View\XmlView;
+use Origin\View\JsonView;
 
 class Controller
 {
@@ -364,43 +363,39 @@ class Controller
      */
     public function render($options=[])
     {
-        $autorender = false;
         $template = $this->request->params('action');
         if (empty($options)) {
             $options = $template;
-            $autorender = true;
         }
         if (is_string($options)) {
             $options = ['template'=>$options];
-        }
-
-        if ($autorender and in_array($this->request->type(), ['json','xml'])) {
-            if ($this->serialize) {
-                $options['type'] = $this->request->type();
-                $serializer = new Serializer();
-                $options[$options['type']] = $serializer->serialize($this->serialize, $this->viewVars);
-                if ($options['type'] === 'xml' and count($options[$options['type']]) > 1) {
-                    $options[$options['type']] = ['response'=>$options[$options['type']]];
-                }
-            }
         }
       
         $options += [
             'status' => $this->response->statusCode(),
             'type' => 'html'
         ];
+
         $body = null;
 
         /**
-         * When working with json sometiems values can empty, for example autocomplete
+         * When working with json sometimes values can empty, for example autocomplete
          * so array key exists better than isset.
          */
         if (array_key_exists('json', $options)) {
             return $this->renderJson($options['json'], $options['status']);
         }
+
+        if ($this->autoRender and $this->serialize and $this->request->type() === 'json') {
+            return $this->renderJson(null, $options['status']);
+        }
         
         if (array_key_exists('xml', $options)) {
             return $this->renderXml($options['xml'], $options['status']);
+        }
+
+        if ($this->autoRender and $this->serialize and $this->request->type() === 'xml') {
+            return $this->renderXml(null, $options['status']);
         }
         
         if (array_key_exists('text', $options)) {
@@ -414,10 +409,12 @@ class Controller
             if (isset($options['template'])) {
                 $template =  $options['template'];
             }
-            $body = $this->viewObject()->render(
+            $view = new AppView($this);
+            $body = $view->render(
                 $template,
                 $options['type']=== 'html'?$this->layout:false
             );
+            unset($view);
         }
     
         $this->response->type($options['type']);   // 'json' or application/json
@@ -430,7 +427,7 @@ class Controller
      * Sets the key or keys of the viewVars to be serialized
      *
      * @param string|array $keyOrKeys
-     * @return void
+     * @return string|null
      */
     public function serialize($keyOrKeys = null)
     {
@@ -438,17 +435,6 @@ class Controller
             return $this->serialize;
         }
         $this->serialize = $keyOrKeys;
-    }
-
-    /**
-     * Creates a View object, overide if you want to use
-     * a custom class.
-     *
-     * @return \App\View\AppView
-     */
-    protected function viewObject()
-    {
-        return new AppView($this);
     }
 
     /**
@@ -485,14 +471,11 @@ class Controller
         $this->autoRender = false; // Only render once
         $this->beforeRender();
         
-        if (is_object($data) and method_exists($data, 'toJson')) {
-            $body = $data->toJson();
-        } else {
-            $body = json_encode($data);
-        }
+        $view = new JsonView($this);
+        
         $this->response->type('json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
-        $this->response->body($body); //
+        $this->response->body($view->render($data, $status)); //
     }
 
     /**
@@ -519,16 +502,11 @@ class Controller
         $this->autoRender = false; // Disable for dispatcher
         $this->beforeRender();
         
-        if (is_object($data) and method_exists($data, 'toXml')) {
-            $body = $data->toXml();
-        } elseif (is_array($data)) {
-            $body = Xml::fromArray($data);
-        } else {
-            $body = $data;
-        }
-        $this->response->type('xml');   // 'xml' or application/xml
+        $view = new XmlView($this);
+        
+        $this->response->type('xml');
         $this->response->statusCode($status); // 200
-        $this->response->body($body);
+        $this->response->body($view->render($data, $status)); //
     }
 
     /**
