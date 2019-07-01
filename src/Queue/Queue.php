@@ -211,8 +211,7 @@ class Queue
         if (mb_strlen($entity->data) >= 65535) {
             throw new InvalidArgumentException('Data string is longer than 65,535');
         }
-        // Disable transaction since this is not needed and cause break
-        if ($this->Job->save($entity, ['transaction'=>false])) {
+        if ($this->Job->save($entity)) {
             return $this->Job->id;
         }
         return false;
