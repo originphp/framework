@@ -30,6 +30,28 @@ use Origin\Http\Router;
 class ErrorHandler
 {
     /**
+    * Holds the level maps
+    *
+    * @var array
+    */
+    protected $levelMap = [
+        E_PARSE => 'error',
+        E_ERROR => 'error',
+        E_CORE_ERROR => 'error',
+        E_COMPILE_ERROR => 'error',
+        E_USER_ERROR => 'error',
+        E_WARNING => 'warning',
+        E_USER_WARNING => 'warning',
+        E_COMPILE_WARNING => 'warning',
+        E_RECOVERABLE_ERROR => 'warning',
+        E_NOTICE => 'notice',
+        E_USER_NOTICE => 'notice',
+        E_DEPRECATED => 'deprecated',
+        E_USER_DEPRECATED => 'deprecated',
+        E_STRICT => 'strict'
+    ];
+    
+    /**
      * Registers the Error and Exception Handling.
      */
     public function register()
@@ -64,7 +86,7 @@ class ErrorHandler
     }
 
     /**
-     * Convert errors to exception but keep @ supression working.
+     * The error handler, fatal errors will be converted to exceptions
      *
      * @param string $message error message
      * @param string $file    Filename where the error was raised
@@ -72,9 +94,20 @@ class ErrorHandler
      */
     public function errorHandler($level, $message, $file, $line)
     {
-        if (error_reporting() !== 0) {
+        if ($level ===  E_USER_ERROR) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
+        $error = $this->levelMap[$level];
+        # Output
+        echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
+
+        # Log
+        $message = $message . ' in {file}, line: {line}';
+        $context = ['file' => $file, 'line' => $line];
+        if ($error === 'deprecated' or $error === 'strict') {
+            $error = 'notice';
+        }
+        Log::write($error, $message, $context);
     }
 
     public function exceptionHandler($exception)

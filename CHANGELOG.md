@@ -23,6 +23,13 @@ Delete tag: git tag -d <tag_name>
 ## Notice
 
 ## [Unreleased]
+### Changed
+- notices, warning etc will no longer throw exception
+- Created Json/Xml view objects
+
+### Fixed
+- Fixed entity:toXml of using incorrect name property
+
 
 ## [1.20.0] - 2019-06-30
 Some internal reorganization occurred, moving Cache,Storage and Queue, and rewriting Logger. (See migration guide, to upgrade)

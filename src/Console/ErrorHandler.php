@@ -44,6 +44,11 @@ class ErrorHandler
      */
     public function errorHandler($level, $message, $file, $line)
     {
+        /**
+         * @internal This is original version. Not sure how to refactor like web based handler since
+         * logger console, outputs to screen as well, so it will be duplicated for errors or not show at all,
+         * so this stays the same for now.
+         */
         if (error_reporting() !== 0) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
