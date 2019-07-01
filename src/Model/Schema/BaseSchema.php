@@ -199,19 +199,6 @@ abstract class BaseSchema
                 continue;
             }
 
-            $mapping = ['name'=>$settings['type']]; // non agnostic
-            if (isset($this->columns[$settings['type']])) {
-                $mapping = $this->columns[$settings['type']];
-
-                // Remove these fields if they are not allowed per columns
-                foreach (['limit','precision','scale'] as $remove) {
-                    if (!isset($mapping[$remove])) {
-                        unset($settings[$remove]);
-                    }
-                }
-            }
-
-            $settings = $settings + $mapping;
             $output = $this->buildColumn(['name'=>$field] + $settings);
          
             /*
