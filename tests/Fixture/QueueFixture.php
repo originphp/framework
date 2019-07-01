@@ -26,30 +26,30 @@ class QueueFixture extends Fixture
         'id' => [
           'type' => 'primaryKey',
           'limit' => 11,
-          'default' => NULL,
+          'default' => null,
           'null' => false,
           'key' => 'primary',
         ],
         'queue' => [
           'type' => 'string',
           'limit' => 80,
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
         'data' => [
           'type' => 'text',
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
         'status' => [
           'type' => 'string',
           'limit' => 40,
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
         'locked' => [
           'type' => 'boolean',
-          'default' => 0,
+          'default' => false,
           'null' => true,
         ],
         'tries' => [
@@ -60,17 +60,17 @@ class QueueFixture extends Fixture
         ],
         'scheduled' => [
           'type' => 'datetime',
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
         'created' => [
           'type' => 'datetime',
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
         'modified' => [
           'type' => 'datetime',
-          'default' => NULL,
+          'default' => null,
           'null' => false,
         ],
       ];
