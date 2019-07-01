@@ -69,7 +69,7 @@ class Entity
      * - exists: if the model exists in the database (set during find), null, means dont know
      * - markClean: mark the entity as clean after creation. This is useful for when loading records
      * from the database.
-     * 
+     *
      * @param array $properties data
      * @param array $options
      */
@@ -345,7 +345,7 @@ class Entity
      */
     public function toXml()
     {
-        $root = Inflector::variable($this->name ?? 'Record');
+        $root = Inflector::variable($this->_name ?? 'record');
         return Xml::fromArray([$root => $this->toArray()]);
     }
 }
