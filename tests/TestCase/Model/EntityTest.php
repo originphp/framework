@@ -126,10 +126,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
     public function testhas()
     {
-        $data = array(
+        $data = [
         'title' => 'Article Title',
         'author_id' => null,
-    );
+        ];
 
         $entity = new Entity($data);
 
@@ -140,10 +140,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidate()
     {
-        $data = array(
+        $data = [
         'title' => 'Article Title',
         'author_id' => null,
-    );
+        ];
 
         $entity = new Entity($data);
         $entity->invalidate('title', 'invalid title');
@@ -186,5 +186,39 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $entity = new Entity(['name'=>'test']);
         $entity->errors('name', 'Can\'t be called test');
         $this->assertEquals(['Can\'t be called test'], $entity->errors('name'));
+    }
+
+    public function testToJson()
+    {
+        $data = [
+            'title' => 'Article Title',
+            'body' => 'Article body'
+        ];
+        $entity = new Entity($data, ['name'=>'Article']);
+
+      
+        $expected = '{"title":"Article Title","body":"Article body"}';
+        $this->assertEquals($expected, $entity->toJson());
+    }
+
+    public function testToXml()
+    {
+        $data = [
+            'title' => 'Article Title',
+            'body' => 'Article body'
+        ];
+        $entity = new Entity($data, ['name'=>'Article']);
+
+        $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<article><title>Article Title</title><body>Article body</body></article>\n";
+        $this->assertEquals($expected, $entity->toXml());
+
+        $data = [
+            'title' => 'Article Title',
+            'body' => 'Article body'
+        ];
+        $entity = new Entity($data);
+
+        $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<record><title>Article Title</title><body>Article body</body></record>\n";
+        $this->assertEquals($expected, $entity->toXml());
     }
 }
