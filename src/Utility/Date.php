@@ -55,8 +55,8 @@ class Date
         }
         $locale += [
             'timezone' => 'UTC',
-            'date' => 'm/d/Y',
-            'datetime' => 'm/d/Y H:i',
+            'date' => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i',
             'time' => 'H:i'
         ];
         static::$locale = $locale;
@@ -70,13 +70,13 @@ class Date
      */
     public static function dateFormat(string $format = null)
     {
-        if($format === null){
+        if ($format === null) {
             return static::$locale['date'];
         }
         static::$locale['date'] = $format;
     }
 
-       /**
+    /**
      * Sets and gets the datetimeformat
      *
      * @param string $format
@@ -84,13 +84,13 @@ class Date
      */
     public static function datetimeFormat(string $format = null)
     {
-        if($format === null){
+        if ($format === null) {
             return static::$locale['datetime'];
         }
         static::$locale['datetime'] = $format;
     }
 
-       /**
+    /**
      * Sets and gets the dateformat
      *
      * @param string $format
@@ -98,14 +98,15 @@ class Date
      */
     public static function timeFormat(string $format = null)
     {
-        if($format === null){
+        if ($format === null) {
             return static::$locale['time'];
         }
         static::$locale['time'] = $format;
     }
 
 
-    protected static function convert(){
+    protected static function convert()
+    {
         return (date_default_timezone_get() !== static::$locale['timezone']);
     }
 
@@ -121,9 +122,9 @@ class Date
         if ($format) {
             if (static::convert()) {
                 if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
-                    $dateString = static::convertTimezone($dateString , date_default_timezone_get(), static::$locale['timezone']);
+                    $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
                 } elseif (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $dateString)) {
-                    $dateString = static::convertTimezone($dateString .' 00:00:00' , date_default_timezone_get(), static::$locale['timezone']);
+                    $dateString = static::convertTimezone($dateString .' 00:00:00', date_default_timezone_get(), static::$locale['timezone']);
                 }
             }
             return date($format, strtotime($dateString));
@@ -148,13 +149,13 @@ class Date
      */
     public static function formatDate(string $dateString)
     {
-        if(strpos($dateString,':') === false){
+        if (strpos($dateString, ':') === false) {
             $dateString .= ' 00:00:00';
         }
         if (static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
-         return date(static::$locale['date'], strtotime($dateString));
+        return date(static::$locale['date'], strtotime($dateString));
     }
 
     /**
@@ -184,10 +185,10 @@ class Date
 
         // Add fictious date to work (careful of DST)
         if (!$hasDate) {
-            $dateString = "2019-01-01 {$dateString}"; 
+            $dateString = "2019-01-01 {$dateString}";
         }
         // Only convert timezone if date is supplied.
-        if ($hasDate AND static::convert()) {
+        if ($hasDate and static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
         return date(static::$locale['time'], strtotime($dateString));
@@ -220,9 +221,9 @@ class Date
     }
 
     /**
-     * Parses a time string and converts to a MySQL time string. 
+     * Parses a time string and converts to a MySQL time string.
      * Timezone for times are not converted because without date its impossbile to know DST
-     *  
+     *
      * @param string $timeString
      * @return string
      */
@@ -230,8 +231,8 @@ class Date
     {
         $timeString = static::convertFormat($timeString, static::$locale['time'], 'H:i:s');
     
-        if ($timeString) { 
-            $timeString = date('H:i:s', strtotime("2019-01-01 {$timeString}")); 
+        if ($timeString) {
+            $timeString = date('H:i:s', strtotime("2019-01-01 {$timeString}"));
         }
         return $timeString;
     }
