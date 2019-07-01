@@ -47,7 +47,7 @@ Some internal changes have made that will trigger a deprecation warning in debug
 - If you have used `Cache::use` them then adjust to use `Cache::store`
 - If you have used `Storage::use` then adjust to use `Storage::volume`
 
-- In your console integration testsc change methods `$this->errorOutput(` to `$this->error(`
+- In your console integration tests change methods `$this->errorOutput(` to `$this->error(`
 
 ### Deprecated
 
