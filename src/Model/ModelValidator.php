@@ -40,7 +40,7 @@ class ModelValidator
     public function __construct(Model $model)
     {
         $this->model = $model;
-     }
+    }
 
     /**
      * Sets and gets rules
@@ -68,16 +68,16 @@ class ModelValidator
         }
 
         foreach ($params as $key => $value) {
-             $value += [
+            $value += [
                 'rule' => null,
                 'message' => null,
                 'required' => false,
                 'on' => null,
                 'allowBlank' => false,
             ];
-            if($value['message'] === null){
+            if ($value['message'] === null) {
                 $value['message'] = 'Invalid value';
-                if($value['rule'] === 'notBlank'){
+                if ($value['rule'] === 'notBlank') {
                     $value['message'] = 'This field is required';
                 }
             }
@@ -143,7 +143,7 @@ class ModelValidator
      * Validates data
      *
      * @internal Data should only be validated if it is submmited, it will cause issues.
-     * 
+     *
      * @param Entity $entity
      * @param boolean $create
      * @return void
@@ -153,16 +153,15 @@ class ModelValidator
         $modified = $entity->modified();
 
         foreach ($this->validationRules as $field => $ruleset) {
-
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
 
                 // Don't run validation rule on field if its not in the entity
-                if(!$validationRule['required'] AND in_array($field,$modified) === false){
+                if (!$validationRule['required'] and in_array($field, $modified) === false) {
                     continue;
-                 }
+                }
             
                 $value = $entity->get($field);
                   
@@ -173,29 +172,25 @@ class ModelValidator
                     continue;
                 }
                 
-                 // Break out if required and its blank, if not continue with validation
-                 if ($validationRule['required'] AND !in_array($field,$modified)) {
+                // Break out if required and its blank, if not continue with validation
+                if ($validationRule['required'] and !in_array($field, $modified)) {
                     $entity->invalidate($field, 'This field is required');
-                    break; // dont run any more validation rules on this field if blank              
+                    break; // dont run any more validation rules on this field if blank
                 }
 
                 // If its required rule (which does not exist), check and break or continue
-                if($validationRule['rule'] === 'notBlank'){
+                if ($validationRule['rule'] === 'notBlank') {
                     if (!$this->validate($value, 'notBlank')) {
-                        $entity->invalidate($field,$validationRule['message']);
-                        break; // dont run any more validation rules on this field if blank
+                        $entity->invalidate($field, $validationRule['message']);
                     }
                     continue; // goto next rule
                 }
 
                 // If the value is not required and value is empty then don't validate
-                if($value === '' or $value === null){
-                    if($validationRule['allowBlank'] === true){
+                if ($value === '' or $value === null) {
+                    if ($validationRule['allowBlank'] === true) {
                         continue;
                     }
-                    // Invalidate empty values
-                    $entity->invalidate($field, $validationRule['message']);
-                    continue;
                 }
          
                 // Handle both types
@@ -275,7 +270,7 @@ class ModelValidator
      */
     public function decimal($value, $options = null)
     {
-        return $this->float($value,$options);
+        return $this->float($value, $options);
     }
 
     /**
@@ -367,7 +362,7 @@ class ModelValidator
 
     public function numeric($value)
     {
-       return ($this->integer($value) or $this->float($value));
+        return ($this->integer($value) or $this->float($value));
     }
 
     /**
@@ -376,22 +371,24 @@ class ModelValidator
      * @param integer $value e.g. 154
      * @return void
      */
-    public function integer($value){
-        if(is_string($value)){
+    public function integer($value)
+    {
+        if (is_string($value)) {
             return (bool) filter_var($value, FILTER_VALIDATE_INT);
         }
         return is_int($value);
     }
 
-   /**
-     * Finds whether the value is float e.g 123.56
-     *
-     * @param float $value
-     * @return void
-     */
-    public function float($value){
-        if(is_string($value)){
-            return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) AND filter_var($value, FILTER_VALIDATE_INT) === false;
+    /**
+      * Finds whether the value is float e.g 123.56
+      *
+      * @param float $value
+      * @return void
+      */
+    public function float($value)
+    {
+        if (is_string($value)) {
+            return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) and filter_var($value, FILTER_VALIDATE_INT) === false;
         }
         return is_float($value);
     }
