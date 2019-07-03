@@ -379,12 +379,12 @@ class Model
     }
 
     /**
-     * JOINING MODELS TOGETHER - These functions help do that if models and fields
-     * are named properly. Models should be CamelCase and foreign keys should be
-     * underscored_model_id and the primary key field should be id. Whilst we can easily
-     * use the setting from this->primaryKey we would have to load the other model. At this
-     * stage we wont do this. So magic only works if you follow the conventions, if not you
-     * have to manually create the params.
+     * JOINING MODELS TOGETHER - These functions help if models and fields
+     * are named properly. Models should be CamelCase (with first letter capitalized)
+     * and foreign keys should be underscored_model_id and the primary key field should be id.
+     * Whilst we can easily use the setting from this->primaryKey we would have to load the
+     * other model. At this stage we wont do this. So magic only works if you follow the
+     * conventions, if not you have to manually create the params.
      */
 
     /**
@@ -816,6 +816,32 @@ class Model
     public function updateAll(array $data, array $conditions)
     {
         return $this->connection()->update($this->table, $data, $conditions);
+    }
+
+    /**
+     * Increases a column value
+     *
+     * @param string $column the name of the column to increase e.g. views
+     * @param integer $id
+     * @return boolean
+     */
+    public function increment(string $column, int $id) : bool
+    {
+        $sql = "UPDATE {$this->table} SET {$column} = {$column} + 1 WHERE {$this->primaryKey} = :id";
+        return $this->connection()->execute($sql, ['id'=>$id]);
+    }
+
+    /**
+    * Decreases a column value
+    *
+    * @param string $column the name of the column to increase e.g. views
+    * @param integer $id
+    * @return boolean
+    */
+    public function decrement(string $column, int $id) : bool
+    {
+        $sql = "UPDATE {$this->table} SET {$column} = {$column} - 1 WHERE {$this->primaryKey} = :id";
+        return $this->connection()->execute($sql, ['id'=>$id]);
     }
 
     /**
