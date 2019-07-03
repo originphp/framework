@@ -22,7 +22,6 @@ use Origin\Controller\Exception\MissingMethodException;
 use Origin\Controller\Exception\PrivateMethodException;
 use Origin\Core\Exception\RouterException;
 use Origin\Core\Configure;
-use App\Application;
 
 class Dispatcher
 {
@@ -83,7 +82,7 @@ class Dispatcher
      */
     public function dispatch(Request $request, Response $response)
     {
-        if ($request->params()) {
+        if ($request->params('controller')) {
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
             if (!class_exists($class)) {
                 throw new MissingControllerException($request->params('controller'));
