@@ -107,6 +107,7 @@ class FormHelper extends Helper
         'date' => 'date',
         'datetime' => 'datetime',
         'time' => 'time',
+        'timestamp' => 'datetime',
         'boolean' => 'checkbox',
         'binary' => 'file',
     );
@@ -1026,6 +1027,7 @@ class FormHelper extends Helper
             if ($this->meta[$model]['primaryKey'] === $column) {
                 return 'hidden';
             }
+
             if (isset($this->meta[$model]['columnMap'][$column])) {
                 $type = $this->meta[$model]['columnMap'][$column];
                 return $this->controlMap[$type];
