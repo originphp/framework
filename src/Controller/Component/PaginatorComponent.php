@@ -50,7 +50,7 @@ class PaginatorComponent extends Component
       
         $sort = $direction = false;
         if (isset($settings['order'])) {
-            $sort = key($settings['order']);
+            $sort = key((array) $settings['order']);
             $direction = current($settings['order']);
         }
 
