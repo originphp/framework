@@ -17,6 +17,13 @@ use Origin\Model\Entity;
 
 class Serializer
 {
+    /**
+     * This actually preps the data for serialization.
+     *
+     * @param [type] $keys
+     * @param [type] $data
+     * @return void
+     */
     public function serialize($keys, $data)
     {
         if (is_string($keys)) {
