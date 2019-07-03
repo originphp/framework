@@ -31,7 +31,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('9c9f3a586a45dac7a3edb8b0144877ed', SRC . DS . 'Model' . DS . 'Bookmark.php');
         unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
 
-        $this->assertFileHash('1e6187f77c1156f55da9fb97db036a54', SRC . DS . 'Controller' . DS . 'BookmarksController.php');
+        $this->assertFileHash('e09190c9f65a07c2a6c739afb4fadab2', SRC . DS . 'Controller' . DS . 'BookmarksController.php');
         unlink(SRC . DS . 'Controller' . DS . 'BookmarksController.php');
      
         $this->assertFileHash('96ce7c43598ddc6db9b036c116c6e576', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
@@ -40,10 +40,10 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('aeae00069812ef1a457ce5363d5987e2', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
 
-        $this->assertFileHash('e1ee56fedeb7936a4fa4c7d438ae9c94', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
+        $this->assertFileHash('8bde3ab1bef406aeb53bca4b5d4f7606', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
 
-        $this->assertFileHash('f1109b973aa26d24ad851400d6e7ca2e', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
+        $this->assertFileHash('86c6758a5198f828288a0bab4c71d36e', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
     }
 
