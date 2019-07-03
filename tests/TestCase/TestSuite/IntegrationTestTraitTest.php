@@ -15,9 +15,6 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\IntegrationTestTrait;
-use Origin\Controller\Exception\MissingControllerException;
-use Origin\Core\Configure;
-use Origin\Core\Autoloader;
 use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
