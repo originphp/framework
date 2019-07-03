@@ -42,12 +42,13 @@ class HtmlHelper extends Helper
      * @param array $attributes
      * @return void
      */
-    public function link($text, $url, array $attributes = [])
+    public function link(string $text, $url, array $attributes = []) : string
     {
         $options = [
             'text' => $text,
             'url' => Router::url($url),
             'attributes' => $this->attributesToString($attributes),
+            'escape' => true
             ];
 
         return $this->templater()->format('a', $options);
@@ -61,7 +62,7 @@ class HtmlHelper extends Helper
      * @param string $path
      * @return string
      */
-    public function css(string $path)
+    public function css(string $path) : string
     {
         return $this->asset($path, ['ext'=>'css']);
     }
@@ -74,7 +75,7 @@ class HtmlHelper extends Helper
      * @param array $attributes
      * @return void
      */
-    public function img(string $image, array $attributes=[])
+    public function img(string $image, array $attributes=[]) : string
     {
         if ($image[0] !== '/') {
             $image .= '/img/' . $image;
@@ -95,12 +96,12 @@ class HtmlHelper extends Helper
         * @param string $path
         * @return string
         */
-    public function js(string $path)
+    public function js(string $path) : string
     {
         return $this->asset($path, ['ext'=>'js']);
     }
 
-    private function asset($path, $options)
+    private function asset($path, $options) : string
     {
         // without path $html->css('https://example.com/something.css');
         if (strpos($path, '://') !== false) {
@@ -130,8 +131,8 @@ class HtmlHelper extends Helper
         }
         return $this->templater()->format($options['ext'], ['url'=>$path]);
     }
-
-    protected function loadFile(string $filename)
+ 
+    protected function loadFile(string $filename) : string
     {
         if (!file_exists($filename)) {
             throw new NotFoundException($filename . ' not found.');
