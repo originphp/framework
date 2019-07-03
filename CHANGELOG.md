@@ -24,6 +24,14 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+## [1.21.1] - 2019-07-03
+
+### Fixed
+- ErrorHandler rendering fatal errors
+
+### Security
+- Fixed notices, warning showing when in non debug mode
+
 ## [1.21.0] - 2019-07-03
 
 ### Added

@@ -26,17 +26,29 @@ use Origin\Log\Log;
 use Origin\Core\Configure;
 use Origin\Exception\HttpException;
 use Origin\Http\Router;
+use Origin\Exception\Exception;
 
+class FatalErrorException extends Exception
+{
+    public function __construct($message, $code = 500, $file = null, $line = null)
+    {
+        parent::__construct($message, $code);
+        $this->file = $file;
+        $this->line = $line;
+    }
+}
 class ErrorHandler
 {
     /**
     * Holds the level maps
-    *
+    * The following error types cannot be handled with a user defined function: E_ERROR, E_PARSE, E_CORE_ERROR,
+    * E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING, and most of E_STRICT raised in the
+    * file where set_error_handler() is called.
     * @var array
     */
     protected $levelMap = [
-        E_PARSE => 'error',
         E_ERROR => 'error',
+        E_PARSE => 'error',
         E_CORE_ERROR => 'error',
         E_COMPILE_ERROR => 'error',
         E_USER_ERROR => 'error',
@@ -58,6 +70,7 @@ class ErrorHandler
     {
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
+        register_shutdown_function([$this,'handleFatalError']);
     }
 
     /**
@@ -85,21 +98,48 @@ class ErrorHandler
         return false;
     }
 
+
     /**
-     * The error handler, fatal errors will be converted to exceptions
+     * Handle Fatal Errors
      *
+     * @return void
+     */
+    public function handleFatalError()
+    {
+        $error = error_get_last();
+      
+        // Log Message
+        if ($error) {
+            $this->cleanBuffer();
+            $exception = new FatalErrorException($error['message'], 500, $error['file'], $error['line']);
+            $this->exceptionHandler($exception);
+        }
+    }
+
+    /**
+     * The error handler
+     * @internal pay attention to security issues
      * @param string $message error message
      * @param string $file    Filename where the error was raised
      * @param int    $line    the corresponding line number
      */
     public function errorHandler($level, $message, $file, $line)
     {
-        if ($level ===  E_USER_ERROR) {
+        if (error_reporting() === 0) {
+            return null;
+        }
+        /* Original Behavior - I prefer
+        if (error_reporting() !== 0) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
+        */
+   
         $error = $this->levelMap[$level];
-        # Output
-        echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
+
+        if (Configure::read('debug')) {
+            # Output
+            echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
+        }
 
         # Log
         $message = $message . ' in {file}, line: {line}';
