@@ -43,9 +43,9 @@ class Templater
      *
      * @param string $name
      * @param array $data
-     * @return void
+     * @return string
      */
-    public function format(string $name, array $data)
+    public function format(string $name, array $data) : string
     {
         if (!isset($this->templates[$name])) {
             throw new Exception("Template '{$name}' does not exist");
@@ -75,9 +75,9 @@ class Templater
      * You can also use dot notation which will load from the plugin folder.
      * $templater->load('MyPlugin.templates-pagination');
      * @param string $name
-     * @return void
+     * @return bool
      */
-    public function load(string $name)
+    public function load(string $name) : bool
     {
         $filename = CONFIG . DS . $name . '.php';
         list($plugin, $name) = pluginSplit($name);
