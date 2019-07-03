@@ -21,14 +21,29 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## Notice
+## TODO
+- [ ] Test for timeAgoInWords
+- [ ] Test for Increment/Decrement
+- [ ] scaffolding adding id field for add view
 
 ## [Unreleased]
+### Added
+- Model increment/decrement functions
+- DateHelper timeAgoInWords
+
 ### Changed
+- Html::link now escapes title
+- IntegrationTestTrait, added server backup/restore
 - Schema::buildColumn now can create mediumtext,longtext columns
 - notices, warning etc will no longer throw exception
 - Created Json/Xml view objects
 
 ### Fixed
+- Fixed Validator automatically failing rules if allowBlank = false. This should be dependent upon rule.
+- Fixed NotBlank skipping rules on failure, this was legacy behavior before allowBlank
+- Fixed TypeError Argument 1 passed in dispatcher
+- Fixed FormHelper not showing max length
+- Fixed notice in PaginatorComponent when passing a string for order
 - Fixed transaction already started errors
 - Fixed Schema adding null when creating table
 - Fixed entity:toXml of using incorrect name property
