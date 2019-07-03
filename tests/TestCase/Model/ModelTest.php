@@ -48,6 +48,7 @@ class ModelTest extends OriginTestCase
         'Framework.Comment',
         'Framework.Tag',
         'Framework.Address',
+        'Framework.Thread' // Use this to test increment/decrement
     ];
 
     /**
@@ -97,6 +98,26 @@ class ModelTest extends OriginTestCase
         parent::setUp();
     }
 
+
+    public function testIncrementDecrement()
+    {
+        $Thread = new Model([
+            'name'=>'Thread',
+            'datasource'=>'test'
+            ]);
+
+        $this->assertTrue($Thread->increment('views', 1000));
+        $this->assertTrue($Thread->increment('views', 1000));
+        $thread = $Thread->get(1000);
+        $this->assertEquals(2, $thread->views);
+
+        $this->assertTrue($Thread->decrement('views', 1000));
+        $this->assertTrue($Thread->decrement('views', 1000));
+        $thread = $Thread->get(1000);
+        $this->assertEquals(0, $thread->views);
+    }
+
+   
 
     public function testConstruct()
     {
