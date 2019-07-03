@@ -22,10 +22,10 @@ class AuthorFixture extends Fixture
 
     public $schema = [
          'id' => ['type' => 'primaryKey'],
-         'name' => ['type' => 'string','length' => 255, 'null' => false],
+         'name' => ['type' => 'string','limit' => 255, 'null' => false],
          'description' => 'text',
-         'location' => ['type' => 'string','length' => 20],
-         'rating' => ['type' => 'integer','length' => 5],
+         'location' => ['type' => 'string','limit' => 20],
+         'rating' => ['type' => 'integer','limit' => 5],
          'created' => 'datetime',
          'modified' => 'datetime',
     ];

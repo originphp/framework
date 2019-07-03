@@ -30,11 +30,17 @@ class ViewTestsController extends Controller
 
 class Widget extends Model
 {
+    /**
+     * @todo Recreate tests using fixtures since this test was written before
+     * and this has its flaws since schema is set here manually.
+     *
+     * @var array
+     */
     public $schema = [
-        'id' => ['type' => 'integer', 'length' => 11,'key'=>'primary'],
-        'name' => ['type' => 'string', 'length' => 80],
+        'id' => ['type' => 'integer', 'limit' => 11,'key'=>'primary'],
+        'name' => ['type' => 'string', 'limit' => 80],
         'description' => ['type' => 'text'],
-        'active' => ['type' => 'boolean', 'length' => 1],
+        'active' => ['type' => 'boolean', 'limit' => 1],
     ];
 
     public function initialize(array $config)
@@ -416,7 +422,7 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
 
         $FormHelper->create($widget);
-        $expected = '<div class="form-group text required"><label for="name">Name</label><input type="text" name="name" class="form-control" id="name" maxlength="80"></div>';
+        $expected = '<div class="form-group text required"><label for="name">Name</label><input type="text" name="name" class="form-control" id="name" maxlimit="80"></div>';
         $result = $FormHelper->control('name');
         $this->assertEquals($expected, $result);
 
@@ -433,21 +439,21 @@ class FormHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<div class="form-group select"><label for="owner-id">Owner</label><select name="owner_id" class="form-control" id="owner-id"><option value="1">One</option><option value="2">Two</option></select></div>';
         $this->assertsame($expected, $result);
 
-        $expected = '<input type="hidden" name="id" id="id" maxlength="11">';
+        $expected = '<input type="hidden" name="id" id="id" maxlimit="11">';
         $this->assertSame($expected, $this->Form->control('id', ['type'=>'hidden']));
         
         $Widget = new Widget();
         $widget = $Widget->new();
         $widget->id = 1234;
         $widget->name = 'foo';
-        $expected = '<input type="text" name="name" maxlength="80" value="foo">';
+        $expected = '<input type="text" name="name" maxlimit="80" value="foo">';
         $this->Form->create($widget); // reach create=false for required fields
         $this->assertSame($expected, $this->Form->text('name'));
 
         $expected ='<div class="form-group password"><label for="password">Password</label><input type="password" name="password" class="form-control" id="password"></div>';
         $this->assertSame($expected, $this->Form->control('password'));
 
-        $expected ='<input type="hidden" name="id" id="id" maxlength="11" value="1234">';
+        $expected ='<input type="hidden" name="id" id="id" maxlimit="11" value="1234">';
         $this->assertSame($expected, $this->Form->control('id'));
 
         $expected='<div class="form-group text"><label for="unkownmodel-id">Id</label><input type="text" name="unkownModel[id]" class="form-control" id="unkownmodel-id"></div>';

@@ -24,22 +24,22 @@ class UserFixture extends Fixture
       'id' => ['type' => 'primaryKey'],
          'name' => array(
            'type' => 'string',
-           'length' => 255,
+           'limit' => 255,
            'null' => false,
          ),
          'email' => array(
            'type' => 'string',
-           'length' => 255,
+           'limit' => 255,
            'null' => false,
          ),
          'password' => array(
            'type' => 'string',
-           'length' => 255,
+           'limit' => 255,
            'null' => false,
          ),
          'api_token' => [
            'type' => 'string',
-           'length' => 40
+           'limit' => 40
          ],
          'created' => 'datetime',
          'modified' => 'datetime',

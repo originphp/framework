@@ -28,7 +28,7 @@ class MovieFixture extends Fixture
         'id' => ['type' => 'primaryKey'],
         'name' => array(
           'type' => 'string',
-          'length' => 255,
+          'limit' => 255,
           'null' => false,
         ),
         'decsription' => 'text',

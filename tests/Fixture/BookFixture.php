@@ -23,7 +23,7 @@ class BookFixture extends Fixture
     public $schema = [
          'id' => ['type' => 'primaryKey'],
          'author_id' => ['type' => 'integer'],
-         'title' => ['type' => 'string','length' => 255, 'null' => false],
+         'title' => ['type' => 'string','limit' => 255, 'null' => false],
          'description' => 'text',
          'created' => 'datetime',
          'modified' => 'datetime',

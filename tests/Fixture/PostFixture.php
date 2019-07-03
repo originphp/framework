@@ -24,7 +24,7 @@ class PostFixture extends Fixture
       ' id' => ['type' => 'primaryKey'],
          'title' => array(
            'type' => 'string',
-           'length' => 255,
+           'limit' => 255,
            'null' => false,
          ),
          'body' => 'text',
