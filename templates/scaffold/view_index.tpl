@@ -10,7 +10,6 @@
     <table class="table">
     <thead>
         <tr>
-            <th><?= $this->Paginator->sort('%primaryKey%') ?></th>
             <RECORDBLOCK>
             <th><?= $this->Paginator->sort('%field%') ?></th>
             </RECORDBLOCK>
@@ -20,11 +19,13 @@
         <tbody>
         <?php foreach ($%pluralName% as $%singularName%): ?>
             <tr>
-                <td><?= $this->Html->link($%singularName%->%primaryKey%, ['action' => 'view', $%singularName%->id]) ?></td>
+               
                 <RECORDBLOCK>
                  <td><?= h($%singularName%->%field%) ?></td>
                 </RECORDBLOCK>
                 <td class="actions">
+                    <?= $this->Html->link(__('View'), ['action' => 'view', $%singularName%->id]) ?>
+                    |
                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $%singularName%->id]) ?>
                     |
                     <?= $this->Form->postLink(__('Del'), ['action' => 'delete', $%singularName%->id], ['confirm' => __('Are you sure you want to delete # {id}?', ['id'=>$%singularName%->id])]) ?>

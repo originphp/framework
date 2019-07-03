@@ -177,9 +177,9 @@ class GenerateCommand extends Command
         if ($params) {
             foreach ($params as $method) {
                 $this->generate(
-                      $this->getTemplateFilename('view'),
-                      $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.$data['class'] .DS. "{$method}.ctp",
-                      ['action' => Inflector::humanize($method)] + $data
+                    $this->getTemplateFilename('view'),
+                    $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.$data['class'] .DS. "{$method}.ctp",
+                    ['action' => Inflector::humanize($method)] + $data
                 );
             }
         }
@@ -443,8 +443,12 @@ class GenerateCommand extends Command
         }
       
         $directory = $this->getBaseFolder($data['name'], self::SRC) . DS .'View'.DS. $controller;
+
         foreach (['add','edit','index','view'] as $view) {
+            // $blocks = $originalBlocks;
+
             $template = file_get_contents($templateFolder . DS . 'view_' . $view. '.tpl');
+        
             $template = $this->format($template, $vars);
             $template = $this->buildBlocks($template, $blocks);
 
@@ -460,9 +464,6 @@ class GenerateCommand extends Command
                     $fields = array_keys($meta['schema'][$associated]);
                     $blocks = [];
                     foreach ($fields as $field) {
-                        if ($field === 'id') {
-                            continue; // Skip since we already use this
-                        }
                         $block = $data;
                         $block['field'] = $field;
                         $block['fieldName'] = Inflector::humanize(Inflector::underscore($field));

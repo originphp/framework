@@ -10,6 +10,7 @@ class %controller%Controller extends AppController
 {
     public $paginate = [
       'limit' => 20,
+      'associated' => [%associated%]
     ];
 
     public function index()
