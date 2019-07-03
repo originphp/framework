@@ -43,9 +43,9 @@ class DateHelper extends Helper
      * Takes a datetime string and formats in a friendly way. e.g. 3 minutes ago
      *
      * @param string $datetime
-     * @return string
+     * @return string|null
      */
-    public function timeAgoInWords(string $datetime = null) : string
+    public function timeAgoInWords(string $datetime = null) : ?string
     {
         $time = strtotime($datetime);
         if ($time === false) {
