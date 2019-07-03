@@ -257,8 +257,14 @@ trait IntegrationTestTrait
      */
     protected function sendRequest(string $method, $url, array $data = [])
     {
-        $server = $_SERVER; // Copy
-
+        /**
+         * Backup/restore globals
+         */
+        if (!isset($this->_server)) {
+            $this->_server = $_SERVER;
+        }
+        $_SERVER = $this->_server;
+        
         $_SERVER['REQUEST_METHOD'] = $method;
 
         $_SESSION = $_POST = $_GET = $_COOKIE = [];
@@ -301,7 +307,6 @@ trait IntegrationTestTrait
             $dispatcher->dispatch($this->request, $this->response);
             $this->controller = $dispatcher->controller();
         }
-        $_SERVER = $server; // restore
     }
 
 
