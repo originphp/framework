@@ -20,7 +20,7 @@ use Origin\Log\Log;
 /**
  * Runs a backtrace.
  */
-function backtrace()
+function backtrace() : void
 {
     $debugger = new Debugger();
     $debug = $debugger->backtrace();
@@ -44,7 +44,7 @@ function backtrace()
  * @param boolean $isHtml if set to true data will passed through htmlspecialchars
  * @return void
  */
-function debug($data, bool $isHtml = false)
+function debug($data, bool $isHtml = false) : void
 {
     if (Configure::read('debug')) {
         $backtrace = debug_backtrace();
@@ -71,7 +71,7 @@ function debug($data, bool $isHtml = false)
  * @param mixed $data
  * @return void
  */
-function pr($data)
+function pr($data) : void
 {
     if (Configure::read('debug')) {
         $template = '<pre>%s</pre>';
@@ -90,7 +90,7 @@ function pr($data)
  * @param string $class Origin\Framework\Dispatcher
  * @return array ('Origin\Framework\','Dispatcher')
  */
-function namespaceSplit(string $class)
+function namespaceSplit(string $class) : array
 {
     $namespace = null;
     $position = strrpos($class, '\\');
@@ -109,7 +109,7 @@ function namespaceSplit(string $class)
  * @param string $class 'ContactManager.contacts'
  * @return array ('ContactManager','contacts')
  */
-function pluginSplit($name)
+function pluginSplit($name) : array
 {
     $plugin = null;
     if (strpos($name, '.') !== false) {
@@ -125,7 +125,7 @@ function pluginSplit($name)
  * @param string $command app:create-user,
  * @return array
  */
-function commandSplit(string $command)
+function commandSplit(string $command) : array
 {
     $namespace = null;
     if (strpos($command, ':') !== false) {
@@ -141,9 +141,9 @@ function commandSplit(string $command)
  * @example __('Order with id {id} by user {name}...',['id'=>$user->id,'name'=>$user->name]);
  * @param string $string
  * @param mixed arg1 arg2
- * @return string formatted
+ * @return string|null formatted
  */
-function __(string $string = null, array $vars = [])
+function __(string $string = null, array $vars = []) : ?string
 {
     if ($string) {
         return I18n::translate($string, $vars);
@@ -156,9 +156,9 @@ function __(string $string = null, array $vars = [])
  *
  * @param string $text
  * @param string $encoding
- * @return string
+ * @return string|null
  */
-function h(string $text = null, $encoding = 'UTF-8')
+function h(string $text = null, $encoding = 'UTF-8') : ?string
 {
     return htmlspecialchars($text, ENT_QUOTES, $encoding);
 }
@@ -189,7 +189,7 @@ function env(string $variable, string $value = null)
  *
  * @return string date('Y-m-d H:i:s')
  */
-function now()
+function now() : string
 {
     return date('Y-m-d H:i:s');
 }
@@ -201,14 +201,14 @@ function now()
  * @param array $array
  * @return \Origin\Utility\Collection
  */
-function collection($items)
+function collection($items) : Collection
 {
     return new Collection($items);
 }
 
 /**
- * Generates a UUID (Universal Unique Identifier)
- * Set version to 0100 and bits 6-7 to 10
+ * Generates a v4 random UUID (Universally Unique IDentifier).
+ * @internal Set version to 0100 and bits 6-7 to 10
  * @see http://tools.ietf.org/html/rfc4122#section-4.4
  * @return string
  */
@@ -221,11 +221,12 @@ function uuid()
 }
 
 /**
- * Generates a random unpredictable unique id (Unique Identifier)
+ * Generates a random hex string.
+ * @internal Should use even numbers
  * @param integer $length
  * @return string
  */
-function uid($length=13)
+function uid(int $length=13) : string
 {
     $random = random_bytes(ceil($length/2));
     return substr(bin2hex($random), 0, $length);
@@ -250,7 +251,7 @@ function hashPassword(string $password)
  * @param string $message
  * @return void
  */
-function deprecationWarning(string $message)
+function deprecationWarning(string $message) : void
 {
     $trace = debug_backtrace();
     if (isset($trace[0])) {
