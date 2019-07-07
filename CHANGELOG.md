@@ -23,6 +23,15 @@ Delete tag: git tag -d <tag_name>
 ## Notice
 
 ## [Unreleased]
+### Todo
+- [ ] Validation upload mime type test
+### Added
+- File upload and mime type validation
+
+### Fixed
+- Fixed scaffold template css name
+- Form helper file control was not rendering with correct css
+- Model query not adding table alias to query
 
 ## [1.21.1] - 2019-07-03
 
