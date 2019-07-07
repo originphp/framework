@@ -44,7 +44,8 @@ class FormHelper extends Helper
             'select' => ['div' => 'form-group', 'class' => 'form-control'],
             'date' => ['div' => 'form-group', 'class' => 'form-control'],
             'time' => ['div' => 'form-group', 'class' => 'form-control'],
-            'datetime' => ['div' => 'form-group', 'class' => 'form-control'], // Date time appended
+            'datetime' => ['div' => 'form-group', 'class' => 'form-control'], // Date time appended,
+            'file' => ['div'=>'form-group','class'=>'form-control-file']
         ),
         'templates' => array(
             // Controls
