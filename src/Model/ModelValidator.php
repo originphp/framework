@@ -16,6 +16,7 @@ namespace Origin\Model;
 
 use Origin\Model\Exception\ValidatorException;
 use DateTime;
+use Origin\Exception\Exception;
 
 class ModelValidator
 {
@@ -37,6 +38,13 @@ class ModelValidator
     protected $datetimeFormat = null;
     protected $timeFormat = null;
 
+    protected $defaultMessageMap = [
+        'notBlank' => 'This field is required',
+        'mimeType' => 'Invalid mime type',
+        'extension' => 'Invalid file extension',
+        'upload' => 'File upload error'
+    ];
+
     public function __construct(Model $model)
     {
         $this->model = $model;
@@ -46,9 +54,9 @@ class ModelValidator
      * Sets and gets rules
      *
      * @param array $rules
-     * @return void
+     * @return array|null
      */
-    public function rules(array $rules = null)
+    public function rules(array $rules = null) : ?array
     {
         if ($rules === null) {
             return $this->validationRules;
@@ -58,7 +66,7 @@ class ModelValidator
         }
     }
 
-    public function setRule(string $field, $params)
+    public function setRule(string $field, $params) :void
     {
         if (is_string($params)) {
             $params =['rule1' => ['rule' => $params]];
@@ -80,6 +88,14 @@ class ModelValidator
                 if ($value['rule'] === 'notBlank') {
                     $value['message'] = 'This field is required';
                 }
+                $rule = $value['rule'];
+                if (is_array($value['rule'])) {
+                    $rule = $value['rule'][0];
+                }
+        
+                if (isset($this->defaultMessageMap[$rule ])) {
+                    $value['message'] = $this->defaultMessageMap[$rule ];
+                }
             }
            
             $params[$key] = $value;
@@ -94,7 +110,7 @@ class ModelValidator
      * @param string|array $ruleSet email or ['equalTo', 'origin']
      * @return bool
      */
-    public function validate($value, $ruleSet)
+    public function validate($value, $ruleSet) : bool
     {
        
         // ['extension',['csv','txt']]
@@ -131,7 +147,7 @@ class ModelValidator
      * @param string|bool $on null,'create','update'
      * @return bool
      */
-    protected function runRule(bool $create, $on)
+    protected function runRule(bool $create, $on)  : bool
     {
         if ($on === null or ($create and $on ==='create') or (!$create and $on ==='update')) {
             return true;
@@ -146,12 +162,12 @@ class ModelValidator
      *
      * @param Entity $entity
      * @param boolean $create
-     * @return void
+     * @return bool
      */
-    public function validates(Entity $entity, bool $create = true)
+    public function validates(Entity $entity, bool $create = true) : bool
     {
         $modified = $entity->modified();
-
+        
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
@@ -164,14 +180,7 @@ class ModelValidator
                 }
             
                 $value = $entity->get($field);
-                  
-                // Invalidate objects or arrays e.g datetime fields, or other objects - fall back
-                // @this is really to catch development issues
-                if (is_object($value) or is_array($value)) {
-                    $entity->invalidate($field, 'Invalid value');
-                    continue;
-                }
-                
+                                  
                 // Break out if required and its blank, if not continue with validation
                 if ($validationRule['required'] and !in_array($field, $modified)) {
                     $entity->invalidate($field, 'This field is required');
@@ -187,7 +196,7 @@ class ModelValidator
                 }
 
                 // If the value is not required and value is empty then don't validate
-                if ($value === '' or $value === null) {
+                if ($this->isBlank($value)) {
                     if ($validationRule['allowBlank'] === true) {
                         continue;
                     }
@@ -200,30 +209,49 @@ class ModelValidator
                 if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
-         
+               
                 if (!$this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
                 }
             }
         }
-   
+
         return empty($entity->errors());
+    }
+
+    /**
+     * Check if a value is considered blank for running a rule.
+     * It also checks for empty file uploads
+     *
+     * @param mixed $value
+     * @return boolean
+     */
+    protected function isBlank($value) : bool
+    {
+        if ($value === '' or $value === null) {
+            return true;
+        }
+       
+        if (is_array($value) and isset($value['tmp_name']) and isset($value['error'])) {
+            return $value['error'] === UPLOAD_ERR_NO_FILE;
+        }
+        return false;
     }
 
     /**
      * VALIDATORS.
      */
-    public function alphaNumeric($value)
+    public function alphaNumeric($value) : bool
     {
         return ctype_alnum($value);
     }
 
-    public function boolean($value)
+    public function boolean($value) : bool
     {
         return is_bool($value);
     }
 
-    public function custom($value, $regex)
+    public function custom($value, $regex) : bool
     {
         return (bool) preg_match($regex, $value);
     }
@@ -236,13 +264,13 @@ class ModelValidator
      *
      * @return bool
      */
-    public function date($value, $dateFormat = 'Y-m-d')
+    public function date($value, $dateFormat = 'Y-m-d') : bool
     {
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
             return true;
         }
-
+        
         return false;
     }
 
@@ -254,7 +282,7 @@ class ModelValidator
      *
      * @return bool
      */
-    public function datetime($value, $dateFormat = 'Y-m-d H:i:s')
+    public function datetime($value, $dateFormat = 'Y-m-d H:i:s') : bool
     {
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
       
@@ -268,7 +296,7 @@ class ModelValidator
     /**
      * This is alias for float
      */
-    public function decimal($value, $options = null)
+    public function decimal($value, $options = null) : bool
     {
         return $this->float($value, $options);
     }
@@ -276,12 +304,12 @@ class ModelValidator
     /**
      * Smooth email validation.
      */
-    public function email($value, $options = null)
+    public function email($value, $options = null) : bool
     {
         return (bool) preg_match('/[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(.[a-zA-Z0-9-.])+/', $value);
     }
 
-    public function equalTo($value, $comparedTo = null)
+    public function equalTo($value, $comparedTo = null) : bool
     {
         return $value === $comparedTo;
     }
@@ -294,7 +322,7 @@ class ModelValidator
      *
      * @return bool true or false
      */
-    public function extension($value, $extensions = [])
+    public function extension($value, $extensions = []) : bool
     {
         if (is_string($extensions)) {
             $extensions = [$extensions];
@@ -304,7 +332,7 @@ class ModelValidator
         return $this->inList($extension, $extensions, true);
     }
 
-    public function inList($value, $values, $caseInSensitive = false)
+    public function inList($value, $values, $caseInSensitive = false) : bool
     {
         if ($caseInSensitive) {
             $values = array_map('mb_strtolower', $values);
@@ -315,7 +343,7 @@ class ModelValidator
         return in_array($value, $values);
     }
 
-    public function ip($value, $options = null)
+    public function ip($value, $options = null) : bool
     {
         return (bool) filter_var($value, FILTER_VALIDATE_IP);
     }
@@ -323,7 +351,7 @@ class ModelValidator
     /**
      * Checks if string is less than or equals to the max length.
      */
-    public function maxLength($value, $max)
+    public function maxLength($value, $max) : bool
     {
         return mb_strlen($value) <= $max;
     }
@@ -331,7 +359,7 @@ class ModelValidator
     /**
      * Checks if a string is greater or equal to the min length.
      */
-    public function minLength($value, $min)
+    public function minLength($value, $min) : bool
     {
         return mb_strlen($value) >= $min;
     }
@@ -339,7 +367,7 @@ class ModelValidator
     /**
      * Checks if a string is not blank (not empty and not made up of whitespaces).
      */
-    public function notBlank($value)
+    public function notBlank($value) : bool
     {
         if (empty($value) and (string) $value !== '0') {
             return false;
@@ -351,7 +379,7 @@ class ModelValidator
     /**
      * Checks that value is not empty whilst dealing with 0 values.
      */
-    public function notEmpty($value)
+    public function notEmpty($value) : bool
     {
         if (empty($value) and (string) $value !== '0') {
             return false;
@@ -360,7 +388,7 @@ class ModelValidator
         return true;
     }
 
-    public function numeric($value)
+    public function numeric($value) : bool
     {
         return ($this->integer($value) or $this->float($value));
     }
@@ -371,7 +399,7 @@ class ModelValidator
      * @param integer $value e.g. 154
      * @return void
      */
-    public function integer($value)
+    public function integer($value) : bool
     {
         if (is_string($value)) {
             return (bool) filter_var($value, FILTER_VALIDATE_INT);
@@ -385,7 +413,7 @@ class ModelValidator
       * @param float $value
       * @return void
       */
-    public function float($value)
+    public function float($value) : bool
     {
         if (is_string($value)) {
             return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) and filter_var($value, FILTER_VALIDATE_INT) === false;
@@ -393,7 +421,7 @@ class ModelValidator
         return is_float($value);
     }
 
-    public function range($value, $min = null, $max = null)
+    public function range($value, $min = null, $max = null) : bool
     {
         if (!is_numeric($value) or !isset($min) or !isset($max)) {
             return false;
@@ -410,7 +438,7 @@ class ModelValidator
      *
      * @return bool
      */
-    public function time($value, $timeFormat = 'H:i:s')
+    public function time($value, $timeFormat = 'H:i:s') : bool
     {
         $dateTime = DateTime::createFromFormat($timeFormat, $value);
     
@@ -429,7 +457,7 @@ class ModelValidator
      *
      * @return bool true or false
      */
-    public function url($url, $protocol = true)
+    public function url($url, $protocol = true) : bool
     {
         if ($protocol) {
             return (bool) filter_var($url, FILTER_VALIDATE_URL);
@@ -440,5 +468,48 @@ class ModelValidator
         }
 
         return (bool) filter_var('https://'.$url, FILTER_VALIDATE_URL);
+    }
+
+    /**
+     * Checks that file was uploaded ok
+     *
+     * @param array $result
+     * @param mixed $options
+     * @return boolean
+     */
+    public function upload($result, $optional=false) : bool
+    {
+        if (is_array($result) and isset($result['error'])) {
+            $result = $result['error'];
+        }
+        /**
+         * Let test pass if the upload is optional and no file was uploaded
+         */
+        if ($optional and $result === UPLOAD_ERR_NO_FILE) {
+            return true;
+        }
+        return $result === UPLOAD_ERR_OK;
+    }
+
+    /**
+     * Checks the mime type of a file
+     *
+     * @param string $result
+     * @param array $mimeTypes
+     * @return boolean
+     */
+    public function mimeType($result, $mimeTypes = []) : bool
+    {
+        if (is_array($result) and isset($result['tmp_name'])) {
+            $result = $result['tmp_name'];
+        }
+        if (is_string($mimeTypes)) {
+            $mimeTypes = [$mimeTypes];
+        }
+        $mimeType = mime_content_type($result);
+        if ($mimeType === false) {
+            throw new Exception('Unable to determine the mimetype');
+        }
+        return in_array($mimeType, $mimeTypes);
     }
 }
