@@ -9,7 +9,7 @@
     </div>
     <h2><?= __('Add %singularHuman%') ?></h2>
 </div>
-<div class="%pluralName% form">
+<div class="%singularName% form">
     <?= $this->Form->create($%singularName%) ?>
     <?php
         <RECORDBLOCK>
