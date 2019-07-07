@@ -178,8 +178,11 @@ class ConsoleIo
      * @param array $array
      * @param bool  $headers wether first row is headers
      */
-    public function table(array $array, $headers = true)
+    public function table(array $array, bool $headers = true) : void
     {
+        if (empty($array)) {
+            return;
+        }
         // Calculate width of each column
         $widths = [];
         foreach ($array as $rowIndex => $row) {
