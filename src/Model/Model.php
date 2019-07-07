@@ -1389,10 +1389,14 @@ class Model
      */
     protected function prepareQuery(string $type, array $query)
     {
-        if (($type === 'first' or $type === 'all') and empty($query['fields'])) {
-            $query['fields'] = $this->fields();
+        if ($type === 'first' or $type === 'all') {
+            if (empty($query['fields'])) {
+                $query['fields'] = $this->fields();
+            } else {
+                $query['fields'] = $this->prepareFields($query['fields']);
+            }
         }
-
+        
         $query['associated'] = $this->associatedConfig($query);
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
@@ -1475,6 +1479,7 @@ class Model
     protected function prepareResults(array $results)
     {
         $buffer = [];
+
 
         $alias = Inflector::tableize($this->alias);
        
@@ -1608,9 +1613,10 @@ class Model
         }
  
         $results = $connection->fetchAll('num'); // change to num and enableMapResults
-
+       
         if ($results) {
             $results = $connection->mapNumericResults($results, $query['fields']); // use with Num instead of model
+           
             # If foreignKeys are missing data then objects wont be put together
             # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);
