@@ -145,6 +145,28 @@ EOF;
         $this->assertEquals($expected, md5(Html::toText($html, ['format'=>false])));
     }
 
+    public function testSubList()
+    {
+        $html = <<< EOF
+<ul>
+    <li>Item #1</li>
+    <li>Item #2</li>
+    <ul>
+        <li>Item #3</li>
+        <li>Item #4</li>
+    </ul>
+</ul>
+EOF;
+        $expected = <<< EOF
+* Item #1
+* Item #2
+
+     * Item #3
+     * Item #4
+EOF;
+        $this->assertEquals($expected, Html::toText($html, ['format'=>false]));
+    }
+
     public function testStripTagsSelected()
     {
         $html = <<< EOF
