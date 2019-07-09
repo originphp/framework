@@ -165,7 +165,7 @@ class Html
      * Check if value needs converting and convert
      *
      * @param string $value
-     * @return void
+     * @return mixed
      */
     protected static function htmlspecialchars(string $value)
     {
