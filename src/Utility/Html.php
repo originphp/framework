@@ -12,6 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+/**
+ * In version 2.0 this and other utilities/components will be split into their own composer packages
+ */
 
 declare(strict_types=1);
 
@@ -31,7 +34,7 @@ class Html
      *   -tag: default:p tag to wrap lines ines e.g. ['tag'=>'div']
      * @return string
      */
-    public static function fromText(string $text, array $options = []) : string
+    public static function fromText(string $text, array $options = []): string
     {
         $options += ['tag' => 'p'];
         $out = [];
@@ -56,9 +59,9 @@ class Html
     {
         $keepWhitespace = ['address', 'pre', 'script', 'style'];
         $keepWhitespaceAround = [
-            'a', 'abbr', 'acronym', 'b', 'br', 'button', 'cite', 'code', 'del','em', 'i', 'img', 'input', 's', 'select', 'small', 'span', 'strong', 'textarea', 'u'
+            'a', 'abbr', 'acronym', 'b', 'br', 'button', 'cite', 'code', 'del', 'em', 'i', 'img', 'input', 's', 'select', 'small', 'span', 'strong', 'textarea', 'u'
         ];
-    
+
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = false;
@@ -113,16 +116,16 @@ class Html
      */
     public static function toText(string $html, array $options = []): string
     {
-        $options += ['format'=>true];
-        $html = static::stripTags($html, ['script','style','iframe']);
+        $options += ['format' => true];
+        $html = static::stripTags($html, ['script', 'style', 'iframe']);
         $html = static::minify($html);
-        
+
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = false;
 
         $html  = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
-        
+
         /**
          * Create a text version without formatting, just adds new lines, indents for lists, and list type, e.g number
          * or *
@@ -130,24 +133,23 @@ class Html
         if ($options['format'] === false) {
             // ul/li needs to be formatted to work with sublists
             $html = preg_replace('/^ +/m', '', $html); // remove whitespaces from start of each line
-            $html = preg_replace('/(<\/(h1|h2|h3|h4|h5|h6|tr|blockquote|dt|dd|table|p)>)/', '$1'. PHP_EOL, $html);
+            $html = preg_replace('/(<\/(h1|h2|h3|h4|h5|h6|tr|blockquote|dt|dd|table|p)>)/', '$1' . PHP_EOL, $html);
             $html = preg_replace('/(<(h1|h2|h3|h4|h5|h6|table|blockquote|p[^re])[^>]*>)/', PHP_EOL . '$1', $html);
             $html = str_replace("</tr>\n</table>", '</tr></table>', $html);
-            $html = preg_replace('/(<br>)/', '$1'. PHP_EOL, $html);
+            $html = preg_replace('/(<br>)/', '$1' . PHP_EOL, $html);
             $html = preg_replace('/(<\/(th|td)>)/', '$1 ', $html); //Add space
         }
-    
 
         if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            $process = ['a', 'img','br','code','p','h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'ul', 'ol', 'blockquote'];
+            $process = ['a', 'img', 'br', 'code', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table','li','ul', 'ol', 'blockquote'];
 
             if ($options['format'] === false) {
-                $process = ['ul','ol'];
+                $process = ['ul', 'ol'];
             }
+    
             /**
-                 * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
-                 */
-               
+             * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
+             */
             foreach ($process as $needle) {
                 $nodes = $doc->getElementsByTagName($needle);
                 foreach ($nodes as $node) {
@@ -186,7 +188,7 @@ class Html
             return;
         }
         $value = static::htmlspecialchars($tag->nodeValue);
-       
+
         switch ($tag->tagName) {
             case 'a':
                 $tag->nodeValue =  "[{$value}](" . static::htmlspecialchars($tag->getAttribute('href'))  . ")";
@@ -197,11 +199,11 @@ class Html
             case 'code':
                 // indent multi line
                 if (strpos($tag->nodeValue, PHP_EOL) !== false) {
-                    $tag->nodeValue  =  PHP_EOL . "     " . str_replace(PHP_EOL, PHP_EOL. "     ", $value). PHP_EOL;
+                    $tag->nodeValue  =  PHP_EOL . '   ' . str_replace(PHP_EOL, PHP_EOL . '   ', $value) . PHP_EOL;
                 }
-            break;
+                break;
             case 'blockquote':
-                $tag->nodeValue  =  PHP_EOL . '"' . $value .'"'. PHP_EOL;
+                $tag->nodeValue  =  PHP_EOL . '"' . $value . '"' . PHP_EOL;
                 break;
             case 'h1':
             case 'h2':
@@ -224,7 +226,18 @@ class Html
                 $tag->nodeValue = null;
 
                 break;
+                case 'li':
+                    if ($tag->hasChildNodes()) {
+                        foreach ($tag->childNodes as $child) {
+                            if (in_array($child->nodeName, ['ul','ol'])) {
+                                static::processTag($child, $doc);
+                            }
+                        }
+                    }
+                break;
+
             case 'img':
+   
                 $alt = '';
                 if ($tag->hasAttribute('alt')) {
                     $alt = $tag->getAttribute('alt') . ' ';
@@ -239,7 +252,8 @@ class Html
                 $pre = str_repeat(' ', $indent);
                 foreach ($tag->childNodes as $child) {
                     if (isset($child->tagName) and $child->tagName === 'li') {
-                        $child->nodeValue = $lineBreak . $pre .  $count . '. ' . static::htmlspecialchars($child->nodeValue) . PHP_EOL;
+                        $child->nodeValue = $lineBreak . $pre .  $count . '. ' . static::htmlspecialchars($child->nodeValue);
+                        $child->nodeValue = rtrim($child->nodeValue) . PHP_EOL; // friendly with nested lists
                         $count++;
                         $lineBreak = null;
                     }
@@ -250,7 +264,6 @@ class Html
                 break;
 
             case 'table':
-
                 $data = [];
                 $headers = false;
                 foreach ($tag->getElementsByTagName('tr') as $node) {
@@ -273,13 +286,15 @@ class Html
 
                 break;
             case 'ul':
+         
                 $lineBreak  = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);
-                //pr($tag->parentNode->nodeName);
+
                 foreach ($tag->childNodes as $child) {
                     if (isset($child->tagName) and $child->tagName === 'li') {
-                        $child->nodeValue =    $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue) . PHP_EOL;
+                        $child->nodeValue =  $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue);
+                        $child->nodeValue = rtrim($child->nodeValue) . PHP_EOL; // friendly with nested lists
                         $lineBreak = null;
                     }
                 }
@@ -297,15 +312,16 @@ class Html
      * @param DOMNode $node
      * @return integer
      */
-    protected static function getIndentLevel(DOMNode $node):int
+    protected static function getIndentLevel(DOMNode $node): int
     {
         $indent = 0;
         $checkLevelUp = true;
         $current = $node;
+    
         while ($checkLevelUp) {
-            if (in_array($current->parentNode->nodeName, ['ol','ul'])) {
+            if ($current->parentNode->nodeName === 'li') {
                 $current = $current->parentNode;
-                $indent = $indent + 5;
+                $indent = $indent + 3;
             } else {
                 $checkLevelUp = false;
             }
@@ -371,23 +387,23 @@ class Html
 
 
     /**
-    * Cleans up user inputted html for saving to a database
-    *
-    * @param string $html
-    * @param array $options
-    *   - tags: default:['h1','h2','h3','h4','h5','h6','p','i','em','strong','b','blockquote',
-    *           'a', 'ul','li','ol','br','code','pre','div','span'] an array of tags to be allowed e.g. ['p','h1']
-    * To allow certain attributes ['p'=>['class','style]];
-    *
-    * @return string
-    */
-    public static function sanitize(string $html, array $options = []) : string
+     * Cleans up user inputted html for saving to a database
+     *
+     * @param string $html
+     * @param array $options
+     *   - tags: default:['h1','h2','h3','h4','h5','h6','p','i','em','strong','b','blockquote',
+     *           'a', 'ul','li','ol','br','code','pre','div','span'] an array of tags to be allowed e.g. ['p','h1']
+     * To allow certain attributes ['p'=>['class','style]];
+     *
+     * @return string
+     */
+    public static function sanitize(string $html, array $options = []): string
     {
         $options += [
             'tags' => [
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'p',
-                'i', 'em', 'strong', 'b', 'blockquote','del',
+                'i', 'em', 'strong', 'b', 'blockquote', 'del',
                 'a',
                 'ul', 'li', 'ol', 'br',
                 'code', 'pre',
@@ -412,7 +428,7 @@ class Html
          */
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
-  
+
         /**
          * Add html/body but not doctype. body will be remoed later
          */
@@ -421,7 +437,7 @@ class Html
                 static::_sanitize($node, $options); // body
             }
         }
-        
+
         return preg_replace('~<(?:/?(?:html|body))[^>]*>\s*~i', '', $doc->saveHTML());
     }
 
@@ -432,17 +448,17 @@ class Html
      * @param array $options
      * @return void
      */
-    protected static function _sanitize(DomNode $node, array $options=[]) : void
+    protected static function _sanitize(DomNode $node, array $options = []): void
     {
         if ($node->hasChildNodes()) {
-            for ($i=0; $i<$node->childNodes->length; $i++) {
+            for ($i = 0; $i < $node->childNodes->length; $i++) {
                 static::_sanitize($node->childNodes->item($i), $options);
             }
         }
         if ($node->nodeType !== XML_ELEMENT_NODE) {
-            return ;
+            return;
         }
-       
+
         $remove = $change = $attributes = [];
         if (!isset($options['tags'][$node->nodeName]) and $node->nodeName !== 'body') {
             $remove[] = $node;
@@ -483,19 +499,22 @@ class Html
         }
     }
 
-   
+
     /**
-     * Strips HTML tags
+     * Strips HTML tags and the content of those tags
      *
      * @param string $html
      * @param array $tags array of tags to strip, leave empty to strip all tags
      * @return string|null text or html
      */
-    public static function stripTags(string $html, array $tags=[]): ?string
+    public static function stripTags(string $html, array $tags = []): ?string
     {
         $doc = new DOMDocument();
-        $doc->preserveWhiteSpace = false;
-        $doc->formatOutput = true;
+        /**
+         * Html should not be modified in anyway
+         */
+        $doc->preserveWhiteSpace = true;
+        $doc->formatOutput = false;
         if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
             $remove = [];
             foreach ($tags as $tag) {
