@@ -459,6 +459,13 @@ class Model
 
         $this->belongsTo[$association] = $options;
 
+        /**
+         * Load the CounterCache behavior if this is needed and not loaded
+         */
+        if (isset($options['counterCache']) and !isset($this->CounterCache)) {
+            $this->loadBehavior('CounterCache');
+        }
+
         return $options;
     }
 
@@ -728,7 +735,7 @@ class Model
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
         $columns = array_intersect(array_keys($this->schema()), $entity->modified());
-
+    
         $data = [];
         foreach ($columns as $column) {
             $data[$column] = $entity->get($column);
