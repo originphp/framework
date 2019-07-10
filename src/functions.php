@@ -376,7 +376,7 @@ function replace(string $needle, string $with, string $haystack, array $options=
  * @param string $string
  * @return integer
  */
-function length(string $string) : int
+function length(string $string=null) : int
 {
     return mb_strlen($string);
 }
