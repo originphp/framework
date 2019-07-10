@@ -16,6 +16,7 @@ namespace Origin\Test\Utility;
 
 use Origin\Utility\Csv;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Exception\NotFoundException;
 
 class CsvTest extends \PHPUnit\Framework\TestCase
 {
@@ -137,8 +138,9 @@ EOF;
 
         $result = [];
         $rows = Csv::process($tmp, ['header'=>true,'keys'=>['Name','Email']]);
-        foreach ($rows as $row) {
+        foreach ($rows as $i => $row) {
             $result[] = $row;
+            $this->assertEquals($i, $rows->key());
         }
         $this->assertEquals($expected, $result);
 
@@ -164,5 +166,28 @@ EOF;
         }
        
         $this->assertEquals($expected, $result);
+    }
+
+    public function testProcessException()
+    {
+        $this->expectException(NotFoundException::class);
+        Csv::process('/somewhere/outthere');
+    }
+
+    public function testCount()
+    {
+        $tmp = TMP . DS . uid();
+        file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
+        $rows = Csv::process($tmp, ['header'=>true]);
+        $this->assertEquals(3, count($rows));
+    }
+
+    public function testInvalidAmountOfKeys()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $tmp = TMP . DS . uid();
+        file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
+        $rows = Csv::process($tmp, ['header'=>true,'keys'=>['name']]);
+        $rows->current();
     }
 }

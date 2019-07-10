@@ -82,7 +82,7 @@ class CsvIterator implements Iterator, Countable
 
  
     /**
-     * Counts the number of lines in the file
+     * Counts the number of rows excluding headers
      */
     public function count()
     {
@@ -94,6 +94,9 @@ class CsvIterator implements Iterator, Countable
             }
         }
         fclose($fh);
+        if ($this->options['header']) {
+            -- $lines;
+        }
         return $lines;
     }
 
@@ -111,6 +114,7 @@ class CsvIterator implements Iterator, Countable
             $this->options['enclosure'],
             $this->options['escape']
         );
+     
         if ($this->row and $this->headers) {
             if (count($this->row) !== count($this->headers)) {
                 throw new InvalidArgumentException(sprintf('Column header mistmatch on row %d.', $this->position));
