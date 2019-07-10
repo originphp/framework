@@ -18,12 +18,14 @@ use Origin\Model\Model;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\ModelRegistry;
 
+/**
+ * Counter cache should load Automatically
+ */
 class Post extends Model
 {
     public function initialize(array $config)
     {
         $this->loadBehavior('Timestamp');
-        $this->loadBehavior('CounterCache');
         $this->hasMany('Reply');
     }
 }
@@ -33,7 +35,6 @@ class Reply extends Model
     public function initialize(array $config)
     {
         $this->loadBehavior('Timestamp');
-        $this->loadBehavior('CounterCache');
         $this->belongsTo('Post', [
             'counterCache' => true
         ]);
