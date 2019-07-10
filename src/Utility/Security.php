@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -11,7 +12,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types=1);
 namespace Origin\Utility;
 
 use Origin\Core\Configure;
@@ -21,20 +22,20 @@ use Origin\Exception\InvalidArgumentException;
 class Security
 {
     const CIPHER = 'AES-256-CBC';
- 
+
     /**
-    * Hashes a string. This is not for passwords.
-    *
-    * @param string $string
+     * Hashes a string. This is not for passwords.
+     *
+     * @param string $string
      * @param string $string
      * @param array $options options keys are
      * - pepper: (default:false). Set to true to use Security.pepper or set a string to use.
      * - type: (default:sha256)
      * @return string
      */
-    public static function hash(string $string, array $options=[]) : string
+    public static function hash(string $string, array $options = []): string
     {
-        $options += ['pepper'=>false,'type'=>'sha256'];
+        $options += ['pepper' => false, 'type' => 'sha256'];
         $algorithm = strtolower($options['type']);
 
         /**
@@ -42,7 +43,7 @@ class Security
          */
         if (isset($options['salt'])) {
             deprecationWarning('salt option is deprecated. use pepper and rename config to Security.pepper');
-            $options['pepper'] = $options['salt']??false;
+            $options['pepper'] = $options['salt'] ?? false;
         }
 
         if ($options['pepper'] === true) {
@@ -64,7 +65,7 @@ class Security
      * @param string $password
      * @return string
      */
-    public static function hashPassword(string $password) : string
+    public static function hashPassword(string $password): string
     {
         return password_hash($password, PASSWORD_DEFAULT);
     }
@@ -76,7 +77,7 @@ class Security
      * @param string $hash
      * @return boolean
      */
-    public static function verifyPassword(string $password, string $hash) : bool
+    public static function verifyPassword(string $password, string $hash): bool
     {
         return password_verify($password, $hash);
     }
@@ -88,7 +89,7 @@ class Security
      * @param string $compare
      * @return bool
      */
-    public static function compare(string $original = null, string $compare = null) : bool
+    public static function compare(string $original = null, string $compare = null): bool
     {
         if (!is_string($original) or !is_string($compare)) {
             return false;
@@ -101,7 +102,7 @@ class Security
      *
      * @return string
      */
-    public static function generateKey() : string
+    public static function generateKey(): string
     {
         return bin2hex(random_bytes(16));
     }
@@ -114,7 +115,7 @@ class Security
      * @param string $key must must be 256 bits (32 bytes)
      * @return string
      */
-    public static function encrypt(string $string, string $key) : string
+    public static function encrypt(string $string, string $key): string
     {
         if (mb_strlen($key) !== 32) {
             throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
@@ -127,12 +128,12 @@ class Security
     }
 
     /**
-    * Decrypts an encrypted string
-    *
-    * @param string $string
-    * @param string $key must must be 256 bits (32 bytes)
-    * @return string|bool encrypted string
-    */
+     * Decrypts an encrypted string
+     *
+     * @param string $string
+     * @param string $key must must be 256 bits (32 bytes)
+     * @return string|bool encrypted string
+     */
     public static function decrypt(string $string, string $key)
     {
         if (mb_strlen($key) !== 32) {
@@ -148,5 +149,31 @@ class Security
             return false;
         }
         return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+    }
+
+    /**
+     * Generates a secure UID
+     * @param integer $length
+     * @return string
+     */
+    public static function uid(int $length=16) : string
+    {
+        $random = random_bytes((int) ceil($length/2));
+        return substr(bin2hex($random), 0, $length);
+    }
+
+    /**
+     * Generates a v4 random UUID (Universally Unique IDentifier).
+     * @return string
+     */
+    public static function uuid() : string
+    {
+        return implode('-', [
+            bin2hex(random_bytes(4)),
+            bin2hex(random_bytes(2)),
+            bin2hex(chr((ord(random_bytes(1)) & 0x0F) | 0x40)) . bin2hex(random_bytes(1)),
+            bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
+            bin2hex(random_bytes(6))
+        ]);
     }
 }

@@ -87,4 +87,17 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $this->assertFalse(Security::decrypt($encrypted, $key.'x')); // test wrong key
     }
+
+    public function testUUID()
+    {
+        $this->assertRegExp(
+            '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
+            Security::uuid()
+        );
+    }
+    public function testUid()
+    {
+        $this->assertRegExp('/^([a-z0-9]*){16}$/', Security::uid());
+        $this->assertRegExp('/^([a-z0-9]*){7}$/', Security::uid(7));
+    }
 }
