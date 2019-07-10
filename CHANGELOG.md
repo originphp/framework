@@ -25,10 +25,28 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 ### Todo
 - [ ] Validation upload mime type test
+- [ ] Counter Cache Test
+- [ ] CSV process test
+- [ ] Email now uses the Html utility
+
 ### Added
+- CounterCache behavior
+- Security::uid and Security::uuid
+- CSV::process for processing large CSV files
+- CSV utility allowed to pass options such as separator and enclosure
+- Text Utility
+- Html Utility
+- Markdown Utility
 - File upload and mime type validation
 
+### Changed
+- Email Utility now uses Html Utility
+
+### Deprecated
+- The internal class Html2Text is being deprecated, this was used by Email
+
 ### Fixed
+- length function work with null value
 - Fixed scaffold template css name
 - Form helper file control was not rendering with correct css
 - Model query not adding table alias to query
