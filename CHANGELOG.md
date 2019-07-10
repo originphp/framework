@@ -23,7 +23,9 @@ Delete tag: git tag -d <tag_name>
 ## Notice
 
 ## [Unreleased]
+## [1.22.0] - 2019-07-10
 ### Added
+- Validator::extension now works with uploaded files
 - CounterCache behavior
 - Security::uid and Security::uuid
 - CSV::process for processing large CSV files
@@ -42,7 +44,7 @@ Delete tag: git tag -d <tag_name>
 ### Fixed
 - length function work with null value
 - Fixed scaffold template css name
-- Form helper file control was not rendering with correct css
+- Form helper file control was not rendering with correct css class
 - Model query not adding table alias to query
 
 ## [1.21.1] - 2019-07-03
