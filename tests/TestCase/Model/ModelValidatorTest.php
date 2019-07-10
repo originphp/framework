@@ -303,6 +303,9 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->extension('bootstrap.css', ['js', 'css']));
         $this->assertTrue($Validator->extension('Logo.JPG', ['gif', 'png', 'jpg']));
         $this->assertFalse($Validator->extension('bootstrap.js', 'css'));
+
+        $post = ['name'=>'bootstrap.css'];
+        $this->assertTrue($Validator->extension($post, 'css'));
     }
 
     public function testInList()
@@ -428,6 +431,27 @@ class ModelValidatorTest extends OriginTestCase
 
         $this->assertFalse($Validator->url('ftp://www.google.com', false));
         $this->assertFalse($Validator->url('origin://www.google.com', false));
+    }
+
+    public function testMimeType()
+    {
+        $Validator = $this->Validator;
+        $post = ['tmp_name'=> ORIGIN . DS .'phpunit.xml.dist'];
+        $this->assertTrue($Validator->mimeType($post, ['text/xml']));
+        $this->assertFalse($Validator->mimeType($post, ['text/plain']));
+
+        $this->assertTrue($Validator->mimeType(ORIGIN . DS .'phpunit.xml.dist', ['text/xml']));
+    }
+
+    public function testFileUpload()
+    {
+        $Validator = $this->Validator;
+        $post = ['tmp_name'=>null,'error'=>UPLOAD_ERR_NO_FILE];
+        $this->assertFalse($Validator->upload($post));
+        $this->assertTrue($Validator->upload($post, true));
+
+        $post = ['tmp_name'=>null,'error'=>UPLOAD_ERR_OK];
+        $this->assertTrue($Validator->upload($post));
     }
 
     /**
