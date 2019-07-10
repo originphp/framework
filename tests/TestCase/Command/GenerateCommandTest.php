@@ -34,10 +34,10 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('e09190c9f65a07c2a6c739afb4fadab2', SRC . DS . 'Controller' . DS . 'BookmarksController.php');
         unlink(SRC . DS . 'Controller' . DS . 'BookmarksController.php');
      
-        $this->assertFileHash('96ce7c43598ddc6db9b036c116c6e576', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
+        $this->assertFileHash('255346de5fe4d28c9fe66ee4ab1d200e', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'add.ctp');
 
-        $this->assertFileHash('aeae00069812ef1a457ce5363d5987e2', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
+        $this->assertFileHash('752079993cbd5909d81a358104154e0a', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'edit.ctp');
 
         $this->assertFileHash('8bde3ab1bef406aeb53bca4b5d4f7606', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'index.ctp');
