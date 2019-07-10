@@ -11,7 +11,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types=1);
 namespace Origin\Utility\Http;
 
 use Origin\Utility\Xml;
@@ -91,6 +91,12 @@ class Response
         return null;
     }
 
+    /**
+     * Gets all cookies or single cookie
+     *
+     * @param string $cookie
+     * @return array|null
+     */
     public function cookies(string $cookie = null)
     {
         if ($cookie === null) {
@@ -109,7 +115,7 @@ class Response
      * @param string $value
      * @return void
      */
-    public function header(string $header, string $value = null)
+    public function header(string $header, string $value = null) :void
     {
         $this->headers[$header] = $value;
     }
@@ -121,7 +127,7 @@ class Response
      * @param string $value
      * @return void
      */
-    public function cookie(string $name, $value, string $expire=null, array $options = [])
+    public function cookie(string $name, $value, string $expire=null, array $options = []) :void
     {
         $options += [
             'name' => $name,
@@ -173,7 +179,7 @@ class Response
      *
      * @return boolean
      */
-    public function success()
+    public function success() : bool
     {
         $code = $this->statusCode();
         return in_array($code, [200,201,202,204]); // ok,created,accepted,no content
@@ -184,7 +190,7 @@ class Response
      *
      * @return boolean
      */
-    public function redirect()
+    public function redirect() : bool
     {
         $code = $this->statusCode();
         return in_array($code, [301,302,303,304,307]); // moved,found,see other,not modified, temp redirect
@@ -195,7 +201,7 @@ class Response
     *
     * @return boolean
     */
-    public function ok()
+    public function ok() : bool
     {
         return $this->statusCode() === 200;
     }
