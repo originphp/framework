@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,30 +15,223 @@
 
 namespace Origin\Utility;
 
+use Iterator;
 use Origin\Exception\InvalidArgumentException;
+use Countable;
+use Origin\Exception\NotFoundException;
+
+class CsvIterator implements Iterator, Countable
+{
+    /**
+     * Holds the file handle
+     *
+     * @var Resource
+     */
+    protected $fh = null;
+
+    /**
+     * Current position
+     *
+     * @var int
+     */
+    protected $position;
+
+
+    /**
+     * Holds the current row
+     *
+     * @var array
+     */
+    protected $row = null;
+
+    /**
+     * Options array
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
+     * Holds the headers
+     *
+     * @var array
+     */
+    protected $headers = [];
+    /**
+     * Constructor
+     *
+     * @param string $filename
+     * @param array $options
+     */
+    public function __construct(string $filename, array $options = [])
+    {
+        $options += ['separator' => ',', 'enclosure' => '"', 'escape' => '\\', 'header' => null, 'keys' => null];
+        
+        $this->filename = $filename;
+
+        $this->fh = fopen($filename, 'rt'); // read text mode
+        if ($options['header'] === true and $options['keys']) {
+            $headers = $this->getHeaders($options);
+            if ($options['keys'] === true) {
+                $options['keys'] = $headers;
+            }
+            if (count($options['keys']) !== count($headers)) {
+                throw new InvalidArgumentException('Invalid number of keys.');
+            }
+            $this->headers = $options['keys'];
+        }
+
+        $this->options = $options;
+    }
+
+    /**
+     * Gets the first row
+     *
+     * @return array
+     */
+    protected function getHeaders(array $options): array
+    {
+        $headers = fgetcsv(
+            $this->fh,
+            0,
+            $options['separator'],
+            $options['enclosure'],
+            $options['escape']
+        );
+
+        $this->position++;
+        return $headers;
+    }
+
+    /**
+     * Counts the number of lines in the file
+     */
+    public function count()
+    {
+        $lines = 0;
+        $fh = fopen($this->filename, 'rt');
+        while (!feof($fh)) {
+            if (fgets($fh) !== false) {
+                $lines ++;
+            }
+        }
+        fclose($fh);
+        return $lines;
+    }
+
+    /**
+     * Return the current element
+     *
+     * @return void
+     */
+    public function current()
+    {
+        $this->row = fgetcsv(
+            $this->fh,
+            0,
+            $this->options['separator'],
+            $this->options['enclosure'],
+            $this->options['escape']
+        );
+        if ($this->row and $this->headers) {
+            $this->row = array_combine($this->headers, $this->row);
+        }
+        $this->position++;
+        return $this->row;
+    }
+
+    /**
+     * Return the key of the current element
+     *
+     * @return scalar
+     */
+    public function key()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Move forward to next element
+     *
+     * @return void
+     */
+    public function next()
+    {
+        return !feof($this->fh);
+    }
+
+    /**
+     * Rewind the Iterator to the first element
+     *
+     * @return void
+     */
+    public function rewind()
+    {
+        $this->position = 0;
+        rewind($this->fh);
+    }
+
+
+    /**
+     * checks if current position is valid
+     *
+     * @return void
+     */
+    public function valid()
+    {
+        if (!$this->next()) {
+            fclose($this->fh);
+            return false;
+        }
+        return true;
+    }
+}
 
 class Csv
 {
+
+    /**
+     * Used for Processing large files in a memory efficient way
+     *
+     * $records = Csv::process('/path/to/file.csv',$options);
+     * foreach($records as $record){
+     *      .. do something with data
+     * }
+     *
+     * @param string $filename
+     * @param array $options
+     * @return void
+     */
+    public static function process(string $filename, array $options =[]) : CsvIterator
+    {
+        if (file_exists($filename)) {
+            return new CsvIterator($filename, $options);
+        }
+        throw new NotFoundException(sprintf('%s could not be found.', $filename));
+    }
+
     /**
      * Converts an CSV string to an array
      *
-      * @param string $csv
-      * @param array $options The option keys are :
-      *  - header: default false. If the csv file contains a header row
-      *  - keys: array of keys to use or set to true to use headers from csv file
-      * @return array
-      */
-    public static function toArray(string $csv, array $options=[]) : array
+     * @param string $csv
+     * @param array $options The option keys are :
+     *  - header: default false. If the csv file contains a header row
+     *  - keys: array of keys to use or set to true to use headers from csv file
+     *  - separator: default:,
+     *  - enclosure: default:"
+     *  - escape: default:\
+     * @return array
+     */
+    public static function toArray(string $csv, array $options = []): array
     {
-        $options += ['header'=>false,'keys'=>null];
-
+        $options += ['header' => false, 'keys' => null, 'separator'=>',','enclosure'=>'"','escape'=>'\\'];
         $stream = fopen("php://temp", 'r+');
         fputs($stream, $csv);
         rewind($stream);
 
         $result = [];
         $i = 0;
-        while (($data = fgetcsv($stream)) !== false) {
+        while (($data = fgetcsv($stream, 0, $options['separator'], $options['enclosure'], $options['escape'])) !== false) {
             if ($i === 0 and $options['header']) {
                 if ($options['keys'] === true) {
                     $options['keys'] = $data;
@@ -66,19 +260,19 @@ class Csv
      *  - header: true to use keys from array as headers, or pass array of keys to use
      * @return string
      */
-    public static function fromArray(array $data, array $options=[]) : string
+    public static function fromArray(array $data, array $options = []): string
     {
-        $options += ['header'=>false];
+        $options += ['header' => false];
 
         $stream = fopen("php://temp", 'r+');
-  
+
         if ($options['header'] === true) {
             $options['header'] = array_keys(current($data));
         }
         if (is_array($options['header'])) {
             fputcsv($stream, $options['header']);
         }
-    
+
         foreach ($data as $row) {
             fputcsv($stream, $row);
         }
