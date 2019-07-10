@@ -115,4 +115,54 @@ EOF;
         $expected = "\"First Name\",\"Email Address\"\njames,james@example.com\ntony,tony@example.com\namanda,amanda@example.com\n";
         $this->assertEquals($expected, Csv::fromArray($data, ['header'=>['First Name','Email Address']]));
     }
+
+    public function testProcess()
+    {
+        $tmp = TMP . DS . uid();
+        file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
+        $expected = [
+            [
+                'Name'=>'jim',
+                'Email'=>'jim@example.com'
+            ],
+            [
+                'Name'=>'jon',
+                'Email'=>'jon@example.com'
+            ],
+            [
+                'Name'=>'tony',
+                'Email'=>'tony@example.com'
+            ]
+        ];
+
+        $result = [];
+        $rows = Csv::process($tmp, ['header'=>true,'keys'=>['Name','Email']]);
+        foreach ($rows as $row) {
+            $result[] = $row;
+        }
+        $this->assertEquals($expected, $result);
+
+        $expected = [
+            [
+                'name'=>'jim',
+                'email'=>'jim@example.com'
+            ],
+            [
+                'name'=>'jon',
+                'email'=>'jon@example.com'
+            ],
+            [
+                'name'=>'tony',
+                'email'=>'tony@example.com'
+            ]
+        ];
+
+        $result = [];
+        $rows = Csv::process($tmp, ['header'=>true]);
+        foreach ($rows as $row) {
+            $result[] = $row;
+        }
+       
+        $this->assertEquals($expected, $result);
+    }
 }

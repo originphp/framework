@@ -66,43 +66,21 @@ class CsvIterator implements Iterator, Countable
     public function __construct(string $filename, array $options = [])
     {
         $options += ['separator' => ',', 'enclosure' => '"', 'escape' => '\\', 'header' => null, 'keys' => null];
-        
-        $this->filename = $filename;
+       
+        $this->options = $options;
+        $this->filename = $filename; // keep for count
 
         $this->fh = fopen($filename, 'rt'); // read text mode
-        if ($options['header'] === true and $options['keys']) {
-            $headers = $this->getHeaders($options);
-            if ($options['keys'] === true) {
-                $options['keys'] = $headers;
-            }
-            if (count($options['keys']) !== count($headers)) {
-                throw new InvalidArgumentException('Invalid number of keys.');
-            }
-            $this->headers = $options['keys'];
+        if ($options['header'] === true) {
+            $this->headers = $this->current();
         }
 
-        $this->options = $options;
+        if (is_array($options['keys'])) {
+            $this->headers = $options['keys'];
+        }
     }
 
-    /**
-     * Gets the first row
-     *
-     * @return array
-     */
-    protected function getHeaders(array $options): array
-    {
-        $headers = fgetcsv(
-            $this->fh,
-            0,
-            $options['separator'],
-            $options['enclosure'],
-            $options['escape']
-        );
-
-        $this->position++;
-        return $headers;
-    }
-
+ 
     /**
      * Counts the number of lines in the file
      */
@@ -134,6 +112,9 @@ class CsvIterator implements Iterator, Countable
             $this->options['escape']
         );
         if ($this->row and $this->headers) {
+            if (count($this->row) !== count($this->headers)) {
+                throw new InvalidArgumentException(sprintf('Column header mistmatch on row %d.', $this->position));
+            }
             $this->row = array_combine($this->headers, $this->row);
         }
         $this->position++;
@@ -152,8 +133,8 @@ class CsvIterator implements Iterator, Countable
 
     /**
      * Move forward to next element
-     *
-     * @return void
+     * This method is called after each foreach loop.
+     * @return bool
      */
     public function next()
     {
@@ -169,6 +150,12 @@ class CsvIterator implements Iterator, Countable
     {
         $this->position = 0;
         rewind($this->fh);
+        /**
+         * Skip first row if its header
+         */
+        if ($this->options['header'] === true) {
+            $this->current();
+        }
     }
 
 
@@ -231,6 +218,7 @@ class Csv
 
         $result = [];
         $i = 0;
+       
         while (($data = fgetcsv($stream, 0, $options['separator'], $options['enclosure'], $options['escape'])) !== false) {
             if ($i === 0 and $options['header']) {
                 if ($options['keys'] === true) {
