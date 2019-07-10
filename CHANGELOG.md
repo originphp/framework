@@ -23,12 +23,6 @@ Delete tag: git tag -d <tag_name>
 ## Notice
 
 ## [Unreleased]
-### Todo
-- [ ] Validation upload mime type test
-- [ ] Counter Cache Test
-- [ ] CSV process test
-- [ ] Email now uses the Html utility
-
 ### Added
 - CounterCache behavior
 - Security::uid and Security::uuid
