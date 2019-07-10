@@ -19,6 +19,9 @@ namespace Origin\Utility;
 
 use DOMDocument;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Html2Text
 {
     /**
@@ -40,8 +43,9 @@ class Html2Text
          */
         $xml = new DOMDocument();
         @$xml->loadHTML($html, LIBXML_HTML_NODEFDTD); // bug  LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+      
         $html = $xml->saveHTML(); // Clean HTML for parsing
-     
+    
         $html = preg_replace("[\r\n|\n|\r]", '\r\n', $html); // convert line endings to temporary marker
 
         $html = preg_replace('/(\>)\s*(\<)/m', '$1$2', $html); // remove white space between tags
@@ -111,3 +115,4 @@ class Html2Text
         return rtrim($html);
     }
 }
+// @codeCoverageIgnoreEnd
