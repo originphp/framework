@@ -32,7 +32,7 @@ class CounterCacheBehavior extends Behavior
      *
      * @return array
      */
-    public function getFields() : array
+    protected function getFields() : array
     {
         $belongsTo = $this->model()->association('belongsTo');
         if ($this->belongsTo === $belongsTo) {
@@ -41,11 +41,13 @@ class CounterCacheBehavior extends Behavior
         $this->belongsTo = $belongsTo;
         $this->fields = [];
 
+       
         foreach ($belongsTo as $alias => $config) {
             if (!empty($config['counterCache'])) {
                 $field = $config['counterCache'];
                 if ($field === true) {
-                    $field = Inflector::underscore($field) . '_count';
+                    $name = Inflector::pluralize($this->model()->name);
+                    $field = Inflector::underscore($name) . '_count';
                 }
                 $this->fields[$alias] = [
                     'field' => $field,
