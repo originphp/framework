@@ -1007,9 +1007,9 @@ class Email
     /**
      * Checks if a message needs to be encoded
      *
-     * @return void
+     * @return bool
      */
-    protected function needsEncoding()
+    protected function needsEncoding() : bool
     {
         if (mb_check_encoding($this->subject, 'ASCII') === false) {
             return true;
