@@ -20,7 +20,7 @@ use Origin\Core\Inflector;
 use Origin\Utility\Exception\MissingTemplateException;
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Utility\Html2Text;
+use Origin\Utility\Html;
 
 class Email
 {
@@ -401,7 +401,7 @@ class Email
             $filename = $path . DS . 'text' . DS . $template . '.ctp';
             if (file_exists($filename) === false) {
                 if ($this->format() === 'both') {
-                    $this->textMessage = Html2Text::convert($this->htmlMessage);
+                    $this->textMessage = Html::toText($this->htmlMessage);
                 } else {
                     throw new MissingTemplateException(sprintf('Template %s not found', $filename));
                 }
@@ -497,7 +497,7 @@ class Email
 
         if (($this->format() === 'text' or $this->format() === 'both') and empty($this->textMessage)) {
             if ($this->format() === 'both') {
-                $this->textMessage = Html2Text::convert($this->htmlMessage);
+                $this->textMessage = Html::toText($this->htmlMessage);
             } else {
                 throw new Exception('Text Message not set.');
             }

@@ -595,7 +595,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->subject('template test')
             ->htmlMessage('<h1>Welcome Frank</h1>');
         $result = $Email->send();
-        $this->assertContains("# Welcome Frank", $result);
+        $this->assertContains("Welcome Frank\r\n=============", $result);
         $this->assertContains("<h1>Welcome Frank</h1>", $result);
     }
 
@@ -608,7 +608,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->set(['first_name' => 'Frank'])
             ->template('welcome');
         $result = $Email->send();
-        $this->assertContains("# Welcome Frank", $result);
+        $this->assertContains("Welcome Frank\r\n=============", $result);
         $this->assertContains("<h1>Welcome Frank</h1>", $result);
     }
 
