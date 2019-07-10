@@ -54,9 +54,9 @@ class ModelValidator
      * Sets and gets rules
      *
      * @param array $rules
-     * @return array|null
+     * @return array|void
      */
-    public function rules(array $rules = null) : ?array
+    public function rules(array $rules = null)
     {
         if ($rules === null) {
             return $this->validationRules;
