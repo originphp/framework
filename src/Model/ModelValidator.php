@@ -317,13 +317,16 @@ class ModelValidator
     /**
      * Checks that value has an extension.
      *
-     * @param string       $value
+     * @param string|array $value
      * @param string|array $extensions [description]
      *
      * @return bool true or false
      */
     public function extension($value, $extensions = []) : bool
     {
+        if (is_array($value)) {
+            $value = $value['name']??'none';
+        }
         if (is_string($extensions)) {
             $extensions = [$extensions];
         }
@@ -494,7 +497,7 @@ class ModelValidator
     /**
      * Checks the mime type of a file
      *
-     * @param string $result
+     * @param string|array $result
      * @param array $mimeTypes
      * @return boolean
      */
