@@ -327,12 +327,11 @@ class Controller
      * $this->render(['text'=>'OK']);
      *
      * ### View Types
-     * template - standard view
-     * xml - takes an array and coverts to xml
-     * json - takes an array of data and converts to json
-     * text - sends a txt response, this can be handy when dealing with ajax
-     * file - this loads an external file with file_get_contents, if it is not html then remember to set the content type. This
-     * does send the file.
+     * - template - standard view
+     * - xml:takes an array and coverts to xml
+     * - json: takes an array of data and converts to json
+     * - text: sends a txt response, this can be handy when dealing with ajax
+     * - file: this loads an external file with file_get_contents. This does not send the file.
      *
      * ### Options
      * type: this is the content type that will be used (default:html). If use the xml or json options then the type will
@@ -357,7 +356,7 @@ class Controller
      *   - xml: an xml string or an array which will be converted to XML
      *   - text: For rendering plain text
      *   - file: a filename, and file get contents will be used.
-     *   -template: default option, this will render the html template from the views folder.
+     *   - template: default option, this will render the html template from the views folder.
      *   Other
      *   - status: the status code to return, e.g. 404
      */
