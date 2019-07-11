@@ -351,8 +351,8 @@ abstract class Command
     }
 
     /**
-     * If verbose is enabled then output passed here will be displayed.
-     *
+     * To see debug information use --verbose
+     * @internal this is correct, not --debug
      * @param string|array $message
      */
     public function debug($message)
