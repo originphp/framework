@@ -28,6 +28,7 @@ use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Collection;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Query;
 
 class Model
 {
@@ -579,7 +580,6 @@ class Model
      * loads the schema for this model or specified field.
      *
      * @param string $field
-     *
      * @return string|null|array $field;
      */
     public function schema(string $field = null)
@@ -761,12 +761,11 @@ class Model
     /**
      * Updates one or many records at time, no callbacks are called.
      *
-     * @param array $data       array(field=>$value)
+     * @param array $data array(field=>$value)
      * @param array $conditions
-     *
      * @return bool true or false
      */
-    public function updateAll(array $data, array $conditions)
+    public function updateAll(array $data, array $conditions) : bool
     {
         return $this->connection()->update($this->table, $data, $conditions);
     }
@@ -1256,13 +1255,15 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array|null results
      */
-    protected function finderFirst($query = []) : ?Entity
+    protected function finderFirst($options = []) : ?Entity
     {
         // Modify Query
-        $query['limit'] = 1;
+        $options['limit'] = 1;
 
         // Run Query
-        $results = $this->readDataSource($query);
+        $query = new Query($this);
+        $results = $query->find($options);
+        // $results = $this->readDataSource($query);
 
         if (empty($results)) {
             return null;
@@ -1278,10 +1279,13 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Collection|array
      */
-    protected function finderAll($query)
+    protected function finderAll(array $options=[])
     {
         // Run Query
-        $results = $this->readDataSource($query);
+       
+        $query = new Query($this);
+        $results = $query->find($options);
+        // $results = $this->readDataSource($query);
 
         // Modify Results
         if (empty($results)) {
@@ -1297,17 +1301,19 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array $results
      */
-    protected function finderList($query): array
+    protected function finderList(array $options): array
     {
-        if (empty($query['fields'])) {
-            $query['fields'][] = $this->primaryKey;
+        if (empty($options['fields'])) {
+            $options['fields'][] = $this->primaryKey;
             if ($this->displayField) {
-                $query['fields'][] = $this->displayField;
+                $options['fields'][] = $this->displayField;
             }
         }
 
         // Run Query
-        $results = $this->readDataSource($query, 'list');
+        $query = new Query($this);
+        $results = $query->find($options, 'list');
+        // $results = $this->readDataSource($query, 'list');
 
         // Modify Results
         if (empty($results)) {
@@ -1323,15 +1329,17 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return int count
      */
-    protected function finderCount($query) : int
+    protected function finderCount(array $options) : int
     {
         // Modify Query
-        $query['fields'] = ['COUNT(*) AS count'];
-        $query['order'] = null;
-        $query['limit'] = null;
+        $options['fields'] = ['COUNT(*) AS count'];
+        $options['order'] = null;
+        $options['limit'] = null;
 
         // Run Query
-        $results = $this->readDataSource($query, 'assoc');
+        $query = new Query($this);
+        $results = $query->find($options, 'assoc');
+        //$results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
         return $results[0]['count'];
@@ -1422,218 +1430,7 @@ class Model
         }
         return null;
     }
-
-    /**
-     * Takes results from the datasource and converts into an entity. Different
-     * from model::new which takes an array which can include hasMany
-     * and converts.
-     *
-     * @param array $results results from datasource
-     * @return Mixed
-     */
-    protected function prepareResults(array $results)
-    {
-        $buffer = [];
-
-        $alias = Inflector::tableize($this->alias);
-
-        foreach ($results as $record) {
-            $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
-            $entity = new Entity($thisData, ['name' => $this->alias, 'exists' => true, 'markClean' => true]);
-            unset($record[$alias]);
-
-            foreach ($record as $tableAlias => $data) {
-                if (is_string($tableAlias)) {
-                    $model  = Inflector::classify($tableAlias);
-                    $associated = Inflector::variable($model);
-                    /**
-                     * Remove empty records. If the foreignKey is not present then the associated
-                     * data will not be present. This is correct.
-                     */
-                    $foreignKey = null;
-                    if (isset($this->belongsTo[$model])) {
-                        $foreignKey = $this->belongsTo[$model]['foreignKey'];
-                        if (empty($entity->{$foreignKey})) {
-                            continue;
-                        }
-                    } elseif (isset($this->hasOne[$model])) {
-                        $foreignKey = $this->hasOne[$model]['foreignKey'];
-                        if (empty($data[$foreignKey])) {
-                            continue;
-                        }
-                    }
-
-                    $entity->{$associated} = new Entity($data, ['name' => $associated, 'exists' => true, 'markClean' => true]);
-                } else {
-                    /**
-                     * Any data is here is not matched to model, e.g. group by and non existant fields
-                     * add them to model so we can put them in entity nicely. This seems to be cleanest solution
-                     * the resulting entity might not contain any real data from the entity.
-                     */
-                    foreach ($data as $k => $v) {
-                        $entity->{$k} = $v;
-                    }
-                }
-            }
-
-            $buffer[] = $entity;
-        }
-
-        return $buffer;
-    }
-
-    /**
-     * Holds the associated hasMany records
-     *
-     * @param array $query
-     * @param array $results
-     * @return array
-     */
-    protected function loadAssociatedHasMany(array $query, array $results) : array
-    {
-        foreach ($this->hasMany as $alias => $config) {
-            if (isset($query['associated'][$alias])) {
-                $config = array_merge($config, $query['associated'][$alias]);
-
-                if (empty($config['fields'])) {
-                    $config['fields'] = $this->{$alias}->fields();
-                }
-
-                foreach ($results as $index => &$result) {
-                    if (isset($result->{$this->primaryKey})) {
-                        $tableAlias = Inflector::tableize($alias);
-                        $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
-                        $models = Inflector::pluralize(Inflector::variable($alias));
-                        $result->{$models} = $this->{$alias}->find('all', $config);
-                    }
-                }
-            }
-        }
-
-        return $results;
-    }
-
-    protected function loadAssociatedHasAndBelongsToMany(array $query, array $results) : array
-    {
-        foreach ($this->hasAndBelongsToMany as $alias => $config) {
-            if (isset($query['associated'][$alias])) {
-                $config = array_merge($config, $query['associated'][$alias]);
-
-                $config['joins'][0] = array(
-                    'table' => $config['joinTable'],
-                    'alias' => Inflector::tableize($config['with']),
-                    'type' => 'INNER',
-                    'conditions' => $config['conditions'],
-                );
-                $config['conditions'] = [];
-                if (empty($config['fields'])) {
-                    $config['fields'] = array_merge($this->{$alias}->fields(), $this->{$config['with']}->fields());
-                }
-
-                foreach ($results as $index => &$result) {
-                    if (isset($result->{$this->primaryKey})) {
-                        $withAlias = Inflector::tableize($config['with']);
-                        $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
-                    }
-
-                    $models = Inflector::pluralize(Inflector::variable($alias));
-                    $result->{$models} = $this->{$alias}->find('all', $config);
-                }
-            }
-        }
-
-        return  $results;
-    }
-
-    /**
-     * Reads the datasource using query array and returns the result set.
-     *
-     * @param string $type
-     * @param array  $query (conditions,joins,fields,order,limit etc)
-     * @return array|\Origin\Model\Entity|\Origin\Model\Collection|null
-     */
-    protected function readDataSource(array $query, string $type = 'model')
-    {
-        $connection = $this->connection();
-        $connection->select($this->table, $query + ['alias' => Inflector::tableize($this->alias)]);
-
-        if ($type === 'list') {
-            return $connection->fetchList();
-        }
-        // used by count
-        if ($type === 'assoc') {
-            return $connection->fetchAll('assoc');
-        }
-
-        $results = $connection->fetchAll('num'); // change to num and enableMapResults
-
-        if ($results) {
-            $results = $connection->mapNumericResults($results, $query['fields']); // use with Num instead of model
-
-            # If foreignKeys are missing data then objects wont be put together
-            # to prevent empty records, but this means valid records wont show as well.
-            $results = $this->prepareResults($results);
-            $results = $this->loadAssociatedBelongsTo($query, $results);
-            $results = $this->loadAssociatedHasOne($query, $results);
-            $results = $this->loadAssociatedHasMany($query, $results);
-            $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
-        }
-
-        unset($sql, $connection);
-
-        return $results;
-    }
-
-    /**
-     * Recursively load associatedBelongsTo
-     *
-     * @param array $query
-     * @param array $results
-     * @return array
-     */
-    protected function loadAssociatedBelongsTo(array $query, array $results) : array
-    {
-        foreach ($query['associated'] as $model => $config) {
-            if (isset($config['associated']) and isset($this->belongsTo[$model])) {
-                $foreignKey = $this->belongsTo[$model]['foreignKey'];
-                $property = lcfirst($model);
-                foreach ($results as &$result) {
-                    if (isset($result->$foreignKey)) {
-                        $config['conditions'] = [$this->{$model}->primaryKey => $result->{$foreignKey}];
-                        $result->$property = $this->{$model}->find('first', $config);
-                    }
-                }
-            }
-        }
-        return $results;
-    }
-
-    /**
-     * Load Associated Has One
-     *
-     * @param array $query
-     * @param array $results
-     * @return array
-     */
-    public function loadAssociatedHasOne(array $query, array  $results) : array
-    {
-        foreach ($query['associated'] as $model => $config) {
-            if (isset($config['associated']) and isset($this->hasOne[$model])) {
-                $foreignKey = $this->hasOne[$model]['foreignKey']; // author_id
-                $property = lcfirst($model);
-                $primaryKey = $this->{$model}->primaryKey;
-                $modelTableAlias = Inflector::tableize($model);
-                foreach ($results as &$result) {
-                    if (isset($result->{$this->primaryKey})) { // Author id
-                        $config['conditions'] =   $this->hasOne[$model]['conditions'];
-                        $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->primaryKey}];
-                        $result->$property = $this->{$model}->find('first', $config);
-                    }
-                }
-            }
-        }
-        return $results;
-    }
+ 
 
     /**
      * Runs a query and returns the result set if there are any
