@@ -21,6 +21,8 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## Notice
+### Change
+- Redis cache engine changed to work with latest version which had deprecated delete, getKeys, setTimeout aliases.
 
 ## [Unreleased]
 ## [1.22.0] - 2019-07-10

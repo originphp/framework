@@ -134,7 +134,7 @@ class RedisEngine extends BaseEngine
      */
     public function delete(string $key) :bool
     {
-        return $this->Redis->delete($this->key($key));
+        return $this->Redis->del($this->key($key));
     }
 
     /**
@@ -144,10 +144,10 @@ class RedisEngine extends BaseEngine
      */
     public function clear() :bool
     {
-        $keys =  $this->Redis->getKeys($this->config['prefix'] . '*');
+        $keys =  $this->Redis->keys($this->config['prefix'] . '*');
         $result = [];
         foreach ($keys as $key) {
-            $result[] = (bool) $this->Redis->delete($key);
+            $result[] = (bool) $this->Redis->del($key);
         }
         return !in_array(false, $result);
     }
@@ -181,7 +181,7 @@ class RedisEngine extends BaseEngine
         $key = $this->key($key);
         $value = (int) $this->Redis->incrBy($key, $offset);
         if ($this->config['duration']>0) {
-            $this->Redis->setTimeout($key, $this->config['duration']);
+            $this->Redis->expire($key, $this->config['duration']);
         }
         return $value;
     }
@@ -199,7 +199,7 @@ class RedisEngine extends BaseEngine
         $key = $this->key($key);
         $value = (int) $this->Redis->decr($key, $offset);
         if ($this->config['duration']>0) {
-            $this->Redis->setTimeout($key, $this->config['duration']);
+            $this->Redis->expire($key, $this->config['duration']);
         }
         return $value;
     }
