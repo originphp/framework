@@ -11,6 +11,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Origin\Model;
 
 /**
@@ -252,7 +253,7 @@ class Model
      *
      * @param string $name
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if ($name === 'displayField') {
             $this->displayField = $this->detectDisplayField();
@@ -265,9 +266,16 @@ class Model
         return null;
     }
 
+    /**
+     * Magic method it call the first loaded behavior method if its available
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return void
+     */
     public function __call(string $method, array $arguments)
     {
-        // Runs behavior on first found method and returns result
+        //
         foreach ($this->behaviorRegistry()->enabled() as $Behavior) {
             if (method_exists($this->behaviorRegistry()->{$Behavior}, $method)) {
                 return call_user_func_array(
@@ -284,7 +292,7 @@ class Model
      *
      * @return string
      */
-    protected function detectDisplayField()
+    protected function detectDisplayField(): string
     {
         $fields = array_keys($this->schema());
 
@@ -310,7 +318,7 @@ class Model
      * @param string $name hasOne|belongsTo etc
      * @return array
      */
-    public function association(string $name)
+    public function association(string $name): array
     {
         if (in_array($name, $this->associations())) {
             return $this->{$name};
@@ -323,7 +331,7 @@ class Model
      *
      * @return array
      */
-    public function associations()
+    public function associations(): array
     {
         return $this->associations;
     }
@@ -334,8 +342,12 @@ class Model
     public function initialize(array $config)
     {
     }
-
-    public function behaviorRegistry()
+    /**
+     * Returns the behaviorRegistry object
+     *
+     * @return \Origin\Model\Behavior\BehaviorRegistry
+     */
+    public function behaviorRegistry(): BehaviorRegistry
     {
         return $this->behaviorRegistry;
     }
@@ -344,9 +356,9 @@ class Model
      *
      * @param string $name
      * @param array $config
-     * @return void
+     * @return \Origin\Model\Behavior\Behavior
      */
-    public function loadBehavior(string $name, array $config = [])
+    public function loadBehavior(string $name, array $config = []) //no return type cause of mocking
     {
         list($plugin, $behavior) = pluginSplit($name);
         $config = array_merge(['className' => $name . 'Behavior'], $config);
@@ -365,9 +377,9 @@ class Model
      *
      * @param string $model
      * @param array $config
-     * @return Model
+     * @return \Origin\Model\Model
      */
-    public function loadModel(string $name, array $config = [])
+    public function loadModel(string $name, array $config = []): Model
     {
         list($plugin, $alias) = pluginSplit($name);
         $config = array_merge(['className' => $name], $config);
@@ -393,32 +405,17 @@ class Model
      * options manually (even if you change the primary key setting).
      *
      * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey, conditions, fields,  dependent)
+     * @param array  $options The options array accepts any of the following keys
+     *   - className: is the name of the class that you want to load (with or without namespace)
+     *   - foreignKey: the foreign key in the other model. The default value would be the underscored name of the current model suffixed with '\_id'.
+     *   - conditions: an array of additional conditions to the join
+     *   - fields: an array of fields to return from the join model, by default it returns all
+     *   - dependent: default is false, if set to true when delete is called with cascade it will related records.
      */
-    public function hasOne(string $association, $options = [])
+    public function hasOne(string $association, array $options = []): array
     {
-        $options += [
-            'className' => $association,
-            'foreignKey' => null,
-            'conditions' => null,
-            'fields' => null,
-            'dependent' => false,
-        ];
-
-        if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->name) . '_id';
-        }
-        $tableAlias = Inflector::tableize($this->alias);
-        $associationTableAlias = Inflector::tableize($association);
-        $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
-
-        if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array)$options['conditions']);
-        }
-        $options['conditions'] = $conditions;
-        $this->hasOne[$association] = $options;
-
-        return $options;
+        $assoc = new Association($this);
+        return  $this->hasOne[$association] = $assoc->hasOne($association, $options);
     }
 
     /**
@@ -430,43 +427,28 @@ class Model
      * The Current model contians the foreign key This.other_id
      *
      * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey, conditions, fields, type)
+     * @param array  $options The options array accepts any of the following keys
+     *   - className: is the name of the class that you want to load (with or without namespace)
+     *   - foreignKey: the foreign key in the current model.  The default value would be the underscored name of
+     * the other model suffixed with '\_id'.
+     *   - conditions: an array of additional conditions to the join
+     *   - fields: an array of fields to return from the join model, by default it returns all
+     *   - type: default is LEFT, this is the join type used to fetch the associated record.
+     *   - counterCache: default is null. Counter cache allows you to cache counts of records instead of running
+     * counts each time. If you use counter cache anytime a record is created or deleted the counter will be
+     * updated. Set a field name to update the count, if set to true it will use the plural of the current model
+     * with e.g. comments_count. Lets say you wanted to track number of comments for each post, in your Post model,
+     * when setup the belongsTo assocation, say for Comment, set counterCache to true or the name of the field to
+     * increment and decrement.
      */
-    public function belongsTo(string $association, $options = [])
+    public function belongsTo(string $association, array $options = []): array
     {
-        $defaults = [
-            'className' => $association,
-            'foreignKey' => null,
-            'conditions' => null,
-            'fields' => null,
-            'type' => 'LEFT',
-        ];
-
-        $options = array_merge($defaults, $options);
-
-        if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($options['className']) . '_id';
-        }
-        $alias = Inflector::tableize($this->alias);
-        $associatedAlias = Inflector::tableize($association);
-
-        $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
-
-        if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array)$options['conditions']);
-        }
-        $options['conditions'] = $conditions;
-
-        $this->belongsTo[$association] = $options;
-
-        /**
-         * Load the CounterCache behavior if this is needed and not loaded
-         */
+        $assoc = new Association($this);
+        $this->belongsTo[$association] = $assoc->belongsTo($association, $options);
         if (isset($options['counterCache']) and !isset($this->CounterCache)) {
             $this->loadBehavior('CounterCache');
         }
-
-        return $options;
+        return $this->belongsTo[$association];
     }
 
     /**
@@ -478,28 +460,21 @@ class Model
      * Conditions are additional to the record id of the parent record
      *
      * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey (in other model), conditions, fields, order, dependent, limit,offset)
+     * @param array  $options The options array accepts any of the following keys
+     *   - className: is the name of the class that you want to load.
+     *   - foreignKey: the foreign key in the other model. The default value would be the underscored name of the
+     * current model suffixed with '\_id'.
+     *   - conditions: an array of additional conditions to the join
+     *   - fields: an array of fields to return from the join model, by default it returns all
+     *   - order: a string or array of how to order the result
+     *   - dependent: default is false, if set to true when delete is called with cascade it will related records.
+     *   - limit: default is null, set a value to limit how many rows to return
+     *   - offset: if you are using limit then set from where to start fetching
      */
-    public function hasMany(string $association, $options = [])
+    public function hasMany(string $association, array $options = []): array
     {
-        $options += [
-            'className' => $association,
-            'foreignKey' => null,
-            'conditions' => [],
-            'fields' => null,
-            'order' => null,
-            'dependent' => false,
-            'limit' => null,
-            'offset' => null,
-        ];
-
-        if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] =  Inflector::underscore($this->name) . '_id';
-        }
-
-        $this->hasMany[$association] = $options;
-
-        return $options;
+        $assoc = new Association($this);
+        return  $this->hasMany[$association] = $assoc->hasMany($association, $options);
     }
 
     /**
@@ -508,65 +483,27 @@ class Model
      * you have set the options manually (even if you change the primary
      * key setting).
      *
-     * className: name of model associating to other model
-     * foreignKey: foreign key found in this model
-     * associationForeignKey: foreign key for other model
-     * with: name of JoinModel.  e.g ContactsTag (must be Alphabetical Order)
-     * mode: replace or append. Default is replace.
-     *
-     * @param string $association e.g Comment
-     * @param array  $options     (className, foreignKey (in other model), conditions, fields, order, dependent, limit)
+    * @param string $association e.g Comment
+     * @param array  $options The options array accepts any of the following keys
+     *   - className: is the name of the class that you want to load (with or without the namespace).
+     *   - joinTable: the name of the table used by this relationship
+     *   - with: the name of the model which uses the join table e.g ContactsTag (must be in alphabetical order)
+     *   - foreignKey: - the foreign key in the current model. The default value would be the underscored name of the other model suffixed with '\_id'.
+     *   - associationForeignKey: the foreign key in the other model. The default value would be the underscored name of the other model suffixed with '\_id'.
+     *   - conditions: an array of additional conditions to the join
+     *   - fields: an array of fields to return from the join model, by default it returns all
+     *   - order: a string or array of how to order the result
+     *   - dependent: default is false, if set to true when delete is called with cascade it will related records.
+     *   - limit: default is null, set a value to limit how many rows to return
+     *   - offset: if you are using limit then set from where to start fetching
+     *   - mode: default mode is replace.
+     *      - replace: In replace, when adding records, all other relationships are deleted first. So it assumes one save contains all the joins. Typically the table will just have two fields, and a composite primary key.
+     *      - append: this should be set to append, if you will store other data in the join table, as it wont delete relationships which it is adding back. The table should have an id column and it should be set as the primary key.
      */
-    public function hasAndBelongsToMany(string $association, $options = [])
+    public function hasAndBelongsToMany(string $association, array $options = []): array
     {
-        $options += [
-            'className' => $association,
-            'joinTable' => null,
-            'foreignKey' => null,
-            'associationForeignKey' => null,
-            'conditions' => null,
-            'fields' => null,
-            'order' => null,
-            'dependent' => false,
-            'limit' => null,
-            'offset' => null,
-            'with' => null,
-            'mode' => 'replace',
-        ];
-
-        if ($options['mode'] !== 'append') {
-            $options['mode'] = 'replace';
-        }
-
-        // join table in alphabetic order
-        $models = [$this->name, $options['className']];
-        sort($models);
-        $models = array_values($models);
-
-        $with = Inflector::pluralize($models[0]) . $models[1];
-        if (is_null($options['with'])) {
-            $options['with'] = $with;
-        }
-        if (is_null($options['joinTable'])) {
-            $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['with']));
-        }
-        if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->name) . '_id';
-        }
-        if (is_null($options['associationForeignKey'])) {
-            $options['associationForeignKey'] = Inflector::underscore($options['className']) . '_id';
-        }
-        $withAlias = Inflector::tableize($options['with']);
-        $optionsClassAlias = Inflector::tableize($options['className']);
-        $conditions = ["{$withAlias}.{$options['associationForeignKey']} = {$optionsClassAlias}.id"];
-
-        if (!empty($options['conditions'])) {
-            $conditions = array_merge($conditions, (array)$options['conditions']);
-        }
-        $options['conditions'] = $conditions;
-        $this->hasAndBelongsToMany[$association] = $options;
-
-        return $options;
+        $assoc = new Association($this);
+        return  $this->hasAndBelongsToMany[$association] = $assoc->hasAndBelongsToMany($association, $options);
     }
 
     /**
@@ -584,7 +521,7 @@ class Model
      * @return void
      *
      */
-    public function validate(string $field, $options)
+    public function validate(string $field, $options) : void
     {
         $this->validator()->setRule($field, $options);
     }
@@ -594,7 +531,7 @@ class Model
      *
      * @return array fields
      */
-    public function fields($quote = true)
+    public function fields(bool $quote = true) : array
     {
         $schema = $this->schema();
 
@@ -604,8 +541,13 @@ class Model
 
         return array_keys($schema);
     }
-
-    public function hasField(string $field)
+    /**
+     * Checks if this model has a field
+     *
+     * @param string $field
+     * @return boolean
+     */
+    public function hasField(string $field) : bool
     {
         $fieldSchema = $this->schema($field);
 
@@ -619,10 +561,9 @@ class Model
      * 3. Already alaised Post.title.
      *
      * @param array $fields [description]
-     *
      * @return array quotedFields
      */
-    protected function prepareFields($fields)
+    protected function prepareFields(array $fields) : array
     {
         $alias = Inflector::tableize($this->alias);
         foreach ($fields as $index => $field) {
@@ -662,17 +603,17 @@ class Model
      * @param array $data
      * @return bool true or false
      */
-    public function validates(Entity $data, bool $create = true)
+    public function validates(Entity $data, bool $create = true) : bool
     {
         return $this->validator()->validates($data, $create);
     }
 
     /**
-     * Gets the model validator object and stores.
+     * Gets the model validator object and keeps a copy
      *
      * @return \Origin\Model\ModelValidator
      */
-    public function validator()
+    public function validator(): ModelValidator
     {
         if (!isset($this->ModelValidator)) {
             $this->ModelValidator = new ModelValidator($this);
@@ -681,8 +622,14 @@ class Model
         return $this->ModelValidator;
     }
 
-
-    protected function processSave(Entity $entity, array $options = [])
+    /**
+     * This does the save
+     *
+     * @param Entity $entity
+     * @param array $options
+     * @return bool
+     */
+    protected function processSave(Entity $entity, array $options = []) : bool
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
@@ -735,7 +682,7 @@ class Model
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
         $columns = array_intersect(array_keys($this->schema()), $entity->modified());
-    
+
         $data = [];
         foreach ($columns as $column) {
             $data[$column] = $entity->get($column);
@@ -755,7 +702,7 @@ class Model
             return false;
         }
 
-        $result = null;
+        $result = false;
 
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or !isset($data[$this->primaryKey])) {
@@ -798,13 +745,12 @@ class Model
      * Saves a single field on the current record.
      *
      * @params int|string $primaryKey the id for the record
-     * @param string $fieldName
+     * @param int|string $fieldName
      * @param mixed  $fieldValue
      * @param array  $options    (callbacks, validate,transaction)
-     *
      * @return bool true or false
      */
-    public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = [])
+    public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = []) : bool
     {
         return $this->save(new Entity([
             $this->primaryKey => $primaryKey,
@@ -832,23 +778,23 @@ class Model
      * @param integer $id
      * @return boolean
      */
-    public function increment(string $column, int $id) : bool
+    public function increment(string $column, int $id): bool
     {
         $sql = "UPDATE {$this->table} SET {$column} = {$column} + 1 WHERE {$this->primaryKey} = :id";
-        return $this->connection()->execute($sql, ['id'=>$id]);
+        return $this->connection()->execute($sql, ['id' => $id]);
     }
 
     /**
-    * Decreases a column value
-    *
-    * @param string $column the name of the column to increase e.g. views
-    * @param integer $id
-    * @return boolean
-    */
-    public function decrement(string $column, int $id) : bool
+     * Decreases a column value
+     *
+     * @param string $column the name of the column to increase e.g. views
+     * @param integer $id
+     * @return boolean
+     */
+    public function decrement(string $column, int $id): bool
     {
         $sql = "UPDATE {$this->table} SET {$column} = {$column} - 1 WHERE {$this->primaryKey} = :id";
-        return $this->connection()->execute($sql, ['id'=>$id]);
+        return $this->connection()->execute($sql, ['id' => $id]);
     }
 
     /**
@@ -857,9 +803,9 @@ class Model
      * @param string $association
      * @param Collection|array $data
      * @param boolean $callbacks
-     * @return void
+     * @return bool
      */
-    protected function saveHABTM(string $association, $data, bool $callbacks)
+    protected function saveHABTM(string $association, $data, bool $callbacks) : bool
     {
         $connection = $this->connection();
 
@@ -914,8 +860,6 @@ class Model
             $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->id]);
         }
 
-
-
         foreach ($links as $linkId) {
             if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
                 continue;
@@ -939,9 +883,9 @@ class Model
      * $some = normalizeAssociated(['Tag','User']);
      *
      * @param array|bool $option
-     * @return void
+     * @return array
      */
-    protected function normalizeAssociated($option)
+    protected function normalizeAssociated($option) : array
     {
         $associated = [];
         if ($option === false) {
@@ -984,7 +928,7 @@ class Model
      * @param array  $options keys (validate,callbacks,transaction,associated)
      * @return bool true or false
      */
-    public function save(Entity $data, $options = [])
+    public function save(Entity $data, $options = []) : bool
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true];
 
@@ -1078,16 +1022,12 @@ class Model
     /**
      * Save many records at once.
      *
-     * @param entity|array $data    to save =
-     *                              array(
-     *                              $entity,
-     *                              $entity
-     *                              );
-     * @param array        $options keys include:
-     *                              validate: wether to validate data or not
-     *                              callbacks: call the callbacks duing each stage.  You can also put only before or after
-     *                              transaction: if set true, the save will be as a transaction and rolledback upon
-     *                              any errors. If false, then it will just save what it can
+     * @param entity|array $data to e.g. [$entity1,$entity2]
+     * @param array $options You can pass the following keys
+     *  - validate: wether to validate data or not
+     *  - callbacks: call the callbacks duing each stage. You can also put only before or after
+     *  - transaction: if set true, the save will be as a transaction and rolledback upon
+     *  - any errors. If false, then it will just save what it can
      *
      * @return bool true or false
      */
@@ -1121,30 +1061,37 @@ class Model
      * Checks if the record exists using the primaryKey.
      *
      * @param int|string $id
-     *
      * @return bool true if the record exists
      */
-    public function exists($id = null)
+    public function exists($id = null) : bool
     {
         if ($id === null) {
             return false;
         }
         $tableAlias = Inflector::tableize($this->alias);
-        return (bool)$this->find('count', [
+        return (bool) $this->find('count', [
             'conditions' => ["{$tableAlias}.{$this->primaryKey}" => $id],
             'callbacks' => false
         ]);
     }
 
     /**
-     * PSR friendly find by id.
+     * Gets an individual record, if it does not exist then it throws an exception
      *
-     * @param int|string $id      id of record to fetch
-     * @param array $options  (conditions, fields, joins, order,limit, group, callbacks,contain)
-     *
+     * @param int|string $id  id of record to fetch
+     * @param array $options  The options array can work with the following keys
+     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
+     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     * 'conditions' => ['authors.id = articles.author_id']
+     *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+     *   - limit: the number of records to limit by
+     *   - group: the field to group by e.g. ['category']
+     *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity
      */
-    public function get($id, array $options = [])
+    public function get($id, array $options = []) : Entity
     {
         $options += ['conditions' => []];
 
@@ -1156,10 +1103,19 @@ class Model
     }
 
     /**
-     * The R in CRUD.
+     * Runs a find query
      *
      * @param string $type  (first,all,count,list)
-     * @param array  $query  (conditions, fields, joins, order,limit, group, callbacks,contain)
+     * @param array $options  The options array can work with the following keys
+     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
+     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     * 'conditions' => ['authors.id = articles.author_id']
+     *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+     *   - limit: the number of records to limit by
+     *   - group: the field to group by e.g. ['category']
+     *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $resultSet
      */
     public function find(string $type = 'first', $options = [])
@@ -1176,7 +1132,7 @@ class Model
             'callbacks' => true,
             'associated' => []
         ];
-       
+
         $options = array_merge($default, $options);
 
         if ($options['callbacks'] === true) {
@@ -1206,9 +1162,8 @@ class Model
      * Deletes a record.
      *
      * @param \Origin\Model\Entity $entity
-     * @param bool           $cascade   delete hasOne,hasMany, hasAndBelongsToMany records
-     * @param bool           $callbacks call beforeDelete and afterDelete callbacks
-     *
+     * @param bool  $cascade   delete hasOne,hasMany, hasAndBelongsToMany records
+     * @param bool $callbacks call beforeDelete and afterDelete callbacks
      * @return bool true or false
      */
     public function delete(Entity $entity, $cascade = true, $callbacks = true)
@@ -1264,15 +1219,16 @@ class Model
     /**
      * Deletes the hasAndBelongsToMany associated records.
      *
-     * @var int|string
+     * @var int|string $id
+     * @return void
      */
-    protected function deleteHABTM($id)
+    protected function deleteHABTM($id) : void
     {
         foreach ($this->hasAndBelongsToMany as $association => $config) {
             $associatedModel = $config['with'];
             $conditions = [$config['foreignKey'] => $id];
             $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
-  
+
             foreach ($ids as $id) {
                 $conditions = [$this->{$associatedModel}->primaryKey => $id];
                 $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
@@ -1287,10 +1243,9 @@ class Model
      * Bulk deletes records, does not delete associated data, use model::delete for that.
      *
      * @param array $conditions e.g ('Article.status' => 'draft')
-     *
      * @return bool true or false
      */
-    public function deleteAll($conditions)
+    public function deleteAll($conditions) : bool
     {
         return $this->connection()->delete($this->table, $conditions);
     }
@@ -1299,10 +1254,9 @@ class Model
      * Finder for find('first').
      *
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     *
-     * @return array results
+     * @return array|null results
      */
-    protected function finderFirst($query = [])
+    protected function finderFirst($query = []) : ?Entity
     {
         // Modify Query
         $query['limit'] = 1;
@@ -1322,8 +1276,7 @@ class Model
      * Finder for find('all').
      *
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     *
-     * @return \Origin\Model\Collection
+     * @return \Origin\Model\Collection|array
      */
     protected function finderAll($query)
     {
@@ -1334,7 +1287,6 @@ class Model
         if (empty($results)) {
             return [];
         }
-        // return $results;
         return new Collection($results, ['name' => $this->alias]);
     }
 
@@ -1343,10 +1295,9 @@ class Model
      *  3 different list types ['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']] depending upon how many columns are selected. If more than 3 columns selected it returns ['a'=>'b'].
      *
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     *
-     * @return array results
+     * @return array $results
      */
-    protected function finderList($query)
+    protected function finderList($query): array
     {
         if (empty($query['fields'])) {
             $query['fields'][] = $this->primaryKey;
@@ -1370,10 +1321,9 @@ class Model
      * This is the find('count').
      *
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     *
      * @return int count
      */
-    protected function finderCount($query)
+    protected function finderCount($query) : int
     {
         // Modify Query
         $query['fields'] = ['COUNT(*) AS count'];
@@ -1391,10 +1341,9 @@ class Model
      * Add default keys, auto join models etc.
      *
      * @param array $query
-     *
-     * @return $query
+     * @return array $query
      */
-    protected function prepareQuery(string $type, array $query)
+    protected function prepareQuery(string $type, array $query) : array
     {
         if ($type === 'first' or $type === 'all') {
             if (empty($query['fields'])) {
@@ -1403,7 +1352,7 @@ class Model
                 $query['fields'] = $this->prepareFields($query['fields']);
             }
         }
-        
+
         $query['associated'] = $this->associatedConfig($query);
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->{$association} as $alias => $config) {
@@ -1421,8 +1370,8 @@ class Model
                         $config['fields'] = $this->{$alias}->fields();
                     }
 
-                    // If throw an error, then it can be confusing to know source, so turn to array
-                    $query['fields'] = array_merge((array)$query['fields'], (array)$config['fields']);
+                    // If it throw an error, then it can be confusing to know source, so turn to array
+                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
                 }
             }
         }
@@ -1434,12 +1383,12 @@ class Model
      * data
      *
      * @param array $query
-     * @return void
+     * @return array
      */
-    protected function associatedConfig(array $query)
+    protected function associatedConfig(array $query) : array
     {
-        $contain = [];
-        foreach ((array)$query['associated'] as $alias => $config) {
+        $out = [];
+        foreach ((array) $query['associated'] as $alias => $config) {
             if (is_int($alias)) {
                 $alias = $config;
                 $config = [];
@@ -1449,22 +1398,22 @@ class Model
             foreach ($config['fields'] as $key => $value) {
                 $config['fields'][$key] = "{$tableAlias}.{$value}";
             }
-            $contain[$alias] = $config;
+            $out[$alias] = $config;
 
             if (!$this->findAssociation($alias)) {
                 throw new InvalidArgumentException("{$this->name} is not associated with {$alias}.");
             }
         }
-        return $contain;
+        return $out;
     }
 
     /**
-     * Searches for the associations
+     * Searches associations
      *
      * @param string $name
-     * @return void
+     * @return array|null
      */
-    protected function findAssociation(string $name)
+    protected function findAssociation(string $name): ?array
     {
         foreach ($this->associations as $association) {
             if (isset($this->{$association}[$name])) {
@@ -1480,19 +1429,17 @@ class Model
      * and converts.
      *
      * @param array $results results from datasource
-     *
-     * @return Entity
+     * @return Mixed
      */
     protected function prepareResults(array $results)
     {
         $buffer = [];
 
-
         $alias = Inflector::tableize($this->alias);
-       
+
         foreach ($results as $record) {
-            $thisData = (isset($record[$alias ]) ? $record[$alias ] : []); // Work with group and no fields from db
-            $entity = new Entity($thisData, ['name' => $this->alias , 'exists' => true, 'markClean' => true]);
+            $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
+            $entity = new Entity($thisData, ['name' => $this->alias, 'exists' => true, 'markClean' => true]);
             unset($record[$alias]);
 
             foreach ($record as $tableAlias => $data) {
@@ -1542,7 +1489,7 @@ class Model
      * @param array $results
      * @return array
      */
-    protected function loadAssociatedHasMany($query, $results)
+    protected function loadAssociatedHasMany(array $query, array $results) : array
     {
         foreach ($this->hasMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
@@ -1566,7 +1513,7 @@ class Model
         return $results;
     }
 
-    protected function loadAssociatedHasAndBelongsToMany($query, $results)
+    protected function loadAssociatedHasAndBelongsToMany(array $query, array $results) : array
     {
         foreach ($this->hasAndBelongsToMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
@@ -1582,13 +1529,13 @@ class Model
                 if (empty($config['fields'])) {
                     $config['fields'] = array_merge($this->{$alias}->fields(), $this->{$config['with']}->fields());
                 }
-            
+
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->primaryKey})) {
                         $withAlias = Inflector::tableize($config['with']);
                         $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->primaryKey};
                     }
-        
+
                     $models = Inflector::pluralize(Inflector::variable($alias));
                     $result->{$models} = $this->{$alias}->find('all', $config);
                 }
@@ -1603,14 +1550,13 @@ class Model
      *
      * @param string $type
      * @param array  $query (conditions,joins,fields,order,limit etc)
-     *
-     * @return array|\Origin\Model\Entity|\Origin\Model\Collection
+     * @return array|\Origin\Model\Entity|\Origin\Model\Collection|null
      */
-    protected function readDataSource(array $query, $type = 'model')
+    protected function readDataSource(array $query, string $type = 'model')
     {
         $connection = $this->connection();
         $connection->select($this->table, $query + ['alias' => Inflector::tableize($this->alias)]);
- 
+
         if ($type === 'list') {
             return $connection->fetchList();
         }
@@ -1618,12 +1564,12 @@ class Model
         if ($type === 'assoc') {
             return $connection->fetchAll('assoc');
         }
- 
+
         $results = $connection->fetchAll('num'); // change to num and enableMapResults
-       
+
         if ($results) {
             $results = $connection->mapNumericResults($results, $query['fields']); // use with Num instead of model
-           
+
             # If foreignKeys are missing data then objects wont be put together
             # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);
@@ -1645,7 +1591,7 @@ class Model
      * @param array $results
      * @return array
      */
-    protected function loadAssociatedBelongsTo($query, $results)
+    protected function loadAssociatedBelongsTo(array $query, array $results) : array
     {
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) and isset($this->belongsTo[$model])) {
@@ -1665,11 +1611,11 @@ class Model
     /**
      * Load Associated Has One
      *
-     * @param [type] $query
-     * @param [type] $results
-     * @return void
+     * @param array $query
+     * @param array $results
+     * @return array
      */
-    public function loadAssociatedHasOne($query, $results)
+    public function loadAssociatedHasOne(array $query, array  $results) : array
     {
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) and isset($this->hasOne[$model])) {
@@ -1695,8 +1641,7 @@ class Model
      *
      * @param string $sql
      * @param array  $params bind values
-     *
-     * @return bool
+     * @return bool|array|null
      */
     public function query(string $sql, array $params = [])
     {
@@ -1825,7 +1770,7 @@ class Model
      * @param array  $fields array of fields to check values in entity
      * @return bool
      */
-    public function isUnique(Entity $entity, array $fields = [])
+    public function isUnique(Entity $entity, array $fields = []) : bool
     {
         $conditions = [];
         foreach ($fields as $field) {
@@ -1842,7 +1787,7 @@ class Model
      *
      * @return bool
      */
-    public function begin() : bool
+    public function begin(): bool
     {
         return $this->connection()->begin();
     }
@@ -1852,11 +1797,11 @@ class Model
      *
      * @return boolean
      */
-    public function commit() : bool
+    public function commit(): bool
     {
         return $this->connection()->commit();
     }
-    
+
     /**
      * Rollsback a database transaction
      *
@@ -1875,7 +1820,7 @@ class Model
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function new(array $requestData = null, array $options = [])
+    public function new(array $requestData = null, array $options = []) : Entity
     {
         if ($requestData === null) {
             return new Entity([], ['name' => $this->alias]);
@@ -1892,9 +1837,9 @@ class Model
      *
      * @param array $data
      * @param array $options parse default is set to true
-     * @var \Origin\Model\Collection
+     * @var array
      */
-    public function newEntities(array $requestData, array $options = [])
+    public function newEntities(array $requestData, array $options = []) : array
     {
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
@@ -1910,7 +1855,7 @@ class Model
      * @param array $options parse
      * @var \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $requestData, array $options = [])
+    public function patch(Entity $entity, array $requestData, array $options = []) : Entity
     {
         $options += ['associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
@@ -1923,7 +1868,7 @@ class Model
      *
      * @var \Origin\Model\Marshaller
      */
-    protected function marshaller()
+    protected function marshaller() : Marshaller
     {
         return new Marshaller($this);
     }
@@ -1982,7 +1927,7 @@ class Model
      * @param string $name
      * @return bool
      */
-    public function enableBehavior(string $name)
+    public function enableBehavior(string $name) :bool
     {
         return $this->behaviorRegistry->enable($name);
     }
@@ -1992,7 +1937,7 @@ class Model
      * @param string $name
      * @return bool
      */
-    public function disableBehavior(string $name)
+    public function disableBehavior(string $name) : bool
     {
         return $this->behaviorRegistry->disable($name);
     }
