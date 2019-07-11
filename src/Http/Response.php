@@ -73,7 +73,6 @@ class Response
      * Sets or gets the buffered output.
      *
      * @param string $content
-     *
      * @return string body
      */
     public function body(string $content = null)
