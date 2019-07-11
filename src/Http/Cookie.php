@@ -31,18 +31,18 @@ class Cookie
      */
     const prefix =  'T3JpZ2lu==.';
 
-    protected $key = null;
-
     /**
-     * Constructor - Create key to be used by encryption
+     * Gets the encryption key
+     *
+     * @return string
      */
-    public function __construct()
+    protected function encryptionKey() : string
     {
-        // Create a 32 byte key using the pepper
-        $this->key = md5(Configure::read('Security.pepper')); // Fallback for now
         if (Configure::exists('Cookie.key')) {
-            $this->key = Configure::read('Cookie.key');
+            return Configure::read('Cookie.key');
         }
+        // Create a 32 byte fallback key using the pepper
+        return md5(Configure::read('Security.pepper'));
     }
 
     /**
@@ -149,7 +149,7 @@ class Cookie
         }
        
         if ($encrypt) {
-            $value = self::prefix . Security::encrypt($value, $this->key);
+            $value = self::prefix . Security::encrypt($value, $this->encryptionKey());
         }
        
         return $value;
@@ -166,7 +166,7 @@ class Cookie
         $length = strlen(self::prefix);
         if (substr($value, 0, $length) === self::prefix) {
             $value = substr($value, $length);
-            $value = Security::decrypt($value, $this->key);
+            $value = Security::decrypt($value, $this->encryptionKey());
         }
         if (substr($value, 0, 1)==='{') {
             $value = json_decode($value);
