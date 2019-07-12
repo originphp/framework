@@ -78,8 +78,8 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
     
         $this->assertContains(
-            file_get_contents( ORIGIN . '/tests/TestApp/plugins/widget/public/js/default.js'),
-        $this->Html->js('Widget.default.js')
+            file_get_contents(ORIGIN . '/tests/TestApp/plugins/widget/public/js/default.js'),
+            $this->Html->js('Widget.default.js')
         );
         $this->expectException(NotFoundException::class);
         $this->Html->js('Widget.does-not-exist.js');
@@ -91,5 +91,12 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->Html->img('logo.png'));
         $expected = '<img src="/assets/img/logo.png">';
         $this->assertSame($expected, $this->Html->img('/assets/img/logo.png'));
+    }
+
+    public function testDiv()
+    {
+        $content = '<p>Hello</p>';
+        $expected = '<div class="important"><p>Hello</p></div>';
+        $this->assertEquals($expected, $this->Html->div($content, ['class'=>'important']));
     }
 }
