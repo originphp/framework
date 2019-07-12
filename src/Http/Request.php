@@ -115,38 +115,44 @@ class Request
      * @param array $environment $_SERVER array
      * @return void
      */
-    public function __construct(string $url = null, array $environment = null)
+    public function __construct(string $url = null, array $options = [])
     {
-        $this->initialize($url, $environment);
+        $this->initialize($url, $options);
     }
 
     /**
      * Initializes the request
      *
      * @param string $url articles/edit/2048
-     * @param array $environment $_SERVER array
+     * @param array $options [$_SERVER,$_COOOKIE,$_POST,$_FILES]
      * @return void
      */
-    public function initialize(string $url = null, array $environment = null): void
+    public function initialize(string $url = null, array $options = []): void
     {
+        $options += [
+            'server' => $_SERVER,
+            'post' => (array) $_POST,
+            'cookie' => $this->processCookies(),
+            'files' => (array) $_FILES,
+        ];
+        $this->environment = $options['server'];
+        $this->cookies = $options['cookie'];
+
         if ($url === null) {
             $url = $this->uri();
         }
-        if ($environment === null) {
-            $environment = $_SERVER;
-        }
+       
         if (strlen($url) and $url[0] === '/') {
             $url = substr($url, 1);
         }
 
         $this->params = Router::parse($url);
 
-        $this->processEnvironment($environment);
+        $this->processEnvironment($options['server']);
         $this->processGet($url);
-        $this->processPost();
-        $this->processFiles();
-        $this->processCookies();
-
+        $this->processPost($options['post']);
+        $this->processFiles($options['files']);
+        
         $this->detectRequestType();
         Router::request($this);
     }
@@ -362,7 +368,7 @@ class Request
      */
     public function ssl(): bool
     {
-        return ($this->env('http') == 1);
+        return ($this->env('HTTPS') == 1 or $this->env('HTTPS') === 'on');
     }
 
     /**
@@ -378,9 +384,9 @@ class Request
     /**
      * Gets the ip address of the request
      *
-     * @return string
+     * @return string|null
      */
-    public function ip(): string
+    public function ip(): ?string
     {
         $ip = $this->env('HTTP_CLIENT_IP');
         if ($ip) {
@@ -436,9 +442,8 @@ class Request
      *
      * @return array
      */
-    protected function processPost(): array
+    protected function processPost(array $data = []): array
     {
-        $data = (array) $_POST;
         if ($this->is(['put', 'patch', 'delete'])) {
             parse_str($this->readInput(), $data);
         }
@@ -459,9 +464,9 @@ class Request
      *
      * @return void
      */
-    protected function processFiles(): void
+    protected function processFiles(array $files = []): void
     {
-        foreach ($_FILES as $name => $data) {
+        foreach ($files as $name => $data) {
             $this->data[$name] = $data;
         }
     }
@@ -593,13 +598,18 @@ class Request
     }
 
     /**
-     * Gets an enviroment variable from $_SERVER.
+     * Sets and gets an environment varabile for the request
      *
      * @param string $key
-     * @return string|null
+     * @param string $value
+     * @return string|null|void
      */
-    public function env(string $key): ?string
+    public function env(string $key, string $value = null)
     {
+        if (func_num_args() === 2) {
+            $this->environment[$key] = $value;
+            return;
+        }
         if (isset($this->environment[$key])) {
             return $this->environment[$key];
         }
@@ -692,30 +702,29 @@ class Request
         }
         $this->cookies[$key] = $value;
     }
-
-    protected function processCookies()
+    /**
+     * Processes the $_COOKIE var
+     *
+     * @return array
+     */
+    protected function processCookies() : array
     {
         $cookie = new Cookie();
         $cookies = [];
         foreach (array_keys($_COOKIE) as $key) {
             $cookies[$key] = $cookie->read($key);
         }
-        $this->cookies($cookies);
+        return $cookies;
     }
 
     /**
-     * Processes the headers and normalizes them
+     * Processes the $_SERVER . PHP getallheaders() polyfill.
      *
      * @param array $environment
      * @return void
      */
     protected function processEnvironment(array $environment): void
     {
-        $this->environment = $environment;
-
-        /**
-         * PHP getallheaders() polyfill.
-         */
         foreach ($environment as $key => $value) {
             $name = null;
             if (strpos($key, 'HTTP_') !== false) {
