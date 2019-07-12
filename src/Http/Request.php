@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -27,7 +28,7 @@ class Request
      *
      * @var array
      */
-    protected $params =[
+    protected $params = [
         'controller' => null,
         'action' => null,
         'args' => [],
@@ -59,9 +60,18 @@ class Request
     /**
      * Address of request including base folder WITHOUT Query params.
      *
-     * @example /subfolder/controller/action
+     * @example https://www.example.com/subfolder/controller/action
+     * @var string
      */
     protected $url = null;
+
+    /**
+     * Path of request including base folder WITHOUT Query params.
+     *
+     * @example /subfolder/controller/action
+     * @var string
+     */
+    protected $path = null;
 
     /**
      * Original Headers
@@ -92,41 +102,51 @@ class Request
     protected $format = null;
 
     /**
-     * This makes it easy for testing e.g  $request = new Request('articles/edit/2048');
+     * Holds the environment vars
+     *
+     * @var array
+     */
+    protected $environment = null;
+
+    /**
+     * This makes it easy for testing e.g $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
+     * @param array $environment $_SERVER array
+     * @return void
      */
-    public function __construct($url = null)
+    public function __construct(string $url = null, array $environment = null)
     {
-        $this->initialize($url);
+        $this->initialize($url, $environment);
     }
 
     /**
      * Initializes the request
-     * @params string $url articles/edit/2048
+     *
+     * @param string $url articles/edit/2048
+     * @param array $environment $_SERVER array
+     * @return void
      */
-    public function initialize($url = null)
+    public function initialize(string $url = null, array $environment = null): void
     {
         if ($url === null) {
             $url = $this->uri();
+        }
+        if ($environment === null) {
+            $environment = $_SERVER;
         }
         if (strlen($url) and $url[0] === '/') {
             $url = substr($url, 1);
         }
 
         $this->params = Router::parse($url);
-       
+
+        $this->processEnvironment($environment);
         $this->processGet($url);
         $this->processPost();
         $this->processFiles();
         $this->processCookies();
 
-        if (PHP_SAPI != 'cli') {
-            $this->headers = getallheaders();
-            foreach ($this->headers as $key => $value) {
-                $this->headersNames[strtolower($key)] = $key;
-            }
-        }
         $this->detectRequestType();
         Router::request($this);
     }
@@ -156,7 +176,7 @@ class Request
             $this->query[$key] = $value;
             return;
         }
-       
+
         if (isset($this->query[$key])) {
             return $this->query[$key];
         }
@@ -186,11 +206,11 @@ class Request
             $this->data = $key;
             return;
         }
- 
+
         if (func_num_args() === 2) {
             return $this->data[$key] = $value;
         }
-     
+
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
@@ -223,7 +243,7 @@ class Request
             $this->params[$key] = $value;
             return;
         }
-       
+
         if (isset($this->params[$key])) {
             return $this->params[$key];
         }
@@ -236,7 +256,7 @@ class Request
      *
      * @return string uri
      */
-    protected function uri()
+    protected function uri(): string
     {
         if ($uri = $this->env('REQUEST_URI')) {
             return $uri;
@@ -247,36 +267,53 @@ class Request
     /**
      * This will return the url of the request without the query string unless you set includeQuery
      * to true.
+     *
      * @example /contacts/view/100
      * @param boolean $includeQuery (default:false) /contacts/view/100?page=1
      * @return string
      */
-    public function url(bool $includeQuery = false)
+    public function url(bool $includeQuery = false): string
     {
         $url = $this->url;
         if ($includeQuery and $this->query) {
             $url .= '?' . http_build_query($this->query);
         }
-    
         return $url;
+    }
+
+    /**
+     * This will return the path of request without the query string unless you set includeQuery
+     * to true.
+     *
+     * @example /contacts/view/100
+     * @param boolean $includeQuery (default:false) /contacts/view/100?page=1
+     * @return string
+     */
+    public function path(bool $includeQuery = false): string
+    {
+        $path = $this->path;
+        if ($includeQuery and $this->query) {
+            $path .= '?' . http_build_query($this->query);
+        }
+        return $path;
     }
 
     /**
      * Returns the referrer
      *
-     * @return void
+     * @return string|null
      */
-    public function referer()
+    public function referer(): ?string
     {
         return $this->env('HTTP_REFERER'); // Misspelling is correct
     }
 
     /**
-       * Sets and gets the type that should be rendered. html, json or xml
-       *
-       * @param string $type
-       * @return string|null
-       */
+     * Sets and gets the type that should be rendered. html, json or xml
+     *
+     * @param string $type
+     * @return string|void
+     */
     public function type(string $type = null)
     {
         if ($type === null) {
@@ -284,7 +321,7 @@ class Request
         }
         $this->type = $type;
     }
-  
+
     /**
      * This detects the type for the request.
      *
@@ -294,23 +331,23 @@ class Request
      *
      * This is all only relevant for autorendering.
      *
-     * @return void
+     * @return string|null
      */
-    protected function detectRequestType()
+    protected function detectRequestType(): ?string
     {
         $type = 'html';
-        if ($this->params('type') and in_array($this->params('type'), ['xml','json'])) {
+        if ($this->params('type') and in_array($this->params('type'), ['xml', 'json'])) {
             $type = $this->params('type');
         }
         $extension = $this->params('ext');
-        if ($extension and in_array($extension, ['html','json','xml'])) {
+        if ($extension and in_array($extension, ['html', 'json', 'xml'])) {
             $type = $extension;
         } else {
             $accepts = $this->accepts();
             if ($accepts) {
                 if ($accepts[0] === 'application/json') {
                     $type = 'json';
-                } elseif (in_array($accepts[0], ['application/xml','text/xml'])) {
+                } elseif (in_array($accepts[0], ['application/xml', 'text/xml'])) {
                     $type =  'xml';
                 }
             }
@@ -318,7 +355,52 @@ class Request
         return $this->type($type);
     }
 
-    protected function processGet($url)
+    /**
+     * Checks if the request uses SSL
+     *
+     * @return bool
+     */
+    public function ssl(): bool
+    {
+        return ($this->env('http') == 1);
+    }
+
+    /**
+     * Checks if the request is ajax request
+     *
+     * @return boolean
+     */
+    public function ajax(): bool
+    {
+        return ($this->env('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest');
+    }
+
+    /**
+     * Gets the ip address of the request
+     *
+     * @return string
+     */
+    public function ip(): string
+    {
+        $ip = $this->env('HTTP_CLIENT_IP');
+        if ($ip) {
+            return $ip;
+        }
+        $ip = $this->env('HTTP_X_FORWARDED_FOR');
+        if ($ip) {
+            return $ip;
+        }
+        return $this->env('REMOTE_ADDR');
+    }
+
+
+    /**
+     * Processes the GET stuff
+     *
+     * @param string $url
+     * @return void
+     */
+    protected function processGet(string $url = null): void
     {
         // Build Query
         $query = [];
@@ -327,16 +409,34 @@ class Request
             parse_str($queryString, $query);
         }
 
-        $this->url = '/'.$url;
+        $this->path = '/' . $url;
+
+        $host = $this->env('HTTP_HOST') ?? 'localhost';
+        $scheme = $this->env('REQUEST_SCHEME') ?? 'http';
+        $this->url = $scheme . '://' . $host . $this->path;
+
         $this->query($query);
+    }
+
+    /**
+     * Gets the host name
+     *
+     * @return string|null
+     */
+    public function host(bool $trustProxy = false): ?string
+    {
+        if ($trustProxy) {
+            return $this->env('HTTP_X_FORWARDED_HOST');
+        }
+        return $this->env('HTTP_HOST');
     }
 
     /**
      * curl -i -X POST -H 'Content-Type: application/json' -d '{"title":"CNBC","url":"https://www.cnbc.com"}' http://localhost:8000/bookmarks/add
      *
-     * @return void
+     * @return array
      */
-    protected function processPost()
+    protected function processPost(): array
     {
         $data = (array) $_POST;
         if ($this->is(['put', 'patch', 'delete'])) {
@@ -359,7 +459,7 @@ class Request
      *
      * @return void
      */
-    protected function processFiles()
+    protected function processFiles(): void
     {
         foreach ($_FILES as $name => $data) {
             $this->data[$name] = $data;
@@ -373,7 +473,7 @@ class Request
      *
      * @return bool true or false
      */
-    public function is($type)
+    public function is($type): bool
     {
         $method = $this->env('REQUEST_METHOD');
         if (!$method) {
@@ -391,7 +491,7 @@ class Request
      * example get|post|put|delete
      * @return string
      */
-    public function method()
+    public function method(): ?string
     {
         return $this->env('REQUEST_METHOD');
     }
@@ -404,14 +504,14 @@ class Request
      * @param string|array $type e.g. post or get
      * @return bool
      */
-    public function allowMethod($type)
+    public function allowMethod($type): bool
     {
         if ($this->is($type)) {
             return true;
         }
         throw new MethodNotAllowedException();
     }
- 
+
     /**
      * Checks if the request accepts, this will search the HTTP accept headers and if the
      * router has passed an ext parameter
@@ -422,21 +522,19 @@ class Request
      * @param string|array $type
      * @return bool|array
      */
-    public function accepts($type=null)
+    public function accepts($type = null)
     {
-        $path = parse_url($this->url(), PHP_URL_PATH);
-    
         $acceptHeaders = $this->parseAcceptWith($this->headers('accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
-     
+
         // If router extension set and its valid.
         $extension = $this->params('ext');
-        if ($extension and in_array($extension, ['html','json','xml'])) {
+        if ($extension and in_array($extension, ['html', 'json', 'xml'])) {
             return true;
         }
-        
+
         foreach ((array) $type as $needle) {
             if (in_array($needle, $acceptHeaders)) {
                 return true;
@@ -461,11 +559,11 @@ class Request
         foreach ($languages as $lang) {
             $acceptedLanguages[] = str_replace('-', '_', $lang);
         }
-        
+
         if ($language === null) {
             return $acceptedLanguages;
         }
-    
+
         return in_array($language, $acceptedLanguages);
     }
 
@@ -476,7 +574,7 @@ class Request
      * @param string $header
      * @return array
      */
-    protected function parseAcceptWith(string $header = null) : array
+    protected function parseAcceptWith(string $header = null): array
     {
         $accepts = [];
         if ($header === null) {
@@ -500,12 +598,11 @@ class Request
      * @param string $key
      * @return string|null
      */
-    public function env(string $key) : ?string
+    public function env(string $key): ?string
     {
-        if (isset($_SERVER[$key])) {
-            return $_SERVER[$key];
+        if (isset($this->environment[$key])) {
+            return $this->environment[$key];
         }
-
         return null;
     }
 
@@ -581,7 +678,7 @@ class Request
         if ($key === null) {
             return $this->cookies;
         }
-    
+
         if (is_array($key)) {
             $this->cookies = $key;
             return;
@@ -595,7 +692,7 @@ class Request
         }
         $this->cookies[$key] = $value;
     }
-    
+
     protected function processCookies()
     {
         $cookie = new Cookie();
@@ -605,12 +702,43 @@ class Request
         }
         $this->cookies($cookies);
     }
+
+    /**
+     * Processes the headers and normalizes them
+     *
+     * @param array $environment
+     * @return void
+     */
+    protected function processEnvironment(array $environment): void
+    {
+        $this->environment = $environment;
+
+        /**
+         * PHP getallheaders() polyfill.
+         */
+        foreach ($environment as $key => $value) {
+            $name = null;
+            if (strpos($key, 'HTTP_') !== false) {
+                $name = substr($key, 5);
+            }
+            //CONTENT_TYPE,CONTENT_LENGTH,CONTENT_MD5
+            if (strpos($key, 'CONTENT_') !== false) {
+                $name = $key;
+            }
+            if ($name) {
+                $name = str_replace('_', ' ', strtolower($name));
+                $name = str_replace(' ', '-', ucwords($name));
+                $this->headers($name, $value);
+            }
+        }
+    }
+
     /**
      * Reads the php://input stream
      *
      * @return string
      */
-    protected function readInput() : ?string
+    protected function readInput(): ?string
     {
         $fh = fopen('php://input', 'r');
         $contents = stream_get_contents($fh);

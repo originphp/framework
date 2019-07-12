@@ -62,7 +62,7 @@ class PaginatorHelper extends Helper
 
         $options = [
           'text' => $text,
-          'url' => $this->request()->url().'?'.http_build_query($query),
+          'url' => $this->request()->path().'?'.http_build_query($query),
         ];
 
         return $this->templater()->format($template, $options);
@@ -97,7 +97,7 @@ class PaginatorHelper extends Helper
             }
             $query['page'] = $i;
 
-            $options['url'] = $this->request()->url().'?'.http_build_query($query);
+            $options['url'] = $this->request()->path().'?'.http_build_query($query);
             $options['text'] = $i;
             $output .= $this->templater()->format($template, $options);
         }
@@ -145,7 +145,7 @@ class PaginatorHelper extends Helper
                 $template = 'prev';
             }
         }
-        $options['url'] = $this->request()->url().'?'.http_build_query($query);
+        $options['url'] = $this->request()->path().'?'.http_build_query($query);
 
         return $this->templater()->format($template, $options);
     }
