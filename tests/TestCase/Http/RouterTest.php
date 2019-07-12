@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         // Add Default Routes
         MockRouter::add('/:controller/:action/*');
-        MockRouter::add('/:controller', array('action' => 'index'));
+        MockRouter::add('/:controller', ['action' => 'index']);
     }
 
     public function testParseDefaultRoute()
@@ -59,6 +59,28 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('10', $result['named']['limit']);
     }
 
+    public function testComplicated()
+    {
+        MockRouter::reset();
+        MockRouter::add('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+        MockRouter::add('/t/*', ['controller'=>'Topics','action'=>'view']);
+        MockRouter::add('/:controller/:action/*');
+        MockRouter::add('/:controller', ['action' => 'index']);
+
+        $result = MockRouter::parse('topics');
+        $this->assertEquals('Topics', $result['controller']);
+        $this->assertEquals('index', $result['action']);
+        $result = MockRouter::parse('topics/add');
+        $this->assertEquals('Topics', $result['controller']);
+        $this->assertEquals('add', $result['action']);
+        $result = MockRouter::parse('topics/add/1234');
+        $this->assertEquals('Topics', $result['controller']);
+        $this->assertEquals('add', $result['action']);
+
+        $result = MockRouter::parse('t/some-slug/12345');
+        $this->assertEquals('Topics', $result['controller']);
+        $this->assertEquals('view', $result['action']);
+    }
     public function testRouteIndex()
     {
         $result = MockRouter::parse('/leads');

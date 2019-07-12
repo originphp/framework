@@ -39,55 +39,55 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('ppc', $request->query('source'));
     }
 
-    public function testUri()
-    {
-        $request = new Request();
-        $this->assertEquals('/', $request->url());
-      
-        $_SERVER['REQUEST_URI'] = 'controller/action/100';
-        $request = new Request();
-        $this->assertEquals('/controller/action/100', $request->url());
-    }
-
-    public function testHere()
+    public function testUrl()
     {
         $request = new Request('blog/home?ref=google&source=ppc');
-        $expected = '/blog/home?ref=google&source=ppc';
+        $expected = 'http://localhost/blog/home?ref=google&source=ppc';
         $this->assertEquals($expected, $request->url(true));
         $request = new Request('blog/home/1234');
-        $expected = '/blog/home/1234';
+        $expected = 'http://localhost/blog/home/1234';
         $this->assertEquals($expected, $request->url());
     }
 
+    public function testPath()
+    {
+        $request = new Request('blog/home?ref=google&source=ppc');
+        $expected = '/blog/home?ref=google&source=ppc';
+        $this->assertEquals($expected, $request->path(true));
+        $request = new Request('blog/home/1234');
+        $expected = '/blog/home/1234';
+        $this->assertEquals($expected, $request->path());
+    }
+    
     public function testIs()
     {
-        $request = new Request('articles/index');
+        $request = new Request('articles/index', ['server'=>['REQUEST_METHOD' => 'POST']]);
     
-        $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->assertTrue($request->is(['post']));
         $this->assertFalse($request->is('get'));
         
-        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $request = new Request('articles/index', ['server'=>['REQUEST_METHOD' => 'GET']]);
         $this->assertFalse($request->is('post'));
         $this->assertTrue($request->is('get'));
-        unset($_SERVER['REQUEST_METHOD']);
     }
     public function testAllowMethod()
     {
-        $request = new Request('articles/index');
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = new Request('articles/index', ['server'=>['REQUEST_METHOD' => 'POST']]);
         $this->assertTrue($request->allowMethod(['post']));
       
-        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $request = new Request('articles/index', ['server'=>['REQUEST_METHOD' => 'GET']]);
         $this->expectException(MethodNotAllowedException::class);
         $request->allowMethod(['delete']);
     }
     public function testEnv()
     {
-        $request = new Request('articles/index');
-        $this->assertNull($request->env('FOO'));
-        $_SERVER['FOO'] = 'bar';
-        $this->assertEquals('bar', $request->env('FOO'));
+        $request = new Request('articles/index', ['server'=>['FOO' => 'BAR']]);
+        $this->assertNull($request->env('BAR'));
+        $this->assertEquals('BAR', $request->env('FOO'));
+
+        $request = new Request();
+        $request->env('FOO', 'BAR');
+        $this->assertEquals('BAR', $request->env('FOO'));
     }
     public function testJsonPost()
     {
@@ -138,16 +138,13 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
     public function testMethod()
     {
-        $request = new MockRequest();
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = new MockRequest('/', ['server'=>['REQUEST_METHOD' => 'POST']]);
         $this->assertEquals('POST', $request->method());
-        $_SERVER['REQUEST_METHOD'] = '';
     }
 
     public function testFiles()
     {
-        $_FILES = ['file'=>'dummy file'];
-        $request = new MockRequest();
+        $request = new MockRequest('/', ['files'=>['file'=>'dummy file']]);
         $this->assertEquals('dummy file', $request->data('file'));
     }
 
@@ -160,6 +157,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
             'foo' => 'This is a test'
         ];
         $request = new MockRequest();
+    
         $this->assertEquals($expected, $request->cookies());
         $this->assertEquals('This is a test', $request->cookies('foo'));
     }
@@ -203,5 +201,44 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $accepts = $request->accepts();
         $this->assertEquals('text/html', $accepts[0]);
         $this->assertTrue($request->accepts(['application/xml','application/json']));
+    }
+
+    public function testHost()
+    {
+        $request = new MockRequest(null, ['server'=>['HTTP_HOST'=>'127.0.0.1','HTTP_X_FORWARDED_HOST'=>'127.0.0.2']]);
+        $this->assertEquals('127.0.0.1', $request->host());
+        $request = new MockRequest(null, ['server'=>['HTTP_HOST'=>'127.0.0.1','HTTP_X_FORWARDED_HOST'=>'127.0.0.2']]);
+        $this->assertEquals('127.0.0.2', $request->host(true));
+    }
+
+    public function testIp()
+    {
+        $request = new MockRequest(null, ['server'=>['REMOTE_ADDR'=>'127.0.0.1']]);
+        $this->assertEquals('127.0.0.1', $request->ip());
+        $request = new MockRequest(null, ['server'=>['HTTP_CLIENT_IP'=>'127.0.0.1']]);
+        $this->assertEquals('127.0.0.1', $request->ip());
+        $request = new MockRequest(null, ['server'=>['HTTP_X_FORWARDED_FOR'=>'127.0.0.1']]);
+        $this->assertEquals('127.0.0.1', $request->ip());
+        $request = new MockRequest();
+        $this->assertNull($request->ip());
+    }
+    public function testSsl()
+    {
+        $request = new MockRequest();
+        $this->assertFalse($request->ssl());
+        $request = new MockRequest(null, ['server'=>['HTTPS'=>'off']]);
+        $this->assertFalse($request->ssl());
+        $request = new MockRequest(null, ['server'=>['HTTPS'=>'on']]);
+        $this->assertTrue($request->ssl());
+        $request = new MockRequest(null, ['server'=>['HTTPS'=>1]]);
+        $this->assertTrue($request->ssl());
+    }
+    public function testAjax()
+    {
+        $request = new MockRequest();
+        $this->assertFalse($request->ajax());
+    
+        $request = new MockRequest(null, ['server'=>['HTTP_X_REQUESTED_WITH'=>'XMLHttpRequest']]);
+        $this->assertTrue($request->ajax());
     }
 }

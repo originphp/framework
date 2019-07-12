@@ -155,9 +155,8 @@ class AuthComponentTest extends OriginTestCase
 
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config(['authenticate' => ['Http']]);
-
-        $_SERVER['PHP_AUTH_USER'] = 'amanda';
-        $_SERVER['PHP_AUTH_PW'] = 'amanDa1';
+        $AuthComponent->request()->env('PHP_AUTH_USER', 'amanda');
+        $AuthComponent->request()->env('PHP_AUTH_PW', 'amanDa1');
 
         $expected = ['username' => 'amanda', 'password' => 'amanDa1'];
         $this->assertEquals($expected, $AuthComponent->callMethod('getCredentials'));
@@ -263,11 +262,11 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Http']);
-        $_SERVER['PHP_AUTH_USER'] = 'amanda@example.com';
-        $_SERVER['PHP_AUTH_PW'] = 'secret2';
+        $AuthComponent->request()->env('PHP_AUTH_USER', 'amanda@example.com');
+        $AuthComponent->request()->env('PHP_AUTH_PW', 'secret2');
         $user = $AuthComponent->identify();
+        $this->assertNotNull($user);
         $this->assertEquals('Amanda', $user->name);
-        unset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
     }
 
     public function testIdentifyApi()
