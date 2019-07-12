@@ -88,12 +88,9 @@ class ErrorHandler
      */
     private function isAjax()
     {
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
-            return true;
-        }
         $request = Router::request();
         if ($request) {
-            return $request->type() === 'json';
+            return ($request->ajax() or $request->type() === 'json');
         }
         return false;
     }
