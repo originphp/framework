@@ -44,10 +44,13 @@ class PaginatorComponent extends Component
     {
         $this->model = $model;
 
+       
         $settings = $this->mergeSettings($settings);
     
         $settings = $this->prepareSort($settings);
-      
+
+        
+     
         $sort = $direction = false;
         if (isset($settings['order'])) {
             $sort = key((array) $settings['order']);
@@ -144,6 +147,10 @@ class PaginatorComponent extends Component
         $settings += $this->config;
         $query = $this->controller()->request->query();
         if ($query) {
+            // Ensure page is a number
+            if (isset($query['page']) and !is_integer($query['page'])) {
+                unset($query['page']);
+            }
             $query = $this->filterArray($this->whitelist, $query);
             $settings = array_merge($settings, $query);
         }
