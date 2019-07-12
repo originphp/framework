@@ -30,10 +30,27 @@ class HtmlHelper extends Helper
             'a' => '<a href="{url}"{attributes}>{text}</a>',
             'css' => '<link rel="stylesheet" type="text/css" href="{url}" />',
             'js' => '<script type="text/javascript" src="{url}"></script>',
-            'img' => '<img src="{src}"{attributes}>'
+            'img' => '<img src="{src}"{attributes}>',
+            'tag' => '<{tag}{attributes}>{content}</{tag}>'
         ]
     ];
 
+    /**
+     * Wraps content in a div
+     *
+     * @param string $content
+     * @param array $attributes
+     * @return string
+     */
+    public function div(string $content, array $attributes=[]): string
+    {
+        $options = [
+            'tag' => 'div',
+            'content' => $content,
+            'attributes' => $this->attributesToString($attributes),
+        ];
+        return $this->templater()->format('tag', $options);
+    }
     /**
      * Generates a link
      *
