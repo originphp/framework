@@ -35,6 +35,6 @@ class DispatcherMiddleware extends Middleware
     public function shutdown(Request $request, Response $response)
     {
         $dispatcher = Dispatcher::instance();
-        $response = $dispatcher->dispatch($request, $response);
+        $dispatcher->dispatch($request, $response);
     }
 }
