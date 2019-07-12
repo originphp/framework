@@ -119,7 +119,7 @@ class Markdown
         $text = static::parseLists($text);
 
         # Work with Code Blocks
-        $text = preg_replace("/```([^```].*)```/ms", '<pre><code>$1<code></pre>', $text);
+        $text = preg_replace("/```([^```].*)```/ms", '<pre><code>$1</code></pre>', $text);
         $text = preg_replace("/`([^`].*)`/", '<code>$1</code>', $text);
 
         $text = static::parseTables($text);

@@ -30,6 +30,7 @@ Delete tag: git tag -d <tag_name>
 - Request works with copy of server vars
 
 ### Fixed
+- Fixed invalid tag issue with Markdown::toHtml and code block
 - Fixed issue with router and routes with single character e.g. t/slug/id was getting mapped to txxx/something/sdfsd
 
 ### Security

@@ -126,7 +126,7 @@ Strong emphasis, aka bold, with **asterisks** or __underscores__.
 Combined emphasis with **asterisks and _underscores_**.
 Strikethrough uses two tildes. ~~Scratch this.~~
 EOF;
-        $expected = '1e6de43b62a77857d129222b37d0a557';
+        $expected = '1080e99976954758e53a55b231fb3d1b';
         $this->assertEquals($expected, md5(Markdown::toHtml($text)));
     }
 
