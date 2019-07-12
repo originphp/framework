@@ -84,7 +84,7 @@ class Router
         $pattern = preg_replace('/\:([a-z]+)/', '(?P<\1>[^\.\/]+)', $pattern);
 
         // Enable greedy capture
-        $pattern = str_replace('*', '?(?P<greedy>.*)', $pattern);
+        $pattern = str_replace('*', '?(\/(?P<greedy>.*))?', $pattern); //?(?P<greedy>.*)
 
         // Convert passed arguments to array
         $args = [];
