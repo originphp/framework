@@ -115,7 +115,7 @@ class Router
             $url = substr($url, 1);
         }
 
-        $params = array();
+        $params = [];
         // Remove query
         if (strpos($url, '?') !== false) {
             list($url, $queryString) = explode('?', $url);
