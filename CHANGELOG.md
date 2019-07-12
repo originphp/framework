@@ -20,12 +20,27 @@ Create: git tag -a <tag_name> -m '<tag_message>'
 Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
-## Notice
+## [Unreleased]
+## [1.23.0] - 2019-07-12
+### Added 
+- HtmlHelper div function
+- Request added new methods ip, path, host, ssl and ajax
+
+### Changed
+- Request works with copy of server vars
+
+### Fixed
+- Fixed issue with router and routes with single character e.g. t/slug/id was getting mapped to txxx/something/sdfsd
+
+### Security
+- Added integer check for get params in PaginatorComponent
+
 ## [1.22.1] - 2019-07-11
+
 ### Changed
 - Redis cache engine changed to work with latest version which had deprecated delete, getKeys, setTimeout aliases.
 
-## [Unreleased]
+
 ## [1.22.0] - 2019-07-10
 ### Added
 - Validator::extension now works with uploaded files
