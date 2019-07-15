@@ -262,6 +262,8 @@ abstract class BaseSchema
      * @param string|array $column owner_id, [owner_id,tenant_id]
      * @param array $options
      *  - name: name of index
+     *  - unique: default:false set to to true to create unique index.
+     *  - type: use this to set a specific type. e.g FULLTEXT
      * @return string
      */
     public function addIndex(string $table, $column, string $name, array $options=[]) : string
@@ -271,6 +273,9 @@ abstract class BaseSchema
         }
         if (!empty($options['unique'])) {
             return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";
+        }
+        if (!empty($options['type'])) {
+            return "CREATE " . strtoupper($options['type']) . " INDEX {$name} ON {$table} ({$column})";
         }
         return "CREATE INDEX {$name} ON {$table} ({$column})";
     }
