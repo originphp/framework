@@ -54,10 +54,42 @@ class Session
 
         session_save_path(TMP . DS . 'sessions');
 
+        /**
+         * If the connection is HTTPS then only send cookies
+         * through this.
+         */
+        if( env('HTTPS')){
+            ini_set('session.cookie_secure', 1);
+        }
+        /**
+         * Tell the browsers that the session cookies should not availble client side
+         * to help prevent cookie theft (a majority of XSS attacks include highjacking the
+         * session cookie).
+         */
+        ini_set('session.cookie_httponly', 1);
+
+        /**
+         * Full Path Disclosure attack
+         * @see https://www.owasp.org/index.php/Full_Path_Disclosure
+         */
+        $name = session_name();
+        $id = null;
+        if(isset($_COOKIE[$name])){
+            $id = $_COOKIE[$name];
+        }
+       if($id AND !preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',$id)){
+            $this->destroy();
+            $id = null;
+        }
+
+        if($id === null){
+            session_id(uuid());
+        }
+      
         if (!session_start()) {
             throw new Exception('Error starting a session.');
         }
-     
+        
         $this->started = true;
 
         if ($this->timedOut()) {
