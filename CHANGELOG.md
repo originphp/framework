@@ -21,6 +21,21 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- Added Schema::addIndex Type option to allow for creating fulltext indexes
+- Entity modified(fieldname) to check if field was modified
+- Command out/warning/debug/info/etc placeholder interpolation
+
+### Fixed
+- Fixed router adding route with args
+- Fixed Markdown::toHtml code block issues
+
+### Security
+- Added escaping to Html:fromText
+- Tigthened Session security
+- Markdown::toHtml runs result through Html:sanitize for protection
+
 ## [1.23.0] - 2019-07-12
 ### Added 
 - HtmlHelper div function
