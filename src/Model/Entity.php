@@ -193,6 +193,12 @@ class Entity
         $this->_errors[$field][] = $error;
     }
 
+    /**
+     * Unsets a property or array of properties
+     *
+     * @param string|array $properties
+     * @return \Origin\Model\Entity;
+     */
     public function unset($properties)
     {
         foreach ((array)$properties as $key) {
@@ -249,13 +255,21 @@ class Entity
     }
 
     /**
-     * Returns the fields that modified
+     * Returns the list of properties that have been modified, if you supply
+     * a property name, then it will return a boolean result to tell you if the property has
+     * been changed.
      *
-     * @return array
+     * $array = $entity->modified();
+     * $bool = $entity->modified('email');
+     *
+     * @return array|bool
      */
-    public function modified()
+    public function modified(string $property = null)
     {
-        return array_keys($this->_modified);
+        if ($property === null) {
+            return array_keys($this->_modified);
+        }
+        return isset($this->_modified[$property]);
     }
 
     /**
@@ -326,7 +340,6 @@ class Entity
 
         return $result;
     }
-
 
     /**
      * Converts this entity into Json
