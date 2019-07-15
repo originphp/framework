@@ -32,13 +32,16 @@ class Html
      * @param string $text
      * @param array $options (tag)
      *   -tag: default:p tag to wrap lines ines e.g. ['tag'=>'div']
+     *   -escape: default is true. Escapes text before converting it to html.
      * @return string
      */
     public static function fromText(string $text, array $options = []): string
     {
-        $options += ['tag' => 'p'];
+        $options += ['tag' => 'p','escape' => true];
+        if ($options['escape']) {
+            $text = static::escape($text);
+        }
         $out = [];
-
         $text = str_replace("\r\n", "\n", $text); // Standarize line endings
         $lines = explode("\n\n", $text);
         foreach ($lines as $line) {
@@ -403,7 +406,8 @@ class Html
             'tags' => [
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'p',
-                'i', 'em', 'strong', 'b', 'blockquote', 'del',
+                'i', 'em', 'strong', 'b', 'del',
+                'blockquote'=>['cite'],
                 'a',
                 'ul', 'li', 'ol', 'br',
                 'code', 'pre',
