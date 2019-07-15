@@ -125,8 +125,8 @@ class Router
         $template = array(
           'controller' => null,
           'action' => null,
-          'args' => null,
-          'named' => null,
+          'args' => [],
+          'named' => [],
           'route' => null,
           'plugin' => null,
         );
@@ -157,22 +157,20 @@ class Router
 
         // No params no route
         if (!empty($params)) {
+            $named = [];
             // Parse Greedy results *
             if (!empty($params['greedy'])) {
-                $args = $named = [];
                 $parts = explode('/', $params['greedy']);
-
                 foreach ($parts as $paramater) {
                     if (strpos($paramater, ':') != false) {
                         list($key, $value) = explode(':', $paramater);
                         $named[$key] = urldecode($value);
                     } else {
-                        $args[] = $paramater;
+                        $params['args'][] = $paramater;
                     }
                 }
-                $params['args'] = $args;
-                $params['named'] = $named;
             }
+            $params['named'] = $named;
             unset($params['greedy']);
         }
         return $params;
