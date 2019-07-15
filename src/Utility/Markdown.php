@@ -28,6 +28,13 @@ class Markdown
 {
 
     /**
+     * Characters to escape
+     *
+     * @var string
+     */
+    protected static $characters = '`~*_\'"';
+
+    /**
      * Converts markdown to text
      *
      * @param string $markdown
@@ -100,51 +107,88 @@ class Markdown
     }
 
     /**
-     * A simple markdown convertor.
+     * Converts Markdown to HTML
+     *
      * @param string $text
+     * @param array $options The following option keys are supported:
+     *   -escape: default is true. Escapes all text. If set to false then only code blocks are escaped
      * @return string
      */
     public static function toHtml(string $text, array $options = []): string
     {
+        $options += ['escape'=>false];
+
+        if ($options['escape']) {
+            $text = htmlentities($text);
+        }
+        
         $text = preg_replace('/^ +/m', '', $text); // remove whitespaces from start of each line
         $text  = str_replace(["\r\n", "\n"], PHP_EOL, $text); // Standardize line endings
 
         $text = static::parseHeadings($text);
 
-        $text = preg_replace("/!\[(.*)\]\((.*)\)/", "<img src=\"$2\" alt=\"$1\">", $text); # order
-        $text = preg_replace("/\[(.*)\]\((.*)\)/", "<a href=\"$2\">$1</a>", $text); # order
+        //$text = preg_replace("/!\[(.*)\]\((.*)\)/", "<img src=\"$2\" alt=\"$1\">", $text); # order
+        $text = preg_replace_callback('/!\[(.*)\]\((.*)\)/', function ($matches) {
+            $alt = static::escape($matches[1]);
+            $src = static::escape($matches[2]);
+            return '<img src="'.$src.'" alt="'.$alt.'">';
+        }, $text);
+
+       
+        // $text = preg_replace("/\[(.*)\]\((.*)\)/", "<a href=\"$2\">$1</a>", $text); # order
+        $text = preg_replace_callback('/\[(.*)\]\((.*)\)/', function ($matches) {
+            $text = static::escape($matches[1]);
+            $href = static::escape($matches[2]);
+            return '<a href="'.$href.'">' . $text . '</a>';
+        }, $text);
 
         $text = preg_replace("/^> (.*)$/m", "<blockquote>$1</blockquote>\n", $text);
 
         $text = static::parseLists($text);
 
         # Work with Code Blocks
-        $text = preg_replace("/```([^```].*)```/ms", '<pre><code>$1</code></pre>', $text);
-        $text = preg_replace("/`([^`].*)`/", '<code>$1</code>', $text);
+        $text = preg_replace_callback('/```([^```].*)```/ms', function ($matches) use ($options) {
+            $needle = trim($matches[1]);
+            if ($options['escape'] === false) {
+                $needle = htmlentities($needle, ENT_NOQUOTES); // Codeblocks need to be escaped, but not twice
+            }
+            $needle = static::escape($needle); // Escape markdown characters
 
+            // trim for correct spacing and add line spacing around pre to help with p detection
+            return "\n" . '<pre><code>' . $needle . '</code></pre>' . "\n" ; // add extra \n so that its not stropped
+        }, $text);
+  
+        $text = preg_replace_callback('/`([^`].*)`/', function ($matches) use ($options) {
+            $needle = trim($matches[1]);
+            if ($options['escape'] === false) {
+                $needle = htmlentities($needle, ENT_NOQUOTES);
+            }
+            $needle = static::escape($needle); // Escape markdown characters
+            return '<code>' . $needle . '</code>';
+        }, $text);
+      
         $text = static::parseTables($text);
         $text = static::parseParagraphs($text);
-
+        $text = static::unescape($text);
+  
         /**
-         * Fix Links and Images with underscores
-         * If a link contains two underscores it will be converted to EM due to markdown.
-         * __ is not so common
-         */
-        preg_match_all('/<img src="([^"]*)" alt="([^"]*)">/', $text, $images);
-        if ($images) {
-            foreach ($images[0] as $image) {
-                $replace = str_replace(['<em>', '</em>'], '_', $image);
-                $text = str_replace($image, $replace, $text);
-            }
-        }
-        preg_match_all('/<a href="([^"]*)">([^"]*)<\/a>/', $text, $links);
-        if ($links) {
-            foreach ($links[0] as $link) {
-                $replace = str_replace(['<em>', '</em>'], '_', $link);
-                $text = str_replace($link, $replace, $text);
-            }
-        }
-
+        * Sanitize HTML to ensure nobody slipped in HTML.
+        * On look out for XSS stuff like IMG onerror and javascript alert encode.
+        * This is fallback if escape is disabled.
+        */
+       
+        $text = Html::sanitize($text, [
+        'tags' => [
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'p',
+            'i', 'em', 'strong', 'b', 'blockquote', 'del',
+            'a' => ['href'],
+            'ul', 'li', 'ol', 'br',
+            'code', 'pre',
+            'img' => ['src','alt']
+        ]
+       ]);
+    
         return trim($text);
     }
 
@@ -201,6 +245,7 @@ class Markdown
          * Paragraph lines
          */
         $skip = false;
+    
         foreach ($lines as $index => $line) {
             $line = trim($line);
             if (strpos($line, '<pre>') !== false) {
@@ -214,7 +259,7 @@ class Markdown
             if ($skip === true) {
                 continue;
             }
-            if (!preg_match('/<\/(h1|h2|h3|h4|h5|h6|ul|ol|blockquote|table|tr|th|td)/', $line)) {
+            if (!preg_match('/<\/(h1|h2|h3|h4|h5|h6|ul|ol|blockquote|table|tr|th|td)>/', $line)) {
                 $line = static::convertEmphasis($line);
                 $line = sprintf('<p>%s</p>', $line);
                 $line = str_replace("\n", '<br>', $line);
@@ -280,9 +325,9 @@ class Markdown
      */
     protected static function convertEmphasis(string $data): string
     {
-        $data = preg_replace('/(\*\*|__)(.*)\1/', '<strong>\2</strong>', $data);
-        $data = preg_replace('/(\*|_)(.*)\1/', '<em>\2</em>', $data);
-        return preg_replace('/~~(.*?)~~/', '<del>$1</del>', $data);
+        $data = preg_replace('/(?<!\\\)(\*\*|__)(.*)\1/', '<strong>\2</strong>', $data);
+        $data = preg_replace('/(?<!\\\)(\*|_)(.*)\1/', '<em>\2</em>', $data);
+        return preg_replace('/(?<!\\\)~~(.*?)~~/', '<del>$1</del>', $data);
     }
 
     /**
@@ -511,5 +556,28 @@ class Markdown
             }
         }
         return $indent;
+    }
+
+    /**
+     * Escape markdown characters
+     *
+     * @param string $markdown
+     * @return string
+     */
+    protected static function escape(string $markdown) : string
+    {
+        return preg_replace('#([' . preg_quote(self::$characters, '#') . '])#', '\\\$1', $markdown);
+    }
+  
+    /**
+       * UnEscape markdown characters
+       *
+       * @param string $markdown
+       * @return string
+       */
+
+    protected static function unescape(string $markdown) : string
+    {
+        return preg_replace('#\\\\([' . preg_quote(self::$characters, '#') . '])#', '$1', $markdown);
     }
 }
