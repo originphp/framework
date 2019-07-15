@@ -18,6 +18,7 @@ use Origin\Console\ConsoleIo;
 use Origin\Console\ArgumentParser;
 use Origin\Console\Exception\StopExecutionException;
 use Origin\Console\Exception\ConsoleException;
+use Origin\Model\Model;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
 use Origin\Console\CommandRunner;
@@ -93,13 +94,28 @@ abstract class Command
      */
     protected $commandOptions = [];
 
+
+    /**
+     * Holds the array of arguments passed
+     *
+     * @var array
+     */
     protected $arguments = [];
 
+    /**
+     * Holds the array of options passed
+     *
+     * @var array
+     */
     protected $options = [];
 
+    /**
+     * If verbose option has been called
+     *
+     * @var boolean
+     */
     protected $verbose = false;
 
- 
     /**
      * Undocumented variable.
      *
@@ -135,9 +151,9 @@ abstract class Command
      * @param string $command
      * @param array $args  array of options e.g
      *    $args = ['my_database','--datasource'=>'default','--help']
-     * @return void
+     * @return bool
      */
-    public function runCommand(string $command, array $args=[])
+    public function runCommand(string $command, array $args=[]) : bool
     {
         $runner = new CommandRunner($this->io);
         $instance = $runner->findCommand($command);
@@ -247,7 +263,7 @@ abstract class Command
      * @internal not validating name here. Changes here only affect help usage ouput e.g console app setting name
      * requires spaces.
      * @param string $name
-     * @return void
+     * @return string|void
      */
     public function name(string $name = null)
     {
@@ -258,7 +274,13 @@ abstract class Command
         $this->name = $name;
     }
 
-    protected function validateName(string $name)
+    /**
+     * Inernal function for validating a command name
+     *
+     * @param string $name
+     * @return void
+     */
+    protected function validateName(string $name) : void
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
         if (!preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
@@ -270,6 +292,7 @@ abstract class Command
      * Sets the descripton.
      *
      * @param string|array $description
+     * @return string|array|void
      */
     public function description($description = null)
     {
@@ -285,7 +308,7 @@ abstract class Command
      * @param string $usage
      * @return void
      */
-    public function addUsage(string $usage)
+    public function addUsage(string $usage) : void
     {
         $this->usages[] = $usage;
     }
@@ -300,8 +323,9 @@ abstract class Command
      *  - required: default false
      *  - type: string, integer, boolean, array, hash
      *  - default: default value
+     * @return void
      */
-    public function addOption(string $name, array $options = [])
+    public function addOption(string $name, array $options = []) : void
     {
         $this->parser->addOption($name, $options);
     }
@@ -315,15 +339,16 @@ abstract class Command
      *  - type: string, integer, array, hash
      *  - required: default false
      */
-    public function addArgument(string $name, array $options = [])
+    public function addArgument(string $name, array $options = []) : void
     {
         $this->parser->addArgument($name, $options);
     }
 
     /**
-     * Displays the help.
+     * Displays the help for this command
+     * @return void
      */
-    public function displayHelp()
+    public function displayHelp() : void
     {
         $content = $this->parser->help();
 
@@ -334,8 +359,9 @@ abstract class Command
      * Aborts the execution of the command and sets the exit code as an error.
      *
      * @param string $status
+     * @return void
      */
-    public function abort(string $message = 'Command Aborted', $exitCode = self::ERROR)
+    public function abort(string $message = 'Command Aborted', $exitCode = self::ERROR) : void
     {
         throw new StopExecutionException($message, $exitCode);
     }
@@ -344,90 +370,151 @@ abstract class Command
      * Exits the command succesfully.
      *
      * @param string $status
+     * @return void
      */
-    public function exit(string $message = 'Exited Command', $exitCode = self::SUCCESS)
+    public function exit(string $message = 'Exited Command', $exitCode = self::SUCCESS) : void
     {
         throw new StopExecutionException($message, $exitCode);
     }
 
     /**
-     * To see debug information use --verbose
+     * Displays debug information when --verbose is called.
      * @internal this is correct, not --debug
-     * @param string|array $message
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
      */
-    public function debug($message)
+    public function debug($message, array $context = []) : void
     {
         if ($this->verbose) {
             $message = $this->addTags('debug', $message);
+            if (empty($context) === false) {
+                $message = $this->insert($message, $context);
+            }
             $this->io->out($message);
         }
     }
 
     /**
-     * Displays styled info text.
+     * Displays styled info message
      *
-     * @param string|array $message
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
      */
-    public function info($message)
+    public function info($message, array $context = []) : void
     {
         $message = $this->addTags('info', $message);
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->out($message);
     }
 
     /**
-     * displays styled notices.
+     * Displays styled notice message
      *
-     * @param string|array $message
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
      */
-    public function notice($message)
+    public function notice($message, array $context = []) : void
     {
         $message = $this->addTags('notice', $message);
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->out($message);
     }
 
     /**
-     * Displays styled warnings.
+     * Displays styled success message
      *
-     * @param string|array $message
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
      */
-    public function success($message)
+    public function success($message, array $context = []) : void
     {
         $message = $this->addTags('success', $message);
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->out($message);
     }
 
     /**
-    * Displays styled warnings.
-    *
-    * @param string|array $message
-    */
-    public function warning($message)
+     * Displays styled warning message
+     *
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
+     */
+    public function warning($message, array $context = []) : void
     {
         $message = $this->addTags('warning', $message);
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->err($message);
     }
 
     /**
-     * Displays styled warnings.
-     *
-     * @param string|array $message
-     */
-    public function error($message)
+    * Displays styled error message
+    *
+    * @param string|array $message a message or array of messages
+    * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+    * @return void
+    */
+    public function error($message, array $context = []) : void
     {
         $message = $this->addTags('error', $message);
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->err($message);
     }
 
+
+    /**
+     * Inserts values into the message/s
+     *
+     * @param string|array $message
+     * @param array $values
+     * @return array
+     */
+    protected function insert($message, array $values) : array
+    {
+        if (is_string($message)) {
+            $message = [$message];
+        }
+        $replace = [];
+        foreach ($values as $key => $value) {
+            if (!is_array($value) and (!is_object($value) or method_exists($value, '__toString'))) {
+                $replace['{'. $key . '}'] = $value;
+            }
+        }
+        foreach ($message as $i => $string) {
+            $message[$i] = strtr($string, $replace);
+        }
+        return $message;
+    }
+
+    /**
+     * Wraps message or messages in tags
+     *
+     * @param string $tag
+     * @param string|array $message
+     * @return string|array
+     */
     protected function addTags(string $tag, $message)
     {
         if (is_array($message)) {
             foreach ($message as $i => $line) {
                 $message[$i] = "<{$tag}>{$line}</{$tag}>";
             }
-
             return $message;
         }
-
         return "<{$tag}>{$message}</{$tag}>";
     }
 
@@ -436,8 +523,9 @@ abstract class Command
      *
      * @param string $title
      * @param string $message
+     * @return void
      */
-    public function throwError(string $title, string $message = null)
+    public function throwError(string $title, string $message = null) : void
     {
         $msg = "<exception> ERROR </exception> <heading>{$title}</heading>\n";
         if ($message) {
@@ -471,12 +559,17 @@ abstract class Command
     }
 
     /**
-     * A wrapper for the IO out.
+     * Outputs a message (or messages) and adds a new line
      *
-     * @param array|string $message
+     * @param string|array $message a message or array of messages
+     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
+     * @return void
      */
-    public function out($message)
+    public function out($message, array $context = []) : void
     {
+        if (empty($context) === false) {
+            $message = $this->insert($message, $context);
+        }
         $this->io->out($message);
     }
 
@@ -487,7 +580,7 @@ abstract class Command
      *
      * @return \Origin\Model\Model
      */
-    public function loadModel(string $model)
+    public function loadModel(string $model) : Model
     {
         if (isset($this->{$model})) {
             return $this->{$model};
