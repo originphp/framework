@@ -24,6 +24,8 @@ class Session
 
     public function __construct()
     {
+        $this->configureSession();
+
         if ($this->started() === false) {
             $this->start();
         }
@@ -34,11 +36,45 @@ class Session
     }
 
     /**
-     * Starts the session
+     * Configures the session for use
      *
      * @return void
      */
-    public function start()
+    protected function configureSession() : void
+    {
+        if ($this->started() || headers_sent()) {
+            return;
+        }
+        $config = [];
+        $config['session.save_path'] = TMP . DS . 'sessions';
+       
+        /**
+         * If the connection is HTTPS then only send cookies
+         * through this.
+         */
+        if (env('HTTPS')) {
+            $config['session.cookie_secure'] = 1;
+        }
+        /**
+         * Tell the browsers that the session cookies should not availble client side
+         * to help prevent cookie theft (a majority of XSS attacks include highjacking the
+         * session cookie).
+         */
+        $config['session.cookie_httponly'] = 1;
+
+        foreach ($config as $option => $value) {
+            if (ini_set($option, $value) === false) {
+                throw new Exception(sprintf('Error configuring session for `%s', $options));
+            }
+        }
+    }
+
+    /**
+     * Starts the session
+     *
+     * @return bool
+     */
+    public function start() : bool
     {
         if ($this->started) {
             return false;
@@ -49,24 +85,8 @@ class Session
         }
 
         if ($this->started() === PHP_SESSION_ACTIVE) {
-            throw new Exception('Session alredy started.');
+            throw new Exception('Session already started.');
         }
-
-        session_save_path(TMP . DS . 'sessions');
-
-        /**
-         * If the connection is HTTPS then only send cookies
-         * through this.
-         */
-        if( env('HTTPS')){
-            ini_set('session.cookie_secure', 1);
-        }
-        /**
-         * Tell the browsers that the session cookies should not availble client side
-         * to help prevent cookie theft (a majority of XSS attacks include highjacking the
-         * session cookie).
-         */
-        ini_set('session.cookie_httponly', 1);
 
         /**
          * Full Path Disclosure attack
@@ -74,15 +94,15 @@ class Session
          */
         $name = session_name();
         $id = null;
-        if(isset($_COOKIE[$name])){
+        if (isset($_COOKIE[$name])) {
             $id = $_COOKIE[$name];
         }
-       if($id AND !preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',$id)){
+        if ($id and !preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
             $this->destroy();
             $id = null;
         }
 
-        if($id === null){
+        if ($id === null) {
             session_id(uuid());
         }
       
@@ -96,6 +116,7 @@ class Session
             $this->destroy();
             $this->start();
         }
+        return true;
     }
 
     /**
@@ -125,9 +146,9 @@ class Session
      *
      * @param string $key
      * @param mixed $value
-     * @return null
+     * @return void;
      */
-    public function write(string $key = null, $value = null)
+    public function write(string $key = null, $value = null) : void
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
@@ -202,8 +223,10 @@ class Session
 
     /**
      * Destroys the session.
+     *
+     * @return void
      */
-    public function destroy()
+    public function destroy() : void
     {
         if (!$this->started()) {
             session_start();
@@ -218,14 +241,11 @@ class Session
     /**
      * Checks if session started
      *
-     * @return void
+     * @return bool
      */
     public function started() : bool
     {
-        if ($this->started or session_status() === PHP_SESSION_ACTIVE) {
-            return true;
-        }
-        return false;
+        return ($this->started or session_status() === PHP_SESSION_ACTIVE);
     }
 
     /**
@@ -247,16 +267,17 @@ class Session
      *
      * @return void
      */
-    public function clear()
+    public function clear() : void
     {
         $_SESSION = [];
     }
+    
     /**
      * Resets the session data
      *
      * @return void
      */
-    public function reset()
+    public function reset() : void
     {
         $this->clear();
         $_SESSION = null;
