@@ -260,8 +260,8 @@ abstract class BaseSchema
      *
      * @param string $table
      * @param string|array $column owner_id, [owner_id,tenant_id]
+     * @param string $name name of index
      * @param array $options
-     *  - name: name of index
      *  - unique: default:false set to to true to create unique index.
      *  - type: use this to set a specific type. e.g FULLTEXT
      * @return string

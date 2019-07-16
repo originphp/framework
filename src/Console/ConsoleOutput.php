@@ -257,9 +257,9 @@ class ConsoleOutput
      *
      * @param string $text  'some random text'
      * @param array $settings ['color'=>'blue','background'=>'red','blink'=>true]
-     * @return void
+     * @return string
      */
-    public function color(string $text, array $settings)
+    public function color(string $text, array $settings) : string
     {
         $set = [];
         $unset = [];

@@ -55,7 +55,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function emergency(string $message, array $context = [])
+    public static function emergency(string $message, array $context = []) : void
     {
         static::write('emergency', $message, $context);
     }
@@ -70,7 +70,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function alert(string $message, array $context = [])
+    public static function alert(string $message, array $context = []) : void
     {
         static::write('alert', $message, $context);
     }
@@ -84,7 +84,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function critical(string $message, array $context = [])
+    public static function critical(string $message, array $context = []) : void
     {
         static::write('critical', $message, $context);
     }
@@ -97,7 +97,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function error(string $message, array $context = [])
+    public static function error(string $message, array $context = []) : void
     {
         static::write('error', $message, $context);
     }
@@ -112,7 +112,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function warning(string $message, array $context = [])
+    public static function warning(string $message, array $context = []) : void
     {
         static::write('warning', $message, $context);
     }
@@ -124,7 +124,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function notice(string $message, array $context = [])
+    public static function notice(string $message, array $context = []) : void
     {
         static::write('notice', $message, $context);
     }
@@ -138,7 +138,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function info(string $message, array $context = [])
+    public static function info(string $message, array $context = []) : void
     {
         static::write('info', $message, $context);
     }
@@ -150,7 +150,7 @@ class Log
      * @param array $context
      * @return void
      */
-    public static function debug(string $message, array $context = [])
+    public static function debug(string $message, array $context = []) : void
     {
         static::write('debug', $message, $context);
     }
@@ -174,7 +174,7 @@ class Log
      *  - array: any other data will be converted to a json string
      * @return void
      */
-    public static function write(string $level, string $message, array $context = [])
+    public static function write(string $level, string $message, array $context = []) : void
     {
         $context += ['channel' => 'application'];
         $channel = $context['channel'];
@@ -202,7 +202,12 @@ class Log
         }
     }
     
-    protected static function loadEngines()
+    /**
+     * Loads the engines for logging
+     *
+     * @return void
+     */
+    protected static function loadEngines() : void
     {
         $engines = static::config();
         foreach ($engines as $name => $config) {
@@ -243,7 +248,7 @@ class Log
      *
      * @return void
      */
-    public static function reset()
+    public static function reset() : void
     {
         static::$loaded = null;
         static::$config = [];

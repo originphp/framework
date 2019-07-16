@@ -11,7 +11,7 @@
  * @link         https://www.originphp.com
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types=1);
 namespace Origin\Console;
 
 use Origin\Console\Exception\ConsoleException;
@@ -60,6 +60,13 @@ class ConsoleIo
      */
     protected $lastWrittenLength = null;
 
+    /**
+     * Constructor
+     *
+     * @param ConsoleOutput $out
+     * @param ConsoleOutput $err
+     * @param ConsoleInput $in
+     */
     public function __construct(ConsoleOutput $out = null, ConsoleOutput $err = null, ConsoleInput $in = null)
     {
         if ($out === null) {
@@ -79,29 +86,32 @@ class ConsoleIo
     /**
      * Outputs line or lines to the stdout adding \n to each line.
      *
-     * @param string|array $message
-     */
-    public function out($message)
+    * @param string|array $message a message or array of messages
+    * @return void
+    */
+    public function out($message) : void
     {
         $this->lastWrittenLength = $this->stdout->write($message, true);
     }
 
     /**
-     * Writes to the output without adding new lines.
-     *
-     * @param string|array $message
-     */
-    public function write($message)
+    * Writes to the output without adding new lines.
+    *
+    * @param string|array $message a message or array of messages
+    * @return void
+    */
+    public function write($message) : void
     {
         $this->lastWrittenLength =  $this->stdout->write($message, false);
     }
 
     /**
-     * Outputs line or lines to the stderr.
-     *
-     * @param string|array $message
-     */
-    public function err($message)
+    * Outputs line or lines to the stderr.
+    *
+    * @param string|array $message a message or array of messages
+    * @return void
+    */
+    public function err($message) : void
     {
         $this->stderr->write($message);
     }
@@ -115,7 +125,7 @@ class ConsoleIo
      * @param string|array $message
      * @return void
      */
-    public function overwrite($message, $newLine = true)
+    public function overwrite($message, $newLine = true) : void
     {
         if (is_array($message)) {
             $message = implode("\n", $message);
@@ -136,9 +146,11 @@ class ConsoleIo
     /**
      * A Title style.
      *
-     * @param string $heading
+     * @param string $title
+     * @param string $style
+     * @return void
      */
-    public function title(string $title, string $style ='heading')
+    public function title(string $title, string $style ='heading') : void
     {
         $this->out("<{$style}>{$title}</{$style}>");
         $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
@@ -148,9 +160,11 @@ class ConsoleIo
     /**
      * A heading style.
      *
-     * @param string $heading1
+     * @param string $heading
+     * @param string $style
+     * @return void
      */
-    public function heading(string $heading, string $style ='heading')
+    public function heading(string $heading, string $style ='heading') : void
     {
         $this->out("<{$style}>{$heading}</{$style}>");
         $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
@@ -164,7 +178,7 @@ class ConsoleIo
      * @param integer $indent
      * @return void
      */
-    public function text($text, int $indent=2)
+    public function text($text, int $indent=2) : void
     {
         $text = (array) $text;
         foreach ($text as $line) {
@@ -176,7 +190,8 @@ class ConsoleIo
      * Draws table.
      *
      * @param array $array
-     * @param bool  $headers wether first row is headers
+     * @param boolean $headers wether first row contains headers
+     * @return void
      */
     public function table(array $array, bool $headers = true) : void
     {
@@ -235,7 +250,7 @@ class ConsoleIo
      * @param integer $indent indent amount
      * @return void
      */
-    public function list($elements, string $bullet = '*', int $indent=2)
+    public function list($elements, string $bullet = '*', int $indent=2) : void
     {
         foreach ((array) $elements as $element) {
             $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
@@ -246,22 +261,22 @@ class ConsoleIo
      * Formats a string by using array of options. such as color,background.
      *
      * @param string $text
-     * @param array  $options (background,color,blink=true etc)
-     *
+     * @param array $options (background,color,blink=true etc)
      * @return string
      */
-    public function format(string $text, array $options = [])
+    public function format(string $text, array $options = []) : string
     {
         return $this->stdout->color($text, $options);
     }
 
     /**
-     * Displays a info.
+     * Displays info.
      *
      * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function info($messages, array $options = [])
+    public function info($messages, array $options = []) : void
     {
         $options += ['background' => 'blue', 'color' => 'white', 'bold' => true];
         $this->highlight($messages, $options);
@@ -271,9 +286,10 @@ class ConsoleIo
      * Displays a success block or alert.
      *
      * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function success($messages, array $options = [])
+    public function success($messages, array $options = []) : void
     {
         $options += ['background' => 'green', 'color' => 'white', 'bold' => true];
         $this->highlight($messages, $options);
@@ -283,9 +299,10 @@ class ConsoleIo
     * Displays a warning block or alert to stderr out
     *
     * @param string|array $messages line or array of lines
-    * @param array        $options  (background,color,blink,bold,underline)
+    * @param array $options  (background,color,blink,bold,underline,reverse)
+    * @return void
     */
-    public function warning($messages, array $options = [])
+    public function warning($messages, array $options = []) : void
     {
         $options += ['background' => 'yellow', 'color' => 'black', 'bold' => true];
         foreach ((array) $messages as $message) {
@@ -298,9 +315,10 @@ class ConsoleIo
      * Displays an error block or alert.
      *
      * @param string|array $messages line or array of lines
-     * @param array        $options  (background,color,blink,bold,underline)
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function error($messages, array $options = [])
+    public function error($messages, array $options = []) : void
     {
         $options += ['background' => 'lightRed', 'color' => 'white', 'bold' => true];
         foreach ((array) $messages as $message) {
@@ -312,14 +330,13 @@ class ConsoleIo
     /**
      * Draws a progress bar.
      *
-     * thank you!
      * @param integer $value
      * @param integer $max
      * @param array $options (color) e.g. [color=>cyan]
      * @return void
      * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
-    public function progressBar(int $value, int $max, array $options=[])
+    public function progressBar(int $value, int $max, array $options=[]) : void
     {
         $options += ['color'=>'green'];
         
@@ -337,13 +354,13 @@ class ConsoleIo
             $empty = "\033[30;40m \033[0m";
         }
         if ($percent) {
-            $progressBar = str_repeat($full, floor($percent / 2));
+            $progressBar = str_repeat($full, (int) floor($percent / 2));
         }
         if ($left) {
             if ($left %2 !== 0) {
                 $left ++;
             }
-            $progressBar .= str_repeat($empty, floor($left / 2));
+            $progressBar .= str_repeat($empty, (int) floor($left / 2));
         }
         
         $progress = $percent . '%';
@@ -363,11 +380,11 @@ class ConsoleIo
     /**
      * Highlights some text.
      *
-     * @param string $message
-     * @param string $bgColor
-     * @param string $textColor
+     * @param string|array $messages line or array of lines
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function highlight($messages, array $options = [])
+    public function highlight($messages, array $options = []) : void
     {
         $options += ['background' => 'black', 'color' => 'white'];
 
@@ -382,10 +399,11 @@ class ConsoleIo
     /**
      * Generates a colourful padded alert.
      *
-     * @param string|array $messages
-     * @param array        $options
+     * @param string|array $messages line or array of lines
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function alert($messages, array $options = [])
+    public function alert($messages, array $options = []) : void
     {
         $options += ['background' => 'black', 'color' => 'white'];
 
@@ -406,10 +424,11 @@ class ConsoleIo
     /**
      * Wraps text in a colourful block.
      *
-     * @param string|array $messages
-     * @param array        $options
+     * @param string|array $messages line or array of lines
+     * @param array $options (background,color,blink,bold,underline,reverse)
+     * @return void
      */
-    public function block($messages, array $options = [])
+    public function block($messages, array $options = []) : void
     {
         $options += ['background' => 'black', 'color' => 'white', 'padding' => 4];
 
@@ -436,16 +455,19 @@ class ConsoleIo
      * Outputs new lines.
      *
      * @param int $count number of newlines
+     * @return void
      */
-    public function nl($count = 1)
+    public function nl($count = 1) : void
     {
         $this->stdout->write(str_repeat("\n", $count), false);
     }
 
     /**
      * Clears the screen.
+     *
+     * @return void
      */
-    public function clear()
+    public function clear() : void
     {
         $this->stdout->write("\033c", false);
     }
@@ -453,12 +475,11 @@ class ConsoleIo
     /**
      * Asks the user a question and returns the value (or default if set).
      *
-     * @param string $prompt  The question to ask
+     * @param string $prompt The question to ask
      * @param string $default default value if user presses enter
-     *
      * @return string
      */
-    public function ask(string $prompt, string $default = null)
+    public function ask(string $prompt, string $default = null) : ?string
     {
         $input = '';
         if ($default) {
@@ -482,8 +503,9 @@ class ConsoleIo
      * @param string $prompt  The question to ask
      * @param array  $options ['yes','no']
      * @param string $default default value if user presses enter
+     * @return string
      */
-    public function askChoice(string $prompt, array $options, string $default = null)
+    public function askChoice(string $prompt, array $options, string $default = null) : ?string
     {
         $input = $defaultString = '';
         $optionsString = implode('/', $options);
@@ -498,7 +520,6 @@ class ConsoleIo
             array_map('strtoupper', $options)
         );
        
-      
         while ($input === '' or !in_array($input, $options)) {
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
@@ -545,12 +566,13 @@ class ConsoleIo
     }
 
     /**
-     * Displays a status.
+     * Displays a status, e.g [ OK ] Something that was run
      *
      * @param string $type    e.g. ok, error, ignore
      * @param string $message
+     * @return void
      */
-    public function status(string $status, string $message)
+    public function status(string $status, string $message) : void
     {
         if (!isset($this->statusCodes[$status])) {
             throw new ConsoleException(sprintf('Unkown status %s', $status));
@@ -564,10 +586,9 @@ class ConsoleIo
      * Get the max length of a an array of lines.
      *
      * @param array $lines
-     *
      * @return int
      */
-    protected function getMaxLength(array $lines)
+    protected function getMaxLength(array $lines) : int
     {
         $maxLength = 0;
         foreach ($lines as $line) {
@@ -576,7 +597,6 @@ class ConsoleIo
                 $maxLength = $length;
             }
         }
-
         return $maxLength;
     }
 
@@ -602,7 +622,7 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleOutput;
      */
-    public function stderr()
+    public function stderr() : ConsoleOutput
     {
         return $this->stderr;
     }
@@ -611,7 +631,7 @@ class ConsoleIo
     *
     * @return \Origin\Console\ConsoleOutput;
     */
-    public function stdout()
+    public function stdout() : ConsoleOutput
     {
         return $this->stdout;
     }
@@ -620,7 +640,7 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleInput;
      */
-    public function stdin()
+    public function stdin() : ConsoleInput
     {
         return $this->stdin;
     }
@@ -630,8 +650,9 @@ class ConsoleIo
      *
      * @param string $text
      * @param array  $options
+     * @return void
      */
-    protected function writeFormatted(string $text, array $options = [])
+    protected function writeFormatted(string $text, array $options = []) : void
     {
         $string = $this->format($text, $options);
         $this->stdout->write($string);

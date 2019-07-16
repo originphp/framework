@@ -64,14 +64,12 @@ class Entity
     /**
      * Constructor
      *
-     * List of options th
+     * @param array $properties data
+     * @param array $options
      * - name: Model name
      * - exists: if the model exists in the database (set during find), null, means dont know
      * - markClean: mark the entity as clean after creation. This is useful for when loading records
      * from the database.
-     *
-     * @param array $properties data
-     * @param array $options
      */
     public function __construct(array $properties = [], array $options = [])
     {
