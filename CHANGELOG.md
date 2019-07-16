@@ -25,7 +25,6 @@ Delete tag: git tag -d <tag_name>
 ### Added
 - Added Schema::addIndex Type option to allow for creating fulltext indexes
 - Entity modified(fieldname) to check if field was modified
-- Command out/warning/debug/info/etc placeholder interpolation
 
 ### Fixed
 - Fixed router adding route with args

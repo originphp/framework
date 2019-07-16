@@ -188,6 +188,22 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Can\'t be called test'], $entity->errors('name'));
     }
 
+
+    public function testModified()
+    {
+        $entity = new Entity(['name'=>'test'], ['markClean'=>true]);
+        $this->assertEquals([], $entity->modified());
+        $this->assertFalse($entity->modified('name'));
+
+        $entity->name = 'new name';
+        $this->assertEquals(['name'], $entity->modified());
+        $entity->foo = 'bar';
+        $this->assertEquals(['name','foo'], $entity->modified());
+        
+        $this->assertTrue($entity->modified('name'));
+        $this->assertTrue($entity->modified('foo'));
+    }
+
     public function testToJson()
     {
         $data = [

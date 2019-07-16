@@ -111,6 +111,10 @@ class PgsqlSchemaTest extends OriginTestCase
             $result = $adapter->addIndex('articles', 'title', 'index_title');
             $this->assertTrue($adapter->connection()->execute($result));
         }
+        // The following command wont work on PGSQL, just testing the type
+        $expected = 'CREATE PREFIX INDEX idx_title ON topics (title)';
+        $result = $adapter->addIndex('topics', 'title', 'idx_title', ['type'=>'prefix']);
+        $this->assertEquals($expected, $result);
     }
     public function testChangeColumn()
     {

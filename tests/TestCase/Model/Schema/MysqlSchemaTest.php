@@ -127,6 +127,10 @@ class MysqlSchemaTest extends OriginTestCase
             $result = $adapter->addIndex('articles', 'title', 'index_title');
             $this->assertTrue($adapter->connection()->execute($result));
         }
+
+        $expected = 'CREATE FULLTEXT INDEX idx_title ON topics (title)';
+        $result = $adapter->addIndex('topics', 'title', 'idx_title', ['type'=>'FULLTEXT']);
+        $this->assertEquals($expected, $result);
     }
     public function testChangeColumn()
     {

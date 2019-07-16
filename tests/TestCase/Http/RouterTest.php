@@ -59,6 +59,18 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('10', $result['named']['limit']);
     }
 
+
+    public function testGreedyArgs()
+    {
+        MockRouter::reset();
+        MockRouter::add('/posts/custom/*', ['controller' => 'Articles', 'action' => 'show', 'all']);
+        $result = MockRouter::parse('/posts/custom');
+        $this->assertEquals('all', $result['args'][0]);
+        $result = MockRouter::parse('/posts/custom/1234');
+        $this->assertEquals('all', $result['args'][0]);
+        $this->assertEquals('1234', $result['args'][1]);
+    }
+
     public function testComplicated()
     {
         MockRouter::reset();
