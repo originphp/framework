@@ -378,126 +378,78 @@ abstract class Command
     }
 
     /**
-     * Displays debug information when --verbose is called.
+     * Displays debug information when the --verbose option is passed
+     *
      * @internal this is correct, not --debug
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function debug($message, array $context = []) : void
+    public function debug($message) : void
     {
         if ($this->verbose) {
             $message = $this->addTags('debug', $message);
-            if (empty($context) === false) {
-                $message = $this->insert($message, $context);
-            }
             $this->io->out($message);
         }
     }
 
     /**
-     * Displays styled info message
+     * Displays a styled info message
      *
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function info($message, array $context = []) : void
+    public function info($message) : void
     {
         $message = $this->addTags('info', $message);
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->out($message);
     }
 
     /**
-     * Displays styled notice message
+     * Displays a styled notice message
      *
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function notice($message, array $context = []) : void
+    public function notice($message) : void
     {
         $message = $this->addTags('notice', $message);
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->out($message);
     }
 
     /**
-     * Displays styled success message
+     * Displays a styled success message
      *
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function success($message, array $context = []) : void
+    public function success($message) : void
     {
         $message = $this->addTags('success', $message);
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->out($message);
     }
 
     /**
-     * Displays styled warning message
+     * Displays a styled warning message
      *
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function warning($message, array $context = []) : void
+    public function warning($message) : void
     {
         $message = $this->addTags('warning', $message);
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->err($message);
     }
 
     /**
-    * Displays styled error message
+    * Displays a styled error message
     *
     * @param string|array $message a message or array of messages
-    * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
     * @return void
     */
-    public function error($message, array $context = []) : void
+    public function error($message) : void
     {
         $message = $this->addTags('error', $message);
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->err($message);
-    }
-
-
-    /**
-     * Inserts values into the message/s
-     *
-     * @param string|array $message
-     * @param array $values
-     * @return array
-     */
-    protected function insert($message, array $values) : array
-    {
-        if (is_string($message)) {
-            $message = [$message];
-        }
-        $replace = [];
-        foreach ($values as $key => $value) {
-            if (!is_array($value) and (!is_object($value) or method_exists($value, '__toString'))) {
-                $replace['{'. $key . '}'] = $value;
-            }
-        }
-        foreach ($message as $i => $string) {
-            $message[$i] = strtr($string, $replace);
-        }
-        return $message;
     }
 
     /**
@@ -562,14 +514,10 @@ abstract class Command
      * Outputs a message (or messages) and adds a new line
      *
      * @param string|array $message a message or array of messages
-     * @param array $context an array of values for placeholder interpolation. e.g. ['key'=>'value'] will replace {key} with value
      * @return void
      */
-    public function out($message, array $context = []) : void
+    public function out($message) : void
     {
-        if (empty($context) === false) {
-            $message = $this->insert($message, $context);
-        }
         $this->io->out($message);
     }
 
