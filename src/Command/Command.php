@@ -51,7 +51,7 @@ abstract class Command
      *
      * @var string
      */
-    protected $name = null;
+    protected $name = 'unknown';
 
     /**
      * Holds the description for this command. This is shown before help.
