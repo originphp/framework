@@ -19,6 +19,7 @@ use Origin\Controller\Controller;
 use Origin\Core\Resolver;
 use Origin\Controller\Component\Exception\MissingComponentException;
 use Origin\Http\Response;
+
 /**
  * A quick and easy way to create models and add them to registry. Not sure if
  * this will be added.
@@ -49,7 +50,7 @@ class ComponentRegistry extends ObjectRegistry
             if (method_exists($object, $method)) {
                 $result = call_user_func_array([$object, $method], $arguments);
                 // Redirect has been called
-                if($result instanceof Response OR $this->controller->response->headers('Location')){
+                if ($result instanceof Response or $this->controller->response->headers('Location')) {
                     return $result;
                 }
             }

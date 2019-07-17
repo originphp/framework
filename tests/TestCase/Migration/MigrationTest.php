@@ -18,6 +18,8 @@ use Origin\Migration\Migration;
 use Origin\Model\Schema\MysqlSchema;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Exception\Exception;
+use Origin\Exception\InvalidArgumentException;
+
 use Origin\Log\Log;
 use Origin\Model\ConnectionManager;
 use Origin\Migration\Exception\IrreversibleMigrationException;
@@ -100,7 +102,7 @@ class MockMigration extends Migration
 
 class MigrationTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article','Origin.User'];
+    public $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
 
     public function adapter()
     {
@@ -519,5 +521,162 @@ class MigrationTest extends OriginTestCase
         $migration = new Migration($this->adapter());
         $this->expectException(Exception::class);
         $migration->dropTable('foo');
+    }
+
+    public function testAddColumnException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->addColumn('bananas', 'name', 'string');
+    }
+
+    public function testChangeColumnException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->changeColumn('bananas', 'name', 'string');
+    }
+
+    public function testChangeColumnDoesNotExistException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->changeColumn('articles', 'does_not_exist', 'string');
+    }
+
+    public function testRenameColumnException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->renameColumn('bananas', 'old', 'new');
+    }
+
+    public function testRenameColumnDoesNotExistException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->renameColumn('articles', 'old', 'new');
+    }
+
+    public function testRemoveColumnException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeColumn('bananas', 'old');
+    }
+
+    public function testRemoveColumnDoesNotExistException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeColumn('articles', 'old');
+    }
+
+    public function testRemoveColumnnException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeColumns('bananas', ['old']);
+    }
+
+    public function testRemoveColumnsDoesNotExistException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeColumns('articles', ['old']);
+    }
+
+    public function testColumnExistsException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->columnExists('bananas', 'old');
+    }
+
+    public function testColumnExists()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->assertTrue($migration->columnExists('articles', 'title'));
+        $this->assertTrue($migration->columnExists('articles', 'title', ['type'=>'string']));
+        $this->assertFalse($migration->columnExists('articles', 'title', ['type'=>'integer']));
+        $this->assertFalse($migration->columnExists('articles', 'title', ['default'=>'nonya']));
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit'=>255]));
+        $this->assertFalse($migration->columnExists('articles', 'title', ['limit'=>10]));
+
+        $this->assertTrue($migration->columnExists('deals', 'amount', ['precision'=>15]));
+        $this->assertFalse($migration->columnExists('deals', 'amount', ['precision'=>12]));
+
+        $this->assertTrue($migration->columnExists('deals', 'amount', ['scale'=>2]));
+        $this->assertFalse($migration->columnExists('deals', 'amount', ['scale'=>4]));
+    }
+
+    public function testAddIndexException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->addIndex('bananas', 'foo');
+    }
+
+    public function testRemoveIndexException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeIndex('bananas', 'foo');
+    }
+
+
+    public function testAddForeignKeyException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->addForeignKey('bananas', 'articles');
+    }
+
+    public function testAddForeignKeyDoesNotExistException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->addForeignKey('articles', 'bananas');
+    }
+
+    public function testRemoveForeignKeyException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeForeignKey('bananas', 'articles');
+    }
+
+    public function testRemoveForeignKeyInvalidArgument()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(InvalidArgumentException::class);
+        $migration->removeForeignKey('articles', []);
+    }
+
+    public function testForeignKeyExistsException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->foreignKeyExists('bananas', 'abc123');
+    }
+
+    public function testFetchRow()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $result = $migration->fetchRow('SELECT * FROM articles');
+        $expected = [
+            'id' => 1000,'author_id' => 1001,'title' => 'Article #1','body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00','modified' => '2019-03-27 13:12:00',
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testFetchAll()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $result = $migration->fetchAll('SELECT * FROM articles LIMIT 1');
+        $expected = [
+            'id' => 1000,'author_id' => 1001,'title' => 'Article #1','body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00','modified' => '2019-03-27 13:12:00',
+        ];
+        $this->assertEquals([$expected], $result);
     }
 }

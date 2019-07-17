@@ -130,6 +130,7 @@ class Cookie
      * @param string $name
      * @param array $value
      * @return void
+     * @codeCoverageIgnore
      */
     protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
     {
@@ -169,7 +170,7 @@ class Cookie
             $value = Security::decrypt($value, $this->encryptionKey());
         }
         if (substr($value, 0, 1)==='{') {
-            $value = json_decode($value);
+            $value = json_decode($value, true);
         }
         return $value;
     }

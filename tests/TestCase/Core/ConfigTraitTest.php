@@ -54,5 +54,9 @@ class ConfigTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($mock->config('settingz', 'none'));
         $this->assertEquals('bar', $mock->config('foo'));
         $this->assertEquals('bar/foo', $mock->config('foo/bar'));
+
+        $mock->config('foo', null);
+        $config = $mock->config();
+        $this->assertArrayNotHasKey('foo', $config);
     }
 }

@@ -846,9 +846,14 @@ class Migration
         * @param string $sql
         * @return array|null
         */
-    public function fetchRow(string $sql)
+    public function fetchRow(string $sql) : ?array
     {
-        return $this->connection()->fetchRow($sql);
+        $ds = $this->connection();
+        $result = null;
+        if ($ds->execute($sql)) {
+            $result = $ds->fetch();
+        }
+        return $result;
     }
 
     /**
@@ -857,9 +862,14 @@ class Migration
     * @param string $sql
     * @return array
     */
-    public function fetchAll(string $sql)
+    public function fetchAll(string $sql) : ?array
     {
-        return  $this->connection()->fetchAll($sql);
+        $ds = $this->connection();
+        $result = null;
+        if ($ds->execute($sql)) {
+            $result = $ds->fetchAll();
+        }
+        return $result;
     }
 
     /**

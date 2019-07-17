@@ -19,7 +19,7 @@ class GenerateCommand extends Command
      *
      * @var string
      */
-    protected $directory = ORIGIN . DS . 'templates';
+    protected $directory = SRC . '/templates';
 
     /**
      * Generators array and list of templates they will process.
@@ -41,10 +41,10 @@ class GenerateCommand extends Command
 
     public function initialize()
     {
-        $directory = SRC.'/templates';
-        if (file_exists($directory)) {
-            $this->directory = $directory;
+        if (!file_exists($this->directory)) {
+            $this->directory = ORIGIN . DS . 'templates'; // default
         }
+
         $this->addArgument(
             'generator',
             [
@@ -568,18 +568,7 @@ class GenerateCommand extends Command
         $this->debug("<cyan>{$filename}</cyan>\n\n<code>{$content}</code>");
 
         $result = $this->io->createFile($filename, $content, $this->options('force'));
-
-        if ($result) {
-            $this->io->status('ok', $filename);
-        } else {
-            $this->io->status('error', $filename);
-        }
-        /*$action = "<error>>  created</error>";
-        if(){
-         $action = "<success>>  created</success>";
-        }
-        $filename = str_replace(ROOT . DS,'',$filename);
-        $this->out($action . "  <text>{$filename}</text>");*/
+        $this->io->status($result?'ok':'error', $filename);
         return $result;
     }
 

@@ -256,30 +256,37 @@ class Controller
     public function startupProcess()
     {
         $result = $this->beforeFilter();
-        // Check redirect has not been called
-        if ($result instanceof Response or $this->response->headers('Location')) {
-            return $this->response;
+        if (!$this->isResponseOrRedirect($result)) {
+            $result = $this->componentRegistry()->call('startup');
         }
-        $result = $this->componentRegistry()->call('startup');
-        if ($result instanceof Response or $this->response->headers('Location')) {
+        if ($this->isResponseOrRedirect($result)) {
             return $this->response;
         }
     }
-
+   
     public function shutdownProcess()
     {
         $result = $this->componentRegistry()->call('shutdown');
-        // Check redirect has not been called
-        if ($result instanceof Response or $this->response->headers('Location')) {
-            return $this->response;
+        if (!$this->isResponseOrRedirect($result)) {
+            $result = $this->afterFilter();
         }
-        $result = $this->afterFilter();
-        if ($result instanceof Response or $this->response->headers('Location')) {
+        if ($this->isResponseOrRedirect($result)) {
             return $this->response;
         }
         //# Free Mem for no longer used items
         $this->componentRegistry()->destroy();
         unset($this->componentRegistry);
+    }
+
+    /**
+    * Checks if the result is a response object or redirect was called
+    *
+    * @param mixed $result
+    * @return boolean
+    */
+    protected function isResponseOrRedirect($result) : bool
+    {
+        return ($result instanceof Response or $this->response->headers('Location'));
     }
 
     /**

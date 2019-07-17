@@ -56,4 +56,18 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('33.33%', $this->Intl->percent(33.333333));
     }
+
+    public function testLocales()
+    {
+        $locales = $this->Intl->locales('en_GB');
+        $this->assertEquals('English (United Kingdom)', $locales['en_GB']);
+        $this->assertGreaterThan(700, count($locales)); // this will vary
+    }
+    public function testTimezones()
+    {
+        $timezones = $this->Intl->timezones();
+      
+        $this->assertEquals('GMT +00:00 - UTC', $timezones['UTC']);
+        $this->assertEquals(426, count($timezones)); // not sure if this varys on differen like locales
+    }
 }

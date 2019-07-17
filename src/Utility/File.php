@@ -24,7 +24,7 @@ class File
      * @param string $filename
      * @return string $contents
      */
-    public static function read(string $filename)
+    public static function read(string $filename) : string
     {
         if (is_readable($filename)) {
             return file_get_contents($filename);
@@ -96,7 +96,7 @@ class File
      * @param string $data Data to place in the temporary file
      * @return string $filename A temporary file
      */
-    public static function tmp(string $data = null)
+    public static function tmp(string $data = null) : string
     {
         $filename = sys_get_temp_dir() . DS . uid();
         if ($data) {
@@ -143,9 +143,9 @@ class File
      *
      * @param string $source filename with full path
      * @param string $destination filename with or without full path (same directory)
-     * @return void
+     * @return bool
      */
-    public static function copy(string $source, string $destination)
+    public static function copy(string $source, string $destination) : bool
     {
         if (self::exists($source)) {
             if (strpos($destination, DS) === false) {
@@ -161,9 +161,9 @@ class File
        *
        * @param string $filename filename with full path
        * @param int $mode e.g 0755 (remember 0 infront)
-       * @return bool|string
+       * @return bool
        */
-    public static function chmod(string $filename, int $mode)
+    public static function chmod(string $filename, int $mode) : bool
     {
         if (self::exists($filename)) {
             return @chmod($filename, $mode);
@@ -178,7 +178,7 @@ class File
     * @param string $user  e.g. root, www-data
     * @return bool
     */
-    public static function chown(string $filename, string $user)
+    public static function chown(string $filename, string $user) : bool
     {
         if (self::exists($filename)) {
             return @chown($filename, $user);
@@ -193,7 +193,7 @@ class File
      * @param string $user  e.g. root, www-data
      * @return bool
      */
-    public static function chgrp(string $filename, string $group)
+    public static function chgrp(string $filename, string $group) : bool
     {
         if (self::exists($filename)) {
             return @chgrp($filename, $group);
@@ -206,9 +206,9 @@ class File
      *
      * @param string $filename filename with full path
      * @param int $mode e.g 0755 (remember 0 infront)
-     * @return bool|string
+     * @return string
      */
-    public static function mode(string $filename)
+    public static function mode(string $filename) : string
     {
         if (self::exists($filename)) {
             return (string) substr(sprintf("%o", fileperms($filename)), -4);
@@ -223,7 +223,7 @@ class File
      * @param string $filename
      * @return string
      */
-    public static function perms(string $filename)
+    public static function perms(string $filename) : string
     {
         return static::mode($filename);
     }
@@ -234,7 +234,7 @@ class File
      * @param string $filename filename with full path
      * @return string
      */
-    public static function owner(string $filename)
+    public static function owner(string $filename) : string
     {
         if (self::exists($filename)) {
             return posix_getpwuid(fileowner($filename))['name'];
@@ -247,7 +247,7 @@ class File
      * @param string $filename filename with full path
      * @return string
      */
-    public static function group(string $filename)
+    public static function group(string $filename) : string
     {
         if (self::exists($filename)) {
             return posix_getgrgid(filegroup($filename))['name'];

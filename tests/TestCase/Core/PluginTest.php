@@ -19,15 +19,26 @@ use Origin\Core\Exception\MissingPluginException;
 
 class MockPlugin extends Plugin
 {
+    /**
+     * File where the composer plugins are stored.
+     *
+     * @var strmg
+     */
+    const COMPOSER_PLUGINS = TMP . DS . 'plugins.json';
+
     public static function getLoaded()
     {
         return static::$loaded;
     }
     public static $fileFound = true;
  
-    public static function include(string $filename)
+    public static function include(string $filename) : bool
     {
         return static::$fileFound;
+    }
+    public static function reset()
+    {
+        static::$loaded = [];
     }
 }
 class PluginTest extends \PHPUnit\Framework\TestCase
@@ -86,5 +97,18 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         
         Plugin::load('Widget', ['bootstrap'=>true]);
         $this->assertFalse(Plugin::routes('Widget'));
+    }
+
+    /**
+     * Run initialize, plugin is not there so it will throw exception elsewhere
+     *
+     * @return void
+     */
+    public function testInitialize()
+    {
+        $file = TMP . DS . 'plugins.json';
+        file_put_contents($file, '{"Debug":"\/..\/debug-plugin"}');
+        $this->assertNull(MockPlugin::initialize());
+        MockPlugin::reset();
     }
 }

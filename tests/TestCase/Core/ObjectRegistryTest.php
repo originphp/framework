@@ -27,6 +27,13 @@ class MockObjectRegistry extends ObjectRegistry
 class LemonPie
 {
     public $name = 'LemonPie';
+    
+    public $called = 0;
+
+    public function startup(int $x)
+    {
+        $this->called = $this->called + $x;
+    }
 }
 class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -88,8 +95,8 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
     public function testLoad()
     {
         $Registry = new ObjectRegistry();
-        $Registry->load('Origin\Test\Core\LemonPie');
-        $this->assertTrue($Registry->has('Origin\Test\Core\LemonPie'));
+        $Registry->load(LemonPie::class);
+        $this->assertTrue($Registry->has(LemonPie::class));
         $this->expectException(MissingClassException::class);
         $Registry->load('UnkownClass');
     }
@@ -101,9 +108,9 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $Registry = new ObjectRegistry();
 
-        $Registry->load('Origin\Test\Core\LemonPie');
-        $this->assertTrue($Registry->unload('Origin\Test\Core\LemonPie'));
-        $this->assertFalse($Registry->has('Origin\Test\Core\LemonPie'));
+        $Registry->load(LemonPie::class);
+        $this->assertTrue($Registry->unload(LemonPie::class));
+        $this->assertFalse($Registry->has(LemonPie::class));
         $this->assertFalse($Registry->unload('UnkownClass'));
     }
 
@@ -113,8 +120,8 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
     public function testDisable()
     {
         $Registry = new ObjectRegistry();
-        $Registry->load('Origin\Test\Core\LemonPie');
-        $this->assertTrue($Registry->disable('Origin\Test\Core\LemonPie'));
+        $Registry->load(LemonPie::class);
+        $this->assertTrue($Registry->disable(LemonPie::class));
         $this->assertFalse($Registry->disable('UnkownObject'));
     }
     /**
@@ -123,9 +130,20 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
     public function testEnable()
     {
         $Registry = new ObjectRegistry();
-        $Registry->load('Origin\Test\Core\LemonPie');
-        $Registry->disable('Origin\Test\Core\LemonPie');
-        $this->assertTrue($Registry->enable('Origin\Test\Core\LemonPie'));
-        $this->assertFalse($Registry->enable('Origin\Test\Core\LemonPie'));
+        $Registry->load(LemonPie::class);
+        $Registry->disable(LemonPie::class);
+        $this->assertTrue($Registry->enable(LemonPie::class));
+        $this->assertFalse($Registry->enable(LemonPie::class));
+    }
+
+    public function testCall()
+    {
+        $LemonPie = new LemonPie();
+
+        $Registry = new ObjectRegistry();
+        $Registry->set('LemonPie', $LemonPie);
+        $Registry->enable('LemonPie');
+        $this->assertNull($Registry->call('startup', [1]));
+        $this->assertEquals(1, $LemonPie->called);
     }
 }

@@ -27,6 +27,7 @@ Delete tag: git tag -d <tag_name>
 - Entity modified(fieldname) to check if field was modified
 
 ### Fixed
+- Fixed unpacking arrays from cookies
 - Fixed migration FetchRow/FetchAll feature
 - Fixed router adding route with args
 - Fixed Markdown::toHtml code block issues

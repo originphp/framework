@@ -199,7 +199,7 @@ abstract class Datasource
               ];
             }
 
-            // Fallback if dsiable PDO::ERRMODE_EXCEPTION flag
+            // Fallback if disabled PDO::ERRMODE_EXCEPTION flag
             if (!$result) {
                 return false;
             }

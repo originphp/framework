@@ -14,7 +14,6 @@
 namespace Origin\Model\Engine;
 
 use Origin\Model\Datasource;
-use Origin\Exception\Exception;
 
 class PostgreSQLEngine extends Datasource
 {

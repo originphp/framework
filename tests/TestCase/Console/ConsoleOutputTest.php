@@ -57,7 +57,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->write('<unkown>hello world</unkown>');
-          $this->assertEquals("<unkown>hello world</unkown>\n", $ConsoleOutput->read());
+        $this->assertEquals("<unkown>hello world</unkown>\n", $ConsoleOutput->read());
 
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
@@ -68,7 +68,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     public function testStyles()
     {
         $ConsoleOutput = new ConsoleOutput();
-         $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
+        $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
@@ -88,28 +88,49 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->write('<unkown>This is an unkown style</unkown>');
-        $this->assertContains('<unkown>This is an unkown style</unkown>',$ConsoleOutput->read());
-
+        $this->assertContains('<unkown>This is an unkown style</unkown>', $ConsoleOutput->read());
     }
 
-    public function testNestedStyle(){
+    public function testNestedStyle()
+    {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->write('<text>This is a <yellow>test</yellow></text>');
-        $this->assertEquals('494ad65c5fb334414d393d454f8d6d50',md5($ConsoleOutput->read()));
+        $this->assertEquals('494ad65c5fb334414d393d454f8d6d50', md5($ConsoleOutput->read()));
     }
 
-    public function testModeException(){
+    public function testModeException()
+    {
         $ConsoleOutput = new ConsoleOutput();
+        $mode = $ConsoleOutput->mode();
         $this->expectException(InvalidArgumentException::class);
-        $ConsoleOutput->mode(007);
+        $ConsoleOutput->mode($mode + 1000);
     }
 
-    public function testEmptySet(){
+    public function testEmptySet()
+    {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->styles('foo', ['foo'=>'bar']);
         $ConsoleOutput->write('<foo>bar</foo>');
-        $this->assertEquals("bar\n",$ConsoleOutput->read());
+        $this->assertEquals("bar\n", $ConsoleOutput->read());
+    }
+
+    public function testBytes()
+    {
+        $ConsoleOutput = new \Origin\Console\ConsoleOutput();
+        $bytes = $ConsoleOutput->write('OriginPHP', false);
+        $this->assertEquals(9, $bytes);
+        $ConsoleOutput->write("\r", false);
+    }
+
+    public function testWritePlain()
+    {
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::PLAIN);
+
+        $ConsoleOutput->styles('foo', ['foo'=>'bar']);
+        $ConsoleOutput->write('<foo>bar</foo>');
+        $this->assertEquals("bar\n", $ConsoleOutput->read());
     }
 }

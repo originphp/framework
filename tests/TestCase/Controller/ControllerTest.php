@@ -81,6 +81,57 @@ class TestsController extends Controller
     }
 }
 
+
+/**
+ * Test afterFilter return response
+ */
+class ApplesController extends Controller
+{
+    protected $when = null;
+
+    public function initialize()
+    {
+        $this->loadComponent('Fruit', ['className'=>FruitComponent::class]);
+    }
+    public function setWhen($when)
+    {
+        $this->when = $when;
+    }
+    public function beforeFilter()
+    {
+        if ($this->when === 'beforeFilter') {
+            return $this->response;
+        }
+    }
+    public function afterFilter()
+    {
+        if ($this->when === 'afterFilter') {
+            return $this->response;
+        }
+    }
+}
+class FruitComponent extends Component
+{
+    protected $when = null;
+
+    public function setWhen($when)
+    {
+        $this->when = $when;
+    }
+    public function startup()
+    {
+        if ($this->when === 'startup') {
+            return $this->controller()->response;
+        }
+    }
+    public function shutdown()
+    {
+        if ($this->when === 'shutdown') {
+            return $this->controller()->response;
+        }
+    }
+}
+
 class ControllerTest extends \PHPUnit\Framework\TestCase
 {
     public $controller = null;
@@ -243,6 +294,41 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->setMockRegistry($components);
 
         $controller->shutdownProcess();
+    }
+
+
+    public function testStartupBeforeFilterResponse()
+    {
+        $request = new Request('tests/edit/2048');
+        $controller = new ApplesController($request, new Response());
+        $controller->setWhen('beforeFilter');
+        $this->assertInstanceOf(Response::class, $controller->startupProcess());
+    }
+
+    public function testStartupStartupResponse()
+    {
+        $request = new Request('tests/edit/2048');
+        $controller = new ApplesController($request, new Response());
+        $controller->Fruit->setWhen('startup');
+        $this->assertInstanceOf(Response::class, $controller->startupProcess());
+    }
+
+    public function testShutdownAfterFilterResponse()
+    {
+        $request = new Request('tests/edit/2048');
+        $controller = new ApplesController($request, new Response());
+        $controller->setWhen('afterFilter');
+        $this->assertNull($controller->startupProcess());
+        $this->assertInstanceOf(Response::class, $controller->shutdownProcess());
+    }
+
+    public function testStartupShutdownResponse()
+    {
+        $request = new Request('tests/edit/2048');
+        $controller = new ApplesController($request, new Response());
+        $controller->Fruit->setWhen('shutdown');
+        $this->assertNull($controller->startupProcess());
+        $this->assertInstanceOf(Response::class, $controller->shutdownProcess());
     }
 
     /**

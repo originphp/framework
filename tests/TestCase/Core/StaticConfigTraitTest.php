@@ -57,5 +57,9 @@ class StaticConfigTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(StaticMockObject::config('settingz', 'none'));
         $this->assertEquals('bar', StaticMockObject::config('foo'));
         $this->assertEquals('bar/foo', StaticMockObject::config('foo/bar'));
+
+        StaticMockObject::config('foo', null);
+        $config = StaticMockObject::config();
+        $this->assertArrayNotHasKey('foo', $config);
     }
 }

@@ -39,8 +39,7 @@ class Inflector
     'plural' => array(
       '/([^aeiouy]|qu)y$/i' => '\1ies',
       '/(ch|sh|ss|us|x)$/i' => '\1es',
-      '/^$/' => '',
-      '/$/' => 's',
+      '/^$/' => ''
     ),
 
     'singular' => array(
@@ -71,10 +70,10 @@ class Inflector
         foreach (self::$rules['plural'] as $pattern => $replacement) {
             if (preg_match($pattern, $singular)) {
                 self::$cache['pluralize'][$singular] = preg_replace($pattern, $replacement, $singular);
-
                 return self::$cache['pluralize'][$singular];
             }
         }
+        return $singular . 's';
     }
 
     /**

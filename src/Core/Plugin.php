@@ -25,6 +25,13 @@ use Origin\Core\Exception\MissingPluginException;
 class Plugin
 {
     /**
+     * File where the composer plugins are stored.
+     *
+     * @var [type]
+     */
+    const COMPOSER_PLUGINS = ROOT . DS . 'vendor' . DS . 'originphp-plugins.json';
+
+    /**
      * Loaded plugins are stored here with config
      *
      * @var array
@@ -38,14 +45,10 @@ class Plugin
      */
     public static function initialize()
     {
-        $composerPlugins = ROOT . DS . 'vendor' . DS . 'originphp-plugins.json';
-        if (file_exists($composerPlugins)) {
-            $composer = json_decode(file_get_contents($composerPlugins), true);
+        if (file_exists(static::COMPOSER_PLUGINS)) {
+            $composer = json_decode(file_get_contents(static::COMPOSER_PLUGINS), true);
             foreach ($composer as $plugin => $path) {
-                static::load($plugin, [
-                    'path' => ROOT . $path, // Put to verify exists
-                    'autoload'=>false
-                    ]);
+                static::load($plugin, [ 'path' => ROOT . $path, 'autoload' => false]);
             }
         }
     }
@@ -70,8 +73,9 @@ class Plugin
      *
      * @param string $plugin
      * @param array $options
+     * @return void
      */
-    public static function load(string $plugin, array $options = [])
+    public static function load(string $plugin, array $options = []) : void
     {
         $options += [
             'routes' => true,
@@ -96,9 +100,9 @@ class Plugin
      * Unloads a plugin for use
      *
      * @param string $plugin
-     * @return void
+     * @return bool
      */
-    public static function unload(string $plugin)
+    public static function unload(string $plugin) : bool
     {
         if (isset(static::$loaded[$plugin])) {
             unset(static::$loaded[$plugin]);
@@ -109,8 +113,11 @@ class Plugin
 
     /**
      * Sets up the autoloading of classes for the plugin
+     *
+     * @param string $plugin
+     * @return void
      */
-    protected static function autoload(string $plugin)
+    protected static function autoload(string $plugin) : void
     {
         $autoloader = Autoloader::instance();
         $options = static::$loaded[$plugin];
@@ -125,9 +132,9 @@ class Plugin
      * Loads the bootstrap config for a plugin
      *
      * @param string $plugin
-     * @return void
+     * @return bool
      */
-    public static function bootstrap(string $plugin)
+    public static function bootstrap(string $plugin) : bool
     {
         $options = static::$loaded[$plugin];
         if ($options['bootstrap']) {
@@ -142,17 +149,20 @@ class Plugin
      * @param string $plugin
      * @return void
      */
-    public static function loadRoutes()
+    public static function loadRoutes() : void
     {
         foreach (static::$loaded as $plugin => $options) {
             static::routes($plugin);
         }
-        return true;
     }
+
     /**
      * Loads routes for plugin. Used in config/routes.php.
+     *
+     * @param string $plugin
+     * @return boolean
      */
-    public static function routes(string $plugin)
+    public static function routes(string $plugin) : bool
     {
         $options = static::$loaded[$plugin];
         if ($options['routes']) {
@@ -165,9 +175,9 @@ class Plugin
      * Includes a file
      *
      * @param string $filename
-     * @return void
+     * @return bool
      */
-    protected static function include(string $filename)
+    protected static function include(string $filename) : bool
     {
         if (file_exists($filename)) {
             return (bool) include $filename;
