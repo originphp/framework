@@ -16,7 +16,6 @@ namespace Origin\Command;
 
 use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
 use Origin\Command\DbSchemaTrait;
 
 class DbSchemaDumpCommand extends Command
