@@ -20,18 +20,48 @@ use Origin\Core\Configure;
 
 class Session
 {
+    /**
+     * Bool when started
+     *
+     * @var boolean
+     */
     protected $started = false;
 
+    protected $cli = false;
+
+    protected $timeout = 3600;
+
+    /**
+     * Constructor
+     */
     public function __construct()
     {
-        $this->configureSession();
+        $this->cli = (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg');
+        /**
+        * Security considerations:
+        *
+        * - session.cookie_secure: If the connection is HTTPS then only send cookies through this.
+        * - session.cookie_httponly: Tell the browsers that the session cookies should not availble client side
+        *   to help prevent cookie theft (a majority of XSS attacks include highjacking the session cookie).
+        */
+    
+        $config = [
+            'session.save_path' => TMP . DS . 'sessions',
+            'session.cookie_secure' => 1,
+            'session.cookie_httponly' => 1
+        ];
+
+        if (!$this->started() and !headers_sent()) {
+            $this->setIniConfig($config);
+        }
+
+        // For DOT and CLI
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
 
         if ($this->started() === false) {
             $this->start();
-        }
-        // For DOT
-        if (!isset($_SESSION)) {
-            $_SESSION = [];
         }
     }
 
@@ -40,31 +70,11 @@ class Session
      *
      * @return void
      */
-    protected function configureSession() : void
+    protected function setIniConfig(array $config) : void
     {
-        if ($this->started() || headers_sent()) {
-            return;
-        }
-        $config = [];
-        $config['session.save_path'] = TMP . DS . 'sessions';
-       
-        /**
-         * If the connection is HTTPS then only send cookies
-         * through this.
-         */
-        if (env('HTTPS')) {
-            $config['session.cookie_secure'] = 1;
-        }
-        /**
-         * Tell the browsers that the session cookies should not availble client side
-         * to help prevent cookie theft (a majority of XSS attacks include highjacking the
-         * session cookie).
-         */
-        $config['session.cookie_httponly'] = 1;
-
         foreach ($config as $option => $value) {
             if (ini_set($option, $value) === false) {
-                throw new Exception(sprintf('Error configuring session for `%s', $options));
+                throw new Exception(sprintf('Error configuring session for `%s`', $option));
             }
         }
     }
@@ -80,43 +90,66 @@ class Session
             return false;
         }
 
-        if (PHP_SAPI === 'cli') {
+        if ($this->cli) {
             return $this->started = true;
         }
 
-        if ($this->started() === PHP_SESSION_ACTIVE) {
+        if ($this->started()) {
             throw new Exception('Session already started.');
         }
 
         /**
-         * Full Path Disclosure attack
+         * Validate cookie and create secure session ID
          * @see https://www.owasp.org/index.php/Full_Path_Disclosure
          */
+        $id = $this->validateCookie();
+      
+        $this->startSession($id);
+        
+        return $this->started = true;
+    }
+    
+    /**
+     * Main logic for starting session
+     *
+     * @param string $id
+     * @return void
+     */
+    protected function startSession(string $id = null) : void
+    {
+        if ($id === null) {
+            $this->id(uuid());
+        }
+        
+        if (!session_start()) {
+            throw new Exception('Error starting a session.');
+        }
+
+        if ($this->timedOut($this->timeout)) {
+            $this->destroy();
+            $this->start();
+        }
+    }
+
+    /**
+     * This will validate the cookie and return the ID if it is correct
+     *
+     * @param string $name
+     * @return string|null
+     */
+    protected function validateCookie() : ?string
+    {
         $name = session_name();
+
         $id = null;
         if (isset($_COOKIE[$name])) {
             $id = $_COOKIE[$name];
         }
         if ($id and !preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
             $this->destroy();
-            $id = null;
+            return null;
         }
-
-        if ($id === null) {
-            session_id(uuid());
-        }
-      
-        if (!session_start()) {
-            throw new Exception('Error starting a session.');
-        }
-        
-        $this->started = true;
-
-        if ($this->timedOut()) {
-            $this->destroy();
-            $this->start();
-        }
-        return true;
+        return $id;
     }
 
     /**
@@ -146,7 +179,7 @@ class Session
      *
      * @param string $key
      * @param mixed $value
-     * @return void;
+     * @return void
      */
     public function write(string $key = null, $value = null) : void
     {
@@ -157,7 +190,23 @@ class Session
             return;
         }
         // Overwite session vars
-        $data = $Dot->items();
+        $this->overwrite($Dot->items());
+    }
+
+    /**
+     * Overwrite each session var, for PHP reasons
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function overwrite(array $data) : void
+    {
+        foreach ($_SESSION as $key => $value) {
+            if (!isset($data[$key])) {
+                unset($_SESSION[$key]);
+                continue;
+            }
+        }
         foreach ($data as $key => $value) {
             $_SESSION[$key] = $value;
         }
@@ -213,8 +262,7 @@ class Session
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
             $Dot->delete($key);
-            $_SESSION = $Dot->items();
-
+            $this->overwrite($Dot->items());
             return true;
         }
 
@@ -229,10 +277,14 @@ class Session
     public function destroy() : void
     {
         if (!$this->started()) {
+            // @codeCoverageIgnoreStart
             session_start();
+            // @codeCoverageIgnoreEnd
         }
-        if (PHP_SAPI !== 'cli') {
+        if ($this->cli === false) {
+            // @codeCoverageIgnoreStart
             session_destroy();
+            // @codeCoverageIgnoreEnd
         }
         $this->started = false;
         $_SESSION = [];
@@ -252,14 +304,19 @@ class Session
      * Sets (if headers not already sent) and gets the session id
     *
     * @param string $id
-    * @return string
+    * @return string|void
     */
-    public function id(string $id = null) : string
+    public function id(string $id = null)
     {
-        if ($id and !headers_sent()) {
-            session_id($id);
+        if ($id === null) {
+            return session_id();
         }
-        return session_id();
+
+        if (!headers_sent()) {
+            // @codeCoverageIgnoreStart
+            session_id($id);
+            // @codeCoverageIgnoreEnd
+        }
     }
 
     /**
@@ -274,16 +331,12 @@ class Session
     
     /**
      * Resets the session data
-     *
+     * @codeCoverageIgnore
      * @return void
      */
     public function reset() : void
     {
+        deprecationWarning('session::reset is deprecated use session:clear instead');
         $this->clear();
-        $_SESSION = null;
-        if (!headers_sent()) {
-            session_write_close();
-            $this->start();
-        }
     }
 }

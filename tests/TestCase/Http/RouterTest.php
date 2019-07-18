@@ -209,4 +209,12 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $expected = '/contact_manager/articles/index';
         $this->assertEquals($expected, MockRouter::url($url));
     }
+
+    public function testExtensions()
+    {
+        $this->assertEquals(['json','xml'], Router::extensions());
+        Router::extensions(['xml']);
+        $this->assertEquals(['xml'], Router::extensions());
+        Router::extensions(['json','xml']); // put back
+    }
 }

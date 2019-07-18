@@ -15,6 +15,12 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Session;
+use Origin\TestSuite\TestTrait;
+
+class MockSession extends Session
+{
+    use TestTrait;
+}
 
 class SessionTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,6 +70,8 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->Session->destroy();
         $this->assertFalse($this->Session->exists('Test.status'));
     }
+
+   
     /**
      * @depends testDestroy
      */
@@ -75,11 +83,39 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->Session->exists('Test.status'));
     }
 
-    public function testReset()
+    public function testClear()
     {
         $this->Session->write('Test.status', 'ok');
         $this->assertNotEmpty($_SESSION);
         $this->Session->clear();
         $this->assertEmpty($_SESSION);
+    }
+    public function testValidate()
+    {
+        $session = new MockSession();
+        $name = session_name();
+        $_COOKIE[$name] = uuid();
+        $id = $session->callMethod('validateCookie');
+        $this->assertEquals(36, strlen($id));
+        unset($_COOKIE[$name]);
+        
+        $session = new MockSession();
+        $_COOKIE[$name] = base64_encode(md5('originPHP'));
+        $this->assertNull($session->callMethod('validateCookie'));
+        unset($_COOKIE[$name]);
+
+        $session = new MockSession();
+        $_COOKIE[$name] = bin2hex(random_bytes(1024));
+        $this->assertNull($session->callMethod('validateCookie'));
+        unset($_COOKIE[$name]);
+    }
+
+    public function testTimedout()
+    {
+        $session = new MockSession();
+        $session->write('Session.lastActivity', time());
+        $this->assertFalse($session->callMethod('timedOut'));
+        $session->write('Session.lastActivity', strtotime('-3601 seconds'));
+        $this->assertTrue($session->callMethod('timedOut'));
     }
 }

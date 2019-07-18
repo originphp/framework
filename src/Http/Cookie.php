@@ -41,8 +41,8 @@ class Cookie
         if (Configure::exists('Cookie.key')) {
             return Configure::read('Cookie.key');
         }
-        // Create a 32 byte fallback key using the pepper
-        return md5(Configure::read('Security.pepper'));
+        deprecationWarning('Add Cookie.key to your configuration.');
+        return md5(Configure::read('Security.pepper')); //Create a key using thefor backwards compatability
     }
 
     /**

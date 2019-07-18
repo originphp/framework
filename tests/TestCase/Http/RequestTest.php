@@ -16,9 +16,11 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\Exception\MethodNotAllowedException;
+use Origin\TestSuite\TestTrait;
 
 class MockRequest extends Request
 {
+    use TestTrait;
     public $input = null;
     public function setInput($input)
     {
@@ -125,6 +127,9 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $request->data('key'));
         $this->assertEquals(['key'=>'value'], $request->data());
         $this->assertNull($request->data('fozzy'));
+        $data = ['foo'=>'bar'];
+        $request->data($data); // test replace
+        $this->assertEquals($data, $request->data());
     }
 
     public function testParams()
@@ -134,6 +139,9 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $request->params('key'));
         $this->assertNotEmpty($request->params());
         $this->assertNull($request->params('fozzy'));
+        $data = ['foo'=>'bar'];
+        $request->params($data); // test replace
+        $this->assertEquals($data, $request->params());
     }
 
     public function testMethod()
@@ -148,7 +156,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('dummy file', $request->data('file'));
     }
 
-    public function testCookie()
+    public function testCookies()
     {
         $_COOKIE = [
             'foo'=>'T3JpZ2lu==.sohTIjiPjvT+n6OUcASsZZ4Umymfravo53rhwG2iNbf4Jp/jl9ZDO0zQubXR/DRBstaW+nEnDXUhJ9PNDsdiDQ=='
@@ -160,6 +168,12 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     
         $this->assertEquals($expected, $request->cookies());
         $this->assertEquals('This is a test', $request->cookies('foo'));
+
+        $expected = [
+            'foo' => 'bar'
+        ];
+        $request->cookies($expected);
+        $this->assertEquals($expected, $request->cookies());// test replace
     }
     public function testHeaders()
     {
@@ -240,5 +254,26 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     
         $request = new MockRequest(null, ['server'=>['HTTP_X_REQUESTED_WITH'=>'XMLHttpRequest']]);
         $this->assertTrue($request->ajax());
+    }
+   
+    public function testReferer()
+    {
+        $request = new MockRequest(null, ['server'=>['HTTP_REFERER'=>'https://www.google.com/search?q=top+php+frameworks']]);
+        $this->assertEquals('https://www.google.com/search?q=top+php+frameworks', $request->referer());
+    }
+
+    public function testType()
+    {
+        $request = new MockRequest();
+        $request->params('type', 'json');
+        $request->callMethod('detectRequestType');
+        $this->assertEquals('json', $request->type());
+
+        // Test Accepts
+        $request = new MockRequest(null, ['server'=>['HTTP_ACCEPT'=>'application/json']]);
+        $this->assertEquals('json', $request->type());
+
+        $request = new MockRequest(null, ['server'=>['HTTP_ACCEPT'=>'application/xml']]);
+        $this->assertEquals('xml', $request->type());
     }
 }

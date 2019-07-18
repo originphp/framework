@@ -152,7 +152,7 @@ class Request
         $this->processGet($url);
         $this->processPost($options['post']);
         $this->processFiles($options['files']);
-        
+  
         $this->detectRequestType();
         Router::request($this);
     }
@@ -257,17 +257,14 @@ class Request
     }
 
     /**
-     * Gets the URL for request
+     * Gets the URI for request
      * uri: /controller/action/100.
      *
      * @return string uri
      */
     protected function uri(): string
     {
-        if ($uri = $this->env('REQUEST_URI')) {
-            return $uri;
-        }
-        return '';
+        return $this->env('REQUEST_URI')??'';
     }
 
     /**
@@ -315,8 +312,8 @@ class Request
     }
 
     /**
-     * Sets and gets the type that should be rendered. html, json or xml
-     *
+     * Sets and gets the request type (format), ie. what will be RENDERED e.g html, json or xml.
+     * This is somewhat different to contentType.
      * @param string $type
      * @return string|void
      */
@@ -342,7 +339,7 @@ class Request
     protected function detectRequestType(): ?string
     {
         $type = 'html';
-        if ($this->params('type') and in_array($this->params('type'), ['xml', 'json'])) {
+        if (in_array($this->params('type'), ['xml', 'json'])) {
             $type = $this->params('type');
         }
         $extension = $this->params('ext');
@@ -610,6 +607,7 @@ class Request
             $this->environment[$key] = $value;
             return;
         }
+
         if (isset($this->environment[$key])) {
             return $this->environment[$key];
         }
@@ -618,13 +616,14 @@ class Request
 
     /**
      * Sets or gets a header (you can get in psr friendly way, lowercase)
+     * @see https://www.php-fig.org/psr/psr-7/
      *
      * $result= $request->header('www-Authenticate');
      * $request->header('WWW-Authenticate', 'Negotiate');
      * @codeCoverageIgnore
      * @param string $name name of header to get
      * @param string $value value of header to set
-     * @return string|null
+     * @return string|void
      */
     public function header(string $name, string $value = null)
     {
@@ -639,10 +638,10 @@ class Request
 
     /**
      * Sets and gets headers
-
+     * @see https://www.php-fig.org/psr/psr-7/
      * @param string $name
      * @param string $value
-     * @return array|string|null
+     * @return array|string|null|void
      */
     public function headers(string $name = null, string $value = null)
     {
@@ -669,8 +668,10 @@ class Request
 
     /**
      * Returns the session object
+     *
+     * @return Session
      */
-    public function session()
+    public function session() : Session
     {
         if ($this->session === null) {
             $this->session = new Session();
