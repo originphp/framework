@@ -16,5 +16,8 @@ define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', sys_get_temp_dir());
 define('WEBROOT', ROOT . DS . 'public');
 
-@mkdir(TMP . DS . 'cache');
+if (!file_exists(TMP . DS . 'cache')) {
+    @mkdir(TMP . DS . 'cache');
+}
+
 require ORIGIN . DS . 'src' . DS . 'bootstrap.php';

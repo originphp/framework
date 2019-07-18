@@ -69,13 +69,48 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
     {
         Email::config('demo', ['debug'=>true]);
         $engine = new MockEmailEngine([
-            'to'=>'foo@example.com',
-            'from'=>'foo@example.com',
+            'to'=>'you@example.com',
+            'from'=>'me@example.com',
             'account'=>'demo'
             ]);
         $id = uniqid();
-        $engine->log('error', 'Error code {value}', ['value'=>$id]);
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
         $date = date('Y-m-d G:i:s');
         $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
+        $this->assertContains('From: me@example.com',$engine->email());
+        $this->assertContains('To: you@example.com',$engine->email());
+    }
+
+
+    public function testLogEmailArray()
+    {
+        Email::config('demo', ['debug'=>true]);
+        $engine = new MockEmailEngine([
+            'to'=> ['you@example.com','jimbo'],
+            'from'=>['me@example.com'],
+            'account'=>'demo'
+            ]);
+        $id = uniqid();
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
+        $date = date('Y-m-d G:i:s');
+        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
+   
+        $this->assertContains('From: me@example.com',$engine->email());
+        $this->assertContains('jimbo <you@example.com>',$engine->email());
+    }
+
+    /**
+     * This has invalid credentials and will cause the email
+     *
+     * @return void
+     */
+    public function testSendFailureException(){
+        Email::config('your-personal-gmail-account', ['host'=>'smtp.gmail.com','password'=>'your_password']);
+        $engine = new MockEmailEngine([
+            'to'=>'foo@example.com',
+            'from'=>'foo@example.com',
+            'account'=>'your-personal-gmail-account' // joke
+            ]);
+            $this->assertFalse($engine->log('error', 'This will go into a blackhole'));
     }
 }

@@ -49,7 +49,9 @@ class NumberTest extends \PHPUnit\Framework\TestCase
      */
     public function testDefaultCurrency()
     {
+        $this->assertEquals('USD', Number::defaultCurrency());
         Number::defaultCurrency('GBP');
+        $this->assertEquals('GBP', Number::defaultCurrency());
         $this->assertEquals('£1,234.56', Number::currency(1234.56));
     }
 
@@ -71,22 +73,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123456789.0, Number::parse('123,456,789'));
         $this->assertEquals(123456, Number::parse('123456'));
     }
-    /*
-    @todo seem pointless
-        public function testParseDecimal()
-        {
-            $this->assertEquals(123456789.25, Number::parseDecimal('123,456,789.25'));
-            $this->assertEquals(123456789.0, Number::parseDecimal('123,456,789'));
-            $this->assertEquals(123456, Number::parseDecimal('123456'));
-        }
 
-        public function testParseNumber()
-        {
-            $this->assertEquals(123456789.25, Number::parseInteger('123,456,789.25'));
-            $this->assertEquals(123456789, Number::parseInteger('123,456,789'));
-            $this->assertEquals(123456, Number::parseInteger('123456'));
-        }
-    */
     public function testFormat()
     {
         Number::locale('es-ES');

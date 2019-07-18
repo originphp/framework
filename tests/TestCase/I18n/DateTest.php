@@ -28,6 +28,23 @@ class DateTest extends \PHPUnit\Framework\TestCase
     {
         Date::locale('en_US');
     }
+
+    public function testLocale()
+    {
+        $this->assertEquals('en_US', Date::locale());
+        Date::locale('en_GB');
+        $this->assertEquals('en_GB', Date::locale());
+        Date::locale('en_US');
+    }
+
+    public function testTimezone()
+    {
+        $this->assertEquals('UTC', Date::timezone());
+        Date::timezone('Europe/London');
+        $this->assertEquals('Europe/London', Date::timezone());
+        Date::timezone('UTC');
+    }
+
     public function testFormat()
     {
         // Test Locale Switching

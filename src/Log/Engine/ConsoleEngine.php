@@ -19,14 +19,14 @@ use Origin\Console\ConsoleOutput;
 
 class ConsoleEngine extends BaseEngine
 {
-
     /**
      * Holds the ConsoleOutput
      *
      * @var \Origin\Console\ConsoleOutput
      */
     protected $output = null;
-    /**
+
+   /**
      * Default configuration
      *
      * @var array
@@ -37,20 +37,22 @@ class ConsoleEngine extends BaseEngine
         'channels' => []
     ];
 
+    public function initialize(array $config)
+    {
+        $this->output = new ConsoleOutput($this->config('stream'));
+    }
+
     /**
       * Workhorse for the logging methods
       *
       * @param string $level e.g debug, info, notice, warning, error, critical, alert, emergency.
       * @param string $message 'this is a {what}'
       * @param array $context  ['what'='string']
-      * @return void
+      * @return bool
       */
     public function log(string $level, string $message, array $context = [])
     {
-        if ($this->output === null) {
-            $this->output = new ConsoleOutput($this->config('stream'));
-        }
         $message = $this->format($level, $message, $context);
-        $this->output->write("<{$level}>{$message }</{$level}>");
+        return (bool) $this->output->write("<{$level}>{$message }</{$level}>");
     }
 }

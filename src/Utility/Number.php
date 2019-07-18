@@ -24,37 +24,37 @@ class Number
         'AUD' => [
             'name' => 'Australian Dollar',
             'before' => '$',
-            'after' => '',
+            'after' => ''
         ],
         'CAD' => [
             'name' => 'Canadian Dollar',
             'before' => '$',
-            'after' => '',
+            'after' => ''
         ],
         'CHF' => [
             'name' => 'Swiss Franc',
             'before' => '',
-            'after' => 'Fr',
+            'after' => 'Fr'
         ],
         'EUR' => [
             'name' => 'Euro',
             'before' => '€',
-            'after' => '',
+            'after' => ''
         ],
         'GBP' => [
             'name' => 'British Pound',
             'before' => '£',
-            'after' => '',
+            'after' => ''
         ],
         'JPY' => [
             'name' => 'Japanese Yen',
             'before' => '¥',
-            'after' => '',
+            'after' => ''
         ],
         'USD' => [
             'name' => 'United States Dollar',
             'before' => '$',
-            'after' => '',
+            'after' => ''
         ]
         ];
 
@@ -72,7 +72,7 @@ class Number
      *  - thousands: the thousands seperator
      *  - decimnals: the decimals seperator
      *  - places: the default number of places
-     * @return array|null
+     * @return array|void
      */
     public static function locale(array $locale = null)
     {
@@ -96,7 +96,7 @@ class Number
      * @param array $options
      * @return void
      */
-    public static function addCurrency(string $symbol, $options=[])
+    public static function addCurrency(string $symbol, $options=[]): void
     {
         self::$currencies[$symbol] = $options + ['name'=>$symbol,'before'=>$symbol . ' ','after'=>''];
     }
@@ -108,7 +108,7 @@ class Number
      * @param integer $precision
      * @return string
      */
-    public static function precision($value, int $precision = 2)
+    public static function precision($value, int $precision = 2): string
     {
         $value = sprintf("%01.{$precision}f", $value);
         return static::format($value, ['places'=>$precision]);
@@ -117,12 +117,12 @@ class Number
     /**
      * Formats a number of a perctenage
      *
-     * @param float $value
+     * @param string|float|integer $value
      * @param integer $precision
      * @param array $options
-     * @return void
+     * @return string
      */
-    public static function percent($value, int $precision = 2, $options = [])
+    public static function percent($value, int $precision = 2, $options = []): string
     {
         $options += ['multiply' => false];
         if ($options['multiply']) {
@@ -131,50 +131,66 @@ class Number
         return static::precision($value, $precision) . '%';
     }
     /**
-     * Formats a number from database. If it does not have a decimal point then it
-     * is assumed it is an integer, else it will use the locale places as default.
+     * Formats a number from database.
      *
-     * @param string|float $value
+     * @param string|float|integer $value
      * @param array $options
      * @return string
      */
-    public static function format($value, array $options=[])
+    public static function format($value, array $options=[]) : string
     {
         $locale = static::$locale;
+
+        $places = 0;
+        if(is_float($value) OR (is_string($value) AND strpos($value,'.') !== false)){
+            $places = $locale['places'];
+        }
+
         $options += [
             'before' => '',
             'after'=>'',
-            'places' => preg_match('/^[0-9]+$/u', $value)?0:$locale['places'],
+            'places' => $places,
             'thousands' => $locale['thousands'],
             'decimals' => $locale['decimals']
         ];
 
         $formatted = number_format($value, $options['places'], $options['decimals'], $options['thousands']);
     
-        return $options['before'] .   $formatted  . $options['after'];
+        return $options['before'] .  $formatted  . $options['after'];
     }
 
-    public static function currency($value, string $currency = null, array $options=[])
+    /**
+     * Formats a number to currency format
+     *
+     * @param string|float|integer $value
+     * @param string $currency
+     * @param array $options
+     * @return string
+     */
+    public static function currency($value, string $currency = null, array $options=[]) : string
     {
         if ($currency === null) {
             $currency = static::$locale['currency'];
         }
+        
+        // merge currency setitngs to options or create new one
         if (isset(static::$currencies[$currency])) {
             $options += static::$currencies[$currency];
         } else {
-            $options += ['before' =>  $currency . ' ', 'after'=>''];
+            $options += ['before' => $currency . ' ', 'after'=>''];
         }
+       
         return static::format($value, $options);
     }
 
     /**
      * Parses a localized number into MySQL
      *
-     * @param string|float $value
+     * @param string|float|integer $value
      * @param array $options
      * @return string
      */
-    public static function parse($value, array $options= [])
+    public static function parse($value, array $options= []) : string
     {
         $options += [
             'thousands' => static::$locale['thousands'],

@@ -11,7 +11,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Test\Log;
 
 use Origin\Log\Engine\BaseEngine;
@@ -32,7 +31,6 @@ class NullEngine extends BaseEngine
         return $this->data;
     }
 }
-
 
 class LogTest extends \PHPUnit\Framework\TestCase
 {
@@ -162,11 +160,24 @@ class LogTest extends \PHPUnit\Framework\TestCase
         Log::config('test', ['className'=>'Origin\DoesNotExist\FooEngine']);
         Log::debug('wont work');
     }
+    
+    public function testInvalidLogLevel()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Log::write('informational','This is an invalid log level');
+    }
 
     public function testInvalidEngine()
     {
         $this->expectException(InvalidArgumentException::class);
         Log::config('test', ['engine'=>'Foo']);
         Log::debug('wont work');
+    }
+    
+    public function testInvalidEngine2()
+    {
+        Log::reset(); // force load engine
+        $this->expectException(InvalidArgumentException::class);
+        Log::engine('does-not-exist');
     }
 }
