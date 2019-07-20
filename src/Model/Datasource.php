@@ -14,13 +14,12 @@
 
 namespace Origin\Model;
 
-use Origin\Core\Configure;
-use Origin\Log\Log;
-use Origin\Model\Exception\DatasourceException;
 use PDO;
 use PDOException;
-use Origin\Model\QueryBuilder;
+use Origin\Log\Log;
+use Origin\Core\Configure;
 use Origin\Model\Exception\ConnectionException;
+use Origin\Model\Exception\DatasourceException;
 
 abstract class Datasource
 {
@@ -63,7 +62,6 @@ abstract class Datasource
      */
     private $columnMap = [];
 
-
     /**
      * Holds the connection config
      *
@@ -84,7 +82,6 @@ abstract class Datasource
      */
     protected $adapter = null;
 
-    
     /**
      * If transaction has been started on this datasource
      *
@@ -109,12 +106,12 @@ abstract class Datasource
      */
     public function connect(array $config) : void
     {
-        $config += ['engine'=>'mysql'];
+        $config += ['engine' => 'mysql'];
        
         $flags = [
-          PDO::ATTR_PERSISTENT => false,
-          PDO::ATTR_EMULATE_PREPARES => false, // use real prepared statements
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false,
+            PDO::ATTR_EMULATE_PREPARES => false, // use real prepared statements
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ];
         try {
             $this->connection = new PDO(
@@ -163,18 +160,10 @@ abstract class Datasource
         if (isset($this->config['database'])) {
             return $this->config['database'];
         }
+
         return null;
     }
 
-    /**
-     * Gets the quote identifier for this datasource
-     *
-     * @return string
-     */
-    public function quoteIdentifier()
-    {
-        return $this->escape;
-    }
     /**
      * Executes a sql query.
      *
@@ -192,15 +181,15 @@ abstract class Datasource
             $result = $query->execute($params);
             if (Configure::read('debug')) {
                 $this->log[] = [
-                'query' => $this->unprepare($sql, $params),
-                'error' => !$result,
-                'affected' => $this->lastAffected(),
-                'time' => microtime(true) - $start,
-              ];
+                    'query' => $this->unprepare($sql, $params),
+                    'error' => ! $result,
+                    'affected' => $this->lastAffected(),
+                    'time' => microtime(true) - $start,
+                ];
             }
 
             // Fallback if disabled PDO::ERRMODE_EXCEPTION flag
-            if (!$result) {
+            if (! $result) {
                 return false;
             }
         } catch (PDOException $e) {
@@ -219,9 +208,9 @@ abstract class Datasource
             }
             $sql = preg_replace("/\B:{$needle}/", $replace, $sql);
         }
+
         return $sql;
     }
-
 
     /**
      * Check result object is part of PDOStatement.
@@ -243,6 +232,7 @@ abstract class Datasource
         if ($this->transactionStarted === false) {
             $this->transactionStarted = $this->connection->beginTransaction();
         }
+
         return $this->transactionStarted;
     }
 
@@ -255,8 +245,10 @@ abstract class Datasource
     {
         if ($this->transactionStarted) {
             $this->transactionStarted = false;
+
             return $this->connection->commit();
         }
+
         return false;
     }
 
@@ -269,8 +261,10 @@ abstract class Datasource
     {
         if ($this->transactionStarted) {
             $this->transactionStarted = false;
+
             return $this->connection->rollBack();
         }
+
         return false;
     }
 
@@ -304,11 +298,12 @@ abstract class Datasource
      */
     public function disconnect() : void
     {
+        /*
         if ($this->connection) {
             if ($this->statement) {
                 $this->statement->closeCursor();
             }
-        }
+        }*/
         $this->connection = null;
         $this->statement = null;
     }
@@ -367,6 +362,7 @@ abstract class Datasource
  
             return $rows;
         }
+
         return null;
     }
 
@@ -418,7 +414,7 @@ abstract class Datasource
             }
 
             if ($columnCount == 3) {
-                if (!isset($result[$row[2]])) {
+                if (! isset($result[$row[2]])) {
                     $result[$row[2]] = [];
                 }
                 $result[$row[2]][$row[0]] = $row[1];
@@ -471,9 +467,9 @@ abstract class Datasource
         for ($i = 0; $i < $numberOfFields; ++$i) {
             $column = $statement->getColumnMeta($i); // could be bottle neck on
             if (empty($column['table']) or $this->isVirtualField($column['name'])) {
-                $this->columnMap[$i] = array(0, $column['name']);
+                $this->columnMap[$i] = [0, $column['name']];
             } else {
-                $this->columnMap[$i] = array($column['table'], $column['name']);
+                $this->columnMap[$i] = [$column['table'], $column['name']];
             }
         }
     }
@@ -506,7 +502,7 @@ abstract class Datasource
         $results = [];
         foreach ($records as $record) {
             $array = [];
-            for ($i=0;$i<$count;$i++) {
+            for ($i = 0;$i < $count;$i++) {
                 $model = $index[$i]['model'];
                 $field = $index[$i]['field'];
                 $array[$model][$field] = $record[$i];
@@ -515,6 +511,7 @@ abstract class Datasource
         }
 
         unset($records);
+
         return $results;
     }
 
@@ -528,18 +525,18 @@ abstract class Datasource
     {
         $index = [];
         $count = count($fields);
-    
+      
         /**
          * Build an index
          */
-        for ($i=0;$i<$count;$i++) {
+        for ($i = 0;$i < $count;$i++) {
             $model = 0; // default value
             $field = $fields[$i];
             if (preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i', $field)) {
                 list($model, $field) = explode('.', $fields[$i]);
             }
             
-            $position  = stripos($fields[$i], ' AS ');
+            $position = stripos($fields[$i], ' AS ');
             if ($position !== false) {
                 $field = substr($field, $position + 4);
                 if (strpos($field, '__') !== false) {
@@ -547,10 +544,11 @@ abstract class Datasource
                 }
             }
             $index[$i] = [
-                'model'=>$model,
-                'field'=>$field
+                'model' => $model,
+                'field' => $field,
             ];
         }
+
         return $index;
     }
 
@@ -561,7 +559,7 @@ abstract class Datasource
      */
     public function adapter()
     {
-        if (!$this->adapter) {
+        if (! $this->adapter) {
             $adapterClass = __NAMESPACE__ . '\Schema\\'. ucfirst($this->name) . 'Schema';
             $this->adapter = new $adapterClass($this->config['datasource']);
         }
@@ -634,7 +632,7 @@ abstract class Datasource
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->insert($data)
-                      ->write();
+            ->write();
 
         return $this->execute($sql, $builder->getValues());
     }
@@ -651,8 +649,8 @@ abstract class Datasource
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->update($data)
-                    ->where($conditions)
-                    ->write();
+            ->where($conditions)
+            ->write();
 
         return $this->execute($sql, $builder->getValues());
     }
@@ -668,7 +666,7 @@ abstract class Datasource
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->delete($conditions)
-                    ->write();
+            ->write();
 
         return $this->execute($sql, $builder->getValues());
     }
@@ -679,11 +677,11 @@ abstract class Datasource
      * @param string $table [description]
      * @return \Origin\Model\QueryBuilder QueryBuilder
      */
-    public function queryBuilder(string $table, $alias=null) :QueryBuilder
+    public function queryBuilder(string $table, $alias = null) :QueryBuilder
     {
         return new QueryBuilder($table, $alias, [
-            'escape'=>$this->escape
-            ]);
+            'escape' => $this->escape,
+        ]);
     }
 
     /**

@@ -20,9 +20,8 @@
   */
 namespace Origin\Model\Schema;
 
-use Origin\Model\ConnectionManager;
-use Origin\Exception\Exception;
 use Origin\Model\Datasource;
+use Origin\Model\ConnectionManager;
 
 abstract class BaseSchema
 {
@@ -58,26 +57,20 @@ abstract class BaseSchema
      *  - type: integer,bigint,float,decimail,datetime,date,binary or boolean
      *  - limit: length of field
      *  - precision: for decimals and floasts
-     *  - default: default value use '' or null value
+     *  - default: default value use ''
      *  - null: allow null values
      * @return string
      */
-    public function buildColumn(array $column) : string
+    protected function buildColumn(array $column) : string
     {
         $column += [
-          'name' => null,
-          'type' => null,
-          'limit'=> null, // Max column limit [text, binary, integer]
-          'precision'=> null, // decima, float
-          'null' => null,
-      ];
-  
-        if (empty($column['name'])) {
-            throw new Exception('Column name not specified');
-        }
-        if (empty($column['type'])) {
-            throw new Exception('Column type not specified');
-        }
+            'name' => null,
+            'type' => null,
+            'limit' => null, // Max column limit [text, binary, integer]
+            'precision' => null, // decima, float
+            'null' => null,
+        ];
+
         $real = [];
         $type = $column['type'];
         if (isset($this->columns[$type])) {
@@ -91,18 +84,18 @@ abstract class BaseSchema
                  */
             if ($column['type'] === 'text' and isset($column['limit'])) {
                 $limit = $column['limit'];
-                $type  = 'TEXT';
+                $type = 'TEXT';
                 if ($limit === 16777215) {
-                    $type  = 'MEDIUMTEXT';
+                    $type = 'MEDIUMTEXT';
                 } elseif ($limit === 4294967295) {
-                    $type  = 'LONGTEXT';
+                    $type = 'LONGTEXT';
                 }
             }
 
             //list($namespace, $class) = namespaceSplit(get_class($this));
             # Remove limit,precision, scale if user has sent them (postgre can use int limit)
             foreach (['limit','precision','scale'] as $remove) {
-                if (!isset($real[$remove]) and isset($column[$remove])) {
+                if (! isset($real[$remove]) and isset($column[$remove])) {
                     $column[$remove] = null;
                 }
             }
@@ -116,35 +109,30 @@ abstract class BaseSchema
          * Get defaults if needed
          */
         if ($real) {
-            if (!empty($real['limit']) and empty($column['limit'])) {
+            if (! empty($real['limit']) and empty($column['limit'])) {
                 $column['limit'] = $real['limit'];
             }
-            if (isset($real['precision']) and !isset($column['precision'])) {
+            if (isset($real['precision']) and ! isset($column['precision'])) {
                 $column['precision'] = $real['precision'];
             }
-            if (isset($real['scale']) and !isset($column['scale'])) {
+            if (isset($real['scale']) and ! isset($column['scale'])) {
                 $column['scale'] = $real['scale'];
             }
         }
   
         if ($column['limit']) {
             $output .= "({$column['limit']})";
-        } elseif (!empty($column['precision'])) {
+        } elseif (! empty($column['precision'])) {
             $output .= "({$column['precision']},{$column['scale']})";
         }
 
-    
         /**
          * First handle defaults, then nulls
          */
-        if (isset($column['default']) and $column['null'] === false) {
+        if (! empty($column['default']) and $column['null'] === false) {
             $output .= ' DEFAULT ' . $this->columnValue($column['default']) .' NOT NULL';
-        } elseif (isset($column['default'])) {
-            if ($column['default'] === '') {
-                $output .= ' DEFAULT NULL';
-            } else {
-                $output .= ' DEFAULT ' . $this->columnValue($column['default']);
-            }
+        } elseif (isset($column['default'])) { //isset catches ''
+            $output .= ' DEFAULT ' . $this->columnValue($column['default']);
         } elseif ($column['null'] === false) {
             $output .= ' NOT NULL';
         }
@@ -168,10 +156,10 @@ abstract class BaseSchema
     * @param array $data
     * @return string
     */
-    public function createTable(string $table, array $data, array $options=[]) : string
+    public function createTable(string $table, array $data, array $options = []) : string
     {
         $append = '';
-        if (!empty($options['options'])) {
+        if (! empty($options['options'])) {
             $append = ' '. $options['options'];
         }
 
@@ -179,7 +167,7 @@ abstract class BaseSchema
      
         $primaryKeys = [];
         foreach ($data as $field => $settings) {
-            if (!empty($settings['key'])) {
+            if (! empty($settings['key'])) {
                 $primaryKeys[] = $field;
             }
         }
@@ -192,48 +180,24 @@ abstract class BaseSchema
              * Cant set length on primaryKey
              */
             if ($settings['type'] === 'primaryKey') {
-                if (!in_array($field, $primaryKeys)) {
+                if (! in_array($field, $primaryKeys)) {
                     $primaryKeys[] = $field;
                 }
                 $result[] = ' ' . $field . ' ' . $this->columns['primaryKey']['name'];
                 continue;
             }
 
-            $output = $this->buildColumn(['name'=>$field] + $settings);
+            $output = $this->buildColumn(['name' => $field] + $settings);
          
-            /*
-            $output = $field . ' ' .  strtoupper($mapping['name']);
-
-            if (!empty($settings['limit'])) {
-                $output .= "({$settings['limit']})";
-            } elseif (in_array($settings['type'], ['decimal', 'float'])) {
-                if (isset($settings['scale'])) {
-                    $output .= "({$settings['precision']},{$settings['scale']})";
-                } elseif (isset($settings['precision'])) {
-                    $output .= "({$settings['precision']})"; // postgres float
-                }
-            }
-
-            if (isset($settings['default'])) {
-                $output .= " DEFAULT '{$settings['default']}'";
-            }
-
-            if (isset($settings['null'])) {
-                if ($settings['null'] == true) {
-                    $output .= ' NULL';
-                } else {
-                    $output .= ' NOT NULL';
-                }
-            }*/
             $result[] = ' '.$output;
         }
       
         if ($primaryKeys) {
             $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
         }
+
         return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n){$append}";
     }
-
 
     /**
      * returns SQL statement for adding a column to an existing table
@@ -249,9 +213,10 @@ abstract class BaseSchema
      *   - scale: the numbers after the decimal point
      * @return string
      */
-    public function addColumn(string $table, string $name, string $type, array $options=[]) : string
+    public function addColumn(string $table, string $name, string $type, array $options = []) : string
     {
-        $definition = $this->buildColumn(array_merge(['name'=>$name,'type'=>$type], $options));
+        $definition = $this->buildColumn(array_merge(['name' => $name,'type' => $type], $options));
+
         return "ALTER TABLE {$table} ADD COLUMN {$definition}";
     }
 
@@ -266,17 +231,18 @@ abstract class BaseSchema
      *  - type: use this to set a specific type. e.g FULLTEXT
      * @return string
      */
-    public function addIndex(string $table, $column, string $name, array $options=[]) : string
+    public function addIndex(string $table, $column, string $name, array $options = []) : string
     {
         if (is_array($column)) {
             $column = implode(', ', $column);
         }
-        if (!empty($options['unique'])) {
+        if (! empty($options['unique'])) {
             return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";
         }
-        if (!empty($options['type'])) {
-            return "CREATE " . strtoupper($options['type']) . " INDEX {$name} ON {$table} ({$column})";
+        if (! empty($options['type'])) {
+            return 'CREATE ' . strtoupper($options['type']) . " INDEX {$name} ON {$table} ({$column})";
         }
+
         return "CREATE INDEX {$name} ON {$table} ({$column})";
     }
 
@@ -313,7 +279,7 @@ abstract class BaseSchema
      *  - primaryKey: the name of the primary key
      * @return string
      */
-    public function addForeignKey(string $fromTable, string $toTable, array $options=[]) : string
+    public function addForeignKey(string $fromTable, string $toTable, array $options = []) : string
     {
         return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";
     }
@@ -347,7 +313,7 @@ abstract class BaseSchema
      */
     public function foreignKeyExists(string $table, array $options)
     {
-        $options += ['column'=>null,'name'=>null];
+        $options += ['column' => null,'name' => null];
         $foreignKeys = $this->foreignKeys($table);
       
         foreach ($foreignKeys as $fk) {
@@ -358,6 +324,7 @@ abstract class BaseSchema
                 return true;
             }
         }
+
         return false;
     }
 
@@ -369,7 +336,7 @@ abstract class BaseSchema
      * @param array $options
      * @return string
      */
-    abstract public function changeColumn(string $table, string $name, string $type, array $options=[]);
+    abstract public function changeColumn(string $table, string $name, string $type, array $options = []);
 
     /**
      * Returns a SQL statement for dropping a table
@@ -378,11 +345,12 @@ abstract class BaseSchema
      * @param array options (ifExists)
      * @return string
      */
-    public function dropTable(string $table, array $options=[]) : string
+    public function dropTable(string $table, array $options = []) : string
     {
-        if (!empty($options['ifExists'])) {
+        if (! empty($options['ifExists'])) {
             return "DROP TABLE IF EXISTS {$table}";
         }
+
         return "DROP TABLE {$table}";
     }
 
@@ -428,8 +396,9 @@ abstract class BaseSchema
     {
         $sql = "ALTER TABLE {$table}";
         foreach ($columns as $column) {
-            $sql .="\nDROP COLUMN {$column},";
+            $sql .= "\nDROP COLUMN {$column},";
         }
+
         return substr($sql, 0, -1);
     }
 
@@ -463,6 +432,7 @@ abstract class BaseSchema
     public function columns(string $table)
     {
         $schema = $this->schema($table);
+
         return array_keys($schema);
     }
 
@@ -495,16 +465,7 @@ abstract class BaseSchema
      * @param mixed $value
      * @return mixed
      */
-    public function columnValue($value)
-    {
-        if ($value === null) {
-            $value = 'NULL';
-        }
-        if (is_int($value)) {
-            return $value;
-        }
-        return "'{$value}'";
-    }
+    abstract public function columnValue($value);
 
     /**
      * Gets the schema for a table
@@ -538,6 +499,7 @@ abstract class BaseSchema
     {
         $connection = $this->connection();
         $connection->execute($sql);
+
         return $connection->fetch();
     }
     /**
@@ -554,6 +516,7 @@ abstract class BaseSchema
         if ($results) {
             return $results;
         }
+
         return [];
     }
 

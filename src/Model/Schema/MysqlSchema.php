@@ -23,7 +23,6 @@
 namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
-use Origin\Model\Schema\BaseSchema;
 
 class MysqlSchema extends BaseSchema
 {
@@ -87,7 +86,7 @@ class MysqlSchema extends BaseSchema
                 $type = $reverseMapping[$type];
                 $schema[$column['Field']] = [
                     'type' => $type,
-                    'limit' => ($length and !in_array($type, ['boolean', 'decimal', 'numeric'])) ? (int) $length : null,
+                    'limit' => ($length and ! in_array($type, ['boolean', 'decimal', 'numeric'])) ? (int) $length : null,
                     'default' => $column['Default'],
                     'null' => ($column['Null'] === 'YES' ? true : false),
                 ];
@@ -114,6 +113,7 @@ class MysqlSchema extends BaseSchema
                 }
             }
         }
+
         return $schema;
     }
 
@@ -128,15 +128,16 @@ class MysqlSchema extends BaseSchema
         $config = ConnectionManager::config($this->datasource);
         $sql = "SHOW INDEX FROM {$table}";
         $results = $this->fetchAll($sql);
-        $indexes  = [];
+        $indexes = [];
         foreach ($results as &$result) {
             $result = array_change_key_case($result, CASE_LOWER);
             $indexes[] = [
                 'name' => $result['key_name'],
                 'column' => $result['column_name'],
-                'unique' => ($result['non_unique'] == 0) ? true : false
+                'unique' => ($result['non_unique'] == 0) ? true : false,
             ];
         }
+
         return  $indexes;
     }
 
@@ -163,9 +164,9 @@ class MysqlSchema extends BaseSchema
     public function changeColumn(string $table, string $name, string $type, array $options = []) : string
     {
         $definition = $this->buildColumn(array_merge(['name' => $name, 'type' => $type], $options));
+
         return "ALTER TABLE {$table} MODIFY COLUMN {$definition}";
     }
-
 
     /**
      * Returns a rename column SQL statement
@@ -198,16 +199,15 @@ class MysqlSchema extends BaseSchema
             if (strpos($definition, ' ') !== false) {
                 list($definition, $void) = explode(' ', $definition);
             }
-            if (!empty($schema['limit'])) {
+            if (! empty($schema['limit'])) {
                 $definition .= "({$schema['limit']})";
-            } elseif (!empty($data['precision'])) {
+            } elseif (! empty($data['precision'])) {
                 $definition .= "({$schema['precision']},{$schema['scale']})";
             }
         }
 
         return "ALTER TABLE {$table} CHANGE {$from} {$to} {$definition}";
     }
-
 
     /**
      * Returns a remove index SQL statement
@@ -222,7 +222,6 @@ class MysqlSchema extends BaseSchema
     {
         return "DROP INDEX {$name} ON {$table}";
     }
-
 
     /**
      * Renames an index
@@ -254,6 +253,7 @@ class MysqlSchema extends BaseSchema
         foreach ($results as &$result) {
             $result = array_change_key_case($result, CASE_LOWER);
         }
+
         return $results;
     }
     /**
@@ -276,6 +276,7 @@ class MysqlSchema extends BaseSchema
     public function showCreateTable(string $table) : string
     {
         $result = $this->fetchRow("SHOW CREATE TABLE {$table}");
+
         return $result['Create Table'];
     }
 
@@ -287,18 +288,20 @@ class MysqlSchema extends BaseSchema
      */
     public function columnValue($value)
     {
-        if ($value === null) {
-            $value = 'NULL';
+        if ($value === '' or $value === null) {
+            return 'NULL';
         }
         if (is_bool($value)) {
             if ($value === true) {
                 return 1;
             }
+
             return 0;
         }
         if (is_int($value)) {
             return $value;
         }
+
         return "'{$value}'";
     }
 }

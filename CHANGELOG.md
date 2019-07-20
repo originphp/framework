@@ -27,6 +27,12 @@ Delete tag: git tag -d <tag_name>
 - Entity modified(fieldname) to check if field was modified
 
 ### Fixed
+- Fixed prepare results adding blank records when foreignKey is invalid
+- Fixed Migration checkColumn checking if nullable
+- Migration with PG Sql did not drop null and default values
+- Fixed bug with PGSchema:change column not configuring type
+- Fixed added deprecation warning, for previous deprecated feature which used fallback instead.
+- Fixed session engine had a legacy function reset, which has been deprecated instead of removed.
 - Fixed unpacking arrays from cookies
 - Fixed migration FetchRow/FetchAll feature
 - Fixed router adding route with args
@@ -34,7 +40,7 @@ Delete tag: git tag -d <tag_name>
 
 ### Security
 - Added escaping to Html:fromText
-- Tigthened Session security
+- Tightened Session security
 - Markdown::toHtml runs result through Html:sanitize for protection
 
 ## [1.23.0] - 2019-07-12

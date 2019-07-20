@@ -23,7 +23,6 @@
 namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
-use Origin\Model\Schema\BaseSchema;
 
 class PgsqlSchema extends BaseSchema
 {
@@ -63,7 +62,7 @@ class PgsqlSchema extends BaseSchema
 
         $schema = [];
 
-        if ($results =  $this->fetchAll($sql)) {
+        if ($results = $this->fetchAll($sql)) {
             /**
              * @todo defaults should be type,length,default,null (remove length if empty)
              */
@@ -82,14 +81,13 @@ class PgsqlSchema extends BaseSchema
                     }
                 }
 
-
                 $data['null'] = ($result['null'] === 'YES' ? true : false);
                 //nextval
                 $position = strpos($result['default'], '::character varying');
                 $isAuto = (strpos($result['default'], 'nextval') !== false);
-                if ($position !== false and !$isAuto) {
+                if ($position !== false and ! $isAuto) {
                     $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
-                } elseif (!empty($result['default']) and !$isAuto) {
+                } elseif (! empty($result['default']) and ! $isAuto) {
                     $data['default'] = $result['default'];
                 }
 
@@ -117,32 +115,26 @@ class PgsqlSchema extends BaseSchema
      */
     private function column(string $type) : string
     {
+        $result = 'string';
         if (in_array($type, ['integer', 'text', 'date', 'time', 'boolean', 'bigint'])) {
-            return $type;
+            $result = $type;
         }
         // Char and varchar
-        if (strpos($type, 'character') !== false or $type === 'uuid') {
-            return 'string';
-        }
-        if (strpos($type, 'timestamp') !== false) {
-            return 'datetime';
-        }
-        if (in_array($type, ['decimal', 'numeric'])) {
-            return 'decimal';
-        }
-        if (strpos($type, 'time') !== false) { // time without time zone,with etc
-            return 'time';
-        }
-        if (strpos($type, 'bytea') !== false) {
-            return 'binary';
+        elseif (strpos($type, 'character') !== false or $type === 'uuid') {
+            $result = 'string';
+        } elseif (strpos($type, 'timestamp') !== false) {
+            $result = 'datetime';
+        } elseif (in_array($type, ['decimal', 'numeric'])) {
+            $result = 'decimal';
+        } elseif (strpos($type, 'time') !== false) { // time without time zone,with etc
+            $result = 'time';
+        } elseif (strpos($type, 'bytea') !== false) {
+            $result = 'binary';
+        } elseif (in_array($type, ['float', 'real', 'double', 'double precision'])) {
+            $result = 'float';
         }
 
-        if (in_array($type, ['float', 'real', 'double', 'double precision'])) {
-            return 'float';
-        }
-
-        // How did you get here? maybe something was missed let me know
-        return 'string';
+        return $result;
     }
 
     /**
@@ -159,6 +151,7 @@ class PgsqlSchema extends BaseSchema
         foreach ($results as $result) {
             $result['unique'] = strtolower($result['unique']) === 'true' ? true : false;
         }
+
         return $results;
     }
 
@@ -189,28 +182,25 @@ class PgsqlSchema extends BaseSchema
             $agnoType = $type;
             $type = $this->columns[$type]['name'];
 
-            if ($type === 'decimal' or $type === 'float') {
-                $type = "{$type}({$options['precsion']},{$options['scale']})";
-            } elseif (in_array($agnoType, ['string']) and !empty($options['limit'])) {
+            if ($agnoType === 'decimal' or $agnoType === 'float') {
+                $type = "{$type}({$options['precision']},{$options['scale']})";
+            } elseif (in_array($agnoType, ['string']) and ! empty($options['limit'])) {
                 $type = "{$type}({$options['limit']})";
             }
         }
+
+        // Set the data type
         $sql = "ALTER TABLE {$table} ALTER COLUMN {$name} SET DATA TYPE {$type}";
         $options += ['default' => null, 'null' => null];
-        if (empty($options)) {
-            return $sql;
+
+        if (! empty($options['default']) and $options['null'] === false) {
+            $sql .= ", ALTER COLUMN {$name} SET DEFAULT " . $this->columnValue($options['default']) .", ALTER COLUMN {$name} SET NOT NULL";
+        } elseif (isset($options['default'])) {
+            $sql .= ", ALTER COLUMN {$name} SET DEFAULT " . $this->columnValue($options['default']);
+        } elseif ($options['null'] === false) {
+            $sql .= ", ALTER COLUMN {$name} SET NOT NULL";
         }
-        if (!empty($options['default'])) {
-            if ($options['default'] and $options['null'] == false) {
-                $sql .= ",ALTER COLUMN {$name} SET DEFAULT {$options['default']} NOT NULL";
-            } elseif (isset($options['default'])) {
-                $sql .= ",ALTER COLUMN {$name} SET DEFAULT {$options['default']}";
-            } elseif ($options['null']) {
-                $sql .= ",ALTER COLUMN {$name} SET DEFAULT NULL";
-            } elseif ($options['null'] === false) {
-                $sql .= ",ALTER COLUMN {$name} SET DEFAULT NOT NULL";
-            }
-        }
+
         return $sql;
     }
 
@@ -226,7 +216,6 @@ class PgsqlSchema extends BaseSchema
     {
         return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
     }
-
 
     /**
      * Returns a remove index SQL stataement
@@ -249,9 +238,9 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return void
+     * @return string
      */
-    public function renameIndex(string $table, string $oldName, string $newName)
+    public function renameIndex(string $table, string $oldName, string $newName): string
     {
         return "ALTER INDEX {$oldName} RENAME TO {$newName}";
     }
@@ -293,6 +282,7 @@ class PgsqlSchema extends BaseSchema
     public function showCreateTable(string $table): string
     {
         $schema = $this->schema($table);
+
         return $this->createTable($table, $schema);
     }
 
@@ -304,13 +294,14 @@ class PgsqlSchema extends BaseSchema
      */
     public function columnValue($value)
     {
-        if ($value === null) {
-            $value = 'NULL';
+        if ($value === '' or $value === null) {
+            return 'NULL';
         }
         if (is_bool($value)) {
             if ($value == true) {
                 return 'TRUE';
             }
+
             return 'FALSE';
         }
         /**
@@ -319,6 +310,7 @@ class PgsqlSchema extends BaseSchema
         if (is_int($value)) {
             return $value;
         }
+
         return "'{$value}'";
     }
 }

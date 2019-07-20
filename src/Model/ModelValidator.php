@@ -14,9 +14,9 @@
 
 namespace Origin\Model;
 
-use Origin\Model\Exception\ValidatorException;
 use DateTime;
 use Origin\Exception\Exception;
+use Origin\Model\Exception\ValidatorException;
 
 class ModelValidator
 {
@@ -42,7 +42,7 @@ class ModelValidator
         'notBlank' => 'This field is required',
         'mimeType' => 'Invalid mime type',
         'extension' => 'Invalid file extension',
-        'upload' => 'File upload error'
+        'upload' => 'File upload error',
     ];
 
     public function __construct(Model $model)
@@ -69,7 +69,7 @@ class ModelValidator
     public function setRule(string $field, $params) :void
     {
         if (is_string($params)) {
-            $params =['rule1' => ['rule' => $params]];
+            $params = ['rule1' => ['rule' => $params]];
         }
         if (isset($params['rule'])) {
             $params = ['rule1' => $params];
@@ -93,8 +93,8 @@ class ModelValidator
                     $rule = $value['rule'][0];
                 }
         
-                if (isset($this->defaultMessageMap[$rule ])) {
-                    $value['message'] = $this->defaultMessageMap[$rule ];
+                if (isset($this->defaultMessageMap[$rule])) {
+                    $value['message'] = $this->defaultMessageMap[$rule];
                 }
             }
            
@@ -125,12 +125,12 @@ class ModelValidator
      
         // Validation methods here
         if (method_exists($this, $rule)) {
-            return call_user_func_array(array($this, $rule), $args);
+            return call_user_func_array([$this, $rule], $args);
         }
        
         // Validation methods in model
         if (method_exists($this->model, $rule)) {
-            return call_user_func_array(array($this->model, $rule), $args);
+            return call_user_func_array([$this->model, $rule], $args);
         }
         // Regex expressions
         if ($rule[0] === '/') {
@@ -149,9 +149,10 @@ class ModelValidator
      */
     protected function runRule(bool $create, $on)  : bool
     {
-        if ($on === null or ($create and $on ==='create') or (!$create and $on ==='update')) {
+        if ($on === null or ($create and $on === 'create') or (! $create and $on === 'update')) {
             return true;
         }
+
         return false;
     }
 
@@ -170,26 +171,26 @@ class ModelValidator
         
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['on'] and !$this->runRule($create, $validationRule['on'])) {
+                if ($validationRule['on'] and ! $this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
 
                 // Don't run validation rule on field if its not in the entity
-                if (!$validationRule['required'] and in_array($field, $modified) === false) {
+                if (! $validationRule['required'] and in_array($field, $modified) === false) {
                     continue;
                 }
             
                 $value = $entity->get($field);
                                   
                 // Break out if required and its blank, if not continue with validation
-                if ($validationRule['required'] and !in_array($field, $modified)) {
+                if ($validationRule['required'] and ! in_array($field, $modified)) {
                     $entity->invalidate($field, 'This field is required');
                     break; // dont run any more validation rules on this field if blank
                 }
 
                 // If its required rule (which does not exist), check and break or continue
                 if ($validationRule['rule'] === 'notBlank') {
-                    if (!$this->validate($value, 'notBlank')) {
+                    if (! $this->validate($value, 'notBlank')) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
                     continue; // goto next rule
@@ -210,7 +211,7 @@ class ModelValidator
                     $value = $entity;
                 }
                
-                if (!$this->validate($value, $validationRule['rule'])) {
+                if (! $this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
                 }
             }
@@ -235,6 +236,7 @@ class ModelValidator
         if (is_array($value) and isset($value['tmp_name']) and isset($value['error'])) {
             return $value['error'] === UPLOAD_ERR_NO_FILE;
         }
+
         return false;
     }
 
@@ -325,7 +327,7 @@ class ModelValidator
     public function extension($value, $extensions = []) : bool
     {
         if (is_array($value)) {
-            $value = $value['name']??'none';
+            $value = $value['name'] ?? 'none';
         }
         if (is_string($extensions)) {
             $extensions = [$extensions];
@@ -407,6 +409,7 @@ class ModelValidator
         if (is_string($value)) {
             return (bool) filter_var($value, FILTER_VALIDATE_INT);
         }
+
         return is_int($value);
     }
 
@@ -421,12 +424,13 @@ class ModelValidator
         if (is_string($value)) {
             return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) and filter_var($value, FILTER_VALIDATE_INT) === false;
         }
+
         return is_float($value);
     }
 
     public function range($value, $min = null, $max = null) : bool
     {
-        if (!is_numeric($value) or !isset($min) or !isset($max)) {
+        if (! is_numeric($value) or ! isset($min) or ! isset($max)) {
             return false;
         }
 
@@ -480,7 +484,7 @@ class ModelValidator
      * @param mixed $options
      * @return boolean
      */
-    public function upload($result, $optional=false) : bool
+    public function upload($result, $optional = false) : bool
     {
         if (is_array($result) and isset($result['error'])) {
             $result = $result['error'];
@@ -491,6 +495,7 @@ class ModelValidator
         if ($optional and $result === UPLOAD_ERR_NO_FILE) {
             return true;
         }
+
         return $result === UPLOAD_ERR_OK;
     }
 
@@ -511,8 +516,9 @@ class ModelValidator
         }
         $mimeType = mime_content_type($result);
         if ($mimeType === false) {
-            throw new Exception('Unable to determine the mimetype');
+            throw new Exception('Unable to determine the mimetype'); // Cant reach here
         }
+
         return in_array($mimeType, $mimeTypes);
     }
 }

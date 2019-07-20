@@ -518,7 +518,12 @@ class Model
      *  ]);
      *
      * @param string|array $field Field name to validate
-     * @param array $options (rule name| array [rule|message|on|required])
+     * @param array $options either the rule name e.g. notBlank or an options array with any of the following keys:
+     *   - rule: name of rule e.g. date
+     *   - message: the message to show if the rule fails
+     *   - on: default null. set to create or update to run the rule only on those
+     *   - required: the key must be present
+     *   - allowBlank: dont run rule on blank value
      * @return void
      *
      */
