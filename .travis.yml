@@ -27,10 +27,12 @@ before_install:
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
 before_script:
-#  - phpenv config-rm xdebug.ini
   - composer install --prefer-source --no-interaction
 script:
    - vendor/bin/phpunit --coverage-clover=clover.xml
+after_script:
+   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
+   - php php-coveralls.phar --verbose
 cache:
   directories:
     - $HOME/.composer/cache/files
