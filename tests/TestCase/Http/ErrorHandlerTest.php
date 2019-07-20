@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Http;
 
-use Origin\Http\ErrorHandler;
 use Origin\Log\Log;
-use Origin\Core\Configure;
-use Origin\Exception\NotFoundException;
-use Origin\Http\Request;
 use Origin\Http\Router;
+use Origin\Http\Request;
+use Origin\Core\Configure;
+use Origin\Http\ErrorHandler;
+use Origin\Exception\NotFoundException;
 use Origin\Exception\InternalErrorException;
 
 class MockErrorHandler extends ErrorHandler
@@ -55,9 +55,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         $a = $unkown + 1;
         $result = ob_get_clean();
-        
-        $expected = '<div class="origin-error"><strong>NOTICE:</strong> Undefined variable: unkown in <strong>/var/www/vendor/originphp/framework/tests/TestCase/Http/ErrorHandlerTest.php</strong> line: <strong>56</strong></div>';
-        $this->assertContains($expected, $result);
+               
+        $this->assertContains('<div class="origin-error">', $result);
+        $this->assertContains('<strong>NOTICE:</strong>', $result);
+        $this->assertContains('Undefined variable: unkown', $result);
+        $this->assertContains('line: <strong>56</strong>', $result);
     }
 
     public function testErrorHandlerWarning()
@@ -71,8 +73,10 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         trigger_error('Passing invalid 2nd argument', E_WARNING);
         $result = ob_get_clean();
        
-        $expected = '<div class="origin-error"><strong>WARNING:</strong> Invalid error type specified in <strong>/var/www/vendor/originphp/framework/tests/TestCase/Http/ErrorHandlerTest.php</strong> line: <strong>71</strong></div>';
-        $this->assertContains($expected, $result);
+        $this->assertContains('<div class="origin-error">', $result);
+        $this->assertContains('<strong>WARNING:</strong>', $result);
+        $this->assertContains('Invalid error type specified', $result);
+        $this->assertContains('line: <strong>73</strong>', $result);
     }
 
     public function testErrorHandlerError()
@@ -86,8 +90,10 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         trigger_error('An error has occured', E_USER_ERROR);
         $result = ob_get_clean();
        
-        $expected = '<div class="origin-error"><strong>ERROR:</strong> An error has occured in <strong>/var/www/vendor/originphp/framework/tests/TestCase/Http/ErrorHandlerTest.php</strong> line: <strong>86</strong></div>';
-        $this->assertContains($expected, $result);
+        $this->assertContains('<div class="origin-error">', $result);
+        $this->assertContains('<strong>ERROR:</strong>', $result);
+        $this->assertContains('An error has occured', $result);
+        $this->assertContains('line: <strong>90</strong>', $result);
     }
     
     public function testErrorHandlerDeprecated()
@@ -100,9 +106,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         trigger_error('Function has been deprecated', E_USER_DEPRECATED);
         $result = ob_get_clean();
-       
-        $expected = '<div class="origin-error"><strong>DEPRECATED:</strong> Function has been deprecated in <strong>/var/www/vendor/originphp/framework/tests/TestCase/Http/ErrorHandlerTest.php</strong> line: <strong>101</strong></div>';
-        $this->assertContains($expected, $result);
+   
+        $this->assertContains('<div class="origin-error">', $result);
+        $this->assertContains('<strong>DEPRECATED:</strong>', $result);
+        $this->assertContains('Function has been deprecated', $result);
+        $this->assertContains('line: <strong>107</strong>', $result);
     }
 
     public function testErrorHandlerSupressed()
