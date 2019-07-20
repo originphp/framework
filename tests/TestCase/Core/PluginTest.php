@@ -22,7 +22,7 @@ class MockPlugin extends Plugin
     /**
      * File where the composer plugins are stored.
      *
-     * @var strmg
+     * @var string
      */
     const COMPOSER_PLUGINS = TMP . DS . 'plugins.json';
 
@@ -100,14 +100,15 @@ class PluginTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Run initialize, plugin is not there so it will throw exception elsewhere
+     * Run initialize, plugin is not there so it will throw exception
      *
      * @return void
      */
     public function testInitialize()
     {
+        $this->expectException(MissingPluginException::class);
         $file = TMP . DS . 'plugins.json';
-        file_put_contents($file, '{"Debug":"\/..\/debug-plugin"}');
+        file_put_contents($file, '{"Foo":"\/..\/foo-plugin"}');
         $this->assertNull(MockPlugin::initialize());
         MockPlugin::reset();
     }
