@@ -15,9 +15,9 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
 use Origin\View\Helper\IntlHelper;
 
 class IntlHelperTest extends \PHPUnit\Framework\TestCase
@@ -61,7 +61,7 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
     {
         $locales = $this->Intl->locales('en_GB');
         $this->assertEquals('English (United Kingdom)', $locales['en_GB']);
-        $this->assertGreaterThan(700, count($locales)); // this will vary
+        $this->assertGreaterThan(500, count($locales)); // this will vary
     }
     public function testTimezones()
     {
