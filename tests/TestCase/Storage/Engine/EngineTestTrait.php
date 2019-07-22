@@ -20,11 +20,12 @@ trait EngineTestTrait
 {
     public function testWrite()
     {
-        $data = 'local-engine' . (string) time();
+        $data = uuid();
 
         $this->assertTrue($this->engine()->write('foo.txt', $data));
         $this->assertTrue($this->engine()->write('folder/bar.txt', $data));
         $this->assertTrue($this->engine()->write('folder/subfolder/foobar.txt', $data));
+
         return $data;
     }
     /**
@@ -36,6 +37,8 @@ trait EngineTestTrait
         $this->assertTrue($this->engine()->exists('folder/bar.txt'));
         $this->assertTrue($this->engine()->exists('folder'));
         $this->assertTrue($this->engine()->exists('folder/subfolder/foobar.txt'));
+
+        return $data;
     }
 
     /**
@@ -59,7 +62,7 @@ trait EngineTestTrait
         $expected = [
             'name' => 'foo.txt',
             'timestamp' => 1559996145,
-            'size' => 22,
+            'size' => 36,
         ];
         $this->assertEquals($expected, $foo);
         // Test Contents
@@ -67,12 +70,10 @@ trait EngineTestTrait
         $this->assertHasFileInList('folder/bar.txt', $files);
         $this->assertHasFileInList('folder/subfolder/foobar.txt', $files);
 
-        
         $files = $this->engine()->list('folder');
         $this->assertHasFileInList('bar.txt', $files);
         $this->assertHasFileInList('subfolder/foobar.txt', $files);
 
-                
         $files = $this->engine()->list('folder/subfolder');
         $this->assertHasFileInList('foobar.txt', $files);
 
@@ -120,7 +121,6 @@ trait EngineTestTrait
         $this->assertFalse($this->engine()->exists('docs/dota2/natures_profit.txt'));
     }
 
-
     protected function assertHasFileInList(string $filename, array $files)
     {
         foreach ($files as $file) {
@@ -128,6 +128,7 @@ trait EngineTestTrait
                 return true;
             }
         }
+
         return false;
     }
 
@@ -135,12 +136,14 @@ trait EngineTestTrait
     {
         foreach ($files as $file) {
             if ($file['name'] == $filename) {
-                if ($file['timestamp']>strtotime('-1 minute')) {
+                if ($file['timestamp'] > strtotime('-1 minute')) {
                     $file['timestamp'] = 1559996145; // Standardize
                 }
+
                 return $file;
             }
         }
+
         return null;
     }
 }
