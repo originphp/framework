@@ -32,7 +32,6 @@ class FileTest extends \PHPUnit\Framework\TestCase
         File::read('/foo/bar.txt');
     }
  
-
     public function testInfoException()
     {
         $this->expectException(NotFoundException::class);
@@ -99,7 +98,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
             'extension' => 'txt',
             'type' => 'text/plain',
             'size' => '1333336',
-            'timestamp' => fileatime($tmpfile)
+            'timestamp' => fileatime($tmpfile),
         ];
         $this->assertEquals($expected, File::info($tmpfile));
     }
@@ -173,14 +172,12 @@ class FileTest extends \PHPUnit\Framework\TestCase
         File::perms('/foo/bar.txt');
     }
 
-
     /**
      * Trying to make this test work on multiple systems where user is not known
      */
     public function testOwner()
     {
-        $data = 'Not really important';
-        $filename = File::tmp($data);
+        $filename = File::tmp('data');
         $owner = File::owner($filename);
         $this->assertRegExp('/^[a-z0-9]+$/i', $owner);
         $this->assertTrue(File::chown($filename, $owner));
@@ -192,11 +189,18 @@ class FileTest extends \PHPUnit\Framework\TestCase
         File::owner('/foo/bar.txt');
     }
 
+    public function testChmod()
+    {
+        $tmp = File::tmp('data');
+          
+        $this->assertTrue(File::chmod($tmp, 0777));
+        clearstatcache();
+        $this->assertEquals('0777', File::perms($tmp));
+    }
   
     public function testGroup()
     {
-        $data = 'Not really important';
-        $filename = File::tmp($data);
+        $filename = File::tmp('data');
         $group = File::group($filename);
         $this->assertRegExp('/^[a-z0-9]+$/i', $group);
         $this->assertTrue(File::chgrp($filename, $group));

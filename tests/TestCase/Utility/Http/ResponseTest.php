@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Utility;
 
-use Origin\Utility\Http\Response;
 use Origin\Utility\Xml;
+use Origin\Utility\Http\Response;
 
 class ResponseTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,7 +44,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     
         $expected = [
             'Access-Control-Allow-Origin: *' => null,
-            'Access-Control-Allow-Origin' => '*'
+            'Access-Control-Allow-Origin' => '*',
         ];
         $this->assertEquals($expected, $response->headers());
         $this->assertNull($response->headers('abc'));
@@ -65,17 +65,27 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
     public function testJson()
     {
-        $data =['name'=>'foo','value'=>'bar'];
+        $data = ['name' => 'foo','value' => 'bar'];
         $response = new Response();
+        $this->assertNull($response->json());
         $response->body(json_encode($data));
         $this->assertEquals($data, $response->json());
     }
 
     public function testXml()
     {
-        $data = ['root'=>['name'=>'foo','value'=>'bar']];
+        $data = ['root' => ['name' => 'foo','value' => 'bar']];
         $response = new Response();
+        $this->assertNull($response->xml());
         $response->body(Xml::fromArray($data));
         $this->assertEquals($data, $response->xml());
+    }
+
+    public function testToString()
+    {
+        $response = new Response();
+        $this->assertNull($response->__toString());
+        $response->body('hello world');
+        $this->assertEquals('hello world', $response->__toString());
     }
 }

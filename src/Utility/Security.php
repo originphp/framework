@@ -41,10 +41,12 @@ class Security
         /**
          * The correct terminology is pepper.
          */
+        // @codeCoverageIgnoreStart
         if (isset($options['salt'])) {
             deprecationWarning('salt option is deprecated. use pepper and rename config to Security.pepper');
             $options['pepper'] = $options['salt'] ?? false;
         }
+        // @codeCoverageIgnoreEnd
 
         if ($options['pepper'] === true) {
             $options['pepper'] = Configure::read('Security.pepper');
@@ -53,9 +55,10 @@ class Security
             $string = $options['pepper'] . $string;
         }
 
-        if (!in_array($algorithm, hash_algos())) {
+        if (! in_array($algorithm, hash_algos())) {
             throw new Exception('Invalid hashing algorithm');
         }
+
         return hash($algorithm, $string);
     }
 
@@ -91,15 +94,16 @@ class Security
      */
     public static function compare(string $original = null, string $compare = null): bool
     {
-        if (!is_string($original) or !is_string($compare)) {
+        if (! is_string($original) or ! is_string($compare)) {
             return false;
         }
+
         return hash_equals($original, $compare);
     }
 
     /**
      * Generates a secure 256 bits (32 bytes) key
-     *
+     * @internal the size needs to be the same length as the cipher, the rest will be truncated
      * @return string
      */
     public static function generateKey(): string
@@ -124,6 +128,7 @@ class Security
         $iv = random_bytes($length);
         $raw = openssl_encrypt($string, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
         $hmac = hash_hmac('sha256', $raw, $key, true);
+
         return base64_encode($iv . $hmac . $raw);
     }
 
@@ -145,9 +150,10 @@ class Security
         $hmac = substr($string, $length, 32);
         $raw = substr($string, $length + 32);
         $expected = hash_hmac('sha256', $raw, $key, true);
-        if (!static::compare($expected, $hmac)) {
+        if (! static::compare($expected, $hmac)) {
             return false;
         }
+
         return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
     }
 
@@ -156,9 +162,10 @@ class Security
      * @param integer $length
      * @return string
      */
-    public static function uid(int $length=16) : string
+    public static function uid(int $length = 16) : string
     {
-        $random = random_bytes((int) ceil($length/2));
+        $random = random_bytes((int) ceil($length / 2));
+
         return substr(bin2hex($random), 0, $length);
     }
 
@@ -173,7 +180,7 @@ class Security
             bin2hex(random_bytes(2)),
             bin2hex(chr((ord(random_bytes(1)) & 0x0F) | 0x40)) . bin2hex(random_bytes(1)),
             bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
-            bin2hex(random_bytes(6))
+            bin2hex(random_bytes(6)),
         ]);
     }
 }

@@ -14,6 +14,7 @@
 
 namespace Origin\Test\View\Helper;
 
+use Origin\I18n\I18n;
 use Origin\View\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
@@ -59,9 +60,10 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLocales()
     {
-        $locales = $this->Intl->locales('en_GB');
-        $this->assertEquals('English (United Kingdom)', $locales['en_GB']);
-        $this->assertGreaterThan(500, count($locales)); // this will vary
+        I18n::initialize(['locale' => 'en_GB']);
+ 
+        $locales = $this->Intl->locales();
+        $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // test with null value
     }
     public function testTimezones()
     {

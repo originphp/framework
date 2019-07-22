@@ -16,6 +16,8 @@
  */
 namespace Origin\Utility;
 
+use Origin\Exception\Exception;
+
 class Text
 {
     /**
@@ -31,6 +33,7 @@ class Text
         for ($i = 0; $i < $length; ++$i) {
             $out .= $characters[random_int(0, 61)]; // 61 is count of chars - 1
         }
+
         return $out;
     }
 
@@ -43,10 +46,7 @@ class Text
     */
     public static function contains(string $needle, string $haystack) : bool
     {
-        if (!empty($needle)) {
-            return (mb_strpos($haystack, $needle) !== false);
-        }
-        return false;
+        return $needle !== '' and (mb_strpos($haystack, $needle) !== false);
     }
 
     /**
@@ -58,13 +58,15 @@ class Text
      */
     public static function left(string $characters, string $string) : ?string
     {
-        if (!empty($characters)) {
+        if (! empty($characters)) {
             $position = mb_strpos($string, $characters);
             if ($position === false) {
                 return null;
             }
+    
             return mb_substr($string, 0, $position);
         }
+
         return null;
     }
 
@@ -77,13 +79,15 @@ class Text
      */
     public static function right(string $characters, string $string) : ?string
     {
-        if (!empty($characters)) {
+        if (! empty($characters)) {
             $position = mb_strpos($string, $characters);
             if ($position === false) {
                 return null;
             }
+    
             return mb_substr($string, $position + mb_strlen($characters));
         }
+
         return null;
     }
 
@@ -97,7 +101,8 @@ class Text
     public static function startsWith(string $needle, string $haystack) : bool
     {
         $length = mb_strlen($needle);
-        return (mb_substr($haystack, 0, $length) == $needle);
+
+        return  ($needle !== '' and mb_substr($haystack, 0, $length) === $needle);
     }
 
     /**
@@ -110,7 +115,8 @@ class Text
     public static function endsWith(string $needle, string $haystack) : bool
     {
         $length = mb_strlen($needle);
-        return (mb_substr($haystack, -$length, $length) == $needle);
+
+        return ($needle !== '' and mb_substr($haystack, -$length, $length) === $needle);
     }
 
     /**
@@ -121,14 +127,15 @@ class Text
      * @param array $options (before,after) e.g. ['before'=>':', 'after'=>'']
      * @return string
      */
-    public static function insert(string $string, array $values =[], array $options=[]) : string
+    public static function insert(string $string, array $values = [], array $options = []) : string
     {
-        $options += ['before'=>'{','after'=>'}'];
+        $options += ['before' => '{','after' => '}'];
         $replace = [];
         foreach ($values as $key => $value) {
             $key = "{$options['before']}{$key}{$options['after']}";
             $replace[$key] = $value;
         }
+
         return strtr($string, $replace);
     }
 
@@ -143,12 +150,13 @@ class Text
      *  - insensitive: default false. case-insensitive replace
      * @return string
      */
-    public static function replace(string $needle, string $with, string $haystack, array $options=[]) : string
+    public static function replace(string $needle, string $with, string $haystack, array $options = []) : string
     {
-        $options += ['insensitive'=>false];
+        $options += ['insensitive' => false];
         if ($options['insensitive']) {
             return str_ireplace($needle, $with, $haystack);
         }
+
         return str_replace($needle, $with, $haystack);
     }
 
@@ -210,6 +218,7 @@ class Text
         if ($transliterator === null) {
             $transliterator = 'Any-Latin; Latin-ASCII; [\u0080-\u7fff] remove';
         }
+
         return transliterator_transliterate($transliterator, $string);
     }
 
@@ -225,9 +234,9 @@ class Text
 
      * @return void
      */
-    public static function tokenize(string $string, array $options=[]) : array
+    public static function tokenize(string $string, array $options = []) : array
     {
-        $options += ['keys'=>[],'separator'=>' ','enclosure'=>'"','escape'=>'\\'];
+        $options += ['keys' => [],'separator' => ' ','enclosure' => '"','escape' => '\\'];
         $result = str_getcsv($string, $options['separator'], $options['enclosure'], $options['escape']);
         if (empty($options['keys'])) {
             return $result;
@@ -239,6 +248,7 @@ class Text
         foreach ($options['keys'] as $i => $key) {
             $out[$key] = $result[$i];
         }
+
         return $out;
     }
 
@@ -253,6 +263,7 @@ class Text
         $ascii = static::transliterate($string);
         $ascii = str_replace(' ', '-', mb_strtolower($ascii));
         $ascii = preg_replace('/[^a-z0-9-]/i', '', $ascii);
+
         return $ascii;
     }
 
@@ -263,13 +274,14 @@ class Text
      * @param array $options (length:30, end:...)
      * @return void
      */
-    public static function truncate(string $string, array $options=[])
+    public static function truncate(string $string, array $options = [])
     {
-        $options += ['length' =>30,'end'=>'...'];
+        $options += ['length' => 30,'end' => '...'];
         if (mb_strwidth($string) <= $options['length']) {
             return $string;
         }
         $string = mb_strimwidth($string, 0, $options['length'], '');
+
         return rtrim($string) . $options['end'];
     }
 
@@ -283,9 +295,10 @@ class Text
      *  - cut: default:false to cut string
      * @return string
      */
-    public static function wordWrap(string $string, array $options=[])
+    public static function wordWrap(string $string, array $options = [])
     {
-        $options += ['width' =>80,'break'=>"\n",'cut'=>false];
+        $options += ['width' => 80,'break' => "\n",'cut' => false];
+
         return wordwrap($string, $options['width'], $options['break'], $options['cut']);
     }
 }

@@ -91,7 +91,7 @@ trait ConsoleIntegrationTestTrait
 
     /**
      * Gets the stderr output (Errors)
-     *
+     * @codeCoverageIgnore
      * @return string
      */
     public function errorOutput()
@@ -136,10 +136,12 @@ trait ConsoleIntegrationTestTrait
 
         // Handle Legacy
         if (substr($class, -9) === 'ShellTest') {
+            // @codeCoverageIgnoreStart
             $this->stderr = $this->stdout; // Fixture Issue
             $dispatcher = new ShellDispatcher($argv, $this->stdout, $this->stdin);
             $this->result = $dispatcher->start();
             $this->shell = $dispatcher->shell();
+        // @codeCoverageIgnoreEnd
         } else {
             $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
             $commandRunner = new CommandRunner($io);
@@ -171,9 +173,6 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitSuccess()
     {
-        if ($this->result === false) {
-            printf($this->stderr->read());
-        }
         $this->assertTrue($this->result);
     }
 

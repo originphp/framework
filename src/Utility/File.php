@@ -56,6 +56,7 @@ class File
         if (is_dir($folder) and is_writeable($folder)) {
             return (bool) file_put_contents($filename, $contents, LOCK_EX);
         }
+
         return false;
     }
 
@@ -72,6 +73,7 @@ class File
         if (is_dir($folder) and is_writeable($folder)) {
             return (bool) file_put_contents($filename, $contents, FILE_APPEND | LOCK_EX);
         }
+
         return false;
     }
 
@@ -89,7 +91,6 @@ class File
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
 
-
     /**
      * Creates a temporary file. If no data is provided then it just returns the filename
      *
@@ -102,6 +103,7 @@ class File
         if ($data) {
             file_put_contents($filename, $data);
         }
+
         return $filename;
     }
 
@@ -118,6 +120,7 @@ class File
             if (strpos($to, DS) === false) {
                 $to = pathinfo($from, PATHINFO_DIRNAME) . DS . $to;
             }
+
             return @rename($from, $to);
         }
         throw new NotFoundException(sprintf('%s could not be found', $from));
@@ -151,13 +154,14 @@ class File
             if (strpos($destination, DS) === false) {
                 $destination = pathinfo($source, PATHINFO_DIRNAME) . DS . $destination;
             }
+
             return @copy($source, $destination);
         }
         throw new NotFoundException(sprintf('%s could not be found', $source));
     }
 
     /**
-       * Changes the file permissions
+       * Changes the file permissions. The directory must belong to
        *
        * @param string $filename filename with full path
        * @param int $mode e.g 0755 (remember 0 infront)
@@ -211,12 +215,11 @@ class File
     public static function mode(string $filename) : string
     {
         if (self::exists($filename)) {
-            return (string) substr(sprintf("%o", fileperms($filename)), -4);
+            return (string) substr(sprintf('%o', fileperms($filename)), -4);
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
     
-
     /**
      * Alias for mode. Gets the mode for a file aka permissions
      *
@@ -265,14 +268,15 @@ class File
     {
         if (self::exists($filename)) {
             $pathinfo = pathinfo($filename);
+
             return [
-               'path' => $pathinfo['dirname'],
-               'filename' => $pathinfo['basename'],
-               'extension' => $pathinfo['extension']??null,
-               'type' => mime_content_type($filename),
-               'size' => filesize($filename),
-               'timestamp' => filemtime($filename)
-           ];
+                'path' => $pathinfo['dirname'],
+                'filename' => $pathinfo['basename'],
+                'extension' => $pathinfo['extension'] ?? null,
+                'type' => mime_content_type($filename),
+                'size' => filesize($filename),
+                'timestamp' => filemtime($filename),
+            ];
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }

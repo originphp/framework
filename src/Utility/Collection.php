@@ -56,13 +56,14 @@ class Collection implements Iterator, Countable
      * @param string|function $callback
      * @return \Origin\Utility\Collection
      */
-    public function extract($callback)
+    public function extract($callback) : Collection
     {
         $callback = $this->initializeCallback($callback);
         $result = [];
         foreach ($this->items as $key => $value) {
             $result[$key] = $callback($value);
         }
+
         return new Collection($result);
     }
 
@@ -77,7 +78,7 @@ class Collection implements Iterator, Countable
      * @param callable $callback
      * @return \Origin\Utility\Collection
      */
-    public function each(callable $callback)
+    public function each(callable $callback) : Collection
     {
         foreach ($this->items as $key => $value) {
             $result = $callback($value, $key);
@@ -102,7 +103,7 @@ class Collection implements Iterator, Countable
      * @param callable $callback
      * @return \Origin\Utility\Collection
      */
-    public function map(callable $callback)
+    public function map(callable $callback) : Collection
     {
         $items = [];
         foreach ($this->items as $key => $value) {
@@ -126,12 +127,12 @@ class Collection implements Iterator, Countable
     * @param string $valuePath
     * @return \Origin\Utility\Collection
     */
-    public function combine(string $keyPath, string $valuePath, string $groupPath = null)
+    public function combine(string $keyPath, string $valuePath, string $groupPath = null) : Collection
     {
         $options = [
             'keyPath' => $keyPath,
             'valuePath' => $valuePath,
-            'groupPath' => $groupPath
+            'groupPath' => $groupPath,
         ];
 
         $callback = function ($data) use ($options) {
@@ -144,6 +145,7 @@ class Collection implements Iterator, Countable
             if ($options['groupPath']) {
                 $result['group'] = $this->extractProperty($data, $options['groupPath']);
             }
+
             return $result;
         };
 
@@ -151,14 +153,15 @@ class Collection implements Iterator, Countable
         foreach ($this->items as $value) {
             $result = $callback($value);
             if ($result['group']) {
-                if (!isset($results[$result['group']])) {
+                if (! isset($results[$result['group']])) {
                     $results[$result['group']] = [];
                 }
-                $results[$result['group']][] = [$result['key']=>$result['value']];
+                $results[$result['group']][] = [$result['key'] => $result['value']];
             } else {
                 $results[$result['key']] = $result['value'];
             }
         }
+
         return new Collection($results);
     }
 
@@ -172,12 +175,12 @@ class Collection implements Iterator, Countable
      * @param integer $chunkSize
      * @return \Origin\Utility\Collection
      */
-    public function chunk(int $chunkSize)
+    public function chunk(int $chunkSize) : Collection
     {
         $chunks = [];
         $counter = 0;
         foreach ($this->items as $key => $value) {
-            if (!isset($chunks[$counter])) {
+            if (! isset($chunks[$counter])) {
                 $chunks[$counter] = [];
             }
             $chunks[$counter][$key] = $value;
@@ -186,6 +189,7 @@ class Collection implements Iterator, Countable
                 $counter++;
             }
         }
+
         return new Collection($chunks);
     }
 
@@ -199,7 +203,7 @@ class Collection implements Iterator, Countable
      * @param callable $callback
      * @return \Origin\Utility\Collection
      */
-    public function filter(callable $callback)
+    public function filter(callable $callback) : Collection
     {
         $results = [];
         foreach ($this->items as $key => $value) {
@@ -207,6 +211,7 @@ class Collection implements Iterator, Countable
                 $results[$key] = $value;
             }
         }
+
         return new Collection($results);
     }
 
@@ -220,7 +225,7 @@ class Collection implements Iterator, Countable
      * @param callable $callback
      * @return \Origin\Utility\Collection
      */
-    public function reject(callable $callback)
+    public function reject(callable $callback) : Collection
     {
         $results = [];
         foreach ($this->items as $key => $value) {
@@ -228,6 +233,7 @@ class Collection implements Iterator, Countable
                 $results[$key] = $value;
             }
         }
+
         return new Collection($results);
     }
 
@@ -239,13 +245,13 @@ class Collection implements Iterator, Countable
      * });
      *
      * @param  callable $callback
-     * @return bool     result
+     * @return bool $result
 
      */
-    public function every(callable $callback)
+    public function every(callable $callback) : bool
     {
         foreach ($this->items as $key => $value) {
-            if (!$callback($value, $key)) {
+            if (! $callback($value, $key)) {
                 return false;
             }
         }
@@ -261,16 +267,17 @@ class Collection implements Iterator, Countable
      * });
      *
      * @param  callable $callback
-     * @return bool     result
+     * @return bool $result
 
      */
-    public function some(callable $callback)
+    public function some(callable $callback) : bool
     {
         foreach ($this->items as $key => $value) {
             if ($callback($value, $key) === true) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -286,7 +293,7 @@ class Collection implements Iterator, Countable
      * @param string|callable $callback
      * @return \Origin\Utility\Collection
      */
-    public function sortBy($callback, $direction = SORT_DESC, $type = SORT_NUMERIC)
+    public function sortBy($callback, $direction = SORT_DESC, $type = SORT_NUMERIC) : Collection
     {
         $callback = $this->initializeCallback($callback);
 
@@ -318,7 +325,7 @@ class Collection implements Iterator, Countable
     *   });
     *
     * @param string|callable $callback
-    * @return \Origin\Utility\Collection
+    * @return mixed
     */
     public function min($callback)
     {
@@ -336,7 +343,7 @@ class Collection implements Iterator, Countable
     *   });
     *
     * @param string|callable $callback
-    * @return \Origin\Utility\Collection
+    * @return mixed
     */
     public function max($callback)
     {
@@ -356,13 +363,14 @@ class Collection implements Iterator, Countable
     * @param string|callable $callback
     * @return integer
     */
-    public function sumOf($callback)
+    public function sumOf($callback) : int
     {
         $callback = $this->initializeCallback($callback);
         $sum = 0;
         foreach ($this->items as $key => $value) {
             $sum += $callback($value, $key);
         }
+
         return $sum;
     }
 
@@ -379,9 +387,10 @@ class Collection implements Iterator, Countable
     * @param string|callable $callback
     * @return integer
     */
-    public function avg($callback)
+    public function avg($callback) : int
     {
         $values = $this->extract($callback)->toArray();
+
         return array_sum($values) / count($values);
     }
 
@@ -398,7 +407,7 @@ class Collection implements Iterator, Countable
     * @param string|callable $callback
     * @return integer
     */
-    public function median($callback)
+    public function median($callback) : int
     {
         $values = $this->extract($callback)->toArray();
         $count = count($values);
@@ -425,17 +434,18 @@ class Collection implements Iterator, Countable
      * @param string|callable $callback
      * @return array
      */
-    public function countBy($callback)
+    public function countBy($callback) : array
     {
         $callback = $this->initializeCallback($callback);
         $results = [];
         foreach ($this->items as $key => $value) {
             $result = $callback($value, $key);
-            if (!isset($results[$result])) {
+            if (! isset($results[$result])) {
                 $results[$result] = 0;
             }
             $results[$result] = $results[$result] + 1;
         }
+
         return $results;
     }
 
@@ -451,15 +461,16 @@ class Collection implements Iterator, Countable
     *   })
     *
     * @param string|callable $callback
-    * @return array
+    * @return \Origin\Utility\Collection
     */
-    public function groupBy($callback)
+    public function groupBy($callback) : Collection
     {
         $callback = $this->initializeCallback($callback);
         $group = [];
         foreach ($this->items as $value) {
             $group[$callback($value)][] = $value;
         }
+
         return new Collection($group);
     }
 
@@ -472,7 +483,7 @@ class Collection implements Iterator, Countable
      * @param mixed $values
      * @return \Origin\Utility\Collection
      */
-    public function insert(string $path, $values)
+    public function insert(string $path, $values) : Collection
     {
         $items = [];
         $paths = explode('.', $path);
@@ -481,7 +492,7 @@ class Collection implements Iterator, Countable
             $item = &$row;
             foreach ($paths as $key) {
                 if (is_object($item)) {
-                    if (!isset($item->$key)) {
+                    if (! isset($item->$key)) {
                         $item->$key = [];
                     }
                     $item = &$item->$key;
@@ -503,12 +514,12 @@ class Collection implements Iterator, Countable
      * @param integer $from from which offset
      * @return \Origin\Utility\Collection
      */
-    public function take(int $count, int $from=0)
+    public function take(int $count, int $from = 0) : Collection
     {
         $items = [];
         $to = $from + $count - 1;
 
-        $i=0;
+        $i = 0;
         foreach ($this->items as $item) {
             if ($i > $to) {
                 break;
@@ -518,6 +529,7 @@ class Collection implements Iterator, Countable
             }
             $i++;
         }
+
         return new Collection($items);
     }
 
@@ -550,7 +562,6 @@ class Collection implements Iterator, Countable
         return count($this->items);
     }
 
-
     protected function extractProperty($data, string $path)
     {
         return $this->getColumn($data, explode('.', $path));
@@ -561,11 +572,12 @@ class Collection implements Iterator, Countable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray() : array
     {
         if (is_object($this->items)) {
             return $this->items->toArray();
         }
+
         return $this->items;
     }
 
@@ -574,7 +586,7 @@ class Collection implements Iterator, Countable
      *
      * @return array
      */
-    public function toList()
+    public function toList() : array
     {
         return array_values($this->toArray());
     }
@@ -584,7 +596,7 @@ class Collection implements Iterator, Countable
     */
     private function initializeCallback($callback)
     {
-        if (!is_string($callback)) {
+        if (! is_string($callback)) {
             return $callback;
         }
 
@@ -606,43 +618,50 @@ class Collection implements Iterator, Countable
         $value = null;
         foreach ($path as $key) {
             if (is_array($data)) {
-                if (!isset($data[$key])) {
+                if (! isset($data[$key])) {
                     return null;
                 }
                 $value = $data[$key];
             } elseif (is_object($data)) {
-                if (!isset($data->$key)) {
+                if (! isset($data->$key)) {
                     return null;
                 }
                 $value = $data->$key;
             }
             $data = $value; // Next In path
         }
+
         return $value;
     }
  
-    // Interable
-    public function rewind()
+    # Iterator
+
+    public function rewind() : void
     {
         $this->position = 0;
     }
 
+    /**
+     * Gets the current position
+     *
+     * @return mixed
+     */
     public function current()
     {
         return $this->items[$this->position];
     }
 
-    public function key()
+    public function key() : int
     {
         return $this->position;
     }
 
-    public function next()
+    public function next() : void
     {
         ++$this->position;
     }
 
-    public function valid()
+    public function valid() : bool
     {
         return isset($this->items[$this->position]);
     }

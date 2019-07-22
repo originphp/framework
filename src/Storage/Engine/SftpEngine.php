@@ -14,12 +14,11 @@
 
 namespace Origin\Storage\Engine;
 
-use Origin\Storage\Engine\BaseEngine;
-use Origin\Exception\NotFoundException;
-use Origin\Exception\Exception;
-
 use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
+
+use Origin\Exception\Exception;
+use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 
 /**
@@ -29,14 +28,25 @@ use Origin\Exception\InvalidArgumentException;
 
 class SftpEngine extends BaseEngine
 {
-    protected $defaultConfig =[
+    /**
+     * host: the hostname or ip address
+    * port: the port number. default 22
+    * username: the ssh account username
+    * password: the ssh account password
+    * timeout: default 10 seconds
+    * root: the root folder of the storage. e.g. /home/user/sub_folder
+    * privateKey: either the private key for the account or the filename where the private key can be loaded from
+     *
+     * @var array
+     */
+    protected $defaultConfig = [
         'host' => null,
         'username' => null,
         'password' => null,
         'port' => 22,
-        'root' => null, // Must be absolute path
-        'privateKey' => null, // path to public key file on server,
-        'timeout' => 10
+        'root' => null,
+        'privateKey' => null,
+        'timeout' => 10,
     ];
 
     /**
@@ -48,16 +58,11 @@ class SftpEngine extends BaseEngine
 
     public function initialize(array $config)
     {
-        //"phpseclib/phpseclib
-        if (!class_exists(SFTP::class)) {
+        if (! class_exists(SFTP::class)) {
             throw new Exception('phpseclib not installed.');
         }
         if ($this->config('host') === null) {
             throw new InvalidArgumentException('No host set');
-        }
-
-        if ($this->config('privateKey') and !file_Exists($this->config('privateKey'))) {
-            throw new NotFoundException(sprintf('%s could not be found'));
         }
 
         $this->connection = new SFTP(
@@ -74,25 +79,45 @@ class SftpEngine extends BaseEngine
         }
     }
 
+    /**
+     * Gets the private key, processes and returns a RSA object
+     * for login
+     *
+     * @return RSA
+     */
+    protected function loadPrivateKey() : RSA
+    {
+        $password = new RSA();
+        if ($this->config('password')) {
+            $password->setPassword($this->config('password')); # Must be set before loadKey
+        }
+        $privateKey = $this->config('privateKey');
+        if (substr($privateKey, 0, 5) !== '-----') {
+            if (! file_Exists($this->config('privateKey'))) {
+                throw new NotFoundException(sprintf('%s could not be found', $this->config('privateKey')));
+            }
+            $privateKey = file_get_contents($privateKey);
+        }
+        $password->loadKey($privateKey);
+
+        return $password;
+    }
+
     protected function login()
     {
         $config = $this->config();
         extract($config);
     
         if ($this->config('privateKey')) {
-            $password = new RSA();
-            if ($this->config('password')) {
-                $password->setPassword($this->config('password')); # Must be set before loadKey
-            }
-            $privateKey = $this->config('privateKey');
-            if (substr($privateKey, 0, 5) !== '-----') {
-                $privateKey = file_get_contents(privateKey);
-            }
-            $password ->loadKey($privateKey);
+            $password = $this->loadPrivateKey();
         }
-       
-        if (!$this->connection->login($username, $password)) {
-            throw new Exception('Invalid username or password');
+        
+        try {
+            if (! $this->connection->login($username, $password)) {
+                throw new Exception('Invalid username or password.');
+            }
+        } catch (\ErrorException $e) {
+            throw new Exception(sprintf('Error connecting to %s.', $this->config('host') . ':'. $this->config('port')));
         }
     }
 
@@ -124,7 +149,7 @@ class SftpEngine extends BaseEngine
         $filename = $this->addPathPrefix($name);
 
         $folder = pathinfo($filename, PATHINFO_DIRNAME);
-        if (!$this->connection->stat($folder)) {
+        if (! $this->connection->stat($folder)) {
             $this->connection->mkdir($folder, 0744, true);
         }
 
@@ -162,6 +187,7 @@ class SftpEngine extends BaseEngine
     public function exists(string $name)
     {
         $filename = $this->addPathPrefix($name);
+
         return (bool) $this->connection->stat($filename);
     }
 
@@ -174,10 +200,11 @@ class SftpEngine extends BaseEngine
     {
         $directory = $this->addPathPrefix($name);
 
-        if (!$this->connection->is_dir($directory)) {
+        if (! $this->connection->is_dir($directory)) {
             throw new NotFoundException('directory does not exist');
         }
         $this->base = $this->addPathPrefix($name);
+
         return $this->scandir($name);
     }
 
@@ -198,7 +225,7 @@ class SftpEngine extends BaseEngine
                     $files[] = [
                         'name' => str_replace($this->base . DS, '', $location . DS .  $file),
                         'timestamp' => $info['mtime'],
-                        'size' => $info['size']
+                        'size' => $info['size'],
                     ];
                 } elseif ($info['type'] === 2) {
                     $subDirectory = $file;
@@ -229,6 +256,7 @@ class SftpEngine extends BaseEngine
         if ($path !== null) {
             $location .= DS . $path;
         }
+
         return $location;
     }
 }

@@ -7,13 +7,13 @@ class HtmlTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromText()
     {
-        $text = "This is a line of text without a newline";
+        $text = 'This is a line of text without a newline';
         $expected = '<p>This is a line of text without a newline</p>';
         $this->assertEquals($expected, Html::fromText($text));
 
-        $text = "This is a line of text without a newline";
+        $text = 'This is a line of text without a newline';
         $expected = '<div>This is a line of text without a newline</div>';
-        $this->assertEquals($expected, Html::fromText($text, ['tag'=>'div']));
+        $this->assertEquals($expected, Html::fromText($text, ['tag' => 'div']));
 
         $expected = '<p>This is testing a line<br>with a line break.</p>';
         $text = "This is testing a line\nwith a line break.";
@@ -76,7 +76,6 @@ EOF;
         $this->assertEquals($expected, html::minify($html));
     }
 
-
     /**
      * I put markers to track the line endings
      *
@@ -84,34 +83,34 @@ EOF;
      */
     public function testToTextHeadings()
     {
-        $html = "<span>*</span><h1>Search Engines</h1><span>*</span>";
+        $html = '<span>*</span><h1>Search Engines</h1><span>*</span>';
         $expected = "\nSearch Engines\n==============";
         $this->assertContains($expected, Html::toText($html));
 
-        $html = "<span>*</span><h2>Heading Number 2</h2><span>*</span>";
+        $html = '<span>*</span><h2>Heading Number 2</h2><span>*</span>';
         $expected = "\nHeading Number 2\n----------------";
         $this->assertContains($expected, Html::toText($html));
 
-        $html = "<span>*</span><h3>Heading Number 3</h3><span>*</span>";
+        $html = '<span>*</span><h3>Heading Number 3</h3><span>*</span>';
         $expected = "\nHeading Number 3\n----------------";
         $this->assertContains($expected, Html::toText($html));
 
-        $html = "<span>*</span><h4>Heading Number 4</h4><span>*</span>";
+        $html = '<span>*</span><h4>Heading Number 4</h4><span>*</span>';
         $expected = "\nHeading Number 4\n----------------";
         $this->assertContains($expected, Html::toText($html));
 
-        $html = "<span>*</span><h5>Heading Number 5</h5><span>*</span>";
+        $html = '<span>*</span><h5>Heading Number 5</h5><span>*</span>';
         $expected = "\nHeading Number 5\n----------------";
         $this->assertContains($expected, Html::toText($html));
 
-        $html = "<span>*</span><h6>Heading Number 6</h6><span>*</span>";
+        $html = '<span>*</span><h6>Heading Number 6</h6><span>*</span>';
         $expected = "\nHeading Number 6\n----------------";
         $this->assertContains($expected, Html::toText($html));
     }
 
     public function testToTextBlockquote()
     {
-        $html = "<span>*</span><blockquote>Life is what happens to you whilst you are busy planning it</blockquote><span>*</span>";
+        $html = '<span>*</span><blockquote>Life is what happens to you whilst you are busy planning it</blockquote><span>*</span>';
         $expected = "\n\"Life is what happens to you whilst you are busy planning it\"\n";
         $this->assertContains($expected, Html::toText($html));
     }
@@ -119,27 +118,27 @@ EOF;
     public function testToTextImage()
     {
         $html = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png">';
-        $expected = "[image: https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png]";
+        $expected = '[image: https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png]';
         $this->assertContains($expected, Html::toText($html));
 
         $html = '<img alt="Google Logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png">';
-        $expected = "[image: Google Logo https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png]";
+        $expected = '[image: Google Logo https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/220px-Google_2015_logo.svg.png]';
         $this->assertContains($expected, Html::toText($html));
 
         // Test with special characters
         $html = '<img alt="Beavis & Butt-Head" src="https://en.wikipedia.org/wiki/Beavis_and_Butt-Head#/media/File:Beavis_and_Butt-head_titlecard.png?cache=clear&id=1234">';
-        $expected = "[image: Beavis & Butt-Head https://en.wikipedia.org/wiki/Beavis_and_Butt-Head#/media/File:Beavis_and_Butt-head_titlecard.png?cache=clear&id=1234]";
+        $expected = '[image: Beavis & Butt-Head https://en.wikipedia.org/wiki/Beavis_and_Butt-Head#/media/File:Beavis_and_Butt-head_titlecard.png?cache=clear&id=1234]';
         $this->assertContains($expected, Html::toText($html));
     }
 
     public function testToTextLinks()
     {
         $html = '<a href="https://www.google.com">Google</a>';
-        $expected = "[Google](https://www.google.com)";
+        $expected = '[Google](https://www.google.com)';
         $this->assertContains($expected, Html::toText($html));
 
         $html = '<a href="https://www.google.com/search?q=some_underscored_keyword&results=100">Number #1 Search Engine & Favourite</a>';
-        $expected = "[Number #1 Search Engine & Favourite](https://www.google.com/search?q=some_underscored_keyword&results=100)";
+        $expected = '[Number #1 Search Engine & Favourite](https://www.google.com/search?q=some_underscored_keyword&results=100)';
         $this->assertContains($expected, Html::toText($html));
     }
 
@@ -148,12 +147,12 @@ EOF;
         /**
          * Test various things from line breaks and extra spaces in between p tags
          */
-        $html = "<span>*</span><p>Emphasis,    aka italics, 
+        $html = '<span>*</span><p>Emphasis,    aka italics, 
         with <em>asterisks</em> or <em>underscores</em>.<br>Strong 
         emphasis, aka bold, with <strong>asterisks</strong> or <strong>underscores</strong>.<br>Combined 
         emphasis with <strong>asterisks and <em>underscores</em></strong>.<br>Strikethrough uses 
         two tildes. <del>Scratch this.</del>
-        </p><span>*</span>";
+        </p><span>*</span>';
 
         $expected = <<< EOF
 Emphasis, aka italics, with asterisks or underscores.
@@ -183,10 +182,9 @@ EOF;
         $this->assertContains($expected, Html::toText($html));
     }
 
-
     public function testToTextSubList()
     {
-        $html = "<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ul> <li>Black tea</li><li>Green tea</li></ul></li> <li>Milk</li></ul>";
+        $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ul> <li>Black tea</li><li>Green tea</li></ul></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   * Black tea\n   * Green tea\n* Milk";
         $this->assertContains($expected, Html::toText($html));
@@ -194,7 +192,7 @@ EOF;
 
     public function testToTextSubListOrdered()
     {
-        $html = "<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ol> <li>Black tea</li><li>Green tea</li></ol></li> <li>Milk</li></ul>";
+        $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ol> <li>Black tea</li><li>Green tea</li></ol></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   1. Black tea\n   2. Green tea\n* Milk";
         $this->assertContains($expected, Html::toText($html));
@@ -313,16 +311,14 @@ if (php_sapi_name() != 'cli') {
 </code></pre>
 <p>Emphasis, aka italics, with <em>asterisks</em> or <em>underscores</em>.<br>Strong emphasis, aka bold, with <strong>asterisks</strong> or <strong>underscores</strong>.<br>Combined emphasis with <strong>asterisks and <em>underscores</em></strong>.<br>Strikethrough uses two tildes. <del>Scratch this.</del></p>
 EOF;
-        $expected ='e58d553654c188ef178192cbdd3859ad';
+        $expected = 'e58d553654c188ef178192cbdd3859ad';
  
         $this->assertEquals($expected, md5(Html::toText($html)));
        
         // Non Format version
         $expected = '89f7e9caa94a499e332848dba8cdac15';
-        $this->assertEquals($expected, md5(Html::toText($html, ['format'=>false])));
+        $this->assertEquals($expected, md5(Html::toText($html, ['format' => false])));
     }
-
-  
 
     public function testStripTagsSelected()
     {
@@ -343,5 +339,14 @@ EOF;
 </div>
 EOF;
         $this->assertEquals($expected, Html::stripTags($html, ['script','iframe']));
+    }
+
+    public function testSantize()
+    {
+        $html = '<div><h1>Heading</h1><a href="https:/www.google.com" class="link">Google</a><img src="javascript:alert(\'hello\);"><div>';
+        $tags = ['div','h1','a' => ['class','style']];
+        // link href removed (Attribute)
+        // image completely removed (element)
+        $this->assertEquals('<div><h1>Heading</h1><a class="link">Google</a><div></div></div>', Html::sanitize($html, ['tags' => $tags]));
     }
 }

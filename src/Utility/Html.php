@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace Origin\Utility;
 
-use DOMDocument;
 use DOMNode;
 use DOMXPath;
+use DOMDocument;
 
 class Html
 {
@@ -48,9 +48,9 @@ class Html
             $line = str_replace("\n", '<br>', $line);
             $out[] = sprintf('<%s>%s</%s>', $options['tag'], $line, $options['tag']);
         }
+
         return implode("\n", $out);
     }
-
 
     /**
      * Minifies HTML
@@ -62,7 +62,7 @@ class Html
     {
         $keepWhitespace = ['address', 'pre', 'script', 'style'];
         $keepWhitespaceAround = [
-            'a', 'abbr', 'acronym', 'b', 'br', 'button', 'cite', 'code', 'del', 'em', 'i', 'img', 'input', 's', 'select', 'small', 'span', 'strong', 'textarea', 'u'
+            'a', 'abbr', 'acronym', 'b', 'br', 'button', 'cite', 'code', 'del', 'em', 'i', 'img', 'input', 's', 'select', 'small', 'span', 'strong', 'textarea', 'u',
         ];
 
         $doc = new DOMDocument();
@@ -72,42 +72,32 @@ class Html
 
         $html = preg_replace('/(?=<!--)([\s\S]*?)-->/', '', $html); // Remove comments
 
-        if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            $x = new DOMXPath($doc);
-            $nodes = $x->query("//text()");
+        @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
+        $x = new DOMXPath($doc);
+        $nodes = $x->query('//text()');
 
-            foreach ($nodes as $node) {
-                // Check parent, plus 1 parent level e.g pre/code
-                if (in_array($node->parentNode->nodeName, $keepWhitespace)  or in_array($node->parentNode->parentNode->nodeName, $keepWhitespace)) {
-                    continue;
-                }
-                // Will using regex cause performance issues on large html files?
-                $node->nodeValue = str_replace(["\r\n", "\n", "\r", "\t"], '', $node->nodeValue);
-                $node->nodeValue = preg_replace('/\s{2,}/', ' ', $node->nodeValue);
-
-                # Check parent and one level up for e.g pre + code Not sure of other examples
-                if (!in_array($node->parentNode->nodeName, $keepWhitespaceAround)) {
-                    if ($node->previousSibling and !in_array($node->previousSibling->nodeName, $keepWhitespaceAround)) {
-                        $node->nodeValue = ltrim($node->nodeValue);
-                    }
-                    if ($node->nextSibling and !in_array($node->nextSibling->nodeName, $keepWhitespaceAround)) {
-                        $node->nodeValue = rtrim($node->nodeValue);
-                    }
-                }
-                // Remove empty nodes
-                if (strlen($node->nodeValue) === null) {
-                    $node->parentNode->removeChild($node);
-                }
+        foreach ($nodes as $node) {
+            // Check parent, plus 1 parent level e.g pre/code
+            if (in_array($node->parentNode->nodeName, $keepWhitespace) or in_array($node->parentNode->parentNode->nodeName, $keepWhitespace)) {
+                continue;
             }
+            // Will using regex cause performance issues on large html files?
+            $node->nodeValue = str_replace(["\r\n", "\n", "\r", "\t"], '', $node->nodeValue);
+            $node->nodeValue = preg_replace('/\s{2,}/', ' ', $node->nodeValue);
 
-            $html = $doc->saveHTML();
-            if ($html) {
-                return trim($html);
+            # Check parent and one level up for e.g pre + code Not sure of other examples
+            if (! in_array($node->parentNode->nodeName, $keepWhitespaceAround)) {
+                if ($node->previousSibling and ! in_array($node->previousSibling->nodeName, $keepWhitespaceAround)) {
+                    $node->nodeValue = ltrim($node->nodeValue);
+                }
+                if ($node->nextSibling and ! in_array($node->nextSibling->nodeName, $keepWhitespaceAround)) {
+                    $node->nodeValue = rtrim($node->nodeValue);
+                }
             }
         }
-        return null;
-    }
 
+        return trim($doc->saveHTML() ?? 'An error occured');
+    }
 
     /**
      * A Simple Html To Text Function.
@@ -127,7 +117,7 @@ class Html
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = false;
 
-        $html  = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
+        $html = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
 
         /**
          * Create a text version without formatting, just adds new lines, indents for lists, and list type, e.g number
@@ -143,26 +133,25 @@ class Html
             $html = preg_replace('/(<\/(th|td)>)/', '$1 ', $html); //Add space
         }
 
-        if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            $process = ['a', 'img', 'br', 'code', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table','li','ul', 'ol', 'blockquote'];
+        @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
+        $process = ['a', 'img', 'br', 'code', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table','li','ul', 'ol', 'blockquote'];
 
-            if ($options['format'] === false) {
-                $process = ['ul', 'ol'];
-            }
+        if ($options['format'] === false) {
+            $process = ['ul', 'ol'];
+        }
     
-            /**
-             * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
-             */
-            foreach ($process as $needle) {
-                $nodes = $doc->getElementsByTagName($needle);
-                foreach ($nodes as $node) {
-                    static::processTag($node, $doc);
-                }
+        /**
+         * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
+         */
+        foreach ($process as $needle) {
+            $nodes = $doc->getElementsByTagName($needle);
+            foreach ($nodes as $node) {
+                static::processTag($node, $doc);
             }
         }
+ 
         return trim($doc->textContent);
     }
-
 
     /**
      * Check if value needs converting and convert
@@ -175,6 +164,7 @@ class Html
         if (strpos($value, '&') !== false) {
             $value = htmlspecialchars($value);
         }
+
         return $value;
     }
     /**
@@ -187,26 +177,23 @@ class Html
      */
     protected static function processTag(DomNode $tag, DomDocument $doc): void
     {
-        if (empty($tag->tagName)) {
-            return;
-        }
         $value = static::htmlspecialchars($tag->nodeValue);
 
         switch ($tag->tagName) {
             case 'a':
-                $tag->nodeValue =  "[{$value}](" . static::htmlspecialchars($tag->getAttribute('href'))  . ")";
+                $tag->nodeValue = "[{$value}](" . static::htmlspecialchars($tag->getAttribute('href'))  . ')';
                 break;
             case 'br':
-                $tag->nodeValue  =  PHP_EOL;
+                $tag->nodeValue = PHP_EOL;
                 break;
             case 'code':
                 // indent multi line
                 if (strpos($tag->nodeValue, PHP_EOL) !== false) {
-                    $tag->nodeValue  =  PHP_EOL . '   ' . str_replace(PHP_EOL, PHP_EOL . '   ', $value) . PHP_EOL;
+                    $tag->nodeValue = PHP_EOL . '   ' . str_replace(PHP_EOL, PHP_EOL . '   ', $value) . PHP_EOL;
                 }
                 break;
             case 'blockquote':
-                $tag->nodeValue  =  PHP_EOL . '"' . $value . '"' . PHP_EOL;
+                $tag->nodeValue = PHP_EOL . '"' . $value . '"' . PHP_EOL;
                 break;
             case 'h1':
             case 'h2':
@@ -246,11 +233,11 @@ class Html
                     $alt = $tag->getAttribute('alt') . ' ';
                 }
                 $alt = htmlspecialchars($alt);
-                $tag->nodeValue =  "[image: {$alt}" . static::htmlspecialchars($tag->getAttribute('src')) . "]";
+                $tag->nodeValue = "[image: {$alt}" . static::htmlspecialchars($tag->getAttribute('src')) . ']';
                 break;
             case 'ol':
                 $count = 1;
-                $lineBreak  = PHP_EOL;
+                $lineBreak = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);
                 foreach ($tag->childNodes as $child) {
@@ -281,7 +268,10 @@ class Html
                     }
                     $data[] = $row;
                 }
-                $data = static::arrayToTable($data, $headers);
+                if ($data) {
+                    $data = static::arrayToTable($data, $headers);
+                }
+                
                 // Replacing can cause issues
                 $div = $doc->createElement('div', PHP_EOL . implode(PHP_EOL, $data) . PHP_EOL);
                 $tag->parentNode->insertBefore($div, $tag);
@@ -290,13 +280,13 @@ class Html
                 break;
             case 'ul':
          
-                $lineBreak  = PHP_EOL;
+                $lineBreak = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);
 
                 foreach ($tag->childNodes as $child) {
                     if (isset($child->tagName) and $child->tagName === 'li') {
-                        $child->nodeValue =  $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue);
+                        $child->nodeValue = $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue);
                         $child->nodeValue = rtrim($child->nodeValue) . PHP_EOL; // friendly with nested lists
                         $lineBreak = null;
                     }
@@ -329,6 +319,7 @@ class Html
                 $checkLevelUp = false;
             }
         }
+
         return $indent;
     }
 
@@ -341,14 +332,11 @@ class Html
      */
     protected static function arrayToTable(array $array, bool $headers = true): array
     {
-        if (empty($array)) {
-            return [];
-        }
         // Calculate width of each column
         $widths = [];
         foreach ($array as $row) {
             foreach ($row as $columnIndex => $cell) {
-                if (!isset($widths[$columnIndex])) {
+                if (! isset($widths[$columnIndex])) {
                     $widths[$columnIndex] = 0;
                 }
                 $width = strlen($cell) + 4;
@@ -385,9 +373,9 @@ class Html
             $out[] = $cells;
         }
         $out[] = $seperator;
+
         return $out;
     }
-
 
     /**
      * Cleans up user inputted html for saving to a database
@@ -407,7 +395,7 @@ class Html
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'p',
                 'i', 'em', 'strong', 'b', 'del',
-                'blockquote'=>['cite'],
+                'blockquote' => ['cite'],
                 'a',
                 'ul', 'li', 'ol', 'br',
                 'code', 'pre',
@@ -426,7 +414,7 @@ class Html
         }
         $options['tags'] = $tags;
 
-        $html  = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
+        $html = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
         /**
          * When document is imported it will have HTML and body tag.
          */
@@ -436,12 +424,11 @@ class Html
         /**
          * Add html/body but not doctype. body will be remoed later
          */
-        if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            foreach ($doc->firstChild->childNodes as $node) {
-                static::_sanitize($node, $options); // body
-            }
+        @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
+        foreach ($doc->firstChild->childNodes as $node) {
+            static::_sanitize($node, $options); // body
         }
-
+        
         return preg_replace('~<(?:/?(?:html|body))[^>]*>\s*~i', '', $doc->saveHTML());
     }
 
@@ -464,7 +451,7 @@ class Html
         }
 
         $remove = $change = $attributes = [];
-        if (!isset($options['tags'][$node->nodeName]) and $node->nodeName !== 'body') {
+        if (! isset($options['tags'][$node->nodeName]) and $node->nodeName !== 'body') {
             $remove[] = $node;
             /* This is for keeping text between divs. Keep for now until committed
             foreach ($node->childNodes as $child) {
@@ -475,7 +462,7 @@ class Html
 
         if ($node->attributes) {
             foreach ($node->attributes as $attr) {
-                if (!isset($options['tags'][$node->nodeName]) or !in_array($attr->nodeName, $options['tags'][$node->nodeName])) {
+                if (! isset($options['tags'][$node->nodeName]) or ! in_array($attr->nodeName, $options['tags'][$node->nodeName])) {
                     $attributes[] = $attr->nodeName;
                 }
             }
@@ -503,7 +490,6 @@ class Html
         }
     }
 
-
     /**
      * Strips HTML tags and the content of those tags
      *
@@ -519,23 +505,21 @@ class Html
          */
         $doc->preserveWhiteSpace = true;
         $doc->formatOutput = false;
-        if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            $remove = [];
-            foreach ($tags as $tag) {
-                $nodes = $doc->getElementsByTagName($tag);
-                foreach ($nodes as $node) {
-                    $remove[] = $node;
-                }
+        @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
+        $remove = [];
+        foreach ($tags as $tag) {
+            $nodes = $doc->getElementsByTagName($tag);
+            foreach ($nodes as $node) {
+                $remove[] = $node;
             }
-            foreach ($remove as $node) {
-                $node->parentNode->removeChild($node);
-            }
-            $content = preg_replace('~<(?:/?(?:html|body))[^>]*>\s*~i', '', $doc->saveHTML());
-            return trim($content);
         }
-        return null;
-    }
+        foreach ($remove as $node) {
+            $node->parentNode->removeChild($node);
+        }
+        $content = preg_replace('~<(?:/?(?:html|body))[^>]*>\s*~i', '', $doc->saveHTML());
 
+        return trim($content);
+    }
 
     /**
      * Escapes Html for output in a secure way

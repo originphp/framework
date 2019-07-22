@@ -14,16 +14,16 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Model\ModelRegistry;
+use Origin\Core\Dot;
 use Origin\Http\Router;
-use Origin\Core\Inflector;
 use Origin\Model\Entity;
+use Origin\Utility\Date;
+
+use Origin\Core\Inflector;
+use Origin\Utility\Number;
 
 use Origin\View\TemplateTrait;
-use Origin\Core\Dot;
-
-use Origin\Utility\Date;
-use Origin\Utility\Number;
+use Origin\Model\ModelRegistry;
 
 class FormHelper extends Helper
 {
@@ -34,7 +34,8 @@ class FormHelper extends Helper
      * @var array
      */
     protected $defaultConfig = [
-        'controlDefaults' => array(
+        'format' => true, // Formats date,datetime,time, and numbers. Works with delocalize
+        'controlDefaults' => [
             'text' => ['div' => 'form-group', 'class' => 'form-control'],
             'textarea' => ['div' => 'form-group', 'class' => 'form-control'],
             'password' => ['div' => 'form-group', 'class' => 'form-control'],
@@ -45,9 +46,9 @@ class FormHelper extends Helper
             'date' => ['div' => 'form-group', 'class' => 'form-control'],
             'time' => ['div' => 'form-group', 'class' => 'form-control'],
             'datetime' => ['div' => 'form-group', 'class' => 'form-control'], // Date time appended,
-            'file' => ['div'=>'form-group','class'=>'form-control-file']
-        ),
-        'templates' => array(
+            'file' => ['div' => 'form-group','class' => 'form-control-file'],
+        ],
+        'templates' => [
             // Controls
             /*/ Maybe going forward
         @todo a possible solution to use only templates. Issue is shared clas without complications. That said
@@ -77,7 +78,7 @@ class FormHelper extends Helper
             'postLink' => '<a href="#"{attributes}>{text}</a>',
             'onclickConfirm' => 'if (confirm(&quot;{message}&quot;)) { document.{name}.submit(); } event.returnValue = false; return false;',
             'onclick' => 'document.{name}.submit();',
-        ),
+        ],
     ];
 
     /**
@@ -101,7 +102,7 @@ class FormHelper extends Helper
      */
     protected $requiredFields = [];
 
-    protected $controlMap = array(
+    protected $controlMap = [
         'string' => 'text',
         'text' => 'textarea',
         'number' => 'number',
@@ -111,7 +112,7 @@ class FormHelper extends Helper
         'timestamp' => 'datetime',
         'boolean' => 'checkbox',
         'binary' => 'file',
-    );
+    ];
 
     protected $meta = [];
 
@@ -134,9 +135,9 @@ class FormHelper extends Helper
          * and required fields.
          */
         if (is_string($entity)) {
-            $model  = $entity;
+            $model = $entity;
             $requestData = $this->view()->request->data();
-            $entity = new Entity($requestData, ['name'=>$model]);
+            $entity = new Entity($requestData, ['name' => $model]);
             if ($requestData) {
                 $object = ModelRegistry::get($model);
                 if ($object) {
@@ -200,9 +201,9 @@ class FormHelper extends Helper
     public function submit(string $name, array $options = [])
     {
         $options['type'] = 'submit';
+
         return $this->button($name, $options);
     }
-
 
     /**
      * Creates a checkbox
@@ -215,7 +216,7 @@ class FormHelper extends Helper
     {
         $options = array_merge(['hiddenField' => true], $options);
         $options = $this->prepareOptions($name, $options);
-        $checked = !empty($options['value']) ? true : false;
+        $checked = ! empty($options['value']) ? true : false;
         if ($checked) {
             $options['checked'] = true;
         }
@@ -316,11 +317,10 @@ class FormHelper extends Helper
     {
         $selectOptions = [];
 
-        if (empty($options['type']) and !empty($options['options'])) {
+        if (empty($options['type']) and ! empty($options['options'])) {
             $options['type'] = 'select';
         }
 
-   
         if (empty($options['type'])) {
             $options['type'] = $this->detectType($name);
         }
@@ -410,7 +410,6 @@ class FormHelper extends Helper
             }
         }
 
-
         // Check if field is required to add required class
         $required = false;
         if ($model and in_array($column, $this->requiredFields($model))) {
@@ -424,15 +423,15 @@ class FormHelper extends Helper
             // Each radio needs to be in its own div
             $output = '';
 
-
             foreach ($selectOptions as $key => $value) {
                 $output .= $this->formatTemplate($template, ['class' => $div] + [
-                    'type' => $type,
+                    'type' => 'radio',
                     'before' => $before,
                     'after' => $after,
-                    'content' => $this->radio($name, [$key => $value], $options)
+                    'content' => $this->radio($name, [$key => $value], $options),
                 ]);
             }
+
             return $output;
         } else {
             $fieldOutput = $this->{$type}($name, $options);
@@ -466,6 +465,7 @@ class FormHelper extends Helper
         if (isset($this->meta[$model])) {
             $result = $this->meta[$model]['requiredFields'];
         }
+
         return $result;
     }
     /**
@@ -484,22 +484,26 @@ class FormHelper extends Helper
     public function date(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format'=>Date::locale()['date']];
+        $options += ['format' => $this->config('format')];
         $options['type'] = 'text';
 
         /**
            * Only format database values (if validation fails dont format)
            */
         if ($options['format']) {
+            if ($options['format'] === true) {
+                $options['format'] = Date::locale()['date'];
+            }
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'), $options['format']);
             }
             
-            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
         }
         unset($options['format']);
+
         return $this->formatTemplate('input', $options);
     }
 
@@ -519,21 +523,25 @@ class FormHelper extends Helper
     public function datetime(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format'=>Date::locale()['datetime']];
+        $options += ['format' => $this->config('format')];
         $options['type'] = 'text';
 
         /**
          * Only format database values (if validation fails dont format)
          */
         if ($options['format']) {
+            if ($options['format'] === true) {
+                $options['format'] = Date::locale()['datetime'];
+            }
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
-            if (!empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
         }
         unset($options['format']);
+
         return $this->formatTemplate('input', $options);
     }
 
@@ -628,6 +636,7 @@ class FormHelper extends Helper
     public function textarea(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
+
         return $this->formatTemplate('textarea', $options);
     }
     /**
@@ -646,21 +655,25 @@ class FormHelper extends Helper
     public function time(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format' => Date::locale()['time']];
+        $options += ['format' => $this->config('format')];
         $options['type'] = 'text';
 
         /**
          * Only format database values (if validation fails dont format)
          */
         if ($options['format']) {
+            if ($options['format'] === true) {
+                $options['format'] = Date::locale()['time'];
+            }
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
-            if (!empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']); // Daylight saving issue with timefields
             }
         }
         unset($options['format']);
+
         return $this->formatTemplate('input', $options);
     }
 
@@ -680,18 +693,20 @@ class FormHelper extends Helper
     public function number(string $name, array $options = [])
     {
         $options = $this->prepareOptions($name, $options);
-        $options += ['format'=>true];
+        $options += ['format' => $this->config('format')];
         $options['type'] = 'text';
+
         /**
          * Only format database values (if validation fails dont format)
          */
   
         if ($options['format']) {
-            if (!empty($options['value']) and $options['value'] == (string) (float) $options['value']) {
+            if (! empty($options['value']) and (is_int($options['value']) or is_float($options['value']))) {
                 $options['value'] = Number::format($options['value']);
             }
         }
         unset($options['format']);
+
         return $this->formatTemplate('input', $options);
     }
 
@@ -711,6 +726,7 @@ class FormHelper extends Helper
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'password';
+
         return $this->formatTemplate('input', $options);
     }
 
@@ -735,7 +751,7 @@ class FormHelper extends Helper
             $url = Router::url($url);
         }
         global $formElementCounter;
-        if (!$formElementCounter) {
+        if (! $formElementCounter) {
             $formElementCounter = 1000;
         }
         $form = 'link_' . $formElementCounter++;
@@ -821,7 +837,7 @@ class FormHelper extends Helper
     {
         $selectOptions = $this->prepareOptions($name, $selectOptions);
 
-        if (!empty($selectOptions['empty'])) {
+        if (! empty($selectOptions['empty'])) {
             if ($selectOptions['empty'] === true) {
                 $selectOptions['empty'] = '--None--';
             }
@@ -852,11 +868,13 @@ class FormHelper extends Helper
             if (isset($this->config['controlDefaults'][$defaults])) {
                 return $this->config['controlDefaults'][$defaults];
             }
+
             return null;
         }
         foreach ($defaults as $key => $value) {
             $this->config['controlDefaults'][$key] = $value;
         }
+
         return $this;
     }
 
@@ -899,7 +917,7 @@ class FormHelper extends Helper
         if (isset($options['id']) and $options['id'] === true) {
             $options['id'] = $this->domId($name);
         }
-        if (!isset($options['name'])) {
+        if (! isset($options['name'])) {
             if (strpos($name, '.') === false) {
                 $options['name'] = $name;
             } else {
@@ -908,19 +926,19 @@ class FormHelper extends Helper
                 $options['name'] = $_name . '[' . implode('][', $parts) . ']';
             }
         }
-        if (!isset($options['maxlength'])) {
+        if (! isset($options['maxlength'])) {
             if ($maxlength = $this->getMaxLength($name)) {
                 $options['maxlength'] = $maxlength;
             }
         }
-        if (!isset($options['value'])) {
+        if (! isset($options['value'])) {
             if ($this->data) {
                 $entity = $this->getEntity($this->data, $name);
                 $parts = explode('.', $name);
                 $last = end($parts);
 
                 // Get value unless overridden
-                if (!isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
+                if (! isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
                     $options['value'] = $entity->{$last};
                 }
 
@@ -940,7 +958,6 @@ class FormHelper extends Helper
                 }
             }
         }
-
 
         return $options;
     }
@@ -1031,6 +1048,7 @@ class FormHelper extends Helper
 
             if (isset($this->meta[$model]['columnMap'][$column])) {
                 $type = $this->meta[$model]['columnMap'][$column];
+
                 return $this->controlMap[$type];
             }
         }
@@ -1041,11 +1059,8 @@ class FormHelper extends Helper
     protected function formatTemplate(string $name, array $options = [])
     {
         $template = $this->templates($name);
-        $options += ['escape'=>true];
+        $options += ['escape' => true];
 
-        if (empty($options)) {
-            return $template;
-        }
         $data = [];
         preg_match_all('/\{([a-z]+)\}/', $template, $matches);
         if ($matches) {
@@ -1074,6 +1089,7 @@ class FormHelper extends Helper
 
         // Remaining items in options are attributes
         $data['attributes'] = $this->attributesToString($options);
+
         return $this->templater()->format($name, $data);
     }
 
@@ -1088,6 +1104,7 @@ class FormHelper extends Helper
         if ($token === null) {
             return null;
         }
-        return $this->formatTemplate('hidden', ['name'=>'csrfToken','value'=>$token]);
+
+        return $this->formatTemplate('hidden', ['name' => 'csrfToken','value' => $token]);
     }
 }

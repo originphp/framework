@@ -597,15 +597,15 @@ abstract class Datasource
      *
      * @return array
      */
-    abstract public function tables();
+    abstract public function tables() : array;
     
     abstract public function enableForeignKeyConstraints();
 
     abstract public function disableForeignKeyConstraints();
 
-    abstract public function dropTable(string $table);
+    abstract public function dropTable(string $table) : bool;
     
-    abstract public function truncateTable(string $table);
+    abstract public function truncateTable(string $table): bool;
 
     /**
      * Executes a select statement

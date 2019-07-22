@@ -15,9 +15,9 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
 use Origin\View\Helper\DateHelper;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
@@ -55,5 +55,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         $now = date('Y-m-d H:i:s', strtotime('-1 year'));
         $this->assertEquals('1 year ago', $this->Date->timeAgoInWords($now));
+
+        $this->assertNull($this->Date->timeAgoInWords('some invalid date'));
     }
 }

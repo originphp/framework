@@ -232,8 +232,8 @@ class ModelValidator
         if ($value === '' or $value === null) {
             return true;
         }
-       
-        if (is_array($value) and isset($value['tmp_name']) and isset($value['error'])) {
+        
+        if (is_array($value) and isset($value['error'])) {
             return $value['error'] === UPLOAD_ERR_NO_FILE;
         }
 

@@ -16,6 +16,7 @@ namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 use Origin\TestSuite\TestTrait;
+use Origin\Command\Command;
 
 class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,6 +28,12 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->exec('test say');
         $this->assertOutputContains('Hello world!');
         $this->assertExitSuccess();
+    }
+
+    public function testOutput()
+    {
+        $this->exec('test say');
+        $this->assertContains('Hello world!', $this->output());
     }
 
     public function testExecInput()
@@ -43,9 +50,21 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertErrorContains('OMG! Its all Gone pete tong');
     }
 
+    public function testError()
+    {
+        $this->exec('test omg');
+        $this->assertContains('OMG! Its all Gone pete tong', $this->error());
+    }
+
     public function testEmpty()
     {
         $this->exec('test empty');
         $this->assertOutputEmpty();
+    }
+
+    public function testCommand()
+    {
+        $this->exec('test say');
+        $this->assertInstanceOf(Command::class, $this->command());
     }
 }

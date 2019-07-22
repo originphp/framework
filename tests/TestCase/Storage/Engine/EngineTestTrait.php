@@ -34,6 +34,7 @@ trait EngineTestTrait
     {
         $this->assertTrue($this->engine()->exists('foo.txt'));
         $this->assertTrue($this->engine()->exists('folder/bar.txt'));
+        $this->assertTrue($this->engine()->exists('folder'));
         $this->assertTrue($this->engine()->exists('folder/subfolder/foobar.txt'));
     }
 
@@ -45,6 +46,8 @@ trait EngineTestTrait
         $this->assertEquals($data, $this->engine()->read('foo.txt'));
         $this->assertEquals($data, $this->engine()->read('folder/bar.txt'));
         $this->assertEquals($data, $this->engine()->read('folder/subfolder/foobar.txt'));
+        $this->expectException(NotFoundException::class);
+        $this->engine()->read('passwords.txt');
     }
 
     public function testList()
@@ -72,6 +75,9 @@ trait EngineTestTrait
                 
         $files = $this->engine()->list('folder/subfolder');
         $this->assertHasFileInList('foobar.txt', $files);
+
+        $this->expectException(NotFoundException::class);
+        $this->engine()->list('a-folder-that-does-not-exist');
     }
 
     /**
@@ -81,6 +87,7 @@ trait EngineTestTrait
     public function testDelete()
     {
         $this->assertTrue($this->engine()->delete('foo.txt'));
+        $this->assertFalse($this->engine()->delete('folder/')); // Test Protection
         $this->assertTrue($this->engine()->delete('folder/bar.txt'));
         $this->assertTrue($this->engine()->delete('folder/subfolder/foobar.txt'));
 
