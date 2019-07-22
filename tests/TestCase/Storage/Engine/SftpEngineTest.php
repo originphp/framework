@@ -150,7 +150,7 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(Exception::class);
         $engine = new SftpEngine([
-            'host' => env('FTP_HOST'),
+            'host' => env('SFTP_HOST'),
             'username' => 'admin',
             'password' => 1234,
         ]);
