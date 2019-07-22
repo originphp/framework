@@ -1,10 +1,10 @@
 # OriginPHP Framework
 
 ![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
-![build](https://img.shields.io/badge/build-passing-brightGreen.svg)
-![coverage](https://img.shields.io/badge/coverage-91%25-green.svg)
-![memory](https://img.shields.io/badge/memory-850KB-brightGeen.svg)
-![diskspace](https://img.shields.io/badge/disk_space-1.4MB-brightGreen.svg)
+[![build](https://travis-ci.org/originphp/framework.png)](https://travis-ci.org/originphp/framework)
+[![coverage](https://coveralls.io/repos/originphp/framework/badge.png)](https://coveralls.io/r/originphp/framework)
+![memory](https://img.shields.io/badge/memory-900KB-brightGeen.svg)
+![diskspace](https://img.shields.io/badge/disk_space-1.5MB-brightGreen.svg)
 ![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
@@ -28,6 +28,8 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Yaml reading and writing
 - CSV reading and writing
 - XML reading and writing
+- Html parsing and converting
+- Markdown parsing and converting
 - Storage system which supports local disk, FTP and SFTP
 - Email using SMTP
 - and much more
