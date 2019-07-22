@@ -19,7 +19,6 @@
   */
 namespace Origin\Model\Behavior;
 
-use Origin\Model\Behavior\Behavior;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
@@ -29,7 +28,7 @@ class DelocalizeBehavior extends Behavior
     protected $schema = null;
 
     /**
-     * Before Validate, we de localize user intpu
+     * Before Validate, we de localize user intput
      *
      * @param \Origin\Model\Entity $entity
      * @param array $options
@@ -38,44 +37,58 @@ class DelocalizeBehavior extends Behavior
     public function beforeValidate(Entity $entity)
     {
         $this->delocalize($entity);
+
         return true;
     }
 
-    protected function delocalize(Entity $entity)
+    /**
+     * Delocalize the values in the entity
+     *
+     * @param \Origin\Model\Entity $entity
+     * @return Entity
+     */
+    public function delocalize(Entity $entity) : Entity
     {
         $schema = $this->model()->schema();
         foreach ($entity->modified() as $field) {
-            if ($entity->get($field) === null) {
-                continue;
-            }
-
-            $type = null;
-            if (isset($schema[$field])) {
-                $type = $schema[$field]['type'];
-            }
-
             $value = $entity->get($field);
-            switch ($type) {
-                case 'date':
-                    $value = Date::parseDate($value);
-                break;
-                case 'datetime':
-                    $value = Date::parseDateTime($value);
-                break;
-                case 'time':
-                     $value = Date::parseTime($value);
-                break;
-                case 'number':
-                case 'decimal':
-                case 'integer':
-                    $value = Number::parse($value);
-                break;
+            if ($value) {
+                $type = null;
+                if (isset($schema[$field])) {
+                    $type = $schema[$field]['type'];
+                }
+                $value = $this->processField($type, $value);
+                // Restore value incase of invalid value etc
+                if ($value === null) {
+                    $value = $entity->get($field);
+                }
+                $entity->set($field, $value);
             }
-            // Is data already in correct format, then reget - instead of regex
-            if ($value === null) {
-                $value = $entity->get($field);
-            }
-            $entity->set($field, $value);
         }
+        return $entity;
+    }
+
+    /**
+     * Process value
+     *
+     * @param string $type
+     * @param string $value
+     * @return mixed
+     */
+    protected function processField(string $type, $value)
+    {
+        if ($type === 'date') {
+            return Date::parseDate($value);
+        }
+        if ($type === 'datetime') {
+            return Date::parseDateTime($value);
+        }
+        if ($type === 'time') {
+            $value = Date::parseTime($value);
+        }
+        if (in_array($type, ['number','decimal','integer'])) {
+            return Number::parse($value);
+        }
+        return $value;
     }
 }

@@ -20,6 +20,13 @@ class NumberTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormat()
     {
+        $this->assertEquals('1,234,567', Number::format('1234567')); // test integer
+        $this->assertEquals('1,234,567', Number::format(1234567)); // test integer
+        $this->assertEquals('1,234,567.00', Number::format((float) 1234567)); // test float
+        $this->assertEquals('1,234,567.00', Number::format(1234567.00)); // test float
+        $this->assertEquals('1,234,567.00', Number::format('1234567.00')); // test float
+        $this->assertEquals('1,234,567.80', Number::format(1234567.801234));
+
         $backup = Number::locale();
         $this->assertEquals('1,200.23', Number::format(1200.2345));
 

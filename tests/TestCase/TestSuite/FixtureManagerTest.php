@@ -15,8 +15,9 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\Fixture;
-use Origin\TestSuite\FixtureManager;
 use Origin\TestSuite\TestTrait;
+use Origin\Test\Fixture\PostFixture;
+use Origin\TestSuite\FixtureManager;
 
 class MockTestCase
 {
@@ -35,6 +36,40 @@ class MockFixtureManager extends FixtureManager
 
 class FixtureManagerTest extends \PHPUnit\Framework\TestCase
 {
+    public function testLoadFixtureDropTables()
+    {
+        // Create a stub for the SomeClass class.
+        $stub = $this->createMock(PostFixture::class);
+       
+        $stub->dropTables = true;
+        $stub->expects($this->once())->method('drop');
+        $stub->expects($this->once())->method('create');
+        $stub->expects($this->once())->method('insert');
+        $stub->expects($this->never())->method('truncate');
+
+        $fixtureManager = new MockFixtureManager();
+        $fixtureManager->setProperty('loaded', ['Framework.Post' => $stub]);
+
+        $fixtureManager->loadFixture('Framework.Post');
+    }
+
+    public function testLoadFixtureDontDropTables()
+    {
+        // Create a stub for the SomeClass class.
+        $stub = $this->createMock(PostFixture::class);
+       
+        $stub->dropTables = false;
+        $stub->expects($this->never())->method('drop');
+        $stub->expects($this->never())->method('create');
+        $stub->expects($this->once())->method('insert');
+        $stub->expects($this->once())->method('truncate');
+ 
+        $fixtureManager = new MockFixtureManager();
+        $fixtureManager->setProperty('loaded', ['Framework.Post' => $stub]);
+ 
+        $fixtureManager->loadFixture('Framework.Post');
+    }
+
     public function testLoadUnload()
     {
         $FixtureManager = new MockFixtureManager();
@@ -55,9 +90,11 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $FixtureManager->unload($TestCase);
 
         $FixtureManager->setDropTables('Framework.Post', false);
+        $FixtureManager->load($TestCase);
         $FixtureManager->unload($TestCase);
 
         // set with Set
+        $FixtureManager->shutdown();
     }
 
     public function testLoaded()

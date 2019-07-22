@@ -16,8 +16,6 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Cookie;
 use Origin\Controller\Controller;
-use Origin\Http\Request;
-use Origin\Http\Response;
 
 class MockCookie extends Cookie
 {
@@ -96,5 +94,14 @@ class CookieTest extends \PHPUnit\Framework\TestCase
         $_COOKIE['testDestroy'] = 'PLgTmbAZY5BZjA9tQbp5h50GI1wbXZldGV9cERAx5c6C4nvWBH8Ouc+tGbX+1mfv';
         $cookie->destroy();
         $this->assertEmpty($_COOKIE);
+    }
+
+    public function testPack()
+    {
+        $cookie = new MockCookie();
+        $cookie->write('testPack', [1=>'one'], 0, ['encrypt'=>false]);
+        $this->assertEquals('{"1":"one"}', $cookie->cookies()['testPack']);
+        $_COOKIE['testPack'] = '{"1":"one"}';
+        $this->assertEquals([1=>'one'], $cookie->read('testPack'));
     }
 }

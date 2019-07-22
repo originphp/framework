@@ -19,137 +19,16 @@
 
 namespace Origin\Queue;
 
-use Origin\Model\Entity;
 use Origin\Model\Model;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Exception\Exception;
-
-class Job
-{
-    /**
-     * Holds the last id of Job
-     *
-     * @var int
-     */
-    public $id = null;
-
-    /**
-     * Holds the model for the job
-     *
-     * @var Model
-     */
-    protected $Job = null;
-
-
-    /**
-     * Holds the data
-     *
-     * @var Object
-     */
-    protected $data = null;
-
-    public function __construct(Model $job, Entity $entity)
-    {
-        $this->Job = $job;
-        $this->id = $entity->id;
-        $this->entity = $entity;
-    }
-
-    /**
-     * Returns the message data as an object
-     *
-     * @param boolean $array return as array instead of object
-     * @return object|array
-     */
-    public function data(bool $array=false)
-    {
-        return json_decode($this->entity->data, $array);
-    }
-    
-    /**
-     * Once the job is finished run this
-     *
-     * @return bool
-     */
-    public function executed() : bool
-    {
-        return $this->setStatus('executed');
-    }
-
-    /**
-    * If there was an error run this so you can inspect later.
-    *
-    * @return bool
-    */
-    public function failed() : bool
-    {
-        return $this->setStatus('failed');
-    }
-
-    /**
-     * Run this to delete the job
-     *
-     * @return boolean
-     */
-    public function delete() : bool
-    {
-        return $this->Job->delete($this->entity);
-    }
-
-    /**
-     * Release a job backinto the queue
-     *
-     * @param string $strtotime a strtotime compatiable string, now,+5 minutes, 2022-12-31
-     * @return void
-     */
-    public function release($strtotime = 'now') : bool
-    {
-        $job = $this->entity;
-        $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
-        return $this->setStatus('queued');
-    }
-
-    /**
-    * Will retry a job a maximum number of times or bury it (it will be marked as failed)
-    *
-    * @param integer $tries
-    * @param string $strtotime
-    * @return void
-    */
-    public function retry(int $tries, $strtotime = 'now')
-    {
-        $job = $this->entity;
-        if ($job->tries < $tries) {
-            $job->tries ++;
-            $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
-            return $this->release();
-        }
-        $this->failed();
-    }
-
-    /**
-     * Sets the status of a job (and automatically releases it)
-     * @param string $status
-     * @return boolean
-     */
-    public function setStatus(string $status)  : bool
-    {
-        // Don't use entity since tries updated at database level
-        $job = $this->Job->new([
-            'id' => $this->entity->id,
-            'status' => $status,
-            'locked' => 0,
-        ]);
-        return $this->Job->save($job);
-    }
-}
+use Origin\Queue\Job;
 
 class Queue
 {
     /**
      * Holds the model for the job
      *
-     * @var Model
+     * @var \Origin\Model\Model
      */
     protected $Job = null;
 
@@ -157,9 +36,9 @@ class Queue
      * Constructor - accepts same config as model
      *
      * @param array $config
-     *      - name: model name example Job
-     *      - table: table name for queue e.g. queue
-     *      - datasource: which datasource to use
+     *    - name: model name example Job
+     *    - table: table name for queue e.g. queue
+     *    - datasource: which datasource to use
      */
     public function __construct(array $config=[])
     {
@@ -193,7 +72,7 @@ class Queue
      * @param string $queue name of queue, letters, numbers, underscore and hyphens only.
      * @param array $data this is converted to JSON, and max length is 65535 chars
      * @param string $schedule when to process
-     * @return int $id
+     * @return int|bool $id
      */
     public function add(string $queue = null, array $data = [], string $strtotime = 'now')
     {
@@ -202,7 +81,6 @@ class Queue
         }
     
         $entity = $this->Job->new();
-
         $entity->queue = $queue;
         $entity->data = json_encode($data);
         $entity->status = 'queued';
@@ -211,10 +89,7 @@ class Queue
         if (mb_strlen($entity->data) >= 65535) {
             throw new InvalidArgumentException('Data string is longer than 65,535');
         }
-        if ($this->Job->save($entity)) {
-            return $this->Job->id;
-        }
-        return false;
+        return $this->Job->save($entity)?$this->Job->id:false;
     }
 
 
@@ -222,7 +97,7 @@ class Queue
      * Fetches the next job from a queue and locks it. Remember to work with the queue in a try/catch block
      *
      * @param string $queue name of queue
-     * @return \Origin\Model\Entity
+     * @return \Origin\Model\Entity|bool
      */
     public function fetch(string $queue)
     {
@@ -245,21 +120,19 @@ class Queue
     protected function claim($id)
     {
         $this->Job->begin();
-        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = {$id} AND locked = '0' FOR UPDATE;");
-        $this->Job->query("UPDATE {$this->Job->table} SET locked = '1' , tries = tries + 1, modified = '" . now() . "' WHERE id = {$id};");
+        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = :id AND locked = '0' FOR UPDATE;", ['id'=>$id]);
+        $this->Job->query("UPDATE {$this->Job->table} SET locked = '1' , tries = tries + 1, modified = '" . now() . "' WHERE id = :id;", ['id'=>$id]);
         $this->Job->commit();
-        if ($result) {
-            return $result;
-        }
-        return false;
+        
+        return $result?$result:false;
     }
       
     /**
     * Returns the Queue Job Model
-    *
+    * @internal this will likely be deprecated when engines are introduced.
     * @return \Origin\Model\Model
     */
-    public function model() : Model
+    public function model() : model
     {
         return $this->Job;
     }

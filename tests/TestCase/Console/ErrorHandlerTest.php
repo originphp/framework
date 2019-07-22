@@ -46,23 +46,6 @@ class MockConsoleOutputErrorHandler
 }
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRegisterError()
-    {
-        $ErrorHandler = new MockErrorHandler();
-        $ErrorHandler->register();
-        $this->expectException(\ErrorException::class);
-            
-        $original = unserialize('string');
-        restore_error_handler(); // Don't think
-    }
-    public function testRegisterException()
-    {
-        $ErrorHandler = new MockErrorHandler();
-        $ErrorHandler->register();
-        $ErrorHandler->setup();
-        $this->expectException(Exception::class);
-        throw new Exception('Something went wrong');
-    }
     public function testExceptionRender()
     {
         try {
@@ -77,13 +60,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         /**
          * @todo On different systems line numbers etc are different ie. phpunit etc
          */
-        $this->assertContains('<redBackground> Exception </redBackground> <yellow>Something went wrong</yellow>',$message);
+        $this->assertContains('<redBackground> Exception </redBackground> <yellow>Something went wrong</yellow>', $message);
  
-        $this->assertContains('<yellowBackground> 69 </yellowBackground>',$message);
-        $this->assertContains('<blue>64</blue>',$message);
-        $this->assertContains('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>',$message);
-        $this->assertContains('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>',$message);
-        $this->assertContains('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground',$message);
+        $this->assertContains('<yellowBackground> 52 </yellowBackground>', $message);
+        $this->assertContains('<blue>48</blue>', $message);
+        $this->assertContains('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>', $message);
+        $this->assertContains('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>', $message);
+        $this->assertContains('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground', $message);
     }
     public function testConsoleOutput()
     {

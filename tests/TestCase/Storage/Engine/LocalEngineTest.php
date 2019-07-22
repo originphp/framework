@@ -14,23 +14,23 @@
 namespace Origin\Test\Storage\Engine;
 
 use Origin\Storage\Engine\LocalEngine;
-use Origin\Test\Storage\Engine\EngineTestTrait;
 
-include_once 'EngineTestTrait.php';
+include_once 'EngineTestTrait.php'; // @todo recreate test with providers maybe
 
 class LocalEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
     public $engine = null;
 
-    public function engine(){
-        if($this->engine === null){
+    public function engine()
+    {
+        if ($this->engine === null) {
             $this->engine =  new LocalEngine();
         }
         return $this->engine;
     }
-    public function testConfig(){
-    
-        $this->assertEquals(APP . DS . 'storage',$this->engine()->config('root'));
+    public function testConfig()
+    {
+        $this->assertEquals(APP . DS . 'storage', $this->engine()->config('root'));
     }
 }

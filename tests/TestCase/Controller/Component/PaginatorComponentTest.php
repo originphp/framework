@@ -70,14 +70,14 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
       
         $connection = ConnectionManager::get('test');
-        $sql = $connection->adapter()->createTable('pets',[
+        $sql = $connection->adapter()->createTable('pets', [
             'id' => ['type'=>'primaryKey'],
             'owner_id' => ['type'=>'int','null'=>false],
             'name' => ['type'=>'string','limit'=>20]
         ]);
         $connection->execute($sql);
 
-        $sql = $connection->adapter()->createTable('owners',[
+        $sql = $connection->adapter()->createTable('owners', [
             'id' => ['type'=>'primaryKey'],
             'name' => ['type'=>'string','limit'=>20]
         ]);
@@ -137,6 +137,17 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(NotFoundException::class);
         $results = $this->PaginatorComponent->paginate($this->Pet, ['page'=>10000]);
+    }
+
+    /**
+     * An xss attack to get mysql to generate an error ?page='somestring'
+     *
+     * @return void
+     */
+    public function testPaginateSecurity()
+    {
+        $this->expectException(NotFoundException::class);
+        $this->PaginatorComponent->paginate($this->Pet, ['page'=>'abc']);
     }
 
     /**

@@ -18,21 +18,23 @@ use Origin\Model\Entity;
 class Serializer
 {
     /**
-     * This actually preps the data for serialization.
+     * The original idea was for this to serialize, but it now
+     * only converts the data to array
      *
-     * @param [type] $keys
-     * @param [type] $data
-     * @return void
+     * @param string|array $keys
+     * @param array $data
+     * @return array
      */
-    public function serialize($keys, $data)
+    public function serialize($keys, array $data) : array
     {
+        $result = [];
         if (is_string($keys)) {
             if (isset($data[$keys])) {
-                return $this->toArray($data[$keys]);
+                $result = $this->toArray($data[$keys]);
             }
-            return [];
+            return $result;
         }
-        $result = [];
+       
         foreach ($keys as $key) {
             if (isset($data[$key])) {
                 $result[$key] = $this->toArray($data[$key]);

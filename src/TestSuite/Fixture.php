@@ -14,10 +14,10 @@
 
 namespace Origin\TestSuite;
 
-use Origin\Core\Inflector;
-use Origin\Model\ConnectionManager;
 use Origin\Core\Resolver;
+use Origin\Core\Inflector;
 use Origin\Exception\Exception;
+use Origin\Model\ConnectionManager;
 
 class Fixture
 {
@@ -67,7 +67,7 @@ class Fixture
     {
         if ($this->table === null) {
             list($namespace, $class) = namespaceSplit(get_class($this));
-            $name =  substr($class, 0, -7);
+            $name = substr($class, 0, -7);
             $this->table = Inflector::tableize($name);
         }
 
@@ -86,7 +86,7 @@ class Fixture
      * try to guess it incase of dynamic models
      *
      * @param string $model
-     * @return void
+     * @return bool|null
      */
     public function import()
     {
@@ -94,8 +94,7 @@ class Fixture
             return;
         }
        
-        $defaults = ['datasource'=>'default','model'=>null,'table'=>null,'records'=>false];
-
+        $defaults = ['datasource' => 'default','model' => null,'table' => null,'records' => false];
         $options = array_merge($defaults, $this->import);
      
         // Load information from model is specified
@@ -121,13 +120,30 @@ class Fixture
          * Imports records
          */
         if ($options['records']) {
-            $connection->execute('SELECT * from ' . $options['table']);
-            $this->records = $connection->fetchAll();
+            $this->records = $this->loadRecords($options['datasource'], $options['table']);
         }
     
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->adapter()->createTable($this->table, $schema);
+
         return $connection->execute($sql);
+    }
+
+    /**
+     * Loads records from a datasource
+     *
+     * @param string $datasource
+     * @param string $table
+     * @return array
+     */
+    public function loadRecords(string $datasource, string $table) : array
+    {
+        $connection = ConnectionManager::get($datasource);
+        $connection->execute('SELECT * FROM ' . $table);
+
+        $records = $connection->fetchAll();
+
+        return $records ?? [];
     }
 
     /**
@@ -135,23 +151,23 @@ class Fixture
      *
      * @return bool true or false
      */
-    public function create()
+    public function create() : bool
     {
         if ($this->import) {
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
-        if ($this->schema) {
-            $sql = $connection->adapter()->createTable($this->table, $this->schema);
-            return $connection->execute($sql);
-        }
-        return false;
+        $sql = $connection->adapter()->createTable($this->table, $this->schema);
+
+        return $connection->execute($sql);
     }
 
     /**
      * Inserts the records.
+     *
+     * @return void
      */
-    public function insert()
+    public function insert() : void
     {
         $connection = ConnectionManager::get($this->datasource);
         foreach ($this->records as $record) {
@@ -164,9 +180,10 @@ class Fixture
      *
      * @return bool true or false
      */
-    public function drop()
+    public function drop() : bool
     {
         $connection = ConnectionManager::get($this->datasource);
+
         return $connection->dropTable($this->table);
     }
 
@@ -175,9 +192,10 @@ class Fixture
      *
      * @return bool true or false
      */
-    public function truncate()
+    public function truncate() : bool
     {
         $connection = ConnectionManager::get($this->datasource);
+
         return $connection->truncateTable($this->table);
     }
 }

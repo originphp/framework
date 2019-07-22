@@ -14,10 +14,11 @@
 
 namespace Origin\Test\View\Helper;
 
+use Origin\I18n\I18n;
 use Origin\View\View;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
 use Origin\View\Helper\IntlHelper;
 
 class IntlHelperTest extends \PHPUnit\Framework\TestCase
@@ -55,5 +56,20 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
     public function testPercent()
     {
         $this->assertSame('33.33%', $this->Intl->percent(33.333333));
+    }
+
+    public function testLocales()
+    {
+        I18n::initialize(['locale' => 'en_GB']);
+ 
+        $locales = $this->Intl->locales();
+        $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // test with null value
+    }
+    public function testTimezones()
+    {
+        $timezones = $this->Intl->timezones();
+      
+        $this->assertEquals('GMT +00:00 - UTC', $timezones['UTC']);
+        $this->assertEquals(426, count($timezones)); // not sure if this varys on differen like locales
     }
 }

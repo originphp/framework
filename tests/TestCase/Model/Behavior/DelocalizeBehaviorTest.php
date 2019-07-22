@@ -54,6 +54,27 @@ class DelocalizeBehaviorTest extends OriginTestCase
         $this->assertEquals('10:27:00', $deal->confirmed);
     }
 
+    /**
+     * Process invalid values, original values should be restored since date
+     * will return null
+     *
+     * @return void
+     */
+    public function testBehaviorError(){
+        $behavior = new DelocalizeBehavior($this->Deal);
+
+        $deal = new Entity([
+            'amount' => '1,234,567.89',
+            'close_date' =>'50-06/2019',
+            'created' => '11/21/2019 10:27:00000',
+            'confirmed' => '10:27pm'
+        ]);
+        $behavior->beforeValidate($deal);
+        $this->assertEquals('50-06/2019', $deal->close_date);
+        $this->assertEquals('11/21/2019 10:27:00000', $deal->created);
+        $this->assertEquals('10:27pm', $deal->confirmed);
+    }
+
     public function shutdown()
     {
         Date::locale([

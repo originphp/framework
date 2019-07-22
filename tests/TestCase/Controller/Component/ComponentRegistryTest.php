@@ -21,6 +21,14 @@ use Origin\Controller\Component\Exception\MissingComponentException;
 use Origin\Http\Request;
 use Origin\Http\Response;
 
+class MyComponent extends Component
+{
+    public function startup()
+    {
+        return new Response(); // same as redirect
+    }
+}
+
 class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
@@ -45,5 +53,19 @@ class ComponentRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $componentRegistry = new ComponentRegistry($this->Controller);
         $this->assertInstanceOf('Origin\Controller\Controller', $componentRegistry->controller());
+    }
+
+    /**
+     * Need to reach
+     *
+     * @return void
+     */
+    public function testCall()
+    {
+        $componentRegistry = new ComponentRegistry($this->Controller);
+        $component = $componentRegistry->load(MyComponent::class);
+        $this->assertInstanceOf(MyComponent::class, $component);
+        $result = $componentRegistry->call('startup');
+        $this->assertInstanceOf(Response::class, $result);
     }
 }

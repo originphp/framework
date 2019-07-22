@@ -15,63 +15,68 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Yaml;
+use Origin\Utility\Exception\YamlException;
 
 class YamlTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFromArrayScalar(){
+    public function testFromArrayScalar()
+    {
         $student = [
             'id' => 1234,
             'name' => 'james',
             'date' => '2019-05-05',
-            'boolean' => false
+            'boolean' => false,
         ];
         $yaml = Yaml::fromArray($student);
-$expected = <<< EOT
+        $expected = <<< EOT
 id: 1234
 name: james
 date: 2019-05-05
 boolean: false
 EOT;
-        $this->assertContains($expected,$yaml);
+        $this->assertContains($expected, $yaml);
     }
-    public function testFromArrayCollection(){
+    public function testFromArrayCollection()
+    {
         $student = [
             'id' => 1234,
             'address' => [
                 'line' => '458 Some Road
                 Somewhere, Something', // multi line
-                'city' => 'london'
+                'city' => 'london',
             ],
             
         ];
         $yaml = Yaml::fromArray($student);
        
-$expected = <<< EOT
+        $expected = <<< EOT
 id: 1234
 address: 
   line: | 458 Some Road
                 Somewhere, Something
   city: london
 EOT;
-        $this->assertContains($expected,$yaml);
+        $this->assertContains($expected, $yaml);
     }
 
-    public function testFromList(){
+    public function testFromList()
+    {
         $students = ['tony','nick'];
         $yaml = Yaml::fromArray($students);
-$expected = <<< EOT
+        $expected = <<< EOT
 - tony
 - nick
 EOT;
-        $this->assertContains($expected,$yaml);
+        $this->assertContains($expected, $yaml);
     }
-    public function testFromChildList(){
+    public function testFromChildList()
+    {
         $students = [
-            ['name'=>'tony','phones'=>['1234-456']],
-            ['name'=>'nick','phones'=>['1234-456','456-4334']],
+            ['name' => 'tony','phones' => ['1234-456']],
+            ['name' => 'nick','phones' => ['1234-456','456-4334']],
         ];
         $yaml = Yaml::fromArray($students);
-$expected = <<< EOT
+        $expected = <<< EOT
 - name: tony
   phones: 
     - 1234-456
@@ -81,20 +86,21 @@ $expected = <<< EOT
     - 456-4334
 EOT;
 
-        $this->assertContains($expected,$yaml);
+        $this->assertContains($expected, $yaml);
     }
 
-    public function testFromArrayMultiCollections(){
+    public function testFromArrayMultiCollections()
+    {
         $students = [
             'id' => 1234,
             'name' => 'tony',
             'addresess' => [
-                ['street'=>'1234 some road','city'=>'london'],
-                ['street'=>'546 some avenue','city'=>'london'],
-            ]
-            ];
-            $yaml = Yaml::fromArray($students);
-$expected = <<< EOT
+                ['street' => '1234 some road','city' => 'london'],
+                ['street' => '546 some avenue','city' => 'london'],
+            ],
+        ];
+        $yaml = Yaml::fromArray($students);
+        $expected = <<< EOT
 id: 1234
 name: tony
 addresess: 
@@ -103,29 +109,42 @@ addresess:
   - street: 546 some avenue
     city: london
 EOT;
-                    $this->assertContains($expected,$yaml);
-
+        $this->assertContains($expected, $yaml);
     }
 
-    public function testFromArrayMultiLevel(){
+    public function testPlainScalarMultiline()
+    {
+        $yaml = <<< EOF
+multi:
+  a
+  b
+  c
+  d
+name: test
+EOF;
+        $this->assertEquals('a b c d', Yaml::toArray($yaml)['multi']);
+    }
+
+    public function testFromArrayMultiLevel()
+    {
         $data = [
             'services' => [
                 'app' => [
                     'build' => '.',
                     'depends_on' => [
-                        'db'
-                    ] 
+                        'db',
+                    ],
                 ],
                 'memcached' => [
-                    'image' => 'memcached'
-                ]
+                    'image' => 'memcached',
+                ],
             ],
             'volumes' => [
-                'mysql' => 'abc' // leaving this blank is a problem. works with docker. but cant parse it
-            ]
+                'mysql' => 'abc', // leaving this blank is a problem. works with docker. but cant parse it
+            ],
         ];
         $yaml = Yaml::fromArray($data);
-$expected = <<< EOT
+        $expected = <<< EOT
 services: 
   app: 
     build: .
@@ -136,11 +155,25 @@ services:
 volumes: 
   mysql: abc
 EOT;
-$this->assertContains($expected,$yaml);
+        $this->assertContains($expected, $yaml);
     }
 
-    public function testParseIndexedList(){
-$yaml = <<< EOT
+    public function testParseValues()
+    {
+        $yaml = <<< EOF
+enabled: true
+disabled: false
+empty: null
+EOF;
+        $result = Yaml::toArray($yaml);
+        $this->assertEquals(true, $result['enabled']);
+        $this->assertEquals(false, $result['disabled']);
+        $this->assertNull($result['empty']);
+    }
+
+    public function testParseIndexedList()
+    {
+        $yaml = <<< EOT
 ---
 # List of fruits
 -
@@ -148,12 +181,13 @@ $yaml = <<< EOT
 -
   name: amy
 EOT;
-            $expected = [['name'=>'james'],['name'=>'amy']];
-                $this->assertEquals($expected,Yaml::toArray($yaml));
-            }
+        $expected = [['name' => 'james'],['name' => 'amy']];
+        $this->assertEquals($expected, Yaml::toArray($yaml));
+    }
 
-    public function testParseList(){
-$yaml = <<< EOT
+    public function testParseList()
+    {
+        $yaml = <<< EOT
 ---
 # List of fruits
 fruits:
@@ -161,12 +195,13 @@ fruits:
     - Orange
     - Banana
 EOT;
-    $expected = ['fruits'=>['Apple','Orange','Banana']];
-        $this->assertEquals($expected,Yaml::toArray($yaml));
+        $expected = ['fruits' => ['Apple','Orange','Banana']];
+        $this->assertEquals($expected, Yaml::toArray($yaml));
     }
 
-    public function testParseDictonary(){
-$yaml = <<< EOT
+    public function testParseDictonary()
+    {
+        $yaml = <<< EOT
 ---
 # Employee record
 employee:
@@ -174,12 +209,13 @@ employee:
     position: Senior Developer
 EOT;
    
-            $expected = ['employee'=>['name'=>'James','position'=>'Senior Developer']];
-                $this->assertEquals($expected,Yaml::toArray($yaml)); 
+        $expected = ['employee' => ['name' => 'James','position' => 'Senior Developer']];
+        $this->assertEquals($expected, Yaml::toArray($yaml));
     }
 
-    public function testParseRecordSet(){
-$yaml = <<< EOT
+    public function testParseRecordSet()
+    {
+        $yaml = <<< EOT
 ---
 # Employees 
 - 100:
@@ -190,15 +226,16 @@ $yaml = <<< EOT
   position: Manager
 
 EOT;
-$expected = [
-    '100'=>['name'=>'James','position'=>'Senior Developer'],
-    '200'=>['name'=>'Tony','position'=>'Manager'],
-    ];
-$this->assertEquals($expected,Yaml::toArray($yaml)); 
+        $expected = [
+            '100' => ['name' => 'James','position' => 'Senior Developer'],
+            '200' => ['name' => 'Tony','position' => 'Manager'],
+        ];
+        $this->assertEquals($expected, Yaml::toArray($yaml));
     }
 
-    public function testParseMultiLineBlock(){
-$yaml = <<< EOT
+    public function testParseMultiLineBlock()
+    {
+        $yaml = <<< EOT
 block_1: |
             this is a multiline block
             of text
@@ -207,18 +244,17 @@ block_2: >
             of text
 EOT;
         $expected = [
-            'block_1'=>"this is a multiline block\nof text", // literal
-            'block_2'=>"this also is a multiline block of text", // folded
-            ];
-            $result = Yaml::toArray($yaml);
+            'block_1' => "this is a multiline block\nof text", // literal
+            'block_2' => 'this also is a multiline block of text', // folded
+        ];
+        $result = Yaml::toArray($yaml);
          
-        $this->assertSame($expected,Yaml::toArray($yaml)); 
-
-
+        $this->assertSame($expected, Yaml::toArray($yaml));
     }
 
-    public function testComplicated(){
-$yaml = <<< EOT
+    public function testComplicated()
+    {
+        $yaml = <<< EOT
 ---
 # Employee record
 name: James Anderson
@@ -240,13 +276,13 @@ description: |
     ea eum nihil sapientem, timeam 
     constituto id per. 
 EOT;
-                $expected = '{"name":"James Anderson","job":"PHP developer","active":true,"fruits":["Apple","Banana"],"phones":{"home":"0207 123 4567","mobile":"123 456 567"},"addresses":[{"street":"2 Some road","city":"London"},{"street":"5 Some avenue","city":"Manchester"}],"description":"Lorem ipsum dolor sit amet,\nea eum nihil sapientem, timeam\nconstituto id per."}';
-                $this->assertEquals($expected,json_encode(Yaml::toArray($yaml)));     
+        $expected = '{"name":"James Anderson","job":"PHP developer","active":true,"fruits":["Apple","Banana"],"phones":{"home":"0207 123 4567","mobile":"123 456 567"},"addresses":[{"street":"2 Some road","city":"London"},{"street":"5 Some avenue","city":"Manchester"}],"description":"Lorem ipsum dolor sit amet,\nea eum nihil sapientem, timeam\nconstituto id per."}';
+        $this->assertEquals($expected, json_encode(Yaml::toArray($yaml)));
     }
 
     public function testParseChildNumericalList()
     {
-$yaml = <<< EOT
+        $yaml = <<< EOT
 # Employee record
 name: James
 addresses:
@@ -255,9 +291,23 @@ addresses:
     -
       city: Liverpool
 EOT;
-                $expected =   [['city'=>'London'],['city'=>'Liverpool']];
-                $result = Yaml::toArray($yaml);
+        $expected = [['city' => 'London'],['city' => 'Liverpool']];
+        $result = Yaml::toArray($yaml);
                  
-                $this->assertSame($expected,$result['addresses']); 
+        $this->assertSame($expected, $result['addresses']);
+    }
+
+    public function testUsingTabsException()
+    {
+        $this->expectException(YamlException::class);
+        $yaml = "\tname: no tab please";
+        Yaml::toArray($yaml);
+    }
+
+    public function testMultiDocumentStreamException()
+    {
+        $this->expectException(YamlException::class);
+        $yaml = "...\nname: value...";
+        Yaml::toArray($yaml);
     }
 }

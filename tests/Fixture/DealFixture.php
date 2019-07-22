@@ -20,64 +20,63 @@ class DealFixture extends Fixture
 {
     public $datasource = 'test';
 
-    public $schema = array(
-        'id' =>     [
+    public $schema = [
+        'id' => [
             'type' => 'primaryKey',
             'limit' => 10,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
             'key' => 'primary',
-          ],
-          'name' =>     [
+        ],
+        'name' => [
             'type' => 'string',
             'limit' => 120,
             'default' => '',
             'null' => false,
-          ],
-          'amount' =>     [
+        ],
+        'amount' => [
             'type' => 'decimal',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
             'precision' => '15',
             'scale' => 2,
-          ],
-          'close_date' =>  [
+        ],
+        'close_date' => [
             'type' => 'date',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'stage' =>     [
+        ],
+        'stage' => [
             'type' => 'string',
             'limit' => 150,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-          'status' =>     [
+        ],
+        'status' => [
             'type' => 'string',
             'limit' => 50,
-            'default' => NULL,
+            'default' => 'new',
             'null' => false,
-          ],
-          'description' =>     [
+        ],
+        'description' => [
             'type' => 'text',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'confirmed' =>     [
+        ],
+        'confirmed' => [
             'type' => 'time',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'created' =>     [
+        ],
+        'created' => [
             'type' => 'datetime',
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-          'modified' =>     [
+        ],
+        'modified' => [
             'type' => 'datetime',
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-     );
-    
+        ],
+    ];
 }

@@ -21,6 +21,7 @@ use Origin\Model\Entity;
 use Origin\Exception\ForbiddenException;
 use Origin\Exception\Exception;
 use Origin\Utility\Security;
+use Origin\Http\Response;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -95,7 +96,7 @@ class AuthComponent extends Component
         if ($this->isPrivateOrProtected($action)) {
             return null;
         }
-
+       
         if ($this->isAllowed($action)) {
             return null;
         }
@@ -104,6 +105,7 @@ class AuthComponent extends Component
             return null;
         }
 
+       
         if ($this->isAuthorized($this->getUser())) {
             return null;
         }
@@ -115,8 +117,9 @@ class AuthComponent extends Component
      * Allow action or actions to not need login
      *
      * @param string|array $actions
+     * @return void
      */
-    public function allow($actions)
+    public function allow($actions) : void
     {
         $this->allowedActions = array_merge($this->allowedActions, (array) $actions);
     }
@@ -124,21 +127,18 @@ class AuthComponent extends Component
     /**
      * An additional layer
      *
-     * @param [type] $user
+     * @param array $user
      * @return boolean
      */
-    protected function isAuthorized($user)
+    protected function isAuthorized(array $user = null) : bool
     {
-        if (empty($user)) {
+        if ($user === null) {
             return false;
         }
         if (in_array('Controller', $this->config['authenticate'])) {
             $controller = $this->controller();
             if (!method_exists($controller, 'isAuthorized')) {
                 throw new Exception(sprintf('%s does have an isAuthorized() method.', get_class($controller)));
-            }
-            if ($user instanceof Entity) {
-                $user = $user->toArray();
             }
             return $controller->isAuthorized($user);
         }
@@ -149,20 +149,19 @@ class AuthComponent extends Component
      * Hash password and use with verify password.
      *
      * @param string $password
-     *
      * @return string $hashedPassword
      */
-    public function hashPassword(string $password)
+    public function hashPassword(string $password) : string
     {
-        return password_hash($password, PASSWORD_DEFAULT); // 255 characters is pref for future proofing
+        return Security::hashPassword($password); // 255 characters is pref for future proofing
     }
 
     /**
-     * Gets the user each from session, from by authenticating
+     * ets the user each from session, from by authenticating
      *
-     * @return array|bool
+     * @return array|null
      */
-    public function getUser()
+    public function getUser() : ?array
     {
         if ($this->user()) {
             return $this->user();
@@ -171,7 +170,7 @@ class AuthComponent extends Component
         if ($user) {
             return $user->toArray();
         }
-        return false;
+        return null;
     }
 
     /**
@@ -218,8 +217,9 @@ class AuthComponent extends Component
      * into an array to be stored in the session.
      *
      * @param Entity $user
+     * @return void
      */
-    public function login(Entity $user)
+    public function login(Entity $user) : void
     {
         $this->Session = $this->Session;
         $this->Session->write('Auth.User', $user->toArray());
@@ -229,7 +229,7 @@ class AuthComponent extends Component
      * Gets the Redirect URL using either the config loginRedirect or the
      * Auth.redirect (Default).
      *
-     * @return string url to redirect too
+     * @return array|string
      */
     public function redirectUrl()
     {
@@ -249,7 +249,7 @@ class AuthComponent extends Component
      *
      * @return string url where to redirect too
      */
-    public function logout()
+    public function logout() : string
     {
         $this->Session->delete('Auth');
 
@@ -266,6 +266,7 @@ class AuthComponent extends Component
      * as an array in the Session.
      *
      * @param string $property to get of the logged in user
+     * @return mixed
      */
     public function user(string $property = null)
     {
@@ -285,7 +286,7 @@ class AuthComponent extends Component
     /**
      * Gets the username and password from request
      *
-     * @return array ['username'=>x,'password'=>x];
+     * @return bool|array ['username'=>x,'password'=>x];
      */
     protected function getCredentials()
     {
@@ -311,16 +312,23 @@ class AuthComponent extends Component
         return false;
     }
 
-    protected function isAllowed(string $action)
+    /**
+     * Checks if the action is allowed
+     *
+     * @param string $action
+     * @return boolean
+     */
+    protected function isAllowed(string $action) : bool
     {
-        if (in_array($action, $this->allowedActions) or in_array('*', $this->allowedActions)) {
-            return true;
-        }
-
-        return false;
+        return (in_array($action, $this->allowedActions) or in_array('*', $this->allowedActions));
     }
 
-    protected function isLoginPage()
+    /**
+     * Checks if the current action is the login page
+     *
+     * @return boolean
+     */
+    protected function isLoginPage() : bool
     {
         $loginUrl = Router::url($this->config['loginAction']);
         $params = Router::parse($loginUrl);
@@ -334,12 +342,17 @@ class AuthComponent extends Component
         return false;
     }
 
-    public function isLoggedIn()
+    /**
+     * Checks if the current session is logged in
+     *
+     * @return boolean
+     */
+    public function isLoggedIn() : bool
     {
         return $this->Session->exists('Auth.User');
     }
 
-    protected function isPrivateOrProtected(string $action)
+    protected function isPrivateOrProtected(string $action) : bool
     {
         return !$this->controller()->isAccessible($action);
     }
@@ -350,8 +363,7 @@ class AuthComponent extends Component
      *
      * @param string $username
      * @param string $password
-     *
-     * @return Entity user
+     * @return bool|Entity user
      */
     protected function loadUser(string $username, string $password)
     {
@@ -381,8 +393,9 @@ class AuthComponent extends Component
      * Starts the unauthorize process.
      *
      * @throws ForibddenException
+     * @return \Origin\Http\Response
      */
-    protected function unauthorize()
+    protected function unauthorize() : Response
     {
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);

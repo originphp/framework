@@ -123,8 +123,7 @@ class CommandRunner
         if ($this->command) {
             array_shift($args);
             try {
-                $this->command->run($args);
-                return true;
+                return $this->command->run($args);
             } catch (StopExecutionException $ex) {
                 return false;
             }

@@ -62,11 +62,11 @@ class FtpEngine extends BaseEngine
         }
 
         if (!$this->connection) {
-            throw new Exception(sprintf('Error connecting to %s.', $this->config('host')));
+            throw new Exception(sprintf('Error connecting to %s.', $this->config('host') . ':'. $this->config('port')));
         }
 
         if (!@ftp_login($this->connection, $username, $password)) {
-            throw new Exception('Invalid username or password');
+            throw new Exception('Invalid username or password.');
         }
         ftp_pasv($this->connection, $passive);
     }

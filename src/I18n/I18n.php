@@ -18,11 +18,10 @@ use Origin\I18n\Exception\LocaleNotAvailableException;
 use Origin\Exception\Exception;
 use Locale;
 use Origin\Utility\Yaml;
-
-/**
- * Removed Intl support due to number of issues ranging from bugs (parsing dates properly) or
- * impcomplete features (E.g. date picker support).
- */
+use Origin\I18n\Date as I18nDate;
+use Origin\I18n\Number as I18nNumber;
+use Origin\Utility\Date;
+use Origin\Utility\Number;
 
 class I18n
 {
@@ -62,9 +61,20 @@ class I18n
      */
     protected static $messages = null;
 
+    /**
+     * Holds the locale definition
+     *
+     * @var array
+     */
     protected static $definition = null;
 
-    public static function initialize(array $config = [])
+    /**
+     * Initializes I18n
+     *
+     * @param array $config (locale,language,timezone)
+     * @return void
+     */
+    public static function initialize(array $config = []) : void
     {
         $config += ['locale'=>static::defaultLocale(),'language'=>null,'timezone'=>'UTC'];
 
@@ -76,29 +86,40 @@ class I18n
         self::language($config['language']);
 
         // Configure Date Timezone
-        \Origin\Utility\Date::locale(['timezone'=>$config['timezone']]);
+        Date::locale(['timezone'=>$config['timezone']]);
 
-        // Load Locale information from /locales if available
+        /**
+         * This is the prefered method to use locale YAML files.
+         * If it is available then it will be loaded
+         */
         $locale = static::loadLocale($config['locale']);
-        
+
         if ($locale) {
             extract($locale);
-            \Origin\Utility\Date::locale([
+            Date::locale([
                 'timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime
                 ]);
 
             if ($currency) {
-                \Origin\Utility\Number::addCurrency($currency, ['before'=>$before,'after'=>$after]);
-            } else {
-                unset($locale['currency']);
+                Number::addCurrency($currency, ['before'=>$before,'after'=>$after]);
+            } 
+            else{
+                // Generic locales don't have currency, so remmove to this to work with defaults
+                unset($locale['currency']); 
             }
+            
             unset($locale['before'],$locale['after']);
-            \Origin\Utility\Number::locale($locale);
+            Number::locale($locale);
         }
   
-        // Configure Intl Utilities
-        \Origin\I18n\Date::locale($config['locale']);
-        \Origin\I18n\Date::timezone($config['timezone']);
+        /**
+         * Originally the framework was using the Intl Extension however this became a concern as it
+         * was buggy, lacking features, and problematic. However, in the case of just formating
+         * numbers/dates it can be great. The main issues include input, parsing (bugs), integration with datetime pickers etc.
+         */
+        I18nDate::locale($config['locale']);
+        I18nDate::timezone($config['timezone']);
+        I18nNumber::locale($config['locale']);
     }
 
     /**
@@ -107,17 +128,16 @@ class I18n
      * @param string $locale
      * @return array|null
      */
-    protected static function loadLocale(string $locale)
+    protected static function loadLocale(string $locale) : ?array
     {
         static::$definition = null;
 
         $filename = null;
         if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.yml')) {
             $filename = CONFIG . DS . 'locales' . DS . $locale .'.yml';
-        }
-        elseif (strpos($locale, '_') !== false) {
+        } elseif (strpos($locale, '_') !== false) {
             list($language, $void) = explode('_', $locale, 2);
-            if(file_exists(CONFIG . DS . 'locales' . DS . $language .'.yml')){
+            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.yml')) {
                 $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
             }
         }
@@ -146,7 +166,6 @@ class I18n
         static::$locale = $locale;
         setlocale(LC_ALL, $locale);
         Locale::setDefault($locale); // PHP Intl Extension Friendly
-        //@todo load locale from files if exists.
         static::language(Locale::getPrimaryLanguage($locale));
     }
 
@@ -154,7 +173,7 @@ class I18n
      * Sets or gets the default locale
      *
      * @param string $locale
-     * @return void
+     * @return string|void
      */
     public static function defaultLocale(string $locale = null)
     {
@@ -217,19 +236,22 @@ class I18n
 
     /**
      * Translates a string.
-     * For plurals, you need to use %count%.
+     * For plurals, you need to use {count}.
      *
-     * @param string $message 'Hello %name% all went well', 'There are no apples|There are %count% apples'
-     * @param array  $vars    - to use plurals you must set count ['name'=>'jon', 'count'=>5]
-     *
+     * @param string $message 'Hello {name} all went well', 'There are no apples|There are {count} apples'
+     * @param array  $vars - to use plurals you must use the placeholder {count} ['name'=>'jon', 'count'=>5]
      * @return string
      */
-    public static function translate(string $message, array $vars = [])
+    public static function translate(string $message, array $vars = []) : string
     {
+        /**
+         * Handle if not locale set
+         */
         if (static::$messages === null) {
             static::locale(static::defaultLocale());
         }
-        if (isset(static::$messages[$message])) {
+
+        if( isset(static::$messages[$message])){
             $message = static::$messages[$message];
         }
 
@@ -262,22 +284,18 @@ class I18n
      *
      * @param string $locale
      */
-    protected static function loadMessages(string $language)
+    protected static function loadMessages(string $language) : void
     {
-        $filename = SRC.DS.'Locale'.DS.$language.'.php';
+        $filename = SRC . DS . 'Locale' . DS . $language . '.php';
         
         static::$messages = [];
 
         if (file_exists($filename)) {
             $messages = include $filename;
-
             if (!is_array($messages)) {
                 throw new Exception("{$language}.php does not return an array");
             }
-
             static::$messages = $messages;
         }
-
-        return false;
     }
 }

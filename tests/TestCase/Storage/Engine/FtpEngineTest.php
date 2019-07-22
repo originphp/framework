@@ -14,10 +14,11 @@
 
 namespace Origin\Test\Storage\Engine;
 
+use Origin\Exception\Exception;
 use Origin\Storage\Engine\FtpEngine;
-use Origin\Test\Storage\Engine\EngineTestTrait;
+use Origin\Exception\InvalidArgumentException;
 
-include_once 'EngineTestTrait.php';
+include_once 'EngineTestTrait.php'; // @todo recreate test with providers maybe
 
 class FtpEngineTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,7 +26,7 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        if (!env('FTP_HOST')) {
+        if (! env('FTP_HOST')) {
             $this->markTestSkipped('FTP env vars not set');
         }
     }
@@ -35,12 +36,13 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
     public function engine()
     {
         if ($this->engine === null) {
-            $this->engine =  new FtpEngine([
+            $this->engine = new FtpEngine([
                 'host' => env('FTP_HOST'),
                 'username' => env('FTP_USERNAME'),
-                'password' => env('FTP_PASSWORD')
+                'password' => env('FTP_PASSWORD'),
             ]);
         }
+
         return $this->engine;
     }
     public function testConfig()
@@ -58,5 +60,37 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10, $config['timeout']);
         $this->assertFalse($config['ssl']);
         $this->assertTrue($config['passive']);
+    }
+
+    public function testNoHostSetException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $engine = new FtpEngine([]);
+    }
+
+    /**
+     * This is just to test that no errors when called
+     *
+     * @return void
+     */
+    public function testErrorConnectingTo()
+    {
+        $this->expectException(Exception::class);
+        $engine = new FtpEngine([
+            'host' => '192.168.1.1',
+            'username' => 'username',
+            'password' => 'password',
+            'ssl' => true,
+        ]);
+    }
+
+    public function testInvalidUsernamePassword()
+    {
+        $this->expectException(Exception::class);
+        $engine = new FtpEngine([
+            'host' => env('FTP_HOST'),
+            'username' => 'admin',
+            'password' => 1234,
+        ]);
     }
 }

@@ -31,6 +31,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
         $contents = file_get_contents($filename);
         // Different versions of MySQL also return different results, so test sample
+      
         if (ConnectionManager::get('test')->engine()==='mysql') {
             $this->assertContains("CREATE TABLE `posts` (", $contents);
             $this->assertContains('`title` varchar(255) NOT NULL,', $contents);
@@ -38,6 +39,13 @@ class DbSchemaDumpCommandTest extends OriginTestCase
             $this->assertContains("CREATE TABLE posts (", $contents);
             $this->assertContains('title VARCHAR(255) NOT NULL', $contents);
         }
+    }
+
+    public function testDumpSqlException()
+    {
+        $this->exec('db:schema:dump --datasource=test dump', ['n']);
+        $this->assertExitError();
+        $this->assertErrorContains('Error saving schema file');
     }
 
     public function testDumpPHP()
@@ -56,6 +64,13 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->assertArrayHasKey('posts', $schema);
         $this->assertEquals('primaryKey', $schema['posts']['id']['type']); //
         $this->assertEquals(6, count($schema['posts']));
+    }
+
+    public function testDumpPHPException()
+    {
+        $this->exec('db:schema:dump --datasource=test --type=php dump', ['n']);
+        $this->assertExitError();
+        $this->assertErrorContains('Error saving schema file');
     }
 
     public function testDumpUnkownType()

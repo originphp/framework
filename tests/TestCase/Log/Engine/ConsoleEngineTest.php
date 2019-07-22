@@ -36,6 +36,7 @@ class ConsoleEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('php://stderr', $engine->config('stream'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
+        $this->assertInstanceOf('Origin\Console\ConsoleOutput',$engine->getConsoleOutput());
     }
     public function testLog()
     {

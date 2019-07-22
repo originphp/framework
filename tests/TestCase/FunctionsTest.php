@@ -38,18 +38,18 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $translate = __($expected); // no translation return as is
         $this->assertEquals('Nothing', $translate);
 
-        $translated = __('Your password is {password}!', ['password'=>'secret']);
+        $translated = __('Your password is {password}!', ['password' => 'secret']);
         $this->assertEquals('Your password is secret!', $translated);
         
         $translated = __('Your username is {email} and your password is {password}.', [
-            'email'=>'jimbo@example.com',
-            'password'=>'secret'
-            ]);
+            'email' => 'jimbo@example.com',
+            'password' => 'secret',
+        ]);
         $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
         $translate = 'You have no apples|You have one apple|You have {count} apples';
-        $this->assertEquals('You have no apples', __($translate, ['count'=>0]));
-        $this->assertEquals('You have one apple', __($translate, ['count'=>1]));
-        $this->assertEquals('You have 2 apples', __($translate, ['count'=>2]));
+        $this->assertEquals('You have no apples', __($translate, ['count' => 0]));
+        $this->assertEquals('You have one apple', __($translate, ['count' => 1]));
+        $this->assertEquals('You have 2 apples', __($translate, ['count' => 2]));
     }
     public function testH()
     {
@@ -76,11 +76,13 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertTrue(begins('foo', 'foobar'));
         $this->assertFalse(begins('foo', 'barfoo'));
+        $this->assertFalse(begins('', 'barfoo'));
     }
     public function testEnds()
     {
         $this->assertFalse(ends('foo', 'foobar'));
         $this->assertTrue(ends('foo', 'barfoo'));
+        $this->assertFalse(ends('', 'barfoo'));
     }
     public function testLeft()
     {
@@ -91,8 +93,8 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testRight()
     {
         $this->assertEquals('bar', right(':', 'foo:bar'));
-        $this->assertNull(left('x', 'foo:bar'));
-        $this->assertNull(left('', ''));
+        $this->assertNull(right('x', 'foo:bar'));
+        $this->assertNull(right('', ''));
     }
     public function testContains()
     {
@@ -109,7 +111,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testReplace()
     {
         $this->assertEquals('foo', replace('bar', '', 'foobar'));
-        $this->assertEquals('foo', replace('bar', '', 'fooBAR', ['insensitive'=>true]));
+        $this->assertEquals('foo', replace('bar', '', 'fooBAR', ['insensitive' => true]));
     }
     public function testLen()
     {

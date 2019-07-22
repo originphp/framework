@@ -24,6 +24,7 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertInstanceOf(Datasource::class, ConnectionManager::get('default'));
     }
+
     public function testGetException()
     {
         $this->expectException(MissingDatasourceException::class);
@@ -34,5 +35,17 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertTrue(ConnectionManager::has('default'));
         $this->assertFalse(ConnectionManager::has('foo'));
+    }
+
+    public function testDatasources(){
+        $datasources = ConnectionManager::datasources();
+        $this->assertTrue(in_array('default',$datasources));
+        $this->assertTrue(in_array('test',$datasources));
+    }
+
+    public function testUnkownEngineException()
+    {
+        $this->expectException(MissingDatasourceException::class);
+        ConnectionManager::create('fail',['engine'=>'mongo']);
     }
 }

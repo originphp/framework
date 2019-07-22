@@ -20,9 +20,8 @@ declare(strict_types=1);
 
 namespace Origin\Utility;
 
-use Origin\Utility\Html;
-use DOMDocument;
 use DOMNode;
+use DOMDocument;
 
 class Markdown
 {
@@ -43,12 +42,12 @@ class Markdown
     public static function toText(string $markdown): string
     {
         # Don't remove spaces from start of line  //preg_replace('/^ +/m')
-        $markdown  = str_replace(["\r\n", "\n"], PHP_EOL, $markdown); // Standardize line endings
-        $markdown = preg_replace("/^#{0,6} (.*)$/m", "$1", $markdown);
-        $markdown = preg_replace("/^> (.*)$/m", '"$1"', $markdown);
+        $markdown = str_replace(["\r\n", "\n"], PHP_EOL, $markdown); // Standardize line endings
+        $markdown = preg_replace('/^#{0,6} (.*)$/m', '$1', $markdown);
+        $markdown = preg_replace('/^> (.*)$/m', '"$1"', $markdown);
         $markdown = preg_replace("/```?\n([^\n```].*)```/ms", '$1', $markdown);
 
-        $markdown = preg_replace("/`([^`].*)`/", '$1', $markdown);
+        $markdown = preg_replace('/`([^`].*)`/', '$1', $markdown);
         ;
         $markdown = preg_replace("/!\[([^\]].*)\]\((.*)\)/", '[image: $1 $2]', $markdown); # order
         $markdown = preg_replace("/!\[]\((.*)\)/", '[image: $1]', $markdown); # order
@@ -89,20 +88,20 @@ class Markdown
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = false;
 
-        $html  = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
+        $html = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
 
-        if (@$doc->loadHTML($html, LIBXML_HTML_NODEFDTD)) {
-            /**
-             * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
-             */
-            $process = ['a', 'img', 'br', 'code', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table','li', 'ul', 'ol', 'blockquote'];
-            foreach ($process as $needle) {
-                $nodes = $doc->getElementsByTagName($needle);
-                foreach ($nodes as $node) {
-                    static::processTag($node, $doc);
-                }
+        @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
+        /**
+         * Do not sort. The order is important. Certain elements need to be adjusted first including links, images
+         */
+        $process = ['a', 'img', 'br', 'code', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table','li', 'ul', 'ol', 'blockquote'];
+        foreach ($process as $needle) {
+            $nodes = $doc->getElementsByTagName($needle);
+            foreach ($nodes as $node) {
+                static::processTag($node, $doc);
             }
         }
+       
         return trim($doc->textContent);
     }
 
@@ -111,38 +110,46 @@ class Markdown
      *
      * @param string $text
      * @param array $options The following option keys are supported:
-     *   -escape: default is true. Escapes all text. If set to false then only code blocks are escaped
+     *   -escape: default is false. Escapes all text before passing. Code blocks are always escaped
      * @return string
      */
     public static function toHtml(string $text, array $options = []): string
     {
-        $options += ['escape'=>false];
-
+        $options += ['escape' => true];
         if ($options['escape']) {
-            $text = htmlentities($text);
+            $text = htmlentities($text, ENT_NOQUOTES); // this will
         }
-        
         $text = preg_replace('/^ +/m', '', $text); // remove whitespaces from start of each line
-        $text  = str_replace(["\r\n", "\n"], PHP_EOL, $text); // Standardize line endings
+        $text = str_replace(["\r\n", "\n"], PHP_EOL, $text); // Standardize line endings
 
         $text = static::parseHeadings($text);
 
-        //$text = preg_replace("/!\[(.*)\]\((.*)\)/", "<img src=\"$2\" alt=\"$1\">", $text); # order
         $text = preg_replace_callback('/!\[(.*)\]\((.*)\)/', function ($matches) {
             $alt = static::escape($matches[1]);
-            $src = static::escape($matches[2]);
+
+            // Remove invalid urls
+            $src = '';
+            if (filter_var($matches[2], FILTER_VALIDATE_URL)) {
+                $src = static::escape($matches[2]);
+            }
+
             return '<img src="'.$src.'" alt="'.$alt.'">';
         }, $text);
 
-       
-        // $text = preg_replace("/\[(.*)\]\((.*)\)/", "<a href=\"$2\">$1</a>", $text); # order
         $text = preg_replace_callback('/\[(.*)\]\((.*)\)/', function ($matches) {
             $text = static::escape($matches[1]);
-            $href = static::escape($matches[2]);
+            
+            // Remove invalid urls
+            $href = '';
+            if (filter_var($matches[2], FILTER_VALIDATE_URL)) {
+                $href = static::escape($matches[2]);
+            }
+
             return '<a href="'.$href.'">' . $text . '</a>';
         }, $text);
 
-        $text = preg_replace("/^> (.*)$/m", "<blockquote>$1</blockquote>\n", $text);
+        $text = preg_replace('/^> (.*)$/m', "<blockquote>$1</blockquote>\n", $text);
+        $text = preg_replace('/^&gt; (.*)$/m', "<blockquote>$1</blockquote>\n", $text); // work with escaping
 
         $text = static::parseLists($text);
 
@@ -178,16 +185,16 @@ class Markdown
         */
        
         $text = Html::sanitize($text, [
-        'tags' => [
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'p',
-            'i', 'em', 'strong', 'b', 'blockquote', 'del',
-            'a' => ['href'],
-            'ul', 'li', 'ol', 'br',
-            'code', 'pre',
-            'img' => ['src','alt']
-        ]
-       ]);
+            'tags' => [
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'p',
+                'i', 'em', 'strong', 'b', 'blockquote', 'del',
+                'a' => ['href'],
+                'ul', 'li', 'ol', 'br',
+                'code', 'pre',
+                'img' => ['src','alt'],
+            ],
+        ]);
     
         return trim($text);
     }
@@ -200,12 +207,13 @@ class Markdown
      */
     protected static function parseHeadings(string $data): string
     {
-        $text = preg_replace("/^# (.*)$/m", "<h1>$1</h1>\n", $data);
-        $text = preg_replace("/^## (.*)$/m", "<h2>$1</h2>\n", $text);
-        $text = preg_replace("/^### (.*)$/m", "<h3>$1</h3>\n", $text);
-        $text = preg_replace("/^#### (.*)$/m", "<h3>$1</h4>\n", $text);
-        $text = preg_replace("/^##### (.*)$/m", "<h4>$1</h5>\n", $text);
-        return  preg_replace("/^###### (.*)$/m", "<h5>$1</h6>\n", $text);
+        $text = preg_replace('/^# (.*)$/m', "<h1>$1</h1>\n", $data);
+        $text = preg_replace('/^## (.*)$/m', "<h2>$1</h2>\n", $text);
+        $text = preg_replace('/^### (.*)$/m', "<h3>$1</h3>\n", $text);
+        $text = preg_replace('/^#### (.*)$/m', "<h3>$1</h4>\n", $text);
+        $text = preg_replace('/^##### (.*)$/m', "<h4>$1</h5>\n", $text);
+
+        return  preg_replace('/^###### (.*)$/m', "<h5>$1</h6>\n", $text);
     }
 
     /**
@@ -220,15 +228,17 @@ class Markdown
             '/^[*\-] (.*)$/m',
             function ($matches) {
                 $item = static::convertEmphasis($matches[1]);
+
                 return "<ul><li>{$item}</li></ul>";
             },
             $data
         );
 
-        $text = preg_replace("/^[*\-] (.*)$/m", "<ul><li>$1</li></ul>", $text);
+        $text = preg_replace("/^[*\-] (.*)$/m", '<ul><li>$1</li></ul>', $text);
         $text = str_replace("</ul>\n<ul><li>", "\n<li>", $text);
 
         $text = preg_replace("/^[0-9]\. (.*)$/m", "\n<ol><li>$1</li></ol>", $text);
+
         return str_replace("</ol>\n\n<ol><li>", "\n<li>", $text);
     }
 
@@ -245,11 +255,11 @@ class Markdown
          * Paragraph lines
          */
         $skip = false;
-    
+      
         foreach ($lines as $index => $line) {
             $line = trim($line);
             if (strpos($line, '<pre>') !== false) {
-                $skip  = true;
+                $skip = true;
             }
             if (strpos($line, '</pre>') !== false) {
                 $skip = false;
@@ -259,7 +269,7 @@ class Markdown
             if ($skip === true) {
                 continue;
             }
-            if (!preg_match('/<\/(h1|h2|h3|h4|h5|h6|ul|ol|blockquote|table|tr|th|td)>/', $line)) {
+            if (! preg_match('/<\/(h1|h2|h3|h4|h5|h6|ul|ol|blockquote|table|tr|th|td)>/', $line)) {
                 $line = static::convertEmphasis($line);
                 $line = sprintf('<p>%s</p>', $line);
                 $line = str_replace("\n", '<br>', $line);
@@ -327,6 +337,7 @@ class Markdown
     {
         $data = preg_replace('/(?<!\\\)(\*\*|__)(.*)\1/', '<strong>\2</strong>', $data);
         $data = preg_replace('/(?<!\\\)(\*|_)(.*)\1/', '<em>\2</em>', $data);
+
         return preg_replace('/(?<!\\\)~~(.*?)~~/', '<del>$1</del>', $data);
     }
 
@@ -340,34 +351,27 @@ class Markdown
      */
     protected static function processTag(DomNode $tag, DomDocument $doc): void
     {
-        if (empty($tag->tagName)) {
-            return;
-        }
         $value = static::htmlspecialchars($tag->nodeValue);
 
         switch ($tag->tagName) {
             case 'a':
-                $tag->nodeValue =  "[{$value}](" . static::htmlspecialchars($tag->getAttribute('href')) . ")";
+                $tag->nodeValue = "[{$value}](" . static::htmlspecialchars($tag->getAttribute('href')) . ')';
                 break;
             case 'br':
-                $tag->nodeValue  =  PHP_EOL;
+                $tag->nodeValue = PHP_EOL;
                 break;
             case 'code':
 
                 if (strpos($tag->nodeValue, PHP_EOL) !== false) {
                     // multiline
-                    $tag->nodeValue  =  PHP_EOL . '```' . PHP_EOL . $value . PHP_EOL . '```'  . PHP_EOL;
+                    $tag->nodeValue = PHP_EOL . '```' . PHP_EOL . $value . PHP_EOL . '```'  . PHP_EOL;
                 } else {
-                    $tag->nodeValue  = '`' .  $value . '`';
+                    $tag->nodeValue = '`' .  $value . '`';
                 }
 
                 break;
             case 'blockquote':
-                $tag->nodeValue  =  PHP_EOL . "> " . $value . PHP_EOL;
-                break;
-            case 'em':
-            case 'i':
-                $tag->nodeValue  = '*' . $value . '*';
+                $tag->nodeValue = PHP_EOL . '> ' . $value . PHP_EOL;
                 break;
             case 'h1':
                 $tag->nodeValue = PHP_EOL . '# ' .  $value . PHP_EOL;
@@ -392,7 +396,7 @@ class Markdown
                 if ($tag->hasAttribute('alt')) {
                     $alt = $tag->getAttribute('alt') . ' ';
                 }
-                $tag->nodeValue =  "![{$alt}](" . static::htmlspecialchars($tag->getAttribute('src')) . ")";
+                $tag->nodeValue = "![{$alt}](" . static::htmlspecialchars($tag->getAttribute('src')) . ')';
                 break;
             case 'li':
                 if ($tag->hasChildNodes()) {
@@ -405,7 +409,7 @@ class Markdown
                 break;
             case 'ol':
                 $count = 1;
-                $lineBreak  = PHP_EOL;
+                $lineBreak = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);
                 foreach ($tag->childNodes as $child) {
@@ -419,9 +423,6 @@ class Markdown
                 break;
             case 'p':
                 $tag->nodeValue = PHP_EOL . $value . PHP_EOL;
-                break;
-            case 'strong':
-                $tag->nodeValue  = '**' . $value . '**';
                 break;
             case 'table':
 
@@ -439,7 +440,10 @@ class Markdown
                     }
                     $data[] = $row;
                 }
-                $data = static::arrayToTable($data, $headers);
+                if ($data) {
+                    $data = static::arrayToTable($data, $headers);
+                }
+               
                 // Replacing can cause issues
                 $div = $doc->createElement('div', PHP_EOL . implode(PHP_EOL, $data) . PHP_EOL);
                 $tag->parentNode->insertBefore($div, $tag);
@@ -447,13 +451,13 @@ class Markdown
 
                 break;
             case 'ul':
-                $lineBreak  = PHP_EOL;
+                $lineBreak = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);
 
                 foreach ($tag->childNodes as $child) {
                     if (isset($child->tagName) and $child->tagName === 'li') {
-                        $child->nodeValue =  $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue);
+                        $child->nodeValue = $lineBreak . $pre . '* ' .   static::htmlspecialchars($child->nodeValue);
                         $child->nodeValue = rtrim($child->nodeValue) . PHP_EOL; // friendly with nested lists
                         $lineBreak = null;
                     }
@@ -475,14 +479,11 @@ class Markdown
      */
     protected static function arrayToTable(array $array, bool $headers = true): array
     {
-        if (empty($array)) {
-            return [];
-        }
         // Calculate width of each column
         $widths = [];
         foreach ($array as $row) {
             foreach ($row as $columnIndex => $cell) {
-                if (!isset($widths[$columnIndex])) {
+                if (! isset($widths[$columnIndex])) {
                     $widths[$columnIndex] = 0;
                 }
                 $width = strlen($cell) + 4;
@@ -532,6 +533,7 @@ class Markdown
         if (strpos($value, '&') !== false) {
             $value = htmlspecialchars($value);
         }
+
         return $value;
     }
 
@@ -555,6 +557,7 @@ class Markdown
                 $checkLevelUp = false;
             }
         }
+
         return $indent;
     }
 

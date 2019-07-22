@@ -51,7 +51,7 @@ class Query
 
         if ($results) {
             $results = $connection->mapNumericResults($results, $query['fields']); // use with Num instead of model
-
+           
             # If foreignKeys are missing data then objects wont be put together
             # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);
@@ -62,9 +62,9 @@ class Query
         }
 
         unset($sql, $connection);
+
         return $results;
     }
-
 
     /**
      * Takes results from the datasource and converts into an entity. Different
@@ -82,16 +82,17 @@ class Query
 
         $belongsTo = $this->model->association('belongsTo');
         $hasOne = $this->model->association('hasOne');
-
+       
         foreach ($results as $record) {
             $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
             $entity = new Entity($thisData, ['name' => $this->model->alias, 'exists' => true, 'markClean' => true]);
             unset($record[$alias]);
-
+           
             foreach ($record as $tableAlias => $data) {
                 if (is_string($tableAlias)) {
-                    $model  = Inflector::classify($tableAlias);
+                    $model = Inflector::classify($tableAlias);
                     $associated = Inflector::variable($model);
+                  
                     /**
                      * Remove empty records. If the foreignKey is not present then the associated
                      * data will not be present. This is correct.
@@ -99,16 +100,18 @@ class Query
                     $foreignKey = null;
                     if (isset($belongsTo[$model])) {
                         $foreignKey = $belongsTo[$model]['foreignKey'];
-                        if (empty($entity->{$foreignKey})) {
+                        $primaryKey = $this->model->{$model}->primaryKey;
+                        if (empty($entity->{$foreignKey}) or empty($data[$primaryKey])) {
                             continue;
                         }
                     } elseif (isset($hasOne[$model])) {
                         $foreignKey = $hasOne[$model]['foreignKey'];
-                        if (empty($data[$foreignKey])) {
+                        $primaryKey = $this->model->primaryKey;
+                        if (empty($entity->{$primaryKey}) or empty($data[$foreignKey])) {
                             continue;
                         }
                     }
-
+    
                     $entity->{$associated} = new Entity($data, ['name' => $associated, 'exists' => true, 'markClean' => true]);
                 } else {
                     /**
@@ -125,10 +128,9 @@ class Query
             $buffer[] = $entity;
         }
         unset($belongsTo,$hasOne,$thisData,$entity);
+
         return $buffer;
     }
-
-
 
     /**
      * Recursively load associated belongsTo
@@ -153,6 +155,7 @@ class Query
             }
         }
         unset($belongsTo);
+
         return $results;
     }
 
@@ -182,6 +185,7 @@ class Query
             }
         }
         unset($hasOne);
+
         return $results;
     }
 
@@ -214,6 +218,7 @@ class Query
             }
         }
         unset($hasMany);
+
         return $results;
     }
     /**
@@ -230,12 +235,12 @@ class Query
             if (isset($query['associated'][$alias])) {
                 $config = array_merge($config, $query['associated'][$alias]);
 
-                $config['joins'][0] = array(
+                $config['joins'][0] = [
                     'table' => $config['joinTable'],
                     'alias' => Inflector::tableize($config['with']),
                     'type' => 'INNER',
                     'conditions' => $config['conditions'],
-                );
+                ];
                 $config['conditions'] = [];
                 if (empty($config['fields'])) {
                     $config['fields'] = array_merge($this->model->{$alias}->fields(), $this->model->{$config['with']}->fields());
@@ -253,6 +258,7 @@ class Query
             }
         }
         unset($hasAndBelongsToMany);
+
         return $results;
     }
 }

@@ -16,8 +16,8 @@ namespace Origin\Utility;
 
 use DOMDocument;
 use SimpleXMLElement;
-use Origin\Utility\Exception\XmlException;
 use Origin\Core\Configure;
+use Origin\Utility\Exception\XmlException;
 
 /**
  * The XML utility is for converting arrays to XML strings and XML strings to arrays.
@@ -53,16 +53,16 @@ class Xml
      * @param array $options
      * @return void
      */
-    public static function fromArray(array $data, array $options=[]) : string
+    public static function fromArray(array $data, array $options = []) : string
     {
         // Must have root
-        if (count($data) !==1) {
+        if (count($data) !== 1) {
             throw new XmlException('Invalid array.');
         }
         $defaults = [
             'version' => '1.0',
             'encoding' => Configure::read('App.encoding'),
-            'pretty' => false
+            'pretty' => false,
         ];
         $options += $defaults;
       
@@ -160,15 +160,15 @@ class Xml
     {
         try {
             $simpleXml = new SimpleXMLElement($xml);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new XmlException($e->getMessage());
         }
         
         $namespaces = $simpleXml->getNamespaces(true);
-        $root = static::convertXml($simpleXml, null, array_merge([ null => null], $namespaces));
+        $root = static::convertXml($simpleXml, null, array_merge([null => null], $namespaces));
    
         return [
-            static::getRootName($simpleXml) => $root
+            static::getRootName($simpleXml) => $root,
         ];
     }
 
@@ -184,10 +184,11 @@ class Xml
     {
         $name = $simpleXml->getName();
         $namespaces = $simpleXml->getNamespaces();
-        if ($namespaces and !isset($namespaces[''])) {
+        if ($namespaces and ! isset($namespaces[''])) {
             $prefix = key($namespaces);
             $name = "{$prefix}:{$name}";
         }
+
         return $name;
     }
 
@@ -222,7 +223,7 @@ class Xml
                     $data['xmlns:' . $namespace] = $xmlns;
                 }
                 if (isset($data[$name])) {
-                    if (!is_array($data[$name]) or !isset($data[$name][0])) {
+                    if (! is_array($data[$name]) or ! isset($data[$name][0])) {
                         $data[$name] = [$data[$name]]; // repackage repeated tags
                     }
                     $data[$name][] = $array;

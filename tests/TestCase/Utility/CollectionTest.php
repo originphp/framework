@@ -21,24 +21,24 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->books = [];
-        $book = new Entity(['id'=>1001,'name'=>'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success','category'=>'Business','in_stock'=>true]);
-        $book->author = new Entity(['id'=>600,'name'=>'William N. Thorndike']);
+        $book = new Entity(['id' => 1001,'name' => 'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success','category' => 'Business','in_stock' => true]);
+        $book->author = new Entity(['id' => 600,'name' => 'William N. Thorndike']);
         $this->books[] = $book;
 
-        $book = new Entity(['id'=>1000,'name'=>'How to Win Friends & Influence People','category'=>'Personal Development','in_stock'=>true]);
-        $book->author = new Entity(['id'=>500,'name'=>'Dale Carnegie']);
+        $book = new Entity(['id' => 1000,'name' => 'How to Win Friends & Influence People','category' => 'Personal Development','in_stock' => true]);
+        $book->author = new Entity(['id' => 500,'name' => 'Dale Carnegie']);
         $this->books[] = $book;
 
-        $book = new Entity(['id'=>1002,'name'=>'The Art of War','category'=>'Military','category'=>'Personal Development','in_stock'=>false]);
-        $book->author = new Entity(['id'=>300,'name'=>'Sun Tzu']);
+        $book = new Entity(['id' => 1002,'name' => 'The Art of War','category' => 'Military','category' => 'Personal Development','in_stock' => false]);
+        $book->author = new Entity(['id' => 300,'name' => 'Sun Tzu']);
         $this->books[] = $book;
 
-        $book = new Entity(['id'=>1004,'name'=>'Think and Grow Rich!','category'=>'Personal Development','in_stock'=>false]);
-        $book->author = new Entity(['id'=>200,'name'=>'Napoleon Hill']);
+        $book = new Entity(['id' => 1004,'name' => 'Think and Grow Rich!','category' => 'Personal Development','in_stock' => false]);
+        $book->author = new Entity(['id' => 200,'name' => 'Napoleon Hill']);
         $this->books[] = $book;
 
-        $book = new Entity(['id'=>1003,'name'=>'The 7 Habits of Highly Effective People','category'=>'Personal Development','in_stock'=>true]);
-        $book->author = new Entity(['id'=>250,'name'=>'Stephen R. Covey']);
+        $book = new Entity(['id' => 1003,'name' => 'The 7 Habits of Highly Effective People','category' => 'Personal Development','in_stock' => true]);
+        $book->author = new Entity(['id' => 250,'name' => 'Stephen R. Covey']);
         $this->books[] = $book;
 
         // Convert entities to array
@@ -80,7 +80,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
             1 => null,
             2 => null,
             3 => null,
-            4 => null
+            4 => null,
         ];
         $this->assertEquals($expected, $collection->extract('nonExistant')->toArray());
 
@@ -92,21 +92,21 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     }
     public function testMap()
     {
-        $collection = collection(['a'=>1,'b'=>2,'c'=>3]);
+        $collection = collection(['a' => 1,'b' => 2,'c' => 3]);
       
         $new = $collection->map(function ($value, $key) {
             return $value + 1;
         });
-        $this->assertEquals(['a'=>2,'b'=>3,'c'=>4], $new->toArray());
+        $this->assertEquals(['a' => 2,'b' => 3,'c' => 4], $new->toArray());
     }
     public function testCombine()
     {
-        $expected =  [
+        $expected = [
             'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success' => 'William N. Thorndike',
             'How to Win Friends & Influence People' => 'Dale Carnegie',
             'The Art of War' => 'Sun Tzu',
             'Think and Grow Rich!' => 'Napoleon Hill',
-            'The 7 Habits of Highly Effective People' => 'Stephen R. Covey'];
+            'The 7 Habits of Highly Effective People' => 'Stephen R. Covey', ];
         
         $collection = collection($this->books);
         $this->assertEquals($expected, $collection->combine('name', 'author.name')->toArray());
@@ -115,19 +115,19 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $collection->combine('name', 'author.name')->toArray());
 
         $array = [
-            ['id'=>1,'name'=>'Tom','team'=>'Manchester United'],
-            ['id'=>2,'name'=>'Dave','team'=>'Manchester United'],
-            ['id'=>3,'name'=>'James','team'=>'West Ham'],
+            ['id' => 1,'name' => 'Tom','team' => 'Manchester United'],
+            ['id' => 2,'name' => 'Dave','team' => 'Manchester United'],
+            ['id' => 3,'name' => 'James','team' => 'West Ham'],
         ];
         $collection = collection($array);
-        $expected =[
-            'Manchester United'=>[
-                [1=>'Tom'],
-                [2=>'Dave'],
+        $expected = [
+            'Manchester United' => [
+                [1 => 'Tom'],
+                [2 => 'Dave'],
             ],
-            'West Ham'=>[
-                [3=>'James']
-            ]
+            'West Ham' => [
+                [3 => 'James'],
+            ],
         ];
         $this->assertEquals($expected, $collection->combine('id', 'name', 'team')->toArray());
     }
@@ -146,14 +146,14 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     {
         $collection = collection($this->books);
         $inStock = $collection->filter(function ($book) {
-            return $book->in_stock ===  true;
+            return $book->in_stock === true;
         });
         $books = $inStock->toArray();
         $this->assertEquals(3, count($books));
 
         $collection = collection($this->array);
         $outOfStock = $collection->filter(function ($book) {
-            return $book['in_stock'] ===  false;
+            return $book['in_stock'] === false;
         });
         $books = $outOfStock->toArray();
         $this->assertEquals(2, count($books));
@@ -179,7 +179,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         
         // Filter results to only those in stock
         $inStock = $collection->filter(function ($book) {
-            return $book->in_stock ===  true;
+            return $book->in_stock === true;
         });
        
         $this->assertTrue($inStock->every(function ($book) {
@@ -209,19 +209,19 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $collection = collection($this->books);
         $sorted = $collection->sortBy('name', SORT_ASC, SORT_STRING)->extract('name')->toList();
         $expected = [
-            "How to Win Friends & Influence People",
-            "The 7 Habits of Highly Effective People",
-            "The Art of War",
-            "The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success",
-            "Think and Grow Rich!"
+            'How to Win Friends & Influence People',
+            'The 7 Habits of Highly Effective People',
+            'The Art of War',
+            'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success',
+            'Think and Grow Rich!',
         ];
         $this->assertEquals($expected, $sorted);
         $sorted = $collection->sortBy('name', SORT_DESC, SORT_STRING)->extract('name')->toList();
-        $expected = [ "Think and Grow Rich!",
-        "The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success",
-        "The Art of War",
-        "The 7 Habits of Highly Effective People",
-        "How to Win Friends & Influence People"];
+        $expected = ['Think and Grow Rich!',
+            'The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success',
+            'The Art of War',
+            'The 7 Habits of Highly Effective People',
+            'How to Win Friends & Influence People', ];
         $this->assertEquals($expected, $sorted);
 
         $sorted = $collection->sortBy(function ($book) {
@@ -229,16 +229,17 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         }, SORT_ASC, SORT_STRING);
         $sorted->map(function ($book) {
             $book->index = $book->author->name . '-' . $book->name;
+
             return $book;
         });
         $sorted = $sorted->extract('index')->toList();
         $expected = [
-            "Dale Carnegie-How to Win Friends & Influence People",
-            "Napoleon Hill-Think and Grow Rich!",
-            "Stephen R. Covey-The 7 Habits of Highly Effective People",
-            "Sun Tzu-The Art of War",
-            "William N. Thorndike-The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success"
-            ];
+            'Dale Carnegie-How to Win Friends & Influence People',
+            'Napoleon Hill-Think and Grow Rich!',
+            'Stephen R. Covey-The 7 Habits of Highly Effective People',
+            'Sun Tzu-The Art of War',
+            'William N. Thorndike-The Outsiders: Eight Unconventional CEOs and Their Radically Rational Blueprint for Success',
+        ];
         $this->assertEquals($expected, $sorted);
     }
 
@@ -322,10 +323,10 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testCountBy()
     {
         $collection = collection($this->books);
-        $expected = ['Business' => 1,'Personal Development'=>4];
+        $expected = ['Business' => 1,'Personal Development' => 4];
         $this->assertEquals($expected, $collection->countBy('category'));
 
-        $expected = ['odd'=>2,'even'=>3];
+        $expected = ['odd' => 2,'even' => 3];
         $this->assertEquals($expected, $collection->countBy(function ($book) {
             return $book->id % 2 == 0 ? 'even' : 'odd';
         }));
@@ -348,15 +349,15 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testInsert()
     {
         $users = [
-            ['name'=>'James'],
-            ['name'=>'Roise'],
-            ['name'=>'Liz']
+            ['name' => 'James'],
+            ['name' => 'Roise'],
+            ['name' => 'Liz'],
         ];
         $collection = collection($users);
         $result = $collection->insert('status', 'active')->toArray();
-        $this->assertEquals(['name'=>'James','status'=>'active'], $result[0]);
+        $this->assertEquals(['name' => 'James','status' => 'active'], $result[0]);
         $result = $collection->insert('profile.status', 'active')->toArray();
-        $this->assertEquals(['name'=>'James','profile'=>['status'=>'active']], $result[0]);
+        $this->assertEquals(['name' => 'James','profile' => ['status' => 'active']], $result[0]);
       
         $collection = collection($this->books);
         $result = $collection->insert('location', 'head office')->toArray();
@@ -366,7 +367,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     {
         $collection = collection($this->books);
         $first = $collection->take(2);
-        $second = $collection->take(2,2);
+        $second = $collection->take(2, 2);
         $this->assertEquals(2, count($first->toArray()));
         $this->assertEquals(2, count($second->toArray()));
         $this->assertFalse($first->toArray() === $second->toArray());
@@ -399,7 +400,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     {
         $collection = collection($this->books);
 
-        foreach ($collection as $item) {
+        foreach ($collection as $key => $item) {
             $this->assertInstanceOf(Entity::class, $item);
         }
         //Iterator

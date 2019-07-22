@@ -11,11 +11,11 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+use Origin\Log\Log;
+use Origin\I18n\I18n;
 use Origin\Core\Debugger;
 use Origin\Core\Configure;
 use Origin\Utility\Collection;
-use Origin\I18n\I18n;
-use Origin\Log\Log;
 
 /**
  * Runs a backtrace.
@@ -57,7 +57,7 @@ function debug($data, bool $isHtml = false) : void
         
         if (PHP_SAPI === 'cli') {
             $where = "{$filename} Line: {$line}";
-            $template =  sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
+            $template = sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
         } else {
             $where = "<p><strong>{$filename}</strong> Line: <strong>{$line}</strong></p>";
             $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
@@ -148,6 +148,7 @@ function __(string $string = null, array $vars = []) : ?string
     if ($string) {
         return I18n::translate($string, $vars);
     }
+
     return null;
 }
 
@@ -178,6 +179,7 @@ function env(string $variable, string $value = null)
         if (isset($_ENV[$variable])) {
             return $_ENV[$variable];
         }
+
         return null;
     }
 
@@ -217,6 +219,7 @@ function uuid()
     $random = random_bytes(16);
     $random[6] = chr(ord($random[6]) & 0x0f | 0x40);
     $random[8] = chr(ord($random[8]) & 0x3f | 0x80);
+
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($random), 4));
 }
 
@@ -226,12 +229,12 @@ function uuid()
  * @param integer $length
  * @return string
  */
-function uid(int $length=13) : string
+function uid(int $length = 13) : string
 {
-    $random = random_bytes(ceil($length/2));
+    $random = random_bytes(ceil($length / 2));
+
     return substr(bin2hex($random), 0, $length);
 }
-
 
 /**
  * The OriginPHP default password hasher
@@ -242,6 +245,7 @@ function uid(int $length=13) : string
 function hashPassword(string $password)
 {
     deprecationWarning('Deprecated: Use Security::hashPassword instead');
+
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
@@ -269,7 +273,6 @@ function deprecationWarning(string $message) : void
  * Helper Functions
  */
 
-
 /**
 * Checks if a string contains a substring
 *
@@ -279,12 +282,12 @@ function deprecationWarning(string $message) : void
 */
 function contains(string $needle, string $haystack) : bool
 {
-    if (!empty($needle)) {
+    if (! empty($needle)) {
         return (mb_strpos($haystack, $needle) !== false);
     }
+
     return false;
 }
-
 
 /**
  * Gets part of the string from the left part of characters
@@ -295,13 +298,15 @@ function contains(string $needle, string $haystack) : bool
  */
 function left(string $characters, string $string) : ?string
 {
-    if (!empty($characters)) {
+    if (! empty($characters)) {
         $position = mb_strpos($string, $characters);
         if ($position === false) {
             return null;
         }
+
         return mb_substr($string, 0, $position);
     }
+
     return null;
 }
 
@@ -314,13 +319,15 @@ function left(string $characters, string $string) : ?string
  */
 function right(string $characters, string $string) : ?string
 {
-    if (!empty($characters)) {
+    if (! empty($characters)) {
         $position = mb_strpos($string, $characters);
         if ($position === false) {
             return null;
         }
+
         return mb_substr($string, $position + mb_strlen($characters));
     }
+
     return null;
 }
 
@@ -334,7 +341,8 @@ function right(string $characters, string $string) : ?string
 function begins(string $needle, string $haystack) : bool
 {
     $length = mb_strlen($needle);
-    return (mb_substr($haystack, 0, $length) == $needle);
+
+    return  ($needle !== '' and mb_substr($haystack, 0, $length) == $needle);
 }
 
 /**
@@ -347,7 +355,8 @@ function begins(string $needle, string $haystack) : bool
 function ends(string $needle, string $haystack) : bool
 {
     $length = mb_strlen($needle);
-    return (mb_substr($haystack, -$length, $length) == $needle);
+
+    return ($needle !== '' and mb_substr($haystack, -$length, $length) == $needle);
 }
 
 /**
@@ -361,12 +370,13 @@ function ends(string $needle, string $haystack) : bool
  *  - insensitive: default false. case-insensitive replace
  * @return string
  */
-function replace(string $needle, string $with, string $haystack, array $options=[]) : string
+function replace(string $needle, string $with, string $haystack, array $options = []) : string
 {
-    $options += ['insensitive'=>false];
+    $options += ['insensitive' => false];
     if ($options['insensitive']) {
         return str_ireplace($needle, $with, $haystack);
     }
+
     return str_replace($needle, $with, $haystack);
 }
 
@@ -376,7 +386,7 @@ function replace(string $needle, string $with, string $haystack, array $options=
  * @param string $string
  * @return integer
  */
-function length(string $string=null) : int
+function length(string $string = null) : int
 {
     return mb_strlen($string);
 }

@@ -33,20 +33,20 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $plain = 'The quick brown fox jumps over the lazy dog';
         $expected = '2fd4e1c67a2d28fced849ee1bb76e7391b93eb12';
        
-        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1']));
+        $this->assertEquals($expected, Security::hash($plain, ['type' => 'sha1']));
    
         $expected = 'd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592';
         $this->assertEquals($expected, Security::hash($plain));
         
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','pepper'=>'OriginPHP']));
+        $this->assertEquals($expected, Security::hash($plain, ['type' => 'sha1','pepper' => 'OriginPHP']));
 
         Configure::write('Security.pepper', 'OriginPHP');
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
-        $this->assertEquals($expected, Security::hash($plain, ['type'=>'sha1','pepper'=>true]));
+        $this->assertEquals($expected, Security::hash($plain, ['type' => 'sha1','pepper' => true]));
 
         $this->expectException(Exception::class);
-        Security::hash($plain, ['type'=>'unkownHashType']);
+        Security::hash($plain, ['type' => 'unkownHashType']);
     }
 
     public function testHashPassword()
@@ -66,8 +66,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 
     public function testCompare()
     {
-        $expected  = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
-        $correct   = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
+        $expected = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
+        $correct = crypt('12345', '$2a$07$areallylongstringthatwillbeusedasasalt$');
         $incorrect = crypt('67890', '$2a$07$areallylongstringthatwillbeusedasasalt$');
 
         $this->assertTrue(Security::compare($expected, $correct));
@@ -86,6 +86,23 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(Exception::class);
         $this->assertFalse(Security::decrypt($encrypted, $key.'x')); // test wrong key
+    }
+
+    public function testGenerateKey()
+    {
+        $this->assertEquals(32, strlen(Security::generateKey()));
+    }
+
+    public function testEncryptInvalidKeyLength()
+    {
+        $this->expectException(Exception::class);
+        Security::encrypt('text', 'invalidkey');
+    }
+
+    public function testDecryptInvalidKeyLength()
+    {
+        $this->expectException(Exception::class);
+        Security::decrypt('text', 'invalidkey');
     }
 
     public function testUUID()

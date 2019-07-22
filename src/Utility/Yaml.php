@@ -90,23 +90,24 @@ class YamlParser
      * This is used to manually create lines e.g list of lists.
      *
      * @param array $lines
-     * @return void
+     * @return array
      */
-    public function lines(array $lines = null)
+    public function lines(array $lines = null) : array
     {
         if ($lines) {
             $this->lines = $lines;
         }
+
         return $this->lines;
     }
 
     /**
      * Help identify record sets
      *
-     * @param [type] $from
-     * @return void
+     * @param int $from
+     * @return array
      */
-    protected function findRecordSets(int $from)
+    protected function findRecordSets(int $from) : array
     {
         $lines = count($this->lines);
         $results = [];
@@ -114,7 +115,7 @@ class YamlParser
         
         $start = null;
         
-        for ($w=$from;$w<$lines;$w++) {
+        for ($w = $from;$w < $lines;$w++) {
             $marker = ltrim($this->lines[$w]);
             if ($marker[0] === '-') {
                 if ($start !== null) {
@@ -126,10 +127,10 @@ class YamlParser
                 }
             }
             if (strpos($this->lines[$w], $marker) < $spaces) {
-                $results[$start] = $w -1;
+                $results[$start] = $w - 1;
                 $start = null;
                 break; // its parent
-            } elseif ($w === ($lines -1) and $start) {
+            } elseif ($w === ($lines - 1) and $start) {
                 $results[$start] = $w; // Reached end of of file
             }
         }
@@ -141,28 +142,21 @@ class YamlParser
      * Parses the array
      *
      * @param integer $lineNo from
-     * @param integer $to
      * @return array
      */
-    protected function parse(int $lineNo=0, int $rows = null): array
+    protected function parse(int $lineNo = 0) : array
     {
         $result = [];
         $lines = count($this->lines);
      
         $spaces = $lastSpaces = 0;
     
-        for ($i=$lineNo;$i<$lines;$i++) {
-            /**
-             * Stop after getting x rows
-             */
-            if ($rows and $rows === ($lineNo + $rows)) {
-                break;
-            }
+        for ($i = $lineNo;$i < $lines;$i++) {
             $line = $this->lines[$i];
             $marker = trim($line);
        
             // Skip comments,empty lines  and directive
-            if ($marker === '' or $marker[0] === '#' or $line ==='---' or substr($line, 0, '5') === '%YAML') {
+            if ($marker === '' or $marker[0] === '#' or $line === '---' or substr($line, 0, '5') === '%YAML') {
                 $this->i = $i;
                 continue;
             }
@@ -183,15 +177,15 @@ class YamlParser
             }
 
             // Walk forward for multi line data
-            if (!$this->isList($line) and !$this->isScalar($line) and !$this->isParent($line)) {
-                $parentLine = $this->lines[$i-1];
-                if (!$this->isParent($parentLine)) {
+            if (! $this->isList($line) and ! $this->isScalar($line) and ! $this->isParent($line)) {
+                $parentLine = $this->lines[$i - 1];
+                if (! $this->isParent($parentLine)) {
                     continue; // Skip if there is no parent
                 }
                 $block = trim($line);
-                for ($w=$i+1;$w<$lines;$w++) {
+                for ($w = $i + 1;$w < $lines;$w++) {
                     $nextLine = trim($this->lines[$w]);
-                    if (!$this->isList($nextLine) and !$this->isScalar($nextLine) and !$this->isParent($nextLine)) {
+                    if (! $this->isList($nextLine) and ! $this->isScalar($nextLine) and ! $this->isParent($nextLine)) {
                         $block .= ' ' . $nextLine; // In the plain scalar,newlines become spaces
                     } else {
                         break;
@@ -216,15 +210,15 @@ class YamlParser
                     $break = ' ';
                 }
  
-                for ($w=$i+1;$w<$lines;$w++) {
+                for ($w = $i + 1;$w < $lines;$w++) {
                     $nextLine = trim($this->lines[$w]);
 
                     // Handle multilines which are on the last lastline
-                    if ($w === $lines-1) {
+                    if ($w === $lines - 1) {
                         $value .= $nextLine . $break;
                     }
                     
-                    if ($this->isScalar($nextLine) or $this->isParent($nextLine) or $this->isList($nextLine) or $w === $lines-1) {
+                    if ($this->isScalar($nextLine) or $this->isParent($nextLine) or $this->isList($nextLine) or $w === $lines - 1) {
                         $result[$key] = rtrim($value);
                         break;
                     }
@@ -237,11 +231,11 @@ class YamlParser
             if ($this->isList($line)) {
                 $trimmedLine = ltrim(substr(ltrim($line), 2)); // work with any number of spaces;
                
-                if (trim($line) !== '-' and !$this->isParent($trimmedLine) and !$this->isScalar($trimmedLine)) {
+                if (trim($line) !== '-' and ! $this->isParent($trimmedLine) and ! $this->isScalar($trimmedLine)) {
                     $result[] = $trimmedLine;
                 } elseif ($this->isParent($trimmedLine)) {
                     $key = substr(ltrim($trimmedLine), 0, -1);
-                    $result[$key] = $this->parse($i+1);
+                    $result[$key] = $this->parse($i + 1);
                     $i = $this->i;
                 } else {
                     /**
@@ -251,7 +245,7 @@ class YamlParser
                     $sets = $this->findRecordSets($i);
                     foreach ($sets as $start => $finish) {
                         $setLines = [];
-                        for ($ii=$start;$ii<$finish+1;$ii++) {
+                        for ($ii = $start;$ii < $finish + 1;$ii++) {
                             $setLine = $this->lines[$ii];
                        
                             if ($ii === $start) {
@@ -278,7 +272,7 @@ class YamlParser
                 $key = substr($line, 0, -1);
             
                 $key = rtrim($key);   // remove ending spaces e.g. invoice   :
-                $result[$key] = $this->parse($i+1);
+                $result[$key] = $this->parse($i + 1);
                 // Walk backward
                 if (isset($result[$key]['__plain_scalar__'])) {
                     $result[$key] = $result[$key]['__plain_scalar__'];
@@ -292,16 +286,6 @@ class YamlParser
         return $result;
     }
 
-    /**
-     * Remove quotes from start and end of string
-     *
-     * @param string $string
-     * @return void
-     */
-    protected function removeQuotes(string $string)
-    {
-        return trim($string, '"\'');
-    }
     /**
      * Converts a string into an array of lines
      *
@@ -318,6 +302,7 @@ class YamlParser
                 $lines[] = $line;
             }
         }
+
         return $lines;
     }
 
@@ -352,6 +337,7 @@ class YamlParser
     protected function isList(string $line) : bool
     {
         $line = trim($line);
+
         return (substr($line, 0, 2) === '- ') or $line === '-';
     }
 
@@ -369,13 +355,13 @@ class YamlParser
      * Undocumented function
      * Many types of bool
      * @see https://yaml.org/type/bool.html
-     * @param [type] $value
-     * @return void
+     * @param mixed $value
+     * @return mixed
      */
     protected function readValue($value)
     {
         switch ($value) {
-            case "true":
+            case 'true':
                 return true;
             break;
             case 'false':
@@ -406,6 +392,7 @@ class Yaml
     public static function toArray(string $string) : array
     {
         $parser = new YamlParser($string);
+
         return $parser->toArray();
     }
   
@@ -420,7 +407,7 @@ class Yaml
         return self::dump($array);
     }
 
-    protected static function dump(array $array, int $indent=0, $isList= false)
+    protected static function dump(array $array, int $indent = 0, $isList = false)
     {
         $output = '';
         $line = 0;
@@ -430,7 +417,7 @@ class Yaml
                     $output .= self::dump($value, $indent, true);
                 } else {
                     $output .= str_repeat(' ', $indent)  . "{$key}: \n";
-                    $output .= self::dump($value, $indent  + self::$indent);
+                    $output .= self::dump($value, $indent + self::$indent);
                 }
             } else {
                 $value = self::dumpValue($value);
@@ -439,16 +426,17 @@ class Yaml
                 } else {
                     $string = "{$key}: {$value}";
                 }
-                if ($isList and $line==0) {
+                if ($isList and $line == 0) {
                     $string = '- ' . $string;
                 }
                 $output .= str_repeat(' ', $indent) . "{$string}\n";
-                if ($isList and $line==0) {
-                    $indent = $indent  + 2;
+                if ($isList and $line == 0) {
+                    $indent = $indent + 2;
                 }
             }
             $line ++;
         }
+
         return $output;
     }
     
@@ -463,6 +451,7 @@ class Yaml
         if (strpos($value, "\n") !== false) {
             $value = "| {$value}";
         }
+
         return $value;
     }
 }

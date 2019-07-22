@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -27,6 +28,13 @@ class LocaleGenerateCommand extends Command
     protected $name = 'locale:generate';
     protected $description = 'Generates locale definition file or files';
 
+    protected $path = CONFIG . DS  . 'locales';
+
+    /**
+     * I18n -> PHP
+     *
+     * @var array
+     */
     protected $dateMap = [
         'MMMM' => 'F',
         'MMM' => 'M',
@@ -40,11 +48,15 @@ class LocaleGenerateCommand extends Command
         'd' => 'j',
         'GGGG ' => '',
         ' GGGG' => '', // remove ad,
-        'G'=> '',
-        'GG' =>'',
-        'GGG' =>'',
+        'G' => '',
+        'GG' => '',
+        'GGG' => '',
     ];
-
+    /**
+     * I18n -> PHP
+     *
+     * @var array
+     */
     protected $timeMap = [
         'HH' => 'H',
         'H' => 'G',
@@ -56,11 +68,12 @@ class LocaleGenerateCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('expected', ['description'=>'Adds the expected information','type'=>'boolean']);
-        $this->addOption('single-file', ['description'=>'Put all definitions in a single file','type'=>'boolean']);
-        $this->addOption('force', ['description'=>'Force overwrite','type'=>'boolean']);
-        $this->addArgument('locales', ['description'=>'The names of the locales you want to genreate seperated by space','type'=>'array']);
+        $this->addOption('expected', ['description' => 'Adds the expected information', 'type' => 'boolean']);
+        $this->addOption('single-file', ['description' => 'Put all definitions in a single file', 'type' => 'boolean']);
+        $this->addOption('force', ['description' => 'Force overwrite', 'type' => 'boolean']);
+        $this->addArgument('locales', ['description' => 'The names of the locales you want to genreate seperated by space', 'type' => 'array']);
     }
+
     public function execute()
     {
         $types = [];
@@ -68,52 +81,51 @@ class LocaleGenerateCommand extends Command
         if ($this->arguments('locales')) {
             $locales = $this->arguments('locales');
         }
-        $path = CONFIG . DS  .'locales';
 
-        if (!file_Exists($path)) {
-            mkdir($path);
+        if (!file_Exists($this->path)) {
+            mkdir($this->path);
         }
 
         $results = [];
- 
+
         $max = count($locales);
         $this->info('Generating locales definitions');
 
         $this->io->progressBar(0, $max);
-        
-        $i=1;
+
+        $i = 1;
 
         //@todo where to put this. Should be part of source code, but cant add to vendor
         foreach ($locales as $locale) {
             $result = $this->parseLocale($locale);
             $results[$locale] = $result;
             if ($this->options('single-file') === false) {
-                $this->io->createFile($path . DS .$locale.'.yml', Yaml::fromArray($result), $this->options('force'));
+                $this->io->createFile($this->path . DS . $locale . '.yml', Yaml::fromArray($result), $this->options('force'));
             }
-           
+
             $this->io->progressBar($i, $max);
-            
+
             $i++;
         }
-    
+
         if ($this->options('single-file')) {
-            $this->io->createFile($path . DS . 'locales.yml', Yaml::fromArray($results), $this->options('force'));
+            $this->io->createFile($this->path . DS . 'locales.yml', Yaml::fromArray($results), $this->options('force'));
         }
         $this->io->success(sprintf('Generated %d locale definitions', count($results)));
     }
 
     /**
-     * Undocumented function
+     * Parses the locale from I18n
      *
      * @param string $locale
-     * @return void
+     * @return array
      */
-    protected function parseLocale(string $locale = null)
+    protected function parseLocale(string $locale = null): array
     {
-        $config = ['name'=>null,'decimals'=>null,'thousands'=>null,'currency'=>null,'before'=>null,'after'=>null,'date'=>null,'time'=>null,'datetime'=>null];
+        $config = ['name' => null, 'decimals' => null, 'thousands' => null, 'currency' => null, 'before' => null, 'after' => null, 'date' => null, 'time' => null, 'datetime' => null];
 
         $fmt = new NumberFormatter($locale, NumberFormatter::CURRENCY);
-       
+
         $config['name'] = Locale::getDisplayName($locale);
         $config['decimals'] = $fmt->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
         $config['thousands'] = $fmt->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
@@ -132,14 +144,14 @@ class LocaleGenerateCommand extends Command
 
         //http://userguide.icu-project.org/formatparse/datetime
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-    
+
         $config['date'] = $this->convertDate($fmt->getPattern());
         $expected['date'] = $fmt->format(new DateTime());
-        
+
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
         $config['time'] =  $this->convertTime($fmt->getPattern());
         $expected['time'] = $fmt->format(new DateTime());
-        
+
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
         $config['datetime'] =  $this->convertDatetime($fmt->getPattern());
 
@@ -147,19 +159,37 @@ class LocaleGenerateCommand extends Command
         if ($this->options('expected')) {
             $config['expected'] = $expected;
         }
-        
+
         return $config;
     }
-
-    public function convertDate(String $string)
+    /**
+     * Convert the date using the date map
+     *
+     * @param string $string
+     * @return string
+     */
+    public function convertDate(string $string): string
     {
         return strtr($string, $this->dateMap);
     }
-    public function convertTime(String $string)
+    /**
+     * Convert the time using the time map
+     *
+     * @param string $string
+     * @return string
+     */
+    public function convertTime(string $string): string
     {
         return strtr($string, $this->timeMap);
     }
-    public function convertDatetime(String $string)
+
+    /**
+     * Convert the time using the time map
+     *
+     * @param string $string
+     * @return string
+     */
+    public function convertDatetime(string $string): string
     {
         $string = $this->convertDate($string);
         return strtr($string, $this->timeMap);

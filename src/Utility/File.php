@@ -24,7 +24,7 @@ class File
      * @param string $filename
      * @return string $contents
      */
-    public static function read(string $filename)
+    public static function read(string $filename) : string
     {
         if (is_readable($filename)) {
             return file_get_contents($filename);
@@ -56,6 +56,7 @@ class File
         if (is_dir($folder) and is_writeable($folder)) {
             return (bool) file_put_contents($filename, $contents, LOCK_EX);
         }
+
         return false;
     }
 
@@ -72,6 +73,7 @@ class File
         if (is_dir($folder) and is_writeable($folder)) {
             return (bool) file_put_contents($filename, $contents, FILE_APPEND | LOCK_EX);
         }
+
         return false;
     }
 
@@ -89,19 +91,19 @@ class File
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
 
-
     /**
      * Creates a temporary file. If no data is provided then it just returns the filename
      *
      * @param string $data Data to place in the temporary file
      * @return string $filename A temporary file
      */
-    public static function tmp(string $data = null)
+    public static function tmp(string $data = null) : string
     {
         $filename = sys_get_temp_dir() . DS . uid();
         if ($data) {
             file_put_contents($filename, $data);
         }
+
         return $filename;
     }
 
@@ -118,6 +120,7 @@ class File
             if (strpos($to, DS) === false) {
                 $to = pathinfo($from, PATHINFO_DIRNAME) . DS . $to;
             }
+
             return @rename($from, $to);
         }
         throw new NotFoundException(sprintf('%s could not be found', $from));
@@ -143,27 +146,28 @@ class File
      *
      * @param string $source filename with full path
      * @param string $destination filename with or without full path (same directory)
-     * @return void
+     * @return bool
      */
-    public static function copy(string $source, string $destination)
+    public static function copy(string $source, string $destination) : bool
     {
         if (self::exists($source)) {
             if (strpos($destination, DS) === false) {
                 $destination = pathinfo($source, PATHINFO_DIRNAME) . DS . $destination;
             }
+
             return @copy($source, $destination);
         }
         throw new NotFoundException(sprintf('%s could not be found', $source));
     }
 
     /**
-       * Changes the file permissions
+       * Changes the file permissions. The directory must belong to
        *
        * @param string $filename filename with full path
        * @param int $mode e.g 0755 (remember 0 infront)
-       * @return bool|string
+       * @return bool
        */
-    public static function chmod(string $filename, int $mode)
+    public static function chmod(string $filename, int $mode) : bool
     {
         if (self::exists($filename)) {
             return @chmod($filename, $mode);
@@ -178,7 +182,7 @@ class File
     * @param string $user  e.g. root, www-data
     * @return bool
     */
-    public static function chown(string $filename, string $user)
+    public static function chown(string $filename, string $user) : bool
     {
         if (self::exists($filename)) {
             return @chown($filename, $user);
@@ -193,7 +197,7 @@ class File
      * @param string $user  e.g. root, www-data
      * @return bool
      */
-    public static function chgrp(string $filename, string $group)
+    public static function chgrp(string $filename, string $group) : bool
     {
         if (self::exists($filename)) {
             return @chgrp($filename, $group);
@@ -206,24 +210,23 @@ class File
      *
      * @param string $filename filename with full path
      * @param int $mode e.g 0755 (remember 0 infront)
-     * @return bool|string
+     * @return string
      */
-    public static function mode(string $filename)
+    public static function mode(string $filename) : string
     {
         if (self::exists($filename)) {
-            return (string) substr(sprintf("%o", fileperms($filename)), -4);
+            return (string) substr(sprintf('%o', fileperms($filename)), -4);
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }
     
-
     /**
      * Alias for mode. Gets the mode for a file aka permissions
      *
      * @param string $filename
      * @return string
      */
-    public static function perms(string $filename)
+    public static function perms(string $filename) : string
     {
         return static::mode($filename);
     }
@@ -234,7 +237,7 @@ class File
      * @param string $filename filename with full path
      * @return string
      */
-    public static function owner(string $filename)
+    public static function owner(string $filename) : string
     {
         if (self::exists($filename)) {
             return posix_getpwuid(fileowner($filename))['name'];
@@ -247,7 +250,7 @@ class File
      * @param string $filename filename with full path
      * @return string
      */
-    public static function group(string $filename)
+    public static function group(string $filename) : string
     {
         if (self::exists($filename)) {
             return posix_getgrgid(filegroup($filename))['name'];
@@ -265,14 +268,15 @@ class File
     {
         if (self::exists($filename)) {
             $pathinfo = pathinfo($filename);
+
             return [
-               'path' => $pathinfo['dirname'],
-               'filename' => $pathinfo['basename'],
-               'extension' => $pathinfo['extension']??null,
-               'type' => mime_content_type($filename),
-               'size' => filesize($filename),
-               'timestamp' => filemtime($filename)
-           ];
+                'path' => $pathinfo['dirname'],
+                'filename' => $pathinfo['basename'],
+                'extension' => $pathinfo['extension'] ?? null,
+                'type' => mime_content_type($filename),
+                'size' => filesize($filename),
+                'timestamp' => filemtime($filename),
+            ];
         }
         throw new NotFoundException(sprintf('%s could not be found', $filename));
     }

@@ -37,10 +37,7 @@ class DbSetupCommand extends Command
  
     public function execute()
     {
-        $name = $this->arguments('name');
-        if ($name === null) {
-            $name = 'schema';
-        }
+        $name = $this->arguments('name')??'schema';
 
         # Create arguments
         $schema = $name;

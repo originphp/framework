@@ -2,6 +2,7 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Text;
+use Origin\Exception\Exception;
 
 class TextTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,30 +29,36 @@ class TextTest extends \PHPUnit\Framework\TestCase
             '192.168.1.22',
             'GET /users/login HTTP/1.0',
             '200',
-            '1024'
+            '1024',
         ];
         $this->assertEquals($expected, Text::tokenize($text));
 
         $expected = [
-            'date'=>'2019-07-10',
-            'time'=>'13:30:00',
+            'date' => '2019-07-10',
+            'time' => '13:30:00',
             'ip' => '192.168.1.22',
-            'request' =>'GET /users/login HTTP/1.0',
-            'code'=>'200',
-            'bytes'=>'1024'
+            'request' => 'GET /users/login HTTP/1.0',
+            'code' => '200',
+            'bytes' => '1024',
         ];
-        $this->assertEquals($expected, Text::tokenize($text, ['keys'=>['date','time','ip','request','code','bytes']]));
+        $this->assertEquals($expected, Text::tokenize($text, ['keys' => ['date','time','ip','request','code','bytes']]));
+
+        // invalid amount of keys
+        $this->expectException(Exception::class);
+        Text::tokenize($text, ['keys' => ['date']]);
     }
 
     public function testStartsWith()
     {
         $this->assertTrue(Text::startsWith('foo', 'foobar'));
         $this->assertFalse(Text::startsWith('foo', 'barfoo'));
+        $this->assertFalse(Text::startsWith('', 'foobar'));
     }
     public function testEndsWith()
     {
         $this->assertFalse(Text::endsWith('foo', 'foobar'));
         $this->assertTrue(Text::endsWith('foo', 'barfoo'));
+        $this->assertFalse(Text::endsWith('', 'foobar'));
     }
     public function testLeft()
     {
@@ -63,8 +70,8 @@ class TextTest extends \PHPUnit\Framework\TestCase
     public function testRight()
     {
         $this->assertEquals('bar', Text::right(':', 'foo:bar'));
-        $this->assertNull(Text::left('x', 'foo:bar'));
-        $this->assertNull(Text::left('', ''));
+        $this->assertNull(Text::right('x', 'foo:bar'));
+        $this->assertNull(Text::right('', ''));
     }
     public function testContains()
     {
@@ -72,6 +79,7 @@ class TextTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(Text::contains('foo', 'barfoo'));
         $this->assertTrue(Text::contains('foo', 'xfoox'));
         $this->assertFalse(Text::contains('moo', 'barfoo'));
+        $this->assertFalse(Text::contains('', 'barfoo'));
     }
     public function testUpLo()
     {
@@ -81,7 +89,7 @@ class TextTest extends \PHPUnit\Framework\TestCase
     public function testReplace()
     {
         $this->assertEquals('foo', Text::replace('bar', '', 'foobar'));
-        $this->assertEquals('foo', Text::replace('bar', '', 'fooBAR', ['insensitive'=>true]));
+        $this->assertEquals('foo', Text::replace('bar', '', 'fooBAR', ['insensitive' => true]));
     }
     public function testLen()
     {
@@ -94,12 +102,12 @@ class TextTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             'Record 1234568 has been updated',
-            Text::insert('Record {id} has been updated', ['id'=>1234568])
+            Text::insert('Record {id} has been updated', ['id' => 1234568])
         );
 
         $this->assertEquals(
             'Record 1234568 has been updated',
-            Text::insert('Record {id} has been updated', ['id'=>1234568,['before'=>':','after'=>'']])
+            Text::insert('Record {id} has been updated', ['id' => 1234568,['before' => ':','after' => '']])
         );
     }
 
@@ -120,10 +128,10 @@ class TextTest extends \PHPUnit\Framework\TestCase
 
         $string = 'Once upon a time';
         $expected = "Once\nupon a\ntime";
-        $this->assertEquals($expected, Text::wordWrap($string, ['width'=>8]));
+        $this->assertEquals($expected, Text::wordWrap($string, ['width' => 8]));
 
         $expected = "Once\nupon\na\ntime";
-        $this->assertEquals($expected, Text::wordWrap($string, ['width'=>1]));
+        $this->assertEquals($expected, Text::wordWrap($string, ['width' => 1]));
     }
 
     public function testTruncate()

@@ -128,6 +128,7 @@ Strikethrough uses two tildes. ~~Scratch this.~~
 EOF;
         $expected = '92df3efd6e94f77f072b9e44c4c81429';
         $this->assertEquals($expected, md5(Markdown::toHtml($text)));
+        $this->assertEquals($expected, md5(Markdown::toHtml($text, ['escape' => false])));
     }
 
     public function testFromHtml()
@@ -211,10 +212,9 @@ EOF;
         $this->assertContains($expected, Markdown::fromHtml($html));
     }
 
-
     public function testToTextSubList()
     {
-        $html = "<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ul> <li>Black tea</li><li>Green tea</li></ul></li> <li>Milk</li></ul>";
+        $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ul> <li>Black tea</li><li>Green tea</li></ul></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   * Black tea\n   * Green tea\n* Milk";
         $this->assertContains($expected, Markdown::fromHtml($html));
@@ -222,9 +222,17 @@ EOF;
 
     public function testToTextSubListOrdered()
     {
-        $html = "<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ol> <li>Black tea</li><li>Green tea</li></ol></li> <li>Milk</li></ul>";
+        $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ol> <li>Black tea</li><li>Green tea</li></ol></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   1. Black tea\n   2. Green tea\n* Milk";
         $this->assertContains($expected, Markdown::fromHtml($html));
+    }
+
+    public function testUrlSecurity()
+    {
+        $text = '[xss](javascript:alert%281%29)'; // Actual attack vector
+        $this->assertContains('<a href="">xss</a>', Markdown::toHtml($text));
+        $text = '![xss](javascript:alert%281%29)'; // just testing url is being removed
+        $this->assertContains('<img src="" alt="xss">', Markdown::toHtml($text));
     }
 }

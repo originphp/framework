@@ -58,9 +58,9 @@ class Folder
      * @param string $directory
      * @param array $options Options keys are
      *  - directories: default false, includes directories
-     * @return void
+     * @return array
      */
-    public static function list(string $directory, array $options= [])
+    public static function list(string $directory, array $options= []) : array
     {
         $options += ['directories'=>false];
         if (self::exists($directory)) {
@@ -85,13 +85,13 @@ class Folder
     }
 
     /**
-     * Deletes a directory. For saftey reasons recrusive is disabled by default, since this
-     * will delete files etc.
+     * Deletes a directory. For saftey reasons recrusive is disabled by default,
+     * since this will delete files etc.
      *
      * @param string $directory
-     * @param array options (recursive default false)
-     *  - recursive: If set to true, it will delete all contents and sub folders
-     * @return void
+     * @param array options These are the options can you use:
+     *    - recursive: If set to true, it will delete all contents and sub folders
+     * @return bool
      */
     public static function delete(string $directory, array $options = []) : bool
     {
@@ -136,9 +136,9 @@ class Folder
      *
      * @param string $source /var/www/tmp/docs
      * @param string $destination /var/www/tmp/documents
-     * @return void
+     * @return bool
      */
-    public static function move(string $source, string $destination)
+    public static function move(string $source, string $destination) : bool
     {
         if (self::exists($source)) {
             if (strpos($destination, DS) === false) {
@@ -156,7 +156,7 @@ class Folder
      * @param string $destination project_name or /var/www/tmp/project_name
      * @return boolean
      */
-    public static function copy(string $source, string $destination)
+    public static function copy(string $source, string $destination) : bool
     {
         if (self::exists($source)) {
             if (strpos($destination, DS) === false) {
@@ -184,7 +184,7 @@ class Folder
     * @param string $directory filename with full path
     * @return string
     */
-    public static function mode(string $directory)
+    public static function mode(string $directory) : string
     {
         if (self::exists($directory)) {
             return  (string) substr(sprintf("%o", fileperms($directory)), -4);
@@ -198,7 +198,7 @@ class Folder
     * @param string $filename
     * @return string|null
     */
-    public static function perms(string $directory)
+    public static function perms(string $directory) : ?string
     {
         return static::mode($directory);
     }
@@ -209,7 +209,7 @@ class Folder
       * @param string $directory filename with full path
       * @return string|null
       */
-    public static function owner(string $directory)
+    public static function owner(string $directory) : ?string
     {
         if (self::exists($directory)) {
             return posix_getpwuid(fileowner($directory))['name'];
@@ -223,7 +223,7 @@ class Folder
      * @param string $directory filename with full path
      * @return string|null
      */
-    public static function group(string $directory)
+    public static function group(string $directory) : ?string
     {
         if (self::exists($directory)) {
             return posix_getgrgid(filegroup($directory))['name'];
@@ -238,9 +238,9 @@ class Folder
     * @param int $mode e.g 0755 (remember 0 infront)
      * @param array options (recursive default false)
      *  - recursive: If set to true, it will delete all contents and sub folders
-    * @return bool|string
+    * @return bool
     */
-    public static function chmod(string $directory, int $mode, array $options = [])
+    public static function chmod(string $directory, int $mode, array $options = []) : bool
     {
         $options += ['recursive'=>false];
 
@@ -269,7 +269,7 @@ class Folder
      *  - recursive: If set to true, it will delete all contents and sub folders
      * @return bool
      */
-    public static function chown(string $directory, string $user, array $options =[])
+    public static function chown(string $directory, string $user, array $options =[]) : bool
     {
         $options += ['recursive'=>false];
         if (self::exists($directory)) {
@@ -297,7 +297,7 @@ class Folder
     *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool
     */
-    public static function chgrp(string $directory, string $group = null, array $options=[])
+    public static function chgrp(string $directory, string $group = null, array $options=[]) : bool
     {
         $options += ['recursive'=>false];
         if (self::exists($directory)) {

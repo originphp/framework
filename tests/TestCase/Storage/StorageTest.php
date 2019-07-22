@@ -21,18 +21,24 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 {
     public function testCRD()
     {
+        $tmpFolder = uniqid();
         Storage::config('tmp', [
             'engine'=>'Local',
-            'root' => TMP
+            'root' => TMP . DS . $tmpFolder
             ]);
 
         $file = uniqid();
         # Create
         $this->assertTrue(Storage::write($file, 'bar', ['config'=>'tmp']));
-        $this->assertFileExists(TMP . DS . $file); // Check using correct config
+        $this->assertFileExists(TMP . DS . $tmpFolder . DS . $file); // Check using correct config
         # Read
         $this->assertEquals('bar', Storage::read($file, ['config'=>'tmp']));
         $this->assertTrue(Storage::exists($file, ['config'=>'tmp']));
+
+        $contents = Storage::list(null, ['config'=>'tmp']);
+        $this->assertEquals(1, count($contents));
+        $this->assertEquals($file, $contents[0]['name']);
+
         # Delete
         Storage::delete($file, ['config'=>'tmp']);
         $this->assertFalse(Storage::exists($file, ['config'=>'tmp']));

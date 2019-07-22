@@ -55,6 +55,14 @@ class SessionHelperTest extends \PHPUnit\Framework\TestCase
         $this->Session->write('foo', 'bar');
         $this->assertTrue($this->Session->exists('foo'));
     }
+    
+    public function testClear()
+    {
+        $this->Session->write('foo', 'bar');
+        $this->assertTrue($this->Session->exists('foo'));
+        $this->Session->clear();
+        $this->assertFalse($this->Session->exists('foo'));
+    }
     public function testDelete()
     {
         $this->Session->write('foo', 'bar');

@@ -24,17 +24,18 @@ class DateTest extends \PHPUnit\Framework\TestCase
             'timezone' => 'UTC',
             'date' => 'm/d/Y',
             'datetime' => 'm/d/Y H:i:s',
-            'time' => 'H:i:s'
+            'time' => 'H:i:s',
         ]);
     }
 
-    public function testGettersAndSetters(){
+    public function testGettersAndSetters()
+    {
         Date::dateFormat('d/m/Y');
-        $this->assertEquals(Date::dateFormat(),'d/m/Y');
+        $this->assertEquals(Date::dateFormat(), 'd/m/Y');
         Date::datetimeFormat('d/m/Y H:i');
-        $this->assertEquals(Date::datetimeFormat(),'d/m/Y H:i');
+        $this->assertEquals(Date::datetimeFormat(), 'd/m/Y H:i');
         Date::timeFormat('H:i a');
-        $this->assertEquals(Date::timeFormat(),'H:i a');
+        $this->assertEquals(Date::timeFormat(), 'H:i a');
     }
 
     public function testConvertTimezone()
@@ -47,7 +48,6 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(Date::convertTimezone('foo', 'UTC', 'Europe/Madrid'));
     }
 
-
     public function testConvertFormat()
     {
         $this->assertEquals('2019-02-25', Date::convertFormat('25/02/2019', 'd/m/Y', 'Y-m-d'));
@@ -56,37 +56,41 @@ class DateTest extends \PHPUnit\Framework\TestCase
     
     public function testFormatArgs()
     {
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A']);
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A']);
         $this->assertEquals('19/03/2019 11:54 AM', Date::format('2019-03-19 11:54:00'));
-        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00','d/m/Y'));
+        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00', 'd/m/Y'));
 
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','timezone' => 'Europe/Madrid']);
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A','timezone' => 'Europe/Madrid']);
         $this->assertEquals('19-03-2019 12:54 PM', Date::format('2019-03-19 11:54:00', 'd-m-Y g:i A'));
-        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00','d/m/Y'));
+        $this->assertEquals('19/03/2019', Date::format('2019-03-19 11:54:00', 'd/m/Y'));
     }
 
-    public function testFormatFormat(){
+    public function testFormatFormat()
+    {
         // Test No TZ
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','time' =>'g:i A']);
-        $this->assertEquals('11-06-2019 4:00 PM', Date::format('2019-06-11 16:00:00','d-m-Y g:i A'));
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A','time' => 'g:i A']);
+        $this->assertEquals('11-06-2019 4:00 PM', Date::format('2019-06-11 16:00:00', 'd-m-Y g:i A'));
 
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','time' =>'g:i A','timezone' => 'Europe/Madrid']);
-        $this->assertEquals('11-06-2019 6:00 PM', Date::format('2019-06-11 16:00:00','d-m-Y g:i A'));
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A','time' => 'g:i A','timezone' => 'Europe/Madrid']);
+        $this->assertEquals('11-06-2019 6:00 PM', Date::format('2019-06-11 16:00:00', 'd-m-Y g:i A'));
     }
 
-    public function testFormatAutoDetect(){
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','time' =>'g:i A']);
+    public function testFormatAutoDetect()
+    {
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A','time' => 'g:i A']);
         $this->assertEquals('11/06/2019 4:00 PM', Date::format('2019-06-11 16:00:00'));
         $this->assertEquals('11/06/2019', Date::format('2019-06-11'));
         $this->assertEquals('4:00 PM', Date::format('16:00:00'));
+
+        $this->assertNull(Date::format('Invalid Date Format'));
     }
 
     public function testFormatDate()
     {
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A']);
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A']);
         $this->assertEquals('19/03/2019', Date::formatDate('2019-03-19'));
 
-        Date::locale(['date'=>'d/m/Y','datetime' => 'd/m/Y g:i A','timezone' => 'Europe/Madrid']);
+        Date::locale(['date' => 'd/m/Y','datetime' => 'd/m/Y g:i A','timezone' => 'Europe/Madrid']);
         $this->assertEquals('19/03/2019', Date::formatDate('2019-03-19'));
     }
 

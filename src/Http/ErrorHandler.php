@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -19,6 +20,7 @@
  * render json errors when json type detected.
  * Currently setting response->type json would not affect error handler
  */
+
 namespace Origin\Http;
 
 use Origin\Core\Debugger;
@@ -40,12 +42,18 @@ class FatalErrorException extends Exception
 class ErrorHandler
 {
     /**
-    * Holds the level maps
-    * The following error types cannot be handled with a user defined function: E_ERROR, E_PARSE, E_CORE_ERROR,
-    * E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING, and most of E_STRICT raised in the
-    * file where set_error_handler() is called.
-    * @var array
-    */
+     * If an error has been handled
+     *
+     * @var boolean
+     */
+    protected $handled = false;
+    /**
+     * Holds the level maps
+     * The following error types cannot be handled with a user defined function: E_ERROR, E_PARSE, E_CORE_ERROR,
+     * E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING, and most of E_STRICT raised in the
+     * file where set_error_handler() is called.
+     * @var array
+     */
     protected $levelMap = [
         E_ERROR => 'error',
         E_PARSE => 'error',
@@ -62,15 +70,17 @@ class ErrorHandler
         E_USER_DEPRECATED => 'deprecated',
         E_STRICT => 'strict'
     ];
-    
+
     /**
      * Registers the Error and Exception Handling.
+     *
+     * @return void
      */
-    public function register()
+    public function register(): void
     {
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
-        register_shutdown_function([$this,'handleFatalError']);
+        register_shutdown_function([$this, 'handleFatalError']);
     }
 
     /**
@@ -82,55 +92,66 @@ class ErrorHandler
      * post also set this
      * 3. If the .json extension is detected
      *
-     *
-     * @todo how to set content type to json then
      * @return boolean
      */
-    private function isAjax()
+    protected function isAjax(): bool
     {
+        $result = false;
         $request = Router::request();
         if ($request) {
-            return ($request->ajax() or $request->type() === 'json');
+            $result =($request->ajax() or $request->type() === 'json');
         }
-        return false;
+        return $result;
     }
 
-
     /**
-     * Handle Fatal Errors
+     * Shutdown function to check for fatal errors
      *
      * @return void
      */
-    public function handleFatalError()
+    public function handleFatalError(): void
     {
         $error = error_get_last();
-      
-        // Log Message
-        if ($error) {
-            $this->cleanBuffer();
-            $exception = new FatalErrorException($error['message'], 500, $error['file'], $error['line']);
-            $this->exceptionHandler($exception);
+        if (is_array($error) and in_array($error['type'], [E_PARSE,E_ERROR,E_USER_ERROR])) {
+            $this->fatalErrorHandler($error['type'], $error['message'], $error['file'], $error['line']);
         }
+    }
+
+    /**
+        * The fatal error handler
+        *
+        * @internal pay attention to security issues
+        * @param string $message error message
+        * @param string $file  Filename where the error was raised
+        * @param int  $line the corresponding line number
+        * @return void
+        */
+    public function fatalErrorHandler(int $level, string $message, string $file, int $line): void
+    {
+        $exception = new FatalErrorException($message, 500, $file, $line);
+        $this->exceptionHandler($exception);
     }
 
     /**
      * The error handler
+     *
      * @internal pay attention to security issues
      * @param string $message error message
      * @param string $file    Filename where the error was raised
      * @param int    $line    the corresponding line number
+     * @return void
      */
-    public function errorHandler($level, $message, $file, $line)
+    public function errorHandler(int $level, string $message, string $file, int $line): void
     {
         if (error_reporting() === 0) {
-            return null;
+            return;
         }
         /* Original Behavior - I prefer
         if (error_reporting() !== 0) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
         */
-   
+
         $error = $this->levelMap[$level];
 
         if (Configure::read('debug')) {
@@ -139,20 +160,22 @@ class ErrorHandler
         }
 
         # Log
-        $message = $message . ' in {file}, line: {line}';
-        $context = ['file' => $file, 'line' => $line];
         if ($error === 'deprecated' or $error === 'strict') {
             $error = 'notice';
         }
-        Log::write($error, $message, $context);
+        Log::write($error, $message . ' in {file}, line: {line}', [
+            'file' => $file, 'line' => $line
+            ]);
     }
 
-    public function exceptionHandler($exception)
+    /**
+     * Undocumented function
+     *
+     * @param Exception $exception
+     * @return void
+     */
+    public function exceptionHandler($exception) : void
     {
-        if ($this->isAjax()) {
-            return $this->ajaxExceptionHandler($exception);
-        }
-
         $errorCode = 500;
         if ($exception->getCode() === 404) {
             $errorCode = 404;
@@ -160,12 +183,19 @@ class ErrorHandler
 
         $this->logException($exception, $errorCode);
         $this->cleanBuffer();
-        if (Configure::read('debug')) {
-            return $this->debugException($exception);
+       
+        if ($this->isAjax()) {
+            $this->ajaxExceptionHandler($exception);
+        } elseif (Configure::read('debug') === true) {
+            $this->debugExceptionHandler($exception);
+        } else {
+            ob_start();
+            include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+            $response = ob_get_clean();
+            $this->sendResponse($response, $errorCode);
         }
-      
-        http_response_code($errorCode);
-        include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+     
+        $this->stop();
     }
 
     /**
@@ -174,30 +204,29 @@ class ErrorHandler
      * @param Exception $exception
      * @return void
      */
-    public function ajaxExceptionHandler($exception)
+    public function ajaxExceptionHandler($exception): void
     {
-        $this->cleanBuffer();
         $errorCode = $exception->getCode();
-        $response = ['error'=>['message'=>$exception->getMessage(),'code' => $errorCode ]];
-  
-        if (Configure::read('debug') === false and !$exception instanceof HttpException) {
+        $response = ['error' => ['message' => $exception->getMessage(), 'code' => $errorCode]];
+
+        if (Configure::read('debug') !== true and !$exception instanceof HttpException) {
             $errorCode = 500;
+            $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => $errorCode]];
             if ($exception->getCode() === 404) {
                 $errorCode = 404;
-            }
-            $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => 500]];
-            if ($errorCode === 404) {
-                $response = ['error' => ['message' => 'Not found', 'code' => 404]];
+                $response = ['error' => ['message' => 'Not found', 'code' => $errorCode]];
             }
         }
-
-        $this->logException($exception, $errorCode);
-        http_response_code($errorCode);
-        
-        echo json_encode($response);
+        $this->sendResponse(json_encode($response), $errorCode);
     }
 
-    private function logException($exception)
+    /**
+     * Logs The exception
+     *
+     * @param Exception $exception
+     * @return void
+     */
+    protected function logException($exception): void
     {
         $class = (new \ReflectionClass($exception))->getShortName();
         $message = $exception->getMessage();
@@ -205,7 +234,7 @@ class ErrorHandler
         $file =  str_replace(ROOT . DS, '', $exception->getFile());
 
         $message = "{$class} {$message} in {$file}:{$line}";
-        
+
         if ($exception instanceof \ErrorException) {
             Log::error($message);
         } else {
@@ -215,33 +244,54 @@ class ErrorHandler
 
     /**
      * Handles the debug output
-     * @param [type] $exception
+     *
+     * @param Exception $exception
      * @return void
      */
-    public function debugException($exception)
+    public function debugExceptionHandler($exception): void
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
-
+          
+        ob_start();
         include SRC . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
-
-        $this->stop();
+        $response = ob_get_clean();
+      
+        $this->sendResponse($response);
     }
 
     /**
      * Clean Buffer
-     *
+     * @codeCoverageIgnore
      * @internal when calling a function that does not exist on a helper from within an element it was still rendering
      * page. So to allow for nested i have added the while loop.
+     *
+     * @return void
      */
-    protected function cleanBuffer()
+    protected function cleanBuffer(): void
     {
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
     }
 
-    public function stop()
+    /**
+     * A wrapper to make it easier to test
+     * @codeCoverageIgnore
+     * @return void
+     */
+    protected function sendResponse(string $response = null, int $statusCode = 200) : void
+    {
+        http_response_code($statusCode);
+        echo $response;
+    }
+
+    /**
+     * A wrapper to make it easier to test
+     * @codeCoverageIgnore
+     * @return void
+     */
+    public function stop(): void
     {
         exit();
     }

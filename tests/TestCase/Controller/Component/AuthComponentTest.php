@@ -24,6 +24,7 @@ use Origin\Model\Entity;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Exception\ForbiddenException;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Exception\Exception;
 
 class MockAuthComponent extends AuthComponent
 {
@@ -31,6 +32,13 @@ class MockAuthComponent extends AuthComponent
 }
 class UsersController extends Controller
 {
+    /**
+     * Quick switch
+     *
+     * @var boolean
+     */
+    public $allow = false;
+
     public function initialize()
     {
         $this->loadComponent('Auth');
@@ -44,12 +52,27 @@ class UsersController extends Controller
     {
     }
 
+    public function admin()
+    {
+    }
+
     public function login()
     {
     }
     public function redirect($url, int $code = 302)
     {
-        return true;
+        return $this->response;
+    }
+    public function isAuthorized($user)
+    {
+        return $this->allow;
+    }
+}
+
+class MembersController extends Controller
+{
+    public function index()
+    {
     }
 }
 
@@ -113,6 +136,22 @@ class AuthComponentTest extends OriginTestCase
         $this->assertFalse($AuthComponent->isLoggedIn());
         $AuthComponent->Session->write('Auth.User', ['user_name' => 'james']);
         $this->assertTrue($AuthComponent->isLoggedIn());
+    }
+
+    public function testGetUser()
+    {
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->Session->write('Auth.User', ['user_name' => 'james']);
+        $this->assertEquals(['user_name' => 'james'], $AuthComponent->getUser());
+        $AuthComponent->Session->destroy();
+
+        $AuthComponent = $this->AuthComponent;
+        $AuthComponent->config('authenticate', ['Form']);
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+        
+        $result = $AuthComponent->getUser();
+        $this->assertEquals('James', $result['name']);
     }
 
     public function testIsPrivateOrProtected()
@@ -327,5 +366,110 @@ class AuthComponentTest extends OriginTestCase
         $this->Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($this->Controller);
         $this->assertNull($AuthComponent->startup());
+    }
+
+    public function testHashPassword()
+    {
+        $result = $this->AuthComponent->hashPassword('secret');
+        $this->assertStringStartsWith('$2y$10', $result);
+    }
+
+    public function testIsAuthorizedForm()
+    {
+        $request = new Request('/users/admin');
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->config('scope', ['name' !== 'nobody']); // test scope whilst at it
+        $this->assertNull($AuthComponent->startup());
+        $expected = [
+            'id' => '1000',
+            'name' => 'James',
+            'email' => 'james@example.com',
+            'password' => '$2y$10$V5RgkqQ6Onnxgz2rmEBJDuftS9DX7iD0qv8V3LlM0qDdTYK2Y3Fbq',
+            'api_token' => '43cbd312fd6eaf3480a4572aa988ada0f4c6310b',
+            'created' => '2018-12-20 09:00:15',
+            'modified' => null
+        ];
+      
+        $this->assertEquals($expected, $AuthComponent->getUser());
+    }
+
+    public function testIsAuthorizedAPI()
+    {
+        $request = new Request('/users/admin');
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->config('authenticate', ['Api']);
+        $AuthComponent->request()->query('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
+        $AuthComponent->config('scope', ['name' !== 'nobody']); // test scope whilst at it
+        $this->assertNull($AuthComponent->startup());
+        $expected = [
+            'id' => '1001',
+            'name' => 'Amanda',
+            'email' => 'amanda@example.com',
+            'password' => '$2y$10$YK3SO6y4O9ObgpLG6HH75e6o2uQFQxdQ3qbE8szwMCTpZxSao6H16',
+            'api_token' => 'dea50af153b77b3f3b725517ba18b5f0619fa4da',
+            'created' => '2018-12-20 09:00:30',
+            'modified' => null
+        ];
+        $this->assertEquals($expected, $AuthComponent->getUser());
+    }
+
+    public function testIsNotAuthorized()
+    {
+        $request = new Request('/users/admin');
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', '----');
+        
+        $this->assertInstanceOf(Response::class, $AuthComponent->startup());
+    }
+
+    public function testIsNotAuthorizedApi()
+    {
+        $request = new Request('/users/admin');
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->config('authenticate', ['Api']);
+        $AuthComponent->request()->query('api_token', '1234-5678-9012-3456-7890');
+        $this->expectException(ForbiddenException::class);
+        $AuthComponent->startup();
+    }
+
+    public function testIsAuthorizedController()
+    {
+        $request = new Request('/users/admin');
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->config('authenticate', ['Form','Controller']);
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+        $this->assertInstanceOf(Response::class, $AuthComponent->startup());
+      
+        $Controller = new UsersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $Controller->allow = true;
+        $this->assertNull($AuthComponent->startup());
+    }
+
+    public function testAuthorizeControllerException()
+    {
+        $request = new Request('/members/index');
+      
+        $Controller = new MembersController($request, new Response());
+        $AuthComponent = new MockAuthComponent($Controller);
+        $AuthComponent->config('authenticate', ['Form','Controller']);
+        $AuthComponent->request()->data('email', 'james@example.com');
+        $AuthComponent->request()->data('password', 'secret1');
+        $this->expectException(Exception::class); // MembersController does have an isAuthorized() method.
+        $AuthComponent->startup();
     }
 }

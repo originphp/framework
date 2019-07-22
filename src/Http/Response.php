@@ -19,7 +19,6 @@ use Origin\Exception\NotFoundException;
 
 class Response
 {
-
     /**
      * Holds the buffered output.
      *
@@ -73,7 +72,7 @@ class Response
      * Sets or gets the buffered output.
      *
      * @param string $content
-     * @return string body
+     * @return string|void body
      */
     public function body(string $content = null)
     {
@@ -86,8 +85,10 @@ class Response
 
     /**
      * Sets the headers and sends the response.
+     *
+     * @return void
      */
-    public function send()
+    public function send() : void
     {
         http_response_code($this->statusCode);
 
@@ -108,6 +109,7 @@ class Response
     /**
      * Checks the status of the response object to see if its ready to be used.
      * If body has already been sent or a file set then its nos longer in ready state.
+     *
      * @return bool
      */
     public function ready() : bool
@@ -116,10 +118,10 @@ class Response
     }
 
     /**
-     * Wrapper for exit. Mocked during testing.
+     * Wrapper to help with testing
      *
-     * @return void
      * @codeCoverageIgnore
+     * @return void
      */
     public function stop()
     {
@@ -142,7 +144,7 @@ class Response
      * Sets or gets the HTTP status code for sending.
      *
      * @param int $code
-     * @return int statusCode
+     * @return int|void statusCode
      */
     public function statusCode(int $code = null)
     {
@@ -160,10 +162,10 @@ class Response
      *  $response->header(['Accept-Encoding'=>'gzip,deflate']);
      *
      * @param string|array $header []
-     * @param mixed  $value
-     * @return bool
+     * @param mixed $value
+     * @return void
      */
-    public function header($header, $value = null)
+    public function header($header, $value = null) : void
     {
         if (is_string($header)) {
             $header = [$header=>$value];
@@ -172,8 +174,6 @@ class Response
         foreach ($header as $key => $value) {
             $this->headers[$key] = $value;
         }
-
-        return true;
     }
 
     /**
@@ -217,20 +217,20 @@ class Response
      *
      * @param string $name
      * @param string $value
+     * @return void
      */
-    private function sendHeader(string $name, $value = null)
+    protected function sendHeader(string $name, $value = null) : void
     {
-        // don't try to send headers if already sent!
-        if (headers_sent($file, $line)) {
-            return;
-        }
         $header = $name;
         if ($value) {
             $header = "{$name}: {$value}";
         }
-        // @codeCoverageIgnoreStart
-        header($header);
-        // @codeCoverageIgnoreEnd
+     
+        if (!headers_sent($file, $line)) {
+            // @codeCoverageIgnoreStart
+            header($header);
+            // @codeCoverageIgnoreEnd
+        }
     }
 
     /**
@@ -244,9 +244,9 @@ class Response
      * @param mixed $value
      * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
-     * @return mixed
+     * @return void
      */
-    public function cookie(string $name, $value, string $expire='+1 month', array $options = [])
+    public function cookie(string $name, $value, string $expire='+1 month', array $options = []) : void
     {
         $options += [
             'name' => $name,
@@ -263,7 +263,7 @@ class Response
     }
 
     /**
-     * Sets the content type
+     * Sets or gets the content type. You can use
      *
      *  // get the current content type
      *  $contentType = $response->type();
@@ -271,10 +271,8 @@ class Response
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
      *
-     *
-     *
      * @param string $contentType
-     * @return void
+     * @return mixed
      */
     public function type($contentType = null)
     {
@@ -310,7 +308,7 @@ class Response
      * @param array $options (name,download)
      * @return void
      */
-    public function file(string $filename, array $options=[])
+    public function file(string $filename, array $options=[]) : void
     {
         # Setup Options
         $options += ['name'=>null,'download'=>false,'type'=>null];
@@ -332,11 +330,18 @@ class Response
         $this->file = $filename;
     }
 
-    private function sendCookies()
+    /**
+     * Write the cookies
+     *
+     * @return void
+     */
+    protected function sendCookies() : void
     {
         $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {
+            // @codeCoverageIgnoreStart
             $cookie->write($name, $options['value'], $options['expire'], $options);
+            // @codeCoverageIgnoreEnd
         }
     }
 }

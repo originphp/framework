@@ -14,13 +14,13 @@
 
 namespace Origin\Core\Test;
 
-use Origin\TestSuite\OriginTestCase;
-
-use Origin\Model\ModelValidator;
 use Origin\Model\Model;
+
 use Origin\Model\Entity;
-use Origin\Model\Exception\ValidatorException;
 use Origin\Model\ModelRegistry;
+use Origin\Model\ModelValidator;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Exception\ValidatorException;
 
 class Widget extends Model
 {
@@ -38,7 +38,7 @@ class MockValidator extends ModelValidator
             return $this->{$method}();
         }
 
-        return call_user_func_array(array($this, $method), $args);
+        return call_user_func_array([$this, $method], $args);
     }
 }
 
@@ -48,14 +48,14 @@ class ModelValidatorTest extends OriginTestCase
 
     protected function setUp(): void
     {
-        $Post = new Model(array('name' => 'Post'));
+        $Post = new Model(['name' => 'Post']);
         $this->Validator = new MockValidator($Post);
 
         // Add Non Existant Model to registry - if mock then create class above
         $this->Article = new Model([
-            'name'=>'Article',
-            'datasource'=>'test'
-            ]);
+            'name' => 'Article',
+            'datasource' => 'test',
+        ]);
         ModelRegistry::set('Article', $this->Article);
     }
 
@@ -64,15 +64,15 @@ class ModelValidatorTest extends OriginTestCase
      */
     public function testPrepareRules()
     {
-        $rules = array(
-        'field1' => 'email',
-        'field2' => array(
-            'rule' => array('minLength', '10'),
-            'message' => 'Minimum 10 characters long',
-        ),
-      );
+        $rules = [
+            'field1' => 'email',
+            'field2' => [
+                'rule' => ['minLength', '10'],
+                'message' => 'Minimum 10 characters long',
+            ],
+        ];
         $this->Validator->rules($rules);
-        $result =  $this->Validator->rules();
+        $result = $this->Validator->rules();
 
         $this->assertEquals('email', $result['field1']['rule1']['rule']);
         $this->assertArrayHasKey('message', $result['field2']['rule1']);
@@ -81,19 +81,32 @@ class ModelValidatorTest extends OriginTestCase
     public function testValidationRuleString()
     {
         $Validator = $this->Validator;
-        $validate = array(
-        'value' => array(
-            'rule' => 'numeric',
-            'message' => 'This value must be an integer',
-        ),
-      );
+        $validate = [
+            'value' => [
+                'rule' => 'numeric',
+                'message' => 'This value must be an integer',
+            ],
+        ];
 
         $Validator->rules($validate);
-        $data = new Entity(array('value' => 'some string'));
+        $data = new Entity(['value' => 'some string']);
         $this->assertFalse($Validator->validates($data));
 
-        $data = new Entity(array('value' => 256));
+        $data = new Entity(['value' => 256]);
         $this->assertTrue($Validator->validates($data));
+    }
+
+    public function testValidationFileUploadIsBlank()
+    {
+        $Validator = $this->Validator;
+ 
+        $Validator->rules([
+            'file' => ['rule' => 'upload'],
+        ]);
+
+        $entity = new Entity(['file' => ['tmp_name' => null,'error' => UPLOAD_ERR_NO_FILE]]);
+
+        $this->assertFalse($Validator->validates($entity));
     }
 
     public function testValidatesRequired()
@@ -101,8 +114,8 @@ class ModelValidatorTest extends OriginTestCase
         $Validator = $this->Validator;
  
         $Validator->rules([
-            'name' => ['rule' => 'notBlank']
-            ]);
+            'name' => ['rule' => 'notBlank'],
+        ]);
             
         $create = true;
         $update = false;
@@ -113,8 +126,8 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
        
         $Validator->rules([
-            'name' => ['rule' => 'notBlank','on' => 'create']
-            ]);
+            'name' => ['rule' => 'notBlank','on' => 'create'],
+        ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
@@ -122,8 +135,8 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->validates(new Entity(['name' => null]), $update));
 
         $Validator->rules([
-            'name' => ['rule' => 'notBlank','on' => 'update']
-            ]);
+            'name' => ['rule' => 'notBlank','on' => 'update'],
+        ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'some string']), $create));
         $this->assertTrue($Validator->validates(new Entity(['name' => null]), $create));
@@ -136,20 +149,19 @@ class ModelValidatorTest extends OriginTestCase
         $Validator = $this->Validator;
         $Validator->rules([
             'name' => 'alphaNumeric',
-            'email' => ['rule'=>'email','required'=>false]
-            ]);
+            'email' => ['rule' => 'email','required' => false],
+        ]);
 
         $entity = new Entity(['name' => 'data']);
         $this->assertTrue($Validator->validates($entity));
 
         $Validator->rules([
             'name' => 'alphaNumeric',
-            'email' => ['rule'=>'email','required'=>true]
-            ]);
+            'email' => ['rule' => 'email','required' => true],
+        ]);
         $this->assertFalse($Validator->validates($entity));
 
-        
-        $entity = new Entity(['name' => 'data','email'=>'js@example.com']);
+        $entity = new Entity(['name' => 'data','email' => 'js@example.com']);
         $this->assertTrue($Validator->validates($entity));
     }
 
@@ -158,8 +170,8 @@ class ModelValidatorTest extends OriginTestCase
         $Validator = $this->Validator;
  
         $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric','required'=>true]
-            ]);
+            'name' => ['rule' => 'alphaNumeric','required' => true],
+        ]);
             
         $create = true;
         $update = false;
@@ -170,8 +182,8 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $update));
        
         $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric','on' => 'create','required'=>true]
-            ]);
+            'name' => ['rule' => 'alphaNumeric','on' => 'create','required' => true],
+        ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
         $this->assertFalse($Validator->validates(new Entity(['name' => null]), $create));
@@ -179,8 +191,8 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->validates(new Entity(['name' => null]), $update));
 
         $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric','on' => 'update','required'=>true]
-            ]);
+            'name' => ['rule' => 'alphaNumeric','on' => 'update','required' => true],
+        ]);
     
         $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
         $this->assertTrue($Validator->validates(new Entity(['name' => null]), $create));
@@ -191,37 +203,37 @@ class ModelValidatorTest extends OriginTestCase
     public function testValidationRuleArray()
     {
         $Validator = $this->Validator;
-        $validationRules = array(
-            'framework' => array(
-                'rule' => array('equalTo', 'origin'),
+        $validationRules = [
+            'framework' => [
+                'rule' => ['equalTo', 'origin'],
                 'message' => 'This value must be origin',
-            ),
-        );
+            ],
+        ];
 
         $Validator->rules($validationRules);
-        $data = new Entity(array('framework' => 'something else'));
+        $data = new Entity(['framework' => 'something else']);
         $this->assertFalse($Validator->validates($data));
 
-        $data = new Entity(array('framework' => 'origin'));
+        $data = new Entity(['framework' => 'origin']);
         $this->assertTrue($Validator->validates($data));
 
-        $validationRules = array(
-            'framework' => '/^[a-zA-Z ]+$/'
-        );
+        $validationRules = [
+            'framework' => '/^[a-zA-Z ]+$/',
+        ];
         $Validator->rules($validationRules);
-        $data = new Entity(array('framework' => 'origin'));
+        $data = new Entity(['framework' => 'origin']);
         $this->assertTrue($Validator->validates($data));
     }
 
     public function testUnkownValidationRule()
     {
         $this->expectException(ValidatorException::class);
-        $rules = array(
+        $rules = [
           
-            'name' => 'php'
-        );
+            'name' => 'php',
+        ];
         $this->Validator->rules($rules);
-        $data = new Entity(array('name' => 'abc'));
+        $data = new Entity(['name' => 'abc']);
         $this->Validator->validates($data);
     }
 
@@ -304,7 +316,7 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertTrue($Validator->extension('Logo.JPG', ['gif', 'png', 'jpg']));
         $this->assertFalse($Validator->extension('bootstrap.js', 'css'));
 
-        $post = ['name'=>'bootstrap.css'];
+        $post = ['name' => 'bootstrap.css'];
         $this->assertTrue($Validator->extension($post, 'css'));
     }
 
@@ -436,8 +448,10 @@ class ModelValidatorTest extends OriginTestCase
     public function testMimeType()
     {
         $Validator = $this->Validator;
-        $post = ['tmp_name'=> ORIGIN . DS .'phpunit.xml.dist'];
+        $post = ['tmp_name' => ORIGIN . DS .'phpunit.xml.dist'];
+        $this->assertTrue($Validator->mimeType($post, 'text/xml'));
         $this->assertTrue($Validator->mimeType($post, ['text/xml']));
+        $this->assertFalse($Validator->mimeType($post, 'text/plain'));
         $this->assertFalse($Validator->mimeType($post, ['text/plain']));
 
         $this->assertTrue($Validator->mimeType(ORIGIN . DS .'phpunit.xml.dist', ['text/xml']));
@@ -446,11 +460,11 @@ class ModelValidatorTest extends OriginTestCase
     public function testFileUpload()
     {
         $Validator = $this->Validator;
-        $post = ['tmp_name'=>null,'error'=>UPLOAD_ERR_NO_FILE];
+        $post = ['tmp_name' => null,'error' => UPLOAD_ERR_NO_FILE];
         $this->assertFalse($Validator->upload($post));
         $this->assertTrue($Validator->upload($post, true));
 
-        $post = ['tmp_name'=>null,'error'=>UPLOAD_ERR_OK];
+        $post = ['tmp_name' => null,'error' => UPLOAD_ERR_OK];
         $this->assertTrue($Validator->upload($post));
     }
 
@@ -459,7 +473,7 @@ class ModelValidatorTest extends OriginTestCase
      */
     public function testIsUnique()
     {
-        $this->Article->validate('id', ['rule'=> 'isUnique']);
+        $this->Article->validate('id', ['rule' => 'isUnique']);
         $article = $this->Article->new();
         $article->id = 1;
         $this->assertTrue($this->Article->validates($article));
@@ -468,7 +482,7 @@ class ModelValidatorTest extends OriginTestCase
         $article->id = 1000;
         $this->assertFalse($this->Article->validates($article));
  
-        $this->Article->validate('id', ['rule'=> ['isUnique',['id','title']]]);
+        $this->Article->validate('id', ['rule' => ['isUnique',['id','title']]]);
         $article = $this->Article->new();
         $article->id = 1000;
         $article->title = 'Article #1';
@@ -484,21 +498,21 @@ class ModelValidatorTest extends OriginTestCase
     {
         $this->Article->validate('title', 'email');
     
-        $article = $this->Article->new(['title'=>'']);
+        $article = $this->Article->new(['title' => '']);
         $this->assertFalse($this->Article->validates($article));
 
-        $this->Article->validate('title', ['rule'=>'email','required'=>true]);
-        $article = $this->Article->new(['title'=>'']);
+        $this->Article->validate('title', ['rule' => 'email','required' => true]);
+        $article = $this->Article->new(['title' => '']);
         $this->Article->validates($article);
 
         $this->assertFalse($this->Article->validates($article));
 
-        $this->Article->validate('title', ['rule'=>'email','allowBlank'=>true]);
-        $article = $this->Article->new(['title'=>'']);
+        $this->Article->validate('title', ['rule' => 'email','allowBlank' => true]);
+        $article = $this->Article->new(['title' => '']);
         $this->assertTrue($this->Article->validates($article));
         
         $this->Article->validate('body', 'alphanumeric');
-        $article = $this->Article->new(['title'=>'','body'=>['bad data']]);
+        $article = $this->Article->new(['title' => '','body' => ['bad data']]);
         $this->assertFalse($this->Article->validates($article));
     }
 }

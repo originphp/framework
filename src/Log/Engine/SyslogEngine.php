@@ -69,7 +69,7 @@ class SyslogEngine extends BaseEngine
         if (isset($this->levelMap[$level])) {
             $priority = $this->levelMap[$level];
         }
-        $this->write($priority, $message);
+        return $this->write($priority, $message);
     }
 
     /**

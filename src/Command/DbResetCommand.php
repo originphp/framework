@@ -37,11 +37,8 @@ class DbResetCommand extends Command
     public function execute()
     {
         $datasource = $this->options('datasource');
-        $name = $this->arguments('name');
-        if ($name === null) {
-            $name = 'schema';
-        }
-    
+        $name = $this->arguments('name')??'schema';
+
         $this->runCommand('db:drop', [
             '--datasource' => $datasource
         ]);

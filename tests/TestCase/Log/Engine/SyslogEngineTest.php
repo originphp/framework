@@ -44,8 +44,18 @@ class SyslogEngineTest extends \PHPUnit\Framework\TestCase
     {
         $engine = new MockSyslogEngine();
         $id = uniqid();
-        $engine->log('error', 'Error code {value}', ['value'=>$id]);
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
         $date = date('Y-m-d G:i:s');
         $this->assertContains("3:[{$date}] application ERROR: Error code {$id}", $engine->written);
+    }
+
+    /**
+     * Just test that tests are run
+     *
+     * @return void
+     */
+    public function testLogAddDebug(){
+        $enigne = new SyslogEngine();
+        $this->assertTrue($enigne->log('debug','SyslogEngineTest run'));
     }
 }

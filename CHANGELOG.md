@@ -27,12 +27,24 @@ Delete tag: git tag -d <tag_name>
 - Entity modified(fieldname) to check if field was modified
 
 ### Fixed
+Taking the code coverage from 90%-97*% has been difficult but worthwhile.
+
+- Fixed starts/ends and Text:beginsWith, Text::endsWith returned true when empty string was used
+- Fixed SFTP engine loading private key from file
+- Fixed prepare results adding blank records when foreignKey is invalid
+- Fixed Migration checkColumn checking if nullable
+- Migration with pgsql did not drop null and default values
+- Fixed bug with PgsqlSchema:change column not configuring type
+- Fixed added deprecation warning, for previous deprecated feature which used fallback instead.
+- Fixed session engine had a legacy function reset, which has been deprecated instead of removed.
+- Fixed unpacking arrays from cookies
+- Fixed migration FetchRow/FetchAll feature
 - Fixed router adding route with args
 - Fixed Markdown::toHtml code block issues
 
 ### Security
 - Added escaping to Html:fromText
-- Tigthened Session security
+- Tightened Session security
 - Markdown::toHtml runs result through Html:sanitize for protection
 
 ## [1.23.0] - 2019-07-12

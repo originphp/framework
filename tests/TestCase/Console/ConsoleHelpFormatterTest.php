@@ -15,6 +15,12 @@
 namespace Origin\Test\Console;
 
 use Origin\Console\ConsoleHelpFormatter;
+use Origin\TestSuite\TestTrait;
+
+class MockConsoleHelperFormatter extends ConsoleHelpFormatter
+{
+    use TestTrait;
+}
 
 class ConsoleHelpFormatterTest extends \PHPUnit\Framework\TestCase
 {

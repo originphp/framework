@@ -29,6 +29,7 @@ class MockHttp extends Http
         if ($this->response) {
             return $this->response;
         }
+
         return new Response();
     }
     public function response($response = null)
@@ -46,6 +47,7 @@ class MockHttp extends Http
         if (isset($this->options[$key])) {
             return $this->options[$key];
         }
+
         return null;
     }
 }
@@ -55,21 +57,20 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testBuildOptionsUrl()
     {
         $http = new MockHttp();
-        $http->get('https://www.google.com', ['query'=>['q'=>'keyword']]);
+        $http->get('https://www.google.com', ['query' => ['q' => 'keyword']]);
         $this->assertEquals('https://www.google.com?q=keyword', $http->options(CURLOPT_URL));
 
         $http = new MockHttp([
-            'base'=>'http://www.someapi.com/api/'
-            ]);
+            'base' => 'http://www.someapi.com/api/',
+        ]);
         $http->get('posts');
         $this->assertEquals('http://www.someapi.com/api/posts', $http->options(CURLOPT_URL));
     }
   
-   
     public function testBuildOptionsHeaders()
     {
         $http = new MockHttp();
-        $options = ['headers'=>['Foo'=>'bar']];
+        $options = ['headers' => ['Foo' => 'bar']];
         $http->get('https://www.example.com/posts', $options);
         $this->assertNotEmpty($http->options(CURLOPT_HTTPHEADER));
         $this->assertEquals(['Foo: bar'], $http->options(CURLOPT_HTTPHEADER));
@@ -77,7 +78,7 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testBuildOptionsCookies()
     {
         $http = new MockHttp();
-        $options = ['cookies'=>['Foo'=>'bar','Bar'=>'foo']];
+        $options = ['cookies' => ['Foo' => 'bar','Bar' => 'foo']];
         $http->get('https://www.example.com/posts', $options);
 
         $this->assertEquals(['Cookie: Foo=bar; Bar=foo'], $http->options(CURLOPT_HTTPHEADER));
@@ -85,22 +86,21 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testPersistCookies()
     {
         $http = new MockHttp();
-        $options = ['cookies'=>['Foo'=>'bar']];
+        $options = ['cookies' => ['Foo' => 'bar']];
         $http->get('https://www.example.com/posts', $options);
      
-       
-        $this->assertEquals(['name'=>'Foo','value'=>'bar'], $http->cookies('Foo'));
+        $this->assertEquals(['name' => 'Foo','value' => 'bar'], $http->cookies('Foo'));
         $this->assertEquals(['Cookie: Foo=bar'], $http->options(CURLOPT_HTTPHEADER));
         $http->get('https://www.example.com/posts');
 
-        $this->assertEquals(['name'=>'Foo','value'=>'bar'], $http->cookies('Foo'));
+        $this->assertEquals(['name' => 'Foo','value' => 'bar'], $http->cookies('Foo'));
         $this->assertEquals(['Cookie: Foo=bar'], $http->options(CURLOPT_HTTPHEADER));
     }
 
     public function testBuildOptionsType()
     {
         $http = new MockHttp();
-        $options = ['type'=>'json'];
+        $options = ['type' => 'json'];
         $http->get('https://www.example.com/posts', $options);
         $this->assertEquals(['Accept: application/json','Content-Type: application/json'], $http->options(CURLOPT_HTTPHEADER));
     }
@@ -121,8 +121,8 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->get('https://www.example.com/posts', [
-            'userAgent'=>'OriginPHP','referer'=>'https://www.google.com','redirect'=>true
-            ]);
+            'userAgent' => 'OriginPHP','referer' => 'https://www.google.com','redirect' => true,
+        ]);
         $this->assertEquals('OriginPHP', $http->options(CURLOPT_USERAGENT));
         $this->assertEquals('https://www.google.com', $http->options(CURLOPT_REFERER));
         $this->assertTrue($http->options(CURLOPT_FOLLOWLOCATION));
@@ -132,8 +132,8 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->get('https://www.example.com/posts', [
-            'verbose'=>true
-            ]);
+            'verbose' => true,
+        ]);
         $this->assertEquals(true, $http->options(CURLOPT_VERBOSE));
     }
 
@@ -141,18 +141,18 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->post('https://www.example.com/posts', [
-           'fields' => [ 'title'=>'Article title','body' => 'Article body']
-            ]);
+            'fields' => ['title' => 'Article title','body' => 'Article body'],
+        ]);
         $this->assertEquals('title=Article+title&body=Article+body', $http->options(CURLOPT_POSTFIELDS));
 
         $http->post('https://www.example.com/posts', [
-            'fields' => [ 'title'=>'Article title','body' => 'Article body'],
-            'type'=>'json'
+            'fields' => ['title' => 'Article title','body' => 'Article body'],
+            'type' => 'json',
         ]);
         $this->assertEquals('{"title":"Article title","body":"Article body"}', $http->options(CURLOPT_POSTFIELDS));
 
         $http->post('https://www.example.com/upload', [
-            'fields' => ['file' => '@' . ROOT . DS . 'README.md']
+            'fields' => ['file' => '@' . ROOT . DS . 'README.md'],
         ]);
         $this->assertContains(
             '%2FREADME.md&file%5Bmime%5D=text%2Fplain&file%5Bpostname%5D=README.md',
@@ -161,15 +161,15 @@ class HttpTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(NotFoundException::class);
         $http->post('https://www.example.com/upload', [
-            'fields' => ['file' => '@/does_not_exist/passwords.txt']
+            'fields' => ['file' => '@/does_not_exist/passwords.txt'],
         ]);
     }
 
     public function testBuildOptionsCookieJar()
     {
         $http = new MockHttp([
-            'cookieJar'=> sys_get_temp_dir() . DS . 'cookieJar'
-            ]);
+            'cookieJar' => sys_get_temp_dir() . DS . 'cookieJar',
+        ]);
         $http->get('https://www.example.com/posts');
    
         $this->assertEquals(sys_get_temp_dir() . DS . 'cookieJar', $http->options(CURLOPT_COOKIEFILE));
@@ -180,13 +180,13 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->get('https://www.example.com/posts', [
-            'auth' => ['username'=>'foo','password'=>'bar','type'=>'basic']
-            ]);
+            'auth' => ['username' => 'foo','password' => 'bar','type' => 'basic'],
+        ]);
         $this->assertEquals(CURLAUTH_BASIC, $http->options(CURLOPT_HTTPAUTH));
         $this->assertEquals('foo:bar', $http->options(CURLOPT_USERPWD));
         $http->get('https://www.example.com/posts', [
-            'auth' => ['username'=>'foo','password'=>'bar','type'=>'digest']
-            ]);
+            'auth' => ['username' => 'foo','password' => 'bar','type' => 'digest'],
+        ]);
         $this->assertEquals(CURLAUTH_DIGEST, $http->options(CURLOPT_HTTPAUTH));
     }
 
@@ -194,18 +194,18 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     {
         $http = new MockHttp();
         $http->get('https://www.example.com/posts', [
-            'proxy' => ['proxy'=>'192.168.1.7:1000']
-            ]);
+            'proxy' => ['proxy' => '192.168.1.7:1000'],
+        ]);
         $this->assertEquals('192.168.1.7:1000', $http->options(CURLOPT_PROXY));
         $http->get('https://www.example.com/posts', [
-            'proxy' => ['proxy'=>'192.168.1.7:2000','username'=>'foo','password'=>'bar']
-            ]);
+            'proxy' => ['proxy' => '192.168.1.7:2000','username' => 'foo','password' => 'bar'],
+        ]);
         $this->assertEquals('192.168.1.7:2000', $http->options(CURLOPT_PROXY));
         $this->assertEquals('foo:bar', $http->options(CURLOPT_PROXYUSERPWD));
 
         $http->get('https://www.example.com/posts', [
-            'proxy' => ['proxy'=>'192.168.1.7:2000','username'=>'1234-5678']
-            ]);
+            'proxy' => ['proxy' => '192.168.1.7:2000','username' => '1234-5678'],
+        ]);
         $this->assertEquals('1234-5678:', $http->options(CURLOPT_PROXYUSERPWD));
     }
 
@@ -214,8 +214,8 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http = new MockHttp();
         //
         $http->get('https://www.example.com/posts', [
-            'curl' => ['safe_upload'=>true]
-            ]);
+            'curl' => ['safe_upload' => true],
+        ]);
         $this->assertTrue($http->options(CURLOPT_SAFE_UPLOAD));
     }
 
@@ -251,10 +251,10 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testPost()
     {
         $http = new Http();
-        $data = ['title'=>'curl post test','body'=>'A simple test for curl posting','userId'=>1234];
+        $data = ['title' => 'curl post test','body' => 'A simple test for curl posting','userId' => 1234];
         
         $response = $http->post('https://jsonplaceholder.typicode.com/posts', [
-            'fields' => $data
+            'fields' => $data,
         ]);
  
         $this->assertInstanceOf(Response::class, $response);
@@ -269,9 +269,9 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testPut()
     {
         $http = new Http();
-        $data = ['title'=>'curl put test','body'=>'A simple test for curl putting','userId'=>1234];
+        $data = ['title' => 'curl put test','body' => 'A simple test for curl putting','userId' => 1234];
         
-        $response = $http->put('https://jsonplaceholder.typicode.com/posts/1', ['fields'=>$data]);
+        $response = $http->put('https://jsonplaceholder.typicode.com/posts/1', ['fields' => $data]);
         $this->assertInstanceOf(Response::class, $response);
       
         $result = json_decode($response->body()); // test using body
@@ -284,9 +284,9 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testPatch()
     {
         $http = new Http();
-        $data = ['title'=>'curl patch test'];
+        $data = ['title' => 'curl patch test'];
         
-        $response = $http->patch('https://jsonplaceholder.typicode.com/posts/1', ['fields'=>$data]);
+        $response = $http->patch('https://jsonplaceholder.typicode.com/posts/1', ['fields' => $data]);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->success());
         $result = json_decode($response->body()); // test using body
@@ -309,8 +309,12 @@ class HttpTest extends \PHPUnit\Framework\TestCase
     public function testCookies()
     {
         $http = new Http();
+        $this->assertEmpty($http->cookies());
         $response = $http->get('http://www.cnbc.com');
+
         $cookies = $response->cookies();
         $this->assertNotEmpty($cookies['region']['value']);
+        $this->assertNotEmpty($http->cookies('region'));
+        $this->assertNull($http->cookies('password'));
     }
 }

@@ -36,6 +36,7 @@ class DateHelper extends Helper
         if ($dateString) {
             return Date::format($dateString, $format);
         }
+
         return null;
     }
 
@@ -78,15 +79,19 @@ class DateHelper extends Helper
             1 => 'second',
         ];
 
+        $result = null;
         foreach ($conditions as $seconds => $type) {
             $result = $difference / $seconds;
-            if ($result  >= 1) {
+            if ($result >= 1) {
                 $final = round($result);
                 if ($final > 1) {
                     $type .= 's'; // inflect
                 }
-                return "{$final} {$type}" . ($isFuture === false ? ' ago' : '');
+                $result = "{$final} {$type}" . ($isFuture === false ? ' ago' : '');
+                break;
             }
         }
+
+        return $result;
     }
 }

@@ -130,9 +130,10 @@ class ConsoleIo
         if (is_array($message)) {
             $message = implode("\n", $message);
         }
-        $this->stdout->write("\033[{$this->lastWrittenLength}D", false);
-    
-        $difference = strlen($message) - $this->lastWrittenLength;
+        $backspaces = str_repeat("\x08", (int) $this->lastWrittenLength); // "\033[{$this->lastWrittenLength}D"
+        $this->stdout->write($backspaces, false);
+       
+        $difference = strlen($message) - (int) $this->lastWrittenLength;
         if ($difference > 0) {
             $message .= str_repeat(' ', $difference);
         }
@@ -332,13 +333,13 @@ class ConsoleIo
      *
      * @param integer $value
      * @param integer $max
-     * @param array $options (color) e.g. [color=>cyan]
+     * @param array $options (color,ansi:boolean) e.g. [color=>cyan]
      * @return void
      * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
     public function progressBar(int $value, int $max, array $options=[]) : void
     {
-        $options += ['color'=>'green'];
+        $options += ['color'=>'green','ansi'=>$this->stdout->supportsAnsi()];
         
         $progressBar = '';
         $full = '#';
@@ -347,9 +348,8 @@ class ConsoleIo
         $percent = floor(($value / $max) * 100);
         $left = 100 - $percent;
 
-        $ansi = $this->stdout->supportsAnsi();
-
-        if ($ansi) {
+  
+        if ($options['ansi']) {
             $full = $this->format(' ', ['background'=>$options['color']]);
             $empty = "\033[30;40m \033[0m";
         }
@@ -364,7 +364,7 @@ class ConsoleIo
         }
         
         $progress = $percent . '%';
-        if ($ansi) {
+        if ($options['ansi']) {
             $progress = $this->format($progress, $options);
         } else {
             $progressBar = "[{$progressBar}]";
