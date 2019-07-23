@@ -47,9 +47,12 @@ class Session
     
         $config = [
             'session.save_path' => TMP . DS . 'sessions',
-            'session.cookie_secure' => 1,
             'session.cookie_httponly' => 1,
         ];
+
+        if (env('HTTPS')) {
+            $config['session.cookie_secure'] = 1;
+        }
 
         if (! $this->started() and ! headers_sent()) {
             $this->setIniConfig($config);
