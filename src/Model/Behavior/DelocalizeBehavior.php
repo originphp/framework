@@ -52,12 +52,10 @@ class DelocalizeBehavior extends Behavior
         $schema = $this->model()->schema();
         foreach ($entity->modified() as $field) {
             $value = $entity->get($field);
-            if ($value) {
-                $type = null;
-                if (isset($schema[$field])) {
-                    $type = $schema[$field]['type'];
-                }
+            if ($value and isset($schema[$field])) {
+                $type = $schema[$field]['type'];
                 $value = $this->processField($type, $value);
+                
                 // Restore value incase of invalid value etc
                 if ($value === null) {
                     $value = $entity->get($field);
@@ -65,6 +63,7 @@ class DelocalizeBehavior extends Behavior
                 $entity->set($field, $value);
             }
         }
+
         return $entity;
     }
 
@@ -86,9 +85,10 @@ class DelocalizeBehavior extends Behavior
         if ($type === 'time') {
             $value = Date::parseTime($value);
         }
-        if (in_array($type, ['number','decimal','integer'])) {
+        if (in_array($type, ['decimal','integer','float','bigint'])) {
             return Number::parse($value);
         }
+
         return $value;
     }
 }
