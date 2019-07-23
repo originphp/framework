@@ -20,7 +20,7 @@ trait EngineTestTrait
 {
     public function testWrite()
     {
-        $data = uuid();
+        $data = md5(uniqid());
 
         $this->assertTrue($this->engine()->write('foo.txt', $data));
         $this->assertTrue($this->engine()->write('folder/bar.txt', $data));
@@ -42,7 +42,7 @@ trait EngineTestTrait
     }
 
     /**
-     * @depends testWrite
+     * @depends testExists
      */
     public function testRead($data)
     {
@@ -53,16 +53,20 @@ trait EngineTestTrait
         $this->engine()->read('passwords.txt');
     }
 
+    /**
+     * @depends testWrite
+     */
     public function testList()
     {
         $files = $this->engine()->list();
 
+        $this->assertTrue($this->engine()->exists('foo.txt'));
         // Test Format
         $foo = $this->getFile('foo.txt', $files);
         $expected = [
             'name' => 'foo.txt',
             'timestamp' => 1559996145,
-            'size' => 36,
+            'size' => 32,
         ];
         $this->assertEquals($expected, $foo);
         // Test Contents
