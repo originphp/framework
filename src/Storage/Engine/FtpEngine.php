@@ -108,14 +108,14 @@ class FtpEngine extends BaseEngine
         $filename = $this->addPathPrefix($name);
 
         $path = pathinfo($filename, PATHINFO_DIRNAME);
-        pr([$name,$filename,$path]);
-        if (! ftp_chdir($this->connection, $path)) {
+       
+        if (! @ftp_chdir($this->connection, $path)) {
             $this->mkdir($path);
         }
         $stream = fopen('php://temp', 'w+b'); // +b force binary
         fwrite($stream, $data);
         rewind($stream);
-        $result = ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
+        $result = @ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
         fclose($stream);
 
         return $result;
