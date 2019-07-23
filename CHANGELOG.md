@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
+## [1.24.0] - 2019-07-23
 ### Added
 - Added Schema::addIndex Type option to allow for creating fulltext indexes
 - Entity modified(fieldname) to check if field was modified
