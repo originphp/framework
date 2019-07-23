@@ -77,6 +77,10 @@ class SftpEngine extends BaseEngine
         if ($this->config('root') === null) {
             $this->config('root', $this->connection->pwd());
         }
+
+        if (! $this->connection->is_dir($this->config('root'))) {
+            throw new InvalidArgumentException(sprintf('Invalid root %s.', $this->config('root')));
+        }
     }
 
     /**

@@ -14,19 +14,22 @@
 
 namespace Origin\Storage\Engine;
 
-use Origin\Storage\Engine\BaseEngine;
-use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
+use \RecursiveDirectoryIterator;
 use Origin\Exception\NotFoundException;
+use Origin\Exception\InvalidArgumentException;
 
 class LocalEngine extends BaseEngine
 {
-    protected $defaultConfig =[
-        'root' => APP . DS . 'storage'
+    protected $defaultConfig = [
+        'root' => APP . DS . 'storage',
     ];
 
     public function initialize(array $config)
     {
+        if (! file_exists($this->config('root')) and ! is_dir($this->config('root'))) {
+            throw new InvalidArgumentException(sprintf('Invalid root %s.', $this->config('root')));
+        }
     }
 
     /**
@@ -57,9 +60,10 @@ class LocalEngine extends BaseEngine
         $filename = $this->addPathPrefix($name);
 
         $folder = pathinfo($filename, PATHINFO_DIRNAME);
-        if (!file_exists($folder)) {
+        if (! file_exists($folder)) {
             mkdir($folder, 0744, true);
         }
+
         return (bool) file_put_contents($filename, $data, LOCK_EX);
     }
 
@@ -82,6 +86,7 @@ class LocalEngine extends BaseEngine
             if (is_dir($filename)) {
                 return $this->rmdir($filename, true);
             }
+
             return unlink($filename);
         }
         throw new NotFoundException(sprintf('%s does not exist', $name));
@@ -96,6 +101,7 @@ class LocalEngine extends BaseEngine
     public function exists(string $name)
     {
         $filename = $this->addPathPrefix($name);
+
         return file_exists($filename);
     }
 
@@ -111,18 +117,18 @@ class LocalEngine extends BaseEngine
         if (file_exists($directory)) {
             $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
 
-       
             $files = [];
             foreach ($rii as $file) {
                 if ($file->isDir()) {
                     continue;
                 }
-                $files[]  = [
+                $files[] = [
                     'name' => str_replace($directory . DS, '', $file->getPathname()),
-                    'timestamp' =>  $file->getMTime(),
-                    'size' => $file->getSize()
+                    'timestamp' => $file->getMTime(),
+                    'size' => $file->getSize(),
                 ];
             }
+
             return $files;
         }
         throw new NotFoundException('directory does not exist');
@@ -146,6 +152,7 @@ class LocalEngine extends BaseEngine
                 unlink($directory . DS . $filename);
             }
         }
+
         return @rmdir($directory);
     }
 
@@ -161,6 +168,7 @@ class LocalEngine extends BaseEngine
         if ($path) {
             $location .= DS . $path;
         }
+
         return $location;
     }
 }

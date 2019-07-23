@@ -14,6 +14,7 @@
 namespace Origin\Test\Storage\Engine;
 
 use Origin\Storage\Engine\LocalEngine;
+use Origin\Exception\InvalidArgumentException;
 
 include_once 'EngineTestTrait.php'; // @todo recreate test with providers maybe
 
@@ -25,12 +26,21 @@ class LocalEngineTest extends \PHPUnit\Framework\TestCase
     public function engine()
     {
         if ($this->engine === null) {
-            $this->engine =  new LocalEngine();
+            $this->engine = new LocalEngine();
         }
+
         return $this->engine;
     }
     public function testConfig()
     {
         $this->assertEquals(APP . DS . 'storage', $this->engine()->config('root'));
+    }
+
+    public function testInvalidRoot()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $engine = new LocalEngine([
+            'root' => '/some-directory/that-does-not-exist',
+        ]);
     }
 }

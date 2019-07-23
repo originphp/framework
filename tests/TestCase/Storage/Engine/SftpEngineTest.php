@@ -79,6 +79,17 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10, $config['timeout']);
     }
 
+    public function testInvalidRoot()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $engine = new SftpEngine([
+            'host' => env('SFTP_HOST'),
+            'username' => env('SFTP_USERNAME'),
+            'password' => env('SFTP_PASSWORD'),
+            'root' => '/some-directory/that-does-not-exist',
+        ]);
+    }
+
     public function testNotFoundPrivateKey()
     {
         $this->expectException(NotFoundException::class);

@@ -45,6 +45,18 @@ class FtpEngineTest extends \PHPUnit\Framework\TestCase
 
         return $this->engine;
     }
+
+    public function testInvalidRoot()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $engine = new FtpEngine([
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+            'root' => '/some-directory/that-does-not-exist',
+        ]);
+    }
+
     public function testConfig()
     {
         $config = $this->engine()->config();

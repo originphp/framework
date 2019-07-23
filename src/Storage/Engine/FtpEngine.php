@@ -14,15 +14,13 @@
 
 namespace Origin\Storage\Engine;
 
-use Origin\Storage\Engine\BaseEngine;
-
-use Origin\Exception\NotFoundException;
 use Origin\Exception\Exception;
+use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 
 class FtpEngine extends BaseEngine
 {
-    protected $defaultConfig =[
+    protected $defaultConfig = [
         'host' => null,
         'username' => null,
         'password' => null,
@@ -31,7 +29,7 @@ class FtpEngine extends BaseEngine
         'timeout' => 10,
         'ssl' => false,
         'passive' => true, // passive is the default mode used. e.g.  WinSCP
-        'root' => null
+        'root' => null,
     ];
 
     protected $connection = null;
@@ -48,8 +46,11 @@ class FtpEngine extends BaseEngine
         if ($this->config('root') === null) {
             $this->config('root', ftp_pwd($this->connection));
         }
-    }
 
+        if (! @ftp_chdir($this->connection, $this->config('root'))) {
+            throw new InvalidArgumentException(sprintf('Invalid root %s.', $this->config('root')));
+        }
+    }
 
     protected function login()
     {
@@ -61,11 +62,12 @@ class FtpEngine extends BaseEngine
             $this->connection = @ftp_connect($host, $port, $timeout);
         }
 
-        if (!$this->connection) {
+        if (! $this->connection) {
             throw new Exception(sprintf('Error connecting to %s.', $this->config('host') . ':'. $this->config('port')));
         }
 
-        if (!@ftp_login($this->connection, $username, $password)) {
+        if (! @ftp_login($this->connection, $username, $password)) {
+            $this->disconnect();
             throw new Exception('Invalid username or password.');
         }
         ftp_pasv($this->connection, $passive);
@@ -83,14 +85,14 @@ class FtpEngine extends BaseEngine
 
         $stream = fopen('php://temp', 'w+b'); // +b force binary
         $result = @ftp_fget($this->connection, $stream, $filename, FTP_BINARY);
-        rewind($stream);
-        $data = stream_get_contents($stream);
-        fclose($stream);
 
         if ($result) {
+            rewind($stream);
+            $data = stream_get_contents($stream);
+            fclose($stream);
+
             return $data;
         }
-
         throw new NotFoundException(sprintf('File %s does not exist', $name));
     }
 
@@ -106,7 +108,8 @@ class FtpEngine extends BaseEngine
         $filename = $this->addPathPrefix($name);
 
         $path = pathinfo($filename, PATHINFO_DIRNAME);
-        if (!@ftp_chdir($this->connection, $path)) {
+       
+        if (! @ftp_chdir($this->connection, $path)) {
             $this->mkdir($path);
         }
         $stream = fopen('php://temp', 'w+b'); // +b force binary
@@ -114,6 +117,7 @@ class FtpEngine extends BaseEngine
         rewind($stream);
         $result = @ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
         fclose($stream);
+
         return $result;
         /*
         $tmpfile = sys_get_temp_dir() . DS . uniqid();
@@ -139,11 +143,11 @@ class FtpEngine extends BaseEngine
         if ($this->isDir($filename)) {
             return $this->rmdir($filename, true);
         }
-        if ($this->fileExists($filename)) {
-            return ftp_delete($this->connection, $filename);
+        if (! @ftp_delete($this->connection, $filename)) {
+            throw new NotFoundException(sprintf('%s does not exist', $name));
         }
     
-        throw new NotFoundException(sprintf('%s does not exist', $name));
+        return true;
     }
 
     /**
@@ -163,6 +167,18 @@ class FtpEngine extends BaseEngine
         return $this->fileExists($filename);
     }
 
+    /**
+     * Disconnects from server
+     *
+     * @return void
+     */
+    public function disconnect()
+    {
+        if ($this->connection) {
+            ftp_close($this->connection);
+        }
+        $this->connection = null;
+    }
 
     /**
      * Gets a list of items on the disk
@@ -173,12 +189,14 @@ class FtpEngine extends BaseEngine
     {
         $directory = $this->addPathPrefix($name);
 
-        if (!$this->isDir($directory)) {
+        if (! $this->isDir($directory)) {
             throw new NotFoundException('directory does not exist');
         }
+
         ftp_chdir($this->connection, $this->config('root'));
 
         $this->base = $this->addPathPrefix($name);
+
         return $this->scandir($name);
     }
 
@@ -189,9 +207,9 @@ class FtpEngine extends BaseEngine
         if (is_array($list) and in_array($filename, $list)) {
             return true;
         }
+
         return false;
     }
-
 
     /**
      * Creates directories recrusively
@@ -201,17 +219,17 @@ class FtpEngine extends BaseEngine
      */
     protected function mkdir(string $path)
     {
-        @ftp_chdir($this->connection, $this->config('root'));
+        ftp_chdir($this->connection, $this->config('root'));
 
         $parts = array_filter(explode('/', $path));
         foreach ($parts as $part) {
-            if (!@ftp_chdir($this->connection, $part)) {
+            if (! @ftp_chdir($this->connection, $part)) {
                 ftp_mkdir($this->connection, $part);
                 ftp_chmod($this->connection, 0744, $part);
                 ftp_chdir($this->connection, $part);
             }
         }
-        @ftp_chdir($this->connection, $this->config('root'));
+        ftp_chdir($this->connection, $this->config('root'));
     }
 
     /**
@@ -222,10 +240,11 @@ class FtpEngine extends BaseEngine
      */
     protected function isDir(string $directory)
     {
-        if (!@ftp_chdir($this->connection, $directory)) {
+        if (! @ftp_chdir($this->connection, $directory)) {
             return false;
         }
         ftp_chdir($this->connection, $this->config('root'));
+
         return true;
     }
 
@@ -255,7 +274,7 @@ class FtpEngine extends BaseEngine
                     $files[] = [
                         'name' => ltrim(str_replace($this->base . DS, '', $location . DS .  $file), '/'),
                         'timestamp' => ftp_mdtm($this->connection, $location . DS . $file),
-                        'size' => $result[4]
+                        'size' => $result[4],
                     ];
                 }
             }
@@ -283,6 +302,7 @@ class FtpEngine extends BaseEngine
                 ftp_delete($this->connection, $filename);
             }
         }
+
         return @ftp_rmdir($this->connection, $directory);
     }
 
