@@ -22,26 +22,31 @@ class StorageTest extends \PHPUnit\Framework\TestCase
     public function testCRD()
     {
         $tmpFolder = uniqid();
+
+        $root = TMP . DS . $tmpFolder;
+        
+        mkdir($root);
+
         Storage::config('tmp', [
-            'engine'=>'Local',
-            'root' => TMP . DS . $tmpFolder
-            ]);
+            'engine' => 'Local',
+            'root' => $root,
+        ]);
 
         $file = uniqid();
         # Create
-        $this->assertTrue(Storage::write($file, 'bar', ['config'=>'tmp']));
+        $this->assertTrue(Storage::write($file, 'bar', ['config' => 'tmp']));
         $this->assertFileExists(TMP . DS . $tmpFolder . DS . $file); // Check using correct config
         # Read
-        $this->assertEquals('bar', Storage::read($file, ['config'=>'tmp']));
-        $this->assertTrue(Storage::exists($file, ['config'=>'tmp']));
+        $this->assertEquals('bar', Storage::read($file, ['config' => 'tmp']));
+        $this->assertTrue(Storage::exists($file, ['config' => 'tmp']));
 
-        $contents = Storage::list(null, ['config'=>'tmp']);
+        $contents = Storage::list(null, ['config' => 'tmp']);
         $this->assertEquals(1, count($contents));
         $this->assertEquals($file, $contents[0]['name']);
 
         # Delete
-        Storage::delete($file, ['config'=>'tmp']);
-        $this->assertFalse(Storage::exists($file, ['config'=>'tmp']));
+        Storage::delete($file, ['config' => 'tmp']);
+        $this->assertFalse(Storage::exists($file, ['config' => 'tmp']));
     }
 
     public function testUnkownConfig()
@@ -52,7 +57,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
     public function testClassNotExists()
     {
-        Storage::config('foo', ['className'=>'Void\MegaStorage']);
+        Storage::config('foo', ['className' => 'Void\MegaStorage']);
         $this->expectException(InvalidArgumentException::class);
         Storage::volume('foo');
     }
