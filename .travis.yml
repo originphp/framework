@@ -22,7 +22,6 @@ before_install:
   - if [ $DB_ENGINE = 'pgsql' ]; then psql -c 'CREATE DATABASE origin_test;' -U postgres; fi
   - pecl channel-update pecl.php.net
   - echo yes | pecl install -f apcu
-  - echo 'extension = apcu.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
