@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Behavior\DelocalizeBehavior;
 use Origin\Model\Model;
-use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Behavior\DelocalizeBehavior;
 
 class DelocalizeBehaviorTest extends OriginTestCase
 {
@@ -27,9 +27,9 @@ class DelocalizeBehaviorTest extends OriginTestCase
 
     protected function setUp() : void
     {
-        $this->Deal = new Model(['name' => 'Deal','datasource'=>'test']); // Create model Dynamically
-        Date::locale(['date'=>'d/m/Y','time'=>'H:i','datetime'=>'d/m/Y H:i','timezone'=>'Europe/London']);
-        Number::locale(['currency'=>'USD','thousands'=>',','decimals'=>'.']);
+        $this->Deal = new Model(['name' => 'Deal','datasource' => 'test']); // Create model Dynamically
+        Date::locale(['date' => 'd/m/Y','time' => 'H:i','datetime' => 'd/m/Y H:i','timezone' => 'Europe/London']);
+        Number::locale(['currency' => 'USD','thousands' => ',','decimals' => '.']);
     }
  
     public function testBehavior()
@@ -38,9 +38,9 @@ class DelocalizeBehaviorTest extends OriginTestCase
 
         $deal = new Entity([
             'amount' => '1,234,567.89',
-            'close_date' =>'11/06/2019',
+            'close_date' => '11/06/2019',
             'created' => '11/06/2019 10:27',
-            'confirmed' => '10:27'
+            'confirmed' => '10:27',
         ]);
         $behavior->beforeValidate($deal);
 
@@ -60,14 +60,15 @@ class DelocalizeBehaviorTest extends OriginTestCase
      *
      * @return void
      */
-    public function testBehaviorError(){
+    public function testBehaviorError()
+    {
         $behavior = new DelocalizeBehavior($this->Deal);
 
         $deal = new Entity([
             'amount' => '1,234,567.89',
-            'close_date' =>'50-06/2019',
+            'close_date' => '50-06/2019',
             'created' => '11/21/2019 10:27:00000',
-            'confirmed' => '10:27pm'
+            'confirmed' => '10:27pm',
         ]);
         $behavior->beforeValidate($deal);
         $this->assertEquals('50-06/2019', $deal->close_date);
@@ -81,7 +82,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
             'timezone' => 'UTC',
             'date' => 'Y-m-d',
             'datetime' => 'Y-m-d H:i',
-            'time' => 'H:i'
+            'time' => 'H:i',
         ]);
     }
 }

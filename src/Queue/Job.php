@@ -19,8 +19,8 @@
 
 namespace Origin\Queue;
 
-use Origin\Model\Entity;
 use Origin\Model\Model;
+use Origin\Model\Entity;
 
 class Job
 {
@@ -37,7 +37,6 @@ class Job
      * @var Model
      */
     protected $Job = null;
-
 
     /**
      * Holds the data
@@ -59,7 +58,7 @@ class Job
      * @param boolean $array return as array instead of object
      * @return object|array
      */
-    public function data(bool $array=false)
+    public function data(bool $array = false)
     {
         return json_decode($this->entity->data, $array);
     }
@@ -104,6 +103,7 @@ class Job
     {
         $job = $this->entity;
         $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+
         return $this->setStatus('queued');
     }
 
@@ -120,6 +120,7 @@ class Job
         if ($job->tries < $tries) {
             $job->tries ++;
             $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+
             return $this->release();
         }
         $this->failed();
@@ -138,6 +139,7 @@ class Job
             'status' => $status,
             'locked' => 0,
         ]);
+
         return $this->Job->save($job);
     }
 }

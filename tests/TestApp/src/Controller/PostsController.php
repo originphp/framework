@@ -1,8 +1,6 @@
 <?php
 namespace App\Controller;
 
-use App\Controller\AppController;
-
 class PostsController extends AppController
 {
     public function index()
@@ -12,6 +10,6 @@ class PostsController extends AppController
     public function list()
     {
         $this->layout = false;
-        $this->set('data', ['error'=>'Noting to list']);
+        $this->set('data', ['error' => 'Noting to list']);
     }
 }

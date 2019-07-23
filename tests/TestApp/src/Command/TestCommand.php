@@ -1,5 +1,6 @@
 <?php
 namespace App\Command;
+
 use Origin\Command\Command;
 
 class TestCommand extends Command
@@ -8,30 +9,35 @@ class TestCommand extends Command
 
     protected $description = 'A command for testing';
 
-    public function initialize(){
-        $this->addArgument('test',['description'=>'Which test','required'=>true]);
+    public function initialize()
+    {
+        $this->addArgument('test', ['description' => 'Which test','required' => true]);
     }
 
-    public function execute(){
+    public function execute()
+    {
         $test = $this->arguments('test');
         $this->{$test}();
     }
 
-    public function say(){
+    public function say()
+    {
         $this->out('Hello world!');
     }
 
-    public function ask(){
+    public function ask()
+    {
         $answer = $this->io->askChoice('Yes or no', ['yes','no']);
         $this->out('You entered ' . $answer);
     }
 
-
-    public function omg(){
+    public function omg()
+    {
         $this->throwError('OMG! Its all Gone pete tong');
     }
 
-    public function empty(){
+    public function empty()
+    {
         // do nothing
     }
 }

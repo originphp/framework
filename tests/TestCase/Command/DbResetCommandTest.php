@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbResetCommandTest extends OriginTestCase
 {
@@ -27,7 +27,7 @@ class DbResetCommandTest extends OriginTestCase
 
     public function testExecuteMySQL()
     {
-        if (ConnectionManager::get('test')->engine() !=='mysql') {
+        if (ConnectionManager::get('test')->engine() !== 'mysql') {
             $this->markTestSkipped('This test is for mysql');
         }
         $ds = ConnectionManager::get('test');
@@ -44,7 +44,7 @@ class DbResetCommandTest extends OriginTestCase
 
     public function testExecutePostgreSQL()
     {
-        if (ConnectionManager::get('test')->engine() !=='pgsql') {
+        if (ConnectionManager::get('test')->engine() !== 'pgsql') {
             $this->markTestSkipped('This test is for pgsql');
         }
         $ds = ConnectionManager::get('test');

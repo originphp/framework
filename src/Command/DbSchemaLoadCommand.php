@@ -14,11 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
-use Origin\Command\DbSchemaTrait;
-
 class DbSchemaLoadCommand extends Command
 {
     use DbSchemaTrait;
@@ -30,11 +25,11 @@ class DbSchemaLoadCommand extends Command
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
-            'default' => 'default'
-            ]);
+            'default' => 'default',
+        ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
-            'default' => 'schema'
+            'default' => 'schema',
         ]);
     }
  

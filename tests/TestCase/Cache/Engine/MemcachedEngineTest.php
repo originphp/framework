@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Cache\Engine;
 
-use Origin\Cache\Engine\MemcachedEngine;
 use Memcached;
 use Origin\Exception\Exception;
+use Origin\Cache\Engine\MemcachedEngine;
 
 class MockMemcachedEngine extends MemcachedEngine
 {
@@ -30,10 +30,10 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        if (!extension_loaded('memcached')) {
+        if (! extension_loaded('memcached')) {
             $this->markTestSkipped('Memcached extension not loaded');
         }
-        if (!env('MEMCACHED_HOST') or !env('MEMCACHED_PORT')) {
+        if (! env('MEMCACHED_HOST') or ! env('MEMCACHED_PORT')) {
             $this->markTestSkipped('Memcached settings not found');
         }
      
@@ -51,7 +51,7 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
             'host' => env('MEMCACHED_HOST'),
             'port' => env('MEMCACHED_PORT'),
             'duration' => 3600,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
     }
     public function testSet()
@@ -139,7 +139,7 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
             'host' => 'memcached-not-exist',
             'duration' => 0,
             'prefix' => 'origin_',
-            'persistent' => 'my-app'
+            'persistent' => 'my-app',
         ]);
     }
 
@@ -149,7 +149,7 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
         new MockMemcachedEngine([
             'path' => '/tmp/fake-socket',
             'duration' => 0,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
     }
 
@@ -157,12 +157,12 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
     {
         $servers = [
             [env('MEMCACHED_HOST'), 11211],
-            [env('MEMCACHED_HOST'), 11211]
+            [env('MEMCACHED_HOST'), 11211],
         ];
         $memcached = new MockMemcachedEngine([
             'servers' => $servers,
             'duration' => 0,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
         $this->assertInstanceOf(MemcachedEngine::class, $memcached);
     }
@@ -175,7 +175,7 @@ class MemcachedEngineTest extends \PHPUnit\Framework\TestCase
             'username' => 'tony',
             'password' => 'secret',
             'duration' => 0,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
     }
 }

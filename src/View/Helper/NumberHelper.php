@@ -23,13 +23,13 @@ class NumberHelper extends Helper
      *
      * $number->currency(1024,'USD'); // $1,024
      * $number->currency(1024.00,'USD'); // $1,024.00
-     * 
+     *
      * @param string|float|integer $value 1234567.43
      * @param string $currency USD|EUR|GBP|AUD etc.
      * @param array $options before,after,places,thousands,decimals
      * @return string
      */
-    public function currency($value, string $currency=null, array $options=[]) : string
+    public function currency($value, string $currency = null, array $options = []) : string
     {
         return Number::currency($value, $currency, $options);
     }
@@ -79,7 +79,7 @@ class NumberHelper extends Helper
      * @param array $options
      * @return string
      */
-    public function format($value, array $options=[]) : string
+    public function format($value, array $options = []) : string
     {
         return Number::format($value, $options);
     }

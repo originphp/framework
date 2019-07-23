@@ -21,7 +21,6 @@ namespace Origin\Queue;
 
 use Origin\Model\Model;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Queue\Job;
 
 class Queue
 {
@@ -40,12 +39,12 @@ class Queue
      *    - table: table name for queue e.g. queue
      *    - datasource: which datasource to use
      */
-    public function __construct(array $config=[])
+    public function __construct(array $config = [])
     {
         $config += [
-            'name'=>'Job',
-            'table'=>'queue',
-            'datasource'=>'default'
+            'name' => 'Job',
+            'table' => 'queue',
+            'datasource' => 'default',
         ];
         $this->Job = new Model($config);
         $this->Job->loadBehavior('Timestamp');
@@ -59,10 +58,11 @@ class Queue
      */
     public function purge(string $queue = null) : bool
     {
-        $conditions = ['status'=> 'executed'];
+        $conditions = ['status' => 'executed'];
         if ($queue) {
             $conditions['queue'] = $queue;
         }
+
         return $this->Job->deleteAll($conditions);
     }
 
@@ -76,7 +76,7 @@ class Queue
      */
     public function add(string $queue = null, array $data = [], string $strtotime = 'now')
     {
-        if (!preg_match('/^[\w.-]+$/i', $queue)) {
+        if (! preg_match('/^[\w.-]+$/i', $queue)) {
             throw new InvalidArgumentException('Queue name can only contain letters, numbers, underscores, hypens and dots.');
         }
     
@@ -89,9 +89,9 @@ class Queue
         if (mb_strlen($entity->data) >= 65535) {
             throw new InvalidArgumentException('Data string is longer than 65,535');
         }
+
         return $this->Job->save($entity)?$this->Job->id:false;
     }
-
 
     /**
      * Fetches the next job from a queue and locks it. Remember to work with the queue in a try/catch block
@@ -102,12 +102,13 @@ class Queue
     public function fetch(string $queue)
     {
         # Boolean fields on Postgre work differently and does not accept 0 only '0'
-        $conditions = ['queue'=>$queue,'status'=>'queued','locked = \'0\' ','scheduled <=' => date('Y-m-d H:i:s')];
-        if ($result = $this->Job->find('first', ['conditions'=>$conditions])) {
+        $conditions = ['queue' => $queue,'status' => 'queued','locked = \'0\' ','scheduled <=' => date('Y-m-d H:i:s')];
+        if ($result = $this->Job->find('first', ['conditions' => $conditions])) {
             if ($this->claim($result->id)) {
                 return new Job($this->Job, $result);
             }
         }
+
         return false;
     }
 
@@ -120,8 +121,8 @@ class Queue
     protected function claim($id)
     {
         $this->Job->begin();
-        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = :id AND locked = '0' FOR UPDATE;", ['id'=>$id]);
-        $this->Job->query("UPDATE {$this->Job->table} SET locked = '1' , tries = tries + 1, modified = '" . now() . "' WHERE id = :id;", ['id'=>$id]);
+        $result = $this->Job->query("SELECT * FROM {$this->Job->table} WHERE id = :id AND locked = '0' FOR UPDATE;", ['id' => $id]);
+        $this->Job->query("UPDATE {$this->Job->table} SET locked = '1' , tries = tries + 1, modified = '" . now() . "' WHERE id = :id;", ['id' => $id]);
         $this->Job->commit();
         
         return $result?$result:false;

@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Origin\Model\Behavior;
 
-use Origin\Model\Behavior\Behavior;
 use Origin\Model\Entity;
 use Origin\Core\Inflector;
 
@@ -41,9 +40,8 @@ class CounterCacheBehavior extends Behavior
         $this->belongsTo = $belongsTo;
         $this->fields = [];
 
-       
         foreach ($belongsTo as $alias => $config) {
-            if (!empty($config['counterCache'])) {
+            if (! empty($config['counterCache'])) {
                 $field = $config['counterCache'];
                 if ($field === true) {
                     $name = Inflector::pluralize($this->model()->name);
@@ -52,10 +50,11 @@ class CounterCacheBehavior extends Behavior
                 $this->fields[$alias] = [
                     'field' => $field,
                     'foreignKey' => $config['foreignKey'],
-                    'name' => Inflector::underscore($alias)
+                    'name' => Inflector::underscore($alias),
                 ];
             }
         }
+
         return $this->fields;
     }
 

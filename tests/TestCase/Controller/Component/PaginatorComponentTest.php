@@ -14,16 +14,16 @@
 
 namespace Origin\Test\Controller\Component;
 
-use Origin\Controller\Component\PaginatorComponent;
-use Origin\TestSuite\TestTrait; // callMethod + getProperty
-use Origin\Controller\Controller;
-use Origin\Http\Request;
-use Origin\Http\Response;
-
 use Origin\Model\Model;
+use Origin\Http\Request; // callMethod + getProperty
+use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
+use Origin\TestSuite\TestTrait;
+
+use Origin\Controller\Controller;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\NotFoundException;
+use Origin\Controller\Component\PaginatorComponent;
 
 class Pet extends Model
 {
@@ -56,7 +56,6 @@ class MockPaginatorComponent extends PaginatorComponent
     }
 }
 
-
 /**
  * @todo i think this test can be written associatedout database access mocking fetchResults and check settings array is correct
  */
@@ -71,15 +70,15 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
       
         $connection = ConnectionManager::get('test');
         $sql = $connection->adapter()->createTable('pets', [
-            'id' => ['type'=>'primaryKey'],
-            'owner_id' => ['type'=>'int','null'=>false],
-            'name' => ['type'=>'string','limit'=>20]
+            'id' => ['type' => 'primaryKey'],
+            'owner_id' => ['type' => 'int','null' => false],
+            'name' => ['type' => 'string','limit' => 20],
         ]);
         $connection->execute($sql);
 
         $sql = $connection->adapter()->createTable('owners', [
-            'id' => ['type'=>'primaryKey'],
-            'name' => ['type'=>'string','limit'=>20]
+            'id' => ['type' => 'primaryKey'],
+            'name' => ['type' => 'string','limit' => 20],
         ]);
         $connection->execute($sql);
         
@@ -88,8 +87,8 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
       
         ModelRegistry::set('Pet', $this->Pet);
 
-        for ($i=0;$i<100;$i++) {
-            $this->Pet->save($this->Pet->new(['owner_id' => $i + 1000, 'name'=>'Pet' . $i]));
+        for ($i = 0;$i < 100;$i++) {
+            $this->Pet->save($this->Pet->new(['owner_id' => $i + 1000, 'name' => 'Pet' . $i]));
         }
     }
 
@@ -110,18 +109,18 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $results = $this->PaginatorComponent->paginate($this->Pet);
         $this->assertEquals(20, count($results));
 
-        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort'=>'non_existant']);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort' => 'non_existant']);
         $this->assertEquals(20, count($results));
 
         // Test foreign_keys
-        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort'=>'owner_id']);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort' => 'owner_id']);
         $this->assertEquals(20, count($results));
 
         // Test foreign_keys
-        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort'=>'id','direction'=>'ASC']);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort' => 'id','direction' => 'ASC']);
         $this->assertEquals(1, $results[0]->id);
     
-        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort'=>'id','direction'=>'DESC']);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['sort' => 'id','direction' => 'DESC']);
         $this->assertEquals(100, $results[0]->id);
 
         // test url sorting
@@ -136,7 +135,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Pet0', $results[0]->name);
 
         $this->expectException(NotFoundException::class);
-        $results = $this->PaginatorComponent->paginate($this->Pet, ['page'=>10000]);
+        $results = $this->PaginatorComponent->paginate($this->Pet, ['page' => 10000]);
     }
 
     /**
@@ -147,7 +146,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
     public function testPaginateSecurity()
     {
         $this->expectException(NotFoundException::class);
-        $this->PaginatorComponent->paginate($this->Pet, ['page'=>'abc']);
+        $this->PaginatorComponent->paginate($this->Pet, ['page' => 'abc']);
     }
 
     /**
@@ -162,17 +161,17 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $Pet->Owner = new Owner();
 
         // Test foreign_keys
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['Owner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort' => 'owner_id','associated' => ['Owner']]);
         $this->assertEquals(20, count($results));
 
-        $results = $PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['Owner']]);
+        $results = $PaginatorComponent->paginate($Pet, ['sort' => 'owner_id','associated' => ['Owner']]);
         $this->assertEquals('asc', $results['order']['owners.name']); // check alias.
 
         $Pet = new Pet();
-        $Pet->belongsTo('MyOwner', ['foreignKey'=>'owner_id']);
-        $Pet->MyOwner = new Model(['name'=>'MyOwner','alias'=>'MyOwner','table'=>'owners','datasource'=>'test']);
+        $Pet->belongsTo('MyOwner', ['foreignKey' => 'owner_id']);
+        $Pet->MyOwner = new Model(['name' => 'MyOwner','alias' => 'MyOwner','table' => 'owners','datasource' => 'test']);
 
-        $results = $this->PaginatorComponent->paginate($Pet, ['sort'=>'owner_id','associated'=>['MyOwner']]);
+        $results = $this->PaginatorComponent->paginate($Pet, ['sort' => 'owner_id','associated' => ['MyOwner']]);
         $this->assertEquals(20, count($results));
     }
 }

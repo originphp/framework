@@ -14,11 +14,10 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Http\Router;
-use Origin\View\TemplateTrait;
 use Origin\Core\Plugin;
+use Origin\Http\Router;
 use Origin\Core\Inflector;
-use Origin\Exception;
+use Origin\View\TemplateTrait;
 use Origin\Exception\NotFoundException;
 
 class HtmlHelper extends Helper
@@ -31,8 +30,8 @@ class HtmlHelper extends Helper
             'css' => '<link rel="stylesheet" type="text/css" href="{url}" />',
             'js' => '<script type="text/javascript" src="{url}"></script>',
             'img' => '<img src="{src}"{attributes}>',
-            'tag' => '<{tag}{attributes}>{content}</{tag}>'
-        ]
+            'tag' => '<{tag}{attributes}>{content}</{tag}>',
+        ],
     ];
 
     /**
@@ -42,13 +41,14 @@ class HtmlHelper extends Helper
      * @param array $attributes
      * @return string
      */
-    public function div(string $content, array $attributes=[]): string
+    public function div(string $content, array $attributes = []): string
     {
         $options = [
             'tag' => 'div',
             'content' => $content,
             'attributes' => $this->attributesToString($attributes),
         ];
+
         return $this->templater()->format('tag', $options);
     }
     /**
@@ -65,8 +65,8 @@ class HtmlHelper extends Helper
             'text' => $text,
             'url' => Router::url($url),
             'attributes' => $this->attributesToString($attributes),
-            'escape' => true
-            ];
+            'escape' => true,
+        ];
 
         return $this->templater()->format('a', $options);
     }
@@ -81,7 +81,7 @@ class HtmlHelper extends Helper
      */
     public function css(string $path) : string
     {
-        return $this->asset($path, ['ext'=>'css']);
+        return $this->asset($path, ['ext' => 'css']);
     }
 
     /**
@@ -92,7 +92,7 @@ class HtmlHelper extends Helper
      * @param array $attributes
      * @return void
      */
-    public function img(string $image, array $attributes=[]) : string
+    public function img(string $image, array $attributes = []) : string
     {
         if ($image[0] !== '/') {
             $image .= '/img/' . $image;
@@ -100,7 +100,7 @@ class HtmlHelper extends Helper
         $options = [
             'src' => $image,
             'attributes' => $this->attributesToString($attributes),
-            ];
+        ];
 
         return $this->templater()->format('img', $options);
     }
@@ -115,14 +115,14 @@ class HtmlHelper extends Helper
         */
     public function js(string $path) : string
     {
-        return $this->asset($path, ['ext'=>'js']);
+        return $this->asset($path, ['ext' => 'js']);
     }
 
     private function asset($path, $options) : string
     {
         // without path $html->css('https://example.com/something.css');
         if (strpos($path, '://') !== false) {
-            return $this->templater()->format($options['ext'], ['url'=>$path]);
+            return $this->templater()->format($options['ext'], ['url' => $path]);
         }
         $plugin = null;
         list($a, $b) = pluginSplit($path);
@@ -135,25 +135,28 @@ class HtmlHelper extends Helper
             $path .= '.' . $options['ext'];
         }
         // without path $html->css('form');
-        if (!$plugin and $path[0] !== '/') {
+        if (! $plugin and $path[0] !== '/') {
             $path = DS .$options['ext'] . DS . $path;
         }
 
         if ($plugin) {
             $filename = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
-            if ($options['ext']==='js') {
+            if ($options['ext'] === 'js') {
                 return '<script>' .$this->loadFile($filename) . '</script>';
             }
+
             return '<style>' .$this->loadFile($filename) . '</styles>';
         }
-        return $this->templater()->format($options['ext'], ['url'=>$path]);
+
+        return $this->templater()->format($options['ext'], ['url' => $path]);
     }
  
     protected function loadFile(string $filename) : string
     {
-        if (!file_exists($filename)) {
+        if (! file_exists($filename)) {
             throw new NotFoundException($filename . ' not found.');
         }
+
         return file_get_contents($filename);
     }
 }

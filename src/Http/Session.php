@@ -15,8 +15,8 @@
 namespace Origin\Http;
 
 use Origin\Core\Dot;
-use Origin\Exception\Exception;
 use Origin\Core\Configure;
+use Origin\Exception\Exception;
 
 class Session
 {
@@ -48,15 +48,15 @@ class Session
         $config = [
             'session.save_path' => TMP . DS . 'sessions',
             'session.cookie_secure' => 1,
-            'session.cookie_httponly' => 1
+            'session.cookie_httponly' => 1,
         ];
 
-        if (!$this->started() and !headers_sent()) {
+        if (! $this->started() and ! headers_sent()) {
             $this->setIniConfig($config);
         }
 
         // For DOT and CLI
-        if (!isset($_SESSION)) {
+        if (! isset($_SESSION)) {
             $_SESSION = [];
         }
 
@@ -121,7 +121,7 @@ class Session
             $this->id(uuid());
         }
         
-        if (!session_start()) {
+        if (! session_start()) {
             throw new Exception('Error starting a session.');
         }
 
@@ -145,10 +145,12 @@ class Session
         if (isset($_COOKIE[$name])) {
             $id = $_COOKIE[$name];
         }
-        if ($id and !preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
+        if ($id and ! preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
             $this->destroy();
+
             return null;
         }
+
         return $id;
     }
 
@@ -187,6 +189,7 @@ class Session
         $Dot->set($key, $value);
         if (strpos($key, '.') === false) {
             $_SESSION[$key] = $value;
+
             return;
         }
         // Overwite session vars
@@ -202,7 +205,7 @@ class Session
     protected function overwrite(array $data) : void
     {
         foreach ($_SESSION as $key => $value) {
-            if (!isset($data[$key])) {
+            if (! isset($data[$key])) {
                 unset($_SESSION[$key]);
                 continue;
             }
@@ -237,6 +240,7 @@ class Session
     public function check(string $key = null) : bool
     {
         deprecationWarning('Session::check is depreciated use session:exists');
+
         return $this->exists($key);
     }
 
@@ -249,6 +253,7 @@ class Session
     public function exists(string $key = null) : bool
     {
         $Dot = new Dot($_SESSION);
+
         return $Dot->has($key);
     }
     /**
@@ -263,6 +268,7 @@ class Session
         if ($Dot->has($key)) {
             $Dot->delete($key);
             $this->overwrite($Dot->items());
+
             return true;
         }
 
@@ -276,7 +282,7 @@ class Session
      */
     public function destroy() : void
     {
-        if (!$this->started()) {
+        if (! $this->started()) {
             // @codeCoverageIgnoreStart
             session_start();
             // @codeCoverageIgnoreEnd
@@ -312,7 +318,7 @@ class Session
             return session_id();
         }
 
-        if (!headers_sent()) {
+        if (! headers_sent()) {
             // @codeCoverageIgnoreStart
             session_id($id);
             // @codeCoverageIgnoreEnd

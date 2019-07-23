@@ -13,9 +13,9 @@
  */
 namespace Origin\View;
 
-use Origin\Controller\Controller;
-use Origin\Http\Serializer;
 use Origin\Utility\Xml;
+use Origin\Http\Serializer;
+use Origin\Controller\Controller;
 
 class XmlView
 {
@@ -48,9 +48,9 @@ class XmlView
 
     public function __construct(Controller $controller)
     {
-        $this->request =& $controller->request;
-        $this->response =& $controller->response;
-        $this->viewVars =& $controller->viewVars;
+        $this->request = & $controller->request;
+        $this->response = & $controller->response;
+        $this->viewVars = & $controller->viewVars;
         $this->serialize = $controller->serialize();
     }
 
@@ -66,7 +66,7 @@ class XmlView
         /**
          * If user requests JSON and serialize is set then use that
          */
-        if ($data === null and $this->request->type() === 'xml' and !empty($this->serialize)) {
+        if ($data === null and $this->request->type() === 'xml' and ! empty($this->serialize)) {
             $serializer = new Serializer();
             $data = $serializer->serialize($this->serialize, $this->viewVars);
             $data = ['response' => $data];
@@ -77,6 +77,7 @@ class XmlView
         } elseif (is_array($data)) {
             return Xml::fromArray($data);
         }
+
         return $data;
     }
 }

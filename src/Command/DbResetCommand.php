@@ -14,10 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
-
 class DbResetCommand extends Command
 {
     protected $name = 'db:reset';
@@ -27,8 +23,8 @@ class DbResetCommand extends Command
     public function initialize()
     {
         $this->addOption('datasource', [
-            'description'=>'Use a different datasource','short'=>'ds','default'=>'default'
-            ]);
+            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
         ]);
@@ -37,15 +33,15 @@ class DbResetCommand extends Command
     public function execute()
     {
         $datasource = $this->options('datasource');
-        $name = $this->arguments('name')??'schema';
+        $name = $this->arguments('name') ?? 'schema';
 
         $this->runCommand('db:drop', [
-            '--datasource' => $datasource
+            '--datasource' => $datasource,
         ]);
        
         $this->runCommand('db:setup', [
             '--datasource' => $datasource,
-            $name
+            $name,
         ]);
     }
 }

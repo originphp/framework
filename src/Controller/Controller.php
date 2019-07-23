@@ -13,18 +13,18 @@
  */
 namespace Origin\Controller;
 
+use ReflectionClass;
+use App\View\AppView;
+use ReflectionMethod;
+use Origin\Http\Router;
 use Origin\Http\Request;
+use Origin\View\XmlView;
 use Origin\Http\Response;
+use Origin\View\JsonView;
+use Origin\Core\Inflector;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
-use App\View\AppView;
 use Origin\Controller\Component\ComponentRegistry;
-use Origin\Core\Inflector;
-use Origin\Http\Router;
-use ReflectionClass;
-use ReflectionMethod;
-use Origin\View\XmlView;
-use Origin\View\JsonView;
 
 class Controller
 {
@@ -128,6 +128,7 @@ class Controller
         list($plugin, $component) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Component'], $config);
         $this->{$component} = $this->componentRegistry()->load($name, $config);
+
         return $this->{$component};
     }
 
@@ -163,7 +164,7 @@ class Controller
      * @param array $options
      * @return \Origin\Model\Model
      */
-    public function loadModel(string $model, array $options=[])
+    public function loadModel(string $model, array $options = [])
     {
         list($plugin, $alias) = pluginSplit($model);
 
@@ -191,10 +192,11 @@ class Controller
         if ($controller->hasMethod($action)) {
             return false;
         }
-        if (!method_exists($this, $action)) {
+        if (! method_exists($this, $action)) {
             return false;
         }
         $reflection = new ReflectionMethod($this, $action);
+
         return $reflection->isPublic();
     }
 
@@ -256,7 +258,7 @@ class Controller
     public function startupProcess()
     {
         $result = $this->beforeFilter();
-        if (!$this->isResponseOrRedirect($result)) {
+        if (! $this->isResponseOrRedirect($result)) {
             $result = $this->componentRegistry()->call('startup');
         }
         if ($this->isResponseOrRedirect($result)) {
@@ -267,7 +269,7 @@ class Controller
     public function shutdownProcess()
     {
         $result = $this->componentRegistry()->call('shutdown');
-        if (!$this->isResponseOrRedirect($result)) {
+        if (! $this->isResponseOrRedirect($result)) {
             $result = $this->afterFilter();
         }
         if ($this->isResponseOrRedirect($result)) {
@@ -306,7 +308,7 @@ class Controller
         $object = $this->loadModel($model);
 
         $this->loadComponent('Paginator');
-        if (!isset($this->viewHelpers['Paginator'])) {
+        if (! isset($this->viewHelpers['Paginator'])) {
             $this->loadHelper('Paginator');
         }
         
@@ -367,19 +369,19 @@ class Controller
      *   Other
      *   - status: the status code to return, e.g. 404
      */
-    public function render($options=[])
+    public function render($options = [])
     {
         $template = $this->request->params('action');
         if (empty($options)) {
             $options = $template;
         }
         if (is_string($options)) {
-            $options = ['template'=>$options];
+            $options = ['template' => $options];
         }
       
         $options += [
             'status' => $this->response->statusCode(),
-            'type' => 'html'
+            'type' => 'html',
         ];
 
         $body = null;
@@ -413,12 +415,12 @@ class Controller
         }
         if ($body === null) {
             if (isset($options['template'])) {
-                $template =  $options['template'];
+                $template = $options['template'];
             }
             $view = new AppView($this);
             $body = $view->render(
                 $template,
-                $options['type']=== 'html'?$this->layout:false
+                $options['type'] === 'html'?$this->layout:false
             );
             unset($view);
         }
@@ -427,7 +429,6 @@ class Controller
         $this->response->statusCode($options['status']); // 200
         $this->response->body($body); //
     }
-
 
     /**
      * Sets the key or keys of the viewVars to be serialized

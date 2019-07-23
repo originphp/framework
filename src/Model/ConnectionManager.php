@@ -14,8 +14,8 @@
 
 namespace Origin\Model;
 
-use Origin\Model\Exception\MissingDatasourceException;
 use Origin\Core\StaticConfigTrait;
+use Origin\Model\Exception\MissingDatasourceException;
 
 class ConnectionManager
 {
@@ -51,22 +51,21 @@ class ConnectionManager
             return static::$datasources[$name];
         }
 
-        if (!static::config($name)) {
+        if (! static::config($name)) {
             throw new MissingDatasourceException("No configuration for {$name} datasource.");
         }
 
-        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine'=>'mysql'];
+        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
         
         $config = array_merge($defaults, static::config($name));
        
-    
-        if (!isset(static::$engines[$config['engine']])) {
+        if (! isset(static::$engines[$config['engine']])) {
             throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
         }
         static::$driver = $config['engine'];
       
         $class = static::$engines[$config['engine']];
-        $datasource = new $class(['datasource'=>$name]+$config);
+        $datasource = new $class(['datasource' => $name] + $config);
 
         $datasource->connect($config);
 
@@ -76,6 +75,7 @@ class ConnectionManager
     public static function create(string $name, array $config)
     {
         self::config($name, $config);
+
         return self::get($name);
     }
 
@@ -90,8 +90,10 @@ class ConnectionManager
         if (isset(static::$datasources[$name])) {
             static::config($name, null);
             unset(static::$datasources[$name]);
+
             return true;
         }
+
         return false;
     }
 

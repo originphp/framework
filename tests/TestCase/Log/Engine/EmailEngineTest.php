@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Core;
 
+use Origin\Utility\Email;
 use Origin\Log\Engine\EmailEngine;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Utility\Email;
 
 class MockEmailEngine extends EmailEngine
 {
@@ -29,8 +29,8 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultConfig()
     {
-        Email::config('demo', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo@example.com','account'=>'demo']);
+        Email::config('demo', ['debug' => true]);
+        $engine = new MockEmailEngine(['to' => 'foo@example.com','from' => 'foo@example.com','account' => 'demo']);
         $this->assertEquals('demo', $engine->config('account'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
@@ -38,65 +38,64 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
     public function testInvalidToAddress()
     {
         $this->expectException(InvalidArgumentException::class);
-        $engine = new MockEmailEngine(['from'=>'foo@example.com']);
+        $engine = new MockEmailEngine(['from' => 'foo@example.com']);
     }
     public function testInvalidToAddressNotNull()
     {
         $this->expectException(InvalidArgumentException::class);
-        $engine = new MockEmailEngine(['to'=>'foo','from'=>'foo@example.com']);
+        $engine = new MockEmailEngine(['to' => 'foo','from' => 'foo@example.com']);
     }
     public function testInvalidEmailAccount()
     {
         $this->expectException(InvalidArgumentException::class);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo@example.com','account'=>'foo']);
+        $engine = new MockEmailEngine(['to' => 'foo@example.com','from' => 'foo@example.com','account' => 'foo']);
     }
 
     public function testAccountFromNotSet()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('demo', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','account'=>'demo']);
+        Email::config('demo', ['debug' => true]);
+        $engine = new MockEmailEngine(['to' => 'foo@example.com','account' => 'demo']);
     }
 
     public function testAccountFromInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('demo', ['debug'=>true]);
-        $engine = new MockEmailEngine(['to'=>'foo@example.com','from'=>'foo','account'=>'demo']);
+        Email::config('demo', ['debug' => true]);
+        $engine = new MockEmailEngine(['to' => 'foo@example.com','from' => 'foo','account' => 'demo']);
     }
    
     public function testLog()
     {
-        Email::config('demo', ['debug'=>true]);
+        Email::config('demo', ['debug' => true]);
         $engine = new MockEmailEngine([
-            'to'=>'you@example.com',
-            'from'=>'me@example.com',
-            'account'=>'demo'
-            ]);
+            'to' => 'you@example.com',
+            'from' => 'me@example.com',
+            'account' => 'demo',
+        ]);
         $id = uniqid();
-        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
         $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
-        $this->assertContains('From: me@example.com',$engine->email());
-        $this->assertContains('To: you@example.com',$engine->email());
+        $this->assertContains('From: me@example.com', $engine->email());
+        $this->assertContains('To: you@example.com', $engine->email());
     }
-
 
     public function testLogEmailArray()
     {
-        Email::config('demo', ['debug'=>true]);
+        Email::config('demo', ['debug' => true]);
         $engine = new MockEmailEngine([
-            'to'=> ['you@example.com','jimbo'],
-            'from'=>['me@example.com'],
-            'account'=>'demo'
-            ]);
+            'to' => ['you@example.com','jimbo'],
+            'from' => ['me@example.com'],
+            'account' => 'demo',
+        ]);
         $id = uniqid();
-        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
         $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
    
-        $this->assertContains('From: me@example.com',$engine->email());
-        $this->assertContains('jimbo <you@example.com>',$engine->email());
+        $this->assertContains('From: me@example.com', $engine->email());
+        $this->assertContains('jimbo <you@example.com>', $engine->email());
     }
 
     /**
@@ -104,13 +103,14 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testSendFailureException(){
-        Email::config('your-personal-gmail-account', ['host'=>'smtp.gmail.com','password'=>'your_password']);
+    public function testSendFailureException()
+    {
+        Email::config('your-personal-gmail-account', ['host' => 'smtp.gmail.com','password' => 'your_password']);
         $engine = new MockEmailEngine([
-            'to'=>'foo@example.com',
-            'from'=>'foo@example.com',
-            'account'=>'your-personal-gmail-account' // joke
-            ]);
-            $this->assertFalse($engine->log('error', 'This will go into a blackhole'));
+            'to' => 'foo@example.com',
+            'from' => 'foo@example.com',
+            'account' => 'your-personal-gmail-account', // joke
+        ]);
+        $this->assertFalse($engine->log('error', 'This will go into a blackhole'));
     }
 }

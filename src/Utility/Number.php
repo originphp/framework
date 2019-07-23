@@ -24,46 +24,46 @@ class Number
         'AUD' => [
             'name' => 'Australian Dollar',
             'before' => '$',
-            'after' => ''
+            'after' => '',
         ],
         'CAD' => [
             'name' => 'Canadian Dollar',
             'before' => '$',
-            'after' => ''
+            'after' => '',
         ],
         'CHF' => [
             'name' => 'Swiss Franc',
             'before' => '',
-            'after' => 'Fr'
+            'after' => 'Fr',
         ],
         'EUR' => [
             'name' => 'Euro',
             'before' => '€',
-            'after' => ''
+            'after' => '',
         ],
         'GBP' => [
             'name' => 'British Pound',
             'before' => '£',
-            'after' => ''
+            'after' => '',
         ],
         'JPY' => [
             'name' => 'Japanese Yen',
             'before' => '¥',
-            'after' => ''
+            'after' => '',
         ],
         'USD' => [
             'name' => 'United States Dollar',
             'before' => '$',
-            'after' => ''
-        ]
-        ];
+            'after' => '',
+        ],
+    ];
 
     protected static $locale = [
-            'currency' => 'USD',
-            'thousands' => ',',
-            'decimals' => '.',
-            'places' => 2,
-          ];
+        'currency' => 'USD',
+        'thousands' => ',',
+        'decimals' => '.',
+        'places' => 2,
+    ];
 
     /**
      * Sets and gets the locale array
@@ -83,7 +83,7 @@ class Number
             'currency' => 'USD',
             'thousands' => ',',
             'decimals' => '.',
-            'places' => 2
+            'places' => 2,
         ];
         static::$locale = $locale;
     }
@@ -96,9 +96,9 @@ class Number
      * @param array $options
      * @return void
      */
-    public static function addCurrency(string $symbol, $options=[]): void
+    public static function addCurrency(string $symbol, $options = []): void
     {
-        self::$currencies[$symbol] = $options + ['name'=>$symbol,'before'=>$symbol . ' ','after'=>''];
+        self::$currencies[$symbol] = $options + ['name' => $symbol,'before' => $symbol . ' ','after' => ''];
     }
 
     /**
@@ -111,7 +111,8 @@ class Number
     public static function precision($value, int $precision = 2): string
     {
         $value = sprintf("%01.{$precision}f", $value);
-        return static::format($value, ['places'=>$precision]);
+
+        return static::format($value, ['places' => $precision]);
     }
     
     /**
@@ -128,6 +129,7 @@ class Number
         if ($options['multiply']) {
             $value *= 100;
         }
+
         return static::precision($value, $precision) . '%';
     }
     /**
@@ -137,21 +139,21 @@ class Number
      * @param array $options
      * @return string
      */
-    public static function format($value, array $options=[]) : string
+    public static function format($value, array $options = []) : string
     {
         $locale = static::$locale;
 
         $places = 0;
-        if(is_float($value) OR (is_string($value) AND strpos($value,'.') !== false)){
+        if (is_float($value) or (is_string($value) and strpos($value, '.') !== false)) {
             $places = $locale['places'];
         }
 
         $options += [
             'before' => '',
-            'after'=>'',
+            'after' => '',
             'places' => $places,
             'thousands' => $locale['thousands'],
-            'decimals' => $locale['decimals']
+            'decimals' => $locale['decimals'],
         ];
 
         $formatted = number_format($value, $options['places'], $options['decimals'], $options['thousands']);
@@ -167,7 +169,7 @@ class Number
      * @param array $options
      * @return string
      */
-    public static function currency($value, string $currency = null, array $options=[]) : string
+    public static function currency($value, string $currency = null, array $options = []) : string
     {
         if ($currency === null) {
             $currency = static::$locale['currency'];
@@ -177,7 +179,7 @@ class Number
         if (isset(static::$currencies[$currency])) {
             $options += static::$currencies[$currency];
         } else {
-            $options += ['before' => $currency . ' ', 'after'=>''];
+            $options += ['before' => $currency . ' ', 'after' => ''];
         }
        
         return static::format($value, $options);
@@ -190,13 +192,14 @@ class Number
      * @param array $options
      * @return string
      */
-    public static function parse($value, array $options= []) : string
+    public static function parse($value, array $options = []) : string
     {
         $options += [
             'thousands' => static::$locale['thousands'],
-            'decimals' => static::$locale['decimals']
+            'decimals' => static::$locale['decimals'],
         ];
         $value = str_replace($options['thousands'], '', (string) $value);
+
         return str_replace($options['decimals'], '.', $value);
     }
 }

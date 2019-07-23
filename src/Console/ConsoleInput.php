@@ -26,7 +26,7 @@ class ConsoleInput
     * Constructs a new instance
     * @param string $stream fopen stream php://stdin
     */
-    public function __construct(string $stream ='php://stdin')
+    public function __construct(string $stream = 'php://stdin')
     {
         $this->stream = fopen($stream, 'r');
     }

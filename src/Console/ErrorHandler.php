@@ -14,9 +14,8 @@
 
 namespace Origin\Console;
 
-use Origin\Core\Debugger;
-use Origin\Console\ConsoleOutput;
 use Origin\Log\Log;
+use Origin\Core\Debugger;
 
 /**
  * This is the error handler for Console
@@ -31,8 +30,8 @@ class ErrorHandler
      */
     public function register()
     {
-        set_error_handler(array($this, 'errorHandler'));
-        set_exception_handler(array($this, 'exceptionHandler'));
+        set_error_handler([$this, 'errorHandler']);
+        set_exception_handler([$this, 'exceptionHandler']);
     }
 
     /**
@@ -64,8 +63,8 @@ class ErrorHandler
         'yellow' => ['color' => 'lightYellow'],
         'red' => ['color' => 'red'],
         'white' => ['color' => 'white'],
-        'magenta' => ['color'=>'magenta'],
-        'cyan' => ['color'=>'cyan']
+        'magenta' => ['color' => 'magenta'],
+        'cyan' => ['color' => 'cyan'],
     ];
 
     /**
@@ -82,6 +81,7 @@ class ErrorHandler
         foreach ($this->colourStyles as $name => $options) {
             $ConsoleOutput->styles($name, $options);
         }
+
         return $ConsoleOutput;
     }
 
@@ -109,7 +109,7 @@ class ErrorHandler
 
         $message = "{$debug['class']} {$debug['message']}";
         if (isset($debug['stackFrames'][0]['file'])) {
-            $filename =  str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
+            $filename = str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
             $message .= " {$filename}:{$debug['stackFrames'][0]['line']}";
         }
         Log::error($message);
@@ -132,7 +132,7 @@ class ErrorHandler
 
         // Code Preview
         if (isset($stackFrames[0]['file'])) {
-            $this->out("<cyan>" . $this->shortenPath($stackFrames[0]['file']) . "</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");
+            $this->out('<cyan>' . $this->shortenPath($stackFrames[0]['file']) . "</cyan> <yellowBackground> {$stackFrames[0]['line']} </yellowBackground>\n");
 
             $contents = file($debug['stackFrames'][0]['file']);
             $on = $debug['stackFrames'][0]['line'] - 1;
@@ -153,14 +153,14 @@ class ErrorHandler
         // Show Partial Stack Trace
         $this->out("\n<blueBackground> Stack Trace </blueBackground>");
         foreach ($stackFrames as $i => $stackFrame) {
-            if ($i > 2 and !$fullBacktrace) {
+            if ($i > 2 and ! $fullBacktrace) {
                 continue;
             }
             $class = $stackFrame['class'] ? $stackFrame['class'] . ' ' : '';
             $this->out("\n<cyan>{$class}</cyan><green>{$stackFrame['function']}</green>");
 
             if ($stackFrame['file']) {
-                $this->out("<white>" . $this->shortenPath($stackFrame['file']) . "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
+                $this->out('<white>' . $this->shortenPath($stackFrame['file']) . "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
             }
         }
         if ($fullBacktrace === false and $i > 3) {

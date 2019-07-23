@@ -21,7 +21,7 @@ class StaticMockObject
     use StaticConfigTrait;
 
     protected static $defaultConfig = [
-        'setting' => 'on'
+        'setting' => 'on',
     ];
     public static function reset()
     {
@@ -33,13 +33,13 @@ class StaticConfigTraitTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfig()
     {
-        $this->assertEquals(['setting'=>'on'], StaticMockObject::config());
+        $this->assertEquals(['setting' => 'on'], StaticMockObject::config());
         $this->assertEquals('on', StaticMockObject::config('setting'));
      
         StaticMockObject::config('key', 'value');
         $this->assertEquals('value', StaticMockObject::config('key'));
 
-        StaticMockObject::config(['foo'=>'bar']);
+        StaticMockObject::config(['foo' => 'bar']);
         $this->assertEquals('bar', StaticMockObject::config('foo'));
         
         $this->assertNull(StaticMockObject::config('bar'));
@@ -51,7 +51,7 @@ class StaticConfigTraitTest extends \PHPUnit\Framework\TestCase
         StaticMockObject::reset();
 
         StaticMockObject::config('foo', 'bar');
-        StaticMockObject::config(['foo/bar'=>'bar/foo']);
+        StaticMockObject::config(['foo/bar' => 'bar/foo']);
 
         $this->assertEquals('on', StaticMockObject::config('setting'));
         $this->assertTrue(StaticMockObject::config('settingz', 'none'));

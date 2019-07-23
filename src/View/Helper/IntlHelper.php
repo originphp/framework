@@ -14,10 +14,10 @@
 
 namespace Origin\View\Helper;
 
-use Origin\I18n\I18n;
-use Origin\I18n\Date;
-use Origin\I18n\Number;
 use ResourceBundle;
+use Origin\I18n\Date;
+use Origin\I18n\I18n;
+use Origin\I18n\Number;
 
 class IntlHelper extends Helper
 {
@@ -116,14 +116,12 @@ class IntlHelper extends Helper
         return Number::percent($value, $precision, $options);
     }
 
-
-
     /**
      * Returns a list of locale with display name in the current language
      * if language is not set. Use this for a picklist in your app for locale selection.
      *
-     * @example 
-     * @param string $language  
+     * @example
+     * @param string $language
       * @return $locales [en_GB => English (United Kingdom)]
      */
     public function locales(string $language = null)
@@ -155,7 +153,7 @@ class IntlHelper extends Helper
             $list[$zone] = 'GMT '.date('P', $timestamp).' - '. str_replace('_', ' ', $zone);
         }
         date_default_timezone_set($originalTimeZone);
+
         return $list;
     }
-
 }

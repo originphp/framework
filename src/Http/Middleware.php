@@ -16,8 +16,6 @@
  */
 namespace Origin\Http;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
 use Origin\Core\ConfigTrait;
 
 class Middleware
@@ -98,6 +96,7 @@ class Middleware
             $response = $next($request, $response);
         }
         $this->process($request, $response);
+
         return $response;
     }
 }

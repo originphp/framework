@@ -38,6 +38,7 @@ class PostgreSQLEngine extends Datasource
         if ($database) {
             return "{$engine}:host={$host};dbname={$database};options='--client_encoding=UTF8'";
         }
+
         return "{$engine}:host={$host};options='--client_encoding=UTF8'";
     }
     
@@ -78,6 +79,7 @@ class PostgreSQLEngine extends Datasource
             }
             sort($out); // why sort with db server
         }
+
         return $out;
     }
 
@@ -96,6 +98,7 @@ class PostgreSQLEngine extends Datasource
                 $out = $list;
             }
         }
+
         return $out;
     }
 

@@ -25,7 +25,7 @@ class ConsoleOutput
      */
     protected $stream = null;
 
-    const RAW  = 0;
+    const RAW = 0;
     const PLAIN = 1;
     const COLOR = 2;
 
@@ -48,7 +48,7 @@ class ConsoleOutput
         'lightBlue' => 94,
         'lightMagenta' => 95,
         'lightCyan' => 96,
-        'white' => 97
+        'white' => 97,
     ];
 
     protected $backgroundColors = [
@@ -68,7 +68,7 @@ class ConsoleOutput
         'lightBlue' => 104,
         'lightMagenta' => 105,
         'lightCyan' => 106,
-        'white' => 107
+        'white' => 107,
     ];
 
     protected $options = [
@@ -88,17 +88,17 @@ class ConsoleOutput
     ];
 
     protected $styles = [
-        'exception' => ['color' => 'white','background'=>'lightRed'],
+        'exception' => ['color' => 'white','background' => 'lightRed'],
 
         # Notifications
         /**
          * POSIX Levels. Works with logger as well
          */
-        'emergency' => ['color' => 'white','background'=>'lightRed','blink'=>true],
-        'alert' => ['color' => 'white','background'=>'lightRed'],
-        'critical' => ['color' => 'white','background'=>'lightRed'],
+        'emergency' => ['color' => 'white','background' => 'lightRed','blink' => true],
+        'alert' => ['color' => 'white','background' => 'lightRed'],
+        'critical' => ['color' => 'white','background' => 'lightRed'],
         'error' => ['color' => 'red'],
-        'warning'=> ['color' => 'yellow'],
+        'warning' => ['color' => 'yellow'],
         'notice' => ['color' => 'cyan'],
         'info' => ['color' => 'blue'],
         'debug' => ['color' => 'white'],
@@ -106,8 +106,8 @@ class ConsoleOutput
         'success' => ['color' => 'lightGreen'],
 
         # Standardize Outputs
-        'heading' => ['color'=>'lightYellow'],
-        'text' => ['color'=>'white'],
+        'heading' => ['color' => 'lightYellow'],
+        'text' => ['color' => 'white'],
         'code' => ['color' => 'lightGreen'],
       
         # Standard Colors which make things just easier
@@ -116,19 +116,19 @@ class ConsoleOutput
         'yellow' => ['color' => 'lightYellow'],
         'red' => ['color' => 'red'],
         'white' => ['color' => 'white'],
-        'magenta' => ['color'=>'magenta'],
-        'cyan' => ['color'=>'cyan']
+        'magenta' => ['color' => 'magenta'],
+        'cyan' => ['color' => 'cyan'],
     ];
 
     /**
      * Constructs a new instance
      * @param string $stream fopen stream php://stdout
      */
-    public function __construct(string $stream ='php://stdout')
+    public function __construct(string $stream = 'php://stdout')
     {
         $this->stream = fopen($stream, 'r');
         // Check that Ansi Escape Sequences are supported
-        if (!$this->supportsAnsi()) {
+        if (! $this->supportsAnsi()) {
             $this->mode = SELF::PLAIN;
         }
     }
@@ -159,7 +159,7 @@ class ConsoleOutput
         if ($mode === null) {
             return $this->mode;
         }
-        if (!in_array($mode, [self::RAW,self::PLAIN, self::COLOR])) {
+        if (! in_array($mode, [self::RAW,self::PLAIN, self::COLOR])) {
             throw new InvalidArgumentException(sprintf('Invalid mode %s', $mode));
         }
         $this->mode = $mode;
@@ -187,6 +187,7 @@ class ConsoleOutput
         if ($newLine) {
             $data .= "\n";
         }
+
         return $this->fwrite($data);
     }
 
@@ -199,6 +200,7 @@ class ConsoleOutput
     protected function fwrite(string $data)
     {
         fwrite($this->stream, $data);
+
         return strlen($data);
     }
 
@@ -281,11 +283,10 @@ class ConsoleOutput
         if (empty($set)) {
             return $text;
         }
+
         return "\033[" . implode(';', $set) . 'm' . $text . "\033[" . implode(';', $unset) . 'm';
     }
     
- 
-
     /**
      * Sets or modifies existing styles
      *  $styles = $ConsoleOutput->styles();
@@ -306,13 +307,16 @@ class ConsoleOutput
             if (isset($this->styles[$name])) {
                 return $this->styles[$name];
             }
+
             return null;
         }
         if ($values === false) {
             unset($this->styles[$name]);
+
             return true;
         }
         $this->styles[$name] = $values;
+
         return true;
     }
 }

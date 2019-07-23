@@ -23,12 +23,11 @@
 
 namespace Origin\Http;
 
-use Origin\Core\Debugger;
 use Origin\Log\Log;
+use Origin\Core\Debugger;
 use Origin\Core\Configure;
-use Origin\Exception\HttpException;
-use Origin\Http\Router;
 use Origin\Exception\Exception;
+use Origin\Exception\HttpException;
 
 class FatalErrorException extends Exception
 {
@@ -68,7 +67,7 @@ class ErrorHandler
         E_USER_NOTICE => 'notice',
         E_DEPRECATED => 'deprecated',
         E_USER_DEPRECATED => 'deprecated',
-        E_STRICT => 'strict'
+        E_STRICT => 'strict',
     ];
 
     /**
@@ -99,8 +98,9 @@ class ErrorHandler
         $result = false;
         $request = Router::request();
         if ($request) {
-            $result =($request->ajax() or $request->type() === 'json');
+            $result = ($request->ajax() or $request->type() === 'json');
         }
+
         return $result;
     }
 
@@ -164,8 +164,8 @@ class ErrorHandler
             $error = 'notice';
         }
         Log::write($error, $message . ' in {file}, line: {line}', [
-            'file' => $file, 'line' => $line
-            ]);
+            'file' => $file, 'line' => $line,
+        ]);
     }
 
     /**
@@ -209,7 +209,7 @@ class ErrorHandler
         $errorCode = $exception->getCode();
         $response = ['error' => ['message' => $exception->getMessage(), 'code' => $errorCode]];
 
-        if (Configure::read('debug') !== true and !$exception instanceof HttpException) {
+        if (Configure::read('debug') !== true and ! $exception instanceof HttpException) {
             $errorCode = 500;
             $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => $errorCode]];
             if ($exception->getCode() === 404) {
@@ -231,7 +231,7 @@ class ErrorHandler
         $class = (new \ReflectionClass($exception))->getShortName();
         $message = $exception->getMessage();
         $line = $exception->getLine();
-        $file =  str_replace(ROOT . DS, '', $exception->getFile());
+        $file = str_replace(ROOT . DS, '', $exception->getFile());
 
         $message = "{$class} {$message} in {$file}:{$line}";
 

@@ -21,19 +21,19 @@ class BookmarksTagFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'bookmark_id' =>     [
+        'bookmark_id' => [
             'type' => 'integer',
             'limit' => 11,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
             'key' => 'primary',
-          ],
-          'tag_id' =>     [
+        ],
+        'tag_id' => [
             'type' => 'integer',
             'limit' => 11,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
             'key' => 'primary',
-          ],
+        ],
     ];
 }

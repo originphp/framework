@@ -102,7 +102,7 @@ class ConsoleIo
     */
     public function write($message) : void
     {
-        $this->lastWrittenLength =  $this->stdout->write($message, false);
+        $this->lastWrittenLength = $this->stdout->write($message, false);
     }
 
     /**
@@ -143,7 +143,6 @@ class ConsoleIo
         $this->write($message);
     }
 
-    
     /**
      * A Title style.
      *
@@ -151,7 +150,7 @@ class ConsoleIo
      * @param string $style
      * @return void
      */
-    public function title(string $title, string $style ='heading') : void
+    public function title(string $title, string $style = 'heading') : void
     {
         $this->out("<{$style}>{$title}</{$style}>");
         $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
@@ -165,7 +164,7 @@ class ConsoleIo
      * @param string $style
      * @return void
      */
-    public function heading(string $heading, string $style ='heading') : void
+    public function heading(string $heading, string $style = 'heading') : void
     {
         $this->out("<{$style}>{$heading}</{$style}>");
         $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
@@ -179,7 +178,7 @@ class ConsoleIo
      * @param integer $indent
      * @return void
      */
-    public function text($text, int $indent=2) : void
+    public function text($text, int $indent = 2) : void
     {
         $text = (array) $text;
         foreach ($text as $line) {
@@ -204,7 +203,7 @@ class ConsoleIo
         foreach ($array as $rowIndex => $row) {
             $maxColumnWidth = 0;
             foreach ($row as $columnIndex => $cell) {
-                if (!isset($widths[$columnIndex])) {
+                if (! isset($widths[$columnIndex])) {
                     $widths[$columnIndex] = 0;
                 }
                 $width = strlen($cell) + 4;
@@ -251,7 +250,7 @@ class ConsoleIo
      * @param integer $indent indent amount
      * @return void
      */
-    public function list($elements, string $bullet = '*', int $indent=2) : void
+    public function list($elements, string $bullet = '*', int $indent = 2) : void
     {
         foreach ((array) $elements as $element) {
             $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
@@ -337,9 +336,9 @@ class ConsoleIo
      * @return void
      * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
-    public function progressBar(int $value, int $max, array $options=[]) : void
+    public function progressBar(int $value, int $max, array $options = []) : void
     {
-        $options += ['color'=>'green','ansi'=>$this->stdout->supportsAnsi()];
+        $options += ['color' => 'green','ansi' => $this->stdout->supportsAnsi()];
         
         $progressBar = '';
         $full = '#';
@@ -348,16 +347,15 @@ class ConsoleIo
         $percent = floor(($value / $max) * 100);
         $left = 100 - $percent;
 
-  
         if ($options['ansi']) {
-            $full = $this->format(' ', ['background'=>$options['color']]);
+            $full = $this->format(' ', ['background' => $options['color']]);
             $empty = "\033[30;40m \033[0m";
         }
         if ($percent) {
             $progressBar = str_repeat($full, (int) floor($percent / 2));
         }
         if ($left) {
-            if ($left %2 !== 0) {
+            if ($left % 2 !== 0) {
                 $left ++;
             }
             $progressBar .= str_repeat($empty, (int) floor($left / 2));
@@ -388,7 +386,7 @@ class ConsoleIo
     {
         $options += ['background' => 'black', 'color' => 'white'];
 
-        if (!is_array($messages)) {
+        if (! is_array($messages)) {
             $messages = [$messages];
         }
         foreach ($messages as $message) {
@@ -409,7 +407,7 @@ class ConsoleIo
 
         $this->nl();
 
-        if (!is_array($messages)) {
+        if (! is_array($messages)) {
             $messages = [$messages];
         }
 
@@ -436,7 +434,7 @@ class ConsoleIo
   
         $this->nl();
 
-        if (!is_array($messages)) {
+        if (! is_array($messages)) {
             $messages = [$messages];
         }
         $maxLength = $this->getMaxLength($messages) + ($options['padding'] * 2);
@@ -520,7 +518,7 @@ class ConsoleIo
             array_map('strtoupper', $options)
         );
        
-        while ($input === '' or !in_array($input, $options)) {
+        while ($input === '' or ! in_array($input, $options)) {
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
             $input = $this->stdin->read();
@@ -556,9 +554,10 @@ class ConsoleIo
 
         try {
             $directory = dirname($filename);
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 mkdir($directory, 0777, true);
             }
+
             return (bool) file_put_contents($filename, $contents);
         } catch (\Exception $e) {
             return false;
@@ -574,7 +573,7 @@ class ConsoleIo
      */
     public function status(string $status, string $message) : void
     {
-        if (!isset($this->statusCodes[$status])) {
+        if (! isset($this->statusCodes[$status])) {
             throw new ConsoleException(sprintf('Unkown status %s', $status));
         }
         $color = $this->statusCodes[$status];
@@ -597,6 +596,7 @@ class ConsoleIo
                 $maxLength = $length;
             }
         }
+
         return $maxLength;
     }
 
@@ -614,6 +614,7 @@ class ConsoleIo
     public function styles(string $name = null, $values = null)
     {
         $this->stderr->styles($name, $values);
+
         return $this->stdout->styles($name, $values);
     }
 

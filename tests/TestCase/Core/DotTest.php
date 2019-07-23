@@ -22,11 +22,11 @@ class DotTest extends \PHPUnit\Framework\TestCase
     {
         $Dot = new Dot();
         $Dot->set('App.encoding', 'UTF-8');
-        $expected = array('App' => array('encoding' => 'UTF-8'));
+        $expected = ['App' => ['encoding' => 'UTF-8']];
         $this->assertSame($expected, $Dot->items());
 
         $Dot = new Dot();
-        $Dot->set('App', array('encoding' => 'UTF-8'));
+        $Dot->set('App', ['encoding' => 'UTF-8']);
         $this->assertSame($expected, $Dot->items());
 
         $Dot->set('System.settings.server', 'localhost');
@@ -35,7 +35,7 @@ class DotTest extends \PHPUnit\Framework\TestCase
 
         $Dot = new Dot();
         $Dot->set('key', 'value');
-        $expected = array('key' => 'value');
+        $expected = ['key' => 'value'];
         $this->assertSame($expected, $Dot->items());
     }
 
@@ -51,7 +51,7 @@ class DotTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($Dot->get('App.secretPassword'));
 
         $Dot->set('App.encoding', 'UTF-8');
-        $expected = array('baseDirectory' => 'blog', 'encoding' => 'UTF-8');
+        $expected = ['baseDirectory' => 'blog', 'encoding' => 'UTF-8'];
         $this->assertSame($expected, $Dot->get('App'));
 
         $Dot->set('System.settings.server', 'localhost');

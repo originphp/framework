@@ -2,16 +2,15 @@
 
 namespace Origin\Test\Command;
 
+use Origin\Utility\Folder;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Utility\Folder;
 
 class GenerateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
     public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
-
 
     public function testScaffoldUnkownModel()
     {
@@ -46,7 +45,6 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('86c6758a5198f828288a0bab4c71d36e', SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
         unlink(SRC . DS . 'View' . DS . 'Bookmarks' . DS . 'view.ctp');
     }
-
 
     public function testInvalidGenerator()
     {
@@ -125,20 +123,20 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force command ContactManager.Duck');
         $this->assertExitSuccess();
 
-        $filename =  APP.DS.'plugins'.DS.'contact_manager'.DS.'src'.DS.'Command'.DS.'DuckCommand.php';
+        $filename = APP.DS.'plugins'.DS.'contact_manager'.DS.'src'.DS.'Command'.DS.'DuckCommand.php';
  
         $this->assertOutputContains('contact_manager/src/Command/DuckCommand.php');
         $this->assertFileHash('756c980100dc9eda742fff6172117dc4', $filename);
         unlink($filename);
 
-        $filename =  APP.DS.'plugins'.DS.'contact_manager'.DS.'tests'.DS.'TestCase'.DS.'Command'.DS.'DuckCommandTest.php';
+        $filename = APP.DS.'plugins'.DS.'contact_manager'.DS.'tests'.DS.'TestCase'.DS.'Command'.DS.'DuckCommandTest.php';
      
         $this->assertOutputContains('contact_manager/tests/TestCase/Command/DuckCommandTest.php');
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('a3e958f578c2464757f9ae9f99d01b86', $filename);
         unlink($filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', ['recursive'=>true]);
+        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', ['recursive' => true]);
     }
 
     public function testGenerateComponent()
@@ -273,9 +271,6 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
-
-
-    
     public function testPlugin()
     {
         $this->exec('generate --force plugin Dummy');
@@ -297,10 +292,9 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertTrue(file_exists($filename));
         $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'dummy', ['recursive'=>true]);
+        Folder::delete(APP.DS.'plugins'.DS.'dummy', ['recursive' => true]);
     }
 
-   
     /*
 
         'plugin' => 'Generates a plugin skeleton',

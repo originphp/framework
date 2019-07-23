@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Cache\Engine;
 
-use Origin\Cache\Engine\FileEngine;
 use Origin\Exception\Exception;
+use Origin\Cache\Engine\FileEngine;
 
 class FileEngineTest extends \PHPUnit\Framework\TestCase
 {

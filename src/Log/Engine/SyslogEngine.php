@@ -14,8 +14,6 @@
 
 namespace Origin\Log\Engine;
 
-use Origin\Log\Engine\BaseEngine;
-
 class SyslogEngine extends BaseEngine
 {
     protected $opened = false;
@@ -33,7 +31,7 @@ class SyslogEngine extends BaseEngine
         'warning' => LOG_WARNING,
         'notice' => LOG_NOTICE,
         'info' => LOG_INFO,
-        'debug' => LOG_DEBUG
+        'debug' => LOG_DEBUG,
     ];
 
     /**
@@ -41,13 +39,13 @@ class SyslogEngine extends BaseEngine
      *
      * @var array
      */
-    protected $defaultConfig =  [
+    protected $defaultConfig = [
         'levels' => [],
         'channels' => [],
         // syslog settings  see https://www.php.net/manual/en/function.openlog.php
         'identity' => '',
         'option' => LOG_ODELAY,
-        'facility' => LOG_USER
+        'facility' => LOG_USER,
     ];
 
     /**
@@ -69,6 +67,7 @@ class SyslogEngine extends BaseEngine
         if (isset($this->levelMap[$level])) {
             $priority = $this->levelMap[$level];
         }
+
         return $this->write($priority, $message);
     }
 
@@ -80,7 +79,7 @@ class SyslogEngine extends BaseEngine
      * @param int $facility
      * @return bool
      */
-    protected function openlog(string $identity, int $option=null, int $facility=null) :bool
+    protected function openlog(string $identity, int $option = null, int $facility = null) :bool
     {
         return $this->opened = openlog($identity, $option, $facility);
     }

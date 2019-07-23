@@ -25,7 +25,6 @@
 namespace Origin\Http;
 
 use Origin\Core\Inflector;
-use Origin\Http\Request;
 
 class Router
 {
@@ -68,11 +67,11 @@ class Router
     public static function add(string $route, array $params = [])
     {
         $defaults = [
-          'controller' => null,
-          'action' => null,
-          'args' => null,
-          'route' => null,
-          'method' => null
+            'controller' => null,
+            'action' => null,
+            'args' => null,
+            'route' => null,
+            'method' => null,
         ];
 
         // Create REGEX pattern
@@ -122,14 +121,14 @@ class Router
             parse_str($queryString, $query);
         }
 
-        $template = array(
-          'controller' => null,
-          'action' => null,
-          'args' => [],
-          'named' => [],
-          'route' => null,
-          'plugin' => null,
-        );
+        $template = [
+            'controller' => null,
+            'action' => null,
+            'args' => [],
+            'named' => [],
+            'route' => null,
+            'plugin' => null,
+        ];
 
         // Remove matching extensions, so it can be parsed
         $extension = pathinfo($url, PATHINFO_EXTENSION);
@@ -156,10 +155,10 @@ class Router
         }
 
         // No params no route
-        if (!empty($params)) {
+        if (! empty($params)) {
             $named = [];
             // Parse Greedy results *
-            if (!empty($params['greedy'])) {
+            if (! empty($params['greedy'])) {
                 $parts = explode('/', $params['greedy']);
                 foreach ($parts as $paramater) {
                     if (strpos($paramater, ':') != false) {
@@ -173,6 +172,7 @@ class Router
             $params['named'] = $named;
             unset($params['greedy']);
         }
+
         return $params;
     }
 
@@ -191,11 +191,11 @@ class Router
         if (empty($url)) {
             return '/';
         }
-        $params = array(
+        $params = [
             'controller' => null,
             'action' => null,
             'plugin' => null,
-        );
+        ];
         $url = array_merge($params, $url);
 
         $output = '';

@@ -15,8 +15,8 @@
 namespace Origin\Storage;
 
 use Origin\Core\StaticConfigTrait;
-use Origin\Exception\InvalidArgumentException;
 use Origin\Storage\Engine\BaseEngine;
+use Origin\Exception\InvalidArgumentException;
 
 class Storage
 {
@@ -25,8 +25,8 @@ class Storage
     protected static $defaultConfig = [
         'default' => [
             'className' => 'Origin\Storage\Engine\LocalEngine',
-            'path' => APP . DS . 'storage'
-        ]
+            'path' => APP . DS . 'storage',
+        ],
     ];
 
     /**
@@ -83,9 +83,10 @@ class Storage
             if (isset($config['engine'])) {
                 $config['className'] = "Origin\Storage\Engine\\{$config['engine']}Engine";
             }
-            if (empty($config['className']) or !class_exists($config['className'])) {
+            if (empty($config['className']) or ! class_exists($config['className'])) {
                 throw new InvalidArgumentException("Storage Engine for {$name} could not be found");
             }
+
             return new $config['className']($config);
         }
         throw new InvalidArgumentException("{$config} config does not exist");
@@ -101,7 +102,7 @@ class Storage
     public static function use(string $config)
     {
         deprecationWarning('Storage::use is deprecated use Storage::volume() or pass options.');
-        if (!static::config($config)) {
+        if (! static::config($config)) {
             throw new InvalidArgumentException("{$config} config does not exist");
         }
         self::$default = $config;
@@ -119,6 +120,7 @@ class Storage
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $engine = static::engine($options['config']);
+
         return $engine->read($name);
     }
     /**
@@ -134,6 +136,7 @@ class Storage
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $engine = static::engine($options['config']);
+
         return $engine->write($name, $value);
     }
 
@@ -150,6 +153,7 @@ class Storage
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $engine = static::engine($options['config']);
+
         return $engine->exists($name);
     }
 
@@ -165,6 +169,7 @@ class Storage
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $engine = static::engine($options['config']);
+
         return $engine->delete($name);
     }
 
@@ -180,6 +185,7 @@ class Storage
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $engine = static::engine($options['config']);
+
         return $engine->list($path);
     }
 }

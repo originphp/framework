@@ -17,7 +17,6 @@
 
 namespace Origin\Cache\Engine;
 
-use Origin\Cache\Engine\BaseEngine;
 use Origin\Exception\Exception;
 
 class FileEngine extends BaseEngine
@@ -25,7 +24,7 @@ class FileEngine extends BaseEngine
     protected $defaultConfig = [
         'path' => TMP . DS . 'cache',
         'duration' => 3600,
-        'prefix' => 'origin_'
+        'prefix' => 'origin_',
     ];
 
     /**
@@ -54,6 +53,7 @@ class FileEngine extends BaseEngine
                 return unserialize(file_get_contents($filename));
             }
         }
+
         return false;
     }
     /**
@@ -77,6 +77,7 @@ class FileEngine extends BaseEngine
         if ($this->exists($key)) {
             return unlink($this->config['path'] . DS . $this->key($key));
         }
+
         return false;
     }
 
@@ -94,7 +95,8 @@ class FileEngine extends BaseEngine
                 $result[] = (unlink($this->config['path'] . DS . $file) === true);
             }
         }
-        return !in_array(false, $result);
+
+        return ! in_array(false, $result);
     }
 
     public function increment(string $key, int $offset = 1)

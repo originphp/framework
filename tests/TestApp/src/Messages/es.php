@@ -1,5 +1,5 @@
 <?php
 
     return [
-        'This is a test.' => 'Esto es una prueba.'
+        'This is a test.' => 'Esto es una prueba.',
     ];

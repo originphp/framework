@@ -14,7 +14,6 @@
 
 namespace Origin\Log\Engine;
 
-use Origin\Log\Engine\BaseEngine;
 use Origin\Console\ConsoleOutput;
 
 class ConsoleEngine extends BaseEngine
@@ -26,15 +25,15 @@ class ConsoleEngine extends BaseEngine
      */
     protected $output = null;
 
-   /**
-     * Default configuration
-     *
-     * @var array
-     */
-    protected $defaultConfig =  [
+    /**
+      * Default configuration
+      *
+      * @var array
+      */
+    protected $defaultConfig = [
         'stream' => 'php://stderr',
         'levels' => [],
-        'channels' => []
+        'channels' => [],
     ];
 
     public function initialize(array $config)
@@ -53,6 +52,7 @@ class ConsoleEngine extends BaseEngine
     public function log(string $level, string $message, array $context = [])
     {
         $message = $this->format($level, $message, $context);
+
         return (bool) $this->output->write("<{$level}>{$message }</{$level}>");
     }
 }

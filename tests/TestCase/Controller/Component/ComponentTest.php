@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Controller\Component;
 
-use Origin\Controller\Component\Component;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
+use Origin\Controller\Component\Component;
 use Origin\Controller\Component\SessionComponent;
 
 class MockComponent extends Component

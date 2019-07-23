@@ -88,6 +88,7 @@ class Response
         if (isset($this->headers[$header])) {
             return $this->headers[$header];
         }
+
         return null;
     }
 
@@ -105,6 +106,7 @@ class Response
         if (isset($this->cookies[$cookie])) {
             return $this->cookies[$cookie];
         }
+
         return null;
     }
 
@@ -127,7 +129,7 @@ class Response
      * @param string $value
      * @return void
      */
-    public function cookie(string $name, $value, string $expire=null, array $options = []) :void
+    public function cookie(string $name, $value, string $expire = null, array $options = []) :void
     {
         $options += [
             'name' => $name,
@@ -136,13 +138,12 @@ class Response
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => $expire // convert from
+            'expire' => $expire, // convert from
         ];
         
         $this->cookies[$name] = $options;
     }
 
-    
     /**
      * Gets the body as json
      *
@@ -153,6 +154,7 @@ class Response
         if ($this->body) {
             return json_decode($this->body, true);
         }
+
         return null;
     }
 
@@ -166,6 +168,7 @@ class Response
         if ($this->body) {
             return xml::toArray($this->body);
         }
+
         return null;
     }
 
@@ -182,6 +185,7 @@ class Response
     public function success() : bool
     {
         $code = $this->statusCode();
+
         return in_array($code, [200,201,202,204]); // ok,created,accepted,no content
     }
 
@@ -193,6 +197,7 @@ class Response
     public function redirect() : bool
     {
         $code = $this->statusCode();
+
         return in_array($code, [301,302,303,304,307]); // moved,found,see other,not modified, temp redirect
     }
 

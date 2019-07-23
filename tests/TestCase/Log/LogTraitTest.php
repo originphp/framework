@@ -13,8 +13,8 @@
  */
 namespace Origin\Test\Log;
 
-use Origin\Log\LogTrait;
 use Origin\Log\Log;
+use Origin\Log\LogTrait;
 
 class Controller
 {
@@ -23,22 +23,23 @@ class Controller
 
 class LogTraitTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp() :void 
+    public function setUp() :void
     {
         Log::reset();
     }
-    public function testTrait(){
-        Log::config('default',['engine'=>'File']);
+    public function testTrait()
+    {
+        Log::config('default', ['engine' => 'File']);
         $controller = new Controller();
         $id = uniqid();
-        $controller->log('debug','XXX {id} ' , ['id'=>$id]);
-        $this->assertContains($id,file_get_contents(TMP . DS . 'development.log'));
+        $controller->log('debug', 'XXX {id} ', ['id' => $id]);
+        $this->assertContains($id, file_get_contents(TMP . DS . 'development.log'));
     }
 
     public function tearDown() : void
     {
         $log = TMP . DS . 'development.log';
-        if(file_exists($log)){
+        if (file_exists($log)) {
             unlink($log);
             touch($log);
         }

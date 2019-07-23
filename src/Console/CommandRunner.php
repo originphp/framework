@@ -17,8 +17,8 @@ namespace Origin\Console;
 use Origin\Core\Plugin;
 use Origin\Core\Configure;
 use Origin\Core\Inflector;
-use Origin\Console\Exception\StopExecutionException;
 use Origin\Console\Exception\ConsoleException;
+use Origin\Console\Exception\StopExecutionException;
 
 class CommandRunner
 {
@@ -91,7 +91,7 @@ class CommandRunner
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
 
-            if (!class_exists($class)) {
+            if (! class_exists($class)) {
                 throw new ConsoleException(sprintf('%s does not exist or cannot be found', $class));
             }
             $object = new $class();
@@ -115,6 +115,7 @@ class CommandRunner
         array_shift($args); // first arg is the script that called it
         if (empty($args)) {
             $this->displayHelp();
+
             return;
         }
   
@@ -218,7 +219,7 @@ class CommandRunner
             }
           
             foreach ($cmds as $cmd => $description) {
-                if (!is_array($description)) {
+                if (! is_array($description)) {
                     $description = [$description];
                 }
                 foreach ($description as $desc) {
@@ -241,7 +242,7 @@ class CommandRunner
     public function scanDirectory(string $directory, string $namespace)
     {
         $results = [];
-        if (!file_exists($directory)) {
+        if (! file_exists($directory)) {
             return [];
         }
         $files = scandir($directory);

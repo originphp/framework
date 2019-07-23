@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Console;
 
-use Origin\Console\ConsoleHelpFormatter;
 use Origin\TestSuite\TestTrait;
+use Origin\Console\ConsoleHelpFormatter;
 
 class MockConsoleHelperFormatter extends ConsoleHelpFormatter
 {
@@ -50,10 +50,10 @@ class ConsoleHelpFormatterTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $formatter->setEpilog([
-         'Lorem ipsum dolor sit amet, adipisci nibh risus mollis sagittis, sed egestas erat, dui eu eros,',
-         'facilisi nulla, wisi aenean id egestas. Ante orci vivamus fusce ac orci eget, id eget tincidunt',
-         'nonummy diam.',
-     ]);
+            'Lorem ipsum dolor sit amet, adipisci nibh risus mollis sagittis, sed egestas erat, dui eu eros,',
+            'facilisi nulla, wisi aenean id egestas. Ante orci vivamus fusce ac orci eget, id eget tincidunt',
+            'nonummy diam.',
+        ]);
 
         $result = $formatter->generate();
 

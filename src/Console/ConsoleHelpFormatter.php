@@ -114,32 +114,32 @@ class ConsoleHelpFormatter
         }
 
         if ($this->usage) {
-            $out[] = "<yellow>Usage:</yellow>";
+            $out[] = '<yellow>Usage:</yellow>';
             $out[] = $this->usage;
             $out[] = '';
         }
 
         $maxWidth = $this->calculateWidth();
         if ($this->commands) {
-            $out[] = "<yellow>Commands:</yellow>";
+            $out[] = '<yellow>Commands:</yellow>';
             $out[] = $this->createTable($this->commands, $maxWidth);
             $out[] = '';
         }
 
         if ($this->arguments) {
-            $out[] = "<yellow>Arguments:</yellow>";
+            $out[] = '<yellow>Arguments:</yellow>';
             $out[] = $this->createTable($this->arguments, $maxWidth);
             $out[] = '';
         }
 
         if ($this->options) {
-            $out[] = "<yellow>Options:</yellow>";
+            $out[] = '<yellow>Options:</yellow>';
             $out[] = $this->createTable($this->options, $maxWidth);
             $out[] = '';
         }
 
         if ($this->help) {
-            $out[] = "<yellow>Help:</yellow>";
+            $out[] = '<yellow>Help:</yellow>';
             $out[] = $this->help;
             $out[] = '';
         }
@@ -166,6 +166,7 @@ class ConsoleHelpFormatter
                 $minWidth = $maxWidth;
             }
         }
+
         return $minWidth + 1;
     }
 
@@ -188,7 +189,7 @@ class ConsoleHelpFormatter
      */
     public function setUsage($usage) : void
     {
-        $usage =  $this->toText($usage, "\n  ");
+        $usage = $this->toText($usage, "\n  ");
         $this->usage = '<white>' . $this->wrapText($usage, 2) .'</white>';
     }
     /**
@@ -243,7 +244,7 @@ class ConsoleHelpFormatter
      */
     public function setHelp($help) : void
     {
-        $help =  $this->toText($help, "\n  ");
+        $help = $this->toText($help, "\n  ");
         $this->help = '<white>' . $this->wrapText($help, 2) .'</white>';
     }
 
@@ -254,11 +255,12 @@ class ConsoleHelpFormatter
      * @param string $glue
      * @return string
      */
-    protected function toText($mixed, $glue ="\n") : string
+    protected function toText($mixed, $glue = "\n") : string
     {
         if (is_string($mixed)) {
             $mixed = [$mixed];
         }
+
         return implode($glue, $mixed);
     }
     
@@ -281,6 +283,7 @@ class ConsoleHelpFormatter
                 $left = str_repeat(' ', strlen($left)); // Only show once
             }
         }
+
         return $this->indentText(implode("\n", $out), 2);
     }
 
@@ -295,10 +298,11 @@ class ConsoleHelpFormatter
         $maxLength = 0;
         foreach ($array as $left => $right) {
             $width = strlen($left);
-            if ($width>$maxLength) {
+            if ($width > $maxLength) {
                 $maxLength = $width;
             }
         }
+
         return $maxLength;
     }
 
@@ -315,6 +319,7 @@ class ConsoleHelpFormatter
         if ($indent > 0) {
             $string = $this->indentText($string, $indent);
         }
+
         return $string;
     }
 
@@ -328,6 +333,7 @@ class ConsoleHelpFormatter
     protected function indentText(string $string, int $indent) : string
     {
         $padding = str_repeat(' ', $indent);
+
         return $padding . str_replace("\n", "\n{$padding}", $string);
     }
 }

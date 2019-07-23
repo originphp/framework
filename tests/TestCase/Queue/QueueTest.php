@@ -14,9 +14,8 @@
 namespace Origin\Test\Queue;
 
 use Origin\Queue\Queue;
-use Origin\Model\ConnectionManager;
-use Origin\Exception\InvalidArgumentException;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Exception\InvalidArgumentException;
 
 class QueueTest extends OriginTestCase
 {
@@ -31,30 +30,30 @@ class QueueTest extends OriginTestCase
 
     protected function setUp(): void
     {
-        $this->Queue = new Queue(['datasource'=>'test']);
+        $this->Queue = new Queue(['datasource' => 'test']);
     }
    
     public function testAdd()
     {
-        $this->assertNotNull($this->Queue->add('welcome_emails', ['user_id'=>1234]));
+        $this->assertNotNull($this->Queue->add('welcome_emails', ['user_id' => 1234]));
         $this->assertEquals(1, $this->Queue->model()->find('count'));
     }
 
     public function testAddFailQueueName()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->Queue->add('this has space', ['id'=>1234]);
+        $this->Queue->add('this has space', ['id' => 1234]);
     }
 
     public function testAddFailParamsOverload()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->Queue->add('overload', ['data'=>str_repeat('+', 65535)]);
+        $this->Queue->add('overload', ['data' => str_repeat('+', 65535)]);
     }
 
     public function testExecuted()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
     
         $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->executed());
@@ -67,7 +66,7 @@ class QueueTest extends OriginTestCase
 
     public function testFailed()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->failed());
 
@@ -79,7 +78,7 @@ class QueueTest extends OriginTestCase
 
     public function testRelease()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         $job = $this->Queue->fetch('welcome_emails');
         $job->release();
         $job = $this->Queue->model()->get($job->id);
@@ -89,7 +88,7 @@ class QueueTest extends OriginTestCase
 
     public function testRetry()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         $job = $this->Queue->fetch('welcome_emails');
         $job->retry(1);
         $jobFromDb = $this->Queue->model()->get($job->id);
@@ -101,7 +100,7 @@ class QueueTest extends OriginTestCase
 
     public function testPurge()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         $this->assertEquals(1, $this->Queue->model()->find('count'));
         $job = $this->Queue->fetch('welcome_emails');
         $job->executed();
@@ -111,7 +110,7 @@ class QueueTest extends OriginTestCase
 
     public function testDelete()
     {
-        $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         $job = $this->Queue->fetch('welcome_emails');
         $this->assertTrue($job->delete());
         $this->assertEquals(0, $this->Queue->model()->find('count'));
@@ -119,7 +118,7 @@ class QueueTest extends OriginTestCase
 
     public function testFetch()
     {
-        $id = $this->Queue->add('welcome_emails', ['user_id'=>1234]);
+        $id = $this->Queue->add('welcome_emails', ['user_id' => 1234]);
         
         // Test job entity
         $job = $this->Queue->fetch('welcome_emails');

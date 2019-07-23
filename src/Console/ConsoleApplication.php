@@ -14,13 +14,10 @@
 
 namespace Origin\Console;
 
-use Origin\Console\ConsoleIo;
-use Origin\Console\ConsoleHelpFormatter;
-use Origin\Console\ArgumentParser;
 use Origin\Core\Resolver;
 use Origin\Exception\Exception;
-use Origin\Console\Exception\ConsoleException;
 use Origin\Core\LazyLoadContainer;
+use Origin\Console\Exception\ConsoleException;
 use Origin\Exception\InvalidArgumentException;
 
 /**
@@ -59,7 +56,7 @@ class ConsoleApplication
      *
      * @var string
      */
-    protected $description =  null;
+    protected $description = null;
 
     /**
     * Holds the command list
@@ -67,7 +64,6 @@ class ConsoleApplication
     * @var array
     */
     protected $commands = [];
-
 
     /**
      * Undocumented variable
@@ -99,8 +95,8 @@ class ConsoleApplication
         $this->argumentParser = new ArgumentParser();
 
         $this->argumentParser->addOption('help', [
-            'short'=>'h','description'=>'Displays this help message','type'=>'boolean'
-            ]);
+            'short' => 'h','description' => 'Displays this help message','type' => 'boolean',
+        ]);
    
         $this->initialize();
         
@@ -122,7 +118,7 @@ class ConsoleApplication
         if ($name === null) {
             return $this->name;
         }
-        if (!preg_match('/^[a-z-]+$/', $name)) {
+        if (! preg_match('/^[a-z-]+$/', $name)) {
             throw new ConsoleException(sprintf('Command App name `%s` is invalid', $name));
         }
         $this->name = $name;
@@ -134,7 +130,7 @@ class ConsoleApplication
      * @param string|array $description
      * @return string|null
      */
-    public function description($description =null)
+    public function description($description = null)
     {
         if ($description === null) {
             return $this->description;
@@ -177,8 +173,9 @@ class ConsoleApplication
             }
         }
         
-        if (!$command) {
+        if (! $command) {
             $this->displayHelp();
+
             return true;
         }
 
@@ -186,6 +183,7 @@ class ConsoleApplication
             $this->{$command} = $this->commandRegistry->get($command);
         } catch (Exception $ex) {
             $this->io->error("Invalid command {$command}.");
+
             return false;
         }
       
@@ -232,12 +230,12 @@ class ConsoleApplication
      */
     public function addCommand(string $alias, string $name)
     {
-        if (!preg_match('/^[a-z-]+$/', $alias)) {
+        if (! preg_match('/^[a-z-]+$/', $alias)) {
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));
         }
 
         $className = Resolver::className($name, 'Command', 'Command');
-        if (!$className) {
+        if (! $className) {
             throw new InvalidArgumentException(sprintf('`%s` command not found.', $name));
         }
         $this->commandRegistry->add($alias, $className);

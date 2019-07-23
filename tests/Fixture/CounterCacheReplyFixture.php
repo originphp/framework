@@ -21,11 +21,11 @@ class CounterCacheReplyFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-         'id' => ['type' => 'primaryKey'],
-         'post_id' => ['type' => 'integer'],
-         'description' => 'text',
-         'created' => 'datetime',
-         'modified' => 'datetime',
+        'id' => ['type' => 'primaryKey'],
+        'post_id' => ['type' => 'integer'],
+        'description' => 'text',
+        'created' => 'datetime',
+        'modified' => 'datetime',
     ];
 
     public $records = [];

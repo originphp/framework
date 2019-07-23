@@ -16,10 +16,10 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\BaseApplication;
-use Origin\Exception\InvalidArgumentException;
 use Origin\Http\Middleware;
+use Origin\Http\BaseApplication;
 use Origin\Http\MiddlewareRunner;
+use Origin\Exception\InvalidArgumentException;
 
 class FooMiddleware extends Middleware
 {
@@ -57,7 +57,7 @@ class BaseApplicationTest extends \PHPUnit\Framework\TestCase
     {
         $middlewareRunner = $this->createMock(MiddlewareRunner::class);
         $middlewareRunner->method('run')
-             ->willReturn(null);
+            ->willReturn(null);
 
         $application = new FooApplication(new Request(), new Response(), $middlewareRunner);
         $this->expectException(InvalidArgumentException::class);
@@ -67,7 +67,7 @@ class BaseApplicationTest extends \PHPUnit\Framework\TestCase
     {
         $middlewareRunner = $this->createMock(MiddlewareRunner::class);
         $middlewareRunner->method('run')
-             ->willReturn(null);
+            ->willReturn(null);
 
         $application = new FooApplication(new Request(), new Response(), $middlewareRunner);
         $this->assertNull($application->loadMiddleware(FooMiddleware::class));

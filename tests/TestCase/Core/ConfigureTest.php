@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\Configure;
 use Origin\Core\Dot;
+use Origin\Core\Configure;
 
 class MockConfigure extends Configure
 {
@@ -36,7 +36,7 @@ class ConfigureTest extends \PHPUnit\Framework\TestCase
         $expected = 'foo';
         Configure::write('Test.value', $expected);
         $this->assertEquals($expected, Configure::read('Test.value'));
-        $this->assertEquals(['value'=>$expected], Configure::read('Test'));
+        $this->assertEquals(['value' => $expected], Configure::read('Test'));
     }
 
     public function testWrite()
@@ -45,7 +45,7 @@ class ConfigureTest extends \PHPUnit\Framework\TestCase
         Configure::write('Test.value', $expected);
         $this->assertEquals($expected, Configure::read('Test.value'));
 
-        $expected = ['value'=>'ok'];
+        $expected = ['value' => 'ok'];
         Configure::write('Test', $expected);
         $this->assertEquals($expected, Configure::read('Test'));
 

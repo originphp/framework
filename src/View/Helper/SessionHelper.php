@@ -39,6 +39,7 @@ class SessionHelper extends Helper
         if ($this->session === null) {
             $this->session = new Session();
         }
+
         return $this->session;
     }
     /**
@@ -88,6 +89,7 @@ class SessionHelper extends Helper
     public function check(string $name) : bool
     {
         deprecationWarning('Session::check is depreciated use session:exists');
+
         return $this->exists($name);
     }
 

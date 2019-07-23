@@ -14,9 +14,9 @@
 
 namespace Origin\Model\Behavior;
 
-use Origin\Core\ObjectRegistry;
 use Origin\Model\Model;
 use Origin\Core\Resolver;
+use Origin\Core\ObjectRegistry;
 use Origin\Model\Exception\MissingBehaviorException;
 
 /**

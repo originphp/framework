@@ -15,18 +15,20 @@
 namespace Origin\TestSuite\Stub;
 
 use Origin\Console\ConsoleOutput as BaseConsoleOutput;
+
 class ConsoleOutput extends BaseConsoleOutput
 {
     protected $mode = SELF::RAW;
 
     protected $buffer = '';
 
-    protected function fwrite(string $data){
+    protected function fwrite(string $data)
+    {
         $this->buffer .= $data;
     }
 
-    public function read(){
+    public function read()
+    {
         return $this->buffer;
     }
-
 }

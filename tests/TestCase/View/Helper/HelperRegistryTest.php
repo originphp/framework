@@ -14,11 +14,11 @@
 
 namespace Origin\Test\View\Helper;
 
-use Origin\View\Helper\HelperRegistry;
-use Origin\Http\Response;
-use Origin\Http\Request;
-use Origin\Controller\Controller;
 use Origin\View\View;
+use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\Controller\Controller;
+use Origin\View\Helper\HelperRegistry;
 use Origin\View\Exception\MissingHelperException;
 
 class HelperRegistryTest extends \PHPUnit\Framework\TestCase

@@ -21,52 +21,50 @@ class BookmarkFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' =>     [
+        'id' => [
             'type' => 'primaryKey',
             'limit' => 11,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
             'key' => 'primary',
-          ],
-          'user_id' =>     [
+        ],
+        'user_id' => [
             'type' => 'integer',
             'limit' => 11,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-          'title' =>     [
+        ],
+        'title' => [
             'type' => 'string',
             'limit' => 50,
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-          'description' =>     [
+        ],
+        'description' => [
             'type' => 'text',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'url' =>     [
+        ],
+        'url' => [
             'type' => 'text',
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'category' =>     [
+        ],
+        'category' => [
             'type' => 'string',
             'limit' => 80,
-            'default' => NULL,
+            'default' => null,
             'null' => true,
-          ],
-          'created' =>     [
+        ],
+        'created' => [
             'type' => 'datetime',
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ],
-          'modified' =>     [
+        ],
+        'modified' => [
             'type' => 'datetime',
-            'default' => NULL,
+            'default' => null,
             'null' => false,
-          ]
+        ],
     ];
-
-   
 }

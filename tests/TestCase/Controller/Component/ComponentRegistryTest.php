@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Controller\Component;
 
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Controller\Controller;
 use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
 use Origin\Controller\Component\Exception\MissingComponentException;
-use Origin\Http\Request;
-use Origin\Http\Response;
 
 class MyComponent extends Component
 {

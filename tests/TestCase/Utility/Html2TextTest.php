@@ -53,7 +53,7 @@ class Html2TextTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<code>$ docker-compose up</code>';
         $result = Html2Text::convert($html);
-        $expected = "`$ docker-compose up`";
+        $expected = '`$ docker-compose up`';
         $this->assertSame($expected, $result);
     }
 

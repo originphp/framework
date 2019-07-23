@@ -15,10 +15,6 @@
 
 namespace Origin\Http;
 
-use Origin\Http\Router;
-use Origin\Http\Session;
-use Origin\Http\Cookie;
-
 use Origin\Exception\MethodNotAllowedException;
 
 class Request
@@ -34,7 +30,7 @@ class Request
         'args' => [],
         'named' => [],
         'plugin' => null,
-        'route' => null
+        'route' => null,
     ];
 
     /**
@@ -176,19 +172,21 @@ class Request
 
         if (is_array($key)) {
             $this->query = $key;
+
             return;
         }
         if (func_num_args() === 2) {
             $this->query[$key] = $value;
+
             return;
         }
 
         if (isset($this->query[$key])) {
             return $this->query[$key];
         }
+
         return null;
     }
-
 
     /**
      * Set/get the values in data, can set individual or whole data array
@@ -210,6 +208,7 @@ class Request
 
         if (is_array($key)) {
             $this->data = $key;
+
             return;
         }
 
@@ -220,6 +219,7 @@ class Request
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
+
         return null;
     }
 
@@ -242,17 +242,20 @@ class Request
 
         if (is_array($key)) {
             $this->params = $key;
+
             return;
         }
 
         if (func_num_args() === 2) {
             $this->params[$key] = $value;
+
             return;
         }
 
         if (isset($this->params[$key])) {
             return $this->params[$key];
         }
+
         return null;
     }
 
@@ -264,7 +267,7 @@ class Request
      */
     protected function uri(): string
     {
-        return $this->env('REQUEST_URI')??'';
+        return $this->env('REQUEST_URI') ?? '';
     }
 
     /**
@@ -281,6 +284,7 @@ class Request
         if ($includeQuery and $this->query) {
             $url .= '?' . http_build_query($this->query);
         }
+
         return $url;
     }
 
@@ -298,6 +302,7 @@ class Request
         if ($includeQuery and $this->query) {
             $path .= '?' . http_build_query($this->query);
         }
+
         return $path;
     }
 
@@ -351,10 +356,11 @@ class Request
                 if ($accepts[0] === 'application/json') {
                     $type = 'json';
                 } elseif (in_array($accepts[0], ['application/xml', 'text/xml'])) {
-                    $type =  'xml';
+                    $type = 'xml';
                 }
             }
         }
+
         return $this->type($type);
     }
 
@@ -393,9 +399,9 @@ class Request
         if ($ip) {
             return $ip;
         }
+
         return $this->env('REMOTE_ADDR');
     }
-
 
     /**
      * Processes the GET stuff
@@ -431,6 +437,7 @@ class Request
         if ($trustProxy) {
             return $this->env('HTTP_X_FORWARDED_HOST');
         }
+
         return $this->env('HTTP_HOST');
     }
 
@@ -447,12 +454,13 @@ class Request
         if ($this->is(['post'])) {
             if ($this->env('CONTENT_TYPE') === 'application/json') {
                 $data = json_decode($this->readInput(), true);
-                if (!is_array($data)) {
+                if (! is_array($data)) {
                     $data = [];
                 }
             }
         }
         $this->data($data);
+
         return $data;
     }
 
@@ -478,10 +486,10 @@ class Request
     public function is($type): bool
     {
         $method = $this->env('REQUEST_METHOD');
-        if (!$method) {
+        if (! $method) {
             return false;
         }
-        if (!is_array($type)) {
+        if (! is_array($type)) {
             $type = [$type];
         }
 
@@ -546,7 +554,6 @@ class Request
         return false;
     }
 
-
     /**
      * Gets a list of accepted languages, checks if a specific language is accepted
      *
@@ -591,6 +598,7 @@ class Request
             }
             $accepts[] = $value;
         }
+
         return $accepts;
     }
 
@@ -605,12 +613,14 @@ class Request
     {
         if (func_num_args() === 2) {
             $this->environment[$key] = $value;
+
             return;
         }
 
         if (isset($this->environment[$key])) {
             return $this->environment[$key];
         }
+
         return null;
     }
 
@@ -659,6 +669,7 @@ class Request
             if (isset($this->headers[$key])) {
                 return $this->headers[$key];
             }
+
             return null;
         }
 
@@ -676,6 +687,7 @@ class Request
         if ($this->session === null) {
             $this->session = new Session();
         }
+
         return $this->session;
     }
 
@@ -692,6 +704,7 @@ class Request
 
         if (is_array($key)) {
             $this->cookies = $key;
+
             return;
         }
 
@@ -699,6 +712,7 @@ class Request
             if (isset($this->cookies[$key])) {
                 return $this->cookies[$key];
             }
+
             return null;
         }
         $this->cookies[$key] = $value;
@@ -715,6 +729,7 @@ class Request
         foreach (array_keys($_COOKIE) as $key) {
             $cookies[$key] = $cookie->read($key);
         }
+
         return $cookies;
     }
 
@@ -753,6 +768,7 @@ class Request
         $fh = fopen('php://input', 'r');
         $contents = stream_get_contents($fh);
         fclose($fh);
+
         return $contents;
     }
 }

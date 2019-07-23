@@ -67,6 +67,7 @@ class Autoloader
         if (static::$instance === null) {
             static::$instance = new Autoloader();
         }
+
         return static::$instance;
     }
 
@@ -94,7 +95,7 @@ class Autoloader
      */
     public function register()
     {
-        return spl_autoload_register(array($this, 'load'));
+        return spl_autoload_register([$this, 'load']);
     }
 
     /**

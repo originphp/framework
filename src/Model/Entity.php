@@ -22,7 +22,6 @@ namespace Origin\Model;
 
 use Origin\Utility\Xml;
 use Origin\Core\Inflector;
-use Origin\Model\Collection;
 
 class Entity
 {
@@ -171,6 +170,7 @@ class Entity
             if (isset($this->_errors[$field])) {
                 return $this->_errors[$field];
             }
+
             return null;
         }
         $this->invalidate($field, $error);
@@ -185,7 +185,7 @@ class Entity
      */
     public function invalidate(string $field, string $error)
     {
-        if (!isset($this->_errors[$field])) {
+        if (! isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
         }
         $this->_errors[$field][] = $error;
@@ -267,6 +267,7 @@ class Entity
         if ($property === null) {
             return array_keys($this->_modified);
         }
+
         return isset($this->_modified[$property]);
     }
 
@@ -357,6 +358,7 @@ class Entity
     public function toXml()
     {
         $root = Inflector::variable($this->_name ?? 'record');
+
         return Xml::fromArray([$root => $this->toArray()]);
     }
 }

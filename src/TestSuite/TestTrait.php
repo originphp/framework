@@ -31,7 +31,7 @@ trait TestTrait
             return $this->{$method}();
         }
 
-        return call_user_func_array(array($this, $method), $args);
+        return call_user_func_array([$this, $method], $args);
     }
 
     public function getProperty(string $property)

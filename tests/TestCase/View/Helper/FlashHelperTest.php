@@ -15,9 +15,9 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
 use Origin\View\Helper\FlashHelper;
 
 class FlashHelperTest extends \PHPUnit\Framework\TestCase
@@ -31,7 +31,7 @@ class FlashHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->Flash->messages());
         $expected = '<div class="alert alert-danger" role="alert">holy moly</div>';
-        $this->Flash->Session->write('Flash', ['error'=>['holy moly']]);
+        $this->Flash->Session->write('Flash', ['error' => ['holy moly']]);
         $this->assertEquals($expected, $this->Flash->messages());
     }
 }

@@ -22,16 +22,16 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testBody()
     {
         $content = '<h1>Title</h1>';
-        $response  = new Response();
+        $response = new Response();
         $response->body($content);
         $this->assertEquals($content, $response->body());
     }
     public function testHeader()
     {
-        $response  = new Response();
+        $response = new Response();
         
         $response->header('Accept-Language', 'en-us,en;q=0.5');
-        $response->header(['Accept-Encoding'=>'gzip,deflate']);
+        $response->header(['Accept-Encoding' => 'gzip,deflate']);
 
         $headers = $response->headers();
         
@@ -40,7 +40,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
     public function testCookie()
     {
-        $response  = new Response();
+        $response = new Response();
         $response->cookie('foo', 'bar');
         $this->assertEquals('bar', $response->cookies('foo')['value']);
 
@@ -51,14 +51,14 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     }
     public function testStatusCode()
     {
-        $response  = new Response();
+        $response = new Response();
         $response->statusCode(501);
         $this->assertEquals(501, $response->statusCode());
     }
 
     public function testSend()
     {
-        $response  = new Response();
+        $response = new Response();
         $response->statusCode(200);
         $response->header('Accept-Language', 'en-us,en;q=0.5');
         $this->assertNull($response->send()); // or $response->send()
@@ -66,7 +66,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
     public function testType()
     {
-        $response  = new Response();
+        $response = new Response();
         
         // Test Set
         $this->assertEquals('text/html', $response->type());
@@ -81,13 +81,13 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
     public function testFile()
     {
-        $response  = new Response();
+        $response = new Response();
        
-        $response->file(ROOT . DS . 'README.md', ['download'=>true]);
+        $response->file(ROOT . DS . 'README.md', ['download' => true]);
         $headers = $response->headers();
         $this->assertEquals('attachment; filename="README.md"', $headers['Content-Disposition']);
 
         $this->expectException(NotFoundException::class);
-        $response->file('/var/www/---does-not-exist.md', ['download'=>true]);
+        $response->file('/var/www/---does-not-exist.md', ['download' => true]);
     }
 }

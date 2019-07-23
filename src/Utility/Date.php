@@ -32,7 +32,7 @@ class Date
         'timezone' => 'UTC',
         'date' => 'Y-m-d',
         'datetime' => 'Y-m-d H:i',
-        'time' => 'H:i'
+        'time' => 'H:i',
     ];
 
     /**
@@ -57,7 +57,7 @@ class Date
             'timezone' => 'UTC',
             'date' => 'Y-m-d',
             'datetime' => 'Y-m-d H:i',
-            'time' => 'H:i'
+            'time' => 'H:i',
         ];
         static::$locale = $locale;
     }
@@ -104,7 +104,6 @@ class Date
         static::$locale['time'] = $format;
     }
 
-
     protected static function convert()
     {
         return (date_default_timezone_get() !== static::$locale['timezone']);
@@ -127,6 +126,7 @@ class Date
                     $dateString = static::convertTimezone($dateString .' 00:00:00', date_default_timezone_get(), static::$locale['timezone']);
                 }
             }
+
             return date($format, strtotime($dateString));
         }
         if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
@@ -155,6 +155,7 @@ class Date
         if (static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
+
         return date(static::$locale['date'], strtotime($dateString));
     }
 
@@ -170,6 +171,7 @@ class Date
         if (static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
+
         return date(static::$locale['datetime'], strtotime($dateString));
     }
 
@@ -184,13 +186,14 @@ class Date
         $hasDate = (strpos($dateString, ' ') !== false);
 
         // Add fictious date to work (careful of DST)
-        if (!$hasDate) {
+        if (! $hasDate) {
             $dateString = "2019-01-01 {$dateString}";
         }
         // Only convert timezone if date is supplied.
         if ($hasDate and static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
+
         return date(static::$locale['time'], strtotime($dateString));
     }
 
@@ -217,6 +220,7 @@ class Date
         if ($dateString and static::convert()) {
             $dateString = static::convertTimezone($dateString, static::$locale['timezone'], date_default_timezone_get());
         }
+
         return $dateString;
     }
 
@@ -234,6 +238,7 @@ class Date
         if ($timeString) {
             $timeString = date('H:i:s', strtotime("2019-01-01 {$timeString}"));
         }
+
         return $timeString;
     }
 
@@ -251,6 +256,7 @@ class Date
         if ($date) {
             return $date->format($toFormat);
         }
+
         return null;
     }
 
@@ -269,8 +275,10 @@ class Date
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new DateTimeZone($fromTimezone));
         if ($date) {
             $date->setTimeZone(new DateTimeZone($toTimezone));
+
             return $date->format('Y-m-d H:i:s');
         }
+
         return null;
     }
 }

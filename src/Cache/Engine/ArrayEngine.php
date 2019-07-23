@@ -17,7 +17,6 @@
 
 namespace Origin\Cache\Engine;
 
-use Origin\Cache\Engine\BaseEngine;
 use Origin\Core\ConfigTrait;
 
 class ArrayEngine extends BaseEngine
@@ -25,7 +24,7 @@ class ArrayEngine extends BaseEngine
     use ConfigTrait;
     
     protected $defaultConfig = [
-        'prefix' => null
+        'prefix' => null,
     ];
     
     protected $data = [];
@@ -40,6 +39,7 @@ class ArrayEngine extends BaseEngine
     public function write(string $key, $value) :bool
     {
         $this->data[$this->key($key)] = $value;
+
         return true;
     }
     /**
@@ -54,6 +54,7 @@ class ArrayEngine extends BaseEngine
         if ($this->exists($key)) {
             return $this->data[$key];
         }
+
         return false;
     }
     /**
@@ -77,8 +78,10 @@ class ArrayEngine extends BaseEngine
         $key = $this->key($key);
         if ($this->exists($key)) {
             unset($this->data[$key]);
+
             return true;
         }
+
         return false;
     }
 
@@ -90,6 +93,7 @@ class ArrayEngine extends BaseEngine
     public function clear(): bool
     {
         $this->data = [];
+
         return true;
     }
 
@@ -103,10 +107,11 @@ class ArrayEngine extends BaseEngine
     public function increment(string $key, int $offset = 1): int
     {
         $key = $this->key($key);
-        if (!$this->exists($key)) {
+        if (! $this->exists($key)) {
             $this->data[$key] = 0;
         }
         $this->data[$key] += $offset;
+
         return $this->data[$key];
     }
 
@@ -120,10 +125,11 @@ class ArrayEngine extends BaseEngine
     public function decrement(string $key, int $offset = 1): int
     {
         $key = $this->key($key);
-        if (!$this->exists($key)) {
+        if (! $this->exists($key)) {
             $this->data[$key] = 0;
         }
         $this->data[$key] -= $offset;
+
         return $this->data[$key];
     }
 }

@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Controller\Component;
 
-use Origin\Controller\Controller;
-use Origin\Controller\Component\SessionComponent;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
+use Origin\Controller\Component\SessionComponent;
 
 class SessionComponentTest extends \PHPUnit\Framework\TestCase
 {

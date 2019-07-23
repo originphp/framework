@@ -49,7 +49,7 @@ class Number
      */
     public static function defaultCurrency(string $currency = null)
     {
-        if($currency === null){
+        if ($currency === null) {
             return self::$currency;
         }
         self::$currency = $currency;
@@ -84,7 +84,7 @@ class Number
      */
     public static function percent(float $value, int $precision = 2, array $options = [])
     {
-        if (!empty($options['multiply'])) {
+        if (! empty($options['multiply'])) {
             $value = $value * 100;
         }
 
@@ -142,6 +142,7 @@ class Number
     public static function parse(string $string, $type = NumberFormatter::DECIMAL)
     {
         $formatter = new NumberFormatter(static::$locale, $type);
+
         return $formatter->parse($string);
     }
 

@@ -15,14 +15,14 @@
 namespace Origin\Controller\Component;
 
 use Origin\Model\Model;
-use Origin\Exception\NotFoundException;
 use Origin\Core\Inflector;
+use Origin\Exception\NotFoundException;
 
 class PaginatorComponent extends Component
 {
     protected $defaultConfig = [
-      'page' => 1,
-      'limit' => 20,
+        'page' => 1,
+        'limit' => 20,
     ];
 
     /**
@@ -44,14 +44,13 @@ class PaginatorComponent extends Component
     {
         $this->model = $model;
 
-       
         $settings = $this->mergeSettings($settings);
         $settings = $this->prepareSort($settings);
 
         /**
          * Security: block non integer values here
          */
-        if (!is_int($settings['page'])) {
+        if (! is_int($settings['page'])) {
             throw new NotFoundException('Invalid Page Value');
         }
      
@@ -65,13 +64,13 @@ class PaginatorComponent extends Component
         $pages = (int) ceil($count / $settings['limit']);
 
         $this->controller()->set('paging', [
-          'current' => $settings['page'],
-          'pages' => ($pages > 1 ? $pages : 1),
-          'records' => $count,
-          'sort' => $sort,
-          'direction' => $direction,
-          'prevPage' => ($settings['page'] > 1),
-          'nextPage' => ($settings['page'] < $pages),
+            'current' => $settings['page'],
+            'pages' => ($pages > 1 ? $pages : 1),
+            'records' => $count,
+            'sort' => $sort,
+            'direction' => $direction,
+            'prevPage' => ($settings['page'] > 1),
+            'nextPage' => ($settings['page'] < $pages),
         ]);
       
         if ($settings['page'] > 1 and $settings['page'] > ($count * $settings['limit'])) {
@@ -111,7 +110,7 @@ class PaginatorComponent extends Component
     protected function getModelFromField(string $field)
     {
         $needle = Inflector::camelize(substr($field, 0, -3)); // owner_id -> Owner;
-        $belongsTo =  $this->model->association('belongsTo');
+        $belongsTo = $this->model->association('belongsTo');
     
         if (isset($belongsTo[$needle])) {
             return $needle;
@@ -168,7 +167,7 @@ class PaginatorComponent extends Component
          * 1. Check field exists to prevent injections
          * 2. Use pre-defined values for sort
          */
-        if (isset($settings['sort']) and !$this->model->hasField($settings['sort'])) {
+        if (isset($settings['sort']) and ! $this->model->hasField($settings['sort'])) {
             unset($settings['sort']);
 
             return $settings;

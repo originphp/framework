@@ -1,18 +1,17 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Utility\Folder;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Utility\Folder;
 
 class LocaleGenerateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-  
     public function testRun()
     {
-        Folder::delete(CONFIG . DS . 'locales', ['recursive'=>true]); // reach path
+        Folder::delete(CONFIG . DS . 'locales', ['recursive' => true]); // reach path
 
         $this->exec('locale:generate --force');
         $this->assertExitSuccess();
@@ -20,7 +19,7 @@ class LocaleGenerateCommandTest extends OriginTestCase
         $this->assertRegExp('/Generated ([0-9]{3}) locale definitions/', $output); // Different systems generate different amounts
       
         // Remove files
-        Folder::delete(CONFIG . DS . 'locales', ['recursive'=>true]); // reach path
+        Folder::delete(CONFIG . DS . 'locales', ['recursive' => true]); // reach path
     }
 
     public function testQualityCheck()

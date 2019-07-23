@@ -16,15 +16,13 @@
  */
 namespace Origin\Cache\Engine;
 
-use Origin\Cache\Engine\BaseEngine;
-
 use Origin\Exception\Exception;
 
 class ApcuEngine extends BaseEngine
 {
     protected $defaultConfig = [
         'duration' => 3600,
-        'prefix' => 'origin_'
+        'prefix' => 'origin_',
     ];
 
     public function initialize(array $config)

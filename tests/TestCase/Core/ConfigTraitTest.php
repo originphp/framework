@@ -21,7 +21,7 @@ class MockObject
     use ConfigTrait;
 
     protected $defaultConfig = [
-        'setting' => 'on'
+        'setting' => 'on',
     ];
 }
 
@@ -30,13 +30,13 @@ class ConfigTraitTest extends \PHPUnit\Framework\TestCase
     public function testConfig()
     {
         $mock = new MockObject();
-        $this->assertEquals(['setting'=>'on'], $mock->config());
+        $this->assertEquals(['setting' => 'on'], $mock->config());
         $this->assertEquals('on', $mock->config('setting'));
      
         $mock->config('key', 'value');
         $this->assertEquals('value', $mock->config('key'));
 
-        $mock->config(['foo'=>'bar']);
+        $mock->config(['foo' => 'bar']);
         $this->assertEquals('bar', $mock->config('foo'));
         $this->assertNull($mock->config('bar'));
     }
@@ -48,7 +48,7 @@ class ConfigTraitTest extends \PHPUnit\Framework\TestCase
 
         $mock = new MockObject();
         $mock->config('foo', 'bar');
-        $mock->config(['foo/bar'=>'bar/foo']);
+        $mock->config(['foo/bar' => 'bar/foo']);
 
         $this->assertEquals('on', $mock->config('setting')); // default setting after set
         $this->assertTrue($mock->config('settingz', 'none'));

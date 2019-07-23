@@ -1,7 +1,6 @@
 <?php
 namespace Origin\Command;
 
-use Origin\Command\Command;
 use Origin\Core\Inflector;
 
 class PluginInstallCommand extends Command
@@ -14,16 +13,16 @@ class PluginInstallCommand extends Command
     {
         $this->addArgument('url', [
             'help' => 'github repo URL or github username/repo',
-            'required' => true
+            'required' => true,
         ]);
         $this->addArgument('name', [
-            'description' => 'name for the plugin. e.g. UserManagement'
+            'description' => 'name for the plugin. e.g. UserManagement',
         ]);
     }
 
     protected function getUrl(string $url)
     {
-        if (strtolower(substr($url, 0, 4)) !==  'http') {
+        if (strtolower(substr($url, 0, 4)) !== 'http') {
             $url = "https://github.com/{$url}";
         }
         // Svn friendly urls have .git
@@ -34,17 +33,18 @@ class PluginInstallCommand extends Command
         return $url;
     }
 
-    protected function getPlugin(string $url, string $plugin=null)
+    protected function getPlugin(string $url, string $plugin = null)
     {
         if ($plugin) {
-            if (!preg_match('/^([A-Z]+[a-z0-9]+)+/', $plugin)) {
+            if (! preg_match('/^([A-Z]+[a-z0-9]+)+/', $plugin)) {
                 $this->throwError(sprintf('Plugin name `%s` is invalid', $plugin));
             }
         }
-        if (!$plugin) {
+        if (! $plugin) {
             $plugin = pathinfo($url, PATHINFO_FILENAME);
             $plugin = preg_replace('/[^a-z0-9]+/i', '_', $plugin);
         }
+
         return Inflector::underscore($plugin);
     }
 
@@ -58,6 +58,7 @@ class PluginInstallCommand extends Command
     protected function download(string $url, string $folder)
     {
         shell_exec("git clone {$url} {$folder}");
+
         return file_exists($folder);
     }
 
@@ -87,6 +88,7 @@ class PluginInstallCommand extends Command
             $plugin = Inflector::camelize($plugin);
             $this->appendApplication($plugin);
             $this->io->status('ok', sprintf('%s Plugin installed', $plugin));
+
             return;
         } else {
             $this->io->status('error', sprintf('Plugin not downloaded from `%s`', $url));

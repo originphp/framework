@@ -17,11 +17,6 @@ namespace Origin\Http;
  * Web Application holder
  */
 
-use Origin\Http\Request;
-use Origin\Http\Response;
-use Origin\Exception\Exception;
-use Origin\Http\Middleware;
-use Origin\Http\MiddlewareRunner;
 use Origin\Core\Resolver;
 use Origin\Exception\InvalidArgumentException;
 
@@ -40,7 +35,6 @@ class BaseApplication
         $this->loadMiddleware('Dispatcher'); # By running last it will run process/shutdown first
         $this->runner->run($request, $response);
     }
-
 
     /**
      * This is where middleware is setup
@@ -78,7 +72,7 @@ class BaseApplication
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware');
         if (empty($className)) {
-            throw new InvalidArgumentException(sprintf("Unkown Middleware %s", $name));
+            throw new InvalidArgumentException(sprintf('Unkown Middleware %s', $name));
         }
         $this->addMiddleware(new $className);
     }

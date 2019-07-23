@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbSetupCommandTest extends OriginTestCase
 {
@@ -25,7 +25,6 @@ class DbSetupCommandTest extends OriginTestCase
         $ds->execute('DROP DATABASE IF EXISTS dummy');
     }
     
-
     public function testExecuteMySql()
     {
         if (ConnectionManager::get('test')->engine() !== 'mysql') {

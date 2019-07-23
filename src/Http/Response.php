@@ -14,7 +14,6 @@
 
 namespace Origin\Http;
 
-use Origin\Http\Cookie;
 use Origin\Exception\NotFoundException;
 
 class Response
@@ -137,6 +136,7 @@ class Response
     public function status(int $status = null)
     {
         deprecationWarning('status has been depreciated use statusCode instead.');
+
         return $this->statusCode($status);
     }
 
@@ -168,7 +168,7 @@ class Response
     public function header($header, $value = null) : void
     {
         if (is_string($header)) {
-            $header = [$header=>$value];
+            $header = [$header => $value];
         }
       
         foreach ($header as $key => $value) {
@@ -190,6 +190,7 @@ class Response
         if (isset($this->headers[$header])) {
             return $this->headers[$header];
         }
+
         return null;
     }
 
@@ -206,6 +207,7 @@ class Response
         if (isset($this->cookies[$cookie])) {
             return $this->cookies[$cookie];
         }
+
         return null;
     }
 
@@ -226,7 +228,7 @@ class Response
             $header = "{$name}: {$value}";
         }
      
-        if (!headers_sent($file, $line)) {
+        if (! headers_sent($file, $line)) {
             // @codeCoverageIgnoreStart
             header($header);
             // @codeCoverageIgnoreEnd
@@ -246,7 +248,7 @@ class Response
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function cookie(string $name, $value, string $expire='+1 month', array $options = []) : void
+    public function cookie(string $name, $value, string $expire = '+1 month', array $options = []) : void
     {
         $options += [
             'name' => $name,
@@ -256,7 +258,7 @@ class Response
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
             'expire' => strtotime($expire),
-            'encrypt' => true
+            'encrypt' => true,
         ];
         
         $this->cookies[$name] = $options;
@@ -283,6 +285,7 @@ class Response
             foreach ($contentType as $type => $definition) {
                 $this->mimeTypes[$type] = $definition;
             }
+
             return $this->contentType;
         }
         if (isset($this->mimeTypes[$contentType])) {
@@ -308,17 +311,17 @@ class Response
      * @param array $options (name,download)
      * @return void
      */
-    public function file(string $filename, array $options=[]) : void
+    public function file(string $filename, array $options = []) : void
     {
         # Setup Options
-        $options += ['name'=>null,'download'=>false,'type'=>null];
-        if (!file_exists($filename)) {
+        $options += ['name' => null,'download' => false,'type' => null];
+        if (! file_exists($filename)) {
             throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $filename));
         }
-        if ($options['name']===null) {
+        if ($options['name'] === null) {
             $options['name'] = basename($filename);
         }
-        if ($options['type']=== null) {
+        if ($options['type'] === null) {
             $options['type'] = mime_content_type($filename);
         }
         

@@ -12,10 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-
 namespace Origin\Core;
-
-use Origin\Core\Configure;
 
 /**
  * A minimalistic PSR friendly logger- which currently just works with files.
@@ -74,7 +71,7 @@ class Logger
      * @param array $context
      * @return void
      */
-    public function debug(string $message, array $context=[])
+    public function debug(string $message, array $context = [])
     {
         $this->log('debug', $message, $context);
     }
@@ -88,7 +85,7 @@ class Logger
      * @param array $context
      * @return void
      */
-    public function info(string $message, array $context=[])
+    public function info(string $message, array $context = [])
     {
         $this->log('info', $message, $context);
     }
@@ -100,7 +97,7 @@ class Logger
      * @param array $context
      * @return void
      */
-    public function notice(string $message, array $context=[])
+    public function notice(string $message, array $context = [])
     {
         $this->log('notice', $message, $context);
     }
@@ -115,7 +112,7 @@ class Logger
      * @param array $context
      * @return void
      */
-    public function warning(string $message, array $context=[])
+    public function warning(string $message, array $context = [])
     {
         $this->log('warning', $message, $context);
     }
@@ -128,7 +125,7 @@ class Logger
         * @param array $context
         * @return void
         */
-    public function error(string $message, array $context=[])
+    public function error(string $message, array $context = [])
     {
         $this->log('error', $message, $context);
     }
@@ -141,7 +138,7 @@ class Logger
         * @param array $context
         * @return void
         */
-    public function critical(string $message, array $context=[])
+    public function critical(string $message, array $context = [])
     {
         $this->log('critical', $message, $context);
     }
@@ -155,7 +152,7 @@ class Logger
         * @param array $context
         * @return void
         */
-    public function alert(string $message, array $context=[])
+    public function alert(string $message, array $context = [])
     {
         $this->log('alert', $message, $context);
     }
@@ -167,7 +164,7 @@ class Logger
       * @param array $context
       * @return void
       */
-    public function emergency(string $message, array $context=[])
+    public function emergency(string $message, array $context = [])
     {
         $this->log('emergency', $message, $context);
     }
@@ -183,7 +180,8 @@ class Logger
     protected function log(string $level, string $message, array $context = [])
     {
         $message = $this->interpolate($message, $context);
-        $data  = '['.date('Y-m-d G:i:s') . '] ' . $this->channel . ' ' . strtoupper($level). ': ' .  $message . "\n";
+        $data = '['.date('Y-m-d G:i:s') . '] ' . $this->channel . ' ' . strtoupper($level). ': ' .  $message . "\n";
+
         return file_put_contents($this->filename, $data, FILE_APPEND | LOCK_EX);
     }
 
@@ -199,10 +197,11 @@ class Logger
     {
         $replace = [];
         foreach ($context as $key => $value) {
-            if (!is_array($value) and (!is_object($value) or method_exists($value, '__toString'))) {
+            if (! is_array($value) and (! is_object($value) or method_exists($value, '__toString'))) {
                 $replace['{'. $key . '}'] = $value;
             }
         }
+
         return strtr($message, $replace);
     }
 }

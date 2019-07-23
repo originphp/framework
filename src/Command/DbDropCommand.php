@@ -14,7 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 
@@ -29,15 +28,15 @@ class DbDropCommand extends Command
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
-            'default' => 'default'
-            ]);
+            'default' => 'default',
+        ]);
     }
  
     public function execute()
     {
         $datasource = $this->options('datasource');
         $config = ConnectionManager::config($datasource);
-        if (!$config) {
+        if (! $config) {
             $this->throwError("{$datasource} datasource not found");
         }
      
@@ -46,7 +45,7 @@ class DbDropCommand extends Command
         $config['database'] = null;
         $connection = ConnectionManager::create('tmp', $config);
 
-        if (!in_array($database, $connection->databases())) {
+        if (! in_array($database, $connection->databases())) {
             $this->io->status('error', sprintf('Database `%s` does not exist', $database));
             $this->abort();
         }

@@ -15,7 +15,6 @@
 namespace Origin\Log\Engine;
 
 use Origin\Core\Configure;
-use Origin\Log\Engine\BaseEngine;
 
 class FileEngine extends BaseEngine
 {
@@ -24,11 +23,11 @@ class FileEngine extends BaseEngine
      *
      * @var array
      */
-    protected $defaultConfig =  [
+    protected $defaultConfig = [
         'file' => null,
         'path' => LOGS,
         'levels' => [],
-        'channels' => []
+        'channels' => [],
     ];
 
     public function initialize(array $config)
@@ -54,6 +53,7 @@ class FileEngine extends BaseEngine
     {
         $message = $this->format($level, $message, $context) . "\n";
         $file = $this->config('path') . DS . $this->config('file');
+
         return (bool) file_put_contents($file, $message, FILE_APPEND | LOCK_EX);
     }
 }

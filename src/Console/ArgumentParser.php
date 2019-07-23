@@ -18,7 +18,6 @@
 namespace Origin\Console;
 
 use Origin\Console\Exception\ConsoleException;
-use Origin\Console\ConsoleHelpFormatter;
 
 class ArgumentParser
 {
@@ -49,7 +48,7 @@ class ArgumentParser
      *
      * @var string
      */
-    protected $epilog =  null;
+    protected $epilog = null;
 
     /**
      * Additional Long Help text
@@ -60,7 +59,7 @@ class ArgumentParser
 
     protected $usage = null;
 
-    public function __construct(string $name = 'command', string $description=null)
+    public function __construct(string $name = 'command', string $description = null)
     {
         $this->command = $name;
         $this->description = $description;
@@ -116,13 +115,13 @@ class ArgumentParser
      *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
      * @return void
      */
-    public function addOption(string $name, array $options=[])
+    public function addOption(string $name, array $options = [])
     {
-        $options += ['name'=>$name,'short'=>null,'default'=>null,'required'=>false,'type'=>'string','description'=>'','banner'=>strtoupper($name)];
+        $options += ['name' => $name,'short' => null,'default' => null,'required' => false,'type' => 'string','description' => '','banner' => strtoupper($name)];
         if ($options['default'] and $options['required']) {
             throw new ConsoleException("Option {$name} cannot be required and have default value");
         }
-        if (!in_array($options['type'], ['string','boolean','integer','array','hash'])) {
+        if (! in_array($options['type'], ['string','boolean','integer','array','hash'])) {
             throw new ConsoleException("Option {$name} invalid type");
         }
     
@@ -132,9 +131,9 @@ class ArgumentParser
         $this->options[$name] = $options;
     }
 
-    public function addCommand(string $name, array $options=[])
+    public function addCommand(string $name, array $options = [])
     {
-        $options += ['name'=>$name,'description'=>null];
+        $options += ['name' => $name,'description' => null];
         $this->commands[$name] = $options;
     }
 
@@ -148,19 +147,19 @@ class ArgumentParser
      *  - type: string, integer, boolean, array hash
      * @return void
      */
-    public function addArgument(string $name, array $options=[])
+    public function addArgument(string $name, array $options = [])
     {
-        $options += ['name'=>$name,'default'=>null,'required'=>false,'type'=>'string','description'=>''];
+        $options += ['name' => $name,'default' => null,'required' => false,'type' => 'string','description' => ''];
         if ($options['required'] and $this->arguments) {
             $arg = end($this->arguments);
             if ($arg['required'] === false) {
-                throw new ConsoleException("You cannot add a required argument after an optional one.");
+                throw new ConsoleException('You cannot add a required argument after an optional one.');
             }
         }
         if ($this->arguments) {
             $arg = end($this->arguments);
-            if ($arg['type'] === 'array' or $arg['type'] ==='hash') {
-                throw new ConsoleException("You cannot add an argument after an array or hash argument");
+            if ($arg['type'] === 'array' or $arg['type'] === 'hash') {
+                throw new ConsoleException('You cannot add an argument after an array or hash argument');
             }
         }
         $this->arguments[$name] = $options;
@@ -184,25 +183,26 @@ class ArgumentParser
         $arguments = $this->parseArguments($args);
 
         foreach ($this->options as $option) {
-            if (!empty($option['required']) and empty($options[$option['name']])) {
+            if (! empty($option['required']) and empty($options[$option['name']])) {
                 throw new ConsoleException(sprintf('Missing required option `%s`', $option['name']));
             }
-            if ($option['type'] === 'boolean' and !isset($options[$option['name']])) {
+            if ($option['type'] === 'boolean' and ! isset($options[$option['name']])) {
                 $options[$option['name']] = false;
-            } elseif (!empty($option['default']) and !isset($options[$option['name']])) {
+            } elseif (! empty($option['default']) and ! isset($options[$option['name']])) {
                 $options[$option['name']] = $option['default'];
             }
         }
 
         $requiredArguments = [];
         foreach ($this->arguments as $argument) {
-            if (!empty($options['help'])) {
+            if (! empty($options['help'])) {
                 break;
             }
-            if (!empty($argument['required']) and !isset($arguments[$argument['name']])) {
+            if (! empty($argument['required']) and ! isset($arguments[$argument['name']])) {
                 throw new ConsoleException(sprintf('Missing required argument `%s`', $argument['name']));
             }
         }
+
         return [$options,$arguments];
     }
 
@@ -222,13 +222,13 @@ class ArgumentParser
                 $type = $this->arguments[$name]['type'];
                 $max = count($args);
                 if ($type === 'array') {
-                    for ($i=$key;$i<$max;$i++) {
+                    for ($i = $key;$i < $max;$i++) {
                         $values[] = $args[$i];
                     }
                     $arguments[$name] = $values;
                     break;
-                } elseif ($type ==='hash') {
-                    for ($i=$key;$i<$max;$i++) {
+                } elseif ($type === 'hash') {
+                    for ($i = $key;$i < $max;$i++) {
                         if (strpos($args[$i], ':') !== false) {
                             list($k, $v) = explode(':', $args[$i]);
                             $values[$k] = $v;
@@ -242,17 +242,19 @@ class ArgumentParser
                 $arguments[$name] = $this->value($type, $arg);
             }
         }
+
         return $arguments;
     }
 
     protected function value($type, $value)
     {
-        if ($type ==='boolean') {
+        if ($type === 'boolean') {
             return (bool) $value;
         }
-        if ($type ==='integer') {
+        if ($type === 'integer') {
             return (int) $value;
         }
+
         return $value;
     }
 
@@ -261,6 +263,7 @@ class ArgumentParser
         $name = $this->getOptionName($option);
         if ($this->options[$name]['type'] === 'boolean') {
             $options[$name] = true;
+
             return $options;
         }
  
@@ -281,9 +284,10 @@ class ArgumentParser
     {
         $option = substr($arg, 2);
         $name = $this->getOptionName($option);
-        if (!isset($this->options[$name])) {
+        if (! isset($this->options[$name])) {
             throw new ConsoleException(sprintf('Unkown option --%s', $name));
         }
+
         return $this->parseOption($option, $options);
     }
 
@@ -292,7 +296,7 @@ class ArgumentParser
         $option = substr($arg, 1);
         $name = $this->getOptionName($option);
    
-        if (!isset($this->shortOptions[$name])) {
+        if (! isset($this->shortOptions[$name])) {
             throw new ConsoleException(sprintf('Unkown short option -%s', $name));
         }
         $option = $this->shortOptions[$name]['name'];
@@ -300,6 +304,7 @@ class ArgumentParser
             list($k, $v) = explode('=', $arg);
             $option .= "={$v}";
         }
+
         return $this->parseOption($option, $options);
     }
 
@@ -308,6 +313,7 @@ class ArgumentParser
         if (strpos($option, '=') !== false) {
             list($option, $value) = explode('=', $option);
         }
+
         return $option;
     }
 
@@ -331,6 +337,7 @@ class ArgumentParser
     {
         $formatter = new ConsoleHelpFormatter();
         $formatter->setUsage($this->generateUsage($this->command));
+
         return $formatter->generate();
     }
 
@@ -376,6 +383,7 @@ class ArgumentParser
             }
             $arguments[$argument['name']] = $description;
         }
+
         return $arguments;
     }
 
@@ -389,6 +397,7 @@ class ArgumentParser
             }
             $commands[$command['name']] = $description;
         }
+
         return $commands;
     }
 
@@ -406,31 +415,32 @@ class ArgumentParser
             if ($option['short']) {
                 $text = '-' . $option['short']. ', ' . $text;
             }
-            if ($option['type']  !== 'boolean') {
-                $text .=  '=' . $option['banner'] ;
+            if ($option['type'] !== 'boolean') {
+                $text .= '=' . $option['banner'] ;
             }
             $help = $option['description'];
-            if (!empty($option['default'])) {
+            if (! empty($option['default'])) {
                 $default = " <yellow>[default: {$option['default']}]</yellow>";
                 if (is_array($help)) {
                     $rows = count($help);
-                    $help[$rows-1] .= $default;
+                    $help[$rows - 1] .= $default;
                 } else {
                     $help .= $default;
                 }
             }
-            $options[$text] =  $help;
+            $options[$text] = $help;
         }
+
         return $options;
     }
 
-    protected function generateUsage(string $command ='command')
+    protected function generateUsage(string $command = 'command')
     {
         $results = [];
      
         $options = $arguments = [];
         foreach ($this->options as $option) {
-            if (!empty($option['required'])) {
+            if (! empty($option['required'])) {
                 $options[] = '--'.  $option['name'];
             }
         }
@@ -438,7 +448,7 @@ class ArgumentParser
         $options[] = '[options]';
         
         foreach ($this->arguments as $arg) {
-            if (!empty($arg['required'])) {
+            if (! empty($arg['required'])) {
                 $arguments[] = $arg['name'];
             } else {
                 $arguments[] = "[{$arg['name']}]";
@@ -449,8 +459,8 @@ class ArgumentParser
             $arguments[] = '[arguments]';
         }
        
-        if (!empty($this->commands)) {
-            $command .= " command";
+        if (! empty($this->commands)) {
+            $command .= ' command';
         }
      
         return $command . ' ' .  implode(' ', array_merge($options, $arguments));

@@ -14,8 +14,8 @@
 
 namespace Origin\Controller\Component;
 
-use Origin\Controller\Controller;
 use Origin\Core\ConfigTrait;
+use Origin\Controller\Controller;
 
 class Component
 {
@@ -58,11 +58,11 @@ class Component
      * @param array $config
      * @return void
      */
-    public function loadComponent(string $name, array $config=[])
+    public function loadComponent(string $name, array $config = [])
     {
         list($plugin, $component) = pluginSplit($name);
-        if (!isset($this->_components[$component])) {
-            $this->_components[$component] =  array_merge(['className' => $name . 'Component','enable'=>false], $config);
+        if (! isset($this->_components[$component])) {
+            $this->_components[$component] = array_merge(['className' => $name . 'Component','enable' => false], $config);
         }
     }
 
@@ -78,6 +78,7 @@ class Component
                 return $this->{$name};
             }
         }
+
         return null;
     }
 

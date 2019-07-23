@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbDropCommandTest extends OriginTestCase
 {

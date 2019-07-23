@@ -15,12 +15,11 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
+use Locale;
+use DateTime;
+use ResourceBundle;
 use NumberFormatter;
 use IntlDateFormatter;
-use ResourceBundle;
-use DateTime;
-use Locale;
 use Origin\Utility\Yaml;
 
 class LocaleGenerateCommand extends Command
@@ -63,7 +62,7 @@ class LocaleGenerateCommand extends Command
         'hh' => 'h',
         'h' => 'g',
         'a' => 'a', // am pm
-        'mm' => 'i'
+        'mm' => 'i',
     ];
 
     public function initialize()
@@ -82,7 +81,7 @@ class LocaleGenerateCommand extends Command
             $locales = $this->arguments('locales');
         }
 
-        if (!file_Exists($this->path)) {
+        if (! file_Exists($this->path)) {
             mkdir($this->path);
         }
 
@@ -149,11 +148,11 @@ class LocaleGenerateCommand extends Command
         $expected['date'] = $fmt->format(new DateTime());
 
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
-        $config['time'] =  $this->convertTime($fmt->getPattern());
+        $config['time'] = $this->convertTime($fmt->getPattern());
         $expected['time'] = $fmt->format(new DateTime());
 
         $fmt = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-        $config['datetime'] =  $this->convertDatetime($fmt->getPattern());
+        $config['datetime'] = $this->convertDatetime($fmt->getPattern());
 
         $expected['datetime'] = $fmt->format(new DateTime());
         if ($this->options('expected')) {
@@ -192,6 +191,7 @@ class LocaleGenerateCommand extends Command
     public function convertDatetime(string $string): string
     {
         $string = $this->convertDate($string);
+
         return strtr($string, $this->timeMap);
     }
 }

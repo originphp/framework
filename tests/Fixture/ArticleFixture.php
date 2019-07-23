@@ -21,38 +21,38 @@ class ArticleFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-         'id' => ['type' => 'primaryKey'],
-         'author_id' => ['type' => 'integer'],
-         'title' => ['type' => 'string','limit' => 255, 'null' => false],
-         'body' => 'text',
-         'created' => 'datetime',
-         'modified' => 'datetime',
+        'id' => ['type' => 'primaryKey'],
+        'author_id' => ['type' => 'integer'],
+        'title' => ['type' => 'string','limit' => 255, 'null' => false],
+        'body' => 'text',
+        'created' => 'datetime',
+        'modified' => 'datetime',
     ];
 
     public $records = [
         [
-            'id'=>1000,
+            'id' => 1000,
             'author_id' => 1001,
-            'title'=>'Article #1',
+            'title' => 'Article #1',
             'body' => 'Description about article #1',
-            'created'=>'2019-03-27 13:10:00',
-            'modified'=>'2019-03-27 13:12:00'
+            'created' => '2019-03-27 13:10:00',
+            'modified' => '2019-03-27 13:12:00',
         ],
         [
-            'id'=>1001,
+            'id' => 1001,
             'author_id' => 1000,
-            'title'=>'Article #2',
+            'title' => 'Article #2',
             'body' => 'Description about article #2',
-            'created'=>'2019-03-27 13:11:00',
-            'modified'=>'2019-03-27 13:11:00'
+            'created' => '2019-03-27 13:11:00',
+            'modified' => '2019-03-27 13:11:00',
         ],
         [
-            'id'=>1002,
+            'id' => 1002,
             'author_id' => 1000,
-            'title'=>'Article #3',
+            'title' => 'Article #3',
             'body' => 'Description about article #3',
-            'created'=>'2019-03-27 13:12:00',
-            'modified'=>'2019-03-27 13:10:00'
+            'created' => '2019-03-27 13:12:00',
+            'modified' => '2019-03-27 13:10:00',
         ],
         
     ];

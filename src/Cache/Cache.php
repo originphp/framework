@@ -15,9 +15,9 @@
 namespace Origin\Cache;
 
 use Origin\Core\StaticConfigTrait;
-use Origin\Exception\InvalidArgumentException;
-use Origin\Cache\Engine\NullEngine;
 use Origin\Cache\Engine\BaseEngine;
+use Origin\Cache\Engine\NullEngine;
+use Origin\Exception\InvalidArgumentException;
 
 class Cache
 {
@@ -25,8 +25,8 @@ class Cache
     protected static $defaultConfig = [
         'default' => [
             'className' => __NAMESPACE__ . '\Engine\FileEngine',
-            'duration' => 3600
-            ]
+            'duration' => 3600,
+        ],
     ];
 
     /**
@@ -83,6 +83,7 @@ class Cache
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
         }
+
         return static::$loaded[$name] = static::buildEngine($name);
     }
 
@@ -100,9 +101,10 @@ class Cache
             if (isset($config['engine'])) {
                 $config['className'] = __NAMESPACE__  . "\Engine\\{$config['engine']}Engine";
             }
-            if (empty($config['className']) or !class_exists($config['className'])) {
+            if (empty($config['className']) or ! class_exists($config['className'])) {
                 throw new InvalidArgumentException("Cache engine for {$name} could not be found");
             }
+
             return new $config['className']($config);
         }
         throw new InvalidArgumentException("{$config} config does not exist");
@@ -118,12 +120,11 @@ class Cache
     public static function use(string $config)
     {
         deprecationWarning('Cache::use is deprecated use Cache::store() or pass options.');
-        if (!static::config($config)) {
+        if (! static::config($config)) {
             throw new InvalidArgumentException("{$config} config does not exist");
         }
         self::$use = $config;
     }
-
 
     /**
      * Reads an item from the Cache
@@ -133,10 +134,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return mixed
      */
-    public static function read(string $key, array $options=[])
+    public static function read(string $key, array $options = [])
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->read($key);
     }
     /**
@@ -148,10 +150,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return bool
      */
-    public static function write(string $key, $value, array $options=[]):bool
+    public static function write(string $key, $value, array $options = []):bool
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->write($key, $value);
     }
 
@@ -164,6 +167,7 @@ class Cache
     public static function check(string $key):bool
     {
         deprecationWarning('Cache::check is depreciated use cache::exists');
+
         return static::exists($key);
     }
 
@@ -175,10 +179,11 @@ class Cache
     *   - config: default:default the name of the config to use
     * @return bool
     */
-    public static function exists(string $key, array $options=[]):bool
+    public static function exists(string $key, array $options = []):bool
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->exists($key);
     }
 
@@ -190,10 +195,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return bool
      */
-    public static function delete(string $key, array $options=[]) :bool
+    public static function delete(string $key, array $options = []) :bool
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->delete($key);
     }
 
@@ -206,10 +212,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return integer
      */
-    public static function increment(string $key, int $offset = 1, array $options=[]): int
+    public static function increment(string $key, int $offset = 1, array $options = []): int
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->increment($key, $offset);
     }
 
@@ -222,10 +229,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return integer
      */
-    public static function decrement(string $key, int $offset = 1, array $options=[]): int
+    public static function decrement(string $key, int $offset = 1, array $options = []): int
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->decrement($key, $offset);
     }
 
@@ -235,10 +243,11 @@ class Cache
      *   - config: default:default the name of the config to use
      * @return void
      */
-    public static function clear(array $options=[]) :bool
+    public static function clear(array $options = []) :bool
     {
         $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
         $cache = static::engine($options['config']);
+
         return $cache->clear();
     }
 
@@ -250,7 +259,7 @@ class Cache
     public static function disable()
     {
         static::$nullEngine = new NullEngine();
-        static::$disabled =  true;
+        static::$disabled = true;
     }
     
     /**
@@ -261,6 +270,6 @@ class Cache
     public static function enable()
     {
         static::$nullEngine = null;
-        static::$disabled =  false;
+        static::$disabled = false;
     }
 }

@@ -14,16 +14,16 @@
 
 namespace Origin\Test\View;
 
-use Origin\TestSuite\TestTrait;
 use Origin\View\View;
-use Origin\View\Helper\Helper;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\View\Helper\Helper;
 use Origin\Exception\Exception;
-use Origin\View\Exception\MissingElementException;
+use Origin\TestSuite\TestTrait;
+use Origin\Controller\Controller;
 use Origin\View\Exception\MissingViewException;
 use Origin\View\Exception\MissingLayoutException;
+use Origin\View\Exception\MissingElementException;
 
 class TestsController extends Controller
 {
@@ -40,7 +40,7 @@ class MockView extends View
 {
     use TestTrait; // add invokeMethod
 
-    public $mockFiles = array();
+    public $mockFiles = [];
 
     /**
      * Used to overide files for testing rendering views etc.
@@ -133,8 +133,6 @@ class ViewTest extends \PHPUnit\Framework\TestCase
 
         $result = $view->callMethod('getViewFilename', ['Make.MyController/action']);
 
-
-
         $this->assertEquals($expected, $result);
     }
 
@@ -189,10 +187,10 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view = new MockView($controller);
 
         $view->overideFiles = [
-      'layout' => ORIGIN.'/tests/TestCase/View/layout.ctp',
-      'edit' => ORIGIN.'/tests/TestCase/View/action.ctp',
-      'element' => ORIGIN.'/tests/TestCase/View/element.ctp',
-    ];
+            'layout' => ORIGIN.'/tests/TestCase/View/layout.ctp',
+            'edit' => ORIGIN.'/tests/TestCase/View/action.ctp',
+            'element' => ORIGIN.'/tests/TestCase/View/element.ctp',
+        ];
 
         $view->set('title', 'Layout Loaded');
         $result = $view->callMethod('render', ['edit', 'layout']);
@@ -204,8 +202,6 @@ class ViewTest extends \PHPUnit\Framework\TestCase
      * New Tests - based upon new features such as testApp etc, these previously not avaiable.
      *
      */
-
-  
 
     public function testViewRender()
     {
@@ -221,7 +217,6 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $result = $this->View->render('Widget.Widgets/items', false);
         $this->assertEquals('<h2>Widget Items</h2>', $result);
 
-
         $request = new Request('tests/edit/2048');
         $controller = new Controller($request, new Response());
         $controller->name = 'Widgets';
@@ -229,7 +224,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller->request->params('plugin', 'Widget');
 
         $view = new View($controller);
-        $result =  $view->render('items');
+        $result = $view->render('items');
         $this->assertEquals('<h2>Widget Items</h2>', $result);
     }
 

@@ -36,7 +36,7 @@ class ConsoleEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('php://stderr', $engine->config('stream'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
-        $this->assertInstanceOf('Origin\Console\ConsoleOutput',$engine->getConsoleOutput());
+        $this->assertInstanceOf('Origin\Console\ConsoleOutput', $engine->getConsoleOutput());
     }
     public function testLog()
     {
@@ -44,7 +44,7 @@ class ConsoleEngineTest extends \PHPUnit\Framework\TestCase
         $bufferedOutput = new ConsoleOutput();
         $engine->setConsoleOutput($bufferedOutput); // Buffered;
         $id = uniqid();
-        $engine->log('error', 'Error code {value}', ['value'=>$id]);
+        $engine->log('error', 'Error code {value}', ['value' => $id]);
         $date = date('Y-m-d G:i:s');
         $this->assertContains("[{$date}] application ERROR: Error code {$id}", $bufferedOutput->read());
     }

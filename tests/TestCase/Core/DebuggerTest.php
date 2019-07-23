@@ -34,7 +34,7 @@ class DebuggerTest extends \PHPUnit\Framework\TestCase
             'line' => '1154',
             'class' => 'Origin\Test\Core\DebuggerTest',
             'function' => 'testBacktrace',
-            'args' => []
+            'args' => [],
         ];
 
         $this->assertArrayHasKey('namespace', $result);

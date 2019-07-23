@@ -14,7 +14,6 @@
 namespace Origin\Model\Engine;
 
 use Origin\Model\Datasource;
-use Origin\Exception\Exception;
 
 class MySQLEngine extends Datasource
 {
@@ -39,9 +38,9 @@ class MySQLEngine extends Datasource
         if ($database) {
             return "{$engine}:host={$host};dbname={$database};charset=utf8mb4";
         }
+
         return  "{$engine}:host={$host};charset=utf8mb4";
     }
-
 
     /**
      * Enables Foreign Key Constraints
@@ -78,6 +77,7 @@ class MySQLEngine extends Datasource
                 $tables[] = current($value);
             }
         }
+
         return $tables;
     }
 
@@ -96,6 +96,7 @@ class MySQLEngine extends Datasource
                 $out[] = current($value);
             }
         }
+
         return $out;
     }
 

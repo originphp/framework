@@ -13,10 +13,9 @@
  */
 namespace Origin\Model;
 
-use ArrayAccess;
 use Iterator;
 use Countable;
-use Origin\Model\Entity;
+use ArrayAccess;
 use Origin\Utility\Xml;
 use Origin\Core\Inflector;
 
@@ -26,13 +25,12 @@ class Collection implements ArrayAccess, Iterator, Countable
     protected $position = 0;
     protected $model = null;
     
-    public function __construct(array $items, array $options=[])
+    public function __construct(array $items, array $options = [])
     {
-        $options += ['name'=>null];
+        $options += ['name' => null];
         $this->model = $options['name'];
         $this->items = $items;
     }
-
 
     /**
      * Magic method is trigged when calling var_dump
@@ -81,10 +79,11 @@ class Collection implements ArrayAccess, Iterator, Countable
      */
     public function toXml()
     {
-        $root = Inflector::variable(Inflector::pluralize($this->model??'Record'));
+        $root = Inflector::variable(Inflector::pluralize($this->model ?? 'Record'));
         $data = [$root => [
-            Inflector::variable($this->model??'Record') => $this->toArray()
+            Inflector::variable($this->model ?? 'Record') => $this->toArray(),
         ]];
+
         return Xml::fromArray($data);
     }
 
@@ -96,6 +95,7 @@ class Collection implements ArrayAccess, Iterator, Countable
         foreach ($results as $key => $value) {
             $results[$key] = $this->convertToArray($value);
         }
+
         return $results;
     }
 

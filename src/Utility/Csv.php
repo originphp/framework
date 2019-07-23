@@ -16,9 +16,9 @@
 namespace Origin\Utility;
 
 use Iterator;
-use Origin\Exception\InvalidArgumentException;
 use Countable;
 use Origin\Exception\NotFoundException;
+use Origin\Exception\InvalidArgumentException;
 
 class CsvIterator implements Iterator, Countable
 {
@@ -35,7 +35,6 @@ class CsvIterator implements Iterator, Countable
      * @var int
      */
     protected $position;
-
 
     /**
      * Holds the current row
@@ -80,7 +79,6 @@ class CsvIterator implements Iterator, Countable
         }
     }
 
- 
     /**
      * Counts the number of rows excluding headers
      */
@@ -88,7 +86,7 @@ class CsvIterator implements Iterator, Countable
     {
         $lines = 0;
         $fh = fopen($this->filename, 'rt');
-        while (!feof($fh)) {
+        while (! feof($fh)) {
             if (fgets($fh) !== false) {
                 $lines ++;
             }
@@ -97,6 +95,7 @@ class CsvIterator implements Iterator, Countable
         if ($this->options['header']) {
             -- $lines;
         }
+
         return $lines;
     }
 
@@ -122,6 +121,7 @@ class CsvIterator implements Iterator, Countable
             $this->row = array_combine($this->headers, $this->row);
         }
         $this->position++;
+
         return $this->row;
     }
 
@@ -142,7 +142,7 @@ class CsvIterator implements Iterator, Countable
      */
     public function next()
     {
-        return !feof($this->fh);
+        return ! feof($this->fh);
     }
 
     /**
@@ -162,7 +162,6 @@ class CsvIterator implements Iterator, Countable
         }
     }
 
-
     /**
      * checks if current position is valid
      *
@@ -170,10 +169,12 @@ class CsvIterator implements Iterator, Countable
      */
     public function valid()
     {
-        if (!$this->next()) {
+        if (! $this->next()) {
             fclose($this->fh);
+
             return false;
         }
+
         return true;
     }
 }
@@ -193,7 +194,7 @@ class Csv
      * @param array $options
      * @return void
      */
-    public static function process(string $filename, array $options =[]) : CsvIterator
+    public static function process(string $filename, array $options = []) : CsvIterator
     {
         if (file_exists($filename)) {
             return new CsvIterator($filename, $options);
@@ -215,8 +216,8 @@ class Csv
      */
     public static function toArray(string $csv, array $options = []): array
     {
-        $options += ['header' => false, 'keys' => null, 'separator'=>',','enclosure'=>'"','escape'=>'\\'];
-        $stream = fopen("php://temp", 'r+');
+        $options += ['header' => false, 'keys' => null, 'separator' => ',','enclosure' => '"','escape' => '\\'];
+        $stream = fopen('php://temp', 'r+');
         fputs($stream, $csv);
         rewind($stream);
 
@@ -240,6 +241,7 @@ class Csv
             $i++;
         }
         fclose($stream);
+
         return $result;
     }
 
@@ -256,7 +258,7 @@ class Csv
     {
         $options += ['header' => false];
 
-        $stream = fopen("php://temp", 'r+');
+        $stream = fopen('php://temp', 'r+');
 
         if ($options['header'] === true) {
             $options['header'] = array_keys(current($data));
@@ -271,6 +273,7 @@ class Csv
         rewind($stream);
         $result = stream_get_contents($stream);
         fclose($stream);
+
         return $result;
     }
 }

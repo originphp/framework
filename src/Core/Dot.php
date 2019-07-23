@@ -60,7 +60,7 @@ class Dot
     {
         $items = &$this->items;
         foreach (explode('.', $key) as $key) {
-            if (!isset($items[$key]) or !is_array($items[$key])) {
+            if (! isset($items[$key]) or ! is_array($items[$key])) {
                 $items[$key] = [];
             }
             $items = &$items[$key];
@@ -86,7 +86,7 @@ class Dot
 
         $items = $this->items;
         foreach (explode('.', $key) as $path) {
-            if (!is_array($items) or !array_key_exists($path, $items)) {
+            if (! is_array($items) or ! array_key_exists($path, $items)) {
                 return $defaultValue;
             }
             $items = &$items[$path];
@@ -127,7 +127,7 @@ class Dot
         $lastPath = array_pop($paths);
 
         foreach ($paths as $path) {
-            if (!is_array($items) or !array_key_exists($path, $items)) {
+            if (! is_array($items) or ! array_key_exists($path, $items)) {
                 continue;
             }
             $items = &$items[$path];
@@ -160,7 +160,7 @@ class Dot
         $lastPath = array_pop($paths);
 
         foreach ($paths as $path) {
-            if (!is_array($items) or !array_key_exists($path, $items)) {
+            if (! is_array($items) or ! array_key_exists($path, $items)) {
                 continue;
             }
             $items = &$items[$path];

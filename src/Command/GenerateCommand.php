@@ -36,31 +36,31 @@ class GenerateCommand extends Command
         'middleware' => 'Generates a middleware class',
         'migration' => 'Generates a migration class',
         'plugin' => 'Generates a plugin skeleton',
-        'scaffold' => 'Generates a MVC base application using the database'
+        'scaffold' => 'Generates a MVC base application using the database',
     ];
 
     public function initialize()
     {
-        if (!file_exists($this->directory)) {
+        if (! file_exists($this->directory)) {
             $this->directory = ORIGIN . DS . 'templates'; // default
         }
 
         $this->addArgument(
             'generator',
             [
-            'description' => [
-                'The name of the generator. Generators include: behavior,command,component',
-                'controller, helper,model,middleware, migration and plugin', ], ]
+                'description' => [
+                    'The name of the generator. Generators include: behavior,command,component',
+                    'controller, helper,model,middleware, migration and plugin', ], ]
         );
         $this->addArgument(
             'name',
             [
-            'description' => 'This is a mixed case name, e.g Contact,ContactAddress,Plugin.Product', 'required' => false, ]
+                'description' => 'This is a mixed case name, e.g Contact,ContactAddress,Plugin.Product', 'required' => false, ]
         );
         $this->addArgument('params', [
             'description' => [
                 'Additional params to be passed to generator. For controllers this will be action names',
-            'seperated by spaces. For models it coulmn:type also seperated by spaces.', ],
+                'seperated by spaces. For models it coulmn:type also seperated by spaces.', ],
             'type' => 'array',
         ]);
         $this->addOption('force', [
@@ -71,7 +71,7 @@ class GenerateCommand extends Command
 
         $this->addOption('datasource', [
             'description' => 'The datasource to use for the database',
-            'default' => 'default'
+            'default' => 'default',
         ]);
     }
 
@@ -95,17 +95,17 @@ class GenerateCommand extends Command
             }
         }
 
-        if (!$this->isValidGenerator($generator)) {
+        if (! $this->isValidGenerator($generator)) {
             $this->io->error("Unkown generator {$generator}");
             $this->abort();
         }
 
-        if (!$name) {
-            $this->io->error("You must provide a name e.g. Single,DoubleWord");
+        if (! $name) {
+            $this->io->error('You must provide a name e.g. Single,DoubleWord');
             $this->abort();
         }
 
-        if (!$this->isValidName($name)) {
+        if (! $this->isValidName($name)) {
             $this->io->error('Invalid name format. Should be mixed case Product,ContactManager');
             $this->abort();
         }
@@ -113,12 +113,12 @@ class GenerateCommand extends Command
         list($plugin, $class) = pluginSplit($name);
 
         $data = [
-                'name' => $name,
-                'class' => $class,  // Product // StudlyCaps/PascalCase
-                'plugin' => $plugin,
-                'underscored' => Inflector::underscore($class),
-                'namespace' => $plugin ? $plugin : 'App',
-            ];
+            'name' => $name,
+            'class' => $class,  // Product // StudlyCaps/PascalCase
+            'plugin' => $plugin,
+            'underscored' => Inflector::underscore($class),
+            'namespace' => $plugin ? $plugin : 'App',
+        ];
 
         return $this->{$generator}($data);
     }
@@ -306,7 +306,7 @@ class GenerateCommand extends Command
         $path = $pluginDirectory.DS.Inflector::underscore($data['class']);
         foreach ($structure as $folder) {
             $directory = $path.DS.$folder;
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 $this->createDirectory($directory);
             }
         }
@@ -355,8 +355,8 @@ class GenerateCommand extends Command
         $model = $data['class'];
         $meta = $scaffold->meta();
         $models = array_keys($meta['schema']);
-        if (!in_array($data['class'], $models)) {
-            $this->io->error(sprintf("Unkown model %s", $data['class']));
+        if (! in_array($data['class'], $models)) {
+            $this->io->error(sprintf('Unkown model %s', $data['class']));
             $this->abort();
         }
         # Prepare Data
@@ -377,9 +377,9 @@ class GenerateCommand extends Command
                 $v = $meta['vars'][$otherModel];
                 $vars['compact'][] = $v['pluralName'];
                 $blocks[] = [
-                    'currentModel'=> $model,
+                    'currentModel' => $model,
                     'pluralName' => $v['pluralName'],
-                    'model' => $otherModel
+                    'model' => $otherModel,
                 ];
             }
         }
@@ -415,9 +415,9 @@ class GenerateCommand extends Command
                 $validationRules[$field] = [];
                 foreach ($rules as $rule) {
                     if (count($rules) === 1) {
-                        $validationRules[$field] = [ 'rule' => $rule];
+                        $validationRules[$field] = ['rule' => $rule];
                     } else {
-                        $validationRules[$field][$rule] = [ 'rule' => $rule];
+                        $validationRules[$field][$rule] = ['rule' => $rule];
                     }
                 }
                 $export = $this->varExport($validationRules[$field], true);
@@ -428,10 +428,9 @@ class GenerateCommand extends Command
         $template = $this->format($template, $vars);
         $this->saveGeneratedCode($filename, $template);
 
-       
         # View
         $vars += [
-            'controllerUnderscored' => Inflector::underscore($controller)
+            'controllerUnderscored' => Inflector::underscore($controller),
         ];
         $fields = array_keys($meta['schema'][$model]);
         $blocks = [];
@@ -454,7 +453,7 @@ class GenerateCommand extends Command
 
             # Build Related
             if ($view === 'view') {
-                $related = array_merge($associations ['hasMany'], $associations ['hasAndBelongsToMany']);
+                $related = array_merge($associations['hasMany'], $associations['hasAndBelongsToMany']);
                 $relatedLists = [];
                 foreach ($related as $associated) {
                     $v = $meta['vars'][$associated];
@@ -478,7 +477,6 @@ class GenerateCommand extends Command
         }
     }
 
-      
     protected function getTemplateFilename(string $name)
     {
         return $this->directory.DS.'generator'.DS.$name.'.tpl';
@@ -516,17 +514,18 @@ class GenerateCommand extends Command
     protected function generate(string $input, string $output, array $data)
     {
         $content = $this->format(file_get_contents($input), $data);
+
         return $this->saveGeneratedCode($output, $content);
     }
 
-
-    protected function format(string $template, array $data=[])
+    protected function format(string $template, array $data = [])
     {
         foreach ($data as $key => $value) {
             if (is_scalar($value)) {
                 $template = str_replace('%' . $key . '%', $value, $template);
             }
         }
+
         return $template;
     }
 
@@ -543,11 +542,12 @@ class GenerateCommand extends Command
             foreach ($matches[1] as $index => $block) {
                 $recordBlock = '';
                 foreach ($data as $field => $blockData) {
-                    $recordBlock .=  $this->format($block, $blockData);
+                    $recordBlock .= $this->format($block, $blockData);
                 }
                 $template = str_replace($matches[0][$index], $recordBlock, $template);
             }
         }
+
         return $template;
     }
 
@@ -569,6 +569,7 @@ class GenerateCommand extends Command
 
         $result = $this->io->createFile($filename, $content, $this->options('force'));
         $this->io->status($result?'ok':'error', $filename);
+
         return $result;
     }
 
@@ -582,8 +583,6 @@ class GenerateCommand extends Command
         return preg_match('/^([A-Z]+[a-z0-9]+)+/', $name);
     }
 }
-
-
 
 class Scaffold
 {
@@ -638,6 +637,7 @@ class Scaffold
                 }
             }
         }
+
         return $validationRules;
     }
 
@@ -653,10 +653,10 @@ class Scaffold
         $template = [
             'belongsTo' => [],
             'hasMany' => [],
-            'hasAndBelongsToMany' => []
+            'hasAndBelongsToMany' => [],
         ];
 
-        $associations = ['ignore'=>[]];
+        $associations = ['ignore' => []];
         foreach ($models as $model) {
             $associations[$model] = $template;
             $associations = $this->findBelongsTo($model, $associations);
@@ -688,18 +688,18 @@ class Scaffold
             $plural = Inflector::pluralize($model);
             $data[$model] = [
                 'model' => $model,
-                'controller' => $plural ,
+                'controller' => $plural,
                 'singularName' => Inflector::variable($model), // for vars
                 'pluralName' => Inflector::variable($plural), // for vars
                 'singularHuman' => Inflector::humanize(Inflector::underscore($model)),
-                'pluralHuman' =>   Inflector::humanize(Inflector::underscore($plural)),
+                'pluralHuman' => Inflector::humanize(Inflector::underscore($plural)),
                 'singularHumanLower' => strtolower(Inflector::humanize(Inflector::underscore($model))),
-                'pluralHumanLower' =>   strtolower(Inflector::humanize(Inflector::underscore($plural))),
-                'primaryKey' => $this->primaryKey($model)
+                'pluralHumanLower' => strtolower(Inflector::humanize(Inflector::underscore($plural))),
+                'primaryKey' => $this->primaryKey($model),
             ];
         }
 
-        $this->meta = ['vars'=>$data,'associations'=>$associations,'validate'=>$validationRules,'schema'=>$this->schema];
+        $this->meta = ['vars' => $data,'associations' => $associations,'validate' => $validationRules,'schema' => $this->schema];
     }
 
     /**
@@ -709,7 +709,7 @@ class Scaffold
      * @param array $associations
      * @return void
      */
-    public function findBelongsTo(string $model, array $associations=[])
+    public function findBelongsTo(string $model, array $associations = [])
     {
         $fields = $this->schema[$model];
         foreach ($fields as $field => $schema) {
@@ -718,6 +718,7 @@ class Scaffold
                 $associations[$model]['belongsTo'][] = $associatedModel;
             }
         }
+
         return $associations;
     }
     /**
@@ -727,7 +728,7 @@ class Scaffold
      * @param array $associations
      * @return void
      */
-    public function findHasMany(string $model, array $associations=[])
+    public function findHasMany(string $model, array $associations = [])
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
@@ -741,13 +742,14 @@ class Scaffold
                 $associations[$model]['hasMany'][] = $otherModel;
             }
         }
+
         return $associations;
     }
     /**
      * Finds the hasAndToBelongsToMany using table names. Table name needs to be alphabetical order if not
      * it will be ignored.
      */
-    public function findHasAndBelongsToMany(string $model, array $associations=[])
+    public function findHasAndBelongsToMany(string $model, array $associations = [])
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
@@ -761,6 +763,7 @@ class Scaffold
                 }
             }
         }
+
         return $associations;
     }
 
@@ -780,6 +783,7 @@ class Scaffold
                 }
             }
         }
+
         return null;
     }
 }

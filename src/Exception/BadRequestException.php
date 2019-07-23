@@ -14,8 +14,6 @@
 
 namespace Origin\Exception;
 
-use Origin\Exception\HttpException;
-
 class BadRequestException extends HttpException
 {
     public function __construct($message = null, $code = 400)

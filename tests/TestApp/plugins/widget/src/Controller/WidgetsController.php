@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Widget\Controller;
 
 use Origin\Controller\Controller;

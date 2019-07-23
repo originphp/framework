@@ -15,11 +15,11 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\View\Helper\SessionHelper;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
-use Origin\Http\Response;
 use Origin\Http\Session;
+use Origin\Http\Response;
+use Origin\Controller\Controller;
+use Origin\View\Helper\SessionHelper;
 
 class MockSessionHelper extends SessionHelper
 {

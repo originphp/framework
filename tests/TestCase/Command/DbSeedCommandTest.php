@@ -3,7 +3,6 @@ namespace Origin\Test\Command;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbSeedCommandTest extends OriginTestCase
 {

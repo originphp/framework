@@ -16,15 +16,14 @@ namespace Origin\Test\I8n;
 
 use Origin\I18n\I18n;
 use Origin\Utility\Number;
-use Origin\I18n\Exception\LocaleNotAvailableException;
 use Origin\Exception\Exception;
+use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18nTest extends \PHPUnit\Framework\TestCase
 {
- 
     public function testInitialize()
     {
-        I18n::initialize(['locale'=>'en_GB']);
+        I18n::initialize(['locale' => 'en_GB']);
         $this->assertEquals('en', I18n::language());
         $this->assertEquals('en_GB', I18n::locale());
     }
@@ -34,23 +33,6 @@ class I18nTest extends \PHPUnit\Framework\TestCase
      */
     public function testLocaleNoCurrency()
     {
-$locale = <<< EOF
-name: English (World)
-decimals: .
-thousands: ,
-currency: 
-before: ¤
-after: 
-date: d/m/Y
-time: g:i a
-datetime: d/m/Y, g:i a
-EOF;
-        file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml',$locale);
-        I18n::initialize(['locale'=>'en_001']);
-        $this->assertEquals('$10,000', Number::currency(10000));
-    }
-
-    public function testLocaleGeneric(){
         $locale = <<< EOF
 name: English (World)
 decimals: .
@@ -62,8 +44,26 @@ date: d/m/Y
 time: g:i a
 datetime: d/m/Y, g:i a
 EOF;
-        file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.yml',$locale);
-        I18n::initialize(['locale'=>'en_NOT_EXIST']);
+        file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml', $locale);
+        I18n::initialize(['locale' => 'en_001']);
+        $this->assertEquals('$10,000', Number::currency(10000));
+    }
+
+    public function testLocaleGeneric()
+    {
+        $locale = <<< EOF
+name: English (World)
+decimals: .
+thousands: ,
+currency: 
+before: ¤
+after: 
+date: d/m/Y
+time: g:i a
+datetime: d/m/Y, g:i a
+EOF;
+        file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.yml', $locale);
+        I18n::initialize(['locale' => 'en_NOT_EXIST']);
         $this->assertEquals('$10,000', Number::currency(10000));
     }
 
@@ -76,53 +76,56 @@ EOF;
         $this->assertEquals('en_US', I18n::detectLocale());
     }
 
-    public function testDefaultLocale(){
-     
-        $this->assertEquals('en_US',I18n::defaultLocale());
+    public function testDefaultLocale()
+    {
+        $this->assertEquals('en_US', I18n::defaultLocale());
         I18n::defaultLocale('en_GB');
-        $this->assertEquals('en_GB',I18n::defaultLocale());
+        $this->assertEquals('en_GB', I18n::defaultLocale());
     }
 
-    public function testAvailableLocales(){
-     
-        $this->assertEquals([],I18n::availableLocales());
+    public function testAvailableLocales()
+    {
+        $this->assertEquals([], I18n::availableLocales());
         I18n::availableLocales(['en_US','en_GB']);
-        $this->assertEquals(['en_US','en_GB'],I18n::availableLocales());
+        $this->assertEquals(['en_US','en_GB'], I18n::availableLocales());
     }
 
     /**
      * @depends testAvailableLocales
      */
-    public function testDefaultLocaleException(){
+    public function testDefaultLocaleException()
+    {
         $this->expectException(LocaleNotAvailableException::class);
         I18n::availableLocales(['en_US','en_GB']);
         I18n::defaultLocale('fr_FR');
     }
 
-     /**
-     * @depends testAvailableLocales
-     */
-    public function testLocaleException(){
+    /**
+    * @depends testAvailableLocales
+    */
+    public function testLocaleException()
+    {
         $this->expectException(LocaleNotAvailableException::class);
         I18n::availableLocales(['en_US','en_GB']);
         I18n::Locale('fr_FR');
     }
 
-    public function testTranslate(){
-        I18n::initialize(['locale'=>'es_ES']);
-        $this->assertEquals('Hola Mundo',__('hello world'));
-        $this->assertEquals('Hola Jim',__('Hello {name}',['name'=>'Jim']));
-        $this->assertEquals('Hay 0 manzanas',__('There is one apple|There are {count} apples',['count'=>0]));
-        $this->assertEquals('Hay una manzana',__('There is one apple|There are {count} apples',['count'=>1]));
-        $this->assertEquals('Hay 2 manzanas',__('There is one apple|There are {count} apples',['count'=>2]));
+    public function testTranslate()
+    {
+        I18n::initialize(['locale' => 'es_ES']);
+        $this->assertEquals('Hola Mundo', __('hello world'));
+        $this->assertEquals('Hola Jim', __('Hello {name}', ['name' => 'Jim']));
+        $this->assertEquals('Hay 0 manzanas', __('There is one apple|There are {count} apples', ['count' => 0]));
+        $this->assertEquals('Hay una manzana', __('There is one apple|There are {count} apples', ['count' => 1]));
+        $this->assertEquals('Hay 2 manzanas', __('There is one apple|There are {count} apples', ['count' => 2]));
     }
 
-    public function testLoadMessagesException(){
+    public function testLoadMessagesException()
+    {
         $this->expectException(Exception::class);
-        I18n::initialize(['locale'=>'ar_AR']);
+        I18n::initialize(['locale' => 'ar_AR']);
         __('It really does not matter');
     }
-
 
     protected function tearDown(): void
     {

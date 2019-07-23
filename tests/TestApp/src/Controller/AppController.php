@@ -2,7 +2,6 @@
 namespace App\Controller;
 
 use Origin\Controller\Controller;
-use Origin\I18n\I18n;
 
 class AppController extends Controller
 {
@@ -21,7 +20,6 @@ class AppController extends Controller
         $this->loadHelper('Flash');
         $this->loadHelper('Number');
         $this->loadHelper('Date');
-
     }
 
     /**

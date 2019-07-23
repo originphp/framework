@@ -25,7 +25,7 @@ abstract class BaseEngine
      *
      * @param array $config  duration,prefix,path
      */
-    public function __construct(array $config=[])
+    public function __construct(array $config = [])
     {
         $this->config($config);
         $this->initialize($config);
@@ -113,6 +113,7 @@ abstract class BaseEngine
         if ($this->config['persistent'] === true) {
             return 'origin-php';
         }
+
         return (string) $this->config['persistent'];
     }
 }

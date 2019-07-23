@@ -15,11 +15,10 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\View\Helper\CookieHelper;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Cookie;
+use Origin\Controller\Controller;
+use Origin\View\Helper\CookieHelper;
 
 class CookieHelperTest extends \PHPUnit\Framework\TestCase
 {

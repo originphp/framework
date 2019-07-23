@@ -14,9 +14,9 @@
 
 namespace Origin\Test\TestSuite;
 
-use Origin\TestSuite\OriginTestListener;
 use Origin\TestSuite\FixtureManager;
 use Origin\TestSuite\OriginTestCase;
+use Origin\TestSuite\OriginTestListener;
 
 class MockTestSuite extends \PHPUnit\Framework\TestSuite
 {
@@ -51,14 +51,14 @@ class OriginTestListenerTest extends \PHPUnit\Framework\TestCase
 
         $mockFixtureManager = $this->createMock(FixtureManager::class);
         $mockFixtureManager->expects($this->exactly(1))
-                            ->method('load');
+            ->method('load');
 
         $listener->fixtureManager = $mockFixtureManager;
         $listener->startTest(new MockOriginTestCase());
 
         $mockFixtureManager = $this->createMock(FixtureManager::class);
         $mockFixtureManager->expects($this->exactly(0))
-                            ->method('load');
+            ->method('load');
 
         $listener->fixtureManager = $mockFixtureManager;
         $listener->startTest(new MockTestSuite());
@@ -70,14 +70,14 @@ class OriginTestListenerTest extends \PHPUnit\Framework\TestCase
         
         $mockFixtureManager = $this->createMock(FixtureManager::class);
         $mockFixtureManager->expects($this->exactly(1))
-                            ->method('unload');
+            ->method('unload');
 
         $listener->fixtureManager = $mockFixtureManager;
         $listener->endTest(new MockOriginTestCase(), microtime(true));
 
         $mockFixtureManager = $this->createMock(FixtureManager::class);
         $mockFixtureManager->expects($this->exactly(0))
-                            ->method('unload');
+            ->method('unload');
 
         $listener->fixtureManager = $mockFixtureManager;
         $listener->endTest(new MockTestSuite(), microtime(true));

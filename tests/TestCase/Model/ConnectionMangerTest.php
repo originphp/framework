@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\ConnectionManager;
 use Origin\Model\Datasource;
+use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\MissingDatasourceException;
 
 class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
@@ -37,15 +37,16 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(ConnectionManager::has('foo'));
     }
 
-    public function testDatasources(){
+    public function testDatasources()
+    {
         $datasources = ConnectionManager::datasources();
-        $this->assertTrue(in_array('default',$datasources));
-        $this->assertTrue(in_array('test',$datasources));
+        $this->assertTrue(in_array('default', $datasources));
+        $this->assertTrue(in_array('test', $datasources));
     }
 
     public function testUnkownEngineException()
     {
         $this->expectException(MissingDatasourceException::class);
-        ConnectionManager::create('fail',['engine'=>'mongo']);
+        ConnectionManager::create('fail', ['engine' => 'mongo']);
     }
 }

@@ -20,7 +20,6 @@
 namespace Origin\Utility;
 
 use DOMDocument;
-use DOMElement;
 
 /**
   * This does the magic want it work like javascript querySelector, querySelectorAll.
@@ -35,7 +34,7 @@ use DOMElement;
   * - [attribute=value] - e.g. a[target='_blank'] will select all links with target = _blank
   * - :first-child - e.g. p:first-child will select the first child element from the p
   * - :last-child - e.g. p:last-child will select the last child element from the p
-  * - :nth-child(3) = e.g. p:3 will select the third child. 
+  * - :nth-child(3) = e.g. p:3 will select the third child.
   *
   * It currently does not cover complex selectors like div.highlighted > p for now. (~>+^|$).
   *
@@ -81,6 +80,7 @@ use DOMElement;
          if ($result) {
              return $result[0];
          }
+
          return null;
      }
      /**
@@ -116,6 +116,7 @@ use DOMElement;
          foreach ($jobs as $job) {
              $results = array_merge($results, $this->querySelectorAll($job));
          }
+
          return $results;
      }
 
@@ -125,7 +126,7 @@ use DOMElement;
       * @param string $path
       * @return array
       */
-     protected function runQuery(string $path, $dom =null) : array
+     protected function runQuery(string $path, $dom = null) : array
      {
          $this->results = [];
        
@@ -177,28 +178,28 @@ use DOMElement;
          
          // Handle last-child, first-child, nth etc
          if (strpos($path, ':') !== false) {
-             list($tag, $n) =  explode(':', $path);
+             list($tag, $n) = explode(':', $path);
              $elements = $dom->getElementsByTagName($tag);
              if ($elements) {
                  // hanlde span:lastChild
                  if ($n === 'first-child') {
                      $this->results[] = $elements[0];
                  } elseif ($n === 'last-child') {
-                     $this->results[] = $elements[count($elements)-1];
-                 } elseif (preg_match('/nth-child\((\d+)\)/',$n,$matches)) {
-                    if(isset($matches[1]) AND isset($elements[$matches[1]])){
-                        $this->results[] = $elements[$matches[1]];
-                    }             
+                     $this->results[] = $elements[count($elements) - 1];
+                 } elseif (preg_match('/nth-child\((\d+)\)/', $n, $matches)) {
+                     if (isset($matches[1]) and isset($elements[$matches[1]])) {
+                         $this->results[] = $elements[$matches[1]];
+                     }
                  }
              }
          } else {
              foreach ($dom->getElementsByTagName($tag) as $element) {
                  if ($attrName) {
                      if ($element->hasAttribute($attrName) and $element->getAttribute($attrName) === $attrValue) {
-                         $this->results[]=  $element;
+                         $this->results[] = $element;
                      }
                  } elseif ($class === null or ($element->hasAttribute('class') and in_array($class, explode(' ', $element->getAttribute('class'))))) {
-                     $this->results[] =  $element;
+                     $this->results[] = $element;
                  }
              }
          }

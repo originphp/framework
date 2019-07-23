@@ -15,9 +15,9 @@
 namespace Origin\Test\View\Helper;
 
 use Origin\View\View;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
 use Origin\View\Helper\NumberHelper;
 
 class NumberHelperTest extends \PHPUnit\Framework\TestCase

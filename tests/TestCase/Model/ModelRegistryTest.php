@@ -15,9 +15,9 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\Model;
+use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
-use Origin\Exception\Exception;
 
 class MockModelRegistry extends ModelRegistry
 {

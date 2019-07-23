@@ -5,9 +5,9 @@ class CreateBarTableMigration extends Migration
 {
     public function change()
     {
-        $this->createTable('bar',[
+        $this->createTable('bar', [
             'name' => 'string',
-            'description' => 'text'
+            'description' => 'text',
         ]);
     }
 }

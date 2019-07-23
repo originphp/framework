@@ -48,9 +48,10 @@ trait StaticConfigTrait
      */
     public static function config($key = null, $value = null)
     {
-        if (is_array($key) or  func_num_args() === 2) {
+        if (is_array($key) or func_num_args() === 2) {
             return static::setConfig($key, $value);
         }
+
         return static::getConfig($key);
     }
     /**
@@ -78,6 +79,7 @@ trait StaticConfigTrait
             }
             static::$config[$key] = $value;
         }
+
         return true;
     }
     /**
@@ -89,7 +91,6 @@ trait StaticConfigTrait
      * @return mixed|null
      */
  
-
     protected static function getConfig(string $key = null, $default = null)
     {
         if (static::$config === null) {

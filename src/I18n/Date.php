@@ -15,7 +15,6 @@
 namespace Origin\I18n;
 
 use DateTime;
-use DateTimeZone;
 use IntlDateFormatter;
 
 /**
@@ -48,15 +47,15 @@ class Date
      */
     protected static $timeFormat = [IntlDateFormatter::NONE, IntlDateFormatter::SHORT];
 
-   /**
-    * Sets or gets the locale
-    *
-    * @param string $locale
-    * @return string|void
-    */
+    /**
+     * Sets or gets the locale
+     *
+     * @param string $locale
+     * @return string|void
+     */
     public static function locale(string $locale = null)
     {
-        if($locale === null){
+        if ($locale === null) {
             return self::$locale;
         }
         self::$locale = $locale;
@@ -68,10 +67,10 @@ class Date
      * @param string $timezone
      * @return string|void
      */
-    public static function timezone(string $timezone=null)
+    public static function timezone(string $timezone = null)
     {
-        if($timezone === null){
-           return self::$timezone;
+        if ($timezone === null) {
+            return self::$timezone;
         }
         self::$timezone = $timezone;
     }
@@ -83,7 +82,7 @@ class Date
      */
     public static function dateformat($dateFormat = null)
     {
-        if($dateFormat === null){
+        if ($dateFormat === null) {
             return self::$dateFormat;
         }
         self::$dateFormat = $dateFormat;
@@ -94,9 +93,9 @@ class Date
      *
      * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
      */
-    public static function datetimeFormat($datetimeFormat=null)
+    public static function datetimeFormat($datetimeFormat = null)
     {
-        if($datetimeFormat === null){
+        if ($datetimeFormat === null) {
             return self::$datetimeFormat;
         }
         self::$datetimeFormat = $datetimeFormat;
@@ -109,7 +108,7 @@ class Date
      */
     public static function timeFormat($timeFormat = null)
     {
-        if($timeFormat === null){
+        if ($timeFormat === null) {
             return self::$timeFormat;
         }
         self::$timeFormat = $timeFormat;
@@ -154,6 +153,7 @@ class Date
         if ($format === null) {
             $format = self::$dateFormat;
         }
+
         return self::format($dateString, $format);
     }
 
@@ -167,6 +167,7 @@ class Date
         if ($format === null) {
             $format = self::$datetimeFormat;
         }
+
         return self::format($dateString, $format);
     }
 
@@ -180,6 +181,7 @@ class Date
         if ($format === null) {
             $format = self::$timeFormat;
         }
+
         return self::format($dateString, $format);
     }
 
@@ -206,9 +208,9 @@ class Date
         $hasTime = (stripos($pattern, 'h') !== false);
    
         $returnFormat = 'Y-m-d H:i:s';
-        if ($hasTime and !$hasDate) {
+        if ($hasTime and ! $hasDate) {
             $returnFormat = 'H:i:s';
-        } elseif ($hasDate and !$hasTime) {
+        } elseif ($hasDate and ! $hasTime) {
             $returnFormat = 'Y-m-d';
         }
 
@@ -239,6 +241,7 @@ class Date
         if ($timestamp !== false) {
             return date('Y-m-d', $timestamp);
         }
+
         return null;
     }
 
@@ -261,6 +264,7 @@ class Date
         if ($timestamp !== false) {
             return date('H:i:s', $timestamp);
         }
+
         return null;
     }
 

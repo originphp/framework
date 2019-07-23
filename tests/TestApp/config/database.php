@@ -6,19 +6,19 @@
 use Origin\Model\ConnectionManager;
 
 ConnectionManager::config('default', [
-  'host' => env('DB_HOST'),
-  'database' => 'origin',
-  'username' => env('DB_USERNAME'),
-  'password' => env('DB_PASSWORD'),
-  'engine' => env('DB_ENGINE')
+    'host' => env('DB_HOST'),
+    'database' => 'origin',
+    'username' => env('DB_USERNAME'),
+    'password' => env('DB_PASSWORD'),
+    'engine' => env('DB_ENGINE'),
 ]);
 
 ConnectionManager::config('test', [
-  'host' => env('DB_HOST'),
-  'database' => 'origin_test',
-  'username' => env('DB_USERNAME'),
-  'password' => env('DB_PASSWORD'),
-  'engine' => env('DB_ENGINE')
+    'host' => env('DB_HOST'),
+    'database' => 'origin_test',
+    'username' => env('DB_USERNAME'),
+    'password' => env('DB_PASSWORD'),
+    'engine' => env('DB_ENGINE'),
 ]);
 
 /*

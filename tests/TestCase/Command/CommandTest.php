@@ -14,16 +14,15 @@
 
 namespace Origin\Test\Command;
 
-use Origin\Console\ConsoleIo;
-use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Command\Command;
-use Origin\TestSuite\TestTrait;
-use Origin\Console\Exception\ConsoleException;
-use Origin\Model\ModelRegistry;
 use Origin\Model\Model;
+use Origin\Command\Command;
+use Origin\Console\ConsoleIo;
+use Origin\Model\ModelRegistry;
+use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\Stub\ConsoleOutput;
+use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Console\Exception\StopExecutionException;
-use Origin\Console\Exception\Exception;
 
 class MockCommand extends Command
 {
@@ -47,9 +46,9 @@ class BackupCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', ['short'=>'ds','description'=>'Which datasource to use','default'=>'main']);
-        $this->addArgument('database', ['required'=>true,'description'=>'The database to backup']);
-        $this->addArgument('filename', ['description'=>'The filename to output too']);
+        $this->addOption('datasource', ['short' => 'ds','description' => 'Which datasource to use','default' => 'main']);
+        $this->addArgument('database', ['required' => true,'description' => 'The database to backup']);
+        $this->addArgument('filename', ['description' => 'The filename to output too']);
     }
 
     public function execute()
@@ -68,8 +67,8 @@ class CacheCommand extends Command
 
     public function initialize()
     {
-        $this->addSubCommand('enable', ['description'=>'enables the cache']);
-        $this->addSubCommand('disable', ['description'=>'disables the cache']);
+        $this->addSubCommand('enable', ['description' => 'enables the cache']);
+        $this->addSubCommand('disable', ['description' => 'disables the cache']);
     }
 
     public function execute()
@@ -104,9 +103,9 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $consoleOutput->mode(ConsoleOutput::RAW);
         $io = new ConsoleIo($consoleOutput, $consoleOutput);
         $mock = $this->getMockBuilder(MockCommand::class)
-                        ->setConstructorArgs([$io])
-                         ->setMethods(['abort'])
-                         ->getMock();
+            ->setConstructorArgs([$io])
+            ->setMethods(['abort'])
+            ->getMock();
 
         $mock->throwError('test', 'A comment about this error');
         $output = $consoleOutput->read();
@@ -131,17 +130,17 @@ class CommandTest extends \PHPUnit\Framework\TestCase
     public function testArguments()
     {
         $command = new MockCommand();
-        $command->setProperty('arguments', ['name'=>'foo']);
+        $command->setProperty('arguments', ['name' => 'foo']);
         $this->assertEquals('foo', $command->arguments('name'));
-        $this->assertEquals(['name'=>'foo'], $command->arguments());
+        $this->assertEquals(['name' => 'foo'], $command->arguments());
         $this->assertNull($command->arguments('got'));
     }
     public function testOptions()
     {
         $command = new MockCommand();
-        $command->setProperty('options', ['name'=>'foo']);
+        $command->setProperty('options', ['name' => 'foo']);
         $this->assertEquals('foo', $command->options('name'));
-        $this->assertEquals(['name'=>'foo'], $command->options());
+        $this->assertEquals(['name' => 'foo'], $command->options());
         $this->assertNull($command->options('got'));
     }
 
@@ -156,7 +155,6 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $command->callMethod('validateName', ['foo bar']);
     }
 
- 
     public function testRun()
     {
         $command = new BackupCommand($this->io());
@@ -171,7 +169,6 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('<exception> ERROR </exception> <text>Missing required argument `database`</text>', $this->out->read());
     }
 
-
     public function testRunHelp()
     {
         $command = new BackupCommand($this->io());
@@ -183,7 +180,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadModel()
     {
-        $Post = new Model(['name'=>'Post','datasource'=>'test']);
+        $Post = new Model(['name' => 'Post','datasource' => 'test']);
         ModelRegistry::set('Post', $Post);
         $command = new MockCommand();
         $this->assertInstanceOf(Model::class, $command->loadModel('Post'));
@@ -243,7 +240,7 @@ EOF;
         $command = new MockCommand($this->io());
         $command->runCommand('say-hello', [
             '--color=blue',
-            'jon'
+            'jon',
         ]);
         $this->assertContains('<blue>Hello jon</blue>', $this->out->read());
     }

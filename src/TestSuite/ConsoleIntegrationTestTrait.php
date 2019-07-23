@@ -16,11 +16,11 @@
 
 namespace Origin\TestSuite;
 
-use Origin\Console\ConsoleInput;
-use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Console\ShellDispatcher;
-use Origin\Console\CommandRunner;
 use Origin\Console\ConsoleIo;
+use Origin\Console\ConsoleInput;
+use Origin\Console\CommandRunner;
+use Origin\Console\ShellDispatcher;
+use Origin\TestSuite\Stub\ConsoleOutput;
 
 /**
  * A way to test controllers from a higher level.
@@ -97,6 +97,7 @@ trait ConsoleIntegrationTestTrait
     public function errorOutput()
     {
         deprecationWarning('ConsoleIntegrationTestTrait::errorOutput deprecated use ConsoleIntegrationTestTrait::error instead');
+
         return $this->error();
     }
 
@@ -115,9 +116,9 @@ trait ConsoleIntegrationTestTrait
         $this->stdout = new ConsoleOutput();
         $this->stderr = new ConsoleOutput();
         $this->stdin = $this->getMockBuilder(ConsoleInput::class)
-                        ->disableOriginalConstructor()
-                        ->setMethods(['read'])
-                        ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['read'])
+            ->getMock();
 
         $x = 0;
         foreach ($input as $data) {

@@ -21,14 +21,11 @@ namespace Origin\Model;
  */
 
 use Origin\Core\Inflector;
-use Origin\Model\Behavior\BehaviorRegistry;
-use Origin\Model\Exception\MissingModelException;
-use Origin\Exception\NotFoundException;
-use Origin\Exception\InvalidArgumentException;
-use Origin\Model\Collection;
 use Origin\Exception\Exception;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Query;
+use Origin\Exception\NotFoundException;
+use Origin\Model\Behavior\BehaviorRegistry;
+use Origin\Exception\InvalidArgumentException;
+use Origin\Model\Exception\MissingModelException;
 
 class Model
 {
@@ -119,7 +116,6 @@ class Model
      */
     protected $hasAndBelongsToMany = [];
 
-
     /**
      * List of Associations
      * @var array
@@ -134,7 +130,6 @@ class Model
      * @var array
      */
     protected $schema = null;
-
 
     /**
      * Marshaller
@@ -185,7 +180,7 @@ class Model
         $this->datasource = $datasource;
 
         // Remove so we can autodetect when needed
-        if (!$this->displayField) {
+        if (! $this->displayField) {
             unset($this->displayField);
         }
 
@@ -230,11 +225,11 @@ class Model
         }
 
         if ($habtmModel) {
-            $object = new Model(array(
+            $object = new Model([
                 'name' => $className,
                 'table' => $this->hasAndBelongsToMany[$alias]['joinTable'],
                 'datasource' => $this->datasource,
-            ));
+            ]);
 
             if (count($object->fields()) === 2) {
                 $object->primaryKey = $this->hasAndBelongsToMany[$alias]['foreignKey'];
@@ -264,6 +259,7 @@ class Model
         if (isset($this->{$name})) {
             return $this->{$name};
         }
+
         return null;
     }
 
@@ -364,6 +360,7 @@ class Model
         list($plugin, $behavior) = pluginSplit($name);
         $config = array_merge(['className' => $name . 'Behavior'], $config);
         $this->{$behavior} = $this->behaviorRegistry()->load($name, $config);
+
         return $this->{$behavior};
     }
 
@@ -416,6 +413,7 @@ class Model
     public function hasOne(string $association, array $options = []): array
     {
         $assoc = new Association($this);
+
         return  $this->hasOne[$association] = $assoc->hasOne($association, $options);
     }
 
@@ -446,9 +444,10 @@ class Model
     {
         $assoc = new Association($this);
         $this->belongsTo[$association] = $assoc->belongsTo($association, $options);
-        if (isset($options['counterCache']) and !isset($this->CounterCache)) {
+        if (isset($options['counterCache']) and ! isset($this->CounterCache)) {
             $this->loadBehavior('CounterCache');
         }
+
         return $this->belongsTo[$association];
     }
 
@@ -475,6 +474,7 @@ class Model
     public function hasMany(string $association, array $options = []): array
     {
         $assoc = new Association($this);
+
         return  $this->hasMany[$association] = $assoc->hasMany($association, $options);
     }
 
@@ -504,6 +504,7 @@ class Model
     public function hasAndBelongsToMany(string $association, array $options = []): array
     {
         $assoc = new Association($this);
+
         return  $this->hasAndBelongsToMany[$association] = $assoc->hasAndBelongsToMany($association, $options);
     }
 
@@ -557,7 +558,7 @@ class Model
     {
         $fieldSchema = $this->schema($field);
 
-        return !empty($fieldSchema);
+        return ! empty($fieldSchema);
     }
 
     /**
@@ -590,7 +591,7 @@ class Model
     public function schema(string $field = null)
     {
         if ($this->schema === null) {
-            $this->schema =  $this->connection()->schema($this->table);
+            $this->schema = $this->connection()->schema($this->table);
         }
         if ($field === null) {
             return $this->schema;
@@ -620,7 +621,7 @@ class Model
      */
     public function validator(): ModelValidator
     {
-        if (!isset($this->ModelValidator)) {
+        if (! isset($this->ModelValidator)) {
             $this->ModelValidator = new ModelValidator($this);
         }
 
@@ -646,22 +647,22 @@ class Model
         $exists = $this->exists($this->id);
 
         if ($options['validate'] === true) {
-            if ($options['callbacks'] === true and !$this->triggerCallback('beforeValidate', [$entity])) {
+            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', [$entity])) {
                 return false;
             }
-            $validated = $this->validates($entity, !$exists);
+            $validated = $this->validates($entity, ! $exists);
 
             if ($options['callbacks'] === true) {
                 $this->triggerCallback('afterValidate', [$entity, $validated]);
             }
 
-            if (!$validated) {
+            if (! $validated) {
                 return false;
             }
         }
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
-            if (!$this->triggerCallback('beforeSave', [$entity, $options])) {
+            if (! $this->triggerCallback('beforeSave', [$entity, $options])) {
                 return false;
             }
         }
@@ -710,7 +711,7 @@ class Model
         $result = false;
 
         // Don't save if only field set is id (e.g savingHABTM)
-        if (count($data) > 1 or !isset($data[$this->primaryKey])) {
+        if (count($data) > 1 or ! isset($data[$this->primaryKey])) {
             $connection = $this->connection();
             if ($exists) {
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
@@ -723,7 +724,7 @@ class Model
 
         if ($result) {
             if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                $this->triggerCallback('afterSave', [$entity, !$exists, $options]);
+                $this->triggerCallback('afterSave', [$entity, ! $exists, $options]);
             }
         }
 
@@ -731,7 +732,7 @@ class Model
          * Save HABTM. It is here, because control is needed on false result from here
          */
         foreach ($hasAndBelongsToMany as $alias => $data) {
-            if (!$this->saveHABTM($alias, $data, $options['callbacks'])) {
+            if (! $this->saveHABTM($alias, $data, $options['callbacks'])) {
                 return false;
             }
             $result = true;
@@ -785,6 +786,7 @@ class Model
     public function increment(string $column, int $id): bool
     {
         $sql = "UPDATE {$this->table} SET {$column} = {$column} + 1 WHERE {$this->primaryKey} = :id";
+
         return $this->connection()->execute($sql, ['id' => $id]);
     }
 
@@ -798,6 +800,7 @@ class Model
     public function decrement(string $column, int $id): bool
     {
         $sql = "UPDATE {$this->table} SET {$column} = {$column} - 1 WHERE {$this->primaryKey} = :id";
+
         return $this->connection()->execute($sql, ['id' => $id]);
     }
 
@@ -841,10 +844,10 @@ class Model
                 $links[] = $id;
                 $row->set($primaryKey, $id);
             } else {
-                if (!$this->{$association}->save($row, array(
+                if (! $this->{$association}->save($row, [
                     'callbacks' => $callbacks,
                     'transaction' => false,
-                ))) {
+                ])) {
                     return false;
                 }
                 $links[] = $this->{$association}->id;
@@ -875,6 +878,7 @@ class Model
 
             $connection->insert($joinModel->table, $insertData);
         }
+
         return true;
     }
 
@@ -904,6 +908,7 @@ class Model
                 $associated = array_merge($associated, array_keys($this->{$assocation}));
             }
         }
+
         return $associated;
     }
 
@@ -948,11 +953,11 @@ class Model
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
             $key = lcfirst($alias);
-            if (!in_array($alias, $options['associated']) or !$data->has($key) or !$data->{$key} instanceof Entity) {
+            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                 continue;
             }
             if ($data->{$key}->modified()) {
-                if (!$this->{$alias}->save($data->{$key}, $associatedOptions)) {
+                if (! $this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
                     break;
                 }
@@ -974,14 +979,14 @@ class Model
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
                 $key = lcfirst($alias);
-                if (!in_array($alias, $options['associated']) or !$data->has($key) or !$data->{$key} instanceof Entity) {
+                if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                     continue;
                 }
                 if ($data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
 
-                    if (!$this->{$alias}->save($data->get($key), $associatedOptions)) {
+                    if (! $this->{$alias}->save($data->get($key), $associatedOptions)) {
                         $result = false;
                         break;
                     }
@@ -991,7 +996,7 @@ class Model
             // Save hasMany
             foreach ($this->hasMany as $alias => $config) {
                 $key = Inflector::pluralize(lcfirst($alias));
-                if (!in_array($alias, $options['associated']) or !$data->has($key)) {
+                if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
                     continue;
                 }
 
@@ -1000,7 +1005,7 @@ class Model
                 foreach ($data->get($key) as $record) {
                     if ($record instanceof Entity and $record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
-                        if (!$this->{$alias}->save($record, $associatedOptions)) {
+                        if (! $this->{$alias}->save($record, $associatedOptions)) {
                             $result = false;
                             break;
                         }
@@ -1044,7 +1049,7 @@ class Model
         }
         $result = true;
         foreach ($data as $row) {
-            if (!$this->save($row, array('transaction' => false) + $options)) {
+            if (! $this->save($row, ['transaction' => false] + $options)) {
                 $result = false;
                 break;
             }
@@ -1054,7 +1059,7 @@ class Model
             $this->commit();
         }
 
-        if (!$result and $options['transaction']) {
+        if (! $result and $options['transaction']) {
             $this->rollback();
         }
 
@@ -1073,9 +1078,10 @@ class Model
             return false;
         }
         $tableAlias = Inflector::tableize($this->alias);
+
         return (bool) $this->find('count', [
             'conditions' => ["{$tableAlias}.{$this->primaryKey}" => $id],
-            'callbacks' => false
+            'callbacks' => false,
         ]);
     }
 
@@ -1134,7 +1140,7 @@ class Model
             'page' => null,
             'offset' => null,
             'callbacks' => true,
-            'associated' => []
+            'associated' => [],
         ];
 
         $options = array_merge($default, $options);
@@ -1174,12 +1180,12 @@ class Model
     {
         $this->id = $entity->get($this->primaryKey);
 
-        if (empty($this->id) or !$this->exists($this->id)) {
+        if (empty($this->id) or ! $this->exists($this->id)) {
             return false;
         }
 
         if ($callbacks) {
-            if (!$this->triggerCallback('beforeDelete', [$entity, $cascade])) {
+            if (! $this->triggerCallback('beforeDelete', [$entity, $cascade])) {
                 return false;
             }
         }
@@ -1284,7 +1290,7 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Collection|array
      */
-    protected function finderAll(array $options=[])
+    protected function finderAll(array $options = [])
     {
         // Run Query
        
@@ -1296,6 +1302,7 @@ class Model
         if (empty($results)) {
             return [];
         }
+
         return new Collection($results, ['name' => $this->alias]);
     }
 
@@ -1371,13 +1378,13 @@ class Model
             foreach ($this->{$association} as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
-                    $query['joins'][] = array(
+                    $query['joins'][] = [
                         'table' => $this->{$alias}->table,
                         'alias' => Inflector::tableize($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
                         'datasource' => $this->datasource,
-                    );
+                    ];
 
                     if (empty($config['fields'])) {
                         $config['fields'] = $this->{$alias}->fields();
@@ -1388,6 +1395,7 @@ class Model
                 }
             }
         }
+
         return $query;
     }
 
@@ -1413,10 +1421,11 @@ class Model
             }
             $out[$alias] = $config;
 
-            if (!$this->findAssociation($alias)) {
+            if (! $this->findAssociation($alias)) {
                 throw new InvalidArgumentException("{$this->name} is not associated with {$alias}.");
             }
         }
+
         return $out;
     }
 
@@ -1433,10 +1442,10 @@ class Model
                 return $this->{$association}[$name];
             }
         }
+
         return null;
     }
  
-
     /**
      * Runs a query and returns the result set if there are any
      * if not returns true or false.
@@ -1581,6 +1590,7 @@ class Model
                 $conditions[$field] = $entity->{$field};
             }
         }
+
         return $this->find('count', ['conditions' => $conditions]) === 0;
     }
 
@@ -1630,7 +1640,8 @@ class Model
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
-        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
+        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
+
         return $this->marshaller()->one($requestData, $options);
     }
 
@@ -1645,7 +1656,8 @@ class Model
     {
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
+        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
+
         return $this->marshaller()->many($requestData, $options);
     }
 
@@ -1661,7 +1673,8 @@ class Model
     {
         $options += ['associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData =  $this->triggerCallback('beforeMarshal', [$requestData], true);
+        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
+
         return $this->marshaller()->patch($entity, $requestData, $options);
     }
 

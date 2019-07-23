@@ -14,15 +14,14 @@
 
 namespace Origin\TestSuite;
 
-use Origin\TestSuite\FixtureManager;
 /*
  *
  * @link https://phpunit.readthedocs.io/en/7.4/extending-phpunit.html
  */
-use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\Test;
-use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\AssertionFailedError;
 
 class OriginTestListener implements TestListener

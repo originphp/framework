@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Middleware;
 
-use Origin\Middleware\CsrfProtectionMiddleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Middleware\CsrfProtectionMiddleware;
 use Origin\Middleware\Exception\InvalidCsrfTokenException;
 
 class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware

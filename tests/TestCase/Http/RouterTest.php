@@ -35,30 +35,29 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testParseDefaultRoute()
     {
-        $result =MockRouter::parse('leads/index');
+        $result = MockRouter::parse('leads/index');
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('index', $result['action']);
 
-        $result =MockRouter::parse('user_profiles/index');
+        $result = MockRouter::parse('user_profiles/index');
         $this->assertEquals('UserProfiles', $result['controller']);
         $this->assertEquals('index', $result['action']);
 
-        $result =MockRouter::parse('leads/edit/1000');
+        $result = MockRouter::parse('leads/edit/1000');
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('edit', $result['action']);
-        $this->assertEquals(array(1000), $result['args']);
+        $this->assertEquals([1000], $result['args']);
 
-        $result =MockRouter::parse('user_profiles/view/sort/256');
+        $result = MockRouter::parse('user_profiles/view/sort/256');
         $this->assertEquals('UserProfiles', $result['controller']);
         $this->assertEquals('view', $result['action']);
-        $this->assertEquals(array('sort', '256'), $result['args']);
+        $this->assertEquals(['sort', '256'], $result['args']);
 
         // Parse Named Params
-        $result =MockRouter::parse('leads/home/sort:asc/limit:10');
+        $result = MockRouter::parse('leads/home/sort:asc/limit:10');
         $this->assertEquals('asc', $result['named']['sort']);
         $this->assertEquals('10', $result['named']['limit']);
     }
-
 
     public function testGreedyArgs()
     {
@@ -74,8 +73,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function testComplicated()
     {
         MockRouter::reset();
-        MockRouter::add('/', array('controller' => 'pages', 'action' => 'display', 'home'));
-        MockRouter::add('/t/*', ['controller'=>'Topics','action'=>'view']);
+        MockRouter::add('/', ['controller' => 'pages', 'action' => 'display', 'home']);
+        MockRouter::add('/t/*', ['controller' => 'Topics','action' => 'view']);
         MockRouter::add('/:controller/:action/*');
         MockRouter::add('/:controller', ['action' => 'index']);
 
@@ -100,7 +99,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('index', $result['action']);
 
-        $result =MockRouter::parse('/user_profiles');
+        $result = MockRouter::parse('/user_profiles');
 
         $this->assertEquals('UserProfiles', $result['controller']);
         $this->assertEquals('index', $result['action']);
@@ -114,25 +113,25 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function testRouteHome()
     {
         MockRouter::reset();
-        MockRouter::add('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+        MockRouter::add('/', ['controller' => 'pages', 'action' => 'display', 'home']);
 
-        $result =MockRouter::parse('/');
+        $result = MockRouter::parse('/');
 
         $this->assertEquals('Pages', $result['controller']);
         $this->assertEquals('display', $result['action']);
-        $this->assertEquals(array('home'), $result['args']);
+        $this->assertEquals(['home'], $result['args']);
     }
 
     public function testRoutePage()
     {
         MockRouter::reset();
-        MockRouter::add('/help', array('controller' => 'docs', 'action' => 'view', 256));
+        MockRouter::add('/help', ['controller' => 'docs', 'action' => 'view', 256]);
 
-        $result =MockRouter::parse('/help');
+        $result = MockRouter::parse('/help');
 
         $this->assertEquals('Docs', $result['controller']);
         $this->assertEquals('view', $result['action']);
-        $this->assertEquals(array(256), $result['args']);
+        $this->assertEquals([256], $result['args']);
     }
 
     public function testRenameController()
@@ -140,9 +139,9 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         MockRouter::reset();
         MockRouter::add(
             '/developers/:action/*',
-            array('controller' => 'users')
+            ['controller' => 'users']
     );
-        $result =MockRouter::parse('/developers/directory');
+        $result = MockRouter::parse('/developers/directory');
 
         $this->assertEquals('Users', $result['controller']);
         $this->assertEquals('directory', $result['action']);
@@ -152,9 +151,9 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         MockRouter::reset();
 
-        MockRouter::add('/:action/*', array('controller' => 'jobs')); // one controller
+        MockRouter::add('/:action/*', ['controller' => 'jobs']); // one controller
 
-        $result =MockRouter::parse('/active');
+        $result = MockRouter::parse('/active');
 
         $this->assertEquals('Jobs', $result['controller']);
         $this->assertEquals('active', $result['action']);
@@ -169,43 +168,43 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $expected = '/articles/edit/100';
         $this->assertEquals($expected, MockRouter::url($expected));
 
-        $url = array('controller' => 'Articles', 'action' => 'edit', 100);
+        $url = ['controller' => 'Articles', 'action' => 'edit', 100];
         $expected = '/articles/edit/100';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('controller' => 'UserProfiles', 'action' => 'edit', 256);
+        $url = ['controller' => 'UserProfiles', 'action' => 'edit', 256];
         $expected = '/user_profiles/edit/256';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'edit', 100);
+        $url = ['action' => 'edit', 100];
         $expected = '/articles/edit/100';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'edit', 100, 'other');
+        $url = ['action' => 'edit', 100, 'other'];
         $expected = '/articles/edit/100/other';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'edit');
+        $url = ['action' => 'edit'];
         $expected = '/articles/edit';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'index', 100, '?' => array('page' => 1));
+        $url = ['action' => 'index', 100, '?' => ['page' => 1]];
         $expected = '/articles/index/100?page=1';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'index', 100, '?' => array('page' => 1, 'limit' => 2));
+        $url = ['action' => 'index', 100, '?' => ['page' => 1, 'limit' => 2]];
         $expected = '/articles/index/100?page=1&limit=2';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'something', 'named1' => 'yes', 'named2' => 'no');
+        $url = ['action' => 'something', 'named1' => 'yes', 'named2' => 'no'];
         $expected = '/articles/something/named1:yes/named2:no';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'edit', 100, '#' => 'top');
+        $url = ['action' => 'edit', 100, '#' => 'top'];
         $expected = '/articles/edit/100#top';
         $this->assertEquals($expected, MockRouter::url($url));
 
-        $url = array('action' => 'index', 'plugin'=>'contact_manager');
+        $url = ['action' => 'index', 'plugin' => 'contact_manager'];
         $expected = '/contact_manager/articles/index';
         $this->assertEquals($expected, MockRouter::url($url));
     }

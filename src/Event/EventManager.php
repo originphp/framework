@@ -12,7 +12,6 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace Origin\Event;
-use Origin\Event\Event;
 
 class EventManager
 {
@@ -50,42 +49,45 @@ class EventManager
      * @param mixed $data
      * @return \Origin\Event\Event;
      */
-    public function new(string $name,object $subject = null,$data = null){
-       return new Event($name,$subject,$data);
+    public function new(string $name, object $subject = null, $data = null)
+    {
+        return new Event($name, $subject, $data);
     }
 
     /**
-     * Dispatches an event. If the event returns false then it is stopped. 
-     * 
+     * Dispatches an event. If the event returns false then it is stopped.
+     *
      * $event = $eventManager->new('Order.afterPurchase);
      * $eventManger->dispatch($event);
-     *  
+     *
      * OR
-     * 
+     *
      * $eventManager->dispatch('Order.afterPurchase');
-     * 
-     * 
+     *
+     *
      * @param Event|string $event
      * @return bool
      */
-    public function dispatch($event){
-        if(is_string($event)){
+    public function dispatch($event)
+    {
+        if (is_string($event)) {
             $event = new Event($event);
         }
         $listeners = $this->listeners($event->name());
-        if(empty($listeners)){
+        if (empty($listeners)) {
             return false;
         }
-        foreach($listeners as $listener){
-            if($event->isStopped()){
+        foreach ($listeners as $listener) {
+            if ($event->isStopped()) {
                 break;
             }
             $result = call_user_func($listener, $event);
-            if($result === false){
+            if ($result === false) {
                 $event->stop();
             }
             $event->result($result);
         }
+
         return true;
     }
 
@@ -96,8 +98,9 @@ class EventManager
      * @param callable $callable
      * @return void
      */
-    public function listen(string $name, callable $callable,int $priority = 10){
-        if(empty($this->listeners[$name])){
+    public function listen(string $name, callable $callable, int $priority = 10)
+    {
+        if (empty($this->listeners[$name])) {
             $this->listeners[$name][$priority] = [];
         }
 
@@ -113,34 +116,36 @@ class EventManager
     protected function listeners(string $name) : array
     {
         $listeners = [];
-        if(isset($this->listeners[$name])){
+        if (isset($this->listeners[$name])) {
             ksort($this->listeners[$name]);
-            foreach($this->listeners[$name] as $priority => $queue){
-                $listeners = array_merge($listeners,$queue);
+            foreach ($this->listeners[$name] as $priority => $queue) {
+                $listeners = array_merge($listeners, $queue);
             }
         }
+
         return $listeners;
     }
 
     /**
      * Attach multiple listeners of an object, the object should have a method
      * implementedEvents which returns an array.
-     * 
+     *
      * Example:
      * class Foo {
      *  function implementedEvents(){
      *     return ['Controller.initialize'=>'initialize']
      *  }
      * }
-     *  
+     *
      * $manager->subscribe(new Foo());
      *
      * @param object $subscriber
      * @return bool
      */
-    public function subscribe(object $subscriber){
-        foreach($subscriber->implementedEvents() as $key => $function){
-            $this->listen($key,[$subscriber,$function]);
+    public function subscribe(object $subscriber)
+    {
+        foreach ($subscriber->implementedEvents() as $key => $function) {
+            $this->listen($key, [$subscriber,$function]);
         }
     }
 }

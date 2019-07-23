@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Origin\Model;
 
-use Origin\Model\Model;
 use Origin\Core\Inflector;
 
 class Association
@@ -67,7 +66,7 @@ class Association
         $associationTableAlias = Inflector::tableize($association);
         $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
 
-        if (!empty($options['conditions'])) {
+        if (! empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
         $options['conditions'] = $conditions;
@@ -118,7 +117,7 @@ class Association
 
         $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
 
-        if (!empty($options['conditions'])) {
+        if (! empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
         $options['conditions'] = $conditions;
@@ -160,7 +159,7 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] =  Inflector::underscore($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscore($this->model->name) . '_id';
         }
 
         return $options;
@@ -238,7 +237,7 @@ class Association
         $optionsClassAlias = Inflector::tableize($options['className']);
         $conditions = ["{$withAlias}.{$options['associationForeignKey']} = {$optionsClassAlias}.id"];
 
-        if (!empty($options['conditions'])) {
+        if (! empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
         }
         $options['conditions'] = $conditions;

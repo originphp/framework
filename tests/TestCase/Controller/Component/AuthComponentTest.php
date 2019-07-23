@@ -14,17 +14,16 @@
 
 namespace Origin\Test\Controller\Component;
 
-use Origin\TestSuite\TestTrait;
-use Origin\Controller\Component\AuthComponent;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
-use Origin\Http\Response;
-use Origin\Http\Session;
 use Origin\Model\Entity;
+use Origin\Http\Response;
+use Origin\Exception\Exception;
+use Origin\TestSuite\TestTrait;
+use Origin\Controller\Controller;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Exception\ForbiddenException;
+use Origin\Controller\Component\AuthComponent;
 use Origin\Model\Exception\MissingModelException;
-use Origin\Exception\Exception;
 
 class MockAuthComponent extends AuthComponent
 {
@@ -203,7 +202,7 @@ class AuthComponentTest extends OriginTestCase
 
     public function testlogin()
     {
-        $data = ['username'=>'fred@smith.com','password'=>1234];
+        $data = ['username' => 'fred@smith.com','password' => 1234];
         $entity = new Entity($data);
         $this->AuthComponent->login($entity);
    
@@ -217,7 +216,7 @@ class AuthComponentTest extends OriginTestCase
      */
     public function testUser()
     {
-        $data = ['username'=>'fred@smith.com','password'=>1234,'date'=>'2019-02-07'];
+        $data = ['username' => 'fred@smith.com','password' => 1234,'date' => '2019-02-07'];
         $entity = new Entity($data);
         $this->AuthComponent->login($entity);
         $this->assertEquals($data, $this->AuthComponent->user());
@@ -232,8 +231,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $expected = [
             'controller' => 'Users',
-        'action' => 'index',
-        'plugin' => null];
+            'action' => 'index',
+            'plugin' => null, ];
         $redirectUrl = $this->AuthComponent->redirectUrl();
         $this->assertEquals($expected, $redirectUrl);
         
@@ -284,7 +283,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->config('scope', ['id'=>1024]);
+        $AuthComponent->config('scope', ['id' => 1024]);
         $AuthComponent->request()->data('email', 'james@example.com');
         $AuthComponent->request()->data('password', 'secret1');
         $this->assertFalse($AuthComponent->identify());
@@ -294,7 +293,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $this->expectException(MissingModelException::class);
         $this->Controller = new UsersController(new Request(), new Response());
-        $this->AuthComponent = new MockAuthComponent($this->Controller, ['model'=>'Foo']);
+        $this->AuthComponent = new MockAuthComponent($this->Controller, ['model' => 'Foo']);
     }
 
     public function testIdentifyHttp()
@@ -391,7 +390,7 @@ class AuthComponentTest extends OriginTestCase
             'password' => '$2y$10$V5RgkqQ6Onnxgz2rmEBJDuftS9DX7iD0qv8V3LlM0qDdTYK2Y3Fbq',
             'api_token' => '43cbd312fd6eaf3480a4572aa988ada0f4c6310b',
             'created' => '2018-12-20 09:00:15',
-            'modified' => null
+            'modified' => null,
         ];
       
         $this->assertEquals($expected, $AuthComponent->getUser());
@@ -414,7 +413,7 @@ class AuthComponentTest extends OriginTestCase
             'password' => '$2y$10$YK3SO6y4O9ObgpLG6HH75e6o2uQFQxdQ3qbE8szwMCTpZxSao6H16',
             'api_token' => 'dea50af153b77b3f3b725517ba18b5f0619fa4da',
             'created' => '2018-12-20 09:00:30',
-            'modified' => null
+            'modified' => null,
         ];
         $this->assertEquals($expected, $AuthComponent->getUser());
     }

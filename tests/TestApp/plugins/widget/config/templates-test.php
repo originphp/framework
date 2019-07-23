@@ -1,4 +1,4 @@
-<?php 
+<?php
     return [
-          'p' => '<p>{text}</p>'
+        'p' => '<p>{text}</p>',
     ];

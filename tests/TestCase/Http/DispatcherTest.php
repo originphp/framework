@@ -14,17 +14,17 @@
 
 namespace Origin\Test\Http;
 
-use Origin\Http\Dispatcher;
-use Origin\Controller\Controller;
-use Origin\TestSuite\TestTrait;
-
-use Origin\Core\Exception\RouterException;
-use Origin\Controller\Exception\MissingControllerException;
-use Origin\Controller\Exception\MissingMethodException;
-use Origin\Controller\Exception\PrivateMethodException;
-
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Http\Dispatcher;
+
+use Origin\TestSuite\TestTrait;
+use Origin\Controller\Controller;
+use Origin\Core\Exception\RouterException;
+use Origin\Controller\Exception\MissingMethodException;
+
+use Origin\Controller\Exception\PrivateMethodException;
+use Origin\Controller\Exception\MissingControllerException;
 
 class BlogPostsController extends Controller
 {
@@ -41,7 +41,7 @@ class BlogPostsController extends Controller
      * @param string $view
      * @return void
      */
-    public function render($options=[])
+    public function render($options = [])
     {
         return true;
     }

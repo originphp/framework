@@ -39,8 +39,9 @@ class LazyLoadContainer
      * @param array $config An array of options that will be passed to the constructor
      * @return void
      */
-    public function add(string $alias, string $className, array $config=[]){
-        $this->config[$alias] = ['className'=>$className,'config'=>$config];
+    public function add(string $alias, string $className, array $config = [])
+    {
+        $this->config[$alias] = ['className' => $className,'config' => $config];
     }
 
     /**
@@ -49,7 +50,8 @@ class LazyLoadContainer
      * @param string $alias
      * @return boolean
      */
-    public function has(string $alias){
+    public function has(string $alias)
+    {
         return isset($this->config[$alias]);
     }
 
@@ -58,7 +60,8 @@ class LazyLoadContainer
      *
      * @return void
      */
-    public function list(){
+    public function list()
+    {
         return array_keys($this->config);
     }
 
@@ -68,14 +71,16 @@ class LazyLoadContainer
      * @param string $alias
      * @return mixed Entry
      */
-    public function get(string $alias){
-        if($this->has($alias)){
-            if(empty($this->objects[$alias])){
+    public function get(string $alias)
+    {
+        if ($this->has($alias)) {
+            if (empty($this->objects[$alias])) {
                 $className = $this->config[$alias]['className'];
-                $this->objects[$alias] = new $className(...$this->config[$alias]['config']); 
+                $this->objects[$alias] = new $className(...$this->config[$alias]['config']);
             }
+
             return $this->objects[$alias];
         }
-        throw new Exception(sprintf('%s was not found',$alias));
+        throw new Exception(sprintf('%s was not found', $alias));
     }
 }

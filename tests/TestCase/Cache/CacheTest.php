@@ -57,19 +57,19 @@ class CacheTest extends \PHPUnit\Framework\TestCase
 
     public function testClassNotExists()
     {
-        Cache::config('foo', ['className'=>'Void\MegaCache']);
+        Cache::config('foo', ['className' => 'Void\MegaCache']);
         $this->expectException(InvalidArgumentException::class);
         Cache::store('foo');
     }
 
     public function testIncrementDecrement()
     {
-        if (!extension_loaded('apcu')) {
+        if (! extension_loaded('apcu')) {
             $this->markTestSkipped('Apcu extension not loaded');
         }
-        Cache::config('counter', ['engine'=>'Apcu']);
+        Cache::config('counter', ['engine' => 'Apcu']);
    
-        $options = ['config'=>'counter'];
+        $options = ['config' => 'counter'];
         $this->assertEquals(1, Cache::increment('foo', 1, $options));
         $this->assertEquals(2, Cache::increment('foo', 1, $options));
         $this->assertEquals(4, Cache::increment('foo', 2, $options));

@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Console;
 
+use Origin\Command\Command;
+use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleApplication;
 use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Console\ConsoleIo;
-use Origin\Command\Command;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Exception\InvalidArgumentException;
 
@@ -49,7 +49,7 @@ class CacheDeleteCommand extends Command
 
     public function initialize()
     {
-        $this->addArgument('key', ['required'=>true]);
+        $this->addArgument('key', ['required' => true]);
     }
 
     public function execute()
@@ -67,7 +67,6 @@ class FooCommand extends Command
     }
 }
 
-
 class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
 {
     protected function consoleApplication()
@@ -75,6 +74,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $this->output = new ConsoleOutput();
         $this->output->mode(ConsoleOutput::RAW);
         $io = new ConsoleIo($this->output, $this->output);
+
         return new ConsoleApplication($io);
     }
 
@@ -136,7 +136,6 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $consoleApplication->addCommand('enable', CacheEnableCommand::class);
         $consoleApplication->addCommand('disable', CacheDisableCommand::class);
         $consoleApplication->addCommand('delete', CacheDeleteCommand::class);
-        
         
         $this->assertFalse($consoleApplication->run(['delete']));
 

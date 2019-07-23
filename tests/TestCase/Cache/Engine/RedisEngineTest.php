@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Cache\Engine;
 
-use Origin\Cache\Engine\RedisEngine;
 use Redis;
 use Origin\Exception\Exception;
+use Origin\Cache\Engine\RedisEngine;
 
 class MockRedisEngine extends RedisEngine
 {
@@ -30,11 +30,11 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        if (!extension_loaded('redis')) {
+        if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension not loaded');
         }
 
-        if (!env('REDIS_HOST') or !env('REDIS_PORT')) {
+        if (! env('REDIS_HOST') or ! env('REDIS_PORT')) {
             $this->markTestSkipped('Redis settings not found');
         }
      
@@ -53,7 +53,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
             'host' => env('REDIS_HOST'),
             'port' => env('REDIS_PORT'),
             'duration' => 3600,
-            'prefix' => 'origin_'
+            'prefix' => 'origin_',
         ]);
     }
     public function testSet()
@@ -138,7 +138,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
             'port' => env('REDIS_PORT'),
             'duration' => 3600,
             'prefix' => 'origin_',
-            'persistent' => false
+            'persistent' => false,
         ]);
         $this->assertTrue($cache->closeConnection());
     }
@@ -149,7 +149,6 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $cache->clear();
     }
 
-    
     /**
      * Make sure it runs smothely
      *
@@ -161,7 +160,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
             'host' => env('REDIS_HOST'),
             'duration' => 0,
             'prefix' => 'origin_',
-            'persistent' => 'persisten-id'
+            'persistent' => 'persisten-id',
         ]);
     
         $redis ->write('counter', 100);
@@ -174,7 +173,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $redis = new MockRedisEngine([
             'engine' => 'Redis',
             'path' => '/var/sockets/redis',
-         ]);
+        ]);
     }
 
     public function testNonPersisentException()
@@ -182,17 +181,17 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $engine = new MockRedisEngine([
             'host' => 'foo',
-            'port' => 1234
+            'port' => 1234,
         ]);
     }
 
     public function testInvalidPassword()
     {
         $this->expectException(Exception::class);
-        $engine =  new MockRedisEngine([
+        $engine = new MockRedisEngine([
             'host' => env('REDIS_HOST'),
             'port' => env('REDIS_PORT'),
-            'password' => 'secret'
+            'password' => 'secret',
         ]);
     }
 }

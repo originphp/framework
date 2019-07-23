@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbSchemaDumpCommandTest extends OriginTestCase
 {
@@ -32,11 +32,11 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $contents = file_get_contents($filename);
         // Different versions of MySQL also return different results, so test sample
       
-        if (ConnectionManager::get('test')->engine()==='mysql') {
-            $this->assertContains("CREATE TABLE `posts` (", $contents);
+        if (ConnectionManager::get('test')->engine() === 'mysql') {
+            $this->assertContains('CREATE TABLE `posts` (', $contents);
             $this->assertContains('`title` varchar(255) NOT NULL,', $contents);
         } else { //pgsql
-            $this->assertContains("CREATE TABLE posts (", $contents);
+            $this->assertContains('CREATE TABLE posts (', $contents);
             $this->assertContains('title VARCHAR(255) NOT NULL', $contents);
         }
     }

@@ -5,9 +5,9 @@ class CreateFooBarTableMigration extends Migration
 {
     public function change()
     {
-        $this->createTable('foobar',[
+        $this->createTable('foobar', [
             'name' => 'string',
-            'description' => 'text'
+            'description' => 'text',
         ]);
     }
 }

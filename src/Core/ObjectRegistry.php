@@ -66,7 +66,7 @@ class ObjectRegistry
 
     public function enable(string $object)
     {
-        if (!isset($this->loaded[$object]) or in_array($object, $this->enabled)) {
+        if (! isset($this->loaded[$object]) or in_array($object, $this->enabled)) {
             return false;
         }
         $this->enabled[] = $object;
@@ -119,7 +119,7 @@ class ObjectRegistry
         if (isset($this->loaded[$name])) {
             return $this->loaded[$name];
         }
-        $options += ['enable'=>true];
+        $options += ['enable' => true];
 
         $object = $this->create($name, $options);
 
@@ -159,6 +159,7 @@ class ObjectRegistry
             $this->unload($name);
         }
         $this->clear();
+
         return null;
     }
 
@@ -181,6 +182,7 @@ class ObjectRegistry
         if ($className === null) {
             $this->throwException($name);
         }
+
         return $this->createObject($className, $options);
     }
 

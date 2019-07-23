@@ -5,7 +5,7 @@ $autoloader = Autoloader::instance();
 $autoloader->directory(APP);
 
 $namespaces = [
-    'App' => 'src'
+    'App' => 'src',
 ];
 
 $autoloader->addNamespaces($namespaces);

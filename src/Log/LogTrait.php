@@ -14,8 +14,6 @@
 
 namespace Origin\Log;
 
-use Origin\Log\Log;
-
 trait LogTrait
 {
     /**

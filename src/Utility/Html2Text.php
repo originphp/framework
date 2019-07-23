@@ -82,7 +82,7 @@ class Html2Text
         $html = preg_replace('/<code.*?>(.*?)<\/code>/', '`$1`' ."\n", $html);
         $html = preg_replace('/<dt.*?>(.*?)<\/dt>/i', '$1' ."\n", $html);
         $html = preg_replace('/<dd.*?>(.*?)<\/dd>/', ':  $1' ."\n", $html);
-        $html = preg_replace("/&nbsp;/i", ' ', $html);
+        $html = preg_replace('/&nbsp;/i', ' ', $html);
         $html = str_replace('\r\n', '', $html); // remove temporary marker
 
         //Loop through each <a> and </a> tag in the dom and add it to the link array
@@ -111,7 +111,8 @@ class Html2Text
             $html = str_replace($needle, $string, $html);
         }
 
-        $html =  strip_tags($html);
+        $html = strip_tags($html);
+
         return rtrim($html);
     }
 }

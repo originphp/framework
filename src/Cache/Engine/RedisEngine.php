@@ -25,11 +25,10 @@
 
 namespace Origin\Cache\Engine;
 
-use Origin\Core\ConfigTrait;
-use Origin\Exception\Exception;
-use Origin\Cache\Engine\BaseEngine;
 use Redis;
 use RedisException;
+use Origin\Core\ConfigTrait;
+use Origin\Exception\Exception;
 
 class RedisEngine extends BaseEngine
 {
@@ -44,13 +43,13 @@ class RedisEngine extends BaseEngine
 
     protected $defaultConfig = [
         'host' => '127.0.0.1',
-        'port' =>  6379,
+        'port' => 6379,
         'password' => null,
         'timeout' => 0,
         'persistent' => true, // Faster!!!
         'path' => null, // Path to redis unix socket,
         'duration' => 3600,
-        'prefix' => 'origin_'
+        'prefix' => 'origin_',
     ];
 
     /**
@@ -75,9 +74,9 @@ class RedisEngine extends BaseEngine
     {
         $result = false;
         try {
-            if (!empty($this->config['path'])) {
+            if (! empty($this->config['path'])) {
                 $result = $this->Redis->connect($this->config['path']);
-            } elseif (!empty($this->config['persistent'])) {
+            } elseif (! empty($this->config['persistent'])) {
                 $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
             } else {
                 $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
@@ -90,6 +89,7 @@ class RedisEngine extends BaseEngine
                 return $this->Redis->auth($this->config['password']);
             }
         }
+
         return $result;
     }
     /**
@@ -104,6 +104,7 @@ class RedisEngine extends BaseEngine
         if ($this->config['duration'] === 0) {
             return $this->Redis->set($this->key($key), $value);
         }
+
         return $this->Redis->setex($this->key($key), $this->config['duration'], $value);
     }
     /**
@@ -144,20 +145,23 @@ class RedisEngine extends BaseEngine
      */
     public function clear() :bool
     {
-        $keys =  $this->Redis->keys($this->config['prefix'] . '*');
+        $keys = $this->Redis->keys($this->config['prefix'] . '*');
         $result = [];
         foreach ($keys as $key) {
             $result[] = (bool) $this->Redis->del($key);
         }
-        return !in_array(false, $result);
+
+        return ! in_array(false, $result);
     }
 
     public function closeConnection() : bool
     {
-        if ($this->Redis instanceof Redis and !$this->config['persistent']) {
+        if ($this->Redis instanceof Redis and ! $this->config['persistent']) {
             $this->Redis->close();
+
             return true;
         }
+
         return false;
     }
 
@@ -180,12 +184,12 @@ class RedisEngine extends BaseEngine
     {
         $key = $this->key($key);
         $value = (int) $this->Redis->incrBy($key, $offset);
-        if ($this->config['duration']>0) {
+        if ($this->config['duration'] > 0) {
             $this->Redis->expire($key, $this->config['duration']);
         }
+
         return $value;
     }
-
 
     /**
      * Decreases a value
@@ -198,9 +202,10 @@ class RedisEngine extends BaseEngine
     {
         $key = $this->key($key);
         $value = (int) $this->Redis->decr($key, $offset);
-        if ($this->config['duration']>0) {
+        if ($this->config['duration'] > 0) {
             $this->Redis->expire($key, $this->config['duration']);
         }
+
         return $value;
     }
 }

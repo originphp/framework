@@ -24,7 +24,7 @@ abstract class BaseEngine
 {
     use ConfigTrait;
 
-    protected $defaultConfig =  [];
+    protected $defaultConfig = [];
 
     /**
      * Holds the channel
@@ -75,9 +75,10 @@ abstract class BaseEngine
     public function levels() : array
     {
         $levels = $this->config('levels');
-        if (is_array($levels) and !empty($levels)) {
+        if (is_array($levels) and ! empty($levels)) {
             return $levels;
         }
+
         return [];
     }
 
@@ -89,9 +90,10 @@ abstract class BaseEngine
     public function channels() : array
     {
         $channels = $this->config('channels');
-        if (is_array($channels) and !empty($channels)) {
+        if (is_array($channels) and ! empty($channels)) {
             return $channels;
         }
+
         return [];
     }
 
@@ -225,10 +227,11 @@ abstract class BaseEngine
     {
         $replace = [];
         foreach ($context as $key => $value) {
-            if (!is_array($value) and (!is_object($value) or method_exists($value, '__toString'))) {
+            if (! is_array($value) and (! is_object($value) or method_exists($value, '__toString'))) {
                 $replace['{' . $key . '}'] = $value;
             }
         }
+
         return strtr($message, $replace);
     }
 

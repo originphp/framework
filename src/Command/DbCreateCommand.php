@@ -14,7 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 
@@ -26,15 +25,15 @@ class DbCreateCommand extends Command
     public function initialize()
     {
         $this->addOption('datasource', [
-            'description'=>'Use a different datasource','short'=>'ds','default'=>'default'
-            ]);
+            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        ]);
     }
  
     public function execute()
     {
         $datasource = $this->options('datasource');
         $config = ConnectionManager::config($datasource);
-        if (!$config) {
+        if (! $config) {
             $this->throwError("{$datasource} datasource not found");
         }
         $database = $config['database'];

@@ -15,9 +15,9 @@
 namespace Origin\Test\Console\ConsoleIo;
 
 use Origin\Console\ConsoleIo;
-use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Console\ConsoleInput;
 use Origin\Exception\Exception;
+use Origin\Console\ConsoleInput;
+use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockConsoleInput extends ConsoleInput
 {
@@ -42,6 +42,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $this->stderr->mode(ConsoleOutput::RAW);
 
         $this->stdin = new MockConsoleInput();
+
         return new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
     }
    
@@ -63,16 +64,15 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
     {
         $io = $this->io();
         $io->write('Line #1');
-        $this->assertEquals("Line #1", $this->stdout->read());
+        $this->assertEquals('Line #1', $this->stdout->read());
     }
-
 
     public function testOverwrite()
     {
         $io = $this->io();
 
         $io->write('downloading...');
-        $this->assertEquals("downloading...", $this->stdout->read());
+        $this->assertEquals('downloading...', $this->stdout->read());
         $io->overwrite('completed');
   
         $output = $this->stdout->read();
@@ -91,7 +91,6 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(43, strlen($this->stdout->read())); // Not sure how to test this
     }
 
-
     public function testTitle()
     {
         $io = $this->io();
@@ -99,7 +98,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $expected = [
             '<heading>My Title</heading>',
             '<heading>========</heading>',
-            "\n"
+            "\n",
         ];
 
         $this->assertEquals(implode("\n", $expected), $this->stdout->read());
@@ -112,7 +111,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $expected = [
             '<heading>My Heading</heading>',
             '<heading>----------</heading>',
-            "\n"
+            "\n",
         ];
 
         $this->assertEquals(implode("\n", $expected), $this->stdout->read());
@@ -188,7 +187,7 @@ EOF;
     {
         $io = $this->io();
         
-        $result = $io->format('Hello', ['color'=>'red','background'=>'white']);
+        $result = $io->format('Hello', ['color' => 'red','background' => 'white']);
         $this->assertEquals("\033[31;107mHello\033[39;49m", $result);
     }
 
@@ -222,13 +221,13 @@ EOF;
     public function testAlert()
     {
         $io = $this->io();
-        $io->alert('An Alert Box', ['background'=>'white','color'=>'black']);
+        $io->alert('An Alert Box', ['background' => 'white','color' => 'black']);
         $this->assertEquals('32584b2056b87965eb1224d0d3d95ede', md5($this->stdout->read()));
     }
     public function testBlock()
     {
         $io = $this->io();
-        $io->block('A Block', ['background'=>'yellow','color'=>'black']);
+        $io->block('A Block', ['background' => 'yellow','color' => 'black']);
         $this->assertEquals('09ec36ad34e84fa021cc8cbe4fd3d9db', md5($this->stdout->read()));
     }
 
@@ -262,14 +261,14 @@ EOF;
     {
         $io = $this->io();
         $this->assertNotEmpty($io->styles());
-        $io->styles('fire', ['color'=>'red']);
-        $this->assertEquals(['color'=>'red'], $io->styles('fire'));
+        $io->styles('fire', ['color' => 'red']);
+        $this->assertEquals(['color' => 'red'], $io->styles('fire'));
     }
 
     public function testProgressBar()
     {
         $io = $this->io();
-        $io->progressBar(10, 20, ['ansi'=>false]);
+        $io->progressBar(10, 20, ['ansi' => false]);
         $this->assertContains('[#########################                         ] 50%', $this->stdout->read());
     }
 
@@ -308,7 +307,6 @@ EOF;
         $io = $this->io();
         $io->status('error', 'An Error Occured');
         $this->assertContains('<white>[</white> <red>ERROR</red> <white>] An Error Occured</white>', $this->stdout->read());
-
 
         $io = $this->io();
         $io->status('ignore', 'The Status Text');

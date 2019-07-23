@@ -33,8 +33,9 @@ class MockConsoleOutput extends ConsoleOutput
     }
     public function getContents()
     {
-        $stream =  $this->stream;
+        $stream = $this->stream;
         rewind($stream);
+
         return  stream_get_contents($stream);
     }
 }
@@ -68,7 +69,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     public function testStyles()
     {
         $ConsoleOutput = new ConsoleOutput();
-        $this->assertEquals(['color' => 'white','background'=>'lightRed'], $ConsoleOutput->styles('exception'));
+        $this->assertEquals(['color' => 'white','background' => 'lightRed'], $ConsoleOutput->styles('exception'));
         
         $ConsoleOutput->styles('foo', ['bar']);
         $this->assertEquals(['bar'], $ConsoleOutput->styles('foo'));
@@ -81,7 +82,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
-        $ConsoleOutput->styles('complete', ['background'=>'lightRed','underline'=>true,'color'=>'white']);
+        $ConsoleOutput->styles('complete', ['background' => 'lightRed','underline' => true,'color' => 'white']);
         $ConsoleOutput->write('<complete>Test</complete>');
         $this->assertEquals("\033[97;101;4mTest\033[39;49;24m\n", $ConsoleOutput->read());
 
@@ -111,7 +112,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
     {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
-        $ConsoleOutput->styles('foo', ['foo'=>'bar']);
+        $ConsoleOutput->styles('foo', ['foo' => 'bar']);
         $ConsoleOutput->write('<foo>bar</foo>');
         $this->assertEquals("bar\n", $ConsoleOutput->read());
     }
@@ -129,7 +130,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::PLAIN);
 
-        $ConsoleOutput->styles('foo', ['foo'=>'bar']);
+        $ConsoleOutput->styles('foo', ['foo' => 'bar']);
         $ConsoleOutput->write('<foo>bar</foo>');
         $this->assertEquals("bar\n", $ConsoleOutput->read());
     }

@@ -14,14 +14,14 @@
 
 namespace Origin\I18n;
 
-use Origin\I18n\Exception\LocaleNotAvailableException;
-use Origin\Exception\Exception;
 use Locale;
+use Origin\Utility\Date;
 use Origin\Utility\Yaml;
+use Origin\Utility\Number;
+use Origin\Exception\Exception;
 use Origin\I18n\Date as I18nDate;
 use Origin\I18n\Number as I18nNumber;
-use Origin\Utility\Date;
-use Origin\Utility\Number;
+use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18n
 {
@@ -76,7 +76,7 @@ class I18n
      */
     public static function initialize(array $config = []) : void
     {
-        $config += ['locale'=>static::defaultLocale(),'language'=>null,'timezone'=>'UTC'];
+        $config += ['locale' => static::defaultLocale(),'language' => null,'timezone' => 'UTC'];
 
         static::locale($config['locale']);
 
@@ -86,7 +86,7 @@ class I18n
         self::language($config['language']);
 
         // Configure Date Timezone
-        Date::locale(['timezone'=>$config['timezone']]);
+        Date::locale(['timezone' => $config['timezone']]);
 
         /**
          * This is the prefered method to use locale YAML files.
@@ -97,15 +97,14 @@ class I18n
         if ($locale) {
             extract($locale);
             Date::locale([
-                'timezone'=>$config['timezone'],'date'=>$date,'time'=>$time,'datetime'=>$datetime
-                ]);
+                'timezone' => $config['timezone'],'date' => $date,'time' => $time,'datetime' => $datetime,
+            ]);
 
             if ($currency) {
-                Number::addCurrency($currency, ['before'=>$before,'after'=>$after]);
-            } 
-            else{
+                Number::addCurrency($currency, ['before' => $before,'after' => $after]);
+            } else {
                 // Generic locales don't have currency, so remmove to this to work with defaults
-                unset($locale['currency']); 
+                unset($locale['currency']);
             }
             
             unset($locale['before'],$locale['after']);
@@ -144,6 +143,7 @@ class I18n
         if ($filename) {
             static::$definition = Yaml::toArray(file_get_contents($filename));
         }
+
         return static::$definition;
     }
     
@@ -160,7 +160,7 @@ class I18n
             return static::$locale;
         }
 
-        if (static::$availableLocales and !in_array($locale, static::$availableLocales)) {
+        if (static::$availableLocales and ! in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
         static::$locale = $locale;
@@ -181,10 +181,11 @@ class I18n
             if (static::$defaulLocale === null) {
                 static::$defaulLocale = self::DEFAULT_LOCALE;
             }
+
             return static::$defaulLocale;
         }
 
-        if (static::$availableLocales and !in_array($locale, static::$availableLocales)) {
+        if (static::$availableLocales and ! in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
         static::$defaulLocale = $locale;
@@ -251,7 +252,7 @@ class I18n
             static::locale(static::defaultLocale());
         }
 
-        if( isset(static::$messages[$message])){
+        if (isset(static::$messages[$message])) {
             $message = static::$messages[$message];
         }
 
@@ -271,7 +272,7 @@ class I18n
 
         $replace = [];
         foreach ($vars as $key => $value) {
-            if (!is_array($value) and !is_object($value)) {
+            if (! is_array($value) and ! is_object($value)) {
                 $replace['{'.$key.'}'] = $value;
             }
         }
@@ -292,7 +293,7 @@ class I18n
 
         if (file_exists($filename)) {
             $messages = include $filename;
-            if (!is_array($messages)) {
+            if (! is_array($messages)) {
                 throw new Exception("{$language}.php does not return an array");
             }
             static::$messages = $messages;

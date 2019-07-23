@@ -67,11 +67,11 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $entity = new Entity();
         $entity->id = 1003;
         unset($entity->id);
-        $this->assertTrue(!isset($entity->id));
+        $this->assertTrue(! isset($entity->id));
         $entity->foo = 'bar';
         $this->assertTrue(isset($entity->foo));
         $entity->unset('foo');
-        $this->assertTrue(!isset($entity->foo));
+        $this->assertTrue(! isset($entity->foo));
     }
 
     /**
@@ -88,10 +88,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
     public function testCreate()
     {
-        $data = array(
+        $data = [
             'id' => 1004,
             'name' => 'EntityName',
-        );
+        ];
         $entity = new Entity($data);
         $this->assertEquals(1004, $entity->id);
         $this->assertEquals('EntityName', $entity->name);
@@ -110,16 +110,16 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $comment->description = 'a comment';
 
         $article->author = $author;
-        $article->comments = array(
-      $comment,
-    );
-        $expected = array(
-      'id' => 256,
-      'author' => array('name' => 'Tony'),
-      'comments' => array(
-        array('description' => 'a comment'),
-      ),
-    );
+        $article->comments = [
+            $comment,
+        ];
+        $expected = [
+            'id' => 256,
+            'author' => ['name' => 'Tony'],
+            'comments' => [
+                ['description' => 'a comment'],
+            ],
+        ];
 
         $this->assertEquals($expected, $article->toArray());
     }
@@ -127,8 +127,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     public function testhas()
     {
         $data = [
-        'title' => 'Article Title',
-        'author_id' => null,
+            'title' => 'Article Title',
+            'author_id' => null,
         ];
 
         $entity = new Entity($data);
@@ -141,8 +141,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     public function testInvalidate()
     {
         $data = [
-        'title' => 'Article Title',
-        'author_id' => null,
+            'title' => 'Article Title',
+            'author_id' => null,
         ];
 
         $entity = new Entity($data);
@@ -153,45 +153,44 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
     public function testToString()
     {
-        $entity = new Entity(['name'=>'1234']);
-        $expected ="{\n    \"name\": \"1234\"\n}";
+        $entity = new Entity(['name' => '1234']);
+        $expected = "{\n    \"name\": \"1234\"\n}";
         $this->assertEquals($expected, (string) $entity);
     }
 
     public function testProperties()
     {
-        $data = ['foo'=>'bar','a'=>'b'];
+        $data = ['foo' => 'bar','a' => 'b'];
         $entity = new Entity($data);
         $this->assertEquals(['foo','a'], $entity->properties());
     }
 
     public function testPropertyExists()
     {
-        $entity = new Entity(['name'=>'test']);
+        $entity = new Entity(['name' => 'test']);
         $this->assertTrue($entity->propertyExists('name'));
-        $entity = new Entity(['name'=>null]);
+        $entity = new Entity(['name' => null]);
         $this->assertTrue($entity->propertyExists('name'));
         $this->assertFalse($entity->propertyExists('foo'));
     }
 
     public function testDebugInfo()
     {
-        $data = ['name'=>'test'];
+        $data = ['name' => 'test'];
         $entity = new Entity($data);
         $this->assertEquals($data, $entity->__debugInfo());
     }
 
     public function testErrors()
     {
-        $entity = new Entity(['name'=>'test']);
+        $entity = new Entity(['name' => 'test']);
         $entity->errors('name', 'Can\'t be called test');
         $this->assertEquals(['Can\'t be called test'], $entity->errors('name'));
     }
 
-
     public function testModified()
     {
-        $entity = new Entity(['name'=>'test'], ['markClean'=>true]);
+        $entity = new Entity(['name' => 'test'], ['markClean' => true]);
         $this->assertEquals([], $entity->modified());
         $this->assertFalse($entity->modified('name'));
 
@@ -208,11 +207,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             'title' => 'Article Title',
-            'body' => 'Article body'
+            'body' => 'Article body',
         ];
-        $entity = new Entity($data, ['name'=>'Article']);
+        $entity = new Entity($data, ['name' => 'Article']);
 
-      
         $expected = '{"title":"Article Title","body":"Article body"}';
         $this->assertEquals($expected, $entity->toJson());
     }
@@ -221,16 +219,16 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             'title' => 'Article Title',
-            'body' => 'Article body'
+            'body' => 'Article body',
         ];
-        $entity = new Entity($data, ['name'=>'Article']);
+        $entity = new Entity($data, ['name' => 'Article']);
 
         $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<article><title>Article Title</title><body>Article body</body></article>\n";
         $this->assertEquals($expected, $entity->toXml());
 
         $data = [
             'title' => 'Article Title',
-            'body' => 'Article body'
+            'body' => 'Article body',
         ];
         $entity = new Entity($data);
 

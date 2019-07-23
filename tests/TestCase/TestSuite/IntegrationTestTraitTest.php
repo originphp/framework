@@ -14,11 +14,11 @@
 
 namespace Origin\Test\TestSuite;
 
-use Origin\TestSuite\IntegrationTestTrait;
-use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\TestSuite\TestTrait;
+use Origin\Controller\Controller;
+use Origin\TestSuite\IntegrationTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
 
 class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
@@ -26,7 +26,6 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     use IntegrationTestTrait;
     use TestTrait;
     
-
     public function testGet()
     {
         $this->get('/posts/index');
@@ -43,7 +42,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     }
     public function testPost()
     {
-        $data = ['id'=>512];
+        $data = ['id' => 512];
         $this->post('/posts/index', $data);
         $this->assertEquals('POST', $_SERVER['REQUEST_METHOD']);
         $this->assertEquals($data, $_POST);
@@ -106,7 +105,6 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->response();
     }
 
-    
     public function testViewVariable()
     {
         $this->get('/posts/index');
@@ -124,14 +122,13 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->viewVariable('beforeGet');
     }
 
-
     public function testEnv()
     {
         $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
 
         // Test setting
         $this->env('HTTP_USER_AGENT', $userAgent);
-        $this->assertEquals(['HTTP_USER_AGENT'=>$userAgent], $this->getProperty('env'));
+        $this->assertEquals(['HTTP_USER_AGENT' => $userAgent], $this->getProperty('env'));
         
         $this->get('/posts/index');
     }
@@ -141,34 +138,33 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 
         // Test setting
         $this->cookie('foo', 'bar');
-        $this->assertEquals(['foo'=>'bar'], $this->getProperty('cookies'));
+        $this->assertEquals(['foo' => 'bar'], $this->getProperty('cookies'));
 
         $this->get('/posts/index');
         $this->assertEquals('bar', $this->response->cookies('foo')['value']);
     }
 
-
     public function testHeader()
     {
-        $header = "HTTP/1.0 404 Not Found";
+        $header = 'HTTP/1.0 404 Not Found';
         $this->header($header);
-        $this->assertEquals([$header=>null], $this->getProperty('headers'));
+        $this->assertEquals([$header => null], $this->getProperty('headers'));
 
         $this->header('Location', 'http://www.example.com/');
-        $this->assertEquals(['Location'=>'http://www.example.com/','HTTP/1.0 404 Not Found'=>null], $this->getProperty('headers'));
+        $this->assertEquals(['Location' => 'http://www.example.com/','HTTP/1.0 404 Not Found' => null], $this->getProperty('headers'));
    
         $this->get('/posts/index');
     }
 
     public function testSession()
     {
-        $data1 = ['Widget.name'=>'foo'];
+        $data1 = ['Widget.name' => 'foo'];
         $this->session($data1);
-        $data2 = ['Widget.serial'=>'12345'];
+        $data2 = ['Widget.serial' => '12345'];
         $this->session($data2);
         $expected = [
-            'Widget.name'=>'foo',
-            'Widget.serial'=>'12345'
+            'Widget.name' => 'foo',
+            'Widget.serial' => '12345',
         ];
         $this->assertEquals($expected, $this->getProperty('session'));
 

@@ -15,8 +15,8 @@
 namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
-use Origin\Model\Exception\MissingModelException;
 use Origin\Model\ModelRegistry;
+use Origin\Model\Exception\MissingModelException;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -64,7 +64,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      */
     public function loadFixture(string $name)
     {
-        if (!in_array($name, $this->fixtures)) {
+        if (! in_array($name, $this->fixtures)) {
             $this->fixtures[] = $name;
         }
     }
@@ -95,7 +95,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     {
         if (empty($options['className'])) {
             $options['className'] = Resolver::className($alias, 'Model');
-            if (!$options['className']) {
+            if (! $options['className']) {
                 throw new MissingModelException($alias);
             }
         }
@@ -126,14 +126,14 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     {
         if ($options) {
             return $this->getMockBuilder($className)
-            ->setMethods($methods)
-            ->setConstructorArgs([$options])
-            ->getMock();
+                ->setMethods($methods)
+                ->setConstructorArgs([$options])
+                ->getMock();
         }
 
         return $this->getMockBuilder($className)
             ->setMethods($methods)
-             ->getMock();
+            ->getMock();
     }
 
     protected function setUp() : void

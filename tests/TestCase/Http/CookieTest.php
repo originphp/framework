@@ -21,7 +21,7 @@ class MockCookie extends Cookie
 {
     protected $cookies = [];
 
-    protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false)
     {
         $this->cookies[$name] = $value;
     }
@@ -36,6 +36,7 @@ class MockCookie extends Cookie
         if (isset($this->cookies[$name])) {
             return $this->cookies[$name];
         }
+
         return null;
     }
 }
@@ -99,9 +100,9 @@ class CookieTest extends \PHPUnit\Framework\TestCase
     public function testPack()
     {
         $cookie = new MockCookie();
-        $cookie->write('testPack', [1=>'one'], 0, ['encrypt'=>false]);
+        $cookie->write('testPack', [1 => 'one'], 0, ['encrypt' => false]);
         $this->assertEquals('{"1":"one"}', $cookie->cookies()['testPack']);
         $_COOKIE['testPack'] = '{"1":"one"}';
-        $this->assertEquals([1=>'one'], $cookie->read('testPack'));
+        $this->assertEquals([1 => 'one'], $cookie->read('testPack'));
     }
 }

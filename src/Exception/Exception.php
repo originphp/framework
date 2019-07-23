@@ -22,8 +22,8 @@ class BaseException extends \Exception
     public function __construct($message, $code = 500)
     {
         if ($this->template !== null) {
-            if (!is_array($message)) {
-                $message = array($message);
+            if (! is_array($message)) {
+                $message = [$message];
             }
             $message = vsprintf($this->template, $message);
         }

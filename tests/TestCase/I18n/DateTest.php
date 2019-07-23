@@ -14,7 +14,6 @@
 
 namespace Origin\Test\I18n;
 
-use Origin\I18n\I18n;
 use Origin\I18n\Date;
 use IntlDateFormatter;
 
@@ -70,13 +69,11 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $options = [IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE];
         $this->assertEquals('Dec 27, 2018', Date::format('2018-12-27 13:02:00', $options));
 
-
         $options = [IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM];
         $this->assertEquals('Dec 27, 2018, 1:02:00 PM', Date::format('2018-12-27 13:02:00', $options));
 
         $options = [IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM];
         $this->assertEquals('1:02:00 PM', Date::format('2018-12-27 13:02:00', $options));
-
 
         $this->assertEquals('Feb 25, 2019', Date::format('2019-02-25 08:20:00', IntlDateFormatter::MEDIUM));
         

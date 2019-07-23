@@ -43,7 +43,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testPercentage()
     {
         $this->assertEquals('99.00%', Number::percent(99));
-        $this->assertEquals('50.00%', Number::percent(.50, 2, ['multiply'=>true]));
+        $this->assertEquals('50.00%', Number::percent(.50, 2, ['multiply' => true]));
     }
     public function testCurrency()
     {
@@ -56,6 +56,6 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testParse()
     {
         $this->assertEquals('1234.789', Number::parse('1,234.789'));
-        $this->assertEquals('1234.789', Number::parse('1.234,789', ['thousands'=>'.','decimals'=>',']));
+        $this->assertEquals('1234.789', Number::parse('1.234,789', ['thousands' => '.','decimals' => ',']));
     }
 }

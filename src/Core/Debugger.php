@@ -53,7 +53,7 @@ class Debugger
             'line' => $exception->getLine(),
             'class' => $class,
             'function' => null,
-            ];
+        ];
         $stacktrace = $exception->getTrace();
         foreach ($stacktrace as $stack) {
             $result['stackFrames'][] = [
@@ -85,7 +85,7 @@ class Debugger
                 'class' => isset($stack['class']) ? $stack['class'] : '',
                 'function' => $stack['function'],
                 'args' => $stack['args'],
-                ];
+            ];
         }
 
         return $result;

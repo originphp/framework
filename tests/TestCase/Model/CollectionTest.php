@@ -14,16 +14,16 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Collection;
 use Origin\Model\Entity;
+use Origin\Model\Collection;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testArray()
     {
         $array = [
-            new Entity(['title'=>'foo'], ['name'=>'Bookmark']),
-            new Entity(['title'=>'bar'], ['name'=>'Bookmark']),
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
+            new Entity(['title' => 'bar'], ['name' => 'Bookmark']),
         ];
         $collection = new Collection($array);
         foreach ($collection as $key => $value) {
@@ -41,7 +41,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testDebugInfo()
     {
         $array = [
-            new Entity(['title'=>'foo'], ['name'=>'Bookmark'])
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
         ];
         $collection = new Collection($array);
         $data = print_r($collection, true);
@@ -50,7 +50,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testToJson()
     {
         $array = [
-            new Entity(['title'=>'foo'], ['name'=>'Bookmark'])
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
         ];
         $collection = new Collection($array);
 
@@ -59,7 +59,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     public function testToXml()
     {
         $array = [
-            new Entity(['title'=>'foo'], ['name'=>'Bookmark'])
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
         ];
         $collection = new Collection($array);
 

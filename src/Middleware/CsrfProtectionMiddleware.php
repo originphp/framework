@@ -13,12 +13,12 @@
  */
 namespace Origin\Middleware;
 
-use Origin\Middleware\Exception\InvalidCsrfTokenException;
-
 use Origin\Http\Request;
+
 use Origin\Http\Response;
 use Origin\Http\Middleware;
 use Origin\Utility\Security;
+use Origin\Middleware\Exception\InvalidCsrfTokenException;
 
 class CsrfProtectionMiddleware extends Middleware
 {
@@ -30,12 +30,12 @@ class CsrfProtectionMiddleware extends Middleware
 
     protected $defaultConfig = [
         'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
-        'expires' => '+60 minutes' // Expiry time defaults to 60 minutes like sessions
+        'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions
     ];
 
     public function initialize(array $config)
     {
-        $this->token = Security::hash(random_bytes(64), ['type'=>'sha512']);
+        $this->token = Security::hash(random_bytes(64), ['type' => 'sha512']);
     }
 
     /**
@@ -85,7 +85,6 @@ class CsrfProtectionMiddleware extends Middleware
         return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
     }
 
-
     /**
      * Validates the CSRF token using either the cookie or the header
      *
@@ -103,11 +102,11 @@ class CsrfProtectionMiddleware extends Middleware
 
         $cookie = $request->cookies($this->config('cookieName'));
 
-        if (!$cookie) {
+        if (! $cookie) {
             throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
         }
  
-        if (!Security::compare($cookie, $request->data('csrfToken')) and !Security::compare($cookie, $request->headers('X-CSRF-Token'))) {
+        if (! Security::compare($cookie, $request->data('csrfToken')) and ! Security::compare($cookie, $request->headers('X-CSRF-Token'))) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
     }

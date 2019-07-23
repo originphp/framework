@@ -28,27 +28,27 @@ class Inflector
      *
      * @var array
      */
-    private static $cache = array();
+    private static $cache = [];
 
     /**
      * Core set of rules for inflection that work pretty well.
      *
      * @var array
      */
-    private static $rules = array(
-    'plural' => array(
-      '/([^aeiouy]|qu)y$/i' => '\1ies',
-      '/(ch|sh|ss|us|x)$/i' => '\1es',
-      '/^$/' => ''
-    ),
+    private static $rules = [
+        'plural' => [
+            '/([^aeiouy]|qu)y$/i' => '\1ies',
+            '/(ch|sh|ss|us|x)$/i' => '\1es',
+            '/^$/' => '',
+        ],
 
-    'singular' => array(
-      '/([^aeiouy]|qu)ies$/i' => '\1y',
-      '/(ch|sh|ss|us|x)es$/i' => '\1',
-      '/^$/' => '',
-      '/s$/i' => '',
-    ),
-  );
+        'singular' => [
+            '/([^aeiouy]|qu)ies$/i' => '\1y',
+            '/(ch|sh|ss|us|x)es$/i' => '\1',
+            '/^$/' => '',
+            '/s$/i' => '',
+        ],
+    ];
 
     /**
      * Converts a word to purual form.
@@ -70,9 +70,11 @@ class Inflector
         foreach (self::$rules['plural'] as $pattern => $replacement) {
             if (preg_match($pattern, $singular)) {
                 self::$cache['pluralize'][$singular] = preg_replace($pattern, $replacement, $singular);
+
                 return self::$cache['pluralize'][$singular];
             }
         }
+
         return $singular . 's';
     }
 

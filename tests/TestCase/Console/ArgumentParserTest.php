@@ -22,9 +22,9 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testParseString()
     {
         $ap = new ArgumentParser();
-        $ap->addOption('text_a', ['type'=>'string','short'=>'a']);
-        $ap->addOption('text_b', ['type'=>'string','short'=>'b']);
-        $ap->addArgument('text_c', ['type'=>'string']);
+        $ap->addOption('text_a', ['type' => 'string','short' => 'a']);
+        $ap->addOption('text_b', ['type' => 'string','short' => 'b']);
+        $ap->addArgument('text_c', ['type' => 'string']);
 
         list($options, $arguments) = $ap->parse(['--text_a=foo','-b=bar','foobar']);
         $this->assertEquals('foo', $options['text_a']);
@@ -35,14 +35,13 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testDefault()
     {
         $ap = new ArgumentParser();
-        $ap->addOption('value1', ['type'=>'string','default'=>'foo']);
+        $ap->addOption('value1', ['type' => 'string','default' => 'foo']);
     
         list($options, $arguments) = $ap->parse([]);
         $this->assertEquals('foo', $options['value1']);
 
-
         $ap = new ArgumentParser();
-        $ap->addOption('value1', ['type'=>'string','default'=>'foo','description'=>['Line 1','Line 2']]);
+        $ap->addOption('value1', ['type' => 'string','default' => 'foo','description' => ['Line 1','Line 2']]);
         $help = $ap->help();
         $this->assertContains('<white>Line 2 <yellow>[default: foo]</yellow></white>', $help); // Check its line 2
     }
@@ -50,7 +49,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testRequiredOption()
     {
         $ap = new ArgumentParser();
-        $ap->addOption('value1', ['type'=>'string','required'=>true]);
+        $ap->addOption('value1', ['type' => 'string','required' => true]);
         $this->expectException(ConsoleException::class);
         $ap->parse([]);
     }
@@ -59,20 +58,20 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     {
         $ap = new ArgumentParser();
         $this->expectException(ConsoleException::class);
-        $ap->addOption('value1', ['type'=>'string','required'=>true,'default'=>'irrelevant']);
+        $ap->addOption('value1', ['type' => 'string','required' => true,'default' => 'irrelevant']);
     }
 
     public function testOptionInvalidType()
     {
         $ap = new ArgumentParser();
         $this->expectException(ConsoleException::class);
-        $ap->addOption('value1', ['type'=>'<-o->']);
+        $ap->addOption('value1', ['type' => '<-o->']);
     }
 
     public function testRequiredArgument()
     {
         $ap = new ArgumentParser();
-        $ap->addArgument('value1', ['type'=>'string','required'=>true]);
+        $ap->addArgument('value1', ['type' => 'string','required' => true]);
         $this->expectException(ConsoleException::class);
         $ap->parse([]);
     }
@@ -80,26 +79,26 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testArgumentRequiredAfterOptional()
     {
         $ap = new ArgumentParser();
-        $ap->addArgument('value1', ['type'=>'string']);
+        $ap->addArgument('value1', ['type' => 'string']);
         $this->expectException(ConsoleException::class);
-        $ap->addArgument('value2', ['type'=>'string','required'=>true]);
+        $ap->addArgument('value2', ['type' => 'string','required' => true]);
     }
 
     public function testArgumentAfterArray()
     {
         $ap = new ArgumentParser();
-        $ap->addArgument('value1', ['type'=>'array']);
+        $ap->addArgument('value1', ['type' => 'array']);
         $this->expectException(ConsoleException::class);
-        $ap->addArgument('value2', ['type'=>'string']);
+        $ap->addArgument('value2', ['type' => 'string']);
     }
 
     public function testParseBoolean()
     {
         $ap = new ArgumentParser();
-        $ap->addOption('value1', ['type'=>'boolean','short'=>'a']);
-        $ap->addOption('value2', ['type'=>'boolean','short'=>'b']);
-        $ap->addOption('value3', ['type'=>'boolean']); // check false
-        $ap->addArgument('value4', ['type'=>'boolean']);
+        $ap->addOption('value1', ['type' => 'boolean','short' => 'a']);
+        $ap->addOption('value2', ['type' => 'boolean','short' => 'b']);
+        $ap->addOption('value3', ['type' => 'boolean']); // check false
+        $ap->addArgument('value4', ['type' => 'boolean']);
 
         list($options, $arguments) = $ap->parse(['--value1','-b','true']);
         $this->assertEquals(true, $options['value1']);
@@ -111,8 +110,8 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testParseInteger()
     {
         $ap = new ArgumentParser();
-        $ap->addOption('value1', ['type'=>'integer']);
-        $ap->addArgument('value2', ['type'=>'integer']);
+        $ap->addOption('value1', ['type' => 'integer']);
+        $ap->addArgument('value2', ['type' => 'integer']);
         list($options, $arguments) = $ap->parse(['--value1=1234','1000']);
         $this->assertEquals(1234, $options['value1']);
         $this->assertEquals(1000, $arguments['value2']);
@@ -132,13 +131,12 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->parse(['-v=1234']);
     }
 
-
     public function testArray()
     {
         $ap = new ArgumentParser();
 
-        $ap->addArgument('controller', ['type'=>'string']);
-        $ap->addArgument('actions', ['type'=>'array']);
+        $ap->addArgument('controller', ['type' => 'string']);
+        $ap->addArgument('actions', ['type' => 'array']);
         list($options, $arguments) = $ap->parse(['Products','index','add','edit']);
         $this->assertEquals('Products', $arguments['controller']);
         $this->assertEquals(['index','add','edit'], $arguments['actions']);
@@ -147,15 +145,14 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     public function testHash()
     {
         $ap = new ArgumentParser();
-        $ap->addArgument('model', ['type'=>'string']);
-        $ap->addArgument('schema', ['type'=>'hash']);
+        $ap->addArgument('model', ['type' => 'string']);
+        $ap->addArgument('schema', ['type' => 'hash']);
         list($options, $arguments) = $ap->parse(['Product','name:string','description:text','error']);
         $this->assertEquals('Product', $arguments['model']);
     
-        $this->assertEquals(['name'=>'string','description'=>'text','error'], $arguments['schema']);
+        $this->assertEquals(['name' => 'string','description' => 'text','error'], $arguments['schema']);
     }
    
-
     public function testBuildHelp()
     {
         $ap = new ArgumentParser();
@@ -178,7 +175,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap = new ArgumentParser();
         $ap->setCommand('foo');
        
-        $ap->addArgument('something', ['description'=>['Line #1','Line #2']]);
+        $ap->addArgument('something', ['description' => ['Line #1','Line #2']]);
         $help = $ap->help();
      
         $this->assertContains('Line #1', $help);
@@ -191,7 +188,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap = new ArgumentParser();
         $ap->setCommand('foo');
        
-        $ap->addArgument('something', ['description'=>['Line #1','Line #2']]);
+        $ap->addArgument('something', ['description' => ['Line #1','Line #2']]);
         $help = $ap->help();
      
         $this->assertContains('Line #1', $help);
@@ -203,7 +200,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     {
         $ap = new ArgumentParser();
         $ap->setCommand('foo');
-        $ap->addArgument('bar', ['required'=>true]);
+        $ap->addArgument('bar', ['required' => true]);
         $help = $ap->help();
         
         $this->assertContains('foo [options] bar', $help);
@@ -212,7 +209,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     {
         $ap = new ArgumentParser();
         $ap->setCommand('foo');
-        $ap->addOption('bar', ['required'=>true]);
+        $ap->addOption('bar', ['required' => true]);
         $help = $ap->help();
         
         $this->assertContains('foo --bar [options] [arguments]', $help);
@@ -222,7 +219,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap = new ArgumentParser();
         $ap->setCommand('foo');
         
-        $ap->addCommand('[bar]', ['description'=>'The part after foo']);
+        $ap->addCommand('[bar]', ['description' => 'The part after foo']);
         $help = $ap->help();
         
         $this->assertContains('foo command [options] [arguments]', $help);

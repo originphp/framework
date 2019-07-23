@@ -15,8 +15,8 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\DotEnv;
-use Origin\Exception\NotFoundException;
 use Origin\Exception\Exception;
+use Origin\Exception\NotFoundException;
 
 class MockDotEnv extends DotEnv
 {

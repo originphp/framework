@@ -14,7 +14,6 @@
 
 namespace Origin\Core;
 
-use Origin\Core\Autoloader;
 use Origin\Core\Exception\MissingPluginException;
 
 /**
@@ -38,7 +37,6 @@ class Plugin
      */
     protected static $loaded = [];
 
-
     /**
      * Initializes the Plugin Object
      * Will load the plugins installed by composer
@@ -48,7 +46,7 @@ class Plugin
         if (file_exists(static::COMPOSER_PLUGINS)) {
             $composer = json_decode(file_get_contents(static::COMPOSER_PLUGINS), true);
             foreach ($composer as $plugin => $path) {
-                static::load($plugin, [ 'path' => ROOT . $path, 'autoload' => false]);
+                static::load($plugin, ['path' => ROOT . $path, 'autoload' => false]);
             }
         }
     }
@@ -64,9 +62,9 @@ class Plugin
         if ($plugin) {
             return isset(static::$loaded[$plugin]);
         }
+
         return array_keys(static::$loaded);
     }
-
 
     /**
      * Loads a plugin
@@ -83,7 +81,7 @@ class Plugin
             'path' => PLUGINS . DS . Inflector::underscore($plugin),
             'autoload' => true,
         ];
-        if (!file_exists($options['path'])) {
+        if (! file_exists($options['path'])) {
             throw new MissingPluginException($plugin);
         }
 
@@ -106,8 +104,10 @@ class Plugin
     {
         if (isset(static::$loaded[$plugin])) {
             unset(static::$loaded[$plugin]);
+
             return true;
         }
+
         return false;
     }
 
@@ -140,6 +140,7 @@ class Plugin
         if ($options['bootstrap']) {
             return static::include($options['path'] . DS . 'config' . DS . 'bootstrap.php');
         }
+
         return false;
     }
 
@@ -168,6 +169,7 @@ class Plugin
         if ($options['routes']) {
             return static::include($options['path'] . DS . 'config' . DS . 'routes.php');
         }
+
         return false;
     }
 
@@ -182,6 +184,7 @@ class Plugin
         if (file_exists($filename)) {
             return (bool) include $filename;
         }
+
         return false;
     }
 }

@@ -14,8 +14,8 @@
 
 namespace Origin\Command;
 
-use Origin\Model\ConnectionManager;
 use Origin\Core\Inflector;
+use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 
 trait DbSchemaTrait
@@ -27,15 +27,15 @@ trait DbSchemaTrait
      * @param string $name schema or Plugin.schema
      * @return string
      */
-    public function schemaFilename(string $name, string $extension='sql') : string
+    public function schemaFilename(string $name, string $extension = 'sql') : string
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
             return PLUGINS . DS . Inflector::underscore($plugin) . DS . 'db' . DS .  $file . '.' . $extension;
         }
+
         return APP . DS . 'db' . DS . $file . '.' . $extension;
     }
-
 
     /**
      * Parses a SQL string into an array of statements
@@ -47,9 +47,9 @@ trait DbSchemaTrait
     {
         # Clean Up Soure Code
          $sql = str_replace(";\r\n", ";\n", $sql); // Convert windows line endings on STATEMENTS ONLY
-         $sql   = preg_replace('!/\*.*?\*/!s', '', $sql);
-        $sql  = preg_replace('/^-- .*$/m', '', $sql); // Remove Comment line starting with --
-         $sql  = preg_replace('/^#.*$/m', '', $sql); // Remove Comments start with #
+         $sql = preg_replace('!/\*.*?\*/!s', '', $sql);
+        $sql = preg_replace('/^-- .*$/m', '', $sql); // Remove Comment line starting with --
+         $sql = preg_replace('/^#.*$/m', '', $sql); // Remove Comments start with #
   
          $statements = [];
         if ($sql) {
@@ -68,12 +68,12 @@ trait DbSchemaTrait
      */
     public function loadSchema(string $filename, string $datasource)
     {
-        if (!file_exists($filename)) {
+        if (! file_exists($filename)) {
             $this->throwError("File {$filename} not found");
         }
         $this->io->info("Loading {$filename}");
        
-        if (!ConnectionManager::config($datasource)) {
+        if (! ConnectionManager::config($datasource)) {
             $this->throwError("{$datasource} datasource not found");
         }
         $connection = ConnectionManager::get($datasource);
@@ -93,6 +93,7 @@ trait DbSchemaTrait
             }
         }
         $this->io->success(sprintf('Executed %d statements', count($statements)));
+
         return true;
     }
 }

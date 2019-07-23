@@ -79,9 +79,9 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         Number::locale('es-ES');
         $this->assertSame('1.024,66', Number::format(1024.66));
 
-        $this->assertEquals('1,024.66', Number::format(1024.66, ['locale'=>'en_GB']));
+        $this->assertEquals('1,024.66', Number::format(1024.66, ['locale' => 'en_GB']));
 
         Number::locale('en_GB');
-        $this->assertEquals('1025 KG', Number::format(1024.66, ['pattern'=>'0 KG']));
+        $this->assertEquals('1025 KG', Number::format(1024.66, ['pattern' => '0 KG']));
     }
 }

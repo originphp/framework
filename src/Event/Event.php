@@ -57,7 +57,8 @@ class Event
      * @param object $subject
      * @param mixed $data
      */
-    public function __construct(string $name,object $subject = null,$data= null){
+    public function __construct(string $name, object $subject = null, $data = null)
+    {
         $this->name = $name;
         $this->subject = $subject;
         $this->data = $data;
@@ -88,11 +89,12 @@ class Event
      *
      * @return mixed
      */
-    public function data($data = null){
-        if($data === null){
+    public function data($data = null)
+    {
+        if ($data === null) {
             return $this->data;
         }
-         $this->data = $data;
+        $this->data = $data;
     }
 
     /**
@@ -100,7 +102,8 @@ class Event
      *
      * @return void
      */
-    public function stop(){
+    public function stop()
+    {
         $this->stopped = true;
     }
     
@@ -109,7 +112,8 @@ class Event
      *
      * @return boolean
      */
-    public function isStopped(){
+    public function isStopped()
+    {
         return $this->stopped;
     }
 
@@ -119,8 +123,9 @@ class Event
      * @param mixed $result
      * @return mixed
      */
-    public function result($result = null){
-        if($result === null){
+    public function result($result = null)
+    {
+        if ($result === null) {
             return $this->result;
         }
         $this->result = $result;

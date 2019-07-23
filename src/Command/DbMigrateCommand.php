@@ -13,7 +13,7 @@
  */
 
 namespace Origin\Command;
-use Origin\Command\Command;
+
 use Origin\Model\Model;
 use Origin\Exception\Exception;
 
@@ -25,31 +25,31 @@ class DbMigrateCommand extends Command
 
     const PATH = APP . DS . 'db'. DS .'migrate';
 
-    public function initialize(){
+    public function initialize()
+    {
         $this->addOption('datasource', [
-            'description'=>'Use a different datasource','short'=>'ds','default'=>'default'
-            ]);
-        $this->addArgument('version',[
+            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        ]);
+        $this->addArgument('version', [
             'description' => 'a target version e.g. 20190511111934',
         ]);
-       
     }
  
-    public function execute(){
+    public function execute()
+    {
         $version = $this->arguments('version');
 
         # Dynamically Create Migration Model for CRUD
         $this->Migration = new Model([
-            'name'=>'Migration',
-            'datasource'=> $this->options('datasource')
-            ]);
+            'name' => 'Migration',
+            'datasource' => $this->options('datasource'),
+        ]);
         $this->Migration->loadBehavior('Timestamp');
 
         $lastMigration = $this->lastMigration();
-        if($version === null OR $version > $lastMigration){
+        if ($version === null or $version > $lastMigration) {
             $this->migrate($version);
-        }
-        else{
+        } else {
             $this->rollback($version);
         }
     }
@@ -59,6 +59,7 @@ class DbMigrateCommand extends Command
         $migrations = $this->getMigrations($this->lastMigration(), $version);
         if (empty($migrations)) {
             $this->io->warning('No migrations found');
+
             return;
         }
         $start = microtime(true);
@@ -73,7 +74,7 @@ class DbMigrateCommand extends Command
                 // pr($migration->reverseStatements());
                 $entity = $this->Migration->new([
                     'version' => $object->version,
-                    'rollback' => json_encode($migration->reverseStatements())
+                    'rollback' => json_encode($migration->reverseStatements()),
                 ]);
          
                 $this->Migration->save($entity);
@@ -83,7 +84,7 @@ class DbMigrateCommand extends Command
             }
         }
 
-        $this->io->success(sprintf('Migration Complete. %d migrations in %d ms', $count,(microtime(true) - $start)));
+        $this->io->success(sprintf('Migration Complete. %d migrations in %d ms', $count, (microtime(true) - $start)));
     }
 
     protected function rollback(string $version)
@@ -93,6 +94,7 @@ class DbMigrateCommand extends Command
   
         if (empty($migrations)) {
             $this->io->warning('No migrations found');
+
             return;
         }
         $count = 0;
@@ -101,7 +103,7 @@ class DbMigrateCommand extends Command
             $this->out("<red>{$object->name}</red> [<yellow>{$object->version}</yellow>]");
             try {
                 $migration = $this->createMigration($object);
-                $entity = $this->Migration->find('first', ['conditions'=>['version'=>$object->version]]);
+                $entity = $this->Migration->find('first', ['conditions' => ['version' => $object->version]]);
                 /**
                  * Do the magic
                  */
@@ -117,8 +119,7 @@ class DbMigrateCommand extends Command
                 $this->throwError($ex->getMessage());
             }
         }
-        $this->io->success(sprintf('Rollback Complete. %d migrations in %d ms', $count,(microtime(true) - $start)));
-
+        $this->io->success(sprintf('Rollback Complete. %d migrations in %d ms', $count, (microtime(true) - $start)));
     }
 
     /**
@@ -132,29 +133,31 @@ class DbMigrateCommand extends Command
         include_once self::PATH . DIRECTORY_SEPARATOR . $object->filename;
         $adapter = $this->Migration->connection()->adapter();
         $migration = new $object->class($adapter);
+
         return $migration;
     }
 
-      /**
+    /**
      * Gets the last migration version
      *
      * @return int|null
      */
     private function lastMigration()
     {
-        $lastMigration = $this->Migration->find('first', ['order'=>'version DESC']);
+        $lastMigration = $this->Migration->find('first', ['order' => 'version DESC']);
         if ($lastMigration) {
             return $lastMigration->version;
         }
+
         return null;
     }
 
     private function verboseStatements(array $statements)
     {
-        $this->out("");
+        $this->out('');
         foreach ($statements as $statement) {
-            $this->out(sprintf("<green> > </green><text>%s</text>", $statement));
-            $this->out("");
+            $this->out(sprintf('<green> > </green><text>%s</text>', $statement));
+            $this->out('');
         }
     }
 
@@ -167,24 +170,25 @@ class DbMigrateCommand extends Command
      */
     private function getMigrations(int $from = null, int $to = null)
     {
-        $results = array_diff(scandir(self::PATH), array('.', '..'));
+        $results = array_diff(scandir(self::PATH), ['.', '..']);
         $migrations = [];
         foreach ($results as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
          
             if (preg_match('/^([0-9]{14})(.*)/', $class, $matches)) {
-                $version  = $matches[1];
+                $version = $matches[1];
                 if (($from and $version <= $from) or ($to and $version > $to)) {
                     continue;
                 }
                 $migrations[] = (object) [
                     'name' => $matches[2],
-                    'version'=>$matches[1],
+                    'version' => $matches[1],
                     'class' => $matches[2] .'Migration',
-                    'filename'=> $file,
+                    'filename' => $file,
                 ];
             }
         }
+
         return $migrations;
     }
 }

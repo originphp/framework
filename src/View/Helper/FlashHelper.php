@@ -23,14 +23,14 @@ class FlashHelper extends Helper
 {
     use TemplateTrait;
     
-    public $defaultConfig = array(
-    'templates' => array(
-      'error' => '<div class="alert alert-danger" role="alert">%s</div>',
-      'success' => '<div class="alert alert-success" role="alert">%s</div>',
-      'warning' => '<div class="alert alert-warning" role="alert">%s</div>',
-      'info' => '<div class="alert alert-info" role="alert">%s</div>',
-    ),
-  );
+    public $defaultConfig = [
+        'templates' => [
+            'error' => '<div class="alert alert-danger" role="alert">%s</div>',
+            'success' => '<div class="alert alert-success" role="alert">%s</div>',
+            'warning' => '<div class="alert alert-warning" role="alert">%s</div>',
+            'info' => '<div class="alert alert-info" role="alert">%s</div>',
+        ],
+    ];
 
     public function initialize(array $config)
     {
@@ -39,7 +39,7 @@ class FlashHelper extends Helper
 
     public function messages()
     {
-        if (!$this->Session->exists('Flash')) {
+        if (! $this->Session->exists('Flash')) {
             return null;
         }
         $output = '';

@@ -1,10 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
 
 class DbCreateCommandTest extends OriginTestCase
 {
@@ -28,7 +27,7 @@ class DbCreateCommandTest extends OriginTestCase
 
     public function testExecuteMySQL()
     {
-        if (ConnectionManager::get('test')->engine() !=='mysql') {
+        if (ConnectionManager::get('test')->engine() !== 'mysql') {
             $this->markTestSkipped('This test is for mysql');
         }
         $this->exec('db:create --datasource=dummy');
@@ -39,7 +38,7 @@ class DbCreateCommandTest extends OriginTestCase
 
     public function testExecutePgSQL()
     {
-        if (ConnectionManager::get('test')->engine() !=='pgsql') {
+        if (ConnectionManager::get('test')->engine() !== 'pgsql') {
             $this->markTestSkipped('This test is for pgsql');
         }
         $this->exec('db:create --datasource=dummy schema-pg');

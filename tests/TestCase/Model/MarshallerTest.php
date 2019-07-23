@@ -14,11 +14,10 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Marshaller;
 use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Model\Marshaller;
 use Origin\Testsuite\TestTrait;
-use Origin\Model\ModelRegistry;
 
 class MockMarkshaller extends Marshaller
 {
@@ -29,7 +28,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildMap()
     {
-        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
 
         $Article->hasOne('Author');
         $Article->belongsTo('Category');
@@ -41,35 +40,34 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $result = $Marshaller->callMethod('buildAssociationMap', [$options]);
 
         $expected = [
-        'author' => 'one',
-        'category' => 'one',
-        'comments' => 'many',
-        'tags' => 'many',
-      ];
+            'author' => 'one',
+            'category' => 'one',
+            'comments' => 'many',
+            'tags' => 'many',
+        ];
         $this->assertEquals($expected, $result);
     }
 
-
     public function testnew()
     {
-        $data = array(
-          'id' => 1024,
-          'title' => 'Some article title',
-          'description' => null,
-          'author' => array(
-            'id' => 2048,
-            'name' => 'Jon',
-            'created' => '2018-10-01 13:41:00'
-          ),
-          'tags' => array(
-            array('tag' => 'new', 'created' => '2018-10-01 13:42:00'),
-            array('tag' => 'featured'),
-          ),
-          'created' => '2018-10-01 13:43:00'
-        );
-        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-        $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
-        $Article->Author = new Model(array('name' => 'User','alias'=>'Author', 'datasource' => 'test'));
+        $data = [
+            'id' => 1024,
+            'title' => 'Some article title',
+            'description' => null,
+            'author' => [
+                'id' => 2048,
+                'name' => 'Jon',
+                'created' => '2018-10-01 13:41:00',
+            ],
+            'tags' => [
+                ['tag' => 'new', 'created' => '2018-10-01 13:42:00'],
+                ['tag' => 'featured'],
+            ],
+            'created' => '2018-10-01 13:43:00',
+        ];
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
+        $Article->Author = new Model(['name' => 'User','alias' => 'Author', 'datasource' => 'test']);
         $Marshaller = new Marshaller($Article);
 
         $entity = $Marshaller->one($data, ['name' => 'Article']);
@@ -81,7 +79,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-10-01 13:43:00', $entity->created);
 
         // Mass Assignment prevention
-        $entity = $Marshaller->one($data, ['name' => 'Article','fields'=>['id','title']]);
+        $entity = $Marshaller->one($data, ['name' => 'Article','fields' => ['id','title']]);
         $this->assertTrue($entity->has('id'));
         $this->assertTrue($entity->has('title'));
         $this->assertFalse($entity->has('description'));
@@ -90,7 +88,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $Article->hasMany('Tag');
         $Marshaller = new Marshaller($Article);
 
-        $entity = $Marshaller->one($data, ['name' => 'Article', 'associated'=>['Author','Tag']]);
+        $entity = $Marshaller->one($data, ['name' => 'Article', 'associated' => ['Author','Tag']]);
       
         $this->assertEquals('2018-10-01 13:41:00', $entity->author->created);
         $this->assertEquals('2018-10-01 13:42:00', $entity->tags[0]->created);
@@ -98,44 +96,41 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Entity::class, $entity->tags[0]);
 
         $entity = $Marshaller->one($data, [
-          'name' => 'Article', 'associated'=>[
-            'Author'=>['fields'=>['id','name']]
-            ]]);
+            'name' => 'Article', 'associated' => [
+                'Author' => ['fields' => ['id','name']],
+            ], ]);
  
         $this->assertTrue($entity->author->has('name'));
         $this->assertFalse($entity->author->has('created'));
 
-        $data = ['name'=>'Article','author'=>'bad data'];
-        $entity = $Marshaller->one($data, ['associated'=>['Author']]);
+        $data = ['name' => 'Article','author' => 'bad data'];
+        $entity = $Marshaller->one($data, ['associated' => ['Author']]);
         $this->assertNull($entity->author);
     }
-
-
-
 
     /**
      * @d epends testnew
      */
     public function testpatch()
     {
-        $data = array(
-      'id' => 1024,
-      'title' => 'Some article name',
-      'author' => array(
-        'id' => 2048,
-        'name' => 'Jon',
-        'created' => ['date'=>'22/01/2019','time'=>'01:41pm']
-      ),
-      'tags' => array(
-        array('tag' => 'new'),
-        array('tag' => 'featured'),
-      ),
-      'created' => ['date'=>'22/01/2019','time'=>'10:20am']
-    );
+        $data = [
+            'id' => 1024,
+            'title' => 'Some article name',
+            'author' => [
+                'id' => 2048,
+                'name' => 'Jon',
+                'created' => ['date' => '22/01/2019','time' => '01:41pm'],
+            ],
+            'tags' => [
+                ['tag' => 'new'],
+                ['tag' => 'featured'],
+            ],
+            'created' => ['date' => '22/01/2019','time' => '10:20am'],
+        ];
 
-        $Article = new Model(array('name' => 'Article', 'datasource' => 'test'));
-        $Article->Author = new Model(array('name' => 'Author', 'datasource' => 'test'));
-        $Article->Tag = new Model(array('name' => 'Tag', 'datasource' => 'test'));
+        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article->Author = new Model(['name' => 'Author', 'datasource' => 'test']);
+        $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
         
         $Article->hasOne('Author');
         $Article->hasMany('Tag');
@@ -143,35 +138,35 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
      
         $Entity = $Marshaller->one($data, ['name' => 'Article']);
 
-        $requestData = array(
-           'title' => 'New Article Name',
-           'unkown' => 'insert data',
-           'author' => array(
-             'name' => 'Claire',
-           ),
-           'tags' => array(
-             array('tag' => 'published'),
-             array('tag' => 'top ten'),
-           ),
-         );
+        $requestData = [
+            'title' => 'New Article Name',
+            'unkown' => 'insert data',
+            'author' => [
+                'name' => 'Claire',
+            ],
+            'tags' => [
+                ['tag' => 'published'],
+                ['tag' => 'top ten'],
+            ],
+        ];
      
-        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['associated'=>['Author','Tag']]);
+        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['associated' => ['Author','Tag']]);
 
         $this->assertEquals('New Article Name', $patchedEntity->title);
         $this->assertEquals('Claire', $patchedEntity->author->name);
         $this->assertEquals('published', $patchedEntity->tags[0]->tag);
         $this->assertEquals('top ten', $patchedEntity->tags[1]->tag);
 
-        $Entity = $Marshaller->one(['id'=>1234], ['name' => 'Article']);
+        $Entity = $Marshaller->one(['id' => 1234], ['name' => 'Article']);
         $requestData['author']['location'] = 'New York';
          
-        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['fields'=>['id','author'],'associated'=>['Author'=>['fields'=>['id','name']]]]);
+        $patchedEntity = $Marshaller->patch($Entity, $requestData, ['fields' => ['id','author'],'associated' => ['Author' => ['fields' => ['id','name']]]]);
     
         $this->assertTrue($patchedEntity->author->has('name'));
         $this->assertFalse($patchedEntity->author->has('location'));
 
-        $data = ['name'=>'Article','author'=>'bad data'];
-        $entity = $Marshaller->patch($Entity, $data, ['associated'=>['Author']]);
+        $data = ['name' => 'Article','author' => 'bad data'];
+        $entity = $Marshaller->patch($Entity, $data, ['associated' => ['Author']]);
         $this->assertNull($entity->author);
     }
 }

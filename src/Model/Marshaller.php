@@ -16,8 +16,6 @@ namespace Origin\Model;
 
 use Origin\Core\Inflector;
 
-use Origin\Model\Model;
-
 class Marshaller
 {
     /**
@@ -74,9 +72,10 @@ class Marshaller
                 $value = [];
             }
             
-            $value += ['fields'=>[]];
+            $value += ['fields' => []];
             $result[$key] = $value;
         }
+
         return $result;
     }
 
@@ -90,9 +89,9 @@ class Marshaller
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function one(array $data, array $options=[]) : Entity
+    public function one(array $data, array $options = []) : Entity
     {
-        $options += ['name' => null,'associated'=>[],'fields'=>[]];
+        $options += ['name' => null,'associated' => [],'fields' => []];
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
@@ -103,7 +102,7 @@ class Marshaller
      
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
-                if (!is_array($value)) {
+                if (! is_array($value)) {
                     $properties[$property] = null;// remove inconsistent data
                     continue;
                 }
@@ -120,10 +119,10 @@ class Marshaller
                 }
      
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                    'name'=>ucfirst($alias),
+                    'name' => ucfirst($alias),
                     'fields' => $fields,
-                    'associated' => $options['associated']
-                    ]);
+                    'associated' => $options['associated'],
+                ]);
             } else {
                 $properties[$property] = $value;
             }
@@ -135,9 +134,11 @@ class Marshaller
                     $entity->set($property, $value);
                 }
             }
+
             return $entity;
         }
         $entity->set($properties);
+
         return $entity;
     }
     
@@ -148,12 +149,13 @@ class Marshaller
      * @param array $options
      * @return array
      */
-    public function many(array $data, array $options=[]) : array
+    public function many(array $data, array $options = []) : array
     {
         $result = [];
         foreach ($data as $row) {
             $result[] = $this->one($row, $options);
         }
+
         return $result;
     }
 
@@ -166,9 +168,9 @@ class Marshaller
      * @param array  $data
      * @return \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $data, array $options=[]) : Entity
+    public function patch(Entity $entity, array $data, array $options = []) : Entity
     {
-        $options += ['name' => $entity->name(),'associated'=>[],'fields'=>[]];
+        $options += ['name' => $entity->name(),'associated' => [],'fields' => []];
         
         $entity->reset(); // reset modified
 
@@ -178,7 +180,7 @@ class Marshaller
         $properties = [];
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
-                if (!is_array($value)) {
+                if (! is_array($value)) {
                     $properties[$property] = null;// remove inconsistent data
                     continue;
                 }
@@ -195,10 +197,10 @@ class Marshaller
                 }
 
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                    'name'=>ucfirst($alias),
+                    'name' => ucfirst($alias),
                     'fields' => $fields,
-                    'associated' => $options['associated'] // passing same data might
-                    ]);
+                    'associated' => $options['associated'], // passing same data might
+                ]);
             } else {
                 $original = $entity->get($property);
                 if ($value !== $original) {
@@ -213,9 +215,11 @@ class Marshaller
                     $entity->set($property, $value);
                 }
             }
+
             return $entity;
         }
         $entity->set($properties);
+
         return $entity;
     }
 }

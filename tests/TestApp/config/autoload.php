@@ -5,7 +5,7 @@ $autoloader = Autoloader::instance();
 $autoloader->directory(ROOT);
 
 $namespaces = [
-    'App' => 'vendor/originphp/framework/tests/TestApp/src'
+    'App' => 'vendor/originphp/framework/tests/TestApp/src',
 ];
 
 $autoloader->addNamespaces($namespaces);

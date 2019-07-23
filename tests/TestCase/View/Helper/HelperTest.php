@@ -14,10 +14,10 @@
 
 namespace Origin\Test\View;
 
-use Origin\View\Helper\Helper;
 use Origin\View\View;
-use Origin\Http\Response;
 use Origin\Http\Request;
+use Origin\Http\Response;
+use Origin\View\Helper\Helper;
 use Origin\Controller\Controller;
 
 class HelperTest extends \PHPUnit\Framework\TestCase

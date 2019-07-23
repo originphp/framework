@@ -33,7 +33,7 @@ class DotEnv
     public function load(string $filename = null)
     {
         if ($filename === null) {
-            $filename  = CONFIG . '.env';
+            $filename = CONFIG . '.env';
         }
         
         if (is_readable($filename)) {
@@ -42,6 +42,7 @@ class DotEnv
             foreach ($env as $key => $value) {
                 $this->env($key, $value);
             }
+
             return true;
         }
         throw new NotFoundException(sprintf('%s could not be found.', $filename));
@@ -72,7 +73,7 @@ class DotEnv
         $quotes = '"';
         foreach ($lines as $row) {
             $row = trim($row);
-            if ($row === null or $row ==='' or substr($row, 0, 1) === '#') {
+            if ($row === null or $row === '' or substr($row, 0, 1) === '#') {
                 continue;
             }
             
@@ -81,7 +82,7 @@ class DotEnv
             }
 
             # Comment Stripper
-            $row = preg_replace('% # .*%', "", $row);
+            $row = preg_replace('% # .*%', '', $row);
             
             # Parse
             if (strpos($row, '=') !== false) {
@@ -96,7 +97,7 @@ class DotEnv
                 $capture = false;
             } elseif ($capture) {
                 $env[$capture] .= "\n". $row;
-            } elseif (in_array(substr($value, 0, 1), ['"',"'"]) and !in_array(substr($row, -1), ['"',"'"])) {
+            } elseif (in_array(substr($value, 0, 1), ['"',"'"]) and ! in_array(substr($row, -1), ['"',"'"])) {
                 $capture = $key;
                 $quotes = substr($value, 0, 1);
             }
@@ -109,6 +110,7 @@ class DotEnv
         foreach ($env as $key => $value) {
             $env[$key] = trim($value, "\"'");
         }
+
         return $env;
     }
 
@@ -124,11 +126,12 @@ class DotEnv
             $value = null;
         } elseif ($value === 'true') {
             $value = true;
-        } elseif ($value ==='false') {
+        } elseif ($value === 'false') {
             $value = false;
         } else {
             $value = str_replace('\n', "\n", $value);
         }
+
         return trim($value);
     }
 }

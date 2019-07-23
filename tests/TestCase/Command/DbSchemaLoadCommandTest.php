@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
 
 class DbSchemaLoadCommandTest extends OriginTestCase
 {
@@ -22,6 +22,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
         if ($engine === 'pgsql') {
             return 'schema-pg';
         }
+
         return 'schema';
     }
     public function testExecute()
@@ -69,7 +70,6 @@ class DbSchemaLoadCommandTest extends OriginTestCase
         $this->assertErrorContains('/plugins/my_plugin/db/pschema.sql');
     }
 
- 
     protected function tearDown() : void
     {
         parent::tearDown();

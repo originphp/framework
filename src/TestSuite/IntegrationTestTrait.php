@@ -15,11 +15,11 @@
 
 namespace Origin\TestSuite;
 
+use App\Application;
+use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
-use Origin\Http\Router;
-use App\Application;
 
 /**
  * A way to test controllers from a higher level
@@ -146,7 +146,6 @@ trait IntegrationTestTrait
         $this->sendRequest('PUT', $url, $data);
     }
     
-
     /**
      * Fetches a view variable
      *
@@ -161,6 +160,7 @@ trait IntegrationTestTrait
         if (isset($this->controller->viewVars[$key])) {
             return $this->controller->viewVars[$key];
         }
+
         return null;
     }
 
@@ -219,6 +219,7 @@ trait IntegrationTestTrait
         if ($this->controller === null) {
             $this->fail('No controller');
         }
+
         return $this->controller;
     }
 
@@ -232,6 +233,7 @@ trait IntegrationTestTrait
         if ($this->request === null) {
             $this->fail('No request');
         }
+
         return $this->request;
     }
     /**
@@ -244,6 +246,7 @@ trait IntegrationTestTrait
         if ($this->response === null) {
             $this->fail('No response');
         }
+
         return $this->response;
     }
 
@@ -260,7 +263,7 @@ trait IntegrationTestTrait
         /**
          * Backup/restore globals
          */
-        if (!isset($this->_server)) {
+        if (! isset($this->_server)) {
             $this->_server = $_SERVER;
         }
         $_SERVER = $this->_server;
@@ -281,8 +284,8 @@ trait IntegrationTestTrait
         $this->request->session()->destroy();
        
         $this->response = $this->getMockBuilder(Response::class)
-                            ->setMethods(['send','stop'])
-                            ->getMock();
+            ->setMethods(['send','stop'])
+            ->getMock();
 
         // Write session data
         foreach ($this->session as $key => $value) {
@@ -308,8 +311,6 @@ trait IntegrationTestTrait
             $this->controller = $dispatcher->controller();
         }
     }
-
-
 
     /**
      * IMPORTANT:: call parent::tearDown
@@ -424,7 +425,7 @@ trait IntegrationTestTrait
      */
     public function assertResponseNotContains(string $text)
     {
-        $body =  (string) $this->response()->body();
+        $body = (string) $this->response()->body();
         $this->assertNotContains($text, $body);
     }
 

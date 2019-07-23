@@ -14,12 +14,12 @@
 
 namespace Origin\Test\View\Helper;
 
-use Origin\View\Helper\HtmlHelper;
 use Origin\View\View;
-use Origin\Controller\Controller;
+use Origin\Core\Plugin;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Core\Plugin;
+use Origin\Controller\Controller;
+use Origin\View\Helper\HtmlHelper;
 use Origin\Exception\NotFoundException;
 
 class HtmlHelperTest extends \PHPUnit\Framework\TestCase
@@ -97,6 +97,6 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
     {
         $content = '<p>Hello</p>';
         $expected = '<div class="important"><p>Hello</p></div>';
-        $this->assertEquals($expected, $this->Html->div($content, ['class'=>'important']));
+        $this->assertEquals($expected, $this->Html->div($content, ['class' => 'important']));
     }
 }

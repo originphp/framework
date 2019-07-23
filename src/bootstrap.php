@@ -20,7 +20,7 @@
  * Load the Paths constants, if not already set (e.g. Tests)
  */
 
-if (!defined('DS')) {
+if (! defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
@@ -72,12 +72,12 @@ require __DIR__ . DS . 'functions.php';
  */
 require CONFIG . DS . 'bootstrap.php';
 
-if(file_exists(CONFIG . DS . '.env')){
-  $dotEnv = new Origin\Core\DotEnv();
-  $dotEnv->load(CONFIG . DS . '.env');
+if (file_exists(CONFIG . DS . '.env')) {
+    $dotEnv = new Origin\Core\DotEnv();
+    $dotEnv->load(CONFIG . DS . '.env');
 }
 
-foreach(['server','database','email','storage'] as $config){
+foreach (['server','database','email','storage'] as $config) {
     if (file_exists(CONFIG . DS .  $config . '.php')) {
         include CONFIG . DS .  $config . '.php';
     }

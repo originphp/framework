@@ -13,8 +13,6 @@
  */
 namespace Origin\Http;
 
-use Origin\Model\Entity;
-
 class Serializer
 {
     /**
@@ -32,6 +30,7 @@ class Serializer
             if (isset($data[$keys])) {
                 $result = $this->toArray($data[$keys]);
             }
+
             return $result;
         }
        
@@ -40,6 +39,7 @@ class Serializer
                 $result[$key] = $this->toArray($data[$key]);
             }
         }
+
         return $result;
     }
     protected function toArray($mixed)
@@ -47,6 +47,7 @@ class Serializer
         if (is_object($mixed) and method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
         }
+
         return $mixed;
     }
 }

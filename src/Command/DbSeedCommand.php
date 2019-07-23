@@ -14,11 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
-use Origin\Command\DbSchemaTrait;
-
 class DbSeedCommand extends Command
 {
     use DbSchemaTrait;
@@ -31,8 +26,8 @@ class DbSeedCommand extends Command
         $this->addOption('datasource', [
             'description' => 'Use a different datasource',
             'short' => 'ds',
-            'default' => 'default'
-            ]);
+            'default' => 'default',
+        ]);
         $this->addArgument('name', [
             'description' => 'seed or Plugin.seed',
         ]);
@@ -44,7 +39,7 @@ class DbSeedCommand extends Command
     public function execute()
     {
         $name = $this->arguments('name');
-        if ($name and !file_exists($this->schemaFilename($name))) {
+        if ($name and ! file_exists($this->schemaFilename($name))) {
             $this->throwError(sprintf('Seed file `%s` could not be found', $this->schemaFilename($name)));
         }
         if ($name === null) {

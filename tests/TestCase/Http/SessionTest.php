@@ -71,7 +71,6 @@ class SessionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->Session->exists('Test.status'));
     }
 
-   
     /**
      * @depends testDestroy
      */

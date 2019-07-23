@@ -36,10 +36,9 @@
 
 namespace Origin\Cache\Engine;
 
+use Memcached;
 use Origin\Core\ConfigTrait;
 use Origin\Exception\Exception;
-use Origin\Cache\Engine\BaseEngine;
-use Memcached;
 
 class MemcachedEngine extends BaseEngine
 {
@@ -61,7 +60,7 @@ class MemcachedEngine extends BaseEngine
         'persistent' => false, // set true or string id e.g my-app-xx-, my-app-yyy etc
         'path' => null, // Path to memcached unix socket,
         'duration' => 3600, // memcache has limits if more than 30 days
-        'prefix' => 'origin_'
+        'prefix' => 'origin_',
     ];
 
     /**
@@ -95,7 +94,7 @@ class MemcachedEngine extends BaseEngine
 
     protected function connect()
     {
-        if (!empty($this->config['servers'])) {
+        if (! empty($this->config['servers'])) {
             return $this->Memcached->addServers($this->config['servers']);
         }
         extract($this->config);
@@ -103,9 +102,9 @@ class MemcachedEngine extends BaseEngine
             $host = $this->config['path'];
             $port = 0;
         }
+
         return $this->Memcached->addServer($host, $port);
     }
-
 
     /**
      * Sets a value in the cache
@@ -137,6 +136,7 @@ class MemcachedEngine extends BaseEngine
     public function exists(string $key) :bool
     {
         $this->Memcached->get($this->key($key));
+
         return ($this->Memcached->getResultCode() === Memcached::RES_SUCCESS);
     }
     /**
@@ -160,7 +160,6 @@ class MemcachedEngine extends BaseEngine
         return $this->Memcached->flush();
     }
 
-
     /**
      * Increases a value
      *
@@ -175,7 +174,6 @@ class MemcachedEngine extends BaseEngine
     {
         return $this->Memcached->increment($this->key($key), $offset);
     }
-
 
     /**
      * Decreases a value

@@ -16,8 +16,6 @@
  */
 namespace Origin\Cache\Engine;
 
-use Origin\Cache\Engine\BaseEngine;
-
 class NullEngine extends BaseEngine
 {
     /**

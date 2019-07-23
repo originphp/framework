@@ -14,11 +14,11 @@
 
 namespace Origin\Utility;
 
-use Origin\Exception\HttpException;
-use Origin\Core\ConfigTrait;
-use Origin\Exception\NotFoundException;
-use Origin\Utility\Http\Response;
 use CURLFile;
+use Origin\Core\ConfigTrait;
+use Origin\Utility\Http\Response;
+use Origin\Exception\HttpException;
+use Origin\Exception\NotFoundException;
 
 class Http
 {
@@ -300,11 +300,12 @@ class Http
      * @param array $options
      * @return \Origin\Utility\Http
      */
-    protected function request(string $method, string $url, array $options=[])
+    protected function request(string $method, string $url, array $options = [])
     {
         $options = $this->mergeOptions($options);
         $url = $this->buildUrl($url, $options);
         $options = $this->buildOptions(strtoupper($method), $url, $options);
+
         return $this->send($options);
     }
 
@@ -314,11 +315,12 @@ class Http
      */
     public static function file(string $filename)
     {
-        if (!file_exists($filename)) {
+        if (! file_exists($filename)) {
             throw new NotFoundException("{$filename} could not be found");
         }
         $mime = mime_content_type($filename);
         $name = pathinfo($filename, PATHINFO_BASENAME);
+
         return new CURLFile($filename, $mime, $name);
     }
 
@@ -337,10 +339,10 @@ class Http
                 $cookies[] = rawurlencode($cookie['name']) . '=' . rawurlencode($cookie['value']);
             }
         }
-        if (!empty($options['cookies']) and is_array($options['cookies'])) {
+        if (! empty($options['cookies']) and is_array($options['cookies'])) {
             foreach ($options['cookies'] as $name => $value) {
                 $cookies[] = rawurlencode($name) . '=' . rawurlencode($value);
-                $this->cookies[$name] = ['name'=>$name,'value'=>$value];
+                $this->cookies[$name] = ['name' => $name,'value' => $value];
             }
         }
 
@@ -348,13 +350,13 @@ class Http
             $options['headers']['Cookie'] = implode('; ', $cookies);
         }
 
-        if (!empty($options['type']) and in_array($options['type'], ['json','xml'])) {
+        if (! empty($options['type']) and in_array($options['type'], ['json','xml'])) {
             $type = 'application/' . $options['type'];
             $options['headers']['Content-Type'] = $options['headers']['Accept'] = $type;
         }
         
         $headers = [];
-        if (!empty($options['headers'])) {
+        if (! empty($options['headers'])) {
             foreach ($options['headers'] as $header => $value) {
                 $headers[] = "{$header}: {$value}";
             }
@@ -380,10 +382,9 @@ class Http
             CURLOPT_HTTPHEADER => $this->buildRequestHeaders($options),
             CURLOPT_TIMEOUT => $options['timeout'],
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2
+            CURLOPT_SSL_VERIFYHOST => 2,
         ];
 
-    
         switch ($method) {
                case 'GET':
                    $out[CURLOPT_HTTPGET] = true;
@@ -402,26 +403,26 @@ class Http
         if ($options['verbose']) {
             $out[CURLOPT_VERBOSE] = true;
         }
-        if (!empty($options['userAgent'])) {
+        if (! empty($options['userAgent'])) {
             $out[CURLOPT_USERAGENT] = $options['userAgent'];
         }
 
-        if (!empty($options['referer'])) {
+        if (! empty($options['referer'])) {
             $out[CURLOPT_REFERER] = $options['referer'];
         }
 
-        if (!empty($options['redirect'])) {
+        if (! empty($options['redirect'])) {
             $out[CURLOPT_FOLLOWLOCATION] = $options['redirect'];
         }
 
         if (in_array($method, ['POST','PUT','PATCH'])) {
-            if (!empty($options['fields']) and is_array($options['fields'])) {
+            if (! empty($options['fields']) and is_array($options['fields'])) {
                 foreach ($options['fields'] as $key => $value) {
                     if (is_string($value) and substr($value, 0, 1) === '@') {
                         $options['fields'][$key] = Http::file(substr($value, 1));
                     }
                 }
-                if (!empty($options['type']) and $options['type']==='json') {
+                if (! empty($options['type']) and $options['type'] === 'json') {
                     $out[CURLOPT_POSTFIELDS] = json_encode($options['fields']);
                 } else {
                     // Passing an array to CURLOPT_POSTFIELDS will encode the data as multipart/form-data,
@@ -432,22 +433,22 @@ class Http
             }
         }
 
-        if (!empty($options['cookieJar']) and is_string($options['cookieJar'])) {
+        if (! empty($options['cookieJar']) and is_string($options['cookieJar'])) {
             $out[CURLOPT_COOKIEFILE] = $options['cookieJar'];
             $out[CURLOPT_COOKIEJAR] = $options['cookieJar'];
         }
 
-        if (!empty($options['auth'])) {
-            $options['auth'] += ['username'=>null,'password'=>null,'type'=>'basic'];
+        if (! empty($options['auth'])) {
+            $options['auth'] += ['username' => null,'password' => null,'type' => 'basic'];
             $map = ['basic' => CURLAUTH_BASIC, 'digest' => CURLAUTH_DIGEST, 'ntlm' => CURLAUTH_NTLM,'any' => CURLAUTH_ANY];
-            $out[CURLOPT_HTTPAUTH] = $map[$options['auth']['type']]??CURLAUTH_BASIC;
+            $out[CURLOPT_HTTPAUTH] = $map[$options['auth']['type']] ?? CURLAUTH_BASIC;
             $out[CURLOPT_USERPWD] = $options['auth']['username'] . ':' . $options['auth']['password'];
         }
 
         if (isset($options['proxy']['proxy'])) {
             $out[CURLOPT_PROXY] = $options['proxy']['proxy'];
             if (isset($options['proxy']['username'])) {
-                $password = $options['proxy']['password']??'';
+                $password = $options['proxy']['password'] ?? '';
                 $out[CURLOPT_PROXYUSERPWD] = $options['proxy']['username'] . ':' . $password;
             }
         }
@@ -467,22 +468,23 @@ class Http
         return $out;
     }
 
-
     protected function mergeOptions(array $options)
     {
         $options += $this->config();
+
         return $options;
     }
 
     protected function buildUrl(string $url, array $options)
     {
-        if (!empty($options['base'])) {
+        if (! empty($options['base'])) {
             $url = $options['base'] . $url;
         }
         
-        if (!empty($options['query']) and is_array($options['query'])) {
+        if (! empty($options['query']) and is_array($options['query'])) {
             $url .= '?' . http_build_query($options['query']);
         }
+
         return $url;
     }
 
@@ -499,6 +501,7 @@ class Http
         $headerString = trim(substr($response, 0, $headerSize));
         $headers = explode("\r\n", $headerString);
         $body = substr($response, $headerSize);
+
         return [$headers,$body];
     }
 
@@ -515,6 +518,7 @@ class Http
                 unset($headers[$i]);
             }
         }
+
         return $cookies;
     }
 
@@ -536,7 +540,7 @@ class Http
             'value' => rawurldecode($value),
             'expires' => null,
             'path' => null,
-            'domain' => null
+            'domain' => null,
         ];
         // Parse additional settings. e.g Domain,Path,Expires etc
         foreach ($cookie as $attr) {
@@ -550,6 +554,7 @@ class Http
                 $out[] = $attr;
             }
         }
+
         return $out;
     }
 
@@ -561,7 +566,7 @@ class Http
      */
     protected function normalizeHeaders(array $headers)
     {
-        $result =[];
+        $result = [];
         foreach ($headers as $header) {
             if (strpos($header, ':') !== false) {
                 list($header, $value) = explode(':', $header);
@@ -570,6 +575,7 @@ class Http
             }
             $result[$header] = $value;
         }
+
         return $result;
     }
 }

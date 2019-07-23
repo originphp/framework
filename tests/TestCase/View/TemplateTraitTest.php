@@ -14,9 +14,9 @@
 
 namespace Origin\Test\View;
 
+use Origin\View\Templater;
 use Origin\Core\ConfigTrait;
 use Origin\View\TemplateTrait;
-use Origin\View\Templater;
 
 class MockObject
 {
@@ -24,7 +24,7 @@ class MockObject
     use ConfigTrait; // TemplateTrait uses this
 
     public $defaultConfig = [
-        'templates' => []
+        'templates' => [],
     ];
 }
 
@@ -33,7 +33,7 @@ class TemplateTraitTest extends \PHPUnit\Framework\TestCase
     public function testTemplates()
     {
         $object = new MockObject();
-        $object->templates(['input'=>'<input class="form-control">']);
+        $object->templates(['input' => '<input class="form-control">']);
         $this->assertEquals('<input class="form-control">', $object->templates('input'));
     }
 

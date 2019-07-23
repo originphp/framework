@@ -61,7 +61,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($config['Make']['bootstrap']);
         
         // Test with no routes and bootstrap
-        MockPlugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
+        MockPlugin::load('Make', ['routes' => false,'bootstrap' => false]);
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
         $this->assertFalse($config['Make']['routes']);
@@ -83,19 +83,19 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         MockPlugin::loadRoutes();
 
         // Give include test
-        Plugin::load('Make', ['routes'=>false,'bootstrap'=>false]);
+        Plugin::load('Make', ['routes' => false,'bootstrap' => false]);
         $this->assertFalse(Plugin::routes('Make')); // Test Include
-        Plugin::load('Make', ['routes'=>true]);
+        Plugin::load('Make', ['routes' => true]);
         $this->assertTrue(Plugin::routes('Make'));
     }
     public function testInclude()
     {
-        Plugin::load('Make', ['routes'=>false]);
+        Plugin::load('Make', ['routes' => false]);
         $this->assertFalse(Plugin::routes('Make'));
-        Plugin::load('Make', ['routes'=>true]);
+        Plugin::load('Make', ['routes' => true]);
         $this->assertTrue(Plugin::routes('Make'));
         
-        Plugin::load('Widget', ['bootstrap'=>true]);
+        Plugin::load('Widget', ['bootstrap' => true]);
         $this->assertFalse(Plugin::routes('Widget'));
     }
 

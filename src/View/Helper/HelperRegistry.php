@@ -14,9 +14,9 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\ObjectRegistry;
 use Origin\View\View;
 use Origin\Core\Resolver;
+use Origin\Core\ObjectRegistry;
 use Origin\View\Exception\MissingHelperException;
 
 /**

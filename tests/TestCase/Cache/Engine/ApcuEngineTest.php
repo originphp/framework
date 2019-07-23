@@ -20,11 +20,11 @@ class ApcuEngineTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        if (!extension_loaded('apcu')) {
+        if (! extension_loaded('apcu')) {
             $this->markTestSkipped('Apcu extension not loaded');
         }
 
-        if (!ini_get('apc.enable_cli')) {
+        if (! ini_get('apc.enable_cli')) {
             $this->markTestSkipped('apc.enable_cli disabled');
         }
 

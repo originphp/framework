@@ -157,6 +157,7 @@ class ModelRegistry
             if (isset(static::$config[$alias])) {
                 return static::$config[$alias];
             }
+
             return null;
         }
         if (isset(static::$registry[$alias])) {

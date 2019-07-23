@@ -15,8 +15,8 @@
 namespace Origin\Test\Model\Behavior;
 
 use Origin\Model\Model;
-use Origin\TestSuite\OriginTestCase;
 use Origin\Model\ModelRegistry;
+use Origin\TestSuite\OriginTestCase;
 
 /**
  * Counter cache should load Automatically
@@ -36,7 +36,7 @@ class Reply extends Model
     {
         $this->loadBehavior('Timestamp');
         $this->belongsTo('Post', [
-            'counterCache' => true
+            'counterCache' => true,
         ]);
     }
 }
@@ -51,13 +51,13 @@ class CounterCacheBehaviorTest extends OriginTestCase
         $this->Post = ModelRegistry::get('Post', [
             'className' => 'Origin\Test\Model\Behavior\Post',
             'table' => 'counter_cache_posts',
-            'datasource' => 'test'
+            'datasource' => 'test',
         ]);
    
         $this->Reply = ModelRegistry::get('Reply', [
             'className' => 'Origin\Test\Model\Behavior\Reply',
             'table' => 'counter_cache_replies',
-            'datasource' => 'test'
+            'datasource' => 'test',
         ]);
     }
 
@@ -77,7 +77,7 @@ class CounterCacheBehaviorTest extends OriginTestCase
 
         $reply = $this->Post->Reply->new([
             'post_id' => 1,
-            'description' => 'some random text'
+            'description' => 'some random text',
         ]);
   
         $this->assertTrue($this->Post->Reply->save($reply));

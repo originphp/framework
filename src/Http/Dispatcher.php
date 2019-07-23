@@ -14,14 +14,12 @@
 
 namespace Origin\Http;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
+use Origin\Core\Configure;
 use Origin\Controller\Controller;
-use Origin\Controller\Exception\MissingControllerException;
+use Origin\Core\Exception\RouterException;
 use Origin\Controller\Exception\MissingMethodException;
 use Origin\Controller\Exception\PrivateMethodException;
-use Origin\Core\Exception\RouterException;
-use Origin\Core\Configure;
+use Origin\Controller\Exception\MissingControllerException;
 
 class Dispatcher
 {
@@ -48,9 +46,9 @@ class Dispatcher
         if (static::$instance === null) {
             static::$instance = new Dispatcher();
         }
+
         return static::$instance;
     }
-
 
     /**
      * Starts the disatch process by creating the request and response objects
@@ -70,6 +68,7 @@ class Dispatcher
         if ($plugin) {
             $namespace = $plugin;
         }
+
         return $namespace.'\Controller\\'. $controller . 'Controller';
     }
 
@@ -84,7 +83,7 @@ class Dispatcher
     {
         if ($request->params('controller')) {
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
-            if (!class_exists($class)) {
+            if (! class_exists($class)) {
                 throw new MissingControllerException($request->params('controller'));
             }
             
@@ -110,11 +109,11 @@ class Dispatcher
     {
         $controller = new $class($request, $response);
         $action = $request->params('action');
-        if (!method_exists($controller, $action)) {
+        if (! method_exists($controller, $action)) {
             throw new MissingMethodException([$controller->name, $action]);
         }
 
-        if (!$controller->isAccessible($action)) {
+        if (! $controller->isAccessible($action)) {
             throw new PrivateMethodException([$controller->name, $action]);
         }
 
@@ -131,7 +130,7 @@ class Dispatcher
             return $result;
         }
 
-        call_user_func_array(array($controller, $action), $arguments['args']);
+        call_user_func_array([$controller, $action], $arguments['args']);
      
         if ($controller->autoRender and $controller->response->ready()) {
             $controller->render();

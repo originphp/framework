@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Behavior\TimestampBehavior;
 use Origin\Model\Model;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Behavior\TimestampBehavior;
 
 class TimestampBehaviorTest extends OriginTestCase
 {
@@ -26,9 +26,9 @@ class TimestampBehaviorTest extends OriginTestCase
     }
     public function testBeforeSaveCreate()
     {
-        $Article = new Model(['name' => 'Article','datasource'=>'test']);
+        $Article = new Model(['name' => 'Article','datasource' => 'test']);
         $behavior = new TimestampBehavior($Article);
-        $data = ['title'=>'Foo Bar'];
+        $data = ['title' => 'Foo Bar'];
         $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
         $behavior->beforeSave($entity);
@@ -37,9 +37,9 @@ class TimestampBehaviorTest extends OriginTestCase
     }
     public function testBeforeSaveUpdate()
     {
-        $Article = new Model(['name' => 'Article','datasource'=>'test']);
+        $Article = new Model(['name' => 'Article','datasource' => 'test']);
         $behavior = new TimestampBehavior($Article);
-        $data = ['title'=>'Foo Bar','created'=>'2019-03-02 20:00:00','modified'=>'2019-03-02 20:00:00'];
+        $data = ['title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
         $entity = $Article->new($data);
     
         $timestamp = date('Y-m-d H:i:s');
@@ -47,7 +47,7 @@ class TimestampBehaviorTest extends OriginTestCase
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
         $this->assertEquals($timestamp, $entity->modified);
 
-        $data = ['title'=>'Foo Bar'];
+        $data = ['title' => 'Foo Bar'];
         $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
         $behavior->beforeSave($entity);

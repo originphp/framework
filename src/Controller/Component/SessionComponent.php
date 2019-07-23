@@ -40,6 +40,7 @@ class SessionComponent extends Component
         if ($this->session === null) {
             $this->session = new Session();
         }
+
         return $this->session;
     }
     /**
@@ -89,9 +90,9 @@ class SessionComponent extends Component
     public function check(string $name) : bool
     {
         deprecationWarning('Session::check depreciated use session::exists');
+
         return $this->exists($name);
     }
-
 
     /**
      * Checks if a session exists

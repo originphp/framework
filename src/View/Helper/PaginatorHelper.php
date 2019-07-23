@@ -22,7 +22,7 @@ class PaginatorHelper extends Helper
     use TemplateTrait;
 
     public $defaultConfig = [
-        'templates'=> [
+        'templates' => [
             'sort' => '<a href="{url}">{text}</a>',
             'sortAsc' => '<a href="{url}" class="asc">{text}</a>',
             'sortDesc' => '<a href="{url}" class="desc">{text}</a>',
@@ -32,8 +32,8 @@ class PaginatorHelper extends Helper
             'prev' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
             'prevDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
             'next' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-            'nextDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>']
-  ];
+            'nextDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>', ],
+    ];
 
     /**
      * Creates a sort link for a particular field.
@@ -61,8 +61,8 @@ class PaginatorHelper extends Helper
         }
 
         $options = [
-          'text' => $text,
-          'url' => $this->request()->path().'?'.http_build_query($query),
+            'text' => $text,
+            'url' => $this->request()->path().'?'.http_build_query($query),
         ];
 
         return $this->templater()->format($template, $options);
@@ -116,6 +116,7 @@ class PaginatorHelper extends Helper
     public function control($previous = 'Previous', $next = 'Next')
     {
         $output = $this->prev($previous).$this->numbers().$this->next($next);
+
         return $this->templater()->format('control', ['content' => $output]);
     }
 
@@ -127,7 +128,7 @@ class PaginatorHelper extends Helper
         $query = $this->request()->query();
         $paging = $this->params();
 
-        if (!isset($query['page'])) {
+        if (! isset($query['page'])) {
             $query['page'] = $paging['current'];
         }
         if ($type === 'nextPage') {

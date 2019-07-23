@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Cache\Engine;
 
-use Origin\Cache\Engine\ArrayEngine;
 use Origin\TestSuite\TestTrait;
+use Origin\Cache\Engine\ArrayEngine;
 
 class MockArrayEngine extends ArrayEngine
 {

@@ -53,7 +53,7 @@ class CookieComponent extends Component
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, string $expire='+1 month', $options=[])
+    public function write(string $name, $value, string $expire = '+1 month', $options = [])
     {
         $this->response()->cookie($name, $value, $expire, $options);
     }
@@ -78,6 +78,7 @@ class CookieComponent extends Component
     public function check(string $name) : bool
     {
         deprecationWarning('Cookie::check is depreciated use Cookie:exists');
+
         return $this->exists($name);
     }
 
@@ -90,6 +91,7 @@ class CookieComponent extends Component
     public function exists(string $name) : bool
     {
         $cookies = $this->request()->cookies();
+
         return isset($cookies[$name]);
     }
 
@@ -101,6 +103,6 @@ class CookieComponent extends Component
     public function destroy()
     {
         unset($_COOKIE);
-        $_COOKIE=[];
+        $_COOKIE = [];
     }
 }

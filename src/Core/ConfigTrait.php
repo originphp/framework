@@ -51,6 +51,7 @@ trait ConfigTrait
         if (is_array($key) or func_num_args() === 2) {
             return $this->setConfig($key, $value);
         }
+
         return $this->getConfig($key);
     }
     /**
@@ -76,6 +77,7 @@ trait ConfigTrait
             }
             $this->config[$key] = $value;
         }
+
         return true;
     }
     /**
@@ -85,7 +87,7 @@ trait ConfigTrait
      * @param mixed $default default value to return
      * @return void
      */
-    protected function getConfig(string $key = null, $default =null)
+    protected function getConfig(string $key = null, $default = null)
     {
         if ($this->config === null) {
             $this->initConfig();
@@ -97,6 +99,7 @@ trait ConfigTrait
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
+
         return $default;
     }
 }

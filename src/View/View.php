@@ -17,17 +17,16 @@ namespace Origin\View;
  * @todo change protected properties to have _prefix to get out of sight during
  * code completion views.
  */
-use Origin\Controller\Controller;
 use Origin\Core\Inflector;
+use Origin\Exception\Exception;
+use Origin\Controller\Controller;
 use Origin\View\Helper\HelperRegistry;
 use Origin\View\Exception\MissingViewException;
-use Origin\View\Exception\MissingElementException;
 use Origin\View\Exception\MissingLayoutException;
-use Origin\Exception\Exception;
+use Origin\View\Exception\MissingElementException;
 
 class View
 {
-
 
     /**
      * Name of controller that created this view.
@@ -86,9 +85,9 @@ class View
     {
         $this->name = $controller->name;
 
-        $this->request =& $controller->request;
-        $this->response =& $controller->response;
-        $this->vars =& $controller->viewVars;
+        $this->request = & $controller->request;
+        $this->response = & $controller->response;
+        $this->vars = & $controller->viewVars;
 
         $this->helperRegistry = new HelperRegistry($this);
 
@@ -129,6 +128,7 @@ class View
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
         $config = array_merge(['className' => $name . 'Helper'], $config);
         $this->{$helper} = $this->helperRegistry()->load($name, $config);
+
         return $this->{$helper};
     }
 
@@ -174,6 +174,7 @@ class View
         if (isset($this->vars['title'])) {
             return $this->vars['title'];
         }
+
         return null;
     }
 
@@ -188,6 +189,7 @@ class View
         if (isset($this->{$key})) {
             return $this->{$key};
         }
+
         return null;
     }
 
@@ -251,10 +253,9 @@ class View
     {
         $path = $this->getViewPath() . DS ;
 
-        
         if ($name[0] === '/') {
             $path = $this->getViewPath(false); // get without controller folder
-        } elseif (strpos($name, '.')!==false) {
+        } elseif (strpos($name, '.') !== false) {
             list($plugin, $name) = explode('.', $name);
             $path = PLUGINS . DS . Inflector::underscore($plugin) .  DS . 'src' .DS .'View' . DS;
         }
@@ -318,6 +319,7 @@ class View
         if ($plugin) {
             return PLUGINS .DS . $plugin . DS . 'src' . DS . 'View' . DS . $folder . DS . $name . '.ctp';
         }
+
         return $this->viewPath . DS . $folder . DS . $name . '.ctp';
     }
 
@@ -352,7 +354,7 @@ class View
     {
         $layout_filename = $this->getLayoutFilename($layout);
 
-        if (!isset($this->vars['title'])) {
+        if (! isset($this->vars['title'])) {
             $this->vars['title'] = Inflector::humanize(Inflector::underscore($this->name));
         }
        
@@ -360,6 +362,7 @@ class View
 
         ob_start();
         require $layout_filename;
+
         return ob_get_clean();
     }
 

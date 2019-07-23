@@ -14,11 +14,10 @@
 
 namespace Origin\Test\Controller\Component;
 
-use Origin\Controller\Controller;
-use Origin\Controller\Component\FlashComponent;
-use Origin\Http\Session;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Controller\Controller;
+use Origin\Controller\Component\FlashComponent;
 
 class MockFlashComponent extends FlashComponent
 {

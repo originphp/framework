@@ -14,19 +14,19 @@
 
 namespace Origin\Test\Controller;
 
-use Origin\Controller\Controller;
-use Origin\Model\ModelRegistry;
-use Origin\Controller\Component\Component;
-use Origin\View\Helper\Helper;
-use Origin\Http\Request;
-use Origin\Http\Response;
 use Origin\Http\Router;
 use Origin\Model\Model;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\MissingModelException;
-use Origin\Controller\Component\Exception\MissingComponentException;
-use Origin\Controller\Component\ComponentRegistry;
+use Origin\Http\Request;
 use Origin\Model\Entity;
+use Origin\Http\Response;
+use Origin\View\Helper\Helper;
+use Origin\Model\ModelRegistry;
+use Origin\Controller\Controller;
+use Origin\Model\ConnectionManager;
+use Origin\Controller\Component\Component;
+use Origin\Model\Exception\MissingModelException;
+use Origin\Controller\Component\ComponentRegistry;
+use Origin\Controller\Component\Exception\MissingComponentException;
 
 class Pet extends Model
 {
@@ -81,7 +81,6 @@ class TestsController extends Controller
     }
 }
 
-
 /**
  * Test afterFilter return response
  */
@@ -91,7 +90,7 @@ class ApplesController extends Controller
 
     public function initialize()
     {
-        $this->loadComponent('Fruit', ['className'=>FruitComponent::class]);
+        $this->loadComponent('Fruit', ['className' => FruitComponent::class]);
     }
     public function setWhen($when)
     {
@@ -170,7 +169,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertObjectHasAttribute('Tester', $controller);
         $this->assertInstanceOf('Origin\Test\Controller\TesterComponent', $controller->Tester);
 
-      
         $this->expectException(MissingComponentException::class);
         $controller->loadComponent('Tron');
     }
@@ -188,21 +186,21 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/1024');
         $controller = new TestsController($request, new Response());
 
-        $apples = array('granny smith', 'pink lady');
+        $apples = ['granny smith', 'pink lady'];
         $controller->set('apples', $apples);
         $this->assertArrayHasKey('apples', $controller->viewVars);
         $this->assertEquals($controller->viewVars['apples'], $apples);
 
-        $fruits = array('apple', 'banana', 'orange');
+        $fruits = ['apple', 'banana', 'orange'];
         $controller->set('fruits', $fruits);
         $this->assertArrayHasKey('fruits', $controller->viewVars);
         $this->assertEquals($controller->viewVars['fruits'], $fruits);
 
-        $combo = array(
-        'apples' => array('granny smith', 'pink lady'),
-        'bananas' => array('cavendish', 'Baby (Niño)'),
-        'oranges' => array('blood', 'clementine'),
-        );
+        $combo = [
+            'apples' => ['granny smith', 'pink lady'],
+            'bananas' => ['cavendish', 'Baby (Niño)'],
+            'oranges' => ['blood', 'clementine'],
+        ];
         $controller->set($combo);
         $this->assertArrayHasKey('bananas', $controller->viewVars);
         $this->assertEquals(['granny smith', 'pink lady'], $controller->viewVars['apples']);
@@ -254,7 +252,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $controller->expects($this->once())
-    ->method('beforeFilter');
+            ->method('beforeFilter');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -262,8 +260,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $components->expects($this->once())
-     ->method('call')
-       ->with('startup');
+            ->method('call')
+            ->with('startup');
 
         $controller->setMockRegistry($components);
 
@@ -280,7 +278,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $controller->expects($this->once())
-    ->method('afterFilter');
+            ->method('afterFilter');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -288,14 +286,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $components->expects($this->once())
-     ->method('call')
-       ->with('shutdown');
+            ->method('call')
+            ->with('shutdown');
 
         $controller->setMockRegistry($components);
 
         $controller->shutdownProcess();
     }
-
 
     public function testStartupBeforeFilterResponse()
     {
@@ -351,36 +348,34 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         // test single
         $request = new Request('posts/index.json');
         $controller = new \App\Controller\PostsController($request, new Response());
-        $controller->set(['user'=>['name'=>'jim']]);
+        $controller->set(['user' => ['name' => 'jim']]);
         $controller->serialize('user');
         $controller->render();
         $this->assertEquals('{"name":"jim"}', $controller->response->body());
      
         // Test multi
         $controller = new \App\Controller\PostsController(new Request('posts/index.xml'), new Response());
-        $controller->set(['user'=>['name'=>'jim'],'profile'=>['name'=>'admin']]);
+        $controller->set(['user' => ['name' => 'jim'],'profile' => ['name' => 'admin']]);
         $controller->serialize(['user','profile']);
         $controller->render();
   
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><user><name>jim</name></user><profile><name>admin</name></profile></response>\n", $controller->response->body());
     }
 
-
     public function testRenderJson()
     {
         $request = new Request('tests/edit/1024');
         $controller = new TestsController($request, new Response());
-        $data = ['data'=>['game'=>'Dota 2']];
-        $controller->render(['json'=>$data,'status'=>201]);
+        $data = ['data' => ['game' => 'Dota 2']];
+        $controller->render(['json' => $data,'status' => 201]);
         $this->assertEquals(json_encode($data), $controller->response->body());
         $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('application/json', $controller->response->type());
 
-
         $controller = new TestsController($request, new Response());
         $book = new Entity();
         $book->name = 'How to use PHPUnit';
-        $controller->render(['json'=>$book]);
+        $controller->render(['json' => $book]);
         $this->assertEquals($book->toJson(), $controller->response->body());
 
         // test serialize and request
@@ -402,30 +397,30 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $data = [
             'book' => [
                 'xmlns:' => 'http://www.w3.org/1999/xhtml',
-                'title' => 'Its a Wonderful Day'
-            ]
-            ];
+                'title' => 'Its a Wonderful Day',
+            ],
+        ];
 
         $xml = $expected = '<?xml version="1.0" encoding="UTF-8"?>' . "\n". '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>'."\n";
        
-        $controller->render(['xml'=>$data,'status'=>201]);
+        $controller->render(['xml' => $data,'status' => 201]);
         $this->assertEquals($expected, $controller->response->body());
         $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('application/xml', $controller->response->type());
 
         $controller = new TestsController($request, new Response());
-        $controller->render(['xml'=>$xml]); //xml string
+        $controller->render(['xml' => $xml]); //xml string
         $this->assertEquals($xml, $controller->response->body());
 
         $controller = new TestsController($request, new Response());
         $book = new Entity();
         $book->name = 'How to use PHPUnit';
-        $controller->render(['xml'=>$book]);
+        $controller->render(['xml' => $book]);
         $this->assertEquals($book->toXml(), $controller->response->body());
 
         // test serialize and request
         $controller = new TestsController($request, new Response());
-        $book = new Entity(['name'=>'book']);
+        $book = new Entity(['name' => 'book']);
         $book->name = 'How to use PHPUnit';
         $controller->set('book', $book);
         $controller->serialize('book');
@@ -439,7 +434,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/status');
         $controller = new TestsController($request, new Response());
-        $controller->render(['text'=>'OK','status'=>201]);
+        $controller->render(['text' => 'OK','status' => 201]);
         $this->assertEquals('OK', $controller->response->body());
         $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('text/plain', $controller->response->type());
@@ -449,7 +444,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/status');
         $controller = new TestsController($request, new Response());
-        $controller->render(['file'=> ROOT . DS .'phpunit.xml.dist','status'=>201]);
+        $controller->render(['file' => ROOT . DS .'phpunit.xml.dist','status' => 201]);
         $this->assertEquals(file_get_contents(ROOT . DS .'phpunit.xml.dist'), $controller->response->body());
         $this->assertEquals(201, $controller->response->statusCode());
         $this->assertEquals('text/xml', $controller->response->type());
@@ -459,26 +454,25 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $response = $this->getMockBuilder(Response::class)
-           ->setMethods(['header', 'send','statusCode','stop'])
-           ->getMock();
+            ->setMethods(['header', 'send','statusCode','stop'])
+            ->getMock();
 
         $controller = new Controller($request, $response);
 
         $response->expects($this->once())
-        ->method('statusCode')
-          ->with(302);
+            ->method('statusCode')
+            ->with(302);
 
         $response->expects($this->once())
-           ->method('header')
-             ->with('Location', '/tests/view/2048');
+            ->method('header')
+            ->with('Location', '/tests/view/2048');
 
         $response->expects($this->once())
-           ->method('send');
+            ->method('send');
 
-        
         $this->assertInstanceOf(Response::class, $controller->redirect([
-            'action' => 'view', 2048
-            ]));
+            'action' => 'view', 2048,
+        ]));
     }
 
     public function testPaginate()
@@ -487,16 +481,16 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
         $sql = $connection->adapter()->createTable('pets', [
-            'id' => ['type'=>'primaryKey'],
-            'name' => ['type'=>'string','limit'=>20]
+            'id' => ['type' => 'primaryKey'],
+            'name' => ['type' => 'string','limit' => 20],
         ]);
         $connection->execute($sql);
 
         # Create Dummy Data
         $Pet = new Pet();
         ModelRegistry::set('Pet', $Pet);
-        for ($i=0;$i<100;$i++) {
-            $Pet->save($Pet->new(['name'=>'Pet' . $i]));
+        for ($i = 0;$i < 100;$i++) {
+            $Pet->save($Pet->new(['name' => 'Pet' . $i]));
         }
         
         $controller = new TestsController(
@@ -509,10 +503,10 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $results = $controller->paginate();
         $this->assertEquals(20, count($results));
 
-        $results = $controller->paginate('Pet', ['limit'=>10]);
+        $results = $controller->paginate('Pet', ['limit' => 10]);
         $this->assertEquals(10, count($results));
 
-        $controller->paginate = ['Pet'=>['limit'=>7]];
+        $controller->paginate = ['Pet' => ['limit' => 7]];
         $results = $controller->paginate('Pet');
         $this->assertEquals(7, count($results));
     }

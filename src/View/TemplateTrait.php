@@ -33,11 +33,12 @@ trait TemplateTrait
      * @param array|null $templates
      * @return array|bool
      */
-    public function templates($templates=null)
+    public function templates($templates = null)
     {
         if (is_array($templates)) {
             return $this->templater()->set($templates);
         }
+
         return $this->templater()->get($templates);
     }
     
@@ -50,7 +51,7 @@ trait TemplateTrait
      */
     public function templater()
     {
-        if (!isset($this->templater)) {
+        if (! isset($this->templater)) {
             $this->templater = new Templater();
             $templates = $this->config('templates');
             if (is_array($templates)) {

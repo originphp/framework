@@ -14,14 +14,14 @@
 
 namespace Origin\Command;
 
-use Origin\Console\ConsoleIo;
-use Origin\Console\ArgumentParser;
-use Origin\Console\Exception\StopExecutionException;
-use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Model;
-use Origin\Model\Exception\MissingModelException;
+use Origin\Console\ConsoleIo;
 use Origin\Model\ModelRegistry;
 use Origin\Console\CommandRunner;
+use Origin\Console\ArgumentParser;
+use Origin\Console\Exception\ConsoleException;
+use Origin\Model\Exception\MissingModelException;
+use Origin\Console\Exception\StopExecutionException;
 
 abstract class Command
 {
@@ -94,7 +94,6 @@ abstract class Command
      */
     protected $commandOptions = [];
 
-
     /**
      * Holds the array of arguments passed
      *
@@ -153,7 +152,7 @@ abstract class Command
      *    $args = ['my_database','--datasource'=>'default','--help']
      * @return bool
      */
-    public function runCommand(string $command, array $args=[]) : bool
+    public function runCommand(string $command, array $args = []) : bool
     {
         $runner = new CommandRunner($this->io);
         $instance = $runner->findCommand($command);
@@ -173,7 +172,6 @@ abstract class Command
    
         return $instance->run($argv);
     }
-
 
     /**
      * Runs this command used by Command Runner
@@ -211,6 +209,7 @@ abstract class Command
 
         if ($this->options('help')) {
             $this->displayHelp();
+
             return true;
         }
 
@@ -283,7 +282,7 @@ abstract class Command
     protected function validateName(string $name) : void
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
-        if (!preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
+        if (! preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
             throw new ConsoleException(sprintf('Command name `%s` is invalid', $name));
         }
     }
@@ -465,8 +464,10 @@ abstract class Command
             foreach ($message as $i => $line) {
                 $message[$i] = "<{$tag}>{$line}</{$tag}>";
             }
+
             return $message;
         }
+
         return "<{$tag}>{$message}</{$tag}>";
     }
 

@@ -14,10 +14,6 @@
 
 namespace Origin\Command;
 
-use Origin\Command\Command;
-use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
-
 class DbSetupCommand extends Command
 {
     protected $name = 'db:setup';
@@ -27,17 +23,17 @@ class DbSetupCommand extends Command
     public function initialize()
     {
         $this->addOption('datasource', [
-            'description'=>'Use a different datasource','short'=>'ds','default'=>'default'
-            ]);
+            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
-            'default' => 'schema'
+            'default' => 'schema',
         ]);
     }
  
     public function execute()
     {
-        $name = $this->arguments('name')??'schema';
+        $name = $this->arguments('name') ?? 'schema';
 
         # Create arguments
         $schema = $name;
@@ -50,21 +46,21 @@ class DbSetupCommand extends Command
     
         $datasource = $this->options('datasource');
         $this->runCommand('db:create', [
-            '--datasource' => $datasource
+            '--datasource' => $datasource,
         ]);
    
         $this->io->nl();
     
         $this->runCommand('db:schema:load', [
             '--datasource' => $datasource,
-            $schema
+            $schema,
         ]);
      
         $this->io->nl();
 
         $this->runCommand('db:seed', [
             '--datasource' => $datasource,
-            $seed
+            $seed,
         ]);
     }
 }

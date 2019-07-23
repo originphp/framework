@@ -14,8 +14,8 @@
 
 namespace Origin\Http;
 
-use Origin\Utility\Security;
 use Origin\Core\Configure;
+use Origin\Utility\Security;
 
 /**
  * Cookie Component - makes it easy to work with cookies, cookies are set using the response
@@ -29,7 +29,7 @@ class Cookie
      * with a . appended to it. Originally this was an encrypted string but it was long. We
      * just need an unique identifier. enc:1
      */
-    const prefix =  'T3JpZ2lu==.';
+    const prefix = 'T3JpZ2lu==.';
 
     /**
      * Gets the encryption key
@@ -42,6 +42,7 @@ class Cookie
             return Configure::read('Cookie.key');
         }
         deprecationWarning('Add Cookie.key to your configuration.');
+
         return md5(Configure::read('Security.pepper')); //Create a key using thefor backwards compatability
     }
 
@@ -56,6 +57,7 @@ class Cookie
         if (isset($_COOKIE[$name])) {
             return $this->unpack($_COOKIE[$name]);
         }
+
         return null;
     }
 
@@ -71,14 +73,14 @@ class Cookie
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, int $expire = 0, array $options=[])
+    public function write(string $name, $value, int $expire = 0, array $options = [])
     {
         $options += [
             'path' => '/', // path on server
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'encrypt' => true
+            'encrypt' => true,
         ];
     
         extract($options);
@@ -95,7 +97,7 @@ class Cookie
     public function delete(string $name)
     {
         unset($_COOKIE[$name]);
-        $this->write($name, "", time() - 3600);
+        $this->write($name, '', time() - 3600);
     }
 
     /**
@@ -109,6 +111,7 @@ class Cookie
         if (isset($_COOKIE[$name])) {
             return true;
         }
+
         return false;
     }
     
@@ -132,7 +135,7 @@ class Cookie
      * @return void
      * @codeCoverageIgnore
      */
-    protected function setCookie($name, $value, $expire=0, $path='/', $domain='', $secure=false, $httpOnly=false)
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false)
     {
         setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
@@ -143,7 +146,7 @@ class Cookie
      * @param mixed $value
      * @return string
      */
-    protected function pack($value, $encrypt=true)
+    protected function pack($value, $encrypt = true)
     {
         if (is_array($value)) {
             $value = json_encode($value);
@@ -169,9 +172,10 @@ class Cookie
             $value = substr($value, $length);
             $value = Security::decrypt($value, $this->encryptionKey());
         }
-        if (substr($value, 0, 1)==='{') {
+        if (substr($value, 0, 1) === '{') {
             $value = json_decode($value, true);
         }
+
         return $value;
     }
 }

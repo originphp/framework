@@ -1,13 +1,12 @@
 <?php
 namespace Origin\Test\Command;
 
-use Origin\TestSuite\OriginTestCase;
-use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\Model\ConnectionManager;
-use Origin\Command\PluginInstallCommand;
-use Origin\TestSuite\TestTrait;
 use Origin\Console\ConsoleIo;
+use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Command\PluginInstallCommand;
 use Origin\TestSuite\Stub\ConsoleOutput;
+use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class MockPluginInstallCommand extends PluginInstallCommand
 {
@@ -22,70 +21,74 @@ class PluginInstallCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
   
-    public function testGetUrl(){
+    public function testGetUrl()
+    {
         $cmd = new MockPluginInstallCommand();
         $this->assertEquals(
             'https://github.com/originphp/framework.git',
-            $cmd->callMethod('getUrl',['originphp/framework'])
+            $cmd->callMethod('getUrl', ['originphp/framework'])
         );
     }
 
-    public function testGetPlugin(){
+    public function testGetPlugin()
+    {
         $cmd = new MockPluginInstallCommand();
         $this->assertEquals(
             'user_management',
-            $cmd->callMethod('getPlugin',['https://github.com/originphp/framework.git','UserManagement'])
+            $cmd->callMethod('getPlugin', ['https://github.com/originphp/framework.git','UserManagement'])
         );
 
         $this->assertEquals(
             'funky_name',
-            $cmd->callMethod('getPlugin',['https://github.com/originphp/FunkyName.git'])
+            $cmd->callMethod('getPlugin', ['https://github.com/originphp/FunkyName.git'])
         );
     }
 
-    public function testRunSuccess(){
+    public function testRunSuccess()
+    {
         $cmd = $this->getMockBuilder(PluginInstallCommand::class)
-                     ->setMethods(['download'])
-                     ->getMock();
+            ->setMethods(['download'])
+            ->getMock();
 
-                     $cmd->expects($this->once())
-                     ->method('download')
-                     ->willReturn(true);
+        $cmd->expects($this->once())
+            ->method('download')
+            ->willReturn(true);
     
-
         $bufferedOutput = new ConsoleOutput();
-        $cmd->io = new ConsoleIo($bufferedOutput,new ConsoleOutput());
+        $cmd->io = new ConsoleIo($bufferedOutput, new ConsoleOutput());
  
         $cmd->run(['originphp/framework','UserManagement']);
-        $this->assertContains('UserManagement Plugin installed',$bufferedOutput->read());
+        $this->assertContains('UserManagement Plugin installed', $bufferedOutput->read());
         $bootstrap = file_get_contents(CONFIG . '/application.php');
-        file_put_contents(CONFIG . '/application.php',str_replace("\nPlugin::load('UserManagement');\n",'',$bootstrap));
+        file_put_contents(CONFIG . '/application.php', str_replace("\nPlugin::load('UserManagement');\n", '', $bootstrap));
     }
 
-    public function testRunError(){
+    public function testRunError()
+    {
         $cmd = $this->getMockBuilder(PluginInstallCommand::class)
-                     ->setMethods(['download','appendApplication'])
-                     ->getMock();
+            ->setMethods(['download','appendApplication'])
+            ->getMock();
 
-                     $cmd->expects($this->once())
-                     ->method('download')
-                     ->willReturn(false);
+        $cmd->expects($this->once())
+            ->method('download')
+            ->willReturn(false);
     
-
         $bufferedOutput = new ConsoleOutput();
-        $cmd->io = new ConsoleIo($bufferedOutput,$bufferedOutput);
+        $cmd->io = new ConsoleIo($bufferedOutput, $bufferedOutput);
  
         $cmd->run(['originphp/framework','UserManagement']);
-        $this->assertContains('Plugin not downloaded from `https://github.com/originphp/framework.git`',$bufferedOutput->read());
+        $this->assertContains('Plugin not downloaded from `https://github.com/originphp/framework.git`', $bufferedOutput->read());
     }
 
-    public function testInvalidPluginName(){
+    public function testInvalidPluginName()
+    {
         $this->exec('plugin:install cool/repo abc-123');
         $this->assertExitError();
         $this->assertErrorContains('Plugin name `abc-123` is invalid');
     }
 
-    public function testPluginAlreadyExists(){
+    public function testPluginAlreadyExists()
+    {
         $this->exec('plugin:install cool/repo Make');
         $this->assertExitError();
         $this->assertErrorContains('Plugin `make` already exists');
@@ -100,7 +103,7 @@ class PluginInstallCommandTest extends OriginTestCase
         $this->assertContains("Plugin::load('DummyPlugin')",$bootstrap);
     }
 
-  
+
     public function shutdown(){
         $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
         file_put_contents(CONFIG . '/bootstrap.php',str_replace("\nPlugin::load('DummyPlugin');\n",'',$bootstrap));
@@ -123,5 +126,4 @@ class PluginInstallCommandTest extends OriginTestCase
         return rmdir($directory);
     }
       */
-  
 }

@@ -14,14 +14,12 @@
 
 namespace Origin\Test\Console;
 
-use Origin\Console\CommandRunner;
-use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\ConsoleIo;
+use Origin\Console\CommandRunner;
+use App\Command\CacheResetCommand;
 use Origin\Command\DbCreateCommand;
 use App\Command\SaySomethingCommand;
-use App\Command\CacheResetCommand;
-
-use Origin\Console\Exception\StopExecutionException;
+use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockCommandRunner extends CommandRunner
 {
@@ -70,11 +68,11 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     public function testRun()
     {
         $result = $this->commandRunner()->run([
-           '/vendor/somescript.php',
-           'say-hello',
-           '--color=blue',
-           'jim'
-           ]);
+            '/vendor/somescript.php',
+            'say-hello',
+            '--color=blue',
+            'jim',
+        ]);
 
         $this->assertTrue($result);
         $this->assertContains('<blue>Hello jim</blue>', $this->out->read());

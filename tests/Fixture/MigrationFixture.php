@@ -21,28 +21,28 @@ class MigrationFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' =>     [
-          'type' => 'primaryKey',
-          'limit' => 11,
-          'default' => NULL,
-          'null' => false,
-          'key' => 'primary',
+        'id' => [
+            'type' => 'primaryKey',
+            'limit' => 11,
+            'default' => null,
+            'null' => false,
+            'key' => 'primary',
         ],
-        'version' =>     [
-          'type' => 'string',
-          'limit' => 14,
-          'default' => NULL,
-          'null' => false,
+        'version' => [
+            'type' => 'string',
+            'limit' => 14,
+            'default' => null,
+            'null' => false,
         ],
-        'rollback' =>     [
-          'type' => 'text',
-          'default' => NULL,
-          'null' => true,
+        'rollback' => [
+            'type' => 'text',
+            'default' => null,
+            'null' => true,
         ],
-        'created' =>     [
-          'type' => 'datetime',
-          'default' => NULL,
-          'null' => false,
+        'created' => [
+            'type' => 'datetime',
+            'default' => null,
+            'null' => false,
         ],
     ];
 }

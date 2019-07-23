@@ -25,7 +25,7 @@ abstract class BaseEngine
      *
      * @param array $config
      */
-    public function __construct(array $config=[])
+    public function __construct(array $config = [])
     {
         $this->config($config);
         $this->initialize($config);

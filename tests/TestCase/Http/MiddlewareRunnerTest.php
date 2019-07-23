@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Middleware;
 
-use Origin\Http\Middleware;
-use Origin\Http\MiddlewareRunner;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Http\Middleware;
+use Origin\Http\MiddlewareRunner;
 
 class OneMiddleware extends Middleware
 {

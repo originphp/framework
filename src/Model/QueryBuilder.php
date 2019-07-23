@@ -184,7 +184,7 @@ class QueryBuilder
      *
      * @var string
      */
-    public $escape ='`';
+    public $escape = '`';
 
     /**
      * List of operators
@@ -203,14 +203,14 @@ class QueryBuilder
      */
     protected $specialFields = [];
 
-    public function __construct($table = null, $alias = null,array $options =[])
+    public function __construct($table = null, $alias = null, array $options = [])
     {
-        $options += ['escape'=>null];
+        $options += ['escape' => null];
 
-        if (!empty($table)) {
+        if (! empty($table)) {
             $this->from($table, $alias);
         }
-        if($options['escape']){
+        if ($options['escape']) {
             $this->escape = $options['escape'];
         }
     }
@@ -270,17 +270,17 @@ class QueryBuilder
      */
     public function select(array $fields = [], array $conditions = []) : QueryBuilder
     {//SELECT users.* FROM `users`
-        $this->query = array(
-          'type' => 'SELECT',
-          'table' => $this->table,
-          'fields' => $fields,
-          'conditions' => $conditions,
-          'joins' => null,
-          'group' => null,
-          'having' => null,
-          'order' => null,
-          'limit' => null,
-        );
+        $this->query = [
+            'type' => 'SELECT',
+            'table' => $this->table,
+            'fields' => $fields,
+            'conditions' => $conditions,
+            'joins' => null,
+            'group' => null,
+            'having' => null,
+            'order' => null,
+            'limit' => null,
+        ];
         $this->i = 0;
         $this->values = [];
 
@@ -297,10 +297,10 @@ class QueryBuilder
     {
         $this->clear();
 
-        $this->query = array(
-          'type' => 'INSERT',
-          'data' => $data,
-        );
+        $this->query = [
+            'type' => 'INSERT',
+            'data' => $data,
+        ];
 
         return $this;
     }
@@ -316,13 +316,13 @@ class QueryBuilder
     {
         $this->clear();
 
-        $this->query = array(
-          'type' => 'UPDATE',
-          'data' => $data,
-          'conditions' => $conditions,
-          'order' => null,
-          'limit' => null,
-        );
+        $this->query = [
+            'type' => 'UPDATE',
+            'data' => $data,
+            'conditions' => $conditions,
+            'order' => null,
+            'limit' => null,
+        ];
 
         return $this;
     }
@@ -333,16 +333,16 @@ class QueryBuilder
      * @param array $conditions
      * @return \Origin\Model\QueryBuilder
      */
-    public function delete(array $conditions=[]) : QueryBuilder
+    public function delete(array $conditions = []) : QueryBuilder
     {
         $this->clear();
 
-        $this->query = array(
-          'type' => 'DELETE',
-          'conditions' => $conditions,
-          'order' => null,
-          'limit' => null,
-        );
+        $this->query = [
+            'type' => 'DELETE',
+            'conditions' => $conditions,
+            'order' => null,
+            'limit' => null,
+        ];
 
         return $this;
     }
@@ -362,6 +362,7 @@ class QueryBuilder
             $alias = $table;
         }
         $this->alias = $alias;
+
         return $this;
     }
 
@@ -456,13 +457,13 @@ class QueryBuilder
     public function join(array $params) : QueryBuilder
     {
         $defaults = [
-              'table' => null,
-              'alias' => null,
-              'type' => 'LEFT',
-              'conditions' => []
+            'table' => null,
+            'alias' => null,
+            'type' => 'LEFT',
+            'conditions' => [],
         ];
         $params = array_merge($defaults, $params);
-        if (!isset($this->query['joins']) or $this->query['joins'] == null) {
+        if (! isset($this->query['joins']) or $this->query['joins'] == null) {
             $this->query['joins'] = [];
         }
 
@@ -533,7 +534,7 @@ class QueryBuilder
      */
     public function insertStatement(array $params) : string
     {
-        if (empty($params) or !isset($params['data']) or empty($params['data'])) {
+        if (empty($params) or ! isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -562,7 +563,7 @@ class QueryBuilder
      */
     public function updateStatement(array $params) : string
     {
-        if (empty($params) or !isset($params['data']) or empty($params['data'])) {
+        if (empty($params) or ! isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -580,14 +581,14 @@ class QueryBuilder
         $setValues = implode(', ', $setValues);
         $statement[] = "UPDATE {$this->table} SET {$setValues}";
 
-        if (!empty($params['conditions'])) {
+        if (! empty($params['conditions'])) {
             $statement[] = "WHERE {$this->conditions($this->alias, $params['conditions'])}";
         }
 
-        if (!empty($params['order'])) {
+        if (! empty($params['order'])) {
             $statement[] = "ORDER BY {$this->orderToString($params['order'])}";
         }
-        if (!empty($params['limit'])) {
+        if (! empty($params['limit'])) {
             $statement[] = "LIMIT {$this->limitToString($params)}";
         }
 
@@ -602,7 +603,7 @@ class QueryBuilder
      */
     public function deleteStatement(array $params) : string
     {
-        if (empty($params) or !isset($params['conditions'])) {
+        if (empty($params) or ! isset($params['conditions'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -611,20 +612,19 @@ class QueryBuilder
 
         $statement[] = "DELETE FROM {$this->table}";
 
-        if (!empty($params['conditions'])) {
+        if (! empty($params['conditions'])) {
             $statement[] = "WHERE {$this->conditions($this->alias, $params['conditions'])}";
         }
 
-        if (!empty($params['order'])) {
+        if (! empty($params['order'])) {
             $statement[] = "ORDER BY {$this->orderToString($params['order'])}";
         }
-        if (!empty($params['limit'])) {
+        if (! empty($params['limit'])) {
             $statement[] = "LIMIT {$this->limitToString($params)}";
         }
 
         return implode(' ', $statement);
     }
-
 
     /**
      * Converts an array of options into a statement.
@@ -634,33 +634,33 @@ class QueryBuilder
      */
     public function selectStatement(array $params) : string
     {
-        if (empty($params) or !isset($params['fields'])) {
+        if (empty($params) or ! isset($params['fields'])) {
             throw new QueryBuilderException('No Fields.');
         }
         $statement = [];
         // SELECT
         $statement[] = "SELECT {$this->fieldsToString($params['fields'])} FROM {$this->tableReference()}";
 
-        if (!empty($params['joins'])) {
+        if (! empty($params['joins'])) {
             foreach ($params['joins'] as $join) {
                 $statement[] = $this->joinToString($join);
             }
         }
 
-        if (!empty($params['conditions'])) {
+        if (! empty($params['conditions'])) {
             $statement[] = "WHERE {$this->conditions($this->alias, $params['conditions'])}";
         }
 
-        if (!empty($params['group'])) {
+        if (! empty($params['group'])) {
             $statement[] = "GROUP BY {$this->groupToString($params['group'])}";
         }
-        if (!empty($params['having'])) {
+        if (! empty($params['having'])) {
             $statement[] = "HAVING {$this->havingToString($params['having'])}";
         }
-        if (!empty($params['order'])) {
+        if (! empty($params['order'])) {
             $statement[] = "ORDER BY {$this->orderToString($params['order'])}";
         }
-        if (!empty($params['limit'])) {
+        if (! empty($params['limit'])) {
             $statement[] = "LIMIT {$this->limitToString($params)}";
         }
 
@@ -678,7 +678,7 @@ class QueryBuilder
     protected function fieldsToString(array $fields) : string
     {
         if (empty($fields)) {
-            $fields = array($this->alias.'.*');
+            $fields = [$this->alias.'.*'];
         }
 
         foreach ($fields as $field) {
@@ -687,6 +687,7 @@ class QueryBuilder
                 $this->specialFields[] = substr($field, $position + 4); // e.g. SUM(quantity) AS items
             }
         }
+
         return implode(', ', $this->addAliases($fields));
     }
 
@@ -759,7 +760,7 @@ class QueryBuilder
     public function write()
     {
         $type = null;
-        if (!empty($this->query)) {
+        if (! empty($this->query)) {
             $type = $this->query['type'];
         }
         switch ($type) {
@@ -817,6 +818,7 @@ class QueryBuilder
                 $fields[$index] = "{$this->alias}.{$index} AS {$this->escape}{$column}{$this->escape}";
             }
         }
+
         return $fields;
     }
 
@@ -835,13 +837,14 @@ class QueryBuilder
  
         // Ignore formulas, existing aliases or virtual fields by ensuring
         // it starts with letter, only contains letters, underscore and number
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
+        if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
             return $field;
         }
         // these are adds we dont need to stress
         if (in_array($field, $this->specialFields)) {
             return $field;
         }
+
         return "{$alias}.{$field}";
     }
 
@@ -865,7 +868,7 @@ class QueryBuilder
             }
             //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
             if (is_string($key) and in_array($key, ['AND', 'OR', 'NOT'])) {
-                $buffer = array();
+                $buffer = [];
                 $start = '(';
                 $end = ')';
                 foreach ($value as $k => $v) {
@@ -880,7 +883,7 @@ class QueryBuilder
                         $start = 'NOT (';
                     }
                     $pre = $post = '';
-                    if (count($data)>1) {
+                    if (count($data) > 1) {
                         $pre = '(';
                         $post = ')';
                     }
@@ -898,7 +901,7 @@ class QueryBuilder
                 } else {
                     list($field, $expression) = explode(' ', $key, 2); //['id !=' => 1]
                 }
-                if (!in_array($expression, $this->operators)) {
+                if (! in_array($expression, $this->operators)) {
                     throw new QueryBuilderException('Invalid Operator '.$expression);
                 }
 
@@ -922,7 +925,7 @@ class QueryBuilder
      */
     protected function nextPlaceholder() : string
     {
-        if (!$this->placeholder) {
+        if (! $this->placeholder) {
             preg_match_all('/(?<=\s|_|^)[a-zA-Z]/i', $this->table, $matches);
             $this->placeholder = implode('', $matches[0]);
         }
@@ -955,7 +958,7 @@ class QueryBuilder
         }
 
         if ($expression == 'BETWEEN' or $expression == 'NOT BETWEEN') {
-            if (!is_array($value) or count($value) !== 2) {
+            if (! is_array($value) or count($value) !== 2) {
                 throw new QueryBuilderException('Bad paramaters');
             }
             $placeholder = $this->nextPlaceholder();
@@ -967,17 +970,17 @@ class QueryBuilder
             return "( {$field} {$expression} :{$placeholder} AND :{$placeholder2} )";
         }
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             $placeholder = $this->nextPlaceholder();
             $this->values[$placeholder] = $value;
 
             return "{$field} {$expression} :{$placeholder}";
         }
         // We should not have array here
-        if (!in_array($expression, ['=', '!=', 'IN', 'NOT IN'])) {
+        if (! in_array($expression, ['=', '!=', 'IN', 'NOT IN'])) {
             throw new QueryBuilderException('Bad paramaters');
         }
-        $placeholders = array();
+        $placeholders = [];
         foreach ($value as $key => $v) {
             $placeholders[] = $placeholder = $this->nextPlaceholder();
             $this->values[$placeholder] = $v;

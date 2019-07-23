@@ -44,7 +44,7 @@ class CookieHelper extends Helper
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, string $expire='+1 month', $options=[])
+    public function write(string $name, $value, string $expire = '+1 month', $options = [])
     {
         $this->response()->cookie($name, $value, $expire, $options);
     }
@@ -69,6 +69,7 @@ class CookieHelper extends Helper
     public function check(string $name) : bool
     {
         deprecationWarning('Cookie::check is depreciated use Cookie:exists');
+
         return $this->exists($name);
     }
 
@@ -81,6 +82,7 @@ class CookieHelper extends Helper
     public function exists(string $name) : bool
     {
         $cookies = $this->request()->cookies();
+
         return isset($cookies[$name]);
     }
 
@@ -92,6 +94,6 @@ class CookieHelper extends Helper
     public function destroy()
     {
         unset($_COOKIE);
-        $_COOKIE=[];
+        $_COOKIE = [];
     }
 }

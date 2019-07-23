@@ -35,9 +35,9 @@ class ConsoleInputTest extends \PHPUnit\Framework\TestCase
     public function testRead()
     {
         $ConsoleInput = $this->getMockBuilder(ConsoleInput::class)
-                        ->disableOriginalConstructor()
-                        ->setMethods(['read'])
-                        ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['read'])
+            ->getMock();
 
         $ConsoleInput->expects($this->at(0))->method('read')->will($this->returnValue(''));
         $ConsoleInput->expects($this->at(1))->method('read')->will($this->returnValue('q'));

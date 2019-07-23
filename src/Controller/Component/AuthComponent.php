@@ -15,13 +15,13 @@
 namespace Origin\Controller\Component;
 
 use Origin\Http\Router;
-use Origin\Model\ModelRegistry;
-use Origin\Model\Exception\MissingModelException;
 use Origin\Model\Entity;
-use Origin\Exception\ForbiddenException;
-use Origin\Exception\Exception;
-use Origin\Utility\Security;
 use Origin\Http\Response;
+use Origin\Utility\Security;
+use Origin\Exception\Exception;
+use Origin\Model\ModelRegistry;
+use Origin\Exception\ForbiddenException;
+use Origin\Model\Exception\MissingModelException;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -39,27 +39,27 @@ class AuthComponent extends Component
      * @var array
      */
     public $defaultConfig = [
-      'authenticate' => ['Form'], // Form and Http supported
-      'loginAction' => [
-        'controller' => 'Users',
-        'action' => 'login',
-        'plugin' => null,
-      ],
-      'loginRedirect' => [
-        'controller' => 'Users',
-        'action' => 'index',
-        'plugin' => null,
-      ],
-      'logoutRedirect' => [
-        'controller' => 'Users',
-        'action' => 'login',
-        'plugin' => null,
-      ],
-      'model' => 'User',
-      'fields' => ['username' => 'email', 'password' => 'password','api_token' => 'api_token'],
-      'scope' => [], // Extra conditions for db . e.g User.active=1;
-      'unauthorizedRedirect' => true, // If false throw ForbiddenException
-      'authError' => 'You are not authorized to access that location.',
+        'authenticate' => ['Form'], // Form and Http supported
+        'loginAction' => [
+            'controller' => 'Users',
+            'action' => 'login',
+            'plugin' => null,
+        ],
+        'loginRedirect' => [
+            'controller' => 'Users',
+            'action' => 'index',
+            'plugin' => null,
+        ],
+        'logoutRedirect' => [
+            'controller' => 'Users',
+            'action' => 'login',
+            'plugin' => null,
+        ],
+        'model' => 'User',
+        'fields' => ['username' => 'email', 'password' => 'password','api_token' => 'api_token'],
+        'scope' => [], // Extra conditions for db . e.g User.active=1;
+        'unauthorizedRedirect' => true, // If false throw ForbiddenException
+        'authError' => 'You are not authorized to access that location.',
     ];
 
     /**
@@ -78,7 +78,7 @@ class AuthComponent extends Component
 
     public function initialize(array $config)
     {
-        if (!ModelRegistry::get($this->config['model'])) {
+        if (! ModelRegistry::get($this->config['model'])) {
             throw new MissingModelException($this->config['model']);
         }
 
@@ -105,7 +105,6 @@ class AuthComponent extends Component
             return null;
         }
 
-       
         if ($this->isAuthorized($this->getUser())) {
             return null;
         }
@@ -137,11 +136,13 @@ class AuthComponent extends Component
         }
         if (in_array('Controller', $this->config['authenticate'])) {
             $controller = $this->controller();
-            if (!method_exists($controller, 'isAuthorized')) {
+            if (! method_exists($controller, 'isAuthorized')) {
                 throw new Exception(sprintf('%s does have an isAuthorized() method.', get_class($controller)));
             }
+
             return $controller->isAuthorized($user);
         }
+
         return true;
     }
 
@@ -170,6 +171,7 @@ class AuthComponent extends Component
         if ($user) {
             return $user->toArray();
         }
+
         return null;
     }
 
@@ -190,7 +192,7 @@ class AuthComponent extends Component
                 $model = ModelRegistry::get($this->config['model']);
                 
                 $conditions = [$this->config['fields']['api_token'] => $token];
-                if (!empty($this->config['scope']) and is_array($this->config['scope'])) {
+                if (! empty($this->config['scope']) and is_array($this->config['scope'])) {
                     $conditions = array_merge($conditions, $this->config['scope']);
                 }
           
@@ -235,6 +237,7 @@ class AuthComponent extends Component
     {
         if ($redirectUrl = $this->Session->read('Auth.redirect')) {
             $this->Session->delete('Auth.redirect');
+
             return $redirectUrl;
         }
 
@@ -280,6 +283,7 @@ class AuthComponent extends Component
         if (isset($user[$property])) {
             return $user[$property];
         }
+
         return null;
     }
     
@@ -354,7 +358,7 @@ class AuthComponent extends Component
 
     protected function isPrivateOrProtected(string $action) : bool
     {
-        return !$this->controller()->isAccessible($action);
+        return ! $this->controller()->isAccessible($action);
     }
 
     /**
@@ -370,10 +374,10 @@ class AuthComponent extends Component
         $model = ModelRegistry::get($this->config['model']);
  
         $conditions = [
-          $this->config['fields']['username'] => $username,
+            $this->config['fields']['username'] => $username,
         ];
 
-        if (!empty($this->config['scope']) and is_array($this->config['scope'])) {
+        if (! empty($this->config['scope']) and is_array($this->config['scope'])) {
             $conditions = array_merge($conditions, $this->config['scope']);
         }
 
@@ -400,6 +404,7 @@ class AuthComponent extends Component
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
             $this->Session->write('Auth.redirect', $this->request()->path(true));
+
             return $this->controller()->redirect(Router::url($this->config['loginAction']));
         }
        

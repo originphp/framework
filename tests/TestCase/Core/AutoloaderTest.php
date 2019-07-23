@@ -15,13 +15,12 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\Autoloader;
-use Origin\Test\Controller\Component\MockAuthComponent;
 
 class MockAutoloader extends Autoloader
 {
-    protected $mockFiles = array();
+    protected $mockFiles = [];
 
-    protected $prefixes = array();
+    protected $prefixes = [];
     protected static $backup = null;
 
     public function setFiles(array $files)
@@ -57,12 +56,14 @@ class MockAutoloader extends Autoloader
     {
         self::$backup = self::$instance;
         self::$instance = null;
+
         return true;
     }
     public static function enableInstance()
     {
         self::$instance = self::$backup ;
         self::$backup = null;
+
         return true;
     }
 }
@@ -75,12 +76,12 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     {
         $this->autoloader = new MockAutoloader(ROOT);
         
-        $this->autoloader->setFiles(array(
+        $this->autoloader->setFiles([
             ROOT.'/src/Autoloader.php',
             ROOT.'/src/Network/Socket.php',
             ROOT.'/vendor/elements/src/Database/Dbo.php',
             ROOT.'/vendor/elements/src/Database/Driver/Mysql.php',
-        ));
+        ]);
 
         $this->autoloader->addNamespace(
             'Origin',
@@ -136,9 +137,9 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     public function testAddNamespaces()
     {
         $Autoloader = new MockAutoloader(ROOT);
-        $Autoloader->addNamespaces(['Origin'=> 'src']);
+        $Autoloader->addNamespaces(['Origin' => 'src']);
     
-        $expected = ['Origin\\'=> ROOT  . '/src/'];
+        $expected = ['Origin\\' => ROOT  . '/src/'];
         $this->assertEquals($expected, $Autoloader->getPrefixes());
     }
 

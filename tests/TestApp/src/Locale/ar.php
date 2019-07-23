@@ -1,2 +1,2 @@
-<?php 
+<?php
 # This is intentionally blank

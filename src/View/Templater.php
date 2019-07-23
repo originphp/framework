@@ -14,14 +14,13 @@
 
 namespace Origin\View;
 
-use Origin\Exception\Exception;
 use Origin\Core\Inflector;
+use Origin\Exception\Exception;
 
 /**
  * Templater
  * This has now been rewritten and works differently.
  */
-
 
 class Templater
 {
@@ -47,7 +46,7 @@ class Templater
      */
     public function format(string $name, array $data) : string
     {
-        if (!isset($this->templates[$name])) {
+        if (! isset($this->templates[$name])) {
             throw new Exception("Template '{$name}' does not exist");
         }
         
@@ -59,9 +58,9 @@ class Templater
                 $template = str_replace("{{$placeholder}}", $value, $template);
             }
         }
+
         return $template;
     }
-
 
     /**
      * Loads templates from a file in the config folder
@@ -91,6 +90,7 @@ class Templater
                 foreach ($return as $key => $value) {
                     $this->templates[$key] = $value;
                 }
+
                 return true;
             }
         }
@@ -107,7 +107,7 @@ class Templater
     public function set(array $templates)
     {
         foreach ($templates as $name => $template) {
-            $this->templates[$name] =  $template;
+            $this->templates[$name] = $template;
         }
     }
 
@@ -125,6 +125,7 @@ class Templater
         if (isset($this->templates[$template])) {
             return $this->templates[$template];
         }
+
         return null;
     }
 }

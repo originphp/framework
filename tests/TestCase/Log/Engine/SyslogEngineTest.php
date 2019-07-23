@@ -19,13 +19,14 @@ use Origin\Log\Engine\SyslogEngine;
 class MockSyslogEngine extends SyslogEngine
 {
     public $written = null;
-    protected function openlog(string $identity, int $option=null, int $facility=null) :bool
+    protected function openlog(string $identity, int $option = null, int $facility = null) :bool
     {
         return true;
     }
     protected function write(int $priority, string $message) :bool
     {
         $this->written = $priority . ':' . $message;
+
         return true;
     }
 }
@@ -44,7 +45,7 @@ class SyslogEngineTest extends \PHPUnit\Framework\TestCase
     {
         $engine = new MockSyslogEngine();
         $id = uniqid();
-        $this->assertTrue($engine->log('error', 'Error code {value}', ['value'=>$id]));
+        $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
         $this->assertContains("3:[{$date}] application ERROR: Error code {$id}", $engine->written);
     }
@@ -54,8 +55,9 @@ class SyslogEngineTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testLogAddDebug(){
+    public function testLogAddDebug()
+    {
         $enigne = new SyslogEngine();
-        $this->assertTrue($enigne->log('debug','SyslogEngineTest run'));
+        $this->assertTrue($enigne->log('debug', 'SyslogEngineTest run'));
     }
 }

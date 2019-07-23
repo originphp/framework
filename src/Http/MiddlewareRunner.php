@@ -13,10 +13,6 @@
  */
 namespace Origin\Http;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
-use Origin\Http\Middleware;
-
 class MiddlewareRunner
 {
     /**
@@ -67,9 +63,11 @@ class MiddlewareRunner
             $next = $this->middlewareStack[$this->current];
             if ($next) {
                 $this->current ++;
+
                 return $next($request, $response, $this);
             }
         }
+
         return $response;
     }
 }

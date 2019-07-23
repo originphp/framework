@@ -37,7 +37,8 @@ class Folder
      */
     public static function create(string $directory, array $options = []) : bool
     {
-        $options += ['recursive'=>false,'mode'=>0744];
+        $options += ['recursive' => false,'mode' => 0744];
+
         return @mkdir($directory, $options['mode'], $options['recursive']); # use@ No such file or directory
     }
 
@@ -60,24 +61,25 @@ class Folder
      *  - directories: default false, includes directories
      * @return array
      */
-    public static function list(string $directory, array $options= []) : array
+    public static function list(string $directory, array $options = []) : array
     {
-        $options += ['directories'=>false];
+        $options += ['directories' => false];
         if (self::exists($directory)) {
             $results = [];
             $files = array_diff(scandir($directory), ['.', '..']);
             foreach ($files as $file) {
-                if (!$options['directories'] and !is_file($directory . DS . $file)) {
+                if (! $options['directories'] and ! is_file($directory . DS . $file)) {
                     continue;
                 }
                 $stats = stat($directory . DS . $file);
-                $results[]  = [
+                $results[] = [
                     'name' => $file,
                     'timestamp' => $stats['mtime'],
                     'size' => $stats['size'],
-                    'type' => is_dir($directory. DS . $file)?'directory':'file'
+                    'type' => is_dir($directory. DS . $file)?'directory':'file',
                 ];
             }
+
             return $results;
         }
        
@@ -95,7 +97,7 @@ class Folder
      */
     public static function delete(string $directory, array $options = []) : bool
     {
-        $options += ['recursive'=>false];
+        $options += ['recursive' => false];
         if (self::exists($directory)) {
             if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
@@ -107,6 +109,7 @@ class Folder
                     @unlink($directory . DS . $filename);
                 }
             }
+
             return @rmdir($directory);
         }
         
@@ -126,6 +129,7 @@ class Folder
             if (strpos($to, DS) === false) {
                 $to = pathinfo($directory, PATHINFO_DIRNAME) . DS . $to;
             }
+
             return @rename($directory, $to);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
@@ -144,6 +148,7 @@ class Folder
             if (strpos($destination, DS) === false) {
                 $destination = pathinfo($source, PATHINFO_DIRNAME) . DS . $destination;
             }
+
             return @rename($source, $destination);
         }
         throw new NotFoundException(sprintf('%s could not be found', $source));
@@ -173,6 +178,7 @@ class Folder
                 }
                 @copy($source . DS . $filename, $destination . DS . $filename);
             }
+
             return self::exists($destination);
         }
         throw new NotFoundException(sprintf('%s could not be found', $source));
@@ -187,7 +193,7 @@ class Folder
     public static function mode(string $directory) : string
     {
         if (self::exists($directory)) {
-            return  (string) substr(sprintf("%o", fileperms($directory)), -4);
+            return  (string) substr(sprintf('%o', fileperms($directory)), -4);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
     }
@@ -242,7 +248,7 @@ class Folder
     */
     public static function chmod(string $directory, int $mode, array $options = []) : bool
     {
-        $options += ['recursive'=>false];
+        $options += ['recursive' => false];
 
         if (self::exists($directory)) {
             if ($options['recursive']) {
@@ -255,6 +261,7 @@ class Folder
                     @chmod($directory . DS . $filename, $mode);
                 }
             }
+
             return @chmod($directory, $mode);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
@@ -269,9 +276,9 @@ class Folder
      *  - recursive: If set to true, it will delete all contents and sub folders
      * @return bool
      */
-    public static function chown(string $directory, string $user, array $options =[]) : bool
+    public static function chown(string $directory, string $user, array $options = []) : bool
     {
-        $options += ['recursive'=>false];
+        $options += ['recursive' => false];
         if (self::exists($directory)) {
             if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
@@ -283,6 +290,7 @@ class Folder
                     @chown($directory . DS . $filename, $user);
                 }
             }
+
             return @chown($directory, $user);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));
@@ -297,9 +305,9 @@ class Folder
     *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool
     */
-    public static function chgrp(string $directory, string $group = null, array $options=[]) : bool
+    public static function chgrp(string $directory, string $group = null, array $options = []) : bool
     {
-        $options += ['recursive'=>false];
+        $options += ['recursive' => false];
         if (self::exists($directory)) {
             if ($options['recursive']) {
                 $files = array_diff(scandir($directory), ['.', '..']);
@@ -311,6 +319,7 @@ class Folder
                     @chgrp($directory . DS . $filename, $group);
                 }
             }
+
             return @chgrp($directory, $group);
         }
         throw new NotFoundException(sprintf('%s could not be found', $directory));

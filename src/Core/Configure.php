@@ -12,9 +12,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace Origin\Core;
-use Origin\Exception\NotFoundException;
 
-use Origin\Core\Dot;
+use Origin\Exception\NotFoundException;
 
 class Configure
 {
@@ -35,6 +34,7 @@ class Configure
         if (self::$dot === null) {
             self::$dot = new Dot();
         }
+
         return self::$dot;
     }
  

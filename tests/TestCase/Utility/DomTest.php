@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Utility;
 
-use Origin\TestSuite\OriginTestCase;
 use Origin\Utility\Dom;
+use Origin\TestSuite\OriginTestCase;
 
 /**
  * @property \Lib\Dom $Dom

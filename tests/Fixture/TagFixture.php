@@ -22,29 +22,29 @@ class TagFixture extends Fixture
 
     public $schema = [
         'id' => ['type' => 'primaryKey'],
-         'title' => ['type' => 'string'],
-         'created' => 'datetime',
-         'modified' => 'datetime',
+        'title' => ['type' => 'string'],
+        'created' => 'datetime',
+        'modified' => 'datetime',
     ];
 
     public $records = [
         [
-            'id'=>1000,
+            'id' => 1000,
             'title' => 'Tag #1',
-            'created'=>'2019-03-27 13:10:00',
-            'modified'=>'2019-03-27 13:12:00'
+            'created' => '2019-03-27 13:10:00',
+            'modified' => '2019-03-27 13:12:00',
         ],
         [
-            'id'=>1001,
+            'id' => 1001,
             'title' => 'Tag #2',
-            'created'=>'2019-03-27 13:11:00',
-            'modified'=>'2019-03-27 13:11:00'
+            'created' => '2019-03-27 13:11:00',
+            'modified' => '2019-03-27 13:11:00',
         ],
         [
-            'id'=>1002,
+            'id' => 1002,
             'title' => 'Tag #3',
-            'created'=>'2019-03-27 13:12:00',
-            'modified'=>'2019-03-27 13:10:00'
+            'created' => '2019-03-27 13:12:00',
+            'modified' => '2019-03-27 13:10:00',
         ],
     ];
 }

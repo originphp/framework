@@ -51,11 +51,11 @@ class Helper
      * @param array $config
      * @return void
      */
-    public function loadHelper(string $name, array $config=[])
+    public function loadHelper(string $name, array $config = [])
     {
         list($plugin, $helper) = pluginSplit($name);
-        if (!isset($this->_helpers[$helper])) {
-            $this->_helpers[$helper] =  array_merge(['className' => $name . 'Helper'], $config);
+        if (! isset($this->_helpers[$helper])) {
+            $this->_helpers[$helper] = array_merge(['className' => $name . 'Helper'], $config);
         }
     }
 
