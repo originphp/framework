@@ -22,7 +22,7 @@ use Origin\Model\ConnectionManager;
 class Fixture
 {
     /**
-     * The datasource to use, should be test
+     * The datasource to use, this should be test
      *
      * @var string
      */
@@ -50,7 +50,11 @@ class Fixture
     public $records = [];
 
     /**
-     * You can import data using a model or table key
+     * You can import data using a model or table key. The options are :
+     *   - datasource: default is default.
+     *   - model: model name to import
+     *   - table: the table to import
+     *   - records: default:false
      *
      * @var array|null
      */

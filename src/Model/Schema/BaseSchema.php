@@ -228,7 +228,7 @@ abstract class BaseSchema
      * @param string $name name of index
      * @param array $options
      *  - unique: default:false set to to true to create unique index.
-     *  - type: use this to set a specific type. e.g FULLTEXT
+     *  - type: use this to set a specific type. e.g fulltext
      * @return string
      */
     public function addIndex(string $table, $column, string $name, array $options = []) : string
