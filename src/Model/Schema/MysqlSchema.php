@@ -71,7 +71,7 @@ class MysqlSchema extends BaseSchema
         $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
         $reverseMapping['mediumtext'] = $reverseMapping['text']; // add missing type
         $reverseMapping['longtext'] = $reverseMapping['text']; // add missing type
-
+      
         foreach ($results as $column) {
             $decimals = $length = null;
             $type = str_replace(')', '', $column['Type']);
@@ -129,13 +129,32 @@ class MysqlSchema extends BaseSchema
         $sql = "SHOW INDEX FROM {$table}";
         $results = $this->fetchAll($sql);
         $indexes = [];
+      
         foreach ($results as &$result) {
             $result = array_change_key_case($result, CASE_LOWER);
+            
+            /**
+             * Handle multiple columns in a index
+             */
+            if ($result['seq_in_index'] > 1) {
+                $key = count($indexes) - 1;
+                $indexes[$key]['column'] = (array) $indexes[$key]['column'];
+                $indexes[$key]['column'][] = $result['column_name'];
+                continue;
+            }
+
             $indexes[] = [
                 'name' => $result['key_name'],
                 'column' => $result['column_name'],
                 'unique' => ($result['non_unique'] == 0) ? true : false,
             ];
+
+            /**
+             * Full text support
+             */
+            if ($result['index_type'] === 'FULLTEXT') {
+                $indexes[count($indexes) - 1]['type'] = 'fulltext';
+            }
         }
 
         return  $indexes;

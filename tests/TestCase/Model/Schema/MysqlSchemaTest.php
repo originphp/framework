@@ -309,6 +309,33 @@ class MysqlSchemaTest extends OriginTestCase
             'unique' => true,
         ];
         $this->assertEquals($expected, $indexes[0]);
+
+        $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
+        $this->assertTrue($adapter->connection()->execute($sql));
+        $indexes = $adapter->indexes('articles');
+
+        $this->assertEquals('test_multicolumn_index', $indexes[1]['name']);
+        $this->assertEquals(['id','author_id'], $indexes[1]['column']);
+    }
+
+    /**
+     *
+     *
+     * @return void
+     */
+    public function testIndexFullText()
+    {
+        $adapter = new MysqlSchema('test');
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for mysql');
+        }
+       
+        $sql = $adapter->addIndex('articles', 'title', 'dummy_index', ['type' => 'fulltext']);
+        $this->assertTrue($adapter->connection()->execute($sql));
+       
+        $indexes = $adapter->indexes('articles');
+        $this->assertEquals('dummy_index', $indexes[1]['name']);
+        $this->assertEquals('fulltext', $indexes[1]['type']);
     }
 
     public function testRemoveColumn()

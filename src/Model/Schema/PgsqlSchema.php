@@ -148,11 +148,24 @@ class PgsqlSchema extends BaseSchema
     {
         $sql = "SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = 'r' AND t.relname = '{$table}' ORDER BY t.relname, i.relname";
         $results = $this->fetchAll($sql);
+        $indexes = [];
+
         foreach ($results as $result) {
-            $result['unique'] = strtolower($result['unique']) === 'true' ? true : false;
+            /**
+             * handle multiple columns
+             */
+            $key = count($indexes) - 1;
+            if ($indexes) {
+                if ($indexes[$key]['name'] === $result['name']) {
+                    $indexes[$key]['column'] = (array) $indexes[$key]['column'];
+                    $indexes[$key]['column'][] = $result['column'];
+                    continue;
+                }
+            }
+            $indexes[] = $result;
         }
 
-        return $results;
+        return $indexes;
     }
 
     /**

@@ -333,6 +333,13 @@ class PgsqlSchemaTest extends OriginTestCase
             'unique' => true,
         ];
         $this->assertEquals($expected, $indexes[0]);
+
+        $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
+        $this->assertTrue($adapter->connection()->execute($sql));
+        $indexes = $adapter->indexes('articles');
+        
+        $this->assertEquals('test_multicolumn_index', $indexes[1]['name']);
+        $this->assertEquals(['id','author_id'], $indexes[1]['column']);
     }
 
     public function testRemoveColumn()
