@@ -231,7 +231,8 @@ class GenerateCommandTest extends OriginTestCase
         $filename = TESTS.DS.'Fixture'.DS.'DummyFixture.php';
         $this->assertOutputContains('tests/Fixture/DummyFixture.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('19a8d51358b8796b3e18d44385f69b98', $filename);
+        
+        $this->assertFileHash('94b89f1f898f2e1824bfebe1e0be055d', $filename);
         unlink($filename);
 
         preg_match('/[0-9]{14}/', $this->output(), $match);
