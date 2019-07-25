@@ -454,8 +454,8 @@ class PgsqlSchemaTest extends OriginTestCase
          * are ignored (have no length)
          */
         $result = $adapter->schema('articles');
-        
-        $expected = 'e75b3d5f82d9f991fef08cf4b866b9c8'; // Any slight change, needs to be investigated
+
+        $expected = 'a2d4141301454b95e500e23cfb137344'; // Any slight change, needs to be investigated
         $this->assertEquals($expected, md5(json_encode($result)));
     }
 

@@ -217,6 +217,7 @@ class ModelTest extends OriginTestCase
             'default' => null,
             'null' => false,
             'key' => 'primary',
+            'autoIncrement' => true,
         ];
         
         $this->assertEquals($expected, $schema['id']);
@@ -240,6 +241,7 @@ class ModelTest extends OriginTestCase
             'default' => null,
             'null' => false,
             'key' => 'primary',
+            'autoIncrement' => true,
         ];
         
         $this->assertEquals($expected, $schema['id']);

@@ -451,7 +451,7 @@ class MysqlSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for mysql');
         }
         $result = $adapter->schema('articles');
-        $expected = '642b0690d11a2147cbb322ebd7fed3ad'; // Any slight change, needs to be investigated
+        $expected = '6376fe928793d0c7f9d899285b71bcfd'; // Any slight change, needs to be investigated
         $this->assertEquals($expected, md5(json_encode($result)));
     }
 

@@ -58,11 +58,12 @@ class PgsqlSchema extends BaseSchema
     public function schema(string $table) : array
     {
         $sql = 'SELECT DISTINCT column_name AS name, data_type AS type, character_maximum_length AS "char_length",numeric_precision ,numeric_scale , column_default AS default,  is_nullable AS "null",character_octet_length AS oct_length, ordinal_position AS position FROM information_schema.columns
-        WHERE  table_catalog = \'' . $this->connection()->database() . '\' AND  table_name = \'' . $table . '\' AND table_schema = \'public\'  ORDER BY position';
+        WHERE table_catalog = \'' . $this->connection()->database() . '\' AND  table_name = \'' . $table . '\' AND table_schema = \'public\'  ORDER BY position';
 
         $schema = [];
 
         if ($results = $this->fetchAll($sql)) {
+       
             /**
              * @todo defaults should be type,length,default,null (remove length if empty)
              */
@@ -91,12 +92,16 @@ class PgsqlSchema extends BaseSchema
                     $data['default'] = $result['default'];
                 }
 
+                if ($isAuto) {
+                    $data['autoIncrement'] = true;
+                }
+
                 /**
                  * Detect Primary Key
                  * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
                  * @todo This wont work for join tables with two primary keys
                  */
-                if ($result['name'] === 'id' and $data['type'] === 'integer') {
+                if ($isAuto or ($result['name'] === 'id' and $data['type'] === 'integer')) {
                     $data['key'] = 'primary'; // Assume id is primary key
                     $data['type'] = 'primaryKey';
                 }

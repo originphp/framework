@@ -102,6 +102,10 @@ class MysqlSchema extends BaseSchema
                     $schema[$column['Field']]['default'] = null; // remove current_timestamp
                 }
 
+                if ($column['Extra'] === 'auto_increment') {
+                    $schema[$column['Field']]['autoIncrement'] = true;
+                }
+
                 if ($column['Key'] === 'PRI' and $column['Extra'] === 'auto_increment') {
                     $schema[$column['Field']]['type'] = 'primaryKey';
                 }
