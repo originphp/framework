@@ -80,6 +80,9 @@ trait DbSchemaTrait
         
         $statement = file_get_contents($filename);
         $statements = $this->parseSql($statement);
+
+        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
+
         foreach ($statements  as $query) {
             $query = trim($query);
             if ($query) {
@@ -92,6 +95,9 @@ trait DbSchemaTrait
                 $this->io->status('ok', str_replace("\n", '', $query));
             }
         }
+       
+        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
+
         $this->io->success(sprintf('Executed %d statements', count($statements)));
 
         return true;
