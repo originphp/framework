@@ -50,10 +50,10 @@ class Fixture
     public $records = [];
 
     /**
-     * You can import data using a model or table key. The options are :
+     * You can import data using a model OR table key. Either model or table The options are :
      *   - datasource: default is default.
-     *   - model: model name to import
-     *   - table: the table to import
+     *   - model: model name to import. This will load the information from model including the table.
+     *   - table: the table to import.
      *   - records: default:false
      *
      * @var array|null
@@ -66,6 +66,13 @@ class Fixture
      * @var bool
      */
     public $dropTables = true;
+    
+    /**
+     * This is an internal flag to only insert records, but do not create or drop tables.
+     *
+     * @var boolean
+     */
+    public $insertOnly = false;
 
     public function __construct()
     {
@@ -76,6 +83,8 @@ class Fixture
         }
 
         $this->initialize();
+
+        $this->insertOnly = (empty($this->schema) and empty($this->import));
     }
 
     /**
@@ -129,7 +138,7 @@ class Fixture
     
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->adapter()->createTable($this->table, $schema);
-
+  
         return $connection->execute($sql);
     }
 
@@ -162,7 +171,7 @@ class Fixture
         }
         $connection = ConnectionManager::get($this->datasource);
         $sql = $connection->adapter()->createTable($this->table, $this->schema);
-
+   
         return $connection->execute($sql);
     }
 

@@ -86,7 +86,7 @@ class FixtureManager
         $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
 
         // create the table table or truncate existing
-        if ($createTable or $this->loaded[$fixture]->dropTables === true) {
+        if (! $this->loaded[$fixture]->insertOnly and ($createTable or $this->loaded[$fixture]->dropTables === true)) {
             $this->loaded[$fixture]->drop();
             $this->loaded[$fixture]->create();
         } else {
@@ -97,7 +97,7 @@ class FixtureManager
         $this->loaded[$fixture]->insert();
 
         $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
-      
+
         // Configure the Model in Registry to use test datasource for this fixture
         list($plugin, $alias) = pluginSplit($fixture);
         ModelRegistry::config($alias, [
@@ -129,7 +129,9 @@ class FixtureManager
     {
         foreach ($this->loaded as $fixture) {
             $this->disableForeignKeyConstraints($fixture->datasource);
-            $fixture->drop();
+            if (! $fixture->insertOnly) {
+                $fixture->drop();
+            }
             $this->enableForeignKeyConstraints($fixture->datasource);
         }
     }
