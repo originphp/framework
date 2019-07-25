@@ -738,7 +738,7 @@ class Scaffold
             $schema = $this->schema[$otherModel];
             $foreignKey = Inflector::underscore($model) . '_id';
        
-            if (isset($schema[$foreignKey]) and empty($schema['key'])) {
+            if (isset($schema[$foreignKey])) {
                 $associations[$model]['hasMany'][] = $otherModel;
             }
         }
