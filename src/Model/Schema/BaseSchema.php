@@ -158,16 +158,28 @@ abstract class BaseSchema
     */
     public function createTable(string $table, array $data, array $options = []) : string
     {
+        $options += ['primaryKey' => null,'options' => null];
         $append = '';
         if (! empty($options['options'])) {
             $append = ' '. $options['options'];
         }
 
         $result = [];
-     
+        
+        /**
+         * Create table accepts primaryKey settings
+         * v1.25 +
+         */
         $primaryKeys = [];
+        if ($options['primaryKey']) {
+            $primaryKeys = (array) $options['primaryKey'];
+        }
+
+        /**
+         * This is legacy handler. for key setting
+         */
         foreach ($data as $field => $settings) {
-            if (! empty($settings['key'])) {
+            if (! empty($settings['key']) and ! in_array($field, $primaryKeys)) {
                 $primaryKeys[] = $field;
             }
         }
