@@ -21,6 +21,24 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.25.0] - 2019-07-26
+### Migration Guide to 1.25
+Small breaking change, on a undocumented method.
+
+- keys from array returned by `Migration::foreignKeys()` have been changed to `table`,`column`,`name`, `referencedTable`, `referencedColumn`
+
+### Fixed
+- Db:schema:load was not disabling foreign key checks when executing statements, this caused issues with SQL files with foreign keys.
+
+### Changed
+- All models loaded through model registry will have the datasource set to test (previously only those loaded through fixtures)
+- Migration::foreignKeys changed column names more inline with framework. Returns table,column,name, referencedTable, referencedColumn
+
+### Added
+- Ability to use fixtures using existing tables in the test database
+- BaseSchema::createTable accepts primaryKey option e.g. 'id' or ['contacts_id','tags_id']
+- Better support for indexes on multiple columns when using Schema
+
 ## [1.24.1] - 2019-07-23
 ### Fixed
 - Session cookies not being sent via non HTTPS
