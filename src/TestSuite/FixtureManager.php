@@ -123,7 +123,7 @@ class FixtureManager
     {
         foreach ($this->loaded as $fixture) {
             $this->disableForeignKeyConstraints($fixture->datasource);
-            if (! $fixture->insertOnly) {
+            if (! $fixture->insertOnly()) {
                 $fixture->drop();
             }
             $this->enableForeignKeyConstraints($fixture->datasource);
