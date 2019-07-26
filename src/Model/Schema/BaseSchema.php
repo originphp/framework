@@ -357,14 +357,7 @@ abstract class BaseSchema
      * @param array options (ifExists)
      * @return string
      */
-    public function dropTable(string $table, array $options = []) : string
-    {
-        if (! empty($options['ifExists'])) {
-            return "DROP TABLE IF EXISTS {$table}";
-        }
-
-        return "DROP TABLE {$table}";
-    }
+    abstract public function dropTable(string $table, array $options = []);
 
     /**
      * Gets a SQL statement for renaming a table

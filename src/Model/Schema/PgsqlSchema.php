@@ -331,4 +331,20 @@ class PgsqlSchema extends BaseSchema
 
         return "'{$value}'";
     }
+
+    /**
+    * Returns a SQL statement for dropping a table
+    * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
+    * @param string $table
+    * @param array options (ifExists)
+    * @return string
+    */
+    public function dropTable(string $table, array $options = []) : string
+    {
+        if (! empty($options['ifExists'])) {
+            return "DROP TABLE IF EXISTS {$table} CASCADE";
+        }
+
+        return "DROP TABLE {$table} CASCADE";
+    }
 }

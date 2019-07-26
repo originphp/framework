@@ -265,10 +265,10 @@ class PgsqlSchemaTest extends OriginTestCase
     public function testDropTable()
     {
         $adapter = new PgsqlSchema('test');
-        $expected = 'DROP TABLE foo';
+        $expected = 'DROP TABLE foo CASCADE';
         $result = $adapter->dropTable('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-        $this->assertEquals('DROP TABLE IF EXISTS foo', $adapter->dropTable('foo', ['ifExists' => true]));
+        $this->assertEquals('DROP TABLE IF EXISTS foo CASCADE', $adapter->dropTable('foo', ['ifExists' => true]));
         if ($adapter->connection()->engine() === 'pgsql') {
             $this->assertTrue($adapter->connection()->execute($result));
         }
