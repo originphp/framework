@@ -53,6 +53,13 @@ class ModelRegistry
         if (isset(static::$config[$model])) {
             $options += static::$config[$model];
         }
+        
+        /**
+         * Set the datasource to test when in the test environment
+         */
+        if (env('ORIGIN_ENV') === 'test' and ! isset($options['datasource'])) {
+            $options['datasource'] = 'test';
+        }
 
         $object = static::create($model, $options);
 
