@@ -19,28 +19,21 @@ use Origin\Core\Inflector;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
+/**
+ * The main goal of the fixture class is to insert records for each test. However, sometimes, the schema
+ * will be needed to be created on the fly, so this also handles this. Features in Fixture have now become
+ * obsolete since introducing the desired default behavior which is to use existing tables in the test database
+ */
 class Fixture
 {
+   
     /**
-     * The datasource to use, this should be test
-     *
-     * @var string
-     */
-    public $datasource = 'test';
-
-    /**
-     * The table name
+     * The table name used by this fixture. It is
+     * guessed using the class name
      *
      * @var string
      */
     public $table = null;
-
-    /**
-     * Holds the schema for this fixture
-     *
-     * @var array
-     */
-    public $schema = [];
 
     /**
      * Records to insert
@@ -50,29 +43,63 @@ class Fixture
     public $records = [];
 
     /**
-     * You can import data using a model OR table key. Either model or table The options are :
-     *   - datasource: default is default.
-     *   - model: model name to import. This will load the information from model including the table.
-     *   - table: the table to import.
-     *   - records: default:false
-     *
-     * @var array|null
-     */
-    public $import = null;
-
-    /**
-     * Drops and recreates tables between tests. Default
-     * behavior is always drop tables.
+     * Drops and recreates tables between tests. Default behavior is always drop tables.
      * @var bool
      */
     public $dropTables = true;
-    
+
     /**
-     * This is an internal flag to only insert records, but do not create or drop tables.
+     * This is an internal flag to only insert records, but does not create or drop tables.
      *
      * @var boolean
      */
-    public $insertOnly = false;
+    protected $insertOnly = false;
+
+    /**
+    * Use this to create a custom table, using the information retreived from Model:schema(). This
+    * is more for internal testing
+    *
+    * Types include primaryKey,string,text,decimal,float, integer.
+    *
+    * Keys include type, limit or precision and scale, null, default, and key (either primary or nothing)
+    *
+    *  ['name' => [
+    *     'type' => 'string',
+    *     'limit' => 255,
+    *     'null' => false,
+    *  ],
+    *  'amount' => [
+    *     'type' => 'decimal',
+    *     'precision' => 10,
+    *     'scale' => 10,
+    *     'null' => false
+    *  ],
+    *  'created' => 'datetime']
+    * @var array
+    */
+    public $schema = [];
+
+    /**
+    * This will be deprecated in the future. The idea is just to work with the test datasource, loading
+    * the schema. This just makes things simpler.
+    *
+    * You can import data using a model OR table key. Either model or table The options are :
+    *
+    *   - datasource: default is default.
+    *   - model: model name to import. This will load the information from model including the table.
+    *   - table: the table to import.
+    *   - records: default:false
+    *
+    * @var array|null
+    */
+    public $import = null;
+
+    /**
+    * The datasource to use, this should be test
+    *
+    * @var string
+    */
+    public $datasource = 'test';
 
     public function __construct()
     {
@@ -88,6 +115,16 @@ class Fixture
     }
 
     /**
+     * Gets the insertOnlyFlag
+     *
+     * @return bool
+     */
+    public function insertOnly() :bool
+    {
+        return $this->insertOnly;
+    }
+
+    /**
      * Use to create dynamic records.
      */
     public function initialize()
@@ -95,6 +132,8 @@ class Fixture
     }
     
     /**
+     * As of 1.25.0 - This will be deprecated in the future.
+     *
      * Import schema. If model is found then use that datasource and table else
      * try to guess it incase of dynamic models
      *
@@ -183,6 +222,7 @@ class Fixture
     public function insert() : void
     {
         $connection = ConnectionManager::get($this->datasource);
+   
         foreach ($this->records as $record) {
             $connection->insert($this->table, $record);
         }
