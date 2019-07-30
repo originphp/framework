@@ -29,6 +29,10 @@ abstract class BaseEngine
     {
         $this->config($config);
         $this->initialize($config);
+
+        if (! is_numeric($config['duration'])) {
+            $this->config['duration'] = strtotime($this->config['duration']) - time();
+        }
     }
 
     public function initialize(array $config)
