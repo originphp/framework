@@ -25,6 +25,7 @@ class FileEngine extends BaseEngine
         'path' => TMP . DS . 'cache',
         'duration' => 3600,
         'prefix' => 'origin_',
+        'serialize' => true,
     ];
 
     /**
@@ -36,7 +37,11 @@ class FileEngine extends BaseEngine
      */
     public function write(string $key, $value) :bool
     {
-        return file_put_contents($this->config['path'] . DS . $this->key($key), serialize($value));
+        if ($value !== '' and $this->config['serialize'] === true) {
+            $value = serialize($value);
+        }
+
+        return file_put_contents($this->config['path'] . DS . $this->key($key), $value);
     }
     /**
      * Gets the value;
@@ -50,7 +55,12 @@ class FileEngine extends BaseEngine
             $filename = $this->config['path'] . DS . $this->key($key);
             $expires = filemtime($filename) + $this->config['duration'];
             if ($expires > time()) {
-                return unserialize(file_get_contents($filename));
+                $data = file_get_contents($filename);
+                if ($data !== '' and $this->config['serialize'] === true) {
+                    $value = unserialize($data);
+                }
+
+                return $value;
             }
         }
 
@@ -64,7 +74,14 @@ class FileEngine extends BaseEngine
      */
     public function exists(string $key) :bool
     {
-        return file_exists($this->config['path'] . DS . $this->key($key));
+        $filename = $this->config['path'] . DS . $this->key($key);
+        if (file_exists($filename)) {
+            $expires = filemtime($filename) + $this->config['duration'];
+
+            return $expires >= time();
+        }
+
+        return  false;
     }
     /**
      * Deletes a kehy from the cache
