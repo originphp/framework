@@ -107,7 +107,7 @@ class Cache
 
             return new $config['className']($config);
         }
-        throw new InvalidArgumentException("{$config} config does not exist");
+        throw new InvalidArgumentException("{$name} config does not exist");
     }
     
     /**
