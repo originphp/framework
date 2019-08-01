@@ -36,13 +36,14 @@ class MysqlSchemaTest extends OriginTestCase
             'f6' => ['type' => 'decimal','precision' => 10,'scale' => 3],
             'f7' => 'datetime',
             'f8' => 'time',
-            'f9' => 'timestamp',
+            'f9' => ['type' => 'timestamp','null' => true],
             'f10' => 'date',
             'f11' => 'binary',
             'f12' => 'boolean',
             'f13' => ['type' => 'integer','limit' => 12,'unsigned' => true],
             'f14' => ['type' => 'string','default' => 'abc'],
             'f15' => ['type' => 'text','limit' => MysqlSchema::MEDIUMTEXT],
+            'f16' => ['type' => 'timestamp','default' => 'CURRENT_TIMESTAMP'],
         ];
         /**
          * Constraints and indexes are needed for next
@@ -58,8 +59,8 @@ class MysqlSchemaTest extends OriginTestCase
             'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
         ];
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-       
-        $this->assertEquals('e7c836ca334db02c28130fcbac7bf156', md5($statements[0]));
+
+        $this->assertEquals('612d49563f960d6632a218e4e853ddd7', md5($statements[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($statements[0]));
@@ -76,8 +77,8 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-        debug($schema);
-        $this->assertEquals('e7b7681ab179ef249e05c56a9ec29d2b', md5(json_encode($schema)));
+
+        $this->assertEquals('367d3a27526bad3f542cf7a449c4fc9a', md5(json_encode($schema)));
 
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }

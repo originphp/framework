@@ -294,6 +294,7 @@ class MysqlSchema extends BaseSchema
                 $out .= ' NULL';
             } elseif (isset($data['default']) and strtolower($data['default']) === 'current_timestamp') {
                 $out .= ' DEFAULT CURRENT_TIMESTAMP';
+                unset($data['default']);
             }
         }
 
