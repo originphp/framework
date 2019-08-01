@@ -76,7 +76,7 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-  
+        debug($schema);
         $this->assertEquals('e7b7681ab179ef249e05c56a9ec29d2b', md5(json_encode($schema)));
 
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
