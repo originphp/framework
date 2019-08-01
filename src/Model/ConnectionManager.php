@@ -55,7 +55,7 @@ class ConnectionManager
             throw new MissingDatasourceException("No configuration for {$name} datasource.");
         }
 
-        $defaults = ['host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
+        $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
         
         $config = array_merge($defaults, static::config($name));
        
@@ -103,7 +103,7 @@ class ConnectionManager
     }
 
     /**
-     * Returns a list of datasources
+     * Returns a list of datasources (connections)
      *
      * @return array
      */
