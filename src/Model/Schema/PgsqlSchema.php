@@ -441,9 +441,12 @@ class PgsqlSchema extends BaseSchema
      */
     public function showCreateTable(string $table): string
     {
-        $schema = $this->schema($table);
+        $schema = $this->connection()->describe($table);
 
-        return $this->createTable($table, $schema);
+        return implode("\n", $this->createTableSql($table, $schema['columns'], [
+            'constraints' => $schema['constraints'],
+            'indexes' => $schema['indexes'],
+        ]));
     }
 
     /**
@@ -526,7 +529,7 @@ class PgsqlSchema extends BaseSchema
 
         $results = $this->fetchAll($sql);
      
-        $schema = $this->convertTableDescription($results);
+        $columns = $this->convertTableDescription($results);
 
         $indexes = $constraints = [];
      
@@ -553,11 +556,8 @@ class PgsqlSchema extends BaseSchema
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
         }
-    
-        $schema['constraints'] = $constraints;
-        $schema['indexes'] = $indexes;
-
-        return $schema;
+   
+        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes];
     }
 
     /**
@@ -651,7 +651,7 @@ class PgsqlSchema extends BaseSchema
     {
         $out = [];
               
-        foreach ($data as $i => $row) {
+        foreach ($data as $row) {
             $defintion = $this->parseColumn($row);
             $defintion += [
                 'null' => $row['null'] === 'YES'?true:false,
@@ -680,7 +680,7 @@ class PgsqlSchema extends BaseSchema
                 $defintion['autoIncrement'] = true;
             }
           
-            $out[] = $defintion;
+            $out[$row['name']] = $defintion;
         }
 
         return $out;

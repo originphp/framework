@@ -56,7 +56,7 @@ class PgsqlSchemaTest extends OriginTestCase
             ],
         ];
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-  
+
         $this->assertEquals('3577f4c11dcfabd922df030142b51652', md5($statements[0]));
        
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -76,8 +76,7 @@ class PgsqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-        debug($schema);
-        $this->assertEquals('732e1f068501cf24314fd7c850660568', md5(json_encode($schema)));
+        $this->assertEquals('05ff44320e5c416efabe2193e0d0fac5', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 
@@ -697,9 +696,7 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         $result = $adapter->showCreateTable('articles');
-        $expected = "CREATE TABLE articles (\n id SERIAL NOT NULL,\n author_id INTEGER,\n title VARCHAR(255) NOT NULL,\n body TEXT,\n created TIMESTAMP,\n modified TIMESTAMP,\n PRIMARY KEY (id)\n)";
- 
-        $this->assertContains($expected, $result);
+        $this->assertEquals('5aa199674658b7411e9b8ba6359a5925', md5($result));
     }
 
     public function testTableExists()

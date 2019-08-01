@@ -134,7 +134,7 @@ class MysqlSchema extends BaseSchema
             if (isset($row['Extra']) and $row['Extra'] === 'auto_increment') {
                 $defintion['autoIncrement'] = true;
             }
-            $out[] = $defintion;
+            $out[$row['Field']] = $defintion;
         }
 
         return $out;

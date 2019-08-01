@@ -36,8 +36,8 @@ class DbSchemaDumpCommandTest extends OriginTestCase
             $this->assertContains('CREATE TABLE `posts` (', $contents);
             $this->assertContains('`title` varchar(255) NOT NULL,', $contents);
         } else { //pgsql
-            $this->assertContains('CREATE TABLE posts (', $contents);
-            $this->assertContains('title VARCHAR(255) NOT NULL', $contents);
+            $this->assertContains('CREATE TABLE "posts" (', $contents);
+            $this->assertContains('"title" VARCHAR(255) NOT NULL,', $contents);
         }
     }
 
