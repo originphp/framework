@@ -84,3 +84,14 @@ foreach (['server','database','email','storage'] as $config) {
 }
 
 require CONFIG . DS . 'routes.php';
+
+/**
+ * Internal caching settings
+ */
+use Origin\Cache\Cache;
+
+Cache::config('origin_model', [
+    'engine' => 'File',
+    'prefix' => 'origin_model_',
+    'duration' => '+5 minutes', // min 2 minutes
+]);

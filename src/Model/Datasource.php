@@ -17,10 +17,14 @@ namespace Origin\Model;
 use PDO;
 use PDOException;
 use Origin\Log\Log;
+use Origin\Cache\Cache;
 use Origin\Core\Configure;
 use Origin\Model\Exception\ConnectionException;
 use Origin\Model\Exception\DatasourceException;
 
+/**
+ * This is the connection class.
+ */
 abstract class Datasource
 {
     /**
@@ -187,7 +191,7 @@ abstract class Datasource
                     'time' => microtime(true) - $start,
                 ];
             }
-
+            
             // Fallback if disabled PDO::ERRMODE_EXCEPTION flag
             if (! $result) {
                 return false;
@@ -575,7 +579,28 @@ abstract class Datasource
      */
     public function schema(string $table) : array
     {
-        return $this->adapter()->schema($table);
+        $cache = Cache::store('origin_model');
+        $key = $this->config['name'] . '_' . $table;
+        $schema = $cache->read($key);
+        if ($schema) {
+            return $schema;
+        }
+        $schema = $this->adapter()->schema($table);
+        $cache->write($key, $schema);
+
+        return $schema;
+    }
+
+    /**
+     * This will is the new schema
+     *
+     * @param string $table
+     * @return array
+     */
+    public function describe(string $table) : array
+    {
+        return $this->adapter()->describe($table);
+        ;
     }
 
     /**

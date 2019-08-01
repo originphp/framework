@@ -21,3 +21,14 @@ if (! file_exists(TMP . DS . 'cache')) {
 }
 
 require ORIGIN . DS . 'src' . DS . 'bootstrap.php';
+
+/**
+ * Disable Cache
+ */
+use Origin\Cache\Cache;
+
+Cache::config('origin_model', [
+    'engine' => 'Null',
+    'prefix' => 'origin_model_',
+    'duration' => 0,
+]);
