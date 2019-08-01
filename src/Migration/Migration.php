@@ -236,28 +236,29 @@ class Migration
     }
 
     /**
-     * Creates a new table, the id column is created regardless.
-     *
-     * @example
-     *
-     * $this->createTable('products',[
-     *  'name' => 'string',
-     *  'amount' => ['type'=>'decimal,'limit'=>10,'precision'=>10],'
-     * ]);
-     *
-     * @param string $name table name
-     * @param array $schema This is an array to build the table, the key for each row should be the field name
-     * and then pass either a string with type of field or an array with more specific options (type,limit,null,precision,default)
-     * @param $options The option keys are as follows
-     *   - id: default true wether to create primaryKey Column
-     *   - primaryKey: default is 'id' the column name of the primary key
-     *   - options: extra options to be appended to the definition
-     * @return void
-     */
+    * Creates a new table, the id column is created regardless.
+    *
+    * @example
+    *
+    * $this->createTable('products',[
+    *  'name' => 'string',
+    *  'amount' => ['type'=>'decimal,'limit'=>10,'precision'=>10],'
+    * ]);
+    *
+    *
+    * @param string $name table name
+    * @param array $schema This is an array to build the table, the key for each row should be the field name
+    * and then pass either a string with type of field or an array with more specific options (type,limit,null,precision,default)
+    * @param $options The option keys are as follows
+    *   - id: default true wether to create primaryKey Column.
+    *   - primaryKey: default is 'id' the column name of the primary key. Set to false not to use primaryKey
+    *   - options: extra options to be appended to the definition
+    * @return void
+    */
     public function createTable(string $name, array $schema = [], array $options = [])
     {
         $options += ['id' => true,'primaryKey' => 'id'];
-        if ($options['id']) {
+        if ($options['id'] and $options['primaryKey']) {
             $schema = array_merge([$options['primaryKey'] => 'primaryKey'], $schema);
         }
         
@@ -265,7 +266,7 @@ class Migration
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
   
-        $this->statements[] = $this->adapter()->createTable($name, $schema, $options);
+        $this->statements[] = $this->adapter()->createTable($name, $schema, $options); //
        
         if ($this->calledBy() === 'change') {
             $this->reverseStatements[] = $this->adapter()->dropTable($name);
@@ -292,15 +293,7 @@ class Migration
             Inflector::singularize($tables[1]).'_id' => 'integer',
         ];
 
-        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
-        $this->pendingTables[] = $tableName ;
-        $this->pendingColumns[$tableName] = array_keys($schema);
-
-        $this->statements[] = $this->adapter()->createTable($tableName, $schema, $options);
-
-        if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->dropTable($tableName);
-        }
+        return $this->createTable($tableName, $schema, $options);
     }
 
     /**
@@ -631,7 +624,7 @@ class Migration
                     $table,
                     $options['column'],
                     $options['name'],
-                    ['unique' => $index['unique']]
+                    ['unique' => ($index['type'] === 'unique')]
                     );
             }
         }
@@ -807,12 +800,12 @@ class Migration
         $foreignKeys = $this->foreignKeys($fromTable);
           
         foreach ($foreignKeys as $foreignKey) {
-            if ($options['column'] and $foreignKey['column_name'] === $options['column']) {
-                $options['name'] = $foreignKey['constraint_name'];
+            if ($options['column'] and $foreignKey['column'] === $options['column']) {
+                $options['name'] = $foreignKey['name'];
                 break;
             }
-            if ($options['name'] and $foreignKey['constraint_name'] === $options['name']) {
-                $options['column'] = $foreignKey['column_name'];
+            if ($options['name'] and $foreignKey['name'] === $options['name']) {
+                $options['column'] = $foreignKey['column'];
                 break;
             }
             $foreignKey = null;
@@ -821,7 +814,7 @@ class Migration
 
         if ($foreignKey) {
             if ($this->calledBy() === 'change') {
-                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $foreignKey['referenced_table_name'], $options);
+                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $foreignKey['referencedTable'], $options);
             }
         }
     }
