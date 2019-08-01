@@ -22,10 +22,18 @@
 
 namespace Origin\Model\Schema;
 
+use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
 class MysqlSchema extends BaseSchema
 {
+    /**
+     * The quote character for table names and columns
+     *
+     * @var string
+     */
+    protected $quote = '`';
+
     /**
      * This is the map for database agnostic, if its not found here then
      * use what user supplies. @important. This will allow using char and medium text when testing
@@ -34,10 +42,10 @@ class MysqlSchema extends BaseSchema
      */
     protected $columns = [
         'primaryKey' => ['name' => 'INT NOT NULL AUTO_INCREMENT'],
-        'string' => ['name' => 'varchar', 'limit' => 255],
-        'text' => ['name' => 'text'],
-        'integer' => ['name' => 'int', 'limit' => 11],
-        'bigint' => ['name' => 'bigint', 'limit' => 20], // chgabged
+        'string' => ['name' => 'VARCHAR', 'limit' => 255],
+        'text' => ['name' => 'TEXT'],
+        'integer' => ['name' => 'INT', 'limit' => 11],
+        'bigint' => ['name' => 'BIGINT', 'limit' => 20], // chgabged
         'float' => ['name' => 'FLOAT', 'precision' => 10, 'scale' => 0], // mysql defaults
         'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
         'datetime' => ['name' => 'DATETIME'],
@@ -47,6 +55,260 @@ class MysqlSchema extends BaseSchema
         'binary' => ['name' => 'BLOB'],
         'boolean' => ['name' => 'TINYINT', 'limit' => 1],
     ];
+
+    const TINYTEXT = 255;
+    const LONGTEXT = 16777215;
+    const MEDIUMTEXT = 4294967295;
+    /**
+     * MySQL column limits for texts
+     *
+     * @var array
+     */
+    protected $columnLimits = ['tinytext' => self::TINYTEXT,'longtext' => self::LONGTEXT,'mediumtext' => self::MEDIUMTEXT];
+    /**
+     * This describes the table in the database using the new format. This will require caching due to the amount
+     * of queries that will need to be executed.
+     *
+     * @internal this is the new function, will evenutally replace schema
+     *
+     * @param string $table
+     * @return array
+     */
+    public function describe(string $table) : array
+    {
+        $results = $this->fetchAll('SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($table));
+
+        $columns = $this->convertTableDescription($results);
+
+        $indexes = $constraints = [];
+     
+        /**
+         * Convert constraints
+         */
+        foreach ($this->indexes($table) as $index) {
+            if ($index['name'] === 'PRIMARY') {
+                $constraints[] = ['type' => 'primary','columns' => $index['column']];
+                continue;
+            }
+            if ($index['type'] === 'unique') {
+                $constraints[] = ['type' => 'unique','columns' => $index['column']];
+                continue;
+            }
+            $indexes[] = ['type' => 'index','columns' => $index['column']];
+        }
+
+        foreach ($this->foreignKeys($table) as $foreignKey) {
+            $constraints[] = [
+                'type' => 'foreign',
+                'columns' => $foreignKey['column'],
+                'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
+            ];
+        }
+
+        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes];
+    }
+
+    /**
+     * Converts the results from the describeTableSQL to abstract
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function convertTableDescription(array $data) : array
+    {
+        $out = [];
+        
+        foreach ($data as $row) {
+            $defintion = $this->parseColumn($row['Type']);
+            $defintion += [
+                'null' => $row['Null'] === 'YES'?true:false,
+                'default' => $row['Default'],
+            ];
+            if (! empty($row['Collation'])) {
+                $defintion['collate'] = $row['Collation'];
+            }
+            if (! empty($row['Comment'])) {
+                $defintion['comment'] = $row['Comment'];
+            }
+
+            if (isset($row['Extra']) and $row['Extra'] === 'auto_increment') {
+                $defintion['autoIncrement'] = true;
+            }
+            $out[] = $defintion;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Parses column data
+     *
+     * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
+     * @see https://dev.mysql.com/doc/refman/5.5/en/data-types.html
+     *
+     * @param string $column
+     * @return array
+     */
+    protected function parseColumn(string $column) : array
+    {
+        preg_match('/([a-z]+)(?:\(([0-9,]+)\))*/i', $column, $matches); //'int(10) unsigned'
+        if (empty($matches)) {
+            throw new Exception(sprintf('Error parsing %s', $column));
+        }
+        $unsigned = stripos($column, 'unsigned') !== false;
+        $limit = $precision = $scale = null;
+
+        $col = strtolower($matches[1]);
+        if (isset($matches[2])) {
+            $limit = (int) $matches[2]; // convert to int
+        }
+
+        if ($col === 'varchar') {
+            return ['type' => 'string','limit' => $limit];
+        }
+
+        if ($col === 'int') {
+            return ['type' => 'integer','limit' => $limit,'unsigned' => $unsigned];
+        }
+        /**
+         * Handle floats and decimals. map doubles to decimal
+         */
+        if (in_array($col, ['float','decimal','double'])) {
+            if (strpos($matches[2], ',') !== false) {
+                list($precision, $scale) = explode(',', $matches[2]);
+                $precision = (int) $precision; // important
+                $scale = (int) $scale;
+            }
+
+            return ['type' => $col === 'float'?'float':'decimal','precision' => $precision, 'scale' => $scale,'unsigned' => $unsigned];
+        }
+
+        if (in_array($col, ['date','datetime','time','timestamp'])) {
+            return ['type' => $col];
+        }
+
+        if ($col === 'text') {
+            return ['type' => 'text'];
+        }
+
+        if ($col === 'tinyint' and $limit === 1) {
+            return ['type' => 'boolean'];
+        }
+
+        if ($col === 'bigint') {
+            return ['type' => 'bigint','limit' => $limit,'unsigned' => $unsigned];
+        }
+
+        if ($col === 'char') {
+            return ['type' => 'string','limit' => $limit,'fixed' => true];
+        }
+
+        if ($col === 'blob') {
+            return ['type' => 'binary'];
+        }
+       
+        if (in_array($col, ['tinytext','longtext','mediumtext'])) {
+            return ['type' => 'text', 'limit' => $this->columnLimits[$col]];
+        }
+       
+        return ['type' => 'string','limit' => $limit];
+    }
+
+    /**
+     * This is the new build column
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function columnSql(array $data) : string
+    {
+        $out = $this->quoteIdentifier($data['name']);
+
+        $typeMap = [
+            'string' => 'VARCHAR',
+            'text' => 'TEXT',
+            'integer' => 'INT',
+            'bigint' => 'BIGINT',
+            'float' => 'FLOAT',
+            'decimal' => 'DECIMAL',
+            'datetime' => 'DATETIME',
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'timestamp' => 'TIMESTAMP',
+            'binary' => 'BLOB',
+            'boolean' => 'TINYINT',
+        ];
+
+        /**
+         * Work with mapped or custom types
+         */
+        $type = $data['type'];
+        $isMapped = $typeMap[$data['type']];
+        if ($isMapped) {
+            $type = $typeMap[$data['type']];
+        }
+        
+        /**
+         * Handle specials and default values
+         */
+        if ($data['type'] === 'string') {
+            if (! isset($data['limit'])) {
+                $data['limit'] = 255;
+            }
+            if (! empty($data['fixed'])) {
+                $type = 'CHAR';
+            }
+        } elseif ($data['type'] === 'text') {
+            if (! empty($data['limit']) and in_array($data['limit'], $this->columnLimits)) {
+                $key = array_search($data['limit'], $this->columnLimits);
+                $type = strtoupper($key);
+            }
+        } elseif ($data['type'] === 'boolean') {
+            $type = 'TINYINT(1)';
+        }
+
+        $out .= ' ' . $type;
+
+        // deal with types that have limits or custom types with limit set
+        if (! empty($data['limit']) and (in_array($data['type'], ['integer','string','bigint']) or ! $isMapped)) {
+            $out .= '(' . $data['limit'] . ')';
+        } elseif (! empty($data['precision']) and (in_array($data['type'], ['decimal','float']) or ! $isMapped)) {
+            $out .= '(' . $data['precision'] .',' . ($data['scale'] ?? 0) . ')'; // 0 is MySQL default
+        }
+
+        // deal with unsigned
+        if (in_array($data['type'], ['integer','bigint','decimal','float']) and ! empty($data['unsigned'])) {
+            $out .= ' UNSIGNED';
+        }
+
+        if (in_array($data['type'], ['string','text']) and ! empty($data['collate'])) {
+            $out .= ' COLLATE ' . $data['collate'];
+        }
+        
+        if (isset($data['null']) and $data['null'] === false) {
+            $out .= ' NOT NULL';
+        }
+
+        if ($data['type'] === 'timestamp') {
+            if (isset($data['null']) and $data['null'] === true) {
+                $out .= ' NULL';
+            } elseif (isset($data['default']) and strtolower($data['default']) === 'current_timestamp') {
+                $out .= ' DEFAULT CURRENT_TIMESTAMP';
+            }
+        }
+
+        if (in_array($data['type'], ['integer','bigint']) and ! empty($data['autoIncrement'])) {
+            $out .= ' AUTO_INCREMENT';
+        } elseif (isset($data['default'])) {
+            $out .= ' DEFAULT ' . $this->columnValue($data['default']);
+        }
+        
+        if (! empty($data['comment'])) {
+            $out .= ' COMMENT ' . $this->columnValue($data['comment']);
+        }
+        
+        return $out;
+    }
 
     /**
      * Returns the schema for the table
@@ -150,7 +412,7 @@ class MysqlSchema extends BaseSchema
             $indexes[] = [
                 'name' => $result['key_name'],
                 'column' => $result['column_name'],
-                'unique' => ($result['non_unique'] == 0) ? true : false,
+                'type' => ($result['non_unique'] == 0) ?'unique' : 'index',
             ];
 
             /**
@@ -272,12 +534,18 @@ class MysqlSchema extends BaseSchema
 
         $sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '{$config['database']}' AND TABLE_NAME = '{$table}';";
 
-        $results = $this->fetchAll($sql);
-        foreach ($results as &$result) {
-            $result = array_change_key_case($result, CASE_LOWER);
+        $out = [];
+        foreach ($this->fetchAll($sql) as $result) {
+            $out[] = [
+                'name' => $result['CONSTRAINT_NAME'],
+                'table' => $result['TABLE_NAME'],
+                'column' => $result['COLUMN_NAME'],
+                'referencedTable' => $result['REFERENCED_TABLE_NAME'],
+                'referencedColumn' => $result['REFERENCED_COLUMN_NAME'],
+            ];
         }
 
-        return $results;
+        return $out;
     }
     /**
      * Returns a remove foreignKey constraint SQL statement
@@ -301,6 +569,135 @@ class MysqlSchema extends BaseSchema
         $result = $this->fetchRow("SHOW CREATE TABLE {$table}");
 
         return $result['Create Table'];
+    }
+
+    /**
+        * This is the new create Table function
+        *
+        * @param string $table
+        * @param array $schema
+        * @param array $options
+        * @return array
+        */
+    public function createTableSql(string $table, array $schema, array $options = []) : array
+    {
+        $columns = $constraints = $indexes = $databaseOptions = [];
+        
+        # All Databases
+        foreach ($schema as $name => $definition) {
+            if (is_string($definition)) {
+                $definition = ['type' => $definition];
+            }
+            $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
+        }
+        
+        if (isset($options['constraints'])) {
+            foreach ($options['constraints'] as $name => $definition) {
+                $constraints[] = '  ' .  $this->tableConstraint(['name' => $name] + $definition);
+            }
+        }
+        
+        if (isset($options['indexes'])) {
+            foreach ($options['indexes'] as $name => $definition) {
+                $indexes[] = '  ' .  $this->tableIndex(['name' => $name] + $definition);
+            }
+        }
+
+        # MySQL Options
+        if (isset($options['options'])) {
+            $databaseOptions = $options['options'];
+        }
+
+        return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);
+    }
+
+    /**
+     * Builds the create Table SQL
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $constraints
+     * @param array $indexes
+     * @param array $options
+     * @return array
+     */
+    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
+    {
+        $out = sprintf("CREATE TABLE %s (\n%s\n)", $this->quoteIdentifier($table), implode(",\n", array_merge($columns, $constraints, $indexes)));
+
+        /**
+         * Options string support. This is used in Migrations
+         */
+        if (isset($options['options']) and is_string($options['options'])) {
+            return $out . ' ' . $options['options'];
+        }
+
+        if (isset($options['engine'])) {
+            $out .= ' ENGINE=' . $options['engine'];
+        }
+
+        /**
+         * @see https://dev.mysql.com/doc/refman/8.0/en/charset-table.html
+         */
+        if (isset($options['charset'])) {
+            $out .= ' DEFAULT CHARACTER SET=' . $options['charset'];
+        }
+        
+        if (isset($options['collate'])) {
+            $out .= ' COLLATE=' . $options['collate'];
+        }
+      
+        return [$out];
+    }
+
+    /**
+        * Creates the contraint code
+        *
+        * @param string $table
+        * @param array $attributes
+        * @return string
+        */
+    protected function tableConstraint(array $attributes) : string
+    {
+        $columns = implode(',', (array) $attributes['columns']);
+        if ($attributes['type'] === 'primary') {
+            return sprintf('PRIMARY KEY (%s)', $columns);
+        }
+        // unique constraint and index very similar, here using key terminology
+        if ($attributes['type'] === 'unique') {
+            return sprintf('UNIQUE KEY (%s)', $columns);
+        }
+       
+        if ($attributes['type'] === 'foreign') {
+            return $this->tableConstraintForeign($attributes);
+        }
+        throw new Exception(sprintf('Unknown constriant %s', $attributes['type']));
+    }
+
+    /**
+    * creates the table index
+    *
+    * @param array $attributes
+    * @return string
+    */
+    protected function tableIndex(array $attributes) : string
+    {
+        $string = null;
+
+        if ($attributes['type'] === 'index') {
+            $string = 'INDEX %s (%s)';
+        } elseif ($attributes['type'] === 'unique') {
+            $string = 'UNIQUE INDEX %s (%s)';
+        } elseif ($attributes['type'] === 'fulltext') {
+            $string = 'FULLTEXT INDEX %s (%s)';
+        }
+        if ($string) {
+            $columns = implode(',', (array) $attributes['columns']);
+
+            return sprintf($string, $this->quoteIdentifier($attributes['name']), $columns);
+        }
+   
+        throw new Exception(sprintf('Unknown index type %s', $attributes['type']));
     }
 
     /**

@@ -22,6 +22,231 @@ class PgsqlSchemaTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
 
+    public function testCreateTableColumns()
+    {
+        // todo unsigned
+        $adapter = new PgsqlSchema('test');
+        $schema = [
+            'f0' => ['type' => 'integer','autoIncrement' => true,'comment' => 'This will be primary key'],
+            'f1' => ['type' => 'string','limit' => 80,'null' => false],
+            'f2' => ['type' => 'string', 'fixed' => true,'default' => 'default string'],
+            'f3' => ['type' => 'text','default' => 'some default text'],
+            'f4' => ['type' => 'integer','default' => 100],
+            'f5' => ['type' => 'float'], # on pgsql float is bytes
+            'f6' => ['type' => 'decimal','precision' => 10,'scale' => 3],
+            'f7' => 'datetime',
+            'f8' => 'time',
+            'f9' => 'timestamp',
+            'f10' => 'date',
+            'f11' => 'binary',
+            'f12' => 'boolean',
+            'f13' => ['type' => 'string','default' => 'default value'],
+            'f14' => ['type' => 'integer','limit' => 123,'default' => 12345789], // test integer limit is not set
+        ];
+        /**
+         * These options are needed for the describe test, since we will use the same table.
+         */
+        $options = [
+            'constraints' => [
+                'p' => ['type' => 'primary','columns' => ['f0']],
+                'u1' => ['type' => 'unique','columns' => ['f1']],
+            ],
+            'indexes' => [
+                'u2' => ['type' => 'index','columns' => ['f2']], // we need this for the next test
+            ],
+        ];
+        $statements = $adapter->createTableSql('tposts', $schema, $options);
+  
+        $this->assertEquals('3577f4c11dcfabd922df030142b51652', md5($statements[0]));
+       
+        if ($adapter->connection()->engine() === 'pgsql') {
+            $this->assertTrue($adapter->connection()->execute($statements[0]));
+            $this->assertTrue($adapter->connection()->execute($statements[1]));
+        }
+    }
+
+    // not getting correct constraint
+    public function testDescribeTable()
+    {
+        $adapter = new PgsqlSchema('test');
+        if ($adapter->connection()->engine() !== 'pgsql') {
+            $this->markTestSkipped('This test is for PgSQL');
+        }
+        /**
+         * Any slight changes should be investigated fully
+         */
+        $schema = $adapter->describe('tposts');
+        debug($schema);
+        $this->assertEquals('732e1f068501cf24314fd7c850660568', md5(json_encode($schema)));
+        $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+    }
+
+    /**
+         * This tests the new create table generator
+         *
+         * @return void
+         */
+    public function testCreateTableSqlBasic()
+    {
+        $adapter = new PgsqlSchema('test');
+        $schema = [
+            'id' => 'integer',
+            'title' => ['type' => 'string'],
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'unique' => ['type' => 'unique', 'columns' => ['title']],
+            ],
+        ];
+        $result = $adapter->createTableSql('tposts', $schema, $options);
+
+        $this->assertEquals('167993ae522a2477725b6b1dc5012ef4', md5($result[0]));
+       
+        if ($adapter->connection()->engine() === 'pgsql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+        }
+
+        // Test composite primary keys
+        $schema = [
+            'article_id' => 'integer',
+            'tag_id' => 'integer',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary', 'columns' => ['article_id','tag_id']],
+                'unique' => ['type' => 'unique', 'columns' => ['article_id','tag_id']],
+            ],
+        ];
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+
+        $this->assertEquals('64f0a25743fc228a2edd885f993fb11f', md5($result[0]));
+        if ($adapter->connection()->engine() === 'pgsql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
+        }
+    }
+
+    public function testCreateTableSqlIndex()
+    {
+        $adapter = new PgsqlSchema('test');
+        $schema = [
+            'id' => 'integer',
+            'title' => ['type' => 'string'],
+            'code' => 'string',
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+            ],
+            'indexes' => [
+                'title_u' => ['type' => 'unique','columns' => ['code']],
+                'title_idx' => ['type' => 'index','columns' => ['title']],
+                'title_ft' => ['type' => 'fulltext','columns' => ['title']], // does not exist on pgsql, but test we normal index
+            ],
+        ];
+        $result = $adapter->createTableSql('tposts', $schema, $options);
+  
+        $this->assertEquals('5476fc1e6d59623281e0f98c2e480d9c', md5($result[0]));
+        $this->assertContains('CREATE UNIQUE INDEX "title_u" ON "tposts" (code)', $result[1]);
+        $this->assertContains('CREATE INDEX "title_idx" ON "tposts" (title)', $result[2]);
+        $this->assertContains('CREATE INDEX "title_ft" ON "tposts" (title)', $result[3]);
+
+        if ($adapter->connection()->engine() === 'pgsql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+        }
+    }
+
+    public function testCreateTableSqlForeignKey()
+    {
+        $adapter = new PgsqlSchema('test');
+
+        $schema = [
+            'id' => 'integer',
+            'user_id' => 'integer',
+            'name' => ['type' => 'string'],
+        ];
+
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'unique' => ['type' => 'unique','columns' => ['name']],
+                'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['users','id']],
+            ],
+        ];
+        
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+
+        $this->assertEquals('cc7038b69b395b9600632023beb70cbe', md5($result[0]));
+
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'fk_users_id' => [
+                    'type' => 'foreign',
+                    'columns' => ['user_id'],
+                    'references' => ['users','id'],
+                    'update' => 'cascade',
+                    'delete' => 'cascade', ],
+                
+            ],
+        ];
+
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+  
+        $this->assertEquals('a1b5fb3f9205184b0181dfddb8c6cffc', md5($result[0]));
+
+        // sanity check
+        if ($adapter->connection()->engine() === 'pgsql') {
+            $schema = [
+                'id' => 'integer',
+                'name' => ['type' => 'string'],
+            ];
+    
+            $options = [
+                'constraints' => [
+                    'primary' => ['type' => 'primary','columns' => ['id']],
+                ],
+            ];
+
+            $statements = $adapter->createTableSql('tusers', $schema, $options);
+
+            $schema = [
+                'id' => 'integer',
+                'user_id' => 'integer',
+                'name' => ['type' => 'string'],
+            ];
+    
+            $options = [
+                'constraints' => [
+                    'primary' => ['type' => 'primary','columns' => ['id']],
+                    'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['tusers','id']],
+                ],
+            ];
+
+            $statements = array_merge($statements, $adapter->createTableSql('tarticles', $schema, $options));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tusers'));
+        }
+    }
+
     public function testAddColumn()
     {
         $adapter = new PgsqlSchema('test');
@@ -280,7 +505,7 @@ class PgsqlSchemaTest extends OriginTestCase
         // Configure the stub.
 
         $foreignKeys = [
-            ['constraint_name' => 'fk_origin_e74ce85cbc','column_name' => 'author_name'],
+            ['name' => 'fk_origin_e74ce85cbc','column' => 'author_name'],
         ];
 
         $stub->method('foreignKeys')
@@ -308,13 +533,13 @@ class PgsqlSchemaTest extends OriginTestCase
             'column' => 'author_id',
         ]);
         $this->assertTrue($adapter->connection()->execute($sql));
-       
+ 
         $expected = [
-            'table_name' => 'articles',
-            'column_name' => 'author_id',
-            'constraint_name' => 'fk_origin_12345',
-            'referenced_table_name' => 'users',
-            'referenced_column_name' => 'id',
+            'name' => 'fk_origin_12345',
+            'table' => 'articles',
+            'column' => 'author_id',
+            'referencedTable' => 'users',
+            'referencedColumn' => 'id',
         ];
         $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }
@@ -330,16 +555,21 @@ class PgsqlSchemaTest extends OriginTestCase
         $expected = [
             'name' => 'articles_pkey', // different on pgsql
             'column' => 'id',
-            'unique' => true,
+            'type' => 'unique',
         ];
         $this->assertEquals($expected, $indexes[0]);
 
+        // Tests multi column index  + normal index type
         $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
         $this->assertTrue($adapter->connection()->execute($sql));
         $indexes = $adapter->indexes('articles');
         
-        $this->assertEquals('test_multicolumn_index', $indexes[1]['name']);
-        $this->assertEquals(['id','author_id'], $indexes[1]['column']);
+        $expected = [
+            'name' => 'test_multicolumn_index',
+            'column' => ['id','author_id'],
+            'type' => 'index',
+        ];
+        $this->assertEquals($expected, $indexes[1]);
     }
 
     public function testRemoveColumn()

@@ -25,6 +25,7 @@ use Origin\Model\ConnectionManager;
 
 abstract class BaseSchema
 {
+    
     /**
      * Holds the datasource name
      *
@@ -40,6 +41,13 @@ abstract class BaseSchema
     protected $columns = [];
 
     /**
+     * The quote character for table names and columns
+     *
+     * @var string
+     */
+    protected $quote = '"';
+
+    /**
      * Constructor
      *
      * @param string $datasource
@@ -48,6 +56,8 @@ abstract class BaseSchema
     {
         $this->datasource = $datasource;
     }
+
+    abstract protected function columnSql(array $data);
 
     /**
      * Build a native sql column string
@@ -73,9 +83,16 @@ abstract class BaseSchema
 
         $real = [];
         $type = $column['type'];
+
+        /**
+         * Temp solution until refactored
+         */
+        if (! empty($column['autoIncrement'])) {
+            $type = 'primaryKey'; // this will be redonne to
+        }
         if (isset($this->columns[$type])) {
             $real = $this->columns[$type];
-            $type = strtoupper($this->columns[$type]['name']);
+            $type = strtoupper($this->columns[$type]['name']); // tmp
 
             /**
                  * Convert Limits for MySQL
@@ -212,6 +229,72 @@ abstract class BaseSchema
     }
 
     /**
+     * This describes the table in the database using the new format. This will require caching due to the amount
+     * of queries that will need to be executed.
+     *
+     * @internal this is the new function, will evenutally replace schema
+     *
+     * @param string $table
+     * @return array
+     */
+    abstract public function describe(string $table);
+
+    abstract public function createTableSql(string $table, array $schema, array $options = []);
+   
+    /**
+     * Builds the create Table statements
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $constraints
+     * @param array $indexes
+     * @param array $options
+     * @return array
+     */
+    abstract protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array;
+
+    /**
+    * creates the table index
+    *
+    * @param array $attributes
+    * @return string
+    */
+    abstract protected function tableIndex(array $attributes);
+    
+    /**
+    * Creates the contraint code
+    *
+    * @param string $table
+    * @param array $attributes
+    * @return string
+    */
+    abstract protected function tableConstraint(array $attributes);
+
+    /**
+    * This creates a foreignKey table parameter
+    *
+    * @param array attributes name,columns,references, update,delete
+    * @return string
+    */
+    protected function tableConstraintForeign(array $attributes) :string
+    {
+        $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
+
+        $sql = sprintf(
+            'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
+            $attributes['name'],
+            implode(', ', $attributes['columns']),
+            $this->quoteIdentifier($attributes['references'][0]),
+            $attributes['references'][1]
+        );
+        
+        if (! empty($attributes['update']) or ! empty($attributes['delete'])) {
+            $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $map[$attributes['update']], $map[$attributes['update']]);
+        }
+
+        return $sql;
+    }
+    /**
      * returns SQL statement for adding a column to an existing table
      *
     * @param string $table table name
@@ -329,10 +412,10 @@ abstract class BaseSchema
         $foreignKeys = $this->foreignKeys($table);
       
         foreach ($foreignKeys as $fk) {
-            if ($options['column'] and $fk['column_name'] == $options['column']) {
+            if ($options['column'] and $fk['column'] == $options['column']) {
                 return true;
             }
-            if ($options['name'] and $fk['constraint_name'] == $options['name']) {
+            if ($options['name'] and $fk['name'] == $options['name']) {
                 return true;
             }
         }
@@ -533,5 +616,16 @@ abstract class BaseSchema
     public function connection() : Datasource
     {
         return ConnectionManager::get($this->datasource);
+    }
+
+    /**
+    * Undocumented function
+    *
+    * @param string $value
+    * @return string
+    */
+    public function quoteIdentifier(string $value) : string
+    {
+        return $this->quote . $value . $this->quote;
     }
 }

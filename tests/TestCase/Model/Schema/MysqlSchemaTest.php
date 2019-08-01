@@ -22,6 +22,229 @@ class MysqlSchemaTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
 
+    public function testCreateTableColumns()
+    {
+        // todo unsigned
+        $adapter = new MysqlSchema('test');
+        $schema = [
+            'f0' => ['type' => 'integer','autoIncrement' => true,'comment' => 'This will be primary key'],
+            'f1' => ['type' => 'string','limit' => 80,'null' => false],
+            'f2' => ['type' => 'string', 'fixed' => true],
+            'f3' => 'text',
+            'f4' => ['type' => 'integer','default' => 100],
+            'f5' => ['type' => 'float','precision' => 8,'scale' => 2],
+            'f6' => ['type' => 'decimal','precision' => 10,'scale' => 3],
+            'f7' => 'datetime',
+            'f8' => 'time',
+            'f9' => 'timestamp',
+            'f10' => 'date',
+            'f11' => 'binary',
+            'f12' => 'boolean',
+            'f13' => ['type' => 'integer','limit' => 12,'unsigned' => true],
+            'f14' => ['type' => 'string','default' => 'abc'],
+            'f15' => ['type' => 'text','limit' => MysqlSchema::MEDIUMTEXT],
+        ];
+        /**
+         * Constraints and indexes are needed for next
+         */
+        $options = [
+            'constraints' => [
+                'p' => ['type' => 'primary','columns' => ['f0']],
+                'u1' => ['type' => 'unique','columns' => ['f1']],
+            ],
+            'indexes' => [
+                'u2' => ['type' => 'index','columns' => ['f2']],
+            ],
+            'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
+        ];
+        $statements = $adapter->createTableSql('tposts', $schema, $options);
+       
+        $this->assertEquals('e7c836ca334db02c28130fcbac7bf156', md5($statements[0]));
+
+        if ($adapter->connection()->engine() === 'mysql') {
+            $this->assertTrue($adapter->connection()->execute($statements[0]));
+        }
+    }
+
+    public function testDescribeTable()
+    {
+        $adapter = new MysqlSchema('test');
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This test is for MySQL');
+        }
+        /**
+         * Any slight changes should be investigated fully
+         */
+        $schema = $adapter->describe('tposts');
+
+        $this->assertEquals('ce8c66e08c7392d74e507c302fe783ae', md5(json_encode($schema)));
+
+        $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+    }
+
+    /**
+     * This tests the new create table generator
+     *
+     * @return void
+     */
+    public function testCreateTableSqlBasic()
+    {
+        $adapter = new MysqlSchema('test');
+        $schema = [
+            'id' => 'integer',
+            'title' => ['type' => 'string'],
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'unique' => ['type' => 'unique', 'columns' => ['title']],
+            ],
+            'options' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
+        ];
+        $result = $adapter->createTableSql('tposts', $schema, $options);
+
+        $this->assertEquals('e072e7ae67738ce47c8a9d6dde92d422', md5($result[0]));
+
+        if ($adapter->connection()->engine() === 'mysql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+        }
+
+        // Test composite primary keys
+        $schema = [
+            'article_id' => 'integer',
+            'tag_id' => 'integer',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary', 'columns' => ['article_id','tag_id']],
+                'unique' => ['type' => 'unique', 'columns' => ['article_id','tag_id']],
+            ],
+        ];
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+        $this->assertEquals('22ef8b660ac2636593ee4e6585ce2393', md5($result[0]));
+        if ($adapter->connection()->engine() === 'mysql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
+        }
+    }
+
+    public function testCreateTableSqlIndex()
+    {
+        $adapter = new MysqlSchema('test');
+        $schema = [
+            'id' => 'integer',
+            'title' => ['type' => 'string'],
+            'code' => 'string',
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ];
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+            ],
+            'indexes' => [
+                'title_u' => ['type' => 'unique','columns' => ['code']], // test unique
+                'title_idx' => ['type' => 'index','columns' => ['title']],
+                'title_ft' => ['type' => 'fulltext','columns' => ['title']],
+            ],
+        ];
+        $result = $adapter->createTableSql('tposts', $schema, $options);
+
+        $this->assertEquals('2396c496250cc53cf4029753cfb7ebe7', md5($result[0]));
+
+        if ($adapter->connection()->engine() === 'mysql') {
+            foreach ($result as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
+        }
+    }
+
+    public function testCreateTableSqlForeignKey()
+    {
+        $adapter = new MysqlSchema('test');
+
+        $schema = [
+            'id' => 'integer',
+            'user_id' => 'integer',
+            'name' => ['type' => 'string'],
+        ];
+
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'unique' => ['type' => 'unique','columns' => ['name']],
+                'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['users','id']],
+            ],
+        ];
+        
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+  
+        $this->assertEquals('cb8b587150b16c31076c1172f565d77a', md5($result[0]));
+
+        $options = [
+            'constraints' => [
+                'primary' => ['type' => 'primary','columns' => ['id']],
+                'fk_users_id' => [
+                    'type' => 'foreign',
+                    'columns' => ['user_id'],
+                    'references' => ['users','id'],
+                    'update' => 'cascade',
+                    'delete' => 'cascade', ],
+                
+            ],
+        ];
+
+        $result = $adapter->createTableSql('tarticles', $schema, $options);
+    
+        $this->assertEquals('a84d1e8c900dd3403453cde0b60b6aa1', md5($result[0]));
+
+        // sanity check
+        if ($adapter->connection()->engine() === 'mysql') {
+            $schema = [
+                'id' => 'integer',
+                'name' => ['type' => 'string'],
+            ];
+    
+            $options = [
+                'constraints' => [
+                    'primary' => ['type' => 'primary','columns' => ['id']],
+                ],
+            ];
+
+            $statements = $adapter->createTableSql('tusers', $schema, $options);
+
+            $schema = [
+                'id' => 'integer',
+                'user_id' => 'integer',
+                'name' => ['type' => 'string'],
+            ];
+    
+            $options = [
+                'constraints' => [
+                    'primary' => ['type' => 'primary','columns' => ['id']],
+                    'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['tusers','id']],
+                ],
+            ];
+
+            $statements = array_merge($statements, $adapter->createTableSql('tarticles', $schema, $options));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
+            $this->assertTrue($adapter->connection()->execute('DROP TABLE tusers'));
+        }
+    }
+
     public function testAddColumn()
     {
         $adapter = new MysqlSchema('test');
@@ -257,7 +480,7 @@ class MysqlSchemaTest extends OriginTestCase
         // Configure the stub.
 
         $foreignKeys = [
-            ['constraint_name' => 'fk_origin_e74ce85cbc','column_name' => 'author_name'],
+            ['name' => 'fk_origin_e74ce85cbc','column' => 'author_name'],
         ];
 
         $stub->method('foreignKeys')
@@ -287,11 +510,11 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertTrue($adapter->connection()->execute($sql));
        
         $expected = [
-            'table_name' => 'articles',
-            'column_name' => 'author_id',
-            'constraint_name' => 'fk_origin_12345',
-            'referenced_table_name' => 'users',
-            'referenced_column_name' => 'id',
+            'name' => 'fk_origin_12345',
+            'table' => 'articles',
+            'column' => 'author_id',
+            'referencedTable' => 'users',
+            'referencedColumn' => 'id',
         ];
         $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }
@@ -304,18 +527,21 @@ class MysqlSchemaTest extends OriginTestCase
         }
         $indexes = $adapter->indexes('articles');
         $expected = [
-            'name' => 'PRIMARY',
+            'name' => 'PRIMARY', // different on pgsql
             'column' => 'id',
-            'unique' => true,
+            'type' => 'unique',
         ];
         $this->assertEquals($expected, $indexes[0]);
 
         $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
         $this->assertTrue($adapter->connection()->execute($sql));
         $indexes = $adapter->indexes('articles');
-
-        $this->assertEquals('test_multicolumn_index', $indexes[1]['name']);
-        $this->assertEquals(['id','author_id'], $indexes[1]['column']);
+        $expected = [
+            'name' => 'test_multicolumn_index',
+            'column' => ['id','author_id'],
+            'type' => 'index',
+        ];
+        $this->assertEquals($expected, $indexes[1]);
     }
 
     /**

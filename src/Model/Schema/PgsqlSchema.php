@@ -22,6 +22,7 @@
 
 namespace Origin\Model\Schema;
 
+use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
 class PgsqlSchema extends BaseSchema
@@ -113,6 +114,132 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
+        * This is the new create Table function
+        *
+        * @param string $table
+        * @param array $schema
+        * @param array $options
+        * @return array
+        */
+    public function createTableSql(string $table, array $schema, array $options = []) : array
+    {
+        $columns = $constraints = $indexes = $databaseOptions = [];
+        
+        # All Databases
+        foreach ($schema as $name => $definition) {
+            if (is_string($definition)) {
+                $definition = ['type' => $definition];
+            }
+            $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
+        }
+        
+        if (isset($options['constraints'])) {
+            foreach ($options['constraints'] as $name => $definition) {
+                $constraints[] = '  ' .  $this->tableConstraint(['name' => $name] + $definition);
+            }
+        }
+        
+        # On PostgreSQL indexes are added after creating the name
+        if (isset($options['indexes'])) {
+            foreach ($options['indexes'] as $name => $definition) {
+                $indexes[] = $this->tableIndex(['name' => $name,'table' => $table] + $definition);
+            }
+        }
+
+        # PostgreSQL column comments
+        $comments = [];
+        foreach ($schema as $column => $data) {
+            if (! empty($data['comment'])) {
+                $comments[$column] = $data['comment'];
+            }
+        }
+        $databaseOptions['comments'] = $comments;
+
+        return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);
+    }
+
+    /**
+        * This is the new create Table function
+        * @internal on pgsql indexes have to be created outside of the table definition
+        *
+        * @param string $table
+        * @param array $params array of columns with reserved keys indexes, constraints
+        * @param array $options (database specific options e.g mysql engine)
+        * @return array
+        */
+    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
+    {
+        $out = $comments = [];
+        $definition = implode(",\n", array_merge($columns, $constraints));
+        $out[] = sprintf("CREATE TABLE \"%s\" (\n%s\n)\n", $table, $definition);
+        foreach ($indexes as $index) {
+            $out[] = $index;
+        }
+        $tableName = $this->quoteIdentifier($table); // dont run in loop
+        
+        foreach ($options['comments'] as $column => $comment) {
+            $out[] = sprintf(
+                'COMMENT ON COLUMN %s.%s IS %s',
+                $tableName,
+                $this->quoteIdentifier($column),
+                $this->columnValue($comment)
+            );
+        }
+
+        return $out;
+    }
+
+    /**
+    * Creates the contraint code
+    *
+    * @param string $table
+    * @param array $attributes
+    * @return string
+    */
+    protected function tableConstraint(array $attributes) : string
+    {
+        $columns = implode(',', (array) $attributes['columns']);
+        if ($attributes['type'] === 'primary') {
+            return sprintf('PRIMARY KEY (%s)', $columns);
+        }
+        if ($attributes['type'] === 'unique') {
+            return sprintf('CONSTRAINT %s UNIQUE (%s)', $this->quoteIdentifier($attributes['name']), $columns);
+        }
+       
+        if ($attributes['type'] === 'foreign') {
+            return $this->tableConstraintForeign($attributes);
+        }
+        throw new Exception(sprintf('Unknown constriant %s', $attributes['type']));
+    }
+
+    /**
+    * creates the indexes when creating tables. In Postgresql this is the same
+    * as add index as this is added after the create table. Eventually the
+    * addIndex needs to be re factored to quote identifiers, but not before this task has been
+    * completed.
+    *
+    * @param array $attributes
+    * @return string
+    */
+    protected function tableIndex(array $attributes) : string
+    {
+        if (empty($attributes['table'])) {
+            throw new Exception(sprintf('No table name provided for index %s', $attributes['name']));
+        }
+        $string = 'CREATE INDEX %s ON %s (%s)';
+        if ($attributes['type'] === 'unique') {
+            $string = 'CREATE UNIQUE INDEX %s ON %s (%s)';
+        }
+
+        return sprintf(
+            $string,
+            $this->quoteIdentifier($attributes['name']),
+            $this->quoteIdentifier($attributes['table']),
+            implode(', ', (array) $attributes['columns'])
+     );
+    }
+
+    /**
      * Try to map types
      *
      * @param string $type
@@ -151,10 +278,10 @@ class PgsqlSchema extends BaseSchema
      */
     public function indexes(string $table) : array
     {
-        $sql = "SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = 'r' AND t.relname = '{$table}' ORDER BY t.relname, i.relname";
+        $sql = "SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique, ix.indisprimary AS primary FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = 'r' AND t.relname = '{$table}' ORDER BY t.relname, i.relname";
         $results = $this->fetchAll($sql);
         $indexes = [];
-
+        
         foreach ($results as $result) {
             /**
              * handle multiple columns
@@ -167,7 +294,12 @@ class PgsqlSchema extends BaseSchema
                     continue;
                 }
             }
-            $indexes[] = $result;
+            
+            $indexes[] = [
+                'name' => $result['name'],
+                'column' => $result['column'],
+                'type' => $result['unique'] ? 'unique': 'index',
+            ];
         }
 
         return $indexes;
@@ -274,10 +406,20 @@ class PgsqlSchema extends BaseSchema
         $config = ConnectionManager::config($this->datasource);
 
         $sql = 'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = \'' . $this->connection()->database() . '\' AND  tc.table_name = \'' . $table . '\' AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'';
+       
+        $out = [];
 
-        $results = $this->fetchAll($sql);
+        foreach ($this->fetchAll($sql) as $result) {
+            $out[] = [
+                'name' => $result['constraint_name'],
+                'table' => $result['table_name'],
+                'column' => $result['column_name'],
+                'referencedTable' => $result['referenced_table_name'],
+                'referencedColumn' => $result['referenced_column_name'],
+            ];
+        }
 
-        return $results;
+        return $out;
     }
     /**
     * Returns a remove foreign key SQL stataement
@@ -346,5 +488,250 @@ class PgsqlSchema extends BaseSchema
         }
 
         return "DROP TABLE {$table} CASCADE";
+    }
+
+    /**
+    * This describes the table in the database using the new format. This will require caching due to the amount
+    * of queries that will need to be executed.
+    *
+    * @internal this is the new function, will evenutally replace schema
+    *
+    * @param string $table
+    * @return array
+    */
+    public function describe(string $table) : array
+    {
+        $database = $this->connection()->database();
+
+        $sql = "SELECT DISTINCT
+        column_name AS name,
+        data_type AS type,
+        is_nullable AS null,
+        column_default AS default,
+        character_maximum_length AS limit,
+        numeric_precision as precision,
+        numeric_scale as scale,
+        pg_get_serial_sequence(attr.attrelid::regclass::text, attr.attname) IS NOT NULL AS autoincrement,
+        c.collation_name as collation,
+        d.description as comment,
+        ordinal_position as position 
+     FROM information_schema.columns c 
+        INNER JOIN pg_catalog.pg_namespace ns ON (ns.nspname = table_schema) 
+        INNER JOIN pg_catalog.pg_class cl ON (cl.relnamespace = ns.oid AND cl.relname = table_name) 
+        LEFT JOIN pg_catalog.pg_index i  ON (i.indrelid = cl.oid  AND i.indkey[0] = c.ordinal_position) 
+        LEFT JOIN pg_catalog.pg_description d on (cl.oid = d.objoid AND d.objsubid = c.ordinal_position) 
+        LEFT JOIN pg_catalog.pg_attribute attr ON (cl.oid = attr.attrelid AND column_name = attr.attname) 
+     WHERE table_name = '{$table}' AND table_schema = 'public' AND table_catalog = '{$database}' 
+     ORDER BY position";
+
+        $results = $this->fetchAll($sql);
+     
+        $schema = $this->convertTableDescription($results);
+
+        $indexes = $constraints = [];
+     
+        /**
+         * Convert primary key to constraint
+         */
+        foreach ($this->indexes($table) as $index) {
+            if (substr($index['name'], -5) === '_pkey') {
+                $constraints[] = ['type' => 'primary','columns' => $index['column']];
+                continue;
+            }
+            // unique constraint is same as unique index
+            if ($index['type'] === 'unique') {
+                $constraints[] = ['type' => 'unique','columns' => $index['column']];
+                continue;
+            }
+            $indexes[] = ['type' => 'index','columns' => $index['column']];
+        }
+
+        foreach ($this->foreignKeys($table) as $foreignKey) {
+            $constraints[] = [
+                'type' => 'foreign',
+                'columns' => $foreignKey['column'],
+                'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
+            ];
+        }
+    
+        $schema['constraints'] = $constraints;
+        $schema['indexes'] = $indexes;
+
+        return $schema;
+    }
+
+    /**
+     * This is the new build column
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function columnSql(array $data) : string
+    {
+        $out = $this->quoteIdentifier($data['name']);
+
+        $typeMap = [
+            'string' => 'VARCHAR',
+            'text' => 'TEXT',
+            'integer' => 'INTEGER',
+            'bigint' => 'BIGINT',
+            'float' => 'FLOAT',
+            'decimal' => 'DECIMAL',
+            'datetime' => 'TIMESTAMP',
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'timestamp' => 'TIMESTAMP',
+            'binary' => 'BYTEA',
+            'boolean' => 'BOOLEAN',
+        ];
+
+        /**
+         * Work with mapped or custom types
+         */
+        $type = $data['type'];
+        $isMapped = $typeMap[$data['type']];
+        if ($isMapped) {
+            $type = $typeMap[$data['type']];
+        }
+        
+        /**
+         * Handle specials and default values
+         */
+        if ($data['type'] === 'string') {
+            if (! isset($data['limit'])) {
+                $data['limit'] = 255;
+            }
+            if (! empty($data['fixed'])) {
+                $type = 'CHAR';
+            }
+        }
+
+        if (in_array($data['type'], ['integer','bigint']) and ! empty($data['autoIncrement'])) {
+            $type = $data['type'] === 'integer'?'SERIAL':'BIGSERIAL';
+            unset($data['default'],$data['null']);
+        }
+
+        $out .= ' ' . $type;
+
+        // deal with types that have limits or custom types with limit set
+        if (! empty($data['limit']) and in_array($data['type'], ['string','text']) or ! $isMapped) {
+            $out .= '(' . $data['limit'] . ')';
+        } elseif (! empty($data['precision'])) {
+            if ($data['type'] === 'float') {
+                $out .= '(' . $data['precision'] . ')';
+            } elseif ($data['type'] === 'decimal' or ! $isMapped) {
+                $out .= '(' . $data['precision'] .',' . ($data['scale'] ?? 0) . ')';
+            }
+        }
+
+        if (in_array($data['type'], ['string','text']) and ! empty($data['collate'])) {
+            $out .= ' COLLATE "' . $data['collate'] .'"';
+        }
+
+        if (isset($data['null']) and $data['null'] === false) {
+            $out .= ' NOT NULL';
+        }
+
+        if (isset($data['default']) and $data['type'] === 'timestamp' and strtolower($data['default']) === 'current_timestamp') {
+            $out .= ' DEFAULT CURRENT_TIMESTAMP';
+        } elseif (isset($data['default'])) {
+            $out .= ' DEFAULT ' . $this->columnValue($data['default']);
+        }
+        
+        return $out;
+    }
+
+    /**
+     * Converts the results from the describeTableSQL to abstract
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function convertTableDescription(array $data) : array
+    {
+        $out = [];
+              
+        foreach ($data as $i => $row) {
+            $defintion = $this->parseColumn($row);
+            $defintion += [
+                'null' => $row['null'] === 'YES'?true:false,
+                'default' => $row['default'],
+            ];
+
+            // e.g. default value 'home'::character varying
+            if ($row['default']) { // text,varchar and character fields
+                if (preg_match("/'(.*?)'::(text|character varying|bpchar)/", $row['default'], $matches)) {
+                    $defintion['default'] = $matches[1];
+                } elseif (substr($row['default'], 0, 8) === 'nextval(') {
+                    $defintion['default'] = null;
+                }
+            }
+
+            if (! empty($row['collation'])) {
+                $defintion['collate'] = $row['collation'];
+            }
+           
+            if (! empty($row['comment'])) {
+                $defintion['comment'] = $row['comment'];
+            }
+
+            // case is correct
+            if (! empty($row['autoincrement'])) {
+                $defintion['autoIncrement'] = true;
+            }
+          
+            $out[] = $defintion;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Parses the column data, the data
+     *
+     * @param array $row
+     * @return void
+     */
+    protected function parseColumn(array $row)
+    {
+        $out = [];
+        $col = $row['type'];
+        if (strpos($col, ' ') !== false) {
+            list($col, $columnData) = explode(' ', $col, 2);
+        }
+
+        if ($row['type'] === 'character varying') {
+            return ['type' => 'string','limit' => $row['limit']];
+        }
+
+        if ($col === 'character') {
+            return ['type' => 'string','limit' => $row['limit'],'fixed' => true];
+        }
+
+        if ($col === 'integer') {
+            return ['type' => 'integer','limit' => $row['precision']];
+        }
+
+        if ($col === 'real') {
+            return ['type' => 'float']; // float is bytes
+        }
+
+        if ($col === 'numeric') {
+            return ['type' => 'decimal','precision' => $row['precision'],'scale' => $row['scale']];
+        }
+
+        if (in_array($col, ['boolean','date','text','time',])) {
+            return ['type' => $col];
+        }
+
+        if ($col === 'timestamp') {
+            return ['type' => 'datetime'];
+        }
+
+        if ($col === 'bytea') {
+            return ['type' => 'binary'];
+        }
+
+        return ['type' => 'string'];
     }
 }
