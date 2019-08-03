@@ -1,6 +1,7 @@
 <?php
 namespace Origin\Test\Command;
 
+use App\Db\DumpSchema;
 use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
@@ -52,18 +53,22 @@ class DbSchemaDumpCommandTest extends OriginTestCase
     {
         $filename = APP . DS . 'db' . DS . 'dump.php';
         $this->deleteFile($filename);
-
+     
         $this->exec('db:schema:dump --datasource=test --type=php dump');
+    
         $this->assertExitSuccess();
         $this->assertOutputContains('Dumping schema to ' . ROOT . '/tests/TestApp/db/dump.php');
         $this->assertTrue(file_exists($filename));
         $this->assertOutputContains('* posts');
-        include_once $filename;
-        
-        // Random spot checks. Don't test schema again @see Origin\Test\Model\DatasourceTest
-        $this->assertArrayHasKey('posts', $schema);
-        $this->assertEquals('primaryKey', $schema['posts']['id']['type']); //
-        $this->assertEquals(6, count($schema['posts']));
+
+        // Check is valid object and some spot che
+        include $filename;
+        $schema = new DumpSchema();
+        $this->assertInstanceOf(DumpSchema::class, $schema);
+        $this->assertNotEmpty($schema->posts);
+        $this->assertEquals('integer', $schema->posts['id']['type']);
+        $this->assertNotEmpty($schema->posts['constraints']);
+        $this->assertNotEmpty($schema->posts['constraints']['primary']);
     }
 
     public function testDumpPHPException()
