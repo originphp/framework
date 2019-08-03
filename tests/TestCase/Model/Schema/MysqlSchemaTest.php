@@ -331,11 +331,8 @@ class MysqlSchemaTest extends OriginTestCase
     {
         $adapter = new MysqlSchema('test');
         $expected = 'ALTER TABLE `articles` ADD CONSTRAINT `fk_origin_12345` FOREIGN KEY (author_id) REFERENCES `users` (id)';
-        $result = $adapter->addForeignKey('articles', 'users', [
-            'primaryKey' => 'id',
-            'name' => 'fk_origin_12345',
-            'column' => 'author_id',
-        ]);
+ 
+        $result = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
         $this->assertEquals($expected, $result);
 
         if ($adapter->connection()->engine() === 'mysql') {
@@ -508,12 +505,8 @@ class MysqlSchemaTest extends OriginTestCase
         if ($adapter->connection()->engine() !== 'mysql') {
             $this->markTestSkipped('This test is for mysql');
         }
-
-        $sql = $adapter->addForeignKey('articles', 'users', [
-            'primaryKey' => 'id',
-            'name' => 'fk_origin_12345',
-            'column' => 'author_id',
-        ]);
+        $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+ 
         $this->assertTrue($adapter->connection()->execute($sql));
        
         $expected = [
@@ -607,11 +600,7 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertEquals($expected, $result);
 
         if ($adapter->connection()->engine() === 'mysql') {
-            $sql = $adapter->addForeignKey('articles', 'users', [
-                'primaryKey' => 'id',
-                'name' => 'fk_origin_12345',
-                'column' => 'author_id',
-            ]);
+            $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
             $this->assertTrue($adapter->connection()->execute($sql));
             $this->assertTrue($adapter->connection()->execute($result));
         }

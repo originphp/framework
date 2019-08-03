@@ -316,11 +316,7 @@ class PgsqlSchemaTest extends OriginTestCase
     {
         $adapter = new PgsqlSchema('test');
         $expected = 'ALTER TABLE "articles" ADD CONSTRAINT "fk_origin_12345" FOREIGN KEY (author_id) REFERENCES "users" (id)';
-        $result = $adapter->addForeignKey('articles', 'users', [
-            'primaryKey' => 'id',
-            'name' => 'fk_origin_12345',
-            'column' => 'author_id',
-        ]);
+        $result = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
         $this->assertEquals($expected, $result);
         if ($adapter->connection()->engine() === 'pgsql') {
             $this->assertTrue($adapter->connection()->execute($result));
@@ -538,11 +534,7 @@ class PgsqlSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for pgsql');
         }
 
-        $sql = $adapter->addForeignKey('articles', 'users', [
-            'primaryKey' => 'id',
-            'name' => 'fk_origin_12345',
-            'column' => 'author_id',
-        ]);
+        $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
         $this->assertTrue($adapter->connection()->execute($sql));
  
         $expected = [
@@ -619,11 +611,7 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertEquals($expected, $result);
 
         if ($adapter->connection()->engine() === 'pgsql') {
-            $sql = $adapter->addForeignKey('articles', 'users', [
-                'primaryKey' => 'id',
-                'name' => 'fk_origin_12345',
-                'column' => 'author_id',
-            ]);
+            $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
             $this->assertTrue($adapter->connection()->execute($sql));
             $this->assertTrue($adapter->connection()->execute($result));
         }

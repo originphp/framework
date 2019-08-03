@@ -228,25 +228,22 @@ abstract class BaseSchema
      * Returns SQL for adding a foreignKey
      *
      * @param string $fromTable
+     * @param string $name
+     * @param string $column
      * @param string $toTable
-     * @param array $options
-     *  - name: name of the fk constrain
-     *  - column: the column it references
-     *  - primaryKey: the name of the primary key
+     * @param string $primaryKey
      * @return string
      */
-    public function addForeignKey(string $fromTable, string $toTable, array $options = []) : string
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey) : string
     {
         return sprintf(
             'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
             $this->quoteIdentifier($fromTable),
-            $this->quoteIdentifier($options['name']),
-            $options['column'],
+            $this->quoteIdentifier($name),
+            $column,
             $this->quoteIdentifier($toTable),
-            $options['primaryKey']
+            $primaryKey
     );
-        /*
-        return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";*/
     }
 
     /**

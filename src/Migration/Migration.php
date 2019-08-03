@@ -759,8 +759,8 @@ class Migration
         if ($options['name'] === null) {
             $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
         }
-         
-        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $toTable, $options);
+        //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
+        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey']);
         if ($this->calledBy() === 'change') {
             $this->reverseStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
         }
@@ -811,10 +811,10 @@ class Migration
             $foreignKey = null;
         }
         $this->statements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
-
+        //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
         if ($foreignKey) {
             if ($this->calledBy() === 'change') {
-                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $foreignKey['referencedTable'], $options);
+                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $foreignKey['referencedTable'], $options['primaryKey']);
             }
         }
     }
