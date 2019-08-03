@@ -14,14 +14,28 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
 
 class DbSchemaDumpCommand extends Command
 {
     use DbSchemaTrait;
+    
     protected $name = 'db:schema:dump';
-
     protected $description = 'Dumps the schema to a sql file';
+
+    protected $template =
+    '<?php
+namespace App\Db;
+use Origin\Model\Schema;
+
+class %name%Schema extends Schema
+{
+    const VERSION = %version%;
+
+%define%
+}
+';
 
     public function initialize()
     {
@@ -36,16 +50,12 @@ class DbSchemaDumpCommand extends Command
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
-            'default' => 'schema',
         ]);
     }
  
     public function execute()
     {
-        $name = $this->arguments('name');
-        if ($name === null) {
-            $name = 'schema';
-        }
+        $name = $this->arguments('name') ?? 'schema';
 
         $datasource = $this->options('datasource');
         if (! ConnectionManager::config($datasource)) {
@@ -68,35 +78,91 @@ class DbSchemaDumpCommand extends Command
 
     protected function dumpPhp(string $datasource, string $name)
     {
-        $connection = ConnectionManager::get($datasource);
-        $dump = [];
-        $filename = $this->schemaFilename($name, 'php');
-        
-        /**
-         * @internal if issues arrise with PostgreSQL then switch here to pg_dump
-         */
-        $schema = [];
-        foreach ($connection->tables() as $table) {
-            $schema[$table] = $connection->adapter()->schema($table);
-            $this->io->list($table);
+        $className = 'Application';
+        list($plugin, $name) = pluginSplit($name);
+        if ($name !== 'schema') {
+            $className = Inflector::camelize($name);
         }
-        $data = '<?php' . "\n" . '$schema = ' . $this->varExport($schema) . ';';
+        $filename = $this->schemaFilename($name, 'php');
 
-        if (! $this->io->createFile($filename, $data)) {
+        $connection = ConnectionManager::get($datasource);
+        $out = [];
+        $tables = $connection->tables();
+        foreach ($tables as $table) {
+            $data = $connection->adapter()->describe($table);
+            $this->io->list($table);
+            
+            $columns = [];
+            foreach ($data['columns'] as $name => $definition) {
+                $column = $this->values($definition);
+                $columns[] = "\t\t'{$name}' => " . '[' . implode(', ', $column) . ']';
+            }
+
+            $columns[] = $this->datasetToString('constraints', $data['constraints']);
+            $columns[] = $this->datasetToString('indexes', $data['indexes']);
+
+            if (isset($data['tableOptions'])) {
+                $options = $this->values($data['tableOptions']);
+                $columns[] = "\t\t'tableOptions' => " . '[' . implode(', ', $options) . ']';
+            }
+
+            $out[] = "\tpublic \${$table} = [\n" . implode(",\n", $columns) .  "\n\t];\n" ;
+        }
+        $template = str_replace('%version%', date('Ymdhis'), $this->template);
+        $template = str_replace('%define%', implode("\n", $out), $template);
+        $template = str_replace('%name%', $className, $template);
+    
+        if (! $this->io->createFile($filename, $template)) {
             $this->throwError('Error saving schema file');
         }
     }
 
+    protected function datasetToString(string $key, array $data)
+    {
+        $out = '[]';
+        if ($data) {
+            $out = [];
+            foreach ($data as $name => $definition) {
+                $column = $this->values($definition);
+                $out[] = "\t\t'{$name}' => " . '[' . implode(', ', $column) . ']';
+            }
+            $out = "[\n\t" . implode(",\n\t", $out) . "\n\t\t]";
+        }
+
+        return "\t\t'{$key}' => " . $out;
+    }
+
+    protected function values(array $data) : array
+    {
+        $out = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $out[] = "'{$key}' => [" . implode(', ', $this->values($value)) . ']';
+            } else {
+                $value = var_export($value, true);
+                if (is_string($key)) {
+                    $out[] = "'{$key}' => {$value}";
+                } else {
+                    $out[] = $value;
+                }
+            }
+        }
+
+        return $out;
+    }
+
     protected function varExport(array $data)
     {
-        $schema = var_export($data, true);
-        $schema = str_replace(
-            ['array (', '),', " => \n", '=>   ['],
-            ['[', '],', ' => ', '=> ['],
-            $schema
+        $data = var_export($data, true);
+        $data = str_replace(
+            ['array (', "),\n", " => \n"],
+            ['[', "],\n", ' => '],
+            $data
         );
+        $data = preg_replace('/=>\s\s+\[/i', '=> [', $data);
+        $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
 
-        return substr($schema, 0, -1).']';
+        return substr($data, 0, -1).']';
     }
 
     protected function dump(string $datasource, string $name)
@@ -106,10 +172,13 @@ class DbSchemaDumpCommand extends Command
         $filename = $this->schemaFilename($name, 'sql');
      
         /**
-         * @internal if issues arrise with PostgreSQL then switch here to pg_dump
+         * I would like to use pg_dump, however I started getting version matching errors so
+         * therefore I am not sure this is going to be good
+         * @example shell_exec("pg_dump -h {$config['host']} -s {$config['database']} -U {$config['username']}");
          */
+        //
         foreach ($connection->tables() as $table) {
-            $dump[] = $connection->adapter()->showCreateTable($table) .';';
+            $dump[] = $connection->adapter()->showCreateTable($table);
             $this->io->list($table);
         }
 
