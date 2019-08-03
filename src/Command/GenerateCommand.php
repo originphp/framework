@@ -233,14 +233,16 @@ class GenerateCommand extends Command
 
     protected function varExport(array $data)
     {
-        $schema = var_export($data, true);
-        $schema = str_replace(
-            ['array (', '),', " => \n", '=>   ['],
-            ['[', '],', ' => ', '=> ['],
-            $schema
+        $data = var_export($data, true);
+        $data = str_replace(
+            ['array (', "),\n", " => \n"],
+            ['[', "],\n", ' => '],
+            $data
         );
+        $data = preg_replace('/=>\s\s+\[/i', '=> [', $data);
+        $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
 
-        return substr($schema, 0, -1).']';
+        return substr($data, 0, -1).']';
     }
 
     protected function model(array $data)
