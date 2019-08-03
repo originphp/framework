@@ -229,8 +229,7 @@ abstract class BaseSchema
     }
 
     /**
-     * This describes the table in the database using the new format. This will require caching due to the amount
-     * of queries that will need to be executed.
+     * This describes the table in the database using the new format.
      *
      * @internal this is the new function, will evenutally replace schema
      *
@@ -239,6 +238,16 @@ abstract class BaseSchema
      */
     abstract public function describe(string $table);
 
+    /**
+     * Generates the create table SQL, this is return as an array since some engines require
+     * multiple statements. e.g. postgresql adds indexes and comments after the table has been
+     * created.
+     *
+     * @param string $table
+     * @param array $schema
+     * @param array $options
+     * @return array
+     */
     abstract public function createTableSql(string $table, array $schema, array $options = []);
    
     /**
@@ -283,7 +292,7 @@ abstract class BaseSchema
         $sql = sprintf(
             'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
             $attributes['name'],
-            implode(', ', $attributes['columns']),
+            implode(', ', (array) $attributes['column']),
             $this->quoteIdentifier($attributes['references'][0]),
             $attributes['references'][1]
         );

@@ -47,7 +47,7 @@ class TableSchemaTest extends OriginTestCase
         $this->assertInstanceOf(TableSchema::class, $result);
      
         $this->assertNotEmpty($schema->indexes());
-        $this->assertEquals(['table' => 'posts','type' => 'index','columns' => ['name'],'name' => 'index_1'], $schema->indexes('index_1'));
+        $this->assertEquals(['table' => 'posts','type' => 'index','column' => ['name'],'name' => 'index_1'], $schema->indexes('index_1'));
 
         $this->expectException(Exception::class);
         $schema->addIndex('abc', ['type' => 'index']);
@@ -61,11 +61,11 @@ class TableSchemaTest extends OriginTestCase
             'created' => 'datetime',
         ];
         $schema = new TableSchema('posts', $columns);
-        $result = $schema->addConstraint('primary', ['type' => 'primary','columns' => ['id']]);
+        $result = $schema->addConstraint('primary', ['type' => 'primary','column' => ['id']]);
         $this->assertInstanceOf(TableSchema::class, $result);
 
         $this->assertNotEmpty($schema->constraints());
-        $expected = ['name' => 'primary','type' => 'primary','columns' => ['id']];
+        $expected = ['name' => 'primary','type' => 'primary','column' => ['id']];
         $this->assertEquals($expected, $schema->constraints('primary'));
 
         $this->assertEquals(['id'], $schema->primaryKey());
@@ -80,7 +80,7 @@ class TableSchemaTest extends OriginTestCase
         ];
         $schema = new TableSchema('posts', $columns);
         $this->expectException(Exception::class);
-        $schema->addConstraint('name', ['type' => 'fozzy-wuzzy','columns' => ['id']]);
+        $schema->addConstraint('name', ['type' => 'fozzy-wuzzy','column' => ['id']]);
     }
 
     public function testAddConstraintMissingColumnsException()
@@ -104,14 +104,14 @@ class TableSchemaTest extends OriginTestCase
             'created' => 'datetime',
         ];
         $schema = new TableSchema('posts', $columns);
-        $schema->addConstraint('fk_users_id', ['type' => 'foreign','columns' => ['owner_id'],'references' => ['users','id']]);
+        $schema->addConstraint('fk_users_id', ['type' => 'foreign','column' => ['owner_id'],'references' => ['users','id']]);
         
         $this->assertNotEmpty($schema->constraints());
-        $expected = ['type' => 'foreign','columns' => ['owner_id'],'references' => ['users','id'],'table' => 'posts','name' => 'fk_users_id'];
+        $expected = ['type' => 'foreign','column' => ['owner_id'],'references' => ['users','id'],'table' => 'posts','name' => 'fk_users_id'];
         $this->assertEquals($expected, $schema->constraints('fk_users_id'));
 
         $schema = new TableSchema('posts', $columns);
-        $schema->addConstraint('fk_users_id', ['type' => 'foreign','columns' => ['owner_id'],'references' => ['users','id'],'update' => 'cascade','delete' => 'setNull']);
+        $schema->addConstraint('fk_users_id', ['type' => 'foreign','column' => ['owner_id'],'references' => ['users','id'],'update' => 'cascade','delete' => 'setNull']);
         $constraint = $schema->constraints('fk_users_id');
         $this->assertEquals('cascade', $constraint['update']);
         $this->assertEquals('setNull', $constraint['delete']);
@@ -126,7 +126,7 @@ class TableSchemaTest extends OriginTestCase
         ];
         $schema = new TableSchema('posts', $columns);
         $this->expectException(Exception::class);
-        $schema->addConstraint('name', ['type' => 'foreign','columns' => ['id']]);
+        $schema->addConstraint('name', ['type' => 'foreign','column' => ['id']]);
     }
 
     public function testAddConstraintInvalidUpdateReferenceExpection()
@@ -138,7 +138,7 @@ class TableSchemaTest extends OriginTestCase
         ];
         $schema = new TableSchema('posts', $columns);
         $this->expectException(Exception::class);
-        $schema->addConstraint('name', ['type' => 'foreign','columns' => ['id'],'references' => ['users','id'],'update' => 'foo']);
+        $schema->addConstraint('name', ['type' => 'foreign','column' => ['id'],'references' => ['users','id'],'update' => 'foo']);
     }
 
     public function testAddConstraintInvalidReferencesException()
@@ -150,7 +150,7 @@ class TableSchemaTest extends OriginTestCase
         ];
         $schema = new TableSchema('posts', $columns);
         $this->expectException(Exception::class);
-        $schema->addConstraint('fk_users_id', ['type' => 'foreign','columns' => ['owner_id'],'references' => ['id']]);
+        $schema->addConstraint('fk_users_id', ['type' => 'foreign','column' => ['owner_id'],'references' => ['id']]);
     }
 
     public function testAddConstraintInvalidDeleteReference()
@@ -162,7 +162,7 @@ class TableSchemaTest extends OriginTestCase
         ];
         $schema = new TableSchema('posts', $columns);
         $this->expectException(Exception::class);
-        $schema->addConstraint('name', ['type' => 'foreign','columns' => ['id'],'references' => ['users','id'],'delete' => 'foo']);
+        $schema->addConstraint('name', ['type' => 'foreign','column' => ['id'],'references' => ['users','id'],'delete' => 'foo']);
     }
 
     public function testOptions()

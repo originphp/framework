@@ -171,7 +171,7 @@ class PgsqlSchema extends BaseSchema
     {
         $out = $comments = [];
         $definition = implode(",\n", array_merge($columns, $constraints));
-        $out[] = sprintf("CREATE TABLE \"%s\" (\n%s\n)\n", $table, $definition);
+        $out[] = sprintf("CREATE TABLE \"%s\" (\n%s\n)", $table, $definition);
         foreach ($indexes as $index) {
             $out[] = $index;
         }
@@ -198,7 +198,7 @@ class PgsqlSchema extends BaseSchema
     */
     protected function tableConstraint(array $attributes) : string
     {
-        $columns = implode(',', (array) $attributes['columns']);
+        $columns = implode(',', (array) $attributes['column']);
         if ($attributes['type'] === 'primary') {
             return sprintf('PRIMARY KEY (%s)', $columns);
         }
@@ -235,7 +235,7 @@ class PgsqlSchema extends BaseSchema
             $string,
             $this->quoteIdentifier($attributes['name']),
             $this->quoteIdentifier($attributes['table']),
-            implode(', ', (array) $attributes['columns'])
+            implode(', ', (array) $attributes['column'])
      );
     }
 
@@ -443,10 +443,10 @@ class PgsqlSchema extends BaseSchema
     {
         $schema = $this->connection()->describe($table);
 
-        return implode("\n", $this->createTableSql($table, $schema['columns'], [
+        return implode(";\n", $this->createTableSql($table, $schema['columns'], [
             'constraints' => $schema['constraints'],
             'indexes' => $schema['indexes'],
-        ]));
+        ])) .';';
     }
 
     /**
@@ -470,7 +470,7 @@ class PgsqlSchema extends BaseSchema
         /**
          * For booleans as integers, you need to pass '0' not just 0.
          */
-        if (is_int($value)) {
+        if (is_numeric($value)) {
             return $value;
         }
 
@@ -538,21 +538,23 @@ class PgsqlSchema extends BaseSchema
          */
         foreach ($this->indexes($table) as $index) {
             if (substr($index['name'], -5) === '_pkey') {
-                $constraints[] = ['type' => 'primary','columns' => $index['column']];
+                $constraints['primary'] = ['type' => 'primary','column' => $index['column']];
                 continue;
             }
+            $name = $index['name'];
             // unique constraint is same as unique index
             if ($index['type'] === 'unique') {
-                $constraints[] = ['type' => 'unique','columns' => $index['column']];
+                $constraints[$name] = ['type' => 'unique','column' => $index['column']];
                 continue;
             }
-            $indexes[] = ['type' => 'index','columns' => $index['column']];
+            $indexes[$name] = ['type' => 'index','column' => $index['column']];
         }
 
         foreach ($this->foreignKeys($table) as $foreignKey) {
-            $constraints[] = [
+            $name = $foreignKey['name'];
+            $constraints[$name] = [
                 'type' => 'foreign',
-                'columns' => $foreignKey['column'],
+                'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
         }
@@ -609,6 +611,7 @@ class PgsqlSchema extends BaseSchema
         if (in_array($data['type'], ['integer','bigint']) and ! empty($data['autoIncrement'])) {
             $type = $data['type'] === 'integer'?'SERIAL':'BIGSERIAL';
             unset($data['default'],$data['null']);
+            // serial is the equivelent of `id INTEGER NOT NULL DEFAULT nextval('table_name_id_seq')`
         }
 
         $out .= ' ' . $type;
@@ -662,7 +665,7 @@ class PgsqlSchema extends BaseSchema
             if ($row['default']) { // text,varchar and character fields
                 if (preg_match("/'(.*?)'::(text|character varying|bpchar)/", $row['default'], $matches)) {
                     $defintion['default'] = $matches[1];
-                } elseif (substr($row['default'], 0, 8) === 'nextval(') {
+                } elseif (substr($row['default'], 0, 8) === 'nextval(' or substr($row['default'], 0, 6) === 'NULL::') {
                     $defintion['default'] = null;
                 }
             }
@@ -708,12 +711,12 @@ class PgsqlSchema extends BaseSchema
             return ['type' => 'string','limit' => $row['limit'],'fixed' => true];
         }
 
-        if ($col === 'integer') {
-            return ['type' => 'integer','limit' => $row['precision']];
+        if ($col === 'integer' or $col == 'bigint') {
+            return ['type' => $col,'limit' => $row['precision']];
         }
 
         if ($col === 'real') {
-            return ['type' => 'float']; // float is bytes
+            return ['type' => 'float']; // float is bytes not char length
         }
 
         if ($col === 'numeric') {

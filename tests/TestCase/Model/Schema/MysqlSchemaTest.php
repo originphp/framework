@@ -40,27 +40,30 @@ class MysqlSchemaTest extends OriginTestCase
             'f10' => 'date',
             'f11' => 'binary',
             'f12' => 'boolean',
-            'f13' => ['type' => 'integer','limit' => 12,'unsigned' => true],
-            'f14' => ['type' => 'string','default' => 'abc'],
-            'f15' => ['type' => 'text','limit' => MysqlSchema::MEDIUMTEXT],
-            'f16' => ['type' => 'timestamp','default' => 'CURRENT_TIMESTAMP','null' => false], // different default behaviors on different versions
+            'f13' => ['type' => 'bigint','default' => 10000,'null' => false], // test bigint/default/null=false
+            'f14' => ['type' => 'integer','limit' => 12,'unsigned' => true],
+            'f15' => ['type' => 'string','default' => 'abc'],
+            'f16' => ['type' => 'text','limit' => MysqlSchema::MEDIUMTEXT],
+            'f17' => ['type' => 'timestamp','default' => 'CURRENT_TIMESTAMP','null' => false], // different default behaviors on different versions
+            
         ];
         /**
          * Constraints and indexes are needed for next
          */
         $options = [
             'constraints' => [
-                'p' => ['type' => 'primary','columns' => ['f0']],
-                'u1' => ['type' => 'unique','columns' => ['f1']],
+                'p' => ['type' => 'primary','column' => ['f0']],
+                'u1' => ['type' => 'unique','column' => ['f1']],
             ],
             'indexes' => [
-                'u2' => ['type' => 'index','columns' => ['f2']],
+                'u2' => ['type' => 'index','column' => ['f2']],
             ],
-            'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
+            'tableOptions' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
         ];
+        
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-     
-        $this->assertEquals('1bb731d592f79e0495662d38024bd4b3', md5($statements[0]));
+
+        $this->assertEquals('d12f59966d5cd2641cd276760b73fb60', md5($statements[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($statements[0]));
@@ -77,8 +80,7 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-  
-        $this->assertEquals('6e105cbf382c178ef74cef124a789a1f', md5(json_encode($schema)));
+        $this->assertEquals('ffad1c3654777a34a728b7d3f468a060', md5(json_encode($schema)));
 
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
@@ -100,13 +102,13 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary','columns' => ['id']],
-                'unique' => ['type' => 'unique', 'columns' => ['title']],
+                'primary' => ['type' => 'primary','column' => ['id']],
+                'unique' => ['type' => 'unique', 'column' => ['title']],
             ],
-            'options' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
+            'tableOptions' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
-
+      
         $this->assertEquals('e072e7ae67738ce47c8a9d6dde92d422', md5($result[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
@@ -123,8 +125,8 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary', 'columns' => ['article_id','tag_id']],
-                'unique' => ['type' => 'unique', 'columns' => ['article_id','tag_id']],
+                'primary' => ['type' => 'primary', 'column' => ['article_id','tag_id']],
+                'unique' => ['type' => 'unique', 'column' => ['article_id','tag_id']],
             ],
         ];
         $result = $adapter->createTableSql('tarticles', $schema, $options);
@@ -150,12 +152,12 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary','columns' => ['id']],
+                'primary' => ['type' => 'primary','column' => ['id']],
             ],
             'indexes' => [
-                'title_u' => ['type' => 'unique','columns' => ['code']], // test unique
-                'title_idx' => ['type' => 'index','columns' => ['title']],
-                'title_ft' => ['type' => 'fulltext','columns' => ['title']],
+                'title_u' => ['type' => 'unique','column' => ['code']], // test unique
+                'title_idx' => ['type' => 'index','column' => ['title']],
+                'title_ft' => ['type' => 'fulltext','column' => ['title']],
             ],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
@@ -182,9 +184,9 @@ class MysqlSchemaTest extends OriginTestCase
 
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary','columns' => ['id']],
-                'unique' => ['type' => 'unique','columns' => ['name']],
-                'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['users','id']],
+                'primary' => ['type' => 'primary','column' => ['id']],
+                'unique' => ['type' => 'unique','column' => ['name']],
+                'fk_users_id' => ['type' => 'foreign','column' => ['user_id'],'references' => ['users','id']],
             ],
         ];
         
@@ -194,10 +196,10 @@ class MysqlSchemaTest extends OriginTestCase
 
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary','columns' => ['id']],
+                'primary' => ['type' => 'primary','column' => ['id']],
                 'fk_users_id' => [
                     'type' => 'foreign',
-                    'columns' => ['user_id'],
+                    'column' => ['user_id'],
                     'references' => ['users','id'],
                     'update' => 'cascade',
                     'delete' => 'cascade', ],
@@ -218,7 +220,7 @@ class MysqlSchemaTest extends OriginTestCase
     
             $options = [
                 'constraints' => [
-                    'primary' => ['type' => 'primary','columns' => ['id']],
+                    'primary' => ['type' => 'primary','column' => ['id']],
                 ],
             ];
 
@@ -232,8 +234,8 @@ class MysqlSchemaTest extends OriginTestCase
     
             $options = [
                 'constraints' => [
-                    'primary' => ['type' => 'primary','columns' => ['id']],
-                    'fk_users_id' => ['type' => 'foreign','columns' => ['user_id'],'references' => ['tusers','id']],
+                    'primary' => ['type' => 'primary','column' => ['id']],
+                    'fk_users_id' => ['type' => 'foreign','column' => ['user_id'],'references' => ['tusers','id']],
                 ],
             ];
 
@@ -241,6 +243,15 @@ class MysqlSchemaTest extends OriginTestCase
             foreach ($statements as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
+
+            $expected = [
+                'type' => 'foreign',
+                'column' => 'user_id',
+                'references' => ['tusers','id'],
+            ];
+            $schema = $adapter->connection()->describe('tarticles');
+            $this->assertEquals($expected, $schema['constraints']['fk_users_id']);
+
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tusers'));
         }

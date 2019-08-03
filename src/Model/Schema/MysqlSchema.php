@@ -56,9 +56,21 @@ class MysqlSchema extends BaseSchema
         'boolean' => ['name' => 'TINYINT', 'limit' => 1],
     ];
 
+    /**
+     * MySQL TinyText field length
+     */
     const TINYTEXT = 255;
+
+    /**
+     * MySQL LongText field length
+     */
     const LONGTEXT = 16777215;
+
+    /**
+     * MySQL MediumText field length
+     */
     const MEDIUMTEXT = 4294967295;
+
     /**
      * MySQL column limits for texts
      *
@@ -85,27 +97,34 @@ class MysqlSchema extends BaseSchema
         /**
          * Convert constraints
          */
+     
         foreach ($this->indexes($table) as $index) {
+            $name = $index['name'];
             if ($index['name'] === 'PRIMARY') {
-                $constraints[] = ['type' => 'primary','columns' => $index['column']];
-                continue;
+                $constraints['primary'] = ['type' => 'primary','column' => $index['column']];
+            } elseif ($index['type'] === 'unique') {
+                $constraints[$name] = ['type' => 'unique','column' => $index['column']];
+            } else {
+                $indexes[$name] = ['type' => 'index','column' => $index['column']];
             }
-            if ($index['type'] === 'unique') {
-                $constraints[] = ['type' => 'unique','columns' => $index['column']];
-                continue;
-            }
-            $indexes[] = ['type' => 'index','columns' => $index['column']];
         }
 
         foreach ($this->foreignKeys($table) as $foreignKey) {
-            $constraints[] = [
+            $name = $foreignKey['name'];
+            $constraints[$name] = [
                 'type' => 'foreign',
-                'columns' => $foreignKey['column'],
+                'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
         }
 
-        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes];
+        $row = $this->fetchRow("SHOW TABLE STATUS WHERE Name =  '{$table}'");
+        $options = [
+            'engine' => $row['Engine'],
+            'collation' => $row['Collation'],
+        ];
+
+        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes, 'tableOptions' => $options];
     }
 
     /**
@@ -393,34 +412,31 @@ class MysqlSchema extends BaseSchema
      */
     public function indexes(string $table) : array
     {
-        $config = ConnectionManager::config($this->datasource);
-        $sql = "SHOW INDEX FROM {$table}";
+        $sql = sprintf('SHOW INDEX FROM %s', $this->quoteIdentifier($table));
         $results = $this->fetchAll($sql);
         $indexes = [];
       
-        foreach ($results as &$result) {
-            $result = array_change_key_case($result, CASE_LOWER);
-            
+        foreach ($results as $result) {
             /**
              * Handle multiple columns in a index
              */
-            if ($result['seq_in_index'] > 1) {
+            if ($result['Seq_in_index'] > 1) {
                 $key = count($indexes) - 1;
                 $indexes[$key]['column'] = (array) $indexes[$key]['column'];
-                $indexes[$key]['column'][] = $result['column_name'];
+                $indexes[$key]['column'][] = $result['Column_name'];
                 continue;
             }
 
             $indexes[] = [
-                'name' => $result['key_name'],
-                'column' => $result['column_name'],
-                'type' => ($result['non_unique'] == 0) ?'unique' : 'index',
+                'name' => $result['Key_name'],
+                'column' => $result['Column_name'],
+                'type' => ($result['Non_unique'] == 0) ?'unique' : 'index',
             ];
 
             /**
              * Full text support
              */
-            if ($result['index_type'] === 'FULLTEXT') {
+            if ($result['Index_type'] === 'FULLTEXT') {
                 $indexes[count($indexes) - 1]['type'] = 'fulltext';
             }
         }
@@ -606,8 +622,8 @@ class MysqlSchema extends BaseSchema
         }
 
         # MySQL Options
-        if (isset($options['options'])) {
-            $databaseOptions = $options['options'];
+        if (isset($options['tableOptions'])) {
+            $databaseOptions = $options['tableOptions'];
         }
 
         return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);
@@ -661,7 +677,7 @@ class MysqlSchema extends BaseSchema
         */
     protected function tableConstraint(array $attributes) : string
     {
-        $columns = implode(',', (array) $attributes['columns']);
+        $columns = implode(',', (array) $attributes['column']);
         if ($attributes['type'] === 'primary') {
             return sprintf('PRIMARY KEY (%s)', $columns);
         }
@@ -694,7 +710,7 @@ class MysqlSchema extends BaseSchema
             $string = 'FULLTEXT INDEX %s (%s)';
         }
         if ($string) {
-            $columns = implode(',', (array) $attributes['columns']);
+            $columns = implode(',', (array) $attributes['column']);
 
             return sprintf($string, $this->quoteIdentifier($attributes['name']), $columns);
         }
@@ -720,7 +736,7 @@ class MysqlSchema extends BaseSchema
 
             return 0;
         }
-        if (is_int($value)) {
+        if (is_numeric($value)) {
             return $value;
         }
 
