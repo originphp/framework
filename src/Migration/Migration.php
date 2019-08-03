@@ -293,7 +293,7 @@ class Migration
             Inflector::singularize($tables[1]).'_id' => 'integer',
         ];
 
-        return $this->createTable($tableName, $schema, $options);
+        $this->createTable($tableName, $schema, $options);
     }
 
     /**
