@@ -65,8 +65,24 @@ class TableSchema
     public function __construct(string $table, array $columns = [])
     {
         $this->table = $table;
+       
         foreach ($columns as $column => $definition) {
-            $this->addColumn($column, $definition);
+            if (! in_array($column, ['constraints','indexes','tableOptions'])) {
+                $this->addColumn($column, $definition);
+            }
+        }
+        if (isset($columns['constraints'])) {
+            foreach ($columns['constraints'] as $name => $definition) {
+                $this->addConstraint($name, $definition);
+            }
+        }
+        if (isset($columns['indexes'])) {
+            foreach ($columns['indexes'] as $name => $definition) {
+                $this->addIndex($name, $definition);
+            }
+        }
+        if (isset($columns['tableOptions'])) {
+            $this->options($columns['tableOptions']);
         }
     }
 
@@ -127,11 +143,11 @@ class TableSchema
     public function addIndex(string $name, $attributes) : TableSchema
     {
         if (is_string($attributes)) {
-            $attributes = ['columns' => [$attributes]];
+            $attributes = ['column' => [$attributes]];
         }
         $attributes += ['name' => $name, 'table' => $this->table,'type' => 'index'];
-        if (empty($attributes['columns'])) {
-            throw new Exception(sprintf('Index %s is missing columns', $name));
+        if (empty($attributes['column'])) {
+            throw new Exception(sprintf('Index %s is missing column information', $name));
         }
         $this->indexes[$name] = $attributes;
 
@@ -149,11 +165,12 @@ class TableSchema
     {
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
-        $attributes += ['name' => $name,'type' => null,'columns' => null];
+        $attributes += ['name' => $name,'type' => null,'column' => null];
         if (empty($attributes['type']) or ! in_array($attributes['type'], ['primary','unique','foreign'])) {
             throw new Exception(sprintf('Invalid or missing constraint type for %s', $name));
         }
-        if (empty($attributes['columns'])) {
+        
+        if (empty($attributes['column'])) {
             throw new Exception(sprintf('Constraint %s is missing columns', $name));
         }
 
@@ -187,7 +204,7 @@ class TableSchema
     }
 
     /**
-     * Sets or gets the options
+     * Sets or gets the table options (MySQL only)
      *
      * e.g ['engine'=>'InnoDB','collate'=>'utf8_unicode_ci']
      *
@@ -257,7 +274,7 @@ class TableSchema
         $primaryKey = [];
         foreach ($this->constraints as $name => $attributes) {
             if ($attributes['type'] === 'primary') {
-                $primaryKey = $attributes['columns'];
+                $primaryKey = $attributes['column'];
             }
         }
 
