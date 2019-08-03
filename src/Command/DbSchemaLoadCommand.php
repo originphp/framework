@@ -29,16 +29,12 @@ class DbSchemaLoadCommand extends Command
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
-            'default' => 'schema',
         ]);
     }
  
     public function execute()
     {
-        $name = $this->arguments('name');
-        if ($name === null) {
-            $name = 'schema';
-        }
+        $name = $this->arguments('name') ?? 'schema';
         $datasource = $this->options('datasource');
         $filename = $this->schemaFilename($name);
         $this->loadSchema($filename, $datasource);
