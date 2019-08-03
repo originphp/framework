@@ -80,7 +80,8 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-        $this->assertEquals('ffad1c3654777a34a728b7d3f468a060', md5(json_encode($schema)));
+       
+        $this->assertEquals('7acea14011d6458d2343f4bf327a6384', md5(json_encode($schema)));
 
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
@@ -260,48 +261,48 @@ class MysqlSchemaTest extends OriginTestCase
     public function testAddColumn()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(255)';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255)';
         
         $result = $adapter->addColumn('apples', 'colour', 'string');
         $this->assertEquals($expected, $result);
         
         // Test limit
         $result = $adapter->addColumn('apples', 'colour', 'string', ['limit' => 40]);
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(40)';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(40)';
         $this->assertEquals($expected, $result);
 
         $result = $adapter->addColumn('apples', 'qty', 'integer', ['limit' => 3]);
-        $expected = 'ALTER TABLE apples ADD COLUMN qty INT(3)';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `qty` INT(3)';
         $this->assertEquals($expected, $result);
 
         # # # TEST DEFAULTS
         
         // test default not null
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(255) DEFAULT \'foo\' NOT NULL';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) NOT NULL DEFAULT \'foo\'';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['default' => 'foo','null' => false]);
         $this->assertEquals($expected, $result);
 
         // test default null
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(255) DEFAULT \'foo\'';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) DEFAULT \'foo\'';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['default' => 'foo']);
         $this->assertEquals($expected, $result);
 
         // test null
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(255) DEFAULT NULL';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) DEFAULT NULL';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['default' => '']);
         $this->assertEquals($expected, $result);
 
         // test not null (no default)
-        $expected = 'ALTER TABLE apples ADD COLUMN colour VARCHAR(255) NOT NULL';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) NOT NULL';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['null' => false]);
         $this->assertEquals($expected, $result);
         
         // test precision
-        $expected = 'ALTER TABLE apples ADD COLUMN price DECIMAL(7,0)';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `price` DECIMAL(7,0)';
         $result = $adapter->addColumn('apples', 'price', 'decimal', ['precision' => 7]);
         $this->assertEquals($expected, $result);
 
-        $expected = 'ALTER TABLE apples ADD COLUMN price DECIMAL(8,2)';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `price` DECIMAL(8,2)';
         $result = $adapter->addColumn('apples', 'price', 'decimal', ['precision' => 8,'scale' => 2]);
         $this->assertEquals($expected, $result);
 
@@ -311,15 +312,15 @@ class MysqlSchemaTest extends OriginTestCase
         }
 
         # Test MySQL specials
-        $expected = 'ALTER TABLE apples ADD COLUMN description TEXT';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `description` TEXT';
         $result = $adapter->addColumn('apples', 'description', 'text');
         $this->assertEquals($expected, $result);
 
-        $expected = 'ALTER TABLE apples ADD COLUMN description MEDIUMTEXT';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `description` MEDIUMTEXT';
         $result = $adapter->addColumn('apples', 'description', 'text', ['limit' => 16777215]);
         $this->assertEquals($expected, $result);
 
-        $expected = 'ALTER TABLE apples ADD COLUMN description LONGTEXT';
+        $expected = 'ALTER TABLE `apples` ADD COLUMN `description` LONGTEXT';
         $result = $adapter->addColumn('apples', 'description', 'text', ['limit' => 4294967295]);
         $this->assertEquals($expected, $result);
 
@@ -329,7 +330,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testAddForeignKey()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE articles ADD CONSTRAINT fk_origin_12345 FOREIGN KEY (author_id) REFERENCES users (id)';
+        $expected = 'ALTER TABLE `articles` ADD CONSTRAINT `fk_origin_12345` FOREIGN KEY (author_id) REFERENCES `users` (id)';
         $result = $adapter->addForeignKey('articles', 'users', [
             'primaryKey' => 'id',
             'name' => 'fk_origin_12345',
@@ -345,15 +346,15 @@ class MysqlSchemaTest extends OriginTestCase
     public function testAddIndex()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'CREATE INDEX owner_name ON accounts (owner_id)';
+        $expected = 'CREATE INDEX `owner_name` ON `accounts` (owner_id)';
         $result = $adapter->addIndex('accounts', 'owner_id', 'owner_name');
         $this->assertEquals($expected, $result);
 
-        $expected = 'CREATE INDEX owner_name ON accounts (owner_id, tenant_id)';
+        $expected = 'CREATE INDEX `owner_name` ON `accounts` (owner_id, tenant_id)';
         $result = $adapter->addIndex('accounts', ['owner_id','tenant_id'], 'owner_name');
         $this->assertEquals($expected, $result);
 
-        $expected = 'CREATE UNIQUE INDEX owner_name ON accounts (owner_id)';
+        $expected = 'CREATE UNIQUE INDEX `owner_name` ON `accounts` (owner_id)';
         $result = $adapter->addIndex('accounts', 'owner_id', 'owner_name', ['unique' => true]);
         $this->assertEquals($expected, $result);
 
@@ -363,14 +364,14 @@ class MysqlSchemaTest extends OriginTestCase
             $this->assertTrue($adapter->connection()->execute($result));
         }
 
-        $expected = 'CREATE FULLTEXT INDEX idx_title ON topics (title)';
+        $expected = 'CREATE FULLTEXT INDEX `idx_title` ON `topics` (title)';
         $result = $adapter->addIndex('topics', 'title', 'idx_title', ['type' => 'FULLTEXT']);
         $this->assertEquals($expected, $result);
     }
     public function testChangeColumn()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE articles MODIFY COLUMN id INT(15)';
+        $expected = 'ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)';
         $result = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']);
         $this->assertEquals($expected, $result);
 
@@ -391,20 +392,14 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertFalse($adapter->columnExists('posts', 'titles'));
     }
 
-    public function testColumnName()
+    public function testSchemaValue()
     {
         $adapter = new MysqlSchema('test');
-        $this->assertEquals('foo', $adapter->columnName('foo'));
-    }
-
-    public function testColumnValue()
-    {
-        $adapter = new MysqlSchema('test');
-        $this->assertEquals('NULL', $adapter->columnValue(null));
-        $this->assertEquals(3, $adapter->columnValue(3));
-        $this->assertEquals("'foo'", $adapter->columnValue('foo'));
-        $this->assertEquals(1, $adapter->columnValue(true));
-        $this->assertEquals(0, $adapter->columnValue(false));
+        $this->assertEquals('NULL', $adapter->schemaValue(null));
+        $this->assertEquals(3, $adapter->schemaValue(3));
+        $this->assertEquals("'foo'", $adapter->schemaValue('foo'));
+        $this->assertEquals(1, $adapter->schemaValue(true));
+        $this->assertEquals(0, $adapter->schemaValue(false));
     }
 
     public function testColumns()
@@ -477,10 +472,10 @@ class MysqlSchemaTest extends OriginTestCase
     public function testDropTable()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'DROP TABLE foo';
+        $expected = 'DROP TABLE `foo`';
         $result = $adapter->dropTable('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-        $this->assertEquals('DROP TABLE IF EXISTS foo', $adapter->dropTable('foo', ['ifExists' => true]));
+        $this->assertEquals('DROP TABLE IF EXISTS `foo`', $adapter->dropTable('foo', ['ifExists' => true]));
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($result));
         }
@@ -579,7 +574,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRemoveColumn()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE articles DROP COLUMN modified';
+        $expected = 'ALTER TABLE `articles` DROP COLUMN `modified`';
         $result = $adapter->removeColumn('articles', 'modified');
         $this->assertEquals($expected, $result);
     
@@ -592,7 +587,7 @@ class MysqlSchemaTest extends OriginTestCase
     {
         $adapter = new MysqlSchema('test');
        
-        $expected = "ALTER TABLE articles\nDROP COLUMN created,\nDROP COLUMN modified";
+        $expected = "ALTER TABLE `articles`\nDROP COLUMN `created`,\nDROP COLUMN `modified`";
         $result = $adapter->removeColumns('articles', ['created','modified']);
         $this->assertEquals($expected, $result);
  
@@ -607,7 +602,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRemoveForeignKey()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE articles DROP FOREIGN KEY fk_origin_12345';
+        $expected = 'ALTER TABLE `articles` DROP FOREIGN KEY `fk_origin_12345`';
         $result = $adapter->removeForeignKey('articles', 'fk_origin_12345');
         $this->assertEquals($expected, $result);
 
@@ -625,7 +620,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRemoveIndex()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'DROP INDEX author_id ON articles';
+        $expected = 'DROP INDEX `author_id` ON `articles`';
         $result = $adapter->removeIndex('articles', 'author_id');
         $this->assertEquals($expected, $result);
     }
@@ -641,12 +636,12 @@ class MysqlSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for mysql');
         }
 
-        $expected = 'ALTER TABLE articles CHANGE author_id user_id INT(11)';
+        $expected = 'ALTER TABLE `articles` CHANGE `author_id` `user_id` INT(11)';
         $result = $adapter->renameColumn('articles', 'author_id', 'user_id');
         $this->assertEquals($expected, $result);
         $this->assertTrue($adapter->connection()->execute($result));
 
-        $expected = 'ALTER TABLE deals CHANGE amount deal_amount DECIMAL(15,2)';
+        $expected = 'ALTER TABLE `deals` CHANGE `amount` `deal_amount` DECIMAL(15,2)';
         $result = $adapter->renameColumn('deals', 'amount', 'deal_amount');
         $this->assertEquals($expected, $result);
         $this->assertTrue($adapter->connection()->execute($result));
@@ -658,7 +653,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRenameIndex()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE articles RENAME INDEX search_title TO title_search';
+        $expected = 'ALTER TABLE `articles` RENAME INDEX `search_title` TO `title_search`';
         $result = $adapter->renameIndex('articles', 'search_title', 'title_search');
         $this->assertEquals($expected, $result);
 
@@ -672,7 +667,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testRenameTable()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'RENAME TABLE articles TO artikel';
+        $expected = 'RENAME TABLE `articles` TO `artikel`';
         $result = $adapter->renameTable('articles', 'artikel');
         $this->assertEquals($expected, $result);
         if ($adapter->connection()->engine() === 'mysql') {
@@ -723,5 +718,13 @@ class MysqlSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for mysql');
         }
         $this->assertEquals(['articles','deals','posts','users'], $adapter->tables());
+    }
+
+    # Test being deprecated
+
+    public function testColumnName()
+    {
+        $adapter = new MysqlSchema('test');
+        $this->assertEquals('foo', $adapter->columnName('foo'));
     }
 }

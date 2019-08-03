@@ -35,48 +35,31 @@ class MysqlSchema extends BaseSchema
     protected $quote = '`';
 
     /**
-     * This is the map for database agnostic, if its not found here then
-     * use what user supplies. @important. This will allow using char and medium text when testing
-     *
-     * @var array
-     */
-    protected $columns = [
-        'primaryKey' => ['name' => 'INT NOT NULL AUTO_INCREMENT'],
-        'string' => ['name' => 'VARCHAR', 'limit' => 255],
-        'text' => ['name' => 'TEXT'],
-        'integer' => ['name' => 'INT', 'limit' => 11],
-        'bigint' => ['name' => 'BIGINT', 'limit' => 20], // chgabged
-        'float' => ['name' => 'FLOAT', 'precision' => 10, 'scale' => 0], // mysql defaults
-        'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
-        'datetime' => ['name' => 'DATETIME'],
-        'time' => ['name' => 'TIME'],
-        'timestamp' => ['name' => 'TIMESTAMP'],
-        'date' => ['name' => 'DATE'],
-        'binary' => ['name' => 'BLOB'],
-        'boolean' => ['name' => 'TINYINT', 'limit' => 1],
-    ];
-
-    /**
      * MySQL TinyText field length
      */
     const TINYTEXT = 255;
 
     /**
-     * MySQL LongText field length
-     */
-    const LONGTEXT = 16777215;
-
-    /**
      * MySQL MediumText field length
      */
-    const MEDIUMTEXT = 4294967295;
+    const MEDIUMTEXT = 16777215;
+
+    /**
+     * MySQL LongText field length
+     */
+    const LONGTEXT = 4294967295;
 
     /**
      * MySQL column limits for texts
      *
      * @var array
      */
-    protected $columnLimits = ['tinytext' => self::TINYTEXT,'longtext' => self::LONGTEXT,'mediumtext' => self::MEDIUMTEXT];
+    protected $columnLimits = [
+        'tinytext' => self::TINYTEXT,
+        'longtext' => self::LONGTEXT,
+        'mediumtext' => self::MEDIUMTEXT,
+    ];
+  
     /**
      * This describes the table in the database using the new format. This will require caching due to the amount
      * of queries that will need to be executed.
@@ -89,7 +72,6 @@ class MysqlSchema extends BaseSchema
     public function describe(string $table) : array
     {
         $results = $this->fetchAll('SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($table));
-
         $columns = $this->convertTableDescription($results);
 
         $indexes = $constraints = [];
@@ -321,87 +303,14 @@ class MysqlSchema extends BaseSchema
         if (in_array($data['type'], ['integer','bigint']) and ! empty($data['autoIncrement'])) {
             $out .= ' AUTO_INCREMENT';
         } elseif (isset($data['default'])) {
-            $out .= ' DEFAULT ' . $this->columnValue($data['default']);
+            $out .= ' DEFAULT ' . $this->schemaValue($data['default']);
         }
         
         if (! empty($data['comment'])) {
-            $out .= ' COMMENT ' . $this->columnValue($data['comment']);
+            $out .= ' COMMENT ' . $this->schemaValue($data['comment']);
         }
         
         return $out;
-    }
-
-    /**
-     * Returns the schema for the table
-     *
-     * @param string $table
-     * @return array
-     */
-    public function schema(string $table) : array
-    {
-        $schema = [];
-        $results = $this->fetchAll("SHOW FULL COLUMNS FROM {$table}");
-
-        $reverseMapping = [];
-        foreach ($this->columns as $key => $value) {
-            $reverseMapping[strtolower($value['name'])] = $key;
-        }
-        /**
-         * @todo refactor to work similar to Postgres,not using reverse mapping. For cleanner
-         * code. These are temporary solutions.
-         * @see MySQL driver - duplicated there.
-         */
-        $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
-        $reverseMapping['mediumtext'] = $reverseMapping['text']; // add missing type
-        $reverseMapping['longtext'] = $reverseMapping['text']; // add missing type
-      
-        foreach ($results as $column) {
-            $decimals = $length = null;
-            $type = str_replace(')', '', $column['Type']);
-            if (strpos($type, '(') !== false) {
-                list($type, $length) = explode('(', $type);
-                if (strpos($length, ',') !== false) {
-                    list($length, $decimals) = explode(',', $length);
-                }
-            }
-
-            if (isset($reverseMapping[$type])) {
-                $type = $reverseMapping[$type];
-                $schema[$column['Field']] = [
-                    'type' => $type,
-                    'limit' => ($length and ! in_array($type, ['boolean', 'decimal', 'numeric'])) ? (int) $length : null,
-                    'default' => $column['Default'],
-                    'null' => ($column['Null'] === 'YES' ? true : false),
-                ];
-
-                if (in_array($type, ['float', 'decimal'])) {
-                    $schema[$column['Field']]['precision'] = $length;
-                    $schema[$column['Field']]['scale'] = (int) $decimals;
-                }
-                if ($schema[$column['Field']]['limit'] === null) {
-                    unset($schema[$column['Field']]['limit']);
-                }
-                if (in_array($type, ['timestamp', 'datetime'])) {
-                    $schema[$column['Field']]['default'] = null; // remove current_timestamp
-                }
-
-                if ($column['Extra'] === 'auto_increment') {
-                    $schema[$column['Field']]['autoIncrement'] = true;
-                }
-
-                if ($column['Key'] === 'PRI' and $column['Extra'] === 'auto_increment') {
-                    $schema[$column['Field']]['type'] = 'primaryKey';
-                }
-                /**
-                 * @todo in postgresql cant get this work yet.
-                 */
-                if ($column['Key'] === 'PRI') {
-                    $schema[$column['Field']]['key'] = 'primary';
-                }
-            }
-        }
-
-        return $schema;
     }
 
     /**
@@ -453,7 +362,13 @@ class MysqlSchema extends BaseSchema
      */
     public function renameTable(string $from, string $to) : string
     {
-        return  "RENAME TABLE {$from} TO {$to}";
+        return sprintf(
+            'RENAME TABLE %s TO %s',
+            $this->quoteIdentifier($from),
+            $this->quoteIdentifier($to)
+            );
+        
+        //return  "RENAME TABLE {$from} TO {$to}";
     }
 
     /**
@@ -466,9 +381,14 @@ class MysqlSchema extends BaseSchema
      */
     public function changeColumn(string $table, string $name, string $type, array $options = []) : string
     {
-        $definition = $this->buildColumn(array_merge(['name' => $name, 'type' => $type], $options));
+        $options += ['name' => $name, 'type' => $type];
 
-        return "ALTER TABLE {$table} MODIFY COLUMN {$definition}";
+        return sprintf(
+            'ALTER TABLE %s MODIFY COLUMN %s',
+            $this->quoteIdentifier($table),
+            $this->columnSql($options)
+        );
+        //return "ALTER TABLE {$table} MODIFY COLUMN {$definition}";
     }
 
     /**
@@ -509,12 +429,19 @@ class MysqlSchema extends BaseSchema
             }
         }
 
-        return "ALTER TABLE {$table} CHANGE {$from} {$to} {$definition}";
+        return sprintf(
+            'ALTER TABLE %s CHANGE %s %s %s',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($from),
+            $this->quoteIdentifier($to),
+            $definition
+        );
+        //return "ALTER TABLE {$table} CHANGE {$from} {$to} {$definition}";
     }
 
     /**
      * Returns a remove index SQL statement
-     *
+     * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
      * @param string|array $column owner_id, [owner_id,tenant_id]
      * @param array $options
@@ -523,7 +450,12 @@ class MysqlSchema extends BaseSchema
      */
     public function removeIndex(string $table, string $name) : string
     {
-        return "DROP INDEX {$name} ON {$table}";
+        return sprintf(
+            'DROP INDEX %s ON %s',
+            $this->quoteIdentifier($name),
+            $this->quoteIdentifier($table)
+        );
+        //return "DROP INDEX {$name} ON {$table}";
     }
 
     /**
@@ -537,7 +469,13 @@ class MysqlSchema extends BaseSchema
      */
     public function renameIndex(string $table, string $oldName, string $newName) : string
     {
-        return "ALTER TABLE {$table} RENAME INDEX {$oldName} TO {$newName}";
+        return sprintf(
+            'ALTER TABLE %s RENAME INDEX %s TO %s',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($oldName),
+            $this->quoteIdentifier($newName)
+        );
+        //return "ALTER TABLE {$table} RENAME INDEX {$oldName} TO {$newName}";
     }
 
     /**
@@ -550,7 +488,12 @@ class MysqlSchema extends BaseSchema
     {
         $config = ConnectionManager::config($this->datasource);
 
-        $sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '{$config['database']}' AND TABLE_NAME = '{$table}';";
+        /*$sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '{$config['database']}' AND TABLE_NAME = '{$table}';";*/
+        $sql = sprintf(
+            'SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = %s AND TABLE_NAME = %s',
+            $this->schemaValue($config['database']),
+            $this->schemaValue($table)
+        );
 
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
@@ -574,7 +517,12 @@ class MysqlSchema extends BaseSchema
      */
     public function removeForeignKey(string $fromTable, string $constraint) : string
     {
-        return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
+        return sprintf(
+            'ALTER TABLE %s DROP FOREIGN KEY %s',
+            $this->quoteIdentifier($fromTable),
+            $this->quoteIdentifier($constraint)
+    );
+        //return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
     }
     /**
      * Undocumented function
@@ -584,7 +532,7 @@ class MysqlSchema extends BaseSchema
      */
     public function showCreateTable(string $table) : string
     {
-        $result = $this->fetchRow("SHOW CREATE TABLE {$table}");
+        $result = $this->fetchRow('SHOW CREATE TABLE ' . $this->quoteIdentifier($table));
 
         return $result['Create Table'];
     }
@@ -641,12 +589,18 @@ class MysqlSchema extends BaseSchema
      */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
     {
-        $out = sprintf("CREATE TABLE %s (\n%s\n)", $this->quoteIdentifier($table), implode(",\n", array_merge($columns, $constraints, $indexes)));
+        $out = sprintf(
+            "CREATE TABLE %s (\n%s\n)",
+            $this->quoteIdentifier($table),
+            implode(",\n", array_merge($columns, $constraints, $indexes))
+        );
 
         /**
          * Options string support. This is used in Migrations
          */
         if (isset($options['options']) and is_string($options['options'])) {
+            deprecationWarning('Creating tables with option strings are depreciated use array instead');
+
             return $out . ' ' . $options['options'];
         }
 
@@ -724,7 +678,7 @@ class MysqlSchema extends BaseSchema
      * @param mixed $value
      * @return mixed
      */
-    public function columnValue($value)
+    public function schemaValue($value)
     {
         if ($value === '' or $value === null) {
             return 'NULL';
@@ -752,10 +706,108 @@ class MysqlSchema extends BaseSchema
     */
     public function dropTable(string $table, array $options = []) : string
     {
+        $sql = 'DROP TABLE %s';
         if (! empty($options['ifExists'])) {
-            return "DROP TABLE IF EXISTS {$table}";
+            $sql = 'DROP TABLE IF EXISTS %s';
         }
 
-        return "DROP TABLE {$table}";
+        return sprintf($sql, $this->quoteIdentifier($table));
+    }
+
+    # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
+
+    /**
+       * This is the map for database agnostic, if its not found here then
+       * use what user supplies.
+       * @internal this is being deprecated in future
+       * @var array
+       */
+    protected $columns = [
+        'primaryKey' => ['name' => 'INT NOT NULL AUTO_INCREMENT'],
+        'string' => ['name' => 'VARCHAR', 'limit' => 255],
+        'text' => ['name' => 'TEXT'],
+        'integer' => ['name' => 'INT', 'limit' => 11],
+        'bigint' => ['name' => 'BIGINT', 'limit' => 20], // chgabged
+        'float' => ['name' => 'FLOAT', 'precision' => 10, 'scale' => 0], // mysql defaults
+        'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
+        'datetime' => ['name' => 'DATETIME'],
+        'time' => ['name' => 'TIME'],
+        'timestamp' => ['name' => 'TIMESTAMP'],
+        'date' => ['name' => 'DATE'],
+        'binary' => ['name' => 'BLOB'],
+        'boolean' => ['name' => 'TINYINT', 'limit' => 1],
+    ];
+
+    /**
+    * Returns the schema for the table
+    *
+    * @param string $table
+    * @return array
+    */
+    public function schema(string $table) : array
+    {
+        $schema = [];
+        $results = $this->fetchAll("SHOW FULL COLUMNS FROM {$table}");
+
+        $reverseMapping = [];
+        foreach ($this->columns as $key => $value) {
+            $reverseMapping[strtolower($value['name'])] = $key;
+        }
+        /**
+         * @todo refactor to work similar to Postgres,not using reverse mapping. For cleanner
+         * code. These are temporary solutions.
+         * @see MySQL driver - duplicated there.
+         */
+        $reverseMapping['char'] = $reverseMapping['varchar']; // add missing type
+        $reverseMapping['mediumtext'] = $reverseMapping['text']; // add missing type
+        $reverseMapping['longtext'] = $reverseMapping['text']; // add missing type
+      
+        foreach ($results as $column) {
+            $decimals = $length = null;
+            $type = str_replace(')', '', $column['Type']);
+            if (strpos($type, '(') !== false) {
+                list($type, $length) = explode('(', $type);
+                if (strpos($length, ',') !== false) {
+                    list($length, $decimals) = explode(',', $length);
+                }
+            }
+
+            if (isset($reverseMapping[$type])) {
+                $type = $reverseMapping[$type];
+                $schema[$column['Field']] = [
+                    'type' => $type,
+                    'limit' => ($length and ! in_array($type, ['boolean', 'decimal', 'numeric'])) ? (int) $length : null,
+                    'default' => $column['Default'],
+                    'null' => ($column['Null'] === 'YES' ? true : false),
+                ];
+
+                if (in_array($type, ['float', 'decimal'])) {
+                    $schema[$column['Field']]['precision'] = $length;
+                    $schema[$column['Field']]['scale'] = (int) $decimals;
+                }
+                if ($schema[$column['Field']]['limit'] === null) {
+                    unset($schema[$column['Field']]['limit']);
+                }
+                if (in_array($type, ['timestamp', 'datetime'])) {
+                    $schema[$column['Field']]['default'] = null; // remove current_timestamp
+                }
+
+                if ($column['Extra'] === 'auto_increment') {
+                    $schema[$column['Field']]['autoIncrement'] = true;
+                }
+
+                if ($column['Key'] === 'PRI' and $column['Extra'] === 'auto_increment') {
+                    $schema[$column['Field']]['type'] = 'primaryKey';
+                }
+                /**
+                 * @todo in postgresql cant get this work yet.
+                 */
+                if ($column['Key'] === 'PRI') {
+                    $schema[$column['Field']]['key'] = 'primary';
+                }
+            }
+        }
+
+        return $schema;
     }
 }

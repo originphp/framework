@@ -60,104 +60,6 @@ abstract class BaseSchema
     abstract protected function columnSql(array $data);
 
     /**
-     * Build a native sql column string
-     *
-     * @param array $column
-     *  - name: name of column
-     *  - type: integer,bigint,float,decimail,datetime,date,binary or boolean
-     *  - limit: length of field
-     *  - precision: for decimals and floasts
-     *  - default: default value use ''
-     *  - null: allow null values
-     * @return string
-     */
-    protected function buildColumn(array $column) : string
-    {
-        $column += [
-            'name' => null,
-            'type' => null,
-            'limit' => null, // Max column limit [text, binary, integer]
-            'precision' => null, // decima, float
-            'null' => null,
-        ];
-
-        $real = [];
-        $type = $column['type'];
-
-        /**
-         * Temp solution until refactored
-         */
-        if (! empty($column['autoIncrement'])) {
-            $type = 'primaryKey'; // this will be redonne to
-        }
-        if (isset($this->columns[$type])) {
-            $real = $this->columns[$type];
-            $type = strtoupper($this->columns[$type]['name']); // tmp
-
-            /**
-                 * Convert Limits for MySQL
-                 * @todo how this be implemented in MySQL schema without duplicating
-                 * code
-                 */
-            if ($column['type'] === 'text' and isset($column['limit'])) {
-                $limit = $column['limit'];
-                $type = 'TEXT';
-                if ($limit === 16777215) {
-                    $type = 'MEDIUMTEXT';
-                } elseif ($limit === 4294967295) {
-                    $type = 'LONGTEXT';
-                }
-            }
-
-            //list($namespace, $class) = namespaceSplit(get_class($this));
-            # Remove limit,precision, scale if user has sent them (postgre can use int limit)
-            foreach (['limit','precision','scale'] as $remove) {
-                if (! isset($real[$remove]) and isset($column[$remove])) {
-                    $column[$remove] = null;
-                }
-            }
-        }
-     
-        # Lengths
-        $output = $this->columnName($column['name']) . ' ' . $type;
-     
-        /**
-         * Logic when using agnostic
-         * Get defaults if needed
-         */
-        if ($real) {
-            if (! empty($real['limit']) and empty($column['limit'])) {
-                $column['limit'] = $real['limit'];
-            }
-            if (isset($real['precision']) and ! isset($column['precision'])) {
-                $column['precision'] = $real['precision'];
-            }
-            if (isset($real['scale']) and ! isset($column['scale'])) {
-                $column['scale'] = $real['scale'];
-            }
-        }
-  
-        if ($column['limit']) {
-            $output .= "({$column['limit']})";
-        } elseif (! empty($column['precision'])) {
-            $output .= "({$column['precision']},{$column['scale']})";
-        }
-
-        /**
-         * First handle defaults, then nulls
-         */
-        if (! empty($column['default']) and $column['null'] === false) {
-            $output .= ' DEFAULT ' . $this->columnValue($column['default']) .' NOT NULL';
-        } elseif (isset($column['default'])) { //isset catches ''
-            $output .= ' DEFAULT ' . $this->columnValue($column['default']);
-        } elseif ($column['null'] === false) {
-            $output .= ' NOT NULL';
-        }
-      
-        return $output;
-    }
-
-    /**
      * This gets the createTable information from a table name
      *
      * @param string $table
@@ -165,68 +67,6 @@ abstract class BaseSchema
      * @return void
      */
     abstract public function showCreateTable(string $table);
-
-    /**
-    * Returns a MySQL string for creating a table. Should be agnostic and non-agnostic.
-    *
-    * @param string $table
-    * @param array $data
-    * @return string
-    */
-    public function createTable(string $table, array $data, array $options = []) : string
-    {
-        $options += ['primaryKey' => null,'options' => null];
-        $append = '';
-        if (! empty($options['options'])) {
-            $append = ' '. $options['options'];
-        }
-
-        $result = [];
-        
-        /**
-         * Create table accepts primaryKey settings
-         * v1.25 +
-         */
-        $primaryKeys = [];
-        if ($options['primaryKey']) {
-            $primaryKeys = (array) $options['primaryKey'];
-        }
-
-        /**
-         * This is legacy handler. for key setting
-         */
-        foreach ($data as $field => $settings) {
-            if (! empty($settings['key']) and ! in_array($field, $primaryKeys)) {
-                $primaryKeys[] = $field;
-            }
-        }
-       
-        foreach ($data as $field => $settings) {
-            if (is_string($settings)) {
-                $settings = ['type' => $settings];
-            }
-            /**
-             * Cant set length on primaryKey
-             */
-            if ($settings['type'] === 'primaryKey') {
-                if (! in_array($field, $primaryKeys)) {
-                    $primaryKeys[] = $field;
-                }
-                $result[] = ' ' . $field . ' ' . $this->columns['primaryKey']['name'];
-                continue;
-            }
-
-            $output = $this->buildColumn(['name' => $field] + $settings);
-         
-            $result[] = ' '.$output;
-        }
-      
-        if ($primaryKeys) {
-            $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
-        }
-
-        return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n){$append}";
-    }
 
     /**
      * This describes the table in the database using the new format.
@@ -319,9 +159,9 @@ abstract class BaseSchema
      */
     public function addColumn(string $table, string $name, string $type, array $options = []) : string
     {
-        $definition = $this->buildColumn(array_merge(['name' => $name,'type' => $type], $options));
+        $definition = $this->columnSql(array_merge(['name' => $name,'type' => $type], $options));
 
-        return "ALTER TABLE {$table} ADD COLUMN {$definition}";
+        return sprintf('ALTER TABLE %s ADD COLUMN %s', $this->quoteIdentifier($table), $definition);
     }
 
     /**
@@ -340,14 +180,26 @@ abstract class BaseSchema
         if (is_array($column)) {
             $column = implode(', ', $column);
         }
+        $sql = 'CREATE INDEX %s ON %s (%s)';
         if (! empty($options['unique'])) {
-            return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";
+            $sql = 'CREATE UNIQUE INDEX %s ON %s (%s)';
         }
         if (! empty($options['type'])) {
-            return 'CREATE ' . strtoupper($options['type']) . " INDEX {$name} ON {$table} ({$column})";
+            $sql = 'CREATE ' . strtoupper($options['type']) . ' INDEX %s ON %s (%s)';
         }
 
-        return "CREATE INDEX {$name} ON {$table} ({$column})";
+        return sprintf($sql, $this->quoteIdentifier($name), $this->quoteIdentifier($table), $column);
+        
+        /*
+         if (! empty($options['unique'])) {
+             return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";
+         }
+         if (! empty($options['type'])) {
+             return 'CREATE ' . strtoupper($options['type']) . " INDEX {$name} ON {$table} ({$column})";
+         }
+
+         return "CREATE INDEX {$name} ON {$table} ({$column})";
+         */
     }
 
     /**
@@ -385,7 +237,16 @@ abstract class BaseSchema
      */
     public function addForeignKey(string $fromTable, string $toTable, array $options = []) : string
     {
-        return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";
+        return sprintf(
+            'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
+            $this->quoteIdentifier($fromTable),
+            $this->quoteIdentifier($options['name']),
+            $options['column'],
+            $this->quoteIdentifier($toTable),
+            $options['primaryKey']
+    );
+        /*
+        return "ALTER TABLE {$fromTable} ADD CONSTRAINT {$options['name']} FOREIGN KEY ({$options['column']}) REFERENCES {$toTable} ({$options['primaryKey']})";*/
     }
 
     /**
@@ -479,7 +340,12 @@ abstract class BaseSchema
      */
     public function removeColumn(string $table, string $column) : string
     {
-        return "ALTER TABLE {$table} DROP COLUMN {$column}";
+        return sprintf(
+            'ALTER TABLE %s DROP COLUMN %s',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($column)
+        );
+        //return "ALTER TABLE {$table} DROP COLUMN {$column}";
     }
 
     /**
@@ -491,12 +357,12 @@ abstract class BaseSchema
      */
     public function removeColumns(string $table, array $columns) : string
     {
-        $sql = "ALTER TABLE {$table}";
+        $out = [];
         foreach ($columns as $column) {
-            $sql .= "\nDROP COLUMN {$column},";
+            $out[] = 'DROP COLUMN ' . $this->quoteIdentifier($column);  //$sql .= "\nDROP COLUMN {$column},";
         }
 
-        return substr($sql, 0, -1);
+        return 'ALTER TABLE ' . $this->quoteIdentifier($table) . "\n" . implode(",\n", $out);
     }
 
     /**
@@ -544,33 +410,6 @@ abstract class BaseSchema
     {
         return in_array($column, $this->columns($table));
     }
-
-    /**
-     * Formats the column name
-     *
-     * @param string $name
-     * @return string
-     */
-    public function columnName(string $name) : string
-    {
-        return $name;
-    }
-
-    /**
-     * Prepares a column value
-     *
-     * @param mixed $value
-     * @return mixed
-     */
-    abstract public function columnValue($value);
-
-    /**
-     * Gets the schema for a table
-     *
-     * @param string $table
-     * @return array
-     */
-    abstract public function schema(string $table);
 
     /**
      * Sets and gets the datasource
@@ -628,7 +467,7 @@ abstract class BaseSchema
     }
 
     /**
-    * Undocumented function
+    * Wraps a column or table name in quotes
     *
     * @param string $value
     * @return string
@@ -636,5 +475,205 @@ abstract class BaseSchema
     public function quoteIdentifier(string $value) : string
     {
         return $this->quote . $value . $this->quote;
+    }
+
+    /**
+     * Prepare value for schema
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    abstract public function schemaValue($value);
+
+    # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
+
+    /**
+        * Returns a MySQL string for creating a table. Should be agnostic and non-agnostic.
+        *
+        * @param string $table
+        * @param array $data
+        * @return string
+        */
+    public function createTable(string $table, array $data, array $options = []) : string
+    {
+        $options += ['primaryKey' => null,'options' => null];
+        $append = '';
+        if (! empty($options['options'])) {
+            $append = ' '. $options['options'];
+        }
+
+        $result = [];
+        
+        /**
+         * Create table accepts primaryKey settings
+         * v1.25 +
+         */
+        $primaryKeys = [];
+        if ($options['primaryKey']) {
+            $primaryKeys = (array) $options['primaryKey'];
+        }
+
+        /**
+         * This is legacy handler. for key setting
+         */
+        foreach ($data as $field => $settings) {
+            if (! empty($settings['key']) and ! in_array($field, $primaryKeys)) {
+                $primaryKeys[] = $field;
+            }
+        }
+       
+        foreach ($data as $field => $settings) {
+            if (is_string($settings)) {
+                $settings = ['type' => $settings];
+            }
+            /**
+             * Cant set length on primaryKey
+             */
+            if ($settings['type'] === 'primaryKey') {
+                if (! in_array($field, $primaryKeys)) {
+                    $primaryKeys[] = $field;
+                }
+                $result[] = ' ' . $field . ' ' . $this->columns['primaryKey']['name'];
+                continue;
+            }
+
+            $output = $this->buildColumn(['name' => $field] + $settings);
+         
+            $result[] = ' '.$output;
+        }
+      
+        if ($primaryKeys) {
+            $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
+        }
+
+        return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n){$append}";
+    }
+
+    /**
+     * Prepares a column value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function columnValue($value)
+    {
+        return $this->schemaValue($value);
+    }
+
+    /**
+        * Gets the schema for a table
+        *
+        * @param string $table
+        * @return array
+        */
+    abstract public function schema(string $table);
+
+    /**
+     * Build a native sql column string
+     *
+     * @param array $column
+     *  - name: name of column
+     *  - type: integer,bigint,float,decimail,datetime,date,binary or boolean
+     *  - limit: length of field
+     *  - precision: for decimals and floasts
+     *  - default: default value use ''
+     *  - null: allow null values
+     * @return string
+     */
+    protected function buildColumn(array $column) : string
+    {
+        $column += [
+            'name' => null,
+            'type' => null,
+            'limit' => null, // Max column limit [text, binary, integer]
+            'precision' => null, // decima, float
+            'null' => null,
+        ];
+
+        $real = [];
+        $type = $column['type'];
+
+        /**
+         * Temp solution until refactored
+         */
+        if (! empty($column['autoIncrement'])) {
+            $type = 'primaryKey'; // this will be redonne to
+        }
+        if (isset($this->columns[$type])) {
+            $real = $this->columns[$type];
+            $type = strtoupper($this->columns[$type]['name']); // tmp
+
+            /**
+                 * Convert Limits for MySQL
+                 * @todo how this be implemented in MySQL schema without duplicating
+                 * code
+                 */
+            if ($column['type'] === 'text' and isset($column['limit'])) {
+                $limit = $column['limit'];
+                $type = 'TEXT';
+                if ($limit === 16777215) {
+                    $type = 'MEDIUMTEXT';
+                } elseif ($limit === 4294967295) {
+                    $type = 'LONGTEXT';
+                }
+            }
+
+            //list($namespace, $class) = namespaceSplit(get_class($this));
+            # Remove limit,precision, scale if user has sent them (postgre can use int limit)
+            foreach (['limit','precision','scale'] as $remove) {
+                if (! isset($real[$remove]) and isset($column[$remove])) {
+                    $column[$remove] = null;
+                }
+            }
+        }
+     
+        # Lengths
+        $output = $this->columnName($column['name']) . ' ' . $type;
+     
+        /**
+         * Logic when using agnostic
+         * Get defaults if needed
+         */
+        if ($real) {
+            if (! empty($real['limit']) and empty($column['limit'])) {
+                $column['limit'] = $real['limit'];
+            }
+            if (isset($real['precision']) and ! isset($column['precision'])) {
+                $column['precision'] = $real['precision'];
+            }
+            if (isset($real['scale']) and ! isset($column['scale'])) {
+                $column['scale'] = $real['scale'];
+            }
+        }
+  
+        if ($column['limit']) {
+            $output .= "({$column['limit']})";
+        } elseif (! empty($column['precision'])) {
+            $output .= "({$column['precision']},{$column['scale']})";
+        }
+
+        /**
+         * First handle defaults, then nulls
+         */
+        if (! empty($column['default']) and $column['null'] === false) {
+            $output .= ' DEFAULT ' . $this->schemaValue($column['default']) .' NOT NULL';
+        } elseif (isset($column['default'])) { //isset catches ''
+            $output .= ' DEFAULT ' . $this->schemaValue($column['default']);
+        } elseif ($column['null'] === false) {
+            $output .= ' NOT NULL';
+        }
+      
+        return $output;
+    }
+
+    /**
+     * Formats the column name
+     *
+     * @param string $name
+     * @return string
+     */
+    public function columnName(string $name) : string
+    {
+        return $name;
     }
 }

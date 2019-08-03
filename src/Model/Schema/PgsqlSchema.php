@@ -28,92 +28,6 @@ use Origin\Model\ConnectionManager;
 class PgsqlSchema extends BaseSchema
 {
     /**
-     * This is the map for database agnostic, if its not found here then
-     * use what user supplies. @important. This will allow using char and medium text when testing
-     *
-     * @var array
-     */
-    protected $columns = [
-        'primaryKey' => ['name' => 'SERIAL NOT NULL'],
-        'string' => ['name' => 'VARCHAR', 'limit' => 255],
-        'text' => ['name' => 'TEXT'],
-        'integer' => ['name' => 'INTEGER'],
-        'bigint' => ['name' => 'BIGINT'],
-        'float' => ['name' => 'FLOAT'],  # Floats get complicated, float(2) converts to real(24).
-        'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
-        'datetime' => ['name' => 'TIMESTAMP'],
-        'timestamp' => ['name' => 'TIMESTAMP'],
-        'date' => ['name' => 'DATE'],
-        'time' => ['name' => 'TIME'],
-        'binary' => ['name' => 'BYTEA'],
-        'boolean' => ['name' => 'BOOLEAN'],
-    ];
-
-    /**
-     * Gets the schema
-     * @internal postgre
-     * @param string $table
-     * @return array
-     * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin_test'  AND table_name = 'articles' AND table_schema = 'public'
-     */
-    public function schema(string $table) : array
-    {
-        $sql = 'SELECT DISTINCT column_name AS name, data_type AS type, character_maximum_length AS "char_length",numeric_precision ,numeric_scale , column_default AS default,  is_nullable AS "null",character_octet_length AS oct_length, ordinal_position AS position FROM information_schema.columns
-        WHERE table_catalog = \'' . $this->connection()->database() . '\' AND  table_name = \'' . $table . '\' AND table_schema = \'public\'  ORDER BY position';
-
-        $schema = [];
-
-        if ($results = $this->fetchAll($sql)) {
-       
-            /**
-             * @todo defaults should be type,length,default,null (remove length if empty)
-             */
-
-            foreach ($results as $result) {
-                $data = ['type' => null, 'limit' => null, 'default' => null, 'null' => null];
-                $data['type'] = $this->column($result['type']);
-                if ($data['type'] === 'string' and $result['type'] === 'character varying') {
-                    $data['limit'] = $result['char_length'];
-                } elseif (in_array($data['type'], ['decimal', 'float'])) {
-                    if ($result['numeric_precision']) {
-                        $data['precision'] = $result['numeric_precision'];
-                    }
-                    if ($result['numeric_scale']) {
-                        $data['scale'] = $result['numeric_scale'];
-                    }
-                }
-
-                $data['null'] = ($result['null'] === 'YES' ? true : false);
-                //nextval
-                $position = strpos($result['default'], '::character varying');
-                $isAuto = (strpos($result['default'], 'nextval') !== false);
-                if ($position !== false and ! $isAuto) {
-                    $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
-                } elseif (! empty($result['default']) and ! $isAuto) {
-                    $data['default'] = $result['default'];
-                }
-
-                if ($isAuto) {
-                    $data['autoIncrement'] = true;
-                }
-
-                /**
-                 * Detect Primary Key
-                 * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
-                 * @todo This wont work for join tables with two primary keys
-                 */
-                if ($isAuto or ($result['name'] === 'id' and $data['type'] === 'integer')) {
-                    $data['key'] = 'primary'; // Assume id is primary key
-                    $data['type'] = 'primaryKey';
-                }
-                $schema[$result['name']] = $data;
-            }
-        }
-
-        return $schema;
-    }
-
-    /**
         * This is the new create Table function
         *
         * @param string $table
@@ -182,7 +96,7 @@ class PgsqlSchema extends BaseSchema
                 'COMMENT ON COLUMN %s.%s IS %s',
                 $tableName,
                 $this->quoteIdentifier($column),
-                $this->columnValue($comment)
+                $this->schemaValue($comment)
             );
         }
 
@@ -278,7 +192,10 @@ class PgsqlSchema extends BaseSchema
      */
     public function indexes(string $table) : array
     {
-        $sql = "SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique, ix.indisprimary AS primary FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = 'r' AND t.relname = '{$table}' ORDER BY t.relname, i.relname";
+        $sql = sprintf(
+            'SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique, ix.indisprimary AS primary FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = \'r\' AND t.relname = %s ORDER BY t.relname, i.relname',
+            $this->schemaValue($table)
+        );
         $results = $this->fetchAll($sql);
         $indexes = [];
         
@@ -314,7 +231,12 @@ class PgsqlSchema extends BaseSchema
      */
     public function renameTable(string $from, string $to) : string
     {
-        return  "ALTER TABLE {$from} RENAME TO {$to}";
+        return sprintf(
+            'ALTER TABLE %s RENAME TO %s',
+            $this->quoteIdentifier($from),
+            $this->quoteIdentifier($to)
+        );
+        //return  "ALTER TABLE {$from} RENAME TO {$to}";
     }
 
     /**
@@ -327,6 +249,7 @@ class PgsqlSchema extends BaseSchema
      */
     public function changeColumn(string $table, string $name, string $type, array $options = []) : string
     {
+        $options += ['default' => null, 'null' => null];
         if (isset($this->columns[$type])) {
             $options = array_merge($this->columns[$type], $options);
             $agnoType = $type;
@@ -338,15 +261,21 @@ class PgsqlSchema extends BaseSchema
                 $type = "{$type}({$options['limit']})";
             }
         }
+        $name = $this->quoteIdentifier($name);
 
-        // Set the data type
-        $sql = "ALTER TABLE {$table} ALTER COLUMN {$name} SET DATA TYPE {$type}";
-        $options += ['default' => null, 'null' => null];
-
+        $sql = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s',
+            $this->quoteIdentifier($table),
+            $name,
+            $type
+        );
+       
+        $default = $this->schemaValue($options['default']);
+        
         if (! empty($options['default']) and $options['null'] === false) {
-            $sql .= ", ALTER COLUMN {$name} SET DEFAULT " . $this->columnValue($options['default']) .", ALTER COLUMN {$name} SET NOT NULL";
+            $sql .= ", ALTER COLUMN {$name} SET DEFAULT {$default}, ALTER COLUMN {$name} SET NOT NULL";
         } elseif (isset($options['default'])) {
-            $sql .= ", ALTER COLUMN {$name} SET DEFAULT " . $this->columnValue($options['default']);
+            $sql .= ", ALTER COLUMN {$name} SET DEFAULT {$default}";
         } elseif ($options['null'] === false) {
             $sql .= ", ALTER COLUMN {$name} SET NOT NULL";
         }
@@ -364,7 +293,13 @@ class PgsqlSchema extends BaseSchema
      */
     public function renameColumn(string $table, string $from, string $to) : string
     {
-        return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
+        return sprintf(
+            'ALTER TABLE %s RENAME COLUMN %s TO %s',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($from),
+            $this->quoteIdentifier($to)
+        );
+        //return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
     }
 
     /**
@@ -378,7 +313,10 @@ class PgsqlSchema extends BaseSchema
      */
     public function removeIndex(string $table, string $name) : string
     {
-        return "DROP INDEX {$name}";
+        return sprintf(
+            'DROP INDEX %s',
+            $this->quoteIdentifier($name)
+        );
     }
 
     /**
@@ -392,7 +330,11 @@ class PgsqlSchema extends BaseSchema
      */
     public function renameIndex(string $table, string $oldName, string $newName): string
     {
-        return "ALTER INDEX {$oldName} RENAME TO {$newName}";
+        return sprintf(
+            'ALTER INDEX %s RENAME TO %s',
+            $this->quoteIdentifier($oldName),
+            $this->quoteIdentifier($newName)
+        );
     }
 
     /**
@@ -405,8 +347,13 @@ class PgsqlSchema extends BaseSchema
     {
         $config = ConnectionManager::config($this->datasource);
 
-        $sql = 'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = \'' . $this->connection()->database() . '\' AND  tc.table_name = \'' . $table . '\' AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'';
-       
+        // $sql = 'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = \'' . $this->connection()->database() . '\' AND  tc.table_name = \'' . $table . '\' AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'';
+
+        $sql = sprintf(
+            'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = %s AND  tc.table_name = %s AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'',
+            $this->schemaValue($this->connection()->database()),
+            $this->schemaValue($table)
+         );
         $out = [];
 
         foreach ($this->fetchAll($sql) as $result) {
@@ -430,11 +377,16 @@ class PgsqlSchema extends BaseSchema
      */
     public function removeForeignKey(string $fromTable, string $constraint): string
     {
-        return "ALTER TABLE {$fromTable} DROP CONSTRAINT {$constraint}";
+        return sprintf(
+            'ALTER TABLE %s DROP CONSTRAINT %s',
+            $this->quoteIdentifier($fromTable),
+            $this->quoteIdentifier($constraint)
+        );
     }
 
     /**
-     * No easy way to do with pgsql. Pref is to use pgdump command
+     * PGSQL does have this feature. Using pg_dump can be an issue if the db server is a different
+     * version like in docker, where a mismatch can occur.
      *
      * @param string $table
      * @return string
@@ -455,7 +407,7 @@ class PgsqlSchema extends BaseSchema
      * @param mixed $value
      * @return mixed
      */
-    public function columnValue($value)
+    public function schemaValue($value)
     {
         if ($value === '' or $value === null) {
             return 'NULL';
@@ -486,11 +438,12 @@ class PgsqlSchema extends BaseSchema
     */
     public function dropTable(string $table, array $options = []) : string
     {
+        $sql = 'DROP TABLE %s CASCADE';
         if (! empty($options['ifExists'])) {
-            return "DROP TABLE IF EXISTS {$table} CASCADE";
+            $sql = 'DROP TABLE IF EXISTS %s CASCADE';
         }
 
-        return "DROP TABLE {$table} CASCADE";
+        return sprintf($sql, $this->quoteIdentifier($table));
     }
 
     /**
@@ -638,7 +591,7 @@ class PgsqlSchema extends BaseSchema
         if (isset($data['default']) and $data['type'] === 'timestamp' and strtolower($data['default']) === 'current_timestamp') {
             $out .= ' DEFAULT CURRENT_TIMESTAMP';
         } elseif (isset($data['default'])) {
-            $out .= ' DEFAULT ' . $this->columnValue($data['default']);
+            $out .= ' DEFAULT ' . $this->schemaValue($data['default']);
         }
         
         return $out;
@@ -736,5 +689,93 @@ class PgsqlSchema extends BaseSchema
         }
 
         return ['type' => 'string'];
+    }
+
+    # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
+
+    /**
+        * This is the map for database agnostic, if its not found here then
+        * use what user supplies. @important. This will allow using char and medium text when testing
+        *
+        * @var array
+        */
+    protected $columns = [
+        'primaryKey' => ['name' => 'SERIAL NOT NULL'],
+        'string' => ['name' => 'VARCHAR', 'limit' => 255],
+        'text' => ['name' => 'TEXT'],
+        'integer' => ['name' => 'INTEGER'],
+        'bigint' => ['name' => 'BIGINT'],
+        'float' => ['name' => 'FLOAT'],  # Floats get complicated, float(2) converts to real(24).
+        'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
+        'datetime' => ['name' => 'TIMESTAMP'],
+        'timestamp' => ['name' => 'TIMESTAMP'],
+        'date' => ['name' => 'DATE'],
+        'time' => ['name' => 'TIME'],
+        'binary' => ['name' => 'BYTEA'],
+        'boolean' => ['name' => 'BOOLEAN'],
+    ];
+
+    /**
+    * Gets the schema
+    * @internal postgre
+    * @param string $table
+    * @return array
+    * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin_test'  AND table_name = 'articles' AND table_schema = 'public'
+    */
+    public function schema(string $table) : array
+    {
+        $sql = 'SELECT DISTINCT column_name AS name, data_type AS type, character_maximum_length AS "char_length",numeric_precision ,numeric_scale , column_default AS default,  is_nullable AS "null",character_octet_length AS oct_length, ordinal_position AS position FROM information_schema.columns
+        WHERE table_catalog = \'' . $this->connection()->database() . '\' AND  table_name = \'' . $table . '\' AND table_schema = \'public\'  ORDER BY position';
+
+        $schema = [];
+
+        if ($results = $this->fetchAll($sql)) {
+       
+            /**
+             * @todo defaults should be type,length,default,null (remove length if empty)
+             */
+
+            foreach ($results as $result) {
+                $data = ['type' => null, 'limit' => null, 'default' => null, 'null' => null];
+                $data['type'] = $this->column($result['type']);
+                if ($data['type'] === 'string' and $result['type'] === 'character varying') {
+                    $data['limit'] = $result['char_length'];
+                } elseif (in_array($data['type'], ['decimal', 'float'])) {
+                    if ($result['numeric_precision']) {
+                        $data['precision'] = $result['numeric_precision'];
+                    }
+                    if ($result['numeric_scale']) {
+                        $data['scale'] = $result['numeric_scale'];
+                    }
+                }
+
+                $data['null'] = ($result['null'] === 'YES' ? true : false);
+                //nextval
+                $position = strpos($result['default'], '::character varying');
+                $isAuto = (strpos($result['default'], 'nextval') !== false);
+                if ($position !== false and ! $isAuto) {
+                    $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
+                } elseif (! empty($result['default']) and ! $isAuto) {
+                    $data['default'] = $result['default'];
+                }
+
+                if ($isAuto) {
+                    $data['autoIncrement'] = true;
+                }
+
+                /**
+                 * Detect Primary Key
+                 * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
+                 * @todo This wont work for join tables with two primary keys
+                 */
+                if ($isAuto or ($result['name'] === 'id' and $data['type'] === 'integer')) {
+                    $data['key'] = 'primary'; // Assume id is primary key
+                    $data['type'] = 'primaryKey';
+                }
+                $schema[$result['name']] = $data;
+            }
+        }
+
+        return $schema;
     }
 }
