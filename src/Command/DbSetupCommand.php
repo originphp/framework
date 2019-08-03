@@ -27,7 +27,6 @@ class DbSetupCommand extends Command
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
-            'default' => 'schema',
         ]);
     }
  
