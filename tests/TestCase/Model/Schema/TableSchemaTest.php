@@ -61,14 +61,13 @@ class TableSchemaTest extends OriginTestCase
             'created' => 'datetime',
         ];
         $schema = new TableSchema('posts', $columns);
-        $result = $schema->addConstraint('primary', ['type' => 'primary','column' => ['id']]);
+        $result = $schema->addConstraint('primary', ['type' => 'primary','column' => 'id']);
         $this->assertInstanceOf(TableSchema::class, $result);
 
         $this->assertNotEmpty($schema->constraints());
-        $expected = ['name' => 'primary','type' => 'primary','column' => ['id']];
+        $expected = ['name' => 'primary','type' => 'primary','column' => 'id'];
         $this->assertEquals($expected, $schema->constraints('primary'));
-
-        $this->assertEquals(['id'], $schema->primaryKey());
+        $this->assertEquals('id', $schema->primaryKey());
     }
 
     public function testAddConstraintInvalidTypeException()

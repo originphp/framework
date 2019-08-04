@@ -58,11 +58,10 @@ class MysqlSchemaTest extends OriginTestCase
             'indexes' => [
                 'u2' => ['type' => 'index','column' => ['f2']],
             ],
-            'tableOptions' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
+            'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
         ];
         
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-
         $this->assertEquals('d12f59966d5cd2641cd276760b73fb60', md5($statements[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
@@ -80,9 +79,7 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-       
-        $this->assertEquals('7acea14011d6458d2343f4bf327a6384', md5(json_encode($schema)));
-
+        $this->assertEquals('cb496320c78ac8cab618bc11b69dee16', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 
@@ -106,7 +103,7 @@ class MysqlSchemaTest extends OriginTestCase
                 'primary' => ['type' => 'primary','column' => ['id']],
                 'unique' => ['type' => 'unique', 'column' => ['title']],
             ],
-            'tableOptions' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
+            'options' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
       

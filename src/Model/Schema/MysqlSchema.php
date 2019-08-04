@@ -106,7 +106,7 @@ class MysqlSchema extends BaseSchema
             'collation' => $row['Collation'],
         ];
 
-        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes, 'tableOptions' => $options];
+        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes, 'options' => $options];
     }
 
     /**
@@ -570,8 +570,8 @@ class MysqlSchema extends BaseSchema
         }
 
         # MySQL Options
-        if (isset($options['tableOptions'])) {
-            $databaseOptions = $options['tableOptions'];
+        if (isset($options['options'])) {
+            $databaseOptions = $options['options'];
         }
 
         return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);

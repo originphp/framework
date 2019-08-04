@@ -48,7 +48,12 @@ class TableSchema
     protected $indexes = [];
 
     /**
-     * Constraints - this is most confusing e.g. primary key, which is index and constraint
+     * Constraints
+     * Example
+     *  [
+     *      'primary' => ['type' => 'primary','column=>'id']]
+     *      'bookmarks_ibfk_1' => ['type' => 'foreign', 'column' => 'user_id', 'references' => ['users', 'id']]
+     *  ]
      *
      * @var array
      */
@@ -62,38 +67,27 @@ class TableSchema
      */
     protected $options = [];
 
-    public function __construct(string $table, array $columns = [])
+    public function __construct(string $table, array $columns = [], array $options = [])
     {
         $this->table = $table;
        
-        foreach ($columns as $column => $definition) {
-            if (! in_array($column, ['constraints','indexes','tableOptions'])) {
-                $this->addColumn($column, $definition);
-            }
+        foreach ($columns as $name => $definition) {
+            $this->addColumn($name, $definition);
         }
-        if (isset($columns['constraints'])) {
-            foreach ($columns['constraints'] as $name => $definition) {
+        
+        if (isset($options['constraints'])) {
+            foreach ($options['constraints'] as $name => $definition) {
                 $this->addConstraint($name, $definition);
             }
         }
-        if (isset($columns['indexes'])) {
-            foreach ($columns['indexes'] as $name => $definition) {
+        if (isset($options['indexes'])) {
+            foreach ($options['indexes'] as $name => $definition) {
                 $this->addIndex($name, $definition);
             }
         }
-        if (isset($columns['tableOptions'])) {
-            $this->options($columns['tableOptions']);
+        if (isset($options['options'])) {
+            $this->options($options['options']);
         }
-    }
-
-    /**
-     * Describes the table from the database
-     *
-     * @return array
-     */
-    public function describe(Datasource $datasource) : array
-    {
-        return $datasource->describe($this->table);
     }
 
     /**
@@ -104,13 +98,9 @@ class TableSchema
      */
     public function toSql(Datasource $datasource) : array
     {
-        $params = $this->columns;
-        $options = $this->options;
-
-        $options['constraints'] = $this->constraints;
-        $options['indexes'] = $this->indexes;
-
-        return $datasource->adapter()->createTableSql($this->table, $params, $options);
+        return $datasource->adapter()->createTableSql($this->table, $this->columns, [
+            'constraints' => $this->constraints,'indexes' => $this->indexes,'options' => $this->options,
+        ]);
     }
 
     /**
@@ -267,14 +257,15 @@ class TableSchema
     /**
      * Gets the primary Key
      *
-     * @return array
+     * @return string|array|null
      */
-    public function primaryKey() : array
+    public function primaryKey()
     {
-        $primaryKey = [];
+        $primaryKey = null;
         foreach ($this->constraints as $name => $attributes) {
             if ($attributes['type'] === 'primary') {
                 $primaryKey = $attributes['column'];
+                break;
             }
         }
 
