@@ -91,19 +91,14 @@ class %name%Schema extends Schema
         foreach ($tables as $table) {
             $data = $connection->adapter()->describe($table);
             $this->io->list($table);
-            
             $columns = [];
-            foreach ($data['columns'] as $name => $definition) {
-                $column = $this->values($definition);
-                $columns[] = "\t\t'{$name}' => " . '[' . implode(', ', $column) . ']';
-            }
-
+            $columns[] = $this->datasetToString('columns', $data['columns']);
             $columns[] = $this->datasetToString('constraints', $data['constraints']);
             $columns[] = $this->datasetToString('indexes', $data['indexes']);
 
-            if (isset($data['tableOptions'])) {
-                $options = $this->values($data['tableOptions']);
-                $columns[] = "\t\t'tableOptions' => " . '[' . implode(', ', $options) . ']';
+            if (isset($data['options'])) {
+                $options = $this->values($data['options']);
+                $columns[] = "\t\t'options' => " . '[' . implode(', ', $options) . ']';
             }
 
             $out[] = "\tpublic \${$table} = [\n" . implode(",\n", $columns) .  "\n\t];\n" ;
