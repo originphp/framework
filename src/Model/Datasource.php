@@ -592,7 +592,7 @@ abstract class Datasource
     }
 
     /**
-     * This will is the new schema
+     * Describes the table
      *
      * @param string $table
      * @return array
@@ -600,7 +600,6 @@ abstract class Datasource
     public function describe(string $table) : array
     {
         return $this->adapter()->describe($table);
-        ;
     }
 
     /**
