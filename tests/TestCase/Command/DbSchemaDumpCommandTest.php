@@ -66,7 +66,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $schema = new DumpSchema();
         $this->assertInstanceOf(DumpSchema::class, $schema);
         $this->assertNotEmpty($schema->posts);
-        $this->assertEquals('integer', $schema->posts['id']['type']);
+        $this->assertEquals('integer', $schema->posts['columns']['id']['type']);
         $this->assertNotEmpty($schema->posts['constraints']);
         $this->assertNotEmpty($schema->posts['constraints']['primary']);
     }
