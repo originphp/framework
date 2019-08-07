@@ -166,7 +166,7 @@ class Fixture
         }
 
         $connection = ConnectionManager::get($options['datasource']);
-        $schema = $connection->schema($options['table']);
+        $schema = $connection->schema($options['table']); // being deprecated
         
         /**
          * Imports records
