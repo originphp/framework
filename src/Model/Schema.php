@@ -19,7 +19,8 @@ class Schema
         $properties = get_object_vars($this);
         $tables = array_keys($properties);
         foreach ($tables as $table) {
-            $schema = new TableSchema($table, $properties[$table]);
+            $columns = $properties[$table]['columns'] ?? [];
+            $schema = new TableSchema($table, $columns, $properties[$table]);
             $out = array_merge($out, $schema->toSql($datasource));
         }
 

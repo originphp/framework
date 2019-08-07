@@ -120,22 +120,22 @@ class MysqlSchema extends BaseSchema
         $out = [];
         
         foreach ($data as $row) {
-            $defintion = $this->parseColumn($row['Type']);
-            $defintion += [
+            $definition = $this->parseColumn($row['Type']);
+            $definition += [
                 'null' => $row['Null'] === 'YES'?true:false,
                 'default' => $row['Default'],
             ];
             if (! empty($row['Collation'])) {
-                $defintion['collate'] = $row['Collation'];
+                $definition['collate'] = $row['Collation'];
             }
             if (! empty($row['Comment'])) {
-                $defintion['comment'] = $row['Comment'];
+                $definition['comment'] = $row['Comment'];
             }
 
             if (isset($row['Extra']) and $row['Extra'] === 'auto_increment') {
-                $defintion['autoIncrement'] = true;
+                $definition['autoIncrement'] = true;
             }
-            $out[$row['Field']] = $defintion;
+            $out[$row['Field']] = $definition;
         }
 
         return $out;
@@ -147,7 +147,7 @@ class MysqlSchema extends BaseSchema
      * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
      * @see https://dev.mysql.com/doc/refman/5.5/en/data-types.html
      *
-     * @param string $column
+     * @param string $column e.g int(11) unsigned
      * @return array
      */
     protected function parseColumn(string $column) : array
@@ -156,7 +156,8 @@ class MysqlSchema extends BaseSchema
         if (empty($matches)) {
             throw new Exception(sprintf('Error parsing %s', $column));
         }
-        $unsigned = stripos($column, 'unsigned') !== false;
+
+        $unsigned = substr(strtolower($column), -8) === 'unsigned';
         $limit = $precision = $scale = null;
 
         $col = strtolower($matches[1]);
@@ -204,14 +205,14 @@ class MysqlSchema extends BaseSchema
             return ['type' => 'string','limit' => $limit,'fixed' => true];
         }
 
-        if ($col === 'blob') {
-            return ['type' => 'binary'];
-        }
-       
         if (in_array($col, ['tinytext','longtext','mediumtext'])) {
             return ['type' => 'text', 'limit' => $this->columnLimits[$col]];
         }
        
+        if ($col === 'blob') {
+            return ['type' => 'binary'];
+        }
+
         return ['type' => 'string','limit' => $limit];
     }
 

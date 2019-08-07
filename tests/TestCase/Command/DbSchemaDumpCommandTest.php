@@ -25,7 +25,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
         $this->exec('db:schema:dump --datasource=test dump');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping schema to ' . ROOT . '/tests/TestApp/db/dump.sql');
+        $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.sql');
         $this->assertTrue(file_exists($filename));
         
         $this->assertOutputContains('* posts');
@@ -57,7 +57,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->exec('db:schema:dump --datasource=test --type=php dump');
     
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping schema to ' . ROOT . '/tests/TestApp/db/dump.php');
+        $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.php');
         $this->assertTrue(file_exists($filename));
         $this->assertOutputContains('* posts');
 
