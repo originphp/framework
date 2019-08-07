@@ -599,7 +599,16 @@ abstract class Datasource
      */
     public function describe(string $table) : array
     {
-        return $this->adapter()->describe($table);
+        $cache = Cache::store('origin_model');
+        $key = $this->config['name'] . '_' . $table;
+        $schema = $cache->read($key);
+        if ($schema) {
+            return $schema;
+        }
+        $schema = $this->adapter()->describe($table);
+        $cache->write($key, $schema);
+
+        return $schema;
     }
 
     /**
