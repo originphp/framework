@@ -22,9 +22,11 @@ class ConsoleOutput extends BaseConsoleOutput
 
     protected $buffer = '';
 
-    protected function fwrite(string $data)
+    protected function fwrite(string $data) : int
     {
         $this->buffer .= $data;
+
+        return strlen($data);
     }
 
     public function read()

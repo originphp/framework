@@ -77,7 +77,8 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
   
         $output = $this->stdout->read();
         $this->assertNotEquals('downloading...completed', $output);
-        $this->assertEquals(33, strlen($this->stdout->read())); // Not sure how to test this
+      
+        $this->assertEquals(43, strlen($this->stdout->read())); // Not sure how to test this
     }
 
     public function testMultiLine()
@@ -88,7 +89,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $io->write(['first line','second line']);
         $this->assertEquals("first line\nsecond line", $this->stdout->read());
         $io->overwrite('third line');
-        $this->assertEquals(43, strlen($this->stdout->read())); // Not sure how to test this
+        $this->assertEquals(67, strlen($this->stdout->read())); // Not sure how to test this
     }
 
     public function testTitle()

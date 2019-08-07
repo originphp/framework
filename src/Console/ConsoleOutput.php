@@ -141,9 +141,9 @@ class ConsoleOutput
     /**
      * Checks for Ansi Support
      *
-     * @return void
+     * @return bool
      */
-    public function supportsAnsi()
+    public function supportsAnsi() : bool
     {
         return function_exists('posix_isatty') and posix_isatty($this->stream);
     }
@@ -171,7 +171,7 @@ class ConsoleOutput
      * @param string|array $data
      * @return int
      */
-    public function write($data, $newLine = true)
+    public function write($data, $newLine = true) : int
     {
         if (is_array($data)) {
             $data = implode("\n", $data);
@@ -197,7 +197,7 @@ class ConsoleOutput
      * @param string $data
      * @return int bytes
      */
-    protected function fwrite(string $data)
+    protected function fwrite(string $data) : int
     {
         fwrite($this->stream, $data);
 
@@ -209,7 +209,7 @@ class ConsoleOutput
      *
      * @return void
      */
-    public function close()
+    public function close() : void
     {
         if (is_resource($this->stream)) {
             fclose($this->stream);
@@ -217,11 +217,11 @@ class ConsoleOutput
     }
 
     /**
-    * Fromats the text by parsing tags
+    * Formats the text by parsing tags
     * @param  string $string text
-    * @return string        text
+    * @return string text
     */
-    public function parseTags($string)
+    public function parseTags($string) : string
     {
         $regex = '/<([a-z0-9]+)>(.*?)<\/(\1)>/ims';
         if (preg_match_all($regex, $string, $matches)) {
@@ -244,8 +244,12 @@ class ConsoleOutput
 
     /**
      * Generates the styled ansi string
+     *
+     * @param string $tag
+     * @param string $text
+     * @return string
      */
-    protected function style($tag, $text)
+    protected function style(string $tag, string $text) : string
     {
         if (isset($this->styles[$tag]) === false) {
             return "<{$tag}>{$text}</{$tag}>";

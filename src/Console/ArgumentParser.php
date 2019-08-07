@@ -64,13 +64,24 @@ class ArgumentParser
         $this->command = $name;
         $this->description = $description;
     }
-
-    public function setCommand(string $command)
+    /**
+     * Sets the command name
+     *
+     * @param string $command
+     * @return void
+     */
+    public function setCommand(string $command) : void
     {
         $this->command = $command;
     }
 
-    public function setDescription($description)
+    /**
+     * Sets the description
+     *
+     * @param string|array $description
+     * @return void
+     */
+    public function setDescription($description) : void
     {
         if (is_array($description)) {
             $description = implode("\n", $description);
@@ -78,15 +89,27 @@ class ArgumentParser
         $this->description = $description;
     }
 
-    public function setEpilog($epilog)
+    /**
+     * Sets the epilog
+     *
+     * @param string|array $epilog
+     * @return void
+     */
+    public function setEpilog($epilog) : void
     {
         if (is_array($epilog)) {
             $epilog = implode("\n", $epilog);
         }
         $this->epilog = $epilog;
     }
-
-    public function setHelp($help)
+    
+    /**
+     * Sets the help description
+     *
+     * @param string|array $help
+     * @return void
+     */
+    public function setHelp($help) : void
     {
         if (is_array($help)) {
             $help = implode("\n", $help);
@@ -94,7 +117,13 @@ class ArgumentParser
         $this->help = $help;
     }
 
-    public function setUsage($usage)
+    /**
+    * Sets the usage
+    *
+    * @param string|array $usage
+    * @return void
+    */
+    public function setUsage($usage) : void
     {
         if (is_array($usage)) {
             $usage = implode("\n", $usage);
@@ -103,7 +132,7 @@ class ArgumentParser
     }
 
     /**
-     * Undocumented function
+     * Adds an option
      *
      * @param string $name
      * @param array $options
@@ -115,7 +144,7 @@ class ArgumentParser
      *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
      * @return void
      */
-    public function addOption(string $name, array $options = [])
+    public function addOption(string $name, array $options = []) : void
     {
         $options += ['name' => $name,'short' => null,'default' => null,'required' => false,'type' => 'string','description' => '','banner' => strtoupper($name)];
         if ($options['default'] and $options['required']) {
@@ -131,14 +160,21 @@ class ArgumentParser
         $this->options[$name] = $options;
     }
 
-    public function addCommand(string $name, array $options = [])
+    /**
+     * Adds command
+     *
+     * @param string $name
+     * @param array $options
+     * @return void
+     */
+    public function addCommand(string $name, array $options = []) : void
     {
         $options += ['name' => $name,'description' => null];
         $this->commands[$name] = $options;
     }
 
     /**
-     * Undocumented function
+     * Adds an argument
      *
      * @param string $name
      * @param array $options
@@ -147,7 +183,7 @@ class ArgumentParser
      *  - type: string, integer, boolean, array hash
      * @return void
      */
-    public function addArgument(string $name, array $options = [])
+    public function addArgument(string $name, array $options = []) : void
     {
         $options += ['name' => $name,'default' => null,'required' => false,'type' => 'string','description' => ''];
         if ($options['required'] and $this->arguments) {
@@ -165,7 +201,13 @@ class ArgumentParser
         $this->arguments[$name] = $options;
     }
 
-    public function parse(array $argv)
+    /**
+     * Parses the argv
+     *
+     * @param array $argv
+     * @return array
+     */
+    public function parse(array $argv) : array
     {
         $arguments = $options = [];
         $args = [];
@@ -207,12 +249,12 @@ class ArgumentParser
     }
 
     /**
-     * Undocumented function
+     * Parses the arguments
      *
      * @param array $args extracted args
-     * @return void
+     * @return array
      */
-    protected function parseArguments(array $args)
+    protected function parseArguments(array $args) : array
     {
         $keys = array_keys($this->arguments);
         $arguments = [];
@@ -246,7 +288,14 @@ class ArgumentParser
         return $arguments;
     }
 
-    protected function value($type, $value)
+    /**
+     * Converst a value
+     *
+     * @param string $type
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function value(string $type, $value)
     {
         if ($type === 'boolean') {
             return (bool) $value;
@@ -257,8 +306,14 @@ class ArgumentParser
 
         return $value;
     }
-
-    protected function parseOption($option, $options)
+    /**
+     * Parse an option
+     *
+     * @param string $option
+     * @param array $options
+     * @return array
+     */
+    protected function parseOption(string $option, array $options) : array
     {
         $name = $this->getOptionName($option);
         if ($this->options[$name]['type'] === 'boolean') {
@@ -280,7 +335,14 @@ class ArgumentParser
         return $options;
     }
 
-    protected function parseLongOption($arg, $options)
+    /**
+     * Parses a long option e.g. --datasource=1234
+     *
+     * @param string $arg
+     * @param array $options
+     * @return array
+     */
+    protected function parseLongOption(string $arg, array $options) : array
     {
         $option = substr($arg, 2);
         $name = $this->getOptionName($option);
@@ -291,7 +353,14 @@ class ArgumentParser
         return $this->parseOption($option, $options);
     }
 
-    protected function parseShortOption($arg, $options)
+    /**
+     * Parses a short option e.g. -ds=1234
+     *
+     * @param string $arg
+     * @param array $options
+     * @return array
+     */
+    protected function parseShortOption(string $arg, array $options) : array
     {
         $option = substr($arg, 1);
         $name = $this->getOptionName($option);
@@ -308,7 +377,13 @@ class ArgumentParser
         return $this->parseOption($option, $options);
     }
 
-    protected function getOptionName($option)
+    /**
+     * Parses the option string to get a name
+     *
+     * @param string $option
+     * @return string
+     */
+    protected function getOptionName(string $option) : string
     {
         if (strpos($option, '=') !== false) {
             list($option, $value) = explode('=', $option);
@@ -317,23 +392,35 @@ class ArgumentParser
         return $option;
     }
 
-    protected function isLongOption(string $option)
+    /**
+     * Checks if an option is a long option
+     *
+     * @param string $option
+     * @return boolean
+     */
+    protected function isLongOption(string $option) : bool
     {
         return (substr($option, 0, 2) === '--');
     }
 
-    protected function isShortOption(string $option)
+    /**
+        * Checks if an option is a short option
+        *
+        * @param string $option
+        * @return boolean
+        */
+    protected function isShortOption(string $option) : bool
     {
         return ($option[0] === '-' and substr($option, 0, 2) != '--');
     }
 
     /**
      *
-     * Generats the usage only
+     * Generates the usage only
      * @param string $name
-     * @return void
+     * @return string
      */
-    public function usage()
+    public function usage() : string
     {
         $formatter = new ConsoleHelpFormatter();
         $formatter->setUsage($this->generateUsage($this->command));
@@ -346,7 +433,7 @@ class ArgumentParser
      *
      * @return string
      */
-    public function help()
+    public function help() : string
     {
         $formatter = new ConsoleHelpFormatter();
        
@@ -373,7 +460,12 @@ class ArgumentParser
         return $formatter->generate();
     }
 
-    protected function generateArguments()
+    /**
+     * Generates the arguments for help
+     *
+     * @return array
+     */
+    protected function generateArguments() : array
     {
         $arguments = [];
         foreach ($this->arguments as $argument) {
@@ -387,7 +479,12 @@ class ArgumentParser
         return $arguments;
     }
 
-    protected function generateCommands()
+    /**
+     * Generates the commands for help
+     *
+     * @return array
+     */
+    protected function generateCommands() : array
     {
         $commands = [];
         foreach ($this->commands as $command) {
@@ -406,7 +503,7 @@ class ArgumentParser
      *
      * @return array
      */
-    protected function generateOptions()
+    protected function generateOptions() : array
     {
         $options = [];
         foreach ($this->options as $option) {
@@ -434,7 +531,13 @@ class ArgumentParser
         return $options;
     }
 
-    protected function generateUsage(string $command = 'command')
+    /**
+     * Generats the usage string
+     *
+     * @param string $command
+     * @return string
+     */
+    protected function generateUsage(string $command = 'command') : string
     {
         $results = [];
      

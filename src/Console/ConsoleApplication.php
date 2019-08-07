@@ -19,7 +19,6 @@ use Origin\Exception\Exception;
 use Origin\Core\LazyLoadContainer;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Exception\InvalidArgumentException;
-
 /**
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
@@ -78,6 +77,13 @@ class ConsoleApplication
      * @var \Origin\Console\ConsoleIo
      */
     protected $io = null;
+
+    /**
+     * Undocumented variable
+     *
+     * @var \Origin\Console\ArgumentParser
+     */
+    protected $argumentParser = null;
 
     /**
      * Constructor

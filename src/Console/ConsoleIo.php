@@ -91,7 +91,7 @@ class ConsoleIo
     */
     public function out($message) : void
     {
-        $this->lastWrittenLength = $this->stdout->write($message, true);
+        $this->stdout->write($message, true);
     }
 
     /**
@@ -133,7 +133,8 @@ class ConsoleIo
         $backspaces = str_repeat("\x08", (int) $this->lastWrittenLength); // "\033[{$this->lastWrittenLength}D"
         $this->stdout->write($backspaces, false);
        
-        $difference = strlen($message) - (int) $this->lastWrittenLength;
+        $difference = $this->lastWrittenLength - strlen($message);
+        
         if ($difference > 0) {
             $message .= str_repeat(' ', $difference);
         }

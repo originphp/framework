@@ -23,12 +23,32 @@ use Origin\Core\Debugger;
 
 class ErrorHandler
 {
+    /**
+     * ConsoleOutput object
+     *
+     * @var \Origin\Console\ConsoleOutput;
+     */
     protected $consoleOutput = null;
+
+    protected $colourStyles = [
+        'redBackground' => ['color' => 'white', 'background' => 'lightRed'],
+        'yellowBackground' => ['color' => 'white', 'background' => 'lightYellow'],
+        'blueBackground' => ['color' => 'white', 'background' => 'blue'],
+        'yellow' => ['color' => 'lightYellow'],
+        'green' => ['color' => 'lightGreen'], // linux green
+        'blue' => ['color' => 'blue'],
+        'red' => ['color' => 'red'],
+        'white' => ['color' => 'white'],
+        'magenta' => ['color' => 'magenta'],
+        'cyan' => ['color' => 'cyan'],
+    ];
 
     /**
      * Registers the Error and Exception Handling.
+     *
+     * @return void
      */
-    public function register()
+    public function register() : void
     {
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
@@ -38,10 +58,10 @@ class ErrorHandler
      * Convert errors to exception but keep @ supression working.
      *
      * @param string $message error message
-     * @param string $file    Filename where the error was raised
-     * @param int    $line    the corresponding line number
+     * @param string $file Filename where the error was raised
+     * @param int    $line the corresponding line number
      */
-    public function errorHandler($level, $message, $file, $line)
+    public function errorHandler($level, $message, $file, $line) : void
     {
         /**
          * @internal This is original version. Not sure how to refactor like web based handler since
@@ -53,26 +73,12 @@ class ErrorHandler
         }
     }
 
-    protected $colourStyles = [
-        'redBackground' => ['color' => 'white', 'background' => 'lightRed'],
-        'yellowBackground' => ['color' => 'white', 'background' => 'lightYellow'],
-        'blueBackground' => ['color' => 'white', 'background' => 'blue'],
-        'yellow' => ['color' => 'lightYellow'],
-        'green' => ['color' => 'lightGreen'], // linux green
-        'blue' => ['color' => 'blue'],
-        'yellow' => ['color' => 'lightYellow'],
-        'red' => ['color' => 'red'],
-        'white' => ['color' => 'white'],
-        'magenta' => ['color' => 'magenta'],
-        'cyan' => ['color' => 'cyan'],
-    ];
-
     /**
      * Creates or gets the console output object
      *
-     * @return void
+     * @return \Origin\Console\ConsoleOutput
      */
-    protected function consoleOutput()
+    protected function consoleOutput() : ConsoleOutput
     {
         if ($this->consoleOutput) {
             return $this->consoleOutput;
@@ -90,19 +96,19 @@ class ErrorHandler
      *
      * @param string $message
      * @param boolean $newLine
-     * @return void
+     * @return int
      */
-    protected function out(string $message, $newLine = true)
+    protected function out(string $message, $newLine = true) : int
     {
         return $this->consoleOutput()->write($message, $newLine);
     }
     /**
      * Renders the cli exception. Initial version.
      * @todo refactor to clean up code
-     * @param Exception $exception
+     * @param \Exception $exception
      * @return void
      */
-    public function exceptionHandler($exception)
+    public function exceptionHandler($exception) : void
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
@@ -124,7 +130,7 @@ class ErrorHandler
      * @param array $debug
      * @return void
      */
-    public function render(array $debug, $fullBacktrace = false)
+    public function render(array $debug, $fullBacktrace = false) : void
     {
         extract($debug);
 
@@ -172,9 +178,9 @@ class ErrorHandler
      * Removes the /var/www from the filename
      *
      * @param string $filename
-     * @return void
+     * @return string
      */
-    protected function shortenPath(string $filename)
+    protected function shortenPath(string $filename) : string
     {
         return str_replace(ROOT . DS, '', $filename);
     }
