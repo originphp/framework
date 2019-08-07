@@ -6,7 +6,6 @@ use Origin\Core\Inflector;
 class PluginInstallCommand extends Command
 {
     protected $name = 'plugin:install';
-
     protected $description = 'Installs a plugin using a URL or github username/repo. GIT is required to be installed.';
 
     public function initialize()
@@ -20,7 +19,13 @@ class PluginInstallCommand extends Command
         ]);
     }
 
-    protected function getUrl(string $url)
+    /**
+     * Gets the full git url
+     *
+     * @param string $url
+     * @return string
+     */
+    protected function getUrl(string $url) : string
     {
         if (strtolower(substr($url, 0, 4)) !== 'http') {
             $url = "https://github.com/{$url}";
@@ -33,7 +38,14 @@ class PluginInstallCommand extends Command
         return $url;
     }
 
-    protected function getPlugin(string $url, string $plugin = null)
+    /**
+     * Gets the plugin name
+     *
+     * @param string $url
+     * @param string $plugin
+     * @return string
+     */
+    protected function getPlugin(string $url, string $plugin = null) : string
     {
         if ($plugin) {
             if (! preg_match('/^([A-Z]+[a-z0-9]+)+/', $plugin)) {
@@ -53,9 +65,9 @@ class PluginInstallCommand extends Command
      *
      * @param string $url
      * @param string $folder
-     * @return void
+     * @return bool
      */
-    protected function download(string $url, string $folder)
+    protected function download(string $url, string $folder) : bool
     {
         shell_exec("git clone {$url} {$folder}");
 
@@ -68,7 +80,7 @@ class PluginInstallCommand extends Command
      * @param string $plugin
      * @return void
      */
-    protected function appendApplication(string $plugin)
+    protected function appendApplication(string $plugin) : void
     {
         file_put_contents(CONFIG . DS . 'application.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
     }

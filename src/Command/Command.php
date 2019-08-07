@@ -181,7 +181,7 @@ abstract class Command
      */
     public function run(array $args) : bool
     {
-        $this->initialize($args);
+        $this->initialize();
       
         # Configure Help
         $this->parser->setCommand($this->name);

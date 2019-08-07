@@ -11,7 +11,6 @@ class GenerateCommand extends Command
     const TEST = 2;
 
     protected $name = 'generate';
-
     protected $description = 'Generates new code files';
 
     /**
@@ -422,7 +421,7 @@ class GenerateCommand extends Command
                         $validationRules[$field][$rule] = ['rule' => $rule];
                     }
                 }
-                $export = $this->varExport($validationRules[$field], true);
+                $export = $this->varExport($validationRules[$field]);
                 $vars['initialize'] .= '       $this->' . "validate('{$field}',{$export});\n";
             }
         }

@@ -53,7 +53,7 @@ class Cache
     /**
      * Undocumented variable
      *
-     * @var \Origin\Cache\EngineNullEngine
+     * @var \Origin\Cache\Engine\NullEngine
      */
     protected static $nullEngine = null;
 
@@ -123,7 +123,7 @@ class Cache
         if (! static::config($config)) {
             throw new InvalidArgumentException("{$config} config does not exist");
         }
-        self::$use = $config;
+        self::$default = $config;
     }
 
     /**

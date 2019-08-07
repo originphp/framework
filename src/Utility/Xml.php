@@ -178,9 +178,9 @@ class Xml
      * Multiple namespaces defined will only return the actual namespace
      *
      * @param SimpleXMLElement $simpleXml
-     * @return void
+     * @return string
      */
-    protected static function getRootName(SimpleXMLElement $simpleXml)
+    protected static function getRootName(SimpleXMLElement $simpleXml) : string
     {
         $name = $simpleXml->getName();
         $namespaces = $simpleXml->getNamespaces();
@@ -198,7 +198,7 @@ class Xml
      * @param SimpleXMLElement $xml
      * @param [type] $currentNamespace
      * @param array $namespaces
-     * @return void
+     * @return array|string
      */
     protected static function convertXml(SimpleXMLElement $xml, $currentNamespace, array $namespaces = [])
     {

@@ -20,10 +20,16 @@ use Origin\Exception\Exception;
 class DbMigrateCommand extends Command
 {
     protected $name = 'db:migrate';
-
     protected $description = 'Runs and rolls back migrations';
 
     const PATH = APP . DS . 'db'. DS .'migrate';
+
+    /**
+     * Undocumented variable
+     *
+     * @var \Origin\Migration\Migration
+     */
+    protected $Migration = null;
 
     public function initialize()
     {
@@ -54,7 +60,13 @@ class DbMigrateCommand extends Command
         }
     }
 
-    protected function migrate(string $version = null)
+    /**
+     * Migrates
+     *
+     * @param string $version
+     * @return void
+     */
+    protected function migrate(string $version = null) : void
     {
         $migrations = $this->getMigrations($this->lastMigration(), $version);
         if (empty($migrations)) {
@@ -87,7 +99,13 @@ class DbMigrateCommand extends Command
         $this->io->success(sprintf('Migration Complete. %d migrations in %d ms', $count, (microtime(true) - $start)));
     }
 
-    protected function rollback(string $version)
+    /**
+     * Rollsback
+     *
+     * @param string $version
+     * @return void
+     */
+    protected function rollback(string $version) : void
     {
         $migrations = $this->getMigrations($version, $this->lastMigration());
         $migrations = array_reverse($migrations);
@@ -126,23 +144,22 @@ class DbMigrateCommand extends Command
      * Creates the object
      *
      * @param object $object
-     * @return void
+     * @return \Origin\Migration\Migration;
      */
     private function createMigration(object $object)
     {
         include_once self::PATH . DIRECTORY_SEPARATOR . $object->filename;
         $adapter = $this->Migration->connection()->adapter();
-        $migration = new $object->class($adapter);
 
-        return $migration;
+        return new $object->class($adapter);
     }
 
     /**
      * Gets the last migration version
      *
-     * @return int|null
+     * @return string|null
      */
-    private function lastMigration()
+    private function lastMigration() : ?string
     {
         $lastMigration = $this->Migration->find('first', ['order' => 'version DESC']);
         if ($lastMigration) {
@@ -152,7 +169,13 @@ class DbMigrateCommand extends Command
         return null;
     }
 
-    private function verboseStatements(array $statements)
+    /**
+     * Verboses statements to screen
+     *
+     * @param array $statements
+     * @return void
+     */
+    private function verboseStatements(array $statements) : void
     {
         $this->out('');
         foreach ($statements as $statement) {
@@ -166,9 +189,9 @@ class DbMigrateCommand extends Command
      *
      * @param integer $from
      * @param integer $to
-     * @return void
+     * @return array
      */
-    private function getMigrations(int $from = null, int $to = null)
+    private function getMigrations(int $from = null, int $to = null) : array
     {
         $results = array_diff(scandir(self::PATH), ['.', '..']);
         $migrations = [];
