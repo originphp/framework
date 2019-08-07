@@ -245,7 +245,7 @@ class MysqlSchema extends BaseSchema
          * Work with mapped or custom types
          */
         $type = $data['type'];
-        $isMapped = $typeMap[$data['type']];
+        $isMapped = isset($typeMap[$data['type']]);
         if ($isMapped) {
             $type = $typeMap[$data['type']];
         }
@@ -402,7 +402,7 @@ class MysqlSchema extends BaseSchema
      */
     public function renameColumn(string $table, string $from, string $to) : string
     {
-        $tableSchema = $this->schema($table);
+        $tableSchema = $this->describe($table)['columns'];
         $definition = '';
 
         $schema = null;
@@ -539,13 +539,13 @@ class MysqlSchema extends BaseSchema
     }
 
     /**
-        * This is the new create Table function
-        *
-        * @param string $table
-        * @param array $schema
-        * @param array $options
-        * @return array
-        */
+    * This is the new create Table function
+    *
+    * @param string $table
+    * @param array $schema
+    * @param array $options
+    * @return array
+    */
     public function createTableSql(string $table, array $schema, array $options = []) : array
     {
         $columns = $constraints = $indexes = $databaseOptions = [];
@@ -573,6 +573,12 @@ class MysqlSchema extends BaseSchema
         # MySQL Options
         if (isset($options['options'])) {
             $databaseOptions = $options['options'];
+            /**
+             * @deprecated This provides backwards comptability
+             */
+            if (is_string($databaseOptions)) {
+                $databaseOptions = ['options' => $options];
+            }
         }
 
         return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);

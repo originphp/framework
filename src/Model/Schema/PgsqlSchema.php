@@ -544,7 +544,7 @@ class PgsqlSchema extends BaseSchema
          * Work with mapped or custom types
          */
         $type = $data['type'];
-        $isMapped = $typeMap[$data['type']];
+        $isMapped = isset($typeMap[$data['type']]);
         if ($isMapped) {
             $type = $typeMap[$data['type']];
         }
