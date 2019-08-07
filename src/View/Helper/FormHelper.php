@@ -255,7 +255,8 @@ class FormHelper extends Helper
        
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey;
-            foreach ($model->schema() as $column => $row) {
+          
+            foreach ($model->schema()['columns'] as $column => $row) {
                 $type = $row['type'];
 
                 if (in_array($row['type'], ['float', 'integer', 'decimal'])) {

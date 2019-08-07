@@ -74,7 +74,7 @@ class MockMigration extends Migration
     {
         $this->calledBy = $name;
     }
-    public function calledBy()
+    public function calledBy() : string
     {
         return $this->calledBy;
     }
@@ -144,7 +144,7 @@ class MigrationTest extends OriginTestCase
         ], ['options' => $extra]);
         
         $reversableStatements = $migration->invokeStart();
-     
+ 
         $this->assertTrue($migration->columnExists('products', 'id'));
         $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
 
@@ -173,10 +173,10 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->dropTable('articles');
-
+        
         $reversableStatements = $migration->invokeStart();
         $this->assertFalse($migration->tableExists('articles'));
-
+  
         $migration->rollback($reversableStatements);
         $this->assertTrue($migration->tableExists('articles'));
     }
@@ -216,9 +216,14 @@ class MigrationTest extends OriginTestCase
         $migration->addColumn('articles', 'comment_5', 'string', ['null' => true]);
 
         $reversableStatements = array_merge($migration->invokeStart(), $reversableStatements); # add to end
-    
+        
         $this->assertTrue($migration->columnExists('articles', 'category_id'));
-        $this->assertTrue($migration->columnExists('articles', 'opens', ['limit' => 3]));
+        if ($migration->connection()->engine() === 'mysql') {
+            $this->assertTrue($migration->columnExists('articles', 'opens', ['limit' => 3]));
+        } else {
+            $this->assertTrue($migration->columnExists('articles', 'opens')); // Integer does not limit on pgsql
+        }
+       
         $this->assertTrue($migration->columnExists('articles', 'amount', ['precision' => 5,'scale' => 2]));
         $this->assertTrue($migration->columnExists('articles', 'balance', ['precision' => 10,'scale' => 0]));
         $this->assertTrue($migration->columnExists('articles', 'comment_1', ['default' => 'no comment']));

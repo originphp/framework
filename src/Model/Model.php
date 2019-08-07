@@ -291,7 +291,7 @@ class Model
      */
     protected function detectDisplayField(): string
     {
-        $fields = array_keys($this->schema());
+        $fields = array_keys($this->schema()['columns']);
 
         $needles = [
             Inflector::underscore($this->name) . '_name',
@@ -540,7 +540,7 @@ class Model
      */
     public function fields(bool $quote = true) : array
     {
-        $schema = $this->schema();
+        $schema = $this->schema()['columns'];
 
         if ($quote === true) {
             return $this->prepareFields(array_keys($schema));
@@ -591,13 +591,13 @@ class Model
     public function schema(string $field = null)
     {
         if ($this->schema === null) {
-            $this->schema = $this->connection()->schema($this->table);
+            $this->schema = $this->connection()->describe($this->table);
         }
         if ($field === null) {
             return $this->schema;
         }
-        if (isset($this->schema[$field])) {
-            return $this->schema[$field];
+        if (isset($this->schema['columns'][$field])) {
+            return $this->schema['columns'][$field];
         }
 
         return null;
@@ -687,7 +687,7 @@ class Model
         /**
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
-        $columns = array_intersect(array_keys($this->schema()), $entity->modified());
+        $columns = array_intersect(array_keys($this->schema()['columns']), $entity->modified());
 
         $data = [];
         foreach ($columns as $column) {

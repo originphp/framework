@@ -205,49 +205,48 @@ class ModelTest extends OriginTestCase
     public function testSchema()
     {
         $ds = $this->Article->connection();
-        if ($ds->engine() !== 'mysql') {
-            $this->markTestSkipped(
-                'Requires PostgreSQL'
-              );
-        }
+        
         $schema = $this->Article->schema();
+
+        $this->assertIsArray($schema);
+
+        $this->assertArrayHasKey('columns', $schema);
+        $this->assertNotEmpty($schema['columns']);
+
+        $this->assertArrayHasKey('constraints', $schema);
+        $this->assertNotEmpty($schema['constraints']);
+
+        $this->assertArrayHasKey('indexes', $schema);
+        $this->assertEmpty($schema['indexes']); // no index set
+        
+        $this->assertArrayHasKey('id', $schema['columns']);
+        
+        if ($ds->engine() === 'mysql') {
+            $this->assertArrayHasKey('options', $schema);
+            $this->assertNotEmpty($schema['options']);
+        }
+        $schema = $this->Article->schema('id');
+
         $expected = [
-            'type' => 'primaryKey',
+            'type' => 'integer',
             'limit' => 11,
-            'default' => null,
+            'unsigned' => false,
             'null' => false,
-            'key' => 'primary',
+            'default' => null,
             'autoIncrement' => true,
         ];
-        
-        $this->assertEquals($expected, $schema['id']);
 
-        $idSchema = $this->Article->schema('id');
-        $this->assertEquals($expected, $idSchema);
-    }
-
-    public function testSchemaPG()
-    {
-        $ds = $this->Article->connection();
-        if ($ds->engine() !== 'pgsql') {
-            $this->markTestSkipped(
-                'Requires PostgreSQL'
-              );
+        if ($ds->engine() === 'pgsql') {
+            $expected = [
+                'type' => 'integer',
+                'limit' => 32,
+                'null' => false,
+                'default' => null,
+                'autoIncrement' => true,
+            ];
         }
-        $schema = $this->Article->schema();
-        $expected = [
-            'type' => 'primaryKey',
-            'limit' => null,
-            'default' => null,
-            'null' => false,
-            'key' => 'primary',
-            'autoIncrement' => true,
-        ];
         
-        $this->assertEquals($expected, $schema['id']);
-
-        $idSchema = $this->Article->schema('id');
-        $this->assertEquals($expected, $idSchema);
+        $this->assertEquals($expected, $schema);
     }
 
     public function testHasField()

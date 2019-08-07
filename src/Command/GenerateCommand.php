@@ -434,7 +434,7 @@ class GenerateCommand extends Command
         $vars += [
             'controllerUnderscored' => Inflector::underscore($controller),
         ];
-        $fields = array_keys($meta['schema'][$model]);
+        $fields = array_keys($meta['schema'][$model]['columns']);
         $blocks = [];
         foreach ($fields as $field) {
             $block = $data;
@@ -462,7 +462,7 @@ class GenerateCommand extends Command
                     $v['currentModel'] = lcfirst($model); // This for records
                     $t = file_get_contents($templateFolder . DS . 'view_related.tpl');
                     $t = $this->format($t, $v);
-                    $fields = array_keys($meta['schema'][$associated]);
+                    $fields = array_keys($meta['schema'][$associated]['columns']);
                     $blocks = [];
                     foreach ($fields as $field) {
                         $block = $data;
@@ -609,17 +609,23 @@ class Scaffold
         $tables = $connection->tables();
         foreach ($tables as $table) {
             $model = Inflector::classify($table);
-            $this->schema[$model] = $connection->schema($table);
+            $this->schema[$model] = $connection->describe($table);
         }
     }
 
-    public function validationRules()
+    /**
+     * Gets the validations rules array
+     *
+     * @return array
+     */
+    public function validationRules() : array
     {
         $validationRules = [];
         foreach ($this->schema as $model => $schema) {
             $validationRules[$model] = [];
-            foreach ($schema as $field => $meta) {
-                if (isset($meta['key']) and $meta['key'] === 'primary') {
+            $primaryKey = (array) $this->primaryKey($model);
+            foreach ($schema['columns'] as $field => $meta) {
+                if (in_array($field, $primaryKey)) {
                     continue;
                 }
                 $validationRules[$model][$field] = [];
@@ -646,9 +652,9 @@ class Scaffold
     /**
      * Builds an array map of vars,validation rules and associations
      *
-     * @return array $map ['vars'=>$data,'associations'=>$associations,'validate'=>$validationRules,'schema'=>$schema];
+     * @return void
      */
-    public function build()
+    public function build() :void
     {
         $models = array_keys($this->schema);
        
@@ -709,13 +715,14 @@ class Scaffold
      *
      * @param string $model
      * @param array $associations
-     * @return void
+     * @return array
      */
-    public function findBelongsTo(string $model, array $associations = [])
+    public function findBelongsTo(string $model, array $associations = []) : array
     {
-        $fields = $this->schema[$model];
+        $fields = $this->schema[$model]['columns'];
+        $primaryKey = (array) $this->primaryKey($model);
         foreach ($fields as $field => $schema) {
-            if (substr($field, -3) === '_id' and empty($schema['key'])) {
+            if (substr($field, -3) === '_id' and ! in_array($field, $primaryKey)) {
                 $associatedModel = Inflector::camelize(substr($field, 0, -3));
                 $associations[$model]['belongsTo'][] = $associatedModel;
             }
@@ -728,16 +735,16 @@ class Scaffold
      *
      * @param string $model
      * @param array $associations
-     * @return void
+     * @return array
      */
-    public function findHasMany(string $model, array $associations = [])
+    public function findHasMany(string $model, array $associations = []) : array
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
             if ($otherModel === $model or in_array($otherModel, $associations['ignore'])) {
                 continue;
             }
-            $schema = $this->schema[$otherModel];
+            $schema = $this->schema[$otherModel]['columns'];
             $foreignKey = Inflector::underscore($model) . '_id';
        
             if (isset($schema[$foreignKey])) {
@@ -750,8 +757,12 @@ class Scaffold
     /**
      * Finds the hasAndToBelongsToMany using table names. Table name needs to be alphabetical order if not
      * it will be ignored.
+     *
+     * @param string $model
+     * @param array $associations
+     * @return array
      */
-    public function findHasAndBelongsToMany(string $model, array $associations = [])
+    public function findHasAndBelongsToMany(string $model, array $associations = []) : array
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
@@ -773,16 +784,14 @@ class Scaffold
      * Gets the primary key for a model
      *
      * @param string $model
-     * @return string|null field
+     * @return string|array|null field
      */
     public function primaryKey(string $model)
     {
         if (isset($this->schema[$model])) {
             $schema = $this->schema[$model];
-            foreach ($schema as $field => $meta) {
-                if (isset($meta['key']) and $meta['key'] === 'primary') {
-                    return $field;
-                }
+            if (isset($schema['constraints']['primary'])) {
+                return $schema['constraints']['primary']['column'];
             }
         }
 

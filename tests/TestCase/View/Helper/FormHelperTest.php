@@ -41,10 +41,12 @@ class Widget extends Model
      * @var array
      */
     public $schema = [
-        'id' => ['type' => 'integer', 'limit' => 11,'key' => 'primary'],
-        'name' => ['type' => 'string', 'limit' => 80],
-        'description' => ['type' => 'text'],
-        'active' => ['type' => 'boolean', 'limit' => 1],
+        'columns' => [
+            'id' => ['type' => 'integer', 'limit' => 11,'key' => 'primary'],
+            'name' => ['type' => 'string', 'limit' => 80],
+            'description' => ['type' => 'text'],
+            'active' => ['type' => 'boolean', 'limit' => 1],
+        ],
     ];
 
     public function initialize(array $config)

@@ -45,16 +45,15 @@ class DelocalizeBehavior extends Behavior
      * Delocalize the values in the entity
      *
      * @param \Origin\Model\Entity $entity
-     * @return Entity
+     * @return \Origin\Model\Entity
      */
     public function delocalize(Entity $entity) : Entity
     {
-        $schema = $this->model()->schema();
+        $columns = $this->model()->schema()['columns'];
         foreach ($entity->modified() as $field) {
             $value = $entity->get($field);
-            if ($value and isset($schema[$field])) {
-                $type = $schema[$field]['type'];
-                $value = $this->processField($type, $value);
+            if ($value and isset($columns[$field])) {
+                $value = $this->processField($columns[$field]['type'], $value);
                 
                 // Restore value incase of invalid value etc
                 if ($value === null) {

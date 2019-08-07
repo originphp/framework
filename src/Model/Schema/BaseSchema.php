@@ -262,9 +262,9 @@ abstract class BaseSchema
      * @param string $table
      * @return void
      */
-    abstract public function foreignKeys(string $table);
+    abstract public function foreignKeys(string $table) : array;
 
-    abstract public function indexes(string $table);
+    abstract public function indexes(string $table) : array;
 
     /**
      * Checks if a foreignKey exists
@@ -273,7 +273,7 @@ abstract class BaseSchema
      * @param string $foreignKey
      * @return bool
      */
-    public function foreignKeyExists(string $table, array $options)
+    public function foreignKeyExists(string $table, array $options) : bool
     {
         $options += ['column' => null,'name' => null];
         $foreignKeys = $this->foreignKeys($table);
@@ -391,7 +391,7 @@ abstract class BaseSchema
      */
     public function columns(string $table)
     {
-        $schema = $this->schema($table);
+        $schema = $this->describe($table)['columns'];
 
         return array_keys($schema);
     }
@@ -486,7 +486,7 @@ abstract class BaseSchema
 
     /**
         * Returns a MySQL string for creating a table. Should be agnostic and non-agnostic.
-        *
+        * @todo when this is removed, then createTableSQL might need to be renamed to be consistent.
         * @param string $table
         * @param array $data
         * @return string
