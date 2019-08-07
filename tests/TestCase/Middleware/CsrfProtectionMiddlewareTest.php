@@ -29,7 +29,7 @@ class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware
         $this->token = $token;
     }
 
-    public function isTestEnvironment()
+    public function isTestEnvironment() : bool
     {
         return false;
     }
