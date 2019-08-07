@@ -19,7 +19,7 @@ use Origin\TestSuite\TestTrait;
 use Origin\Console\ErrorHandler;
 use Origin\Console\ConsoleOutput;
 
-use Origin\TestSuite\Stub\ConsoleOutput as MockConsoleOutputErrorHandler;
+//use Origin\TestSuite\Stub\ConsoleOutput as MockConsoleOutputErrorHandler;
 
 class MockErrorHandler extends ErrorHandler
 {
@@ -33,8 +33,8 @@ class MockErrorHandler extends ErrorHandler
         return $this->consoleOutput->read();
     }
 }
-/*
-class MockConsoleOutputErrorHandler
+
+class MockConsoleOutputErrorHandler extends ConsoleOutput
 {
     protected $buffer = '';
 
@@ -42,14 +42,14 @@ class MockConsoleOutputErrorHandler
     {
         return $this->buffer;
     }
-    public function write(string $data) : int
+    public function write($data, $newLine = true) : int
     {
         $this->buffer .= $data;
 
         return strlen($data);
     }
 }
-*/
+
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testExceptionRender()
@@ -62,7 +62,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $ErrorHandler->setup();
         $ErrorHandler->exceptionHandler($ex);
         $message = $ErrorHandler->read();
-        
+  
         /**
          * @internal On different systems line numbers etc are different ie. phpunit etc
          */
@@ -70,7 +70,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
  
         $this->assertContains('<yellowBackground> 58 </yellowBackground>', $message);
         $this->assertContains('<blue>54</blue>', $message);
-        $this->assertContains("<cyan>Exception </cyan><green></green>\n<white>tests/TestCase/Console/ErrorHandlerTest.php</white>", $message);
+        $this->assertContains('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>', $message);
         $this->assertContains('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>', $message);
         $this->assertContains('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground', $message);
     }
