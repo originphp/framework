@@ -36,7 +36,7 @@ class CookieComponent extends Component
      * @param string $name
      * @return string|null
      */
-    public function read(string $name)
+    public function read(string $name) : ?string
     {
         return $this->request()->cookies($name);
     }
@@ -53,7 +53,7 @@ class CookieComponent extends Component
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, string $expire = '+1 month', $options = [])
+    public function write(string $name, $value, string $expire = '+1 month', $options = []) : void
     {
         $this->response()->cookie($name, $value, $expire, $options);
     }
@@ -64,7 +64,7 @@ class CookieComponent extends Component
      * @param string $name
      * @return void
      */
-    public function delete(string $name)
+    public function delete(string $name) : void
     {
         $this->response()->cookie($name, '', '-60 minutes');
     }
@@ -86,7 +86,7 @@ class CookieComponent extends Component
     * Checks if a cookie exists
     *
     * @param string $name
-    * @return void
+    * @return bool
     */
     public function exists(string $name) : bool
     {
@@ -100,7 +100,7 @@ class CookieComponent extends Component
      *
      * @return void
      */
-    public function destroy()
+    public function destroy() : void
     {
         unset($_COOKIE);
         $_COOKIE = [];

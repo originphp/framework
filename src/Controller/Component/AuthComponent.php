@@ -69,13 +69,6 @@ class AuthComponent extends Component
      */
     protected $allowedActions = [];
 
-    /**
-     * Holds the reuest object
-     *
-     * @var Request
-     */
-    public $request = null;
-
     public function initialize(array $config)
     {
         if (! ModelRegistry::get($this->config['model'])) {

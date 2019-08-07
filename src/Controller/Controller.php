@@ -17,12 +17,14 @@ use ReflectionClass;
 use App\View\AppView;
 use ReflectionMethod;
 use Origin\Http\Router;
+use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\View\XmlView;
 use Origin\Http\Response;
 use Origin\View\JsonView;
 use Origin\Core\Inflector;
 use Origin\Model\ModelRegistry;
+use Origin\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Controller\Component\ComponentRegistry;
 
@@ -123,7 +125,7 @@ class Controller
      * @param array  $config array of config to be passed to component. Class name
      * @return \Origin\Controller\Component\Component
      */
-    public function loadComponent(string $name, array $config = [])
+    public function loadComponent(string $name, array $config = []) : Component
     {
         list($plugin, $component) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Component'], $config);
@@ -137,8 +139,9 @@ class Controller
      *
      * @param string $name   Helper name e.g. Form
      * @param array  $config array of config to be passed to helper
+     * @return void
      */
-    public function loadHelper(string $name, array $config = [])
+    public function loadHelper(string $name, array $config = []) : void
     {
         list($plugin, $helper) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Helper'], $config);
@@ -164,7 +167,7 @@ class Controller
      * @param array $options
      * @return \Origin\Model\Model
      */
-    public function loadModel(string $model, array $options = [])
+    public function loadModel(string $model, array $options = []) : Model
     {
         list($plugin, $alias) = pluginSplit($model);
 
@@ -186,7 +189,7 @@ class Controller
      * @param string $action
      * @return bool
      */
-    public function isAccessible(string $action)
+    public function isAccessible(string $action) : bool
     {
         $controller = new ReflectionClass(Controller::class);
         if ($controller->hasMethod($action)) {
@@ -213,8 +216,9 @@ class Controller
      *
      * @param string|array $name key name or array
      * @param $value if key is a string set the value for this
+     * @return void
      */
-    public function set($name, $value = null)
+    public function set($name, $value = null) : void
     {
         if (is_array($name)) {
             $data = $name;
@@ -249,12 +253,17 @@ class Controller
      * Called after the controller action and the component shutdown function.
      * Remember to call parent
      *
-     * @return void
+     * @return \Origin\Http\Response|void
      */
     public function afterFilter()
     {
     }
 
+    /**
+     * The controller startup process
+     *
+     * @return mixed
+     */
     public function startupProcess()
     {
         $result = $this->beforeFilter();
@@ -266,6 +275,11 @@ class Controller
         }
     }
    
+    /**
+     * The controller shutdown process
+     *
+     * @return mixed
+     */
     public function shutdownProcess()
     {
         $result = $this->componentRegistry()->call('shutdown');
@@ -297,7 +311,7 @@ class Controller
      * @param string $model name of the model
      * @param array $settings the settings used by PaginatorComponent these are the same settings as in
      * find query (fields, joins, order,limit, group, callbacks,contain)
-     * @return array paginated records
+     * @return mixed
      */
     public function paginate(string $model = null, array $settings = [])
     {
@@ -368,6 +382,7 @@ class Controller
      *   - template: default option, this will render the html template from the views folder.
      *   Other
      *   - status: the status code to return, e.g. 404
+     * @return void
      */
     public function render($options = [])
     {
@@ -434,7 +449,7 @@ class Controller
      * Sets the key or keys of the viewVars to be serialized
      *
      * @param string|array $keyOrKeys
-     * @return string|null
+     * @return string|void
      */
     public function serialize($keyOrKeys = null)
     {
@@ -473,7 +488,7 @@ class Controller
      * @param array|string $data data which will be json encoded
      * @return void
      */
-    public function renderJson($data, int $status = 200)
+    public function renderJson($data, int $status = 200) : void
     {
         $this->autoRender = false; // Only render once
         $this->beforeRender();
@@ -504,7 +519,7 @@ class Controller
      * @param integer $status
      * @return void
      */
-    public function renderXml($data, int $status = 200)
+    public function renderXml($data, int $status = 200) : void
     {
         $this->autoRender = false; // Disable for dispatcher
         $this->beforeRender();
@@ -530,7 +545,7 @@ class Controller
      * @param int status code default 302
      * @return \Origin\Http\Response
      */
-    public function redirect($url, int $code = 302)
+    public function redirect($url, int $code = 302) : Response
     {
         $this->autoRender = false;
         $this->beforeRedirect();

@@ -36,10 +36,17 @@ class PaginatorComponent extends Component
      * This is the model for the current Pagination request. All functions that need
      * this will use this until paginate is called again, if ever.
      *
-     * @var Model
+     * @var \Origin\Model\Model
      */
     protected $model = null;
 
+    /**
+     * Paginates the records
+     *
+     * @param Model $model
+     * @param array $settings
+     * @return mixed
+     */
     public function paginate(Model $model, array $settings = [])
     {
         $this->model = $model;
@@ -95,7 +102,12 @@ class PaginatorComponent extends Component
 
         return $this->fetchResults($settings);
     }
-
+    /**
+     * Return
+     *
+     * @param array $settings
+     * @return mixed
+     */
     protected function fetchResults(array $settings)
     {
         return $this->model->find('all', $settings);
@@ -107,7 +119,7 @@ class PaginatorComponent extends Component
      * @param string $field
      * @return string model/alias
      */
-    protected function getModelFromField(string $field)
+    protected function getModelFromField(string $field) : ?string
     {
         $needle = Inflector::camelize(substr($field, 0, -3)); // owner_id -> Owner;
         $belongsTo = $this->model->association('belongsTo');
@@ -131,7 +143,13 @@ class PaginatorComponent extends Component
         return null;
     }
 
-    protected function getTotal($settings)
+    /**
+     * Runs a count
+     *
+     * @param array $settings
+     * @return integer
+     */
+    protected function getTotal(array $settings) : int
     {
         unset($settings['page'],$settings['limit']);
 
@@ -142,9 +160,9 @@ class PaginatorComponent extends Component
      * Merges settings with defaults, and then checks and whitelists request query  params
      *
      * @param array $settings
-     * @return void
+     * @return array
      */
-    protected function mergeSettings(array $settings)
+    protected function mergeSettings(array $settings) : array
     {
         // merge with defaults
         $settings += $this->config;
@@ -158,7 +176,13 @@ class PaginatorComponent extends Component
         return $settings;
     }
 
-    protected function prepareSort($settings)
+    /**
+     * Return an array
+     *
+     * @param array $settings
+     * @return array
+     */
+    protected function prepareSort(array $settings) : array
     {
         /**
          * Security issues to consider

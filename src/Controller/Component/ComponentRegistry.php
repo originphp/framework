@@ -29,7 +29,7 @@ class ComponentRegistry extends ObjectRegistry
     /**
      * Holds the controller object
      *
-     * @var \Origin\Core\Controller
+     * @var \Origin\Controller\Controller
      */
     protected $controller = null;
 

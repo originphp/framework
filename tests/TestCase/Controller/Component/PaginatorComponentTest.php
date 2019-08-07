@@ -19,7 +19,6 @@ use Origin\Http\Request; // callMethod + getProperty
 use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
-
 use Origin\Controller\Controller;
 use Origin\Model\ConnectionManager;
 use Origin\Exception\NotFoundException;

@@ -58,7 +58,10 @@ class UsersController extends Controller
     public function login()
     {
     }
-    public function redirect($url, int $code = 302)
+    /*
+    * @return \Origin\Http\Response
+    */
+    public function redirect($url, int $code = 302) : Response
     {
         return $this->response;
     }

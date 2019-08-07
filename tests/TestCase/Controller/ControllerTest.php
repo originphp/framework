@@ -32,10 +32,6 @@ class Pet extends Model
 {
     public $datasource = 'test';
 }
-class TestModel
-{
-    public $name = 'TestModel';
-}
 
 class TesterComponent extends Component
 {
@@ -221,16 +217,16 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new TestsController($request, new Response());
-        $Test = new TestModel();
-        ModelRegistry::set('Test', $Test);
+        $model = new Model(['name' => 'Test']);
+        ModelRegistry::set('Test', $model);
         $lazyLoaded = $controller->Test;
-        $this->assertEquals($Test, $lazyLoaded);
+        $this->assertInstanceOf(Model::class, $lazyLoaded);
 
-        $Test->name = 'Test2Model';
-        ModelRegistry::set('Test2', $Test);
+        $model = new Model(['name' => 'Tes2t']);
+        ModelRegistry::set('Test2', $model);
 
-        $this->assertEquals($Test, $controller->loadModel('Test2'));
-        $this->assertEquals($Test, $controller->Test2);
+        $this->assertInstanceOf(Model::class, $controller->loadModel('Test2'));
+        $this->assertInstanceOf(Model::class, $controller->Test2);
         $this->assertNull($controller->NonExistantModel);
     }
 
