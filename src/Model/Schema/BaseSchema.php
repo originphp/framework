@@ -260,10 +260,16 @@ abstract class BaseSchema
      * Gets a list of foreignKeys
      *
      * @param string $table
-     * @return void
+     * @return array
      */
     abstract public function foreignKeys(string $table) : array;
 
+    /**
+     * Returns a list of indexes on a table
+     *
+     * @param string $table
+     * @return array
+     */
     abstract public function indexes(string $table) : array;
 
     /**

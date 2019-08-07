@@ -28,9 +28,9 @@ class DotEnv
     /**
      * Loads an .env file
      *
-     * @return bool
+     * @return void
      */
-    public function load(string $filename = null)
+    public function load(string $filename = null) : void
     {
         if ($filename === null) {
             $filename = CONFIG . '.env';
@@ -43,7 +43,7 @@ class DotEnv
                 $this->env($key, $value);
             }
 
-            return true;
+            return;
         }
         throw new NotFoundException(sprintf('%s could not be found.', $filename));
     }
@@ -55,7 +55,7 @@ class DotEnv
      * @param mixed $value
      * @return void
      */
-    protected function env(string $key, $value)
+    protected function env(string $key, $value) : void
     {
         env($key, $value);
     }
@@ -64,9 +64,9 @@ class DotEnv
      * Processes the parsed lines
      *
      * @param array $lines
-     * @return void
+     * @return array
      */
-    protected function parse(array $lines)
+    protected function parse(array $lines) : array
     {
         $env = [];
         $capture = false;

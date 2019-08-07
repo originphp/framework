@@ -105,6 +105,13 @@ class Request
     protected $environment = null;
 
     /**
+     * Request type
+     *
+     * @var string
+     */
+    protected $type = null;
+
+    /**
      * This makes it easy for testing e.g $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048

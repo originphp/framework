@@ -51,7 +51,7 @@ class Xml
      *
      * @param array $data
      * @param array $options
-     * @return void
+     * @return string
      */
     public static function fromArray(array $data, array $options = []) : string
     {
@@ -154,7 +154,7 @@ class Xml
      * Converts an array into XML
      *
      * @param string $xml
-     * @return void
+     * @return array
      */
     public static function toArray(string $xml) : array
     {

@@ -78,9 +78,9 @@ class CsrfProtectionMiddleware extends Middleware
     /**
      * Checks if in test environment
      *
-     * @return void
+     * @return bool
      */
-    protected function isTestEnvironment()
+    protected function isTestEnvironment() : bool
     {
         return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
     }
@@ -91,7 +91,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param Request $request
      * @return void
      */
-    protected function validateToken(Request $request)
+    protected function validateToken(Request $request) : void
     {
         /**
          * Disable when runing unit tests

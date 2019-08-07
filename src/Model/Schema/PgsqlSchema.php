@@ -646,9 +646,9 @@ class PgsqlSchema extends BaseSchema
      * Parses the column data, the data
      *
      * @param array $row
-     * @return void
+     * @return array
      */
-    protected function parseColumn(array $row)
+    protected function parseColumn(array $row) : array
     {
         $out = [];
         $col = $row['type'];

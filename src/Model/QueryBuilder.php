@@ -243,7 +243,7 @@ class QueryBuilder
      *
      * @param string  $table
      * @param string $alias
-     * @return void
+     * @return string
      */
     protected function tableReference(string $table = null, string $alias = null) : string
     {

@@ -298,15 +298,15 @@ class ModelValidator
     /**
      * This is alias for float
      */
-    public function decimal($value, $options = null) : bool
+    public function decimal($value) : bool
     {
-        return $this->float($value, $options);
+        return $this->float($value);
     }
 
     /**
      * Smooth email validation.
      */
-    public function email($value, $options = null) : bool
+    public function email($value) : bool
     {
         return (bool) preg_match('/[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(.[a-zA-Z0-9-.])+/', $value);
     }
@@ -402,7 +402,7 @@ class ModelValidator
      * Finds whether the value is integer e.g. 123
      *
      * @param integer $value e.g. 154
-     * @return void
+     * @return bool
      */
     public function integer($value) : bool
     {
@@ -417,7 +417,7 @@ class ModelValidator
       * Finds whether the value is float e.g 123.56
       *
       * @param float $value
-      * @return void
+      * @return bool
       */
     public function float($value) : bool
     {
@@ -428,6 +428,14 @@ class ModelValidator
         return is_float($value);
     }
 
+    /**
+     * Checks if a number is in a range
+     *
+     * @param int $value
+     * @param int $min
+     * @param int $max
+     * @return boolean
+     */
     public function range($value, $min = null, $max = null) : bool
     {
         if (! is_numeric($value) or ! isset($min) or ! isset($max)) {
@@ -442,7 +450,6 @@ class ModelValidator
      *
      * @param string $value
      * @param string $timeFormat H:i:s
-     *
      * @return bool
      */
     public function time($value, $timeFormat = 'H:i:s') : bool
@@ -461,7 +468,6 @@ class ModelValidator
      *
      * @param string $url
      * @param bool   $protocol set to false if you want a valid url not to include the protocol
-     *
      * @return bool true or false
      */
     public function url($url, $protocol = true) : bool

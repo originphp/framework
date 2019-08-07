@@ -16,7 +16,7 @@ namespace Origin\Event;
 class EventManager
 {
     /**
-     * @var Singleton
+     * @var \Origin\Event\EventManager
      */
     private static $instance;
 
@@ -32,7 +32,7 @@ class EventManager
      *
      * @return void
      */
-    public static function instance()
+    public static function instance() : EventManager
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -49,7 +49,7 @@ class EventManager
      * @param mixed $data
      * @return \Origin\Event\Event;
      */
-    public function new(string $name, object $subject = null, $data = null)
+    public function new(string $name, object $subject = null, $data = null) : Event
     {
         return new Event($name, $subject, $data);
     }
@@ -68,7 +68,7 @@ class EventManager
      * @param Event|string $event
      * @return bool
      */
-    public function dispatch($event)
+    public function dispatch($event) : bool
     {
         if (is_string($event)) {
             $event = new Event($event);
@@ -98,7 +98,7 @@ class EventManager
      * @param callable $callable
      * @return void
      */
-    public function listen(string $name, callable $callable, int $priority = 10)
+    public function listen(string $name, callable $callable, int $priority = 10) : void
     {
         if (empty($this->listeners[$name])) {
             $this->listeners[$name][$priority] = [];
@@ -140,9 +140,9 @@ class EventManager
      * $manager->subscribe(new Foo());
      *
      * @param object $subscriber
-     * @return bool
+     * @return void
      */
-    public function subscribe(object $subscriber)
+    public function subscribe(object $subscriber) : void
     {
         foreach ($subscriber->implementedEvents() as $key => $function) {
             $this->listen($key, [$subscriber,$function]);

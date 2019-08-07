@@ -21,7 +21,7 @@ use Origin\Exception\NotFoundException;
 class MockDotEnv extends DotEnv
 {
     protected $env = [];
-    protected function env(string $key, $value)
+    protected function env(string $key, $value) : void
     {
         $this->env[$key] = $value;
     }

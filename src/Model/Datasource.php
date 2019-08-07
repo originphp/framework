@@ -16,6 +16,7 @@ namespace Origin\Model;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use Origin\Log\Log;
 use Origin\Cache\Cache;
 use Origin\Core\Configure;

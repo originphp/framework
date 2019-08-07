@@ -39,7 +39,7 @@ class Dispatcher
     /**
        * Returns a single instance of the object
        *
-       * @return Autoloader
+       * @return Dispatcher
        */
     public static function instance()
     {
