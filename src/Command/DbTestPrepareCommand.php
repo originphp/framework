@@ -21,17 +21,29 @@ class DbTestPrepareCommand extends Command
     protected $name = 'db:test:prepare';
     protected $description = 'Prepares the test database using the current schema file';
     
+    public function initialize()
+    {
+        $this->addOption('type', [
+            'description' => 'Which schema type to be loaded sql or php',
+            'default' => 'sql',
+        ]);
+    }
     public function execute()
     {
         $config = ConnectionManager::config('test');
         if (! $config) {
             $this->throwError('test datasource not found');
         }
-        $connection = ConnectionManager::get('test');
-        if (in_array($config['database'], $connection->databases())) {
+        // Create tmp Connection
+        $database = $config['database'];
+        $config['database'] = null;
+        $connection = ConnectionManager::create('tmp', $config);
+  
+        if (in_array($database, $connection->databases())) {
             $this->runCommand('db:drop', ['--datasource=test']);
         }
+
         $this->runCommand('db:create', ['--datasource=test']);
-        $this->runCommand('db:schema:load', ['--datasource=test']);
+        $this->runCommand('db:schema:load', ['--datasource' => 'test','--type' => $this->options('type')]);
     }
 }
