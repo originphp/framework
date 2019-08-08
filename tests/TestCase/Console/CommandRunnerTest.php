@@ -51,7 +51,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     {
         $runner = $this->commandRunner();
         $runner->run([]);
-        $this->assertEquals('215c4f301a1e87901893c2fcef5b3b8b', md5($this->out->read())); // rest
+        $this->assertEquals('5338a68141085bb555518ba73a1978d2', md5($this->out->read())); // rest
     }
 
     public function testFindCommand()
