@@ -72,7 +72,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
 
     public function testExecuteLoadPHPSchema()
     {
-        $this->exec('db:schema:load --datasource=test --type=php dump');
+        $this->exec('db:schema:load --datasource=test --type=php migrations');
         $this->assertExitSuccess();
         $this->assertOutputContains('Executed 1 statements');
     }
@@ -81,7 +81,6 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     {
         parent::tearDown();
         $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS authors');
         $ds->execute('DROP DATABASE IF EXISTS posts');
     }
 }
