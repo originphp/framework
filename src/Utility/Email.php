@@ -1066,9 +1066,9 @@ class Email
      * Gets/Sets the email format
      *
      * @param string|null $type html, text or both
-     * @return \Origin\Utility\Email
+     * @return string|\Origin\Utility\Email
      */
-    public function format($format = null) : Email
+    public function format($format = null)
     {
         if ($format === null) {
             return $this->emailFormat;
