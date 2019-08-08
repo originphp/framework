@@ -26,7 +26,6 @@ class DbSchemaDumpCommand extends Command
 
     protected $template =
     '<?php
-namespace App\Db;
 use Origin\Model\Schema;
 
 class %name%Schema extends Schema
