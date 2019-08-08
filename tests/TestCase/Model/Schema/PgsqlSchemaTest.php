@@ -696,7 +696,7 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         $result = $adapter->showCreateTable('articles');
-        $this->assertEquals('7c1f89c35516bdc6b8065c0576fd42fd', md5($result));
+        $this->assertEquals('a021a9a15d1444af83fed87aff779785', md5($result));
     }
 
     public function testTableExists()

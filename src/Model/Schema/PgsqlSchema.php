@@ -570,7 +570,7 @@ class PgsqlSchema extends BaseSchema
         $out .= ' ' . $type;
 
         // deal with types that have limits or custom types with limit set
-        if (! empty($data['limit']) and in_array($data['type'], ['string','text']) or ! $isMapped) {
+        if (! empty($data['limit']) and ($data['type'] === 'string' or ! $isMapped)) {
             $out .= '(' . $data['limit'] . ')';
         } elseif (! empty($data['precision'])) {
             if ($data['type'] === 'float') {
