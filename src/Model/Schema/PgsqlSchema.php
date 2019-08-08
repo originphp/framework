@@ -614,14 +614,18 @@ class PgsqlSchema extends BaseSchema
                 'default' => $row['default'],
             ];
 
-            // e.g. default value 'home'::character varying
-            if ($row['default']) { // text,varchar and character fields
+            /**
+             * Remove Postgre default stuff
+             * e.g. default value 'home'::character varying
+             */
+            if ($defintion['default']) { // text,varchar and character fields
                 if (preg_match("/'(.*?)'::(text|character varying|bpchar)/", $row['default'], $matches)) {
                     $defintion['default'] = $matches[1];
                 } elseif (substr($row['default'], 0, 8) === 'nextval(' or substr($row['default'], 0, 6) === 'NULL::') {
                     $defintion['default'] = null;
                 }
             }
+            $defintion['default'] = $this->defaultValue($defintion['type'], $defintion['default']); // standarize value
 
             if (! empty($row['collation'])) {
                 $defintion['collate'] = $row['collation'];

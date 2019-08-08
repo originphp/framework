@@ -118,12 +118,12 @@ class MysqlSchema extends BaseSchema
     protected function convertTableDescription(array $data) : array
     {
         $out = [];
-        
+    
         foreach ($data as $row) {
             $definition = $this->parseColumn($row['Type']);
             $definition += [
                 'null' => $row['Null'] === 'YES'?true:false,
-                'default' => $row['Default'],
+                'default' => $this->defaultvalue($definition['type'], $row['Default']),
             ];
             if (! empty($row['Collation'])) {
                 $definition['collate'] = $row['Collation'];

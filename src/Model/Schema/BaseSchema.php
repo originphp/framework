@@ -488,6 +488,25 @@ abstract class BaseSchema
      */
     abstract public function schemaValue($value);
 
+    /**
+    * Standardizes default values
+    *
+    * @param mixed $value
+    * @return mixed
+    */
+    protected function defaultValue(string $type, $value)
+    {
+        if (in_array($type, ['bigint','integer','float','decimal'])) {
+            if (is_numeric($value)) {
+                return ($value == (int) $value) ? (int) $value : (float) $value;
+            }
+        } elseif ($type === 'boolean') {
+            return (bool) $value;
+        }
+
+        return $value;
+    }
+
     # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
 
     /**
