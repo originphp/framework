@@ -14,6 +14,9 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Inflector;
+use Origin\Model\ConnectionManager;
+
 class DbSchemaLoadCommand extends Command
 {
     use DbSchemaTrait;
@@ -30,13 +33,57 @@ class DbSchemaLoadCommand extends Command
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
         ]);
+        $this->addOption('type', [
+            'description' => 'How the schema will be dumped, in sql or php',
+            'default' => 'sql',
+        ]);
     }
  
     public function execute()
     {
         $name = $this->arguments('name') ?? 'schema';
         $datasource = $this->options('datasource');
-        $filename = $this->schemaFilename($name);
-        $this->loadSchema($filename, $datasource);
+        $type = $this->options('type');
+        $filename = $this->schemaFilename($name, $type);
+        if ($type === 'php') {
+            $this->loadPhpSchema($name, $filename, $datasource);
+        } else {
+            $this->loadSchema($filename, $datasource);
+        }
+    }
+
+    public function loadPhpSchema(string $name, string $filename, string $datasource) : void
+    {
+        if (! file_exists($filename)) {
+            $this->throwError("File {$filename} not found");
+        }
+        $this->io->info("Loading {$filename}");
+       
+        if (! ConnectionManager::config($datasource)) {
+            $this->throwError("{$datasource} datasource not found");
+        }
+        $connection = ConnectionManager::get($datasource);
+        
+        $class = Inflector::camelize($name) . 'Schema';
+
+        include $filename;
+        $object = new $class;
+        $statements = $object->createSql($connection);
+
+        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
+
+        foreach ($statements  as $statement) {
+            try {
+                $connection->execute($statement);
+            } catch (DatasourceException $ex) {
+                $this->io->status('error', str_replace("\n", '', $statement));
+                $this->throwError('Executing query failed', $ex->getMessage());
+            }
+            $this->io->status('ok', str_replace("\n", '', $statement));
+        }
+       
+        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
+
+        $this->io->success(sprintf('Executed %d statements', count($statements)));
     }
 }

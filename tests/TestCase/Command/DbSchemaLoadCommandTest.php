@@ -70,6 +70,13 @@ class DbSchemaLoadCommandTest extends OriginTestCase
         $this->assertErrorContains('/plugins/my_plugin/db/pschema.sql');
     }
 
+    public function testExecuteLoadPHPSchema()
+    {
+        $this->exec('db:schema:load --datasource=test --type=php dump');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Executed 1 statements');
+    }
+
     protected function tearDown() : void
     {
         parent::tearDown();
