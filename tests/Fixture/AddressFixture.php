@@ -21,11 +21,16 @@ class AddressFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => ['type' => 'primaryKey'],
-        'author_id' => ['type' => 'integer'],
-        'description' => 'text',
-        'created' => 'datetime',
-        'modified' => 'datetime',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'author_id' => ['type' => 'integer'],
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ],
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
+        ],
     ];
 
     public $records = [

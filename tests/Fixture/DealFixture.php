@@ -21,62 +21,61 @@ class DealFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => [
-            'type' => 'primaryKey',
-            'limit' => 10,
-            'default' => null,
-            'null' => false,
-            'key' => 'primary',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'name' => [
+                'type' => 'string',
+                'limit' => 120,
+                'default' => null,
+                'null' => false,
+            ],
+            'amount' => [
+                'type' => 'decimal',
+                'default' => null,
+                'null' => true,
+                'precision' => '15',
+                'scale' => 2,
+            ],
+            'close_date' => [
+                'type' => 'date',
+                'default' => null,
+                'null' => true,
+            ],
+            'stage' => [
+                'type' => 'string',
+                'limit' => 150,
+                'default' => null,
+                'null' => false,
+            ],
+            'status' => [
+                'type' => 'string',
+                'limit' => 50,
+                'default' => 'new',
+                'null' => false,
+            ],
+            'description' => [
+                'type' => 'text',
+                'default' => null,
+                'null' => true,
+            ],
+            'confirmed' => [
+                'type' => 'time',
+                'default' => null,
+                'null' => true,
+            ],
+            'created' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
+            'modified' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
         ],
-        'name' => [
-            'type' => 'string',
-            'limit' => 120,
-            'default' => '',
-            'null' => false,
-        ],
-        'amount' => [
-            'type' => 'decimal',
-            'default' => null,
-            'null' => true,
-            'precision' => '15',
-            'scale' => 2,
-        ],
-        'close_date' => [
-            'type' => 'date',
-            'default' => null,
-            'null' => true,
-        ],
-        'stage' => [
-            'type' => 'string',
-            'limit' => 150,
-            'default' => null,
-            'null' => false,
-        ],
-        'status' => [
-            'type' => 'string',
-            'limit' => 50,
-            'default' => 'new',
-            'null' => false,
-        ],
-        'description' => [
-            'type' => 'text',
-            'default' => null,
-            'null' => true,
-        ],
-        'confirmed' => [
-            'type' => 'time',
-            'default' => null,
-            'null' => true,
-        ],
-        'created' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
-        ],
-        'modified' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
     ];
 }

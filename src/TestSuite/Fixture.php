@@ -18,6 +18,7 @@ use Origin\Core\Resolver;
 use Origin\Core\Inflector;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Schema\TableSchema;
 
 /**
  * The main goal of the fixture class is to insert records for each test. However, sometimes, the schema
@@ -56,25 +57,26 @@ class Fixture
     protected $insertOnly = false;
 
     /**
-    * Use this to create a custom table, using the information retreived from Model:schema(). This
-    * is more for internal testing
-    *
-    * Types include primaryKey,string,text,decimal,float, integer.
-    *
-    * Keys include type, limit or precision and scale, null, default, and key (either primary or nothing)
-    *
-    *  ['name' => [
-    *     'type' => 'string',
-    *     'limit' => 255,
-    *     'null' => false,
-    *  ],
-    *  'amount' => [
-    *     'type' => 'decimal',
-    *     'precision' => 10,
-    *     'scale' => 10,
-    *     'null' => false
-    *  ],
-    *  'created' => 'datetime']
+    * Use this to create a custom table, using the information retreived from Model:describe('table');
+    * example:
+    * public $schema = [
+    *        'columns' => [
+    *            'id' => ['type' => 'integer','autoIncrement' => true],
+    *            'author_id' => ['type' => 'integer'],
+    *            'description' => 'text',
+    *            'created' => 'datetime',
+    *            'modified' => 'datetime',
+    *        ],
+    *        'constraints' => [
+    *            'primary' => [
+     *                 'type' => 'primary','column' => 'id'
+     *            ],
+    *        ],
+    *        'indexes' => [
+    *             'title_slug_idx'=>[
+    *                   'type'=>'index','column'=>['title','slug']]
+    *          ]
+    *    ];
     * @var array
     */
     public $schema = [];
@@ -209,9 +211,21 @@ class Fixture
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->adapter()->createTable($this->table, $this->schema);
-   
-        return $connection->execute($sql);
+
+        $statements = [];
+        // Backwards compatability handler
+        if (! isset($this->schema['columns'])) {
+            $statements[] = $connection->adapter()->createTable($this->table, $this->schema);
+        } else {
+            $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
+            $statements = $table->toSql($connection);
+        }
+
+        foreach ($statements as $statement) {
+            $connection->execute($statement);
+        }
+       
+        return true; // Backwards compatability
     }
 
     /**

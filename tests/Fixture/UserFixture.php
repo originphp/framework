@@ -21,28 +21,34 @@ class UserFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => ['type' => 'primaryKey'],
-        'name' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'name' => [
+                'type' => 'string',
+                'limit' => 255,
+                'null' => false,
+            ],
+            'email' => [
+                'type' => 'string',
+                'limit' => 255,
+                'null' => false,
+            ],
+            'password' => [
+                'type' => 'string',
+                'limit' => 255,
+                'null' => false,
+            ],
+            'api_token' => [
+                'type' => 'string',
+                'limit' => 40,
+            ],
+            'created' => 'datetime',
+            'modified' => 'datetime',
         ],
-        'email' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
-        'password' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
-        ],
-        'api_token' => [
-            'type' => 'string',
-            'limit' => 40,
-        ],
-        'created' => 'datetime',
-        'modified' => 'datetime',
+    
     ];
     public $records = [
         [

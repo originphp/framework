@@ -21,14 +21,13 @@ class ThreadFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => ['type' => 'primaryKey'],
-        'name' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'name' => ['type' => 'string', 'limit' => 255, 'null' => false],
+            'views' => ['type' => 'integer'],
         ],
-        'views' => [
-            'type' => 'integer',
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
     ];
     public $records = [

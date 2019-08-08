@@ -21,50 +21,49 @@ class BookmarkFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => [
-            'type' => 'primaryKey',
-            'limit' => 11,
-            'default' => null,
-            'null' => false,
-            'key' => 'primary',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'user_id' => [
+                'type' => 'integer',
+                'limit' => 11,
+                'default' => null,
+                'null' => false,
+            ],
+            'title' => [
+                'type' => 'string',
+                'limit' => 50,
+                'default' => null,
+                'null' => false,
+            ],
+            'description' => [
+                'type' => 'text',
+                'default' => null,
+                'null' => true,
+            ],
+            'url' => [
+                'type' => 'text',
+                'default' => null,
+                'null' => true,
+            ],
+            'category' => [
+                'type' => 'string',
+                'limit' => 80,
+                'default' => null,
+                'null' => true,
+            ],
+            'created' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
+            'modified' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
         ],
-        'user_id' => [
-            'type' => 'integer',
-            'limit' => 11,
-            'default' => null,
-            'null' => false,
-        ],
-        'title' => [
-            'type' => 'string',
-            'limit' => 50,
-            'default' => null,
-            'null' => false,
-        ],
-        'description' => [
-            'type' => 'text',
-            'default' => null,
-            'null' => true,
-        ],
-        'url' => [
-            'type' => 'text',
-            'default' => null,
-            'null' => true,
-        ],
-        'category' => [
-            'type' => 'string',
-            'limit' => 80,
-            'default' => null,
-            'null' => true,
-        ],
-        'created' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
-        ],
-        'modified' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
     ];
 }

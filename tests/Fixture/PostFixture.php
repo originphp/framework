@@ -21,21 +21,27 @@ class PostFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        ' id' => ['type' => 'primaryKey'],
-        'title' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'title' => [
+                'type' => 'string',
+                'limit' => 255,
+                'null' => false,
+            ],
+            'body' => 'text',
+            'published' => [
+                'type' => 'integer', // should be bool but needs testing
+                'default' => '0',
+                'null' => false,
+               
+            ],
+            'created' => 'datetime',
+            'modified' => 'datetime',
         ],
-        'body' => 'text',
-        'published' => [
-            'type' => 'integer', // should be bool but needs testing
-            'default' => '0',
-            'null' => false,
-           
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
-        'created' => 'datetime',
-        'modified' => 'datetime',
+
     ];
 
     public $records = [

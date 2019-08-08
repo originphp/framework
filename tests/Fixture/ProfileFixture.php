@@ -21,11 +21,16 @@ class ProfileFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => ['type' => 'primaryKey'],
-        'user_id' => ['type' => 'integer'],
-        'name' => ['type' => 'string'],
-        'created' => 'datetime',
-        'modified' => 'datetime',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'user_id' => ['type' => 'integer'],
+            'name' => ['type' => 'string'],
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ],
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
+        ],
     ];
 
     public $records = [

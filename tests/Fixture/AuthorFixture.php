@@ -21,13 +21,18 @@ class AuthorFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        'id' => ['type' => 'primaryKey'],
-        'name' => ['type' => 'string','limit' => 255, 'null' => false],
-        'description' => 'text',
-        'location' => ['type' => 'string','limit' => 20],
-        'rating' => ['type' => 'integer','limit' => 5],
-        'created' => 'datetime',
-        'modified' => 'datetime',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'name' => ['type' => 'string','limit' => 255, 'null' => false],
+            'description' => 'text',
+            'location' => ['type' => 'string','limit' => 20],
+            'rating' => ['type' => 'integer','limit' => 5],
+            'created' => 'datetime',
+            'modified' => 'datetime',
+        ],
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
+        ],
     ];
 
     public $records = [

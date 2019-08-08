@@ -23,55 +23,55 @@ class QueueFixture extends Fixture
     public $table = 'queue';
 
     public $schema = [
-        'id' => [
-            'type' => 'primaryKey',
-            'limit' => 11,
-            'default' => null,
-            'null' => false,
-            'key' => 'primary',
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'queue' => [
+                'type' => 'string',
+                'limit' => 80,
+                'default' => null,
+                'null' => false,
+            ],
+            'data' => [
+                'type' => 'text',
+                'default' => null,
+                'null' => false,
+            ],
+            'status' => [
+                'type' => 'string',
+                'limit' => 40,
+                'default' => null,
+                'null' => false,
+            ],
+            'locked' => [
+                'type' => 'boolean',
+                'default' => false,
+                'null' => true,
+            ],
+            'tries' => [
+                'type' => 'integer',
+                'limit' => 1,
+                'default' => 0,
+                'null' => true,
+            ],
+            'scheduled' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
+            'created' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
+            'modified' => [
+                'type' => 'datetime',
+                'default' => null,
+                'null' => false,
+            ],
         ],
-        'queue' => [
-            'type' => 'string',
-            'limit' => 80,
-            'default' => null,
-            'null' => false,
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
-        'data' => [
-            'type' => 'text',
-            'default' => null,
-            'null' => false,
-        ],
-        'status' => [
-            'type' => 'string',
-            'limit' => 40,
-            'default' => null,
-            'null' => false,
-        ],
-        'locked' => [
-            'type' => 'boolean',
-            'default' => false,
-            'null' => true,
-        ],
-        'tries' => [
-            'type' => 'integer',
-            'limit' => 1,
-            'default' => 0,
-            'null' => true,
-        ],
-        'scheduled' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
-        ],
-        'created' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
-        ],
-        'modified' => [
-            'type' => 'datetime',
-            'default' => null,
-            'null' => false,
-        ],
+     
     ];
 }

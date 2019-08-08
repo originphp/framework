@@ -21,21 +21,26 @@ class CounterCachePostFixture extends Fixture
     public $datasource = 'test';
 
     public $schema = [
-        ' id' => ['type' => 'primaryKey'],
-        'title' => [
-            'type' => 'string',
-            'limit' => 255,
-            'null' => false,
+        'columns' => [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'title' => [
+                'type' => 'string',
+                'limit' => 255,
+                'null' => false,
+            ],
+            'body' => 'text',
+            'replies_count' => [
+                'type' => 'integer',
+                'default' => 0,
+                'null' => false,
+               
+            ],
+            'created' => 'datetime',
+            'modified' => 'datetime',
         ],
-        'body' => 'text',
-        'replies_count' => [
-            'type' => 'integer',
-            'default' => 0,
-            'null' => false,
-           
+        'constraints' => [
+            'primary' => ['type' => 'primary','column' => 'id'],
         ],
-        'created' => 'datetime',
-        'modified' => 'datetime',
     ];
 
     public $records = [
