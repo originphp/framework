@@ -16,7 +16,15 @@ namespace Origin\Core;
 
 class Resolver
 {
-    public static function className(string $class, $objectType = null, $suffix = null)
+    /**
+     * Resolves the class name
+     *
+     * @param string $class
+     * @param [type] $objectType
+     * @param [type] $suffix
+     * @return string|null
+     */
+    public static function className(string $class, $objectType = null, $suffix = null) : ?string
     {
         if (strpos($class, '\\') !== false) {
             return $class;
@@ -45,8 +53,11 @@ class Resolver
 
     /**
      * To help with testing.
+     *
+     * @param string $className
+     * @return boolean
      */
-    protected static function classExists(string $className)
+    protected static function classExists(string $className) : bool
     {
         return class_exists($className);
     }

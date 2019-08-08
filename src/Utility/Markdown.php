@@ -526,9 +526,9 @@ class Markdown
      * Check if value needs converting and convert
      *
      * @param string $value
-     * @return void
+     * @return string
      */
-    protected static function htmlspecialchars(string $value)
+    protected static function htmlspecialchars(string $value) : string
     {
         if (strpos($value, '&') !== false) {
             $value = htmlspecialchars($value);

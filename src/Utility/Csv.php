@@ -165,7 +165,7 @@ class CsvIterator implements Iterator, Countable
     /**
      * checks if current position is valid
      *
-     * @return void
+     * @return bool
      */
     public function valid()
     {
@@ -192,7 +192,7 @@ class Csv
      *
      * @param string $filename
      * @param array $options
-     * @return void
+     * @return CsvIterator
      */
     public static function process(string $filename, array $options = []) : CsvIterator
     {
@@ -214,7 +214,7 @@ class Csv
      *  - escape: default:\
      * @return array
      */
-    public static function toArray(string $csv, array $options = []): array
+    public static function toArray(string $csv, array $options = []) : array
     {
         $options += ['header' => false, 'keys' => null, 'separator' => ',','enclosure' => '"','escape' => '\\'];
         $stream = fopen('php://temp', 'r+');
@@ -254,7 +254,7 @@ class Csv
      *  - header: true to use keys from array as headers, or pass array of keys to use
      * @return string
      */
-    public static function fromArray(array $data, array $options = []): string
+    public static function fromArray(array $data, array $options = []) : string
     {
         $options += ['header' => false];
 

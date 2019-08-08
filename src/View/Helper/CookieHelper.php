@@ -27,7 +27,7 @@ class CookieHelper extends Helper
        * @param string $name
        * @return string|null
        */
-    public function read(string $name)
+    public function read(string $name) : ?string
     {
         return $this->request()->cookies($name);
     }
@@ -44,7 +44,7 @@ class CookieHelper extends Helper
      * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
      * @return void
      */
-    public function write(string $name, $value, string $expire = '+1 month', $options = [])
+    public function write(string $name, $value, string $expire = '+1 month', $options = []) : void
     {
         $this->response()->cookie($name, $value, $expire, $options);
     }
@@ -55,7 +55,7 @@ class CookieHelper extends Helper
      * @param string $name
      * @return void
      */
-    public function delete(string $name)
+    public function delete(string $name) : void
     {
         $this->response()->cookie($name, '', '-60 minutes');
     }
@@ -77,7 +77,7 @@ class CookieHelper extends Helper
     * Checks if a cookie exists
     *
     * @param string $name
-    * @return void
+    * @return bool
     */
     public function exists(string $name) : bool
     {
@@ -91,7 +91,7 @@ class CookieHelper extends Helper
      *
      * @return void
      */
-    public function destroy()
+    public function destroy() : void
     {
         unset($_COOKIE);
         $_COOKIE = [];

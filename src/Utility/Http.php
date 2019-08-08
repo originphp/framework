@@ -16,6 +16,7 @@ namespace Origin\Utility;
 
 use CURLFile;
 use Origin\Core\ConfigTrait;
+use Origin\Utility\Http\Request;
 use Origin\Utility\Http\Response;
 use Origin\Exception\HttpException;
 use Origin\Exception\NotFoundException;
@@ -116,9 +117,9 @@ class Http
      * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
      * - headers: an array of headers to set. e.g ['header'=>'value']
      * - cookies: an array of cookies to set. e.g. ['name'=>'value']
-     *  @return \Origin\Utility\Http\Request
+     *  @return \Origin\Utility\Http\Response
     */
-    public function get(string $url, array $options = [])
+    public function get(string $url, array $options = []) : Response
     {
         return $this->request('GET', $url, $options);
     }
@@ -140,9 +141,9 @@ class Http
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
     * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
-    *  @return \Origin\Utility\Http\Request
+    *  @return \Origin\Utility\Http\Response
     */
-    public function head(string $url, array $options = [])
+    public function head(string $url, array $options = []) : Response
     {
         return $this->request('HEAD', $url, $options);
     }
@@ -165,9 +166,9 @@ class Http
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
     * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
-    *  @return \Origin\Utility\Http\Request
+    *  @return \Origin\Utility\Http\Response
     */
-    public function post(string $url, array $options = [])
+    public function post(string $url, array $options = []) : Response
     {
         return $this->request('POST', $url, $options);
     }
@@ -190,9 +191,9 @@ class Http
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
     * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
-    *  @return \Origin\Utility\Http\Request
+    *  @return \Origin\Utility\Http\Response
     */
-    public function put(string $url, array $options = [])
+    public function put(string $url, array $options = []) : Response
     {
         return $this->request('PUT', $url, $options);
     }
@@ -214,8 +215,9 @@ class Http
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
     * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    * @return \Origin\Utility\Http\Response
     */
-    public function patch(string $url, array $options = [])
+    public function patch(string $url, array $options = []) : Response
     {
         return $this->request('PATCH', $url, $options);
     }
@@ -236,19 +238,19 @@ class Http
     * - curl: an array of curl options either string or constant e.g [CURLOPT_SSL_VERIFYHOST=>0, 'ssl_verifypeer'=>0]
     * - headers: an array of headers to set. e.g ['header'=>'value']
     * - cookies: an array of cookies to set. e.g. ['name'=>'value']
+    * @return \Origin\Utility\Http\Response
     */
-    public function delete(string $url, array $options = [])
+    public function delete(string $url, array $options = []) : Response
     {
         return $this->request('DELETE', $url, $options);
     }
     /**
       * Sends the actual request through cURL
       *
-      * @param string $url
       * @param array $options
-      * @return \Origin\Utility\Http
+      * @return \Origin\Utility\Http\Response
       */
-    protected function send(array $options)
+    protected function send(array $options) : Response
     {
         $curl = curl_init();
         curl_setopt_array($curl, $options);
@@ -298,11 +300,11 @@ class Http
      * @param string $method
      * @param string $url
      * @param array $options
-     * @return \Origin\Utility\Http
+     * @return Origin\Utility\Http\Response
      */
-    protected function request(string $method, string $url, array $options = [])
+    protected function request(string $method, string $url, array $options = []) : Response
     {
-        $options = $this->mergeOptions($options);
+        $options += $this->config();
         $url = $this->buildUrl($url, $options);
         $options = $this->buildOptions(strtoupper($method), $url, $options);
 
@@ -313,7 +315,7 @@ class Http
      * Returns a cURL file object
      * @return CURLFile
      */
-    public static function file(string $filename)
+    public static function file(string $filename) : CURLFile
     {
         if (! file_exists($filename)) {
             throw new NotFoundException("{$filename} could not be found");
@@ -330,7 +332,7 @@ class Http
      * @param array $options
      * @return array
      */
-    protected function buildRequestHeaders(array $options)
+    protected function buildRequestHeaders(array $options) : array
     {
         // Process headers
         $cookies = [];
@@ -373,7 +375,7 @@ class Http
      * @param array $options
      * @return array
      */
-    protected function buildOptions(string $method, string $url, array $options)
+    protected function buildOptions(string $method, string $url, array $options) : array
     {
         $out = [
             CURLOPT_URL => $url,
@@ -468,14 +470,14 @@ class Http
         return $out;
     }
 
-    protected function mergeOptions(array $options)
-    {
-        $options += $this->config();
-
-        return $options;
-    }
-
-    protected function buildUrl(string $url, array $options)
+    /**
+     * Builds the url using options and query
+     *
+     * @param string $url
+     * @param array $options
+     * @return string
+     */
+    protected function buildUrl(string $url, array $options) : string
     {
         if (! empty($options['base'])) {
             $url = $options['base'] . $url;
@@ -494,7 +496,7 @@ class Http
       * @param string $response
       * @return array
       */
-    protected function parseResponse($ch, string $response)
+    protected function parseResponse($ch, string $response) : array
     {
         // Parse Response
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -508,7 +510,7 @@ class Http
     /**
      * Parses the cookies from headers.
      */
-    protected function parseCookies(array &$headers)
+    protected function parseCookies(array &$headers) : array
     {
         $cookies = [];
         foreach ($headers as $i => $header) {
@@ -564,7 +566,7 @@ class Http
      * @param array $headers
      * @return array $result
      */
-    protected function normalizeHeaders(array $headers)
+    protected function normalizeHeaders(array $headers) : array
     {
         $result = [];
         foreach ($headers as $header) {

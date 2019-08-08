@@ -818,9 +818,9 @@ class Email
      * Validates a header line to prevent Email Header Injections
      *
      * @param string $input
-     * @return void
+     * @return bool
      */
-    protected function validateHeader(string $input = null)
+    protected function validateHeader(string $input = null) : bool
     {
         return ($input === str_ireplace(["\r", "\n", '%0A', '%0D'], '', $input));
     }
@@ -828,9 +828,9 @@ class Email
     /**
      * Builds an array of headers for the email
      *
-     * @return void
+     * @return array
      */
-    protected function buildHeaders()
+    protected function buildHeaders() : array
     {
         $headers = [];
 
@@ -881,7 +881,7 @@ class Email
      *
      * @return array message
      */
-    protected function buildMessage()
+    protected function buildMessage() : array
     {
         $message = [];
 
@@ -960,9 +960,9 @@ class Email
      * Standardizes the line endings and encodes if needed
      *
      * @param string $message
-     * @return void
+     * @return string
      */
-    protected function formatMessage(string $message, bool $needsEncoding)
+    protected function formatMessage(string $message, bool $needsEncoding) : string
     {
         $message = preg_replace("/\r\n|\n/", "\r\n", $message);
         if ($needsEncoding) {
@@ -976,9 +976,9 @@ class Email
      * Gets the message id for the message
      * if messageId is null [default] then it generates a UUID
      *
-     * @return void
+     * @return string
      */
-    protected function getMessageId()
+    protected function getMessageId() : string
     {
         if ($this->messageId === null) {
             /**
@@ -999,9 +999,9 @@ class Email
 
     /**
      * Gets the domain to be used for message id generation
-     * @return void
+     * @return string
      */
-    public function getDomain()
+    public function getDomain() : string
     {
         $domain = php_uname('n');
         if ($this->from) {
@@ -1015,9 +1015,9 @@ class Email
     /**
      * Gets the boundary to be used in the email, if not set it will generate a unique id
      *
-     * @return void
+     * @return string
      */
-    protected function getBoundary()
+    protected function getBoundary() : string
     {
         if ($this->boundary === null) {
             $this->boundary = md5(uniqid(microtime(true), true));
@@ -1029,9 +1029,9 @@ class Email
     /**
      * Gets and encodes the subject
      *
-     * @return void
+     * @return string
      */
-    protected function getSubject()
+    protected function getSubject() : string
     {
         if ($this->subject) {
             $this->subject = mb_encode_mimeheader($this->subject, $this->charset, 'B');
@@ -1043,9 +1043,9 @@ class Email
     /**
      * Gets the content type for the email
      *
-     * @return void
+     * @return string
      */
-    protected function getContentType()
+    protected function getContentType() : string
     {
         if ($this->attachments) {
             return 'multipart/mixed; boundary="' . $this->getBoundary() . '"';
@@ -1068,7 +1068,7 @@ class Email
      * @param string|null $type html, text or both
      * @return \Origin\Utility\Email
      */
-    public function format($format = null)
+    public function format($format = null) : Email
     {
         if ($format === null) {
             return $this->emailFormat;
@@ -1105,7 +1105,7 @@ class Email
      * @param array $address
      * @return string james@originphp.com James <james@originphp.com>
      */
-    protected function formatAddress(array $address)
+    protected function formatAddress(array $address) : string
     {
         list($email, $name) = $address;
         if ($name === null) {
@@ -1116,7 +1116,13 @@ class Email
         return "{$name} <{$email}>";
     }
 
-    protected function formatAddresses(array $addresses)
+    /**
+     * Formats multiple email addresses to be used within email headers
+     *
+     * @param array $addresses
+     * @return string
+     */
+    protected function formatAddresses(array $addresses) : string
     {
         $result = [];
         foreach ($addresses as $address) {

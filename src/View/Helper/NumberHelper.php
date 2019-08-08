@@ -41,13 +41,12 @@ class NumberHelper extends Helper
     *
     * @param string|float $value 1234567.43
     * @param string $currency USD|EUR|GBP|AUD etc.
-    * @param array $options before,after,places,thousands,decimails
     * @return string
     */
     
-    public function percent($value, int $precision = 2, $options = []) : string
+    public function percent($value, int $precision = 2) : string
     {
-        return Number::percent($value, $precision, $options);
+        return Number::percent($value, $precision);
     }
     /**
     * Formats a number with a specified level of precision
@@ -55,28 +54,25 @@ class NumberHelper extends Helper
     *  $number->precision(1024.10101010,4); // 1,024.1010
     *
     * @param string|float $value 1234567.43
-    * @param string $precision max number of decimal places to show
-    * @param array $options before,after,places,thousands,decimails
+    * @param int $precision max number of decimal places to show
     * @return string
     */
-    public function precision($value, int $precision = 2, $options = []) : string
+    public function precision($value, int $precision = 2) : string
     {
-        return Number::precision($value, $precision, $options);
+        return Number::precision($value, $precision);
     }
     /**
      * Formats a number
      *
      * $number->format(1024.512); // 1,024.51
      *
-     * ## Options
-     * before - something to be shown before
-     * after - something to be added after
-     * thousands - the thousands seperator
-     * decimals - the decimals seperator
-     * places - how many decimal points to show
-     *
      * @param float|string $value
      * @param array $options
+     *   - before: something to be shown before
+     *   - after: something to be added after
+     *   - thousands: the thousands seperator
+     *   - decimals: the decimals seperator
+     *   - places: how many decimal points to show
      * @return string
      */
     public function format($value, array $options = []) : string

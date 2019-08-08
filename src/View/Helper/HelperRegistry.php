@@ -25,6 +25,11 @@ use Origin\View\Exception\MissingHelperException;
  */
 class HelperRegistry extends ObjectRegistry
 {
+    /**
+     * Holds the view object
+     *
+     * @var \Origin\View\View
+     */
     protected $view = null;
 
     public function __construct(View $view)
@@ -32,7 +37,13 @@ class HelperRegistry extends ObjectRegistry
         $this->view = $view;
     }
 
-    protected function className(string $class)
+    /**
+     * Resolves the class name of a helper
+     *
+     * @param string $class
+     * @return string|null
+     */
+    protected function className(string $class) : ?string
     {
         return Resolver::className($class, 'View/Helper');
     }
@@ -42,19 +53,30 @@ class HelperRegistry extends ObjectRegistry
      *
      * @param string $class
      * @param array $options
-     * @return \App\View\Helper\Helper
+     * @return \Origin\View\Helper\Helper
      */
-    protected function createObject(string $class, array $options = [])
+    protected function createObject(string $class, array $options = []) : Helper
     {
         return new $class($this->view, $options);
     }
 
-    protected function throwException(string $object)
+    /**
+     * Throws an exception
+     *
+     * @param string $object
+     * @return void
+     */
+    protected function throwException(string $object) : void
     {
         throw new MissingHelperException($object);
     }
 
-    public function view()
+    /**
+     * Returns a view object
+     *
+     * @return View
+     */
+    public function view() : View
     {
         return $this->view;
     }

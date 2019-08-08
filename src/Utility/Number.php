@@ -120,7 +120,7 @@ class Number
      *
      * @param string|float|integer $value
      * @param integer $precision
-     * @param array $options
+     * @param array $options multiply default is false
      * @return string
      */
     public static function percent($value, int $precision = 2, $options = []): string

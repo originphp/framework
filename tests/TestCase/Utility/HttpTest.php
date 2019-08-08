@@ -23,7 +23,7 @@ class MockHttp extends Http
 {
     protected $response = null;
     protected $options = [];
-    protected function send(array $options)
+    protected function send(array $options) : Response
     {
         $this->options = $options;
         if ($this->response) {

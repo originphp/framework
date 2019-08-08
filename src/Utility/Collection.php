@@ -21,7 +21,7 @@ class Collection implements Iterator, Countable
     /**
      * Holds the Items
      *
-     * @var array|Origin\Model\Collection
+     * @var array|\Origin\Model\Collection
      */
     protected $items = null;
 
@@ -53,7 +53,7 @@ class Collection implements Iterator, Countable
      *       return $book->name . ' written by ' . $book->author->name;
      *    });
      *
-     * @param string|function $callback
+     * @param string|callable $callback
      * @return \Origin\Utility\Collection
      */
     public function extract($callback) : Collection
