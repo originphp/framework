@@ -77,13 +77,13 @@ class %name%Schema extends Schema
 
     protected function dumpPhp(string $datasource, string $name)
     {
-        $className = 'Application';
+        $filename = $this->schemaFilename($name, 'php');
         list($plugin, $name) = pluginSplit($name);
+        $className = 'Application';
         if ($name !== 'schema') {
             $className = Inflector::camelize($name);
         }
-        $filename = $this->schemaFilename($name, 'php');
-
+       
         $connection = ConnectionManager::get($datasource);
         $out = [];
         $tables = $connection->tables();
