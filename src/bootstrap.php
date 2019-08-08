@@ -90,8 +90,13 @@ require CONFIG . DS . 'routes.php';
  */
 use Origin\Cache\Cache;
 
-Cache::config('origin_model', [
-    'engine' => 'File',
-    'prefix' => 'origin_model_',
-    'duration' => '+5 minutes', // min 2 minutes
-]);
+/**
+ * Backwards comptability for projects created < 1.26
+ */
+if (! Cache::config('origin_model')) {
+    Cache::config('origin_model', [
+        'engine' => 'File',
+        'prefix' => 'origin_model_',
+        'duration' => '+5 minutes', // min 2 minutes
+    ]);
+}
