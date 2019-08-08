@@ -76,13 +76,13 @@ class DbSchemaLoadCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $this->assertRegExp('/Executed (1|2) statements/', $this->output());
-        ConnectionManager::get('test')->execute('DROP DATABASE IF EXISTS migrations');
+        ConnectionManager::get('test')->execute('DROP TABLE IF EXISTS migrations');
     }
 
     protected function tearDown() : void
     {
         parent::tearDown();
         $ds = ConnectionManager::get('test');
-        $ds->execute('DROP DATABASE IF EXISTS posts');
+        $ds->execute('DROP TABLE IF EXISTS posts');
     }
 }
