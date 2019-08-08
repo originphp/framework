@@ -20,7 +20,7 @@ class MockResolver extends Resolver
 {
     public static $classes = [];
 
-    public static function classExists(string $class)
+    public static function classExists(string $class) : bool
     {
         return in_array($class, static::$classes);
     }
