@@ -172,7 +172,7 @@ class %name%Schema extends Schema
          */
         //
         foreach ($connection->tables() as $table) {
-            $dump[] = $connection->adapter()->showCreateTable($table);
+            $dump[] = $connection->adapter()->showCreateTable($table) . ';';
             $this->io->list($table);
         }
 

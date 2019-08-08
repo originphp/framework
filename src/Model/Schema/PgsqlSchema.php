@@ -398,7 +398,7 @@ class PgsqlSchema extends BaseSchema
         return implode(";\n", $this->createTableSql($table, $schema['columns'], [
             'constraints' => $schema['constraints'],
             'indexes' => $schema['indexes'],
-        ])) .';';
+        ]));
     }
 
     /**
