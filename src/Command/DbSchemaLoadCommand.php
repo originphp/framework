@@ -16,6 +16,7 @@ namespace Origin\Command;
 
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Exception\DatasourceException;
 
 class DbSchemaLoadCommand extends Command
 {
@@ -63,15 +64,19 @@ class DbSchemaLoadCommand extends Command
             $this->throwError("{$datasource} datasource not found");
         }
         $connection = ConnectionManager::get($datasource);
-        
-        $class = Inflector::camelize($name) . 'Schema';
 
+        list($plugin, $name) = pluginSplit($name);
+        $class = 'ApplicationSchema';
+        if ($name !== 'schema') {
+            $class = Inflector::camelize($name) . 'Schema';
+        }
+       
         include $filename;
         $object = new $class;
         $statements = $object->createSql($connection);
 
-        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
-
+        $connection->disableForeignKeyConstraints();
+     
         foreach ($statements  as $statement) {
             try {
                 $connection->execute($statement);
@@ -81,9 +86,9 @@ class DbSchemaLoadCommand extends Command
             }
             $this->io->status('ok', str_replace("\n", '', $statement));
         }
+        $connection->commit();
+        $connection->enableForeignKeyConstraints();
        
-        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
-
         $this->io->success(sprintf('Executed %d statements', count($statements)));
     }
 }

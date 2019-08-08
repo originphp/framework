@@ -74,7 +74,9 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     {
         $this->exec('db:schema:load --datasource=test --type=php migrations');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Executed 1 statements');
+
+        $this->assertRegExp('/Executed (1|2) statements/', $this->output());
+        ConnectionManager::get('test')->execute('DROP DATABASE IF EXISTS migrations');
     }
 
     protected function tearDown() : void
