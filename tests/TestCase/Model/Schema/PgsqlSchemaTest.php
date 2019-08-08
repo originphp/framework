@@ -193,7 +193,7 @@ class PgsqlSchemaTest extends OriginTestCase
         
         $result = $adapter->createTableSql('tarticles', $schema, $options);
         
-        $this->assertEquals('1177ba8cfc36a151b941484fb2b55a4f', md5($result[0]));
+        $this->assertEquals('1615a1cdff7f0e637c94ce1d65870efd', md5($result[0]));
 
         $options = [
             'constraints' => [
@@ -209,8 +209,8 @@ class PgsqlSchemaTest extends OriginTestCase
         ];
 
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-  
-        $this->assertEquals('1b55c80fbd56aebf6fc7ebf5741cedcc', md5($result[0]));
+
+        $this->assertEquals('63ee1c702b43c6ac12d33208aa772ee3', md5($result[0]));
 
         // sanity check
         if ($adapter->connection()->engine() === 'pgsql') {

@@ -104,6 +104,29 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
+    * This creates a foreignKey table parameter
+    *
+    * @param array attributes name,columns,references, update,delete
+    * @return string
+    */
+    protected function tableConstraintForeign(array $attributes) :string
+    {
+        $sql = sprintf(
+            'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
+            $attributes['name'],
+            implode(', ', (array) $attributes['column']),
+            $this->quoteIdentifier($attributes['references'][0]),
+            $attributes['references'][1]
+        );
+        
+        if (! empty($attributes['update']) or ! empty($attributes['delete'])) {
+            $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $this->onClause($attributes['update']), $this->onClause($attributes['delete']));
+        }
+
+        return $sql . ' DEFERRABLE INITIALLY IMMEDIATE';
+    }
+
+    /**
     * Creates the contraint code
     *
     * @param string $table
@@ -346,8 +369,6 @@ class PgsqlSchema extends BaseSchema
     public function foreignKeys(string $table) : array
     {
         $config = ConnectionManager::config($this->datasource);
-
-        // $sql = 'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = \'' . $this->connection()->database() . '\' AND  tc.table_name = \'' . $table . '\' AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'';
 
         $sql = sprintf(
             'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = %s AND  tc.table_name = %s AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'',

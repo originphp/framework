@@ -125,23 +125,19 @@ abstract class BaseSchema
     * @param array attributes name,columns,references, update,delete
     * @return string
     */
-    protected function tableConstraintForeign(array $attributes) :string
+    abstract protected function tableConstraintForeign(array $attributes) :string;
+
+    /**
+     * Maps the onclause value
+     *
+     * @param string $value
+     * @return void
+     */
+    protected function onClause(string $value)
     {
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
-        $sql = sprintf(
-            'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
-            $attributes['name'],
-            implode(', ', (array) $attributes['column']),
-            $this->quoteIdentifier($attributes['references'][0]),
-            $attributes['references'][1]
-        );
-        
-        if (! empty($attributes['update']) or ! empty($attributes['delete'])) {
-            $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $map[$attributes['update']], $map[$attributes['update']]);
-        }
-
-        return $sql;
+        return $map[$value] ?? 'RESTRICT';
     }
     /**
      * returns SQL statement for adding a column to an existing table

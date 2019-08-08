@@ -189,7 +189,7 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-  
+        
         $this->assertEquals('cb8b587150b16c31076c1172f565d77a', md5($result[0]));
 
         $options = [
@@ -200,14 +200,13 @@ class MysqlSchemaTest extends OriginTestCase
                     'column' => ['user_id'],
                     'references' => ['users','id'],
                     'update' => 'cascade',
-                    'delete' => 'cascade', ],
+                    'delete' => 'restrict', ],
                 
             ],
         ];
 
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-    
-        $this->assertEquals('a84d1e8c900dd3403453cde0b60b6aa1', md5($result[0]));
+        $this->assertEquals('6f2d38018eb8dae025e23855db3dfb1d', md5($result[0]));
 
         // sanity check
         if ($adapter->connection()->engine() === 'mysql') {
