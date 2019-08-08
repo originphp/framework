@@ -13,8 +13,8 @@ class MigrationsSchema extends Schema
     public $migrations = [
         'columns' => [
             'id' => ['type' => 'integer', 'limit' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'autoIncrement' => true],
-            'version' => ['type' => 'string', 'limit' => 14, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci'],
-            'rollback' => ['type' => 'text', 'limit' => 16777215, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci'],
+            'version' => ['type' => 'string', 'limit' => 14, 'null' => false, 'default' => null],
+            'rollback' => ['type' => 'text', 'limit' => 16777215, 'null' => true, 'default' => null],
             'created' => ['type' => 'datetime', 'null' => false, 'default' => null],
         ],
         'constraints' => [
@@ -23,6 +23,6 @@ class MigrationsSchema extends Schema
         'indexes' => [
             'migrations_version_index' => ['type' => 'index', 'column' => 'version'],
         ],
-        'options' => ['engine' => 'InnoDB', 'collation' => 'utf8mb4_0900_ai_ci'],
+        'options' => ['engine' => 'InnoDB'],
     ];
 }
