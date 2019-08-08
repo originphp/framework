@@ -1,7 +1,7 @@
 <?php
 namespace Origin\Test\Command;
 
-use App\Db\DumpSchema;
+use DumpSchema;
 use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
@@ -60,7 +60,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.php');
         $this->assertTrue(file_exists($filename));
         $this->assertOutputContains('* posts');
-
+    
         // Check is valid object and some spot che
         include $filename;
         $schema = new DumpSchema();
