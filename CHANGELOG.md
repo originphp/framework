@@ -21,18 +21,35 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.26.0] - 2019-08-08
+Refactored databse engine to use the new schema design.
+
+### Changed
+- Datasource:schema/describe now uses caching
+
+### Added
+- db:test:prepare command
+- TableSchema object or creating tables with full support of constraints, indexes etc
+- Cache file engine serialize option. Now serialization can be disabled.
+- Cache duration now accepts string, e.g. +2 hours etc
+
+### Fixed
+- Fixed console output overwrite function when overwriting with shorter text
+- File Cache exists checks expiration date
+- Changelog mentioned of Schema/Migration::foreignKeys, this was not actually committed.
+
 ## [1.25.0] - 2019-07-26
 ### Migration Guide to 1.25
 Small breaking change, on a undocumented method.
 
-- keys from array returned by `Migration::foreignKeys()` have been changed to `table`,`column`,`name`, `referencedTable`, `referencedColumn`
+- keys and values from array returned by `Schema::foreignKeys()` have been changed to `table`,`column`,`name`, `referencedTable`,`referencedColumn`
 
 ### Fixed
 - Db:schema:load was not disabling foreign key checks when executing statements, this caused issues with SQL files with foreign keys.
 
 ### Changed
 - All models loaded through model registry will have the datasource set to test (previously only those loaded through fixtures)
-- Migration::foreignKeys changed column names more inline with framework. Returns table,column,name, referencedTable, referencedColumn
+- Migration::foreignKeys changed column names more inline with framework.
 
 ### Added
 - Ability to use fixtures using existing tables in the test database
