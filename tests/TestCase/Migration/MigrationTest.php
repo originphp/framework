@@ -627,6 +627,7 @@ class MigrationTest extends OriginTestCase
     public function testColumnExists()
     {
         $migration = new CreateProductTableMigration($this->adapter());
+      
         $this->assertTrue($migration->columnExists('articles', 'title'));
         $this->assertTrue($migration->columnExists('articles', 'title', ['type' => 'string']));
         $this->assertFalse($migration->columnExists('articles', 'title', ['type' => 'integer']));
@@ -638,8 +639,8 @@ class MigrationTest extends OriginTestCase
         $this->assertTrue($migration->columnExists('deals', 'amount', ['precision' => 15]));
         $this->assertFalse($migration->columnExists('deals', 'amount', ['precision' => 12]));
 
-        $this->assertTrue($migration->columnExists('deals', 'name', ['null' => true]));
-        $this->assertFalse($migration->columnExists('deals', 'name', ['null' => false]));
+        $this->assertFalse($migration->columnExists('deals', 'name', ['null' => true]));
+        $this->assertTrue($migration->columnExists('deals', 'name', ['null' => false]));
 
         $this->assertTrue($migration->columnExists('deals', 'amount', ['scale' => 2]));
         $this->assertFalse($migration->columnExists('deals', 'amount', ['scale' => 4]));
