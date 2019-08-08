@@ -30,16 +30,52 @@ abstract class BaseEngine
         $this->config($config);
         $this->initialize($config);
     }
-
+    /**
+     * Hook for construct
+     *
+     * @param array $config
+     * @return void
+     */
     abstract public function initialize(array $config);
 
-    abstract public function read(string $name);
+    /**
+     * Reads from the storage
+     *
+     * @param string $name
+     * @return string
+     */
+    abstract public function read(string $name) : string;
 
-    abstract public function write(string $name, string $data);
+    /**
+     * Writes to the storage
+     *
+     * @param string $name
+     * @param string $data
+     * @return bool
+     */
+    abstract public function write(string $name, string $data) : bool;
 
-    abstract public function delete(string $name);
+    /**
+     * Deletes from the storage
+     *
+     * @param string $name
+     * @return bool
+     */
+    abstract public function delete(string $name) : bool;
 
-    abstract public function exists(string $name);
- 
-    abstract public function list(string $name = null);
+    /**
+     * Checks if a file exists on the storage
+     *
+     * @param string $name
+     * @return bool
+     */
+    abstract public function exists(string $name) : bool;
+    
+    /**
+     * Returns the list of files from the storage
+     *
+     * @param string $name
+     * @return array
+     */
+    abstract public function list(string $name = null) : array;
 }

@@ -26,7 +26,7 @@ class FixtureManager
     /**
      * Loads fixtures defined in a test.
      * @internal so this can be tested not setting a type
-     * @param PHPUnit\Framework\Test $test
+     * @param \PHPUnit\Framework\Test $test
      * @return void
      */
     public function load($test) : void
@@ -39,7 +39,7 @@ class FixtureManager
     /**
      * Unloads fixtures defined in a test.
      * @internal so this can be tested not setting a type
-     * @param PHPUnit\Framework\Test $test
+     * @param \PHPUnit\Framework\Test $test
      * @return void
      */
     public function unload($test) :void
@@ -56,7 +56,7 @@ class FixtureManager
      * Gets the load fixtures or fixture
      *
      * @param string $fixture
-     * @return \Origin\TestSuite\Fixture|array
+     * @return \Origin\TestSuite\Fixture|array|null
      */
     public function loaded(string $fixture = null)
     {
@@ -64,7 +64,7 @@ class FixtureManager
             return $this->loaded;
         }
 
-        return isset($this->loaded[$fixture]);
+        return isset($this->loaded[$fixture])?$this->loaded[$fixture]:null;
     }
 
     /**

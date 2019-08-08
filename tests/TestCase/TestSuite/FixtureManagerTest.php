@@ -77,12 +77,12 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
        
         // Load/unload first time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
+        $this->assertInstanceOf(PostFixture::class, $FixtureManager->loaded('Framework.Post'));
         $this->assertNull($FixtureManager->unload($TestCase));
   
         // Load/unload second time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
+        $this->assertInstanceOf(PostFixture::class, $FixtureManager->loaded('Framework.Post'));
         $this->assertNull($FixtureManager->unload($TestCase));
 
         $FixtureManager->setDropTables('Framework.Post', true);
@@ -104,7 +104,7 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
        
         // Load/unload first time
         $FixtureManager->load($TestCase);
-        $this->assertTrue($FixtureManager->loaded('Framework.Post'));
+        $this->assertInstanceOf(PostFixture::class, $FixtureManager->loaded('Framework.Post'));
         $loaded = $FixtureManager->loaded();
         $this->assertInstanceOf(Fixture::class, $loaded['Framework.Post']);
     }

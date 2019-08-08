@@ -107,7 +107,12 @@ class SftpEngine extends BaseEngine
         return $password;
     }
 
-    protected function login()
+    /**
+     * Logs into the SFTP server
+     *
+     * @return void
+     */
+    protected function login() : void
     {
         $config = $this->config();
         extract($config);
@@ -131,7 +136,7 @@ class SftpEngine extends BaseEngine
      * @param string $name
      * @return string
      */
-    public function read(string $name)
+    public function read(string $name) : string
     {
         $filename = $this->addPathPrefix($name);
 
@@ -148,7 +153,7 @@ class SftpEngine extends BaseEngine
      * @param mixed $data that can be converted to string
      * @return bool
      */
-    public function write(string $name, string $data)
+    public function write(string $name, string $data) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -167,7 +172,7 @@ class SftpEngine extends BaseEngine
      * @param string $name
      * @return boolean
      */
-    public function delete(string $name)
+    public function delete(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -188,7 +193,7 @@ class SftpEngine extends BaseEngine
      * @param string $name
      * @return bool
      */
-    public function exists(string $name)
+    public function exists(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -200,19 +205,25 @@ class SftpEngine extends BaseEngine
      *
      * @return array
      */
-    public function list(string $name = null)
+    public function list(string $name = null) : array
     {
         $directory = $this->addPathPrefix($name);
 
         if (! $this->connection->is_dir($directory)) {
             throw new NotFoundException('directory does not exist');
         }
-        $this->base = $this->addPathPrefix($name);
 
-        return $this->scandir($name);
+        return $this->scandir($name, $this->addPathPrefix($name));
     }
 
-    protected function scandir(string $directory = null)
+    /**
+     * Internal directory scanner for files
+     *
+     * @param string $directory
+     * @param string $base
+     * @return array
+     */
+    protected function scandir(string $directory = null, string $base) : array
     {
         $location = $this->addPathPrefix($directory);
         $files = [];
@@ -227,7 +238,7 @@ class SftpEngine extends BaseEngine
                
                 if ($info['type'] === 1) {
                     $files[] = [
-                        'name' => str_replace($this->base . DS, '', $location . DS .  $file),
+                        'name' => str_replace($base . DS, '', $location . DS .  $file),
                         'timestamp' => $info['mtime'],
                         'size' => $info['size'],
                     ];
@@ -237,7 +248,7 @@ class SftpEngine extends BaseEngine
                         $subDirectory = $directory . '/' . $file;
                     }
 
-                    $recursiveFiles = $this->scandir($subDirectory);
+                    $recursiveFiles = $this->scandir($subDirectory, $base);
                     foreach ($recursiveFiles as $item) {
                         $files[] = $item;
                     }
@@ -254,7 +265,7 @@ class SftpEngine extends BaseEngine
     * @param string $path
     * @return string
     */
-    protected function addPathPrefix(string $path = null)
+    protected function addPathPrefix(string $path = null) : string
     {
         $location = $this->config('root');
         if ($path !== null) {

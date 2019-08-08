@@ -29,7 +29,6 @@ class FtpEngine extends BaseEngine
         'timeout' => 10,
         'ssl' => false,
         'passive' => true, // passive is the default mode used. e.g.  WinSCP
-        'root' => null,
     ];
 
     protected $connection = null;
@@ -52,7 +51,12 @@ class FtpEngine extends BaseEngine
         }
     }
 
-    protected function login()
+    /**
+     * Logs into the ftp server
+     *
+     * @return void
+     */
+    protected function login() : void
     {
         $config = $this->config();
         extract($config);
@@ -79,7 +83,7 @@ class FtpEngine extends BaseEngine
      * @param string $name
      * @return string
      */
-    public function read(string $name)
+    public function read(string $name) : string
     {
         $filename = $this->addPathPrefix($name);
 
@@ -103,7 +107,7 @@ class FtpEngine extends BaseEngine
      * @param mixed $data that can be converted to string
      * @return bool
      */
-    public function write(string $name, string $data)
+    public function write(string $name, string $data) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -131,7 +135,7 @@ class FtpEngine extends BaseEngine
      * @param string $name
      * @return boolean
      */
-    public function delete(string $name)
+    public function delete(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -156,7 +160,7 @@ class FtpEngine extends BaseEngine
      * @param string $name
      * @return bool
      */
-    public function exists(string $name)
+    public function exists(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -172,7 +176,7 @@ class FtpEngine extends BaseEngine
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect() : void
     {
         if ($this->connection) {
             ftp_close($this->connection);
@@ -185,7 +189,7 @@ class FtpEngine extends BaseEngine
      *
      * @return array
      */
-    public function list(string $name = null)
+    public function list(string $name = null) : array
     {
         $directory = $this->addPathPrefix($name);
 
@@ -195,12 +199,16 @@ class FtpEngine extends BaseEngine
 
         ftp_chdir($this->connection, $this->config('root'));
 
-        $this->base = $this->addPathPrefix($name);
-
-        return $this->scandir($name);
+        return $this->scandir($name, $this->addPathPrefix($name));
     }
 
-    protected function fileExists(string $filename)
+    /**
+     * Checks a file exists
+     *
+     * @param string $filename
+     * @return boolean
+     */
+    protected function fileExists(string $filename) : bool
     {
         $path = pathinfo($filename, PATHINFO_DIRNAME);
         $list = ftp_nlist($this->connection, $path);
@@ -217,7 +225,7 @@ class FtpEngine extends BaseEngine
      * @param string $path
      * @return void
      */
-    protected function mkdir(string $path)
+    protected function mkdir(string $path) : void
     {
         ftp_chdir($this->connection, $this->config('root'));
 
@@ -238,7 +246,7 @@ class FtpEngine extends BaseEngine
      * @param string $directory
      * @return boolean
      */
-    protected function isDir(string $directory)
+    protected function isDir(string $directory) : bool
     {
         if (! @ftp_chdir($this->connection, $directory)) {
             return false;
@@ -248,7 +256,14 @@ class FtpEngine extends BaseEngine
         return true;
     }
 
-    protected function scandir(string $directory = null)
+    /**
+     * Gets the contents listing of a directory
+     *
+     * @param string $directory
+     * @param string $base
+     * @return array
+     */
+    protected function scandir(string $directory = null, string $base) : array
     {
         $location = $this->addPathPrefix($directory);
         $files = [];
@@ -266,13 +281,13 @@ class FtpEngine extends BaseEngine
                         $subDirectory = $directory . '/' . $file;
                     }
 
-                    $recursiveFiles = $this->scandir($subDirectory);
+                    $recursiveFiles = $this->scandir($subDirectory, $base);
                     foreach ($recursiveFiles as $item) {
                         $files[] = $item;
                     }
                 } else {
                     $files[] = [
-                        'name' => ltrim(str_replace($this->base . DS, '', $location . DS .  $file), '/'),
+                        'name' => ltrim(str_replace($base . DS, '', $location . DS .  $file), '/'),
                         'timestamp' => ftp_mdtm($this->connection, $location . DS . $file),
                         'size' => $result[4],
                     ];
@@ -290,7 +305,7 @@ class FtpEngine extends BaseEngine
      * @param string $directory
      * @return bool
      */
-    protected function rmdir(string $directory, bool $recursive = true)
+    protected function rmdir(string $directory, bool $recursive = true) : bool
     {
         if ($recursive) {
             $files = ftp_nlist($this->connection, $directory);
@@ -312,7 +327,7 @@ class FtpEngine extends BaseEngine
     * @param string $path
     * @return string
     */
-    protected function addPathPrefix(string $path = null)
+    protected function addPathPrefix(string $path = null) : string
     {
         $location = $this->config('root');
         if ($path) {

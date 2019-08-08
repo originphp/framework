@@ -116,7 +116,7 @@ class Queue
      * Claims a job for processing and record is set to locked, prevents multiple.
      *
      * @param int|string $id
-     * @return bool|Entity;
+     * @return bool|\Origin\Model\Entity
      */
     protected function claim($id)
     {

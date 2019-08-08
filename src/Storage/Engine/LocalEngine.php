@@ -38,7 +38,7 @@ class LocalEngine extends BaseEngine
      * @param string $name
      * @return string
      */
-    public function read(string $name)
+    public function read(string $name) : string
     {
         $filename = $this->addPathPrefix($name);
 
@@ -55,7 +55,7 @@ class LocalEngine extends BaseEngine
      * @param mixed $data that can be converted to string
      * @return bool
      */
-    public function write(string $name, string $data)
+    public function write(string $name, string $data) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -73,7 +73,7 @@ class LocalEngine extends BaseEngine
     * @param string $name
     * @return boolean
     */
-    public function delete(string $name)
+    public function delete(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -98,7 +98,7 @@ class LocalEngine extends BaseEngine
      * @param string $name
      * @return bool
      */
-    public function exists(string $name)
+    public function exists(string $name) : bool
     {
         $filename = $this->addPathPrefix($name);
 
@@ -110,7 +110,7 @@ class LocalEngine extends BaseEngine
      *
      * @return array
      */
-    public function list(string $name = null)
+    public function list(string $name = null) : array
     {
         $directory = $this->addPathPrefix($name);
 
@@ -140,7 +140,7 @@ class LocalEngine extends BaseEngine
      * @param string $directory
      * @return bool
      */
-    protected function rmdir(string $directory, bool $recursive = true)
+    protected function rmdir(string $directory, bool $recursive = true) : bool
     {
         if ($recursive) {
             $files = array_diff(scandir($directory), ['.', '..']);
@@ -162,7 +162,7 @@ class LocalEngine extends BaseEngine
     * @param string $path
     * @return string
     */
-    protected function addPathPrefix(string $path = null)
+    protected function addPathPrefix(string $path = null) : string
     {
         $location = $this->config('root');
         if ($path) {

@@ -34,16 +34,23 @@ class Job
     /**
      * Holds the model for the job
      *
-     * @var Model
+     * @var \Origin\Model\Model
      */
     protected $Job = null;
 
     /**
-     * Holds the data
+     * Holds the message data
      *
      * @var Object
      */
     protected $data = null;
+
+    /**
+     * Holds the entity
+     *
+     * @var \Origin\Model\Entity
+     */
+    protected $entity = null;
 
     public function __construct(Model $job, Entity $entity)
     {
@@ -66,7 +73,7 @@ class Job
     /**
      * Once the job is finished run this
      *
-     * @return bool
+     * @return boolean
      */
     public function executed() : bool
     {
@@ -76,7 +83,7 @@ class Job
     /**
     * If there was an error run this so you can inspect later.
     *
-    * @return bool
+    * @return boolean
     */
     public function failed() : bool
     {
@@ -88,6 +95,7 @@ class Job
      *
      * @return boolean
      */
+
     public function delete() : bool
     {
         return $this->Job->delete($this->entity);
@@ -97,7 +105,7 @@ class Job
      * Release a job backinto the queue
      *
      * @param string $strtotime a strtotime compatiable string, now,+5 minutes, 2022-12-31
-     * @return void
+     * @return boolean
      */
     public function release($strtotime = 'now') : bool
     {
@@ -112,9 +120,9 @@ class Job
     *
     * @param integer $tries
     * @param string $strtotime
-    * @return void
+    * @return boolean
     */
-    public function retry(int $tries, $strtotime = 'now')
+    public function retry(int $tries, $strtotime = 'now') : bool
     {
         $job = $this->entity;
         if ($job->tries < $tries) {
@@ -124,6 +132,8 @@ class Job
             return $this->release();
         }
         $this->failed();
+
+        return false;
     }
 
     /**
