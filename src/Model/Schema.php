@@ -1,4 +1,17 @@
 <?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2019 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
+
 namespace Origin\Model;
 
 use Origin\Exception\Exception;
@@ -48,6 +61,7 @@ class Schema
 
         /**
          * Add all foreign keys statements
+         * @example ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_ibfk_1" FOREIGN KEY (user_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE
          */
         foreach (array_keys($properties) as $table) {
             foreach ($foreignKeys[$table] as $name => $settings) {
@@ -71,11 +85,11 @@ class Schema
     {
         $out = [];
         $properties = get_object_vars($this);
-        $tables = array_keys($properties);
-        foreach ($tables as $table) {
+
+        foreach (array_keys($properties) as $table) {
             $out[] = $datasource->adapter()->dropTable($table);
         }
-
+        
         return $out;
     }
 }
