@@ -749,6 +749,8 @@ class Migration
      * - column: the foreignKey on the fromTable defaults toTable.singularized_id
      * - primaryKey: the primary key defaults to id
      * - name: the constraint name defaults to fk_origin_1234567891
+     * - update: action to carry out on update. (cascade,restrict,setNull,setDefault,noAction)
+     * - delete: action to carry out on delete. (cascade,restrict,setNull,setDefault,noAction)
      * @return void
      */
     public function addForeignKey(string $fromTable, string $toTable, array $options = []) : void
@@ -765,6 +767,8 @@ class Migration
             'column' => strtolower(Inflector::singularize($toTable)).'_id',
             'primaryKey' => 'id',
             'name' => null,
+            'update' => null,
+            'delete' => null,
         ];
   
         // Get column name first
@@ -772,7 +776,7 @@ class Migration
             $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
         }
         //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
-        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey']);
+        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete']);
         if ($this->calledBy() === 'change') {
             $this->reverseStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
         }
