@@ -27,10 +27,9 @@ use Origin\Model\Schema\TableSchema;
  */
 class Fixture
 {
-   
     /**
      * The table name used by this fixture. It is
-     * guessed using the class name
+     * guessed using the class name. ArticleFixture treats table as articles
      *
      * @var string
      */
@@ -97,8 +96,8 @@ class Fixture
     public $import = null;
 
     /**
-    * The datasource to use, this should be test
-    *
+    * The datasource config to use - it should be test
+    * @deprecated This is only used by legacy functions
     * @var string
     */
     public $datasource = 'test';
@@ -112,7 +111,7 @@ class Fixture
         }
 
         $this->initialize();
-
+        
         $this->insertOnly = (empty($this->schema) and empty($this->import));
     }
 
@@ -134,14 +133,94 @@ class Fixture
     }
     
     /**
-     * As of 1.25.0 - This will be deprecated in the future.
+     * Loads records from a datasource
      *
-     * Import schema. If model is found then use that datasource and table else
-     * try to guess it incase of dynamic models
-     *
-     * @param string $model
-     * @return bool|null
+     * @param string $datasource
+     * @param string $table
+     * @return array
      */
+    public function loadRecords(string $datasource, string $table) : array
+    {
+        $connection = ConnectionManager::get($datasource);
+        $connection->execute('SELECT * FROM ' . $table);
+
+        $records = $connection->fetchAll();
+
+        return $records ?? [];
+    }
+
+    /**
+     * Creates the table.
+     *
+     * @return bool true or false
+     */
+    public function create() : bool
+    {
+        if ($this->isLegacy()) {
+            return $this->legacyCreate();
+        }
+        
+        $connection = ConnectionManager::get('test');
+        $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
+
+        foreach ($table->toSql($connection) as $statement) {
+            $connection->execute($statement);
+        }
+       
+        return true; // Backwards compatability
+    }
+
+    /**
+     * Inserts the records.
+     *
+     * @return void
+     */
+    public function insert() : void
+    {
+        $connection = ConnectionManager::get($this->datasource);
+   
+        foreach ($this->records as $record) {
+            $connection->insert($this->table, $record);
+        }
+    }
+
+    /**
+     * Drops the table.
+     *
+     * @return bool true or false
+     */
+    public function drop() : bool
+    {
+        $connection = ConnectionManager::get($this->datasource);
+        $sql = $connection->adapter()->dropTableSql($this->table, ['ifExists' => true]);
+
+        return $connection->execute($sql);
+    }
+
+    /**
+     * Truncates the table.
+     *
+     * @return bool true or false
+     */
+    public function truncate() : bool
+    {
+        $connection = ConnectionManager::get($this->datasource);
+        $sql = $connection->adapter()->truncateTableSql($this->table);
+
+        return $connection->execute($sql);
+    }
+
+    # Functions for deprecated features
+
+    /**
+        * As of 1.25.0 - This will be deprecated in the future.
+        *
+        * Import schema. If model is found then use that datasource and table else
+        * try to guess it incase of dynamic models
+        *
+        * @param string $model
+        * @return bool|null
+        */
     public function import()
     {
         if ($this->import === null) {
@@ -184,85 +263,30 @@ class Fixture
     }
 
     /**
-     * Loads records from a datasource
-     *
-     * @param string $datasource
-     * @param string $table
-     * @return array
-     */
-    public function loadRecords(string $datasource, string $table) : array
+    * Checks if deprecated features are being used.
+    *
+    * @return boolean
+    */
+    protected function isLegacy() : bool
     {
-        $connection = ConnectionManager::get($datasource);
-        $connection->execute('SELECT * FROM ' . $table);
-
-        $records = $connection->fetchAll();
-
-        return $records ?? [];
+        return ($this->import or ! isset($this->schema['columns']));
     }
 
     /**
-     * Creates the table.
+     * Legacy handler
      *
-     * @return bool true or false
+     * @return boolean
      */
-    public function create() : bool
+    protected function legacyCreate() : bool
     {
         if ($this->import) {
             return $this->import();
         }
         $connection = ConnectionManager::get($this->datasource);
+        $sql = $connection->adapter()->createTable($this->table, $this->schema);
 
-        $statements = [];
-        // Backwards compatability handler
-        if (! isset($this->schema['columns'])) {
-            $statements[] = $connection->adapter()->createTable($this->table, $this->schema);
-        } else {
-            $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
-            $statements = $table->toSql($connection);
-        }
+        return $connection->execute($sql);
 
-        foreach ($statements as $statement) {
-            $connection->execute($statement);
-        }
-       
-        return true; // Backwards compatability
-    }
-
-    /**
-     * Inserts the records.
-     *
-     * @return void
-     */
-    public function insert() : void
-    {
-        $connection = ConnectionManager::get($this->datasource);
-   
-        foreach ($this->records as $record) {
-            $connection->insert($this->table, $record);
-        }
-    }
-
-    /**
-     * Drops the table.
-     *
-     * @return bool true or false
-     */
-    public function drop() : bool
-    {
-        $connection = ConnectionManager::get($this->datasource);
-
-        return $connection->dropTable($this->table);
-    }
-
-    /**
-     * Truncates the table.
-     *
-     * @return bool true or false
-     */
-    public function truncate() : bool
-    {
-        $connection = ConnectionManager::get($this->datasource);
-
-        return $connection->truncateTable($this->table);
+        return true;
     }
 }

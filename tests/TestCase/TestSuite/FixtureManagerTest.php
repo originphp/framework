@@ -15,6 +15,7 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\Fixture;
+use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Test\Fixture\PostFixture;
 use Origin\TestSuite\FixtureManager;
@@ -31,6 +32,15 @@ class MockFixtureManager extends FixtureManager
     public function setDropTables($fixture, $value)
     {
         $this->loaded[$fixture]->dropTables = $value;
+    }
+
+    public function setSchema(string $fixture, array $schema)
+    {
+        $this->loaded[$fixture]->schema = $schema;
+    }
+    public function setRecords(string $fixture, array $records)
+    {
+        $this->loaded[$fixture]->records = $records;
     }
 }
 
@@ -68,6 +78,43 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $fixtureManager->setProperty('loaded', ['Framework.Post' => $stub]);
  
         $fixtureManager->loadFixture('Framework.Post');
+    }
+
+    public function testCreateTableException()
+    {
+        $FixtureManager = new MockFixtureManager();
+        $TestCase = new MockTestCase();
+
+        // Load and Unload
+        $FixtureManager->load($TestCase);
+        $FixtureManager->unload($TestCase);
+
+        // Error creating Framework.Post fixture for test case Origin\Test\TestSuite\MockTestCase
+        $this->expectException(Exception::class);
+        $FixtureManager->setSchema('Framework.Post', [
+            'columns' => [
+                'id' => 'integer',
+                'text' => 'POSTTITLE(1234)',
+            ],
+        ]);
+        $FixtureManager->load($TestCase);
+    }
+
+    public function testInsertRecordsException()
+    {
+        $FixtureManager = new MockFixtureManager();
+        $TestCase = new MockTestCase();
+
+        // Load and Unload
+        $FixtureManager->load($TestCase);
+        $FixtureManager->unload($TestCase);
+
+        // Error inserting records in Framework.Post fixture for test case Origin\Test\TestSuite\MockTestCase
+        $this->expectException(Exception::class);
+        $FixtureManager->setRecords('Framework.Post', [
+            ['id' => 'abc'],
+        ]);
+        $FixtureManager->load($TestCase);
     }
 
     public function testLoadUnload()

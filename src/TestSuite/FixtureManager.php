@@ -15,13 +15,27 @@
 namespace Origin\TestSuite;
 
 use Origin\Core\Configure;
-use PHPUnit\Framework\Test;
+
+use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\ConnectionManager;
+use Origin\Model\Exception\DatasourceException;
 
 class FixtureManager
 {
+    /**
+     * Loaded fixtures for this test case
+     *
+     * @var array
+     */
     protected $loaded = [];
+
+    /**
+     * The name the of the test case which is loaded
+     *
+     * @var string
+     */
+    protected $testCaseName = null;
 
     /**
      * Loads fixtures defined in a test.
@@ -31,8 +45,14 @@ class FixtureManager
      */
     public function load($test) : void
     {
-        foreach ($test->fixtures as $fixture) {
-            $this->loadFixture($fixture);
+        $this->testCaseName = get_class($test);
+
+        if ($test->fixtures) {
+            $this->before();
+            foreach ($test->fixtures as $fixture) {
+                $this->loadFixture($fixture);
+            }
+            $this->after();
         }
     }
 
@@ -44,12 +64,40 @@ class FixtureManager
      */
     public function unload($test) :void
     {
-        foreach ($test->fixtures as $fixture) {
-            $this->unloadFixture($fixture);
+        if ($test->fixtures) {
+            $this->before();
+            foreach ($test->fixtures as $fixture) {
+                $this->unloadFixture($fixture);
+            }
+            $this->after();
         }
-    
+       
         // Clear the model registry
         ModelRegistry::clear();
+    }
+
+    /**
+     * Called before load or unload
+     *
+     * @return void
+     */
+    protected function before() : void
+    {
+        $connection = ConnectionManager::get('test');
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
+    }
+
+    /**
+    * Called after load or unload
+    *
+    * @return void
+    */
+    protected function after() : void
+    {
+        $connection = ConnectionManager::get('test');
+        $connection->enableForeignKeyConstraints();
+        $connection->commit();
     }
 
     /**
@@ -83,20 +131,26 @@ class FixtureManager
             $createTable = true;
         }
 
-        $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
-
-        // create the table table or truncate existing
-        if (! $this->loaded[$fixture]->insertOnly() and ($createTable or $this->loaded[$fixture]->dropTables === true)) {
-            $this->loaded[$fixture]->drop();
-            $this->loaded[$fixture]->create();
-        } else {
-            $this->loaded[$fixture]->truncate();
+        try {
+            // create the table table or truncate existing
+            if (! $this->loaded[$fixture]->insertOnly() and ($createTable or $this->loaded[$fixture]->dropTables === true)) {
+                $this->loaded[$fixture]->drop();
+                $this->loaded[$fixture]->create();
+            } else {
+                $this->loaded[$fixture]->truncate();
+            }
+        } catch (DataSourceException $e) {
+            ConnectionManager::get('test')->rollback(); # Cancel Transaction
+            throw new Exception(sprintf('Error creating fixture %s for test case %s ', $fixture, $this->testCaseName));
         }
-       
-        // Insert the records
-        $this->loaded[$fixture]->insert();
 
-        $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
+        try {
+            // Insert the records
+            $this->loaded[$fixture]->insert();
+        } catch (DataSourceException $e) {
+            ConnectionManager::get('test')->rollback();  # Cancel Transaction
+            throw new Exception(sprintf('Error inserting records in fixture %s for test case %s ', $fixture, $this->testCaseName));
+        }
     }
 
     /**
@@ -108,9 +162,7 @@ class FixtureManager
     public function unloadFixture(string $fixture) : void
     {
         if (isset($this->loaded[$fixture])) {
-            $this->disableForeignKeyConstraints($this->loaded[$fixture]->datasource);
             $this->loaded[$fixture]->truncate();
-            $this->enableForeignKeyConstraints($this->loaded[$fixture]->datasource);
         }
     }
 
@@ -121,35 +173,13 @@ class FixtureManager
      */
     public function shutdown() : void
     {
+        $this->before();
         foreach ($this->loaded as $fixture) {
-            $this->disableForeignKeyConstraints($fixture->datasource);
             if (! $fixture->insertOnly()) {
                 $fixture->drop();
             }
-            $this->enableForeignKeyConstraints($fixture->datasource);
         }
-    }
-
-    /**
-     * Disables ForeignKeyConstrains for a datasource
-     *
-     * @param string $datasource
-     * @return void
-     */
-    protected function disableForeignKeyConstraints(string $datasource) : void
-    {
-        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
-    }
-
-    /**
-    * Enables ForeignKeyConstrains for a datasource
-    *
-    * @param string $datasource
-    * @return void
-    */
-    protected function enableForeignKeyConstraints(string $datasource) : void
-    {
-        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
+        $this->after();
     }
 
     /**

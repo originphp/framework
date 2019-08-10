@@ -11,7 +11,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
+/**
+ * This is test has been added so that later on it can easily be removed.
+ */
 namespace Origin\Test\TestSuite;
 
 use Origin\Model\Model;
@@ -19,39 +21,32 @@ use Origin\TestSuite\Fixture;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
-class Movie extends Model
+class LegacyMovie extends Model
 {
+    public $table = 'movies';
 }
-
-class MovieFixture extends Fixture
+/**
+ * Fixture for the deprecated version
+ */
+class LegacyMovieFixture extends Fixture
 {
     public $table = 'movies';
 
     public $schema = [
-        'columns' => [
-            'id' => ['type' => 'integer','autoIncrement' => true],
-            'name' => [
-                'type' => 'string',
-                'limit' => 255,
-                'null' => false,
-            ],
-            'decsription' => 'text',
-            'year' => [
-                'type' => 'integer',
-                'default' => '0',
-                'null' => false,
-            ],
-            'created' => 'datetime',
-            'modified' => 'datetime',
+        'id' => ['type' => 'primaryKey'],
+        'name' => [
+            'type' => 'string',
+            'limit' => 255,
+            'null' => false,
         ],
-        'constraints' => [
-            'primary' => [
-                'type' => 'primary', 'column' => 'id',
-            ],
+        'decsription' => 'text',
+        'year' => [
+            'type' => 'integer',
+            'default' => '0',
+            'null' => false,
         ],
-        'indexes' => [
-            'name_idx' => ['column' => 'name'],
-        ],
+        'created' => 'datetime',
+        'modified' => 'datetime',
     ];
 
     public $records = [
@@ -79,7 +74,7 @@ class MovieFixture extends Fixture
     ];
 }
 
-class FixtureTest extends \PHPUnit\Framework\TestCase
+class LegacyFixtureTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
@@ -88,13 +83,13 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     }
     public function testConstruct()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $this->assertEquals('movies', $fixture->table);
         $this->assertEquals('test', $fixture->datasource);
     }
     public function testCreate()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $this->assertTrue($fixture->create());
     }
     /**
@@ -104,7 +99,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
      */
     public function testInsert()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->create();
         $this->assertNull($fixture->insert());
 
@@ -115,14 +110,14 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
 
     public function testTruncate()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->create();
         $fixture->insert();
         $this->assertTrue($fixture->truncate());
     }
     public function testDrop()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->create();
         $fixture->insert();
         $this->assertTrue($fixture->drop());
@@ -149,7 +144,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         ]);
     
         $connection->execute($sql);
-        $Movie = new Movie();
+        $Movie = new LegacyMovie();
         $Movie->datasource = 'default';
         $entity = $Movie->new(['name' => 'The Sound of Music','year' => 1965]);
 
@@ -158,7 +153,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
    
     public function testImportNull()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
 
         $this->assertNull($fixture->import());
     }
@@ -173,7 +168,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $connection = ConnectionManager::get('default');
         $connection->execute('DROP TABLE IF EXISTS guests'); // TMP
 
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->import = ['model' => 'Guest']; // convert to table
         
         $sql = $connection->adapter()->createTable('guests', [
@@ -188,7 +183,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testImportModel()
     {
         $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->import = ['model' => 'Origin\Test\TestSuite\Movie'];
         $this->assertTrue($fixture->create());
     }
@@ -196,7 +191,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testImportTable()
     {
         $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->import = ['table' => 'movies'];
         $this->assertTrue($fixture->create());
         $records = $fixture->loadRecords('test', 'movies');
@@ -205,7 +200,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadRecords()
     {
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $records = $fixture->loadRecords('default', 'movies');
         $this->assertEquals('The Sound of Music', $records[0]['name']);
     }
@@ -213,7 +208,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testImportTableWithRecords()
     {
         $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->import = ['table' => 'movies','records' => true];
         $this->assertTrue($fixture->create());
         $fixture->insert();
@@ -225,7 +220,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testImportNoTableException()
     {
         $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
+        $fixture = new LegacyMovieFixture();
         $fixture->import = ['foo' => 'bar'];
         $this->expectException(Exception::class);
         $fixture->create();
