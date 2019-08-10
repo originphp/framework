@@ -15,6 +15,7 @@
 namespace Origin\Command;
 
 use Origin\Core\Inflector;
+use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 
@@ -46,14 +47,15 @@ trait DbSchemaTrait
     public function parseSql(string $sql)
     {
         # Clean Up Soure Code
-         $sql = str_replace(";\r\n", ";\n", $sql); // Convert windows line endings on STATEMENTS ONLY
-         $sql = preg_replace('!/\*.*?\*/!s', '', $sql);
+        $sql = str_replace(";\r\n", ";\n", $sql); // Convert windows line endings on STATEMENTS ONLY
+        $sql = preg_replace('!/\*.*?\*/!s', '', $sql);
         $sql = preg_replace('/^-- .*$/m', '', $sql); // Remove Comment line starting with --
-         $sql = preg_replace('/^#.*$/m', '', $sql); // Remove Comments start with #
+        $sql = preg_replace('/^#.*$/m', '', $sql); // Remove Comments start with #
   
-         $statements = [];
+        $statements = [];
         if ($sql) {
             $statements = explode(";\n", $sql);
+            $statements = array_map('trim', $statements);
         }
       
         return $statements;
@@ -81,25 +83,39 @@ trait DbSchemaTrait
         $statement = file_get_contents($filename);
         $statements = $this->parseSql($statement);
 
-        ConnectionManager::get($datasource)->disableForeignKeyConstraints();
+        $count = $this->executeStatements($statements, $connection);
 
-        foreach ($statements  as $query) {
-            $query = trim($query);
-            if ($query) {
-                try {
-                    $connection->execute($query);
-                } catch (DatasourceException $ex) {
-                    $this->io->status('error', str_replace("\n", '', $query));
-                    $this->throwError('Executing query failed', $ex->getMessage());
-                }
-                $this->io->status('ok', str_replace("\n", '', $query));
-            }
-        }
-       
-        ConnectionManager::get($datasource)->enableForeignKeyConstraints();
-
-        $this->io->success(sprintf('Executed %d statements', count($statements)));
+        $this->io->success(sprintf('Executed %d statements', $count));
 
         return true;
+    }
+
+    /**
+    * Runs a set of statments against a datasource
+    *
+    * @param array $statements
+    * @param Datasource $connection
+    * @return integer
+    */
+    protected function executeStatements(array $statements, Datasource $connection) : int
+    {
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
+        
+        foreach ($statements  as $statement) {
+            try {
+                $connection->execute($statement);
+            } catch (DatasourceException $ex) {
+                $connection->rollback();
+                $this->io->status('error', str_replace("\n", '', $statement));
+                $this->throwError('Executing query failed', $ex->getMessage());
+            }
+            $this->io->status('ok', str_replace("\n", '', $statement));
+        }
+       
+        $connection->commit();
+        $connection->enableForeignKeyConstraints();
+
+        return count($statements);
     }
 }

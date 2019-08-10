@@ -16,7 +16,6 @@ namespace Origin\Command;
 
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\DatasourceException;
 
 class DbSchemaLoadCommand extends Command
 {
@@ -43,9 +42,10 @@ class DbSchemaLoadCommand extends Command
     public function execute()
     {
         $name = $this->arguments('name') ?? 'schema';
-        $datasource = $this->options('datasource');
         $type = $this->options('type');
         $filename = $this->schemaFilename($name, $type);
+        $datasource = $this->options('datasource');
+     
         if ($type === 'php') {
             $this->loadPhpSchema($name, $filename, $datasource);
         } else {
@@ -71,24 +71,12 @@ class DbSchemaLoadCommand extends Command
             $class = Inflector::camelize($name) . 'Schema';
         }
        
-        include $filename;
+        include_once $filename;
         $object = new $class;
         $statements = $object->createSql($connection);
+        
+        $count = $this->executeStatements($statements, $connection);
 
-        $connection->disableForeignKeyConstraints();
-     
-        foreach ($statements  as $statement) {
-            try {
-                $connection->execute($statement);
-            } catch (DatasourceException $ex) {
-                $this->io->status('error', str_replace("\n", '', $statement));
-                $this->throwError('Executing query failed', $ex->getMessage());
-            }
-            $this->io->status('ok', str_replace("\n", '', $statement));
-        }
-        $connection->commit();
-        $connection->enableForeignKeyConstraints();
-       
-        $this->io->success(sprintf('Executed %d statements', count($statements)));
+        $this->io->success(sprintf('Executed %d statements', $count));
     }
 }
