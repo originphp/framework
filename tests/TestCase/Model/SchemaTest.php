@@ -28,9 +28,7 @@ class SchemaTest extends OriginTestCase
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
         
-        foreach ($schema->createSql($connection) as $statement) {
-            $this->assertTrue($connection->execute($statement));
-        }
+        $this->executeStatements($schema->createSql($connection));
     }
 
     public function testDropSql()
@@ -38,8 +36,18 @@ class SchemaTest extends OriginTestCase
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
 
-        foreach ($schema->dropSql($connection) as $statement) {
+        $this->executeStatements($schema->dropSql($connection));
+    }
+
+    protected function executeStatements(array $statements)
+    {
+        $connection = ConnectionManager::get('test');
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
+        foreach ($statements as $statement) {
             $this->assertTrue($connection->execute($statement));
         }
+        $connection->enableForeignKeyConstraints();
+        $connection->commit();
     }
 }
