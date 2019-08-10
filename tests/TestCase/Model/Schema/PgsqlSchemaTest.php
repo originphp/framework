@@ -193,7 +193,7 @@ class PgsqlSchemaTest extends OriginTestCase
         
         $result = $adapter->createTableSql('tarticles', $schema, $options);
         
-        $this->assertEquals('1615a1cdff7f0e637c94ce1d65870efd', md5($result[0]));
+        $this->assertEquals('24fa96935e3c34613596bc7d9a29f93d', md5($result[0]));
 
         $options = [
             'constraints' => [
@@ -209,8 +209,7 @@ class PgsqlSchemaTest extends OriginTestCase
         ];
 
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-
-        $this->assertEquals('63ee1c702b43c6ac12d33208aa772ee3', md5($result[0]));
+        $this->assertEquals('38b774843bdba657fbb52ff58ee9dc14', md5($result[0]));
 
         // sanity check
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -315,7 +314,7 @@ class PgsqlSchemaTest extends OriginTestCase
     public function testAddForeignKey()
     {
         $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER TABLE "articles" ADD CONSTRAINT "fk_origin_12345" FOREIGN KEY (author_id) REFERENCES "users" (id)';
+        $expected = 'ALTER TABLE "articles" ADD CONSTRAINT "fk_origin_12345" FOREIGN KEY (author_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE';
         $result = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
         $this->assertEquals($expected, $result);
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -498,9 +497,9 @@ class PgsqlSchemaTest extends OriginTestCase
     {
         $adapter = new PgsqlSchema('test');
         $expected = 'DROP TABLE "foo" CASCADE';
-        $result = $adapter->dropTable('foo'); # created in createTable
+        $result = $adapter->dropTableSql('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-        $this->assertEquals('DROP TABLE IF EXISTS "foo" CASCADE', $adapter->dropTable('foo', ['ifExists' => true]));
+        $this->assertEquals('DROP TABLE IF EXISTS "foo" CASCADE', $adapter->dropTableSql('foo', ['ifExists' => true]));
         if ($adapter->connection()->engine() === 'pgsql') {
             $this->assertTrue($adapter->connection()->execute($result));
         }

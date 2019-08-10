@@ -480,6 +480,40 @@ class MysqlSchema extends BaseSchema
     }
 
     /**
+     * Sql for truncating a table
+     *
+     * @param string $table
+     * @return string
+     */
+    public function truncateTableSql(string $table) : string
+    {
+        return sprintf(
+            'TRUNCATE TABLE %s',
+            $this->quoteIdentifier($table)
+        );
+    }
+
+    /**
+     * Sql for disabling foreign key checks
+     *
+     * @return string
+     */
+    public function disableForeignKeySql() : string
+    {
+        return 'SET FOREIGN_KEY_CHECKS = 0';
+    }
+
+    /**
+     * Sql for enabling foreign key checks
+     *
+     * @return string
+     */
+    public function enableForeignKeySql() : string
+    {
+        return 'SET FOREIGN_KEY_CHECKS = 1';
+    }
+
+    /**
      * Returns a list of foreign keys on a table
      *
      * @param string $table
@@ -639,7 +673,7 @@ class MysqlSchema extends BaseSchema
     {
         $sql = sprintf(
             'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
-            $attributes['name'],
+            $this->quoteIdentifier($attributes['name']),
             implode(', ', (array) $attributes['column']),
             $this->quoteIdentifier($attributes['references'][0]),
             $attributes['references'][1]
@@ -734,7 +768,7 @@ class MysqlSchema extends BaseSchema
     * @param array options (ifExists)
     * @return string
     */
-    public function dropTable(string $table, array $options = []) : string
+    public function dropTableSql(string $table, array $options = []) : string
     {
         $sql = 'DROP TABLE %s';
         if (! empty($options['ifExists'])) {

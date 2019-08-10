@@ -278,7 +278,7 @@ class Migration
         }
 
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->dropTable($name);
+            $this->reverseStatements[] = $this->adapter()->dropTableSql($name);
         }
     }
 
@@ -319,7 +319,7 @@ class Migration
             throw new Exception("{$table} table does not exist");
         }
 
-        $this->statements[] = $this->adapter()->dropTable($table, $options);
+        $this->statements[] = $this->adapter()->dropTableSql($table, $options);
 
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->describe($table);

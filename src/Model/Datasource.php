@@ -74,7 +74,7 @@ abstract class Datasource
      */
     protected $config = [];
     /**
-     * What to escape table and column aliases
+     * What to quote table and column aliases
      *
      * @var string
      */
@@ -205,7 +205,7 @@ abstract class Datasource
         return true;
     }
 
-    protected function unprepare($sql, $params) : string
+    protected function unprepare(string $sql, array  $params) : string
     {
         foreach ($params as $needle => $replace) {
             if (is_string($replace)) {
@@ -574,7 +574,7 @@ abstract class Datasource
 
     /**
      * Gets the schema for a table
-     *
+     * @deprecated This is kept for backwards compatability but it no longer going to be used in future
      * @param string $table
      * @return array
      */
@@ -583,11 +583,10 @@ abstract class Datasource
         $cache = Cache::store('origin_model');
         $key = $this->config['name'] . '_' . $table;
         $schema = $cache->read($key);
-        if ($schema) {
-            return $schema;
+        if (! $schema) {
+            $schema = $this->adapter()->schema($table);
+            $cache->write($key, $schema);
         }
-        $schema = $this->adapter()->schema($table);
-        $cache->write($key, $schema);
 
         return $schema;
     }
@@ -603,11 +602,10 @@ abstract class Datasource
         $cache = Cache::store('origin_model');
         $key = $this->config['name'] . '_' . $table;
         $schema = $cache->read($key);
-        if ($schema) {
-            return $schema;
+        if (! $schema) {
+            $schema = $this->adapter()->describe($table);
+            $cache->write($key, $schema);
         }
-        $schema = $this->adapter()->describe($table);
-        $cache->write($key, $schema);
 
         return $schema;
     }
@@ -633,13 +631,25 @@ abstract class Datasource
      */
     abstract public function tables() : array;
     
-    abstract public function enableForeignKeyConstraints();
+    /**
+    * Enables Foreign Key Constraints
+    *
+    * @return void
+    */
+    public function enableForeignKeyConstraints() : void
+    {
+        $this->execute($this->adapter()->enableForeignKeySql());
+    }
 
-    abstract public function disableForeignKeyConstraints();
-
-    abstract public function dropTable(string $table) : bool;
-    
-    abstract public function truncateTable(string $table): bool;
+    /**
+     * Disables Foreign Key Constraints
+     *
+     * @return void
+     */
+    public function disableForeignKeyConstraints() : void
+    {
+        $this->execute($this->adapter()->disableForeignKeySql());
+    }
 
     /**
      * Executes a select statement
@@ -714,7 +724,7 @@ abstract class Datasource
     public function queryBuilder(string $table, $alias = null) :QueryBuilder
     {
         return new QueryBuilder($table, $alias, [
-            'escape' => $this->escape,
+            'escape' => $this->quote,
         ]);
     }
 

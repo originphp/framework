@@ -189,8 +189,8 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-        
-        $this->assertEquals('cb8b587150b16c31076c1172f565d77a', md5($result[0]));
+
+        $this->assertEquals('a578d2dcc76c88ba3e1fd372bd365db9', md5($result[0]));
 
         $options = [
             'constraints' => [
@@ -206,7 +206,8 @@ class MysqlSchemaTest extends OriginTestCase
         ];
 
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-        $this->assertEquals('6f2d38018eb8dae025e23855db3dfb1d', md5($result[0]));
+
+        $this->assertEquals('5714028332ba2d21d8889cc106a51f7a', md5($result[0]));
 
         // sanity check
         if ($adapter->connection()->engine() === 'mysql') {
@@ -466,9 +467,9 @@ class MysqlSchemaTest extends OriginTestCase
     {
         $adapter = new MysqlSchema('test');
         $expected = 'DROP TABLE `foo`';
-        $result = $adapter->dropTable('foo'); # created in createTable
+        $result = $adapter->dropTableSql('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-        $this->assertEquals('DROP TABLE IF EXISTS `foo`', $adapter->dropTable('foo', ['ifExists' => true]));
+        $this->assertEquals('DROP TABLE IF EXISTS `foo`', $adapter->dropTableSql('foo', ['ifExists' => true]));
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($result));
         }

@@ -20,11 +20,11 @@ class MySQLEngine extends Datasource
     protected $name = 'mysql';
       
     /**
-     * What to escape table and column aliases
+     * What to quote table and column aliases
      *
      * @var string
      */
-    protected $escape = '`';
+    protected $quote = '`';
 
     /**
      * Returns the DSN string
@@ -40,26 +40,6 @@ class MySQLEngine extends Datasource
         }
 
         return  "{$engine}:host={$host};charset=utf8mb4";
-    }
-
-    /**
-     * Enables Foreign Key Constraints
-     *
-     * @return void
-     */
-    public function enableForeignKeyConstraints() : void
-    {
-        $this->execute('SET FOREIGN_KEY_CHECKS = 1');
-    }
-
-    /**
-     * Disables Foreign Key Constraints
-     *
-     * @return void
-     */
-    public function disableForeignKeyConstraints() : void
-    {
-        $this->execute('SET FOREIGN_KEY_CHECKS = 0');
     }
 
     /**

@@ -87,7 +87,7 @@ class Schema
         $properties = get_object_vars($this);
 
         foreach (array_keys($properties) as $table) {
-            $out[] = $datasource->adapter()->dropTable($table);
+            $out[] = $datasource->adapter()->dropTableSql($table);
         }
         
         return $out;

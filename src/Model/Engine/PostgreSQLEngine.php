@@ -20,11 +20,11 @@ class PostgreSQLEngine extends Datasource
     protected $name = 'pgsql';
 
     /**
-    * What to escape table and column aliases
+    * What to quote table and column aliases
     *
     * @var string
     */
-    protected $escape = '"';
+    protected $quote = '"';
 
     /**
      * Returns the DSN string
@@ -42,26 +42,6 @@ class PostgreSQLEngine extends Datasource
         return "{$engine}:host={$host};options='--client_encoding=UTF8'";
     }
     
-    /**
-    * Enables Foreign Key Constraints
-    *
-    * @return void
-    */
-    public function enableForeignKeyConstraints() : void
-    {
-        $this->execute('SET CONSTRAINTS ALL IMMEDIATE');
-    }
-
-    /**
-     * Disables Foreign Key Constraints
-     *
-     * @return void
-     */
-    public function disableForeignKeyConstraints() : void
-    {
-        $this->execute('SET CONSTRAINTS ALL DEFERRED');
-    }
-
     /**
      * Gets a list of tables
      *
@@ -100,27 +80,5 @@ class PostgreSQLEngine extends Datasource
         }
 
         return $out;
-    }
-
-    /**
-     * Drops a table
-     *
-     * @param string $table
-     * @return bool
-     */
-    public function dropTable(string $table) : bool
-    {
-        return $this->execute("DROP TABLE IF EXISTS {$table} CASCADE");
-    }
-
-    /**
-     * Truncates a table
-     *
-     * @param string $table
-     * @return boolean
-     */
-    public function truncateTable(string $table) : bool
-    {
-        return $this->execute("TRUNCATE TABLE {$table} CASCADE");
     }
 }

@@ -12,12 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * Know Issues:
-  * ============
-  * - Cant set limit for primaryKey
-  * - Cant detect primaryKey properly in postgresql without second query
-  */
+/**
+ * @todo Eventually all functions that return sql statements name should end with SQL
+ */
 namespace Origin\Model\Schema;
 
 use Origin\Model\Datasource;
@@ -101,6 +98,10 @@ abstract class BaseSchema
      * @return array
      */
     abstract protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array;
+
+    abstract public function disableForeignKeySql() : string;
+    
+    abstract public function enableForeignKeySql() : string;
 
     /**
     * creates the table index
@@ -221,25 +222,28 @@ abstract class BaseSchema
     abstract public function renameIndex(string $table, string $oldName, string $newName);
  
     /**
-     * Returns SQL for adding a foreignKey
-     *
-     * @param string $fromTable
-     * @param string $name
-     * @param string $column
-     * @param string $toTable
-     * @param string $primaryKey
-     * @return string
-     */
-    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey) : string
+    * Returns SQL for adding a foreignKey
+    *
+    * @param string $fromTable
+    * @param string $name
+    * @param string $column
+    * @param string $toTable
+    * @param string $primaryKey
+    * @param string $onUpdate (cascade,restrict,setNull,setDefault,noAction)
+    * @param string $onDelete (cascade,restrict,setNull,setDefault,noAction)
+    * @return string
+    */
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null) : string
     {
-        return sprintf(
-            'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
-            $this->quoteIdentifier($fromTable),
-            $this->quoteIdentifier($name),
-            $column,
-            $this->quoteIdentifier($toTable),
-            $primaryKey
-    );
+        $fragment = $this->tableConstraintForeign([
+            'name' => $name,
+            'column' => $column,
+            'references' => [$toTable,$primaryKey],
+            'update' => $onUpdate,
+            'delete' => $onDelete,
+        ]);
+
+        return sprintf('ALTER TABLE %s ADD ', $this->quoteIdentifier($fromTable)) . $fragment;
     }
 
     /**
@@ -309,7 +313,15 @@ abstract class BaseSchema
      * @param array options (ifExists)
      * @return string
      */
-    abstract public function dropTable(string $table, array $options = []);
+    abstract public function dropTableSql(string $table, array $options = []);
+
+    /**
+     * Returns the sql for truncating the table
+     *
+     * @param string $table
+     * @return string
+     */
+    abstract public function truncateTableSql(string $table) : string;
 
     /**
      * Gets a SQL statement for renaming a table

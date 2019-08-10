@@ -113,7 +113,7 @@ class PgsqlSchema extends BaseSchema
     {
         $sql = sprintf(
             'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
-            $attributes['name'],
+            $this->quoteIdentifier($attributes['name']),
             implode(', ', (array) $attributes['column']),
             $this->quoteIdentifier($attributes['references'][0]),
             $attributes['references'][1]
@@ -123,7 +123,7 @@ class PgsqlSchema extends BaseSchema
             $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $this->onClause($attributes['update']), $this->onClause($attributes['delete']));
         }
 
-        return $sql . ' DEFERRABLE INITIALLY IMMEDIATE';
+        return $sql . ' DEFERRABLE INITIALLY IMMEDIATE'; #! Important
     }
 
     /**
@@ -361,6 +361,26 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
+         * Sql for disabling foreign key checks
+         *
+         * @return string
+         */
+    public function disableForeignKeySql() : string
+    {
+        return 'SET CONSTRAINTS ALL DEFERRED';
+    }
+    
+    /**
+     * Sql for enabling foreign key checks
+     *
+     * @return string
+     */
+    public function enableForeignKeySql() : string
+    {
+        return 'SET CONSTRAINTS ALL IMMEDIATE';
+    }
+
+    /**
      * Returns a list of foreign keys for table
      *
      * @param string $table
@@ -451,13 +471,27 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
+    * Sql for truncating a table
+    *
+    * @param string $table
+    * @return string
+    */
+    public function truncateTableSql(string $table) : string
+    {
+        return sprintf(
+            'TRUNCATE TABLE %s RESTART IDENTITY CASCADE',
+            $this->quoteIdentifier($table)
+        );
+    }
+
+    /**
     * Returns a SQL statement for dropping a table
     * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
     * @param string $table
     * @param array options (ifExists)
     * @return string
     */
-    public function dropTable(string $table, array $options = []) : string
+    public function dropTableSql(string $table, array $options = []) : string
     {
         $sql = 'DROP TABLE %s CASCADE';
         if (! empty($options['ifExists'])) {
