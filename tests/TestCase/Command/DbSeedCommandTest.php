@@ -18,16 +18,6 @@ class DbSeedCommandTest extends OriginTestCase
         $this->assertOutputContains('Executed 3 statements');
     }
 
-    public function testExecuteSkipped()
-    {
-        $seed = ROOT . '/tests/TestApp/db/seed.sql';
-        $contents = file_get_Contents($seed);
-        unlink($seed);
-        $this->exec('db:seed --datasource=test');
-        file_put_contents($seed, $contents);
-        $this->assertOutputContains('SKIPPED');
-    }
-
     public function testExecuteArgumentName()
     {
         $this->exec('db:seed --datasource=test seed');
@@ -38,6 +28,6 @@ class DbSeedCommandTest extends OriginTestCase
     {
         $this->exec('db:seed --datasource=test MyPlugin.records');
         $this->assertExitError();
-        $this->assertErrorContains('plugins/my_plugin/db/records.sql` could not be found'); // check plugin name as well
+        $this->assertErrorContains('my_plugin/db/records.sql not found'); // check plugin name as well
     }
 }
