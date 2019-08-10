@@ -122,7 +122,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new \Origin\Console\ConsoleOutput();
         $bytes = $ConsoleOutput->write('OriginPHP', false);
         $this->assertEquals(9, $bytes);
-        $ConsoleOutput->write("\r", false);
+        $ConsoleOutput->write(str_repeat("\x08", 9), false);
     }
 
     public function testWritePlain()
