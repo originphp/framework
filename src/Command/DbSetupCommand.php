@@ -28,6 +28,10 @@ class DbSetupCommand extends Command
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
         ]);
+        $this->addOption('type', [
+            'description' => 'Use sql or php file',
+            'default' => 'sql',
+        ]);
     }
  
     public function execute()
@@ -52,6 +56,7 @@ class DbSetupCommand extends Command
     
         $this->runCommand('db:schema:load', [
             '--datasource' => $datasource,
+            '--type' => $this->options('type'),
             $schema,
         ]);
      
@@ -59,6 +64,7 @@ class DbSetupCommand extends Command
 
         $this->runCommand('db:seed', [
             '--datasource' => $datasource,
+            '--type' => $this->options('type'),
             $seed,
         ]);
     }
