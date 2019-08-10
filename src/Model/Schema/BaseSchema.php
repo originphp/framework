@@ -323,6 +323,7 @@ abstract class BaseSchema
      */
     abstract public function truncateTableSql(string $table) : string;
 
+    abstract public function changeAutoIncrementSql(string $table, string $column, int $counter) : string;
     /**
      * Gets a SQL statement for renaming a table
      *

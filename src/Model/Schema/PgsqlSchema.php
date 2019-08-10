@@ -484,6 +484,11 @@ class PgsqlSchema extends BaseSchema
         );
     }
 
+    public function changeAutoIncrementSql(string $table, string $column, int $counter): string
+    {
+        return sprintf('ALTER SEQUENCE %s_%s_seq RESTART WITH %d ', $table, $column, $counter);
+    }
+
     /**
     * Returns a SQL statement for dropping a table
     * @internal on pgsql cascade is required for dropping tables if foreign keys reference it

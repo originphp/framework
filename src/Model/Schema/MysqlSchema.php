@@ -493,6 +493,11 @@ class MysqlSchema extends BaseSchema
         );
     }
 
+    public function changeAutoIncrementSql(string $table, string $column, int $counter): string
+    {
+        return sprintf('ALTER TABLE %s AUTO_INCREMENT = %d ', $this->quoteIdentifier($table), $counter);
+    }
+
     /**
      * Sql for disabling foreign key checks
      *
