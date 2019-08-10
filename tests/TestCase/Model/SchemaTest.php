@@ -38,12 +38,8 @@ class SchemaTest extends OriginTestCase
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
 
-        $connection->disableForeignKeyConstraints();
-
         foreach ($schema->dropSql($connection) as $statement) {
             $this->assertTrue($connection->execute($statement));
         }
-        
-        $connection->enableForeignKeyConstraints();
     }
 }
