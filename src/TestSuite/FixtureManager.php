@@ -46,14 +46,20 @@ class FixtureManager
     public function load($test) : void
     {
         $this->testCaseName = get_class($test);
-
-        if ($test->fixtures) {
-            $this->before();
-            foreach ($test->fixtures as $fixture) {
-                $this->loadFixture($fixture);
-            }
-            $this->after();
+        
+        # Create Tables or Truncate
+        $this->disableForeignKeyConstraints();
+        foreach ($test->fixtures as $fixture) {
+            $this->loadFixture($fixture);
         }
+        $this->enableForeignKeyConstraints();
+
+        # Insert Records for Fixtures
+        $this->disableForeignKeyConstraints();
+        foreach ($test->fixtures as $fixture) {
+            $this->loadRecords($fixture);
+        }
+        $this->enableForeignKeyConstraints();
     }
 
     /**
@@ -64,40 +70,14 @@ class FixtureManager
      */
     public function unload($test) :void
     {
-        if ($test->fixtures) {
-            $this->before();
-            foreach ($test->fixtures as $fixture) {
-                $this->unloadFixture($fixture);
-            }
-            $this->after();
+        $this->disableForeignKeyConstraints();
+        foreach ($test->fixtures as $fixture) {
+            $this->unloadFixture($fixture);
         }
+        $this->enableForeignKeyConstraints();
        
         // Clear the model registry
         ModelRegistry::clear();
-    }
-
-    /**
-     * Called before load or unload
-     *
-     * @return void
-     */
-    protected function before() : void
-    {
-        $connection = ConnectionManager::get('test');
-        $connection->begin();
-        $connection->disableForeignKeyConstraints();
-    }
-
-    /**
-    * Called after load or unload
-    *
-    * @return void
-    */
-    protected function after() : void
-    {
-        $connection = ConnectionManager::get('test');
-        $connection->enableForeignKeyConstraints();
-        $connection->commit();
     }
 
     /**
@@ -116,7 +96,7 @@ class FixtureManager
     }
 
     /**
-     * Loads fixture
+     * Loads fixture: creates table or truncates
      *
      * @param string $fixture
      * @return void
@@ -124,7 +104,7 @@ class FixtureManager
     public function loadFixture(string $fixture) : void
     {
         $class = $this->resolveFixture($fixture);
-
+   
         $createTable = false;
         if (empty($this->loaded[$fixture])) {
             $this->loaded[$fixture] = new $class();
@@ -140,16 +120,24 @@ class FixtureManager
                 $this->loaded[$fixture]->truncate();
             }
         } catch (DataSourceException $e) {
-            ConnectionManager::get('test')->rollback(); # Cancel Transaction
-            throw new Exception(sprintf('Error creating fixture %s for test case %s ', $fixture, $this->testCaseName));
+            ConnectionManager::get('test')->rollback();  # Cancel Transaction
+            throw new Exception(sprintf('Error creating fixture %s for test case %s : %s', $fixture, $this->testCaseName, $e->getMessage()));
         }
+    }
 
+    /**
+     * Loads the records for a fixture
+     *
+     * @param string $fixture
+     * @return void
+     */
+    public function loadRecords(string $fixture) : void
+    {
         try {
-            // Insert the records
             $this->loaded[$fixture]->insert();
         } catch (DataSourceException $e) {
             ConnectionManager::get('test')->rollback();  # Cancel Transaction
-            throw new Exception(sprintf('Error inserting records in fixture %s for test case %s ', $fixture, $this->testCaseName));
+            throw new Exception(sprintf('Error inserting records in fixture %s for test case %s : %s', $fixture, $this->testCaseName, $e->getMessage()));
         }
     }
 
@@ -173,13 +161,29 @@ class FixtureManager
      */
     public function shutdown() : void
     {
-        $this->before();
+        $this->disableForeignKeyConstraints();
+
         foreach ($this->loaded as $fixture) {
             if (! $fixture->insertOnly()) {
                 $fixture->drop();
             }
         }
-        $this->after();
+        $this->enableForeignKeyConstraints();
+    }
+
+    protected function disableForeignKeyConstraints() : void
+    {
+        $connection = ConnectionManager::get('test');
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
+    }
+
+    protected function enableForeignKeyConstraints() : void
+    {
+        $connection = ConnectionManager::get('test');
+      
+        $connection->enableForeignKeyConstraints();
+        $connection->commit();
     }
 
     /**

@@ -60,7 +60,7 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $fixtureManager = new MockFixtureManager();
         $fixtureManager->setProperty('loaded', ['Framework.Post' => $stub]);
 
-        $fixtureManager->loadFixture('Framework.Post');
+        $fixtureManager->load(new MockTestCase());
     }
 
     public function testLoadFixtureDontDropTables()
@@ -77,7 +77,7 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $fixtureManager = new MockFixtureManager();
         $fixtureManager->setProperty('loaded', ['Framework.Post' => $stub]);
  
-        $fixtureManager->loadFixture('Framework.Post');
+        $fixtureManager->load(new MockTestCase());
     }
 
     public function testCreateTableException()
