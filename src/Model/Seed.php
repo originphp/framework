@@ -16,6 +16,19 @@ namespace Origin\Model;
 
 class Seed
 {
+    public function __construct()
+    {
+        $this->initialize();
+    }
+
+    /**
+     * A hook for construct
+     *
+     * @return void
+     */
+    public function initialize() : void
+    {
+    }
     /**
      * Creates the SQL statements for inserting
      *
