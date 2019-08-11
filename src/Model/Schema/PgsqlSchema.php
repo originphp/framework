@@ -69,6 +69,16 @@ class PgsqlSchema extends BaseSchema
         }
         $databaseOptions['comments'] = $comments;
 
+        if (isset($options['options']['autoIncrement']) and isset($options['constraints']['primary']['column'])) {
+            if (is_string($options['constraints']['primary']['column'])) {
+                $databaseOptions['setAutoIncrement'] = $this->changeAutoIncrementSql(
+                    $table,
+                    $options['constraints']['primary']['column'],
+                    $options['options']['autoIncrement']
+                );
+            }
+        }
+
         return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);
     }
 
@@ -90,7 +100,7 @@ class PgsqlSchema extends BaseSchema
             $out[] = $index;
         }
         $tableName = $this->quoteIdentifier($table); // dont run in loop
-        
+
         foreach ($options['comments'] as $column => $comment) {
             $out[] = sprintf(
                 'COMMENT ON COLUMN %s.%s IS %s',
@@ -98,6 +108,10 @@ class PgsqlSchema extends BaseSchema
                 $this->quoteIdentifier($column),
                 $this->schemaValue($comment)
             );
+        }
+
+        if (isset($options['setAutoIncrement'])) {
+            $out[] = $options['setAutoIncrement'];
         }
 
         return $out;
@@ -486,7 +500,7 @@ class PgsqlSchema extends BaseSchema
 
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string
     {
-        return sprintf('ALTER SEQUENCE %s_%s_seq RESTART WITH %d ', $table, $column, $counter);
+        return sprintf('ALTER SEQUENCE %s_%s_seq RESTART WITH %d', $table, $column, $counter);
     }
 
     /**

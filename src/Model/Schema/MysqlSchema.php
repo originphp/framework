@@ -495,7 +495,7 @@ class MysqlSchema extends BaseSchema
 
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string
     {
-        return sprintf('ALTER TABLE %s AUTO_INCREMENT = %d ', $this->quoteIdentifier($table), $counter);
+        return sprintf('ALTER TABLE %s AUTO_INCREMENT = %d', $this->quoteIdentifier($table), $counter);
     }
 
     /**
@@ -620,6 +620,16 @@ class MysqlSchema extends BaseSchema
             }
         }
 
+        if (isset($options['options']['autoIncrement']) and isset($options['constraints']['primary']['column'])) {
+            if (is_string($options['constraints']['primary']['column'])) {
+                $databaseOptions['setAutoIncrement'] = $this->changeAutoIncrementSql(
+                    $table,
+                    $options['constraints']['primary']['column'],
+                    $options['options']['autoIncrement']
+                );
+            }
+        }
+
         return $this->buildCreateTableSql($table, $columns, $constraints, $indexes, $databaseOptions);
     }
 
@@ -664,8 +674,13 @@ class MysqlSchema extends BaseSchema
         if (isset($options['collate'])) {
             $out .= ' COLLATE=' . $options['collate'];
         }
-      
-        return [$out];
+        
+        $out = [$out];
+        if (isset($options['setAutoIncrement'])) {
+            $out[] = $options['setAutoIncrement'];
+        }
+
+        return $out;
     }
 
     /**

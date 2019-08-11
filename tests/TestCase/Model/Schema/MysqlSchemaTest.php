@@ -58,7 +58,7 @@ class MysqlSchemaTest extends OriginTestCase
             'indexes' => [
                 'u2' => ['type' => 'index','column' => ['f2']],
             ],
-            'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin'],
+            'options' => ['charset' => 'UTF8mb4','collate' => 'utf8mb4_bin','autoIncrement' => 1000],
         ];
         
         $statements = $adapter->createTableSql('tposts', $schema, $options);
@@ -100,14 +100,15 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         $options = [
             'constraints' => [
-                'primary' => ['type' => 'primary','column' => ['id']],
+                'primary' => ['type' => 'primary','column' => 'id'],
                 'unique' => ['type' => 'unique', 'column' => ['title']],
             ],
-            'options' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci'],
+            'options' => ['engine' => 'InnoDB','charset' => 'utf8','collate' => 'utf8_unicode_ci','autoIncrement' => 1000],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
-      
+       
         $this->assertEquals('e072e7ae67738ce47c8a9d6dde92d422', md5($result[0]));
+        $this->assertEquals('f23839a1d5f204c328780d457e5ac4e8', md5($result[1]));
 
         if ($adapter->connection()->engine() === 'mysql') {
             foreach ($result as $statement) {
@@ -461,6 +462,17 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertEquals('foo', $adapter->datasource());
         $adapter->datasource('bar');
         $this->assertEquals('bar', $adapter->datasource());
+    }
+
+    public function testChangeAutoIncrementSql()
+    {
+        $adapter = new MysqlSchema('test');
+        $expected = 'ALTER TABLE `foo` AUTO_INCREMENT = 1024';
+        $result = $adapter->changeAutoIncrementSql('foo', 'id', 1024); # created in createTable
+        $this->assertEquals($expected, $result);
+        if ($adapter->connection()->engine() === 'mysql') {
+            $this->assertTrue($adapter->connection()->execute($result));
+        }
     }
 
     public function testDropTable()

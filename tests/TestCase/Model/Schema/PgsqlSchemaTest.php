@@ -56,6 +56,7 @@ class PgsqlSchemaTest extends OriginTestCase
             'indexes' => [
                 'u2' => ['type' => 'index','column' => ['f2']], // we need this for the next test
             ],
+            'options' => ['autoIncrement' => 1000],
         ];
         $statements = $adapter->createTableSql('tposts', $schema, $options);
 
@@ -93,7 +94,7 @@ class PgsqlSchemaTest extends OriginTestCase
     {
         $adapter = new PgsqlSchema('test');
         $schema = [
-            'id' => 'integer',
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'title' => ['type' => 'string'],
             'description' => 'text',
             'created' => 'datetime',
@@ -104,10 +105,12 @@ class PgsqlSchemaTest extends OriginTestCase
                 'primary' => ['type' => 'primary','column' => 'id'],
                 'unique' => ['type' => 'unique', 'column' => 'title'],
             ],
+            'options' => ['autoIncrement' => 1000],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
-        $this->assertEquals('d1034af99749ab7dc9f865bad17e29d0', md5($result[0]));
-       
+        
+        $this->assertEquals('d406a607d78e19c3a5490ee66890799a', md5($result[0]));
+        $this->assertEquals('391876f15125755e54eca9cdcbb1d1a9', md5($result[1]));
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($result as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
@@ -491,6 +494,17 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertEquals('foo', $adapter->datasource());
         $adapter->datasource('bar');
         $this->assertEquals('bar', $adapter->datasource());
+    }
+
+    public function testChangeAutoIncrementSql()
+    {
+        $adapter = new PgsqlSchema('test');
+        $expected = 'ALTER SEQUENCE foo_id_seq RESTART WITH 1024';
+        $result = $adapter->changeAutoIncrementSql('foo', 'id', 1024); # created in createTable
+        $this->assertEquals($expected, $result);
+        if ($adapter->connection()->engine() === 'pgsql') {
+            $this->assertTrue($adapter->connection()->execute($result));
+        }
     }
 
     public function testDropTable()
