@@ -51,7 +51,12 @@ class SeedTest extends OriginTestCase
     {
         $connection = ConnectionManager::get('test');
         $schema = new \ApplicationSchema();
+
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
         $this->executeStatements($schema->dropSql($connection));
+        $connection->enableForeignKeyConstraints();
+        $connection->commit();
     }
 
     protected function executeStatements(array $statements)
