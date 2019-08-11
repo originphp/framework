@@ -252,28 +252,38 @@ class Migration
     * @param $options The option keys are as follows (constraints/indexes are here but deliberately not documentated)
     *   - id: default true wether to create primaryKey column and constraint.
     *   - primaryKey: default is 'id' the column name of the primary key. Set to false not to use primaryKey
-    *   - options: table options for MySQL an array with any keys (charset,collate,engine)
-    *  The new CreateTable function accepts additional options which could be used but not part of migrations
-    *   - constraints: e.g. ['unique'=>['type'=>'unique','column'=>'title']]
-    *   - indexes: e.g. ['idx_title'=>['type'=>'index','column' => ['title','slug']]]
+    *   - engine: this is for MySQL only. e.g InnoDB
+    *   - charset: this is for MySQL DEFAULT CHARACTER SET e.g. utf8
+    *   - collate: this is for MySQL utf8_unicode_ci
+    *   - autoIncrement: this sets the auto increment (mysql) or serial (pgsql) value. e.g. 10000
     * @return void
     */
     public function createTable(string $name, array $schema = [], array $options = []) : void
     {
-        $options += ['id' => true,'primaryKey' => 'id','constraints' => [],'indexes' => null,'options' => null];
+        $tableOptions = ['options' => $options];
+
+        $options += ['id' => true,'primaryKey' => 'id'];
         if ($options['id'] and $options['primaryKey']) {
             $schema[$options['primaryKey']] = [
                 'type' => 'integer',
                 'autoIncrement' => true,
             ];
-            $options['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
+            $tableOptions['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
         }
-        
+
+        /**
+         * Legacy handler
+         * @deprecated options was deprecated 1.26
+         */
+        if (isset($options['options'])) {
+            $tableOptions['options'] = $options['options'];
+        }
+
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
   
-        foreach ($this->adapter()->createTableSql($name, $schema, $options) as $statement) {
+        foreach ($this->adapter()->createTableSql($name, $schema, $tableOptions) as $statement) {
             $this->statements[] = $statement;
         }
 

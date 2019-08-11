@@ -121,7 +121,12 @@ class MigrationTest extends OriginTestCase
         return $migration;
     }
 
-    public function testCreateTable()
+    /**
+     * This uses the legacy options string
+     * @deprecated added here to keep track so its easy to remove later
+     * @return void
+     */
+    public function testCreateTableLegacy()
     {
         $migration = $this->migration();
 
@@ -145,6 +150,42 @@ class MigrationTest extends OriginTestCase
         
         $reversableStatements = $migration->invokeStart();
  
+        $this->assertTrue($migration->columnExists('products', 'id'));
+        $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
+
+        $this->assertTrue($migration->columnExists('products', 'name', ['type' => 'string']));
+        $this->assertTrue($migration->columnExists('products', 'description', ['type' => 'text']));
+        
+        $migration->rollback($reversableStatements);
+        $this->assertFalse($migration->tableExists('products'));
+    }
+
+    public function testCreateTable()
+    {
+        $migration = $this->migration();
+
+        $options = ['engine' => 'InnoDB','autoIncrement' => 10000,'charset' => 'utf8','collate' => 'utf8_unicode_ci'];
+
+        $index = 'PRIMARY';
+        if ($migration->connection()->engine() === 'pgsql') {
+            $index = 'products_pkey';
+        }
+
+        $migration->createTable('products', [
+            'name' => 'string',
+            'description' => 'text',
+            'column_1' => ['type' => 'string','default' => 'foo'],
+            'column_2' => ['type' => 'string','default' => 'foo','null' => true],
+            'column_3' => ['type' => 'string','default' => 'foo','null' => false],
+            'column_4' => ['type' => 'string','null' => false],
+            'column_5' => ['type' => 'string','null' => true],
+            'column_6' => ['type' => 'VARCHAR','limit' => 5], // test non agnostic#$
+        ], $options);
+        
+        $this->assertEquals(2, count($migration->statements())); // second statement should be setting autoincrement
+
+        $reversableStatements = $migration->invokeStart();
+      
         $this->assertTrue($migration->columnExists('products', 'id'));
         $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
 
