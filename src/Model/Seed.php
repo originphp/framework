@@ -26,7 +26,7 @@ class Seed
      *
      * @return void
      */
-    public function initialize() : void
+    public function initialize()
     {
     }
     /**
