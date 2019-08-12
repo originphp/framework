@@ -158,7 +158,8 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Controller'.DS.'DummiesController.php';
         $this->assertOutputContains('src/Controller/DummiesController.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('81465b7ec67173d7509485d126629e74', $filename);
+    
+        $this->assertFileHash('a9c56ac0678b4d0779c9253d35be45cb', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Controller'.DS.'DummiesControllerTest.php';
@@ -177,7 +178,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Controller'.DS.'DummiesController.php';
         $this->assertOutputContains('src/Controller/DummiesController.php');
         $this->assertTrue(file_exists($filename));
-        $this->assertFileHash('136dbf2be60889e47afd4602b26482a5', $filename);
+        $this->assertFileHash('ba99d19770bfb7ad852afbfe3fc74a91', $filename);
         unlink($filename);
 
         $filename = SRC.DS.'View'.DS.'Dummies'.DS .'index.ctp';
