@@ -75,11 +75,9 @@ class MysqlSchema extends BaseSchema
         $columns = $this->convertTableDescription($results);
 
         $indexes = $constraints = [];
-     
-        /**
-         * Convert constraints
-         */
-     
+
+        # Convert constraints
+
         foreach ($this->indexes($table) as $index) {
             $name = $index['name'];
             if ($index['name'] === 'PRIMARY') {
@@ -87,10 +85,10 @@ class MysqlSchema extends BaseSchema
             } elseif ($index['type'] === 'unique') {
                 $constraints[$name] = ['type' => 'unique','column' => $index['column']];
             } else {
-                $indexes[$name] = ['type' => 'index','column' => $index['column']];
+                $indexes[$name] = ['type' => $index['type'],'column' => $index['column']];
             }
         }
-
+        
         foreach ($this->foreignKeys($table) as $foreignKey) {
             $name = $foreignKey['name'];
             $constraints[$name] = [
