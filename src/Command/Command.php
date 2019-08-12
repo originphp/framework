@@ -381,11 +381,13 @@ abstract class Command
      *
      * @internal this is correct, not --debug
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function debug($message) : void
+    public function debug($message, array $context = []) : void
     {
         if ($this->verbose) {
+            $message = $this->interpolate($message, $context);
             $message = $this->addTags('debug', $message);
             $this->io->out($message);
         }
@@ -395,22 +397,26 @@ abstract class Command
      * Displays a styled info message
      *
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function info($message) : void
+    public function info($message, array $context = []) : void
     {
+        $message = $this->interpolate($message, $context);
         $message = $this->addTags('info', $message);
-        $this->io->out($message);
+        $this->io->out($message, $context);
     }
 
     /**
      * Displays a styled notice message
      *
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function notice($message) : void
+    public function notice($message, array $context = []) : void
     {
+        $message = $this->interpolate($message, $context);
         $message = $this->addTags('notice', $message);
         $this->io->out($message);
     }
@@ -419,10 +425,12 @@ abstract class Command
      * Displays a styled success message
      *
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function success($message) : void
+    public function success($message, array $context = []) : void
     {
+        $message = $this->interpolate($message, $context);
         $message = $this->addTags('success', $message);
         $this->io->out($message);
     }
@@ -431,10 +439,12 @@ abstract class Command
      * Displays a styled warning message
      *
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function warning($message) : void
+    public function warning($message, array $context = []) : void
     {
+        $message = $this->interpolate($message, $context);
         $message = $this->addTags('warning', $message);
         $this->io->err($message);
     }
@@ -443,10 +453,12 @@ abstract class Command
     * Displays a styled error message
     *
     * @param string|array $message a message or array of messages
+    * @param array $context
     * @return void
     */
-    public function error($message) : void
+    public function error($message, array $context = []) : void
     {
+        $message = $this->interpolate($message, $context);
         $message = $this->addTags('error', $message);
         $this->io->err($message);
     }
@@ -515,11 +527,13 @@ abstract class Command
      * Outputs a message (or messages) and adds a new line
      *
      * @param string|array $message a message or array of messages
+     * @param array $context
      * @return void
      */
-    public function out($message) : void
+    public function out($message, array $context = []) : void
     {
-        $this->io->out($message);
+        $message = $this->interpolate($message, $context);
+        $this->io->out($message, $context);
     }
 
     /**
@@ -541,5 +555,33 @@ abstract class Command
             return $this->{$model};
         }
         throw new MissingModelException($model);
+    }
+
+    /**
+    * Interpolates context values into the message placeholders.
+    *
+    * @param string|array $message
+    * @param array $context
+    * @return array
+    */
+    protected function interpolate($messages, array $context = []) : array
+    {
+        if (is_string($messages)) {
+            $messages = [$messages];
+        }
+
+        $replace = [];
+        foreach ($context as $key => $value) {
+            if (! is_array($value) and (! is_object($value) or method_exists($value, '__toString'))) {
+                $replace['{' . $key . '}'] = $value;
+            }
+        }
+
+        $out = [];
+        foreach ($messages as $message) {
+            $out[] = strtr($message, $replace);
+        }
+
+        return $out;
     }
 }

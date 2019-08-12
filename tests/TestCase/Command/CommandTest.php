@@ -211,6 +211,51 @@ EOF;
         $this->assertContains($expected, $this->out->read());
     }
 
+    public function testInfo()
+    {
+        $command = new MockCommand($this->io());
+        $command->info('some text no placeholder');
+        $this->assertContains('some text no placeholder', $this->out->read());
+        $command->info('User {id}', ['id' => 1234]);
+        $this->assertContains('User 1234', $this->out->read());
+    }
+
+    public function testWarning()
+    {
+        $command = new MockCommand($this->io());
+        $command->warning('some text no placeholder');
+        $this->assertContains('some text no placeholder', $this->out->read());
+        $command->warning('User {id}', ['id' => 1234]);
+        $this->assertContains('User 1234', $this->out->read());
+    }
+
+    public function testError()
+    {
+        $command = new MockCommand($this->io());
+        $command->error('some text no placeholder');
+        $this->assertContains('some text no placeholder', $this->out->read());
+        $command->error('User {id}', ['id' => 1234]);
+        $this->assertContains('User 1234', $this->out->read());
+    }
+    
+    public function testNotice()
+    {
+        $command = new MockCommand($this->io());
+        $command->notice('some text no placeholder');
+        $this->assertContains('some text no placeholder', $this->out->read());
+        $command->notice('User {id}', ['id' => 1234]);
+        $this->assertContains('User 1234', $this->out->read());
+    }
+
+    public function testSuccess()
+    {
+        $command = new MockCommand($this->io());
+        $command->success('some text no placeholder');
+        $this->assertContains('some text no placeholder', $this->out->read());
+        $command->success('User {id}', ['id' => 1234]);
+        $this->assertContains('User 1234', $this->out->read());
+    }
+
     public function testDebugVerbose()
     {
         $command = new MockCommand($this->io());
