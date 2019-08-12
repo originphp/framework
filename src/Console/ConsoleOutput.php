@@ -166,7 +166,7 @@ class ConsoleOutput
     }
 
     /**
-     * Writes to the stream
+     * Prepares data and writes to stream
      *
      * @param string|array $data
      * @return int
@@ -192,7 +192,7 @@ class ConsoleOutput
     }
 
     /**
-     * Does the stuff
+     * Writes the data to the stream
      *
      * @param string $data
      * @return int bytes
