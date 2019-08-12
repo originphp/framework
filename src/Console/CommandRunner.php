@@ -34,6 +34,7 @@ class CommandRunner
 
     /**
      * Holds a list of namespaces in array ['namespace'=>'path'].
+     * e.g [Origin => /var/www/vendor/originphp/framework/src/Command]
      *
      * @var array
      */
