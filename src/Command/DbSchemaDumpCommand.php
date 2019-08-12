@@ -66,9 +66,9 @@ class %name%Schema extends Schema
         if (! in_array($type, ['sql','php'])) {
             $this->throwError(sprintf('The type `%s` is invalid', $type));
         }
-
+        $database = ConnectionManager::get($datasource)->database();
         $filename = $this->schemaFilename($name, $type);
-        $this->io->info("Dumping schema to {$filename}");
+        $this->io->info("Dumping database `{$database}` schema to {$filename}");
         if ($type === 'sql') {
             $this->dump($datasource, $name);
         } else {
@@ -76,7 +76,43 @@ class %name%Schema extends Schema
         }
     }
 
-    protected function dumpPhp(string $datasource, string $name)
+    /**
+     * Dumps the schema to SQL format
+     *
+     * @param string $datasource
+     * @param string $name
+     * @return void
+     */
+    protected function dump(string $datasource, string $name) : void
+    {
+        $connection = ConnectionManager::get($datasource);
+        $dump = [];
+        $filename = $this->schemaFilename($name, 'sql');
+     
+        /**
+         * I would like to use pg_dump, however I started getting version matching errors so
+         * therefore I am not sure this is going to be good
+         * @example shell_exec("pg_dump -h {$config['host']} -s {$config['database']} -U {$config['username']}");
+         */
+        //
+        foreach ($connection->tables() as $table) {
+            $dump[] = $connection->adapter()->showCreateTable($table) . ';';
+            $this->io->list($table);
+        }
+
+        if (! $this->io->createFile($filename, implode("\n\n", $dump))) {
+            $this->throwError('Error saving schema file');
+        }
+    }
+
+    /**
+     * Dumps the schema to agnostic version
+     *
+     * @param string $datasource
+     * @param string $name
+     * @return void
+     */
+    protected function dumpPhp(string $datasource, string $name) : void
     {
         $filename = $this->schemaFilename($name, 'php');
         list($plugin, $name) = pluginSplit($name);
@@ -112,7 +148,14 @@ class %name%Schema extends Schema
         }
     }
 
-    protected function datasetToString(string $key, array $data)
+    /**
+     * Converts a dataset to string
+     *
+     * @param string $key
+     * @param array $data
+     * @return string
+     */
+    protected function datasetToString(string $key, array $data) : string
     {
         $out = '[]';
         if ($data) {
@@ -127,6 +170,12 @@ class %name%Schema extends Schema
         return "\t\t'{$key}' => " . $out;
     }
 
+    /**
+     * Process values recursively
+     *
+     * @param array $data
+     * @return array
+     */
     protected function values(array $data) : array
     {
         $out = [];
@@ -146,7 +195,13 @@ class %name%Schema extends Schema
         return $out;
     }
 
-    protected function varExport(array $data)
+    /**
+     * VarExport using short version of array
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function varExport(array $data) : string
     {
         $data = var_export($data, true);
         $data = str_replace(
@@ -158,27 +213,5 @@ class %name%Schema extends Schema
         $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
 
         return substr($data, 0, -1).']';
-    }
-
-    protected function dump(string $datasource, string $name)
-    {
-        $connection = ConnectionManager::get($datasource);
-        $dump = [];
-        $filename = $this->schemaFilename($name, 'sql');
-     
-        /**
-         * I would like to use pg_dump, however I started getting version matching errors so
-         * therefore I am not sure this is going to be good
-         * @example shell_exec("pg_dump -h {$config['host']} -s {$config['database']} -U {$config['username']}");
-         */
-        //
-        foreach ($connection->tables() as $table) {
-            $dump[] = $connection->adapter()->showCreateTable($table) . ';';
-            $this->io->list($table);
-        }
-
-        if (! $this->io->createFile($filename, implode("\n\n", $dump))) {
-            $this->throwError('Error saving schema file');
-        }
     }
 }

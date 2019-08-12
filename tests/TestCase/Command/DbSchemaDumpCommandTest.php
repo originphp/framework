@@ -25,7 +25,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
         $this->exec('db:schema:dump --datasource=test --type=sql dump');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.sql');
+        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.sql');
         $this->assertTrue(file_exists($filename));
         
         $this->assertOutputContains('* posts');
@@ -57,11 +57,11 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->exec('db:schema:dump --datasource=test --type=php dump');
     
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.php');
+        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.php');
         $this->assertTrue(file_exists($filename));
         $this->assertOutputContains('* posts');
     
-        // Check is valid object and some spot che
+        // Check is valid object and some spot check
         include $filename;
         $schema = new DumpSchema();
         $this->assertInstanceOf(DumpSchema::class, $schema);
