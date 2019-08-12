@@ -86,16 +86,16 @@ class ConsoleIo
     /**
      * Outputs line or lines to the stdout adding \n to each line.
      *
-    * @param string|array $message a message or array of messages
-    * @return void
-    */
+     * @param string|array $message a message or array of messages
+     * @return void
+     */
     public function out($message) : void
     {
         $this->stdout->write($message, true);
     }
 
     /**
-    * Writes to the output without adding new lines.
+    * Writes to the output without adding new line.
     *
     * @param string|array $message a message or array of messages
     * @return void
