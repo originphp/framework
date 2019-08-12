@@ -446,6 +446,23 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->foreignKeyExists('articles', ['column' => 'user_id']));
     }
 
+    public function testAddForeignKeyOnUpdateAndDelete()
+    {
+        // Prepare
+        $migration = $this->migration();
+        $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
+        $reversableStatements = $migration->invokeStart();
+
+        $migration = $this->migration();
+        $migration->addForeignKey('articles', 'users', ['update' => 'cascade','delete' => 'restrict']);
+
+        $reversableStatements = array_merge($migration->invokeStart(), $reversableStatements);
+        $this->assertTrue($migration->foreignKeyExists('articles', ['column' => 'user_id']));
+
+        $migration->rollback($reversableStatements);
+        $this->assertFalse($migration->foreignKeyExists('articles', ['column' => 'user_id']));
+    }
+
     public function testAddForeignKeyCustom()
     {
        
