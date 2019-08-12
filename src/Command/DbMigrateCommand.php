@@ -20,7 +20,7 @@ use Origin\Exception\Exception;
 class DbMigrateCommand extends Command
 {
     protected $name = 'db:migrate';
-    protected $description = 'Runs and rolls back migrations';
+    protected $description = 'Runs and rollsback migrations';
 
     const PATH = APP . DS . 'db'. DS .'migrate';
 
