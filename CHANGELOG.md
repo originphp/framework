@@ -21,8 +21,18 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+## [1.27.0] - 2019-08-*
+### Added
+- Command output with context support for info/debug/out/warning/error/success etc
+
+### Fixed
+- Markdown::toHtml code blocks had spaced removed due to santization
+- Describe was not picking up fulltext indexes
+- Legacy handler for db commands switched to sql
+
 ## [1.26.0] - 2019-08-12
-Refactored databse engine to use the new schema design.
+Refactored database engine to use the new schema design.
 
 ### Changed
 - Console db commands now work with default php files instead of sql files

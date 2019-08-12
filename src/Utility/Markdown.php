@@ -34,6 +34,24 @@ class Markdown
     protected static $characters = '`~*_\'"';
 
     /**
+     * Prepares markdown for parsing
+     *
+     * @param string $markdown
+     * @return string
+     */
+    protected static function prepareMarkdown(string $markdown) : string
+    {
+        # Don't remove spaces from start of line  //preg_replace('/^ +/m')
+        $markdown = str_replace(["\r\n", "\n"], PHP_EOL, $markdown); // Standardize line endings
+       
+        // Remove preceeding spaces on headings and blockquotes
+        $markdown = preg_replace('/^(\s*)#/', '#', $markdown);
+        $markdown = preg_replace('/^(\s*)> /', '> ', $markdown);
+
+        return preg_replace('/^(\s*)&gt; /', '> ', $markdown);
+    }
+
+    /**
      * Converts markdown to text
      *
      * @param string $markdown
@@ -42,7 +60,8 @@ class Markdown
     public static function toText(string $markdown): string
     {
         # Don't remove spaces from start of line  //preg_replace('/^ +/m')
-        $markdown = str_replace(["\r\n", "\n"], PHP_EOL, $markdown); // Standardize line endings
+        $markdown = static::prepareMarkdown($markdown);
+
         $markdown = preg_replace('/^#{0,6} (.*)$/m', '$1', $markdown);
         $markdown = preg_replace('/^> (.*)$/m', '"$1"', $markdown);
         $markdown = preg_replace("/```?\n([^\n```].*)```/ms", '$1', $markdown);
@@ -113,18 +132,18 @@ class Markdown
      *   -escape: default is false. Escapes all text before passing. Code blocks are always escaped
      * @return string
      */
-    public static function toHtml(string $text, array $options = []): string
+    public static function toHtml(string $markdown, array $options = []): string
     {
         $options += ['escape' => true];
         if ($options['escape']) {
-            $text = htmlentities($text, ENT_NOQUOTES); // this will
+            $markdown = htmlentities($markdown, ENT_NOQUOTES); // this will
         }
-        $text = preg_replace('/^ +/m', '', $text); // remove whitespaces from start of each line
-        $text = str_replace(["\r\n", "\n"], PHP_EOL, $text); // Standardize line endings
+        # Don't remove spaces from start of line  //preg_replace('/^ +/m')
+        $markdown = static::prepareMarkdown($markdown);
 
-        $text = static::parseHeadings($text);
+        $markdown = static::parseHeadings($markdown);
 
-        $text = preg_replace_callback('/!\[(.*)\]\((.*)\)/', function ($matches) {
+        $markdown = preg_replace_callback('/!\[(.*)\]\((.*)\)/', function ($matches) {
             $alt = static::escape($matches[1]);
 
             // Remove invalid urls
@@ -134,10 +153,10 @@ class Markdown
             }
 
             return '<img src="'.$src.'" alt="'.$alt.'">';
-        }, $text);
+        }, $markdown);
 
-        $text = preg_replace_callback('/\[(.*)\]\((.*)\)/', function ($matches) {
-            $text = static::escape($matches[1]);
+        $markdown = preg_replace_callback('/\[(.*)\]\((.*)\)/', function ($matches) {
+            $markdown = static::escape($matches[1]);
             
             // Remove invalid urls
             $href = '';
@@ -145,16 +164,16 @@ class Markdown
                 $href = static::escape($matches[2]);
             }
 
-            return '<a href="'.$href.'">' . $text . '</a>';
-        }, $text);
+            return '<a href="'.$href.'">' . $markdown . '</a>';
+        }, $markdown);
 
-        $text = preg_replace('/^> (.*)$/m', "<blockquote>$1</blockquote>\n", $text);
-        $text = preg_replace('/^&gt; (.*)$/m', "<blockquote>$1</blockquote>\n", $text); // work with escaping
+        $markdown = preg_replace('/^> (.*)$/m', "<blockquote>$1</blockquote>\n", $markdown);
+        $markdown = preg_replace('/^&gt; (.*)$/m', "<blockquote>$1</blockquote>\n", $markdown); // work with escaping
 
-        $text = static::parseLists($text);
+        $markdown = static::parseLists($markdown);
 
         # Work with Code Blocks
-        $text = preg_replace_callback('/```([^```].*)```/ms', function ($matches) use ($options) {
+        $markdown = preg_replace_callback('/```([^```].*)```/ms', function ($matches) use ($options) {
             $needle = trim($matches[1]);
             if ($options['escape'] === false) {
                 $needle = htmlentities($needle, ENT_NOQUOTES); // Codeblocks need to be escaped, but not twice
@@ -163,20 +182,20 @@ class Markdown
 
             // trim for correct spacing and add line spacing around pre to help with p detection
             return "\n" . '<pre><code>' . $needle . '</code></pre>' . "\n" ; // add extra \n so that its not stropped
-        }, $text);
+        }, $markdown);
   
-        $text = preg_replace_callback('/`([^`].*)`/', function ($matches) use ($options) {
+        $markdown = preg_replace_callback('/`([^`].*)`/', function ($matches) use ($options) {
             $needle = trim($matches[1]);
             if ($options['escape'] === false) {
                 $needle = htmlentities($needle, ENT_NOQUOTES);
             }
             $needle = static::escape($needle); // Escape markdown characters
             return '<code>' . $needle . '</code>';
-        }, $text);
+        }, $markdown);
       
-        $text = static::parseTables($text);
-        $text = static::parseParagraphs($text);
-        $text = static::unescape($text);
+        $markdown = static::parseTables($markdown);
+        $markdown = static::parseParagraphs($markdown);
+        $markdown = static::unescape($markdown);
   
         /**
         * Sanitize HTML to ensure nobody slipped in HTML.
@@ -184,7 +203,7 @@ class Markdown
         * This is fallback if escape is disabled.
         */
        
-        $text = Html::sanitize($text, [
+        $markdown = Html::sanitize($markdown, [
             'tags' => [
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'p',
@@ -196,7 +215,7 @@ class Markdown
             ],
         ]);
     
-        return trim($text);
+        return trim($markdown);
     }
 
     /**
