@@ -65,7 +65,7 @@ class ConsoleApplication
     protected $commands = [];
 
     /**
-     * Undocumented variable
+     * Holds the Command Registry
      *
      * @var \Origin\Core\LazyLoadContainer
      */
@@ -89,7 +89,6 @@ class ConsoleApplication
      * Constructor
      *
      * @param string $name should be the same as the executable file as this will be used in help
-     * @param string|array $desription description shown in help
      */
     public function __construct(ConsoleIo $io = null)
     {
@@ -153,7 +152,7 @@ class ConsoleApplication
      * @param array $args default is argv
      * @return bool
      */
-    public function run(array $args = null)
+    public function run(array $args = null) : bool
     {
         if ($args === null) {
             global $argv;
@@ -209,7 +208,7 @@ class ConsoleApplication
      *
      * @return void
      */
-    public function displayHelp()
+    public function displayHelp() : void
     {
         $formatter = new ConsoleHelpFormatter();
       
@@ -218,8 +217,11 @@ class ConsoleApplication
         }
         $formatter->setUsage(["{$this->name} command [options] [arguments]"]);
         $commands = [];
+        
+        $list = $this->commandRegistry->list();
+        sort($list);
 
-        foreach ($this->commandRegistry->list() as $name) {
+        foreach ($list as $name) {
             $command = $this->commandRegistry->get($name);
             $commands[$name] = $command->description();
         }
@@ -228,13 +230,13 @@ class ConsoleApplication
     }
     
     /**
-     * A work in progress
+     * Adds a command to this Console Application
      *
      * @param string $alias
      * @param string $name Cache,Plugin.Cache, App\Command\Custom\Cache
      * @return void
      */
-    public function addCommand(string $alias, string $name)
+    public function addCommand(string $alias, string $name) : void
     {
         if (! preg_match('/^[a-z-]+$/', $alias)) {
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));

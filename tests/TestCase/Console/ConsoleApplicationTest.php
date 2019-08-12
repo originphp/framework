@@ -110,7 +110,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $consoleApplication->addCommand('enable', CacheEnableCommand::class);
         $consoleApplication->addCommand('disable', CacheDisableCommand::class);
         $this->assertTrue($consoleApplication->run([]));
-        $this->assertEquals('1c8e93d50325319c00b0440f3a9dd134', md5($this->output->read()));
+        $this->assertEquals('147bd05c7164f8418d58dd1199546a02', md5($this->output->read()));
     }
 
     public function testAppStopExcution()
