@@ -23,7 +23,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $filename = APP . DS . 'db' . DS . 'dump.sql';
         $this->deleteFile($filename);
 
-        $this->exec('db:schema:dump --datasource=test dump');
+        $this->exec('db:schema:dump --datasource=test --type=sql dump');
         $this->assertExitSuccess();
         $this->assertOutputContains('Dumping schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'db' . DS . 'dump.sql');
         $this->assertTrue(file_exists($filename));
@@ -44,7 +44,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
     public function testDumpSqlException()
     {
-        $this->exec('db:schema:dump --datasource=test dump', ['n']);
+        $this->exec('db:schema:dump --datasource=test --type=sql dump', ['n']);
         $this->assertExitError();
         $this->assertErrorContains('Error saving schema file');
     }

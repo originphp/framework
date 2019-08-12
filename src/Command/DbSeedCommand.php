@@ -14,6 +14,7 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
@@ -38,7 +39,7 @@ class DbSeedCommand extends Command
         ]);
         $this->addOption('type', [
             'description' => 'Wether to use sql or php',
-            'default' => 'sql',
+            'default' => Configure::read('Schema.format'),
         ]);
     }
  
@@ -49,7 +50,7 @@ class DbSeedCommand extends Command
         $datasource = $this->options('datasource');
         $type = $this->options('type');
         $filename = $this->schemaFilename($name, $type);
-
+        
         if ($type === 'php') {
             $this->loadPHPSeed($name, $filename, $datasource);
         } else {

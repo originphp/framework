@@ -33,7 +33,7 @@ class DbResetCommandTest extends OriginTestCase
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE DATABASE dummy;');
       
-        $this->exec('db:reset --datasource=dummy');
+        $this->exec('db:reset --datasource=dummy --type=sql');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
         $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema.sql');
@@ -50,7 +50,7 @@ class DbResetCommandTest extends OriginTestCase
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE DATABASE dummy;');
       
-        $this->exec('db:reset --datasource=dummy schema-pg');
+        $this->exec('db:reset --datasource=dummy --type=sql schema-pg');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
         $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema-pg.sql');

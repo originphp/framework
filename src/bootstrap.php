@@ -11,6 +11,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+use Origin\Cache\Cache;
 
 /**
  * FrontController.
@@ -88,10 +89,11 @@ require CONFIG . DS . 'routes.php';
 /**
  * Internal caching settings
  */
-use Origin\Cache\Cache;
+use Origin\Core\Configure;
 
 /**
  * Backwards comptability for projects created < 1.26
+ * @todo this will be deprecated in 2.0
  */
 if (! Cache::config('origin_model')) {
     Cache::config('origin_model', [
@@ -99,4 +101,7 @@ if (! Cache::config('origin_model')) {
         'prefix' => 'origin_model_',
         'duration' => '+5 minutes', // min 2 minutes
     ]);
+}
+if (! Configure::exists('Schema.format')) {
+    Configure::write('Schema.format', 'php');
 }

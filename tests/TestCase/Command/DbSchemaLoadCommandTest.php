@@ -29,8 +29,8 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     {
         $name = $this->getSchemaName();
 
-        $this->exec('db:schema:load --datasource=test ' . $this->getSchemaName());
-
+        $this->exec('db:schema:load --datasource=test --type=sql ' . $this->getSchemaName());
+   
         $this->assertExitSuccess();
         $this->assertOutputContains('Executed 2 statements');
     }
@@ -39,21 +39,23 @@ class DbSchemaLoadCommandTest extends OriginTestCase
     {
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE TABLE authors (id INT)');
-        $this->exec('db:schema:load --datasource=test '. $this->getSchemaName());
+   
+        $this->exec('db:schema:load --datasource=test --type=sql '. $this->getSchemaName());
+    
         $this->assertExitError();
         $this->assertErrorContains('Executing query failed'); # Using normal output for this
     }
 
     public function testExecuteInvalidSchemaFile()
     {
-        $this->exec('db:schema:load --datasource=test dummy');
+        $this->exec('db:schema:load --datasource=test --type=sql dummy');
         $this->assertExitError();
         $this->assertErrorContains('File ' . ROOT . '/tests/TestApp/db/dummy.sql not found'); # Using normal output for this
     }
 
     public function testExecuteInvalidDatasource()
     {
-        $this->exec('db:schema:load --datasource=foo');
+        $this->exec('db:schema:load --datasource=foo --type=sql');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found'); # Using normal output for this
     }
@@ -65,7 +67,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
      */
     public function testExecutePluginSchemaFile()
     {
-        $this->exec('db:schema:load --datasource=test MyPlugin.pschema');
+        $this->exec('db:schema:load --datasource=test --type=sql MyPlugin.pschema');
         $this->assertExitError();
         $this->assertErrorContains('/plugins/my_plugin/db/pschema.sql');
     }
@@ -77,6 +79,13 @@ class DbSchemaLoadCommandTest extends OriginTestCase
 
         $this->assertRegExp('/Executed (1|2) statements/', $this->output());
         ConnectionManager::get('test')->execute('DROP TABLE IF EXISTS migrations');
+    }
+
+    public function testLoadUnkownType()
+    {
+        $this->exec('db:schema:load --datasource=test --type=ruby');
+        $this->assertExitError();
+        $this->assertErrorContains('The type `ruby` is invalid');
     }
 
     protected function tearDown() : void

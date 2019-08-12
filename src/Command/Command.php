@@ -169,7 +169,7 @@ abstract class Command
                 $argv[] = "{$key}={$value}";
             }
         }
-   
+
         return $instance->run($argv);
     }
 

@@ -31,7 +31,7 @@ class DbSetupCommandTest extends OriginTestCase
             $this->markTestSkipped('This test is for MySQL');
         }
         
-        $this->exec('db:setup --datasource=dummy');
+        $this->exec('db:setup --datasource=dummy --type=sql');
         
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -47,7 +47,7 @@ class DbSetupCommandTest extends OriginTestCase
             $this->markTestSkipped('This test is for PostgreSQL');
         }
         
-        $this->exec('db:setup --datasource=dummy schema-pg');
+        $this->exec('db:setup --datasource=dummy --type=sql schema-pg');
       
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -59,7 +59,7 @@ class DbSetupCommandTest extends OriginTestCase
 
     public function testExecutePluginPath()
     {
-        $this->exec('db:setup --datasource=dummy MyPlugin.pschema');
+        $this->exec('db:setup --datasource=dummy --type=sql MyPlugin.pschema');
         $this->assertExitError();
         $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/db/pschema.sql');
     }

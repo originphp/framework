@@ -14,6 +14,7 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
 
@@ -21,7 +22,7 @@ class DbSchemaLoadCommand extends Command
 {
     use DbSchemaTrait;
     protected $name = 'db:schema:load';
-    protected $description = 'Loads the schema from a sql file';
+    protected $description = 'Loads the database schema from file';
 
     public function initialize()
     {
@@ -35,7 +36,7 @@ class DbSchemaLoadCommand extends Command
         ]);
         $this->addOption('type', [
             'description' => 'How the schema will be dumped, in sql or php',
-            'default' => 'sql',
+            'default' => Configure::read('Schema.format'),
         ]);
     }
  
@@ -46,6 +47,10 @@ class DbSchemaLoadCommand extends Command
         $filename = $this->schemaFilename($name, $type);
         $datasource = $this->options('datasource');
      
+        if (! in_array($type, ['sql','php'])) {
+            $this->throwError(sprintf('The type `%s` is invalid', $type));
+        }
+
         if ($type === 'php') {
             $this->loadPhpSchema($name, $filename, $datasource);
         } else {

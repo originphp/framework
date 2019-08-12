@@ -14,6 +14,7 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Configure;
 use Origin\Core\Inflector;
 use Origin\Model\ConnectionManager;
 
@@ -22,7 +23,7 @@ class DbSchemaDumpCommand extends Command
     use DbSchemaTrait;
     
     protected $name = 'db:schema:dump';
-    protected $description = 'Dumps the schema to a sql file';
+    protected $description = 'Dumps the database schema to file';
 
     protected $template =
     '<?php
@@ -45,7 +46,7 @@ class %name%Schema extends Schema
         ]);
         $this->addOption('type', [
             'description' => 'How the schema will be dumped, in sql or php',
-            'default' => 'sql',
+            'default' => Configure::read('Schema.format'),
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',

@@ -14,6 +14,8 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Configure;
+
 class DbSetupCommand extends Command
 {
     protected $name = 'db:setup';
@@ -30,7 +32,7 @@ class DbSetupCommand extends Command
         ]);
         $this->addOption('type', [
             'description' => 'Use sql or php file',
-            'default' => 'sql',
+            'default' => Configure::read('Schema.format'),
         ]);
     }
  

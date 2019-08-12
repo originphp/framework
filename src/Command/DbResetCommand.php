@@ -14,6 +14,8 @@
 
 namespace Origin\Command;
 
+use Origin\Core\Configure;
+
 class DbResetCommand extends Command
 {
     protected $name = 'db:reset';
@@ -31,7 +33,7 @@ class DbResetCommand extends Command
 
         $this->addOption('type', [
             'description' => 'Use sql or php file',
-            'default' => 'sql',
+            'default' => Configure::read('Schema.format'),
         ]);
     }
  
