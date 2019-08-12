@@ -302,17 +302,27 @@ class Migration
      */
     public function createJoinTable(string $table1, string $table2, array $options = []) : void
     {
-        $options += ['id' => false,'primaryKey' => false];
         $tables = [$table1,$table2];
         sort($tables);
-        $tableName = implode('_', $tables);
+        $name = implode('_', $tables);
         # This will create up and down
         $schema = [
             Inflector::singularize($tables[0]).'_id' => 'integer',
             Inflector::singularize($tables[1]).'_id' => 'integer',
         ];
 
-        $this->createTable($tableName, $schema, $options);
+        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        $this->pendingTables[] = $name;
+        $this->pendingColumns[$name] = array_keys($schema);
+  
+        // do not run through this->createTable due to called by
+        foreach ($this->adapter()->createTableSql($name, $schema, $options) as $statement) {
+            $this->statements[] = $statement;
+        }
+
+        if ($this->calledBy() === 'change') {
+            $this->reverseStatements[] = $this->adapter()->dropTableSql($name);
+        }
     }
 
     /**
