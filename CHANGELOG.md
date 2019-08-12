@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-## [1.26.0] - 2019-08-15 (Estimated)
+## [1.26.0] - 2019-08-12
 Refactored databse engine to use the new schema design.
 
 ### Changed
