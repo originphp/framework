@@ -21,19 +21,24 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-## [1.26.0] - 2019-08-08
+## [1.26.0] - 2019-08-15 (Estimated)
 Refactored databse engine to use the new schema design.
 
 ### Changed
+- Console db commands now work with default php files instead of sql files
 - Datasource:schema/describe now uses caching
 
 ### Added
+- Db:rollback command
+- Seed class
+- Migrations add foreign key now accepts on update and delete options
 - db:test:prepare command
 - TableSchema object or creating tables with full support of constraints, indexes etc
 - Cache file engine serialize option. Now serialization can be disabled.
 - Cache duration now accepts string, e.g. +2 hours etc
 
 ### Fixed
+- Migration createJoinTable reverse statement outside of test not working
 - Fixed console output overwrite function when overwriting with shorter text
 - File Cache exists checks expiration date
 - Changelog mentioned of Schema/Migration::foreignKeys, this was not actually committed.
