@@ -237,12 +237,12 @@ class Elasticsearch
     }
 
     /**
-         * Carries out a full text search
-         *
-         * @param string $index index name e.g development_posts
-         * @param array $query
-         * @return array
-         */
+     * Carries out a search
+     *
+     * @param string $index index name e.g development_posts
+     * @param array $query
+     * @return array
+     */
     public function search(string $index, array $query): array
     {
         $this->response = $this->sendRequest('GET', "{$this->url}/{$index}/_search", $query);
