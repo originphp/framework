@@ -14,6 +14,7 @@
 
 namespace Origin\Test\Model;
 
+use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 
@@ -28,6 +29,17 @@ class SchemaTest extends OriginTestCase
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
         
+        $this->executeStatements($schema->createSql($connection));
+    }
+
+    public function testCreateSqlInvalidForeignKeySettings()
+    {
+        $this->expectException(Exception::class);
+        $schema = new \ApplicationSchema();
+        $connection = ConnectionManager::get('test');
+
+        $schema->bookmarks['constraints']['bookmarks_ibfk_1'] = ['key' => 'value'];
+
         $this->executeStatements($schema->createSql($connection));
     }
 

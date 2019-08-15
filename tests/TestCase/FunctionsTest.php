@@ -72,6 +72,14 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp('/^([a-z0-9]*){5}$/', uid(5));
     }
 
+    public function testEnv()
+    {
+        $this->assertNull(env('ABC', '123'));
+        $this->assertEquals('123', env('ABC'));
+
+        $this->assertNotNull(env('HOSTNAME'));
+    }
+
     public function testBegins()
     {
         $this->assertTrue(begins('foo', 'foobar'));
@@ -102,6 +110,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(contains('foo', 'barfoo'));
         $this->assertTrue(contains('foo', 'xfoox'));
         $this->assertFalse(contains('moo', 'barfoo'));
+        $this->assertFalse(contains('', 'barfoo'));
     }
     public function testUpLo()
     {
@@ -116,5 +125,34 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testLen()
     {
         $this->assertEquals(3, length('foo'));
+    }
+
+    public function testPr()
+    {
+        ob_start();
+        pr(['key' => 'value']);
+        $out = ob_get_clean();
+        $this->assertContains("Array\n(\n    [key] => value\n)", $out);
+    }
+
+    public function testdebug()
+    {
+        ob_start();
+        debug(['key' => 'value']);
+        $out = ob_get_clean();
+        debug($out);
+        $expected = <<< EOF
+# # # # # DEBUG # # # # #
+tests/TestCase/FunctionsTest.php Line: 141
+
+Array
+(
+    [key] => value
+)
+
+
+# # # # # # # # # # # # #
+EOF;
+        $this->assertContains($expected, $out);
     }
 }

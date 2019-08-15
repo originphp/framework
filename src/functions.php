@@ -19,6 +19,7 @@ use Origin\Utility\Collection;
 
 /**
  * Runs a backtrace.
+ * @codeCoverageIgnore
  */
 function backtrace() : void
 {
