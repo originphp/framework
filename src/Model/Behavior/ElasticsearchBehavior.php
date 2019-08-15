@@ -173,7 +173,8 @@ class ElasticsearchBehavior extends Behavior
     }
 
     /**
-     * Searches the Elasticsearch engine using either a query string dsl or request body array
+     * Searches the Elasticsearch engine using either a query string dsl or request body array. Only
+     * data from the _source property is returned, so if it is not indexed
      *
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
