@@ -143,7 +143,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         debug($out);
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/FunctionsTest.php Line: 140
+tests/TestCase/FunctionsTest.php Line: 141
 
 Array
 (
