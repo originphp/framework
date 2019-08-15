@@ -63,4 +63,19 @@ class DbSetupCommandTest extends OriginTestCase
         $this->assertExitError();
         $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/db/pschema.sql');
     }
+
+    /**
+     * Load both schema and seed from php.
+     *
+     * @return void
+     */
+    public function testSetupPHP()
+    {
+        $this->exec('db:setup --datasource=dummy --type=php');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema.php');
+        $this->assertOutputContains('Executed 7 statements');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.php');
+        $this->assertOutputContains('Executed 11 statements');
+    }
 }

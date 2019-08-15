@@ -25,6 +25,16 @@ Cache::config('default', ['engine' => 'File']);
  */
 Configure::write('Security.pepper', '-----ORIGIN PHP-----');
 Configure::write('Cookie.key', md5('-----ORIGIN PHP-----')); // For testing
+
+use Origin\Utility\Elasticsearch;
+
+Elasticsearch::config('test', [
+    'scheme' => 'http',
+    'host' => env('ELASTICSEARCH_HOST'),
+    'port' => 9200,
+    'timeout' => 400,
+]);
+
 /*
  * Load your plugins here
  * @example Plugin::load('ContactManager');
