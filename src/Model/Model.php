@@ -1031,7 +1031,7 @@ class Model
     /**
      * Save many records at once.
      *
-     * @param entity|array $data to e.g. [$entity1,$entity2]
+     * @param array $data to e.g. [$entity1,$entity2]
      * @param array $options You can pass the following keys
      *  - validate: wether to validate data or not
      *  - callbacks: call the callbacks duing each stage. You can also put only before or after
@@ -1040,7 +1040,7 @@ class Model
      *
      * @return bool true or false
      */
-    public function saveMany(array $data, array $options = [])
+    public function saveMany(array $data, array $options = []) : bool
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
@@ -1055,14 +1055,14 @@ class Model
             }
         }
 
-        if ($result and $options['transaction']) {
-            $this->commit();
+        if ($options['transaction']) {
+            if ($result) {
+                $this->commit();
+            } else {
+                $this->rollback();
+            }
         }
-
-        if (! $result and $options['transaction']) {
-            $this->rollback();
-        }
-
+    
         return $result;
     }
 
@@ -1177,7 +1177,7 @@ class Model
      *   - callbacks: call beforeDelete and afterDelete callbacks
      * @return bool true or false
      */
-    public function delete(Entity $entity, $options = [])
+    public function delete(Entity $entity, $options = []) : bool
     {
         /**
          * @deprecated cascade bool argument
@@ -1230,7 +1230,7 @@ class Model
      *
      * @var int|string
      */
-    protected function deleteDependent($primaryKey)
+    protected function deleteDependent($primaryKey) : void
     {
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
@@ -1273,11 +1273,9 @@ class Model
      * Bulk deletes records, does not delete associated data, use model::delete for that.
      *
      * @param array $conditions e.g ('Article.status' => 'draft')
-     * @param bool $cascade delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
-     * @param bool $callbacks call beforeDelete and afterDelete callbacks
      * @return bool true or false
      */
-    public function deleteAll($conditions) : bool
+    public function deleteAll(array $conditions) : bool
     {
         return $this->connection()->delete($this->table, $conditions);
     }
@@ -1288,7 +1286,7 @@ class Model
      * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array|null results
      */
-    protected function finderFirst($options = []) : ?Entity
+    protected function finderFirst(array $options = []) : ?Entity
     {
         // Modify Query
         $options['limit'] = 1;
@@ -1315,10 +1313,8 @@ class Model
     protected function finderAll(array $options = [])
     {
         // Run Query
-       
         $query = new Query($this);
         $results = $query->find($options);
-        // $results = $this->readDataSource($query);
 
         // Modify Results
         if (empty($results)) {
@@ -1457,7 +1453,7 @@ class Model
      * @param string $name
      * @return array|null
      */
-    protected function findAssociation(string $name): ?array
+    protected function findAssociation(string $name) : ?array
     {
         foreach ($this->associations as $association) {
             if (isset($this->{$association}[$name])) {
@@ -1493,7 +1489,7 @@ class Model
      *
      * @return \Origin\Model\Datasource
      */
-    public function connection(): Datasource
+    public function connection() : Datasource
     {
         return ConnectionManager::get($this->datasource);
     }
@@ -1621,7 +1617,7 @@ class Model
      *
      * @return bool
      */
-    public function begin(): bool
+    public function begin() : bool
     {
         return $this->connection()->begin();
     }
@@ -1631,7 +1627,7 @@ class Model
      *
      * @return boolean
      */
-    public function commit(): bool
+    public function commit() : bool
     {
         return $this->connection()->commit();
     }
@@ -1641,7 +1637,7 @@ class Model
      *
      * @return boolean
      */
-    public function rollback(): bool
+    public function rollback() : bool
     {
         return $this->connection()->rollBack();
     }
