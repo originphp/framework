@@ -130,6 +130,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testPr()
     {
         ob_start();
+        pr(['key' => 'value']);
         $out = ob_get_clean();
         $this->assertContains("Array\n(\n    [key] => value\n)", $out);
     }
