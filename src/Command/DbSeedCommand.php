@@ -76,7 +76,7 @@ class DbSeedCommand extends Command
             $class = Inflector::camelize($name) . 'Seed';
         }
        
-        include $filename;
+        include_once $filename;
         $seed = new $class;
       
         $statements = $seed->insertSql($connection);
