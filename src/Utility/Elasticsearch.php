@@ -144,7 +144,13 @@ class Elasticsearch
      */
     public function indexExists(string $name): bool
     {
-        return in_array($name, $this->indexes());
+        $this->response = $this->sendRequest('HEAD', "{$this->url}/{$name}/?pretty");
+
+        if ($this->response['statusCode'] !== 404 and isset($this->response['body']['error'])) {
+            throw new ElasticsearchException($this->response['body']['error']['reason']);
+        }
+
+        return ($this->response['statusCode'] === 200);
     }
 
     /**
@@ -215,6 +221,10 @@ class Elasticsearch
     {
         $this->response = $this->sendRequest('HEAD', "{$this->url}/{$index}/_doc/{$id}");
 
+        if ($this->response['statusCode'] !== 404 and isset($this->response['body']['error'])) {
+            throw new ElasticsearchException($this->response['body']['error']['reason']);
+        }
+
         return ($this->response['statusCode'] === 200);
     }
 
@@ -237,15 +247,34 @@ class Elasticsearch
     }
 
     /**
-     * Carries out a search
+     * Carries out a search using either query string or using request body
+     *
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
      *
      * @param string $index index name e.g development_posts
-     * @param array $query
-     * @return array
-     */
-    public function search(string $index, array $query): array
+     * @param array|string a query string or array query.
+     *  example query strings:  'php', '+php +framework', 'title:how to', '(new york city) OR (big apple)'
+     *  example using request body
+    *   $query = [
+    *        'query' => [
+    *           'multi_match' => [
+    *           'query' => 'search keywords',
+    *           'fields' => ['title','body']
+    *           ]
+    *      ]
+    *   ];
+    * @return array
+    */
+    public function search(string $index, $query): array
     {
-        $this->response = $this->sendRequest('GET', "{$this->url}/{$index}/_search", $query);
+        $url = "{$this->url}/{$index}/_search";
+
+        if (is_string($query)) {
+            $url .= '?' . http_build_query(['q' => $query]);
+            $query = null;
+        }
+        $this->response = $this->sendRequest('GET', $url, $query);
 
         if (isset($this->response['body']['error'])) {
             throw new ElasticsearchException($this->response['body']['error']['reason']);

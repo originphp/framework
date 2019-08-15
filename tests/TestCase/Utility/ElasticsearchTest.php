@@ -88,6 +88,25 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $query = ['query' => ['multi_match' => ['query' => 'elasticsearch']]];
         $result = $elasticsearch->search('test_posts', $query);
         $this->assertEquals(3, count($result));
+
+        $result = $elasticsearch->search('test_posts', 'analytics');
+        $this->assertEquals(1, count($result));
+
+        $result = $elasticsearch->search('test_posts', 'body:analytics');
+        $this->assertEquals(0, count($result));
+
+        // Make sure some searches are working
+        $result = $elasticsearch->search('test_posts', '+analytics +engine');
+        $this->assertEquals(1, count($result));
+
+        $result = $elasticsearch->search('test_posts', 'engine analytics');
+        $this->assertEquals(1, count($result));
+
+        $result = $elasticsearch->search('test_posts', '"engine analytics"');
+        $this->assertEquals(0, count($result));
+
+        $result = $elasticsearch->search('test_posts', '+analytics -engine');
+        $this->assertEquals(0, count($result));
     }
 
     public function testDelete()
