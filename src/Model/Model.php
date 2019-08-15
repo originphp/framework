@@ -937,7 +937,7 @@ class Model
      * @param array  $options keys (validate,callbacks,transaction,associated)
      * @return bool true or false
      */
-    public function save(Entity $data, $options = []) : bool
+    public function save(Entity $data, array $options = []) : bool
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true];
 
@@ -1172,32 +1172,53 @@ class Model
      * Deletes a record.
      *
      * @param \Origin\Model\Entity $entity
-     * @param bool  $cascade   delete hasOne,hasMany, hasAndBelongsToMany records
-     * @param bool $callbacks call beforeDelete and afterDelete callbacks
+     * @param array options supports the following keys
+     *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
+     *   - callbacks: call beforeDelete and afterDelete callbacks
      * @return bool true or false
      */
-    public function delete(Entity $entity, $cascade = true, $callbacks = true)
+    public function delete(Entity $entity, $options = [])
     {
+        /**
+         * @deprecated cascade bool argument
+         */
+        
+        if (is_bool($options)) {
+            deprecationWarning('Model:delete now only accepts options array');
+            $options = ['cascade' => $options];
+        }
+        
+        $options += ['cascade' => true,'callbacks' => true];
+
+        /**
+        * @deprecated callbacks bool argument
+        */
+        $args = func_get_args();
+        if (isset($args[2])) {
+            deprecationWarning('Model:delete now only accepts options array');
+            $options['callbacks'] = $args[2];
+        }
+ 
         $this->id = $entity->get($this->primaryKey);
 
         if (empty($this->id) or ! $this->exists($this->id)) {
             return false;
         }
 
-        if ($callbacks) {
-            if (! $this->triggerCallback('beforeDelete', [$entity, $cascade])) {
+        if ($options['callbacks']) {
+            if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
                 return false;
             }
         }
 
         $this->deleteHABTM($this->id);
-        if ($cascade) {
+        if ($options['cascade']) {
             $this->deleteDependent($this->id);
         }
 
         $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
 
-        if ($callbacks) {
+        if ($options['callbacks']) {
             $this->triggerCallback('afterDelete', [$entity, $result]);
         }
 
@@ -1230,7 +1251,6 @@ class Model
      * Deletes the hasAndBelongsToMany associated records.
      *
      * @var int|string $id
-     * @return void
      */
     protected function deleteHABTM($id) : void
     {
@@ -1253,6 +1273,8 @@ class Model
      * Bulk deletes records, does not delete associated data, use model::delete for that.
      *
      * @param array $conditions e.g ('Article.status' => 'draft')
+     * @param bool $cascade delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
+     * @param bool $callbacks call beforeDelete and afterDelete callbacks
      * @return bool true or false
      */
     public function deleteAll($conditions) : bool

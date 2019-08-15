@@ -1343,8 +1343,29 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->get(1000, ['associated' => ['Comment','Tag']]);
         $comments = count($article->comments);
         $tags = count($article->tags);
-        $this->assertTrue($this->Article->delete($article, false));
+        $this->assertTrue($this->Article->delete($article, ['cascade' => false]));
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions' => ['article_id' => 1000]]));
+    }
+
+    public function testDeleteNoCallbacks()
+    {
+        $article = $this->Article->get(1000);
+    
+        # Stub Model
+        $stub = $this->getMockForModel('Article', [
+            'beforeDelete','afterDelete',
+        ], ['className' => Article::class]);
+
+        $stub->expects($this->never())
+            ->method('beforeDelete')
+            ->willReturn($this->returnArgument(0));
+
+        $stub->expects($this->never())
+            ->method('afterDelete')
+            ->willReturn($this->returnArgument(0));
+
+        $this->assertTrue($stub->delete($article, ['callbacks' => false]));
+        $this->assertEquals(0, $stub->find('count', ['conditions' => ['id' => 1000]]));
     }
 
     public function testDeleteNotExists()
