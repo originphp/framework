@@ -173,17 +173,26 @@ class ElasticsearchBehavior extends Behavior
     }
 
     /**
-     * Searches the Elasticsearch engine, if a string is provided it searches all fields in the index
+     * Searches the Elasticsearch engine using either a query string dsl or request body array
      *
-     * @param string|array $query value to search or elastic search query array
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
+     *
+     * @param array|string a query string or array query.
+     *  example query strings:  'php', '+php +framework', 'title:how to', '(new york city) OR (big apple)'
+     *  example using request body
+    *   $query = [
+    *        'query' => [
+    *           'multi_match' => [
+    *           'query' => 'search keywords',
+    *           'fields' => ['title','body']
+    *           ]
+    *      ]
+    *   ];
      * @return array
      */
     public function search($query) : array
     {
-        if (is_string($query)) {
-            $query = ['query' => ['multi_match' => ['query' => $query]]];
-        }
-
         $results = $this->connection()->search($this->indexName, $query);
 
         return $this->model()->newEntities($results);

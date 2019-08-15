@@ -48,6 +48,14 @@ class Elasticsearch
     /**
      * Gets the connection
      *
+     * Example:
+     *
+     *   Elasticsearch::config('default', [
+     *      'host' => '127.0.0.1','port' => 9200,'ssl' => false, 'timeout' => 400
+     *   ]);
+     *
+     *  $connection = Elasticsearch::connection('default');
+     *
      * @param string $name
      * @return Elasticsearch
      */
@@ -72,6 +80,21 @@ class Elasticsearch
      */
     protected $url = null;
 
+    /**
+     * Constructor
+     *
+     * Example
+     *
+     * $es = new Elasticsearch(
+     *      'host' => '127.0.0.1','port' => 9200,'ssl' => false, 'timeout' => 400
+     *   ]);
+     *
+     * @param array $config Config accepts the following keys
+     *   - host: hostname e.g. 127.0.0.1 or elasticsearch (for docker)
+     *   - port: port number e.g. 9200
+     *   - ssl: default: false. Set to true to connect using https
+     *   - timeout: timeout milliseconds
+     */
     public function __construct(array $config = [])
     {
         $config += self::$defaultConfig;
@@ -82,7 +105,7 @@ class Elasticsearch
     /**
      * Returns the last response from Elasticsearch.
      *
-     * @return array
+     * @return array $response ['statusCode' => 400,'body' => []]
      */
     public function response() : array
     {
@@ -92,7 +115,7 @@ class Elasticsearch
     /**
      * Gets a list of indexes
      */
-    public function indexes(): array
+    public function indexes() : array
     {
         $this->response = $this->sendRequest('GET', "{$this->url}/_all?pretty");
 
@@ -108,7 +131,7 @@ class Elasticsearch
      * @param array $settings
      * @return bool
      */
-    public function addIndex(string $name, array $settings = null): bool
+    public function addIndex(string $name, array $settings = null) : bool
     {
         $this->response = $this->sendRequest('PUT', "{$this->url}/{$name}", $settings);
         
@@ -125,7 +148,7 @@ class Elasticsearch
      * @param string $name
      * @return bool
      */
-    public function removeIndex(string $name): bool
+    public function removeIndex(string $name) : bool
     {
         $this->response = $this->sendRequest('DELETE', "{$this->url}/{$name}");
 
@@ -142,13 +165,9 @@ class Elasticsearch
      * @param string $Name
      * @return boolean
      */
-    public function indexExists(string $name): bool
+    public function indexExists(string $name) : bool
     {
         $this->response = $this->sendRequest('HEAD', "{$this->url}/{$name}/?pretty");
-
-        if ($this->response['statusCode'] !== 404 and isset($this->response['body']['error'])) {
-            throw new ElasticsearchException($this->response['body']['error']['reason']);
-        }
 
         return ($this->response['statusCode'] === 200);
     }
@@ -179,7 +198,7 @@ class Elasticsearch
      * @param array $data an array of data to be indexed ['title'=>'article title','body'=>'some description']
      * @return bool
      */
-    public function add(string $index, int $id, array $data): bool
+    public function add(string $index, int $id, array $data) : bool
     {
         $this->response = $this->sendRequest('PUT', "{$this->url}/{$index}/_doc/{$id}", $data);
  
@@ -197,7 +216,7 @@ class Elasticsearch
      * @param integer $id
      * @return array
      */
-    public function get(string $index, int $id): array
+    public function get(string $index, int $id) : array
     {
         $this->response = $this->sendRequest('GET', "{$this->url}/{$index}/_doc/{$id}");
 
@@ -220,10 +239,6 @@ class Elasticsearch
     public function exists(string $index, int $id) : bool
     {
         $this->response = $this->sendRequest('HEAD', "{$this->url}/{$index}/_doc/{$id}");
-
-        if ($this->response['statusCode'] !== 404 and isset($this->response['body']['error'])) {
-            throw new ElasticsearchException($this->response['body']['error']['reason']);
-        }
 
         return ($this->response['statusCode'] === 200);
     }
@@ -266,7 +281,7 @@ class Elasticsearch
     *   ];
     * @return array
     */
-    public function search(string $index, $query): array
+    public function search(string $index, $query) : array
     {
         $url = "{$this->url}/{$index}/_search";
 
@@ -290,7 +305,7 @@ class Elasticsearch
      * @param array $query ['title'=>'how to']
      * @return int
      */
-    public function count(string $index, array $query = null): int
+    public function count(string $index, array $query = null) : int
     {
         $data = [];
         if ($query) {
@@ -314,7 +329,7 @@ class Elasticsearch
      * @param array $data
      * @return array
      */
-    public function sendRequest(string $method, string $url, array $data = null): array
+    public function sendRequest(string $method, string $url, array $data = null) : array
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -365,7 +380,7 @@ class Elasticsearch
        * @param array $this->response
        * @return array
        */
-    protected function convertResults(array $response): array
+    protected function convertResults(array $response) : array
     {
         $out = [];
         if (isset($this->response['body']['hits']) and $this->response['body']['hits']['total']['value'] > 0) {

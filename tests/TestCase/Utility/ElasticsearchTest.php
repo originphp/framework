@@ -8,40 +8,80 @@ use Origin\Utility\Exception\ElasticsearchException;
 
 class ElasticsearchTest extends \PHPUnit\Framework\TestCase
 {
+    public function testConnection()
+    {
+        $elasticsearch = Elasticsearch::connection('test');
+        $this->assertInstanceOf(Elasticsearch::class, $elasticsearch);
+    }
+    /**
+     * @depends testConnection
+     */
+    public function testInvalidConnection()
+    {
+        $this->expectException(ElasticsearchException::class);
+        $elasticsearch = Elasticsearch::connection('foo');
+    }
+    /**
+     * @depends testConnection
+     */
     public function testAddIndex()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->addIndex('test_index'));
+
+        $this->expectException(ElasticsearchException::class);
+        $elasticsearch->addIndex('__invalid name * +');
     }
 
+    /**
+     * @depends testConnection
+     */
     public function testIndexes()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $result = $elasticsearch->indexes();
         $this->assertTrue(in_array('test_index', $result));
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testIndexExists()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->indexExists('test_index'));
         $this->assertFalse($elasticsearch->indexExists('unkown_index'));
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testIndex()
     {
         $elasticsearch = Elasticsearch::connection('test');
-        $this->assertTrue($elasticsearch->indexExists('test_index'));
-        $this->assertFalse($elasticsearch->indexExists('unkown_index'));
+        $index = $elasticsearch->index('test_index');
+        $this->assertNotEmpty($index['settings']['index']);
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testRemoveIndex()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->removeIndex('test_index'));
         $this->assertFalse($elasticsearch->indexExists('test_index'));
-    }
 
+        $this->expectException(ElasticsearchException::class);
+        $this->assertTrue($elasticsearch->removeIndex('index_that_does_not_exist'));
+    }
+    public function testResponse()
+    {
+        $elasticsearch = Elasticsearch::connection('test');
+        $this->assertFalse($elasticsearch->indexExists('unkown_index'));
+        $response = ['statusCode' => 404,'body' => null];
+        $this->assertEquals($response, $elasticsearch->response());
+    }
+    /**
+     * @depends testConnection
+     */
     public function testAdd()
     {
         $elasticsearch = Elasticsearch::connection('test');
@@ -55,7 +95,9 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ElasticsearchException::class);
         $elasticsearch->add('test_posts', 1234, ['abc']);
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testGet()
     {
         $elasticsearch = Elasticsearch::connection('test');
@@ -65,13 +107,28 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $elasticsearch->get('test_posts', 100000000);
     }
 
+    /**
+        * @depends testConnection
+        */
+    public function testGetException()
+    {
+        $this->expectException(ElasticsearchException::class);
+        $elasticsearch = Elasticsearch::connection('test');
+        $record = $elasticsearch->get('invalid_index', 1000);
+    }
+
+    /**
+     * @depends testConnection
+     */
     public function testExists()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->exists('test_posts', 1000));
         $this->assertFalse($elasticsearch->exists('test_posts', 2000));
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testCount()
     {
         $elasticsearch = Elasticsearch::connection('test');
@@ -80,7 +137,9 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ElasticsearchException::class);
         $elasticsearch->count('foo');
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testSearch()
     {
         $elasticsearch = Elasticsearch::connection('test');
@@ -108,11 +167,15 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $result = $elasticsearch->search('test_posts', '+analytics -engine');
         $this->assertEquals(0, count($result));
     }
-
+    /**
+     * @depends testConnection
+     */
     public function testDelete()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->delete('test_posts', 1000));
         $this->assertFalse($elasticsearch->delete('test_posts', 1000));
+        $this->expectException(ElasticsearchException::class);
+        $elasticsearch->delete('___', 1000);
     }
 }

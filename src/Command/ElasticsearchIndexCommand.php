@@ -18,7 +18,7 @@ class ElasticsearchIndexCommand extends Command
         foreach ($models as $model) {
             $this->loadModel($model);
 
-            if (isset($this->{$model}->ElasticSearch)) {
+            if (isset($this->{$model}->Elasticsearch)) {
                 $this->{$model}->deleteIndex();
                 $this->{$model}->createIndex();
                 $count = $this->{$model}->import();
