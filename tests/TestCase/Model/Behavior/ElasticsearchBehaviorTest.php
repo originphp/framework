@@ -51,8 +51,8 @@ class ElasticsearchBehaviorTest extends OriginTestCase
 
     public function testIndex()
     {
-        $this->Article->index('title', ['type' => 'string']);
-        $this->Article->index('body');
+        $this->Article->indexColumn('title', ['type' => 'string']);
+        $this->Article->indexColumn('body');
         $expected = [
             'title' => ['type' => 'string'],
             'body' => ['type' => 'text'],
@@ -62,7 +62,7 @@ class ElasticsearchBehaviorTest extends OriginTestCase
         $this->assertEquals($expected, $result);
 
         $this->expectException(Exception::class);
-        $this->Article->index('foo');
+        $this->Article->getIndex('foo');
     }
 
     public function testIndexSettings()

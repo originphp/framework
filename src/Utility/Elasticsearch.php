@@ -175,22 +175,24 @@ class Elasticsearch
     /**
      * Gets the information on the index
      *
+     * @internal the naming on this is delicate since index is also the verb to index the document (not add or update)
+     *
      * @param string $name
      * @return array|null
      */
-    public function index(string $name) : ?array
+    public function getIndex(string $index) : ?array
     {
-        $this->response = $this->sendRequest('GET', "{$this->url}/{$name}?pretty");
+        $this->response = $this->sendRequest('GET', "{$this->url}/{$index}?pretty");
  
         if (isset($this->response['body']['error'])) {
             throw new ElasticsearchException($this->response['body']['error']['reason']);
         }
 
-        return $this->response['body'][$name] ?? null;
+        return $this->response['body'][$index] ?? null;
     }
 
     /**
-     * Adds a document to the index
+     * Indexes an item
      *
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
      * @param string $index index name e.g development_posts
@@ -198,7 +200,7 @@ class Elasticsearch
      * @param array $data an array of data to be indexed ['title'=>'article title','body'=>'some description']
      * @return bool
      */
-    public function add(string $index, int $id, array $data) : bool
+    public function index(string $index, int $id, array $data) : bool
     {
         $this->response = $this->sendRequest('PUT', "{$this->url}/{$index}/_doc/{$id}", $data);
  
@@ -210,7 +212,7 @@ class Elasticsearch
     }
 
     /**
-     * Gets a document from the index
+     * Gets an item from the index
      *
      * @param string $index index name e.g development_posts
      * @param integer $id
@@ -230,7 +232,7 @@ class Elasticsearch
     }
 
     /**
-     * Checks if a document exists
+     * Checks if an item exists
      *
      * @param string $index index name e.g development_posts
      * @param integer $id
@@ -244,7 +246,7 @@ class Elasticsearch
     }
 
     /**
-     * Deletes a document from the index
+     * Deletes an item from the index
      *
      * @param string $index
      * @param integer $id
@@ -259,6 +261,27 @@ class Elasticsearch
         }
 
         return (isset($this->response['body']['result']) and $this->response['body']['result'] === 'deleted');
+    }
+
+    /**
+     * Deletes multiple documents from the index
+     *
+     * @param string $index
+     * @param array $ids
+     * @return boolean
+     */
+    public function deleteAll(string $index, array $ids)
+    {
+        $query = [
+            'query' => ['terms' => ['_id' => $ids]],
+        ];
+        $this->response = $this->sendRequest('POST', "{$this->url}/{$index}/_delete_by_query", $query);
+
+        if (isset($this->response['body']['error'])) {
+            throw new ElasticsearchException($this->response['body']['error']['reason']);
+        }
+
+        return true;
     }
 
     /**

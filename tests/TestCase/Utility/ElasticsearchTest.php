@@ -54,10 +54,10 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testConnection
      */
-    public function testIndex()
+    public function testGetIndex()
     {
         $elasticsearch = Elasticsearch::connection('test');
-        $index = $elasticsearch->index('test_index');
+        $index = $elasticsearch->getIndex('test_index');
         $this->assertNotEmpty($index['settings']['index']);
     }
     /**
@@ -86,14 +86,14 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
     {
         $elasticsearch = Elasticsearch::connection('test');
         $data = ['title' => 'how to use elasticsearch','body' => 'some article content goes here'];
-        $this->assertTrue($elasticsearch->add('test_posts', 1000, $data));
+        $this->assertTrue($elasticsearch->index('test_posts', 1000, $data));
         $data = ['title' => 'what is Elasticsearch','body' => 'some article content goes here'];
-        $this->assertTrue($elasticsearch->add('test_posts', 1001, $data));
+        $this->assertTrue($elasticsearch->index('test_posts', 1001, $data));
         $data = ['title' => 'open source search and analytics engine','body' => 'Check out elasticsearch'];
-        $this->assertTrue($elasticsearch->add('test_posts', 1002, $data));
+        $this->assertTrue($elasticsearch->index('test_posts', 1002, $data));
         sleep(1); // # Important! if not tests fails afterwards
         $this->expectException(ElasticsearchException::class);
-        $elasticsearch->add('test_posts', 1234, ['abc']);
+        $elasticsearch->index('test_posts', 1234, ['abc']);
     }
     /**
      * @depends testConnection
@@ -175,7 +175,17 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertTrue($elasticsearch->delete('test_posts', 1000));
         $this->assertFalse($elasticsearch->delete('test_posts', 1000));
+        sleep(1);
         $this->expectException(ElasticsearchException::class);
         $elasticsearch->delete('___', 1000);
+    }
+
+    public function testDeleteAll()
+    {
+        $elasticsearch = Elasticsearch::connection('test');
+        $this->assertEquals(2, $elasticsearch->count('test_posts'));
+        $this->assertTrue($elasticsearch->deleteAll('test_posts', [1001,1002]));
+        sleep(1);
+        $this->assertEquals(0, $elasticsearch->count('test_posts'));
     }
 }

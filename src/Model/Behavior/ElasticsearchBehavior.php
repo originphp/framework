@@ -59,7 +59,7 @@ class ElasticsearchBehavior extends Behavior
      * @param array $options e.g ['type'=>'keyword','analyzer'=>'english']
      * @return void
      */
-    public function index(string $name, array $options = []) : void
+    public function indexColumn(string $name, array $options = []) : void
     {
         $schema = $this->model()->schema($name);
         if (! $schema) {
@@ -138,7 +138,7 @@ class ElasticsearchBehavior extends Behavior
     {
         $counter = 0;
         foreach ($this->model()->find('all') as $entity) {
-            $this->addEntityToIndex($entity);
+            $this->index($entity);
             $counter ++;
         }
 
@@ -155,7 +155,7 @@ class ElasticsearchBehavior extends Behavior
      */
     public function afterSave(Entity $entity, bool $created, array $options = [])
     {
-        $this->addEntityToIndex($entity);
+        $this->index($entity);
     }
 
     /**
@@ -210,12 +210,12 @@ class ElasticsearchBehavior extends Behavior
     }
 
     /**
-     * Adds an entity to index
+     * Indexes a record
      *
      * @param Entity $entity
      * @return void
      */
-    protected function addEntityToIndex(Entity $entity) : void
+    public function index(Entity $entity) : void
     {
         $out = [];
 
@@ -225,7 +225,7 @@ class ElasticsearchBehavior extends Behavior
         }
  
         // Issues connecting to server or no columns found for indexing
-        if (! $this->connection()->add($this->indexName, $entity->id, $out)) {
+        if (! $this->connection()->index($this->indexName, $entity->id, $out)) {
             throw new Exception(sprintf('Elasticsearch: Error adding record to index for model `%s`', $this->model()->name));
         }
     }
