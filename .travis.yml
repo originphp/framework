@@ -15,7 +15,6 @@ services:
   - postgresql
   - memcached
   - redis-server
-  - elasticsearch
 before_install:
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin;'; fi
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
