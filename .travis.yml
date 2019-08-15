@@ -26,6 +26,7 @@ before_install:
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.3.0-amd64.deb && sudo dpkg -i --force-confnew elasticsearch-7.3.0.deb && sudo service elasticsearch restart
 before_script:
   - composer install --prefer-source --no-interaction
 script:
