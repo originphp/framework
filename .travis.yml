@@ -7,7 +7,7 @@ env:
   global:
     - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
     - REDIS_HOST=localhost REDIS_PORT=6379
-    - ELASTICSEARCH_VERSION="7.3.0"
+    - ES_VERSION="7.3.0"
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
     - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
@@ -26,12 +26,14 @@ before_install:
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
-  - curl -O "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb"
-  - sudo dpkg -i --force-confnew elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
-  - sudo service elasticsearch restart
+install:
+  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
+  - tar -xzf elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
 before_script:
   - composer install --prefer-source --no-interaction
 script:
+  - sleep 10
   - vendor/bin/phpunit --coverage-clover=clover.xml
 after_script:
   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
