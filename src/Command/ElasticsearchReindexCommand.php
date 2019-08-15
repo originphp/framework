@@ -1,9 +1,9 @@
 <?php
 namespace Origin\Command;
 
-class ElasticsearchIndexCommand extends Command
+class ElasticsearchReindexCommand extends Command
 {
-    protected $name = 'elasticsearch:index';
+    protected $name = 'elasticsearch:reindex';
     protected $description = 'Deletes and then recreates indexes and adds data to the indexes from the database';
     protected $help = 'Deletes existing indexes, then creates the new one with the settings defined in the model, then imports the data into the index.';
 

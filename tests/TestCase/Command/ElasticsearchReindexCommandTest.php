@@ -16,7 +16,7 @@ class Article extends Model
     }
 }
 
-class ElasticsearchIndexCommandTest extends OriginTestCase
+class ElasticsearchReindexCommandTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Article'];
 
@@ -30,21 +30,21 @@ class ElasticsearchIndexCommandTest extends OriginTestCase
 
     public function testMissingRequiredArgument()
     {
-        $this->exec('elasticsearch:index');
+        $this->exec('elasticsearch:reindex');
         $this->assertExitError();
         $this->assertErrorContains('Missing required argument `model`');
     }
 
     public function testSkippingModel()
     {
-        $this->exec('elasticsearch:index User');
+        $this->exec('elasticsearch:reindex User');
         $this->assertExitSuccess();
         $this->assertOutputContains('User does not have Elasticsearch Behavior loaded');
     }
 
     public function testExecute()
     {
-        $this->exec('elasticsearch:index Article');
+        $this->exec('elasticsearch:reindex Article');
         $this->assertExitSuccess();
         $this->assertOutputContains('Article index created and 3 record(s) added to index');
     }
