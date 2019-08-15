@@ -7,7 +7,7 @@ env:
   global:
     - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
     - REDIS_HOST=localhost REDIS_PORT=6379
-    - ELASTICSEARCH_VERSION="7.0.0"
+    - ELASTICSEARCH_VERSION="7.3.0"
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
     - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
@@ -32,7 +32,6 @@ before_install:
 before_script:
   - composer install --prefer-source --no-interaction
 script:
-  - wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200
   - vendor/bin/phpunit --coverage-clover=clover.xml
 after_script:
   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
