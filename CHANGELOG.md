@@ -23,13 +23,18 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ## [1.27.0] - 2019-08-*
+
+### Deprecated
+- Model:delete arguments change. `delete($entity,$options)` use to be `delete($entity,$cascade,$callbacks)`;
+
 ### Added
+- Elasticsearch (Utility/Behavior and Command) 
 - Command output with context support for info/debug/out/warning/error/success etc
 
 ### Fixed
 - Markdown::toHtml code blocks had spaced removed due to santization
 - Describe was not picking up fulltext indexes
-- Legacy handler for db commands switched to sql
+- Legacy handler for db commands switched to SQL
 
 ## [1.26.0] - 2019-08-12
 Refactored database engine to use the new schema design.
