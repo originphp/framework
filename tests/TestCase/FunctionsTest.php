@@ -140,7 +140,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         ob_start();
         debug(['key' => 'value']);
         $out = ob_get_clean();
-        debug($out);
+        
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
 tests/TestCase/FunctionsTest.php Line: 141
