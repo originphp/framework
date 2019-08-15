@@ -332,8 +332,8 @@ abstract class Command
     /**
      * Adds a available.
      *
-     * @param string $name    name of the command
-     * @param array  $options
+     * @param string $name argument name
+     * @param array  $options Options accepts the following keys:
      *  - description: the help description
      *  - type: string, integer, array, hash
      *  - required: default false
