@@ -246,14 +246,17 @@ class Elasticsearch
     }
 
     /**
-     * Deletes an item from the index
+     * Removes an item from the index
      *
      * @param string $index
-     * @param integer $id
+     * @param integer|array $id id or array of ids
      * @return bool
      */
-    public function delete(string $index, int $id) : bool
+    public function deindex(string $index, $id) : bool
     {
+        if (is_array($id)) {
+            return $this->deindexAll($index, $id);
+        }
         $this->response = $this->sendRequest('DELETE', "{$this->url}/{$index}/_doc/{$id}");
 
         if (isset($this->response['body']['error'])) {
@@ -264,13 +267,13 @@ class Elasticsearch
     }
 
     /**
-     * Deletes multiple documents from the index
+     * Deletes multiple items from the index
      *
      * @param string $index
      * @param array $ids
      * @return boolean
      */
-    public function deleteAll(string $index, array $ids)
+    protected function deindexAll(string $index, array $ids)
     {
         $query = [
             'query' => ['terms' => ['_id' => $ids]],

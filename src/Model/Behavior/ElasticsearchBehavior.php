@@ -138,7 +138,7 @@ class ElasticsearchBehavior extends Behavior
     {
         $counter = 0;
         foreach ($this->model()->find('all') as $entity) {
-            $this->index($entity);
+            $this->indexRecord($entity);
             $counter ++;
         }
 
@@ -155,7 +155,7 @@ class ElasticsearchBehavior extends Behavior
      */
     public function afterSave(Entity $entity, bool $created, array $options = [])
     {
-        $this->index($entity);
+        $this->indexRecord($entity);
     }
 
     /**
@@ -167,7 +167,7 @@ class ElasticsearchBehavior extends Behavior
      */
     public function afterDelete(Entity $entity, bool $success)
     {
-        if (! $this->connection()->delete($this->indexName, $entity->id)) {
+        if (! $this->connection()->deindex($this->indexName, $entity->id)) {
             throw new Exception(sprintf('Elasticsearch: Error deleting from index for model `%s`', $this->model()->name));
         }
     }
@@ -215,7 +215,7 @@ class ElasticsearchBehavior extends Behavior
      * @param Entity $entity
      * @return void
      */
-    public function index(Entity $entity) : void
+    protected function indexRecord(Entity $entity) : void
     {
         $out = [];
 

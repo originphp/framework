@@ -173,18 +173,18 @@ class ElasticsearchTest extends \PHPUnit\Framework\TestCase
     public function testDelete()
     {
         $elasticsearch = Elasticsearch::connection('test');
-        $this->assertTrue($elasticsearch->delete('test_posts', 1000));
-        $this->assertFalse($elasticsearch->delete('test_posts', 1000));
+        $this->assertTrue($elasticsearch->deindex('test_posts', 1000));
+        $this->assertFalse($elasticsearch->deindex('test_posts', 1000));
         sleep(1);
         $this->expectException(ElasticsearchException::class);
-        $elasticsearch->delete('___', 1000);
+        $elasticsearch->deindex('___', 1000);
     }
 
     public function testDeleteAll()
     {
         $elasticsearch = Elasticsearch::connection('test');
         $this->assertEquals(2, $elasticsearch->count('test_posts'));
-        $this->assertTrue($elasticsearch->deleteAll('test_posts', [1001,1002]));
+        $this->assertTrue($elasticsearch->deindex('test_posts', [1001,1002]));
         sleep(1);
         $this->assertEquals(0, $elasticsearch->count('test_posts'));
     }
