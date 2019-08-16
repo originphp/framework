@@ -19,10 +19,6 @@ use Origin\Core\Resolver;
 use Origin\Core\ObjectRegistry;
 use Origin\View\Exception\MissingHelperException;
 
-/**
- * A quick and easy way to create models and add them to registry. Not sure if
- * this will be added.
- */
 class HelperRegistry extends ObjectRegistry
 {
     /**
@@ -32,6 +28,11 @@ class HelperRegistry extends ObjectRegistry
      */
     protected $view = null;
 
+    /**
+     * Constructor
+     *
+     * @param \Origin\View\View $view
+     */
     public function __construct(View $view)
     {
         $this->view = $view;
@@ -41,7 +42,7 @@ class HelperRegistry extends ObjectRegistry
      * Resolves the class name of a helper
      *
      * @param string $class
-     * @return string|null
+     * @return string|null $namespacedClass
      */
     protected function className(string $class) : ?string
     {

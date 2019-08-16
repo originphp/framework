@@ -60,9 +60,9 @@ class Autoloader
     /**
      * Returns a single instance of the object
      *
-     * @return Autoloader
+     * @return \Origin\Core\Autoloader
      */
-    public static function instance()
+    public static function instance() : Autoloader
     {
         if (static::$instance === null) {
             static::$instance = new Autoloader();
@@ -71,6 +71,11 @@ class Autoloader
         return static::$instance;
     }
 
+    /**
+     * Constructor
+     *
+     * @param string $directory
+     */
     public function __construct(string $directory = null)
     {
         $this->directory = $directory;
@@ -80,7 +85,7 @@ class Autoloader
      * Sets or gets the project directory
      *
      * @param string $directory
-     * @return void
+     * @return string|void
      */
     public function directory(string $directory = null)
     {
@@ -91,9 +96,11 @@ class Autoloader
     }
 
     /**
-     * Register loader with SPL autoloader stack.
-     */
-    public function register()
+    * Register loader with SPL autoloader stack.
+    *
+    * @return boolean
+    */
+    public function register() : bool
     {
         return spl_autoload_register([$this, 'load']);
     }
@@ -105,13 +112,12 @@ class Autoloader
      *
      * @param string $prefix        the namespace prefix
      * @param string $baseDirectory a base directory where classes are for namespace
+     * @return void
      */
-    public function addNamespace(string $prefix, string $baseDirectory)
+    public function addNamespace(string $prefix, string $baseDirectory) : void
     {
         $prefix = trim($prefix, '\\').'\\';
-
         $path = rtrim($baseDirectory, DS).'/';
-
         $this->prefixes[$prefix] = $this->directory . DS . $path;
     }
 
@@ -124,8 +130,9 @@ class Autoloader
      *    ));
      *
      * @param string $namespaces array ((namespacePrefix => baseDirectory))
+     * @return void
      */
-    public function addNamespaces(array $namespaces)
+    public function addNamespaces(array $namespaces) : void
     {
         foreach ($namespaces as $namespace => $baseDirectory) {
             $this->addNamespace($namespace, $baseDirectory);
@@ -136,10 +143,9 @@ class Autoloader
      * Loads the class for the autoloader.
      *
      * @param string $class
-     *
-     * @return bool
+     * @return string|null
      */
-    public function load(string $class)
+    public function load(string $class) : ?string
     {
         $prefix = $class;
     
@@ -158,8 +164,8 @@ class Autoloader
 
             $prefix = rtrim($prefix, '\\');
         }
-     
-        return false;
+
+        return null;
     }
 
     /**
@@ -169,7 +175,7 @@ class Autoloader
      * @param string $filename
      * @return bool
      */
-    protected function requireFile(string $filename)
+    protected function requireFile(string $filename) : bool
     {
         if (file_exists($filename)) {
             require $filename;

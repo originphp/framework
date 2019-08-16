@@ -33,16 +33,35 @@ class ComponentRegistry extends ObjectRegistry
      */
     protected $controller = null;
 
+    /**
+     * Constructor
+     *
+     * @param \Origin\Controller\Controller $controller
+     */
     public function __construct(Controller $controller)
     {
         $this->controller = $controller;
     }
 
-    protected function className(string $class)
+    /**
+     * Resolves the clas name
+     *
+     * @param string $class
+     * @return string|null $namespacedClass
+     */
+    protected function className(string $class) : ?string
     {
         return Resolver::className($class, 'Controller/Component');
     }
 
+    /**
+     * Calls a method on objects loaded, if one of those objects returns a response or has set the header location
+     * then it will return the result
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return \Origin\Http\Response|void
+     */
     public function call(string $method, array $arguments = [])
     {
         foreach ($this->enabled as $name) {
@@ -55,12 +74,10 @@ class ComponentRegistry extends ObjectRegistry
                 }
             }
         }
-
-        return null;
     }
 
     /**
-     * Undocumented function
+     * Creates the Component object
      *
      * @param string $class
      * @param array $options
@@ -71,12 +88,23 @@ class ComponentRegistry extends ObjectRegistry
         return new $class($this->controller, $options);
     }
 
-    protected function throwException(string $object)
+    /**
+     * Throws an exception
+     *
+     * @param string $object
+     * @return void
+     */
+    protected function throwException(string $object) : void
     {
         throw new MissingComponentException($object);
     }
 
-    public function controller()
+    /**
+     * Returns the controller object
+     *
+     * @return \Origin\Controller\Controller
+     */
+    public function controller() : Controller
     {
         return $this->controller;
     }

@@ -28,7 +28,7 @@ class MockAutoloader extends Autoloader
         $this->mockFiles = $files;
     }
 
-    protected function requireFile(string $file)
+    protected function requireFile(string $file) : bool
     {
         return in_array($file, $this->mockFiles);
     }
@@ -132,7 +132,7 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
     public function testMissingFile()
     {
         $actual = $this->autoloader->load('No_Vendor\No_Package\NoClass');
-        $this->assertFalse($actual);
+        $this->assertNull($actual);
     }
     public function testAddNamespaces()
     {

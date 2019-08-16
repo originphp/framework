@@ -54,10 +54,9 @@ class Inflector
      * Converts a word to purual form.
      *
      * @param string $singular apple,orange,banana
-     *
      * @return string $plural
      */
-    public static function pluralize(string $singular)
+    public static function pluralize(string $singular) : string
     {
         if (isset(self::$dictonary[$singular])) {
             return self::$dictonary[$singular];
@@ -82,10 +81,9 @@ class Inflector
      * Converts a word to singular form.
      *
      * @param string $plural apples,oranges,bananas
-     *
      * @return string $singular
      */
-    public static function singularize(string $plural)
+    public static function singularize(string $plural) : string
     {
         if ($key = array_search($plural, self::$dictonary)) {
             return $key;
@@ -107,13 +105,17 @@ class Inflector
     }
 
     /**
+     * Camelize is really studly caps (aka Pascal Case)
+     * varible is really camel cased
+     */
+
+    /**
      * Converts an underscored word to CamelCase.
      *
      * @param string $underscoredWord camel_case
-     *
      * @return string CamelCase
      */
-    public static function camelize(string $underscoredWord)
+    public static function camelize(string $underscoredWord) : string
     {
         if (isset(self::$cache['camelize'][$underscoredWord])) {
             return self::$cache['camelize'][$underscoredWord];
@@ -128,10 +130,9 @@ class Inflector
      * Converts an underscored word to mixed camelCase.
      *
      * @param string $underscoredWord camel_case
-     *
      * @return string lowerCamelCase
      */
-    public static function variable(string $underscoredWord)
+    public static function variable(string $underscoredWord) : string
     {
         if (isset(self::$cache['variable'][$underscoredWord])) {
             return self::$cache['variable'][$underscoredWord];
@@ -146,10 +147,9 @@ class Inflector
      * Undersores a CamelCased word.
      *
      * @param string $camelCasedWord
-     *
      * @return string $underscored_word
      */
-    public static function underscore(string $camelCasedWord)
+    public static function underscore(string $camelCasedWord) : string
     {
         if (isset(self::$cache['underscore'][$camelCasedWord])) {
             return self::$cache['underscore'][$camelCasedWord];
@@ -165,10 +165,9 @@ class Inflector
      * from a model name.
      *
      * @param string $camelCase
-     *
      * @return string $underscored
      */
-    public static function tableize(string $camelCasedWord)
+    public static function tableize(string $camelCasedWord) : string
     {
         if (isset(self::$cache['tableize'][$camelCasedWord])) {
             return self::$cache['tableize'][$camelCasedWord];
@@ -182,10 +181,9 @@ class Inflector
      * Converts a tablename into a class name.
      *
      * @param string $table contact_actitvities
-     *
      * @return string $className ContactActivities
      */
-    public static function classify(string $table)
+    public static function classify(string $table) : string
     {
         if (isset(self::$cache['classify'][$table])) {
             return self::$cache['classify'][$table];
@@ -202,7 +200,7 @@ class Inflector
      *
      * @return string $result Contact Manger
      */
-    public static function humanize(string $underscoredWord)
+    public static function humanize(string $underscoredWord) : string
     {
         if (isset(self::$cache['humanize'][$underscoredWord])) {
             return self::$cache['humanize'][$underscoredWord];
@@ -220,8 +218,9 @@ class Inflector
      *
      * @param string $type  singular or plural
      * @param array  $rules array(regexPattern => replacement)
+     * @return void
      */
-    public static function rules(string $type, array $rules)
+    public static function rules(string $type, array $rules) : void
     {
         foreach ($rules as $find => $replace) {
             self::$rules[$type] = [$find => $replace] + self::$rules[$type];
@@ -235,8 +234,9 @@ class Inflector
      *
      * @param string $singular underscored person happy_person
      * @param string $plural   underscored people happy_people
+     * @return void
      */
-    public static function add(string $singular, string $plural)
+    public static function add(string $singular, string $plural) : void
     {
         self::$dictonary[$singular] = $plural;
         self::$dictonary[self::camelize($singular)] = self::camelize($plural);

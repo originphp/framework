@@ -32,12 +32,24 @@ class BehaviorRegistry extends ObjectRegistry
      */
     protected $model = null;
 
+    /**
+     * Constructor
+     *
+     * @param Model $model
+     * @return void
+     */
     public function __construct(Model $model)
     {
         $this->model = $model;
     }
 
-    protected function className(string $class)
+    /**
+     * Resolves the class name
+     *
+     * @param string $class
+     * @return string|null $namespacedClass
+     */
+    protected function className(string $class) : ?string
     {
         return Resolver::className($class, 'Model/Behavior');
     }
@@ -54,7 +66,13 @@ class BehaviorRegistry extends ObjectRegistry
         return new $class($this->model, $options);
     }
 
-    protected function throwException(string $object)
+    /**
+     * Throws an exception
+     *
+     * @param string $object
+     * @return void
+     */
+    protected function throwException(string $object) : void
     {
         throw new MissingBehaviorException($object);
     }

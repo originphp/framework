@@ -34,12 +34,13 @@ class Resolver
         if ($plugin) {
             $namespace = $plugin;
         }
+        
         if ($objectType === null) {
             $path = '\\'.$class.$suffix;
         } else {
             $path = '\\'.str_replace('/', '\\', $objectType).'\\'.$class.$suffix;
         }
-       
+      
         if (static::classExists($namespace.$path)) {
             return $namespace.$path;
         }

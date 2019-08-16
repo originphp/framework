@@ -23,10 +23,9 @@ class Debugger
      * functions.php.
      *
      * @param string $class
-     *
      * @return array
      */
-    protected function namespaceSplit(string $class)
+    protected function namespaceSplit(string $class) : array
     {
         $position = strrpos($class, '\\');
         if ($position === false) {
@@ -36,7 +35,13 @@ class Debugger
         return [substr($class, 0, $position), substr($class, $position + 1)];
     }
 
-    public function exception($exception)
+    /**
+     * Creates the exception array
+     *
+     * @param Exception\ErrorException $exception
+     * @return array
+     */
+    public function exception($exception) : array
     {
         $result = [];
 
@@ -67,7 +72,12 @@ class Debugger
         return $result;
     }
 
-    public function backtrace()
+    /**
+     * Creates the backtrace array
+     *
+     * @return array
+     */
+    public function backtrace() : array
     {
         $result = [
             'namespace' => '',

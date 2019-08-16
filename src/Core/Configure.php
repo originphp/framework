@@ -20,16 +20,16 @@ class Configure
     /**
      * Dot Object
      *
-     * @var Dot
+     * @var \Origin\Core\Dot
      */
     protected static $dot = null;
 
     /**
      * Returns the dot object
      *
-     * @return Dot
+     * @return \Origin\Core\Dot
      */
-    protected static function dot()
+    protected static function dot() : Dot
     {
         if (self::$dot === null) {
             self::$dot = new Dot();
@@ -67,7 +67,7 @@ class Configure
      * @param mixed $value The value to set
      * @return void
      */
-    public static function write(string $key = null, $value = null)
+    public static function write(string $key = null, $value = null) : void
     {
         self::dot()->set($key, $value);
         if ($key === 'debug') {
@@ -103,7 +103,7 @@ class Configure
      * @param string $key The key to use, accepts also dot notation e.g. Session.timeout
      * @return bool
      */
-    public static function delete(string $key = null)
+    public static function delete(string $key = null) : bool
     {
         return self::dot()->delete($key);
     }

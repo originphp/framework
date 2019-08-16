@@ -21,11 +21,23 @@ class ObjectRegistry
     protected $loaded = [];
     protected $enabled = [];
 
+    /**
+     * Magic get method
+     *
+     * @param string $name
+     * @return Mixed
+     */
     public function &__get($name)
     {
         return $this->get($name);
     }
 
+    /**
+     * Magic isset method
+     *
+     * @param string $name
+     * @return boolean
+     */
     public function __isset($name)
     {
         return isset($this->loaded[$name]);
@@ -35,6 +47,7 @@ class ObjectRegistry
      * Calls a method on all ENABLED objects.
      *
      * @param string $method e.g startup
+     * @return void|\Origin\Http\Response
      */
     public function call(string $method, array $arguments = [])
     {
@@ -46,13 +59,24 @@ class ObjectRegistry
         }
     }
 
-    public function clear()
+    /**
+     * Clears the loaded items
+     *
+     * @return void
+     */
+    public function clear() : void
     {
         unset($this->loaded);
         $this->loaded = [];
     }
 
-    public function disable(string $object)
+    /**
+     * Disables an object
+     *
+     * @param string $object
+     * @return bool
+     */
+    public function disable(string $object) : bool
     {
         $key = array_search($object, $this->enabled);
         if ($key !== false) {
@@ -64,7 +88,13 @@ class ObjectRegistry
         return false;
     }
 
-    public function enable(string $object)
+    /**
+     * Enables an object
+     *
+     * @param string $object
+     * @return bool
+     */
+    public function enable(string $object) : bool
     {
         if (! isset($this->loaded[$object]) or in_array($object, $this->enabled)) {
             return false;
@@ -74,7 +104,12 @@ class ObjectRegistry
         return true;
     }
 
-    public function enabled()
+    /**
+     * Gets a list of enabled objefts
+     *
+     * @return array
+     */
+    public function enabled() : array
     {
         return $this->enabled;
     }
@@ -94,12 +129,25 @@ class ObjectRegistry
         return $value;
     }
 
-    public function has(string $name)
+    /**
+     * Checks if the object registry has an object
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function has(string $name) : bool
     {
         return isset($this->loaded[$name]);
     }
 
-    public function set(string $name, $object)
+    /**
+     * Adds an objec to the object registry
+     *
+     * @param string $name
+     * @param mixed $object
+     * @return void
+     */
+    public function set(string $name, $object) : void
     {
         if (isset($this->loaded[$name])) {
             $this->unload($name);
@@ -132,12 +180,23 @@ class ObjectRegistry
         return $object;
     }
 
-    public function loaded()
+    /**
+     * Gets a list of loaded objects
+     *
+     * @return array
+     */
+    public function loaded() : array
     {
         return array_keys($this->loaded);
     }
 
-    public function unload(string $name)
+    /**
+     * Unloads an object from the registry
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function unload(string $name) : bool
     {
         if (isset($this->loaded[$name])) {
             unset($this->loaded[$name]);
@@ -153,14 +212,12 @@ class ObjectRegistry
      *
      * @return void
      */
-    public function destroy()
+    public function destroy() : void
     {
         foreach ($this->loaded as $name => $object) {
             $this->unload($name);
         }
         $this->clear();
-
-        return null;
     }
 
     /**
@@ -169,7 +226,6 @@ class ObjectRegistry
      *
      * @param string $class
      * @param array  $options
-     *
      * @return object
      */
     protected function create(string $name, array $options = [])
@@ -179,6 +235,7 @@ class ObjectRegistry
         }
 
         $className = $this->className($name);
+       
         if ($className === null) {
             $this->throwException($name);
         }
@@ -191,8 +248,7 @@ class ObjectRegistry
      *
      * @param string $class
      * @param array  $options
-     *
-     * @return object
+     * @return mixed
      */
     protected function createObject(string $class, array $options = [])
     {
@@ -204,15 +260,20 @@ class ObjectRegistry
      * set object type and suffixes type;.
      *
      * @param string $class
-     *
-     * @return string $namespacedClass
+     * @return string|null $namespacedClass
      */
-    protected function className(string $class)
+    protected function className(string $class) : ?string
     {
         return Resolver::className($class);
     }
 
-    protected function throwException(string $object)
+    /**
+     * Throws an excpetion
+     *
+     * @param string $object
+     * @return void
+     */
+    protected function throwException(string $object) : void
     {
         throw new MissingClassException($object);
     }

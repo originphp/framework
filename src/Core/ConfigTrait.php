@@ -14,12 +14,8 @@
 
 namespace Origin\Core;
 
-/**
- * Need to have a universal config throughout framework.
- */
 trait ConfigTrait
 {
-
     /**
      * Holds the config.
      *
@@ -27,7 +23,12 @@ trait ConfigTrait
      */
     protected $config = null;
 
-    protected function initConfig()
+    /**
+     * Intializes the configuration array
+     *
+     * @return void
+     */
+    protected function initConfig() : void
     {
         $this->config = [];
         if (isset($this->defaultConfig)) {
@@ -49,7 +50,9 @@ trait ConfigTrait
     public function config($key = null, $value = null)
     {
         if (is_array($key) or func_num_args() === 2) {
-            return $this->setConfig($key, $value);
+            $this->setConfig($key, $value);
+
+            return;
         }
 
         return $this->getConfig($key);
@@ -61,7 +64,7 @@ trait ConfigTrait
      * @param mixed $value
      * @return void
      */
-    protected function setConfig($key, $value = null)
+    protected function setConfig($key, $value = null) : void
     {
         if ($this->config === null) {
             $this->initConfig();
@@ -77,22 +80,19 @@ trait ConfigTrait
             }
             $this->config[$key] = $value;
         }
-
-        return true;
     }
     /**
-     * Gets a config
+     * Gets an item from config
      *
      * @param string $key
      * @param mixed $default default value to return
-     * @return void
+     * @return mixed
      */
     protected function getConfig(string $key = null, $default = null)
     {
         if ($this->config === null) {
             $this->initConfig();
         }
-
         if ($key === null) {
             return $this->config;
         }
