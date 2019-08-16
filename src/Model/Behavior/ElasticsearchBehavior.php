@@ -59,7 +59,7 @@ class ElasticsearchBehavior extends Behavior
      * @param array $options e.g ['type'=>'keyword','analyzer'=>'english']
      * @return void
      */
-    public function indexColumn(string $name, array $options = []) : void
+    public function index(string $name, array $options = []) : void
     {
         $schema = $this->model()->schema($name);
         if (! $schema) {
@@ -98,11 +98,24 @@ class ElasticsearchBehavior extends Behavior
     }
 
     /**
+     * This deletes the index if it exists, creates it again and indexes all records in the database
+     *
+     * @return integer
+     */
+    public function reindex() : int
+    {
+        $this->deleteIndex();
+        $this->createIndex();
+
+        return $this->indexRecords();
+    }
+
+    /**
      * Deletes an index
      *
      * @return boolean
      */
-    public function deleteIndex() : bool
+    protected function deleteIndex() : bool
     {
         $elasticsearch = $this->connection();
         if ($elasticsearch->indexExists($this->indexName)) {
@@ -117,7 +130,7 @@ class ElasticsearchBehavior extends Behavior
      *
      * @return boolean
      */
-    public function createIndex() : bool
+    protected function createIndex() : bool
     {
         $settings = [
             'mappings' => ['properties' => $this->indexes()],
@@ -134,7 +147,7 @@ class ElasticsearchBehavior extends Behavior
      *
      * @return bool|int
      */
-    public function import()
+    protected function indexRecords()
     {
         $counter = 0;
         foreach ($this->model()->find('all') as $entity) {

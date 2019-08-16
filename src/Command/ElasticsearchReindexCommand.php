@@ -19,9 +19,7 @@ class ElasticsearchReindexCommand extends Command
             $this->loadModel($model);
 
             if (isset($this->{$model}->Elasticsearch)) {
-                $this->{$model}->deleteIndex();
-                $this->{$model}->createIndex();
-                $count = $this->{$model}->import();
+                $count = $this->{$model}->reindex();
                 $this->io->status('ok', "{$model} index created and {$count} record(s) added to index");
             } else {
                 $this->io->status('skipped', "{$model} does not have Elasticsearch Behavior loaded");

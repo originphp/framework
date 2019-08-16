@@ -28,7 +28,7 @@ class Elasticsearch
         'host' => '127.0.0.1',
         'port' => 9200,
         'timeout' => 300,
-        'ssl' => false,
+        'https' => false,
     ];
 
     /**
@@ -98,7 +98,7 @@ class Elasticsearch
     public function __construct(array $config = [])
     {
         $config += self::$defaultConfig;
-        $this->url = $config['ssl']?'https':'http' . '://' . $config['host'] . ':' . $config['port'];
+        $this->url = $config['https']?'https':'http' . '://' . $config['host'] . ':' . $config['port'];
         $this->timeout = $config['timeout'];
     }
 
