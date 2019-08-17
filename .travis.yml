@@ -33,7 +33,7 @@ before_script:
   - composer install --prefer-source --no-interaction
 script:
   - sleep 10
-  - vendor/bin/phpunit --coverage-clover=clover.xml --debug
+  - vendor/bin/phpunit --coverage-clover=clover.xml
 after_script:
   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
   - php php-coveralls.phar --verbose
