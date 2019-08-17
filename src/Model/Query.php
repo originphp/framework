@@ -13,7 +13,7 @@
  */
 namespace Origin\Model;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 /**
  * This handles the model finds
@@ -37,7 +37,7 @@ class Query
     public function find(array $query, string $type = 'model')
     {
         $connection = $this->model->connection();
-        $connection->select($this->model->table, $query + ['alias' => Inflector::tableize($this->model->alias)]);
+        $connection->select($this->model->table, $query + ['alias' => Inflector::tableName($this->model->alias)]);
 
         if ($type === 'list') {
             return $connection->fetchList();
@@ -78,7 +78,7 @@ class Query
     {
         $buffer = [];
 
-        $alias = Inflector::tableize($this->model->alias);
+        $alias = Inflector::tableName($this->model->alias);
 
         $belongsTo = $this->model->association('belongsTo');
         $hasOne = $this->model->association('hasOne');
@@ -90,8 +90,8 @@ class Query
            
             foreach ($record as $tableAlias => $data) {
                 if (is_string($tableAlias)) {
-                    $model = Inflector::classify($tableAlias);
-                    $associated = Inflector::variable($model);
+                    $model = Inflector::className($tableAlias);
+                    $associated = Inflector::camelCase($model);
                   
                     /**
                      * Remove empty records. If the foreignKey is not present then the associated
@@ -174,7 +174,7 @@ class Query
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
                 $primaryKey = $this->model->{$model}->primaryKey;
-                $modelTableAlias = Inflector::tableize($model);
+                $modelTableAlias = Inflector::tableName($model);
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey})) { // Author id
                         $config['conditions'] = $hasOne[$model]['conditions'];
@@ -209,9 +209,9 @@ class Query
 
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->model->primaryKey})) {
-                        $tableAlias = Inflector::tableize($alias);
+                        $tableAlias = Inflector::tableName($alias);
                         $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey};
-                        $models = Inflector::pluralize(Inflector::variable($alias));
+                        $models = Inflector::plural(Inflector::camelCase($alias));
                         $result->{$models} = $this->model->{$alias}->find('all', $config);
                     }
                 }
@@ -237,7 +237,7 @@ class Query
 
                 $config['joins'][0] = [
                     'table' => $config['joinTable'],
-                    'alias' => Inflector::tableize($config['with']),
+                    'alias' => Inflector::tableName($config['with']),
                     'type' => 'INNER',
                     'conditions' => $config['conditions'],
                 ];
@@ -248,11 +248,11 @@ class Query
 
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->model->primaryKey})) {
-                        $withAlias = Inflector::tableize($config['with']);
+                        $withAlias = Inflector::tableName($config['with']);
                         $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey};
                     }
 
-                    $models = Inflector::pluralize(Inflector::variable($alias));
+                    $models = Inflector::plural(Inflector::camelCase($alias));
                     $result->{$models} = $this->model->{$alias}->find('all', $config);
                 }
             }

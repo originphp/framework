@@ -14,7 +14,7 @@
 
 namespace Origin\View;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 
 /**
@@ -81,7 +81,7 @@ class Templater
         $filename = CONFIG . DS . $name . '.php';
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            $filename = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'config' . DS . $name . '.php';
+            $filename = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'config' . DS . $name . '.php';
         }
 
         if (file_exists($filename)) {

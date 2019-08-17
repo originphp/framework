@@ -15,7 +15,7 @@
 namespace Origin\Command;
 
 use Origin\Core\Configure;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -73,7 +73,7 @@ class DbSeedCommand extends Command
         list($plugin, $name) = pluginSplit($name);
         $class = 'ApplicationSeed';
         if ($name !== 'seed') {
-            $class = Inflector::camelize($name) . 'Seed';
+            $class = Inflector::studlyCaps($name) . 'Seed';
         }
        
         include_once $filename;

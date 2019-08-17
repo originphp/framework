@@ -20,7 +20,7 @@ namespace Origin\Model;
  *
  */
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Exception\NotFoundException;
 use Origin\Model\Behavior\BehaviorRegistry;
@@ -169,7 +169,7 @@ class Model
         $this->alias = $alias;
 
         if (is_null($table)) {
-            $table = Inflector::tableize($this->name);
+            $table = Inflector::tableName($this->name);
         }
         $this->table = $table;
 
@@ -294,7 +294,7 @@ class Model
         $fields = array_keys($this->schema()['columns']);
 
         $needles = [
-            Inflector::underscore($this->name) . '_name',
+            Inflector::underscored($this->name) . '_name',
             'name',
             'title',
             $this->primaryKey,
@@ -572,7 +572,7 @@ class Model
      */
     protected function prepareFields(array $fields) : array
     {
-        $alias = Inflector::tableize($this->alias);
+        $alias = Inflector::tableName($this->alias);
         foreach ($fields as $index => $field) {
             if (strpos($field, ' ') === false and strpos($field, '.') === false and strpos($field, '(') === false) {
                 $fields[$index] = "{$alias}.{$field}";
@@ -674,7 +674,7 @@ class Model
          */
         $hasAndBelongsToMany = [];
         foreach ($this->hasAndBelongsToMany as $alias => $habtm) {
-            $needle = Inflector::pluralize(lcfirst($alias)); // ArticleTag -> articleTags
+            $needle = Inflector::plural(lcfirst($alias)); // ArticleTag -> articleTags
             if (in_array($alias, $options['associated'])) {
                 $data = $entity->get($needle);
 
@@ -995,7 +995,7 @@ class Model
 
             // Save hasMany
             foreach ($this->hasMany as $alias => $config) {
-                $key = Inflector::pluralize(lcfirst($alias));
+                $key = Inflector::plural(lcfirst($alias));
                 if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
                     continue;
                 }
@@ -1077,7 +1077,7 @@ class Model
         if ($id === null) {
             return false;
         }
-        $tableAlias = Inflector::tableize($this->alias);
+        $tableAlias = Inflector::tableName($this->alias);
 
         return (bool) $this->find('count', [
             'conditions' => ["{$tableAlias}.{$this->primaryKey}" => $id],
@@ -1398,7 +1398,7 @@ class Model
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
                     $query['joins'][] = [
                         'table' => $this->{$alias}->table,
-                        'alias' => Inflector::tableize($alias),
+                        'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
                         'datasource' => $this->datasource,
@@ -1433,7 +1433,7 @@ class Model
                 $config = [];
             }
             $config += ['fields' => []];
-            $tableAlias = Inflector::tableize($alias);
+            $tableAlias = Inflector::tableName($alias);
             foreach ($config['fields'] as $key => $value) {
                 $config['fields'][$key] = "{$tableAlias}.{$value}";
             }

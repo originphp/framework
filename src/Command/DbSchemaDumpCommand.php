@@ -15,7 +15,7 @@
 namespace Origin\Command;
 
 use Origin\Core\Configure;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 
 class DbSchemaDumpCommand extends Command
@@ -118,7 +118,7 @@ class %name%Schema extends Schema
         list($plugin, $name) = pluginSplit($name);
         $className = 'Application';
         if ($name !== 'schema') {
-            $className = Inflector::camelize($name);
+            $className = Inflector::studlyCaps($name);
         }
        
         $connection = ConnectionManager::get($datasource);

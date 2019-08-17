@@ -19,7 +19,7 @@ use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Utility\Number;
 
 use Origin\View\TemplateTrait;
@@ -350,7 +350,7 @@ class FormHelper extends Helper
         if (substr($name, -3) === '_id') {
             $label = substr($name, 0, -3);
             $parts = explode('.', $label);
-            $models = Inflector::pluralize($parts[0]);
+            $models = Inflector::plural($parts[0]);
 
             if (isset($this->view()->vars[$models])) {
                 $selectOptions = $this->view()->vars[$models];
@@ -359,7 +359,7 @@ class FormHelper extends Helper
             $parts = explode('.', $label);
         }
 
-        $label = Inflector::humanize(end($parts));
+        $label = Inflector::human(end($parts));
 
         $options += [
             'label' => $label,

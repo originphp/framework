@@ -15,7 +15,7 @@
 namespace Origin\Controller\Component;
 
 use Origin\Model\Model;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\NotFoundException;
 
 class PaginatorComponent extends Component
@@ -87,14 +87,14 @@ class PaginatorComponent extends Component
         // Enable sorting on related Fields. e.g author_id - this sort by Display Field
         if ($sort and substr($sort, -3) === '_id') {
             // Setup default sort if intra model fails
-            $tableAlias = Inflector::tableize($this->model->alias);
+            $tableAlias = Inflector::tableName($this->model->alias);
             $settings['order'] = ["{$tableAlias}.{$sort}" => $direction];
             // intra model sorting by display field if configured
             $alias = $this->getModelFromField($sort);
             
             if (isset($this->model->{$alias})) {
                 if ($displayField = $this->model->{$alias}->displayField) {
-                    $tableAlias = Inflector::tableize($this->model->{$alias}->alias);
+                    $tableAlias = Inflector::tableName($this->model->{$alias}->alias);
                     $settings['order'] = ["{$tableAlias}.{$displayField}" => $direction];
                 }
             }
@@ -121,7 +121,7 @@ class PaginatorComponent extends Component
      */
     protected function getModelFromField(string $field) : ?string
     {
-        $needle = Inflector::camelize(substr($field, 0, -3)); // owner_id -> Owner;
+        $needle = Inflector::studlyCaps(substr($field, 0, -3)); // owner_id -> Owner;
         $belongsTo = $this->model->association('belongsTo');
     
         if (isset($belongsTo[$needle])) {

@@ -2,7 +2,7 @@
 
 namespace Origin\Command;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 
 class GenerateCommand extends Command
@@ -115,7 +115,7 @@ class GenerateCommand extends Command
             'name' => $name,
             'class' => $class,  // Product // StudlyCaps/PascalCase
             'plugin' => $plugin,
-            'underscored' => Inflector::underscore($class),
+            'underscored' => Inflector::underscored($class),
             'namespace' => $plugin ? $plugin : 'App',
         ];
 
@@ -150,7 +150,7 @@ class GenerateCommand extends Command
 
     protected function controller(array $data)
     {
-        $data['model'] = Inflector::singularize($data['class']);
+        $data['model'] = Inflector::singular($data['class']);
         $data['methods'] = '';
 
         $controllerMethods = $testMethods = '';
@@ -178,7 +178,7 @@ class GenerateCommand extends Command
                 $this->generate(
                     $this->getTemplateFilename('view'),
                     $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.$data['class'] .DS. "{$method}.ctp",
-                    ['action' => Inflector::humanize($method)] + $data
+                    ['action' => Inflector::human($method)] + $data
                 );
             }
         }
@@ -280,7 +280,7 @@ class GenerateCommand extends Command
         # Generate Migration
         if ($schema) {
             $export = $this->varExport($schema);
-            $table = Inflector::tableize($data['class']);
+            $table = Inflector::tableName($data['class']);
 
             $data['class'] = 'Create'.$data['class'].'Table';
             $data['code'] = sprintf('$this->createTable(\'%s\',%s);', $table, $export);
@@ -304,7 +304,7 @@ class GenerateCommand extends Command
         ];
         $pluginDirectory = APP.DS.'plugins';
 
-        $path = $pluginDirectory.DS.Inflector::underscore($data['class']);
+        $path = $pluginDirectory.DS.Inflector::underscored($data['class']);
         foreach ($structure as $folder) {
             $directory = $path.DS.$folder;
             if (! file_exists($directory)) {
@@ -312,7 +312,7 @@ class GenerateCommand extends Command
             }
         }
 
-        $directory = $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'src';
+        $directory = $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'src';
 
         $this->generate(
             $this->getTemplateFilename('plugin_controller'),
@@ -326,13 +326,13 @@ class GenerateCommand extends Command
         );
         $this->generate(
             $this->getTemplateFilename('plugin_routes'),
-            $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'config'.DS.'routes.php',
+            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'config'.DS.'routes.php',
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('phpunit'),
-            $pluginDirectory.DS.Inflector::underscore($data['class']).DS.'phpunit.xml',
+            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'phpunit.xml',
             $data
         );
     }
@@ -392,7 +392,7 @@ class GenerateCommand extends Command
         $template = $this->buildBlocks($template, $blocks);
         $template = $this->format($template, $vars);
        
-        $controller = Inflector::pluralize($model);
+        $controller = Inflector::plural($model);
         $filename = $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS."{$controller}Controller.php";
         $this->saveGeneratedCode($filename, $template);
         unset($vars['compact'],$vars['associated']);
@@ -431,14 +431,14 @@ class GenerateCommand extends Command
 
         # View
         $vars += [
-            'controllerUnderscored' => Inflector::underscore($controller),
+            'controllerUnderscored' => Inflector::underscored($controller),
         ];
         $fields = array_keys($meta['schema'][$model]['columns']);
         $blocks = [];
         foreach ($fields as $field) {
             $block = $data;
             $block['field'] = $field;
-            $block['fieldName'] = Inflector::humanize(Inflector::underscore($field));
+            $block['fieldName'] = Inflector::human(Inflector::underscored($field));
             $blocks[] = $block;
         }
       
@@ -466,7 +466,7 @@ class GenerateCommand extends Command
                     foreach ($fields as $field) {
                         $block = $data;
                         $block['field'] = $field;
-                        $block['fieldName'] = Inflector::humanize(Inflector::underscore($field));
+                        $block['fieldName'] = Inflector::human(Inflector::underscored($field));
                         $blocks[] = $block;
                     }
                     $relatedLists[] = $this->buildBlocks($t, $blocks);
@@ -487,7 +487,7 @@ class GenerateCommand extends Command
     {
         list($plugin, $name) = pluginsplit($class);
         if ($plugin) {
-            $plugin = Inflector::underscore($plugin);
+            $plugin = Inflector::underscored($plugin);
         }
         // Src
         if ($src === self::SRC) {
@@ -607,7 +607,7 @@ class Scaffold
         $connection = ConnectionManager::get($datasource);
         $tables = $connection->tables();
         foreach ($tables as $table) {
-            $model = Inflector::classify($table);
+            $model = Inflector::className($table);
             $this->schema[$model] = $connection->describe($table);
         }
     }
@@ -692,16 +692,16 @@ class Scaffold
          */
         $data = [];
         foreach ($models as $model) {
-            $plural = Inflector::pluralize($model);
+            $plural = Inflector::plural($model);
             $data[$model] = [
                 'model' => $model,
                 'controller' => $plural,
-                'singularName' => Inflector::variable($model), // for vars
-                'pluralName' => Inflector::variable($plural), // for vars
-                'singularHuman' => Inflector::humanize(Inflector::underscore($model)),
-                'pluralHuman' => Inflector::humanize(Inflector::underscore($plural)),
-                'singularHumanLower' => strtolower(Inflector::humanize(Inflector::underscore($model))),
-                'pluralHumanLower' => strtolower(Inflector::humanize(Inflector::underscore($plural))),
+                'singularName' => Inflector::camelCase($model), // for vars
+                'pluralName' => Inflector::camelCase($plural), // for vars
+                'singularHuman' => Inflector::human(Inflector::underscored($model)),
+                'pluralHuman' => Inflector::human(Inflector::underscored($plural)),
+                'singularHumanLower' => strtolower(Inflector::human(Inflector::underscored($model))),
+                'pluralHumanLower' => strtolower(Inflector::human(Inflector::underscored($plural))),
                 'primaryKey' => $this->primaryKey($model),
             ];
         }
@@ -722,7 +722,7 @@ class Scaffold
         $primaryKey = (array) $this->primaryKey($model);
         foreach ($fields as $field => $schema) {
             if (substr($field, -3) === '_id' and ! in_array($field, $primaryKey)) {
-                $associatedModel = Inflector::camelize(substr($field, 0, -3));
+                $associatedModel = Inflector::studlyCaps(substr($field, 0, -3));
                 $associations[$model]['belongsTo'][] = $associatedModel;
             }
         }
@@ -744,7 +744,7 @@ class Scaffold
                 continue;
             }
             $schema = $this->schema[$otherModel]['columns'];
-            $foreignKey = Inflector::underscore($model) . '_id';
+            $foreignKey = Inflector::underscored($model) . '_id';
        
             if (isset($schema[$foreignKey])) {
                 $associations[$model]['hasMany'][] = $otherModel;
@@ -765,9 +765,9 @@ class Scaffold
     {
         $models = array_keys($this->schema);
         foreach ($models as $otherModel) {
-            $array = [Inflector::pluralize($model),Inflector::pluralize(($otherModel))];
+            $array = [Inflector::plural($model),Inflector::plural(($otherModel))];
             sort($array);
-            $hasAndBelongsToMany = Inflector::singularize(implode('', $array));
+            $hasAndBelongsToMany = Inflector::singular(implode('', $array));
             if (isset($this->schema[$hasAndBelongsToMany])) {
                 $associations[$model]['hasAndBelongsToMany'][] = $otherModel;
                 if (in_array($hasAndBelongsToMany, $associations['ignore']) === false) {

@@ -14,6 +14,7 @@
 
 namespace Origin\Core;
 
+use Origin\Utility\Inflector;
 use Origin\Core\Exception\MissingPluginException;
 
 /**
@@ -78,7 +79,7 @@ class Plugin
         $options += [
             'routes' => true,
             'bootstrap' => true,
-            'path' => PLUGINS . DS . Inflector::underscore($plugin),
+            'path' => PLUGINS . DS . Inflector::underscored($plugin),
             'autoload' => true,
         ];
         if (! file_exists($options['path'])) {

@@ -14,7 +14,7 @@
 
 namespace Origin\Command;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -32,7 +32,7 @@ trait DbSchemaTrait
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS . DS . Inflector::underscore($plugin) . DS . 'db' . DS .  $file . '.' . $extension;
+            return PLUGINS . DS . Inflector::underscored($plugin) . DS . 'db' . DS .  $file . '.' . $extension;
         }
 
         return APP . DS . 'db' . DS . $file . '.' . $extension;

@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Origin\Model\Behavior;
 
 use Origin\Model\Entity;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 /**
  * In Book belongsTo Author set counterCache = true or fieldName
@@ -44,13 +44,13 @@ class CounterCacheBehavior extends Behavior
             if (! empty($config['counterCache'])) {
                 $field = $config['counterCache'];
                 if ($field === true) {
-                    $name = Inflector::pluralize($this->model()->name);
-                    $field = Inflector::underscore($name) . '_count';
+                    $name = Inflector::plural($this->model()->name);
+                    $field = Inflector::underscored($name) . '_count';
                 }
                 $this->fields[$alias] = [
                     'field' => $field,
                     'foreignKey' => $config['foreignKey'],
-                    'name' => Inflector::underscore($alias),
+                    'name' => Inflector::underscored($alias),
                 ];
             }
         }

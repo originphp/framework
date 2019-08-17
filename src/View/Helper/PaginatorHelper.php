@@ -14,7 +14,7 @@
 
 namespace Origin\View\Helper;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\View\TemplateTrait;
 
 class PaginatorHelper extends Helper
@@ -46,7 +46,7 @@ class PaginatorHelper extends Helper
     public function sort(string $column, string $text = null)
     {
         if ($text === null) {
-            $text = Inflector::humanize($column);
+            $text = Inflector::human($column);
         }
         $query = $this->request()->query();
         $paging = $this->params();

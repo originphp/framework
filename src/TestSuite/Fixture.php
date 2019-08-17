@@ -15,7 +15,7 @@
 namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\TableSchema;
@@ -107,7 +107,7 @@ class Fixture
         if ($this->table === null) {
             list($namespace, $class) = namespaceSplit(get_class($this));
             $name = substr($class, 0, -7);
-            $this->table = Inflector::tableize($name);
+            $this->table = Inflector::tableName($name);
         }
 
         $this->initialize();
@@ -238,7 +238,7 @@ class Fixture
                 $options['datasource'] = $model->datasource;
                 $options['table'] = $model->table;
             } else {
-                $options['table'] = Inflector::tableize($options['model']); // for dynamic models fall back
+                $options['table'] = Inflector::tableName($options['model']); // for dynamic models fall back
             }
         }
         // Table is not specified or could not find model

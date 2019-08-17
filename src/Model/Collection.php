@@ -17,7 +17,7 @@ use Iterator;
 use Countable;
 use ArrayAccess;
 use Origin\Utility\Xml;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class Collection implements ArrayAccess, Iterator, Countable
 {
@@ -79,9 +79,9 @@ class Collection implements ArrayAccess, Iterator, Countable
      */
     public function toXml()
     {
-        $root = Inflector::variable(Inflector::pluralize($this->model ?? 'Record'));
+        $root = Inflector::camelCase(Inflector::plural($this->model ?? 'Record'));
         $data = [$root => [
-            Inflector::variable($this->model ?? 'Record') => $this->toArray(),
+            Inflector::camelCase($this->model ?? 'Record') => $this->toArray(),
         ]];
 
         return Xml::fromArray($data);

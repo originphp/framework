@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Origin\Model;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class Association
 {
@@ -60,10 +60,10 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
         }
-        $tableAlias = Inflector::tableize($this->model->alias);
-        $associationTableAlias = Inflector::tableize($association);
+        $tableAlias = Inflector::tableName($this->model->alias);
+        $associationTableAlias = Inflector::tableName($association);
         $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
 
         if (! empty($options['conditions'])) {
@@ -110,10 +110,10 @@ class Association
         $options = array_merge($defaults, $options);
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($options['className']) . '_id';
+            $options['foreignKey'] = Inflector::underscored($options['className']) . '_id';
         }
-        $alias = Inflector::tableize($this->model->alias);
-        $associatedAlias = Inflector::tableize($association);
+        $alias = Inflector::tableName($this->model->alias);
+        $associatedAlias = Inflector::tableName($association);
 
         $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
 
@@ -159,7 +159,7 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
         }
 
         return $options;
@@ -220,21 +220,21 @@ class Association
         sort($models);
         $models = array_values($models);
 
-        $with = Inflector::pluralize($models[0]) . $models[1];
+        $with = Inflector::plural($models[0]) . $models[1];
         if (is_null($options['with'])) {
             $options['with'] = $with;
         }
         if (is_null($options['joinTable'])) {
-            $options['joinTable'] = Inflector::pluralize(Inflector::underscore($options['with']));
+            $options['joinTable'] = Inflector::plural(Inflector::underscored($options['with']));
         }
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscore($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
         }
         if (is_null($options['associationForeignKey'])) {
-            $options['associationForeignKey'] = Inflector::underscore($options['className']) . '_id';
+            $options['associationForeignKey'] = Inflector::underscored($options['className']) . '_id';
         }
-        $withAlias = Inflector::tableize($options['with']);
-        $optionsClassAlias = Inflector::tableize($options['className']);
+        $withAlias = Inflector::tableName($options['with']);
+        $optionsClassAlias = Inflector::tableName($options['className']);
         $conditions = ["{$withAlias}.{$options['associationForeignKey']} = {$optionsClassAlias}.id"];
 
         if (! empty($options['conditions'])) {

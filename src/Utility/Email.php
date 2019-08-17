@@ -15,7 +15,7 @@
 namespace Origin\Utility;
 
 use Origin\Core\Configure;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
@@ -405,7 +405,7 @@ class Email
         list($plugin, $template) = pluginSplit($name);
         $path = SRC . DS . 'View' . DS . 'Email';
         if ($plugin) {
-            $path = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View' . DS . 'Email';
+            $path = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Email';
         }
 
         if ($this->format() === 'html' or $this->format() === 'both') {

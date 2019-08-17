@@ -1,7 +1,7 @@
 <?php
 namespace Origin\Command;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class PluginInstallCommand extends Command
 {
@@ -57,7 +57,7 @@ class PluginInstallCommand extends Command
             $plugin = preg_replace('/[^a-z0-9]+/i', '_', $plugin);
         }
 
-        return Inflector::underscore($plugin);
+        return Inflector::underscored($plugin);
     }
 
     /**
@@ -97,7 +97,7 @@ class PluginInstallCommand extends Command
 
         // Needs to show this for username/password
         if ($this->download($url, $folder)) {
-            $plugin = Inflector::camelize($plugin);
+            $plugin = Inflector::studlyCaps($plugin);
             $this->appendApplication($plugin);
             $this->io->status('ok', sprintf('%s Plugin installed', $plugin));
 

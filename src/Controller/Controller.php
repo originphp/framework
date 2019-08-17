@@ -22,7 +22,7 @@ use Origin\Http\Request;
 use Origin\View\XmlView;
 use Origin\Http\Response;
 use Origin\View\JsonView;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Model\ModelRegistry;
 use Origin\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
@@ -108,7 +108,7 @@ class Controller
         list($namespace, $name) = namespaceSplit(get_class($this));
         $this->name = substr($name, 0, -10);
 
-        $this->modelName = Inflector::singularize($this->name);
+        $this->modelName = Inflector::singular($this->name);
 
         $this->request = $request;
         $this->response = $response;

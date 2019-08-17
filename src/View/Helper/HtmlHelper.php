@@ -16,7 +16,7 @@ namespace Origin\View\Helper;
 
 use Origin\Core\Plugin;
 use Origin\Http\Router;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\View\TemplateTrait;
 use Origin\Exception\NotFoundException;
 
@@ -140,7 +140,7 @@ class HtmlHelper extends Helper
         }
 
         if ($plugin) {
-            $filename = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
+            $filename = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
             if ($options['ext'] === 'js') {
                 return '<script>' .$this->loadFile($filename) . '</script>';
             }

@@ -14,6 +14,10 @@
 
 namespace Origin\Core;
 
+/**
+ * @deprecated This has been deprecated
+ * @codeCoverageIgnore
+ */
 class Inflector
 {
     /**
@@ -58,6 +62,8 @@ class Inflector
      */
     public static function pluralize(string $singular) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$dictonary[$singular])) {
             return self::$dictonary[$singular];
         }
@@ -85,6 +91,8 @@ class Inflector
      */
     public static function singularize(string $plural) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if ($key = array_search($plural, self::$dictonary)) {
             return $key;
         }
@@ -117,6 +125,8 @@ class Inflector
      */
     public static function camelize(string $underscoredWord) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+        
         if (isset(self::$cache['camelize'][$underscoredWord])) {
             return self::$cache['camelize'][$underscoredWord];
         }
@@ -134,11 +144,13 @@ class Inflector
      */
     public static function variable(string $underscoredWord) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$cache['variable'][$underscoredWord])) {
             return self::$cache['variable'][$underscoredWord];
         }
 
-        self::$cache['variable'][$underscoredWord] = lcfirst(self::camelize($underscoredWord));
+        self::$cache['variable'][$underscoredWord] = lcfirst(self::studlyCaps($underscoredWord));
 
         return self::$cache['variable'][$underscoredWord];
     }
@@ -151,6 +163,8 @@ class Inflector
      */
     public static function underscore(string $camelCasedWord) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$cache['underscore'][$camelCasedWord])) {
             return self::$cache['underscore'][$camelCasedWord];
         }
@@ -169,10 +183,12 @@ class Inflector
      */
     public static function tableize(string $camelCasedWord) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$cache['tableize'][$camelCasedWord])) {
             return self::$cache['tableize'][$camelCasedWord];
         }
-        self::$cache['tableize'][$camelCasedWord] = self::pluralize(self::underscore($camelCasedWord));
+        self::$cache['tableize'][$camelCasedWord] = self::plural(self::underscored($camelCasedWord));
 
         return self::$cache['tableize'][$camelCasedWord];
     }
@@ -185,10 +201,12 @@ class Inflector
      */
     public static function classify(string $table) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$cache['classify'][$table])) {
             return self::$cache['classify'][$table];
         }
-        self::$cache['classify'][$table] = self::camelize(Inflector::singularize($table));
+        self::$cache['classify'][$table] = self::studlyCaps(Inflector::singular($table));
 
         return self::$cache['classify'][$table];
     }
@@ -202,6 +220,8 @@ class Inflector
      */
     public static function humanize(string $underscoredWord) : string
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+
         if (isset(self::$cache['humanize'][$underscoredWord])) {
             return self::$cache['humanize'][$underscoredWord];
         }
@@ -222,6 +242,8 @@ class Inflector
      */
     public static function rules(string $type, array $rules) : void
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+        
         foreach ($rules as $find => $replace) {
             self::$rules[$type] = [$find => $replace] + self::$rules[$type];
         }
@@ -238,7 +260,9 @@ class Inflector
      */
     public static function add(string $singular, string $plural) : void
     {
+        deprecationWarning('Origin\Core\Inflector has been deprecated use Origin\Utility\Inflector');
+        
         self::$dictonary[$singular] = $plural;
-        self::$dictonary[self::camelize($singular)] = self::camelize($plural);
+        self::$dictonary[self::studlyCaps($singular)] = self::studlyCaps($plural);
     }
 }

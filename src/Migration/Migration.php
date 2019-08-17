@@ -22,7 +22,7 @@
   */
 namespace Origin\Migration;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\BaseSchema;
@@ -307,8 +307,8 @@ class Migration
         $name = implode('_', $tables);
         # This will create up and down
         $schema = [
-            Inflector::singularize($tables[0]).'_id' => 'integer',
-            Inflector::singularize($tables[1]).'_id' => 'integer',
+            Inflector::singular($tables[0]).'_id' => 'integer',
+            Inflector::singular($tables[1]).'_id' => 'integer',
         ];
 
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
@@ -784,7 +784,7 @@ class Migration
         }
 
         $options += [
-            'column' => strtolower(Inflector::singularize($toTable)).'_id',
+            'column' => strtolower(Inflector::singular($toTable)).'_id',
             'primaryKey' => 'id',
             'name' => null,
             'update' => null,
@@ -823,7 +823,7 @@ class Migration
         $options = $optionsOrToTable;
         if (is_string($options)) {
             $options = [
-                'column' => strtolower(Inflector::singularize($options)).'_id',
+                'column' => strtolower(Inflector::singular($options)).'_id',
             ];
         }
         $options += ['name' => null,'column' => null,'primaryKey' => 'id'];

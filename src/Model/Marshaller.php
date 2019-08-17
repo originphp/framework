@@ -14,7 +14,7 @@
 
 namespace Origin\Model;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class Marshaller
 {
@@ -48,7 +48,7 @@ class Marshaller
         }
         foreach (array_merge($model->hasMany, $model->hasAndBelongsToMany) as  $alias => $config) {
             if (in_array($alias, $associated)) {
-                $key = Inflector::pluralize(lcfirst($alias));
+                $key = Inflector::plural(lcfirst($alias));
                 $map[$key] = 'many';
             }
         }
@@ -109,7 +109,7 @@ class Marshaller
                 $alias = $property;
                 $fields = [];
                 if ($propertyMap[$property] === 'many') {
-                    $alias = Inflector::singularize($alias);
+                    $alias = Inflector::singular($alias);
                 }
               
                 $model = ucfirst($alias);
@@ -187,7 +187,7 @@ class Marshaller
                 $alias = $property;
                 $fields = [];
                 if ($propertyMap[$property] === 'many') {
-                    $alias = Inflector::singularize($alias);
+                    $alias = Inflector::singular($alias);
                 }
 
                 $model = ucfirst($alias);

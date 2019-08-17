@@ -24,7 +24,7 @@
 
 namespace Origin\Http;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class Router
 {
@@ -148,7 +148,7 @@ class Router
                             $params[$key] = $value;
                         }
                     }
-                    $params['controller'] = Inflector::camelize($params['controller']);
+                    $params['controller'] = Inflector::studlyCaps($params['controller']);
                     break;
                 }
             }
@@ -204,12 +204,12 @@ class Router
             $params = static::$request->params();
         }
         if ($url['plugin']) {
-            $output .= '/' . Inflector::underscore($url['plugin']);
+            $output .= '/' . Inflector::underscored($url['plugin']);
         }
 
         $controller = empty($url['controller']) ? $params['controller'] : $url['controller'];
         $action = empty($url['action']) ? $params['action'] : $url['action'];
-        $output .= '/' . Inflector::underscore($controller) . '/' . $action;
+        $output .= '/' . Inflector::underscored($controller) . '/' . $action;
 
         unset($url['controller'],$url['action'],$url['plugin']);
 

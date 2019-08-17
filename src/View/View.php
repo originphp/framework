@@ -17,7 +17,7 @@ namespace Origin\View;
  * @todo change protected properties to have _prefix to get out of sight during
  * code completion views.
  */
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Controller\Controller;
 use Origin\View\Helper\HelperRegistry;
@@ -257,7 +257,7 @@ class View
             $path = $this->getViewPath(false); // get without controller folder
         } elseif (strpos($name, '.') !== false) {
             list($plugin, $name) = explode('.', $name);
-            $path = PLUGINS . DS . Inflector::underscore($plugin) .  DS . 'src' .DS .'View' . DS;
+            $path = PLUGINS . DS . Inflector::underscored($plugin) .  DS . 'src' .DS .'View' . DS;
         }
          
         $filename = $path .  $name . '.ctp';
@@ -279,7 +279,7 @@ class View
         $viewPath = $this->viewPath;
         $plugin = $this->request->params('plugin');
         if ($plugin) {
-            $viewPath = PLUGINS . DS . Inflector::underscore($plugin) . DS . 'src' . DS . 'View';
+            $viewPath = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View';
         }
         if ($withControllerName) {
             $viewPath = $viewPath . DS . $this->name;
@@ -355,7 +355,7 @@ class View
         $layout_filename = $this->getLayoutFilename($layout);
 
         if (! isset($this->vars['title'])) {
-            $this->vars['title'] = Inflector::humanize(Inflector::underscore($this->name));
+            $this->vars['title'] = Inflector::human(Inflector::underscored($this->name));
         }
        
         extract($this->vars);

@@ -12,114 +12,114 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Core;
+namespace Origin\Test\Utility;
 
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class InflectorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testPluralize()
+    public function testPlural()
     {
         // Test rules
-        $this->assertEquals('apples', Inflector::pluralize('apple'));
-        $this->assertEquals('companies', Inflector::pluralize('company'));
-        $this->assertEquals('branches', Inflector::pluralize('branch'));
-        $this->assertEquals('businesses', Inflector::pluralize('business'));
-        $this->assertEquals('backslashes', Inflector::pluralize('backslash'));
-        $this->assertEquals('mailboxes', Inflector::pluralize('mailbox'));
-        $this->assertEquals('responses', Inflector::pluralize('response'));
-        $this->assertEquals('', Inflector::pluralize(''));
+        $this->assertEquals('apples', Inflector::plural('apple'));
+        $this->assertEquals('companies', Inflector::plural('company'));
+        $this->assertEquals('branches', Inflector::plural('branch'));
+        $this->assertEquals('businesses', Inflector::plural('business'));
+        $this->assertEquals('backslashes', Inflector::plural('backslash'));
+        $this->assertEquals('mailboxes', Inflector::plural('mailbox'));
+        $this->assertEquals('responses', Inflector::plural('response'));
+        $this->assertEquals('', Inflector::plural(''));
 
         // Test fit
-        $this->assertEquals('statuses', Inflector::pluralize('status'));
-        $this->assertEquals('employees', Inflector::pluralize('employee'));
-        $this->assertEquals('processes', Inflector::pluralize('process'));
-        $this->assertEquals('patches', Inflector::pluralize('patch'));
-        $this->assertEquals('cases', Inflector::pluralize('case'));
+        $this->assertEquals('statuses', Inflector::plural('status'));
+        $this->assertEquals('employees', Inflector::plural('employee'));
+        $this->assertEquals('processes', Inflector::plural('process'));
+        $this->assertEquals('patches', Inflector::plural('patch'));
+        $this->assertEquals('cases', Inflector::plural('case'));
 
-        $this->AssertEquals('-----s', Inflector::pluralize('-----'));
+        $this->AssertEquals('-----s', Inflector::plural('-----'));
     }
 
-    public function testSingularize()
+    public function testSingular()
     {
-        $this->assertEquals('apple', Inflector::singularize('apples'));
-        $this->assertEquals('company', Inflector::singularize('companies'));
-        $this->assertEquals('branch', Inflector::singularize('branches'));
-        $this->assertEquals('business', Inflector::singularize('businesses'));
-        $this->assertEquals('backslash', Inflector::singularize('backslashes'));
-        $this->assertEquals('mailbox', Inflector::singularize('mailboxes'));
-        $this->assertEquals('response', Inflector::singularize('responses'));
-        $this->assertEquals('', Inflector::singularize(''));
+        $this->assertEquals('apple', Inflector::singular('apples'));
+        $this->assertEquals('company', Inflector::singular('companies'));
+        $this->assertEquals('branch', Inflector::singular('branches'));
+        $this->assertEquals('business', Inflector::singular('businesses'));
+        $this->assertEquals('backslash', Inflector::singular('backslashes'));
+        $this->assertEquals('mailbox', Inflector::singular('mailboxes'));
+        $this->assertEquals('response', Inflector::singular('responses'));
+        $this->assertEquals('', Inflector::singular(''));
 
-        $this->assertEquals('status', Inflector::singularize('statuses'));
-        $this->assertEquals('employee', Inflector::singularize('employees'));
-        $this->assertEquals('process', Inflector::singularize('processes'));
-        $this->assertEquals('patch', Inflector::singularize('patches'));
-        $this->assertEquals('case', Inflector::singularize('cases'));
-        $this->AssertEquals('-----', Inflector::singularize('-----s'));
-        $this->AssertEquals('-----', Inflector::singularize('-----'));
+        $this->assertEquals('status', Inflector::singular('statuses'));
+        $this->assertEquals('employee', Inflector::singular('employees'));
+        $this->assertEquals('process', Inflector::singular('processes'));
+        $this->assertEquals('patch', Inflector::singular('patches'));
+        $this->assertEquals('case', Inflector::singular('cases'));
+        $this->AssertEquals('-----', Inflector::singular('-----s'));
+        $this->AssertEquals('-----', Inflector::singular('-----'));
     }
 
-    public function testCamelize()
+    public function testStudlyCaps()
     {
-        $this->assertEquals('CamelCase', Inflector::camelize('camel_case'));
+        $this->assertEquals('CamelCase', Inflector::studlyCaps('camel_case'));
     }
 
-    public function testUnderscore()
+    public function testUnderscored()
     {
-        $this->assertEquals('contacts', Inflector::underscore('Contacts'));
-        $this->assertEquals('leads', Inflector::underscore('leads'));
-        $this->assertEquals('contact_notes', Inflector::underscore('ContactNotes'));
-        $this->assertEquals('lead_notes', Inflector::underscore('leadNotes'));
+        $this->assertEquals('contacts', Inflector::underscored('Contacts'));
+        $this->assertEquals('leads', Inflector::underscored('leads'));
+        $this->assertEquals('contact_notes', Inflector::underscored('ContactNotes'));
+        $this->assertEquals('lead_notes', Inflector::underscored('leadNotes'));
     }
 
-    public function testTabelize()
+    public function testTableName()
     {
-        $this->assertEquals('contacts', Inflector::tableize('Contact'));
-        $this->assertEquals('contact_emails', Inflector::tableize('ContactEmail'));
+        $this->assertEquals('contacts', Inflector::tableName('Contact'));
+        $this->assertEquals('contact_emails', Inflector::tableName('ContactEmail'));
     }
 
-    public function testvariable()
+    public function testCamelCase()
     {
-        $this->assertEquals('camelCase', Inflector::variable('camel_case'));
+        $this->assertEquals('camelCase', Inflector::camelCase('camel_case'));
     }
 
     /**
-     * @depends testSingularize
+     * @depends testSingular
      */
-    public function testClassify()
+    public function testClassname()
     {
-        $this->assertEquals('Contact', Inflector::classify('contacts'));
-        $this->assertEquals('ContactEmail', Inflector::classify('contact_emails'));
+        $this->assertEquals('Contact', Inflector::className('contacts'));
+        $this->assertEquals('ContactEmail', Inflector::className('contact_emails'));
     }
 
-    public function testHumanize()
+    public function testHuman()
     {
-        $this->assertEquals('Contact Manager', Inflector::humanize('contact_manager'));
+        $this->assertEquals('Contact Manager', Inflector::human('contact_manager'));
     }
 
     public function testAddRules()
     {
         Inflector::rules('singular', ['/foo/i' => 'fooBar']);
         Inflector::rules('plural', ['/bar/i' => 'barFoo']);
-        $this->assertEquals('fooBar', Inflector::singularize('foo'));
-        $this->assertEquals('barFoo', Inflector::pluralize('bar'));
+        $this->assertEquals('fooBar', Inflector::singular('foo'));
+        $this->assertEquals('barFoo', Inflector::plural('bar'));
 
         Inflector::rules('singular', ['/(quiz)zes$/i' => '\\1']);
         Inflector::rules('plural', ['/(quiz)$/i' => '\1zes']);
 
-        $this->assertEquals('quiz', Inflector::singularize('quizzes'));
-        $this->assertEquals('quizzes', Inflector::pluralize('quiz'));
+        $this->assertEquals('quiz', Inflector::singular('quizzes'));
+        $this->assertEquals('quizzes', Inflector::plural('quiz'));
     }
 
     public function testDictonary()
     {
         Inflector::add('person', 'people');
 
-        $this->assertEquals('person', Inflector::singularize('people'));
-        $this->assertEquals('people', Inflector::pluralize('person'));
+        $this->assertEquals('person', Inflector::singular('people'));
+        $this->assertEquals('people', Inflector::plural('person'));
 
-        $this->assertEquals('people', Inflector::tableize('Person'));
-        $this->assertEquals('Person', Inflector::classify('People'));
+        $this->assertEquals('people', Inflector::tableName('Person'));
+        $this->assertEquals('Person', Inflector::className('People'));
     }
 }

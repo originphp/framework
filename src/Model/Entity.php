@@ -21,7 +21,7 @@
 namespace Origin\Model;
 
 use Origin\Utility\Xml;
-use Origin\Core\Inflector;
+use Origin\Utility\Inflector;
 
 class Entity
 {
@@ -357,7 +357,7 @@ class Entity
      */
     public function toXml()
     {
-        $root = Inflector::variable($this->_name ?? 'record');
+        $root = Inflector::camelCase($this->_name ?? 'record');
 
         return Xml::fromArray([$root => $this->toArray()]);
     }
