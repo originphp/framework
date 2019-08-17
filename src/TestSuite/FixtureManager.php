@@ -47,19 +47,21 @@ class FixtureManager
     {
         $this->testCaseName = get_class($test);
         
-        # Create Tables or Truncate
-        $this->disableForeignKeyConstraints();
-        foreach ($test->fixtures as $fixture) {
-            $this->loadFixture($fixture);
-        }
-        $this->enableForeignKeyConstraints();
+        if ($test->fixtures) {
+            # Create Tables or Truncate
+            $this->disableForeignKeyConstraints();
+            foreach ($test->fixtures as $fixture) {
+                $this->loadFixture($fixture);
+            }
+            $this->enableForeignKeyConstraints();
 
-        # Insert Records for Fixtures
-        $this->disableForeignKeyConstraints();
-        foreach ($test->fixtures as $fixture) {
-            $this->loadRecords($fixture);
+            # Insert Records for Fixtures
+            $this->disableForeignKeyConstraints();
+            foreach ($test->fixtures as $fixture) {
+                $this->loadRecords($fixture);
+            }
+            $this->enableForeignKeyConstraints();
         }
-        $this->enableForeignKeyConstraints();
     }
 
     /**
@@ -70,11 +72,13 @@ class FixtureManager
      */
     public function unload($test) :void
     {
-        $this->disableForeignKeyConstraints();
-        foreach ($test->fixtures as $fixture) {
-            $this->unloadFixture($fixture);
+        if ($test->fixtures) {
+            $this->disableForeignKeyConstraints();
+            foreach ($test->fixtures as $fixture) {
+                $this->unloadFixture($fixture);
+            }
+            $this->enableForeignKeyConstraints();
         }
-        $this->enableForeignKeyConstraints();
        
         // Clear the model registry
         ModelRegistry::clear();
