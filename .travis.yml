@@ -16,6 +16,7 @@ services:
   - postgresql
   - memcached
   - redis-server
+  - docker
 before_install:
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin;'; fi
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
@@ -26,10 +27,8 @@ before_install:
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
-install:
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
-  - tar -xzf elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
+  - docker pull docker.elastic.co/elasticsearch/elasticsearch:7.3.0
+  - docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.3.0
 before_script:
   - composer install --prefer-source --no-interaction
 script:
