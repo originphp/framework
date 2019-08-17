@@ -108,7 +108,6 @@ class ElasticsearchBehaviorTest extends OriginTestCase
     public function testAfterSave()
     {
         $record = [
-            'id' => 1234,
             'author_id' => 1002,
             'title' => 'Some Random Title',
             'body' => 'A description for this post',
@@ -117,18 +116,10 @@ class ElasticsearchBehaviorTest extends OriginTestCase
         ];
         $record = $this->Article->new($record);
         $this->assertTrue($this->Article->save($record));
-    }
 
-    /**
-     * Issues on travis with test halting randomly with php 7.3. Split to debug.
-     *
-     * @return void
-     */
-    public function testItsIndex()
-    {
         $this->wait();
         $result = $this->Article->search('Some Random Title');
-        $this->assertEquals(1234, $result[0]->id);
+        $this->assertEquals($record->id, $result[0]->id);
     }
 
     public function testAfterDelete()
