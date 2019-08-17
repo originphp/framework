@@ -11,6 +11,7 @@ class DbSchemaLoadCommandTest extends OriginTestCase
 
     protected function setUp() : void
     {
+        parent::setUp();
         // Create copy
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP TABLE IF EXISTS authors');

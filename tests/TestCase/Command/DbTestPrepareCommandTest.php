@@ -10,8 +10,9 @@ class DbTestPrepareCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function startup()
+    protected function setUp() : void
     {
+        parent::setUp();
         $config = $this->config = ConnectionManager::config('test');
         $config['database'] = 'tmp123';
         ConnectionManager::config('test', $config);
@@ -24,8 +25,9 @@ class DbTestPrepareCommandTest extends OriginTestCase
         $this->assertRegExp('/Executed ([0-9]) statements/', $this->output());
     }
 
-    public function shutdown()
+    protected function tearDown() : void
     {
+        parent::tearDown();
         // ConnectionManager::execute('drop table migrations');
         ConnectionManager::drop('test');
         ConnectionManager::config('test', $this->config);

@@ -22,8 +22,9 @@ class ElasticsearchReindexCommandTest extends OriginTestCase
 
     use ConsoleIntegrationTestTrait;
 
-    public function startup()
+    protected function setUp() : void
     {
+        parent::setUp();
         if (env('ELASTICSEARCH_HOST') === null) {
             $this->markTestSkipped('Elasticsearch not available');
         }
