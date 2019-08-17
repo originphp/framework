@@ -24,6 +24,10 @@ class ElasticsearchReindexCommandTest extends OriginTestCase
 
     public function startup()
     {
+        if (env('ELASTICSEARCH_HOST') === null) {
+            $this->markTestSkipped('Elasticsearch not available');
+        }
+        
         ModelRegistry::set('Article', new Article(['datasource' => 'test']));
         ModelRegistry::set('User', new Model(['name' => 'User','datasource' => 'test']));
     }
