@@ -73,8 +73,9 @@ class DbSetupCommandTest extends OriginTestCase
     {
         $this->exec('db:setup --datasource=dummy --type=php');
         $this->assertExitSuccess();
+        $expected = ConnectionManager::get('test')->engine() === 'pgsql'?9:7;
         $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema.php');
-        $this->assertOutputContains('Executed 7 statements');
+        $this->assertOutputContains('Executed '.$expected.' statements');
         $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.php');
         $this->assertOutputContains('Executed 11 statements');
     }
