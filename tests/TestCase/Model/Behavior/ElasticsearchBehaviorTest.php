@@ -47,6 +47,10 @@ class ElasticsearchBehaviorTest extends OriginTestCase
     {
         parent::setUp();
         $this->Article = new Article(['datasource' => 'test']);
+
+        if (env('ELASTICSEARCH_HOST') === null) {
+            $this->markTestSkipped('Elasticsearch not available');
+        }
     }
 
     public function testIndex()

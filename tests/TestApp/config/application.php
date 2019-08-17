@@ -28,12 +28,14 @@ Configure::write('Cookie.key', md5('-----ORIGIN PHP-----')); // For testing
 
 use Origin\Utility\Elasticsearch;
 
-Elasticsearch::config('test', [
-    'host' => env('ELASTICSEARCH_HOST'),
-    'port' => 9200,
-    'ssl' => false,
-    'timeout' => 400,
-]);
+if (env('ELASTICSEARCH_HOST')) {
+    Elasticsearch::config('test', [
+        'host' => env('ELASTICSEARCH_HOST'),
+        'port' => 9200,
+        'ssl' => false,
+        'timeout' => 400,
+    ]);
+}
 
 /*
  * Load your plugins here
