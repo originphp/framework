@@ -3,7 +3,6 @@ namespace Origin\Test\Command;
 
 use Origin\Console\ConsoleIo;
 use Origin\TestSuite\TestTrait;
-use Origin\TestSuite\OriginTestCase;
 use Origin\Command\PluginInstallCommand;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
@@ -17,7 +16,7 @@ class MockPluginInstallCommand extends PluginInstallCommand
  * Its a mockery trying to test this
  */
 
-class PluginInstallCommandTest extends OriginTestCase
+class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
 {
     use ConsoleIntegrationTestTrait;
   
@@ -93,37 +92,4 @@ class PluginInstallCommandTest extends OriginTestCase
         $this->assertExitError();
         $this->assertErrorContains('Plugin `make` already exists');
     }
-
-    /*
-    public function testExecute(){
-        $this->exec('plugin:install originphp/framework DummyPlugin');
-        $this->assertExitSuccess();
-        $this->assertOutputContains('DummyPlugin Plugin installed');
-        $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
-        $this->assertContains("Plugin::load('DummyPlugin')",$bootstrap);
-    }
-
-
-    public function shutdown(){
-        $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
-        file_put_contents(CONFIG . '/bootstrap.php',str_replace("\nPlugin::load('DummyPlugin');\n",'',$bootstrap));
-        if(file_exists(PLUGINS . DS . 'dummy_plugin')){
-            $this->rmdir(PLUGINS . DS . 'dummy_plugin');
-        }
-    }
-
-    public function rmdir(string $directory)
-    {
-        $files = array_diff(scandir($directory), ['.', '..']);
-        foreach ($files as $filename) {
-            if(is_dir($directory . DS . $filename)){
-                $this->rmdir($directory . DS . $filename);
-                continue;
-            }
-            unlink($directory . DS . $filename);
-        }
-
-        return rmdir($directory);
-    }
-      */
 }

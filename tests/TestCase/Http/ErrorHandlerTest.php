@@ -256,13 +256,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('<h1>An Internal Error Has Occured</h1>', $errorHandler->response);
     }
 
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         Router::request(new Request());
         Configure::write('debug', true);
     }
-    public function tearDown()
+    protected function tearDown() : void
     {
         parent::tearDown();
         

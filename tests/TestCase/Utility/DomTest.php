@@ -15,12 +15,11 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Dom;
-use Origin\TestSuite\OriginTestCase;
 
 /**
  * @property \Lib\Dom $Dom
  */
-class DomTest extends OriginTestCase
+class DomTest extends \PHPUnit\Framework\TestCase
 {
     public function testSelectorTag()
     {

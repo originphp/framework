@@ -15,12 +15,11 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
-use Origin\TestSuite\OriginTestCase;
 
 include_once APP . DS . 'db' . DS . 'schema.php';
 include_once APP . DS . 'db' . DS . 'seed.php';
 
-class SeedTest extends OriginTestCase
+class SeedTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp() : void
     {

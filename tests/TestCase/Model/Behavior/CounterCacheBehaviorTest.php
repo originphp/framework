@@ -45,7 +45,7 @@ class CounterCacheBehaviorTest extends OriginTestCase
 {
     public $fixtures = ['Origin.CounterCachePost','Origin.CounterCacheReply'];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->Post = ModelRegistry::get('Post', [

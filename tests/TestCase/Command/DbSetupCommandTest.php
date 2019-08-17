@@ -2,10 +2,9 @@
 namespace Origin\Test\Command;
 
 use Origin\Model\ConnectionManager;
-use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
-class DbSetupCommandTest extends OriginTestCase
+class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
 {
     use ConsoleIntegrationTestTrait;
 

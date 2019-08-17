@@ -43,7 +43,7 @@ class ElasticsearchBehaviorTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Article'];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->Article = new Article(['datasource' => 'test']);

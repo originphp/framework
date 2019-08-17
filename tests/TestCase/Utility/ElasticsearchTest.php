@@ -8,7 +8,7 @@ use Origin\Utility\Exception\ElasticsearchException;
 
 class ElasticsearchTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp() : void
+    protected function setUp() : void
     {
         if (env('ELASTICSEARCH_HOST') === null) {
             $this->markTestSkipped('Elasticsearch not available');

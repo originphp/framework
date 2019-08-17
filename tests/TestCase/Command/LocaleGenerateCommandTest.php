@@ -2,10 +2,9 @@
 namespace Origin\Test\Command;
 
 use Origin\Utility\Folder;
-use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
-class LocaleGenerateCommandTest extends OriginTestCase
+class LocaleGenerateCommandTest extends \PHPUnit\Framework\TestCase
 {
     use ConsoleIntegrationTestTrait;
 

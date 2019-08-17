@@ -16,14 +16,11 @@ namespace Origin\Test\Model;
 
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
-use Origin\TestSuite\OriginTestCase;
 
-class SchemaTest extends OriginTestCase
+include_once APP . DS . 'db' . DS . 'schema.php';
+
+class SchemaTest extends \PHPUnit\Framework\TestCase
 {
-    public function initialize()
-    {
-        include_once APP . DS . 'db' . DS . 'schema.php';
-    }
     public function testCreateSql()
     {
         $schema = new \ApplicationSchema();

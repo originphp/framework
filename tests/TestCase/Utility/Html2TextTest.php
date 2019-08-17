@@ -18,7 +18,7 @@ use Origin\Utility\Html2Text;
 
 class Html2TextTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->markTestSkipped('This class is being deprecated');
