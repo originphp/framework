@@ -26,14 +26,9 @@ before_install:
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
-install:
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
-  - tar -xzf elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
 before_script:
   - composer install --prefer-source --no-interaction
 script:
-  - sleep 10
   - vendor/bin/phpunit --coverage-clover=clover.xml
 after_script:
   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
