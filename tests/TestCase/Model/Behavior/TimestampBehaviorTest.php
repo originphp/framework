@@ -20,10 +20,8 @@ use Origin\Model\Behavior\TimestampBehavior;
 
 class TimestampBehaviorTest extends OriginTestCase
 {
-    public function initialize()
-    {
-        $this->loadFixture('Origin.Article');
-    }
+    public $fixtures = ['Origin.Article'];
+
     public function testBeforeSaveCreate()
     {
         $Article = new Model(['name' => 'Article','datasource' => 'test']);

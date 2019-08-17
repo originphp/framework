@@ -17,15 +17,12 @@ namespace Origin\Test\Model;
 use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 
+include_once APP . DS . 'db' . DS . 'schema.php';
+include_once APP . DS . 'db' . DS . 'seed.php';
+
 class SeedTest extends OriginTestCase
 {
-    public function initialize()
-    {
-        include_once APP . DS . 'db' . DS . 'schema.php';
-        include_once APP . DS . 'db' . DS . 'seed.php';
-    }
-
-    public function startup()
+    protected function setUp() : void
     {
         $connection = ConnectionManager::get('test');
         $schema = new \ApplicationSchema();
@@ -47,7 +44,7 @@ class SeedTest extends OriginTestCase
         $connection->commit();
     }
 
-    public function shutdown()
+    protected function tearDown() : void
     {
         $connection = ConnectionManager::get('test');
         $schema = new \ApplicationSchema();

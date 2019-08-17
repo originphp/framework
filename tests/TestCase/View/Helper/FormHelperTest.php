@@ -71,10 +71,8 @@ class MockFormHelper extends FormHelper
 
 class FormHelperTest extends OriginTestCase
 {
-    public function initialize()
-    {
-        $this->loadFixture('Origin.Post');
-    }
+    public $fixtures = ['Origin.Post'];
+    
     protected function setUp(): void
     {
         $request = new Request('widgets/edit');
