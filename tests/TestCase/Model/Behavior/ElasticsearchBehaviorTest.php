@@ -118,7 +118,7 @@ class ElasticsearchBehaviorTest extends OriginTestCase
         $record = $this->Article->new($record);
         $this->assertTrue($this->Article->save($record));
         $this->wait();
-        $result = $this->Article->search('Some Random Title', 'title');
+        $result = $this->Article->search('Some Random Title');
         $this->assertEquals(1234, $result[0]->id);
     }
 
