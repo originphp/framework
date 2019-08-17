@@ -293,7 +293,7 @@ class Elasticsearch
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
      *
-     * @param string $index index name e.g development_posts
+     * @param string|array $index index name e.g development_posts or ['posts','users']
      * @param array|string a query string or array query.
      *  example query strings:  'php', '+php +framework', 'title:how to', '(new york city) OR (big apple)'
      *  example using request body
@@ -307,8 +307,9 @@ class Elasticsearch
     *   ];
     * @return array
     */
-    public function search(string $index, $query) : array
+    public function search($index, $query) : array
     {
+        $index = implode(',', (array) $index);
         $url = "{$this->url}/{$index}/_search";
 
         if (is_string($query)) {
