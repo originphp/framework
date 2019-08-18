@@ -341,12 +341,12 @@ EOF;
         $this->assertEquals($expected, Html::stripTags($html, ['script','iframe']));
     }
 
-    public function testSantize()
+    public function testSanitize()
     {
-        $html = '<div><h1>Heading</h1><a href="https:/www.google.com" class="link">Google</a><img src="javascript:alert(\'hello\);"><div>';
+        $html = '<div><h1 class="foo">Heading</h1><a href="https:/www.google.com" class="link">Google</a><img src="javascript:alert(\'hello\);"><div>';
         $tags = ['div','h1','a' => ['class','style']];
         // link href removed (Attribute)
         // image completely removed (element)
-        $this->assertEquals('<div><h1>Heading</h1><a class="link">Google</a><div></div></div>', Html::sanitize($html, ['tags' => $tags]));
+        $this->assertEquals('<div><h1>Heading</h1><a class="link">Google</a><div></div></div>', Html::sanitize($html, $tags));
     }
 }

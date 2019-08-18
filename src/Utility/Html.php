@@ -381,38 +381,40 @@ class Html
      * Cleans up user inputted html for saving to a database
      *
      * @param string $html
-     * @param array $options
-     *   - tags: default:['h1','h2','h3','h4','h5','h6','p','i','em','strong','b','blockquote',
-     *           'a', 'ul','li','ol','br','code','pre','div','span'] an array of tags to be allowed e.g. ['p','h1']
-     * To allow certain attributes ['p'=>['class','style]];
-     *
+     * @param array tags An array of tags to be allowed e.g. ['p','h1'] or to
+     * only allow certain attributes on tags ['p'=>['class','style]];
+     * The defaults are :
+     * ['h1', 'h2', 'h3', 'h4', 'h5', 'h6','p','i', 'em', 'strong', 'b', 'del', 'blockquote' => ['cite']
+     * 'a','ul', 'li', 'ol', 'br','code', 'pre', 'div', 'span']
      * @return string
      */
-    public static function sanitize(string $html, array $options = []): string
+    public static function sanitize(string $html, array $tags = null): string
     {
-        $options += [
-            'tags' => [
-                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                'p',
-                'i', 'em', 'strong', 'b', 'del',
-                'blockquote' => ['cite'],
-                'a',
-                'ul', 'li', 'ol', 'br',
-                'code', 'pre',
-                'div', 'span',
-            ],
+        $defaults = [
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6','p','i', 'em', 'strong', 'b', 'del', 'blockquote' => ['cite'],'a','ul', 'li', 'ol', 'br','code', 'pre', 'div', 'span',
         ];
 
-        // Normalize options
-        $tags = [];
-        foreach ((array) $options['tags'] as $key => $value) {
+        if ($tags === null) {
+            $tags = $defaults;
+        }
+
+        /**
+         * @deprecated This was a mistake and was corrected. this provides backwards comptability.
+         */
+        if (isset($tags['tags'])) {
+            deprecationWarning('Html::sanitize options does not need tags key.');
+            $tags = [$tags['tags']];
+        }
+
+        // Normalize tag options
+        $options = [];
+        foreach ($tags as $key => $value) {
             if (is_int($key)) {
                 $key = $value;
                 $value = [];
             }
-            $tags[$key] = $value;
+            $options[$key] = $value;
         }
-        $options['tags'] = $tags;
 
         $html = str_replace(["\r\n", "\n"], PHP_EOL, $html); // Standardize line endings
         /**
@@ -422,7 +424,7 @@ class Html
         $doc->preserveWhiteSpace = false;
 
         /**
-         * Add html/body but not doctype. body will be remoed later
+         * Add html/body but not doctype. body will be removed later
          */
         @$doc->loadHTML($html, LIBXML_HTML_NODEFDTD);
         foreach ($doc->firstChild->childNodes as $node) {
@@ -439,11 +441,11 @@ class Html
      * @param array $options
      * @return void
      */
-    protected static function _sanitize(DomNode $node, array $options = []): void
+    protected static function _sanitize(DomNode $node, array $tags = []): void
     {
         if ($node->hasChildNodes()) {
             for ($i = 0; $i < $node->childNodes->length; $i++) {
-                static::_sanitize($node->childNodes->item($i), $options);
+                static::_sanitize($node->childNodes->item($i), $tags);
             }
         }
         if ($node->nodeType !== XML_ELEMENT_NODE) {
@@ -451,7 +453,7 @@ class Html
         }
 
         $remove = $change = $attributes = [];
-        if (! isset($options['tags'][$node->nodeName]) and $node->nodeName !== 'body') {
+        if (! isset($tags[$node->nodeName]) and $node->nodeName !== 'body') {
             $remove[] = $node;
             /* This is for keeping text between divs. Keep for now until committed
             foreach ($node->childNodes as $child) {
@@ -462,7 +464,7 @@ class Html
 
         if ($node->attributes) {
             foreach ($node->attributes as $attr) {
-                if (! isset($options['tags'][$node->nodeName]) or ! in_array($attr->nodeName, $options['tags'][$node->nodeName])) {
+                if (! isset($tags[$node->nodeName]) or ! in_array($attr->nodeName, $tags[$node->nodeName])) {
                     $attributes[] = $attr->nodeName;
                 }
             }

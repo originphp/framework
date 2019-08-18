@@ -204,15 +204,13 @@ class Markdown
         */
        
         $markdown = Html::sanitize($markdown, [
-            'tags' => [
-                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                'p',
-                'i', 'em', 'strong', 'b', 'blockquote', 'del',
-                'a' => ['href'],
-                'ul', 'li', 'ol', 'br',
-                'code', 'pre',
-                'img' => ['src','alt'],
-            ],
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'p',
+            'i', 'em', 'strong', 'b', 'blockquote', 'del',
+            'a' => ['href'],
+            'ul', 'li', 'ol', 'br',
+            'code', 'pre',
+            'img' => ['src','alt'],
         ]);
     
         return trim($markdown);
