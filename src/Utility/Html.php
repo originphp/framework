@@ -403,7 +403,7 @@ class Html
          */
         if (isset($tags['tags'])) {
             deprecationWarning('Html::sanitize options does not need tags key.');
-            $tags = [$tags['tags']];
+            $tags = $tags['tags'];
         }
 
         // Normalize tag options
