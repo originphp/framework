@@ -97,8 +97,7 @@ class CommandRunner
             }
             $object = new $class();
             $name = $object->name();
-            $description = $object->description();
-
+  
             list($ns, $cmd) = commandSplit($name);
             $results[$ns][$name] = $object->description();
         }
