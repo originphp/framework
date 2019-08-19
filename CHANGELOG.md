@@ -23,15 +23,23 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ## [1.27.0] - 2019-08-*
+Cleaned up a code a bit, there are almost 10k lines of code written over a year, fixed comments and added return types for internal functions. Split inflector to Utility namespace with method name changes (see changes)
+
+### Changes
+- new Inflector class  - major difference is camelCase now returns lower case first letter, and studly caps terminology is used for upper first case
 
 ### Deprecated
-- Model:delete arguments change. `delete($entity,$options)` use to be `delete($entity,$cascade,$callbacks)`;
+- Origin\Core\Inflector is now Origin\Utility\Inflector, function names have been changed
+- Model:delete arguments change to be more inline with framework style. `delete($entity,$options)` used to be `delete($entity,$cascade,$callbacks)`;
 
 ### Added
+- Generate command tests for Behaviors,Helpers, Components and Middleware
 - Elasticsearch (Utility/Behavior and Command) 
 - Command output with context support for info/debug/out/warning/error/success etc
 
 ### Fixed
+- Paginator component was blocking string page numbers
+- Html:sanitize options array was using tags options key which was suppose to be refactored during design stage.
 - Markdown::toHtml code blocks had spaced removed due to santization
 - Describe was not picking up fulltext indexes
 - Legacy handler for db commands switched to SQL

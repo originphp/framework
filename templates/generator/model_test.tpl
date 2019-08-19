@@ -11,8 +11,9 @@ class %class%Test extends OriginTestCase
 {
     public $fixtures = ['%class%'];
 
-    protected function setUp(): void
+    public function startup()
     {
+        parent::startup();
         $this->%class% = ModelRegistry::get('%class%');
         parent::setUp();
     }

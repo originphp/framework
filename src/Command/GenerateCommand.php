@@ -129,6 +129,12 @@ class GenerateCommand extends Command
             $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Behavior'.DS."{$data['class']}Behavior.php",
             $data
         );
+
+        $this->generate(
+            $this->getTemplateFilename('behavior_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Behavior'.DS."{$data['class']}BehaviorTest.php",
+            $data
+        );
     }
 
     protected function command(array $data)
@@ -160,8 +166,9 @@ class GenerateCommand extends Command
         if ($params) {
             foreach ($params as $method) {
                 if (preg_match('/^[a-z_0-9]+/', $method)) {
-                    $controllerMethods .= "    function {$method}(){\n    }\n\n";
-                    $testMethods .= '    function test'.ucfirst($method)."(){\n    }\n\n";
+                    $method = Inflector::camelCase($method);
+                    $controllerMethods .= "    function {$method}()\n    {\n    }\n\n";
+                    $testMethods .= '    function test'. ucfirst($method) ."()\n    {\n    }\n\n";
                 }
             }
         }
@@ -198,6 +205,12 @@ class GenerateCommand extends Command
             $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS.'Component'.DS."{$data['class']}Component.php",
             $data
         );
+
+        $this->generate(
+            $this->getTemplateFilename('component_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Controller'.DS.'Component'.DS."{$data['class']}ComponentTest.php",
+            $data
+        );
     }
 
     protected function helper(array $data)
@@ -207,6 +220,12 @@ class GenerateCommand extends Command
             $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.'Helper'.DS."{$data['class']}Helper.php",
             $data
         );
+
+        $this->generate(
+            $this->getTemplateFilename('helper_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'View'.DS.'Helper'.DS."{$data['class']}HelperTest.php",
+            $data
+        );
     }
 
     protected function middleware(array $data)
@@ -214,6 +233,12 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('middleware'),
             $this->getBaseFolder($data['name'], self::SRC).DS.'Middleware'.DS."{$data['class']}Middleware.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('middleware_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Middleware'.DS."{$data['class']}MiddlewareTest.php",
             $data
         );
     }
