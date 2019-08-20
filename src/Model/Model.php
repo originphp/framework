@@ -717,8 +717,14 @@ class Model
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
             } else {
                 $result = $connection->insert($this->table, $data);
-                $this->id = $connection->lastInsertId();
-                $entity->{$this->primaryKey} = $this->id;
+                /**
+                 * Postgresql lastInsertId error if you specify wrong id.
+                 * @internal lastval is not yet defined in this session
+                 */
+                if (! isset($entity->{$this->primaryKey})) {
+                    $entity->{$this->primaryKey} = $connection->lastInsertId();
+                }
+                $this->id = $entity->{$this->primaryKey};
             }
         }
 
@@ -972,7 +978,7 @@ class Model
              * it can return false but HABTM is ok, and we need to capture false from
              * callbacks.
              */
-
+            
             $result = $this->processSave($data, $options);
         }
 

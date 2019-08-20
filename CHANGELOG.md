@@ -21,6 +21,14 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.27.1] - 2019-08-20
+
+### Changed
+- Log file engine, file parameter changed to filename as this better fits since the path option is also avilable.
+
+### Fixed
+- Fixed issue with postgresql lastval is not yet defined in this session
+- Fixed issue caused by constraint failure during tests
 
 ## [1.27.0] - 2019-08-19
 Cleaned up a code a bit, there are almost 10k lines of code written over a year, fixed comments and added return types for internal functions. Split inflector to Utility namespace with method name changes (see changes)

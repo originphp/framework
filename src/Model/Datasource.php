@@ -172,17 +172,16 @@ abstract class Datasource
     /**
      * Executes a sql query.
      *
-     * @param string $sql    statement
-     * @param array  $params array('name'=>'John') or array('p1'=>'John')
+     * @param string $sql SQL statement
+     * @param array  $params ['name'=>'John'] or ['p1'=>'John']
      * @return bool result
      */
     public function execute(string $sql, array $params = []) :bool
     {
         try {
             $start = microtime(true);
-
             $this->statement = $query = $this->connection->prepare($sql);
-
+           
             $result = $query->execute($params);
             if (Configure::read('debug')) {
                 $this->log[] = [
@@ -199,6 +198,12 @@ abstract class Datasource
             }
         } catch (PDOException $e) {
             Log::debug($this->unprepare($sql, $params));
+
+            /**
+             * Important: rollback transcation if one was started.
+             */
+            $this->rollback();
+            
             throw new DatasourceException($e->getMessage());
         }
 
@@ -258,7 +263,7 @@ abstract class Datasource
     }
 
     /**
-     * Rolls back the current transaction.
+     * Rolls back the current transaction (if a transcation was started)
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
