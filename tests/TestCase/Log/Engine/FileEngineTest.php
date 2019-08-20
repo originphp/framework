@@ -18,11 +18,17 @@ use Origin\Log\Engine\FileEngine;
 
 class FileEngineTest extends \PHPUnit\Framework\TestCase
 {
+    public function testName()
+    {
+        $this->expectException(\ErrorException::class);
+        $engine = new FileEngine(['file' => 'foo.log']);
+        $this->assertEquals('foo.log', $engine->config('filename'));
+    }
     public function testDefaultConfig()
     {
         $engine = new FileEngine();
         $this->assertEquals(LOGS, $engine->config('path'));
-        $this->assertEquals('development.log', $engine->config('file'));
+        $this->assertEquals('development.log', $engine->config('filename'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
     }

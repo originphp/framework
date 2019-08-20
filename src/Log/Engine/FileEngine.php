@@ -24,7 +24,7 @@ class FileEngine extends BaseEngine
      * @var array
      */
     protected $defaultConfig = [
-        'file' => null,
+        'filename' => null,
         'path' => LOGS,
         'levels' => [],
         'channels' => [],
@@ -32,12 +32,20 @@ class FileEngine extends BaseEngine
 
     public function initialize(array $config)
     {
-        if ($this->config('file') === null) {
-            $file = 'application.log';
+        /**
+         * @deprecated this was changed, so this is to provide
+         * backwards comptability
+         */
+        if (isset($this->config['file'])) {
+            $this->config['filename'] = $this->config['file'];
+            deprecationWarning('FileEngine option file deprecated use filename instead');
+        }
+        if ($this->config('filename') === null) {
+            $filename = 'application.log';
             if (Configure::read('debug')) {
-                $file = 'development.log';
+                $filename = 'development.log';
             }
-            $this->config('file', $file);
+            $this->config('filename', $filename);
         }
     }
 
@@ -52,7 +60,7 @@ class FileEngine extends BaseEngine
     public function log(string $level, string $message, array $context = [])
     {
         $message = $this->format($level, $message, $context) . "\n";
-        $file = $this->config('path') . DS . $this->config('file');
+        $file = $this->config('path') . DS . $this->config('filename');
 
         return (bool) file_put_contents($file, $message, FILE_APPEND | LOCK_EX);
     }
