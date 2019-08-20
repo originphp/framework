@@ -269,7 +269,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         Configure::write('debug', true);
 
         $logger = Log::engine('default');
-        $file = LOGS . DS . $logger->config('file');
+        $file = LOGS . DS . $logger->config('filename');
         if (file_exists($file)) {
             unlink($file);
         }
