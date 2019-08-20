@@ -57,7 +57,7 @@ class PaginatorComponent extends Component
         /**
          * Security: block non integer values here
          */
-        if (! is_int($settings['page'])) {
+        if (! ctype_digit((string) $settings['page'])) {
             throw new NotFoundException('Invalid Page Value');
         }
      

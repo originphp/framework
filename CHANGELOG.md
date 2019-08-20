@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.27.2] - 2019-08-20
+
+### Fixed
+- Paginator component was blocking string page numbers
+
 ## [1.27.1] - 2019-08-20
 
 ### Changed
@@ -46,7 +51,6 @@ Cleaned up a code a bit, there are almost 10k lines of code written over a year,
 - Command output with context support for info/debug/out/warning/error/success etc
 
 ### Fixed
-- Paginator component was blocking string page numbers
 - Html:sanitize options array was using tags options key which was suppose to be refactored during design stage.
 - Markdown::toHtml code blocks had spaced removed due to santization
 - Describe was not picking up fulltext indexes
