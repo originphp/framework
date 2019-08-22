@@ -20,10 +20,64 @@
 namespace Origin\Queue;
 
 use Origin\Model\Model;
+use Origin\Core\StaticConfigTrait;
+use Origin\Queue\Engine\BaseEngine;
 use Origin\Exception\InvalidArgumentException;
 
 class Queue
 {
+    use StaticConfigTrait;
+
+    /**
+     * Holds the queue engines
+     *
+     * @var array
+     */
+    protected static $loaded = [];
+    
+    /**
+     * Gets the configured connection
+     *
+     * @param string $name
+     * @return \Origin\Queue\Engine\BaseEngine
+     */
+    public static function connection(string $name) : BaseEngine
+    {
+        if (isset(static::$loaded[$name])) {
+            return static::$loaded[$name];
+        }
+
+        return static::$loaded[$name] = static::buildEngine($name);
+    }
+
+    /**
+     * Builds an engine using the configuration
+     *
+     * @param string $name
+     * @throws \Origin\Exception\InvalidArgumentException
+     * @return \Origin\Queue\Engine\BaseEngine
+     */
+    protected static function buildEngine(string $name) : BaseEngine
+    {
+        $config = static::config($name);
+        if ($config) {
+            if (isset($config['engine'])) {
+                $config['className'] = __NAMESPACE__  . "\Engine\\{$config['engine']}Engine";
+            }
+            if (empty($config['className']) or ! class_exists($config['className'])) {
+                throw new InvalidArgumentException("Queue engine for {$name} could not be found");
+            }
+
+            return new $config['className']($config);
+        }
+        throw new InvalidArgumentException("{$name} config does not exist");
+    }
+
+    /**
+     * @deprecated code below is for old queue and is going to be
+     * deprecated
+     */
+
     /**
      * Holds the model for the job
      *
@@ -97,7 +151,7 @@ class Queue
      * Fetches the next job from a queue and locks it. Remember to work with the queue in a try/catch block
      *
      * @param string $queue name of queue
-     * @return \Origin\Model\Entity|bool
+     * @return \Origin\Queue\QueueJob|bool
      */
     public function fetch(string $queue)
     {
@@ -105,7 +159,7 @@ class Queue
         $conditions = ['queue' => $queue,'status' => 'queued','locked = \'0\' ','scheduled <=' => date('Y-m-d H:i:s')];
         if ($result = $this->Job->find('first', ['conditions' => $conditions])) {
             if ($this->claim($result->id)) {
-                return new Job($this->Job, $result);
+                return new QueueJob($this->Job, $result);
             }
         }
 

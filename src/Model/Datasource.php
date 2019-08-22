@@ -190,6 +190,12 @@ abstract class Datasource
                     'affected' => $this->lastAffected(),
                     'time' => microtime(true) - $start,
                 ];
+                /**
+                 * Limit to 200 queries to prevent memory issues
+                 */
+                if (count($this->log) > 200) {
+                    array_shift($this->log);
+                }
             }
             
             // Fallback if disabled PDO::ERRMODE_EXCEPTION flag
