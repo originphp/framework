@@ -516,7 +516,7 @@ class ArgumentParser
                 $text .= '=' . $option['banner'] ;
             }
             $help = $option['description'];
-            if (! empty($option['default'])) {
+            if (array_key_exists('default', $option) and $option['default'] !== null) {
                 $default = " <yellow>[default: {$option['default']}]</yellow>";
                 if (is_array($help)) {
                     $rows = count($help);
