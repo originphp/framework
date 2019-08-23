@@ -24,54 +24,22 @@ class QueueFixture extends Fixture
 
     public $schema = [
         'columns' => [
-            'id' => ['type' => 'integer','autoIncrement' => true],
-            'queue' => [
-                'type' => 'string',
-                'limit' => 80,
-                'default' => null,
-                'null' => false,
-            ],
-            'data' => [
-                'type' => 'text',
-                'default' => null,
-                'null' => false,
-            ],
-            'status' => [
-                'type' => 'string',
-                'limit' => 40,
-                'default' => null,
-                'null' => false,
-            ],
-            'locked' => [
-                'type' => 'boolean',
-                'default' => false,
-                'null' => true,
-            ],
-            'tries' => [
-                'type' => 'integer',
-                'limit' => 1,
-                'default' => 0,
-                'null' => true,
-            ],
-            'scheduled' => [
-                'type' => 'datetime',
-                'default' => null,
-                'null' => false,
-            ],
-            'created' => [
-                'type' => 'datetime',
-                'default' => null,
-                'null' => false,
-            ],
-            'modified' => [
-                'type' => 'datetime',
-                'default' => null,
-                'null' => false,
-            ],
+            'id' => ['type' => 'integer', 'limit' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'autoIncrement' => true],
+            'queue' => ['type' => 'string', 'limit' => 80, 'null' => false, 'default' => null],
+            'data' => ['type' => 'text', 'null' => false,'limit' => 16777215, 'default' => null],
+            'status' => ['type' => 'string', 'limit' => 40, 'null' => false, 'default' => null],
+            'locked' => ['type' => 'datetime', 'null' => true, 'default' => null],
+            'scheduled' => ['type' => 'datetime', 'null' => false, 'default' => null],
+            'created' => ['type' => 'datetime', 'null' => false, 'default' => null],
+            'modified' => ['type' => 'datetime', 'null' => false, 'default' => null],
         ],
         'constraints' => [
-            'primary' => ['type' => 'primary','column' => 'id'],
+            'primary' => ['type' => 'primary', 'column' => 'id'],
         ],
+        'indexes' => [
+            'queue_index' => ['type' => 'index', 'column' => 'queue'],
+        ],
+        'options' => ['engine' => 'InnoDB', 'collation' => 'utf8mb4_0900_ai_ci','autoIncrement' => 1000],
      
     ];
 }

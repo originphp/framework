@@ -19,7 +19,7 @@ use Origin\Exception\InvalidArgumentException;
 
 class QueueTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    public $fixtures = ['Origin.QueueLegacy'];
 
     /**
      * Undocumented variable

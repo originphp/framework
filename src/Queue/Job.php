@@ -12,297 +12,144 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+/**
+ * This is a Queue System with a MySQL backend.
+ * @todo investigate using pcntl_signal/ pcntl_alarm for timing out tasks
+ */
+
 namespace Origin\Queue;
 
-use \ArrayObject;
-use Origin\Model\ModelRegistry;
-use Origin\Queue\Engine\BaseEngine;
-use Origin\Model\Exception\MissingModelException;
+use Origin\Model\Model;
+use Origin\Model\Entity;
 
 class Job
 {
     /**
-     * The name of the queue for this job
+     * Holds the last id of Job
      *
-     * @var string
+     * @var int
      */
-    public $queue = 'default';
+    public $id = null;
 
     /**
-     * The name of the connection to use
+     * Holds the model for the job
      *
-     * @var string
+     * @var \Origin\Model\Model
      */
-    public $connection = 'default';
+    protected $Job = null;
 
     /**
-     * A strtotime compatible string used to schedule when the job
-     * will be run
+     * Holds the message data
      *
-     * @example '+5 minutes' '2019-08-20 10:23:00'
-     * @var string
+     * @var Object
      */
-    public $schedule = 'now';
+    protected $data = null;
 
     /**
-     * This is the display name for the job
+     * Holds the entity
      *
-     * @var string
+     * @var \Origin\Model\Entity
      */
-    public $name = null;
+    protected $entity = null;
+
+    public function __construct(Model $job, Entity $entity)
+    {
+        $this->Job = $job;
+        $this->id = $entity->id;
+        $this->entity = $entity;
+    }
 
     /**
-     * Job identifier
+     * Returns the message data as an object
      *
-     * @var mixed
+     * @param boolean $array return as array instead of object
+     * @return object|array
      */
-    protected $id = null;
+    public function data(bool $array = false)
+    {
+        return json_decode($this->entity->data, $array);
+    }
     
     /**
-     * These are the arguments that will be passed on to execute
+     * Once the job is finished run this
      *
-     * @var array
+     * @return boolean
      */
-    protected $arguments = [];
-
-    /**
-     * Number of times this has been executed
-     *
-     * @var integer
-     */
-    protected $tries = 0;
-
-    /**
-     * The date this job was enqueued.
-     *
-     * @var string
-     */
-    protected $created = null;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function executed() : bool
     {
-        $this->arguments = func_get_args();
-        $this->id = uuid();
-        
-        if ($this->name === null) {
-            $this->name = get_class($this);
-        }
-        
-        if (! method_exists($this, 'execute')) {
-            throw new Exception('Job must have an execute method');
-        }
-
-        $this->initialize();
+        return $this->setStatus('executed');
     }
 
     /**
-     * This is the construct hook
-     *
-     * @return void
-     */
-    public function initialize()
-    {
-    }
-
-    /**
-     * This is called just before execute
-     *
-     * @return void
-     */
-    public function startup()
-    {
-    }
-
-    /**
-     * This is called after execute
-     *
-     * @return void
-     */
-    public function shutdown()
-    {
-    }
-
-    /**
-     * This is the callback when an error has occured processing the job
-     *
-     * @return void
-     */
-    public function onError(Throwable $exception)
-    {
-    }
-
-    /**
-     * Setter and getter for Job ID
-     *
-     * @param string|int
-     * @return
-     */
-    public function id($id = null)
-    {
-        if ($id === null) {
-            return $this->id;
-        }
-        $this->id = $id;
-    }
-
-    /**
-    * Gets the display name
+    * If there was an error run this so you can inspect later.
     *
-    * @return string
+    * @return boolean
     */
-    public function name() : string
+    public function failed() : bool
     {
-        if (isset($this->name)) {
-            return $this->name;
+        return $this->setStatus('failed');
+    }
+
+    /**
+     * Run this to delete the job
+     *
+     * @return boolean
+     */
+
+    public function delete() : bool
+    {
+        return $this->Job->delete($this->entity);
+    }
+
+    /**
+     * Release a job backinto the queue
+     *
+     * @param string $strtotime a strtotime compatiable string, now,+5 minutes, 2022-12-31
+     * @return boolean
+     */
+    public function release($strtotime = 'now') : bool
+    {
+        $job = $this->entity;
+        $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+
+        return $this->setStatus('queued');
+    }
+
+    /**
+    * Will retry a job a maximum number of times or bury it (it will be marked as failed)
+    *
+    * @param integer $tries
+    * @param string $strtotime
+    * @return boolean
+    */
+    public function retry(int $tries, $strtotime = 'now') : bool
+    {
+        $job = $this->entity;
+        if ($job->tries < $tries) {
+            $job->tries ++;
+            $job->scheduled = date('Y-m-d H:i:s', strtotime($strtotime));
+
+            return $this->release();
         }
+        $this->failed();
 
-        return get_class($this);
+        return false;
     }
 
     /**
-     * Returns the amount of times this job has been executed
-     *
-     * @return int
+     * Sets the status of a job (and automatically releases it)
+     * @param string $status
+     * @return boolean
      */
-    public function tries() : int
+    public function setStatus(string $status)  : bool
     {
-        return $this->tries;
-    }
+        // Don't use entity since tries updated at database level
+        $job = $this->Job->new([
+            'id' => $this->entity->id,
+            'status' => $status,
+            'locked' => 0,
+        ]);
 
-    /**
-     * Inkokes the execute method to run the job.
-     *
-     * @return void
-     */
-    public function runOld() : void
-    {
-        $this->tries ++;
-        $this->startup();
-        $this->execute(...$this->arguments);
-        $this->shutdown();
-    }
-
-    /**
-     * Returns the connection for the Queue
-     *
-     * @return void
-     */
-    public function connection() : BaseEngine
-    {
-        return Queue::connection($this->connection);
-    }
-
-    public function enqueue(array $options = [])
-    {
-    }
-
-    /**
-     * Inkokes the execute method to run the job.
-     *
-     * @return void
-     */
-    public function run() : void
-    {
-        $this->tries ++;
-        try {
-            $this->startup();
-            $this->execute(...$this->arguments);
-            $this->shutdown();
-        } catch (\Exception $e) {
-            $this->onException($e);
-        }
-    }
-    /**
-     * This callback is triggered on exception
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onException(\Exception $exception)
-    {
-    }
-
-    /**
-     * Retries a job
-     *
-     * @param array $options
-     * @return void
-     */
-    public function retry(array $options = [])
-    {
-        $options += ['wait' => 'now','tries' => 3];
-        $this->connection()->retry($this, $options['tries'], $options['wait']);
-    }
-
-    /**
-     * Loads a model
-     *
-     * @param string $model
-     * @param array $options
-     * @return \Origin\Model\Model
-     */
-    public function loadModel(string $model, array $options = []) : Model
-    {
-        list($plugin, $alias) = pluginSplit($model);
-
-        if (isset($this->{$alias})) {
-            return $this->{$alias};
-        }
-
-        $this->{$alias} = ModelRegistry::get($model, $options);
-
-        if ($this->{$alias}) {
-            return $this->{$alias};
-        }
-        throw new MissingModelException($model);
-    }
-
-    /**
-     * Dispatch the job with the given arguments.
-     *
-     * @return bool
-     */
-    public static function dispatch() : bool
-    {
-        $job = new static(...func_get_args());
-
-        return Queue::connection($job->connection)->add($job);
-    }
-
-    /**
-     * Returns an array of data to be passed to connection
-     * to be serialized
-     */
-    public function serialize() : array
-    {
-        return [
-            'className' => get_class($this),
-            'id' => $this->id,
-            'queue' => $this->queue,
-            'connection' => $this->connection,
-            'arguments' => serialize(new ArrayObject($this->arguments)),
-            'tries' => $this->tries,
-            'created' => date('Y-m-d H:i:s'),
-        ];
-    }
-
-    /**
-     * Deserializes data from Job::serialize
-     *
-     * @see https://api.rubyonrails.org/v6.0.0/classes/ActiveJob/Core.html
-     * @param array $data
-     * @return void
-     */
-    public function deserialize(array $data) : void
-    {
-        $this->id = $data['id'];
-        $this->queue = $data['queue'];
-        $this->connection = $data['connection'];
-        $this->arguments = unserialize($data['arguments']);
-        $this->tries = $data['tries'];
-        $this->created = $data['created'];
+        return $this->Job->save($job);
     }
 }
