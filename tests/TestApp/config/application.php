@@ -1,7 +1,9 @@
 <?php
+use Origin\Job\Queue;
 use Origin\Cache\Cache;
 use Origin\Core\Plugin;
 use Origin\Core\Configure;
+use Origin\Utility\Elasticsearch;
 
 /*
  * This will go in your server.php file once your app has been developed.
@@ -26,8 +28,6 @@ Cache::config('default', ['engine' => 'File']);
 Configure::write('Security.pepper', '-----ORIGIN PHP-----');
 Configure::write('Cookie.key', md5('-----ORIGIN PHP-----')); // For testing
 
-use Origin\Utility\Elasticsearch;
-
 if (env('ELASTICSEARCH_HOST')) {
     Elasticsearch::config('test', [
         'host' => env('ELASTICSEARCH_HOST'),
@@ -37,6 +37,10 @@ if (env('ELASTICSEARCH_HOST')) {
     ]);
 }
 
+Queue::config('test', [
+    'engine' => 'Database',
+    'connection' => 'test',
+]);
 /*
  * Load your plugins here
  * @example Plugin::load('ContactManager');
