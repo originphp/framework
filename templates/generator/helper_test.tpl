@@ -1,8 +1,6 @@
 <?php
 namespace %namespace%\View\Helper;
 
-use %namespace%\View\Helper\AppHelper;
-
 use Origin\TestSuite\OriginTestCase;
 use Origin\Controller\Controller;
 use Origin\Http\Request;
