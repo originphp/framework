@@ -31,6 +31,7 @@ class GenerateCommand extends Command
         'component' => 'Generates a component class',
         'controller' => 'Generates a controller class',
         'helper' => 'Generates a helper class',
+        'job' => 'Generates a job class',
         'model' => 'Generates a model class',
         'middleware' => 'Generates a middleware class',
         'migration' => 'Generates a migration class',
@@ -224,6 +225,22 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('helper_test'),
             $this->getBaseFolder($data['name'], self::TEST).DS.'View'.DS.'Helper'.DS."{$data['class']}HelperTest.php",
+            $data
+        );
+    }
+
+    protected function job(array $data)
+    {
+        $data['human'] = Inflector::human($data['underscored']);
+        $this->generate(
+            $this->getTemplateFilename('job'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Job'.DS."{$data['class']}Job.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('job_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Job'.DS."{$data['class']}JobTest.php",
             $data
         );
     }
