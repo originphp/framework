@@ -249,7 +249,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'DummyTest.php';
         $this->assertOutputContains('tests/TestCase/Model/DummyTest.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('4b06378e8dfbfe793c32790761431595', $filename);
+        $this->assertFileHash('9fd68f113e6801c6d017f2e8a77c6cd2', $filename);
    
         unlink($filename);
 
@@ -294,15 +294,33 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Job'.DS.'DummyJob.php';
         $this->assertOutputContains('src/Job/DummyJob.php');
         $this->assertFileExists($filename);
- 
-        $this->assertFileHash('bdb24cc71b6f3dea6c792acba0203ce2', $filename);
+    
+        $this->assertFileHash('89103e5d3a8ed342d55132e46776cfcb', $filename);
         unlink($filename);
         
         $filename = TESTS.DS.'TestCase'.DS .'Job'.DS.'DummyJobTest.php';
        
         $this->assertOutputContains('TestCase/Job/DummyJobTest.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('55bd5feccb316086d3930b52c676a620', $filename);
+        $this->assertFileHash('27e6b98f491d555a056ce929b30df5d6', $filename);
+        unlink($filename);
+    }
+
+    public function testGenerateService()
+    {
+        $this->exec('generate --force service Dummy');
+        $this->assertExitSuccess();
+        $filename = SRC.DS.'Service'.DS.'DummyService.php';
+        $this->assertOutputContains('src/Service/DummyService.php');
+        $this->assertFileExists($filename);
+    
+        $this->assertFileHash('9e321871470df8ecc94fd40f3f8f834d', $filename);
+        unlink($filename);
+        
+        $filename = TESTS.DS.'TestCase'.DS .'Service'.DS.'DummyServiceTest.php';
+        $this->assertOutputContains('TestCase/Service/DummyServiceTest.php');
+        $this->assertFileExists($filename);
+        $this->assertFileHash('f646e791a1a6d9c38cf371a3ccaf22d9', $filename);
         unlink($filename);
     }
 
