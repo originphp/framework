@@ -15,6 +15,5 @@ class %class%Test extends OriginTestCase
     {
         parent::startup();
         $this->%class% = ModelRegistry::get('%class%');
-        parent::setUp();
     }
 }
