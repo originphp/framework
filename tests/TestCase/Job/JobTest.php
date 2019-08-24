@@ -94,7 +94,7 @@ class JobTest extends OriginTestCase
         $job = $connection->fetch();
         $this->assertEquals(0, $job->attempts());
 
-        $this->assertTrue($job->run());
+        $this->assertTrue($job->dispatchNow());
 
         $this->assertEquals(1, $job->attempts());
         $this->assertFalse($connection->model()->exists(1000));
@@ -116,7 +116,7 @@ class JobTest extends OriginTestCase
         $job = $connection->fetch();
         $this->assertEquals(0, $job->attempts());
 
-        $this->assertFalse($job->run());
+        $this->assertFalse($job->dispatchNow());
         $this->assertEquals(1, $job->attempts());
         $this->assertTrue($connection->model()->exists(1000));
     }
@@ -137,7 +137,7 @@ class JobTest extends OriginTestCase
         $job = $connection->fetch();
         $this->assertEquals(0, $job->attempts());
 
-        $this->assertFalse($job->run());
+        $this->assertFalse($job->dispatchNow());
         $this->assertEquals(1, $job->attempts());
 
         $record = $connection->model()->get(1000);
@@ -146,7 +146,7 @@ class JobTest extends OriginTestCase
         $job = $connection->fetch();
         $this->assertEquals(1, $job->attempts());
 
-        $this->assertFalse($job->run());
+        $this->assertFalse($job->dispatchNow());
         $record = $connection->model()->get(1000);
         $this->assertEquals('failed', $record->status);
     }

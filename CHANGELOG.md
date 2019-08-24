@@ -21,6 +21,19 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- Jobs
+- Service Objects
+- ConsoleIntegrationTest extra assertions. E.g. assertOutputNotContains,assertErrorNotContains,assertOutputRegExp,assertErrorRegExp
+
+### Changed
+- Limited in memory SQL statement logging to 200 
+
+### Fixed
+- Generate for model test was loading calling parent::setUp twice
+- Command help not showing default values for 0
+
 ## [1.27.2] - 2019-08-20
 
 ### Fixed

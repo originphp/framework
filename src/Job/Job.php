@@ -21,6 +21,11 @@ use Origin\Model\ModelRegistry;
 use Origin\Job\Engine\BaseEngine;
 use Origin\Model\Exception\MissingModelException;
 
+/**
+ * (new SendUserWelcomeEmail($user))->dispatch();
+ * (new SendUserWelcomeEmail($user))->dispatch(['wait' => '+5 minutes']);
+ */
+
 class Job
 {
     /**
@@ -47,7 +52,7 @@ class Job
     public $connection = 'default';
 
     /**
-     * Deafult wait time before dispatching the job, this is a strtotime compatible
+     * Default wait time before dispatching the job, this is a strtotime compatible
      * string. e.g '+5 minutes' or '+1 day' etc
      *
      * @example '+30 minutes'
@@ -96,20 +101,20 @@ class Job
     public function __construct()
     {
         $this->arguments = func_get_args();
-        
+       
         if ($this->name === null) {
-            $this->name = get_class($this);
+            list($namespace, $name) = namespaceSplit(get_class($this));
+  
+            $this->name = substr($name, 0, -3);
         }
 
         if (! method_exists($this, 'execute')) {
             throw new Exception('Job must have an execute method');
         }
-
-        $this->initialize();
     }
 
     /**
-     * This is the construct hook
+     * This is the hook when the job is created for sending
      *
      * @return void
      */
@@ -205,7 +210,7 @@ class Job
     {
         $options += ['wait' => '+ 5 seconds','limit' => 3];
 
-        return $this->connection()->retry($this, $options['limit'], $options['wait']);
+        return ($this->id and $this->connection()->retry($this, $options['limit'], $options['wait']));
     }
 
     /**
@@ -219,24 +224,31 @@ class Job
     }
 
     /**
-     * Runs this job
+     * Dispatches the job immediately.
+     * @internal if id set that means job has been serialized/unserialzied
      *
      * @return bool
      */
-    public function run() : bool
+    public function dispatchNow() : bool
     {
         try {
             $this->attempts ++;
-            
+
+            $this->initialize();
+
             $this->startup();
             $this->execute(...$this->arguments);
             $this->shutdown();
 
-            $this->connection()->success($this);
+            if ($this->id) {
+                $this->connection()->success($this);
+            }
            
             return true;
         } catch (\Throwable $e) {
-            $this->connection()->fail($this);
+            if ($this->id) {
+                $this->connection()->fail($this);
+            }
            
             $this->onException($e);
         }

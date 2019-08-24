@@ -67,10 +67,19 @@ class QueueWorkerCommand extends Command
         if ($this->options('daemon')) {
             $this->daemon($queues);
         } else {
-            foreach ($queues as $queue) {
-                $this->processQueue($queue);
-            }
+            $this->worker($queues);
         }
+    }
+
+    /**
+     * Checks that worker is running
+     *
+     * @param integer $iteration
+     * @return boolean
+     */
+    protected function isRunning() : bool
+    {
+        return ($this->stopped === false);
     }
 
     /**
@@ -84,19 +93,31 @@ class QueueWorkerCommand extends Command
     protected function daemon(array $queues) : void
     {
         $sleep = $this->options('sleep');
-  
-        while ($this->stopped === false) {
-            $jobs = 0;
-            foreach ($queues as $queue) {
-                if ($this->processQueue($queue)) {
-                    $jobs++;
-                }
-            }
-        
-            if ($jobs === 0 and $sleep) {
-                sleep($sleep);
+
+        while ($this->isRunning()) {
+            $this->worker($queues, $sleep);
+        }
+    }
+
+    /**
+     * Works the queue runs 1 job for each queue
+     *
+     * @param array $queues
+     * @param integer $sleep time to send worker to sleep when there were no jobs
+     * @return void
+     */
+    protected function worker(array $queues, int $sleep = null) : void
+    {
+        $ranJobs = false;
+        foreach ($queues as $queue) {
+            if ($this->processQueue($queue)) {
+                $ranJobs = true;
             }
             $this->checkMemoryUsage();
+        }
+
+        if (! $ranJobs and $sleep) {
+            sleep($sleep);
         }
     }
 
@@ -114,7 +135,7 @@ class QueueWorkerCommand extends Command
             return false;
         }
 
-        $this->dispatch($job);
+        $this->dispatchJob($job);
 
         return true;
     }
@@ -125,7 +146,7 @@ class QueueWorkerCommand extends Command
      * @param \Origin\Queue\Job $job
      * @return void
      */
-    protected function dispatch(Job $job) : void
+    protected function dispatchJob(Job $job) : void
     {
         $result = true;
        
@@ -133,7 +154,7 @@ class QueueWorkerCommand extends Command
             $this->setTimeout($job->timeout);
         }
 
-        $this->writeOutput('<text>[{date}] <cyan>{type}</cyan> {name} </text><green>{id}</green>', [
+        $this->writeOutput('<text>[{date}]</text> <cyan>{type}</cyan> <text>{name}</text> <green>{id}</green>', [
             'date' => date('Y-m-d G:i:s'),
             'type' => $job->attempts() === 0?'Run':'Retry #' . $job->attempts(),
             'name' => $job->name,
@@ -141,7 +162,7 @@ class QueueWorkerCommand extends Command
         ], false);
 
         $start = time();
-        $result = $job->run();
+        $result = $job->dispatchNow();
         $end = time();
 
         $this->writeOutput('<text> ({took}s)</text> {status}', [
@@ -227,6 +248,10 @@ class QueueWorkerCommand extends Command
      */
     protected function setupSignalHandler() : void
     {
+        /**
+         * declare ticks captures CTRL-c after job finished, pcntl_async_signals(true) only works
+         * after all jobs finished.
+         */
         declare(ticks = 1);
         pcntl_signal(SIGTERM, [$this, 'cancelJob']);
         pcntl_signal(SIGINT, [$this, 'cancelJob']);
@@ -276,7 +301,7 @@ class QueueWorkerCommand extends Command
         ]);
 
         $this->addOption('sleep', [
-            'description' => 'Number of seconds to wait between checking for jobs',
+            'description' => 'Number of seconds to sleep when no jobs are available',
             'type' => 'integer',
             'default' => 5,
         ]);

@@ -8,11 +8,7 @@ class %class%JobTest extends OriginTestCase
 {
     public function testExecute()
     {
-        $args = []; // args for execute method
-
-        $job = new %class%Job(...$args);
-        $this->assertTrue($job->run()); 
-
-        // Do additional check depending upon job
+        $result = (new %class%Job())->dispatchNow();
+        $this->assertTrue($result); 
     }
 }

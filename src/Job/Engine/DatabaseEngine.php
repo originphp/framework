@@ -84,7 +84,9 @@ class DatabaseEngine extends BaseEngine
     }
 
     /**
-     * Handles a failed job
+     * Handles a failed job.
+     * @internal in Job fail is called before OnException. If in other
+     * engines the record is deleted, then job has to be rethought
      *
      * @param \Origin\Queue\Job $job
      * @return boolean
@@ -94,7 +96,7 @@ class DatabaseEngine extends BaseEngine
         if (! $job->id()) {
             return false;
         }
-        
+
         return $this->updateDatabase([
             'id' => $job->id(),
             'status' => 'failed',

@@ -37,6 +37,7 @@ class GenerateCommand extends Command
         'migration' => 'Generates a migration class',
         'plugin' => 'Generates a plugin skeleton',
         'scaffold' => 'Generates a MVC base application using the database',
+        'service' => 'Generates a service object class',
     ];
 
     public function initialize()
@@ -231,7 +232,6 @@ class GenerateCommand extends Command
 
     protected function job(array $data)
     {
-        $data['human'] = Inflector::human($data['underscored']);
         $this->generate(
             $this->getTemplateFilename('job'),
             $this->getBaseFolder($data['name'], self::SRC).DS.'Job'.DS."{$data['class']}Job.php",
@@ -241,6 +241,21 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('job_test'),
             $this->getBaseFolder($data['name'], self::TEST).DS.'Job'.DS."{$data['class']}JobTest.php",
+            $data
+        );
+    }
+
+    protected function service(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('service'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Service'.DS."{$data['class']}Service.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('service_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Service'.DS."{$data['class']}ServiceTest.php",
             $data
         );
     }
