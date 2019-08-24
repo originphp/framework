@@ -177,31 +177,36 @@ class ConsoleOutput
             $data = implode("\n", $data);
         }
         
-        if ($this->mode === SELF::COLOR) {
-            $data = $this->parseTags($data);
-        } elseif ($this->mode === SELF::PLAIN) {
-            $tags = array_keys($this->styles);
-            $data = preg_replace('/<\/?(' . implode('|', $tags) . ')>/', '', $data);
-        }
-       
+        $data = $this->styleText($data);
+
         if ($newLine) {
             $data .= "\n";
         }
 
-        return $this->fwrite($data);
-    }
-
-    /**
-     * Writes the data to the stream
-     *
-     * @param string $data
-     * @return int bytes
-     */
-    protected function fwrite(string $data) : int
-    {
         fwrite($this->stream, $data);
 
         return strlen($data);
+    }
+
+    /**
+     * Styles the text
+     *
+     * @param string $text
+     * @return string
+     */
+    public function styleText(string $text) : string
+    {
+        if ($this->mode === SELF::RAW) {
+            return $text;
+        }
+
+        if ($this->mode === SELF::PLAIN) {
+            $tags = array_keys($this->styles);
+
+            return preg_replace('/<\/?(' . implode('|', $tags) . ')>/', '', $text);
+        }
+
+        return $this->parseTags($text); // color default
     }
 
     /**

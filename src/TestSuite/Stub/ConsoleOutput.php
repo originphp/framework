@@ -18,6 +18,32 @@ use Origin\Console\ConsoleOutput as BaseConsoleOutput;
 
 class ConsoleOutput extends BaseConsoleOutput
 {
+    protected $buffer = '';
+
+    public function write($data, $newLine = true) : int
+    {
+        $buffer = [];
+        foreach ((array) $data as $line) {
+            $buffer[] = $line;
+        }
+        if ($newLine) {
+            $buffer[] = '';
+        }
+        $buffer = implode("\n", $buffer);
+        $this->buffer .= $buffer;
+
+        return strlen($buffer);
+    }
+ 
+    public function read()
+    {
+        return $this->buffer;
+    }
+}
+
+/*
+class ConsoleOutput extends BaseConsoleOutput
+{
     protected $mode = SELF::RAW;
 
     protected $buffer = '';
@@ -34,3 +60,5 @@ class ConsoleOutput extends BaseConsoleOutput
         return $this->buffer;
     }
 }
+
+*/

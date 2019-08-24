@@ -62,8 +62,9 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
 
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
-        $ConsoleOutput->write('<yellow>hello world</yellow>');
-        $this->assertContains("\033[93mhello world\033[39m\n", $ConsoleOutput->read());
+        $output = $ConsoleOutput->styleText('<yellow>hello world</yellow>');
+    
+        $this->assertContains("\033[93mhello world\033[39m", $output);
     }
 
     public function testStyles()
@@ -83,21 +84,19 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->styles('complete', ['background' => 'lightRed','underline' => true,'color' => 'white']);
-        $ConsoleOutput->write('<complete>Test</complete>');
-        $this->assertEquals("\033[97;101;4mTest\033[39;49;24m\n", $ConsoleOutput->read());
+        $output = $ConsoleOutput->styleText('<complete>Test</complete>');
+        $this->assertEquals("\033[97;101;4mTest\033[39;49;24m", $output);
 
-        $ConsoleOutput = new ConsoleOutput();
-        $ConsoleOutput->mode(ConsoleOutput::COLOR);
-        $ConsoleOutput->write('<unkown>This is an unkown style</unkown>');
-        $this->assertContains('<unkown>This is an unkown style</unkown>', $ConsoleOutput->read());
+        $output = $ConsoleOutput->styleText('<unkown>This is an unkown style</unkown>');
+        $this->assertContains('<unkown>This is an unkown style</unkown>', $output);
     }
 
     public function testNestedStyle()
     {
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
-        $ConsoleOutput->write('<text>This is a <yellow>test</yellow></text>');
-        $this->assertEquals('494ad65c5fb334414d393d454f8d6d50', md5($ConsoleOutput->read()));
+        $result = $ConsoleOutput->styleText('<text>This is a <yellow>test</yellow></text>');
+        $this->assertEquals('4bec28364108c365d9bb6b11bf15e69c', md5($result));
     }
 
     public function testModeException()
@@ -113,10 +112,16 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $ConsoleOutput->styles('foo', ['foo' => 'bar']);
-        $ConsoleOutput->write('<foo>bar</foo>');
-        $this->assertEquals("bar\n", $ConsoleOutput->read());
+        
+        $result = $ConsoleOutput->styleText('<foo>bar</foo>');
+        $this->assertEquals('bar', $result);
     }
 
+    /**
+     * This tests the amount of bytes, then goes back so you dont notice
+     *
+     * @return void
+     */
     public function testBytes()
     {
         $ConsoleOutput = new \Origin\Console\ConsoleOutput();
@@ -131,7 +136,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->mode(ConsoleOutput::PLAIN);
 
         $ConsoleOutput->styles('foo', ['foo' => 'bar']);
-        $ConsoleOutput->write('<foo>bar</foo>');
-        $this->assertEquals("bar\n", $ConsoleOutput->read());
+        $result = $ConsoleOutput->styleText('<foo>bar</foo>');
+        $this->assertEquals('bar', $result);
     }
 }

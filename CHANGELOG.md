@@ -31,6 +31,7 @@ Delete tag: git tag -d <tag_name>
 - Limited in memory SQL statement logging to 200 
 
 ### Fixed
+- ConsoleOutput on Travis was switch TestStub output to plain causing inconsistent results with non framework tests.
 - Generate for model test was loading calling parent::setUp twice
 - Command help not showing default values for 0
 
