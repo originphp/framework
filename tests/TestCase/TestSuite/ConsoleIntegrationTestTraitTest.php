@@ -27,6 +27,7 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('test say');
         $this->assertOutputContains('Hello world!');
+        $this->assertOutputRegExp('/WORLD/i');
         $this->assertExitSuccess();
     }
 
@@ -40,6 +41,7 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('test ask', ['no']);
         $this->assertOutputContains('You entered no');
+        $this->assertOutputNotContains('foo');
         $this->assertExitSuccess();
     }
 
@@ -48,6 +50,8 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->exec('test omg');
         $this->assertExitError();
         $this->assertErrorContains('OMG! Its all Gone pete tong');
+        $this->assertErrorRegExp('/PETE/i');
+        $this->assertErrorNotContains('Tony DeVit');
     }
 
     public function testError()

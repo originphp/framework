@@ -162,6 +162,26 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
+     * Asserts that console output does not contains text.
+     *
+     * @param string $needle The text that you want to assert that is in the output
+     */
+    public function assertOutputNotContains(string $needle)
+    {
+        $this->assertNotContains($needle, $this->stdout->read());
+    }
+
+    /**
+     * Assert output against a regex expression
+     *
+     * @param string $message
+     */
+    public function assertOutputRegExp(string $expression)
+    {
+        $this->assertRegexp($expression, $this->stdout->read());
+    }
+
+    /**
      * Asserts that console output is empty.
      */
     public function assertOutputEmpty()
@@ -193,6 +213,26 @@ trait ConsoleIntegrationTestTrait
     public function assertErrorContains(string $message)
     {
         $this->assertContains($message, $this->stderr->read());
+    }
+
+    /**
+     * Assert an error does not contain a string
+     *
+     * @param string $message
+     */
+    public function assertErrorNotContains(string $message)
+    {
+        $this->assertNotContains($message, $this->stderr->read());
+    }
+
+    /**
+     * Assert error output against a regex expression
+     *
+     * @param string $message
+     */
+    public function assertErrorRegExp(string $expression)
+    {
+        $this->assertRegexp($expression, $this->stderr->read());
     }
 
     /**
