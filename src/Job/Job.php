@@ -184,9 +184,9 @@ class Job
      * @param array $options These options will overide the set properties. The available option keys are:
      *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
      *   - queue: the queue to dispatch if different to configured
-     * @return bool
+     * @return void
      */
-    public function dispatch(array $options = []) : bool
+    public function dispatch(array $options = []) : void
     {
         $options += [
             'wait' => $this->wait ?: 'now',
@@ -195,7 +195,7 @@ class Job
         $this->wait = $options['wait'];
         $this->queue = $options['queue'];
 
-        return $this->connection()->add($this, $options['wait']);
+        $this->connection()->add($this, $options['wait']);
     }
 
     /**
@@ -297,7 +297,7 @@ class Job
     {
         return [
             'className' => get_class($this),
-            'id' => $this->id ?: uuid(),
+            'id' => $this->id,
             'queue' => $this->queue,
             'arguments' => serialize(new ArrayObject($this->arguments)),
             'attempts' => $this->attempts,
