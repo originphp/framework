@@ -16,7 +16,7 @@ namespace Origin\Test\Model;
 
 use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
-use Origin\Model\Exception\MissingDatasourceException;
+use Origin\Exception\InvalidArgumentException;
 
 class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +27,7 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetException()
     {
-        $this->expectException(MissingDatasourceException::class);
+        $this->expectException(InvalidArgumentException::class);
         ConnectionManager::get('foo');
     }
 
@@ -46,7 +46,7 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testUnkownEngineException()
     {
-        $this->expectException(MissingDatasourceException::class);
+        $this->expectException(InvalidArgumentException::class);
         ConnectionManager::create('fail', ['engine' => 'mongo']);
     }
 }

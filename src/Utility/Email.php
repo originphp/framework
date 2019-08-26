@@ -15,10 +15,10 @@
 namespace Origin\Utility;
 
 use Origin\Core\Configure;
-use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
+
 use Origin\Utility\Exception\MissingTemplateException;
 
 class Email
@@ -169,7 +169,7 @@ class Email
             return $this;
         }
 
-        throw new Exception(sprintf('Unkown email configuration %s', $config));
+        throw new InvalidArgumentException(sprintf('The email account `%s` does not exist.', $config));
     }
 
     /**
@@ -540,9 +540,9 @@ class Email
         if ($this->account === null) {
             throw new Exception('Email config has not been set.');
         }
-
+       
         $this->content = $this->render();
-
+       
         if (! isset($this->account['debug']) or $this->account['debug'] === false) {
             $this->smtpSend();
         }

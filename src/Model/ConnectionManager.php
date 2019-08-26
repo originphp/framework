@@ -15,7 +15,7 @@
 namespace Origin\Model;
 
 use Origin\Core\StaticConfigTrait;
-use Origin\Model\Exception\MissingDatasourceException;
+use Origin\Exception\InvalidArgumentException;
 
 class ConnectionManager
 {
@@ -52,7 +52,7 @@ class ConnectionManager
         }
 
         if (! static::config($name)) {
-            throw new MissingDatasourceException("No configuration for {$name} datasource.");
+            throw new InvalidArgumentException(sprintf('The connection configuration `%s` does not exist.', $name));
         }
 
         $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
@@ -60,7 +60,7 @@ class ConnectionManager
         $config = array_merge($defaults, static::config($name));
        
         if (! isset(static::$engines[$config['engine']])) {
-            throw new MissingDatasourceException("Unkown driver for {$name} datasource.");
+            throw new InvalidArgumentException("Unkown engine `{$config['engine']}` in `{$name}` connection.");
         }
         static::$driver = $config['engine'];
       
