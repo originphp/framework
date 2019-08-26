@@ -257,11 +257,9 @@ class QueueWorkerCommand extends Command
      */
     protected function setupSignalHandler() : void
     {
-        /**
-         * declare ticks captures CTRL-c after job finished, pcntl_async_signals(true) only works
-         * after all jobs finished.
-         */
+        //pcntl_async_signals(true); Does not stop if there are jobs
         declare(ticks = 1);
+       
         pcntl_signal(SIGTERM, [$this, 'cancelJob']);
         pcntl_signal(SIGINT, [$this, 'cancelJob']);
     }
@@ -273,7 +271,7 @@ class QueueWorkerCommand extends Command
      */
     protected function cancelJob() : void
     {
-        $this->warning('<white>Gracefully stopping... (press Ctrl+C again to force)</white>');
+        $this->out('<green>> </green><white>Gracefully stopping... (press <yellow>Ctrl+C</yellow> again to force)</white>');
         $this->stopped = true;
     }
 
