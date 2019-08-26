@@ -36,6 +36,16 @@ class %class%Job extends AppJob
     {
     }
 
+
+    /**
+    * This is called before execute
+    *
+    * @return void
+    */
+    public function startup()
+    {
+    }
+
     /**
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
