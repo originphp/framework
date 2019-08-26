@@ -15,10 +15,8 @@
 namespace Origin\Job\Engine;
 
 use Redis;
-
 use Origin\Job\Job;
-use RedisException;
-use Origin\Exception\Exception;
+use Origin\Redis\RedisConnection;
 
 class RedisEngine extends BaseEngine
 {
@@ -39,24 +37,15 @@ class RedisEngine extends BaseEngine
         'path' => null, // Path to redis unix socket
     ];
 
-    # This code has been duplicated from RedisCache Engine
-
     /**
-        * Constructor
-        *
-        * @param array $config  duration,prefix,path
-        */
+       * Constructor
+       *
+       * @param array $config  duration,prefix,path
+       */
     public function initialize(array $config)
     {
-        $msg = 'Redis extension not loaded.';
-        if (extension_loaded('redis')) {
-            $this->Redis = new Redis();
-            if ($this->connect()) {
-                return;
-            }
-            $msg = 'Error connecting to Redis server.';
-        }
-        throw new Exception($msg);
+        $mergedWithDefault = $this->config();
+        $this->Redis = RedisConnection::connect($mergedWithDefault);
     }
 
     /**
@@ -160,43 +149,6 @@ class RedisEngine extends BaseEngine
                 $this->Redis->zrem('scheduled:' . $queue, $serialized);
             }
         }
-    }
-
-    protected function connect()
-    {
-        $result = false;
-        try {
-            if (! empty($this->config['path'])) {
-                $result = $this->Redis->connect($this->config['path']);
-            } elseif (! empty($this->config['persistent'])) {
-                $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
-            } else {
-                $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
-            }
-        } catch (RedisException $e) {
-            return false;
-        }
-        if ($result) {
-            if (isset($this->config['password'])) {
-                return $this->Redis->auth($this->config['password']);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns a string id for persistent connections
-     *
-     * @return string
-     */
-    protected function persistentId() : string
-    {
-        if ($this->config['persistent'] === true) {
-            return 'origin-php';
-        }
-
-        return (string) $this->config['persistent'];
     }
 
     /**

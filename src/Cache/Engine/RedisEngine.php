@@ -26,13 +26,10 @@
 namespace Origin\Cache\Engine;
 
 use Redis;
-use RedisException;
-use Origin\Core\ConfigTrait;
-use Origin\Exception\Exception;
+use Origin\Redis\RedisConnection;
 
 class RedisEngine extends BaseEngine
 {
-    use ConfigTrait;
 
     /**
      * Redis Object
@@ -59,39 +56,10 @@ class RedisEngine extends BaseEngine
      */
     public function initialize(array $config)
     {
-        $msg = 'Redis extension not loaded.';
-        if (extension_loaded('redis')) {
-            $this->Redis = new Redis();
-            if ($this->connect()) {
-                return;
-            }
-            $msg = 'Error connecting to Redis server.';
-        }
-        throw new Exception($msg);
+        $mergedWithDefault = $this->config();
+        $this->Redis = RedisConnection::connect($mergedWithDefault);
     }
 
-    protected function connect()
-    {
-        $result = false;
-        try {
-            if (! empty($this->config['path'])) {
-                $result = $this->Redis->connect($this->config['path']);
-            } elseif (! empty($this->config['persistent'])) {
-                $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
-            } else {
-                $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
-            }
-        } catch (RedisException $e) {
-            return false;
-        }
-        if ($result) {
-            if (isset($this->config['password'])) {
-                return $this->Redis->auth($this->config['password']);
-            }
-        }
-
-        return $result;
-    }
     /**
      * Sets a value in the cache
      *
