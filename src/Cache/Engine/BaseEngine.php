@@ -114,10 +114,6 @@ abstract class BaseEngine
      */
     protected function persistentId() : string
     {
-        if ($this->config['persistent'] === true) {
-            return 'origin-php';
-        }
-
-        return (string) $this->config['persistent'];
+        return ($this->config['persistent'] === true) ? 'origin-php' : (string) $this->config['persistent'];
     }
 }
