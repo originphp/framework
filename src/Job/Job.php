@@ -232,13 +232,19 @@ class Job
     * @param array $options The following option keys are supported :
     *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
     *   - limit: The maximum number of retries to do. Default:3
-    * @return void
+    * @return bool
     */
-    public function retry(array $options = []) : void
+    public function retry(array $options = []) : bool
     {
         $options += ['wait' => '+ 5 seconds','limit' => 3];
 
-        $this->retryOptions = $options;
+        if ($this->attempts() < $options['limit'] + 1) {
+            $this->retryOptions = $options;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -336,10 +342,12 @@ class Job
         return [
             'className' => get_class($this),
             'id' => $this->id,
+            'backendId' => $this->backendId,
             'queue' => $this->queue,
             'arguments' => serialize(new ArrayObject($this->arguments)),
             'attempts' => $this->attempts,
             'enqueued' => $this->enqueued,
+            'serialized' => date('Y-m-d H:i:s'),
         ];
     }
 
@@ -352,9 +360,11 @@ class Job
     public function deserialize(array $data) : void
     {
         $this->id = $data['id'];
+        $this->backendId = $data['backendId'];
         $this->queue = $data['queue'];
         $this->arguments = (array) unserialize($data['arguments']); # unserialize object and convert to []
         $this->attempts = $data['attempts'];
         $this->enqueued = $data['enqueued'];
+        $this->serialized = $data['serialized'];
     }
 }

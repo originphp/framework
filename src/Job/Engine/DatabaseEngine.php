@@ -46,16 +46,26 @@ class DatabaseEngine extends BaseEngine
      */
     public function add(Job $job, string $strtotime = 'now')
     {
-        $serialized = $this->serialize($job);
-
-        return $this->updateDatabase([
+        $model = $this->model();
+        $entity = $model->new([
             'queue' => $job->queue,
-            'data' => $serialized,
-            'status' => 'queued',
+            'data' => '[]',
+            'status' => 'new',
             'scheduled' => date('Y-m-d H:i:s', strtotime($strtotime)),
             'created' => now(),
             'modified' => now(),
         ]);
+
+        if (! $model->save($entity)) {
+            return false;
+        }
+
+        // Serialize with MySQL id
+        $job->backendId($entity->id);
+        $entity->data = $this->serialize($job);
+        $entity->status = 'queued';
+
+        return $model->save($entity);
     }
 
     /**
@@ -75,8 +85,7 @@ class DatabaseEngine extends BaseEngine
         
         if ($record and $this->lockRecord($record)) {
             $job = $this->deserialize($record->data);
-            $job->backendId($record->id);
-    
+
             return $job;
         }
 
@@ -100,6 +109,7 @@ class DatabaseEngine extends BaseEngine
         return $this->updateDatabase([
             'id' => $job->backendId(),
             'status' => 'failed',
+            'data' => $this->serialize($job),
             'locked' => null,
         ]);
     }
