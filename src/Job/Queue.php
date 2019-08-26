@@ -69,6 +69,6 @@ class Queue
 
             return new $config['className']($config);
         }
-        throw new InvalidArgumentException("{$name} config does not exist");
+        throw new InvalidArgumentException(sprintf('The queue configuration `%s` does not exist.', $name));
     }
 }

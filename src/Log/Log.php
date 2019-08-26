@@ -237,7 +237,7 @@ class Log
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
         }
-        throw new InvalidArgumentException("{$name} config does not exist");
+        throw new InvalidArgumentException(sprintf('The log configuration `%s` does not exist.', $name));
     }
 
     /**

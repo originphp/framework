@@ -89,7 +89,7 @@ class Storage
 
             return new $config['className']($config);
         }
-        throw new InvalidArgumentException("{$config} config does not exist");
+        throw new InvalidArgumentException(sprintf('The storage configuration `%s` does not exist.', $name));
     }
 
     /**
