@@ -194,14 +194,18 @@ class JobTest extends OriginTestCase
         $model = new Model(['name' => 'Article','datasource' => 'test']);
         $data = ['key' => 'value'];
         $job = new PassOrFailJob($model, $data);
-        $job->id(uuid());
+   
+        $job->backendId(1000);
+
         $expected = [
             'className' => 'Origin\Test\Job\PassOrFailJob',
             'id' => $job->id(),
+            'backendId' => 1000,
             'queue' => $job->queue,
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => $job->attempts(),
             'enqueued' => null,
+            'serialized' => date('Y-m-d H:i:s'),
         ];
         $this->assertEquals($expected, $job->serialize());
     }
@@ -216,10 +220,12 @@ class JobTest extends OriginTestCase
         $serialized = [
             'className' => 'Origin\Test\Job\PassOrFailJob',
             'id' => $id,
+            'backendId' => 1000,
             'queue' => 'foo',
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => 5,
             'enqueued' => '2019-08-23 08:29:08',
+            'serialized' => date('Y-m-d H:i:s'),
         ];
 
         $job->deserialize($serialized);
