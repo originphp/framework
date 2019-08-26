@@ -73,7 +73,8 @@ class RedisEngineTest extends OriginTestCase
 
         Queue::config('redis-test', [
             'engine' => 'Redis',
-            'host' => 'redis',
+            'host' => env('REDIS_HOST'),
+            'port' => env('REDIS_PORT'),
         ]);
 
         $this->engine = Queue::connection('redis-test');
