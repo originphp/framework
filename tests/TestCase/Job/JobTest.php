@@ -15,7 +15,6 @@ namespace Origin\Test\Job;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
-use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
@@ -45,6 +44,12 @@ class PassOrFailJob extends Job
         $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);
     }
+    public function set($array)
+    {
+        foreach ($array as $key => $value) {
+            $this->{$key} = $value;
+        }
+    }
 }
 
 class JobTest extends OriginTestCase
@@ -59,24 +64,19 @@ class JobTest extends OriginTestCase
 
     public function testConstruct()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $this->assertIsUUID($job->id());
-    }
-    public function testNoExecuteException()
-    {
-        $this->expectException(Exception::class);
-        $job = new Job();
     }
 
     public function testGetId()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $this->assertNotNull($job->id());
     }
 
     public function testBackendId()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $this->assertNull($job->backendId());
         $job->backendId(12345);
         $this->assertEquals(12345, $job->backendId());
@@ -84,7 +84,7 @@ class JobTest extends OriginTestCase
 
     public function testConnection()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $connection = $job->connection();
         $this->assertInstanceOf(DatabaseEngine::class, $connection);
         $this->assertEquals('test', $connection->config('datasource'));
@@ -92,8 +92,8 @@ class JobTest extends OriginTestCase
 
     public function testDispatch()
     {
-        $job = new PassOrFailJob(true);
-        $job->dispatch(['wait' => 'tomorrow','queue' => 'foo']);
+        $job = new PassOrFailJob(['wait' => 'tomorrow','queue' => 'foo']);
+        $job->dispatch(true);
         $record = $job->connection()->model()->find('first');
         $this->assertEquals('foo', $record->queue);
         $this->assertEquals(date('Y-m-d H:i:s', strtotime('tomorrow')), $record->scheduled);
@@ -108,8 +108,8 @@ class JobTest extends OriginTestCase
         /**
          * Test using dispatch and check db
          */
-        $job = new PassOrFailJob(true);
-        $job->dispatch();
+        $job = new PassOrFailJob();
+        $job->dispatch(true);
         $connection = $job->connection();
 
         $job = $connection->fetch();
@@ -132,14 +132,14 @@ class JobTest extends OriginTestCase
         /**
           * Test using dispatch and check db
           */
-        $job = new PassOrFailJob(false);
-        $job->dispatch();
+        $job = new PassOrFailJob();
+        $job->dispatch(false);
         $connection = $job->connection();
 
         $job = $connection->fetch();
         $this->assertEquals(0, $job->attempts());
 
-        $this->assertFalse($job->dispatchNow());
+        $this->assertFalse($job->dispatchNow(false));
         $this->assertEquals(1, $job->attempts());
         $this->assertTrue($connection->model()->exists(1000));
     }
@@ -153,14 +153,14 @@ class JobTest extends OriginTestCase
         /**
            * Test using dispatch and check db
            */
-        $job = new PassOrFailJob(false);
-        $job->dispatch();
+        $job = new PassOrFailJob();
+        $job->dispatch(false);
         $connection = $job->connection();
   
         $job = $connection->fetch();
         $this->assertEquals(0, $job->attempts());
 
-        $this->assertFalse($job->dispatchNow());
+        $this->assertFalse($job->dispatchNow(false));
         $this->assertEquals(1, $job->attempts());
 
         $record = $connection->model()->get(1000);
@@ -169,21 +169,21 @@ class JobTest extends OriginTestCase
         $job = $connection->fetch();
         $this->assertEquals(1, $job->attempts());
 
-        $this->assertFalse($job->dispatchNow());
+        $this->assertFalse($job->dispatchNow(false));
         $record = $connection->model()->get(1000);
         $this->assertEquals('failed', $record->status);
     }
 
     public function testLoadModelException()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $this->expectException(MissingModelException::class);
         $job->loadModel('Foo');
     }
 
     public function testLoadModel()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
         $this->assertInstanceOf(Model::class, $job->loadModel('Article'));
         // Second time is load from property
         $this->assertInstanceOf(Model::class, $job->loadModel('Article'));
@@ -193,8 +193,8 @@ class JobTest extends OriginTestCase
     {
         $model = new Model(['name' => 'Article','datasource' => 'test']);
         $data = ['key' => 'value'];
-        $job = new PassOrFailJob($model, $data);
-   
+        $job = new PassOrFailJob();
+        $job->set(['arguments' => [$model, $data]]);
         $job->backendId(1000);
 
         $expected = [
@@ -214,7 +214,8 @@ class JobTest extends OriginTestCase
     {
         $model = new Model(['name' => 'Article','datasource' => 'test']);
         $data = ['key' => 'value'];
-        $job = new PassOrFailJob($model, $data);
+        $job = new PassOrFailJob();
+        $job->set(['arguments' => [$model, $data]]);
         $id = uuid();
     
         $serialized = [

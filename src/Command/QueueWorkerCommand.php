@@ -171,7 +171,8 @@ class QueueWorkerCommand extends Command
         ], false);
 
         $start = time();
-        $result = $job->dispatchNow();
+        $arguments = $job->arguments();
+        $result = $job->dispatchNow(...$arguments);
         $end = time();
 
         $this->writeOutput('<text> ({took}s)</text> {status}', [

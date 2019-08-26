@@ -21,6 +21,14 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.28.1] - 2019-08-27
+
+### Fixed
+- Made error messages for missing configurations more explanatory
+
+### Changed
+- The Job constructor arguments were moved in a last minute change from the release a few hours ago.
+
 ## [1.28.0] - 2019-08-26
 
 ### Added

@@ -24,6 +24,12 @@ class MockJob extends Job
     public function execute()
     {
     }
+    public function setArguments()
+    {
+        $this->arguments = func_get_args();
+
+        return $this;
+    }
 }
 
 class BaseEngineTest extends OriginTestCase
@@ -40,7 +46,7 @@ class BaseEngineTest extends OriginTestCase
     public function testSerializeDeserializeArguments()
     {
         $engine = new DatabaseEngine();
-        $job = new MockJob(['key' => 'value']);
+        $job = (new MockJob())->setArguments(['key' => 'value']);
         $serialized = $engine->serialize($job);
         $job = $engine->deserialize($serialized);
         $this->assertInstanceOf(Job::class, $job);
@@ -50,7 +56,7 @@ class BaseEngineTest extends OriginTestCase
     {
         $this->expectException(Exception::class);
         $engine = new DatabaseEngine();
-        $engine->serialize(new MockJob("\xB1\x31"));
+        $engine->serialize((new MockJob())->setArguments("\xB1\x31"));
     }
 
     public function testDeserializeException()

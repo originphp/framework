@@ -45,6 +45,10 @@ class PassOrFailJob extends Job
     {
         $this->attempts ++;
     }
+    public function setArguments()
+    {
+        $this->arguments = func_get_args();
+    }
 }
 
 class DatabaseEngineTest extends OriginTestCase
@@ -67,13 +71,15 @@ class DatabaseEngineTest extends OriginTestCase
 
     public function testAdd()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
     }
 
     public function testFetch()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
@@ -95,7 +101,8 @@ class DatabaseEngineTest extends OriginTestCase
      */
     public function testFail()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
         
         $job = $this->engine->fetch();
@@ -106,13 +113,14 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertEquals('failed', $result->status);
         $this->assertNull($result->locked);
 
-        $newJobWithNoId = new PassOrFailJob(true);
+        $newJobWithNoId = new PassOrFailJob();
         $this->assertFalse($this->engine->fail($newJobWithNoId));
     }
 
     public function testSuccess()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
@@ -122,7 +130,7 @@ class DatabaseEngineTest extends OriginTestCase
         $result = $this->engine->model()->exists(1000);
         $this->assertFalse($result);
 
-        $newJobWithNoId = new PassOrFailJob(true);
+        $newJobWithNoId = new PassOrFailJob();
         $this->assertFalse($this->engine->success($newJobWithNoId));
     }
 
@@ -133,7 +141,8 @@ class DatabaseEngineTest extends OriginTestCase
      */
     public function testDelete()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
@@ -143,13 +152,14 @@ class DatabaseEngineTest extends OriginTestCase
         $result = $this->engine->model()->exists(1000);
         $this->assertFalse($result);
 
-        $newJobWithNoId = new PassOrFailJob(true);
+        $newJobWithNoId = new PassOrFailJob();
         $this->assertFalse($this->engine->delete($newJobWithNoId));
     }
 
     public function testRetry()
     {
-        $job = new PassOrFailJob(true);
+        $job = new PassOrFailJob();
+        $job->setArguments(true);
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
@@ -195,7 +205,7 @@ class DatabaseEngineTest extends OriginTestCase
         $result = $this->engine->model()->get(1000);
         $this->assertEquals('failed', $result->status);
 
-        $newJobWithNoId = new PassOrFailJob(true);
+        $newJobWithNoId = new PassOrFailJob();
         $this->assertFalse($this->engine->retry($newJobWithNoId, 3));
     }
 }

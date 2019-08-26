@@ -36,8 +36,9 @@ class QueueWorkerCommandTest extends OriginTestCase
     public function testRunJobSuccessful()
     {
         // Create a job and dispatch
-        (new PassOrFailJob(true))->dispatch(['queu']);
+        (new PassOrFailJob())->dispatch(true);
         $this->exec('queue:worker --connection=test');
+        
         $this->assertExitSuccess();
         $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text>');
         $this->assertOutputContains('<pass> OK </pass>');
@@ -46,7 +47,7 @@ class QueueWorkerCommandTest extends OriginTestCase
     public function testRunJobFail()
     {
         // Create a job and dispatch
-        (new PassOrFailJob(false))->dispatch();
+        (new PassOrFailJob())->dispatch(false);
         $this->exec('queue:worker --connection=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text>');
@@ -56,7 +57,7 @@ class QueueWorkerCommandTest extends OriginTestCase
     public function testRunJobFailRetry()
     {
         // Create a job and dispatch
-        (new PassOrFailJob(false))->dispatch();
+        (new PassOrFailJob())->dispatch(false);
         $this->exec('queue:worker --connection=test');
       
         $this->assertExitSuccess();

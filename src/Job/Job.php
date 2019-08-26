@@ -60,7 +60,7 @@ class Job
     public $wait = null;
 
     /**
-     * The default timeout in second
+     * The default timeout in seconds
      *
      * @var integer
      */
@@ -111,9 +111,12 @@ class Job
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(array $options = [])
     {
-        $this->arguments = func_get_args();
+        $options += ['wait' => $this->wait,'queue' => $this->queue];
+
+        $this->wait = $options['wait'];
+        $this->queue = $options['queue'];
         
         $this->id = uuid();
 
@@ -121,10 +124,6 @@ class Job
             list($namespace, $name) = namespaceSplit(get_class($this));
   
             $this->name = substr($name, 0, -3);
-        }
-
-        if (! method_exists($this, 'execute')) {
-            throw new Exception('Job must have an execute method');
         }
     }
 
@@ -212,17 +211,11 @@ class Job
      *   - queue: the queue to dispatch if different to configured
      * @return void
      */
-    public function dispatch(array $options = []) : void
+    public function dispatch() : void
     {
-        $options += [
-            'wait' => $this->wait ?: 'now',
-            'queue' => $this->queue,
-        ];
-        $this->wait = $options['wait'];
-        $this->queue = $options['queue'];
+        $this->arguments = func_get_args();
         $this->enqueued = date('Y-m-d H:i:s');
-
-        $this->connection()->add($this, $options['wait']);
+        $this->connection()->add($this, $this->wait ?: 'now');
     }
 
     /**
@@ -265,7 +258,8 @@ class Job
     public function dispatchNow() : bool
     {
         $this->attempts ++;
-        
+        $this->arguments = func_get_args(); // proces the arguments
+
         try {
             $this->initialize();
             $this->startup();
