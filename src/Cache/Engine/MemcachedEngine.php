@@ -37,12 +37,10 @@
 namespace Origin\Cache\Engine;
 
 use Memcached;
-use Origin\Core\ConfigTrait;
 use Origin\Exception\Exception;
 
 class MemcachedEngine extends BaseEngine
 {
-    use ConfigTrait;
 
     /**
      * Memcached Object

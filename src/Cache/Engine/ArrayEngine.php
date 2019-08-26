@@ -17,12 +17,8 @@
 
 namespace Origin\Cache\Engine;
 
-use Origin\Core\ConfigTrait;
-
 class ArrayEngine extends BaseEngine
 {
-    use ConfigTrait;
-    
     protected $defaultConfig = [
         'prefix' => null,
     ];
