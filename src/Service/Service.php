@@ -68,11 +68,9 @@ class Service
      */
     public function __construct()
     {
-        if (! method_exists($this, 'initialize')) {
-            throw new Exception('Job must have an intialize method');
+        if (method_exists($this, 'initialize')) {
+            $this->initialize(...func_get_args());
         }
-
-        $this->initialize(...func_get_args());
     }
 
     # Initialize is not defined here so user can define with proper type hints and return types
@@ -109,16 +107,12 @@ class Service
     }
 
     /**
-     * Dispatches the service
+     * Dispatches the service calling the execute method which should be set
      *
      * @return \Origin\Service\Result|null
      */
     public function dispatch() : ?Result
     {
-        if (! method_exists($this, 'execute')) {
-            throw new Exception('Job must have an execute method');
-        }
-        
         $this->startup();
         $result = $this->execute(...func_get_args());
         $this->shutdown();
