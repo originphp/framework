@@ -1,4 +1,5 @@
 <?php
+declare(ticks = 1);
 namespace Origin\Command;
 
 use Origin\Job\Job;
@@ -258,8 +259,8 @@ class QueueWorkerCommand extends Command
      */
     protected function setupSignalHandler() : void
     {
-        //pcntl_async_signals(true); Does not stop if there are jobs
-        declare(ticks = 1);
+        //pcntl_async_signals(true);
+        //declare(ticks = 1);
        
         pcntl_signal(SIGTERM, [$this, 'cancelJob']);
         pcntl_signal(SIGINT, [$this, 'cancelJob']);
