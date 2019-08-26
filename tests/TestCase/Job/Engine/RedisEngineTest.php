@@ -147,8 +147,8 @@ class RedisEngineTest extends OriginTestCase
         $result = $this->engine->redis()->lrange('queue:test', 0, -1);
         $this->assertEmpty($result);
 
-        # Check its in failed list
-        $result = $this->engine->redis()->lrange('failed:test', 0, -1);
+        # Check its in failed list and can be returned!!!
+        $result = $this->engine->redis()->lrange('failed:jobs', 0, -1);
         $result = $this->engine->deserialize($result[0]);
         $this->assertInstanceOf(Job::class, $result);
         $this->assertEquals($job->id(), $result->id());
