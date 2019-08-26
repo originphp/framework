@@ -17,19 +17,19 @@ use ReflectionClass;
 use App\View\AppView;
 use ReflectionMethod;
 use Origin\Http\Router;
-use Origin\Model\Model;
+
 use Origin\Http\Request;
 use Origin\View\XmlView;
 use Origin\Http\Response;
 use Origin\View\JsonView;
 use Origin\Utility\Inflector;
-use Origin\Model\ModelRegistry;
+use Origin\Model\Traits\ModelTrait;
 use Origin\Controller\Component\Component;
-use Origin\Model\Exception\MissingModelException;
 use Origin\Controller\Component\ComponentRegistry;
 
 class Controller
 {
+    use ModelTrait;
     /**
      * Controller name.
      *
@@ -158,29 +158,6 @@ class Controller
         }
 
         return null;
-    }
-
-    /**
-     * Loads a model, uses from registry or creates a new one.
-     *
-     * @param string $model
-     * @param array $options
-     * @return \Origin\Model\Model
-     */
-    public function loadModel(string $model, array $options = []) : Model
-    {
-        list($plugin, $alias) = pluginSplit($model);
-
-        if (isset($this->{$alias})) {
-            return $this->{$alias};
-        }
-
-        $this->{$alias} = ModelRegistry::get($model, $options);
-
-        if ($this->{$alias}) {
-            return $this->{$alias};
-        }
-        throw new MissingModelException($model);
     }
 
     /**

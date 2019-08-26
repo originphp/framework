@@ -15,11 +15,9 @@
 namespace Origin\Job;
 
 use \ArrayObject;
-use Origin\Model\Model;
 use Origin\Exception\Exception;
-use Origin\Model\ModelRegistry;
 use Origin\Job\Engine\BaseEngine;
-use Origin\Model\Exception\MissingModelException;
+use Origin\Model\Traits\ModelTrait;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -28,6 +26,7 @@ use Origin\Model\Exception\MissingModelException;
 
 class Job
 {
+    use ModelTrait;
     /**
      * This is the display name for the job
      *
@@ -298,29 +297,6 @@ class Job
         }
 
         return true;
-    }
-
-    /**
-     * Loads a model
-     *
-     * @param string $model
-     * @param array $options
-     * @return \Origin\Model\Model
-     */
-    public function loadModel(string $model, array $options = []) : Model
-    {
-        list($plugin, $alias) = pluginSplit($model);
-
-        if (isset($this->{$alias})) {
-            return $this->{$alias};
-        }
-
-        $this->{$alias} = ModelRegistry::get($model, $options);
-
-        if ($this->{$alias}) {
-            return $this->{$alias};
-        }
-        throw new MissingModelException($model);
     }
 
     /**

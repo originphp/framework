@@ -14,17 +14,17 @@
 
 namespace Origin\Command;
 
-use Origin\Model\Model;
 use Origin\Console\ConsoleIo;
-use Origin\Model\ModelRegistry;
 use Origin\Console\CommandRunner;
+
 use Origin\Console\ArgumentParser;
+use Origin\Model\Traits\ModelTrait;
 use Origin\Console\Exception\ConsoleException;
-use Origin\Model\Exception\MissingModelException;
 use Origin\Console\Exception\StopExecutionException;
 
 abstract class Command
 {
+    use ModelTrait;
     /**
      * Default error code.
      *
@@ -534,27 +534,6 @@ abstract class Command
     {
         $message = $this->interpolate($message, $context);
         $this->io->out($message, $context);
-    }
-
-    /**
-     * Loads a model, uses from registry or creates a new one.
-     *
-     * @param string $model
-     *
-     * @return \Origin\Model\Model
-     */
-    public function loadModel(string $model) : Model
-    {
-        if (isset($this->{$model})) {
-            return $this->{$model};
-        }
-
-        $this->{$model} = ModelRegistry::get($model);
-
-        if ($this->{$model}) {
-            return $this->{$model};
-        }
-        throw new MissingModelException($model);
     }
 
     /**
