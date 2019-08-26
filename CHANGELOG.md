@@ -24,7 +24,7 @@ Delete tag: git tag -d <tag_name>
 ## [1.28.1] - 2019-08-27
 
 ### Fixed
-- Moved declare ticks to top of page due to occasional issues in a docker container.
+- Moved declare ticks to top of page due to occasional issues with catching ctrl-c in a docker container.
 - Made error messages for missing configurations more explanatory
 
 ### Changed
