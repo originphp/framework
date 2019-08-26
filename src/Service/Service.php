@@ -72,10 +72,6 @@ class Service
             throw new Exception('Job must have an intialize method');
         }
 
-        if (! method_exists($this, 'execute')) {
-            throw new Exception('Job must have an execute method');
-        }
-
         $this->initialize();
     }
 
@@ -119,6 +115,10 @@ class Service
      */
     public function dispatch() : ?Result
     {
+        if (! method_exists($this, 'execute')) {
+            throw new Exception('Job must have an execute method');
+        }
+        
         $this->startup();
         $result = $this->execute(...func_get_args());
         $this->shutdown();

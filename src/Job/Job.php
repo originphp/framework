@@ -45,7 +45,7 @@ class Job
     public $queue = 'default';
 
     /**
-     * The name of the connection to use
+     * The name of the queue connection to use
      *
      * @var string
      */
@@ -75,6 +75,13 @@ class Job
     protected $id = null;
     
     /**
+     * Adapter id
+     *
+     * @var mixed
+     */
+    protected $backendId = null;
+
+    /**
      * These are the arguments that will be passed on to execute
      *
      * @var array
@@ -93,7 +100,14 @@ class Job
      *
      * @var string
      */
-    protected $created = null;
+    protected $enqueued = null;
+
+    /**
+     * If retry is called the info is stored here.
+     *
+     * @var array
+     */
+    protected $retryOptions = null;
 
     /**
      * Constructor
@@ -101,7 +115,9 @@ class Job
     public function __construct()
     {
         $this->arguments = func_get_args();
-       
+        
+        $this->id = uuid();
+
         if ($this->name === null) {
             list($namespace, $name) = namespaceSplit(get_class($this));
   
@@ -143,27 +159,38 @@ class Job
     }
 
     /**
-     * This callback is triggered on exception
+     * This callback is triggered when an error occurs
      *
      * @param \Exception $exception
      * @return void
      */
-    public function onException(\Exception $exception)
+    public function onError(\Exception $exception)
     {
     }
 
     /**
-     * Setter and getter for Job ID
+     * Gets the id for this job
      *
      * @param string|int
-     * @return
+     * @retun string
      */
-    public function id($id = null)
+    public function id() : string
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets/gets the id by backend if any
+     *
+     * @param int|string $id
+     * @return int|string|void
+     */
+    public function backendId($id = null)
     {
         if ($id === null) {
-            return $this->id;
+            return $this->backendId;
         }
-        $this->id = $id;
+        $this->backendId = $id;
     }
 
     /**
@@ -194,6 +221,7 @@ class Job
         ];
         $this->wait = $options['wait'];
         $this->queue = $options['queue'];
+        $this->enqueued = date('Y-m-d H:i:s');
 
         $this->connection()->add($this, $options['wait']);
     }
@@ -204,13 +232,13 @@ class Job
     * @param array $options The following option keys are supported :
     *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
     *   - limit: The maximum number of retries to do. Default:3
-    * @return bool
+    * @return void
     */
-    public function retry(array $options = []) : bool
+    public function retry(array $options = []) : void
     {
         $options += ['wait' => '+ 5 seconds','limit' => 3];
 
-        return ($this->id and $this->connection()->retry($this, $options['limit'], $options['wait']));
+        $this->retryOptions = $options;
     }
 
     /**
@@ -231,29 +259,39 @@ class Job
      */
     public function dispatchNow() : bool
     {
+        $this->attempts ++;
+        
         try {
-            $this->attempts ++;
-
             $this->initialize();
-
             $this->startup();
             $this->execute(...$this->arguments);
-            $this->shutdown();
-
-            if ($this->id) {
-                $this->connection()->success($this);
-            }
-           
-            return true;
         } catch (\Throwable $e) {
-            if ($this->id) {
+            $this->shutdown();
+        
+            if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
            
-            $this->onException($e);
+            $this->onError($e);
+    
+            if ($this->enqueued and $this->retryOptions) {
+                $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
+            }
+
+            return false;
         }
 
-        return false;
+        $this->shutdown();
+
+        if ($this->enqueued) {
+            $this->connection()->success($this);
+        }
+       
+        if (method_exists($this, 'onSuccess')) {
+            $this->onSuccess(...$this->arguments);
+        }
+
+        return true;
     }
 
     /**
@@ -301,7 +339,7 @@ class Job
             'queue' => $this->queue,
             'arguments' => serialize(new ArrayObject($this->arguments)),
             'attempts' => $this->attempts,
-            'created' => $this->created ?: date('Y-m-d H:i:s'),
+            'enqueued' => $this->enqueued,
         ];
     }
 
@@ -317,6 +355,6 @@ class Job
         $this->queue = $data['queue'];
         $this->arguments = (array) unserialize($data['arguments']); # unserialize object and convert to []
         $this->attempts = $data['attempts'];
-        $this->created = $data['created'];
+        $this->enqueued = $data['enqueued'];
     }
 }

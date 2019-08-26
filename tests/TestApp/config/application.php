@@ -39,7 +39,7 @@ if (env('ELASTICSEARCH_HOST')) {
 
 Queue::config('test', [
     'engine' => 'Database',
-    'connection' => 'test',
+    'datasource' => 'test',
 ]);
 /*
  * Load your plugins here

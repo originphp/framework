@@ -72,6 +72,26 @@ class QueueWorkerCommand extends Command
     }
 
     /**
+     * Works the jobs in the queue in a round robbin way until there are
+     * no jobs the queue
+     *
+     * @param array $queues
+     * @return void
+     */
+    protected function worker(array $queues)
+    {
+        $checkAgain = [];
+        foreach ($queues as $queue) {
+            if ($this->processQueue($queue)) {
+                $checkAgain[] = $queue;
+            }
+        }
+        if ($checkAgain) {
+            $this->worker($checkAgain);
+        }
+    }
+
+    /**
      * Checks that worker is running
      *
      * @param integer $iteration
@@ -95,29 +115,16 @@ class QueueWorkerCommand extends Command
         $sleep = $this->options('sleep');
 
         while ($this->isRunning()) {
-            $this->worker($queues, $sleep);
-        }
-    }
-
-    /**
-     * Works the queue runs 1 job for each queue
-     *
-     * @param array $queues
-     * @param integer $sleep time to send worker to sleep when there were no jobs
-     * @return void
-     */
-    protected function worker(array $queues, int $sleep = null) : void
-    {
-        $ranJobs = false;
-        foreach ($queues as $queue) {
-            if ($this->processQueue($queue)) {
-                $ranJobs = true;
+            $ranJobs = false;
+            foreach ($queues as $queue) {
+                if ($this->processQueue($queue)) {
+                    $ranJobs = true;
+                }
             }
-            $this->checkMemoryUsage();
-        }
-
-        if (! $ranJobs and $sleep) {
-            sleep($sleep);
+    
+            if (! $ranJobs and $sleep) {
+                sleep($sleep);
+            }
         }
     }
 
@@ -136,6 +143,8 @@ class QueueWorkerCommand extends Command
         }
 
         $this->dispatchJob($job);
+
+        $this->checkMemoryUsage();
 
         return true;
     }
@@ -264,7 +273,7 @@ class QueueWorkerCommand extends Command
      */
     protected function cancelJob() : void
     {
-        $this->warning('Shutting down.....');
+        $this->warning('<white>Gracefully stopping... (press Ctrl+C again to force)</white>');
         $this->stopped = true;
     }
 

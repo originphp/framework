@@ -34,7 +34,7 @@ class DatabaseEngine extends BaseEngine
      */
     protected $defaultConfig = [
         'engine' => 'Database',
-        'connection' => 'default',
+        'datasource' => 'default',
     ];
 
     /**
@@ -44,7 +44,7 @@ class DatabaseEngine extends BaseEngine
      * @param string $strtotime
      * @return boolean
      */
-    public function add(Job $job, string $strtotime = 'now') : bool
+    public function add(Job $job, string $strtotime = 'now')
     {
         $serialized = $this->serialize($job);
 
@@ -75,7 +75,7 @@ class DatabaseEngine extends BaseEngine
         
         if ($record and $this->lockRecord($record)) {
             $job = $this->deserialize($record->data);
-            $job->id($record->id);
+            $job->backendId($record->id);
     
             return $job;
         }
@@ -91,14 +91,14 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @return boolean
      */
-    public function fail(Job $job) : bool
+    public function fail(Job $job)
     {
-        if (! $job->id()) {
+        if (! $job->backendId()) {
             return false;
         }
 
         return $this->updateDatabase([
-            'id' => $job->id(),
+            'id' => $job->backendId(),
             'status' => 'failed',
             'locked' => null,
         ]);
@@ -110,9 +110,9 @@ class DatabaseEngine extends BaseEngine
     * @param \Origin\Queue\Job $job
     * @return boolean
     */
-    public function success(Job $job) : bool
+    public function success(Job $job)
     {
-        if (! $job->id()) {
+        if (! $job->backendId()) {
             return false;
         }
 
@@ -125,44 +125,42 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @return boolean
      */
-    public function delete(Job $job) : bool
+    public function delete(Job $job)
     {
-        if (! $job->id()) {
+        if (! $job->backendId()) {
             return false;
         }
         
         $entity = $this->model()->new([
-            'id' => $job->id(),
+            'id' => $job->backendId(),
         ]);
 
         return $this->model()->delete($entity);
     }
 
     /**
-     * Retry a job for a certain amount of times
+     * Retry a failed job for a certain amount of times
      *
      * @param \Origin\Queue\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool
      */
-    public function retry(Job $job, int $tries, $strtotime = 'now') : bool
+    public function retry(Job $job, int $tries, $strtotime = 'now')
     {
-        if (! $job->id()) {
+        if (! $job->backendId()) {
             return false;
         }
-
+        
         if ($job->attempts() < $tries + 1) {
             return $this->updateDatabase([
-                'id' => $job->id(),
+                'id' => $job->backendId(),
                 'status' => 'queued',
                 'scheduled' => date('Y-m-d H:i:s', strtotime($strtotime)),
                 'data' => $this->serialize($job), // # Update message
                 'locked' => null,
             ]);
         }
-
-        return $this->fail($job);
     }
 
     /**
@@ -177,7 +175,7 @@ class DatabaseEngine extends BaseEngine
                 'name' => 'Queue',
                 'alias' => 'queue',
                 'table' => 'queue',
-                'datasource' => $this->config('connection'),
+                'datasource' => $this->config('datasource'),
             ]);
        
             $this->model->loadBehavior('timestamp');

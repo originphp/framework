@@ -25,15 +25,24 @@ class PassOrFailJob extends Job
 {
     public $connection = 'default';
 
+    public function initialize()
+    {
+        $this->status = 'new';
+    }
+
     public function execute(bool $pass = true)
     {
         if (! $pass) {
             $a = 1 / 0;
         }
     }
-    public function onException(\Exception $exception)
+    public function onSuccess(bool $pass = true)
     {
-        parent::onException($exception);
+        $this->status = 'success';
+    }
+    public function onError(\Exception $exception)
+    {
+        $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);
     }
 }
@@ -47,18 +56,30 @@ class JobTest extends OriginTestCase
         $model = new Model(['name' => 'Article','datasource' => 'test']);
         ModelRegistry::set('Article', $model);
     }
+
+    public function testConstruct()
+    {
+        $job = new PassOrFailJob(true);
+        $this->assertIsUUID($job->id());
+    }
     public function testNoExecuteException()
     {
         $this->expectException(Exception::class);
         $job = new Job();
     }
 
-    public function testSetGetId()
+    public function testGetId()
     {
         $job = new PassOrFailJob(true);
-        $this->assertNull($job->id());
-        $job->id(12345);
-        $this->assertEquals(12345, $job->id());
+        $this->assertNotNull($job->id());
+    }
+
+    public function testBackendId()
+    {
+        $job = new PassOrFailJob(true);
+        $this->assertNull($job->backendId());
+        $job->backendId(12345);
+        $this->assertEquals(12345, $job->backendId());
     }
 
     public function testConnection()
@@ -66,7 +87,7 @@ class JobTest extends OriginTestCase
         $job = new PassOrFailJob(true);
         $connection = $job->connection();
         $this->assertInstanceOf(DatabaseEngine::class, $connection);
-        $this->assertEquals('test', $connection->config('connection'));
+        $this->assertEquals('test', $connection->config('datasource'));
     }
 
     public function testDispatch()
@@ -97,7 +118,9 @@ class JobTest extends OriginTestCase
         $this->assertTrue($job->dispatchNow());
 
         $this->assertEquals(1, $job->attempts());
-        $this->assertFalse($connection->model()->exists(1000));
+        $this->assertFalse($connection->model()->exists(1000)); # for Databasedrive
+
+        $this->assertEquals('success', $job->status);
     }
 
     /**
@@ -178,7 +201,7 @@ class JobTest extends OriginTestCase
             'queue' => $job->queue,
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => $job->attempts(),
-            'created' => date('Y-m-d H:i:s'),
+            'enqueued' => null,
         ];
         $this->assertEquals($expected, $job->serialize());
     }
@@ -196,7 +219,7 @@ class JobTest extends OriginTestCase
             'queue' => 'foo',
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => 5,
-            'created' => '2019-08-23 08:29:08',
+            'enqueued' => '2019-08-23 08:29:08',
         ];
 
         $job->deserialize($serialized);
@@ -206,5 +229,13 @@ class JobTest extends OriginTestCase
         $this->assertInstanceOf(Model::class, $job->arguments()[0]);
         $this->assertEquals(['key' => 'value'], $job->arguments()[1]);
         $this->assertEquals(5, $job->attempts());
+    }
+
+    public function assertIsUUID(string $id = null)
+    {
+        $this->assertRegExp(
+            '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
+            $id
+        );
     }
 }

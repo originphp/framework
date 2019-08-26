@@ -28,6 +28,15 @@ class %class%Job extends AppJob
     public $timeout = 60;
 
     /**
+    * This is called when the job is created for dispatching
+    *
+    * @return void
+    */
+    public function initialize()
+    {
+    }
+
+    /**
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
     */
@@ -39,12 +48,22 @@ class %class%Job extends AppJob
     }
 
     /**
-    * This is called just before execute
+    * This callback is triggered when an error occurs
     *
+    * @param \Exception $exception
     * @return void
     */
-    public function startup()
+    public function onError(\Exception $exception)
     {
+
+    }
+
+    /**
+    * Place the job logic here and define the arguments
+    * e.g. function execute(User $User,$records);
+    */
+    public function onSuccess(){
+
     }
 
 
@@ -57,13 +76,5 @@ class %class%Job extends AppJob
     {
     }
 
-    /**
-    * This callback is triggered on exception
-    *
-    * @param \Exception $exception
-    * @return void
-    */
-    public function onException(\Exception $exception)
-    {
-    }
+    
 }

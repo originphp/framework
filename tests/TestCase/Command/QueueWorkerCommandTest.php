@@ -15,10 +15,9 @@ class PassOrFailJob extends Job
             $a = 1 / 0;
         }
     }
-    public function onException(\Exception $exception)
+    public function onError(\Exception $exception)
     {
-        parent::onException($exception);
-        $this->retry(['wait' => 'now','limit' => 1]);
+        $this->retry(['wait' => '+1 second','limit' => 1]);
     }
 }
 
@@ -40,7 +39,8 @@ class QueueWorkerCommandTest extends OriginTestCase
         (new PassOrFailJob(true))->dispatch(['queu']);
         $this->exec('queue:worker --connection=test');
         $this->assertExitSuccess();
-        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text> <green>1000</green><text> (0s)</text> <pass> OK </pass>');
+        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text>');
+        $this->assertOutputContains('<pass> OK </pass>');
     }
 
     public function testRunJobFail()
@@ -49,7 +49,8 @@ class QueueWorkerCommandTest extends OriginTestCase
         (new PassOrFailJob(false))->dispatch();
         $this->exec('queue:worker --connection=test');
         $this->assertExitSuccess();
-        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text> <green>1000</green><text> (0s)</text> <fail> FAILED </fail>');
+        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text>');
+        $this->assertOutputContains('<fail> FAILED </fail>');
     }
 
     public function testRunJobFailRetry()
@@ -57,14 +58,20 @@ class QueueWorkerCommandTest extends OriginTestCase
         // Create a job and dispatch
         (new PassOrFailJob(false))->dispatch();
         $this->exec('queue:worker --connection=test');
+      
         $this->assertExitSuccess();
-        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text> <green>1000</green><text> (0s)</text> <fail> FAILED </fail>');
+        $this->assertOutputContains('<cyan>Run</cyan> <text>PassOrFail</text>');
+        $this->assertOutputContains('<fail> FAILED </fail>');
         $this->assertOutputNotContains('Retry');
+
+        sleep(1);
 
         // Second time should be retry
         $this->exec('queue:worker --connection=test');
-        $this->assertOutputNotContains('<cyan>Run</cyan> <text>PassOrFail</text> <green>1000</green><text> (0s)</text> <fail> FAILED </fail>');
         $this->assertExitSuccess();
-        $this->assertOutputContains('<cyan>Retry #1</cyan> <text>PassOrFail</text> <green>1000</green><text> (0s)</text> <fail> FAILED </fail>');
+        
+        $this->assertOutputNotContains('<cyan>Run</cyan> <text>PassOrFail</text>');
+        $this->assertOutputContains('<cyan>Retry #1</cyan> <text>PassOrFail</text>');
+        $this->assertOutputContains('<fail> FAILED </fail>');
     }
 }

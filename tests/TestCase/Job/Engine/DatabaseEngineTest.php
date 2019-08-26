@@ -64,6 +64,7 @@ class DatabaseEngineTest extends OriginTestCase
 
         $this->engine = Queue::connection('test');
     }
+
     public function testAdd()
     {
         $job = new PassOrFailJob(true);
@@ -77,7 +78,7 @@ class DatabaseEngineTest extends OriginTestCase
 
         $job = $this->engine->fetch();
         $this->assertInstanceOf(Job::class, $job);
-        $this->assertEquals(1000, $job->id());
+        $this->assertEquals(1000, $job->backendId());
         $this->assertEquals([true], $job->get('arguments')); # Check Serialization
 
         $result = $this->engine->model()->get(1000);
@@ -98,7 +99,7 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
         
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->id());
+        $this->assertEquals(1000, $job->backendId());
         $this->assertTrue($this->engine->fail($job));
 
         $result = $this->engine->model()->get(1000);
@@ -115,7 +116,7 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->id());
+        $this->assertEquals(1000, $job->backendId());
         $this->assertTrue($this->engine->success($job));
 
         $result = $this->engine->model()->exists(1000);
@@ -136,7 +137,7 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->id());
+        $this->assertEquals(1000, $job->backendId());
         $this->assertTrue($this->engine->delete($job));
 
         $result = $this->engine->model()->exists(1000);

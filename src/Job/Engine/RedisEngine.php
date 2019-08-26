@@ -59,29 +59,6 @@ class RedisEngine extends BaseEngine
         throw new Exception($msg);
     }
 
-    protected function connect()
-    {
-        $result = false;
-        try {
-            if (! empty($this->config['path'])) {
-                $result = $this->Redis->connect($this->config['path']);
-            } elseif (! empty($this->config['persistent'])) {
-                $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
-            } else {
-                $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
-            }
-        } catch (RedisException $e) {
-            return false;
-        }
-        if ($result) {
-            if (isset($this->config['password'])) {
-                return $this->Redis->auth($this->config['password']);
-            }
-        }
-
-        return $result;
-    }
-
     /**
      * Add a job to the queue
      *
@@ -90,8 +67,6 @@ class RedisEngine extends BaseEngine
      */
     public function add(Job $job, string $strtotime = 'now')
     {
-        $job->id(uuid());
-
         $serialized = $this->serialize($job);
    
         $when = strtotime($strtotime);
@@ -118,7 +93,7 @@ class RedisEngine extends BaseEngine
     }
 
     /**
-     * Deletes a job
+     * Deletes a job from both the queue and scheduled
      *
      * @param \Origin\Queue\Job $job
      * @return null
@@ -127,6 +102,7 @@ class RedisEngine extends BaseEngine
     {
         $serialized = $this->serialize($job);
         $this->Redis->lrem('queue:'. $job->queue, $serialized);
+        $this->Redis->lrem('scheduled:'. $job->queue, $serialized);
     }
     /**
      * Handles a failed job
@@ -136,10 +112,6 @@ class RedisEngine extends BaseEngine
      */
     public function fail(Job $job)
     {
-        if (! $job->id()) {
-            return false;
-        }
-        
         $serialized = $this->serialize($job);
       
         $this->Redis->rpush('failed:' . $job->queue, $serialized);
@@ -154,15 +126,11 @@ class RedisEngine extends BaseEngine
     */
     public function success(Job $job)
     {
-        if (! $job->id()) {
-            return false;
-        }
-
         $this->delete($job);
     }
 
     /**
-    * Retries a job
+    * Retries a failed job
     *
      * @param \Origin\Queue\Job $job
      * @param integer $tries
@@ -175,11 +143,7 @@ class RedisEngine extends BaseEngine
             $serialized = $this->serialize($job);
             $this->Redis->lrem('failed:'. $job->queue, $serialized);
             $this->add($job, $strtotime);
-
-            return;
         }
-
-        $this->fail($job);
     }
 
     /**
@@ -197,6 +161,29 @@ class RedisEngine extends BaseEngine
                 $this->Redis->zrem('scheduled:' . $queue, $serialized);
             }
         }
+    }
+
+    protected function connect()
+    {
+        $result = false;
+        try {
+            if (! empty($this->config['path'])) {
+                $result = $this->Redis->connect($this->config['path']);
+            } elseif (! empty($this->config['persistent'])) {
+                $result = $this->Redis->pconnect($this->config['host'], $this->config['port'], $this->config['timeout'], $this->persistentId());
+            } else {
+                $result = $this->Redis->connect($this->config['host'], $this->config['port'], $this->config['timeout']);
+            }
+        } catch (RedisException $e) {
+            return false;
+        }
+        if ($result) {
+            if (isset($this->config['password'])) {
+                return $this->Redis->auth($this->config['password']);
+            }
+        }
+
+        return $result;
     }
 
     /**
