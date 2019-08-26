@@ -72,7 +72,7 @@ class Service
             throw new Exception('Job must have an intialize method');
         }
 
-        $this->initialize();
+        $this->initialize(...func_get_args());
     }
 
     # Initialize is not defined here so user can define with proper type hints and return types

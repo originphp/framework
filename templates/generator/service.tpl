@@ -20,7 +20,7 @@ class %class%Service extends AppService
     {
         
         return $this->result([
-            'success' => true
+            'success' => true,
             'data' => []
             ]);
     }
