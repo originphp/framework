@@ -113,8 +113,7 @@ class RedisEngine extends BaseEngine
     public function fail(Job $job)
     {
         $serialized = $this->serialize($job);
-      
-        $this->Redis->rpush('failed:' . $job->queue, $serialized);
+        $this->Redis->rpush('failed:jobs', $serialized);
         $this->Redis->lrem('queue:'. $job->queue, $serialized);
     }
 
@@ -141,7 +140,7 @@ class RedisEngine extends BaseEngine
     {
         if ($job->attempts() < $tries + 1) {
             $serialized = $this->serialize($job);
-            $this->Redis->lrem('failed:'. $job->queue, $serialized);
+            $this->Redis->lrem('failed:jobs', $serialized);
             $this->add($job, $strtotime);
         }
     }
