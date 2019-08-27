@@ -99,11 +99,11 @@ class Email
     protected $emailFormat = 'both';
 
     /**
-     * This is the headers + body
+     * Message object
      *
-     * @var array
+     * @var \Origin\Mailer\Message
      */
-    protected $content = null;
+    protected $message = null;
 
     /**
      * Vars to be loaded in template
@@ -505,9 +505,9 @@ class Email
      * Undocumented function
      *
      * @param string $message Text message if sending directly like this
-     * @return string
+     * @return \Origin\Mailer\Message
      */
-    public function send(string $message = null)
+    public function send(string $message = null) : Message
     {
         if (empty($this->from)) {
             throw new Exception('From email is not set.');
@@ -542,32 +542,30 @@ class Email
             throw new Exception('Email config has not been set.');
         }
        
-        $this->content = $this->render();
+        $this->message = $this->render();
        
         if (! isset($this->account['debug']) or $this->account['debug'] === false) {
             $this->smtpSend();
         }
 
-        return $this->content;
+        return $this->message;
     }
 
     /**
      * Builds the headers and message
      *
-     * @return string headers + message
+     * @return \Origin\Mailer\Message
      */
-    protected function render() //: string
+    protected function render() : message
     {
         $headers = '';
         foreach ($this->buildHeaders() as $header => $value) {
             $headers .= "{$header}: {$value}" . self::CRLF;
         }
         $message = implode(self::CRLF, $this->buildMessage());
-        $message = new \Origin\Mailer\Message($headers, $message);
+        $message = new Message($headers, $message);
 
         return $message;
-
-        return $headers . self::CRLF . self::CRLF . $message;
     }
 
     /**
@@ -592,7 +590,7 @@ class Email
 
         $this->sendCommand('DATA', '354');
 
-        $this->sendCommand($this->content . self::CRLF . self::CRLF . self::CRLF . '.', '250');
+        $this->sendCommand($this->message . self::CRLF . self::CRLF . self::CRLF . '.', '250');
 
         $this->sendCommand('QUIT', '221');
 
