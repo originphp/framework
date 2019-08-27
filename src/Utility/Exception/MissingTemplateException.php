@@ -11,11 +11,8 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
-namespace Origin\Utility\Exception;
-
-use Origin\Exception\Exception;
-
-class MissingTemplateException extends Exception
-{
-}
+# Deprecated from v1.20
+// @codeCoverageIgnoreStart
+class_alias('Origin\Mailer\Exception\MissingTemplateException', 'Origin\Utility\Exception\MissingTemplateException');
+deprecationWarning('Use Origin\Mailer\Exception\MissingTemplateException instead of Origin\Utility\Exception\MissingTemplateException.');
+// @codeCoverageIgnoreEnd

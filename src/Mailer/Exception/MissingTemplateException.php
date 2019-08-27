@@ -11,8 +11,11 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-# Deprecated from v1.20
-// @codeCoverageIgnoreStart
-class_alias('Origin\Mailer\Email', 'Origin\Utility\Email');
-deprecationWarning('Use Origin\Mailer\Email instead of Origin\Utility\Email.');
-// @codeCoverageIgnoreEnd
+
+namespace Origin\Mailer\Exception;
+
+use Origin\Exception\Exception;
+
+class MissingTemplateException extends Exception
+{
+}

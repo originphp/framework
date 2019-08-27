@@ -12,13 +12,13 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Utility;
+namespace Origin\Test\Mailer;
 
-use Origin\Utility\Email;
+use Origin\Mailer\Email;
 use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Utility\Exception\MissingTemplateException;
+use Origin\Mailer\Exception\MissingTemplateException;
 
 class MockEmail extends Email
 {
@@ -616,7 +616,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->htmlMessage('<p>this is a test</p>')
             ->format('both');
 
-        $result = $email->send();
+        $result = $email->send()->message();
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
         $this->assertContains($expected, $result);
     }
@@ -628,7 +628,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->from('mailer@originphp.com')
             ->subject('template test')
             ->htmlMessage('<h1>Welcome Frank</h1>');
-        $result = $email->send();
+        $result = $email->send()->message();
         $this->assertContains("Welcome Frank\r\n=============", $result);
         $this->assertContains('<h1>Welcome Frank</h1>', $result);
     }
@@ -641,7 +641,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->subject('template test')
             ->set(['first_name' => 'Frank'])
             ->template('welcome');
-        $result = $email->send();
+        $result = $email->send()->message();
         $this->assertContains("Welcome Frank\r\n=============", $result);
         $this->assertContains('<h1>Welcome Frank</h1>', $result);
     }
@@ -655,7 +655,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('both')
             ->set(['first_name' => 'Frank'])
             ->template('demo');
-        $result = $email->send();
+        $result = $email->send()->message();
         $this->assertContains("Hi Frank,\r\nHow is your day so far?", $result);
         $this->assertContains("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
 
@@ -666,7 +666,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('both')
             ->set(['first_name' => 'Tony'])
             ->template('Widget.how-are-you');
-        $result = $email->send();
+        $result = $email->send()->message();
         $this->assertContains("Hi Tony,\r\nHow are you?", $result);
         $this->assertContains("<p>Hi Tony</p>\r\n<p>How are you?</p>", $result);
     }
@@ -681,7 +681,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('text')
             ->set(['first_name' => 'Frank'])
             ->template('text-exception');
-        $result = $email->send();
+        $email->send();
     }
     public function testCreateMessageTemplateHtmlException()
     {
@@ -693,7 +693,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('html')
             ->set(['first_name' => 'Frank'])
             ->template('html-exception');
-        $result = $email->send();
+        $email->send();
     }
 
     public function testSendNoFromAddress()
@@ -705,7 +705,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('html')
             ->set(['first_name' => 'Frank'])
             ->template('html-exception');
-        $result = $email->send();
+        $email->send();
     }
     public function testSendNoToAddress()
     {
@@ -716,7 +716,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('html')
             ->set(['first_name' => 'Frank'])
             ->template('html-exception');
-        $result = $email->send();
+        $email->send();
     }
 
     public function testSendMessageArg()
@@ -725,7 +725,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('send arg');
-        $result = $email->send("Yo Adrian!\nRocky");
+        $result = $email->send("Yo Adrian!\nRocky")->body();
         $this->assertContains("Yo Adrian!\r\nRocky", $result);
     }
 
@@ -909,7 +909,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $email->sender('sender@originphp.com')
             ->replyTo('replyTo@originphp.com')
             ->returnPath('returnPath@originphp.com');
-        $result = $email->send("Yo Adrian!\nRocky");
+        $result = $email->send("Yo Adrian!\nRocky")->header();
     
         $this->assertContains('Sender: sender@originphp.com', $result);
         $this->assertContains('Reply-To: replyTo@originphp.com', $result);
@@ -922,7 +922,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $email->to('james@originphp.com', 'James')
             ->from('mailer@originphp.com')
             ->subject("Injection test\nBcc: apollo@boxers.io");
-        $result = $email->send("Yo Adrian!\nRocky");
+        $result = $email->send("Yo Adrian!\nRocky")->message();
         $this->assertContains('Subject: Injection =?UTF-8?B?dGVzdApCY2M6IGFwb2xsb0Bib3hlcnMuaW8=?=', $result);
         $this->assertNotContains('apollo@boxers.io', $result);
         
@@ -953,7 +953,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->htmlMessage('The email message has non-ascii chars Ragnarr Loþbrók.')
             ->format('html') // use HTML or TEXT only message. Not both
             ->addAttachment($filename);
-        $result = $email->send();
+        $result = $email->send()->message();
         $this->assertContains('Content-Type: text/html; charset="UTF-8"', $result);
         $this->assertContains('Content-Transfer-Encoding: quoted-printable', $result);
         $this->assertContains('The email message has non-ascii chars Ragnarr Lo=C3=BEbr=C3=B3k', $result);

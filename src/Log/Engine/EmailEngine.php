@@ -14,7 +14,7 @@
 
 namespace Origin\Log\Engine;
 
-use Origin\Utility\Email;
+use Origin\Mailer\Email;
 use Origin\Exception\Exception;
 use Origin\Exception\InvalidArgumentException;
 

@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Utility\Email;
+use Origin\Mailer\Email;
 use Origin\Log\Engine\EmailEngine;
 use Origin\Exception\InvalidArgumentException;
 
@@ -76,9 +76,10 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
         $id = uniqid();
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
-        $this->assertContains('From: me@example.com', $engine->email());
-        $this->assertContains('To: you@example.com', $engine->email());
+        $message = $engine->email()->message();
+        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $message);
+        $this->assertContains('From: me@example.com', $message);
+        $this->assertContains('To: you@example.com', $message);
     }
 
     public function testLogEmailArray()
@@ -90,12 +91,14 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
             'account' => 'demo',
         ]);
         $id = uniqid();
+     
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $engine->email());
-   
-        $this->assertContains('From: me@example.com', $engine->email());
-        $this->assertContains('jimbo <you@example.com>', $engine->email());
+
+        $message = $engine->email()->message();
+        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $message);
+        $this->assertContains('From: me@example.com', $message);
+        $this->assertContains('jimbo <you@example.com>', $message);
     }
 
     /**
