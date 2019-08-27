@@ -204,11 +204,8 @@ class Job
     }
 
     /**
-     * Dispatches the job to the queue
+     * Dispatches the job to the queue with the given arguments.
      *
-     * @param array $options These options will overide the set properties. The available option keys are:
-     *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
-     *   - queue: the queue to dispatch if different to configured
      * @return void
      */
     public function dispatch() : void
@@ -250,8 +247,7 @@ class Job
     }
 
     /**
-     * Dispatches the job immediately.
-     * @internal if id set that means job has been serialized/unserialzied
+     * Dispatches the job immediately with the given arguments.
      *
      * @return bool
      */
@@ -264,7 +260,7 @@ class Job
             $this->initialize();
             $this->startup();
             $this->execute(...$this->arguments);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->shutdown();
         
             if ($this->enqueued) {

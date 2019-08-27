@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+## [1.28.2] - 2019-08-27
+### Fixed
+- Fixed type error causing type error with onError callback.
+
 ## [1.28.1] - 2019-08-27
 
 ### Fixed
