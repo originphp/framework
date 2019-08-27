@@ -110,6 +110,8 @@ class Job
 
     /**
      * Constructor
+     * @internal no dependency injection here because it would also have be serialized and there is the initialize
+     * issue as well, Only execute method
      */
     public function __construct(array $options = [])
     {
