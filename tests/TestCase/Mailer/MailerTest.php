@@ -51,6 +51,15 @@ class MailerTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('How is your day so far?', $message->body());
     }
 
+    public function testDispatchLater()
+    {
+        $params = [
+            'first_name' => 'jim',
+            'email' => 'demo@originphp.com',
+        ];
+        $this->assertNull((new DemoMailer())->dispatchLater($params));
+    }
+
     public function testPreview()
     {
         $mailer = new DemoMailer();

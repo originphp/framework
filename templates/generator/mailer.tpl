@@ -1,6 +1,7 @@
 <?php
 namespace %namespace%\Mailer;
 use App\Mailer\AppMailer;
+use Origin\Model\Entity;
 
 class %class%Mailer extends AppMailer
 {
@@ -10,7 +11,7 @@ class %class%Mailer extends AppMailer
         
         $this->mail([
             'to' => $user->email,
-            'subject' => 'email subject goes here',
+            'subject' => 'email subject'
         ]);
     }
 }

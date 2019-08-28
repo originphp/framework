@@ -108,6 +108,13 @@ abstract class Mailer
      */
     protected $viewVars = [];
 
+    /**
+     * The name of the Queue connection to use
+     *
+     * @var string
+     */
+    protected $queueConnection = 'default';
+
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];
@@ -225,6 +232,21 @@ abstract class Mailer
         $this->shutdown();
 
         return $result;
+    }
+
+    /**
+      * Dispatches the email to the mailer queue using the default connection
+      *
+      * @return bool
+      */
+    public function dispatchLater() : bool
+    {
+        $params = [
+            'mailer' => $this,
+            'arguments' => func_get_args(),
+        ];
+
+        return (new SendEmailJob(['queue' => 'mailer']))->dispatch($params);
     }
 
     /**
