@@ -145,11 +145,14 @@ class Email
      */
     public function account($config = null)
     {
+        $account = null;
+
         if ($config === null) {
             return $this->account;
         }
 
         if (is_string($config)) {
+            $account = $config;
             $config = static::config($config);
         }
 
@@ -170,7 +173,7 @@ class Email
             return $this;
         }
 
-        throw new InvalidArgumentException(sprintf('The email account `%s` does not exist.', $config));
+        throw new InvalidArgumentException(sprintf('The email account `%s` does not exist.', $account));
     }
 
     /**
