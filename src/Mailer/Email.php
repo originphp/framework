@@ -185,10 +185,28 @@ class Email
      */
     protected function applyConfig() : void
     {
-        $methods = ['to', 'from', 'sender', 'bcc', 'cc', 'replyTo'];
-        foreach ($this->account as $method => $args) {
-            if (in_array($method, $methods)) {
-                call_user_func_array([$this, $method], (array)$args);
+        foreach (['to', 'from', 'sender', 'replyTo'] as $method) {
+            if (isset($this->account[$method])) {
+                call_user_func_array([$this, $method], (array) $this->account[$method]);
+            }
+        }
+        if (isset($this->account['bcc'])) {
+            foreach ((array) $this->account['bcc'] as $email => $name) {
+                if (is_int($email)) {
+                    $email = $name;
+                    $name = null;
+                }
+                $this->addBcc($email, $name);
+            }
+        }
+
+        if (isset($this->account['cc'])) {
+            foreach ((array) $this->account['cc'] as $email => $name) {
+                if (is_int($email)) {
+                    $email = $name;
+                    $name = null;
+                }
+                $this->addCc($email, $name);
             }
         }
     }

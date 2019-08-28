@@ -168,6 +168,28 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
     }
 
+    public function testCcDefault()
+    {
+        $email = new MockEmail([
+            'cc' => ['james@originphp.com','guest@originphp.com' => 'Guest'],
+        ]);
+      
+        $property = $email->getProperty('cc');
+        $this->assertEquals(['james@originphp.com', null], $property[0]);
+        $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
+    }
+
+    public function testBccDefault()
+    {
+        $email = new MockEmail([
+            'bcc' => ['james@originphp.com','guest@originphp.com' => 'Guest'],
+        ]);
+      
+        $property = $email->getProperty('bcc');
+        $this->assertEquals(['james@originphp.com', null], $property[0]);
+        $this->assertEquals(['guest@originphp.com', 'Guest'], $property[1]);
+    }
+
     public function testSubject()
     {
         $email = new MockEmail();
