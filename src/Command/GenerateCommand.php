@@ -26,18 +26,19 @@ class GenerateCommand extends Command
      * @var array
      */
     protected $generators = [
-        'behavior' => 'Generates a behavior class',
-        'command' => 'Generates a command class',
-        'component' => 'Generates a component class',
-        'controller' => 'Generates a controller class',
-        'helper' => 'Generates a helper class',
-        'job' => 'Generates a job class',
-        'model' => 'Generates a model class',
-        'middleware' => 'Generates a middleware class',
-        'migration' => 'Generates a migration class',
-        'plugin' => 'Generates a plugin skeleton',
+        'behavior' => 'Generates a Behavior class',
+        'command' => 'Generates a Command class',
+        'component' => 'Generates a Component class',
+        'controller' => 'Generates a Controller class',
+        'helper' => 'Generates a Helper class',
+        'job' => 'Generates a Job class',
+        'mailer' => 'Generates a Mailer class',
+        'model' => 'Generates a Model class',
+        'middleware' => 'Generates a Middleware class',
+        'migration' => 'Generates a Migration class',
+        'plugin' => 'Generates a Plugin skeleton',
         'scaffold' => 'Generates a MVC base application using the database',
-        'service' => 'Generates a service object class',
+        'service' => 'Generates a Service object class',
     ];
 
     public function initialize()
@@ -214,7 +215,6 @@ class GenerateCommand extends Command
             $data
         );
     }
-
     protected function helper(array $data)
     {
         $this->generate(
@@ -228,6 +228,28 @@ class GenerateCommand extends Command
             $this->getBaseFolder($data['name'], self::TEST).DS.'View'.DS.'Helper'.DS."{$data['class']}HelperTest.php",
             $data
         );
+    }
+    protected function mailer(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('mailer'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Mailer'.DS."{$data['class']}Mailer.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('mailer_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Mailer'.DS."{$data['class']}MailerTest.php",
+            $data
+        );
+
+        $input = $this->getTemplateFilename('mailer_html');
+        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.'Mailer'.DS. $data['class'] . DS . 'html.ctp';
+        $this->saveGeneratedCode($out, file_get_contents($input));
+
+        $input = $this->getTemplateFilename('mailer_text');
+        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'View'.DS.'Mailer'.DS. $data['class'] . DS . 'text.ctp';
+        $this->saveGeneratedCode($out, file_get_contents($input));
     }
 
     protected function job(array $data)

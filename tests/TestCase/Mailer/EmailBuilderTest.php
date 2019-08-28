@@ -15,9 +15,17 @@
 namespace Origin\Test\Mailer;
 
 use Origin\Mailer\EmailBuilder;
+use Origin\TestSuite\TestTrait;
+use Origin\Exception\NotFoundException;
+
+class MockEmailBuilder extends EmailBuilder
+{
+    use TestTrait;
+}
 
 class EmailBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    
     /**
      * To/from/sender/reply-to share the same loop so test em all using
      * the different email types
@@ -32,7 +40,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => ['noreply@example.com' => 'web application'],
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
@@ -59,7 +67,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => 'noreply@example.com',
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
@@ -83,7 +91,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => 'noreply@example.com',
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
@@ -105,7 +113,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'to' => 'js@example.com',
             'from' => ['sam@example.com'],
             'subject' => 'test build 2',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
@@ -124,17 +132,20 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'to' => 'js@example.com',
             'from' => ['sam@example.com'],
             'subject' => 'test build 2',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
             'attachments' => [
                 ROOT . DS . 'tests' . DS  . 'README.md' => 'Important.md',
+                ROOT . DS . 'README.md',
             ],
         ];
+      
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
         $this->assertContains('Content-Type: text/plain; name="Important.md"', $message->body());
+        $this->assertContains('Content-Type: text/plain; name="README.md"', $message->body());
     }
 
     public function testRenderHtml()
@@ -145,7 +156,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => ['noreply@example.com' => 'web application'],
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'html',
             'layout' => 'email',
@@ -165,7 +176,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => ['noreply@example.com' => 'web application'],
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'demo',
+            'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'text',
             'layout' => 'email',
@@ -177,6 +188,38 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertContains("Hi jon,\r\n", $message->body());
     }
 
+    public function testRenderHtmlException()
+    {
+        $this->expectException(NotFoundException::class);
+        $options = [
+            'to' => 'js@example.com',
+            'from' => ['sam@example.com'],
+            'subject' => 'test build 1',
+            'folder' => 'DoesNotExist',
+            'viewVars' => ['first_name' => 'jon'],
+            'format' => 'html',
+            'layout' => 'email',
+        ];
+        $builder = new EmailBuilder($options);
+        $message = $builder->build(true)->send();
+    }
+
+    public function testRenderTextException()
+    {
+        $this->expectException(NotFoundException::class);
+        $options = [
+            'to' => 'js@example.com',
+            'from' => ['sam@example.com'],
+            'subject' => 'test build 1',
+            'folder' => 'DoesNotExist',
+            'viewVars' => ['first_name' => 'jon'],
+            'format' => 'text',
+            'layout' => 'email',
+        ];
+        $builder = new EmailBuilder($options);
+        $message = $builder->build(true)->send();
+    }
+
     public function testRenderTextConvert()
     {
         $options = [
@@ -185,7 +228,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'sender' => ['noreply@example.com' => 'web application'],
             'replyTo' => 'blackhole@example.com',
             'subject' => 'test build 1',
-            'template' => 'welcome',
+            'folder' => 'Welcome',
             'viewVars' => ['first_name' => 'jon'],
             'format' => 'both',
             'layout' => 'email',
@@ -195,5 +238,24 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
       
         $this->assertContains("Welcome jon\r\n", $message->body());
         $this->assertContains('<h1>Welcome jon</h1>', $message->body());
+    }
+
+    public function testPluginpaths()
+    {
+        $options = [
+            'to' => 'js@example.com',
+            'from' => ['sam@example.com'],
+            'subject' => 'test build 1',
+            'folder' => 'Welcome',
+            'viewVars' => ['first_name' => 'jon'],
+            'format' => 'both',
+            'layout' => 'email',
+        ];
+        $builder = new MockEmailBuilder($options);
+        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'View' . DS . 'Mailer' .DS . 'SendUserNotification' ;
+        $this->assertEquals($expected, $builder->callMethod('getPath', ['MyPlugin.SendUserNotification']));
+
+        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'View' . DS . 'Layout' .DS . 'mailer.ctp' ;
+        $this->assertEquals($expected, $builder->callMethod('getLayoutFilename', ['MyPlugin.mailer']));
     }
 }

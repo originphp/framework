@@ -21,6 +21,19 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.29.0] - xxx
+### Added
+- Mailer
+
+### Changed
+- Email now returns a Mailer\Message object instead of string
+
+### Deprecated
+- Utility\Email is now Mailer\Email
+
+### Fixed
+- Missing email account error not showing name
+- View loading layout from plugin folder
 
 ## [1.28.2] - 2019-08-27
 ### Fixed

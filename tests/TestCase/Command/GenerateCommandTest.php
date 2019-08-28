@@ -235,6 +235,27 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
+    public function testGenerateMailer()
+    {
+        $this->exec('generate --force mailer Dummy');
+        $this->assertExitSuccess();
+
+        $filename = SRC.DS.'Mailer'.DS.'DummyMailer.php';
+        $this->assertOutputContains('src/Mailer/DummyMailer.php');
+        $this->assertFileExists($filename);
+
+        $this->assertFileHash('eda26d3b5f5e42a0f0f5332fd81bdf08', $filename);
+        unlink($filename);
+
+        $filename = TESTS.DS.'TestCase'.DS .'Mailer'.DS.'DummyMailerTest.php';
+       
+        $this->assertOutputContains('TestCase/Mailer/DummyMailerTest.php');
+        $this->assertFileExists($filename);
+        
+        $this->assertFileHash('5b9af54d9912447714247b8ac3996046', $filename);
+        unlink($filename);
+    }
+
     public function testGenerateModel()
     {
         $this->exec('generate --force model Dummy name:string description:text');

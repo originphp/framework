@@ -14,8 +14,8 @@
 namespace Origin\Mailer;
 
 use Origin\Utility\Html;
+use Origin\Utility\Inflector;
 use Origin\Exception\NotFoundException;
-use Origin\Exception\InvalidArgumentException;
 
 /**
  * This class builds an configured email from an arra for Mailer.
@@ -48,14 +48,13 @@ class EmailBuilder
             'cc' => null,
             'sender' => null,
             'replyTo' => null,
-            'template' => null,
             'format' => null,
+            'folder' => null,
             'headers' => null,
             'attachments' => null,
             'viewVars' => null, ];
       
         $this->options = $options;
-        $this->viewVars = $options['viewVars'];
     }
 
     /**
@@ -66,8 +65,8 @@ class EmailBuilder
      */
     public function build(bool $debug = false) : Email
     {
-        $account = $debug === true ? ['debug' => true] : $this->options['account'];
-       
+        $account = ($debug === true) ? ['debug' => true] : $this->options['account'];
+      
         $this->message = new Email($account);
      
         extract($this->options);
@@ -106,32 +105,43 @@ class EmailBuilder
         
         if ($attachments) {
             foreach ($attachments as $filename => $name) {
+                if (is_int($filename)) {
+                    $filename = $name;
+                    $name = null;
+                }
                 $this->message->addAttachment($filename, $name);
             }
         }
   
-        if (! isset($this->options['template'])) {
-            throw new InvalidArgumentException('No Template set');
-        }
-    
+        $this->render();
+       
+        return $this->message;
+    }
+
+    /**
+     * Renders the message using the templates, if no text template is found
+     * it will create a version from the
+     *
+     * @return void
+     */
+    protected function render() : void
+    {
         if (in_array($this->options['format'], ['html','both'])) {
-            $this->render();
+            $this->renderHtmlMessage();
             $this->message->htmlMessage($this->content);
         }
         if (in_array($this->options['format'], ['text','both'])) {
-            $filename = $this->getFilename($this->options['template'], 'text');
+            $filename = $this->getPath($this->options['folder']) . DS . 'text.ctp';
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
                 $this->message->textMessage($content);
-            } elseif ($this->options['format'] === 'both') {
+            } elseif ($this->content and $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
                 throw new NotFoundException($filename . ' could not be found');
             }
         }
-       
-        return $this->message;
     }
 
     /**
@@ -141,7 +151,7 @@ class EmailBuilder
      * @param string|null $name
      * @return array
      */
-    private function buildArguments($email, $name) : array
+    protected function buildArguments($email, $name) : array
     {
         if (is_int($email)) {
             $email = $name;
@@ -156,10 +166,10 @@ class EmailBuilder
      *
      * @return void
      */
-    protected function render() : void
+    protected function renderHtmlMessage() : void
     {
         $this->content = $this->renderTemplate(
-            $this->getFilename($this->options['template'])
+            $this->getPath($this->options['folder']) . DS . 'html.ctp'
         );
         if ($this->options['layout']) {
             $this->content = $this->renderTemplate(
@@ -176,7 +186,7 @@ class EmailBuilder
         if (! file_exists($__filename)) {
             throw new NotFoundException($__filename. ' could not be found');
         }
-        extract($this->viewVars);
+        extract($this->options['viewVars']);
         ob_start();
         include $__filename;
 
@@ -184,7 +194,8 @@ class EmailBuilder
     }
 
     /**
-    * Returns the rendered content
+    * Returns the rendered content, this is used for inside
+    * rendering.
     *
     * @return string|null
     */
@@ -194,20 +205,19 @@ class EmailBuilder
     }
 
     /**
-     * Used for determining layout/element filenames
+     * Gets the path
      *
      * @param string $name
-     * @param string $folder
-     * @return string
+     * @return void
      */
-    protected function getFilename(string $name, string $type = 'html') : string
+    protected function getPath(string $name) : string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . $plugin . DS . 'src' . DS . 'View' . DS . 'Email' .DS . $type . DS . $name . '.ctp';
+            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Mailer' .DS . $name ;
         }
 
-        return SRC . DS . 'View' . DS .  'Email' .DS . $type . DS . $name . '.ctp';
+        return SRC . DS . 'View' . DS . 'Mailer' .DS . $name ;
     }
 
     /**
@@ -220,7 +230,7 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . $plugin . DS . 'src' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
+            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
         }
 
         return SRC . DS . 'View' . DS .  'Layout' . DS . $name . '.ctp';

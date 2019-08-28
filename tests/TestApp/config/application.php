@@ -2,6 +2,7 @@
 use Origin\Job\Queue;
 use Origin\Cache\Cache;
 use Origin\Core\Plugin;
+use Origin\Mailer\Email;
 use Origin\Core\Configure;
 use Origin\Utility\Elasticsearch;
 
@@ -40,6 +41,10 @@ if (env('ELASTICSEARCH_HOST')) {
 Queue::config('test', [
     'engine' => 'Database',
     'datasource' => 'test',
+]);
+
+Email::config('test', [
+    'debug' => true,
 ]);
 /*
  * Load your plugins here
