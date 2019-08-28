@@ -16,11 +16,12 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
 use Origin\Model\ModelRegistry;
+use Origin\Model\Traits\ModelTrait;
 use Origin\Model\Exception\MissingModelException;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
-
+    use ModelTrait;
     /**
      * Holds the Fixtures list
      * examples
