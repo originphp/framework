@@ -2,7 +2,6 @@
 namespace %namespace%\Test\Model;
 
 use Origin\TestSuite\OriginTestCase;
-use Origin\Model\ModelRegistry;
 
 /**
  * @property \App\Model\%class% $%class%
@@ -13,7 +12,7 @@ class %class%Test extends OriginTestCase
 
     public function startup()
     {
-        parent::startup();
-        $this->%class% = ModelRegistry::get('%class%');
+        parent::startup(); // remember parent
+        $this->loadModel('%class%');
     }
 }

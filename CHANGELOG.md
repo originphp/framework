@@ -26,12 +26,14 @@ Delete tag: git tag -d <tag_name>
 - Mailer
 
 ### Changed
+- TestCase can now load Models with LoadModel
 - Email now returns a Mailer\Message object instead of string
 
 ### Deprecated
 - Utility\Email is now Mailer\Email
 
 ### Fixed
+- Fixed setting default bcc/cc addresses now works with multiple
 - Missing email account error not showing name
 - View loading layout from plugin folder
 
