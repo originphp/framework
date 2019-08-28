@@ -57,7 +57,7 @@ class DotEnv
      */
     protected function env(string $key, $value) : void
     {
-        env($key, $value);
+        $_ENV[$key] = $value;
     }
 
     /**

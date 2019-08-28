@@ -166,25 +166,22 @@ function h(string $text = null, $encoding = 'UTF-8') : ?string
 }
 
 /**
- * Gets or sets an Environment variable
+ * Gets an environment vars
  *
  * @param string $variable
- * @return string|null
+ * @return mixed
  */
-function env(string $variable, string $value = null)
+function env(string $variable, $default = null)
 {
-    if ($value === null) {
-        if (isset($_SERVER[$variable])) {
-            return $_SERVER[$variable];
-        }
-        if (isset($_ENV[$variable])) {
-            return $_ENV[$variable];
-        }
+    $out = $default;
 
-        return null;
+    if (isset($_SERVER[$variable])) {
+        $out = $_SERVER[$variable];
+    } elseif (isset($_ENV[$variable])) {
+        $out = $_ENV[$variable];
     }
 
-    $_ENV[$variable] = $value;
+    return $out;
 }
 
 /**

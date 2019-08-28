@@ -74,10 +74,12 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
 
     public function testEnv()
     {
-        $this->assertNull(env('ABC', '123'));
-        $this->assertEquals('123', env('ABC'));
-        $_SERVER['FOO'] = 'bar'; // server info varies
-        $this->assertEquals('bar', env('FOO'));
+        $this->assertNull(env('foo'));
+        $this->assertEquals('bar', env('foo', 'bar'));
+        $_SERVER['key1'] = 'foo';
+        $_ENV['key2'] = 'bar';
+        $this->assertEquals('foo', env('key1'));
+        $this->assertEquals('bar', env('key2'));
     }
 
     public function testBegins()
@@ -143,7 +145,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/FunctionsTest.php Line: 141
+tests/TestCase/FunctionsTest.php Line: 143
 
 Array
 (
