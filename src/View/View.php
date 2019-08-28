@@ -298,7 +298,6 @@ class View
     protected function getLayoutFilename(string $layout)
     {
         $filename = $this->getFilename($layout, 'Layout');
-
         if ($this->fileExists($filename)) {
             return $filename;
         }
@@ -317,7 +316,7 @@ class View
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . $plugin . DS . 'src' . DS . 'View' . DS . $folder . DS . $name . '.ctp';
+            return PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . $folder . DS . $name . '.ctp';
         }
 
         return $this->viewPath . DS . $folder . DS . $name . '.ctp';

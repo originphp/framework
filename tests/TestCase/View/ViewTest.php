@@ -146,7 +146,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getLayoutFilename', ['bootstrap']);
 
-        $expected = PLUGINS.'/ContactManager/src/View/Layout/bootstrap.ctp';
+        $expected = PLUGINS.'/contact_manager/src/View/Layout/bootstrap.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getLayoutFilename', ['ContactManager.bootstrap']);
 
@@ -163,7 +163,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getElementFilename', ['recordTable']);
 
-        $expected = PLUGINS.'/ContactManager/src/View/Element/recordTable.ctp';
+        $expected = PLUGINS.'/contact_manager/src/View/Element/recordTable.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getElementFilename', ['ContactManager.recordTable']);
 
