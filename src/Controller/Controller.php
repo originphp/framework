@@ -189,7 +189,7 @@ class Controller
     }
 
     /**
-     * Sends a value or array of values to the array.
+     * Sends a value or array of values to the view array.
      *
      * @param string|array $name key name or array
      * @param $value if key is a string set the value for this
