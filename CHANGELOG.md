@@ -24,9 +24,10 @@ Delete tag: git tag -d <tag_name>
 ## [1.29.0] - xxx
 ### Added
 - Mailer
+- TestCase can now load Models with loadModel method
 
 ### Changed
-- TestCase can now load Models with LoadModel
+- ENV function can only set, no longer setter
 - Email now returns a Mailer\Message object instead of string
 
 ### Deprecated
@@ -73,7 +74,7 @@ Delete tag: git tag -d <tag_name>
 ## [1.27.1] - 2019-08-20
 
 ### Changed
-- Log file engine, file parameter changed to filename as this better fits since the path option is also avilable.
+- Log file engine, file parameter changed to filename as this better fits since the path option is also available.
 
 ### Fixed
 - Fixed issue with postgresql lastval is not yet defined in this session
