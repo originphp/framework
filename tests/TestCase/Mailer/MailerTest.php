@@ -17,6 +17,7 @@ namespace Origin\Test\Mailer;
 use Origin\Mailer\Mailer;
 use Origin\Mailer\Message;
 use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\OriginTestCase;
 
 class DemoMailer extends Mailer
 {
@@ -37,8 +38,9 @@ class DemoMailer extends Mailer
     }
 }
 
-class MailerTest extends \PHPUnit\Framework\TestCase
+class MailerTest extends OriginTestCase
 {
+    public $fixtures = ['Origin.Queue'];
     public function testDispatch()
     {
         $mailer = new DemoMailer();
@@ -57,7 +59,7 @@ class MailerTest extends \PHPUnit\Framework\TestCase
             'first_name' => 'jim',
             'email' => 'demo@originphp.com',
         ];
-        $this->assertNull((new DemoMailer())->dispatchLater($params));
+        $this->assertTrue((new DemoMailer())->dispatchLater($params));
     }
 
     public function testPreview()
