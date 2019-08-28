@@ -103,7 +103,7 @@ class RedisEngine extends BaseEngine
      */
     public function delete(string $key) :bool
     {
-        return $this->Redis->del($this->key($key));
+        return $this->Redis->del($this->key($key)) > 0;
     }
 
     /**
