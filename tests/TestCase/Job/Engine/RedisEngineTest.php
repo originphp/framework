@@ -87,10 +87,11 @@ class RedisEngineTest extends OriginTestCase
         $this->engine = Queue::connection('redis-test');
         $this->engine->redis()->flushdb();
     }
+
     public function testAdd()
     {
         $job = (new RedisPassOrFailJob())->setArguments(true);
-        $this->engine->add($job);
+        $this->assertTrue($this->engine->add($job));
      
         // Check it was added
         $result = $this->engine->redis()->lpop('queue:test');
@@ -100,7 +101,7 @@ class RedisEngineTest extends OriginTestCase
     public function testAddScheduled()
     {
         $job = (new RedisPassOrFailJob())->setArguments(true);
-        $this->engine->add($job, '+5 minutes');
+        $this->assertTrue($this->engine->add($job, '+5 minutes'));
 
         // Check it was added
         $result = $this->engine->redis()->zrange('scheduled:test', 0, -1); // schedule uses different type of list
@@ -112,7 +113,7 @@ class RedisEngineTest extends OriginTestCase
         # Prepare
         $job = new RedisPassOrFailJob();
         $job->setArguments(true);
-        $this->engine->add($job);
+        $this->assertTrue($this->engine->add($job));
 
         # Test
         $job = $this->engine->fetch('test');
@@ -129,7 +130,7 @@ class RedisEngineTest extends OriginTestCase
         # Prepare
         $job = new RedisPassOrFailJob();
         $job->setArguments(true);
-        $this->engine->add($job, '+1 second');
+        $this->assertTrue($this->engine->add($job, '+1 second'));
         $this->assertNull($this->engine->fetch('test'));
         sleep(1);
         $scheduledJob = $this->engine->fetch('test');
@@ -146,7 +147,7 @@ class RedisEngineTest extends OriginTestCase
         # Prepare
         $job = new RedisPassOrFailJob();
         $job->setArguments(true);
-        $this->engine->add($job);
+        $this->assertTrue($this->engine->add($job));
         
         $job = $this->engine->fetch('test');
         $this->assertInstanceOf(Job::class, $job);
@@ -170,12 +171,12 @@ class RedisEngineTest extends OriginTestCase
         # Prepare
         $job = new RedisPassOrFailJob();
         $job->setArguments(true);
-        $this->engine->add($job);
+        $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch('test');
         $this->assertInstanceOf(Job::class, $job);
 
-        $this->engine->success($job);
+        $this->engine->success($job); // Can't assert
         $result = $this->engine->redis()->lrange('queue:test', 0, -1);
         $this->assertEmpty($result);
     }
@@ -190,9 +191,9 @@ class RedisEngineTest extends OriginTestCase
         # Prepare
         $job = new RedisPassOrFailJob();
         $job->setArguments(true);
-        $this->engine->add($job);
+        $this->assertTrue($this->engine->add($job));
 
-        $this->engine->delete($job);
+        $this->assertTrue($this->engine->delete($job));
         $result = $this->engine->redis()->lrange('queue:test', 0, -1);
         $this->assertEmpty($result);
     }

@@ -200,7 +200,7 @@ class Job
     */
     public function connection() : BaseEngine
     {
-        $connection = env('ORIGIN_ENV') === 'test' ?'test':$this->connection;
+        $connection = env('ORIGIN_ENV') === 'test' ? 'test' : $this->connection;
 
         return Queue::connection($connection);
     }
@@ -208,44 +208,14 @@ class Job
     /**
      * Dispatches the job to the queue with the given arguments.
      *
-     * @return void
+     * @return bool
      */
-    public function dispatch() : void
+    public function dispatch() : bool
     {
         $this->arguments = func_get_args();
         $this->enqueued = date('Y-m-d H:i:s');
-        $this->connection()->add($this, $this->wait ?: 'now');
-    }
 
-    /**
-    * Retries a job
-    *
-    * @param array $options The following option keys are supported :
-    *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
-    *   - limit: The maximum number of retries to do. Default:3
-    * @return bool
-    */
-    public function retry(array $options = []) : bool
-    {
-        $options += ['wait' => '+ 5 seconds','limit' => 3];
-
-        if ($this->attempts() < $options['limit'] + 1) {
-            $this->retryOptions = $options;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the number of attempts
-     *
-     * @return int
-     */
-    public function attempts() : int
-    {
-        return $this->attempts;
+        return $this->connection()->add($this, $this->wait ?: 'now');
     }
 
     /**
@@ -289,6 +259,37 @@ class Job
         }
 
         return true;
+    }
+
+    /**
+    * Retries a job
+    *
+    * @param array $options The following option keys are supported :
+    *   - wait: a strtotime comptabile string defaults to 5 seconds. e.g. '+ 5 minutes'
+    *   - limit: The maximum number of retries to do. Default:3
+    * @return bool
+    */
+    public function retry(array $options = []) : bool
+    {
+        $options += ['wait' => '+ 5 seconds','limit' => 3];
+
+        if ($this->attempts() < $options['limit'] + 1) {
+            $this->retryOptions = $options;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the number of attempts
+     *
+     * @return int
+     */
+    public function attempts() : int
+    {
+        return $this->attempts;
     }
 
     /**

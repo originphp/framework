@@ -54,17 +54,19 @@ class RedisEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @return null
      */
-    public function add(Job $job, string $strtotime = 'now')
+    public function add(Job $job, string $strtotime = 'now') : bool
     {
         $serialized = $this->serialize($job);
    
         $when = strtotime($strtotime);
 
         if ($when <= time()) {
-            $this->Redis->rpush('queue:'. $job->queue, $serialized);
+            $status = $this->Redis->rpush('queue:'. $job->queue, $serialized);
         } else {
-            $this->Redis->zadd('scheduled:' . $job->queue, $when, $serialized);
+            $status = $this->Redis->zadd('scheduled:' . $job->queue, $when, $serialized);
         }
+  
+        return ! ($status < 1);
     }
 
     /**
@@ -83,38 +85,50 @@ class RedisEngine extends BaseEngine
 
     /**
      * Deletes a job from both the queue and scheduled
+     * @internal MySQL returns true if delete command run not if records were deleted
      *
      * @param \Origin\Queue\Job $job
      * @return null
      */
-    public function delete(Job $job)
+    public function delete(Job $job) : bool
     {
         $serialized = $this->serialize($job);
-        $this->Redis->lrem('queue:'. $job->queue, $serialized);
-        $this->Redis->lrem('scheduled:'. $job->queue, $serialized);
+        $status = $this->Redis->lrem('queue:'. $job->queue, $serialized);
+        if ($status < 0) {
+            return false;
+        }
+        
+        $status = $this->Redis->lrem('scheduled:'. $job->queue, $serialized);
+        if ($status < 0) {
+            return false;
+        }
+
+        return true;
     }
     /**
      * Handles a failed job
      *
      * @param \Origin\Queue\Job $job
-     * @return null
+     * @return bool
      */
-    public function fail(Job $job)
+    public function fail(Job $job) : bool
     {
         $serialized = $this->serialize($job);
-        $this->Redis->rpush('failed:jobs', $serialized);
-        $this->Redis->lrem('queue:'. $job->queue, $serialized);
+
+        $status = $this->Redis->rpush('failed:jobs', $serialized);
+
+        return ! ($status < 0);
     }
 
     /**
     * Handles a successful job
     *
     * @param \Origin\Queue\Job $job
-    * @return null
+    * @return bool
     */
-    public function success(Job $job)
+    public function success(Job $job) : bool
     {
-        $this->delete($job);
+        return $this->delete($job);
     }
 
     /**
@@ -123,15 +137,18 @@ class RedisEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @param integer $tries
      * @param string $strtotime
-     * @return null
+     * @return bool
      */
-    public function retry(Job $job, int $tries, $strtotime = 'now')
+    public function retry(Job $job, int $tries, $strtotime = 'now') : bool
     {
         if ($job->attempts() < $tries + 1) {
             $serialized = $this->serialize($job);
             $this->Redis->lrem('failed:jobs', $serialized);
-            $this->add($job, $strtotime);
+
+            return $this->add($job, $strtotime);
         }
+
+        return true;
     }
 
     /**

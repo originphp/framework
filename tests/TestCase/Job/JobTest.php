@@ -20,6 +20,11 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
 
+class PassOrFailRedis extends PassOrFailJob
+{
+    public $connection = 'redis-test';
+}
+
 class PassOrFailJob extends Job
 {
     public $connection = 'default';

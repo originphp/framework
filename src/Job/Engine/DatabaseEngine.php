@@ -44,7 +44,7 @@ class DatabaseEngine extends BaseEngine
      * @param string $strtotime
      * @return boolean
      */
-    public function add(Job $job, string $strtotime = 'now')
+    public function add(Job $job, string $strtotime = 'now') : bool
     {
         $model = $this->model();
         $entity = $model->new([
@@ -100,7 +100,7 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @return boolean
      */
-    public function fail(Job $job)
+    public function fail(Job $job) : bool
     {
         if (! $job->backendId()) {
             return false;
@@ -120,7 +120,7 @@ class DatabaseEngine extends BaseEngine
     * @param \Origin\Queue\Job $job
     * @return boolean
     */
-    public function success(Job $job)
+    public function success(Job $job) : bool
     {
         if (! $job->backendId()) {
             return false;
@@ -135,7 +135,7 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Queue\Job $job
      * @return boolean
      */
-    public function delete(Job $job)
+    public function delete(Job $job) : bool
     {
         if (! $job->backendId()) {
             return false;
@@ -156,7 +156,7 @@ class DatabaseEngine extends BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    public function retry(Job $job, int $tries, $strtotime = 'now')
+    public function retry(Job $job, int $tries, $strtotime = 'now') : bool
     {
         if (! $job->backendId()) {
             return false;
@@ -171,6 +171,8 @@ class DatabaseEngine extends BaseEngine
                 'locked' => null,
             ]);
         }
+
+        return true;
     }
 
     /**

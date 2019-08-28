@@ -41,9 +41,9 @@ abstract class BaseEngine
      *
      * @param \Origin\Queue\Job $job
      * @param string $strtotime
-     * @return void
+     * @return bool
      */
-    abstract public function add(Job $job, string $strtotime = 'now');
+    abstract public function add(Job $job, string $strtotime = 'now') : bool;
 
     /**
     * Get the next job from the queue
@@ -57,25 +57,25 @@ abstract class BaseEngine
      * Deletes a job
      *
      * @param \Origin\Queue\Job $job
-     * @return void
+     * @return bool
      */
-    abstract public function delete(Job $job);
+    abstract public function delete(Job $job) : bool;
 
     /**
      * Handles a failed job
      *
      * @param \Origin\Queue\Job $job
-     * @return void
+     * @return bool
      */
-    abstract public function fail(Job $job);
+    abstract public function fail(Job $job) : bool;
 
     /**
     * Handles a successful job
     *
     * @param \Origin\Queue\Job $job
-    * @return void
+    * @return bool
     */
-    abstract public function success(Job $job);
+    abstract public function success(Job $job) : bool;
 
     /**
     * Retries a job
@@ -85,7 +85,7 @@ abstract class BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    abstract public function retry(Job $job, int $tries, $strtotime = 'now');
+    abstract public function retry(Job $job, int $tries, $strtotime = 'now') : bool;
 
     /**
     * Serializes a job
