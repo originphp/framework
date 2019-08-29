@@ -23,7 +23,7 @@ class EmailEngine extends BaseEngine
     /**
      * Holds the last email sent
      *
-     * @var string
+     * @var \Origin\Mailer\Message;
      */
     protected $lastEmail = null;
 

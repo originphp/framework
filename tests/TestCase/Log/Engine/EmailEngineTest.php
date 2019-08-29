@@ -29,7 +29,7 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultConfig()
     {
-        Email::config('demo', ['debug' => true]);
+        Email::config('demo', ['engine' => 'Test']);
         $engine = new MockEmailEngine(['to' => 'foo@example.com','from' => 'foo@example.com','account' => 'demo']);
         $this->assertEquals('demo', $engine->config('account'));
         $this->assertEquals([], $engine->config('levels'));
@@ -54,20 +54,20 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
     public function testAccountFromNotSet()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('demo', ['debug' => true]);
+        Email::config('demo', ['engine' => 'Test']);
         $engine = new MockEmailEngine(['to' => 'foo@example.com','account' => 'demo']);
     }
 
     public function testAccountFromInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
-        Email::config('demo', ['debug' => true]);
+        Email::config('demo', ['engine' => 'Test']);
         $engine = new MockEmailEngine(['to' => 'foo@example.com','from' => 'foo','account' => 'demo']);
     }
    
     public function testLog()
     {
-        Email::config('demo', ['debug' => true]);
+        Email::config('demo', ['engine' => 'Test']);
         $engine = new MockEmailEngine([
             'to' => 'you@example.com',
             'from' => 'me@example.com',
@@ -84,7 +84,7 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
 
     public function testLogEmailArray()
     {
-        Email::config('demo', ['debug' => true]);
+        Email::config('demo', ['engine' => 'Test']);
         $engine = new MockEmailEngine([
             'to' => ['you@example.com','jimbo'],
             'from' => ['me@example.com'],

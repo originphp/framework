@@ -65,7 +65,7 @@ class EmailBuilder
      */
     public function build(bool $debug = false) : Email
     {
-        $account = ($debug === true) ? ['debug' => true] : $this->options['account'];
+        $account = ($debug === true) ? ['engine' => 'Test'] : $this->options['account'];
       
         $this->message = new Email($account);
      

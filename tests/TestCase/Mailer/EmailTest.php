@@ -610,7 +610,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testSendNoHtmlMessageException()
     {
         $this->expectException(Exception::class);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('html test');
@@ -620,7 +620,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testSendNoTextMessageException()
     {
         $this->expectException(Exception::class);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('text test')
@@ -630,7 +630,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testSendWithoutSmtp()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('text test')
@@ -645,7 +645,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBothNoText()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -657,7 +657,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateMessageTemplateNoText()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -670,7 +670,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateMessageTemplate()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -681,7 +681,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertContains("Hi Frank,\r\nHow is your day so far?", $result);
         $this->assertContains("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
 
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -696,7 +696,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testCreateMessageTemplateTextException()
     {
         $this->expectException(MissingTemplateException::class);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -708,7 +708,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testCreateMessageTemplateHtmlException()
     {
         $this->expectException(MissingTemplateException::class);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('template test')
@@ -743,7 +743,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testSendMessageArg()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
             ->subject('send arg');
@@ -916,13 +916,13 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->format('java');
     }
 
     public function testBuildHeaderOptionals()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', 'James')
             ->from('mailer@originphp.com')
             ->subject("Injection test\nBcc: apollo@boxers.io");
@@ -940,7 +940,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     public function testEmailHeaderInjectionAttack()
     {
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', 'James')
             ->from('mailer@originphp.com')
             ->subject("Injection test\nBcc: apollo@boxers.io");
@@ -948,7 +948,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('Subject: Injection =?UTF-8?B?dGVzdApCY2M6IGFwb2xsb0Bib3hlcnMuaW8=?=', $result);
         $this->assertNotContains('apollo@boxers.io', $result);
         
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', "James\nBcc: apollo@boxers.io")
             ->from('mailer@originphp.com')
             ->subject('Injection test');
@@ -956,8 +956,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains('apollo@boxers.io', $result);
 
         $this->expectException(Exception::class);
-        $email = new MockEmail(['debug' => true]);
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', 'James')
             ->from('mailer@originphp.com')
             ->subject('Injection test');
@@ -968,7 +968,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     public function testAttachmentAndEncoding()
     {
         $filename = ROOT . DS . 'phpunit.xml.dist';
-        $email = new MockEmail(['debug' => true]);
+        $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', 'James')
             ->from('mailer@originphp.com')
             ->subject('Viking: Ragnarr Loþbrók')

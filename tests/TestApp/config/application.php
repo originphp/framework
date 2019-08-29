@@ -44,7 +44,7 @@ Queue::config('test', [
 ]);
 
 Email::config('test', [
-    'debug' => true,
+    'engine' => 'Test',
 ]);
 /*
  * Load your plugins here
