@@ -21,8 +21,15 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Changed
+- Email class pass engine as test instead of debug =true
+
+### Deprecated
+- Configure class, use config instead 
+
 ## [1.29.1] - 2019-08-29
-Minor release to provide future backwards comptability.
+Minor release to provide future backwards compatability.
 
 ## [1.29.0] - 2019-08-29
 ### Added
