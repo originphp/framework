@@ -22,40 +22,35 @@ use Origin\Core\Configure;
  * Load the Paths constants, if not already set (e.g. Tests)
  */
 
-$legacy = false;
-
 if (! defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
-
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
+    $legacy = file_exists(ROOT . DS . 'src');
+} else {
+    $legacy = file_exists(APP . DS . 'src');  // Work with test app
+}
+
+if (! defined('SRC')) {
     define('CONFIG', ROOT . DS . 'config');
     define('LOGS', ROOT . DS . 'logs');
     define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
     define('PLUGINS', ROOT . DS . 'plugins');
-
+  
     /**
      * @deprecated Added notice here so it can be removed in v2
      * Going back to app folder it was easier to work with
      * DATBASE_FOLDER/MIGRATIONS_FOLDER are to help with this and all references will be
      * removed in v2
      */
-    $legacy = file_exists(ROOT . DS . 'src');
-    if ($legacy) {
-        define('SRC', ROOT . DS . 'src');
-        define('DATABASE_FOLDER', 'db');
-        define('MIGRATIONS_FOLDER', 'migrate');
-    } else {
-        define('SRC', ROOT . DS . 'app');
-        define('DATABASE_FOLDER', 'database');
-        define('MIGRATIONS_FOLDER', 'migrations');
-    }
+  
+    define('SRC', ROOT . DS . ($legacy?'src':'app'));
+    define('DATABASE_FOLDER', ($legacy?'db':'database'));
+    define('MIGRATIONS_FOLDER', ($legacy?'migrate':'migrations'));
     
     define('APP', ROOT);
     define('TESTS', ROOT . DS . 'tests');
     define('TMP', ROOT . DS . 'tmp');
     define('WEBROOT', ROOT . DS . 'public');
-} else {
-    $legacy = file_exists(ROOT . DS . 'src'); # work with tests
 }
 
 error_reporting(E_ALL);
@@ -127,7 +122,7 @@ if ($legacy) {
 
 require CONFIG . DS . 'routes.php';
 
-/**
+ /**
  * Backwards comptability for projects created < 1.26
  * @todo this will be deprecated in 2.0
  */

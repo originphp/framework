@@ -80,7 +80,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Model'.DS.'Behavior'.DS.'DummyBehavior.php';
-        $this->assertOutputContains('src/Model/Behavior/DummyBehavior.php');
+        $this->assertOutputContains('app/Model/Behavior/DummyBehavior.php');
         $this->assertFileExists($filename);
         $this->assertFileHash('aaf850b60f00e768c55ff6fc43f8a075', $filename);
         unlink($filename);
@@ -100,7 +100,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Model'.DS.'Behavior'.DS.'DummyBehavior.php';
-        $this->assertOutputContains('src/Model/Behavior/DummyBehavior.php');
+        $this->assertOutputContains('app/Model/Behavior/DummyBehavior.php');
 
         $this->assertFileExists($filename);
         $this->assertFileHash('aaf850b60f00e768c55ff6fc43f8a075', $filename);
@@ -113,7 +113,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Command'.DS.'DummyCommand.php';
-        $this->assertOutputContains('src/Command/DummyCommand.php');
+        $this->assertOutputContains('app/Command/DummyCommand.php');
     
         $this->assertFileHash('81b1f30a527eaa351d8be662601eb9a1', $filename);
         unlink($filename);
@@ -151,7 +151,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force component Dummy');
         $this->assertExitSuccess();
         $filename = SRC.DS.'Controller'.DS.'Component'.DS.'DummyComponent.php';
-        $this->assertOutputContains('src/Controller/Component/DummyComponent.php');
+        $this->assertOutputContains('app/Controller/Component/DummyComponent.php');
         $this->assertFileExists($filename);
         $this->assertFileHash('bba33e474254126d2544f41abe7c857e', $filename);
         unlink($filename);
@@ -169,7 +169,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Controller'.DS.'DummiesController.php';
-        $this->assertOutputContains('src/Controller/DummiesController.php');
+        $this->assertOutputContains('app/Controller/DummiesController.php');
         $this->assertFileExists($filename);
   
         $this->assertFileHash('3d78d5c80c21c893251b1ba3d882b84c', $filename);
@@ -189,20 +189,20 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Controller'.DS.'DummiesController.php';
-        $this->assertOutputContains('src/Controller/DummiesController.php');
+        $this->assertOutputContains('app/Controller/DummiesController.php');
         $this->assertFileExists($filename);
        
         $this->assertFileHash('dbdc832d0db7942106b9822e27491300', $filename);
         unlink($filename);
 
         $filename = SRC.DS.'View'.DS.'Dummies'.DS .'index.ctp';
-        $this->assertOutputContains('src/View/Dummies/index.ctp');
+        $this->assertOutputContains('app/View/Dummies/index.ctp');
         $this->assertFileExists($filename);
         $this->assertFileHash('af90a7a0bfcd3a6ff30c0aac82c94c16', $filename);
         unlink($filename);
 
         $filename = SRC.DS.'View'.DS.'Dummies'.DS .'get_user.ctp';
-        $this->assertOutputContains('src/View/Dummies/get_user.ctp');
+        $this->assertOutputContains('app/View/Dummies/get_user.ctp');
         $this->assertFileExists($filename);
         $this->assertFileHash('9263ed82c0e1859690365808dcd719b0', $filename);
         unlink($filename);
@@ -221,7 +221,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'View'.DS.'Helper'.DS.'DummyHelper.php';
-        $this->assertOutputContains('src/View/Helper/DummyHelper.php');
+        $this->assertOutputContains('app/View/Helper/DummyHelper.php');
         $this->assertFileExists($filename);
         $this->assertFileHash('27a6aa4b8914e58092914cd7f07d7bc5', $filename);
         unlink($filename);
@@ -241,7 +241,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Mailer'.DS.'DummyMailer.php';
-        $this->assertOutputContains('src/Mailer/DummyMailer.php');
+        $this->assertOutputContains('app/Mailer/DummyMailer.php');
         $this->assertFileExists($filename);
 
         $this->assertFileHash('df49ae8527946c2e10178d3335766917', $filename);
@@ -262,7 +262,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertExitSuccess();
 
         $filename = SRC.DS.'Model'.DS.'Dummy.php';
-        $this->assertOutputContains('src/Model/Dummy.php');
+        $this->assertOutputContains('app/Model/Dummy.php');
         $this->assertFileExists($filename);
         $this->assertFileHash('bf5848a931354bddf853b37e5eda3958', $filename);
         unlink($filename);
@@ -283,9 +283,9 @@ class GenerateCommandTest extends OriginTestCase
 
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
-        $filename = APP.DS.DATABASE_FOLDER.DS.'migrate'.DS.$version.'CreateDummyTable.php';
+        $filename = APP.DS.DATABASE_FOLDER.DS.MIGRATIONS_FOLDER.DS.$version.'CreateDummyTable.php';
         
-        $this->assertOutputContains("db/migrate/{$version}CreateDummyTable.php");
+        $this->assertOutputContains("database/migrations/{$version}CreateDummyTable.php");
         $this->assertFileExists($filename);
         $this->assertFileHash('f848e2ea56639696a82cbc080138a029', $filename);
         unlink($filename);
@@ -296,7 +296,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force middleware Dummy');
         $this->assertExitSuccess();
         $filename = SRC.DS.'Middleware'.DS.'DummyMiddleware.php';
-        $this->assertOutputContains('src/Middleware/DummyMiddleware.php');
+        $this->assertOutputContains('app/Middleware/DummyMiddleware.php');
         $this->assertFileExists($filename);
         $this->assertFileHash('79b5a3c6d032c8ea5ba2942313b0c439', $filename);
         unlink($filename);
@@ -313,7 +313,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force job Dummy');
         $this->assertExitSuccess();
         $filename = SRC.DS.'Job'.DS.'DummyJob.php';
-        $this->assertOutputContains('src/Job/DummyJob.php');
+        $this->assertOutputContains('app/Job/DummyJob.php');
         $this->assertFileExists($filename);
         
         $this->assertFileHash('c2b2cd39f0974d27358854bcdf2b448c', $filename);
@@ -332,7 +332,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force service Dummy');
         $this->assertExitSuccess();
         $filename = SRC.DS.'Service'.DS.'DummyService.php';
-        $this->assertOutputContains('src/Service/DummyService.php');
+        $this->assertOutputContains('app/Service/DummyService.php');
         $this->assertFileExists($filename);
     
         $this->assertFileHash('338b324e5cad8b4ee516c2e22b7ee66e', $filename);
@@ -353,9 +353,9 @@ class GenerateCommandTest extends OriginTestCase
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
 
-        $filename = APP.DS.DATABASE_FOLDER.DS.'migrate'.DS.$version.'Dummy.php';
+        $filename = APP.DS.DATABASE_FOLDER.DS.MIGRATIONS_FOLDER.DS.$version.'Dummy.php';
         
-        $this->assertOutputContains("db/migrate/{$version}Dummy.php");
+        $this->assertOutputContains("database/migrations/{$version}Dummy.php");
         $this->assertFileExists($filename);
         $this->assertFileHash('692f0f096c758b18dd3197f0ce1c6c2f', $filename);
         unlink($filename);

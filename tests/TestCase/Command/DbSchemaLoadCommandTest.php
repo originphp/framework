@@ -50,7 +50,7 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('db:schema:load --datasource=test --type=sql dummy');
         $this->assertExitError();
-        $this->assertErrorContains('File ' . ROOT . '/tests/TestApp/db/dummy.sql not found'); # Using normal output for this
+        $this->assertErrorContains('File ' . ROOT . '/tests/TestApp/database/dummy.sql not found'); # Using normal output for this
     }
 
     public function testExecuteInvalidDatasource()
@@ -69,7 +69,7 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('db:schema:load --datasource=test --type=sql MyPlugin.pschema');
         $this->assertExitError();
-        $this->assertErrorContains('/plugins/my_plugin/db/pschema.sql');
+        $this->assertErrorContains('/plugins/my_plugin/database/pschema.sql');
     }
 
     public function testExecuteLoadPHPSchema()

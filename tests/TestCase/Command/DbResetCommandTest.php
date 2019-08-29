@@ -35,9 +35,9 @@ class DbResetCommandTest extends \PHPUnit\Framework\TestCase
         $this->exec('db:reset --datasource=dummy --type=sql');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
-        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/database/schema.sql');
         $this->assertOutputContains('Executed 2 statements');
-        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/database/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
 
@@ -52,9 +52,9 @@ class DbResetCommandTest extends \PHPUnit\Framework\TestCase
         $this->exec('db:reset --datasource=dummy --type=sql schema-pg');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
-        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/schema-pg.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/database/schema-pg.sql');
         $this->assertOutputContains('Executed 2 statements');
-        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Loading ' . ROOT . '/tests/TestApp/database/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
 }

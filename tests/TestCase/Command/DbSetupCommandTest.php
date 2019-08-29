@@ -34,9 +34,9 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
         
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema.sql');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/schema.sql');
         $this->assertOutputContains('Executed 2 statements');
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
 
@@ -50,9 +50,9 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
       
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema-pg.sql');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/schema-pg.sql');
         $this->assertOutputContains('Executed 2 statements');
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.sql');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/seed.sql');
         $this->assertOutputContains('Executed 3 statements');
     }
 
@@ -60,7 +60,7 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('db:setup --datasource=dummy --type=sql MyPlugin.pschema');
         $this->assertExitError();
-        $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/db/pschema.sql');
+        $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/database/pschema.sql');
     }
 
     /**
@@ -73,9 +73,9 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
         $this->exec('db:setup --datasource=dummy --type=php');
         $this->assertExitSuccess();
         $expected = ConnectionManager::get('test')->engine() === 'pgsql'?9:7;
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/schema.php');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/schema.php');
         $this->assertOutputContains('Executed '.$expected.' statements');
-        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/db/seed.php');
+        $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/seed.php');
         $this->assertOutputContains('Executed 11 statements');
     }
 }

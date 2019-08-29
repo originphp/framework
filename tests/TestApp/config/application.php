@@ -1,54 +1,35 @@
 <?php
-use Origin\Job\Queue;
-use Origin\Cache\Cache;
 use Origin\Core\Config;
-use Origin\Core\Plugin;
-use Origin\Mailer\Email;
-use Origin\Utility\Elasticsearch;
 
-/*
- * This will go in your server.php file once your app has been developed.
+/**
+ * Set configuration vars here
+ * @example
+ * Config::write('Stripe.secret', env('STRIPE_SECRET'));
+ * then in your app $secret = Config::read('Stripe.secret');
  */
-Config::write('debug', true); // goes in server
+Config::write('debug', env('APP_DEBUG', true));
 
-/*
- * If you change namespace name then you will need to change:
- *  1. The namespace declaration in all your files in the src folder
- *  2. config/autoloader.php folder
- */
+Config::write('App.url', env('APP_URL', 'http://localhost'));
+Config::write('App.environment', env('APP_ENV'));
+
 Config::write('App.namespace', 'App');
 Config::write('App.encoding', 'UTF-8');
-Config::write('Session.timeout', 3600);
 
-Cache::config('default', ['engine' => 'File']);
+Config::write('Session.timeout', 3600);
 
 /**
  * Generate a random string such as md5(time()) and place
- * here. This is used with hashing and key generation by Security.
+ * here. This is used by the Security:hash method.
  */
 Config::write('Security.pepper', '-----ORIGIN PHP-----');
-Config::write('Cookie.key', md5('-----ORIGIN PHP-----')); // For testing
 
-if (env('ELASTICSEARCH_HOST')) {
-    Elasticsearch::config('test', [
-        'host' => env('ELASTICSEARCH_HOST'),
-        'port' => 9200,
-        'ssl' => false,
-        'timeout' => 400,
-    ]);
-}
-
-Queue::config('test', [
-    'engine' => 'Database',
-    'datasource' => 'test',
-]);
-
-Email::config('test', [
-    'engine' => 'Test',
-]);
-/*
- * Load your plugins here
- * @example Plugin::load('ContactManager');
+/**
+ * Encryption key to use.
  */
-Plugin::initialize();
-Plugin::load('Make'); // This is for code gen you can remove
+Config::write('Security.key', env('APP_KEY'));
+
+/*
+ * This is the default schema format to be used. This is used
+ * by db commands setup/reset/load etc.
+ */
+Config::write('Schema.format', 'php');

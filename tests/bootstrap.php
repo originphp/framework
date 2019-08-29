@@ -9,7 +9,7 @@ define('ORIGIN', dirname(__DIR__));
 define('CONFIG', ORIGIN . DS . 'tests'. DS . 'TestApp' . DS .'config');
 define('LOGS', sys_get_temp_dir());
 
-define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'src');
+define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'app');
 define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS .'tests');
 define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp');
 define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
@@ -20,8 +20,8 @@ define('WEBROOT', ROOT . DS . 'public');
  * @deprecated this is to help with deprecation
  * @internal DbSchemaDump and PluginTest use 'TestApp' .DS
  */
-define('DATABASE_FOLDER', 'db');
-define('MIGRATIONS_FOLDER', 'migrate');
+define('DATABASE_FOLDER', 'database');
+define('MIGRATIONS_FOLDER', 'migrations');
 
 if (! file_exists(TMP . DS . 'cache')) {
     @mkdir(TMP . DS . 'cache');
