@@ -33,12 +33,12 @@ class LogTraitTest extends \PHPUnit\Framework\TestCase
         $controller = new Controller();
         $id = uniqid();
         $controller->log('debug', 'XXX {id} ', ['id' => $id]);
-        $this->assertContains($id, file_get_contents(TMP . DS . 'development.log'));
+        $this->assertContains($id, file_get_contents(TMP . DS . 'application.log'));
     }
 
     public function tearDown() : void
     {
-        $log = TMP . DS . 'development.log';
+        $log = TMP . DS . 'application.log';
         if (file_exists($log)) {
             unlink($log);
             touch($log);
