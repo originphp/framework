@@ -31,11 +31,11 @@ class Config
      */
     protected static function dot() : Dot
     {
-        if (self::$dot === null) {
-            self::$dot = new Dot();
+        if (static::$dot === null) {
+            static::$dot = new Dot();
         }
 
-        return self::$dot;
+        return static::$dot;
     }
  
     /**
@@ -50,7 +50,7 @@ class Config
             $result = include $filename;
             if(is_array($result)){
                 foreach($result as $key => $value){
-                    self::dot()->set($key, $value);
+                    static::dot()->set($key, $value);
                 }
                 return true;
             }
@@ -69,7 +69,7 @@ class Config
      */
     public static function write(string $key = null, $value = null) : void
     {
-        self::dot()->set($key, $value);
+        static::dot()->set($key, $value);
         if ($key === 'debug') {
             ini_set('display_errors', (int) $value);
         }
@@ -83,7 +83,7 @@ class Config
      */
     public static function read(string $key = null)
     {
-        return self::dot()->get($key);
+        return static::dot()->get($key);
     }
 
     /**
@@ -94,7 +94,7 @@ class Config
      */
     public static function exists(string $key = null) :bool
     {
-        return self::dot()->has($key);
+        return static::dot()->has($key);
     }
 
     /**
@@ -105,6 +105,6 @@ class Config
      */
     public static function delete(string $key = null) : bool
     {
-        return self::dot()->delete($key);
+        return static::dot()->delete($key);
     }
 }
