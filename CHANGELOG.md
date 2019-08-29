@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Changed
+- Log engine for File default log file name is application.log
 - Email class pass engine as test instead of debug =true
 
 ### Deprecated
