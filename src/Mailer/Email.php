@@ -166,6 +166,7 @@ class Email
                 'ssl' => false,
                 'domain' => null,
                 'timeout' => 30,
+                'engine' => 'Smtp'
             ];
             $this->account = array_merge($defaults, $config);
             $this->applyConfig();
@@ -208,6 +209,13 @@ class Email
                 }
                 $this->addCc($email, $name);
             }
+        }
+        /**
+         * Backwards compatability
+         * @deprecated This will be deprecated
+         */
+        if (isset($this->account['debug']) and $this->account['debug'] === 'true') {
+            $this->account['engine'] = 'Test';
         }
     }
 
@@ -565,7 +573,7 @@ class Email
        
         $this->message = $this->render();
        
-        if (! isset($this->account['debug']) or $this->account['debug'] === false) {
+        if ($this->account['engine'] === 'Smtp') {
             $this->smtpSend();
         }
 
