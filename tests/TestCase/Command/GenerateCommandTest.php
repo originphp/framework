@@ -178,7 +178,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = TESTS.DS.'TestCase'.DS.'Controller'.DS.'DummiesControllerTest.php';
         $this->assertOutputContains('tests/TestCase/Controller/DummiesControllerTest.php');
         $this->assertFileExists($filename);
-     
+        
         $this->assertFileHash('f19cad90cdca811884f483da36809b32', $filename);
         unlink($filename);
     }
@@ -283,7 +283,7 @@ class GenerateCommandTest extends OriginTestCase
 
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
-        $filename = APP.DS.'db'.DS.'migrate'.DS.$version.'CreateDummyTable.php';
+        $filename = APP.DS.DATABASE_FOLDER.DS.'migrate'.DS.$version.'CreateDummyTable.php';
         
         $this->assertOutputContains("db/migrate/{$version}CreateDummyTable.php");
         $this->assertFileExists($filename);
@@ -353,7 +353,7 @@ class GenerateCommandTest extends OriginTestCase
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
 
-        $filename = APP.DS.'db'.DS.'migrate'.DS.$version.'Dummy.php';
+        $filename = APP.DS.DATABASE_FOLDER.DS.'migrate'.DS.$version.'Dummy.php';
         
         $this->assertOutputContains("db/migrate/{$version}Dummy.php");
         $this->assertFileExists($filename);

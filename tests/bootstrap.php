@@ -16,6 +16,13 @@ define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', sys_get_temp_dir());
 define('WEBROOT', ROOT . DS . 'public');
 
+/**
+ * @deprecated this is to help with deprecation
+ * @internal DbSchemaDump and PluginTest use 'TestApp' .DS
+ */
+define('DATABASE_FOLDER', 'db');
+define('MIGRATIONS_FOLDER', 'migrate');
+
 if (! file_exists(TMP . DS . 'cache')) {
     @mkdir(TMP . DS . 'cache');
 }

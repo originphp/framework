@@ -304,7 +304,7 @@ class GenerateCommand extends Command
         $version = date('Ymdhis');
         $this->generate(
             $this->getTemplateFilename('migration'),
-            APP.DS.'db'.DS.'migrate'.DS."{$version}{$data['class']}.php",
+            APP .DS . DATABASE_FOLDER . DS . MIGRATIONS_FOLDER . DS . "{$version}{$data['class']}.php",
             $data
         );
     }
@@ -379,7 +379,7 @@ class GenerateCommand extends Command
             'src'.DS.'Model',
             'src'.DS.'View',
             'tests',
-            'db',
+            DATABASE_FOLDER,
         ];
         $pluginDirectory = APP.DS.'plugins';
 
