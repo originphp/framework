@@ -16,8 +16,8 @@ Cache::config('default', [
 /**
  * Cache config for database schema
  */
+
 Cache::config('origin_model', [
-    'engine' => 'File',
+    'engine' => 'Null',
     'prefix' => 'origin_model_',
-    'duration' => '0 seconds', // min 2 minutes
 ]);
