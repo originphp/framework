@@ -28,7 +28,7 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
     {
         $engine = new FileEngine();
         $this->assertEquals(LOGS, $engine->config('path'));
-        $this->assertEquals('development.log', $engine->config('filename'));
+        $this->assertEquals('application.log', $engine->config('filename'));
         $this->assertEquals([], $engine->config('levels'));
         $this->assertEquals([], $engine->config('channels'));
     }
@@ -37,7 +37,7 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
         $engine = new FileEngine();
         $id = uniqid();
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
-        $log = file_get_contents(LOGS . DS .  'development.log');
+        $log = file_get_contents(LOGS . DS .  'application.log');
         $date = date('Y-m-d G:i:s');
         $this->assertContains("[{$date}] application ERROR: Error code {$id}", $log);
     }

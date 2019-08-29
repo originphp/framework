@@ -14,8 +14,6 @@
 
 namespace Origin\Log\Engine;
 
-use Origin\Core\Config;
-
 class FileEngine extends BaseEngine
 {
     /**
@@ -41,11 +39,7 @@ class FileEngine extends BaseEngine
             deprecationWarning('FileEngine option file deprecated use filename instead');
         }
         if ($this->config('filename') === null) {
-            $filename = 'application.log';
-            if (Config::read('debug')) {
-                $filename = 'development.log';
-            }
-            $this->config('filename', $filename);
+            $this->config('filename', 'application.log');
         }
     }
 
