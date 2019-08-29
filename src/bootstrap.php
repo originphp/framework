@@ -21,6 +21,8 @@ use Origin\Cache\Cache;
  * Load the Paths constants, if not already set (e.g. Tests)
  */
 
+$legacy = false;
+
 if (! defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 
@@ -29,11 +31,30 @@ if (! defined('DS')) {
     define('LOGS', ROOT . DS . 'logs');
     define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
     define('PLUGINS', ROOT . DS . 'plugins');
-    define('SRC', ROOT . DS . 'src');
+
+    /**
+     * @deprecated Added notice here so it can be removed in v2
+     * Going back to app folder it was easier to work with
+     * DATBASE_FOLDER/MIGRATIONS_FOLDER are to help with this and all references will be
+     * removed in v2
+     */
+    $legacy = file_exists(ROOT . DS . 'src');
+    if ($legacy) {
+        define('SRC', ROOT . DS . 'src');
+        define('DATABASE_FOLDER', 'db');
+        define('MIGRATIONS_FOLDER', 'migrate');
+    } else {
+        define('SRC', ROOT . DS . 'app');
+        define('DATABASE_FOLDER', 'database');
+        define('MIGRATIONS_FOLDER', 'migrations');
+    }
+    
     define('APP', ROOT);
     define('TESTS', ROOT . DS . 'tests');
     define('TMP', ROOT . DS . 'tmp');
     define('WEBROOT', ROOT . DS . 'public');
+} else {
+    $legacy = file_exists(ROOT . DS . 'src'); # work with tests
 }
 
 error_reporting(E_ALL);
@@ -78,10 +99,22 @@ if (file_exists(CONFIG . DS . '.env')) {
     $dotEnv->load(CONFIG . DS . '.env');
 }
 
-foreach (['server','database','email','storage'] as $config) {
-    if (file_exists(CONFIG . DS .  $config . '.php')) {
-        include CONFIG . DS .  $config . '.php';
+if ($legacy) {
+    /**
+     * @deprecated remove in v2
+     */
+    foreach (['server','database','email','storage'] as $config) {
+        if (file_exists(CONFIG . DS .  $config . '.php')) {
+            include CONFIG . DS .  $config . '.php';
+        }
     }
+} else {
+    include CONFIG . DS .  'log.php';
+    include CONFIG . DS .  'cache.php';
+    include CONFIG . DS .  'database.php';
+    include CONFIG . DS .  'storage.php';
+    include CONFIG . DS .  'email.php';
+    include CONFIG . DS .  'queue.php';
 }
 
 require CONFIG . DS . 'routes.php';

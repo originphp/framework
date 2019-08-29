@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-## [1.29.0] - xxx
+## [1.29.0] - 2019-08-28
 ### Added
 - Mailer
 - TestCase can now load Models with loadModel method

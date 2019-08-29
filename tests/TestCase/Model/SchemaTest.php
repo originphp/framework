@@ -17,7 +17,7 @@ namespace Origin\Test\Model;
 use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
-include_once APP . DS . 'db' . DS . 'schema.php';
+include_once APP . DS . DATABASE_FOLDER . DS . 'schema.php';
 
 class SchemaTest extends \PHPUnit\Framework\TestCase
 {
