@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Utility;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Utility\Security;
 use Origin\Exception\Exception;
 
@@ -22,11 +22,11 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        Configure::write('Security.pepper', 'B1816172FD2BA98F3AF520EF572E3A47');
+        Config::write('Security.pepper', 'B1816172FD2BA98F3AF520EF572E3A47');
     }
     protected function tearDown(): void
     {
-        Configure::write('Security.pepper', '-----ORIGIN PHP-----');
+        Config::write('Security.pepper', '-----ORIGIN PHP-----');
     }
     public function testHash()
     {
@@ -41,7 +41,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
         $this->assertEquals($expected, Security::hash($plain, ['type' => 'sha1','pepper' => 'OriginPHP']));
 
-        Configure::write('Security.pepper', 'OriginPHP');
+        Config::write('Security.pepper', 'OriginPHP');
         $expected = '2a70c8107928b49f2c2b64bac4aacb820aef818b';
         $this->assertEquals($expected, Security::hash($plain, ['type' => 'sha1','pepper' => true]));
 

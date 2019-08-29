@@ -15,9 +15,9 @@
 namespace Origin\Test\Http;
 
 use Origin\Log\Log;
+use Origin\Core\Config;
 use Origin\Http\Router;
 use Origin\Http\Request;
-use Origin\Core\Configure;
 use Origin\Http\ErrorHandler;
 use Origin\Exception\NotFoundException;
 use Origin\Exception\InternalErrorException;
@@ -50,7 +50,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         ob_start();
         $a = $unkown + 1;
@@ -67,7 +67,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         ob_start();
         trigger_error('Passing invalid 2nd argument', E_WARNING);
@@ -84,7 +84,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         ob_start();
         trigger_error('An error has occured', E_USER_ERROR);
@@ -101,7 +101,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         ob_start();
         trigger_error('Function has been deprecated', E_USER_DEPRECATED);
@@ -118,7 +118,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         ob_start();
         @include 'somefile.php';
@@ -132,7 +132,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', false);
+        Config::write('debug', false);
 
         ob_start();
         $a = $unkown + 1;
@@ -146,7 +146,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
        
         $errorHandler->exceptionHandler(
             new NotFoundException('passwords.txt could not be found')
@@ -162,7 +162,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', false);
+        Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
             new NotFoundException('passwords.txt could not be found')
@@ -183,7 +183,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
        
         $errorHandler->exceptionHandler(
             new NotFoundException('fetch not found')
@@ -201,7 +201,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', false);
+        Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
             new NotFoundException('fetch not found')
@@ -219,7 +219,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', false);
+        Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
             new InternalErrorException('Not Developed Yet')
@@ -233,7 +233,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', true);
+        Config::write('debug', true);
        
         $errorHandler->fatalErrorHandler(E_ERROR, 'A Fatal Error has occured', 'dummy.php', 212);
         $this->assertContains('FatalErrorException', $errorHandler->response);
@@ -246,7 +246,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler = new MockErrorHandler();
         $errorHandler->register();
 
-        Configure::write('debug', false);
+        Config::write('debug', false);
        
         $errorHandler->fatalErrorHandler(E_ERROR, 'A Fatal Error has occured', 'dummy.php', 212);
        
@@ -260,13 +260,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         Router::request(new Request());
-        Configure::write('debug', true);
+        Config::write('debug', true);
     }
     protected function tearDown() : void
     {
         parent::tearDown();
         
-        Configure::write('debug', true);
+        Config::write('debug', true);
 
         $logger = Log::engine('default');
         $file = LOGS . DS . $logger->config('filename');

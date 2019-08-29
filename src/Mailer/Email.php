@@ -14,8 +14,8 @@
 
 namespace Origin\Mailer;
 
+use Origin\Core\Config;
 use Origin\Utility\Html;
-use Origin\Core\Configure;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\StaticConfigTrait;
@@ -122,7 +122,7 @@ class Email
         if (extension_loaded('mbstring') === false) {
             throw new Exception('mbstring extension is not loaded');
         }
-        $this->charset = Configure::read('App.encoding');
+        $this->charset = Config::read('App.encoding');
         mb_internal_encoding($this->charset); // mb_list_encodings()
 
         if ($config === null) {

@@ -16,7 +16,7 @@ namespace Origin\Utility;
 
 use DOMDocument;
 use SimpleXMLElement;
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Utility\Exception\XmlException;
 
 /**
@@ -61,7 +61,7 @@ class Xml
         }
         $defaults = [
             'version' => '1.0',
-            'encoding' => Configure::read('App.encoding'),
+            'encoding' => Config::read('App.encoding'),
             'pretty' => false,
         ];
         $options += $defaults;

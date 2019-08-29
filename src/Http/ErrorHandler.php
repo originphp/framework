@@ -24,8 +24,8 @@
 namespace Origin\Http;
 
 use Origin\Log\Log;
+use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Core\Configure;
 use Origin\Exception\Exception;
 use Origin\Exception\HttpException;
 
@@ -154,7 +154,7 @@ class ErrorHandler
 
         $error = $this->levelMap[$level];
 
-        if (Configure::read('debug')) {
+        if (Config::read('debug')) {
             # Output
             echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
         }
@@ -186,7 +186,7 @@ class ErrorHandler
        
         if ($this->isAjax()) {
             $this->ajaxExceptionHandler($exception);
-        } elseif (Configure::read('debug') === true) {
+        } elseif (Config::read('debug') === true) {
             $this->debugExceptionHandler($exception);
         } else {
             ob_start();
@@ -209,7 +209,7 @@ class ErrorHandler
         $errorCode = $exception->getCode();
         $response = ['error' => ['message' => $exception->getMessage(), 'code' => $errorCode]];
 
-        if (Configure::read('debug') !== true and ! $exception instanceof HttpException) {
+        if (Config::read('debug') !== true and ! $exception instanceof HttpException) {
             $errorCode = 500;
             $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => $errorCode]];
             if ($exception->getCode() === 404) {

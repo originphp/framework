@@ -14,7 +14,7 @@
 
 namespace Origin\Log\Engine;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 
 class FileEngine extends BaseEngine
 {
@@ -42,7 +42,7 @@ class FileEngine extends BaseEngine
         }
         if ($this->config('filename') === null) {
             $filename = 'application.log';
-            if (Configure::read('debug')) {
+            if (Config::read('debug')) {
                 $filename = 'development.log';
             }
             $this->config('filename', $filename);

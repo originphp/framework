@@ -15,7 +15,7 @@
 declare(strict_types=1);
 namespace Origin\Utility;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Exception\Exception;
 use Origin\Exception\InvalidArgumentException;
 
@@ -49,7 +49,7 @@ class Security
         // @codeCoverageIgnoreEnd
 
         if ($options['pepper'] === true) {
-            $options['pepper'] = Configure::read('Security.pepper');
+            $options['pepper'] = Config::read('Security.pepper');
         }
         if ($options['pepper']) {
             $string = $options['pepper'] . $string;

@@ -19,7 +19,7 @@ use PDOException;
 use PDOStatement;
 use Origin\Log\Log;
 use Origin\Cache\Cache;
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Model\Exception\ConnectionException;
 use Origin\Model\Exception\DatasourceException;
 
@@ -183,7 +183,7 @@ abstract class Datasource
             $this->statement = $query = $this->connection->prepare($sql);
            
             $result = $query->execute($params);
-            if (Configure::read('debug')) {
+            if (Config::read('debug')) {
                 $this->log[] = [
                     'query' => $this->unprepare($sql, $params),
                     'error' => ! $result,

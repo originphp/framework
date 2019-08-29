@@ -14,8 +14,8 @@
 
 namespace Origin\Console;
 
+use Origin\Core\Config;
 use Origin\Core\Plugin;
-use Origin\Core\Configure;
 use Origin\Utility\Inflector;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
@@ -64,7 +64,7 @@ class CommandRunner
     {
         $this->namespaces = [
             'Origin' => ORIGIN.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Command',
-            Configure::read('App.namespace') => SRC.DIRECTORY_SEPARATOR.'Command',
+            Config::read('App.namespace') => SRC.DIRECTORY_SEPARATOR.'Command',
         ];
 
         $plugins = Plugin::loaded();
@@ -156,7 +156,7 @@ class CommandRunner
     public function findCommand(string $command)
     {
         # Use Conventions - Faster
-        $namespace = Configure::read('App.namespace');
+        $namespace = Config::read('App.namespace');
         $className = $namespace.'\\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
         if (class_exists($className)) {
             $object = new $className($this->io);

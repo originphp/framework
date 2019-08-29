@@ -14,7 +14,7 @@
 
 namespace Origin\Http;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Controller\Controller;
 use Origin\Core\Exception\RouterException;
 use Origin\Controller\Exception\MissingMethodException;
@@ -64,7 +64,7 @@ class Dispatcher
 
     protected function getClass(string $controller, string $plugin = null)
     {
-        $namespace = Configure::read('App.namespace');
+        $namespace = Config::read('App.namespace');
         if ($plugin) {
             $namespace = $plugin;
         }

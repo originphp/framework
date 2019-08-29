@@ -15,7 +15,7 @@
 namespace Origin\Http;
 
 use Origin\Core\Dot;
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Exception\Exception;
 
 class Session
@@ -69,7 +69,7 @@ class Session
     }
 
     /**
-     * Configures the session for use
+     * Configs the session for use
      *
      * @return void
      */
@@ -165,8 +165,8 @@ class Session
      */
     protected function timedOut($timeout = 3600) : bool
     {
-        if (Configure::exists('Session.timeout')) {
-            $timeout = Configure::read('Session.timeout');
+        if (Config::exists('Session.timeout')) {
+            $timeout = Config::read('Session.timeout');
         }
         $lastActivity = $this->read('Session.lastActivity');
         $this->write('Session.lastActivity', time());

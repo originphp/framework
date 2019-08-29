@@ -13,8 +13,8 @@
  */
 use Origin\Log\Log;
 use Origin\I18n\I18n;
+use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Core\Configure;
 use Origin\Utility\Collection;
 
 /**
@@ -47,7 +47,7 @@ function backtrace() : void
  */
 function debug($data, bool $isHtml = false) : void
 {
-    if (Configure::read('debug')) {
+    if (Config::read('debug')) {
         $backtrace = debug_backtrace();
         $filename = str_replace(ROOT . DS, '', $backtrace[0]['file']);
         $line = $backtrace[0]['line'];
@@ -74,7 +74,7 @@ function debug($data, bool $isHtml = false) : void
  */
 function pr($data) : void
 {
-    if (Configure::read('debug')) {
+    if (Config::read('debug')) {
         $template = '<pre>%s</pre>';
         if (PHP_SAPI === 'cli') {
             $template = "\n%s\n";
@@ -262,7 +262,7 @@ function deprecationWarning(string $message) : void
 
     Log::warning($message);
 
-    if (Configure::read('debug')) {
+    if (Config::read('debug')) {
         trigger_error($message, E_USER_DEPRECATED);
     }
 }
