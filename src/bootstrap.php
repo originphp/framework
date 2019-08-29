@@ -90,15 +90,22 @@ $ErrorHandler->register();
 
 require __DIR__ . DS . 'functions.php';
 
-/**
- * Load Config
- */
-require CONFIG . DS . 'bootstrap.php';
+if (file_exists(CONFIG . DS . '.env.php')) {
+    $result = include CONFIG . DS . '.env.php';
+    foreach ($result as $key => $value) {
+        $_ENV[$key] = $value;
+    }
+}
 
 if (file_exists(CONFIG . DS . '.env')) {
     $dotEnv = new Origin\Core\DotEnv();
     $dotEnv->load(CONFIG . DS . '.env');
 }
+
+/**
+ * Load Config
+ */
+require CONFIG . DS . 'bootstrap.php';
 
 if ($legacy) {
     /**
@@ -110,13 +117,6 @@ if ($legacy) {
         }
     }
 } else {
-    $envConfig = CONFIG . DS . '.env.php';
-    if (file_exists($envConfig)) {
-        $result = include $envConfig;
-        foreach ($result as $key => $value) {
-            $_ENV[$key] = $value;
-        }
-    }
     include CONFIG . DS .  'log.php';
     include CONFIG . DS .  'cache.php';
     include CONFIG . DS .  'database.php';
