@@ -38,10 +38,16 @@ class Cookie
      */
     protected function encryptionKey() : string
     {
+        if (Configure::exists('Security.key')) {
+            return Configure::read('Security.key');
+        }
+        /**
+         * Backwards, Backwards comptability check
+         */
         if (Configure::exists('Cookie.key')) {
             return Configure::read('Cookie.key');
         }
-        deprecationWarning('Add Cookie.key to your configuration.');
+        deprecationWarning('Add Security.key to your config/application.php.');
 
         return md5(Configure::read('Security.pepper')); //Create a key using thefor backwards compatability
     }
