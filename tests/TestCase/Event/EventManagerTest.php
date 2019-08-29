@@ -43,6 +43,10 @@ class SampleObject
     {
         $this->count = $this->count + 10;
     }
+    public function randomNumber()
+    {
+        return mt_rand(5, 10);
+    }
 }
 class EventManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,17 +57,26 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase
     public function testDispatchNoListener()
     {
         $manager = EventManager::instance();
-        $this->assertFalse($manager->dispatch('Test.dispatch'));
+        $this->assertInstanceOf(Event::class, $manager->dispatch('Test.dispatch'));
     }
     public function testDispatch()
     {
-        $manager = EventManager::instance();
+        $manager = new EventManager();
         $manager->listen('Test.dispatch', function (Event $event) {
             return 'ok';
         });
-        $event = $manager->new('Test.dispatch');
-        $this->assertTrue($manager->dispatch($event));
+        $event = $manager->dispatch('Test.dispatch');
         $this->assertEquals('ok', $event->result());
+    }
+
+    public function testDispatch2()
+    {
+        $manager = new EventManager();
+        $manager->listen('randomNumber', [new SampleObject(),'randomNumber']);
+
+        $event = $manager->dispatch('randomNumber');
+     
+        $this->assertGreaterThan(4, $event->result());
     }
 
     public function testDispatchStop()
@@ -80,8 +93,7 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase
             $event->data($event->data() + 1);
         });
 
-        $event = $manager->new('Test.dispatchStop', $this, 100);
-        $this->assertTrue($manager->dispatch($event));
+        $event = $manager->dispatch($manager->new('Test.dispatchStop', $this, 100));
         $this->assertEquals(101, $event->data());
         $this->assertFalse($event->result());
     }

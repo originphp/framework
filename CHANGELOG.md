@@ -25,9 +25,13 @@ Delete tag: git tag -d <tag_name>
 Adjusted TestApp for framework tests folder structure.
 
 ### Changed
+- EventManager::dispatch now returns Event
 - Configure class changed to Config (alias setup, in future this will be deprecated)
 - Log engine for File default log file name is application.log
 - Email class pass engine as test instead of debug =true
+
+### Fixed
+- Fixed issue Event dispatch array
 
 ## [1.29.1] - 2019-08-29
 Minor release to provide future backwards compatability.

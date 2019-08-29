@@ -66,40 +66,50 @@ class EventManager
      *
      *
      * @param Event|string $event
-     * @return bool
+     * @return \Origin\Event\Event;
      */
-    public function dispatch($event) : bool
+    public function dispatch($event) : Event
     {
         if (is_string($event)) {
             $event = new Event($event);
         }
         $listeners = $this->listeners($event->name());
+
         if (empty($listeners)) {
-            return false;
+            return $event;
         }
+        
         foreach ($listeners as $listener) {
             if ($event->isStopped()) {
                 break;
             }
+         
             $result = call_user_func($listener, $event);
+            
             if ($result === false) {
                 $event->stop();
             }
-            $event->result($result);
+            if ($result !== null) {
+                $event->result($result);
+            }
         }
 
-        return true;
+        return $event;
     }
 
     /**
      * Adds a listener
      *
      * @param string $name [$this,'sendEmail']
-     * @param callable $callable
+     * @param callable|array $callable [$this,'someMethod'], new SlackNotification()
+     * @param integer $priority
      * @return void
      */
-    public function listen(string $name, callable $callable, int $priority = 10) : void
+    public function listen(string $name, $callable, int $priority = 10) : void
     {
+        if (! is_callable($callable) and is_object($callable)) {
+            $callable = [$callable,'execute'];
+        }
         if (empty($this->listeners[$name])) {
             $this->listeners[$name][$priority] = [];
         }
@@ -118,11 +128,11 @@ class EventManager
         $listeners = [];
         if (isset($this->listeners[$name])) {
             ksort($this->listeners[$name]);
-            foreach ($this->listeners[$name] as $priority => $queue) {
+            foreach ($this->listeners[$name] as $queue) {
                 $listeners = array_merge($listeners, $queue);
             }
         }
-
+        
         return $listeners;
     }
 
