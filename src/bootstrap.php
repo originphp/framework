@@ -12,6 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Cache\Cache;
+use Origin\Core\Configure;
 
 /**
  * FrontController.
@@ -109,6 +110,13 @@ if ($legacy) {
         }
     }
 } else {
+    $envConfig = CONFIG . DS . '.env.php';
+    if (file_exists($envConfig)) {
+        $result = include $envConfig;
+        foreach ($result as $key => $value) {
+            $_ENV[$key] = $value;
+        }
+    }
     include CONFIG . DS .  'log.php';
     include CONFIG . DS .  'cache.php';
     include CONFIG . DS .  'database.php';
@@ -118,11 +126,6 @@ if ($legacy) {
 }
 
 require CONFIG . DS . 'routes.php';
-
-/**
- * Internal caching settings
- */
-use Origin\Core\Configure;
 
 /**
  * Backwards comptability for projects created < 1.26
