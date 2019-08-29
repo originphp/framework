@@ -21,13 +21,13 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.30.0] - 2019-08-30
+Adjusted TestApp for framework tests folder structure.
 
 ### Changed
+- Configure class changed to Config (alias setup, in future this will be deprecated)
 - Log engine for File default log file name is application.log
 - Email class pass engine as test instead of debug =true
-
-### Deprecated
-- Configure class, use config instead 
 
 ## [1.29.1] - 2019-08-29
 Minor release to provide future backwards compatability.
