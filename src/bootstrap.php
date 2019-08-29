@@ -27,11 +27,8 @@ if (! defined('DS')) {
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
     $legacy = file_exists(ROOT . DS . 'src');
 } else {
-    echo var_export(['root' => ROOT,'app' => APP,'src' => SRC]);
     $legacy = file_exists(APP . DS . 'src');  // Work with test app
 }
-
-echo var_export(['legacy' => $legacy]);
 
 if (! defined('SRC')) {
     define('CONFIG', ROOT . DS . 'config');

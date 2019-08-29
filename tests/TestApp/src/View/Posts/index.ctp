@@ -1,1 +1,0 @@
-<h1>Posts Home Page</h1>
