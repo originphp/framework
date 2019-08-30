@@ -3,7 +3,7 @@ namespace Origin\Mailer;
 
 use Origin\Job\Job;
 
-class SendEmailJob extends Job
+class MailerJob extends Job
 {
     public function execute(array $params)
     {

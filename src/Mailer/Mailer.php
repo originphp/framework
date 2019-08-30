@@ -246,7 +246,7 @@ abstract class Mailer
             'arguments' => func_get_args(),
         ];
 
-        return (new SendEmailJob(['queue' => 'mailer']))->dispatch($params);
+        return (new MailerJob(['queue' => 'mailer']))->dispatch($params);
     }
 
     /**
