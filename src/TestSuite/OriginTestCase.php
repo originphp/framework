@@ -60,7 +60,8 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Loads a fixture (must be called from Initialize).
-     *
+     * @deprecated This going to be deprecated since this causing too much confusion. Loading model needs to be
+     * done in startup and this in initialize
      * @param string $name Post or MyPlugin.Post
      */
     public function loadFixture(string $name)
@@ -72,7 +73,8 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Loads multiple fixtures (only works from Initialize).
-     *
+     * @deprecated This going to be deprecated since this causing too much confusion. Loading model needs to be
+     * done in startup and this in initialize
      * @param array $fixtures
      */
     public function loadFixtures(array $fixtures)
