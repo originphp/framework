@@ -196,6 +196,8 @@ class RedisEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->delete($job));
         $result = $this->engine->redis()->lrange('queue:test', 0, -1);
         $this->assertEmpty($result);
+
+        $this->assertFalse($this->engine->delete($job));
     }
 
     public function testRetry()

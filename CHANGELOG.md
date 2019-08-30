@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.30.1] - 2019-08-31
+### Fixed
+- Redis job engine delete success return type. Success method cant return delete value since jobs are cant be deleted
+once they are fetched
+
 ## [1.30.0] - 2019-08-30
 Adjusted TestApp for framework tests folder structure.
 

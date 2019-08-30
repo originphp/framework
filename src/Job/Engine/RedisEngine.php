@@ -93,17 +93,16 @@ class RedisEngine extends BaseEngine
     public function delete(Job $job) : bool
     {
         $serialized = $this->serialize($job);
-        $status = $this->Redis->lrem('queue:'. $job->queue, $serialized);
-        if ($status < 0) {
-            return false;
-        }
-        
-        $status = $this->Redis->lrem('scheduled:'. $job->queue, $serialized);
-        if ($status < 0) {
-            return false;
+  
+        if ($this->Redis->lrem('queue:'. $job->queue, $serialized) > 0) {
+            return true;
         }
 
-        return true;
+        if ($this->Redis->lrem('scheduled:'. $job->queue, $serialized) > 0) {
+            return true;
+        }
+
+        return false;
     }
     /**
      * Handles a failed job
@@ -121,14 +120,17 @@ class RedisEngine extends BaseEngine
     }
 
     /**
-    * Handles a successful job
+    * Handles a successful job.
+    * @internal If the job was fetched then its no longer available
     *
     * @param \Origin\Queue\Job $job
     * @return bool
     */
     public function success(Job $job) : bool
     {
-        return $this->delete($job);
+        $this->delete($job);
+
+        return true;
     }
 
     /**
