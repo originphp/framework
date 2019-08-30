@@ -83,8 +83,11 @@ class EventManager
             if ($event->isStopped()) {
                 break;
             }
-         
-            $result = call_user_func($listener, $event);
+            if ($listener['passArgs']) {
+                $result = call_user_func_array($listener['callable'], $event->data() ?? []);
+            } else {
+                $result = call_user_func($listener['callable'], $event);
+            }
             
             if ($result === false) {
                 $event->stop();
@@ -102,19 +105,31 @@ class EventManager
      *
      * @param string $name [$this,'sendEmail']
      * @param callable|array $callable [$this,'someMethod'], new SlackNotification()
-     * @param integer $priority
+     * @param array|int options
      * @return void
      */
-    public function listen(string $name, $callable, int $priority = 10) : void
+    public function listen(string $name, $callable, $options = []) : void
     {
+        /**
+         * Backwards comptability
+         */
+        if (is_int($options)) {
+            $options = ['priority' => $options];
+        }
+        
+        $options += ['passArgs' => false,'priority' => 10];
+
         if (! is_callable($callable) and is_object($callable)) {
             $callable = [$callable,'execute'];
         }
         if (empty($this->listeners[$name])) {
-            $this->listeners[$name][$priority] = [];
+            $this->listeners[$name][$options['priority']] = [];
         }
 
-        $this->listeners[$name][$priority][] = $callable;
+        $this->listeners[$name][$options['priority']][] = [
+            'callable' => $callable,
+            'passArgs' => $options['passArgs']
+        ];
     }
 
     /**
@@ -143,7 +158,10 @@ class EventManager
      * Example:
      * class Foo {
      *  function implementedEvents(){
-     *     return ['Controller.initialize'=>'initialize']
+     *     return [
+     *          'Controller.initialize'=>'initialize'
+     *          'Controller.beforeCreate'=> ['method'=>'beforeCreate','passArgs'=>true]
+     *      ]
      *  }
      * }
      *
@@ -154,8 +172,15 @@ class EventManager
      */
     public function subscribe(object $subscriber) : void
     {
-        foreach ($subscriber->implementedEvents() as $key => $function) {
-            $this->listen($key, [$subscriber,$function]);
+        foreach ($subscriber->implementedEvents() as $key => $options) {
+            if (! is_array($options)) {
+                $options = ['method' => $options];
+            };
+            $options += ['method' => null, 'passArgs' => false];
+
+            if ($options['method']) {
+                $this->listen($key, [$subscriber,$options['method']], $options);
+            }
         }
     }
 }

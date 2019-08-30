@@ -25,6 +25,7 @@ class SampleObject
         return [
             'Something.startup' => 'startup',
             'Something.shutdown' => 'shutdown',
+            'Something.after' => ['method' => 'testWithArgs2','passArgs' => true],
         ];
     }
     public function __construct()
@@ -46,6 +47,15 @@ class SampleObject
     public function randomNumber()
     {
         return mt_rand(5, 10);
+    }
+    public function testWithArgs($a, $b)
+    {
+        return $a + $b;
+    }
+
+    public function testWithArgs2($a, $b)
+    {
+        return $a + $b;
     }
 }
 class EventManagerTest extends \PHPUnit\Framework\TestCase
@@ -77,6 +87,17 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase
         $event = $manager->dispatch('randomNumber');
      
         $this->assertGreaterThan(4, $event->result());
+    }
+
+    public function testDispatchWithArgs()
+    {
+        $manager = new EventManager();
+        $manager->listen('arg-test', [new SampleObject(),'testWithArgs'], ['passArgs' => true]);
+
+        $event = $manager->new('arg-test', null, [5,2]);
+        $event2 = $manager->dispatch($event);
+       
+        $this->assertEquals(7, $event->result());
     }
 
     public function testDispatchStop()
@@ -117,5 +138,14 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase
     {
         $sampleObject = new SampleObject();
         $this->assertEquals(11, $sampleObject->count);
+    }
+
+    public function testSubscribeArray()
+    {
+        $manager = new EventManager();
+        $manager->subscribe(new SampleObject());
+        $event = $manager->new('Something.after', $this, [1,2]);
+        $manager->dispatch($event);
+        $this->AssertEquals(3, $event->result());
     }
 }

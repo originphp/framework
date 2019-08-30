@@ -22,7 +22,11 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+### Added
+- Event Manager now can optionaly pass arguments to listeners isntead of event object
+
 ### Changed
+
 - Non ajax HTTPException now also show error code and message.
 
 ### Fixed

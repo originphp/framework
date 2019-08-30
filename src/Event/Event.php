@@ -30,7 +30,8 @@ class Event
     protected $data = null;
 
     /**
-     * This is the subject of the event, a object
+     * This is the subject of the event, a object. Usally the object
+     * creating the Event
      *
      * @var string
      */
@@ -53,9 +54,9 @@ class Event
     /**
      * Constructor
      *
-     * @param string $name
-     * @param object $subject
-     * @param mixed $data
+     * @param string $name name of event. e.g order.afterPurchase
+     * @param object $subject the object that this event applies too, usually $this.
+     * @param mixed $data optional data to pass. If you want to pass as args then it should be array
      */
     public function __construct(string $name, object $subject = null, $data = null)
     {
