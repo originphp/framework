@@ -81,9 +81,11 @@ class View
      */
     protected $viewPath = SRC . DS . 'View';
 
-    public function __construct(Controller $controller)
+    public function __construct(Controller $controller = null)
     {
         $this->name = $controller->name;
+
+        $controller = $controller ? $controller : new Controller();
 
         $this->request = & $controller->request;
         $this->response = & $controller->response;

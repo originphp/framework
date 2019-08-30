@@ -103,15 +103,15 @@ class Controller
      */
     public $paginate = [];
 
-    public function __construct(Request $request, Response $response)
+    public function __construct(Request $request = null, Response $response = null)
     {
         list($namespace, $name) = namespaceSplit(get_class($this));
         $this->name = substr($name, 0, -10);
 
         $this->modelName = Inflector::singular($this->name);
 
-        $this->request = $request;
-        $this->response = $response;
+        $this->request = $request ?  $request : new Request();
+        $this->response = $response ? $response : new Response();
 
         $this->componentRegistry = new ComponentRegistry($this);
 
