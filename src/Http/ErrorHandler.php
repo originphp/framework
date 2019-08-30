@@ -189,8 +189,21 @@ class ErrorHandler
         } elseif (Config::read('debug') === true) {
             $this->debugExceptionHandler($exception);
         } else {
+            /**
+             * Legacy error handler
+             * @deprecated 404 will be deprecated in future
+             */
+            $error400 = SRC . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
+            $file = SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+            if ($exception instanceof HttpException and file_exists($error400)) {
+                if ($exception->getCode() < 500) {
+                    $file = $error400;
+                    $errorCode = $exception->getCode();
+                    $errorMessage = $exception->getMessage();
+                }
+            }
             ob_start();
-            include SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+            include $file;
             $response = ob_get_clean();
             $this->sendResponse($response, $errorCode);
         }
