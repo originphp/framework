@@ -17,7 +17,6 @@ class %class%HelperTest extends OriginTestCase
 
     public function startup()
     {
-        parent::startup();
         $controller = new Controller(new Request(),new Response());
         $view = new View($controller);
         $this->%class% = new %class%Helper($view);

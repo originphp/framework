@@ -12,7 +12,6 @@ class %class%Test extends OriginTestCase
 
     public function startup()
     {
-        parent::startup(); // remember parent
         $this->loadModel('%class%');
     }
 }

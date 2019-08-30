@@ -20,7 +20,6 @@ class %class%MiddlewareTest extends OriginTestCase
 
     public function startup()
     {
-        parent::startup();
         $this->request = new Request();
         $this->response = new Response();
     

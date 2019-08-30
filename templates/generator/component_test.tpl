@@ -16,10 +16,7 @@ class %class%ComponentTest extends OriginTestCase
 
     public function startup()
     {
-        parent::startup();
-        $request = new Request();
-        $response =  new Response();
-        $controller = new Controller($request,$response);
+        $controller = new Controller(new Request(),new Response());
         $this->%class% = new %class%Component($controller);
     }
 }

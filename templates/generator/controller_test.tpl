@@ -15,7 +15,6 @@ class %class%ControllerTest extends OriginTestCase
 
     public function startup()
     {
-        parent::startup(); // remember parent
         $this->loadModel('%model%');
     }
     
