@@ -6,9 +6,10 @@ use App\Mailer\%class%Mailer;
 
 class %class%MailerTest extends OriginTestCase
 {
+    public $fixtures = ['User'];
+
     public function startup()
     {
-        parent::startup(); // remember parent
         $this->loadModel('User');
     }
     
