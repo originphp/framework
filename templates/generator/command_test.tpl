@@ -8,4 +8,10 @@ class %class%CommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
+    public function testExecute()
+    {
+        $this->exec('%custom%');
+        $this->assertExitSuccess();
+        $this->assertOutputContains('some text');
+    }
 }
