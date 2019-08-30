@@ -85,16 +85,14 @@ $ErrorHandler->register();
 
 require __DIR__ . DS . 'functions.php';
 
-if (file_exists(CONFIG . DS . '.env.php')) {
+if (file_exists(CONFIG . DS . '.env')) {
+    $dotEnv = new Origin\Core\DotEnv();
+    $dotEnv->load(CONFIG . DS . '.env');
+} elseif (file_exists(CONFIG . DS . '.env.php')) {
     $result = include CONFIG . DS . '.env.php';
     foreach ($result as $key => $value) {
         $_ENV[$key] = $value;
     }
-}
-
-if (file_exists(CONFIG . DS . '.env')) {
-    $dotEnv = new Origin\Core\DotEnv();
-    $dotEnv->load(CONFIG . DS . '.env');
 }
 
 /**
