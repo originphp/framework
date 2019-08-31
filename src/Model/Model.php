@@ -1741,6 +1741,7 @@ class Model
                 $arguments[0] = $result;
             }
             /**
+             * @internal - this was fixed in the entity structure, need to test.
              * Bug Fix. When reloading an entity with new belongsTo in afterFind
              * and trying to replace result is overwritten by original after timestamp
              * behavior is called. This only happened when overwriting the entire Entity
