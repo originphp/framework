@@ -108,13 +108,6 @@ abstract class Mailer
      */
     protected $viewVars = [];
 
-    /**
-     * The name of the Queue connection to use
-     *
-     * @var string
-     */
-    protected $queueConnection = 'default';
-
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];
