@@ -23,10 +23,10 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Added
+- Publisher
 - Event Manager now can optionally pass arguments to listeners instead of event object
 
 ### Changed
-
 - Non ajax HTTPException now also show error code and message.
 
 ### Fixed

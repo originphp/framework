@@ -1,8 +1,11 @@
 <?php
 namespace Origin\Publisher;
 
+use Origin\Model\Traits\ModelTrait;
+
 class Listener
 {
+    use ModelTrait;
     public function __construct()
     {
         $this->initialize();

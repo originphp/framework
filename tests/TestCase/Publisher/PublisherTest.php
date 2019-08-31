@@ -127,6 +127,18 @@ class PublisherTest extends OriginTestCase
     public function testInstance()
     {
         $this->assertInstanceOf(Publisher::class, MockPublisher::instance());
-        MockPublisher::destroy();
+    }
+
+    public function testGlobal()
+    {
+        $publisher = Publisher::instance();
+        $publisher ->subscribe(MockListener::class, ['queue' => true]);
+
+        $publisher = Publisher::instance();
+        $this->assertNotEmpty($publisher->listeners());
+        
+        $publisher->clear();
+        $publisher = Publisher::instance();
+        $this->assertEmpty($publisher->listeners());
     }
 }

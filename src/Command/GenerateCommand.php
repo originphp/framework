@@ -32,6 +32,7 @@ class GenerateCommand extends Command
         'controller' => 'Generates a Controller class',
         'helper' => 'Generates a Helper class',
         'job' => 'Generates a Job class',
+        'listener' => 'Generates a Listener class',
         'mailer' => 'Generates a Mailer class',
         'model' => 'Generates a Model class',
         'middleware' => 'Generates a Middleware class',
@@ -278,6 +279,21 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('service_test'),
             $this->getBaseFolder($data['name'], self::TEST).DS.'Service'.DS."{$data['class']}ServiceTest.php",
+            $data
+        );
+    }
+
+    protected function listener(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('listener'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Listener'.DS."{$data['class']}Listener.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('listener_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Listener'.DS."{$data['class']}ListenerTest.php",
             $data
         );
     }

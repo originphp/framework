@@ -345,6 +345,24 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
+    public function testGenerateListener()
+    {
+        $this->exec('generate --force listener Dummy');
+        $this->assertExitSuccess();
+        $filename = SRC.DS.'Listener'.DS.'DummyListener.php';
+        $this->assertOutputContains('app/Listener/DummyListener.php');
+        $this->assertFileExists($filename);
+    
+        $this->assertFileHash('1bd53a0cdd0f3e549ba321967d9587b4', $filename);
+        unlink($filename);
+        
+        $filename = TESTS.DS.'TestCase'.DS .'Listener'.DS.'DummyListenerTest.php';
+        $this->assertOutputContains('TestCase/Listener/DummyListenerTest.php');
+        $this->assertFileExists($filename);
+        $this->assertFileHash('9fe80488ae506a109468569f76598a76', $filename);
+        unlink($filename);
+    }
+
     public function testGenerateMigration()
     {
         $this->exec('generate --force migration Dummy');

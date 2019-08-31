@@ -71,7 +71,7 @@ class Publisher
      * @param object|string $object
      * @param array $options You can pass the following option keys
      *   - on: an array of methods that this object that will listen to, by default it will listen to all
-     *   - queue: true or name of queue connection. All will go into
+     *   - queue: default:false set to true to queue in the background
      * @return bool
      */
     public function subscribe($object, array $options = []) : bool
@@ -117,8 +117,7 @@ class Publisher
 
             # Queue Listener
             if ($options['queue']) {
-                $queue = $options['queue'] === true? 'default' : $options['queue'];
-                $result = (new ListenerJob(['queue' => $queue]))->dispatch($object, $event, $args);
+                $result = (new ListenerJob())->dispatch($object, $event, $args);
                 if ($result === false) {
                     break;
                 }
@@ -167,5 +166,15 @@ class Publisher
     public function listeners() : array
     {
         return $this->listeners;
+    }
+
+    /**
+     * Clear the listeners
+     *
+     * @return void
+     */
+    public function clear() : void
+    {
+        $this->listeners = [];
     }
 }
