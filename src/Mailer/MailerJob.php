@@ -5,6 +5,8 @@ use Origin\Job\Job;
 
 class MailerJob extends Job
 {
+    public $queue = 'mailers';
+    
     public function execute(array $params)
     {
         $params['mailer']->dispatch(...$params['arguments']);
