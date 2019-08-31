@@ -23,7 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Added
-- Event Manager now can optionaly pass arguments to listeners isntead of event object
+- Event Manager now can optionally pass arguments to listeners instead of event object
 
 ### Changed
 
