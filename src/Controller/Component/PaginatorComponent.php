@@ -58,7 +58,7 @@ class PaginatorComponent extends Component
          * Security: block non integer values here
          */
         if (! ctype_digit((string) $settings['page'])) {
-            throw new NotFoundException('Invalid Page Value');
+            throw new NotFoundException('Invalid Page');
         }
      
         $sort = $direction = false;
