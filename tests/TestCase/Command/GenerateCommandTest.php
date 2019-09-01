@@ -264,7 +264,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Model'.DS.'Dummy.php';
         $this->assertOutputContains('app/Model/Dummy.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('bbc580492bbec00c224c7009c20edbea', $filename);
+        $this->assertFileHash('2c84b0ddac64043deada9b4ac29a2d7e', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'DummyTest.php';
