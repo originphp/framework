@@ -21,12 +21,14 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
 ### Added
 - Publisher
+- New model/behavior callbacks beforeCreate,afterCreate,beforeUpdate,afterUpdate,afterCommit,afterRollback
 - Event Manager now can optionally pass arguments to listeners instead of event object
 
 ### Changed
+- Model::delete now wraps in database transaction
+- backtrace option changed to `--verbose` to see full backtrace from command line, this works with both phpunit and commands.
 - Non ajax HTTPException now also show error code and message.
 
 ### Fixed

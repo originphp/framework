@@ -661,10 +661,11 @@ class Model
             }
         }
 
-        if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
-            if (! $this->triggerCallback('beforeSave', [$entity, $options])) {
-                return false;
-            }
+        $beforeCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'before');
+        $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
+
+        if ($beforeCallbacks and ! $this->triggerCallback('beforeSave', [$entity, $options])) {
+            return false;
         }
 
         /**
@@ -714,9 +715,26 @@ class Model
         if (count($data) > 1 or ! isset($data[$this->primaryKey])) {
             $connection = $this->connection();
             if ($exists) {
+                if ($beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity])) {
+                    return false;
+                }
+       
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
+
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterUpdate', [$entity]);
+                }
             } else {
+                if ($beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity])) {
+                    return false;
+                }
+         
                 $result = $connection->insert($this->table, $data);
+
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterCreate', [$entity]);
+                }
+
                 /**
                  * Postgresql lastInsertId error if you specify wrong id.
                  * @internal lastval is not yet defined in this session
@@ -729,7 +747,7 @@ class Model
         }
 
         if ($result) {
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+            if ($afterCallbacks) {
                 $this->triggerCallback('afterSave', [$entity, ! $exists, $options]);
             }
         }
@@ -979,7 +997,17 @@ class Model
              * callbacks.
              */
             
-            $result = $this->processSave($data, $options);
+            try {
+                $result = $this->processSave($data, $options);
+            } catch (Exception $e) {
+                if ($options['transaction']) {
+                    $this->rollback();
+                    if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                        $this->triggerCallback('afterRollback', [$data]);
+                    }
+                }
+                throw $e;
+            }
         }
 
         if ($result) {
@@ -1023,12 +1051,18 @@ class Model
         if ($result) {
             if ($options['transaction']) {
                 $this->commit();
+                if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                    $this->triggerCallback('afterCommit', [$data]);
+                }
             }
 
             return true;
         }
         if ($options['transaction']) {
             $this->rollback();
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->triggerCallback('afterRollback', [$data]);
+            }
         }
 
         return false;
@@ -1181,6 +1215,7 @@ class Model
      * @param array options supports the following keys
      *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
      *   - callbacks: call beforeDelete and afterDelete callbacks
+     *  - transaction: wether to save through a database transaction (default:true)
      * @return bool true or false
      */
     public function delete(Entity $entity, $options = []) : bool
@@ -1190,19 +1225,23 @@ class Model
          */
         
         if (is_bool($options)) {
+            // @codeCoverageIgnoreStart
             deprecationWarning('Model:delete now only accepts options array');
             $options = ['cascade' => $options];
+            // @codeCoverageIgnoreEnd
         }
         
-        $options += ['cascade' => true,'callbacks' => true];
+        $options += ['cascade' => true,'callbacks' => true,'transaction' => true];
 
         /**
         * @deprecated callbacks bool argument
         */
         $args = func_get_args();
         if (isset($args[2])) {
+            // @codeCoverageIgnoreStart
             deprecationWarning('Model:delete now only accepts options array');
             $options['callbacks'] = $args[2];
+            // @codeCoverageIgnoreEnd
         }
  
         $this->id = $entity->get($this->primaryKey);
@@ -1211,21 +1250,41 @@ class Model
             return false;
         }
 
-        if ($options['callbacks']) {
+        if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
                 return false;
             }
         }
 
-        $this->deleteHABTM($this->id);
-        if ($options['cascade']) {
-            $this->deleteDependent($this->id);
+        if ($options['transaction']) {
+            $this->begin();
         }
 
-        $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
+        $this->deleteHABTM($this->id, $options['callbacks']);
+        if ($options['cascade']) {
+            $this->deleteDependent($this->id, $options['callbacks']);
+        }
 
-        if ($options['callbacks']) {
+        try {
+            $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
+        } catch (\Exception $e) {
+            if ($options['transaction']) {
+                $this->rollback();
+                $this->triggerCallback('afterRollback', [$entity]);
+            }
+            throw $e;
+        }
+        
+        $afterCallbacks = $options['callbacks'] === true or $options['callbacks'] === 'after';
+        if ($afterCallbacks) {
             $this->triggerCallback('afterDelete', [$entity, $result]);
+        }
+
+        if ($options['transaction']) {
+            $this->commit();
+            if ($afterCallbacks) {
+                $this->triggerCallback('afterCommit', [$entity]);
+            }
         }
 
         return $result;
@@ -1236,7 +1295,7 @@ class Model
      *
      * @var int|string
      */
-    protected function deleteDependent($primaryKey) : void
+    protected function deleteDependent($primaryKey, $callbacks) : void
     {
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
@@ -1246,7 +1305,7 @@ class Model
                     $conditions = [$this->{$association}->primaryKey => $id];
                     $result = $this->{$association}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                     if ($result) {
-                        $this->{$association}->delete($result);
+                        $this->{$association}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
                     }
                 }
             }
@@ -1258,7 +1317,7 @@ class Model
      *
      * @var int|string $id
      */
-    protected function deleteHABTM($id) : void
+    protected function deleteHABTM($id, $callbacks) : void
     {
         foreach ($this->hasAndBelongsToMany as $association => $config) {
             $associatedModel = $config['with'];
@@ -1269,7 +1328,7 @@ class Model
                 $conditions = [$this->{$associatedModel}->primaryKey => $id];
                 $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                 if ($result) {
-                    $this->{$associatedModel}->delete($result);
+                    $this->{$associatedModel}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
                 }
             }
         }
@@ -1565,6 +1624,48 @@ class Model
     }
 
     /**
+     * Before create callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @return bool must return true to continue
+     */
+    public function beforeCreate(Entity $entity)
+    {
+        return true;
+    }
+
+    /**
+     * Before update callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @return bool must return true to continue
+     */
+    public function beforeUpdate(Entity $entity)
+    {
+        return true;
+    }
+
+    /**
+    * After create callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterCreate(Entity $entity)
+    {
+    }
+
+    /**
+    * After update callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterUpdate(Entity $entity)
+    {
+    }
+
+    /**
      * After save callback
      *
      * @param \Origin\Model\Entity $entity
@@ -1595,6 +1696,26 @@ class Model
      * @return bool
      */
     public function afterDelete(Entity $entity, bool $success)
+    {
+    }
+
+    /**
+    * After commit callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterCommit(Entity $entity)
+    {
+    }
+
+    /**
+    * After rollback callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterRollback(Entity $entity)
     {
     }
 

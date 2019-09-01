@@ -60,9 +60,9 @@ class Behavior
     }
 
     /**
-      * Before find callback. Must return either the query or true to continue
-      * @return array|bool query or bool
-      */
+     * Before find callback. Must return either the query or true to continue
+     * @return array|bool query or bool
+     */
     public function beforeFind(array $query = [])
     {
         return $query;
@@ -112,6 +112,48 @@ class Behavior
     }
 
     /**
+     * Before create callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @return bool must return true to continue
+     */
+    public function beforeCreate(Entity $entity)
+    {
+        return true;
+    }
+
+    /**
+     * Before update callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @return bool must return true to continue
+     */
+    public function beforeUpdate(Entity $entity)
+    {
+        return true;
+    }
+
+    /**
+    * After create callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterCreate(Entity $entity)
+    {
+    }
+
+    /**
+    * After update callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterUpdate(Entity $entity)
+    {
+    }
+
+    /**
      * After save callback
      *
      * @param \Origin\Model\Entity $entity
@@ -142,6 +184,26 @@ class Behavior
      * @return bool
      */
     public function afterDelete(Entity $entity, bool $success)
+    {
+    }
+
+    /**
+    * After commit callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterCommit(Entity $entity)
+    {
+    }
+
+    /**
+    * After rollback callback
+    *
+    * @param \Origin\Model\Entity $entity
+    * @return void
+    */
+    public function afterRollback(Entity $entity)
     {
     }
     /**
