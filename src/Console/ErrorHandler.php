@@ -120,7 +120,7 @@ class ErrorHandler
         }
         Log::error($message);
 
-        $fullBacktrace = in_array('--backtrace', $_SERVER['argv']); // (in_array('--backtrace', $_SERVER['argv']) OR defined('PHPUNIT'));
+        $fullBacktrace = in_array('--verbose', $_SERVER['argv']); // (in_array('--backtrace', $_SERVER['argv']) OR defined('PHPUNIT'));
         $this->render($debug, $fullBacktrace);
     }
 
@@ -170,7 +170,7 @@ class ErrorHandler
             }
         }
         if ($fullBacktrace === false and $i > 3) {
-            $this->out("\n<yellow>Use --backtrace to see the full backtrace.</yellow>\n");
+            $this->out("\n<yellow>Use --verbose to see the full backtrace.</yellow>\n");
         }
     }
 
