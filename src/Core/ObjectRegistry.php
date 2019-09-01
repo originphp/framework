@@ -67,7 +67,7 @@ class ObjectRegistry
     public function clear() : void
     {
         unset($this->loaded);
-        $this->loaded = [];
+        $this->loaded = $this->enabled = [];
     }
 
     /**
@@ -200,6 +200,7 @@ class ObjectRegistry
     {
         if (isset($this->loaded[$name])) {
             unset($this->loaded[$name]);
+            $this->disable($name);
 
             return true;
         }
