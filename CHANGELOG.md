@@ -37,7 +37,9 @@ Delete tag: git tag -d <tag_name>
 - Non ajax HTTPException now also show error code and message.
 
 ### Fixed
+- Deprecation warning function showing correct stack frame
 - Fixed missing closing p tag in error html
+
 
 ## [1.30.2] - 2019-xx-xx
 Cleaned up templates and made small internal adjustments

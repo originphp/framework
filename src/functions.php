@@ -256,8 +256,8 @@ function hashPassword(string $password)
 function deprecationWarning(string $message) : void
 {
     $trace = debug_backtrace();
-    if (isset($trace[0])) {
-        $message = sprintf('%s - %s %s', $message, str_replace(ROOT .DS, '', $trace[0]['file']), $trace[0]['line']);
+    if (isset($trace[1])) {
+        $message = sprintf('%s - %s %s', $message, str_replace(ROOT .DS, '', $trace[1]['file']), $trace[1]['line']);
     }
 
     Log::warning($message);
