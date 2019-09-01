@@ -56,15 +56,4 @@ trait PublisherTrait
     {
         $this->publisher()->publish(...func_get_args());
     }
-
-    /**
-    * Alias for Publish (use any number of arguments)
-    *
-    * @param string $event  'Order.afterPlace'
-    * @return void
-    */
-    public function broadcast(string $event) : void
-    {
-        $this->publisher()->publish(...func_get_args());
-    }
 }

@@ -2,11 +2,13 @@
 namespace App\Test\Publisher;
 
 use Origin\Model\Entity;
+use Origin\Publisher\Listener;
 use Origin\Publisher\Publisher;
 use Origin\Publisher\PublisherTrait;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Exception\InvalidArgumentException;
 
-class MockListener
+class MockListener extends Listener
 {
     public function create(Entity $user, $id)
     {
@@ -18,8 +20,12 @@ class MockListener
 
         return $result;
     }
+    public function throwError()
+    {
+        $a = 1 / 0;
+    }
 }
-class AnotherMockListener
+class AnotherMockListener extends Listener
 {
     public function create(Entity $user, $id)
     {
@@ -122,6 +128,13 @@ class PublisherTest extends OriginTestCase
         $user = $this->User->find('first');
         $simple->publish('create', $user, 12345);
         $this->assertEquals('none', $user->id); // Second subscribe is to test its reached
+    }
+
+    public function testSubscribeQueueFail()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $simple = new SimpleObject();
+        $simple->subscribe(new MockListener(), ['queue' => true]);
     }
 
     public function testInstance()

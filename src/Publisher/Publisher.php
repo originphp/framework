@@ -136,26 +136,29 @@ class Publisher
 
     /**
      * Dispatches the event to the listener
+     * @internal return type can be anything only false is important to Publisher
      *
      * @param object|callable $object
      * @param string $event
      * @param array $args
-     * @return boolean|null
+     * @return mixed
      */
-    public function dispatch($object, string $event, array $args = []) : ?bool
+    public function dispatch($object, string $event, array $args = [])
     {
         $instanceOfListener = $object instanceof Listener;
         if ($instanceOfListener) {
             $object->startup();
         }
-
+        $result = null;
         if (method_exists($object, $event)) {
-            return call_user_func_array([$object,$event], $args);
+            $result = call_user_func_array([$object,$event], $args);
         }
 
         if ($instanceOfListener) {
             $object->shutdown();
         }
+
+        return $result;
     }
 
     /**
