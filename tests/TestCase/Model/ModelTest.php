@@ -113,7 +113,7 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result->author);
 
-        $this->Article->saveField(1000, 'author_id', 12345678); // invalid id
+        $this->Article->updateColumn(1000, 'author_id', 12345678); // invalid id
         $result = $this->Article->get(1000, [
             'associated' => ['Author'],
         ]);
@@ -127,7 +127,7 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result->address);
 
-        $this->Article->Author->Address->saveField(1002, 'author_id', 12345678); // invalid id
+        $this->Article->Author->Address->updateColumn(1002, 'author_id', 12345678); // invalid id
         $result = $this->Article->Author->get(1000, [
             'associated' => ['Address'],
         ]);
@@ -833,9 +833,9 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Article->delete($article));
     }
 
-    public function testSaveField()
+    public function testUpdateColumn()
     {
-        $this->Article->saveField(1000, 'title', 'foo');
+        $this->Article->updateColumn(1000, 'title', 'foo');
         $article = $this->Article->get(1000);
         $this->assertEquals('foo', $article->title);
     }

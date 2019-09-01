@@ -73,7 +73,7 @@ class CounterCacheBehaviorTest extends OriginTestCase
 
     public function testOnDelete()
     {
-        $this->Post->saveField(1, 'replies_count', 5);
+        $this->Post->updateColumn(1, 'replies_count', 5);
 
         $reply = $this->Post->Reply->new([
             'post_id' => 1,

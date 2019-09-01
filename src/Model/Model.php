@@ -772,16 +772,31 @@ class Model
     }
 
     /**
-     * Saves a single field on the current record.
+     * Updates a column in the table, no validation check and callbacks triggered
      *
+     * @params int|string $primaryKey the id for the record
+     * @param int|string $name column name
+     * @param mixed $value
+     * @return bool true or false
+     */
+    public function updateColumn($primaryKey, string $name, $value) : bool
+    {
+        return $this->connection()->update($this->table, [$name => $value], [$this->primaryKey => $primaryKey]);
+    }
+
+    /**
+     * Saves a single field on a current record.
+     * @codeCoverageIgnore
      * @params int|string $primaryKey the id for the record
      * @param int|string $fieldName
      * @param mixed  $fieldValue
-     * @param array  $options    (callbacks, validate,transaction)
+     * @param array  $options (callbacks, validate)
      * @return bool true or false
      */
     public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = []) : bool
     {
+        deprecationWarning('Model:saveField has been deprecated use Model:updateColumn');
+
         return $this->save(new Entity([
             $this->primaryKey => $primaryKey,
             $fieldName => $fieldValue,

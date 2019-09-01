@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+
+### Deprecated
+- `Model::saveField` is being deprecated, use `Model::updateColumn` instead, `updateColumn` wont run callbacks or validate.
+
 ### Added
 - Publisher
 - New model/behavior callbacks beforeCreate,afterCreate,beforeUpdate,afterUpdate,afterCommit,afterRollback
