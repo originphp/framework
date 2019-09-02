@@ -14,7 +14,7 @@
 
 namespace Origin\Exception;
 
-class ServiceUnavailableException extends Exception
+class ServiceUnavailableException extends HttpException
 {
     public function __construct($message = null, $code = 503)
     {

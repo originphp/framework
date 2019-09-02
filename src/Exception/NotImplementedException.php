@@ -14,7 +14,7 @@
 
 namespace Origin\Exception;
 
-class NotImplementedException extends Exception
+class NotImplementedException extends HttpException
 {
     public function __construct($message = null, $code = 501)
     {

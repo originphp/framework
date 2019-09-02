@@ -14,7 +14,7 @@
 
 namespace Origin\Exception;
 
-class NotFoundException extends Exception
+class NotFoundException extends HttpException
 {
     public function __construct($message = null, $code = 404)
     {
