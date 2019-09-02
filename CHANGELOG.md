@@ -21,6 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.31.0] - 2019-09-02
 
 ### Security
 - secured not found exceptions to work with new error display
@@ -36,15 +37,14 @@ Delete tag: git tag -d <tag_name>
 ### Changed
 - Model::delete now wraps in database transaction
 - backtrace option changed to `--verbose` to see full backtrace from command line, this works with both phpunit and commands.
-- Non ajax HTTPException now also show error code and message.
+- Non ajax HTTPException now also show error codes and message for 4xx exceptions.
 
 ### Fixed
 - Deprecation warning function showing correct stack frame
-- Fixed unloading object in registry was removing it from enabled
+- Fixed unloading object in registry was not removing it from enabled
 - Fixed missing closing p tag in error html
 
-
-## [1.30.2] - 2019-xx-xx
+## [1.30.2] - 2019-08-30
 Cleaned up templates and made small internal adjustments
 
 ### Fixed
