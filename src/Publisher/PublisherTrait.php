@@ -37,7 +37,10 @@ trait PublisherTrait
     public function subscribe($object, array $options = []) : bool
     {
         if (is_string($object)) {
-            $object = Resolver::className($object, 'Listener');
+            $object = Resolver::className($object, 'Listener', 'Listener');
+        }
+        if (! is_object($object) and ! is_string($object)) {
+            return false;
         }
 
         return $this->publisher()->subscribe($object, $options);
