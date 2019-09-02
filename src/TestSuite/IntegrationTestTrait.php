@@ -15,11 +15,16 @@
 
 namespace Origin\TestSuite;
 
+use Exception;
 use App\Application;
 use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
+use Origin\Http\ExceptionRenderer;
+
+use PHPUnit\Exception as PhpunitException;
+use Origin\Model\Exception\DatasourceException;
 
 /**
  * A way to test controllers from a higher level
@@ -80,6 +85,14 @@ trait IntegrationTestTrait
     protected $testWithMiddleware = true;
 
     /**
+     * Flag on for error handling, exception will
+     * be caught on response code will be set accordingly.
+     *
+     * @var boolean
+     */
+    protected $testWithErrorHandler = true;
+
+    /**
      * Enables and disables testing with middleware
      *
      * @param boolean $bool
@@ -88,6 +101,26 @@ trait IntegrationTestTrait
     public function useMiddleware(bool $bool)
     {
         $this->testWithMiddleware = $bool;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function disableMiddleware()
+    {
+        $this->testWithMiddleware = false;
+    }
+
+    /**
+     * Disables the error handler
+     *
+     * @return void
+     */
+    public function disableErrorHandler()
+    {
+        $this->testWithErrorHandler = false;
     }
 
     /**
@@ -302,13 +335,26 @@ trait IntegrationTestTrait
             $this->response->cookie($name, $value);
         }
 
-        if ($this->testWithMiddleware) {
-            $application = new Application($this->request, $this->response);
-            $this->controller = Dispatcher::instance()->controller();
-        } else {
-            $dispatcher = new Dispatcher();
-            $dispatcher->dispatch($this->request, $this->response);
-            $this->controller = $dispatcher->controller();
+        try {
+            if ($this->testWithMiddleware) {
+                $application = new Application($this->request, $this->response);
+                $this->controller = Dispatcher::instance()->controller();
+            } else {
+                $dispatcher = new Dispatcher();
+                $dispatcher->dispatch($this->request, $this->response);
+                $this->controller = $dispatcher->controller();
+            }
+        } catch (PhpUnitException $e) {
+            throw $e;
+        } catch (DatasourceException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            if ($this->testWithErrorHandler) {
+                $exceptionRenderer = new ExceptionRenderer($this->request, $this->response);
+                $exceptionRenderer->render($e);
+            } else {
+                throw $e;
+            }
         }
     }
 

@@ -15,7 +15,7 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Response;
-use Origin\Http\Exception\NotFoundException;
+use Origin\Exception\NotFoundException;
 
 class ResponseTest extends \PHPUnit\Framework\TestCase
 {

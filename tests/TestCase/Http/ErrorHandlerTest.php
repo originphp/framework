@@ -165,7 +165,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
-            new NotFoundException('passwords.txt could not be found')
+            new \Origin\Model\Exception\NotFoundException('passwords.txt could not be found')
         );
     
         $this->assertNotContains('NotFoundException', $errorHandler->response);
@@ -204,10 +204,10 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
-            new NotFoundException('fetch not found')
+            new NotFoundException('Index not found')
         );
 
-        $this->assertContains('{"error":{"message":"Not found","code":404}}', $errorHandler->response);
+        $this->assertContains('{"error":{"message":"Index not found","code":404}}', $errorHandler->response);
     }
 
     public function testExceptionHandlerAjaxDebugDisabledInternalError()

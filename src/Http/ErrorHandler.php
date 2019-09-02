@@ -27,7 +27,6 @@ use Origin\Log\Log;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
 use Origin\Exception\Exception;
-use Origin\Exception\HttpException;
 
 class FatalErrorException extends Exception
 {
@@ -183,54 +182,19 @@ class ErrorHandler
 
         $this->logException($exception, $errorCode);
         $this->cleanBuffer();
-       
-        if ($this->isAjax()) {
-            $this->ajaxExceptionHandler($exception);
-        } elseif (Config::read('debug') === true) {
+
+        /**
+         * Display debug backtrace
+         */
+        if (Config::read('debug') === true and ! $this->isAjax()) {
             $this->debugExceptionHandler($exception);
         } else {
-            /**
-             * Legacy error handler
-             * @deprecated 404 will be deprecated in future
-             */
-            $error400 = SRC . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
-            $file = SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
-            if ($exception instanceof HttpException and file_exists($error400)) {
-                if ($exception->getCode() < 500) {
-                    $file = $error400;
-                    $errorCode = $exception->getCode();
-                    $errorMessage = $exception->getMessage();
-                }
-            }
-            ob_start();
-            include $file;
-            $response = ob_get_clean();
-            $this->sendResponse($response, $errorCode);
+            $renderer = new ExceptionRenderer(Router::request());
+            $response = $renderer->render($exception, Config::read('debug'));
+            $this->sendResponse($response->body(), $response->statusCode());
         }
-     
+        
         $this->stop();
-    }
-
-    /**
-     * Ajax and json error handler
-     *
-     * @param Exception $exception
-     * @return void
-     */
-    public function ajaxExceptionHandler($exception): void
-    {
-        $errorCode = $exception->getCode();
-        $response = ['error' => ['message' => $exception->getMessage(), 'code' => $errorCode]];
-
-        if (Config::read('debug') !== true and ! $exception instanceof HttpException) {
-            $errorCode = 500;
-            $response = ['error' => ['message' => 'An Internal Error has Occured', 'code' => $errorCode]];
-            if ($exception->getCode() === 404) {
-                $errorCode = 404;
-                $response = ['error' => ['message' => 'Not found', 'code' => $errorCode]];
-            }
-        }
-        $this->sendResponse(json_encode($response), $errorCode);
     }
 
     /**
