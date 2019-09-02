@@ -26,7 +26,7 @@ use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Behavior\Behavior;
 use Origin\TestSuite\OriginTestCase;
-use Origin\Exception\NotFoundException;
+use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
 

@@ -139,7 +139,7 @@ class EmailBuilder
             } elseif ($this->content and $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
-                throw new NotFoundException($filename . ' could not be found');
+                throw new NotFoundException('Text email template could not be found');# security
             }
         }
     }
@@ -184,7 +184,7 @@ class EmailBuilder
     protected function renderTemplate($__filename) : string
     {
         if (! file_exists($__filename)) {
-            throw new NotFoundException($__filename. ' could not be found');
+            throw new NotFoundException('HTML Email template could not be found');
         }
         extract($this->options['viewVars']);
         ob_start();

@@ -16,8 +16,8 @@ namespace Origin\Storage\Engine;
 
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
-use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Storage\Exception\NotFoundException;
 
 class LocalEngine extends BaseEngine
 {

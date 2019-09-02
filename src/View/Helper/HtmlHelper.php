@@ -18,7 +18,7 @@ use Origin\Core\Plugin;
 use Origin\Http\Router;
 use Origin\Utility\Inflector;
 use Origin\View\TemplateTrait;
-use Origin\Exception\NotFoundException;
+use Origin\View\Exception\NotFoundException;
 
 class HtmlHelper extends Helper
 {

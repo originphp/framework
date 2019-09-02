@@ -22,6 +22,8 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+### Security
+- secured not found exceptions to work with new error display
 
 ### Deprecated
 - `Model::saveField` is being deprecated, use `Model::updateColumn` instead, `updateColumn` wont run callbacks or validate.
@@ -38,6 +40,7 @@ Delete tag: git tag -d <tag_name>
 
 ### Fixed
 - Deprecation warning function showing correct stack frame
+- Fixed unloading object in registry was removing it from enabled
 - Fixed missing closing p tag in error html
 
 

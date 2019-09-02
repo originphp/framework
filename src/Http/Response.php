@@ -14,7 +14,7 @@
 
 namespace Origin\Http;
 
-use Origin\Exception\NotFoundException;
+use Origin\Http\Exception\NotFoundException;
 
 class Response
 {

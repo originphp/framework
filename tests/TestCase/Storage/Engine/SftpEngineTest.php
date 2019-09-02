@@ -23,8 +23,8 @@ use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Storage\Engine\SftpEngine;
 
-use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Storage\Exception\NotFoundException;
 
 class MockSftpEngine extends SftpEngine
 {

@@ -21,7 +21,7 @@ namespace Origin\Core;
  * - Multilines can parsed
  */
 use Origin\Exception\Exception;
-use Origin\Exception\NotFoundException;
+use Origin\Exception\InvalidArgumentException;
 
 class DotEnv
 {
@@ -45,7 +45,7 @@ class DotEnv
 
             return;
         }
-        throw new NotFoundException(sprintf('%s could not be found.', $filename));
+        throw new InvalidArgumentException(sprintf('%s could not be found.', $filename)); # Security
     }
 
     /**

@@ -20,7 +20,7 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Controller\Controller;
 use Origin\View\Helper\HtmlHelper;
-use Origin\Exception\NotFoundException;
+use Origin\View\Exception\NotFoundException;
 
 class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 {

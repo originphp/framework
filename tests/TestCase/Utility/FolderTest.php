@@ -16,7 +16,7 @@ namespace Origin\Test\Utility;
 
 use Origin\Utility\File;
 use Origin\Utility\Folder;
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 
 class FolderTest extends \PHPUnit\Framework\TestCase
 {

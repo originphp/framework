@@ -15,7 +15,7 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\File;
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 
 class FileTest extends \PHPUnit\Framework\TestCase
 {

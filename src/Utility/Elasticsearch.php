@@ -17,7 +17,7 @@ namespace Origin\Utility;
 
 use Origin\Core\StaticConfigTrait;
 
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 use Origin\Utility\Exception\ElasticsearchException;
 
 class Elasticsearch

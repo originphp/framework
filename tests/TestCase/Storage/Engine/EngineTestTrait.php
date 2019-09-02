@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Storage\Engine;
 
-use Origin\Exception\NotFoundException;
+use Origin\Storage\Exception\NotFoundException;
 
 trait EngineTestTrait
 {

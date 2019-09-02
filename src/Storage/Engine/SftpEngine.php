@@ -18,8 +18,8 @@ use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
 
 use Origin\Exception\Exception;
-use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Storage\Exception\NotFoundException;
 
 /**
  * To install phpseclib

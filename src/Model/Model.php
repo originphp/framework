@@ -22,8 +22,8 @@ namespace Origin\Model;
 
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
-use Origin\Exception\NotFoundException;
 use Origin\Model\Behavior\BehaviorRegistry;
+use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
 
@@ -272,7 +272,6 @@ class Model
      */
     public function __call(string $method, array $arguments)
     {
-        //
         foreach ($this->behaviorRegistry()->enabled() as $Behavior) {
             if (method_exists($this->behaviorRegistry()->{$Behavior}, $method)) {
                 return call_user_func_array(
@@ -363,6 +362,7 @@ class Model
 
         return $this->{$behavior};
     }
+
 
     /**
      * This will load any model regardless if it is associated or not.

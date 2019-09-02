@@ -14,7 +14,7 @@
 
 namespace Origin\Utility;
 
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 
 class Folder
 {

@@ -3,7 +3,7 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Elasticsearch;
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 use Origin\Utility\Exception\ElasticsearchException;
 
 class ElasticsearchTest extends \PHPUnit\Framework\TestCase

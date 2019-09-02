@@ -17,8 +17,8 @@ namespace Origin\Utility;
 
 use Iterator;
 use Countable;
-use Origin\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Utility\Exception\NotFoundException;
 
 class CsvIterator implements Iterator, Countable
 {

@@ -16,10 +16,10 @@ namespace Origin\Utility;
 
 use CURLFile;
 use Origin\Core\ConfigTrait;
-use Origin\Utility\Http\Request;
+
 use Origin\Utility\Http\Response;
 use Origin\Exception\HttpException;
-use Origin\Exception\NotFoundException;
+use Origin\Utility\Exception\NotFoundException;
 
 class Http
 {

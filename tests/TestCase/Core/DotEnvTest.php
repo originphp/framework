@@ -16,7 +16,7 @@ namespace Origin\Test\Core;
 
 use Origin\Core\DotEnv;
 use Origin\Exception\Exception;
-use Origin\Exception\NotFoundException;
+use Origin\Exception\InvalidArgumentException;
 
 class MockDotEnv extends DotEnv
 {
@@ -45,7 +45,7 @@ class DotEnvTest extends \PHPUnit\Framework\TestCase
     public function testLoadExecption()
     {
         $dotenv = new MockDotEnv();
-        $this->expectException(NotFoundException::class);
+        $this->expectException(InvalidArgumentException::class);
         $dotenv->load();
     }
 
