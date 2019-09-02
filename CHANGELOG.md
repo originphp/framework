@@ -21,6 +21,15 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Added
+- IntegrationTesting now renders error message instead of throwing exception
+
+
+### Fixed
+- Fixed notice on collection
+- NotFoundException,ServiceUnavailbleException,NotImplementedException now extend HttpException
+
 ## [1.31.0] - 2019-09-02
 
 ### Security

@@ -106,7 +106,7 @@ class Collection implements ArrayAccess, Iterator, Countable
  
     public function offsetGet($key)
     {
-        return $this->items[$key];
+        return $this->items[$key] ?? null;
     }
 
     public function offsetSet($key, $value)
