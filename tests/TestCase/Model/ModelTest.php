@@ -876,6 +876,10 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($article->id);
         $this->assertNotEmpty($this->Article->id);
         $this->assertEmpty($article->modified());
+        $this->assertTrue($article->created());
+        $this->assertTrue($article->saved());
+        $this->assertFalse($article->updated());
+        $this->assertFalse($article->deleted());
    
         # # # READ # # #
         $result = $this->Article->get($article->id);
@@ -887,6 +891,10 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($article->modified());
         $this->assertTrue($this->Article->save($article));
         $this->assertEmpty($article->modified());
+        $this->assertFalse($article->created());
+        $this->assertTrue($article->saved());
+        $this->assertTrue($article->updated());
+        $this->assertFalse($article->deleted());
 
         $result = $this->Article->get($article->id);
         $this->assertEquals('Testing Update in CRUD', $article->title);
@@ -894,6 +902,10 @@ class ModelTest extends OriginTestCase
         # # # DELETE # # #
         $this->assertTrue($this->Article->delete($article));
         $this->assertFalse($this->Article->delete($article));
+        $this->assertFalse($article->created());
+        $this->assertTrue($article->saved());
+        $this->assertFalse($article->updated());
+        $this->assertFalse($article->deleted());
     }
 
     public function testUpdateColumn()

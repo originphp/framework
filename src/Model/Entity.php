@@ -60,6 +60,11 @@ class Entity
      */
     protected $_modified = [];
 
+    protected $_created = false;
+    protected $_saved = false;
+    protected $_updated = false;
+    protected $_deleted = false;
+    
     /**
      * Constructor
      *
@@ -250,6 +255,61 @@ class Entity
     {
         $this->_modified = [];
         $this->_errors = [];
+    }
+
+    /**
+     * Checks if a record was created when it was persisted to the database
+     *
+     * @param boolean $created
+     * @return boolean
+     */
+    public function created(bool $created = null) : bool
+    {
+        return $this->setGetPersisted('created', $created);
+    }
+
+    /**
+     * Checks if a record was saved when it was persisted to the database
+     *
+     * @param boolean $saved
+     * @return boolean
+     */
+    public function saved(bool $saved = null) : bool
+    {
+        return $this->setGetPersisted('saved', $saved);
+    }
+
+    /**
+     * Checks if a record was updated when it was persisted to the database
+     *
+     * @param boolean $updated
+     * @return boolean
+     */
+    public function updated(bool $updated = null) : bool
+    {
+        return $this->setGetPersisted('updated', $updated);
+    }
+
+    /**
+     * Checks if a record was deleted (model->delete was called)
+     *
+     * @param boolean $deleted
+     * @return boolean
+     */
+    public function deleted(bool $deleted = null) : bool
+    {
+        return $this->setGetPersisted('deleted', $deleted);
+    }
+
+    private function setGetPersisted(string $type, bool $value = null)
+    {
+        $var = '_' . $type;
+
+        if ($value === null) {
+            return $this->$var;
+        }
+
+        return $this->$var = $value;
     }
 
     /**

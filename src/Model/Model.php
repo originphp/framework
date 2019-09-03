@@ -755,6 +755,9 @@ class Model
                 $this->id = $entity->{$this->primaryKey};
             }
         }
+        $entity->saved($result);
+        $entity->updated($result and $exists);
+        $entity->created($result and ! $exists);
 
         if ($result) {
             if ($afterCallbacks) {
@@ -1303,6 +1306,8 @@ class Model
             throw $e;
         }
         
+        $entity->deleted($result);
+          
         if ($afterCallbacks) {
             $this->triggerCallback('afterDelete', [$entity, $result]);
         }

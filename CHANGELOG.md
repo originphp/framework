@@ -25,6 +25,7 @@ Delete tag: git tag -d <tag_name>
 ### Added 
 - Concern
 - Repository
+- Entity check states, created,updated,saved and deleted.
 
 ### Fixed
 - IntegrationTesting renders error message instead of throwing exception
