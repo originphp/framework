@@ -16,12 +16,15 @@ namespace Origin\Concern;
 
 use ReflectionMethod;
 use ReflectionException;
+use Origin\Exception\Exception;
 
 /**
  * A concern is for sharing code between a Model or Controller without the overhead
- * from calling every single callback (Behavior).
+ * from calling every single callback (Behavior). Similar to trait, but with a constrctor
+ * and more flexible in the internal method names.
  *
- * A behavior is more a plugin for extending models, a concern is to share code between models.
+ * A behavior is more a plugin for extending models (soft delete, tagging, emailing), a concern is
+ * to share code between models more like a library
  *
  *  Do not use Concern to reduce fat models, use Repos instead.
  *
@@ -53,6 +56,7 @@ class Concern
         if ($this->hasMethod($this->object, $method)) {
             return  call_user_func_array([$this->object,$method], $arguments);
         }
+        throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
     /**
