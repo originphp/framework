@@ -135,7 +135,7 @@ class ModelTest extends OriginTestCase
 
     public function testDeleteExceptionRollback()
     {
-        //$this->expectException(DatasourceException::class);
+        $this->expectException(DatasourceException::class);
         //Invalid text representation: 7 ERROR:  invalid input syntax for integer: "ab78e847-6ea9-4f88-9b10-8c29f2993616"
         //yntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-not-e
         $data = [
