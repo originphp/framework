@@ -21,6 +21,8 @@ namespace Origin\Test\ModelRefactored;
 
 use Origin\Model\Model;
 use Origin\Model\Entity;
+
+use Origin\Concern\Concern;
 use Origin\Model\Collection;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
@@ -28,7 +30,18 @@ use Origin\Model\Behavior\Behavior;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
+
+use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Concern\Exception\MissingConcernException;
+
+class PublishableConcern extends Concern
+{
+    public function foo()
+    {
+        return 'bar';
+    }
+}
 
 /**
  * Used By Mocks
@@ -95,6 +108,55 @@ class ModelTest extends OriginTestCase
         ModelRegistry::set('Address', $this->Address);
        
         parent::setUp();
+    }
+
+    public function testSaveExceptionRollback()
+    {
+        $this->expectException(DatasourceException::class);
+        $data = [
+            'title' => str_repeat('x', 256),
+            'author_id' => 1234,
+            'body' => 'article body goes here',
+        ];
+
+        $stub = $this->getMockForModel('Article', [
+            'begin','rollback',
+        ], ['className' => Article::class]);
+
+        $stub->expects($this->once())
+            ->method('begin');
+
+        $stub->expects($this->once())
+            ->method('rollback');
+
+        $article = $this->Article->new($data);
+        $this->assertFalse($stub->save($article));
+    }
+
+    public function testDeleteExceptionRollback()
+    {
+        $this->expectException(DatasourceException::class);
+        //Invalid text representation: 7 ERROR:  invalid input syntax for integer: "ab78e847-6ea9-4f88-9b10-8c29f2993616"
+        $data = [
+            'id' => uuid(),
+        ];
+
+        $stub = $this->getMockForModel('Article', [
+            'begin','rollback','exists'
+        ], ['className' => Article::class]);
+
+        $stub->expects($this->once())
+            ->method('begin');
+
+        $stub->expects($this->once())
+            ->method('exists')
+            ->willReturn(true);
+
+        $stub->expects($this->once())
+            ->method('rollback');
+
+        $article = $this->Article->new($data);
+        $this->assertFalse($stub->delete($article));
     }
 
     /**
@@ -1864,5 +1926,14 @@ class ModelTest extends OriginTestCase
         $stub->expects($this->never())->method('begin');
         $stub->expects($this->never())->method('rollback');
         $this->assertFalse($stub->save($article, ['transaction' => false]));
+    }
+
+    public function testLoadConcern()
+    {
+        $this->Article->loadConcern('Publishable', ['className' => 'Origin\Test\ModelRefactored\PublishableConcern']);
+        $this->assertEquals('bar', $this->Article->foo());
+
+        $this->expectException(MissingConcernException::class);
+        $this->Article->loadConcern('Zipable');
     }
 }

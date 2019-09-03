@@ -23,6 +23,8 @@ use Origin\View\XmlView;
 use Origin\Http\Response;
 use Origin\View\JsonView;
 use Origin\Utility\Inflector;
+use Origin\Exception\Exception;
+use Origin\Concern\ConcernRegistry;
 use Origin\Model\Traits\ModelTrait;
 use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
@@ -114,8 +116,26 @@ class Controller
         $this->response = $response ? $response : new Response();
 
         $this->componentRegistry = new ComponentRegistry($this);
+        $this->concernRegistry = new ConcernRegistry($this, 'Controller/Concern');
 
         $this->initialize();
+    }
+
+    /**
+    * Magic method it call the first loaded behavior method if its available
+    *
+    * @param string $method
+    * @param array $arguments
+    * @return void
+    */
+    public function __call(string $method, array $arguments)
+    {
+        $concern = $this->concernRegistry->hasMethod($method);
+        if ($concern) {
+            return call_user_func_array([$concern, $method], $arguments);
+        }
+   
+        throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
     /**
@@ -129,9 +149,23 @@ class Controller
     {
         list($plugin, $component) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Component'], $config);
-        $this->{$component} = $this->componentRegistry()->load($name, $config);
 
-        return $this->{$component};
+        return $this->$component = $this->componentRegistry->load($name, $config);
+    }
+
+    /**
+     * Loads a concern
+     *
+     * @param string $name
+     * @param array $config
+     * @return void
+     */
+    public function loadConcern(string $name, array $config = []) //no return type cause of mocking
+    {
+        list($plugin, $concern) = pluginSplit($name);
+        $config = array_merge(['className' => $name . 'Concern'], $config);
+
+        return $this->$concern = $this->concernRegistry->load($name, $config);
     }
 
     /**

@@ -27,6 +27,8 @@ class GenerateCommand extends Command
      */
     protected $generators = [
         'behavior' => 'Generates a Behavior class',
+        'concern_controller' => 'Generates a Concern for a Controller',
+        'concern_model' => 'Generates a Concern for a Model',
         'command' => 'Generates a Command class',
         'component' => 'Generates a Component class',
         'controller' => 'Generates a Controller class',
@@ -38,6 +40,7 @@ class GenerateCommand extends Command
         'middleware' => 'Generates a Middleware class',
         'migration' => 'Generates a Migration class',
         'plugin' => 'Generates a Plugin skeleton',
+        'repository' => 'Generates a Repository for a Model',
         'scaffold' => 'Generates a MVC base application using the database',
         'service' => 'Generates a Service object class',
     ];
@@ -202,6 +205,36 @@ class GenerateCommand extends Command
         );
     }
 
+    protected function concern_controller(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('concern_controller'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Controller'.DS.'Concern'.DS."{$data['class']}Concern.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('concern_controller_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Controller'.DS.'Concern'.DS."{$data['class']}ConcernTest.php",
+            $data
+        );
+    }
+
+    protected function concern_model(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('concern_model'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Concern'.DS."{$data['class']}Concern.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('concern_model_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Concern'.DS."{$data['class']}ConcernTest.php",
+            $data
+        );
+    }
+
     protected function component(array $data)
     {
         $this->generate(
@@ -264,6 +297,21 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('job_test'),
             $this->getBaseFolder($data['name'], self::TEST).DS.'Job'.DS."{$data['class']}JobTest.php",
+            $data
+        );
+    }
+
+    protected function repository(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('repository'),
+            $this->getBaseFolder($data['name'], self::SRC).DS . 'Model' . DS. 'Repository'.DS."{$data['class']}Repository.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('repository_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS . 'Model' . DS. 'Repository'.DS."{$data['class']}RepositoryTest.php",
             $data
         );
     }

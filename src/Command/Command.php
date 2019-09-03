@@ -173,6 +173,10 @@ abstract class Command
         return $instance->run($argv);
     }
 
+    public function dontShow()
+    {
+    }
+
     /**
      * Runs this command used by Command Runner
      *

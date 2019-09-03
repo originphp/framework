@@ -22,6 +22,7 @@ namespace Origin\Model;
 
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
+use Origin\Concern\ConcernRegistry;
 use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
@@ -185,6 +186,7 @@ class Model
         }
 
         $this->behaviorRegistry = new BehaviorRegistry($this);
+        $this->concernRegistry = new ConcernRegistry($this, 'Model/Concern');
 
         $this->initialize($config);
     }
@@ -272,14 +274,16 @@ class Model
      */
     public function __call(string $method, array $arguments)
     {
-        foreach ($this->behaviorRegistry()->enabled() as $Behavior) {
-            if (method_exists($this->behaviorRegistry()->{$Behavior}, $method)) {
-                return call_user_func_array(
-                    [$this->behaviorRegistry()->{$Behavior}, $method],
-                    $arguments
-                );
-            }
+        $behavior = $this->behaviorRegistry->hasMethod($method);
+        if ($behavior) {
+            return call_user_func_array([$behavior, $method], $arguments);
         }
+
+        $concern = $this->concernRegistry->hasMethod($method);
+        if ($concern) {
+            return call_user_func_array([$concern, $method], $arguments);
+        }
+   
         throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
@@ -358,11 +362,17 @@ class Model
     {
         list($plugin, $behavior) = pluginSplit($name);
         $config = array_merge(['className' => $name . 'Behavior'], $config);
-        $this->{$behavior} = $this->behaviorRegistry()->load($name, $config);
 
-        return $this->{$behavior};
+        return $this->$behavior = $this->behaviorRegistry->load($name, $config);
     }
 
+    public function loadConcern(string $name, array $config = []) //no return type cause of mocking
+    {
+        list($plugin, $concern) = pluginSplit($name);
+        $config = array_merge(['className' => $name . 'Concern'], $config);
+
+        return $this->$concern = $this->concernRegistry->load($name, $config);
+    }
 
     /**
      * This will load any model regardless if it is associated or not.
@@ -1270,6 +1280,7 @@ class Model
                 return false;
             }
         }
+        $afterCallbacks = $options['callbacks'] === true or $options['callbacks'] === 'after';
 
         if ($options['transaction']) {
             $this->begin();
@@ -1285,20 +1296,28 @@ class Model
         } catch (\Exception $e) {
             if ($options['transaction']) {
                 $this->rollback();
-                $this->triggerCallback('afterRollback', [$entity]);
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterRollback', [$entity]);
+                }
             }
             throw $e;
         }
         
-        $afterCallbacks = $options['callbacks'] === true or $options['callbacks'] === 'after';
         if ($afterCallbacks) {
             $this->triggerCallback('afterDelete', [$entity, $result]);
         }
 
         if ($options['transaction']) {
-            $this->commit();
-            if ($afterCallbacks) {
-                $this->triggerCallback('afterCommit', [$entity]);
+            if ($result) {
+                $this->commit();
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterCommit', [$entity]);
+                }
+            } else {
+                $this->rollback();
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterRollback', [$entity]);
+                }
             }
         }
 

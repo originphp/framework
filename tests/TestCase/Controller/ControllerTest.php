@@ -19,6 +19,7 @@ use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Model\Entity;
 use Origin\Http\Response;
+use Origin\Concern\Concern;
 use Origin\View\Helper\Helper;
 use Origin\Model\ModelRegistry;
 use Origin\Controller\Controller;
@@ -26,8 +27,16 @@ use Origin\Model\ConnectionManager;
 use Origin\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Controller\Component\ComponentRegistry;
+use Origin\Concern\Exception\MissingConcernException;
 use Origin\Controller\Component\Exception\MissingComponentException;
 
+class PublishableConcern extends Concern
+{
+    public function foo()
+    {
+        return 'bar';
+    }
+}
 class Pet extends Model
 {
     public $datasource = 'test';
@@ -519,6 +528,15 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     public function testComponentRegistry()
     {
         $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
+    }
+
+    public function testLoadConcern()
+    {
+        $this->controller->loadConcern('Publishable', ['className' => 'Origin\Test\Controller\PublishableConcern']);
+        $this->assertEquals('bar', $this->controller->foo());
+
+        $this->expectException(MissingConcernException::class);
+        $this->controller->loadConcern('Zipable');
     }
 
     protected function tearDown(): void
