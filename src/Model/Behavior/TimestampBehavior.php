@@ -29,10 +29,6 @@ class TimestampBehavior extends Behavior
         'modified' => 'modified',
     ];
 
-    public function initialize(array $config = [])
-    {
-    }
-
     public function beforeSave(Entity $entity, array $options = [])
     {
         $model = $this->model();
