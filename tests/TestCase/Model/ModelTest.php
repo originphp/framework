@@ -156,7 +156,7 @@ class ModelTest extends OriginTestCase
             ->method('rollback');
 
         $article = $this->Article->new($data);
-        $this->assertFalse($stub->delete($article));
+        $stub->delete($article);
     }
 
     /**
