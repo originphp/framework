@@ -28,8 +28,6 @@
  */
 namespace Origin\Service;
 
-use Origin\Exception\Exception;
-
 /**
  * Service object uses dependency injection, it does one thing, it contains business
  * logic and should follow the single responsibility principle.
@@ -62,17 +60,13 @@ use Origin\Exception\Exception;
 
 class Service
 {
-    /**
-     * Constructor, pass any dependencies here such as model, and then
-     * store them as property. Do not use configuration/settings here
-     */
     public function __construct()
     {
         if (method_exists($this, 'initialize')) {
             $this->initialize(...func_get_args());
         }
     }
-
+    
     # Initialize is not defined here so user can define with proper type hints and return types
 
     /**
