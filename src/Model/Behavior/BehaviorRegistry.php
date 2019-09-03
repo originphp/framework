@@ -14,7 +14,9 @@
 
 namespace Origin\Model\Behavior;
 
+use ReflectionMethod;
 use Origin\Model\Model;
+use ReflectionException;
 use Origin\Core\Resolver;
 use Origin\Core\ObjectRegistry;
 use Origin\Model\Exception\MissingBehaviorException;
@@ -75,5 +77,25 @@ class BehaviorRegistry extends ObjectRegistry
     protected function throwException(string $object) : void
     {
         throw new MissingBehaviorException($object);
+    }
+
+    /**
+     * Looks for a behavior with the method
+     *
+     * @param string $method
+     * @return \Origin\Model\Behavior
+     */
+    public function hasMethod(string $method)
+    {
+        foreach ($this->enabled as $name) {
+            $object = $this->loaded[$name];
+            try {
+                $method = new ReflectionMethod($object, $method);
+                if ($method->isPublic()) {
+                    return $object;
+                }
+            } catch (ReflectionException $e) {
+            }
+        }
     }
 }
