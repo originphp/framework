@@ -301,6 +301,16 @@ class Entity
         return $this->setGetPersisted('deleted', $deleted);
     }
 
+    /**
+     * Resets the persisted states
+     *
+     * @return void
+     */
+    public function resetStates()
+    {
+        $this->_deleted = $this->_saved = $this->_created = $this->_updated = false;
+    }
+
     private function setGetPersisted(string $type, bool $value = null)
     {
         $var = '_' . $type;

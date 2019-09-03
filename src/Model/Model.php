@@ -1008,6 +1008,7 @@ class Model
             if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                 continue;
             }
+            $data->$key->resetStates();
             if ($data->{$key}->modified()) {
                 if (! $this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
@@ -1026,6 +1027,7 @@ class Model
              */
             
             try {
+                $data->resetStates();
                 $result = $this->processSave($data, $options);
             } catch (Exception $e) {
                 if ($options['transaction']) {
@@ -1044,6 +1046,7 @@ class Model
                 if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                     continue;
                 }
+                $data->$key->resetStates();
                 if ($data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
@@ -1065,7 +1068,11 @@ class Model
                 $foreignKey = $this->hasMany[$alias]['foreignKey'];
 
                 foreach ($data->get($key) as $record) {
-                    if ($record instanceof Entity and $record->modified()) {
+                    if (! $record instanceof Entity) {
+                        continue;
+                    }
+                    $record->resetStates();
+                    if ($record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
                         if (! $this->{$alias}->save($record, $associatedOptions)) {
                             $result = false;
@@ -1274,9 +1281,10 @@ class Model
  
         $this->id = $entity->get($this->primaryKey);
 
-        if (empty($this->id) or ! $this->exists($this->id)) {
+        if (empty($this->id) or $entity->deleted() or ! $this->exists($this->id)) {
             return false;
         }
+        $entity->resetStates();
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
