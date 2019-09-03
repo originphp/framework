@@ -207,13 +207,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity(['name' => 'test']);
         $this->assertFalse($entity->created());
-        $this->assertFalse($entity->updated());
-        $this->assertFalse($entity->saved());
         $this->assertFalse($entity->deleted());
 
         $this->assertTrue($entity->created(true));
-        $this->assertTrue($entity->updated(true));
-        $this->assertTrue($entity->saved(true));
         $this->assertTrue($entity->deleted(true));
     }
 
