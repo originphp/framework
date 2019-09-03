@@ -740,7 +740,9 @@ class Model
                 }
          
                 $result = $connection->insert($this->table, $data);
-
+                if ($result) {
+                    $entity->created(true);
+                }
                 if ($afterCallbacks) {
                     $this->triggerCallback('afterCreate', [$entity]);
                 }
@@ -755,10 +757,7 @@ class Model
                 $this->id = $entity->{$this->primaryKey};
             }
         }
-        $entity->saved($result);
-        $entity->updated($result and $exists);
-        $entity->created($result and ! $exists);
-
+      
         if ($result) {
             if ($afterCallbacks) {
                 $this->triggerCallback('afterSave', [$entity, ! $exists, $options]);
@@ -1008,7 +1007,7 @@ class Model
             if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                 continue;
             }
-            $data->$key->resetStates();
+      
             if ($data->{$key}->modified()) {
                 if (! $this->{$alias}->save($data->{$key}, $associatedOptions)) {
                     $result = false;
@@ -1027,7 +1026,6 @@ class Model
              */
             
             try {
-                $data->resetStates();
                 $result = $this->processSave($data, $options);
             } catch (Exception $e) {
                 if ($options['transaction']) {
@@ -1046,7 +1044,6 @@ class Model
                 if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
                     continue;
                 }
-                $data->$key->resetStates();
                 if ($data->{$key}->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
                     $data->{$key}->{$foreignKey} = $this->id;
@@ -1071,7 +1068,6 @@ class Model
                     if (! $record instanceof Entity) {
                         continue;
                     }
-                    $record->resetStates();
                     if ($record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
                         if (! $this->{$alias}->save($record, $associatedOptions)) {
@@ -1284,7 +1280,6 @@ class Model
         if (empty($this->id) or $entity->deleted() or ! $this->exists($this->id)) {
             return false;
         }
-        $entity->resetStates();
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
@@ -1304,6 +1299,7 @@ class Model
 
         try {
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
+            $entity->deleted($result);
         } catch (\Exception $e) {
             if ($options['transaction']) {
                 $this->rollback();
@@ -1314,8 +1310,6 @@ class Model
             throw $e;
         }
         
-        $entity->deleted($result);
-          
         if ($afterCallbacks) {
             $this->triggerCallback('afterDelete', [$entity, $result]);
         }

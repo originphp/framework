@@ -875,10 +875,8 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($this->Article->save($article));
         $this->assertNotEmpty($article->id);
         $this->assertNotEmpty($this->Article->id);
-        $this->assertEmpty($article->modified());
+
         $this->assertTrue($article->created());
-        $this->assertTrue($article->saved());
-        $this->assertFalse($article->updated());
         $this->assertFalse($article->deleted());
    
         # # # READ # # #
@@ -890,10 +888,8 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->patch($result, $requestData);
         $this->assertNotEmpty($article->modified());
         $this->assertTrue($this->Article->save($article));
-        $this->assertEmpty($article->modified());
+
         $this->assertFalse($article->created());
-        $this->assertTrue($article->saved());
-        $this->assertTrue($article->updated());
         $this->assertFalse($article->deleted());
 
         $result = $this->Article->get($article->id);
@@ -904,8 +900,6 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($this->Article->delete($article));
         $this->assertFalse($this->Article->delete($article));
         $this->assertFalse($article->created());
-        $this->assertFalse($article->saved());
-        $this->assertFalse($article->updated());
         $this->assertTrue($article->deleted());
     }
 

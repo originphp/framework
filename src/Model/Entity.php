@@ -60,9 +60,18 @@ class Entity
      */
     protected $_modified = [];
 
+    /**
+     * The entity is new and inserted into database
+     *
+     * @var boolean
+     */
     protected $_created = false;
-    protected $_saved = false;
-    protected $_updated = false;
+  
+    /**
+     * If the entity was deleted
+     *
+     * @var boolean
+     */
     protected $_deleted = false;
     
     /**
@@ -258,7 +267,7 @@ class Entity
     }
 
     /**
-     * Checks if a record was created when it was persisted to the database
+     * If the record is a newly created record
      *
      * @param boolean $created
      * @return boolean
@@ -267,31 +276,8 @@ class Entity
     {
         return $this->setGetPersisted('created', $created);
     }
-
     /**
-     * Checks if a record was saved when it was persisted to the database
-     *
-     * @param boolean $saved
-     * @return boolean
-     */
-    public function saved(bool $saved = null) : bool
-    {
-        return $this->setGetPersisted('saved', $saved);
-    }
-
-    /**
-     * Checks if a record was updated when it was persisted to the database
-     *
-     * @param boolean $updated
-     * @return boolean
-     */
-    public function updated(bool $updated = null) : bool
-    {
-        return $this->setGetPersisted('updated', $updated);
-    }
-
-    /**
-     * Checks if a record was deleted (model->delete was called)
+     * If the record was deleted
      *
      * @param boolean $deleted
      * @return boolean
@@ -299,16 +285,6 @@ class Entity
     public function deleted(bool $deleted = null) : bool
     {
         return $this->setGetPersisted('deleted', $deleted);
-    }
-
-    /**
-     * Resets the persisted states
-     *
-     * @return void
-     */
-    public function resetStates()
-    {
-        $this->_deleted = $this->_saved = $this->_created = $this->_updated = false;
     }
 
     private function setGetPersisted(string $type, bool $value = null)
