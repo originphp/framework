@@ -165,17 +165,20 @@ class GenerateCommand extends Command
     {
         $data['model'] = Inflector::singular($data['class']);
         $data['methods'] = '';
-
+        $data['human'] = Inflector::human($data['class']);
+      
         $controllerMethods = $testMethods = '';
 
         $params = $this->arguments('params');
         
         if ($params) {
+            $string = '$this->markTestIncomplete(\'This test has not been implemented yet.\');';
+           
             foreach ($params as $method) {
                 if (preg_match('/^[a-z_0-9]+/', $method)) {
                     $method = Inflector::camelCase($method);
                     $controllerMethods .= "    function {$method}()\n    {\n    }\n\n";
-                    $testMethods .= '    function test'. ucfirst($method) ."()\n    {\n    }\n\n";
+                    $testMethods .= '    function test'. ucfirst($method) ."()\n    {\n        {$string}\n    }\n\n";
                 }
             }
         }

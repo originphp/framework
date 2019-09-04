@@ -17,6 +17,19 @@ class %class%ControllerTest extends OriginTestCase
     {
         $this->loadModel('%model%');
     }
+
+    public function testIndexExample()
+    {
+        $this->get('/%underscored%/index');
+        $this->assertResponseOk();
+        $this->assertResponseContains('<h1>%human%</h1>');
+    }
+
+    public function testNotFoundExample()
+    {
+        $this->get('/%underscored%/does-not-exist');
+        $this->assertResponseNotFound();
+    }
     
 %methods%
 }
