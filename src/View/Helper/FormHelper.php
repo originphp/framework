@@ -19,8 +19,8 @@ use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 
-use Origin\Utility\Inflector;
 use Origin\Utility\Number;
+use Origin\Utility\Inflector;
 
 use Origin\View\TemplateTrait;
 use Origin\Model\ModelRegistry;
@@ -155,12 +155,10 @@ class FormHelper extends Helper
             $this->introspectModel($this->modelName);
         }
 
-        $defaults = [
+        $options += [
             'type' => 'post',
             'url' => $this->view()->request->path(true),
         ];
-
-        $options = array_merge($defaults, $options);
 
         if ($options['type'] == 'file') {
             $attributes['enctype'] = 'multipart/form-data';
@@ -185,9 +183,8 @@ class FormHelper extends Helper
      */
     public function button(string $name, array $options = []) : string
     {
-        $defaults = ['name' => $name, 'type' => 'button'];
-        $options = array_merge($defaults, $options);
-
+        $options += ['name' => $name, 'type' => 'button'];
+       
         return $this->formatTemplate('button', $options);
     }
 

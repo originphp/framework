@@ -115,11 +115,10 @@ class Number
      */
     public static function format($value, array $options = [])
     {
-        $defaults = [
+        $options += [
             'type' => NumberFormatter::DECIMAL, 'before' => null, 'after' => null,
         ];
-        $options = array_merge($defaults, $options);
-
+    
         if ($options['type'] === NumberFormatter::CURRENCY) {
             $formatted = static::formatter($options)->formatCurrency($value, $options['currency']);
         } else {

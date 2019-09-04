@@ -148,14 +148,12 @@ class Model
 
     public function __construct(array $config = [])
     {
-        $defaults = [
+        $config += [
             'name' => $this->name,
             'alias' => $this->alias,
             'datasource' => $this->datasource,
             'table' => $this->table,
         ];
-
-        $config = array_merge($defaults, $config);
 
         extract($config);
 
@@ -1201,7 +1199,7 @@ class Model
      */
     public function find(string $type = 'first', $options = [])
     {
-        $default = [
+        $options += [
             'conditions' => null,
             'fields' => [],
             'joins' => [],
@@ -1213,8 +1211,6 @@ class Model
             'callbacks' => true,
             'associated' => [],
         ];
-
-        $options = array_merge($default, $options);
 
         if ($options['callbacks'] === true) {
             $result = $this->triggerCallback('beforeFind', [$options], true);
@@ -1277,7 +1273,7 @@ class Model
  
         $this->id = $entity->get($this->primaryKey);
 
-        if (empty($this->id) or $entity->deleted() or ! $this->exists($this->id)) {
+        if (empty($this->id) or ! $this->exists($this->id)) {
             return false;
         }
 
@@ -1888,7 +1884,7 @@ class Model
             [$this, $callback],
         ];
 
-        foreach ($this->behaviorRegistry()->enabled() as $behavior) {
+        foreach ($this->behaviorRegistry->enabled() as $behavior) {
             $callbacks[] = [$this->{$behavior}, $callback];
         }
 

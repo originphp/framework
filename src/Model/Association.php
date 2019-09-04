@@ -99,15 +99,13 @@ class Association
      */
     public function belongsTo(string $association, array $options = []): array
     {
-        $defaults = [
+        $options += [
             'className' => $association,
             'foreignKey' => null,
             'conditions' => null,
             'fields' => null,
             'type' => 'LEFT',
         ];
-
-        $options = array_merge($defaults, $options);
 
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscored($options['className']) . '_id';

@@ -456,13 +456,13 @@ class QueryBuilder
      */
     public function join(array $params) : QueryBuilder
     {
-        $defaults = [
+        $params += [
             'table' => null,
             'alias' => null,
             'type' => 'LEFT',
             'conditions' => [],
         ];
-        $params = array_merge($defaults, $params);
+        
         if (! isset($this->query['joins']) or $this->query['joins'] == null) {
             $this->query['joins'] = [];
         }
