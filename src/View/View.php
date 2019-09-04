@@ -85,7 +85,7 @@ class View
     {
         $this->name = $controller->name;
 
-        $controller = $controller ? $controller : new Controller();
+        $controller = $controller ?: new Controller();
 
         $this->request = & $controller->request;
         $this->response = & $controller->response;

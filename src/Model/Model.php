@@ -276,16 +276,13 @@ class Model
      */
     public function __call(string $method, array $arguments)
     {
-        $behavior = $this->behaviorRegistry->hasMethod($method);
-        if ($behavior) {
-            return call_user_func_array([$behavior, $method], $arguments);
+        foreach (['behaviorRegistry','concernRegistry'] as $registryObject) {
+            $object = $this->$registryObject->hasMethod($method);
+            if ($object) {
+                return call_user_func_array([$object, $method], $arguments);
+            }
         }
-
-        $concern = $this->concernRegistry->hasMethod($method);
-        if ($concern) {
-            return call_user_func_array([$concern, $method], $arguments);
-        }
-   
+  
         throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
@@ -374,30 +371,6 @@ class Model
         $config = array_merge(['className' => $name . 'Concern'], $config);
 
         return $this->$concern = $this->concernRegistry->load($name, $config);
-    }
-
-    /**
-     * This will load any model regardless if it is associated or not.
-     * If you are loading a model with same name like in a plugin, then best set a unique
-     * alias.
-     * example:
-     *
-     * $this->loadModel('CustomModel2',['className'=>'Plugin.CustomModel']);
-     * $results = $this->CustomModel2->find('all');
-     *
-     * @param string $model
-     * @param array $config
-     * @return \Origin\Model\Model
-     */
-    public function loadModel(string $name, array $config = []): Model
-    {
-        list($plugin, $alias) = pluginSplit($name);
-        $config = array_merge(['className' => $name], $config);
-        $this->{$alias} = ModelRegistry::get($alias, $config);
-        if ($this->{$alias}) {
-            return $this->{$alias};
-        }
-        throw new MissingModelException($name);
     }
 
     /**
