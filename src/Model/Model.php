@@ -22,6 +22,7 @@ namespace Origin\Model;
 
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
+use Origin\Core\InitializerTrait;
 use Origin\Concern\ConcernRegistry;
 use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\NotFoundException;
@@ -30,6 +31,8 @@ use Origin\Model\Exception\MissingModelException;
 
 class Model
 {
+    use InitializerTrait;
+    use ModelTrait;
     /**
      * The name for this model, this generated automatically.
      *
@@ -187,6 +190,7 @@ class Model
         $this->concernRegistry = new ConcernRegistry($this, 'Model/Concern');
 
         $this->initialize($config);
+        $this->initializeTraits($config);
     }
 
     /**

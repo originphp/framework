@@ -24,6 +24,7 @@ use Origin\View\JsonView;
 use Origin\Model\ModelTrait;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
+use Origin\Core\InitializerTrait;
 use Origin\Concern\ConcernRegistry;
 use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
@@ -31,6 +32,7 @@ use Origin\Controller\Component\ComponentRegistry;
 class Controller
 {
     use ModelTrait;
+    use InitializerTrait;
     /**
      * Controller name.
      *
@@ -118,6 +120,7 @@ class Controller
         $this->concernRegistry = new ConcernRegistry($this, 'Controller/Concern');
 
         $this->initialize();
+        $this->initializeTraits();
     }
 
     /**
