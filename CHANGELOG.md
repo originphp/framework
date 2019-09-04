@@ -26,6 +26,7 @@ Delete tag: git tag -d <tag_name>
 - Concern
 - Repository
 - Entity check states, created,updated,saved and deleted.
+- Model:onError callback
 
 ### Fixed
 - IntegrationTesting renders error message instead of throwing exception

@@ -1002,7 +1002,10 @@ class Model
             
             try {
                 $result = $this->processSave($data, $options);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
+                if ($options['callbacks']) {
+                    $this->onError($e);
+                }
                 if ($options['transaction']) {
                     $this->rollback();
                     if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
@@ -1274,6 +1277,9 @@ class Model
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
             $entity->deleted($result);
         } catch (\Exception $e) {
+            if ($options['callbacks']) {
+                $this->onError($e);
+            }
             if ($options['transaction']) {
                 $this->rollback();
                 if ($afterCallbacks) {
@@ -1720,6 +1726,16 @@ class Model
     * @return void
     */
     public function afterCommit(Entity $entity)
+    {
+    }
+
+    /**
+     * This is callback is called when an exception is caught
+     *
+     * @param \Exception $exception
+     * @return void
+     */
+    public function onError(\Exception $exception)
     {
     }
 
