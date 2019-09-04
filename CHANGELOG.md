@@ -21,12 +21,14 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.32.0] - 2019-09-04
 
 ### Added 
 - Concern
 - Repository
-- Entity check states, created,updated,saved and deleted.
+- Entity created and deleted (states)
 - Model:onError callback
+- Controller/Model trait intitializer
 
 ### Fixed
 - IntegrationTesting renders error message instead of throwing exception
