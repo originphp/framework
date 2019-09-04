@@ -12,10 +12,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Model\Traits;
+namespace Origin\Model;
 
-use Origin\Model\Model;
-use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
 trait ModelTrait
@@ -23,7 +21,7 @@ trait ModelTrait
     /**
       * Loads a model, uses from registry or creates a new one.
       *
-      * @param string $model
+      * @param string $model User, MyPlugin.User, User::class
       * @param array $options
       * @return \Origin\Model\Model
       */

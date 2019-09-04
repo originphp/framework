@@ -17,7 +17,7 @@ namespace Origin\Job;
 use \ArrayObject;
 use Origin\Exception\Exception;
 use Origin\Job\Engine\BaseEngine;
-use Origin\Model\Traits\ModelTrait;
+use Origin\Model\ModelTrait;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();

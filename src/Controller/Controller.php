@@ -17,15 +17,14 @@ use ReflectionClass;
 use App\View\AppView;
 use ReflectionMethod;
 use Origin\Http\Router;
-
 use Origin\Http\Request;
 use Origin\View\XmlView;
 use Origin\Http\Response;
 use Origin\View\JsonView;
+use Origin\Model\ModelTrait;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Concern\ConcernRegistry;
-use Origin\Model\Traits\ModelTrait;
 use Origin\Controller\Component\Component;
 use Origin\Controller\Component\ComponentRegistry;
 
@@ -112,8 +111,8 @@ class Controller
 
         $this->modelName = Inflector::singular($this->name);
 
-        $this->request = $request ?  $request : new Request();
-        $this->response = $response ? $response : new Response();
+        $this->request = $request ?: new Request();
+        $this->response = $response ?: new Response();
 
         $this->componentRegistry = new ComponentRegistry($this);
         $this->concernRegistry = new ConcernRegistry($this, 'Controller/Concern');

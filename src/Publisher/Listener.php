@@ -1,7 +1,7 @@
 <?php
 namespace Origin\Publisher;
 
-use Origin\Model\Traits\ModelTrait;
+use Origin\Model\ModelTrait;
 
 class Listener
 {

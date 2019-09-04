@@ -14,11 +14,11 @@
 
 namespace Origin\Command;
 
+use Origin\Model\ModelTrait;
 use Origin\Console\ConsoleIo;
-use Origin\Console\CommandRunner;
 
+use Origin\Console\CommandRunner;
 use Origin\Console\ArgumentParser;
-use Origin\Model\Traits\ModelTrait;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 
