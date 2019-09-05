@@ -21,11 +21,12 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.32.1] - 2019-09-05
 
 ### Fixed
-- Fixed Trait intitializer was not recursive
+- Fixed Trait IntitializerTrait was not recursive
 - Fixed issue with validation `required` option this was checking modified field list which caused a bug when the field was not modified
-- Fixed Result object was rescursive this caused undesired result when working with arrays
+- Fixed Result object was recursive this caused undesired result when working with arrays
 
 ## [1.32.0] - 2019-09-04
 
@@ -34,7 +35,7 @@ Delete tag: git tag -d <tag_name>
 - Repository
 - Entity created and deleted (states)
 - Model:onError callback
-- Controller/Model trait intitializer
+- IntitializerTrait
 
 ### Fixed
 - IntegrationTesting renders error message instead of throwing exception
