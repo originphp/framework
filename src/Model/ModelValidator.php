@@ -181,9 +181,9 @@ class ModelValidator
                 }
             
                 $value = $entity->get($field);
-                                  
-                // Break out if required and its blank, if not continue with validation
-                if ($validationRule['required'] and ! in_array($field, $modified)) {
+  
+                // Required means the key must be present not wether it has a value or not
+                if ($validationRule['required'] and ! in_array($field, $entity->properties())) {
                     $entity->invalidate($field, 'This field is required');
                     break; // dont run any more validation rules on this field if blank
                 }
