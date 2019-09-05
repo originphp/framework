@@ -44,6 +44,10 @@ class PgsqlSchema extends BaseSchema
             if (is_string($definition)) {
                 $definition = ['type' => $definition];
             }
+            // pgsql does not support collate as default, use this option if its not supplied
+            if (isset($options['collate']) and ! isset($definition['collate'])) {
+                $definition['collate'] = options['collation'];
+            }
             $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
         }
         

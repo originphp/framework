@@ -21,6 +21,9 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Db:Schema:Dump setting wrong key 'collation' when descrbing table, which ment this option was ignored
+
 ## [1.32.1] - 2019-09-05
 
 ### Fixed

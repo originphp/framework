@@ -101,7 +101,7 @@ class MysqlSchema extends BaseSchema
         $row = $this->fetchRow("SHOW TABLE STATUS WHERE Name =  '{$table}'");
         $options = [
             'engine' => $row['Engine'],
-            'collation' => $row['Collation'],
+            'collate' => $row['Collation'],
         ];
 
         return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes, 'options' => $options];
