@@ -49,7 +49,6 @@ class ServiceTest extends \PHPUnit\Framework\TestCase
         $service = new MockService('value1', 'value2');
         $result = $service->dispatch('p1', 'p2');
         $this->assertTrue($result->success);
-        $this->assertEquals('p1', $result->data->param1);
-        $this->assertEquals('p2', $result->data->param2);
+        $this->assertEquals(['param1' => 'p1','param2' => 'p2'], $result->data);
     }
 }

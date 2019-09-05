@@ -21,6 +21,6 @@ class ResultTest extends \PHPUnit\Framework\TestCase
     {
         $result = new Result(['key' => 'value','array' => ['foo' => 'bar']]);
         $this->assertEquals('value', $result->key);
-        $this->assertEquals('bar', $result->array->foo);
+        $this->assertEquals(['foo' => 'bar'], $result->array);
     }
 }
