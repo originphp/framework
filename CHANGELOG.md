@@ -21,6 +21,12 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Fixed
+- Fixed Trait intitializer was not recursive
+- Fixed issue with validation `required` option this was checking modified field list which caused a bug when the field was not modified
+- Fixed Result object was rescursive this caused undesired result when working with arrays
+
 ## [1.32.0] - 2019-09-04
 
 ### Added 
