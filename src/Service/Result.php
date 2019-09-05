@@ -14,8 +14,6 @@
 
 namespace Origin\Service;
 
-use stdClass;
-
 /**
  * A result was either successful or
  */
@@ -28,28 +26,8 @@ class Result
      */
     public function __construct(array $properties)
     {
-        $object = $this->toObject($properties);
-        foreach (get_object_vars($object) as $key => $value) {
+        foreach ($properties as $key => $value) {
             $this->{$key} = $value;
         }
-    }
-
-    /**
-     * Recursively creates an object from an array
-     *
-     * @param array $data
-     * @return void
-     */
-    private function toObject(array $data) : object
-    {
-        $obj = new stdClass;
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $value = $this->toObject($value);
-            }
-            $obj->{$key} = $value;
-        }
-
-        return $obj;
     }
 }
