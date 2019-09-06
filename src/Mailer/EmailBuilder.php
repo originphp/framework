@@ -15,7 +15,7 @@ namespace Origin\Mailer;
 
 use Origin\Utility\Html;
 use Origin\Utility\Inflector;
-use Origin\Exception\NotFoundException;
+use Origin\Exception\Exception;
 
 /**
  * This class builds an configured email from an arra for Mailer.
@@ -139,7 +139,7 @@ class EmailBuilder
             } elseif ($this->content and $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
-                throw new NotFoundException('Text email template could not be found');# security
+                throw new Exception(sprintf('Template %s does not exist', $filename));
             }
         }
     }
@@ -184,7 +184,7 @@ class EmailBuilder
     protected function renderTemplate($__filename) : string
     {
         if (! file_exists($__filename)) {
-            throw new NotFoundException('HTML Email template could not be found');
+            throw new Exception(sprintf('Template %s does not exist', $__filename));
         }
         extract($this->options['viewVars']);
         ob_start();

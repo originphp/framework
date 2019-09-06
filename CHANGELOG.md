@@ -22,6 +22,7 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Fixed unhelpful error message with Mailer templates
 - Db:Schema:Dump setting wrong key 'collation' when descrbing table, which ment this option was ignored
 
 ## [1.32.1] - 2019-09-05
