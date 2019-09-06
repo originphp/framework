@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Mailer;
 
+use Origin\Exception\Exception;
 use Origin\Mailer\EmailBuilder;
 use Origin\TestSuite\TestTrait;
-use Origin\Exception\NotFoundException;
 
 class MockEmailBuilder extends EmailBuilder
 {
@@ -190,7 +190,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderHtmlException()
     {
-        $this->expectException(NotFoundException::class);
+        $this->expectException(Exception::class);
         $options = [
             'to' => 'js@example.com',
             'from' => ['sam@example.com'],
@@ -206,7 +206,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderTextException()
     {
-        $this->expectException(NotFoundException::class);
+        $this->expectException(Exception::class);
         $options = [
             'to' => 'js@example.com',
             'from' => ['sam@example.com'],

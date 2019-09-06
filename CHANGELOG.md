@@ -22,6 +22,7 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Fixed bug caused with jobs on a different flavor on linux due incorrect capitalization
 - Fixed unhelpful error message with Mailer templates
 - Db:Schema:Dump setting wrong key 'collation' when descrbing table, which ment this option was ignored
 
