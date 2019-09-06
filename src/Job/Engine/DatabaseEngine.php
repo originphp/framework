@@ -190,7 +190,7 @@ class DatabaseEngine extends BaseEngine
                 'datasource' => $this->config('datasource'),
             ]);
        
-            $this->model->loadBehavior('timestamp');
+            $this->model->loadBehavior('Timestamp');
         }
 
         return $this->model;
