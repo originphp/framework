@@ -21,13 +21,13 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.32.2] - 2019-09-06
 ### Fixed
 - Fixed bug caused with jobs on a different flavor on linux due incorrect capitalization
 - Fixed unhelpful error message with Mailer templates
 - Db:Schema:Dump setting wrong key 'collation' when descrbing table, which ment this option was ignored
 
 ## [1.32.1] - 2019-09-05
-
 ### Fixed
 - Fixed Trait IntitializerTrait was not recursive
 - Fixed issue with validation `required` option this was checking modified field list which caused a bug when the field was not modified
