@@ -245,7 +245,11 @@ class QueueWorkerCommand extends Command
         $seconds = $this->options('timeout');
        
         if (extension_loaded('posix')) {
-            $this->io->warning('Killing process');
+            /**
+             * e.g 2019-09-05 13:16:25] Run Job 6c95e38f-dfc6-415a-acbd-e9e4781e7e4f [ Killing ]
+             */
+            $this->io->write(' '); // put a space infront
+            $this->io->warning(' Killing ');
             posix_kill(getmypid(), SIGKILL);
         }
 
