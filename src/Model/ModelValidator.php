@@ -303,12 +303,9 @@ class ModelValidator
         return $this->float($value);
     }
 
-    /**
-     * Smooth email validation.
-     */
     public function email($value) : bool
     {
-        return (bool) preg_match('/[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(.[a-zA-Z0-9-.])+/', $value);
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     public function equalTo($value, $comparedTo = null) : bool

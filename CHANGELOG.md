@@ -21,6 +21,9 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Email validation, now using PHP filter_var for this.
+
 ## [1.32.2] - 2019-09-06
 ### Fixed
 - Fixed bug caused with jobs on a different flavor on linux due incorrect capitalization

@@ -294,11 +294,10 @@ class ModelValidatorTest extends OriginTestCase
         $Validator = $this->Validator;
         $this->assertTrue($Validator->email('john.smith123@example.com'));
         $this->assertFalse($Validator->email('john.smith1234 @example.com'));
-        $this->assertTrue($Validator->email('bjørn@hammeröath.com'));
-        $this->assertTrue($Validator->email('bjørn@ragnarrloþbrók.com'));
-
-        $this->assertTrue($Validator->email('root@localhost'));
+       
+        $this->assertFalse($Validator->email('root@localhost'));
         $this->assertFalse($Validator->email('john.smith[at]example.com'));
+        $this->assertFalse($Validator->email('john.smith@exam:ple.com'));
     }
 
     public function testEqualTo()
