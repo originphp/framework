@@ -721,7 +721,10 @@ class Email
             }
         }
 
-        if (preg_match("/^($code)/i", $response)) {
+        $responseLines = explode(self::CRLF, rtrim($response, self::CRLF));
+        $lastResponse = end($responseLines);
+
+        if (preg_match("/^($code)/", $lastResponse)) {
             return $code; // Return response code
         }
 
