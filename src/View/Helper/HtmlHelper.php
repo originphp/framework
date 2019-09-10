@@ -144,8 +144,8 @@ class HtmlHelper extends Helper
             if ($options['ext'] === 'js') {
                 return '<script>' .$this->loadFile($filename) . '</script>';
             }
-
-            return '<style>' .$this->loadFile($filename) . '</styles>';
+   
+            return '<style>' .$this->loadFile($filename) . '</style>';
         }
 
         return $this->templater()->format($options['ext'], ['url' => $path]);

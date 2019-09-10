@@ -21,6 +21,10 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Fixed bug with the HTML helper loading CSS files from Plugin folders, it was not closing tag properly.
+- Plugin model generator template
+
 ## [1.32.3] - 2019-09-09
 
 ### Fixed
