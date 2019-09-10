@@ -22,6 +22,7 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Plugin installer adjusted with legacy and new handler
 - Fixed bug with the HTML helper loading CSS files from Plugin folders, it was not closing tag properly.
 - Plugin model generator template
 
