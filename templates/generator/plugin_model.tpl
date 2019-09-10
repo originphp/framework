@@ -13,8 +13,7 @@ class %class%AppModel extends AppModel
     {
         parent::initialize($config);
     }
-    
-   
+     
     /**
     * Before find callback. Must return either the query or true to continue
     * @return array|bool

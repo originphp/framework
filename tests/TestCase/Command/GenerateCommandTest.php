@@ -26,8 +26,8 @@ class GenerateCommandTest extends OriginTestCase
         /**
          * Run the generator on the bookmarks app and test its all working as accepted before changing Hashes
          */
-
-        $this->assertFileHash('9c9f3a586a45dac7a3edb8b0144877ed', SRC . DS . 'Model' . DS . 'Bookmark.php');
+  
+        $this->assertFileHash('8ced2d2a0585b8f0c3e4f9cf03126174', SRC . DS . 'Model' . DS . 'Bookmark.php');
         unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
 
         $this->assertFileHash('e09190c9f65a07c2a6c739afb4fadab2', SRC . DS . 'Controller' . DS . 'BookmarksController.php');
@@ -440,11 +440,11 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Controller'.DS.'DummyAppController.php';
         $this->assertFileExists($filename);
-        $this->assertFileHash('fa169b36a04b4d9133c1eba5c9e364cd', $filename);
+        $this->assertFileHash('80fd3838635b4eaa613f82bf7da9265c', $filename);
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Model'.DS.'DummyAppModel.php';
         $this->assertFileExists($filename);
-        $this->assertFileHash('80c5e6b57f47789bc3e5f99c0b225a92', $filename);
+        $this->assertFileHash('5f7cbb03e9081d4f3a1cc287776a4342', $filename);
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'config'.DS.'routes.php';
         $this->assertFileExists($filename);
