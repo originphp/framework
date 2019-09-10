@@ -50,13 +50,15 @@ class %class%AppModel extends AppModel
     }
 
     /**
-     * After validate callback
-     * @param Entity $entity
-     * @return void
+     * Before Validation takes places, must return true to continue
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param bool $success validation result
+     * @return bool
      */
-    public function afterValidate(Entity $entity)
+    public function afterValidate(Entity $entity, bool $success)
     {
-        parent::afterValidate($entity);
+        parent::afterValidate($entity,$success);
     }
 
     /**
@@ -88,23 +90,29 @@ class %class%AppModel extends AppModel
     }
 
     /**
-     * Before delete callback
-     *
-     * @param boolean $cascade
-     * @return bool must return true to continue
-     */
-    public function beforeDelete(bool $cascade = true)
+    * Before delete, must return true to continue
+    *
+    * @param \Origin\Model\Entity $entity
+    * @param boolean $cascade
+    * @return bool
+    */
+    public function beforeDelete(Entity $entity, bool $cascade = true)
     {
-        if (!parent::beforeDelete($cascade)) {
+        if (!parent::beforeDelete($entity, $cascade)) {
             return false;
         }
-
         return true;
     }
-    /**
-     * After delete callback
+
+   /**
+     * After delete
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param boolean $sucess wether or not it deleted the record
+     * @return void
      */
-    public function afterDelete()
+    public function afterDelete(Entity $entity, bool $success)
     {
+        parent::afterDelete($entity, $success);
     }
 }

@@ -90,12 +90,13 @@ class %model% extends AppModel
     {
         return true;
     }
+    
     /**
      * After delete
      *
      * @param \Origin\Model\Entity $entity
      * @param boolean $sucess wether or not it deleted the record
-     * @return bool
+     * @return void
      */
     public function afterDelete(Entity $entity, bool $success)
     {

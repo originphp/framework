@@ -436,13 +436,15 @@ class GenerateCommand extends Command
 
     public function plugin(array $data)
     {
+
+        // Namespace should be plugin name
+        $data['namespace'] = $data['class'];
+
         $structure = [
             'config',
             'src',
             'src'.DS.'Command',
             'src'.DS.'Controller',
-            'src'.DS.'Migration',
-            'src'.DS.'Lib',
             'src'.DS.'Model',
             'src'.DS.'View',
             'tests',
