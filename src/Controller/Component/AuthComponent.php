@@ -69,6 +69,13 @@ class AuthComponent extends Component
      */
     protected $allowedActions = [];
 
+    /**
+     * Holds the data from API auth
+     *
+     * @var \Origin\Model\Entity
+     */
+    private $statelessData;
+
     public function initialize(array $config)
     {
         if (! ModelRegistry::get($this->config['model'])) {
@@ -189,10 +196,10 @@ class AuthComponent extends Component
                     $conditions = array_merge($conditions, $this->config['scope']);
                 }
           
-                $user = $model->find('first', ['conditions' => $conditions]);
-
-                if ($user) {
-                    return $user;
+                $this->statelessData = $model->find('first', ['conditions' => $conditions]);
+             
+                if ($this->statelessData) {
+                    return $this->statelessData;
                 }
             }
             $this->request()->type('json'); // Force all api usage as json
@@ -274,6 +281,12 @@ class AuthComponent extends Component
                 return null;
             }
         }
+        /**
+         * Load stateless data if its available
+         */
+        if (in_array('Api', $this->config['authenticate']) and $this->statelessData) {
+            $user = $this->statelessData->toArray();
+        }
       
         if ($property === null) {
             return $user;
@@ -281,6 +294,7 @@ class AuthComponent extends Component
         if (isset($user[$property])) {
             return $user[$property];
         }
+
 
         return null;
     }
