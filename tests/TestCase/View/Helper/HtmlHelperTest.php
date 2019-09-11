@@ -59,7 +59,7 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<link rel="stylesheet" type="text/css" href="/assets/css/form.css" />';
         $this->assertSame($expected, $this->Html->css('/assets/css/form.css'));
     
-        $expected = '<style>.plugin { color:#fff }</style>';
+        $expected = '<style>.plugin { color:#fff }</styles>';
         $this->assertSame($expected, $this->Html->css('Widget.default.css'));
 
         $this->expectException(NotFoundException::class);
