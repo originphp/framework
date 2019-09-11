@@ -291,10 +291,8 @@ class AuthComponent extends Component
         if ($property === null) {
             return $user;
         }
-        if (isset($user[$property])) {
-            return $user[$property];
-        }
-        return null;
+   
+        return $user[$property] ?? null;
     }
     
     /**
