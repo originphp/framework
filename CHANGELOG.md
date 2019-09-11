@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Fixed
+- Fixed AuthComponent API authentication using logged in user credentials
+- Fixed ErrorRenderer type error before request was created
+
 ## [1.32.4] - 2019-09-10
 ### Fixed
 - Plugin installer adjusted with legacy and new handler

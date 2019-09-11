@@ -39,7 +39,7 @@ class AuthComponent extends Component
      * @var array
      */
     public $defaultConfig = [
-        'authenticate' => ['Form'], // Form and Http supported
+        'authenticate' => ['Form'], // Form, Http, and API
         'loginAction' => [
             'controller' => 'Users',
             'action' => 'login',
@@ -266,10 +266,15 @@ class AuthComponent extends Component
      */
     public function user(string $property = null)
     {
-        $user = $this->Session->read('Auth.User');
-        if ($user === null) {
-            return null;
+        $user = null;
+        # API authentication should not check data in Session
+        if (in_array('Form', $this->config['authenticate']) or in_array('Http', $this->config['authenticate'])) {
+            $user = $this->Session->read('Auth.User');
+            if ($user === null) {
+                return null;
+            }
         }
+      
         if ($property === null) {
             return $user;
         }
