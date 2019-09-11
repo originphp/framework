@@ -76,6 +76,8 @@ class AuthComponent extends Component
      */
     private $statelessData;
 
+    private static $user;
+
     public function initialize(array $config)
     {
         if (! ModelRegistry::get($this->config['model'])) {
@@ -158,7 +160,7 @@ class AuthComponent extends Component
     }
 
     /**
-     * ets the user each from session, from by authenticating
+     * Gets the user each from session, from by authenticating
      *
      * @return array|null
      */
@@ -196,10 +198,10 @@ class AuthComponent extends Component
                     $conditions = array_merge($conditions, $this->config['scope']);
                 }
           
-                $this->statelessData = $model->find('first', ['conditions' => $conditions]);
+                static::$user = $model->find('first', ['conditions' => $conditions]);
              
-                if ($this->statelessData) {
-                    return $this->statelessData;
+                if (static::$user) {
+                    return static::$user;
                 }
             }
             $this->request()->type('json'); // Force all api usage as json
@@ -277,15 +279,13 @@ class AuthComponent extends Component
         # API authentication should not check data in Session
         if (in_array('Form', $this->config['authenticate']) or in_array('Http', $this->config['authenticate'])) {
             $user = $this->Session->read('Auth.User');
-            if ($user === null) {
-                return null;
-            }
         }
         /**
-         * Load stateless data if its available
+         * Load static user data if its available (stateless). This takes priority and should overwrite
+         * from session.
          */
-        if (in_array('Api', $this->config['authenticate']) and $this->statelessData) {
-            $user = $this->statelessData->toArray();
+        if (in_array('Api', $this->config['authenticate']) and static::$user) {
+            $user = static::$user->toArray();
         }
       
         if ($property === null) {
@@ -294,8 +294,6 @@ class AuthComponent extends Component
         if (isset($user[$property])) {
             return $user[$property];
         }
-
-
         return null;
     }
     
@@ -359,13 +357,13 @@ class AuthComponent extends Component
     }
 
     /**
-     * Checks if the current session is logged in
+     * Checks if the current user is considered logged in
      *
      * @return boolean
      */
     public function isLoggedIn() : bool
     {
-        return $this->Session->exists('Auth.User');
+        return $this->user() !== null;
     }
 
     protected function isPrivateOrProtected(string $action) : bool
