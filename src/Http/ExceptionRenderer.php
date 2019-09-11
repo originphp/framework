@@ -38,9 +38,12 @@ class ExceptionRenderer
      * @param Request $request (Required for ajax detection)
      * @param Response $response (not required, but might need to be replaced)
      */
-    public function __construct(Request $request, Response $response = null)
+    public function __construct(Request $request = null, Response $response = null)
     {
-        $this->request = $request;
+        /**
+         * @internal Error handler needs to work before request is created
+         */
+        $this->request = $request ? $request : new Request();
         $this->response = $response ? $response : new Response();
     }
 

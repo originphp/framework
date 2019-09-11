@@ -25,6 +25,7 @@
 namespace Origin\Http;
 
 use Origin\Utility\Inflector;
+use Origin\Http\Request;
 
 class Router
 {
@@ -148,7 +149,8 @@ class Router
                             $params[$key] = $value;
                         }
                     }
-                    $params['controller'] = Inflector::studlyCaps($params['controller']);
+                    // gracefully handle invalid routes
+                    $params['controller'] = $params['controller'] ? Inflector::studlyCaps($params['controller']): null;
                     break;
                 }
             }
@@ -250,6 +252,7 @@ class Router
         if ($request === null) {
             return static::$request;
         }
+    
         static::$request = $request;
     }
 
