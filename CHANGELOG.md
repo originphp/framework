@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Fixed
+- Fixed migrations create table primary key order in array
 - Fixed AuthComponent API authentication using logged in user credentials
 - Fixed ErrorRenderer type error before request was created
 

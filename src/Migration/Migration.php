@@ -264,10 +264,11 @@ class Migration
 
         $options += ['id' => true,'primaryKey' => 'id'];
         if ($options['id'] and $options['primaryKey']) {
-            $schema[$options['primaryKey']] = [
+            $schema = [$options['primaryKey'] => [
                 'type' => 'integer',
                 'autoIncrement' => true,
-            ];
+            ]] + $schema;
+     
             $tableOptions['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
         }
 
