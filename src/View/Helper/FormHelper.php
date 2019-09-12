@@ -348,7 +348,6 @@ class FormHelper extends Helper
             $label = substr($name, 0, -3);
             $parts = explode('.', $label);
             $models = Inflector::camelCase(Inflector::plural($parts[0]));
-            
             if (isset($this->view()->vars[$models])) {
                 $selectOptions = $this->view()->vars[$models];
             }
@@ -407,6 +406,7 @@ class FormHelper extends Helper
         // Get Validation Errors
         if ($this->data) {
             $entity = $this->getEntity($this->data, $name);
+
             if ($entity) {
                 $model = $entity->name();
                 if ($entity->errors($column)) {
@@ -826,7 +826,8 @@ class FormHelper extends Helper
             $radioOptions['id'] = $radioId . '-' . $key;
             $radioOptions['value'] = $key;
             $additionalOptions = [];
-            if ($key === $checked) {
+            # Strict === can cause issues when data from different sources e.g. database/request
+            if ($key == $checked) {
                 $additionalOptions = ['checked' => true];
             }
             $output .= $this->formatTemplate('radio', $radioOptions + $additionalOptions);
@@ -863,7 +864,7 @@ class FormHelper extends Helper
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);
         }
-
+        
         return $this->formatTemplate('select', $selectOptions);
     }
 
@@ -911,6 +912,10 @@ class FormHelper extends Helper
      */
     private function buildSelectOptions(array $options, array $selectOptions = []) : string
     {
+        $selectOptions += ['value' => null];
+
+        $noneSelected = $selectOptions['value'] === null or $selectOptions['value'] === '';
+        
         $output = '';
         foreach ($options as $key => $value) {
             if (is_array($value)) {
@@ -921,7 +926,12 @@ class FormHelper extends Helper
 
             $template = $this->config['templates']['option'];
 
-            if (array_key_exists('value', $selectOptions) and $selectOptions['value'] === $key) {
+            /**
+             * Changed from strict === to loose == because 1001 not equals '1001'. An example
+             * is url paramaters or arguments might not match database result which then causes
+             * for this not to work
+             */
+            if (! $noneSelected and $selectOptions['value'] == $key) {
                 $template = $this->config['templates']['optionSelected'];
             }
             $template = str_replace('{value}', $key, $template);
