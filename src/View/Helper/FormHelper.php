@@ -347,8 +347,8 @@ class FormHelper extends Helper
         if (substr($name, -3) === '_id') {
             $label = substr($name, 0, -3);
             $parts = explode('.', $label);
-            $models = Inflector::plural($parts[0]);
-
+            $models = Inflector::camelCase(Inflector::plural($parts[0]));
+            
             if (isset($this->view()->vars[$models])) {
                 $selectOptions = $this->view()->vars[$models];
             }

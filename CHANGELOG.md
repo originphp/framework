@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Fixed
+- FormHelper control hasAndBelongsToMany vars with underscore needed to be converted to CamelCase, e.g. really_long_var
 - Fixed migrations create table primary key order in array
 - Fixed AuthComponent API authentication using logged in user credentials
 - Fixed ErrorRenderer type error before request was created
