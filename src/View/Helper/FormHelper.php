@@ -1029,12 +1029,12 @@ class FormHelper extends Helper
      * 'title'  will return the enity for the current model
      * 'user.name' will return the user entity  (belongsTo/hasOne)
      * 'tags.0.tag' will return the tag entity number 0 (hasMany)
-     *
+     * @internal this can return array when using models.x.name
      * @param Entity $entity
      * @param string $path   name, model.name, models.x.name
-     * @return Entity|null
+     * @return Entity|array|null
      */
-    protected function getEntity(Entity $entity, string $path) : ?Entity
+    protected function getEntity(Entity $entity, string $path)
     {
         if (strpos($path, '.') === false) {
             return $entity;
