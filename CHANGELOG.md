@@ -23,6 +23,7 @@ Delete tag: git tag -d <tag_name>
 ## [Unreleased]
 
 ### Fixed
+- PluginInstaller was not deleting .git folder
 - FormHelper getEntity incorrect return type
 - FormHelper control hasAndBelongsToMany vars with underscore needed to be converted to CamelCase, e.g. really_long_var
 - Fixed migrations create table primary key order in array

@@ -1,6 +1,7 @@
 <?php
 namespace Origin\Command;
 
+use Origin\Utility\Folder;
 use Origin\Utility\Inflector;
 
 class PluginInstallCommand extends Command
@@ -71,7 +72,13 @@ class PluginInstallCommand extends Command
     {
         shell_exec("git clone {$url} {$folder}");
 
-        return file_exists($folder);
+        if (file_exists($folder)) {
+            Folder::delete($folder . DS . '.git');
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -87,11 +94,12 @@ class PluginInstallCommand extends Command
             $contents = file_get_contents($file);
             if (strpos($contents, 'Plugin::initialize()') !== false) {
                 $contents = str_replace(
-                    "Plugin::initialize();",
+                    'Plugin::initialize();',
                     "Plugin::load('{$plugin}');\nPlugin::initialize();",
                     $contents
                     );
                 file_put_contents($file, $contents);
+
                 return ;
             }
         }
