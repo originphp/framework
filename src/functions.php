@@ -361,14 +361,14 @@ function ends(string $needle, string $haystack) : bool
  * Replaces text in strings.
  *
  * @internal str_replace works with multibyte string see https://php.net/manual/en/ref.mbstring.php#109937
- * @param string $needle
- * @param string $with
- * @param string $haystack
+ * @param mixed $needle
+ * @param mixed $with
+ * @param mixed $haystack
  * @param array $options (insensitive = false)
  *  - insensitive: default false. case-insensitive replace
  * @return string
  */
-function replace(string $needle, string $with, string $haystack, array $options = []) : string
+function replace($needle, $with, $haystack, array $options = []) : string
 {
     $options += ['insensitive' => false];
     if ($options['insensitive']) {
