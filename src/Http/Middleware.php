@@ -40,7 +40,7 @@ class Middleware
     /**
      * This HANDLES the request
      *
-     * @param Request $request
+     * @param \Origin\Http\Request $request
      * @return void
      */
     public function startup(Request $request)
@@ -50,8 +50,8 @@ class Middleware
      * This PROCESSES the response after all middleware requests have
      * been handled
      *
-     * @param Request $request
-     * @param Response $response
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
      * @return void
      */
     public function shutdown(Request $request, Response $response)
@@ -61,7 +61,7 @@ class Middleware
     /**
      * This HANDLES the request.
      *
-     * @param Request $request
+     * @param \Origin\Http\Request $request
      * @return void
      */
     public function handle(Request $request)
@@ -72,8 +72,8 @@ class Middleware
      * This PROCESSES the response after all middleware requests have
      * been handled
      *
-     * @param Request $request
-     * @param Response $response
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
      * @return void
      */
     public function process(Request $request, Response $response)
@@ -84,10 +84,10 @@ class Middleware
     /**
      * This is the magic method.
      *
-     * @param Request $request
-     * @param Response $response
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
      * @param callable $next
-     * @return void
+     * @return \Origin\Http\Response $response
      */
     public function __invoke(Request $request, Response $response, callable $next = null)
     {
