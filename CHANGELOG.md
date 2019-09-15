@@ -21,9 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
-### Changed
-- CSRF protection middleware no longer generates a new token with each GET request
+## [1.32.5] - 2019-09-16
 
 ### Fixed
 - Fixed FormHelper file using request data triggered type error
@@ -34,6 +32,9 @@ Delete tag: git tag -d <tag_name>
 - Fixed migrations create table primary key order in array
 - Fixed AuthComponent API authentication using logged in user credentials
 - Fixed ErrorRenderer type error before request was created
+
+### Security
+- CSRF protection middleware no longer generates a new token with each GET request
 
 ## [1.32.4] - 2019-09-10
 ### Fixed
