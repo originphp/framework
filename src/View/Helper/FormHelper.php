@@ -569,6 +569,7 @@ class FormHelper extends Helper
     public function file(string $name, array $options = []) : string
     {
         $options = $this->prepareOptions($name, $options);
+        unset($options['value']); // remove value array as this cant be escaped or displayed
 
         return $this->formatTemplate('file', $options);
     }
