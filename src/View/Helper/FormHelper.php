@@ -822,13 +822,13 @@ class FormHelper extends Helper
             $checked = $radioOptions['value'];
             unset($radioOptions['value']);
         }
-
+       
         foreach ($options as $key => $value) {
             $radioOptions['id'] = $radioId . '-' . $key;
             $radioOptions['value'] = $key;
             $additionalOptions = [];
             # Strict === can cause issues when data from different sources e.g. database/request
-            if ($key == $checked) {
+            if (strval($key) === strval($checked)) {
                 $additionalOptions = ['checked' => true];
             }
             $output .= $this->formatTemplate('radio', $radioOptions + $additionalOptions);
@@ -928,11 +928,10 @@ class FormHelper extends Helper
             $template = $this->config['templates']['option'];
 
             /**
-             * Changed from strict === to loose == because 1001 not equals '1001'. An example
-             * is url paramaters or arguments might not match database result which then causes
-             * for this not to work
+             * @internal careful here url params vs database values can be string/int but same so use
+             * strval
              */
-            if (! $noneSelected and $selectOptions['value'] == $key) {
+            if (! $noneSelected and strval($selectOptions['value']) === strval($key)) {
                 $template = $this->config['templates']['optionSelected'];
             }
             $template = str_replace('{value}', $key, $template);
