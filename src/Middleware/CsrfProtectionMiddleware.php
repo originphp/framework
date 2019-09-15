@@ -14,7 +14,6 @@
 namespace Origin\Middleware;
 
 use Origin\Http\Request;
-
 use Origin\Http\Response;
 use Origin\Http\Middleware;
 use Origin\Utility\Security;
@@ -22,45 +21,50 @@ use Origin\Middleware\Exception\InvalidCsrfTokenException;
 
 class CsrfProtectionMiddleware extends Middleware
 {
-    /**
-     * A secure long CSRF token, and its to params to make it available to app and sets a cookie
-     * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
-     */
-    protected $token = null;
-
     protected $defaultConfig = [
         'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
         'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions
     ];
 
-    public function initialize(array $config)
-    {
-        $this->token = Security::hash(random_bytes(64), ['type' => 'sha512']);
-    }
+    /**
+    * Internal flag
+    * @var boolean
+    */
+    private $createCookie = false;
 
     /**
      * This handles the request
      *
-     * If the request is a post request, it will validate the csrf token then create a new one.
-     * If the request is a get request, it just generates the csrf token.
+     * If the request is a post request, it will validate the CSRF token
+     * If the request is a get request and thre is no cookie (or it expired) it will generate a new token
      *
      * @param \Origin\Http\Request $request
      * @param \Origin\Http\Response $response
-     * @return \Origin\Http\Response
+     * @return void
      */
     public function startup(Request $request)
     {
+        if ($request->params('csrfProtection') === false) {
+            return ;
+        }
+        
+        # Generate the CSRF token
+        $token = $request->cookies($this->config('cookieName'));
+        if ($request->is(['get']) and $token === null) {
+            $token = $this->generateToken();
+        }
+       
+        # Works it
         if ($request->is(['post', 'put', 'patch', 'delete']) or $request->data()) {
-            if ($request->params('csrfProtection') !== false) {
-                $this->validateToken($request);
-            }
-            // unset csrfToken field
+            $this->validateToken($request);
+            # Remove csrfToken field that posted with form
             $post = $request->data();
             unset($post['csrfToken']);
             $request->data($post);
         }
 
-        $request->params('csrfToken', $this->token);
+        # Set the CSRF Token in the request
+        $request->params('csrfToken', $token);
     }
 
     /**
@@ -72,7 +76,13 @@ class CsrfProtectionMiddleware extends Middleware
      */
     public function shutdown(Request $request, Response $response)
     {
-        $response->cookie($this->config('cookieName'), $this->token, $this->config('expires'));
+        if ($request->params('csrfProtection') === false) {
+            return ;
+        }
+
+        if ($request->is(['get']) and $this->createCookie) {
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), $this->config('expires'));
+        }
     }
 
     /**
@@ -80,7 +90,7 @@ class CsrfProtectionMiddleware extends Middleware
      *
      * @return bool
      */
-    protected function isTestEnvironment() : bool
+    private function isTestEnvironment() : bool
     {
         return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
     }
@@ -91,7 +101,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param Request $request
      * @return void
      */
-    protected function validateToken(Request $request) : void
+    private function validateToken(Request $request) : void
     {
         /**
          * Disable when runing unit tests
@@ -100,14 +110,29 @@ class CsrfProtectionMiddleware extends Middleware
             return;
         }
 
-        $cookie = $request->cookies($this->config('cookieName'));
+        $token = $request->cookies($this->config('cookieName'));
 
-        if (! $cookie) {
+        if (! $token) {
             throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
         }
  
-        if (! Security::compare($cookie, $request->data('csrfToken')) and ! Security::compare($cookie, $request->headers('X-CSRF-Token'))) {
+        if (! Security::compare($token, $request->data('csrfToken')) and ! Security::compare($token, $request->headers('X-CSRF-Token'))) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
+    }
+
+    /**
+    * Generates a token for CSRF protection
+    * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
+    * @return string
+    */
+    private function generateToken() : string
+    {
+        $this->createCookie = true;
+        $randomBytes = random_bytes(64);
+
+        return Security::hash($randomBytes, [
+            'type' => 'sha512'
+        ]);
     }
 }
