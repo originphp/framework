@@ -74,9 +74,7 @@ class AuthComponent extends Component
      *
      * @var \Origin\Model\Entity
      */
-    private $statelessData;
-
-    private static $user;
+    private $user = null;
 
     public function initialize(array $config)
     {
@@ -102,7 +100,7 @@ class AuthComponent extends Component
         if ($this->isAllowed($action)) {
             return null;
         }
-
+     
         if ($this->isLoginPage()) {
             return null;
         }
@@ -169,7 +167,9 @@ class AuthComponent extends Component
         if ($this->user()) {
             return $this->user();
         }
+     
         $user = $this->identify();
+       
         if ($user) {
             return $user->toArray();
         }
@@ -198,10 +198,9 @@ class AuthComponent extends Component
                     $conditions = array_merge($conditions, $this->config['scope']);
                 }
           
-                static::$user = $model->find('first', ['conditions' => $conditions]);
-             
-                if (static::$user) {
-                    return static::$user;
+                $user = $model->find('first', ['conditions' => $conditions]);
+                if ($user) {
+                    return $this->user = $user;
                 }
             }
             $this->request()->type('json'); // Force all api usage as json
@@ -284,8 +283,9 @@ class AuthComponent extends Component
          * Load static user data if its available (stateless). This takes priority and should overwrite
          * from session.
          */
-        if (in_array('Api', $this->config['authenticate']) and static::$user) {
-            $user = static::$user->toArray();
+     
+        if (in_array('Api', $this->config['authenticate']) and $this->user) {
+            $user = $this->user->toArray();
         }
       
         if ($property === null) {
