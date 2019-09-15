@@ -53,7 +53,7 @@ class CsrfProtectionMiddleware extends Middleware
         if ($request->is(['get']) and $token === null) {
             $token = $this->generateToken();
         }
-       
+         
         # Works it
         if ($request->is(['post', 'put', 'patch', 'delete']) or $request->data()) {
             $this->validateToken($request);
@@ -90,7 +90,7 @@ class CsrfProtectionMiddleware extends Middleware
      *
      * @return bool
      */
-    private function isTestEnvironment() : bool
+    protected function isTestEnvironment() : bool
     {
         return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
     }

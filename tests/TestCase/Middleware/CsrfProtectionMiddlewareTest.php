@@ -21,15 +21,7 @@ use Origin\Middleware\Exception\InvalidCsrfTokenException;
 
 class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware
 {
-    public function token(string $token = null)
-    {
-        if ($token === null) {
-            return $this->token;
-        }
-        $this->token = $token;
-    }
-
-    public function isTestEnvironment() : bool
+    protected function isTestEnvironment() : bool
     {
         return false;
     }
@@ -37,16 +29,45 @@ class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware
 
 class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHandle()
+    const SAMPLETOKEN = '4f837aa1cd7a164b467dd29864b8f5eea1903222d77ef99b4a48627f22a39382713f6621ac02732bb056d2c14cdb55a6113bf9e9b81d226f64875fb797ef2123';
+    
+    public function testHandleGet()
     {
         $request = new Request();
         $response = new Response();
         $middleware = new MockCsrfProtectionMiddleware();
         
+        $request->env('REQUEST_METHOD', 'GET');
+        $middleware->handle($request, $response);
+        $this->assertEquals(128, strlen($request->params('csrfToken')));
+    }
+
+    public function testHandleGetWithCookie()
+    {
+        $request = new Request();
+        $response = new Response();
+        $middleware = new MockCsrfProtectionMiddleware();
+        
+        $request->env('REQUEST_METHOD', 'GET');
+        $request->cookies('CSRF-Token', self::SAMPLETOKEN);
+        $middleware->handle($request, $response);
+        $this->assertEquals(self::SAMPLETOKEN, $request->params('csrfToken'));
+    }
+
+    /**
+     * @depends testHandleGet
+     */
+    public function testHandleDisabled()
+    {
+        $request = new Request();
+        $response = new Response();
+        $middleware = new MockCsrfProtectionMiddleware();
+        
+        $request->env('REQUEST_METHOD', 'GET');
+        $request->params('csrfProtection', false);
         $middleware->handle($request, $response);
 
-        $this->assertEquals(128, strlen($middleware->token()));
-        $this->assertEquals($middleware->token(), $request->params('csrfToken'));
+        $this->assertEquals(0, strlen($request->params('csrfToken')));
     }
 
     public function testProcess()
@@ -55,9 +76,11 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $response = new Response();
         $middleware = new MockCsrfProtectionMiddleware();
 
-        $middleware->process($request, $response);
-        $this->assertEquals(128, strlen($middleware->token())); // failsafe
-        $this->assertEquals($middleware->token(), $response->cookies('CSRF-Token')['value']);
+        $request->env('REQUEST_METHOD', 'GET');
+        $middleware($request, $response);
+     
+        $this->assertEquals(128, strlen($request->params('csrfToken'))); // check agin
+        $this->assertEquals($request->params('csrfToken'), $response->cookies('CSRF-Token')['value']);
     }
 
     public function testMissingCSRFTokenCookie()
@@ -66,9 +89,9 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $response = new Response();
         $middleware = new MockCsrfProtectionMiddleware();
         $request->data('title', 'Article Title');
+  
         $this->expectException(InvalidCsrfTokenException::class);
-        $middleware->handle($request);
-        $middleware->process($request, $response);
+        $middleware($request, $response);
     }
 
     public function testMissingCSRFTokenMismatch()
@@ -79,8 +102,7 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $request->data('title', 'Article Title');
         $request->cookies('CSRF-Token', '1234-1234-1234-1234');
         $this->expectException(InvalidCsrfTokenException::class);
-        $middleware->handle($request);
-        $middleware->process($request, $response);
+        $middleware($request, $response);
     }
 
     public function testValidateTokenForm()
@@ -89,13 +111,12 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $response = new Response();
         $middleware = new MockCsrfProtectionMiddleware();
       
-        $request->cookies('CSRF-Token', $middleware->token());
+        $request->cookies('CSRF-Token', self::SAMPLETOKEN);
 
         $request->data('title', 'Article Title');
-        $request->data('csrfToken', $middleware->token());
+        $request->data('csrfToken', self::SAMPLETOKEN);
        
-        $middleware->handle($request);
-        $middleware->process($request, $response);
+        $middleware($request, $response);
         $this->assertNull($request->data('csrfToken'));
     }
     public function testValidateTokenHeaders()
@@ -104,13 +125,12 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $response = new Response();
         $middleware = new MockCsrfProtectionMiddleware();
 
-        $request->cookies('CSRF-Token', $middleware->token());
+        $request->cookies('CSRF-Token', self::SAMPLETOKEN);
       
         $request->data('title', 'Article Title');
-        $request->headers('X-CSRF-Token', $middleware->token());
+        $request->headers('X-CSRF-Token', self::SAMPLETOKEN);
 
-        $middleware->handle($request);
-        $middleware->process($request, $response);
+        $middleware($request, $response);
         $this->assertNull(null);
     }
 
