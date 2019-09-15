@@ -22,7 +22,12 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+### Changed
+- CSRF protection middleware no longer generates a new token with each GET request
+
 ### Fixed
+- Fixed FormHelper file using request data triggered type error
+- Fixed replace type hints to allow mixed
 - PluginInstaller was not deleting .git folder
 - FormHelper getEntity incorrect return type
 - FormHelper control hasAndBelongsToMany vars with underscore needed to be converted to CamelCase, e.g. really_long_var
