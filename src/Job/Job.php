@@ -15,9 +15,9 @@
 namespace Origin\Job;
 
 use \ArrayObject;
+use Origin\Model\ModelTrait;
 use Origin\Exception\Exception;
 use Origin\Job\Engine\BaseEngine;
-use Origin\Model\ModelTrait;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -60,7 +60,8 @@ class Job
     public $wait = null;
 
     /**
-     * The default timeout in seconds
+     * The default timeout in seconds. Set to false
+     * to disable
      *
      * @var integer
      */

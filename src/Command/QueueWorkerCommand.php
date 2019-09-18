@@ -160,7 +160,7 @@ class QueueWorkerCommand extends Command
     {
         $result = true;
        
-        if ($this->supportsSignals()) {
+        if ($job->timeout and $this->supportsSignals()) {
             $this->setTimeout($job->timeout);
         }
 
@@ -181,7 +181,7 @@ class QueueWorkerCommand extends Command
             'status' => $result ? '<pass> OK </pass>':'<fail> FAILED </fail>',
         ]);
 
-        if ($this->supportsSignals()) {
+        if ($job->timeout and $this->supportsSignals()) {
             $this->unsetTimeout();
         }
     }
