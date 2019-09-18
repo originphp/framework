@@ -41,7 +41,7 @@ class GenerateCommand extends Command
         'migration' => 'Generates a Migration class',
         'plugin' => 'Generates a Plugin skeleton',
         'repository' => 'Generates a Repository for a Model',
-        'scaffold' => 'Generates a MVC base application using the database',
+        'scaffold' => 'Generates a MVC using the database',
         'service' => 'Generates a Service object class',
     ];
 
