@@ -58,8 +58,8 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
  
         $cmd->run(['originphp/framework','UserManagement']);
         $this->assertContains('UserManagement Plugin installed', $bufferedOutput->read());
-        $bootstrap = file_get_contents(CONFIG . '/application.php');
-        file_put_contents(CONFIG . '/application.php', str_replace("\nPlugin::load('UserManagement');\n", '', $bootstrap));
+        $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
+        file_put_contents(CONFIG . '/bootstrap.php', str_replace("Plugin::load('UserManagement');\n", '', $bootstrap));
     }
 
     public function testRunError()
