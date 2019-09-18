@@ -653,6 +653,14 @@ class Model
             return false;
         }
 
+        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity])) {
+            return false;
+        }
+
+        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity])) {
+            return false;
+        }
+
         /**
          * Extract HABTM data to prevent being marked as invalid
          * When finding records from db, these are returned as Model\Collection. When marshalling
@@ -699,29 +707,19 @@ class Model
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or ! isset($data[$this->primaryKey])) {
             $connection = $this->connection();
+ 
             if ($exists) {
-                if ($beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity])) {
-                    return false;
-                }
-       
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
 
                 if ($afterCallbacks) {
                     $this->triggerCallback('afterUpdate', [$entity]);
                 }
             } else {
-                if ($beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity])) {
-                    return false;
-                }
-         
                 $result = $connection->insert($this->table, $data);
                 if ($result) {
                     $entity->created(true);
                 }
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterCreate', [$entity]);
-                }
-
+               
                 /**
                  * Postgresql lastInsertId error if you specify wrong id.
                  * @internal lastval is not yet defined in this session
@@ -730,6 +728,10 @@ class Model
                     $entity->{$this->primaryKey} = $connection->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};
+
+                if ($afterCallbacks) {
+                    $this->triggerCallback('afterCreate', [$entity]);
+                }
             }
         }
       

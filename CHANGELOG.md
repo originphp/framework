@@ -21,6 +21,10 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Fixed
+- Model afterCreate callback called before adding id to entity
+
 ## [1.32.5] - 2019-09-16
 
 ### Fixed
