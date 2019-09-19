@@ -22,9 +22,15 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+### Changed
+- Repoistories lazy load model
+
 ### Fixed
 - PluginInstaller changed to append bootstrap
 - Model afterCreate callback called before adding id to entity
+
+### Deprecated
+- Repostiory dependency injection
 
 ## [1.32.5] - 2019-09-16
 

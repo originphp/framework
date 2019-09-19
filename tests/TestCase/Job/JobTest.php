@@ -20,11 +20,6 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
 
-class PassOrFailRedis extends PassOrFailJob
-{
-    public $connection = 'redis-test';
-}
-
 class PassOrFailJob extends Job
 {
     public $connection = 'default';
@@ -56,6 +51,10 @@ class PassOrFailJob extends Job
         }
     }
 }
+class PassOrFailRedis extends PassOrFailJob
+{
+    public $connection = 'redis-test';
+}
 
 class JobTest extends OriginTestCase
 {
@@ -77,6 +76,13 @@ class JobTest extends OriginTestCase
     {
         $job = new PassOrFailJob();
         $this->assertNotNull($job->id());
+    }
+
+    public function testSchedule()
+    {
+        $job = new PassOrFailJob();
+        $job->schedule('+10 minutes');
+        $this->assertEquals('+10 minutes', $job->wait);
     }
 
     public function testBackendId()
