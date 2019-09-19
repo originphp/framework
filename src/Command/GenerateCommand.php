@@ -306,6 +306,8 @@ class GenerateCommand extends Command
 
     protected function repository(array $data)
     {
+        $data['model'] = Inflector::singular($data['class']);
+        
         $this->generate(
             $this->getTemplateFilename('repository'),
             $this->getBaseFolder($data['name'], self::SRC).DS . 'Model' . DS. 'Repository'.DS."{$data['class']}Repository.php",

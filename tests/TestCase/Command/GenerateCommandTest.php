@@ -118,13 +118,13 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Model'.DS.'Repository'.DS.'DummyRepository.php';
         $this->assertOutputContains('app/Model/Repository/DummyRepository.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('3b81f973134b36822a65822a921ef1c2', $filename);
+        $this->assertFileHash('e76f216a37c6c0f9c3ed664e9de3b162', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'Repository'.DS.'DummyRepositoryTest.php';
         $this->assertOutputContains('TestCase/Model/Repository/DummyRepositoryTest.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('9c4a611beae83bd4d9915afdcb22a770', $filename);
+        $this->assertFileHash('4cf5e8468fdef0efca44f7f939a09740', $filename);
         unlink($filename);
     }
 

@@ -2,12 +2,14 @@
 namespace %namespace%\Model\Repository;
 
 use Origin\Model\Repository\Repository;
-use App\Model\%class%;
 
 class %class%Repository extends Repository
 {
-    public function initialize(%class% $%class%)
-    {
-        $this->%class% = $%class%;
-    }
+     /**
+     * The Model for this Repository
+     *
+     * @param \App\Model\%model%
+     */
+    public $%model%;
+   
 }
