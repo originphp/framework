@@ -541,7 +541,7 @@ class Request
      */
     public function accepts($type = null)
     {
-        $acceptHeaders = $this->parseAcceptWith($this->headers('accept'));
+        $acceptHeaders = $this->parseAcceptWith($this->header('accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
@@ -571,7 +571,7 @@ class Request
     {
         $acceptedLanguages = [];
 
-        $languages = $this->parseAcceptWith($this->headers('accept-language'));
+        $languages = $this->parseAcceptWith($this->header('accept-language'));
         foreach ($languages as $lang) {
             $acceptedLanguages[] = str_replace('-', '_', $lang);
         }
@@ -637,37 +637,13 @@ class Request
      *
      * $result= $request->header('www-Authenticate');
      * $request->header('WWW-Authenticate', 'Negotiate');
-     * @codeCoverageIgnore
      * @param string $name name of header to get
      * @param string $value value of header to set
      * @return string|void
      */
-    public function header(string $name, string $value = null)
+    public function header(string $name, string $value = null)  : ?string
     {
-        deprecationWarning('Request:header is depreciated use request:headers');
-        if (func_num_args() === 1) {
-            return $this->headers($name);
-        }
         $normalized = strtolower($name); // psr thing
-        $this->headers[$name] = $value;
-        $this->headersNames[$normalized] = $name;
-    }
-
-    /**
-     * Sets and gets headers
-     * @see https://www.php-fig.org/psr/psr-7/
-     * @param string $name
-     * @param string $value
-     * @return array|string|null|void
-     */
-    public function headers(string $name = null, string $value = null)
-    {
-        if ($name === null) {
-            return $this->headers;
-        }
-
-        $normalized = strtolower($name); // psr thing
-
         if (func_num_args() === 1) {
             $key = $name;
             if (isset($this->headersNames[$normalized])) {
@@ -679,15 +655,42 @@ class Request
 
             return null;
         }
-
-        $this->headers[$name] = $value;
+        
         $this->headersNames[$normalized] = $name;
+
+        return $this->headers[$name] = $value;
+    }
+
+    /**
+     * Sets and gets headers
+     * @internal in version 2.0 this will set or get array of headers
+     * @see https://www.php-fig.org/psr/psr-7/
+     * @param string $name
+     * @param string $value
+     * @return array|string|null|void
+     */
+    public function headers(string $name = null, string $value = null)
+    {
+        if ($name === null) {
+            return $this->headers;
+        }
+
+        //deprecationWarning('Use Request::header to set a header');
+
+        if (func_num_args() === 1) {
+            return $this->header($name);
+        }
+
+        $normalized = strtolower($name); // psr thing
+        $this->headersNames[$normalized] = $name;
+
+        return $this->headers[$name] = $value;
     }
 
     /**
      * Returns the session object
      *
-     * @return Session
+     * @return \Origin\Http\Session
      */
     public function session() : Session
     {
@@ -701,6 +704,24 @@ class Request
     /**
      * Sets and gets cookies values for the request
      *
+     * @return string|null
+     */
+    public function cookie(string $key, string $value = null) : ?string
+    {
+        if (func_num_args() === 1) {
+            if (isset($this->cookies[$key])) {
+                return $this->cookies[$key];
+            }
+
+            return null;
+        }
+
+        return $this->cookies[$key] = $value;
+    }
+
+    /**
+     * Sets and gets cookies values for the request
+     * @internal in version 2.0 this will set or get array of cookies
      * @return string|array|null
      */
     public function cookies($key = null, string $value = null)
@@ -710,19 +731,20 @@ class Request
         }
 
         if (is_array($key)) {
-            $this->cookies = $key;
-
-            return;
+            return $this->cookies = $key;
         }
 
         if (func_num_args() === 1) {
-            if (isset($this->cookies[$key])) {
-                return $this->cookies[$key];
+            // @codeCoverageIgnoreStart
+            if (! is_array($key)) {
+                deprecationWarning('Use Request::cookie for setting non arrays');
             }
+            // @codeCoverageIgnoreEnd
 
-            return null;
+            return $this->cookie($key);
         }
-        $this->cookies[$key] = $value;
+
+        return $this->cookies[$key] = $value;
     }
     /**
      * Processes the $_COOKIE var
@@ -760,7 +782,7 @@ class Request
             if ($name) {
                 $name = str_replace('_', ' ', strtolower($name));
                 $name = str_replace(' ', '-', ucwords($name));
-                $this->headers($name, $value);
+                $this->header($name, $value);
             }
         }
     }

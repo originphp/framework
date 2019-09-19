@@ -24,6 +24,7 @@ Delete tag: git tag -d <tag_name>
 
 ### Changed
 - Repoistories lazy load model
+- Removed deprecated Request header method
 
 ### Fixed
 - PluginInstaller changed to append bootstrap
