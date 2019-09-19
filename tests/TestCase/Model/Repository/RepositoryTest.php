@@ -17,22 +17,16 @@ namespace Origin\Test\Repository;
 use Origin\Model\Model;
 use Origin\Model\Repository\Repository;
 
-class MockRepository extends Repository
+class UsersRepository extends Repository
 {
-    public $User = null;
-
-    public function initialize(Model $User)
-    {
-        $this->User = $User;
-    }
 }
 
 class RepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testRepo()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
-        $repository = new MockRepository($model);
+        $model = new Model(['name' => 'User']);
+        $repository = new UsersRepository();
         $this->assertInstanceOf(Model::class, $repository->User);
     }
 }
