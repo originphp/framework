@@ -63,7 +63,7 @@ class PaginatorComponent extends Component
      
         $sort = $direction = false;
         if (isset($settings['order'])) {
-            $sort = key((array) $settings['order']);
+            $sort = key($settings['order']);
             $direction = current($settings['order']);
         }
 
@@ -205,6 +205,10 @@ class PaginatorComponent extends Component
 
             $settings['order'] = [$settings['sort'] => $direction];
             unset($settings['sort'],$settings['direction']);
+        }
+
+        if (isset($settings['order']) and is_string($settings['order'])) {
+            $settings['order'] = (array) $settings['order'];
         }
 
         return $settings;
