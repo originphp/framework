@@ -337,4 +337,17 @@ class Job
         $this->enqueued = $data['enqueued'];
         $this->serialized = $data['serialized'];
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $strtotime a strtotime compatiable string e.g '+5 hours' ,'2020-01-01 10:40:00'
+     * @return \Origin\Job\Job
+     */
+    public function schedule(string $strtotime) : Job
+    {
+        $this->wait = $strtotime;
+
+        return $this;
+    }
 }
