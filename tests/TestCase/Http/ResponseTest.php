@@ -37,6 +37,13 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         
         $this->assertEquals('en-us,en;q=0.5', $headers['Accept-Language']);
         $this->assertEquals('gzip,deflate', $headers['Accept-Encoding']);
+
+        $expected = [
+            'X-Extra' => 'Foo',
+            'Location' => 'https://www.originphp.com'
+        ];
+        $response->headers($expected);
+        $this->assertEquals($expected, $response->headers());
     }
     public function testCookie()
     {

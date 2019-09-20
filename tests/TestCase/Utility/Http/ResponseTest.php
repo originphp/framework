@@ -48,6 +48,13 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($expected, $response->headers());
         $this->assertNull($response->headers('abc'));
+
+        $expected = [
+            'X-Extra' => 'Foo',
+            'Location' => 'https://www.originphp.com'
+        ];
+        $response->headers($expected);
+        $this->assertEquals($expected, $response->headers());
     }
 
     public function testCookies()

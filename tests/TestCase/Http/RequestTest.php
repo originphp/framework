@@ -186,6 +186,13 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-type' => 'application/pdf'], $request->headers());
 
         $this->assertEquals(null, $request->headers('secret'));
+
+        $expected = [
+            'X-Extra' => 'Foo',
+            'Location' => 'https://www.originphp.com'
+        ];
+        $request->headers($expected);
+        $this->assertEquals($expected, $request->headers());
     }
 
     /**
