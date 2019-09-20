@@ -71,14 +71,8 @@ class PluginInstallCommand extends Command
     protected function download(string $url, string $folder) : bool
     {
         shell_exec("git clone {$url} {$folder}");
-
-        if (file_exists($folder)) {
-            Folder::delete($folder . DS . '.git');
-
-            return true;
-        }
-
-        return false;
+       
+        return file_exists($folder) and Folder::delete($folder . DS . '.git', ['recursive' => true]);
     }
 
     /**
@@ -104,9 +98,11 @@ class PluginInstallCommand extends Command
             }
         }
         /**
-            * @deprecated this is for backwards comptability older versions
-            */
+        * @deprecated this is for backwards comptability older versions
+        */
+        // @codeCoverageIgnoreStart
         file_put_contents(CONFIG . DS . 'application.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
+        // @codeCoverageIgnoreEnd
     }
  
     public function execute()

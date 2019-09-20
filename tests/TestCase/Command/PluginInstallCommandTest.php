@@ -1,6 +1,7 @@
 <?php
 namespace Origin\Test\Command;
 
+use Origin\Utility\Folder;
 use Origin\Console\ConsoleIo;
 use Origin\TestSuite\TestTrait;
 use Origin\Command\PluginInstallCommand;
@@ -91,5 +92,19 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
         $this->exec('plugin:install cool/repo Make');
         $this->assertExitError();
         $this->assertErrorContains('Plugin `make` already exists');
+    }
+
+    /**
+     * This is flakey but need to test it
+     *
+     * @return void
+     */
+    public function testDownload()
+    {
+        $command = new  MockPluginInstallCommand();
+        $result = $command->callMethod('download', ['https://github.com/originphp/debug-plugin',TMP . DS . 'debug-plugin']);
+        
+        $this->assertTrue($result);
+        Folder::delete(TMP . DS . 'debug-plugin', ['recursive' => true]);
     }
 }
