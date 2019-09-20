@@ -21,9 +21,10 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+## [1.33.0] - 2019-09-20
 
 ### Deprecated
-Fixed confusing request/response header/headers cookie/cookies issue
+Fixed confusing request/response header/headers cookie/cookies design
 - Request::headers deprecated setting headers use Request::header instead
 - Request::cookies deprecated setting using Request:cookie instead
 - Repository dependency injection
