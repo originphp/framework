@@ -79,26 +79,4 @@ class MySQLEngine extends Datasource
 
         return $out;
     }
-
-    /**
-     * Drops a table
-     *
-     * @param string $table
-     * @return bool
-     */
-    public function dropTable(string $table) : bool
-    {
-        return $this->execute("DROP TABLE IF EXISTS {$table}");
-    }
-
-    /**
-     * Truncates a table
-     *
-     * @param string $table
-     * @return bool
-     */
-    public function truncateTable(string $table) : bool
-    {
-        return $this->execute("TRUNCATE TABLE {$table}");
-    }
 }
