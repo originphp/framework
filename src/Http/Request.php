@@ -441,11 +441,7 @@ class Request
      */
     public function host(bool $trustProxy = false): ?string
     {
-        if ($trustProxy) {
-            return $this->env('HTTP_X_FORWARDED_HOST');
-        }
-
-        return $this->env('HTTP_HOST');
+        return $trustProxy ? $this->env('HTTP_X_FORWARDED_HOST') : $this->env('HTTP_HOST');
     }
 
     /**
@@ -478,8 +474,8 @@ class Request
      */
     protected function processFiles(array $files = []): void
     {
-        foreach ($files as $name => $data) {
-            $this->data[$name] = $data;
+        foreach ($files as $header => $data) {
+            $this->data[$header] = $data;
         }
     }
 
@@ -632,56 +628,72 @@ class Request
     }
 
     /**
-     * Sets or gets a header (you can get in psr friendly way, lowercase)
+     * Sets a request header (you can get in psr friendly way, lowercase)
+     *
      * @see https://www.php-fig.org/psr/psr-7/
      *
-     * $result= $request->header('www-Authenticate');
+     * $result = $request->header('www-Authenticate');
      * $request->header('WWW-Authenticate', 'Negotiate');
-     * @codeCoverageIgnore
-     * @param string $name name of header to get
+     *
+     * @param string $header name of header to get
      * @param string $value value of header to set
-     * @return string|void
+     * @return array|string|null
      */
-    public function header(string $name, string $value = null)
+    public function header(string $header, string $value = null)
     {
-        deprecationWarning('Request:header is depreciated use request:headers');
-        if (func_num_args() === 1) {
-            return $this->headers($name);
+        /**
+         * Backwards comptability check :
+         */
+        if (func_num_args() === 1 and strpos($header, ':') === false) {
+            return $this->headers($header);
         }
-        $normalized = strtolower($name); // psr thing
-        $this->headers[$name] = $value;
-        $this->headersNames[$normalized] = $name;
+        // allow for HTTP/1.0 404 Not Found ? is this really needed
+        if ($value === null and strpos($header, ':') != false) {
+            list($header, $value) = explode(':', $header, 2);
+        }
+        $value = trim($value);
+        $normalized = strtolower($header); // psr thing
+       
+        $this->headersNames[$normalized] = $header;
+        $this->headers[$header] = $value;
+
+        return [$header => $value];
     }
 
     /**
-     * Sets and gets headers
+     * Gets headers
+     *
      * @see https://www.php-fig.org/psr/psr-7/
-     * @param string $name
+     * @param string|array $header
      * @param string $value
-     * @return array|string|null|void
+     * @return mixed
      */
-    public function headers(string $name = null, string $value = null)
+    public function headers($header = null, string $value = null)
     {
-        if ($name === null) {
+        if ($header === null) {
+            return $this->headers;
+        }
+        if (is_array($header)) {
+            $this->headers = $this->headersNames = [];
+            foreach ($header as $key => $value) {
+                $this->header($key, $value);
+            }
+
             return $this->headers;
         }
 
-        $normalized = strtolower($name); // psr thing
+        $normalized = strtolower($header); // psr thing
 
         if (func_num_args() === 1) {
-            $key = $name;
-            if (isset($this->headersNames[$normalized])) {
-                $key = $this->headersNames[$normalized];
-            }
-            if (isset($this->headers[$key])) {
-                return $this->headers[$key];
-            }
+            $key = $this->headersNames[$normalized] ?? $header;
 
-            return null;
+            return $this->headers[$key] ?? null;
         }
 
-        $this->headers[$name] = $value;
-        $this->headersNames[$normalized] = $name;
+        deprecationWarning('Use Request::header to set header');
+
+        $this->headers[$header] = $value;
+        $this->headersNames[$normalized] = $header;
     }
 
     /**
@@ -699,7 +711,19 @@ class Request
     }
 
     /**
-     * Sets and gets cookies values for the request
+     * Sets a value for a cookie on the request
+     *
+     * @param string $header
+     * @param string $value
+     * @return string
+     */
+    public function cookie(string $header, string $value) : string
+    {
+        return $this->cookies[$header] = $value;
+    }
+
+    /**
+     * Gets a cookie or sets the cookies array
      *
      * @return string|array|null
      */
@@ -710,18 +734,13 @@ class Request
         }
 
         if (is_array($key)) {
-            $this->cookies = $key;
-
-            return;
+            return $this->cookies = $key;
         }
 
         if (func_num_args() === 1) {
-            if (isset($this->cookies[$key])) {
-                return $this->cookies[$key];
-            }
-
-            return null;
+            return $this->cookies[$key] ?? null;
         }
+        deprecationWarning('Use Request::cookie for setting cookies on the request');
         $this->cookies[$key] = $value;
     }
     /**
@@ -749,18 +768,18 @@ class Request
     protected function processEnvironment(array $environment): void
     {
         foreach ($environment as $key => $value) {
-            $name = null;
+            $header = null;
             if (strpos($key, 'HTTP_') !== false) {
-                $name = substr($key, 5);
+                $header = substr($key, 5);
             }
             //CONTENT_TYPE,CONTENT_LENGTH,CONTENT_MD5
             if (strpos($key, 'CONTENT_') !== false) {
-                $name = $key;
+                $header = $key;
             }
-            if ($name) {
-                $name = str_replace('_', ' ', strtolower($name));
-                $name = str_replace(' ', '-', ucwords($name));
-                $this->headers($name, $value);
+            if ($header) {
+                $header = str_replace('_', ' ', strtolower($header));
+                $header = str_replace(' ', '-', ucwords($header));
+                $this->header($header, $value);
             }
         }
     }

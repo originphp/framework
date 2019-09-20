@@ -40,6 +40,13 @@ class Response
     protected $headers = [];
 
     /**
+     * Mapped names
+     *
+     * @var array
+     */
+    protected $headersNames = [];
+
+    /**
      * Response cookies
      *
      * @var array
@@ -79,17 +86,25 @@ class Response
     *
     * @return string|null|array headers
     */
-    public function headers(string $header = null)
+    public function headers($header = null)
     {
         if ($header === null) {
             return $this->headers;
         }
 
-        if (isset($this->headers[$header])) {
-            return $this->headers[$header];
+        if (is_array($header)) {
+            $this->headers = $this->headersNames = [];
+            foreach ($header as $key => $value) {
+                $this->header($key, $value);
+            }
+
+            return $this->headers;
         }
 
-        return null;
+        $normalized = strtolower($header); // psr thing
+        $key = $this->headersNames[$normalized] ?? $header;
+
+        return $this->headers[$key] ?? null;
     }
 
     /**
@@ -103,23 +118,32 @@ class Response
         if ($cookie === null) {
             return $this->cookies;
         }
-        if (isset($this->cookies[$cookie])) {
-            return $this->cookies[$cookie];
-        }
 
-        return null;
+        return $this->cookies[$cookie] ?? null;
     }
 
     /**
-     * Sets a header
+     * Sets a response header
+     *
+     *  $response->header('HTTP/1.0 404 Not Found');
+     *  $response->header('Accept-Language', 'en-us,en;q=0.5');
      *
      * @param string $header
      * @param string $value
-     * @return void
+     * @return array
      */
-    public function header(string $header, string $value = null) :void
+    public function header(string $header, string $value = null) : array
     {
+        if ($value === null and strpos($header, ':') !== false) {
+            list($header, $value) = explode(':', $header, 2);
+            $value = trim($value);
+        }
+    
+        $normalized = strtolower($header); // psr thing
+        $this->headersNames[$normalized] = $header;
         $this->headers[$header] = $value;
+
+        return [$header => $value];
     }
 
     /**
@@ -151,11 +175,7 @@ class Response
      */
     public function json() : ?array
     {
-        if ($this->body) {
-            return json_decode($this->body, true);
-        }
-
-        return null;
+        return $this->body ? json_decode($this->body, true) : null;
     }
 
     /**
@@ -165,11 +185,7 @@ class Response
      */
     public function xml() : ?array
     {
-        if ($this->body) {
-            return xml::toArray($this->body);
-        }
-
-        return null;
+        return $this->body ? xml::toArray($this->body) : null;
     }
 
     public function __toString()
@@ -184,9 +200,7 @@ class Response
      */
     public function success() : bool
     {
-        $code = $this->statusCode();
-
-        return in_array($code, [200,201,202,204]); // ok,created,accepted,no content
+        return in_array($this->statusCode(), [200,201,202,204]); // ok,created,accepted,no content
     }
 
     /**
@@ -196,9 +210,7 @@ class Response
      */
     public function redirect() : bool
     {
-        $code = $this->statusCode();
-
-        return in_array($code, [301,302,303,304,307]); // moved,found,see other,not modified, temp redirect
+        return in_array($this->statusCode(), [301,302,303,304,307]); // moved,found,see other,not modified, temp redirect
     }
 
     /**

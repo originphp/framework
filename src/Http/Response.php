@@ -155,7 +155,7 @@ class Response
     }
 
     /**
-     * Sets a header. you can also pass an array of headers to set.
+     * Sets a response header
      *
      *  $response->header('HTTP/1.0 404 Not Found');
      *  $response->header('Accept-Language', 'en-us,en;q=0.5');
@@ -163,52 +163,60 @@ class Response
      *
      * @param string|array $header []
      * @param mixed $value
-     * @return void
+     * @return array
      */
-    public function header($header, $value = null) : void
+    public function header($header, $value = null) : array
     {
         if (is_string($header)) {
+            if ($value === null and strpos($header, ':') !== false) {
+                list($header, $value) = explode(':', $header, 2);
+            }
             $header = [$header => $value];
         }
       
-        foreach ($header as $key => $value) {
+        foreach ($header as $key => &$value) {
+            $value = trim($value);
             $this->headers[$key] = $value;
         }
+
+        return $header;
     }
 
     /**
      * Gets all headers or a single header that will be sent
      *
-     * @return string|null|array headers
+     * @param string $header
+     * @return mixed
      */
-    public function headers(string $header = null)
+    public function headers($header = null)
     {
         if ($header === null) {
             return $this->headers;
         }
 
-        if (isset($this->headers[$header])) {
-            return $this->headers[$header];
+        if (is_array($header)) {
+            return $this->headers = $header;
         }
 
-        return null;
+        return $this->headers[$header] ?? null;
     }
 
     /**
-     * Gets all cookies or a single cookie that will be sent in this RESPONSE
+     * Gets all cookies, a single cookie or sets all the cookies
      *
-     * @return string|null|array cookies
+     * @param string|array $cookie name or array of cookies
+     * @return array|null
      */
-    public function cookies(string $cookie = null)
+    public function cookies($cookie = null)
     {
         if ($cookie === null) {
             return $this->cookies;
         }
-        if (isset($this->cookies[$cookie])) {
-            return $this->cookies[$cookie];
+        if (is_array($cookie)) {
+            return $this->cookie = $cookie;
         }
 
-        return null;
+        return $this->cookies[$cookie] ?? null;
     }
 
     /**

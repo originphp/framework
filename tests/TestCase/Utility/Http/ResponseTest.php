@@ -36,15 +36,15 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
     public function testHeaders()
     {
         $response = new Response();
-        $this->assertNull($response->header('Access-Control-Allow-Origin: *'));
+        $this->assertEquals(['Access-Control-Allow-Origin' => '*'], $response->header('Access-Control-Allow-Origin: *'));
        
-        $this->assertNull($response->header('Access-Control-Allow-Origin', '*'));
+        $this->assertEquals(['Accept-Encoding' => 'gzip,deflate'], $response->header('Accept-Encoding', 'gzip,deflate'));
         
         $this->assertEquals('*', $response->headers('Access-Control-Allow-Origin'));
     
         $expected = [
-            'Access-Control-Allow-Origin: *' => null,
             'Access-Control-Allow-Origin' => '*',
+            'Accept-Encoding' => 'gzip,deflate'
         ];
         $this->assertEquals($expected, $response->headers());
         $this->assertNull($response->headers('abc'));

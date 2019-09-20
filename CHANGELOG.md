@@ -22,15 +22,18 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
-### Changed
-- Repoistories lazy load model
+### Deprecated
+Fixed confusing request/response header/headers cookie/cookies issue
+- Request::headers deprecated setting headers use Request::header instead
+- Request::cookies deprecated setting using Request:cookie instead
+- Repository dependency injection
 
 ### Fixed
 - PluginInstaller changed to append bootstrap
 - Model afterCreate callback called before adding id to entity
 
-### Deprecated
-- Repostiory dependency injection
+### Changed
+- Repoistories lazy load model
 
 ## [1.32.5] - 2019-09-16
 
