@@ -167,35 +167,25 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $request = new MockRequest();
     
         $this->assertEquals($expected, $request->cookies());
-    }
+        $this->assertEquals('This is a test', $request->cookies('foo'));
 
-    public function testCookie()
-    {
-        $request = new MockRequest();
-        $this->assertEquals('bar', $request->cookie('foo', 'bar'));
-        $this->assertEquals('bar', $request->cookie('foo'));
-        $this->assertNull($request->cookie('fooz'));
+        $expected = [
+            'foo' => 'bar',
+        ];
+        $request->cookies($expected);
+        $this->assertEquals($expected, $request->cookies());// test replace
     }
-
     public function testHeaders()
     {
         $request = new MockRequest();
-        $request->header('WWW-Authenticate', 'Negotiate');
-        $request->header('HTTP/1.0 404 Not Found', null);
+        $request->headers('WWW-Authenticate', 'Negotiate');
+        $request->headers('HTTP/1.0 404 Not Found', null);
 
-        $expected = ['WWW-Authenticate' => 'Negotiate','HTTP/1.0 404 Not Found' => null];
-        $this->assertEquals($expected, $request->headers());
-    }
+        $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
+        $this->assertEquals('Negotiate', $request->headers('www-authenticate')); // PSR friendly
+        $this->assertEquals(['WWW-Authenticate' => 'Negotiate','HTTP/1.0 404 Not Found' => null], $request->headers());
 
-    public function testHeader()
-    {
-        $request = new MockRequest();
-        $request->header('WWW-Authenticate', 'Negotiate');
-        $this->assertEquals('Negotiate', $request->header('WWW-Authenticate', 'Negotiate'));
-        $request->header('HTTP/1.0 404 Not Found', null);
-        $this->assertEquals('Negotiate', $request->header('WWW-Authenticate'));
-        $this->assertEquals('Negotiate', $request->header('www-authenticate')); // PSR friendly
-        $this->assertNull($request->header('Foo-Header'));
+        $this->assertEquals(null, $request->headers('secret'));
     }
 
     /**
