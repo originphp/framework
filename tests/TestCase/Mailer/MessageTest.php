@@ -16,7 +16,7 @@ namespace Origin\Test\Mailer;
 
 use Origin\Mailer\Message;
 
-class MailerTest extends \PHPUnit\Framework\TestCase
+class MessageTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {
