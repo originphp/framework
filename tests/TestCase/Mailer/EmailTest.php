@@ -746,7 +746,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
-            ->subject('send arg');
+            ->subject('send send message arguments');
         $result = $email->send("Yo Adrian!\nRocky")->body();
         $this->assertContains("Yo Adrian!\r\nRocky", $result);
     }
@@ -777,8 +777,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $email = new MockEmail();
         $email->to('james@originphp.com')
             ->from('mailer@originphp.com')
-            ->subject('send arg');
-        $email->send("Yo Adrian!\nRocky");
+            ->subject('test account not set');
+        $result = $email->send("Yo Adrian!\nRocky");
     }
 
     public function testSmtpLog()
