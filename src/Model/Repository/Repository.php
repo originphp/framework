@@ -30,10 +30,12 @@ class Repository
             /**
              * @deprecated version
              */
+            // @codeCoverageIgnoreStart
             deprecationWarning('Injecting dependencies in Repos has been deprectaed');
             if (method_exists($this, 'initialize')) {
                 $this->initialize(...func_get_args());
             }
+            // @codeCoverageIgnoreEnd
         }
         
         if ($this->modelClass === null) {
@@ -50,10 +52,6 @@ class Repository
      */
     public function __get($name)
     {
-        if ($name === $this->modelClass) {
-            return $this->loadModel($name);
-        }
-
-        return null;
+        return $name === $this->modelClass ? $this->loadModel($name) : null;
     }
 }
