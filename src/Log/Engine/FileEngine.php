@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -27,7 +28,7 @@ class FileEngine extends BaseEngine
         'levels' => [],
         'channels' => [],
     ];
-
+    
     public function initialize(array $config)
     {
         if ($this->config('filename') === null) {
