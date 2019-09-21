@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,11 +12,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-/**
- * In version 2.0 this and other utilities/components will be split into their own composer packages
- */
-
-declare(strict_types=1);
 
 namespace Origin\Utility;
 

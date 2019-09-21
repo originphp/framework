@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 namespace Origin\Model\Behavior;
 
 use Origin\Model\Entity;
