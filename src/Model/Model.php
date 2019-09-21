@@ -774,25 +774,6 @@ class Model
     }
 
     /**
-     * Saves a single field on a current record.
-     * @codeCoverageIgnore
-     * @params int|string $primaryKey the id for the record
-     * @param int|string $fieldName
-     * @param mixed  $fieldValue
-     * @param array  $options (callbacks, validate)
-     * @return bool true or false
-     */
-    public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = []) : bool
-    {
-        deprecationWarning('Model:saveField has been deprecated use Model:updateColumn');
-
-        return $this->save(new Entity([
-            $this->primaryKey => $primaryKey,
-            $fieldName => $fieldValue,
-        ]), $options);
-    }
-
-    /**
      * Updates one or many records at time, no callbacks are called.
      *
      * @param array $data array(field=>$value)
@@ -1227,32 +1208,10 @@ class Model
      *  - transaction: wether to save through a database transaction (default:true)
      * @return bool true or false
      */
-    public function delete(Entity $entity, $options = []) : bool
+    public function delete(Entity $entity, array $options = []) : bool
     {
-        /**
-         * @deprecated cascade bool argument
-         */
-        
-        if (is_bool($options)) {
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Model:delete now only accepts options array');
-            $options = ['cascade' => $options];
-            // @codeCoverageIgnoreEnd
-        }
-        
         $options += ['cascade' => true,'callbacks' => true,'transaction' => true];
 
-        /**
-        * @deprecated callbacks bool argument
-        */
-        $args = func_get_args();
-        if (isset($args[2])) {
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Model:delete now only accepts options array');
-            $options['callbacks'] = $args[2];
-            // @codeCoverageIgnoreEnd
-        }
- 
         $this->id = $entity->get($this->primaryKey);
 
         if (empty($this->id) or ! $this->exists($this->id)) {

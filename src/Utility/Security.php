@@ -38,16 +38,6 @@ class Security
         $options += ['pepper' => false, 'type' => 'sha256'];
         $algorithm = strtolower($options['type']);
 
-        /**
-         * The correct terminology is pepper.
-         */
-        // @codeCoverageIgnoreStart
-        if (isset($options['salt'])) {
-            deprecationWarning('salt option is deprecated. use pepper and rename config to Security.pepper');
-            $options['pepper'] = $options['salt'] ?? false;
-        }
-        // @codeCoverageIgnoreEnd
-
         if ($options['pepper'] === true) {
             $options['pepper'] = Config::read('Security.pepper');
         }

@@ -128,19 +128,6 @@ class Response
     }
 
     /**
-     * Sets or gets the status code for sending.
-     * @codeCoverageIgnore
-     * @param int $status
-     * @return int status
-     */
-    public function status(int $status = null)
-    {
-        deprecationWarning('status has been depreciated use statusCode instead.');
-
-        return $this->statusCode($status);
-    }
-
-    /**
      * Sets or gets the HTTP status code for sending.
      *
      * @param int $code

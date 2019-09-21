@@ -111,22 +111,6 @@ class Cache
     }
     
     /**
-    * Changes the cache config that is being used. Use this when working with multiple cache configurations.
-    * REMEMBER: to even set for default when working with multiple configurations.
-    * @codeCoverageIgnore
-    * @param string $config
-    * @return void
-    */
-    public static function use(string $config)
-    {
-        deprecationWarning('Cache::use is deprecated use Cache::store() or pass options.');
-        if (! static::config($config)) {
-            throw new InvalidArgumentException("{$config} config does not exist");
-        }
-        self::$default = $config;
-    }
-
-    /**
      * Reads an item from the Cache
      *
      * @param string $key name of the key
@@ -156,19 +140,6 @@ class Cache
         $cache = static::engine($options['config']);
 
         return $cache->write($key, $value);
-    }
-
-    /**
-     * Checks if an item is in the cache
-     * @codeCoverageIgnore
-     * @param string $key
-     * @return bool
-     */
-    public static function check(string $key):bool
-    {
-        deprecationWarning('Cache::check is depreciated use cache::exists');
-
-        return static::exists($key);
     }
 
     /**

@@ -90,18 +90,6 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-     * Gets the stderr output (Errors)
-     * @codeCoverageIgnore
-     * @return string
-     */
-    public function errorOutput()
-    {
-        deprecationWarning('ConsoleIntegrationTestTrait::errorOutput deprecated use ConsoleIntegrationTestTrait::error instead');
-
-        return $this->error();
-    }
-
-    /**
      * Executes a console command.
      *
      * @param string $command e.g. db:schema:load

@@ -70,19 +70,6 @@ class CookieComponent extends Component
     }
 
     /**
-     * Checks if a cookie exists
-     * @codeCoverageIgnore
-     * @param string $name
-     * @return void
-     */
-    public function check(string $name) : bool
-    {
-        deprecationWarning('Cookie::check is depreciated use Cookie:exists');
-
-        return $this->exists($name);
-    }
-
-    /**
     * Checks if a cookie exists
     *
     * @param string $name

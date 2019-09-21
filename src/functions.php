@@ -235,19 +235,6 @@ function uid(int $length = 13) : string
 }
 
 /**
- * The OriginPHP default password hasher
- * @codeCoverageIgnore
- * @param string $password
- * @return string
- */
-function hashPassword(string $password)
-{
-    deprecationWarning('Deprecated: Use Security::hashPassword instead');
-
-    return password_hash($password, PASSWORD_DEFAULT);
-}
-
-/**
  * A helper function that Logs a deprecation warning and triggers an error if in debug mode
  *
  * @param string $message

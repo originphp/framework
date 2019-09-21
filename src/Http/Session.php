@@ -236,19 +236,6 @@ class Session
 
     /**
      * Checks if a key exists in the session
-     * @codeCoverageIgnore
-     * @param string $key
-     * @return boolean
-     */
-    public function check(string $key = null) : bool
-    {
-        deprecationWarning('Session::check is depreciated use session:exists');
-
-        return $this->exists($key);
-    }
-
-    /**
-     * Checks if a key exists in the session
      *
      * @param string $key
      * @return boolean
@@ -336,16 +323,5 @@ class Session
     public function clear() : void
     {
         $_SESSION = [];
-    }
-    
-    /**
-     * Resets the session data
-     * @codeCoverageIgnore
-     * @return void
-     */
-    public function reset() : void
-    {
-        deprecationWarning('session::reset is deprecated use session:clear instead');
-        $this->clear();
     }
 }

@@ -93,22 +93,6 @@ class Storage
     }
 
     /**
-     * Changes the storage config that is being used. Use this when working with multiple.
-     * REMEMBER: to set even for default, if using in the same script.
-     * @codeCoverageIgnore
-     * @param string $config
-     * @return void
-     */
-    public static function use(string $config)
-    {
-        deprecationWarning('Storage::use is deprecated use Storage::volume() or pass options.');
-        if (! static::config($config)) {
-            throw new InvalidArgumentException("{$config} config does not exist");
-        }
-        self::$default = $config;
-    }
-
-    /**
      * Reads an item from the Storage
      *
      * @param string $name

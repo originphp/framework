@@ -649,15 +649,6 @@ class MysqlSchema extends BaseSchema
             implode(",\n", array_merge($columns, $constraints, $indexes))
         );
 
-        /**
-         * Options string support. This is used in Migrations
-         */
-        if (isset($options['options']) and is_string($options['options'])) {
-            deprecationWarning('Creating tables with option strings are depreciated use array instead');
-
-            return $out . ' ' . $options['options'];
-        }
-
         if (isset($options['engine'])) {
             $out .= ' ENGINE=' . $options['engine'];
         }

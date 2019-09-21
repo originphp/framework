@@ -26,24 +26,16 @@ class Repository
 
     public function __construct()
     {
-        if (func_get_args()) {
-            /**
-             * @deprecated version
-             */
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Injecting dependencies in Repos has been deprectaed');
-            if (method_exists($this, 'initialize')) {
-                $this->initialize(...func_get_args());
-            }
-            // @codeCoverageIgnoreEnd
-        }
-        
         if ($this->modelClass === null) {
             list($namespace, $class) = namespaceSplit(get_class($this));
             $this->modelClass = Inflector::singular(substr($class, 0, -10));
         }
+        $this->initialize();
     }
 
+    public function initialize()
+    {
+    }
     /**
      * Lazyload the Model for this Repository
      *

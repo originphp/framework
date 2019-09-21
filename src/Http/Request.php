@@ -665,10 +665,9 @@ class Request
      *
      * @see https://www.php-fig.org/psr/psr-7/
      * @param string|array $header
-     * @param string $value
      * @return mixed
      */
-    public function headers($header = null, string $value = null)
+    public function headers($header = null)
     {
         if ($header === null) {
             return $this->headers;
@@ -683,17 +682,8 @@ class Request
         }
 
         $normalized = strtolower($header); // psr thing
-
-        if (func_num_args() === 1) {
-            $key = $this->headersNames[$normalized] ?? $header;
-
-            return $this->headers[$key] ?? null;
-        }
-
-        deprecationWarning('Use Request::header to set header');
-
-        $this->headers[$header] = $value;
-        $this->headersNames[$normalized] = $header;
+        $key = $this->headersNames[$normalized] ?? $header;
+        return $this->headers[$key] ?? null;
     }
 
     /**
@@ -725,9 +715,11 @@ class Request
     /**
      * Gets a cookie or sets the cookies array
      *
-     * @return string|array|null
+     *
+     * @param string|array $key
+     * @return mixed
      */
-    public function cookies($key = null, string $value = null)
+    public function cookies($key = null)
     {
         if ($key === null) {
             return $this->cookies;
@@ -737,11 +729,7 @@ class Request
             return $this->cookies = $key;
         }
 
-        if (func_num_args() === 1) {
-            return $this->cookies[$key] ?? null;
-        }
-        deprecationWarning('Use Request::cookie for setting cookies on the request');
-        $this->cookies[$key] = $value;
+        return $this->cookies[$key] ?? null;
     }
     /**
      * Processes the $_COOKIE var

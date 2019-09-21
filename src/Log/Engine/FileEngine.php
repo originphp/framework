@@ -30,14 +30,6 @@ class FileEngine extends BaseEngine
 
     public function initialize(array $config)
     {
-        /**
-         * @deprecated this was changed, so this is to provide
-         * backwards comptability
-         */
-        if (isset($this->config['file'])) {
-            $this->config['filename'] = $this->config['file'];
-            deprecationWarning('FileEngine option file deprecated use filename instead');
-        }
         if ($this->config('filename') === null) {
             $this->config('filename', 'application.log');
         }

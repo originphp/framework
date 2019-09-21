@@ -36,20 +36,9 @@ class Cookie
      *
      * @return string
      */
-    protected function encryptionKey() : string
+    private function encryptionKey() : string
     {
-        if (Config::exists('Security.key')) {
-            return Config::read('Security.key');
-        }
-        /**
-         * Backwards, Backwards comptability check
-         */
-        if (Config::exists('Cookie.key')) {
-            return Config::read('Cookie.key');
-        }
-        deprecationWarning('Add Security.key to your config/application.php.');
-
-        return md5(Config::read('Security.pepper')); //Create a key using thefor backwards compatability
+        return Config::read('Security.key');
     }
 
     /**

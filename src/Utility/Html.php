@@ -398,14 +398,6 @@ class Html
             $tags = $defaults;
         }
 
-        /**
-         * @deprecated This was a mistake and was corrected. this provides backwards comptability.
-         */
-        if (isset($tags['tags'])) {
-            deprecationWarning('Html::sanitize options does not need tags key.');
-            $tags = $tags['tags'];
-        }
-
         // Normalize tag options
         $options = [];
         foreach ($tags as $key => $value) {
