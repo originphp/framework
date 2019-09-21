@@ -1,9 +1,9 @@
 <?php
 namespace %namespace%\Service;
 
-use App\Service\AppService;
+use App\Service\ApplicationService;
 
-class %class%Service extends AppService
+class %class%Service extends ApplicationService
 {
     /**
     * Dependencies will be sent here from constructor

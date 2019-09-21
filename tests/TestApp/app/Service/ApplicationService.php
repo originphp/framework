@@ -3,6 +3,6 @@ namespace App\Service;
 
 use Origin\Service\Service;
 
-class AppService extends Service
+class ApplicationService extends Service
 {
 }
