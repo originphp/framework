@@ -11,7 +11,7 @@ use Origin\View\View;
  * @property \Origin\View\Helper\NumberHelper $Number
  * @property \Origin\View\Helper\PaginatorHelper $Paginator
  */
-class AppView extends View
+class ApplicationView extends View
 {
     /**
      * Called when the view is created

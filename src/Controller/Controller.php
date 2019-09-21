@@ -14,7 +14,7 @@
 namespace Origin\Controller;
 
 use ReflectionClass;
-use App\View\AppView;
+use App\View\ApplicationView;
 use ReflectionMethod;
 use Origin\Http\Router;
 use Origin\Http\Request;
@@ -445,7 +445,7 @@ class Controller
             if (isset($options['template'])) {
                 $template = $options['template'];
             }
-            $view = new AppView($this);
+            $view = new ApplicationView($this);
             $body = $view->render(
                 $template,
                 $options['type'] === 'html'?$this->layout:false

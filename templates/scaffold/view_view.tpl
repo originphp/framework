@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \App\View\AppView $this
+ * @var \App\View\ApplicationView $this
  */
 ?>
 <div class="%pluralName% view">
