@@ -14,7 +14,7 @@
 
 namespace Origin\TestSuite;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
@@ -202,7 +202,7 @@ class FixtureManager
 
         $namespace = '';
         if ($plugin === 'App' or $plugin === null) {
-            $namespace = Configure::read('App.namespace');
+            $namespace = Config::read('App.namespace');
         } elseif ($plugin == 'Framework') {
             $namespace = 'Origin';
         } elseif ($plugin) {

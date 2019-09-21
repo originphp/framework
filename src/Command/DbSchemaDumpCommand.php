@@ -14,7 +14,7 @@
 
 namespace Origin\Command;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 
@@ -46,7 +46,7 @@ class %name%Schema extends Schema
         ]);
         $this->addOption('type', [
             'description' => 'How the schema will be dumped, in sql or php',
-            'default' => Configure::read('Schema.format'),
+            'default' => Config::read('Schema.format'),
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',

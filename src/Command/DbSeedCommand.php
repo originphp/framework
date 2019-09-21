@@ -14,7 +14,7 @@
 
 namespace Origin\Command;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Utility\Inflector;
 use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
@@ -39,7 +39,7 @@ class DbSeedCommand extends Command
         ]);
         $this->addOption('type', [
             'description' => 'Wether to use sql or php',
-            'default' => Configure::read('Schema.format'),
+            'default' => Config::read('Schema.format'),
         ]);
     }
  

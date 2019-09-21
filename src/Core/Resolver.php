@@ -29,7 +29,7 @@ class Resolver
         if (strpos($class, '\\') !== false) {
             return $class;
         }
-        $namespace = Configure::read('App.namespace');
+        $namespace = Config::read('App.namespace');
         list($plugin, $class) = pluginSplit($class);
         if ($plugin) {
             $namespace = $plugin;

@@ -14,7 +14,7 @@
 
 namespace Origin\Command;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 use Origin\Model\ConnectionManager;
 
 class DbTestPrepareCommand extends Command
@@ -26,7 +26,7 @@ class DbTestPrepareCommand extends Command
     {
         $this->addOption('type', [
             'description' => 'Which schema type to be loaded sql or php',
-            'default' => Configure::read('Schema.format'),
+            'default' => Config::read('Schema.format'),
         ]);
     }
     public function execute()

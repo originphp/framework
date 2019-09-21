@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 use Origin\Cache\Cache;
-use Origin\Core\Configure;
+use Origin\Core\Config;
 
 /**
  * FrontController.
@@ -131,6 +131,6 @@ if (! Cache::config('origin_model')) {
         'duration' => '+5 minutes', // min 2 minutes
     ]);
 }
-if (! Configure::exists('Schema.format')) {
-    Configure::write('Schema.format', 'php');
+if (! Config::exists('Schema.format')) {
+    Config::write('Schema.format', 'php');
 }
