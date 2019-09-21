@@ -162,7 +162,7 @@ class RedisEngine extends BaseEngine
      */
     protected function migrateScheduledJobs(string $queue) : void
     {
-        $results = $this->Redis->zrangebyscore('scheduled:' . $queue, '-inf', time());
+        $results = $this->Redis->zrangebyscore('scheduled:' . $queue, '-inf', (string) time());
         if ($results) {
             foreach ($results as $serialized) {
                 $this->Redis->rpush('queue:'. $queue, $serialized);
