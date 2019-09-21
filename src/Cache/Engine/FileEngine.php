@@ -42,7 +42,7 @@ class FileEngine extends BaseEngine
             $value = serialize($value);
         }
 
-        return file_put_contents($this->config['path'] . DS . $this->key($key), $value);
+        return (bool) file_put_contents($this->config['path'] . DS . $this->key($key), $value);
     }
     /**
      * Gets the value;

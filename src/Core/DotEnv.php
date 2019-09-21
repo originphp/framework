@@ -109,7 +109,7 @@ class DotEnv
         }
         # Remove final quotes
         foreach ($env as $key => $value) {
-            $env[$key] = trim($value, "\"'");
+            $env[$key] = is_string($value) ? trim($value, "\"'") : $value;
         }
 
         return $env;
@@ -133,6 +133,6 @@ class DotEnv
             $value = str_replace('\n', "\n", $value);
         }
 
-        return trim($value);
+        return is_string($value) ?  trim($value) : $value;
     }
 }

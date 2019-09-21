@@ -323,7 +323,7 @@ class Date
             $timeFormat,
             self::$timezone,
             $calendar,
-            $pattern
+            $pattern ?: ''
         );
 
         return $formatter;

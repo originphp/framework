@@ -77,7 +77,7 @@ class EmailEngine extends BaseEngine
             $email = [$email];
         }
 
-        return filter_var($email[0], FILTER_VALIDATE_EMAIL);
+        return (bool) filter_var($email[0], FILTER_VALIDATE_EMAIL);
     }
     /**
       * Workhorse for the logging methods

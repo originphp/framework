@@ -1055,7 +1055,7 @@ class Email
     protected function getBoundary() : string
     {
         if ($this->boundary === null) {
-            $this->boundary = md5(uniqid(microtime(true), true));
+            $this->boundary = md5(random_bytes(16));
         }
 
         return $this->boundary;

@@ -13,9 +13,6 @@ declare(strict_types = 1);
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * @todo implment array and hashes
-  */
 namespace Origin\Console;
 
 use Origin\Console\Exception\ConsoleException;
@@ -213,9 +210,9 @@ class ArgumentParser
         $arguments = $options = [];
         $args = [];
         foreach ($argv as $key => $arg) {
-            if ($this->isLongOption($arg)) {
+            if (is_string($arg) and $this->isLongOption($arg)) {
                 $options = $this->parseLongOption($arg, $options);
-            } elseif ($this->isShortOption($arg)) {
+            } elseif (is_string($arg) and $this->isShortOption($arg)) {
                 $options = $this->parseShortOption($arg, $options);
             } else {
                 $args[] = $arg;
@@ -305,6 +302,10 @@ class ArgumentParser
             return (int) $value;
         }
 
+        if ($type === 'string') {
+            return (string) $value;
+        }
+
         return $value;
     }
     /**
@@ -339,11 +340,11 @@ class ArgumentParser
     /**
      * Parses a long option e.g. --datasource=1234
      *
-     * @param string $arg
+     * @param string|int $arg
      * @param array $options
      * @return array
      */
-    protected function parseLongOption(string $arg, array $options) : array
+    protected function parseLongOption($arg, array $options) : array
     {
         $option = substr($arg, 2);
         $name = $this->getOptionName($option);
@@ -357,11 +358,11 @@ class ArgumentParser
     /**
      * Parses a short option e.g. -ds=1234
      *
-     * @param string $arg
+     * @param int|string $arg
      * @param array $options
      * @return array
      */
-    protected function parseShortOption(string $arg, array $options) : array
+    protected function parseShortOption($arg, array $options) : array
     {
         $option = substr($arg, 1);
         $name = $this->getOptionName($option);

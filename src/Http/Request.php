@@ -456,9 +456,12 @@ class Request
         }
         if ($this->is(['post'])) {
             if ($this->env('CONTENT_TYPE') === 'application/json') {
-                $data = json_decode($this->readInput(), true);
-                if (! is_array($data)) {
-                    $data = [];
+                $input = $this->readInput();
+                if ($input) {
+                    $data = json_decode($this->readInput(), true);
+                    if (! is_array($data)) {
+                        $data = [];
+                    }
                 }
             }
         }
