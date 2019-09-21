@@ -72,7 +72,7 @@ class Config
     {
         static::dot()->set($key, $value);
         if ($key === 'debug') {
-            ini_set('display_errors', '1');
+            ini_set('display_errors', (string) $value);
         }
     }
 
