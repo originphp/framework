@@ -157,7 +157,7 @@ class YamlParser
             $marker = trim($line);
        
             // Skip comments,empty lines  and directive
-            if ($marker === '' or $marker[0] === '#' or $line === '---' or substr($line, 0, '5') === '%YAML') {
+            if ($marker === '' or $marker[0] === '#' or $line === '---' or substr($line, 0, 5) === '%YAML') {
                 $this->i = $i;
                 continue;
             }

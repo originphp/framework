@@ -77,7 +77,7 @@ class Session
     protected function setIniConfig(array $config) : void
     {
         foreach ($config as $option => $value) {
-            if (ini_set($option, $value) === false) {
+            if (ini_set($option, (string) $value) === false) {
                 throw new Exception(sprintf('Error configuring session for `%s`', $option));
             }
         }
