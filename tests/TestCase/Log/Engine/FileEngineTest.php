@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Core;
+namespace Origin\Test\Log;
 
 use Origin\Log\Engine\FileEngine;
 
@@ -20,7 +20,6 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testName()
     {
-        $this->expectException(\ErrorException::class);
         $engine = new FileEngine(['filename' => 'foo.log']);
         $this->assertEquals('foo.log', $engine->config('filename'));
     }

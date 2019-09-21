@@ -376,7 +376,7 @@ class ModelValidator
             return false;
         }
 
-        return (bool) preg_match('/[^\s]+/', $value);
+        return (bool) preg_match('/[^\s]+/', (string) $value);
     }
 
     /**

@@ -163,7 +163,10 @@ class Response
         }
       
         foreach ($header as $key => &$value) {
-            $value = trim($value);
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+           
             $this->headers[$key] = $value;
         }
 

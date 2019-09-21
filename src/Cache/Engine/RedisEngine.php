@@ -94,7 +94,7 @@ class RedisEngine extends BaseEngine
      */
     public function exists(string $key) :bool
     {
-        return $this->Redis->exists($this->key($key));
+        return (bool) $this->Redis->exists($this->key($key));
     }
     /**
      * Deletes a key from the cache

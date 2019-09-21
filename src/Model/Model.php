@@ -726,7 +726,7 @@ class Model
                  * @internal lastval is not yet defined in this session
                  */
                 if (! isset($entity->{$this->primaryKey})) {
-                    $entity->{$this->primaryKey} = $connection->lastInsertId();
+                    $entity->{$this->primaryKey} = (int) $connection->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};
 

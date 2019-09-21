@@ -157,7 +157,7 @@ class Number
             'decimals' => $locale['decimals'],
         ];
 
-        $formatted = number_format($value, $options['places'], $options['decimals'], $options['thousands']);
+        $formatted = number_format((float) $value, $options['places'], $options['decimals'], $options['thousands']);
     
         return $options['before'] .  $formatted  . $options['after'];
     }

@@ -229,7 +229,7 @@ class Dom extends \DOMDocument
 {
     use QuerySelector;
 
-    public function __construct(string $version = null, string $encoding = null)
+    public function __construct(string $version = '', string $encoding = '')
     {
         parent::__construct($version, $encoding);
         $this->registerNodeClass('DOMElement', DomElementX::class);

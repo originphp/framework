@@ -237,7 +237,7 @@ class ElasticsearchBehavior extends Behavior
         foreach ($indexes as $column) {
             $out[$column] = $entity->get($column);
         }
- 
+
         // Issues connecting to server or no columns found for indexing
         if (! $this->connection()->index($this->indexName, $entity->id, $out)) {
             throw new Exception(sprintf('Elasticsearch: Error adding record to index for model `%s`', $this->model()->name));

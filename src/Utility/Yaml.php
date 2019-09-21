@@ -230,7 +230,7 @@ class YamlParser
             }
             // Handle Lists
             if ($this->isList($line)) {
-                $trimmedLine = ltrim(substr(ltrim($line), 2)); // work with any number of spaces;
+                $trimmedLine = ltrim(' '. substr(ltrim($line), 2)); // work with any number of spaces;
                
                 if (trim($line) !== '-' and ! $this->isParent($trimmedLine) and ! $this->isScalar($trimmedLine)) {
                     $result[] = $trimmedLine;
@@ -449,7 +449,7 @@ class Yaml
         if (is_null($value)) {
             return null;
         }
-        if (strpos($value, "\n") !== false) {
+        if (is_string($value) and strpos($value, "\n") !== false) {
             $value = "| {$value}";
         }
 

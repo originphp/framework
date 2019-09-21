@@ -135,7 +135,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
     {
         $cache = new MockRedisEngine([
             'host' => env('REDIS_HOST'),
-            'port' => env('REDIS_PORT'),
+            'port' => (int) env('REDIS_PORT'),
             'duration' => 3600,
             'prefix' => 'origin_',
             'persistent' => false,
@@ -190,7 +190,7 @@ class RedisEngineTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $engine = new MockRedisEngine([
             'host' => env('REDIS_HOST'),
-            'port' => env('REDIS_PORT'),
+            'port' => (int) env('REDIS_PORT'),
             'password' => 'secret',
         ]);
     }

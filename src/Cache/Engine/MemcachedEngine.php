@@ -52,7 +52,7 @@ class MemcachedEngine extends BaseEngine
 
     protected $defaultConfig = [
         'host' => '127.0.0.1',
-        'port' => '11211',
+        'port' => 11211,
         'servers' => [], // if this is defined then a pool is used instead [memached]comptabile with http://php.net/manual/en/memcached.addservers.php
         'username' => null,
         'password' => null,

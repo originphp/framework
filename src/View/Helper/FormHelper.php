@@ -1138,10 +1138,10 @@ class FormHelper extends Helper
         }
         // To prevent XSS attacks escape all output
         if ($options['escape']) {
-            if (isset($data['value'])) {
+            if (isset($data['value']) and is_string($data['value'])) {
                 $data['value'] = h($data['value']);
             }
-            if (isset($options['value'])) {
+            if (isset($options['value']) and is_string($options['value'])) {
                 $options['value'] = h($options['value']);
             }
         }
