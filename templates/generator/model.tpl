@@ -3,7 +3,7 @@ namespace %namespace%\Model;
 
 use Origin\Model\Entity;
 
-class %class% extends AppModel
+class %class% extends ApplicationModel
 {
     /**
     * This is called when the model is constructed. 

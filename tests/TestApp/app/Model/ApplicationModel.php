@@ -5,7 +5,7 @@ namespace App\Model;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 
-class AppModel extends Model
+class ApplicationModel extends Model
 {
     public function initialize(array $config)
     {

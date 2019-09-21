@@ -1,10 +1,10 @@
 <?php 
 namespace %namespace%\Model;
 
-use App\Model\AppModel;
+use App\Model\ApplicationModel;
 use Origin\Model\Entity;
 
-class %class%AppModel extends AppModel
+class %class%ApplicationModel extends ApplicationModel
 {
     /**
     * This is called when the model is constructed. 

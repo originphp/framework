@@ -442,7 +442,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileExists($filename);
         $this->assertFileHash('80fd3838635b4eaa613f82bf7da9265c', $filename);
 
-        $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Model'.DS.'DummyAppModel.php';
+        $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Model'.DS.'DummyApplicationModel.php';
         $this->assertFileExists($filename);
         $this->assertFileHash('5f7cbb03e9081d4f3a1cc287776a4342', $filename);
 

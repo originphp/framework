@@ -471,7 +471,7 @@ class GenerateCommand extends Command
         );
         $this->generate(
             $this->getTemplateFilename('plugin_model'),
-            $directory.DS.'Model'.DS."{$data['class']}AppModel.php",
+            $directory.DS.'Model'.DS."{$data['class']}ApplicationModel.php",
             $data
         );
         $this->generate(
