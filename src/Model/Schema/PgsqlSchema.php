@@ -832,9 +832,13 @@ class PgsqlSchema extends BaseSchema
                 }
 
                 $data['null'] = ($result['null'] === 'YES' ? true : false);
+                $position = $isAuto = false;
                 //nextval
-                $position = strpos($result['default'], '::character varying');
-                $isAuto = (strpos($result['default'], 'nextval') !== false);
+                if ($result['default']) {
+                    $position = strpos($result['default'], '::character varying');
+                    $isAuto = (strpos($result['default'], 'nextval') !== false);
+                }
+               
                 if ($position !== false and ! $isAuto) {
                     $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
                 } elseif (! empty($result['default']) and ! $isAuto) {
