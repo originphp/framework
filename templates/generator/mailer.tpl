@@ -1,11 +1,11 @@
 <?php
 namespace %namespace%\Mailer;
 
-use App\Mailer\AppMailer;
+use App\Mailer\ApplicationMailer;
 use Origin\Core\Config;
 use Origin\Model\Entity;
 
-class %class%Mailer extends AppMailer
+class %class%Mailer extends ApplicationMailer
 {
     public function execute(Entity $user)
     {
