@@ -1,8 +1,8 @@
 <?php
 namespace %namespace%\Job;
-use App\Job\AppJob;
+use App\Job\ApplicationJob;
 
-class %class%Job extends AppJob
+class %class%Job extends ApplicationJob
 {
     /**
     * The name of the queue for this job
