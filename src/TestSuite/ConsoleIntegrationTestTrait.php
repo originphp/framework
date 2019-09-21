@@ -124,20 +124,10 @@ trait ConsoleIntegrationTestTrait
         $argv = explode(' ', "console {$command}");
         list($namespace, $class) = namespacesplit(get_class($this));
 
-        // Handle Legacy
-        if (substr($class, -9) === 'ShellTest') {
-            // @codeCoverageIgnoreStart
-            $this->stderr = $this->stdout; // Fixture Issue
-            $dispatcher = new ShellDispatcher($argv, $this->stdout, $this->stdin);
-            $this->result = $dispatcher->start();
-            $this->shell = $dispatcher->shell();
-        // @codeCoverageIgnoreEnd
-        } else {
-            $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
-            $commandRunner = new CommandRunner($io);
-            $this->result = $commandRunner->run($argv);
-            $this->command = $commandRunner->command();
-        }
+        $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
+        $commandRunner = new CommandRunner($io);
+        $this->result = $commandRunner->run($argv);
+        $this->command = $commandRunner->command();
     }
 
     /**

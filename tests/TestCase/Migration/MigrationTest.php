@@ -121,45 +121,6 @@ class MigrationTest extends OriginTestCase
         return $migration;
     }
 
-    /**
-     * This uses the legacy options string
-     * @deprecated added here to keep track so its easy to remove later
-     * @return void
-     */
-    public function testCreateTableLegacy()
-    {
-        $migration = $this->migration();
-
-        $extra = 'ENGINE=InnoDB DEFAULT CHARSET=utf8';
-        $index = 'PRIMARY';
-        if ($migration->connection()->engine() === 'pgsql') {
-            $extra = '/* comment goes here */';
-            $index = 'products_pkey';
-        }
-
-        $migration->createTable('products', [
-            'name' => 'string',
-            'description' => 'text',
-            'column_1' => ['type' => 'string','default' => 'foo'],
-            'column_2' => ['type' => 'string','default' => 'foo','null' => true],
-            'column_3' => ['type' => 'string','default' => 'foo','null' => false],
-            'column_4' => ['type' => 'string','null' => false],
-            'column_5' => ['type' => 'string','null' => true],
-            'column_6' => ['type' => 'VARCHAR','limit' => 5], // test non agnostic#$
-        ], ['options' => $extra]);
-        
-        $reversableStatements = $migration->invokeStart();
- 
-        $this->assertTrue($migration->columnExists('products', 'id'));
-        $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
-
-        $this->assertTrue($migration->columnExists('products', 'name', ['type' => 'string']));
-        $this->assertTrue($migration->columnExists('products', 'description', ['type' => 'text']));
-        
-        $migration->rollback($reversableStatements);
-        $this->assertFalse($migration->tableExists('products'));
-    }
-
     public function testCreateTable()
     {
         $migration = $this->migration();

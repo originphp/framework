@@ -49,12 +49,6 @@ class Fixture
      */
     public $dropTables = true;
 
-    /**
-     * This is an internal flag to only insert records, but does not create or drop tables.
-     *
-     * @var boolean
-     */
-    protected $insertOnly = false;
 
     /**
     * Use this to create a custom table, using the information retreived from Model:describe('table');
@@ -82,21 +76,6 @@ class Fixture
     public $schema = [];
 
     /**
-    * This will be deprecated in the future. The idea is just to work with the test datasource, loading
-    * the schema. This just makes things simpler.
-    *
-    * You can import data using a model OR table key. Either model or table The options are :
-    *
-    *   - datasource: default is default.
-    *   - model: model name to import. This will load the information from model including the table.
-    *   - table: the table to import.
-    *   - records: default:false
-    *
-    * @var array|null
-    */
-    public $import = null;
-
-    /**
     * The datasource config to use - it should be test
     * @deprecated This is only used by legacy functions
     * @var string
@@ -112,8 +91,6 @@ class Fixture
         }
 
         $this->initialize();
-        
-        $this->insertOnly = (empty($this->schema) and empty($this->import));
     }
 
     /**
@@ -123,7 +100,7 @@ class Fixture
      */
     public function insertOnly() :bool
     {
-        return $this->insertOnly;
+        return empty($this->schema);
     }
 
     /**
@@ -132,24 +109,7 @@ class Fixture
     public function initialize()
     {
     }
-    
-    /**
-     * Loads records from a datasource
-     *
-     * @param string $datasource
-     * @param string $table
-     * @return array
-     */
-    public function loadRecords(string $datasource, string $table) : array
-    {
-        $connection = ConnectionManager::get($datasource);
-        $connection->execute('SELECT * FROM ' . $table);
-
-        $records = $connection->fetchAll();
-
-        return $records ?? [];
-    }
-
+   
     /**
      * Creates the table.
      *
@@ -157,10 +117,6 @@ class Fixture
      */
     public function create() : bool
     {
-        if ($this->isLegacy()) {
-            return $this->legacyCreate();
-        }
-        
         $connection = ConnectionManager::get('test');
         $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
 
@@ -209,85 +165,5 @@ class Fixture
         $sql = $connection->adapter()->truncateTableSql($this->table);
 
         return $connection->execute($sql);
-    }
-
-    # Functions for deprecated features
-
-    /**
-        * As of 1.25.0 - This will be deprecated in the future.
-        *
-        * Import schema. If model is found then use that datasource and table else
-        * try to guess it incase of dynamic models
-        *
-        * @param string $model
-        * @return bool|null
-        */
-    public function import()
-    {
-        if ($this->import === null) {
-            return;
-        }
-       
-        $defaults = ['datasource' => 'default','model' => null,'table' => null,'records' => false];
-        $options = array_merge($defaults, $this->import);
-     
-        // Load information from model is specified
-        if ($options['model']) {
-            $className = Resolver::className($options['model'], 'Model');
-            if ($className) {
-                $model = new $className();
-                $options['datasource'] = $model->datasource;
-                $options['table'] = $model->table;
-            } else {
-                $options['table'] = Inflector::tableName($options['model']); // for dynamic models fall back
-            }
-        }
-        // Table is not specified or could not find model
-        if (empty($options['table'])) {
-            throw new Exception('Undefined table');
-        }
-
-        $connection = ConnectionManager::get($options['datasource']);
-        $schema = $connection->schema($options['table']); // being deprecated
-        
-        /**
-         * Imports records
-         */
-        if ($options['records']) {
-            $this->records = $this->loadRecords($options['datasource'], $options['table']);
-        }
-    
-        $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->adapter()->createTable($this->table, $schema);
-  
-        return $connection->execute($sql);
-    }
-
-    /**
-    * Checks if deprecated features are being used.
-    *
-    * @return boolean
-    */
-    protected function isLegacy() : bool
-    {
-        return ($this->import or ! isset($this->schema['columns']));
-    }
-
-    /**
-     * Legacy handler
-     *
-     * @return boolean
-     */
-    protected function legacyCreate() : bool
-    {
-        if ($this->import) {
-            return $this->import();
-        }
-        $connection = ConnectionManager::get($this->datasource);
-        $sql = $connection->adapter()->createTable($this->table, $this->schema);
-
-        return $connection->execute($sql);
-
-        return true;
     }
 }

@@ -273,14 +273,6 @@ class Migration
             $tableOptions['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
         }
 
-        /**
-         * Legacy handler
-         * @deprecated options was deprecated 1.26
-         */
-        if (isset($options['options'])) {
-            $tableOptions['options'] = $options['options'];
-        }
-
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
