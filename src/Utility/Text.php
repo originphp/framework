@@ -169,7 +169,7 @@ class Text
      */
     public static function length(string $string = null) : int
     {
-        return mb_strlen($string);
+        return mb_strlen((string) $string);
     }
 
     /**

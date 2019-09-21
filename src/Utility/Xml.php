@@ -95,7 +95,7 @@ class Xml
                 $parent->appendChild($dom->createTextNode((string) $data['@']));
             } elseif ($key[0] === '@') {
                 $key = substr($key, 1);
-                $parent->setAttribute($key, $value);
+                $parent->setAttribute($key, (string) $value);
             } else {
                 $tags[$key] = $value;
             }
