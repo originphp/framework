@@ -22,11 +22,8 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
-### Changed
-
-
 ### Fixed
-- Publisher silently breaking on dispatch error, adjusted to throw exception
+- Publisher silently breaking on dispatch error, changed to throw exception instead
 - PluginInstall delete the .git folder recursively
 
 ## [1.33.0] - 2019-09-20
