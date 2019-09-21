@@ -438,7 +438,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->exec('generate --force plugin Dummy');
         $this->assertExitSuccess();
 
-        $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Controller'.DS.'DummyAppController.php';
+        $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Controller'.DS.'DummyApplicationController.php';
         $this->assertFileExists($filename);
         $this->assertFileHash('80fd3838635b4eaa613f82bf7da9265c', $filename);
 

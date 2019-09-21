@@ -1,8 +1,8 @@
 <?php 
 namespace %namespace%\Controller;
 
-use App\Controller\AppController;
+use App\Controller\ApplicationController;
 
-class %class%AppController extends AppController
+class %class%ApplicationController extends ApplicationController
 {
 }

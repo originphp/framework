@@ -466,7 +466,7 @@ class GenerateCommand extends Command
 
         $this->generate(
             $this->getTemplateFilename('plugin_controller'),
-            $directory.DS.'Controller'.DS."{$data['class']}AppController.php",
+            $directory.DS.'Controller'.DS."{$data['class']}ApplicationController.php",
             $data
         );
         $this->generate(

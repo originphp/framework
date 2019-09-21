@@ -2,10 +2,10 @@
 namespace %namespace%\Controller\Concern;
 
 use Origin\Concern\ControllerConcern;
-use App\Controller\AppController;
+use App\Controller\ApplicationController;
 
 /**
- * @method \%namespace%\Controller\AppController controller()
+ * @method \%namespace%\Controller\ApplicationController controller()
  */
 class %class%Concern extends ControllerConcern
 {

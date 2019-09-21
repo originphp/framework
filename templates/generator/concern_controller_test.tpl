@@ -3,7 +3,7 @@ namespace %namespace%\Test\Controller\Concern;
 
 use Origin\TestSuite\OriginTestCase;
 use App\Controller\Concern\%class%Concern;
-use %namespace%\Controller\AppController;
+use %namespace%\Controller\ApplicationController;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
@@ -12,7 +12,7 @@ class %class%ConcernTest extends OriginTestCase
 {
    public function startup()
     {
-        $this->controller = new AppController(
+        $this->controller = new ApplicationController(
             new Request('/controller/action'),
             new Response()
         );

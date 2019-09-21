@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use Origin\Controller\Controller;
 
-class AppController extends Controller
+class ApplicationController extends Controller
 {
     /**
      * This is called immediately after construct, so you don't have

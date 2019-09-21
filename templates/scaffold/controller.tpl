@@ -6,7 +6,7 @@ namespace App\Controller;
  * @property \Origin\Controller\Component\CookieComponent $Cookie
  * @property \Origin\Controller\Component\AuthComponent $Auth
  */
-class %controller%Controller extends AppController
+class %controller%Controller extends ApplicationController
 {
     public $paginate = [
       'limit' => 20,

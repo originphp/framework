@@ -1,7 +1,7 @@
 <?php
 namespace App\Controller;
 
-class PostsController extends AppController
+class PostsController extends ApplicationController
 {
     public function index()
     {
