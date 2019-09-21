@@ -21,6 +21,14 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+
+### Changed
+
+
+### Fixed
+- Publisher silently breaking on dispatch error, adjusted to throw exception
+- PluginInstall delete the .git folder recursively
+
 ## [1.33.0] - 2019-09-20
 
 ### Deprecated

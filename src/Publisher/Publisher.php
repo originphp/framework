@@ -2,6 +2,7 @@
 namespace Origin\Publisher;
 
 use Origin\Exception\InvalidArgumentException;
+use Origin\Publisher\Exception\PublisherException;
 
 class Publisher
 {
@@ -118,8 +119,8 @@ class Publisher
             # Queue Listener
             if ($options['queue']) {
                 $result = (new ListenerJob())->dispatch($object, $event, $args);
-                if ($result === false) {
-                    break;
+                if (! $result) {
+                    throw new PublisherException('Error dispatching ListenerJob');
                 }
             }
 
