@@ -20,6 +20,9 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
 {
     public function testName()
     {
+        $engine = new FileEngine(['filename' => 'foo.log']);
+        $this->assertEquals('foo.log', $engine->config('filename'));
+
         $this->expectException(\ErrorException::class);
         $engine = new FileEngine(['file' => 'foo.log']);
         $this->assertEquals('foo.log', $engine->config('filename'));

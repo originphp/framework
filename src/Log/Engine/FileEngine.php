@@ -22,7 +22,7 @@ class FileEngine extends BaseEngine
      * @var array
      */
     protected $defaultConfig = [
-        'file' => null,
+        'filename' => null,
         'path' => LOGS,
         'levels' => [],
         'channels' => [],
@@ -30,14 +30,12 @@ class FileEngine extends BaseEngine
 
     public function initialize(array $config)
     {
-        /**
-         * Undone deprecation mistake
-         */
-        if (isset($this->config['filename'])) {
-            $this->config['file'] = $this->config['filename'];
+        if (isset($this->config['file'])) {
+            deprecationWarning('Log FileEngine use filename instead of file');
+            $this->config['filename'] = $this->config['file'];
         }
-        if ($this->config('file') === null) {
-            $this->config('file', 'application.log');
+        if ($this->config('filename') === null) {
+            $this->config('filename', 'application.log');
         }
     }
 
