@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Http\Exception;
 
 class NotFoundException extends HttpException
 {
