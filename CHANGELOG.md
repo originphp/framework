@@ -22,6 +22,10 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 
+### Security
+- Elasticsearch Exception changed to extend Exception from HttpException
+- Response file not found error changed to display download name
+
 ### Fixed
 - Publisher silently breaking on dispatch error, changed to throw exception instead
 - PluginInstall delete the .git folder recursively
