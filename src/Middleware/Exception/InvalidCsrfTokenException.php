@@ -1,7 +1,7 @@
 <?php
 namespace Origin\Middleware\Exception;
 
-use Origin\Exception\HttpException;
+use Origin\Http\Exception\HttpException;
 
 class InvalidCsrfTokenException extends HttpException
 {

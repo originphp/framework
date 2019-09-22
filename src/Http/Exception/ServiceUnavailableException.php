@@ -12,14 +12,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Http\Exception;
 
-class InternalErrorException extends Exception
+class ServiceUnavailableException extends HttpException
 {
-    public function __construct($message = null, $code = 500)
+    public function __construct($message = null, $code = 503)
     {
         if ($message === null) {
-            $message = 'Internal Error';
+            $message = 'Service Unavailable';
         }
         parent::__construct($message, $code);
     }

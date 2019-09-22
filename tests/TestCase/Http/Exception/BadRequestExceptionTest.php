@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\InternalErrorException;
+use Origin\Http\Exception\BadRequestException;
 
-class InternalErrorExceptionTest extends \PHPUnit\Framework\TestCase
+class BadRequestExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testException()
+    public function testIt()
     {
-        $exception = new InternalErrorException();
-        $this->assertEquals(500, $exception->getCode());
-        $this->assertEquals('Internal Error', $exception->getMessage());
+        $exception = new BadRequestException();
+        $this->assertEquals(400, $exception->getCode());
+        $this->assertEquals('Bad Request', $exception->getMessage());
     }
 }

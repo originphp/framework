@@ -21,7 +21,7 @@ use Origin\Http\Response;
 use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
-use Origin\Exception\ForbiddenException;
+use Origin\Http\Exception\ForbiddenException;
 use Origin\Model\Exception\MissingModelException;
 
 /**

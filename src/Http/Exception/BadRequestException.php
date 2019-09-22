@@ -12,16 +12,15 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Http\Exception;
 
-use Origin\Exception\MethodNotAllowedException;
-
-class MethodNotAllowedExceptionTest extends \PHPUnit\Framework\TestCase
+class BadRequestException extends HttpException
 {
-    public function testException()
+    public function __construct($message = null, $code = 400)
     {
-        $exception = new MethodNotAllowedException();
-        $this->assertEquals(405, $exception->getCode());
-        $this->assertEquals('Method Not Allowed', $exception->getMessage());
+        if ($message === null) {
+            $message = 'Bad Request';
+        }
+        parent::__construct($message, $code);
     }
 }

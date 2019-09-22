@@ -12,16 +12,15 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Exception;
+namespace Origin\Http\Exception;
 
-use Origin\Exception\BadRequestException;
-
-class BadRequestExceptionTest extends \PHPUnit\Framework\TestCase
+class UnauthorizedException extends HttpException
 {
-    public function testIt()
+    public function __construct($message = null, $code = 401)
     {
-        $exception = new BadRequestException();
-        $this->assertEquals(400, $exception->getCode());
-        $this->assertEquals('Bad Request', $exception->getMessage());
+        if ($message === null) {
+            $message = 'Unauthorized';
+        }
+        parent::__construct($message, $code);
     }
 }

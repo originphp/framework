@@ -14,8 +14,8 @@
 
 namespace Origin\Utility\Exception;
 
-use Origin\Exception\HttpException;
+use Origin\Exception\Exception;
 
-class ElasticsearchException extends HttpException
+class ElasticsearchException extends Exception
 {
 }

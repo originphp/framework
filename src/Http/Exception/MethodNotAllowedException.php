@@ -12,16 +12,15 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Http\Exception;
 
-use Origin\Exception\ForbiddenException;
-
-class ForbiddenExceptionTest extends \PHPUnit\Framework\TestCase
+class MethodNotAllowedException extends HttpException
 {
-    public function testException()
+    public function __construct($message = null, $code = 405)
     {
-        $exception = new ForbiddenException();
-        $this->assertEquals(403, $exception->getCode());
-        $this->assertEquals('Forbidden', $exception->getMessage());
+        if ($message === null) {
+            $message = 'Method Not Allowed';
+        }
+        parent::__construct($message, $code);
     }
 }

@@ -12,14 +12,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Http\Exception;
 
-class MethodNotAllowedException extends HttpException
+class InternalErrorException extends HttpException
 {
-    public function __construct($message = null, $code = 405)
+    public function __construct($message = null, $code = 500)
     {
         if ($message === null) {
-            $message = 'Method Not Allowed';
+            $message = 'Internal Error';
         }
         parent::__construct($message, $code);
     }

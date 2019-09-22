@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\NotImplementedException;
+use Origin\Http\Exception\MethodNotAllowedException;
 
-class NotImplementedExceptionTest extends \PHPUnit\Framework\TestCase
+class MethodNotAllowedExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testException()
     {
-        $exception = new NotImplementedException();
-        $this->assertEquals(501, $exception->getCode());
-        $this->assertEquals('Not Implemented', $exception->getMessage());
+        $exception = new MethodNotAllowedException();
+        $this->assertEquals(405, $exception->getCode());
+        $this->assertEquals('Method Not Allowed', $exception->getMessage());
     }
 }

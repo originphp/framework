@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Http;
 
-use Origin\Exception\MethodNotAllowedException;
+use Origin\Http\Exception\MethodNotAllowedException;
 
 class Request
 {

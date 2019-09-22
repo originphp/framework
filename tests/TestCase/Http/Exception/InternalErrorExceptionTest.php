@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\NotFoundException;
+use Origin\Http\Exception\InternalErrorException;
 
-class NotFoundExceptionTest extends \PHPUnit\Framework\TestCase
+class InternalErrorExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testException()
     {
-        $exception = new NotFoundException();
-        $this->assertEquals(404, $exception->getCode());
-        $this->assertEquals('Not Found', $exception->getMessage());
+        $exception = new InternalErrorException();
+        $this->assertEquals(500, $exception->getCode());
+        $this->assertEquals('Internal Error', $exception->getMessage());
     }
 }

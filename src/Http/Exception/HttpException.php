@@ -12,15 +12,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Http\Exception;
 
-class NotImplementedException extends HttpException
+use Origin\Exception\Exception;
+
+class HttpException extends Exception
 {
-    public function __construct($message = null, $code = 501)
-    {
-        if ($message === null) {
-            $message = 'Not Implemented';
-        }
-        parent::__construct($message, $code);
-    }
 }

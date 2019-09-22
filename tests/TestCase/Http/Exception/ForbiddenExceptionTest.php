@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Http\Exception\ForbiddenException;
 
-class InvalidArgumentExceptionTest extends \PHPUnit\Framework\TestCase
+class ForbiddenExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testException()
     {
-        $exception = new InvalidArgumentException();
-        $this->assertEquals(500, $exception->getCode());
-        $this->assertEquals('Invalid Argument', $exception->getMessage());
+        $exception = new ForbiddenException();
+        $this->assertEquals(403, $exception->getCode());
+        $this->assertEquals('Forbidden', $exception->getMessage());
     }
 }

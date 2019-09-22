@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Http;
 
-use Origin\Exception\HttpException;
+use Origin\Http\Exception\HttpException;
 
 class ExceptionRenderer
 {

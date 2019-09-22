@@ -12,15 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Test\Http\Exception;
 
-class UnauthorizedException extends HttpException
+use Origin\Exception\NotImplementedException;
+
+class NotImplementedExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function __construct($message = null, $code = 401)
+    public function testException()
     {
-        if ($message === null) {
-            $message = 'Unauthorized';
-        }
-        parent::__construct($message, $code);
+        $exception = new NotImplementedException();
+        $this->assertEquals(501, $exception->getCode());
+        $this->assertEquals('Not Implemented', $exception->getMessage());
     }
 }

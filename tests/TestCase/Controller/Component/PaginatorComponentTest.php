@@ -21,7 +21,7 @@ use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
 use Origin\Controller\Controller;
 use Origin\Model\ConnectionManager;
-use Origin\Exception\NotFoundException;
+use Origin\Http\Exception\NotFoundException;
 use Origin\Controller\Component\PaginatorComponent;
 
 class Pet extends Model

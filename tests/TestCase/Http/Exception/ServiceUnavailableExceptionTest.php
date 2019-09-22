@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
 use Origin\Exception\ServiceUnavailableException;
 

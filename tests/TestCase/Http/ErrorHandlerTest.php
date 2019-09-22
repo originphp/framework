@@ -19,8 +19,8 @@ use Origin\Core\Config;
 use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\ErrorHandler;
-use Origin\Exception\NotFoundException;
-use Origin\Exception\InternalErrorException;
+use Origin\Http\Exception\NotFoundException;
+use Origin\Http\Exception\InternalErrorException;
 
 class MockErrorHandler extends ErrorHandler
 {

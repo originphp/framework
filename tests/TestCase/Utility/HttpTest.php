@@ -16,7 +16,7 @@ namespace Origin\Test\Utility;
 
 use Origin\Utility\Http;
 use Origin\Utility\Http\Response;
-use Origin\Exception\HttpException;
+use Origin\Http\Exception\HttpException;
 use Origin\Utility\Exception\NotFoundException;
 
 class MockHttp extends Http

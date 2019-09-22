@@ -12,8 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Test\Http\Exception;
 
-class HttpException extends Exception
+use Origin\Http\Exception\UnauthorizedException;
+
+class UnauthorizedExceptionTest extends \PHPUnit\Framework\TestCase
 {
+    public function testException()
+    {
+        $exception = new UnauthorizedException();
+        $this->assertEquals(401, $exception->getCode());
+        $this->assertEquals('Unauthorized', $exception->getMessage());
+    }
 }

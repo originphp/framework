@@ -12,14 +12,14 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Http\Exception;
 
-class BadRequestException extends HttpException
+class ForbiddenException extends HttpException
 {
-    public function __construct($message = null, $code = 400)
+    public function __construct($message = null, $code = 403)
     {
         if ($message === null) {
-            $message = 'Bad Request';
+            $message = 'Forbidden';
         }
         parent::__construct($message, $code);
     }

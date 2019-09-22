@@ -21,7 +21,7 @@ use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Controller\Controller;
 use Origin\TestSuite\OriginTestCase;
-use Origin\Exception\ForbiddenException;
+use Origin\Http\Exception\ForbiddenException;
 use Origin\Controller\Component\AuthComponent;
 use Origin\Model\Exception\MissingModelException;
 

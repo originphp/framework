@@ -12,16 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Controller\Component;
+namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\UnauthorizedException;
+use Origin\Http\Exception\NotFoundException;
 
-class UnauthorizedExceptionTest extends \PHPUnit\Framework\TestCase
+class NotFoundExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testException()
     {
-        $exception = new UnauthorizedException();
-        $this->assertEquals(401, $exception->getCode());
-        $this->assertEquals('Unauthorized', $exception->getMessage());
+        $exception = new NotFoundException();
+        $this->assertEquals(404, $exception->getCode());
+        $this->assertEquals('Not Found', $exception->getMessage());
     }
 }

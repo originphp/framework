@@ -12,15 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Test\Http\Exception;
 
-class ServiceUnavailableException extends HttpException
+use Origin\Exception\InvalidArgumentException;
+
+class InvalidArgumentExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function __construct($message = null, $code = 503)
+    public function testException()
     {
-        if ($message === null) {
-            $message = 'Service Unavailable';
-        }
-        parent::__construct($message, $code);
+        $exception = new InvalidArgumentException();
+        $this->assertEquals(500, $exception->getCode());
+        $this->assertEquals('Invalid Argument', $exception->getMessage());
     }
 }

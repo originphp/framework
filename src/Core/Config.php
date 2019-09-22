@@ -14,8 +14,6 @@ declare(strict_types = 1);
  */
 namespace Origin\Core;
 
-use Origin\Exception\NotFoundException;
-
 class Config
 {
     /**
@@ -57,7 +55,7 @@ class Config
             }
             return false;
         }
-        throw new NotFoundException(sprintf('%s could not be found.', $filename));
+        throw new Exception(sprintf('%s could not be found.', $filename));
     }
     */
    

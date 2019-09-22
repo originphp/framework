@@ -16,7 +16,7 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\TestSuite\TestTrait;
-use Origin\Exception\MethodNotAllowedException;
+use Origin\Http\Exception\MethodNotAllowedException;
 
 class MockRequest extends Request
 {

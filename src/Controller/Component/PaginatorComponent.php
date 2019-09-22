@@ -17,7 +17,7 @@ namespace Origin\Controller\Component;
 
 use Origin\Model\Model;
 use Origin\Utility\Inflector;
-use Origin\Exception\NotFoundException;
+use Origin\Http\Exception\NotFoundException;
 
 class PaginatorComponent extends Component
 {
