@@ -323,12 +323,15 @@ class Response
     {
         # Setup Options
         $options += ['name' => null,'download' => false,'type' => null];
-        if (! file_exists($filename)) {
-            throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $filename));
-        }
+       
         if ($options['name'] === null) {
             $options['name'] = basename($filename);
         }
+
+        if (! file_exists($filename)) {
+            throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $options['name']));
+        }
+
         if ($options['type'] === null) {
             $options['type'] = mime_content_type($filename);
         }
