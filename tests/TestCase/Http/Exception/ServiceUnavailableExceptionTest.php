@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\ServiceUnavailableException;
+use Origin\Http\Exception\ServiceUnavailableException;
 
 class ServiceUnavailableExceptionTest extends \PHPUnit\Framework\TestCase
 {

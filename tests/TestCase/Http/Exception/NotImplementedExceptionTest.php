@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\NotImplementedException;
+use Origin\Http\Exception\NotImplementedException;
 
 class NotImplementedExceptionTest extends \PHPUnit\Framework\TestCase
 {
