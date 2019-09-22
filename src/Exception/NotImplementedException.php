@@ -14,6 +14,9 @@
 
 namespace Origin\Exception;
 
+/**
+ * Use when API method is not implemented
+ */
 class NotImplementedException extends HttpException
 {
     public function __construct($message = null, $code = 501)
