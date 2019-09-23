@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-## [1.33.1] - 2019-09-23
+## [1.33.2] - 2019-09-23
 
 ### Security
 - Elasticsearch Exception changed to extend Exception from HttpException
