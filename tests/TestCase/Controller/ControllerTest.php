@@ -87,7 +87,7 @@ class TestsController extends Controller
 }
 
 /**
- * Test afterFilter return response
+ * Test afterAction return response
  */
 class ApplesController extends Controller
 {
@@ -101,15 +101,15 @@ class ApplesController extends Controller
     {
         $this->when = $when;
     }
-    public function beforeFilter()
+    public function beforeAction()
     {
-        if ($this->when === 'beforeFilter') {
+        if ($this->when === 'beforeAction') {
             return $this->response;
         }
     }
-    public function afterFilter()
+    public function afterAction()
     {
-        if ($this->when === 'afterFilter') {
+        if ($this->when === 'afterAction') {
             return $this->response;
         }
     }
@@ -252,12 +252,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Controller\TestsController')
-            ->setMethods(['beforeFilter'])
+            ->setMethods(['beforeAction'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-            ->method('beforeFilter');
+            ->method('beforeAction');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -278,12 +278,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Controller\TestsController')
-            ->setMethods(['afterFilter'])
+            ->setMethods(['afterAction'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-            ->method('afterFilter');
+            ->method('afterAction');
 
         $components = $this->getMockBuilder('Origin\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -303,7 +303,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new ApplesController($request, new Response());
-        $controller->setWhen('beforeFilter');
+        $controller->setWhen('beforeAction');
         $this->assertInstanceOf(Response::class, $controller->startupProcess());
     }
 
@@ -319,7 +319,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new ApplesController($request, new Response());
-        $controller->setWhen('afterFilter');
+        $controller->setWhen('afterAction');
         $this->assertNull($controller->startupProcess());
         $this->assertInstanceOf(Response::class, $controller->shutdownProcess());
     }
