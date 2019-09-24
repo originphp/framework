@@ -33,10 +33,10 @@ trait DbSchemaTrait
     {
         list($plugin, $file) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS . DS . Inflector::underscored($plugin) . DS . DATABASE_FOLDER . DS .  $file . '.' . $extension;
+            return PLUGINS . DS . Inflector::underscored($plugin) . DS . 'database' . DS .  $file . '.' . $extension;
         }
 
-        return APP . DS . DATABASE_FOLDER . DS . $file . '.' . $extension;
+        return APP . DS . 'database' . DS . $file . '.' . $extension;
     }
 
     /**

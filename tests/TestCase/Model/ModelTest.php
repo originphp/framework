@@ -35,6 +35,7 @@ use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Concern\Exception\MissingConcernException;
 use ArrayObject;
+use Origin\Utility\Security;
 
 class PublishableConcern extends Concern
 {
@@ -309,7 +310,7 @@ class ModelTest extends OriginTestCase
         //Invalid text representation: 7 ERROR:  invalid input syntax for integer: "ab78e847-6ea9-4f88-9b10-8c29f2993616"
         //yntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-not-e
         $data = [
-            'id' => uuid()
+            'id' => Security::uuid()
         ];
 
         $stub = $this->getMockForModel('Article', [

@@ -359,44 +359,4 @@ class DatasourceTest extends OriginTestCase
         $this->assertTrue($this->connection->execute($sql));
         $this->connection->execute('DROP TABLE bar');
     }
-
-    /**
-     * @depends testCreateTable
-     *
-     * @return void
-     */
-    public function testSchema()
-    {
-        $schema = $this->connection->schema('foo');
-        $engine = $this->connection->engine();
-
-        $this->assertEquals('primaryKey', $schema['id']['type']);
-        $this->assertEquals('primary', $schema['id']['key']);
-        $this->assertEquals('string', $schema['name']['type']);
-        $this->assertEquals('placeholder', $schema['name']['default']);
-        $this->assertEquals('text', $schema['description']['type']);
-        $this->assertEquals('integer', $schema['age']['type']);
-        $this->assertEquals(1234, $schema['age']['default']);
-        $this->assertEquals('bigint', $schema['bi']['type']);
-        $this->assertEquals('float', $schema['fn']['type']);
-        if ($engine === 'mysql') {
-            $this->assertEquals(2, $schema['fn']['precision']);
-        }
-        
-        $this->assertEquals('decimal', $schema['dn']['type']);
-        $this->assertEquals(2, $schema['dn']['precision']);
-        $this->assertEquals('datetime', $schema['dt']['type']);
-        if ($engine === 'mysql') {
-            $this->assertEquals('timestamp', $schema['ts']['type']);
-        } else {
-            $this->assertEquals('datetime', $schema['ts']['type']);
-        }
-        
-        $this->assertEquals('date', $schema['d']['type']);
-        $this->assertEquals('time', $schema['t']['type']);
-        $this->assertEquals('binary', $schema['bf']['type']);
-        $this->assertEquals('boolean', $schema['bool']['type']);
-
-        $this->connection->execute('DROP TABLE foo');
-    }
 }

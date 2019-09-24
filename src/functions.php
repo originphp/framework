@@ -23,15 +23,17 @@ use Origin\Utility\Collection;
  */
 function backtrace() : void
 {
-    $debugger = new Debugger();
-    $debug = $debugger->backtrace();
-
-    if (PHP_SAPI === 'cli') {
-        $errorHandler = new Origin\Console\ErrorHandler();
-        $errorHandler->render($debug, true);
-    } else {
-        ob_clean();
-        include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+    if (Config::read('debug')) {
+        $debugger = new Debugger();
+        $debug = $debugger->backtrace();
+    
+        if (PHP_SAPI === 'cli') {
+            $errorHandler = new Origin\Console\ErrorHandler();
+            $errorHandler->render($debug, true);
+        } else {
+            ob_clean();
+            include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+        }
     }
    
     exit();
@@ -207,31 +209,18 @@ function collection($items) : Collection
 }
 
 /**
- * Generates a v4 random UUID (Universally Unique IDentifier).
- * @internal Set version to 0100 and bits 6-7 to 10
- * @see http://tools.ietf.org/html/rfc4122#section-4.4
- * @return string
+ * Helper setter/getter for config
+ *
+ * @param string $key
+ * @param mixed $value
+ * @return mixed
  */
-function uuid()
+function config(string $key, $value = null)
 {
-    $random = random_bytes(16);
-    $random[6] = chr(ord($random[6]) & 0x0f | 0x40);
-    $random[8] = chr(ord($random[8]) & 0x3f | 0x80);
-
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($random), 4));
-}
-
-/**
- * Generates a random hex string.
- * @internal Should use even numbers
- * @param integer $length
- * @return string
- */
-function uid(int $length = 13) : string
-{
-    $random = random_bytes(ceil($length / 2));
-
-    return substr(bin2hex($random), 0, $length);
+    if (func_num_args() === 1) {
+        return Config::read($key);
+    }
+    Config::write($key, $value);
 }
 
 /**
@@ -252,148 +241,4 @@ function deprecationWarning(string $message) : void
     if (Config::read('debug')) {
         trigger_error($message, E_USER_DEPRECATED);
     }
-}
-
-/**
- * Helper Functions
- */
-
-/**
-* Checks if a string contains a substring
-*
-* @param string $needle
-* @param string $haystack
-* @return bool
-*/
-function contains(string $needle, string $haystack) : bool
-{
-    if (! empty($needle)) {
-        return (mb_strpos($haystack, $needle) !== false);
-    }
-
-    return false;
-}
-
-/**
- * Gets part of the string from the left part of characters
- *
- * @param string $characters   :
- * @param string $string    key:value
- * @return string|null      key
- */
-function left(string $characters, string $string) : ?string
-{
-    if (! empty($characters)) {
-        $position = mb_strpos($string, $characters);
-        if ($position === false) {
-            return null;
-        }
-
-        return mb_substr($string, 0, $position);
-    }
-
-    return null;
-}
-
-/**
- * Gets part of the string from the right part of characters
- *
- * @param string $characters   :
- * @param string $string    key:value
- * @return string|null     value
- */
-function right(string $characters, string $string) : ?string
-{
-    if (! empty($characters)) {
-        $position = mb_strpos($string, $characters);
-        if ($position === false) {
-            return null;
-        }
-
-        return mb_substr($string, $position + mb_strlen($characters));
-    }
-
-    return null;
-}
-
-/**
- * Checks if a string starts with another string
- *
- * @param string $needle
- * @param string $haystack
- * @return boolean
- */
-function begins(string $needle, string $haystack) : bool
-{
-    $length = mb_strlen($needle);
-
-    return  ($needle !== '' and mb_substr($haystack, 0, $length) == $needle);
-}
-
-/**
- * Checks if a string ends with another string
- *
- * @param string $needle
- * @param string $haystack
- * @return boolean
- */
-function ends(string $needle, string $haystack) : bool
-{
-    $length = mb_strlen($needle);
-
-    return ($needle !== '' and mb_substr($haystack, -$length, $length) == $needle);
-}
-
-/**
- * Replaces text in strings.
- *
- * @internal str_replace works with multibyte string see https://php.net/manual/en/ref.mbstring.php#109937
- * @param mixed $needle
- * @param mixed $with
- * @param mixed $haystack
- * @param array $options (insensitive = false)
- *  - insensitive: default false. case-insensitive replace
- * @return string
- */
-function replace($needle, $with, $haystack, array $options = []) : string
-{
-    $options += ['insensitive' => false];
-    if ($options['insensitive']) {
-        return str_ireplace($needle, $with, $haystack);
-    }
-
-    return str_replace($needle, $with, $haystack);
-}
-
-/**
- * Returns the length of a string
- *
- * @param string $string
- * @return integer
- */
-function length(string $string = null) : int
-{
-    return mb_strlen($string);
-}
-
-/**
- * Converts a string to lower case
- *
- * @param string $string
- * @return string
- */
-function lower(string $string) :string
-{
-    return mb_strtolower($string);
-}
-
-/**
- * Converts a stirng to uppercase
- *
- * @param string $string
- * @return string
- */
-function upper(string $string) :string
-{
-    return mb_strtoupper($string);
 }

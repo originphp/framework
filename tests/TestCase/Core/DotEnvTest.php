@@ -17,6 +17,7 @@ namespace Origin\Test\Core;
 use Origin\Core\DotEnv;
 use Origin\Exception\Exception;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Utility\Security;
 
 class MockDotEnv extends DotEnv
 {
@@ -53,8 +54,8 @@ class DotEnvTest extends \PHPUnit\Framework\TestCase
     public function testLoadReal()
     {
         $dotenv = new DotEnv();
-        $tmp = TMP . DS . uid();
-        $value = uuid();
+        $tmp = TMP . DS . Security::uid();
+        $value = Security::uuid();
         file_put_contents($tmp, "ENVTEST_UUID={$value}\n");
 
         $dotenv->load($tmp); // TestApp
@@ -71,7 +72,7 @@ AbDE7...
 -----END RSA PRIVATE KEY-----"
 EOF;
         $dotenv = new DotEnv();
-        $tmp = TMP . DS . uid();
+        $tmp = TMP . DS . Security::uid();
         
         file_put_contents($tmp, $key);
         $dotenv->load($tmp); // TestApp
@@ -86,7 +87,7 @@ a multi line that does not
 end with a quotation
 EOF;
         $dotenv = new DotEnv();
-        $tmp = TMP . DS . uid();
+        $tmp = TMP . DS . Security::uid();
         
         file_put_contents($tmp, $key);
         $this->expectException(Exception::class);

@@ -16,6 +16,7 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Session;
 use Origin\TestSuite\TestTrait;
+use Origin\Utility\Security;
 
 class MockSession extends Session
 {
@@ -93,7 +94,8 @@ class SessionTest extends \PHPUnit\Framework\TestCase
     {
         $session = new MockSession();
         $name = session_name();
-        $_COOKIE[$name] = uuid();
+       
+        $_COOKIE[$name] = Security::uuid();
         $id = $session->callMethod('validateCookie');
         $this->assertEquals(36, strlen($id));
         unset($_COOKIE[$name]);

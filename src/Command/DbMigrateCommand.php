@@ -23,7 +23,7 @@ class DbMigrateCommand extends Command
     protected $name = 'db:migrate';
     protected $description = 'Runs and rollsback migrations';
 
-    const PATH = APP . DS . DATABASE_FOLDER . DS . MIGRATIONS_FOLDER;
+    const PATH = APP . DS . 'database' . DS . 'migrations';
 
     /**
      * Undocumented variable

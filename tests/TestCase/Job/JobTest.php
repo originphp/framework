@@ -19,6 +19,7 @@ use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Utility\Security;
 
 class PassOrFailJob extends Job
 {
@@ -227,7 +228,7 @@ class JobTest extends OriginTestCase
         $data = ['key' => 'value'];
         $job = new PassOrFailJob();
         $job->set(['arguments' => [$model, $data]]);
-        $id = uuid();
+        $id = Security::uuid();
     
         $serialized = [
             'className' => 'Origin\Test\Job\PassOrFailJob',

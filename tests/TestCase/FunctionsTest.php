@@ -59,18 +59,6 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(date('Y-m-d H:i:s'), now());
     }
-    public function testUUID()
-    {
-        $this->assertRegExp(
-            '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
-            uuid()
-        );
-    }
-    public function testUid()
-    {
-        $this->assertRegExp('/^([a-z0-9]*){13}$/', uid());
-        $this->assertRegExp('/^([a-z0-9]*){5}$/', uid(5));
-    }
 
     public function testEnv()
     {
@@ -80,53 +68,6 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $_ENV['key2'] = 'bar';
         $this->assertEquals('foo', env('key1'));
         $this->assertEquals('bar', env('key2'));
-    }
-
-    public function testBegins()
-    {
-        $this->assertTrue(begins('foo', 'foobar'));
-        $this->assertFalse(begins('foo', 'barfoo'));
-        $this->assertFalse(begins('', 'barfoo'));
-    }
-    public function testEnds()
-    {
-        $this->assertFalse(ends('foo', 'foobar'));
-        $this->assertTrue(ends('foo', 'barfoo'));
-        $this->assertFalse(ends('', 'barfoo'));
-    }
-    public function testLeft()
-    {
-        $this->assertEquals('foo', left(':', 'foo:bar'));
-        $this->assertNull(left('x', 'foo:bar'));
-        $this->assertNull(left('', ''));
-    }
-    public function testRight()
-    {
-        $this->assertEquals('bar', right(':', 'foo:bar'));
-        $this->assertNull(right('x', 'foo:bar'));
-        $this->assertNull(right('', ''));
-    }
-    public function testContains()
-    {
-        $this->assertTrue(contains('foo', 'foobar'));
-        $this->assertTrue(contains('foo', 'barfoo'));
-        $this->assertTrue(contains('foo', 'xfoox'));
-        $this->assertFalse(contains('moo', 'barfoo'));
-        $this->assertFalse(contains('', 'barfoo'));
-    }
-    public function testUpLo()
-    {
-        $this->assertEquals(strtoupper('foo'), upper('foo'));
-        $this->assertEquals(strtolower('FOO'), lower('FOO'));
-    }
-    public function testReplace()
-    {
-        $this->assertEquals('foo', replace('bar', '', 'foobar'));
-        $this->assertEquals('foo', replace('bar', '', 'fooBAR', ['insensitive' => true]));
-    }
-    public function testLen()
-    {
-        $this->assertEquals(3, length('foo'));
     }
 
     public function testPr()
@@ -145,7 +86,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/FunctionsTest.php Line: 143
+tests/TestCase/FunctionsTest.php Line: 84
 
 Array
 (

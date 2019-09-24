@@ -585,25 +585,6 @@ abstract class Datasource
     }
 
     /**
-     * Gets the schema for a table
-     * @deprecated This is kept for backwards compatability but it no longer going to be used in future
-     * @param string $table
-     * @return array
-     */
-    public function schema(string $table) : array
-    {
-        $cache = Cache::store('origin_model');
-        $key = $this->config['name'] . '_' . $table;
-        $schema = $cache->read($key);
-        if (! $schema) {
-            $schema = $this->adapter()->schema($table);
-            $cache->write($key, $schema);
-        }
-
-        return $schema;
-    }
-
-    /**
      * Describes the table
      *
      * @param string $table

@@ -18,6 +18,7 @@ namespace Origin\Http;
 use Origin\Core\Dot;
 use Origin\Core\Config;
 use Origin\Exception\Exception;
+use Origin\Utility\Security;
 
 class Session
 {
@@ -122,7 +123,7 @@ class Session
     protected function startSession(string $id = null) : void
     {
         if ($id === null) {
-            $this->id(uuid());
+            $this->id(Security::uuid());
         }
         
         if (! session_start()) {

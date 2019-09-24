@@ -20,12 +20,12 @@ class DbSchemaDumpCommandTest extends OriginTestCase
     }
     public function testDumpSQL()
     {
-        $filename = APP . DS . DATABASE_FOLDER . DS . 'dump.sql';
+        $filename = APP . DS . 'database' . DS . 'dump.sql';
         $this->deleteFile($filename);
 
         $this->exec('db:schema:dump --connection=test --type=sql dump');
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . DATABASE_FOLDER . DS . 'dump.sql');
+        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'database' . DS . 'dump.sql');
         $this->assertTrue(file_exists($filename));
         
         $this->assertOutputContains('* posts');
@@ -51,13 +51,13 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
     public function testDumpPHP()
     {
-        $filename = APP . DS . DATABASE_FOLDER . DS . 'dump.php';
+        $filename = APP . DS . 'database' . DS . 'dump.php';
         $this->deleteFile($filename);
      
         $this->exec('db:schema:dump --connection=test --type=php dump');
     
         $this->assertExitSuccess();
-        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . DATABASE_FOLDER . DS . 'dump.php');
+        $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'database' . DS . 'dump.php');
         $this->assertTrue(file_exists($filename));
         $this->assertOutputContains('* posts');
     

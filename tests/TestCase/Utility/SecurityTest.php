@@ -17,6 +17,7 @@ namespace Origin\Test\Utility;
 use Origin\Core\Config;
 use Origin\Utility\Security;
 use Origin\Exception\Exception;
+use Origin\Exception\InvalidArgumentException;
 
 class SecurityTest extends \PHPUnit\Framework\TestCase
 {
@@ -88,6 +89,22 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(Security::decrypt($encrypted, $key.'x')); // test wrong key
     }
 
+    public function testEncryptInvalidKey()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Security::encrypt('foo', 'secret');
+    }
+
+
+    public function testDecryptInvalidKey()
+    {
+        $key = '58024d70eb647a3d0654d5211af2ebfd';
+
+        $encrypted = Security::encrypt('foo', $key);
+        $this->expectException(InvalidArgumentException::class);
+        Security::decrypt($encrypted, 'secret');
+    }
+
     public function testGenerateKey()
     {
         $this->assertEquals(32, strlen(Security::generateKey()));
@@ -115,6 +132,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     public function testUid()
     {
         $this->assertRegExp('/^([a-z0-9]*){16}$/', Security::uid());
-        $this->assertRegExp('/^([a-z0-9]*){7}$/', Security::uid(7));
+        $this->assertRegExp('/^([a-z0-9]*){8}$/', Security::uid(8));
+        $this->expectException(InvalidArgumentException::class);
+        Security::uid(6);
     }
 }

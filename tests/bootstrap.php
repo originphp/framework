@@ -1,4 +1,16 @@
 <?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2019 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
 
 error_reporting(E_ALL);
 ini_set('display_errors', true);
@@ -15,13 +27,6 @@ define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp');
 define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', sys_get_temp_dir());
 define('WEBROOT', ROOT . DS . 'public');
-
-/**
- * @deprecated this is to help with deprecation
- * @internal DbSchemaDump and PluginTest use 'TestApp' .DS
- */
-define('DATABASE_FOLDER', 'database');
-define('MIGRATIONS_FOLDER', 'migrations');
 
 if (! file_exists(TMP . DS . 'cache')) {
     @mkdir(TMP . DS . 'cache');

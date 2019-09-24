@@ -147,19 +147,23 @@ class Security
     }
 
     /**
-     * Generates a secure UID
-     * @param integer $length
+     * Generates a cryptographically secure random string
+     *
+     * @param integer $length 8,10,12,14,16,18,20,22 etc.
      * @return string
      */
     public static function uid(int $length = 16) : string
     {
-        $random = random_bytes((int) ceil($length / 2));
-
-        return substr(bin2hex($random), 0, $length);
+        if ($length % 2 == 0 and $length >= 8) {
+            $random = random_bytes($length);
+            return bin2hex($random);
+        }
+        throw new InvalidArgumentException('Invalid Length. Length must be 8 or higher and divisible by 2');
     }
 
     /**
      * Generates a v4 random UUID (Universally Unique IDentifier).
+     *
      * @return string
      */
     public static function uuid() : string

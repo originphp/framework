@@ -11,12 +11,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-use Origin\Cache\Cache;
-use Origin\Core\Config;
-
-/**
- * FrontController.
- */
 
 /**
  * Load the Paths constants, if not already set (e.g. Tests)
@@ -25,9 +19,6 @@ use Origin\Core\Config;
 if (! defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
-    $legacy = file_exists(ROOT . DS . 'src');
-} else {
-    $legacy = file_exists(APP . DS . 'src');  // Work with test app
 }
 
 if (! defined('SRC')) {
@@ -35,18 +26,7 @@ if (! defined('SRC')) {
     define('LOGS', ROOT . DS . 'logs');
     define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
     define('PLUGINS', ROOT . DS . 'plugins');
-  
-    /**
-     * @deprecated Added notice here so it can be removed in v2
-     * Going back to app folder it was easier to work with
-     * DATBASE_FOLDER/MIGRATIONS_FOLDER are to help with this and all references will be
-     * removed in v2
-     */
-  
-    define('SRC', ROOT . DS . ($legacy?'src':'app'));
-    define('DATABASE_FOLDER', ($legacy?'db':'database'));
-    define('MIGRATIONS_FOLDER', ($legacy?'migrate':'migrations'));
-    
+    define('SRC', ROOT . DS . 'app');
     define('APP', ROOT);
     define('TESTS', ROOT . DS . 'tests');
     define('TMP', ROOT . DS . 'tmp');
@@ -85,10 +65,7 @@ $ErrorHandler->register();
 
 require __DIR__ . DS . 'functions.php';
 
-if (file_exists(CONFIG . DS . '.env')) {
-    $dotEnv = new Origin\Core\DotEnv();
-    $dotEnv->load(CONFIG . DS . '.env');
-} elseif (file_exists(CONFIG . DS . '.env.php')) {
+if (file_exists(CONFIG . DS . '.env.php')) {
     $result = include CONFIG . DS . '.env.php';
     foreach ($result as $key => $value) {
         $_ENV[$key] = $value;
@@ -99,38 +76,10 @@ if (file_exists(CONFIG . DS . '.env')) {
  * Load Config
  */
 require CONFIG . DS . 'bootstrap.php';
-
-if ($legacy) {
-    /**
-     * @deprecated remove in v2
-     */
-    foreach (['server','database','email','storage'] as $config) {
-        if (file_exists(CONFIG . DS .  $config . '.php')) {
-            include CONFIG . DS .  $config . '.php';
-        }
-    }
-} else {
-    include CONFIG . DS .  'log.php';
-    include CONFIG . DS .  'cache.php';
-    include CONFIG . DS .  'database.php';
-    include CONFIG . DS .  'storage.php';
-    include CONFIG . DS .  'email.php';
-    include CONFIG . DS .  'queue.php';
-}
-
+require CONFIG . DS . 'log.php';
+require CONFIG . DS . 'cache.php';
+require CONFIG . DS . 'database.php';
+require CONFIG . DS . 'storage.php';
+require CONFIG . DS . 'email.php';
+require CONFIG . DS . 'queue.php';
 require CONFIG . DS . 'routes.php';
-
- /**
- * Backwards comptability for projects created < 1.26
- * @todo this will be deprecated in 2.0
- */
-if (! Cache::config('origin_model')) {
-    Cache::config('origin_model', [
-        'engine' => 'File',
-        'prefix' => 'origin_model_',
-        'duration' => '+5 minutes', // min 2 minutes
-    ]);
-}
-if (! Config::exists('Schema.format')) {
-    Config::write('Schema.format', 'php');
-}

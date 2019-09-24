@@ -19,6 +19,7 @@ use \ArrayObject;
 use Origin\Model\ModelTrait;
 use Origin\Exception\Exception;
 use Origin\Job\Engine\BaseEngine;
+use Origin\Utility\Security;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -122,7 +123,7 @@ class Job
         $this->wait = $options['wait'];
         $this->queue = $options['queue'];
         
-        $this->id = uuid();
+        $this->id = Security::uuid();
 
         if ($this->name === null) {
             list($namespace, $name) = namespaceSplit(get_class($this));

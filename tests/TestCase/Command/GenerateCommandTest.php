@@ -338,7 +338,7 @@ class GenerateCommandTest extends OriginTestCase
 
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
-        $filename = APP.DS.DATABASE_FOLDER.DS.MIGRATIONS_FOLDER.DS.$version.'CreateDummyTable.php';
+        $filename = APP.DS.'database'.DS.'migrations'.DS.$version.'CreateDummyTable.php';
         
         $this->assertOutputContains("database/migrations/{$version}CreateDummyTable.php");
         $this->assertFileExists($filename);
@@ -426,7 +426,7 @@ class GenerateCommandTest extends OriginTestCase
         preg_match('/[0-9]{14}/', $this->output(), $match);
         $version = $match[0];
 
-        $filename = APP.DS.DATABASE_FOLDER.DS.MIGRATIONS_FOLDER.DS.$version.'Dummy.php';
+        $filename = APP.DS.'database'.DS.'migrations'.DS.$version.'Dummy.php';
         
         $this->assertOutputContains("database/migrations/{$version}Dummy.php");
         $this->assertFileExists($filename);

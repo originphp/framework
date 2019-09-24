@@ -17,6 +17,7 @@ namespace Origin\Test\Utility;
 use Origin\Utility\Csv;
 use Origin\Exception\InvalidArgumentException; # security
 use Origin\Utility\Exception\NotFoundException;
+use Origin\Utility\Security;
 
 class CsvTest extends \PHPUnit\Framework\TestCase
 {
@@ -119,7 +120,7 @@ EOF;
 
     public function testProcess()
     {
-        $tmp = TMP . DS . uid();
+        $tmp = TMP . DS . Security::uid();
         file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
         $expected = [
             [
@@ -176,7 +177,7 @@ EOF;
 
     public function testCount()
     {
-        $tmp = TMP . DS . uid();
+        $tmp = TMP . DS . Security::uid();
         file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
         $rows = Csv::process($tmp, ['header' => true]);
         $this->assertEquals(3, count($rows));
@@ -185,7 +186,7 @@ EOF;
     public function testInvalidAmountOfKeys()
     {
         $this->expectException(InvalidArgumentException::class);
-        $tmp = TMP . DS . uid();
+        $tmp = TMP . DS . Security::uid();
         file_put_contents($tmp, "name,email\njim,jim@example.com\njon,jon@example.com\ntony,tony@example.com");
         $rows = Csv::process($tmp, ['header' => true,'keys' => ['name']]);
         $rows->current();

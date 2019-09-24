@@ -16,6 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Utility;
 
 use Origin\Utility\Exception\NotFoundException;
+use Origin\Utility\Security;
 
 class File
 {
@@ -100,7 +101,7 @@ class File
      */
     public static function tmp(string $data = null) : string
     {
-        $filename = sys_get_temp_dir() . DS . uid();
+        $filename = sys_get_temp_dir() . DS . Security::uid();
         if ($data) {
             file_put_contents($filename, $data);
         }
