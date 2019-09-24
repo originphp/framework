@@ -1671,10 +1671,12 @@ class Model
         if (method_exists($this, $callback)) {
             $callbacks[] = [$this,$callback];
         }
-  
-        foreach ($this->behaviorRegistry->enabled() as $behavior) {
-            if (method_exists($this->$behavior, $callback)) {
-                $callbacks[] = [$this->$behavior, $callback];
+        
+        foreach ([$this->behaviorRegistry,$this->concernRegistry] as $registry) {
+            foreach ($registry->enabled() as $object) {
+                if (method_exists($registry->$object, $callback)) {
+                    $callbacks[] = [$registry->$object, $callback];
+                }
             }
         }
 

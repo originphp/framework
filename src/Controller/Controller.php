@@ -82,9 +82,18 @@ class Controller
     public $response = null;
 
     /**
-     * Helpers to load.
+     * view helpers to load.
+     * The core is default
      */
-    public $viewHelpers = [];
+    public $viewHelpers = [
+        'Cookie' => ['className'=>'CookieHelper'],
+        'Date' => ['className'=>'DateHelper'],
+        'Flash' => ['className'=>'FlashHelper'],
+        'Form' => ['className'=>'FormHelper'],
+        'Html' => ['className'=>'HtmlHelper'],
+        'Number' =>['className'=>'NumberHelper'],
+        'Session' => ['className'=>'SessionHelper'],
+    ];
 
     /**
        * Holds the componentregistry object.
@@ -92,6 +101,13 @@ class Controller
        * @var \Origin\Controller\Component\ComponentRegistry
        */
     protected $componentRegistry = null;
+
+    /**
+       * Holds the componentregistry object.
+       *
+       * @var \Origin\Concern\ConcernRegistry
+       */
+    protected $concernRegistry = null;
 
     /**
      * Array keys to be serialized
@@ -123,6 +139,22 @@ class Controller
         $this->initialize();
         $this->initializeTraits();
     }
+
+    /**
+     * Lazyload core Components
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        if (in_array($name, ['Session','Cookie','Flash'])) {
+            $this->$name = $this->loadComponent($name);
+            return true;
+        }
+        return false;
+    }
+
 
     /**
     * Magic method it call the first loaded behavior method if its available
@@ -194,6 +226,10 @@ class Controller
             return $this->loadModel($name);
         }
 
+        if (isset($this->$name)) {
+            return $this->$name;
+        }
+
         return null;
     }
 
@@ -246,7 +282,7 @@ class Controller
     /**
     * Callback before the action in the controller is called.
     */
-    public function beforeFilter()
+    public function beforeAction()
     {
     }
 
@@ -269,7 +305,7 @@ class Controller
      *
      * @return \Origin\Http\Response|void
      */
-    public function afterFilter()
+    public function afterAction()
     {
     }
 
@@ -280,12 +316,14 @@ class Controller
      */
     public function startupProcess()
     {
-        $result = $this->beforeFilter();
-        if (! $this->isResponseOrRedirect($result)) {
-            $result = $this->componentRegistry()->call('startup');
-        }
+        $result = $this->beforeAction();
         if ($this->isResponseOrRedirect($result)) {
             return $this->response;
+        }
+        foreach ([$this->componentRegistry,$this->concernRegistry] as $registry) {
+            if ($this->isResponseOrRedirect($registry->call('startup'))) {
+                return $this->response;
+            }
         }
     }
    
@@ -296,16 +334,20 @@ class Controller
      */
     public function shutdownProcess()
     {
-        $result = $this->componentRegistry()->call('shutdown');
-        if (! $this->isResponseOrRedirect($result)) {
-            $result = $this->afterFilter();
+        foreach ([$this->componentRegistry,$this->concernRegistry] as $registry) {
+            if ($this->isResponseOrRedirect($registry->call('shutdown'))) {
+                return $this->response;
+            }
         }
+        $result = $this->afterAction();
         if ($this->isResponseOrRedirect($result)) {
             return $this->response;
         }
         //# Free Mem for no longer used items
-        $this->componentRegistry()->destroy();
+        $this->componentRegistry->destroy();
+        $this->concernRegistry->destroy();
         unset($this->componentRegistry);
+        unset($this->concernRegistry);
     }
 
     /**
