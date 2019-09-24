@@ -104,19 +104,4 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($OriginTestCase->setUp());
         $this->assertNull($OriginTestCase->tearDown());
     }
-
-    public function testLoadFixture()
-    {
-        $testCase = new OriginTestCase();
-        $testCase->loadFixture('Origin.Post');
-        $testCase->loadFixture('Origin.Contact');
-        $this->assertEquals(['Origin.Post','Origin.Contact'], $testCase->fixtures);
-    }
-
-    public function testLoadFixtures()
-    {
-        $testCase = new OriginTestCase();
-        $testCase->loadFixtures(['Origin.Post','Origin.Contact']);
-        $this->assertEquals(['Origin.Post','Origin.Contact'], $testCase->fixtures);
-    }
 }
