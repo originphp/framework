@@ -29,7 +29,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
         if (ConnectionManager::get('test')->engine() !== 'mysql') {
             $this->markTestSkipped('This test is for mysql');
         }
-        $this->exec('db:create --datasource=dummy');
+        $this->exec('db:create --connection=dummy');
 
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -40,7 +40,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
         if (ConnectionManager::get('test')->engine() !== 'pgsql') {
             $this->markTestSkipped('This test is for pgsql');
         }
-        $this->exec('db:create --datasource=dummy schema-pg');
+        $this->exec('db:create --connection=dummy schema-pg');
 
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -48,7 +48,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteInvalidDatasource()
     {
-        $this->exec('db:create --datasource=foo');
+        $this->exec('db:create --connection=foo');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found');
     }
@@ -58,7 +58,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE DATABASE dummy');
 
-        $this->exec('db:create --datasource=dummy');
+        $this->exec('db:create --connection=dummy');
         $this->assertExitError();
         $this->assertOutputContains('Database `dummy` already exists');
     }
@@ -68,7 +68,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
         $config = ConnectionManager::config('test');
         $config['database'] = '<invalid-database-name>';
         ConnectionManager::config('dummy', $config);
-        $this->exec('db:create --datasource=dummy');
+        $this->exec('db:create --connection=dummy');
         $this->assertExitError();
         $this->assertErrorContains('DatasourceException');
     }

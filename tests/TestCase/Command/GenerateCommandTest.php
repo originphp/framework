@@ -14,13 +14,13 @@ class GenerateCommandTest extends OriginTestCase
 
     public function testScaffoldUnkownModel()
     {
-        $this->exec('generate --force --datasource=test scaffold Foo');
+        $this->exec('generate --force --connection=test scaffold Foo');
         $this->assertExitError();
         $this->assertErrorContains('Unkown model Foo');
     }
     public function testGenerateScaffold()
     {
-        $this->exec('generate --force --datasource=test scaffold Bookmark');
+        $this->exec('generate --force --connection=test scaffold Bookmark');
         
         $this->assertExitSuccess();
         /**

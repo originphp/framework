@@ -66,7 +66,7 @@ class ConnectionManager
         static::$driver = $config['engine'];
       
         $class = static::$engines[$config['engine']];
-        $datasource = new $class(['datasource' => $name] + $config);
+        $datasource = new $class(['connection' => $name] + $config);
 
         $datasource->connect($config);
 

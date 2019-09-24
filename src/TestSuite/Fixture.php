@@ -75,13 +75,6 @@ class Fixture
     */
     public $schema = [];
 
-    /**
-    * The datasource config to use - it should be test
-    * @deprecated This is only used by legacy functions
-    * @var string
-    */
-    public $datasource = 'test';
-
     public function __construct()
     {
         if ($this->table === null) {
@@ -134,7 +127,7 @@ class Fixture
      */
     public function insert() : void
     {
-        $connection = ConnectionManager::get($this->datasource);
+        $connection = ConnectionManager::get('test');
    
         foreach ($this->records as $record) {
             $connection->insert($this->table, $record);
@@ -148,7 +141,7 @@ class Fixture
      */
     public function drop() : bool
     {
-        $connection = ConnectionManager::get($this->datasource);
+        $connection = ConnectionManager::get('test');
         $sql = $connection->adapter()->dropTableSql($this->table, ['ifExists' => true]);
 
         return $connection->execute($sql);
@@ -161,7 +154,7 @@ class Fixture
      */
     public function truncate() : bool
     {
-        $connection = ConnectionManager::get($this->datasource);
+        $connection = ConnectionManager::get('test');
         $sql = $connection->adapter()->truncateTableSql($this->table);
 
         return $connection->execute($sql);

@@ -27,9 +27,9 @@ class DbSchemaLoadCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
+        $this->addOption('connection', [
             'description' => 'Use a different datasource',
-            'short' => 'ds',
+            'short' => 'c',
             'default' => 'default',
         ]);
         $this->addArgument('name', [
@@ -46,7 +46,7 @@ class DbSchemaLoadCommand extends Command
         $name = $this->arguments('name') ?? 'schema';
         $type = $this->options('type');
         $filename = $this->schemaFilename($name, $type);
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
      
         if (! in_array($type, ['sql','php'])) {
             $this->throwError(sprintf('The type `%s` is invalid', $type));

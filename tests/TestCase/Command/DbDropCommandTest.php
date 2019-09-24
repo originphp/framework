@@ -30,21 +30,21 @@ class DbDropCommandTest extends OriginTestCase
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE DATABASE dummy');
 
-        $this->exec('db:drop --datasource=dummy');
+        $this->exec('db:drop --connection=dummy');
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` dropped');
     }
 
     public function testExecuteInvalidDatasource()
     {
-        $this->exec('db:drop --datasource=foo');
+        $this->exec('db:drop --connection=foo');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found');
     }
 
     public function testExecuteDatabaseDoesNotExist()
     {
-        $this->exec('db:drop --datasource=dummy');
+        $this->exec('db:drop --connection=dummy');
         $this->assertExitError();
         $this->assertOutputContains('Database `dummy` does not exist');
     }

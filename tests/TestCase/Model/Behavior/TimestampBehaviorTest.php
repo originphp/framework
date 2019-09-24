@@ -25,7 +25,7 @@ class TimestampBehaviorTest extends OriginTestCase
 
     public function testBeforeSaveCreate()
     {
-        $Article = new Model(['name' => 'Article','datasource' => 'test']);
+        $Article = new Model(['name' => 'Article','connection' => 'test']);
         $behavior = new TimestampBehavior($Article);
         $data = ['title' => 'Foo Bar'];
         $entity = $Article->new($data);
@@ -36,7 +36,7 @@ class TimestampBehaviorTest extends OriginTestCase
     }
     public function testBeforeSaveUpdate()
     {
-        $Article = new Model(['name' => 'Article','datasource' => 'test']);
+        $Article = new Model(['name' => 'Article','connection' => 'test']);
         $behavior = new TimestampBehavior($Article);
         $data = ['title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
         $entity = $Article->new($data);

@@ -46,14 +46,14 @@ class BackupCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', ['short' => 'ds','description' => 'Which datasource to use','default' => 'main']);
+        $this->addOption('connection', ['short' => 'c','description' => 'Which datasource to use','default' => 'main']);
         $this->addArgument('database', ['required' => true,'description' => 'The database to backup']);
         $this->addArgument('filename', ['description' => 'The filename to output too']);
     }
 
     public function execute()
     {
-        $msg = sprintf('The database %s was backedup from the %s datasource', $this->arguments('database'), $this->options('datasource'));
+        $msg = sprintf('The database %s was backedup from the %s datasource', $this->arguments('database'), $this->options('connection'));
         $this->out($msg);
     }
 }
@@ -180,7 +180,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadModel()
     {
-        $Post = new Model(['name' => 'Post','datasource' => 'test']);
+        $Post = new Model(['name' => 'Post','connection' => 'test']);
         ModelRegistry::set('Post', $Post);
         $command = new MockCommand();
         $this->assertInstanceOf(Model::class, $command->loadModel('Post'));

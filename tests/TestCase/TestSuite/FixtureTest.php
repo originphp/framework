@@ -90,7 +90,6 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     {
         $fixture = new MovieFixture();
         $this->assertEquals('movies', $fixture->table);
-        $this->assertEquals('test', $fixture->datasource);
     }
     public function testCreate()
     {
@@ -109,7 +108,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($fixture->insert());
 
         $model = new Movie();
-        $model->datasource = 'test';
+        $model->connection = 'test';
         $this->assertEquals(3, $model->find('count'));
     }
 

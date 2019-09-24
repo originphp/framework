@@ -87,7 +87,7 @@ class GenerateCommand extends Command
             'default' => false,
         ]);
 
-        $this->addOption('datasource', [
+        $this->addOption('connection', [
             'description' => 'The datasource to use for the database',
             'default' => 'default',
         ]);
@@ -512,7 +512,7 @@ class GenerateCommand extends Command
 */
     public function scaffold(array $data)
     {
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $scaffold = new Scaffold($datasource);
 
         $model = $data['class'];

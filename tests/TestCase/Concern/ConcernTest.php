@@ -51,20 +51,20 @@ class ConcernTest extends \PHPUnit\Framework\TestCase
 {
     public function testModel()
     {
-        $model = new MockModel(['name' => 'Article','datasource' => 'test']);
+        $model = new MockModel(['name' => 'Article','connection' => 'test']);
         $concern = new  MyModelConcern($model);
         $this->assertInstanceOf(Model::class, $concern->model());
     }
     public function testModelCallConcernFromConcern()
     {
-        $model = new MockModel(['name' => 'Article','datasource' => 'test']);
+        $model = new MockModel(['name' => 'Article','connection' => 'test']);
         $concern = new  MyModelConcern($model);
         $this->assertEquals('bar', $concern->modelFoo());
     }
 
     public function testModelCallConcernFromModel()
     {
-        $model = new MockModel(['name' => 'Article','datasource' => 'test']);
+        $model = new MockModel(['name' => 'Article','connection' => 'test']);
         $model->loadConcern('MyModelConcern', ['className' => 'Origin\Test\Concern\MyModelConcern']);
         $this->assertEquals('bar', $model->foo());
     }

@@ -44,9 +44,9 @@ class ElasticsearchBehavior extends Behavior
      */
     public function initialize(array $config)
     {
-        $datasource = $this->model()->datasource;
+        $connection = $this->model()->connection;
         $model = $this->model()->table;
-        $this->indexName = $datasource . '_' . $model;
+        $this->indexName = $connection . '_' . $model;
     }
 
     /**

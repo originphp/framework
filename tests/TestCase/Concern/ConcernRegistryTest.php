@@ -29,7 +29,7 @@ class ConcernRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testInit()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         $registry = new ConcernRegistry($model);
         $registry->set('Publishable', new PublishableConcern($model));
         $registry->enable('Publishable');

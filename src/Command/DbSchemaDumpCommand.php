@@ -40,9 +40,9 @@ class %name%Schema extends Schema
 
     public function initialize()
     {
-        $this->addOption('datasource', [
+        $this->addOption('connection', [
             'description' => 'Use a different datasource',
-            'short' => 'ds',
+            'short' => 'c',
             'default' => 'default',
         ]);
         $this->addOption('type', [
@@ -58,7 +58,7 @@ class %name%Schema extends Schema
     {
         $name = $this->arguments('name') ?? 'schema';
 
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         if (! ConnectionManager::config($datasource)) {
             $this->throwError("{$datasource} datasource not found");
         }

@@ -30,9 +30,9 @@ class DbSeedCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
+        $this->addOption('connection', [
             'description' => 'Use a different datasource',
-            'short' => 'ds',
+            'short' => 'c',
             'default' => 'default',
         ]);
         $this->addArgument('name', [
@@ -48,7 +48,7 @@ class DbSeedCommand extends Command
     {
         $name = $this->arguments('name') ?? 'seed';
           
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $type = $this->options('type');
         $filename = $this->schemaFilename($name, $type);
         

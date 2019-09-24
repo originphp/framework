@@ -578,7 +578,7 @@ abstract class Datasource
     {
         if (! $this->adapter) {
             $adapterClass = __NAMESPACE__ . '\Schema\\'. ucfirst($this->name) . 'Schema';
-            $this->adapter = new $adapterClass($this->config['datasource']);
+            $this->adapter = new $adapterClass($this->config['connection']);
         }
       
         return $this->adapter;

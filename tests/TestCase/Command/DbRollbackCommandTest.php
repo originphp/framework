@@ -14,26 +14,26 @@ class DbRollbackCommandTest extends OriginTestCase
     public function testRollback()
     {
         // Load the Migrations from file
-        $this->exec('db:migrate --datasource=test');
+        $this->exec('db:migrate --connection=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Migration Complete. 3 migrations in 0 ms');
 
-        $this->exec('db:rollback --datasource=test');
+        $this->exec('db:rollback --connection=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Rollback Complete. 1 migrations in 0 ms');
 
-        $this->exec('db:rollback --datasource=test');
+        $this->exec('db:rollback --connection=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Rollback Complete. 1 migrations in 0 ms');
 
-        $this->exec('db:rollback --datasource=test');
+        $this->exec('db:rollback --connection=test');
         $this->assertExitSuccess();
         $this->assertOutputContains('Rollback Complete. 1 migrations in 0 ms');
     }
 
     public function testNoMigrations()
     {
-        $this->exec('db:rollback --datasource=test');
+        $this->exec('db:rollback --connection=test');
         $this->assertExitSuccess();
         $this->assertErrorContains('No migrations found'); // Its a warning
     }

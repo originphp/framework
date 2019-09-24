@@ -30,7 +30,7 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
             $this->markTestSkipped('This test is for MySQL');
         }
         
-        $this->exec('db:setup --datasource=dummy --type=sql');
+        $this->exec('db:setup --connection=dummy --type=sql');
         
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -46,7 +46,7 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
             $this->markTestSkipped('This test is for PostgreSQL');
         }
         
-        $this->exec('db:setup --datasource=dummy --type=sql schema-pg');
+        $this->exec('db:setup --connection=dummy --type=sql schema-pg');
       
         $this->assertExitSuccess();
         $this->assertOutputContains('Database `dummy` created');
@@ -58,7 +58,7 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecutePluginPath()
     {
-        $this->exec('db:setup --datasource=dummy --type=sql MyPlugin.pschema');
+        $this->exec('db:setup --connection=dummy --type=sql MyPlugin.pschema');
         $this->assertExitError();
         $this->assertErrorContains(ROOT . '/tests/TestApp/plugins/my_plugin/database/pschema.sql');
     }
@@ -70,7 +70,7 @@ class DbSetupCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetupPHP()
     {
-        $this->exec('db:setup --datasource=dummy --type=php');
+        $this->exec('db:setup --connection=dummy --type=php');
         $this->assertExitSuccess();
         $expected = ConnectionManager::get('test')->engine() === 'pgsql'?9:7;
         $this->assertOutputContains('Loading '. ROOT . '/tests/TestApp/database/schema.php');

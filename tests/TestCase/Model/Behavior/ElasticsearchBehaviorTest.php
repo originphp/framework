@@ -46,7 +46,7 @@ class ElasticsearchBehaviorTest extends OriginTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->Article = new Article(['datasource' => 'test']);
+        $this->Article = new Article(['connection' => 'test']);
 
         if (env('ELASTICSEARCH_HOST') === null) {
             $this->markTestSkipped('Elasticsearch not available');

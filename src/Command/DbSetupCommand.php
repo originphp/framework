@@ -25,8 +25,8 @@ class DbSetupCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
-            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        $this->addOption('connection', [
+            'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
@@ -50,15 +50,15 @@ class DbSetupCommand extends Command
             $seed = "{$plugin}.seed";
         }
     
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $this->runCommand('db:create', [
-            '--datasource' => $datasource,
+            '--connection' => $datasource,
         ]);
    
         $this->io->nl();
     
         $this->runCommand('db:schema:load', [
-            '--datasource' => $datasource,
+            '--connection' => $datasource,
             '--type' => $this->options('type'),
             $schema,
         ]);
@@ -66,7 +66,7 @@ class DbSetupCommand extends Command
         $this->io->nl();
 
         $this->runCommand('db:seed', [
-            '--datasource' => $datasource,
+            '--connection' => $datasource,
             '--type' => $this->options('type'),
             $seed,
         ]);

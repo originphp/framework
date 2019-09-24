@@ -51,13 +51,13 @@ class CounterCacheBehaviorTest extends OriginTestCase
         $this->Post = ModelRegistry::get('Post', [
             'className' => 'Origin\Test\Model\Behavior\Post',
             'table' => 'counter_cache_posts',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
    
         $this->Reply = ModelRegistry::get('Reply', [
             'className' => 'Origin\Test\Model\Behavior\Reply',
             'table' => 'counter_cache_replies',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
     }
 

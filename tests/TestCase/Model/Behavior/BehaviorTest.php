@@ -286,7 +286,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testFindCallbacks()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeFind', 'afterFind'])
@@ -311,7 +311,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testValidateCallbacks()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeValidate', 'afterValidate'])
@@ -343,7 +343,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testValidateCallbacksAbort()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeValidate', 'afterValidate'])
@@ -376,7 +376,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testSaveCallbackAbort()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeSave', 'afterSave'])
@@ -409,7 +409,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testSaveCallbacks()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeSave', 'afterSave'])
@@ -443,7 +443,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testDeleteCallbacksAbort()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeDelete', 'afterDelete'])
@@ -468,7 +468,7 @@ class BehaviorTest extends OriginTestCase
 
     public function testDeleteCallbacks()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $behavior = $this->getMockBuilder('Origin\Test\Model\Behavior\BehaviorTesterBehavior')
             ->setMethods(['beforeDelete', 'afterDelete'])

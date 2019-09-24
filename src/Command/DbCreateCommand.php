@@ -25,14 +25,14 @@ class DbCreateCommand extends Command
     
     public function initialize()
     {
-        $this->addOption('datasource', [
-            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        $this->addOption('connection', [
+            'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
     }
  
     public function execute()
     {
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $config = ConnectionManager::config($datasource);
         if (! $config) {
             $this->throwError("{$datasource} datasource not found");

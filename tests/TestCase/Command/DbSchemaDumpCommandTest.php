@@ -23,7 +23,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $filename = APP . DS . DATABASE_FOLDER . DS . 'dump.sql';
         $this->deleteFile($filename);
 
-        $this->exec('db:schema:dump --datasource=test --type=sql dump');
+        $this->exec('db:schema:dump --connection=test --type=sql dump');
         $this->assertExitSuccess();
         $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . DATABASE_FOLDER . DS . 'dump.sql');
         $this->assertTrue(file_exists($filename));
@@ -44,7 +44,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
     public function testDumpSqlException()
     {
-        $this->exec('db:schema:dump --datasource=test --type=sql dump', ['n']);
+        $this->exec('db:schema:dump --connection=test --type=sql dump', ['n']);
         $this->assertExitError();
         $this->assertErrorContains('Error saving schema file');
     }
@@ -54,7 +54,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $filename = APP . DS . DATABASE_FOLDER . DS . 'dump.php';
         $this->deleteFile($filename);
      
-        $this->exec('db:schema:dump --datasource=test --type=php dump');
+        $this->exec('db:schema:dump --connection=test --type=php dump');
     
         $this->assertExitSuccess();
         $this->assertOutputContains('Dumping database `origin_test` schema to ' . ROOT . DS . 'tests' . DS . 'TestApp' . DS . DATABASE_FOLDER . DS . 'dump.php');
@@ -73,21 +73,21 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 
     public function testDumpPHPException()
     {
-        $this->exec('db:schema:dump --datasource=test --type=php dump', ['n']);
+        $this->exec('db:schema:dump --connection=test --type=php dump', ['n']);
         $this->assertExitError();
         $this->assertErrorContains('Error saving schema file');
     }
 
     public function testDumpUnkownType()
     {
-        $this->exec('db:schema:dump --datasource=test --type=ruby');
+        $this->exec('db:schema:dump --connection=test --type=ruby');
         $this->assertExitError();
         $this->assertErrorContains('The type `ruby` is invalid');
     }
 
     public function testExecuteInvalidDatasource()
     {
-        $this->exec('db:schema:dump --datasource=foo');
+        $this->exec('db:schema:dump --connection=foo');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found');
     }

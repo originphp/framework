@@ -26,12 +26,12 @@ use Origin\Controller\Component\PaginatorComponent;
 
 class Pet extends Model
 {
-    public $datasource = 'test';
+    public $connection = 'test';
 }
 
 class Owner extends Model
 {
-    public $datasource = 'test';
+    public $connection = 'test';
 }
 
 class PetsController extends Controller
@@ -168,7 +168,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 
         $Pet = new Pet();
         $Pet->belongsTo('MyOwner', ['foreignKey' => 'owner_id']);
-        $Pet->MyOwner = new Model(['name' => 'MyOwner','alias' => 'MyOwner','table' => 'owners','datasource' => 'test']);
+        $Pet->MyOwner = new Model(['name' => 'MyOwner','alias' => 'MyOwner','table' => 'owners','connection' => 'test']);
 
         $results = $this->PaginatorComponent->paginate($Pet, ['sort' => 'owner_id','associated' => ['MyOwner']]);
         $this->assertEquals(20, count($results));

@@ -28,7 +28,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
 
     protected function setUp() : void
     {
-        $this->Deal = new Model(['name' => 'Deal','datasource' => 'test']); // Create model Dynamically
+        $this->Deal = new Model(['name' => 'Deal','connection' => 'test']); // Create model Dynamically
         Date::locale(['date' => 'd/m/Y','time' => 'H:i','datetime' => 'd/m/Y H:i','timezone' => 'Europe/London']);
         Number::locale(['currency' => 'USD','thousands' => ',','decimals' => '.']);
     }

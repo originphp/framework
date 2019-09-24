@@ -50,11 +50,11 @@ class Model
     public $alias = null;
 
     /**
-     * This is the Database configuration to used by model.
+     * This is the Database connection to used by this model.
      *
      * @var string
      */
-    public $datasource = 'default';
+    public $connection = 'default';
 
     /**
      * This is the table name for the model this will be generated automatically
@@ -156,7 +156,7 @@ class Model
         $config += [
             'name' => $this->name,
             'alias' => $this->alias,
-            'datasource' => $this->datasource,
+            'connection' => $this->connection,
             'table' => $this->table,
         ];
 
@@ -181,7 +181,7 @@ class Model
             $this->primaryKey = 'id';
         }
 
-        $this->datasource = $datasource;
+        $this->connection = $connection;
 
         // Remove so we can autodetect when needed
         if (! $this->displayField) {
@@ -234,7 +234,7 @@ class Model
             $object = new Model([
                 'name' => $className,
                 'table' => $this->hasAndBelongsToMany[$alias]['joinTable'],
-                'datasource' => $this->datasource,
+                'connection' => $this->connection,
             ]);
 
             if (count($object->fields()) === 2) {
@@ -1453,7 +1453,7 @@ class Model
                         'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
-                        'datasource' => $this->datasource,
+                        'connection' => $this->connection,
                     ];
 
                     if (empty($config['fields'])) {
@@ -1543,7 +1543,7 @@ class Model
      */
     public function connection() : Datasource
     {
-        return ConnectionManager::get($this->datasource);
+        return ConnectionManager::get($this->connection);
     }
 
     /**

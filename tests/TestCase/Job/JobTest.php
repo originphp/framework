@@ -62,7 +62,7 @@ class JobTest extends OriginTestCase
 
     public function setUp() : void
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         ModelRegistry::set('Article', $model);
     }
 
@@ -98,7 +98,7 @@ class JobTest extends OriginTestCase
         $job = new PassOrFailJob();
         $connection = $job->connection();
         $this->assertInstanceOf(DatabaseEngine::class, $connection);
-        $this->assertEquals('test', $connection->config('datasource'));
+        $this->assertEquals('test', $connection->config('connection'));
     }
 
     public function testDispatch()
@@ -202,7 +202,7 @@ class JobTest extends OriginTestCase
 
     public function testSerialize()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         $data = ['key' => 'value'];
         $job = new PassOrFailJob();
         $job->set(['arguments' => [$model, $data]]);
@@ -223,7 +223,7 @@ class JobTest extends OriginTestCase
 
     public function testDeserialize()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         $data = ['key' => 'value'];
         $job = new PassOrFailJob();
         $job->set(['arguments' => [$model, $data]]);

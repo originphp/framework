@@ -42,10 +42,10 @@ class DbTestPrepareCommand extends Command
         $connection = ConnectionManager::create('tmp', $config);
   
         if (in_array($database, $connection->databases())) {
-            $this->runCommand('db:drop', ['--datasource=test']);
+            $this->runCommand('db:drop', ['--connection=test']);
         }
 
-        $this->runCommand('db:create', ['--datasource=test']);
-        $this->runCommand('db:schema:load', ['--datasource' => 'test','--type' => $this->options('type')]);
+        $this->runCommand('db:create', ['--connection=test']);
+        $this->runCommand('db:schema:load', ['--connection' => 'test','--type' => $this->options('type')]);
     }
 }

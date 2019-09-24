@@ -49,8 +49,7 @@ class PublishableConcern extends Concern
  */
 class Article extends Model
 {
-    public $datasource = 'test';
-
+    public $connection = 'test';
 
     /**
      * Before find callback must return a bool. Returning false will stop the find operation.
@@ -246,29 +245,29 @@ class ModelTest extends OriginTestCase
     {
         $this->Article = new Model([
             'name' => 'Article',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
         $this->Author = new Model([
             'name' => 'Author',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
         $this->Book = new Model([
             'name' => 'Book',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
         $this->Comment = new Model([
             'name' => 'Comment',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
 
         $this->Tag = new Model([
             'name' => 'Tag',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
 
         $this->Address = new Model([
             'name' => 'Address',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
     
         ModelRegistry::set('Article', $this->Article);
@@ -374,7 +373,7 @@ class ModelTest extends OriginTestCase
     {
         $Thread = new Model([
             'name' => 'Thread',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
 
         $this->assertTrue($Thread->increment('views', 1000));
@@ -394,19 +393,19 @@ class ModelTest extends OriginTestCase
         $this->assertEquals('Model', $Model->name);
         $this->assertEquals('Model', $Model->alias);
         $this->assertEquals('models', $Model->table);
-        $this->assertEquals('default', $Model->datasource);
+        $this->assertEquals('default', $Model->connection);
 
         $Post = new Model(['name' => 'Post']);
         $this->assertEquals('Post', $Post->name);
         $this->assertEquals('Post', $Post->alias);
         $this->assertEquals('posts', $Post->table);
-        $this->assertEquals('default', $Model->datasource);
+        $this->assertEquals('default', $Model->connection);
 
-        $Post = new Model(['name' => 'Post', 'alias' => 'BlogPost', 'datasource' => 'test']);
+        $Post = new Model(['name' => 'Post', 'alias' => 'BlogPost', 'connection' => 'test']);
         $this->assertEquals('Post', $Post->name);
         $this->assertEquals('BlogPost', $Post->alias);
         $this->assertEquals('posts', $Post->table);
-        $this->assertEquals('test', $Post->datasource);
+        $this->assertEquals('test', $Post->connection);
     }
 
     public function testFields()
@@ -500,7 +499,7 @@ class ModelTest extends OriginTestCase
         $ds = $this->Article->connection();
         $sql = $ds->adapter()->createTable('foos', ['not_id' => 'primaryKey','undetectable' => 'string']);
         $ds->execute($sql);
-        $dummy = new Model(['name' => 'Foo','datasource' => 'test']);
+        $dummy = new Model(['name' => 'Foo','connection' => 'test']);
   
         $this->expectException(Exception::class);
         $display = $dummy->displayField;
@@ -1292,7 +1291,7 @@ class ModelTest extends OriginTestCase
         $stub->loadBehavior('Timestamp');
         $stub->enableBehavior('Timestamp');
 
-        $Article = new Model(['name' => 'Article','datasource' => 'test']);
+        $Article = new Model(['name' => 'Article','connection' => 'test']);
         $article = $Article->find('first');
         $article->title = 'title has changed';
   
@@ -1448,7 +1447,7 @@ class ModelTest extends OriginTestCase
         $stub->expects($this->once())
             ->method('afterRollback');
   
-        $Article = new Model(['name' => 'Article','datasource' => 'test']);
+        $Article = new Model(['name' => 'Article','connection' => 'test']);
         $article = $Article->find('first');
         $article->title = 'title has changed';
       

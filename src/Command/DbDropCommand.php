@@ -26,16 +26,16 @@ class DbDropCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
+        $this->addOption('connection', [
             'description' => 'Use a different datasource',
-            'short' => 'ds',
+            'short' => 'c',
             'default' => 'default',
         ]);
     }
  
     public function execute()
     {
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $config = ConnectionManager::config($datasource);
         if (! $config) {
             $this->throwError("{$datasource} datasource not found");

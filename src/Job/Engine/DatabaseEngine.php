@@ -35,7 +35,7 @@ class DatabaseEngine extends BaseEngine
      */
     protected $defaultConfig = [
         'engine' => 'Database',
-        'datasource' => 'default',
+        'connection' => 'default',
     ];
 
     /**
@@ -188,7 +188,7 @@ class DatabaseEngine extends BaseEngine
                 'name' => 'Queue',
                 'alias' => 'queue',
                 'table' => 'queue',
-                'datasource' => $this->config('datasource'),
+                'connection' => $this->config('connection'),
             ]);
        
             $this->model->loadBehavior('Timestamp');

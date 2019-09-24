@@ -39,7 +39,7 @@ class PublishableConcern extends Concern
 }
 class Pet extends Model
 {
-    public $datasource = 'test';
+    public $connection = 'test';
 }
 
 class TesterComponent extends Component

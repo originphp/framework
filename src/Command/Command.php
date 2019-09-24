@@ -150,7 +150,7 @@ abstract class Command
      *
      * @param string $command
      * @param array $args  array of options e.g
-     *    $args = ['my_database','--datasource'=>'default','--help']
+     *    $args = ['my_database','--connection'=>'default','--help']
      * @return bool
      */
     public function runCommand(string $command, array $args = []) : bool

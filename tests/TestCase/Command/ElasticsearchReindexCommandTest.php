@@ -29,8 +29,8 @@ class ElasticsearchReindexCommandTest extends OriginTestCase
             $this->markTestSkipped('Elasticsearch not available');
         }
         
-        ModelRegistry::set('Article', new Article(['datasource' => 'test']));
-        ModelRegistry::set('User', new Model(['name' => 'User','datasource' => 'test']));
+        ModelRegistry::set('Article', new Article(['connection' => 'test']));
+        ModelRegistry::set('User', new Model(['name' => 'User','connection' => 'test']));
     }
 
     public function testMissingRequiredArgument()

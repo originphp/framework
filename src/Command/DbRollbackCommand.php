@@ -31,8 +31,8 @@ class DbRollbackCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
-            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        $this->addOption('connection', [
+            'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
     }
  
@@ -40,12 +40,12 @@ class DbRollbackCommand extends Command
     {
         $this->Migration = new Model([
             'name' => 'Migration',
-            'datasource' => $this->options('datasource'),
+            'connection' => $this->options('connection'),
         ]);
 
         $lastMigration = $this->lastMigration();
         if ($lastMigration) {
-            $this->runCommand('db:migrate', [$lastMigration - 1,'--datasource' => $this->options('datasource')]);
+            $this->runCommand('db:migrate', [$lastMigration - 1,'--connection' => $this->options('connection')]);
         } else {
             $this->io->warning('No migrations found');
         }

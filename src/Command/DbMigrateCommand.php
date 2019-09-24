@@ -34,8 +34,8 @@ class DbMigrateCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
-            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        $this->addOption('connection', [
+            'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
         $this->addArgument('version', [
             'description' => 'a target version e.g. 20190511111934','type' => 'string'
@@ -49,7 +49,7 @@ class DbMigrateCommand extends Command
         # Dynamically Create Migration Model for CRUD
         $this->Migration = new Model([
             'name' => 'Migration',
-            'datasource' => $this->options('datasource'),
+            'connection' => $this->options('connection'),
         ]);
         $this->Migration->loadBehavior('Timestamp');
 

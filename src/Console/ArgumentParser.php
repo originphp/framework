@@ -139,7 +139,7 @@ class ArgumentParser
      *  - default: null
      *  - required: default false
      *  - type: string, integer, boolean
-     *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
+     *  - banner: for displayHelp. default is uppercase value e.g --connection=DATASOURCE
      * @return void
      */
     public function addOption(string $name, array $options = []) : void
@@ -338,7 +338,7 @@ class ArgumentParser
     }
 
     /**
-     * Parses a long option e.g. --datasource=1234
+     * Parses a long option e.g. --connection=1234
      *
      * @param string|int $arg
      * @param array $options

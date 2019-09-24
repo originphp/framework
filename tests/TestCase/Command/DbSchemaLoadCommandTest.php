@@ -29,7 +29,7 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
     {
         $name = $this->getSchemaName();
 
-        $this->exec('db:schema:load --datasource=test --type=sql ' . $this->getSchemaName());
+        $this->exec('db:schema:load --connection=test --type=sql ' . $this->getSchemaName());
    
         $this->assertExitSuccess();
         $this->assertOutputContains('Executed 2 statements');
@@ -40,7 +40,7 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
         $ds = ConnectionManager::get('test');
         $ds->execute('CREATE TABLE authors (id INT)');
    
-        $this->exec('db:schema:load --datasource=test --type=sql '. $this->getSchemaName());
+        $this->exec('db:schema:load --connection=test --type=sql '. $this->getSchemaName());
     
         $this->assertExitError();
         $this->assertErrorContains('Executing query failed'); # Using normal output for this
@@ -48,14 +48,14 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteInvalidSchemaFile()
     {
-        $this->exec('db:schema:load --datasource=test --type=sql dummy');
+        $this->exec('db:schema:load --connection=test --type=sql dummy');
         $this->assertExitError();
         $this->assertErrorContains('File ' . ROOT . '/tests/TestApp/database/dummy.sql not found'); # Using normal output for this
     }
 
     public function testExecuteInvalidDatasource()
     {
-        $this->exec('db:schema:load --datasource=foo --type=sql');
+        $this->exec('db:schema:load --connection=foo --type=sql');
         $this->assertExitError();
         $this->assertErrorContains('foo datasource not found'); # Using normal output for this
     }
@@ -67,14 +67,14 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecutePluginSchemaFile()
     {
-        $this->exec('db:schema:load --datasource=test --type=sql MyPlugin.pschema');
+        $this->exec('db:schema:load --connection=test --type=sql MyPlugin.pschema');
         $this->assertExitError();
         $this->assertErrorContains('/plugins/my_plugin/database/pschema.sql');
     }
 
     public function testExecuteLoadPHPSchema()
     {
-        $this->exec('db:schema:load --datasource=test --type=php migrations');
+        $this->exec('db:schema:load --connection=test --type=php migrations');
         $this->assertExitSuccess();
 
         $this->assertRegExp('/Executed (1|2) statements/', $this->output());
@@ -83,7 +83,7 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadUnkownType()
     {
-        $this->exec('db:schema:load --datasource=test --type=ruby');
+        $this->exec('db:schema:load --connection=test --type=ruby');
         $this->assertExitError();
         $this->assertErrorContains('The type `ruby` is invalid');
     }

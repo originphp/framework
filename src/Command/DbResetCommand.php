@@ -25,8 +25,8 @@ class DbResetCommand extends Command
 
     public function initialize()
     {
-        $this->addOption('datasource', [
-            'description' => 'Use a different datasource','short' => 'ds','default' => 'default',
+        $this->addOption('connection', [
+            'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
         $this->addArgument('name', [
             'description' => 'schema_name or Plugin.schema_name',
@@ -40,15 +40,15 @@ class DbResetCommand extends Command
  
     public function execute()
     {
-        $datasource = $this->options('datasource');
+        $datasource = $this->options('connection');
         $name = $this->arguments('name') ?? 'schema';
 
         $this->runCommand('db:drop', [
-            '--datasource' => $datasource,
+            '--connection' => $datasource,
         ]);
        
         $this->runCommand('db:setup', [
-            '--datasource' => $datasource,
+            '--connection' => $datasource,
             '--type' => $this->options('type'),
             $name,
         ]);
