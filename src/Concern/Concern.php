@@ -20,15 +20,19 @@ use ReflectionException;
 use Origin\Exception\Exception;
 
 /**
- * A concern is for sharing code between a Model or Controller without the overhead
- * from calling every single callback (Behavior). Similar to trait, but with a constrctor
- * and more flexible in the internal method names.
+ * A concern is used for *sharing code* between a Model or Controller. Similar to trait, but with a constrctor
+ * and more flexible in the internal method names. (A library)
  *
- * A behavior is more a plugin for extending models (soft delete, tagging, emailing), a concern is
- * to share code between models more like a library
+ * A behavior is more a plugin for changing the behavior of the model (e.g. soft delete, tagging, emailing), a behavior can be
+ * enabled disabled.
  *
- *  Do not use Concern to reduce fat models, use Repos instead.
+ * They are very similar, the core differences are
  *
+ * 1. The purpose (behavior: changes behavior concern:shares code between)
+ * 2. Behaviors can be enabled/disabled
+ * 3. Concerns are bidirectional
+ *
+ * Do not use Concern to reduce fat models, use Repos instead.
  */
 class Concern
 {
