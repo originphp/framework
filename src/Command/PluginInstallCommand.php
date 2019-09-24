@@ -97,25 +97,13 @@ class PluginInstallCommand extends Command
     protected function appendApplication(string $plugin) : void
     {
         $file = CONFIG . DS . 'bootstrap.php';
-        if (file_exists($file)) {
-            $contents = file_get_contents($file);
-            if (strpos($contents, 'Plugin::initialize()') !== false) {
-                $contents = str_replace(
-                    'Plugin::initialize();',
-                    "Plugin::load('{$plugin}');\nPlugin::initialize();",
-                    $contents
-                    );
-                file_put_contents($file, $contents);
-
-                return ;
-            }
-        }
-        /**
-        * @deprecated this is for backwards comptability older versions
-        */
-        // @codeCoverageIgnoreStart
-        file_put_contents(CONFIG . DS . 'application.php', "\nPlugin::load('{$plugin}');\n", FILE_APPEND);
-        // @codeCoverageIgnoreEnd
+        $contents = file_get_contents($file);
+        $contents = str_replace(
+            'Plugin::initialize();',
+            "Plugin::load('{$plugin}');\nPlugin::initialize();",
+            $contents
+            );
+        file_put_contents($file, $contents);
     }
  
     public function execute()
