@@ -18,8 +18,6 @@ use Origin\TestSuite\Fixture;
 
 class ArticlesTagFixture extends Fixture
 {
-    public $datasource = 'test';
-
     public $schema = [
         'columns' => [
             'article_id' => ['type' => 'integer'],

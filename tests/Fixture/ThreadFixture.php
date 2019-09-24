@@ -18,8 +18,6 @@ use Origin\TestSuite\Fixture;
 
 class ThreadFixture extends Fixture
 {
-    public $datasource = 'test';
-
     public $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],

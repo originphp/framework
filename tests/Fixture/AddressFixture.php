@@ -18,8 +18,6 @@ use Origin\TestSuite\Fixture;
 
 class AddressFixture extends Fixture
 {
-    public $datasource = 'test';
-
     public $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],

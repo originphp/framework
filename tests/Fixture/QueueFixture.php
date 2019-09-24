@@ -18,8 +18,6 @@ use Origin\TestSuite\Fixture;
 
 class QueueFixture extends Fixture
 {
-    public $datasource = 'test';
-
     public $table = 'queue';
 
     public $schema = [
