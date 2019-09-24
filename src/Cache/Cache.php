@@ -45,13 +45,6 @@ class Cache
     protected static $disabled = false;
 
     /**
-      * The default cache storage to use
-      *
-      * @var string
-      */
-    protected static $default = 'default';
-
-    /**
      * Undocumented variable
      *
      * @var \Origin\Cache\Engine\NullEngine
@@ -121,7 +114,7 @@ class Cache
      */
     public static function read(string $key, array $options = [])
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->read($key);
@@ -137,7 +130,7 @@ class Cache
      */
     public static function write(string $key, $value, array $options = []):bool
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->write($key, $value);
@@ -153,7 +146,7 @@ class Cache
     */
     public static function exists(string $key, array $options = []):bool
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->exists($key);
@@ -169,7 +162,7 @@ class Cache
      */
     public static function delete(string $key, array $options = []) :bool
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->delete($key);
@@ -186,7 +179,7 @@ class Cache
      */
     public static function increment(string $key, int $offset = 1, array $options = []): int
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->increment($key, $offset);
@@ -203,7 +196,7 @@ class Cache
      */
     public static function decrement(string $key, int $offset = 1, array $options = []): int
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->decrement($key, $offset);
@@ -217,7 +210,7 @@ class Cache
      */
     public static function clear(array $options = []) :bool
     {
-        $options += ['config' => self::$default]; // be comptabile with use whilst its deprecated
+        $options += ['config' => 'default'];
         $cache = static::engine($options['config']);
 
         return $cache->clear();
