@@ -20,6 +20,7 @@ use Origin\Utility\Date;
 use Origin\Utility\Number;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Behavior\DelocalizeBehavior;
+use ArrayObject;
 
 class DelocalizeBehaviorTest extends OriginTestCase
 {
@@ -42,7 +43,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
             'created' => '11/06/2019 10:27',
             'confirmed' => '10:27',
         ]);
-        $behavior->beforeValidate($deal);
+        $behavior->beforeValidate($deal, new ArrayObject());
 
         $this->assertEquals(1234567.89, $deal->amount);
         $this->assertEquals('2019-06-11', $deal->close_date);
@@ -70,7 +71,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
             'created' => '11/21/2019 10:27:00000',
             'confirmed' => '10:27pm',
         ]);
-        $behavior->beforeValidate($deal);
+        $behavior->beforeValidate($deal, new ArrayObject);
         $this->assertEquals('50-06/2019', $deal->close_date);
         $this->assertEquals('11/21/2019 10:27:00000', $deal->created);
         $this->assertEquals('10:27pm', $deal->confirmed);

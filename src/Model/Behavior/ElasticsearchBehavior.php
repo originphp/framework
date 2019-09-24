@@ -5,12 +5,8 @@ namespace Origin\Model\Behavior;
 use Origin\Model\Entity;
 use Origin\Exception\Exception;
 use Origin\Utility\Elasticsearch;
+use ArrayObject;
 
-/**
- * @todo
- *  1. delete all
- *  2. update all
- */
 class ElasticsearchBehavior extends Behavior
 {
     protected $defaultConfig = [
@@ -163,11 +159,10 @@ class ElasticsearchBehavior extends Behavior
      * After save callback
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $created if this is a new record
-     * @param array $options these were the options passed to save
+     * @param ArrayObject $options
      * @return void
      */
-    public function afterSave(Entity $entity, bool $created, array $options = [])
+    public function afterSave(Entity $entity, ArrayObject $options) : void
     {
         $this->indexRecord($entity);
     }
@@ -176,10 +171,10 @@ class ElasticsearchBehavior extends Behavior
      * After delete
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $sucess wether or not it deleted the record
-     * @return bool
+      * @param ArrayObject $options
+     * @return void
      */
-    public function afterDelete(Entity $entity, bool $success)
+    public function afterDelete(Entity $entity, ArrayObject $options) : void
     {
         if (! $this->connection()->deindex($this->indexName, $entity->id)) {
             throw new Exception(sprintf('Elasticsearch: Error deleting from index for model `%s`', $this->model()->name));

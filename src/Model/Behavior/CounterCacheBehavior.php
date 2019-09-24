@@ -18,6 +18,7 @@ namespace Origin\Model\Behavior;
 
 use Origin\Model\Entity;
 use Origin\Utility\Inflector;
+use ArrayObject;
 
 /**
  * In Book belongsTo Author set counterCache = true or fieldName
@@ -63,11 +64,10 @@ class CounterCacheBehavior extends Behavior
      * After save callback
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $created if this is a new record
-     * @param array $options these were the options passed to save
+     * @param ArrayObject $options
      * @return void
      */
-    public function afterSave(Entity $entity, bool $created, array $options = [])
+    public function afterSave(Entity $entity, ArrayObject $options) : void
     {
         $items = $this->getFields();
         
@@ -84,10 +84,10 @@ class CounterCacheBehavior extends Behavior
      * After delete
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $sucess wether or not it deleted the record
-     * @return bool
+     * @param ArrayObject $options
+     * @return void
      */
-    public function afterDelete(Entity $entity, bool $success)
+    public function afterDelete(Entity $entity, ArrayObject $options) : void
     {
         $items = $this->getFields();
         foreach ($items as $alias => $config) {

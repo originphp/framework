@@ -29,6 +29,7 @@ use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
+use ArrayObject;
 
 class Model
 {
@@ -366,6 +367,13 @@ class Model
         return $this->$behavior = $this->behaviorRegistry->load($name, $config);
     }
 
+    /**
+     * Loads a Concern for a model
+     *
+     * @param string $name
+     * @param array $config
+     * @return \Origin\Model\Concern\Concern
+     */
     public function loadConcern(string $name, array $config = []) //no return type cause of mocking
     {
         list($plugin, $concern) = pluginSplit($name);
@@ -617,14 +625,12 @@ class Model
     /**
      * This does the save
      *
-     * @param Entity $entity
-     * @param array $options
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
      * @return bool
      */
-    protected function processSave(Entity $entity, array $options = []) : bool
+    protected function processSave(Entity $entity, ArrayObject $options) : bool
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
-
         $this->id = null;
         if ($entity->has($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
@@ -633,13 +639,13 @@ class Model
         $exists = $this->exists($this->id);
 
         if ($options['validate'] === true) {
-            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', [$entity])) {
+            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', [$entity, $options])) {
                 return false;
             }
             $validated = $this->validates($entity, ! $exists);
 
             if ($options['callbacks'] === true) {
-                $this->triggerCallback('afterValidate', [$entity, $validated]);
+                $this->triggerCallback('afterValidate', [$entity, $options]);
             }
 
             if (! $validated) {
@@ -654,11 +660,11 @@ class Model
             return false;
         }
 
-        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity])) {
+        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity, $options])) {
             return false;
         }
 
-        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity])) {
+        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity, $options])) {
             return false;
         }
 
@@ -712,8 +718,8 @@ class Model
             if ($exists) {
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
 
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterUpdate', [$entity]);
+                if ($result and $afterCallbacks) {
+                    $this->triggerCallback('afterUpdate', [$entity, $options], false);
                 }
             } else {
                 $result = $connection->insert($this->table, $data);
@@ -730,16 +736,14 @@ class Model
                 }
                 $this->id = $entity->{$this->primaryKey};
 
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterCreate', [$entity]);
+                if ($result and $afterCallbacks) {
+                    $this->triggerCallback('afterCreate', [$entity, $options], false);
                 }
             }
         }
       
-        if ($result) {
-            if ($afterCallbacks) {
-                $this->triggerCallback('afterSave', [$entity, ! $exists, $options]);
-            }
+        if ($result and $afterCallbacks) {
+            $this->triggerCallback('afterSave', [$entity, $options], false);
         }
 
         /**
@@ -949,12 +953,14 @@ class Model
      */
     public function save(Entity $data, array $options = []) : bool
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true];
+        $options = new ArrayObject($options + [
+            'validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true
+        ]);
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
-        $associatedOptions = ['transaction' => false] + $options;
-
+        $associatedOptions = ['transaction' => false] + (array) $options;
+       
         if ($options['transaction']) {
             $this->begin();
         }
@@ -993,7 +999,7 @@ class Model
                 if ($options['transaction']) {
                     $this->rollback();
                     if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                        $this->triggerCallback('afterRollback', [$data]);
+                        $this->triggerCallback('afterRollback', [$data, $options], false);
                     }
                 }
                 throw $e;
@@ -1045,7 +1051,7 @@ class Model
             if ($options['transaction']) {
                 $this->commit();
                 if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                    $this->triggerCallback('afterCommit', [$data]);
+                    $this->triggerCallback('afterCommit', [$data, $options], false);
                 }
             }
 
@@ -1054,7 +1060,7 @@ class Model
         if ($options['transaction']) {
             $this->rollback();
             if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                $this->triggerCallback('afterRollback', [$data]);
+                $this->triggerCallback('afterRollback', [$data, $options], false);
             }
         }
 
@@ -1161,9 +1167,9 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $resultSet
      */
-    public function find(string $type = 'first', $options = [])
+    public function find(string $type = 'first', array $options = [])
     {
-        $options += [
+        $options = new ArrayObject($options + [
             'conditions' => null,
             'fields' => [],
             'joins' => [],
@@ -1174,24 +1180,21 @@ class Model
             'offset' => null,
             'callbacks' => true,
             'associated' => [],
-        ];
+        ]);
 
         if ($options['callbacks'] === true) {
-            $result = $this->triggerCallback('beforeFind', [$options], true);
+            $result = $this->triggerCallback('beforeFind', [$options]);
             if ($result === false) {
                 return null;
-            }
-            if (is_array($result)) {
-                $options = $result;
             }
         }
 
         $options = $this->prepareQuery($type, $options); // AutoJoin
 
-        $results = $this->{'finder' . ucfirst($type)}($options);
+        $results = $this->{'finder' . ucfirst($type)}((array) $options);
 
-        if ($options['callbacks'] === true) {
-            $results = $this->triggerCallback('afterFind', [$results], true);
+        if ($options['callbacks'] === true and ($results instanceof Collection or $results instanceof Entity)) {
+            $this->triggerCallback('afterFind', [$results, $options], false);
         }
 
         unset($options);
@@ -1211,7 +1214,9 @@ class Model
      */
     public function delete(Entity $entity, array $options = []) : bool
     {
-        $options += ['cascade' => true,'callbacks' => true,'transaction' => true];
+        $options = new ArrayObject($options + [
+           'cascade' => true,'callbacks' => true,'transaction' => true
+        ]);
 
         $this->id = $entity->get($this->primaryKey);
 
@@ -1220,7 +1225,7 @@ class Model
         }
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
-            if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
+            if (! $this->triggerCallback('beforeDelete', [$entity, $options])) {
                 return false;
             }
         }
@@ -1245,26 +1250,26 @@ class Model
             if ($options['transaction']) {
                 $this->rollback();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity]);
+                    $this->triggerCallback('afterRollback', [$entity, $options], false);
                 }
             }
             throw $e;
         }
         
-        if ($afterCallbacks) {
-            $this->triggerCallback('afterDelete', [$entity, $result]);
+        if ($result and $afterCallbacks) {
+            $this->triggerCallback('afterDelete', [$entity, $options], false);
         }
 
         if ($options['transaction']) {
             if ($result) {
                 $this->commit();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterCommit', [$entity]);
+                    $this->triggerCallback('afterCommit', [$entity, $options], false);
                 }
             } else {
                 $this->rollback();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity]);
+                    $this->triggerCallback('afterRollback', [$entity, $options], false);
                 }
             }
         }
@@ -1425,10 +1430,10 @@ class Model
     /**
      * Add default keys, auto join models etc.
      *
-     * @param array $query
-     * @return array $query
+     * @param ArrayObject $query
+     * @return ArrayObject $query
      */
-    protected function prepareQuery(string $type, array $query) : array
+    protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
     {
         if ($type === 'first' or $type === 'all') {
             if (empty($query['fields'])) {
@@ -1468,10 +1473,10 @@ class Model
      * Standardizes the config for eager loading of related
      * data
      *
-     * @param array $query
+     * @param ArrayObject $query
      * @return array
      */
-    protected function associatedConfig(array $query) : array
+    protected function associatedConfig(ArrayObject $query) : array
     {
         $out = [];
         foreach ((array) $query['associated'] as $alias => $config) {
@@ -1542,176 +1547,6 @@ class Model
     }
 
     /**
-     * Callback that is triggered just before the request data is marshalled. This will
-     * be triggered when passing data through model::new, model::patch or model::newEntities
-     *
-     * @param array $requestData
-     * @return array
-     */
-    public function beforeMarshal(array $requestData = [])
-    {
-        return $requestData;
-    }
-
-    /**
-     * Before find callback. Must return either the query or true to continue
-     * @return array|bool query or bool
-     */
-    public function beforeFind(array $query = [])
-    {
-        return $query;
-    }
-
-    /**
-     * After find callback, this should return the results
-     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $results
-     */
-    public function afterFind($results)
-    {
-        return $results;
-    }
-
-    /**
-     * Before Validation takes places, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool
-     */
-    public function beforeValidate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-     * Before Validation takes places, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param bool $success validation result
-     * @return bool
-     */
-    public function afterValidate(Entity $entity, bool $success)
-    {
-    }
-
-    /**
-     * Before save callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param array $options
-     * @return bool must return true to continue
-     */
-    public function beforeSave(Entity $entity, array $options = [])
-    {
-        return true;
-    }
-
-    /**
-     * Before create callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
-     */
-    public function beforeCreate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-     * Before update callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
-     */
-    public function beforeUpdate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-    * After create callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterCreate(Entity $entity)
-    {
-    }
-
-    /**
-    * After update callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterUpdate(Entity $entity)
-    {
-    }
-
-    /**
-     * After save callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $created if this is a new record
-     * @param array $options these were the options passed to save
-     * @return void
-     */
-    public function afterSave(Entity $entity, bool $created, array $options = [])
-    {
-    }
-
-    /**
-     * Before delete, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $cascade
-     * @return bool
-     */
-    public function beforeDelete(Entity $entity, bool $cascade = true)
-    {
-        return true;
-    }
-    /**
-     * After delete
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $sucess wether or not it deleted the record
-     * @return bool
-     */
-    public function afterDelete(Entity $entity, bool $success)
-    {
-    }
-
-    /**
-    * After commit callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterCommit(Entity $entity)
-    {
-    }
-
-    /**
-     * This is callback is called when an exception is caught
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onError(\Exception $exception)
-    {
-    }
-
-    /**
-    * After rollback callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterRollback(Entity $entity)
-    {
-    }
-
-    /**
      * Checks values in an entity are unique, this could be that a username is not already
      * taken or an email is not used twice
      * @param \Origin\Model\Entity $entity
@@ -1777,8 +1612,6 @@ class Model
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
-
         return $this->marshaller()->one($requestData, $options);
     }
 
@@ -1793,8 +1626,7 @@ class Model
     {
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
-
+    
         return $this->marshaller()->many($requestData, $options);
     }
 
@@ -1810,7 +1642,6 @@ class Model
     {
         $options += ['associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
 
         return $this->marshaller()->patch($entity, $requestData, $options);
     }
@@ -1829,47 +1660,30 @@ class Model
      * triggerCallback.
      *
      * @param string $callback
-     * @param array  $arguments
-     * @param bool   $passedArgs if result is array overwrite
-     * @return mixed
+     * @param array $arguments
+     * @param boolean $isStoppable
+     * @return void
      */
-    protected function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
+    protected function triggerCallback(string $callback, array $arguments = [], bool $isStoppable = true)
     {
-        $callbacks = [
-            [$this, $callback],
-        ];
+        $callbacks = [];
 
+        if (method_exists($this, $callback)) {
+            $callbacks[] = [$this,$callback];
+        }
+  
         foreach ($this->behaviorRegistry->enabled() as $behavior) {
-            $callbacks[] = [$this->{$behavior}, $callback];
+            if (method_exists($this->$behavior, $callback)) {
+                $callbacks[] = [$this->$behavior, $callback];
+            }
         }
 
         foreach ($callbacks as $callable) {
-            $result = call_user_func_array($callable, $arguments);
-
-            if ($result === false) {
+            if (call_user_func_array($callable, $arguments) === false and $isStoppable) {
                 return false;
             }
-            // overwrite first argument with last result if its array
-            if ($passedArgs and is_array($result)) {
-                $arguments[0] = $result;
-            }
-            /**
-             * @internal - this was fixed in the entity structure, need to test.
-             * Bug Fix. When reloading an entity with new belongsTo in afterFind
-             * and trying to replace result is overwritten by original after timestamp
-             * behavior is called. This only happened when overwriting the entire Entity
-             * not when adjusting eg. $entity->property = 'foo'
-             */
-            if ($result instanceof Entity) {
-                $arguments[0] = $result;
-            }
         }
-        // Free Mem
         unset($callbacks, $result);
-
-        if ($passedArgs) {
-            return $arguments[0]; // was if not exist return result
-        }
 
         return true;
     }

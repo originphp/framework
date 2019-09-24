@@ -2,6 +2,7 @@
 namespace %namespace%\Model;
 
 use Origin\Model\Entity;
+use ArrayObject;
 
 class %class% extends ApplicationModel
 {
@@ -12,44 +13,49 @@ class %class% extends ApplicationModel
     {
         parent::initialize($config);
     }
-    
-    /**
-     * Before find callback. Must return either the query or true to continue
-     * @return array|bool query or bool
-     */
-    public function beforeFind(array $query = [])
-    {
-        return $query;
-    }
 
     /**
-     * After find callback, this should return the results
-     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $results
-     */
-    public function afterFind($results)
-    {
-        return $results;
-    }
-
-    /**
-     * Before Validation takes places, must return true to continue
+     * Before find callback must return a bool. Returning false will stop the find operation.
      *
-     * @param \Origin\Model\Entity $entity
-     * @return bool
+     * @param ArrayObject $options
+     * @return boolean
      */
-    public function beforeValidate(Entity $entity)
+    public function beforeFind(ArrayObject $options) : bool
     {
         return true;
     }
 
     /**
+     * After find callback
+     *
+     * @param mixed $results
+     * @param ArrayObject $options
+     * @return void
+     */
+    public function afterFind($results, ArrayObject $options) : void
+    {
+    }
+
+    /**
      * Before Validation takes places, must return true to continue
      *
      * @param \Origin\Model\Entity $entity
-     * @param bool $success validation result
-     * @return bool
+     * @param ArrayObject $options
+     * @return boolean
      */
-    public function afterValidate(Entity $entity, bool $success)
+    public function beforeValidate(Entity $entity, ArrayObject $options) : bool
+    {
+        return true;
+    }
+
+    /**
+     * After Validation callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
+    public function afterValidate(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -57,10 +63,10 @@ class %class% extends ApplicationModel
      * Before save callback
      *
      * @param \Origin\Model\Entity $entity
-     * @param array $options
-     * @return bool must return true to continue
+     * @param ArrayObject $options
+     * @return boolean
      */
-    public function beforeSave(Entity $entity, array $options = [])
+    public function beforeSave(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -69,9 +75,10 @@ class %class% extends ApplicationModel
      * Before create callback
      *
      * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
+     * @param ArrayObject $options
+     * @return boolean
      */
-    public function beforeCreate(Entity $entity)
+    public function beforeCreate(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -80,30 +87,33 @@ class %class% extends ApplicationModel
      * Before update callback
      *
      * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
+     * @param ArrayObject $options
+     * @return boolean
      */
-    public function beforeUpdate(Entity $entity)
+    public function beforeUpdate(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
 
     /**
     * After create callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterCreate(Entity $entity)
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
+    public function afterCreate(Entity $entity, ArrayObject $options) : void
     {
     }
 
     /**
     * After update callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterUpdate(Entity $entity)
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
+    public function afterUpdate(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -111,11 +121,10 @@ class %class% extends ApplicationModel
      * After save callback
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $created if this is a new record
-     * @param array $options these were the options passed to save
+     * @param ArrayObject $options
      * @return void
      */
-    public function afterSave(Entity $entity, bool $created, array $options = [])
+    public function afterSave(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -123,21 +132,22 @@ class %class% extends ApplicationModel
      * Before delete, must return true to continue
      *
      * @param \Origin\Model\Entity $entity
-     * @param boolean $cascade
+     * @param ArrayObject $options
      * @return bool
      */
-    public function beforeDelete(Entity $entity, bool $cascade = true)
+    public function beforeDelete(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
+
     /**
-     * After delete
+     * After delete callback
      *
      * @param \Origin\Model\Entity $entity
      * @param boolean $sucess wether or not it deleted the record
-     * @return bool
+     * @return void
      */
-    public function afterDelete(Entity $entity, bool $success)
+    public function afterDelete(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -145,9 +155,20 @@ class %class% extends ApplicationModel
     * After commit callback
     *
     * @param \Origin\Model\Entity $entity
-    * @return void
+    * @param ArrayObject $options
+    * @return bool
     */
-    public function afterCommit(Entity $entity)
+    public function afterCommit(Entity $entity, ArrayObject $options) : void
+    {
+    }
+
+    /**
+     * This is callback is called when an exception is caught
+     *
+     * @param \Exception $exception
+     * @return void
+     */
+    public function onError(\Exception $exception) : void
     {
     }
 
@@ -155,9 +176,11 @@ class %class% extends ApplicationModel
     * After rollback callback
     *
     * @param \Origin\Model\Entity $entity
+    * @param ArrayObject $options
     * @return void
     */
-    public function afterRollback(Entity $entity)
+    public function afterRollback(Entity $entity, ArrayObject $options) : void
     {
     }
+
 }

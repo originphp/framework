@@ -17,6 +17,7 @@ namespace Origin\Test\Model;
 use Origin\Model\Model;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Behavior\TimestampBehavior;
+use ArrayObject;
 
 class TimestampBehaviorTest extends OriginTestCase
 {
@@ -29,7 +30,7 @@ class TimestampBehaviorTest extends OriginTestCase
         $data = ['title' => 'Foo Bar'];
         $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
-        $behavior->beforeSave($entity);
+        $behavior->beforeSave($entity, new ArrayObject);
         $this->assertEquals($timestamp, $entity->created);
         $this->assertEquals($timestamp, $entity->modified);
     }
@@ -41,14 +42,14 @@ class TimestampBehaviorTest extends OriginTestCase
         $entity = $Article->new($data);
     
         $timestamp = date('Y-m-d H:i:s');
-        $behavior->beforeSave($entity);
+        $behavior->beforeSave($entity, new ArrayObject);
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
         $this->assertEquals($timestamp, $entity->modified);
 
         $data = ['title' => 'Foo Bar'];
         $entity = $Article->new($data);
         $timestamp = date('Y-m-d H:i:s');
-        $behavior->beforeSave($entity);
+        $behavior->beforeSave($entity, new ArrayObject);
         $this->assertEquals($timestamp, $entity->modified);
     }
 }

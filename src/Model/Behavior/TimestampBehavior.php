@@ -16,6 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Model\Behavior;
 
 use Origin\Model\Entity;
+use ArrayObject;
 
 /**
  * TimestampBehavior
@@ -30,7 +31,14 @@ class TimestampBehavior extends Behavior
         'modified' => 'modified',
     ];
 
-    public function beforeSave(Entity $entity, array $options = [])
+    /**
+     * Before save callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return bool must return true to continue
+     */
+    public function beforeSave(Entity $entity, ArrayObject $options) : bool
     {
         $model = $this->model();
         $timestamp = date('Y-m-d H:i:s');

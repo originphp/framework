@@ -23,6 +23,7 @@ namespace Origin\Model\Behavior;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
+use ArrayObject;
 
 class DelocalizeBehavior extends Behavior
 {
@@ -32,10 +33,10 @@ class DelocalizeBehavior extends Behavior
      * Before Validate, we de localize user intput
      *
      * @param \Origin\Model\Entity $entity
-     * @param array $options
+     * @param ArrayObject $options
      * @return bool must return true to continue
      */
-    public function beforeValidate(Entity $entity)
+    public function beforeValidate(Entity $entity, ArrayObject $options) : bool
     {
         $this->delocalize($entity);
 
