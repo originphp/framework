@@ -211,13 +211,6 @@ class Email
                 $this->addCc($email, $name);
             }
         }
-        /**
-         * Backwards compatability
-         * @deprecated This will be deprecated
-         */
-        if (isset($this->account['debug']) and $this->account['debug'] === 'true') {
-            $this->account['engine'] = 'Test';
-        }
     }
 
     /**
