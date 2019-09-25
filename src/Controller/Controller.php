@@ -443,17 +443,13 @@ class Controller
     public function render($options = [])
     {
         $template = $this->request->params('action');
-        if (empty($options)) {
-            $options = $template;
-        }
+        $options = empty($options) ? $template : $options;
+    
         if (is_string($options)) {
             $options = ['template' => $options];
         }
       
-        $options += [
-            'status' => $this->response->statusCode(),
-            'type' => 'html',
-        ];
+        $options += ['status' => $this->response->statusCode(), 'type' => 'html'];
 
         $body = null;
 
@@ -491,7 +487,7 @@ class Controller
             $view = new ApplicationView($this);
             $body = $view->render(
                 $template,
-                $options['type'] === 'html'?$this->layout:false
+                $options['type'] === 'html' ? $this->layout : false
             );
             unset($view);
         }
@@ -548,12 +544,9 @@ class Controller
     {
         $this->autoRender = false; // Only render once
         $this->beforeRender();
-        
-        $view = new JsonView($this);
-        
         $this->response->type('json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
-        $this->response->body($view->render($data, $status)); //
+        $this->response->body((new JsonView($this))->render($data)); //
     }
 
     /**
@@ -579,12 +572,9 @@ class Controller
     {
         $this->autoRender = false; // Disable for dispatcher
         $this->beforeRender();
-        
-        $view = new XmlView($this);
-        
         $this->response->type('xml');
         $this->response->statusCode($status); // 200
-        $this->response->body($view->render($data, $status)); //
+        $this->response->body((new XmlView($this))->render($data));
     }
 
     /**
@@ -620,7 +610,7 @@ class Controller
      *
      * @return \Origin\Controller\Component\ComponentRegistry
      */
-    public function componentRegistry()
+    public function componentRegistry() : ComponentRegistry
     {
         return $this->componentRegistry;
     }
