@@ -348,7 +348,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('<h1>Posts Home Page</h1>', $controller->response->body());
     }
 
-    public function testRenderSerializeArrays()
+    public function testRenderSerializeArraysJson()
     {
         // test single
         $request = new Request('posts/index.json');
@@ -358,6 +358,25 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render();
         $this->assertEquals('{"name":"jim"}', $controller->response->body());
      
+        // Test multi
+        $controller = new \App\Controller\PostsController(new Request('posts/index.json'), new Response());
+        $controller->set(['user' => ['name' => 'jim'],'profile' => ['name' => 'admin']]);
+        $controller->serialize(['user','profile']);
+        $controller->render();
+  
+        $this->assertEquals('{"user":{"name":"jim"},"profile":{"name":"admin"}}', $controller->response->body());
+    }
+
+    public function testRenderSerializeArraysXml()
+    {
+        // test single
+        $request = new Request('posts/index.xml');
+        $controller = new \App\Controller\PostsController($request, new Response());
+        $controller->set(['user' => ['name' => 'jim']]);
+        $controller->serialize('user');
+        $controller->render();
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><user><name>jim</name></user></response>\n", $controller->response->body());
+
         // Test multi
         $controller = new \App\Controller\PostsController(new Request('posts/index.xml'), new Response());
         $controller->set(['user' => ['name' => 'jim'],'profile' => ['name' => 'admin']]);
@@ -431,7 +450,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->serialize('book');
         $request->type('xml');
         $controller->render();
-        $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><name>How to use PHPUnit</name></response>\n";
+        $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><book><name>How to use PHPUnit</name></book></response>\n";
         $this->assertEquals($expected, $controller->response->body());
     }
 

@@ -57,18 +57,17 @@ class JsonView
     /**
      * Does the rendering
      *
-     * @param [type] $data
+     * @param mixed $data
      * @param integer $status
-     * @return void
+     * @return string
      */
-    public function render($data = null, $status = 200)
+    public function render($data = null) : string
     {
         /**
          * If user requests JSON and serialize is set then use that
          */
         if ($data === null and $this->request->type() === 'json' and ! empty($this->serialize)) {
-            $serializer = new Serializer();
-            $data = $serializer->serialize($this->serialize, $this->viewVars);
+            $data = $this->serialize($this->serialize);
         }
 
         if (is_object($data) and method_exists($data, 'toJson')) {
@@ -76,5 +75,47 @@ class JsonView
         }
 
         return json_encode($data);
+    }
+
+
+    /**
+     * Serializes the data
+     *
+     * @param string|array $serialize
+     * @return array
+     */
+    private function serialize($serialize) : array
+    {
+        $result = [];
+   
+        if (is_string($serialize)) {
+            if (isset($this->viewVars[$serialize])) {
+                $result = $this->toArray($this->viewVars[$serialize]);
+            }
+
+            return $result;
+        }
+
+        foreach ($serialize as $key) {
+            if (isset($this->viewVars[$key])) {
+                $result[$key] = $this->toArray($this->viewVars[$key]);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Converts an object to an array
+     *
+     * @param mixed $mixed
+     * @return mixed
+     */
+    private function toArray($mixed)
+    {
+        if (is_object($mixed) and method_exists($mixed, 'toArray')) {
+            $mixed = $mixed->toArray();
+        }
+        return $mixed;
     }
 }
