@@ -40,6 +40,8 @@ class DbSchemaDumpCommandTest extends OriginTestCase
             $this->assertContains('CREATE TABLE "posts" (', $contents);
             $this->assertContains('"title" VARCHAR(255) NOT NULL,', $contents);
         }
+
+        $this->deleteFile($filename);
     }
 
     public function testDumpSqlException()
@@ -69,6 +71,8 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->assertEquals('integer', $schema->posts['columns']['id']['type']);
         $this->assertNotEmpty($schema->posts['constraints']);
         $this->assertNotEmpty($schema->posts['constraints']['primary']);
+
+        $this->deleteFile($filename);
     }
 
     public function testDumpPHPException()

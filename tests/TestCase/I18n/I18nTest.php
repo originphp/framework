@@ -47,6 +47,7 @@ EOF;
         file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml', $locale);
         I18n::initialize(['locale' => 'en_001']);
         $this->assertEquals('$10,000', Number::currency(10000));
+        unlink(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml');
     }
 
     public function testLocaleGeneric()
@@ -65,6 +66,7 @@ EOF;
         file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.yml', $locale);
         I18n::initialize(['locale' => 'en_NOT_EXIST']);
         $this->assertEquals('$10,000', Number::currency(10000));
+        unlink(CONFIG . DS . 'locales' . DS . 'en' .'.yml');
     }
 
     public function testDetectLocale()

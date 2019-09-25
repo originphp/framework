@@ -160,6 +160,9 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileExists($filename);
         $this->assertFileHash('14918d217be2dd649c01a5528cd69622', $filename);
         unlink($filename);
+
+        $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'Behavior'.DS.'DummyBehaviorTest.php';
+        unlink($filename);
     }
 
     public function testGenerateCommand()
