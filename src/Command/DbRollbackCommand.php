@@ -54,9 +54,9 @@ class DbRollbackCommand extends Command
     /**
      * Gets the last migration version
      *
-     * @return string|null
+     * @return int|null
      */
-    private function lastMigration() : ?string
+    private function lastMigration() : ?int
     {
         $lastMigration = $this->Migration->find('first', ['order' => 'version DESC']);
         if ($lastMigration) {
