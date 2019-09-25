@@ -22,8 +22,8 @@ class MigrationFixture extends Fixture
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'version' => [
-                'type' => 'string',
-                'limit' => 14,
+                'type' => 'bigint',
+                'limit' => null,
                 'default' => null,
                 'null' => false,
             ],

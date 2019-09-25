@@ -38,7 +38,7 @@ class DbMigrateCommand extends Command
             'description' => 'Use a different datasource','short' => 'c','default' => 'default',
         ]);
         $this->addArgument('version', [
-            'description' => 'a target version e.g. 20190511111934','type' => 'string'
+            'description' => 'a target version e.g. 20190511111934','type' => 'integer'
         ]);
     }
  
@@ -64,10 +64,10 @@ class DbMigrateCommand extends Command
     /**
      * Migrates
      *
-     * @param string $version
+     * @param integer $version
      * @return void
      */
-    private function migrate(string $version = null) : void
+    private function migrate(int $version = null) : void
     {
         $migrations = $this->getMigrations($this->lastMigration(), $version);
         if (empty($migrations)) {
@@ -106,7 +106,7 @@ class DbMigrateCommand extends Command
      * @param int $version
      * @return void
      */
-    private function rollback(string $version) : void
+    private function rollback(int $version) : void
     {
         $migrations = $this->getMigrations($version, $this->lastMigration());
         $migrations = array_reverse($migrations);
@@ -158,9 +158,9 @@ class DbMigrateCommand extends Command
     /**
      * Gets the last migration version
      *
-     * @return string|null
+     * @return int|null
      */
-    private function lastMigration() : ?string
+    private function lastMigration() : ?int
     {
         $lastMigration = $this->Migration->find('first', ['order' => 'version DESC']);
         if ($lastMigration) {
@@ -192,7 +192,7 @@ class DbMigrateCommand extends Command
      * @param string $to
      * @return array
      */
-    private function getMigrations(string $from = null, string $to = null) : array
+    private function getMigrations(int $from = null, int $to = null) : array
     {
         $results = array_diff(scandir(self::PATH), ['.', '..']);
         $migrations = [];
