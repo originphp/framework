@@ -1,6 +1,5 @@
 <?php
 declare(strict_types = 1);
-declare(ticks = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -277,7 +276,7 @@ class QueueWorkerCommand extends Command
     protected function setupSignalHandler() : void
     {
         //pcntl_async_signals(true);
-        //declare(ticks = 1);
+        declare(ticks = 1);
        
         pcntl_signal(SIGTERM, [$this, 'cancelJob']);
         pcntl_signal(SIGINT, [$this, 'cancelJob']);
