@@ -529,7 +529,7 @@ trait IntegrationTestTrait
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
-        $this->assertNotContains($text, $headers['Location']);
+        $this->assertStringNotContainsString($text, $headers['Location']);
     }
 
     /**
@@ -593,7 +593,7 @@ trait IntegrationTestTrait
     {
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
-        $this->assertNotContains($value, $headers[$header]);
+        $this->assertStringNotContainsString($value, $headers[$header]);
     }
 
     /**

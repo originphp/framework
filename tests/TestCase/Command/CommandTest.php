@@ -175,7 +175,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $command->addUsage('backup mydb backup.zip');
         $command->run(['--help']);
         $this->assertStringContainsString('backup [options] database [filename]', $this->out->read());
-        $this->assertcontains('backup mydb backup.zip', $this->out->read());
+        $this->assertStringContainsString('backup mydb backup.zip', $this->out->read());
     }
 
     public function testLoadModel()
@@ -260,7 +260,7 @@ EOF;
     {
         $command = new MockCommand($this->io());
         $command->debug('hbm24 = x411'); // Verbose disabled
-        $this->assertNotContains('hbm24 = x411', $this->out->read());
+        $this->assertStringNotContainsString('hbm24 = x411', $this->out->read());
         $command->run(['--verbose']);
         $command->debug('x345 = 1234'); // Verbose enabled
         $this->assertStringContainsString('<debug>x345 = 1234</debug>', $this->out->read());

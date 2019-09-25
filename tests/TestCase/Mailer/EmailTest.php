@@ -946,14 +946,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->subject("Injection test\nBcc: apollo@boxers.io");
         $result = $email->send("Yo Adrian!\nRocky")->message();
         $this->assertStringContainsString('Subject: Injection =?UTF-8?B?dGVzdApCY2M6IGFwb2xsb0Bib3hlcnMuaW8=?=', $result);
-        $this->assertNotContains('apollo@boxers.io', $result);
+        $this->assertStringNotContainsString('apollo@boxers.io', $result);
         
         $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', "James\nBcc: apollo@boxers.io")
             ->from('mailer@originphp.com')
             ->subject('Injection test');
         $this->assertStringContainsString('To: James <james@originphp.com>', $result);
-        $this->assertNotContains('apollo@boxers.io', $result);
+        $this->assertStringNotContainsString('apollo@boxers.io', $result);
 
         $this->expectException(Exception::class);
         $email = new MockEmail(['engine' => 'Test']);

@@ -168,9 +168,9 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
             new \Origin\Model\Exception\NotFoundException('passwords.txt could not be found')
         );
     
-        $this->assertNotContains('NotFoundException', $errorHandler->response);
-        $this->assertNotContains('404', $errorHandler->response);
-        $this->assertNotContains('passwords.txt could not be found', $errorHandler->response);
+        $this->assertStringNotContainsString('NotFoundException', $errorHandler->response);
+        $this->assertStringNotContainsString('404', $errorHandler->response);
+        $this->assertStringNotContainsString('passwords.txt could not be found', $errorHandler->response);
         $this->assertStringContainsString('<h1>Page not found</h1>', $errorHandler->response);
     }
 
@@ -250,9 +250,9 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
        
         $errorHandler->fatalErrorHandler(E_ERROR, 'A Fatal Error has occured', 'dummy.php', 212);
        
-        $this->assertNotContains('FatalErrorException', $errorHandler->response);
-        $this->assertNotContains('500', $errorHandler->response);
-        $this->assertNotContains('A Fatal Error has occured', $errorHandler->response);
+        $this->assertStringNotContainsString('FatalErrorException', $errorHandler->response);
+        $this->assertStringNotContainsString('500', $errorHandler->response);
+        $this->assertStringNotContainsString('A Fatal Error has occured', $errorHandler->response);
         $this->assertStringContainsString('<h1>An Internal Error Has Occured</h1>', $errorHandler->response);
     }
 

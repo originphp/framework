@@ -421,8 +421,7 @@ class BehaviorTest extends OriginTestCase
             ->willReturn(true);
 
         $behavior->expects($this->once())
-            ->method('afterSave')
-            ->willReturn(true);
+            ->method('afterSave');
 
         // As we are injecting mock, we need to enable it as well
         $Article->behaviorRegistry()->set('BehaviorTester', $behavior);

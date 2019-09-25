@@ -1830,15 +1830,13 @@ class ModelTest extends OriginTestCase
 
         $stub->expects($this->never())
             ->method('beforeDelete')
-            ->willReturn($this->returnArgument(0));
+            ->willReturn(true);
 
         $stub->expects($this->never())
-            ->method('afterDelete')
-            ->willReturn($this->returnArgument(0));
+            ->method('afterDelete');
 
         $stub->expects($this->never())
-            ->method('afterCommit')
-            ->willReturn($this->returnArgument(0));
+            ->method('afterCommit');
 
         $this->assertTrue($stub->delete($article, ['callbacks' => false]));
         $this->assertEquals(0, $stub->find('count', ['conditions' => ['id' => 1000]]));
@@ -1915,8 +1913,7 @@ class ModelTest extends OriginTestCase
             ->method('afterCommit');
 
         $stub->expects($this->never())
-            ->method('afterRollback')
-            ->willReturn($this->returnArgument(0));
+            ->method('afterRollback');
             
         $this->assertFalse($stub->delete($article));
     }
