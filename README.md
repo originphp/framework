@@ -1,10 +1,10 @@
 # OriginPHP Framework
 
 ![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
-[![build](https://travis-ci.org/originphp/framework.png)](https://travis-ci.org/originphp/framework)
-[![coverage](https://coveralls.io/repos/originphp/framework/badge.png)](https://coveralls.io/r/originphp/framework)
-![memory](https://img.shields.io/badge/memory-900KB-brightGeen.svg)
-![diskspace](https://img.shields.io/badge/disk_space-1.5MB-brightGreen.svg)
+[![build](https://travis-ci.org/originphp/framework.svg?branch=masterhttps://travis-ci.org/originphp/framework.svg?branch=master)](https://travis-ci.org/originphp/framework)
+[![coverage](https://coveralls.io/repos/github/originphp/framework/badge.svg?branch=master)](https://coveralls.io/github/originphp/framework?branch=master)
+![memory](https://img.shields.io/badge/memory-950KB-brightGeen.svg)
+![diskspace](https://img.shields.io/badge/disk_space-1.75MB-brightGreen.svg)
 ![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
@@ -23,7 +23,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Form helper
 - Date,time,and number formating,validation and delocalization support
 - Internationalization (I18n)
-- Events system based upon the observer pattern
+- Manage events using the Publisher Pattern
 - Http utility for making get,post,patch,put and delete requests
 - Yaml reading and writing
 - CSV reading and writing
@@ -31,7 +31,10 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Html parsing and converting
 - Markdown parsing and converting
 - Storage system which supports local disk, FTP and SFTP
+- Service Objects
+- Repostitories
 - Email using SMTP
+- Collections
 - and much more
 
 See the [documentation](https://www.originphp.com/docs/getting-started/) to find out more. If you want to help contribute make this even better then I would love to hear from you.
