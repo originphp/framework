@@ -497,9 +497,17 @@ class ModelTest extends OriginTestCase
         $this->Article->hasAndBelongsToMany('Tag');
         $this->assertEquals('article_id', $this->Article->ArticlesTag->displayField);
 
+        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'not_id']]];
         $ds = $this->Article->connection();
-        $sql = $ds->adapter()->createTable('foos', ['not_id' => 'primaryKey','undetectable' => 'string']);
-        $ds->execute($sql);
+        $statements = $ds->adapter()->createTableSql('foos', [
+            'not_id' => ['type'=>'integer','autoIncrement'=>true],
+            'undetectable' => 'string'
+        ], $options);
+      
+        foreach ($statements as $statement) {
+            $ds->execute($statement);
+        }
+        
         $dummy = new Model(['name' => 'Foo','connection' => 'test']);
   
         $this->expectException(Exception::class);

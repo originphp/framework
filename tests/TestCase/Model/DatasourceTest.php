@@ -316,47 +316,4 @@ class DatasourceTest extends OriginTestCase
         $this->assertTrue(in_array('authors', $tables));
         $this->assertTrue(in_array('articles', $tables));
     }
-
-    /**
-     * Originally create table was part of Datasource
-     * @todo write test for each adapter, and then rely on that for testin
-     *
-     * @return void
-     */
-    public function testCreateTable()
-    {
-        $this->connection->execute('DROP TABLE IF EXISTS foo;');
-
-        $schema = [
-            'id' => ['type' => 'primaryKey'],
-            'name' => ['type' => 'string','default' => 'placeholder'],
-            'description' => ['type' => 'text','null' => false],
-            'age' => ['type' => 'integer','default' => 1234],
-            'bi' => ['type' => 'bigint'],
-            'fn' => ['type' => 'float','precision' => 2], // ignored by postgres
-            'dn' => ['type' => 'decimal','precision' => 2],
-            'dt' => ['type' => 'datetime'],
-            'ts' => ['type' => 'timestamp'],
-            't' => ['type' => 'time'],
-            'd' => ['type' => 'date'],
-            'bf' => ['type' => 'binary'],
-            'bool' => ['type' => 'boolean'],
-        ];
-        $sql = $this->connection->adapter()->createTable('foo', $schema);
-        
-        $this->assertTrue($this->connection->execute($sql));
-    
-        $schema = [
-            'bookmarks_id' => ['type' => 'integer','key' => 'primary'],
-            'tags_id' => ['type' => 'integer','key' => 'primary'],
-        ];
-        $sql = $this->connection->adapter()->createTable('bar', $schema);
-  
-        $this->assertContains('bookmarks_id INT', $sql);
-        $this->assertContains('tags_id INT', $sql);
-        $this->assertContains('PRIMARY KEY (bookmarks_id,tags_id)', $sql);
-
-        $this->assertTrue($this->connection->execute($sql));
-        $this->connection->execute('DROP TABLE bar');
-    }
 }

@@ -415,11 +415,6 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertFalse($adapter->columnExists('posts', 'titles'));
     }
 
-    public function testColumnName()
-    {
-        $adapter = new PgsqlSchema('test');
-        $this->assertEquals('foo', $adapter->columnName('foo'));
-    }
 
     public function testSchemaValue()
     {
@@ -448,52 +443,37 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertInstanceOf(Datasource::class, $adapter->connection());
     }
 
-    public function testCreateTable()
-    {
-        $adapter = new PgsqlSchema('test');
-
-        $schema = [
-            'id' => ['type' => 'primaryKey'],
-            'name' => ['type' => 'string','default' => ''],
-            'description' => ['type' => 'text'],
-            'created' => ['type' => 'datetime'],
-            'modified' => ['type' => 'datetime'],
-        ];
-        $result = $adapter->createTable('foo', $schema);
-        $this->assertEquals('ef5ad5ed3d97cedb4b45124795923738', md5($result));
-        
-        $schema = [
-            'id' => ['type' => 'primaryKey'],
-            'name' => ['type' => 'string','default' => 'placeholder'],
-            'description' => ['type' => 'text','null' => false],
-            'age' => ['type' => 'integer','default' => 1234],
-            'bi' => ['type' => 'bigint'],
-            'fn' => ['type' => 'float','precision' => 2], // ignored by postgres
-            'dn' => ['type' => 'decimal','precision' => 8,'scale' => 2],
-            'dt' => ['type' => 'datetime'],
-            'ts' => ['type' => 'timestamp'],
-            't' => ['type' => 'time'],
-            'd' => ['type' => 'date'],
-            'bf' => ['type' => 'binary'],
-            'bool' => ['type' => 'boolean'],
-        ];
-        $result = $adapter->createTable('foo', $schema);
-      
-        $expected = '3968d2da444049afd19926cebcbf2aae';
-        $this->assertEquals($expected, md5($result));
-
-        # Sanity check
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
-        }
-    }
-
     public function testDatasource()
     {
         $adapter = new PgsqlSchema('foo');
         $this->assertEquals('foo', $adapter->datasource());
         $adapter->datasource('bar');
         $this->assertEquals('bar', $adapter->datasource());
+    }
+
+    /**
+     * Create a FOO table which next tests will depend upon
+     */
+    public function testCreateTable()
+    {
+        $adapter = new PgsqlSchema('test');
+        if ($adapter->connection()->engine() !== 'pgsql') {
+            $this->markTestSkipped('This is test is for pgsql');
+        }
+
+        $schema = [
+            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'name' => ['type' => 'string','default' => ''],
+            'description' => ['type' => 'text'],
+            'created' => ['type' => 'datetime'],
+            'modified' => ['type' => 'datetime'],
+        ];
+        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $result = $adapter->createTableSql('foo', $schema, $options);
+    
+        foreach ($result as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
+        }
     }
 
     public function testChangeAutoIncrementSql()
