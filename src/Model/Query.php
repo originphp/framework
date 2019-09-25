@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Model;
 
 use Origin\Utility\Inflector;
+use ArrayObject;
 
 /**
  * This handles the model finds
@@ -32,11 +33,13 @@ class Query
      * Reads the datasource using query array and returns the result set.
      *
      * @param string $type
-     * @param array  $query (conditions,joins,fields,order,limit etc)
-     * @return array|\Origin\Model\Entity|\Origin\Model\Collection|null
+     * @param ArrayObject  $query (conditions,joins,fields,order,limit etc)
+     * @return mixed
      */
-    public function find(array $query, string $type = 'model')
+    public function find(ArrayObject $query, string $type = 'model')
     {
+        $query = (array) $query;
+        
         $connection = $this->model->connection();
         $connection->select($this->model->table, $query + ['alias' => Inflector::tableName($this->model->alias)]);
 
@@ -60,6 +63,7 @@ class Query
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
+            $results = new ResultSet($results);
         }
 
         unset($sql, $connection);

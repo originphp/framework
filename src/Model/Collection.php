@@ -46,7 +46,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     /**
     * Counts the number of items in the collection
     *
-    * @return array|object
+    * @return int
     */
     public function count()
     {

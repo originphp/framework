@@ -1182,20 +1182,14 @@ class Model
         ]);
 
         if ($options['callbacks'] === true) {
-            $result = $this->triggerCallback('beforeFind', [$options]);
-            if ($result === false) {
+            if ($this->triggerCallback('beforeFind', [$options]) === false) {
                 return null;
             }
         }
 
         $options = $this->prepareQuery($type, $options); // AutoJoin
 
-        $results = $this->{'finder' . ucfirst($type)}((array) $options);
-
-        if ($options['callbacks'] === true and ($results instanceof Collection or $results instanceof Entity)) {
-            $this->triggerCallback('afterFind', [$results, $options], false);
-        }
-
+        $results = $this->{'finder' . ucfirst($type)}($options);
         unset($options);
 
         return $results;
@@ -1334,55 +1328,60 @@ class Model
     /**
      * Finder for find('first').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject  $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array|null results
      */
-    protected function finderFirst(array $options = []) : ?Entity
+    protected function finderFirst(ArrayObject $options) : ?Entity
     {
         // Modify Query
         $options['limit'] = 1;
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options);
-        // $results = $this->readDataSource($query);
+        $results = (new Query($this))->find($options);
 
         if (empty($results)) {
             return null;
         }
 
+        if ($options['callbacks'] === true) {
+            $this->triggerCallback('afterFind', [$results, $options], false);
+        }
+
         // Modify Results
-        return $results[0];
+        return $results->first();
     }
 
     /**
      * Finder for find('all').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Collection|array
      */
-    protected function finderAll(array $options = [])
+    protected function finderAll(ArrayObject $options)
     {
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options);
+        $results = (new Query($this))->find($options);
 
         // Modify Results
         if (empty($results)) {
             return [];
         }
 
-        return new Collection($results, ['name' => $this->alias]);
+        if ($options['callbacks'] === true) {
+            $this->triggerCallback('afterFind', [$results, $options], false);
+        }
+
+        return new Collection($results->all(), ['name' => $this->alias]);
     }
 
     /**
      * Finder for find('list')
      *  3 different list types ['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']] depending upon how many columns are selected. If more than 3 columns selected it returns ['a'=>'b'].
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array $results
      */
-    protected function finderList(array $options): array
+    protected function finderList(ArrayObject $options) : array
     {
         if (empty($options['fields'])) {
             $options['fields'][] = $this->primaryKey;
@@ -1407,10 +1406,10 @@ class Model
     /**
      * This is the find('count').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return int count
      */
-    protected function finderCount(array $options) : int
+    protected function finderCount(ArrayObject $options) : int
     {
         // Modify Query
         $options['fields'] = ['COUNT(*) AS count'];
@@ -1418,8 +1417,7 @@ class Model
         $options['limit'] = null;
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options, 'assoc');
+        $results = (new Query($this))->find($options, 'assoc');
         //$results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
