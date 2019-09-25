@@ -573,7 +573,7 @@ class FormHelperTest extends OriginTestCase
     {
         $this->Form->request()->params('csrfToken', '* ORIGINPHP *');
         $result = $this->Form->create();
-        $this->assertContains('<input type="hidden" name="csrfToken" value="* ORIGINPHP *">', $result);
+        $this->assertStringContainsString('<input type="hidden" name="csrfToken" value="* ORIGINPHP *">', $result);
     }
 
     public function testFormEscapeValues()

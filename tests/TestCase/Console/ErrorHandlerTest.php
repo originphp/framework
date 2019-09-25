@@ -66,13 +66,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         /**
          * @internal On different systems line numbers etc are different ie. phpunit etc
          */
-        $this->assertContains('<redBackground> Exception </redBackground> <yellow>Something went wrong</yellow>', $message);
+        $this->assertStringContainsString('<redBackground> Exception </redBackground> <yellow>Something went wrong</yellow>', $message);
  
-        $this->assertContains('<yellowBackground> 58 </yellowBackground>', $message);
-        $this->assertContains('<blue>54</blue>', $message);
-        $this->assertContains('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>', $message);
-        $this->assertContains('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>', $message);
-        $this->assertContains('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground', $message);
+        $this->assertStringContainsString('<yellowBackground> 58 </yellowBackground>', $message);
+        $this->assertStringContainsString('<blue>54</blue>', $message);
+        $this->assertStringContainsString('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>', $message);
+        $this->assertStringContainsString('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>', $message);
+        $this->assertStringContainsString('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground', $message);
     }
     public function testConsoleOutput()
     {

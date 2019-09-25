@@ -47,7 +47,7 @@ class SyslogEngineTest extends \PHPUnit\Framework\TestCase
         $id = uniqid();
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("3:[{$date}] application ERROR: Error code {$id}", $engine->written);
+        $this->assertStringContainsString("3:[{$date}] application ERROR: Error code {$id}", $engine->written);
     }
 
     /**

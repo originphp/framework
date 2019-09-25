@@ -137,7 +137,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputContains(string $needle)
     {
-        $this->assertContains($needle, $this->stdout->read());
+        $this->assertStringContainsString($needle, $this->stdout->read());
     }
 
     /**
@@ -147,7 +147,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputNotContains(string $needle)
     {
-        $this->assertNotContains($needle, $this->stdout->read());
+        $this->assertStringNotContainsString($needle, $this->stdout->read());
     }
 
     /**
@@ -165,7 +165,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputEmpty()
     {
-        $this->assertContains('', $this->stdout->read());
+        $this->assertStringContainsString('', $this->stdout->read());
     }
 
     /**
@@ -191,7 +191,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorContains(string $message)
     {
-        $this->assertContains($message, $this->stderr->read());
+        $this->assertStringContainsString($message, $this->stderr->read());
     }
 
     /**
@@ -201,7 +201,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorNotContains(string $message)
     {
-        $this->assertNotContains($message, $this->stderr->read());
+        $this->assertStringNotContainsString($message, $this->stderr->read());
     }
 
     /**

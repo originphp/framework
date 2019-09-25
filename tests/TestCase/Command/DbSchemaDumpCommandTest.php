@@ -34,11 +34,11 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         // Different versions of MySQL also return different results, so test sample
       
         if (ConnectionManager::get('test')->engine() === 'mysql') {
-            $this->assertContains('CREATE TABLE `posts` (', $contents);
-            $this->assertContains('`title` varchar(255) NOT NULL,', $contents);
+            $this->assertStringContainsString('CREATE TABLE `posts` (', $contents);
+            $this->assertStringContainsString('`title` varchar(255) NOT NULL,', $contents);
         } else { //pgsql
-            $this->assertContains('CREATE TABLE "posts" (', $contents);
-            $this->assertContains('"title" VARCHAR(255) NOT NULL,', $contents);
+            $this->assertStringContainsString('CREATE TABLE "posts" (', $contents);
+            $this->assertStringContainsString('"title" VARCHAR(255) NOT NULL,', $contents);
         }
     }
 

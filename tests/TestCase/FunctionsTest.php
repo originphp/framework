@@ -75,7 +75,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         ob_start();
         pr(['key' => 'value']);
         $out = ob_get_clean();
-        $this->assertContains("Array\n(\n    [key] => value\n)", $out);
+        $this->assertStringContainsString("Array\n(\n    [key] => value\n)", $out);
     }
 
     public function testdebug()
@@ -96,6 +96,6 @@ Array
 
 # # # # # # # # # # # # #
 EOF;
-        $this->assertContains($expected, $out);
+        $this->assertStringContainsString($expected, $out);
     }
 }

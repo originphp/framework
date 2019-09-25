@@ -49,8 +49,8 @@ class MailerTest extends OriginTestCase
             'email' => 'demo@originphp.com',
         ]);
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertContains('To: demo@originphp.com', $message->header());
-        $this->assertContains('How is your day so far?', $message->body());
+        $this->assertStringContainsString('To: demo@originphp.com', $message->header());
+        $this->assertStringContainsString('How is your day so far?', $message->body());
     }
 
     public function testDispatchLater()
@@ -70,8 +70,8 @@ class MailerTest extends OriginTestCase
             'email' => 'demo@originphp.com',
         ]);
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertContains('To: demo@originphp.com', $message->header());
-        $this->assertContains('How is your day so far?', $message->body());
+        $this->assertStringContainsString('To: demo@originphp.com', $message->header());
+        $this->assertStringContainsString('How is your day so far?', $message->body());
     }
 
     public function testCallbacksDispatch()

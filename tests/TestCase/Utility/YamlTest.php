@@ -34,7 +34,7 @@ name: james
 date: 2019-05-05
 boolean: false
 EOT;
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
     public function testFromArrayCollection()
     {
@@ -56,7 +56,7 @@ address:
                 Somewhere, Something
   city: london
 EOT;
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
 
     public function testFromList()
@@ -67,7 +67,7 @@ EOT;
 - tony
 - nick
 EOT;
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
     public function testFromChildList()
     {
@@ -86,7 +86,7 @@ EOT;
     - 456-4334
 EOT;
 
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
 
     public function testFromArrayMultiCollections()
@@ -109,7 +109,7 @@ addresess:
   - street: 546 some avenue
     city: london
 EOT;
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
 
     public function testPlainScalarMultiline()
@@ -155,7 +155,7 @@ services:
 volumes: 
   mysql: abc
 EOT;
-        $this->assertContains($expected, $yaml);
+        $this->assertStringContainsString($expected, $yaml);
     }
 
     public function testParseValues()

@@ -33,7 +33,7 @@ class LogTraitTest extends \PHPUnit\Framework\TestCase
         $controller = new Controller();
         $id = uniqid();
         $controller->log('debug', 'XXX {id} ', ['id' => $id]);
-        $this->assertContains($id, file_get_contents(TMP . DS . 'application.log'));
+        $this->assertStringContainsString($id, file_get_contents(TMP . DS . 'application.log'));
     }
 
     public function tearDown() : void

@@ -38,7 +38,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $request = new Request('blog/home?ref=google&source=ppc');
 
         $this->assertEquals('google', $request->query('ref'));
-        $this->assertContains('ppc', $request->query('source'));
+        $this->assertStringContainsString('ppc', $request->query('source'));
     }
 
     public function testUrl()

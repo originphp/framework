@@ -53,7 +53,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     public function testHashPassword()
     {
         $result = Security::hashPassword('secret');
-        $this->assertContains('$2y$10', $result);
+        $this->assertStringContainsString('$2y$10', $result);
     }
 
     /**

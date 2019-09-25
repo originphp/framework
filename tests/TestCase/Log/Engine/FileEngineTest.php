@@ -38,6 +38,6 @@ class FileEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $log = file_get_contents(LOGS . DS .  'application.log');
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $log);
+        $this->assertStringContainsString("[{$date}] application ERROR: Error code {$id}", $log);
     }
 }

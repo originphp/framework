@@ -43,7 +43,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap = new ArgumentParser();
         $ap->addOption('value1', ['type' => 'string','default' => 'foo','description' => ['Line 1','Line 2']]);
         $help = $ap->help();
-        $this->assertContains('<white>Line 2 <yellow>[default: foo]</yellow></white>', $help); // Check its line 2
+        $this->assertStringContainsString('<white>Line 2 <yellow>[default: foo]</yellow></white>', $help); // Check its line 2
     }
 
     public function testRequiredOption()
@@ -164,11 +164,11 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
  
         $help = $ap->help();
        
-        $this->assertContains('This is a description', $help);
-        $this->assertContains('foo [options] [arguments]', $help);
-        $this->assertContains('foo dosomething', $help);
-        $this->assertContains('This is epilog', $help);
-        $this->assertContains('This is additional help', $help);
+        $this->assertStringContainsString('This is a description', $help);
+        $this->assertStringContainsString('foo [options] [arguments]', $help);
+        $this->assertStringContainsString('foo dosomething', $help);
+        $this->assertStringContainsString('This is epilog', $help);
+        $this->assertStringContainsString('This is additional help', $help);
     }
     public function testBuildHelpWithArguments()
     {
@@ -178,9 +178,9 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addArgument('something', ['description' => ['Line #1','Line #2']]);
         $help = $ap->help();
      
-        $this->assertContains('Line #1', $help);
-        $this->assertContains('Line #2', $help);
-        $this->assertContains('foo [options] [something]', $help);
+        $this->assertStringContainsString('Line #1', $help);
+        $this->assertStringContainsString('Line #2', $help);
+        $this->assertStringContainsString('foo [options] [something]', $help);
     }
 
     public function testBuildHelpWithOptions()
@@ -191,9 +191,9 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addArgument('something', ['description' => ['Line #1','Line #2']]);
         $help = $ap->help();
      
-        $this->assertContains('Line #1', $help);
-        $this->assertContains('Line #2', $help);
-        $this->assertContains('foo [options] [something]', $help);
+        $this->assertStringContainsString('Line #1', $help);
+        $this->assertStringContainsString('Line #2', $help);
+        $this->assertStringContainsString('foo [options] [something]', $help);
     }
 
     public function testBuildHelpWithArgumentsRequired()
@@ -203,7 +203,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addArgument('bar', ['required' => true]);
         $help = $ap->help();
         
-        $this->assertContains('foo [options] bar', $help);
+        $this->assertStringContainsString('foo [options] bar', $help);
     }
     public function testBuildHelpWithOptionsRequired()
     {
@@ -212,7 +212,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addOption('bar', ['required' => true]);
         $help = $ap->help();
         
-        $this->assertContains('foo --bar [options] [arguments]', $help);
+        $this->assertStringContainsString('foo --bar [options] [arguments]', $help);
     }
     public function testBuildHelpSubCommands()
     {
@@ -222,8 +222,8 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addCommand('[bar]', ['description' => 'The part after foo']);
         $help = $ap->help();
         
-        $this->assertContains('foo command [options] [arguments]', $help);
-        $this->assertContains('[bar]', $help);
-        $this->assertContains('The part after foo', $help);
+        $this->assertStringContainsString('foo command [options] [arguments]', $help);
+        $this->assertStringContainsString('[bar]', $help);
+        $this->assertStringContainsString('The part after foo', $help);
     }
 }

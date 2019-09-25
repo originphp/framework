@@ -58,7 +58,7 @@ class XmlTest extends \PHPUnit\Framework\TestCase
         ];
    
         $needle = '<book id="256">text value<name>book name</name></book>';
-        $this->assertContains($needle, Xml::fromArray($data));
+        $this->assertStringContainsString($needle, Xml::fromArray($data));
 
         $data = [
             'charges' => [
@@ -86,7 +86,7 @@ class XmlTest extends \PHPUnit\Framework\TestCase
         ];
         $needle = '<book xmlns="http://www.w3.org/1999/xhtml"><title>Its a Wonderful Day</title></book>';
     
-        $this->assertContains($needle, Xml::fromArray($data));
+        $this->assertStringContainsString($needle, Xml::fromArray($data));
 
         $data = [
             'tag' => [
@@ -99,7 +99,7 @@ class XmlTest extends \PHPUnit\Framework\TestCase
         ];
 
         $needle = '<tag><item>one</item><item>two</item><item>three</item></tag>';
-        $this->assertContains($needle, Xml::fromArray($data));
+        $this->assertStringContainsString($needle, Xml::fromArray($data));
 
         $data = [
             'student:record' => [
@@ -110,7 +110,7 @@ class XmlTest extends \PHPUnit\Framework\TestCase
 
         $needle = '<student:record xmlns:student="https://www.originphp.com/student"><student:name>James</student:name><student:phone>07986 123 4567</student:phone></student:record>';
       
-        $this->assertContains($needle, Xml::fromArray($data));
+        $this->assertStringContainsString($needle, Xml::fromArray($data));
 
         $data = [
             'book' => [
@@ -122,7 +122,7 @@ class XmlTest extends \PHPUnit\Framework\TestCase
         ];
 
         $needle = '<book xmlns="urn:loc.gov:books" xmlns:isbn="urn:ISBN:0-395-36341-6"><title>Cheaper by the Dozen</title><isbn:number>1568491379</isbn:number></book>';
-        $this->assertContains($needle, Xml::fromArray($data));
+        $this->assertStringContainsString($needle, Xml::fromArray($data));
     }
 
     /**

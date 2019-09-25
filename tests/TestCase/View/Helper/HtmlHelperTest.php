@@ -77,7 +77,7 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<script type="text/javascript" src="/assets/js/form.js"></script>';
         $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
     
-        $this->assertContains(
+        $this->assertStringContainsString(
             file_get_contents(ORIGIN . '/tests/TestApp/plugins/widget/public/js/default.js'),
             $this->Html->js('Widget.default.js')
         );

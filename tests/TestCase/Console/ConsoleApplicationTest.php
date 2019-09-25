@@ -84,7 +84,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $app->name('console-app');
         $app->description(['This is the description']);
         $this->assertEquals('console-app', $app->name());
-        $this->assertContains('This is the description', $app->description());
+        $this->assertStringContainsString('This is the description', $app->description());
     }
 
     public function testInvalidName()
@@ -126,7 +126,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $consoleApplication->name('cache');
         $consoleApplication->addCommand('enable', CacheEnableCommand::class);
         $this->assertTrue($consoleApplication->run([]));
-        $this->assertContains('OK Cache enabled', $this->output->read());
+        $this->assertStringContainsString('OK Cache enabled', $this->output->read());
     }
 
     public function testArgumentParserError()
@@ -139,7 +139,7 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         
         $this->assertFalse($consoleApplication->run(['delete']));
 
-        $this->assertContains('Missing required argument `key`', $this->output->read());
+        $this->assertStringContainsString('Missing required argument `key`', $this->output->read());
     }
 
     public function testAppCommand()
@@ -150,21 +150,21 @@ class ConsoleApplicationTest extends \PHPUnit\Framework\TestCase
         $consoleApplication->addCommand('disable', CacheDisableCommand::class);
         $this->assertTrue($consoleApplication->run(['enable']));
 
-        $this->assertContains('OK Cache enabled', $this->output->read());
+        $this->assertStringContainsString('OK Cache enabled', $this->output->read());
 
         $consoleApplication = $this->consoleApplication();
         $consoleApplication->name('cache');
         $consoleApplication->addCommand('enable', CacheEnableCommand::class);
         $consoleApplication->addCommand('disable', CacheDisableCommand::class);
         $consoleApplication->run(['disable']);
-        $this->assertContains('OK Cache disabled', $this->output->read());
+        $this->assertStringContainsString('OK Cache disabled', $this->output->read());
 
         $consoleApplication = $this->consoleApplication();
         $consoleApplication->name('cache');
         $consoleApplication->addCommand('enable', CacheEnableCommand::class);
         $consoleApplication->addCommand('disable', CacheDisableCommand::class);
         $this->assertFalse($consoleApplication->run(['reset']));
-        $this->assertContains('Invalid command reset', $this->output->read());
+        $this->assertStringContainsString('Invalid command reset', $this->output->read());
     }
 
     public function testAddCommandException()

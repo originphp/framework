@@ -452,7 +452,7 @@ trait IntegrationTestTrait
     public function assertResponseContains(string $text)
     {
         $body = (string) $this->response()->body();
-        $this->assertContains($text, $body);
+        $this->assertStringContainsString($text, $body);
     }
 
     /**
@@ -461,7 +461,7 @@ trait IntegrationTestTrait
     public function assertResponseNotContains(string $text)
     {
         $body = (string) $this->response()->body();
-        $this->assertNotContains($text, $body);
+        $this->assertStringNotContainsString($text, $body);
     }
 
     /**
@@ -515,7 +515,7 @@ trait IntegrationTestTrait
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
-        $this->assertContains($text, $headers['Location']);
+        $this->assertStringContainsString($text, $headers['Location']);
     }
 
     /**
@@ -579,7 +579,7 @@ trait IntegrationTestTrait
     {
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
-        $this->assertContains($value, $headers[$header]);
+        $this->assertStringContainsString($value, $headers[$header]);
     }
 
     /**

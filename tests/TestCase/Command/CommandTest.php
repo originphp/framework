@@ -109,8 +109,8 @@ class CommandTest extends \PHPUnit\Framework\TestCase
 
         $mock->throwError('test', 'A comment about this error');
         $output = $consoleOutput->read();
-        $this->assertContains('<exception> ERROR </exception> <heading>test</heading>', $output);
-        $this->assertContains('A comment about this error', $output);
+        $this->assertStringContainsString('<exception> ERROR </exception> <heading>test</heading>', $output);
+        $this->assertStringContainsString('A comment about this error', $output);
     }
 
     public function testName()
@@ -159,14 +159,14 @@ class CommandTest extends \PHPUnit\Framework\TestCase
     {
         $command = new BackupCommand($this->io());
         $command->run(['my_database']);
-        $this->assertContains('The database my_database was backedup from the main datasource', $this->out->read());
+        $this->assertStringContainsString('The database my_database was backedup from the main datasource', $this->out->read());
     }
 
     public function testRunArgumentParserError()
     {
         $command = new BackupCommand($this->io());
         $command->run([]);
-        $this->assertContains('<exception> ERROR </exception> <text>Missing required argument `database`</text>', $this->out->read());
+        $this->assertStringContainsString('<exception> ERROR </exception> <text>Missing required argument `database`</text>', $this->out->read());
     }
 
     public function testRunHelp()
@@ -174,7 +174,7 @@ class CommandTest extends \PHPUnit\Framework\TestCase
         $command = new BackupCommand($this->io());
         $command->addUsage('backup mydb backup.zip');
         $command->run(['--help']);
-        $this->assertContains('backup [options] database [filename]', $this->out->read());
+        $this->assertStringContainsString('backup [options] database [filename]', $this->out->read());
         $this->assertcontains('backup mydb backup.zip', $this->out->read());
     }
 
@@ -208,52 +208,52 @@ class CommandTest extends \PHPUnit\Framework\TestCase
 <error>Some error</error>
 EOF;
 
-        $this->assertContains($expected, $this->out->read());
+        $this->assertStringContainsString($expected, $this->out->read());
     }
 
     public function testInfo()
     {
         $command = new MockCommand($this->io());
         $command->info('some text no placeholder');
-        $this->assertContains('some text no placeholder', $this->out->read());
+        $this->assertStringContainsString('some text no placeholder', $this->out->read());
         $command->info('User {id}', ['id' => 1234]);
-        $this->assertContains('User 1234', $this->out->read());
+        $this->assertStringContainsString('User 1234', $this->out->read());
     }
 
     public function testWarning()
     {
         $command = new MockCommand($this->io());
         $command->warning('some text no placeholder');
-        $this->assertContains('some text no placeholder', $this->out->read());
+        $this->assertStringContainsString('some text no placeholder', $this->out->read());
         $command->warning('User {id}', ['id' => 1234]);
-        $this->assertContains('User 1234', $this->out->read());
+        $this->assertStringContainsString('User 1234', $this->out->read());
     }
 
     public function testError()
     {
         $command = new MockCommand($this->io());
         $command->error('some text no placeholder');
-        $this->assertContains('some text no placeholder', $this->out->read());
+        $this->assertStringContainsString('some text no placeholder', $this->out->read());
         $command->error('User {id}', ['id' => 1234]);
-        $this->assertContains('User 1234', $this->out->read());
+        $this->assertStringContainsString('User 1234', $this->out->read());
     }
     
     public function testNotice()
     {
         $command = new MockCommand($this->io());
         $command->notice('some text no placeholder');
-        $this->assertContains('some text no placeholder', $this->out->read());
+        $this->assertStringContainsString('some text no placeholder', $this->out->read());
         $command->notice('User {id}', ['id' => 1234]);
-        $this->assertContains('User 1234', $this->out->read());
+        $this->assertStringContainsString('User 1234', $this->out->read());
     }
 
     public function testSuccess()
     {
         $command = new MockCommand($this->io());
         $command->success('some text no placeholder');
-        $this->assertContains('some text no placeholder', $this->out->read());
+        $this->assertStringContainsString('some text no placeholder', $this->out->read());
         $command->success('User {id}', ['id' => 1234]);
-        $this->assertContains('User 1234', $this->out->read());
+        $this->assertStringContainsString('User 1234', $this->out->read());
     }
 
     public function testDebugVerbose()
@@ -263,14 +263,14 @@ EOF;
         $this->assertNotContains('hbm24 = x411', $this->out->read());
         $command->run(['--verbose']);
         $command->debug('x345 = 1234'); // Verbose enabled
-        $this->assertContains('<debug>x345 = 1234</debug>', $this->out->read());
+        $this->assertStringContainsString('<debug>x345 = 1234</debug>', $this->out->read());
     }
 
     public function testRunCommand()
     {
         $command = new MockCommand($this->io());
         $command->runCommand('cache:reset');
-        $this->assertContains('Cache has been reset', $this->out->read());
+        $this->assertStringContainsString('Cache has been reset', $this->out->read());
     }
 
     public function testRunCommandDoesNotExist()
@@ -287,7 +287,7 @@ EOF;
             '--color=blue',
             'jon',
         ]);
-        $this->assertContains('<blue>Hello jon</blue>', $this->out->read());
+        $this->assertStringContainsString('<blue>Hello jon</blue>', $this->out->read());
     }
 
     public function testAbort()

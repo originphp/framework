@@ -46,80 +46,80 @@ class LogTest extends \PHPUnit\Framework\TestCase
     {
         $date = date('Y-m-d G:i:s');
         Log::emergency('This is an emergency');
-        $this->assertContains("[{$date}] application EMERGENCY: This is an emergency", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application EMERGENCY: This is an emergency", Log::engine('default')->getLog());
        
         Log::emergency('This is an {value}', ['value' => 'emergency']);
-        $this->assertContains("[{$date}] application EMERGENCY: This is an emergency", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application EMERGENCY: This is an emergency", Log::engine('default')->getLog());
     }
     public function testAlert()
     {
         $date = date('Y-m-d G:i:s');
         Log::alert('Some system message');
-        $this->assertContains("[{$date}] application ALERT: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application ALERT: Some system message", Log::engine('default')->getLog());
        
         Log::alert('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application ALERT: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application ALERT: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     public function testCritical()
     {
         $date = date('Y-m-d G:i:s');
         Log::critical('This is critical');
-        $this->assertContains("[{$date}] application CRITICAL: This is critical", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application CRITICAL: This is critical", Log::engine('default')->getLog());
        
         Log::critical('This is {value}', ['value' => 'critical']);
-        $this->assertContains("[{$date}] application CRITICAL: This is critical", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application CRITICAL: This is critical", Log::engine('default')->getLog());
     }
     public function testError()
     {
         $date = date('Y-m-d G:i:s');
         Log::error('Some system message');
-        $this->assertContains("[{$date}] application ERROR: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application ERROR: Some system message", Log::engine('default')->getLog());
        
         Log::error('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application ERROR: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application ERROR: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     public function testWarning()
     {
         $date = date('Y-m-d G:i:s');
         Log::warning('Some system message');
-        $this->assertContains("[{$date}] application WARNING: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application WARNING: Some system message", Log::engine('default')->getLog());
        
         Log::warning('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application WARNING: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application WARNING: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     public function testNotice()
     {
         $date = date('Y-m-d G:i:s');
         Log::notice('Some system message');
-        $this->assertContains("[{$date}] application NOTICE: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application NOTICE: Some system message", Log::engine('default')->getLog());
        
         Log::notice('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application NOTICE: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application NOTICE: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     public function testInfo()
     {
         $date = date('Y-m-d G:i:s');
         Log::info('Some system message');
-        $this->assertContains("[{$date}] application INFO: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application INFO: Some system message", Log::engine('default')->getLog());
        
         Log::info('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application INFO: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application INFO: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     public function testDebug()
     {
         $date = date('Y-m-d G:i:s');
         Log::debug('Some system message');
-        $this->assertContains("[{$date}] application DEBUG: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application DEBUG: Some system message", Log::engine('default')->getLog());
        
         Log::debug('Some system message with the value:{value}', ['value' => 'not-important']);
-        $this->assertContains("[{$date}] application DEBUG: Some system message with the value:not-important", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] application DEBUG: Some system message with the value:not-important", Log::engine('default')->getLog());
     }
     
     public function testChannel()
     {
         Log::debug('Some system message', ['channel' => 'custom']);
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] custom DEBUG: Some system message", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] custom DEBUG: Some system message", Log::engine('default')->getLog());
     }
 
     public function testLevelsRestriction()
@@ -131,7 +131,7 @@ class LogTest extends \PHPUnit\Framework\TestCase
         Log::debug('This will not be logged');
         $this->assertEmpty(Log::engine('default')->getLog());
         Log::critical('This will be logged');
-        $this->assertContains('This will be logged', Log::engine('default')->getLog());
+        $this->assertStringContainsString('This will be logged', Log::engine('default')->getLog());
     }
 
     public function testChannelsRestriction()
@@ -143,14 +143,14 @@ class LogTest extends \PHPUnit\Framework\TestCase
         Log::debug('This will not be logged', ['channel' => 'application']);
         $this->assertEmpty(Log::engine('default')->getLog());
         Log::critical('This will be logged', ['channel' => 'payments']);
-        $this->assertContains('This will be logged', Log::engine('default')->getLog());
+        $this->assertStringContainsString('This will be logged', Log::engine('default')->getLog());
     }
 
     public function testCustomData()
     {
         Log::info('User registered', ['username' => 'pinkpotato','channel' => 'custom']);
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] custom INFO: User registered {\"username\":\"pinkpotato\"}", Log::engine('default')->getLog());
+        $this->assertStringContainsString("[{$date}] custom INFO: User registered {\"username\":\"pinkpotato\"}", Log::engine('default')->getLog());
     }
 
     public function testInvalidClassName()

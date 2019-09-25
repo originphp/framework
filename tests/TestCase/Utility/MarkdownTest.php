@@ -203,14 +203,14 @@ EOF;
     {
         $html = '<span>%</span><ul><li>Item #1</li><li>Item #2</li></ul><span>%</span>';
         $expected = "\n* Item #1\n* Item #2\n";
-        $this->assertContains($expected, Markdown::fromHtml($html));
+        $this->assertStringContainsString($expected, Markdown::fromHtml($html));
     }
 
     public function testToTextNumberedList()
     {
         $html = '<span>%</span><ol><li>Item #1</li><li>Item #2</li></ol><span>%</span>';
         $expected = "\n1. Item #1\n2. Item #2\n";
-        $this->assertContains($expected, Markdown::fromHtml($html));
+        $this->assertStringContainsString($expected, Markdown::fromHtml($html));
     }
 
     public function testToTextSubList()
@@ -218,7 +218,7 @@ EOF;
         $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ul> <li>Black tea</li><li>Green tea</li></ul></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   * Black tea\n   * Green tea\n* Milk";
-        $this->assertContains($expected, Markdown::fromHtml($html));
+        $this->assertStringContainsString($expected, Markdown::fromHtml($html));
     }
 
     public function testToTextSubListOrdered()
@@ -226,14 +226,14 @@ EOF;
         $html = '<h2>A Nested List</h2><p>List can be nested (lists inside lists):</p><ul> <li>Coffee</li><li>Tea<ol> <li>Black tea</li><li>Green tea</li></ol></li> <li>Milk</li></ul>';
 
         $expected = "\n* Coffee\n* Tea\n   1. Black tea\n   2. Green tea\n* Milk";
-        $this->assertContains($expected, Markdown::fromHtml($html));
+        $this->assertStringContainsString($expected, Markdown::fromHtml($html));
     }
 
     public function testUrlSecurity()
     {
         $text = '[xss](javascript:alert%281%29)'; // Actual attack vector
-        $this->assertContains('<a href="">xss</a>', Markdown::toHtml($text));
+        $this->assertStringContainsString('<a href="">xss</a>', Markdown::toHtml($text));
         $text = '![xss](javascript:alert%281%29)'; // just testing url is being removed
-        $this->assertContains('<img src="" alt="xss">', Markdown::toHtml($text));
+        $this->assertStringContainsString('<img src="" alt="xss">', Markdown::toHtml($text));
     }
 }

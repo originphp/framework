@@ -164,9 +164,9 @@ class PgsqlSchemaTest extends OriginTestCase
         $result = $adapter->createTableSql('tposts', $schema, $options);
       
         $this->assertEquals('4d6bbdd7f570bb892c3a484a1621a3f6', md5($result[0]));
-        $this->assertContains('CREATE UNIQUE INDEX "title_u" ON "tposts" (code)', $result[1]);
-        $this->assertContains('CREATE INDEX "title_idx" ON "tposts" (title)', $result[2]);
-        $this->assertContains('CREATE INDEX "title_ft" ON "tposts" (title)', $result[3]);
+        $this->assertStringContainsString('CREATE UNIQUE INDEX "title_u" ON "tposts" (code)', $result[1]);
+        $this->assertStringContainsString('CREATE INDEX "title_idx" ON "tposts" (title)', $result[2]);
+        $this->assertStringContainsString('CREATE INDEX "title_ft" ON "tposts" (title)', $result[3]);
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($result as $statement) {

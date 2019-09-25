@@ -670,7 +670,7 @@ class MysqlSchemaTest extends OriginTestCase
         $result = $adapter->showCreateTable('articles');
         // Different mysql versions e.g. 5.x vs 8 will return slightly different result
         $expected = "CREATE TABLE `articles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `author_id` int(11) DEFAULT NULL,\n  `title` varchar(255) NOT NULL,\n  `body` text,\n  `created` datetime DEFAULT NULL,\n  `modified` datetime DEFAULT NULL,\n  PRIMARY KEY (`id`)\n)"; // Any slight change, needs to be investigated
-        $this->assertContains($expected, $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public function testTableExists()

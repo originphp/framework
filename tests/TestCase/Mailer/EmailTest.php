@@ -640,7 +640,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $result = $email->send()->message();
         $expected = "--0000000000000000000000000000\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nthis is a test\r\n\r\n--0000000000000000000000000000\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n<p>this is a test</p>\r\n\r\n--0000000000000000000000000000--";
-        $this->assertContains($expected, $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public function testSendBothNoText()
@@ -651,8 +651,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->subject('template test')
             ->htmlMessage('<h1>Welcome Frank</h1>');
         $result = $email->send()->message();
-        $this->assertContains("Welcome Frank\r\n=============", $result);
-        $this->assertContains('<h1>Welcome Frank</h1>', $result);
+        $this->assertStringContainsString("Welcome Frank\r\n=============", $result);
+        $this->assertStringContainsString('<h1>Welcome Frank</h1>', $result);
     }
 
     public function testCreateMessageTemplateNoText()
@@ -664,8 +664,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->set(['first_name' => 'Frank'])
             ->template('welcome');
         $result = $email->send()->message();
-        $this->assertContains("Welcome Frank\r\n=============", $result);
-        $this->assertContains('<h1>Welcome Frank</h1>', $result);
+        $this->assertStringContainsString("Welcome Frank\r\n=============", $result);
+        $this->assertStringContainsString('<h1>Welcome Frank</h1>', $result);
     }
 
     public function testCreateMessageTemplate()
@@ -678,8 +678,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->set(['first_name' => 'Frank'])
             ->template('demo');
         $result = $email->send()->message();
-        $this->assertContains("Hi Frank,\r\nHow is your day so far?", $result);
-        $this->assertContains("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
+        $this->assertStringContainsString("Hi Frank,\r\nHow is your day so far?", $result);
+        $this->assertStringContainsString("<p>Hi Frank</p>\r\n<p>How is your day so far?</p>", $result);
 
         $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com')
@@ -689,8 +689,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->set(['first_name' => 'Tony'])
             ->template('Widget.how-are-you');
         $result = $email->send()->message();
-        $this->assertContains("Hi Tony,\r\nHow are you?", $result);
-        $this->assertContains("<p>Hi Tony</p>\r\n<p>How are you?</p>", $result);
+        $this->assertStringContainsString("Hi Tony,\r\nHow are you?", $result);
+        $this->assertStringContainsString("<p>Hi Tony</p>\r\n<p>How are you?</p>", $result);
     }
 
     public function testCreateMessageTemplateTextException()
@@ -748,7 +748,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->from('mailer@originphp.com')
             ->subject('send send message arguments');
         $result = $email->send("Yo Adrian!\nRocky")->body();
-        $this->assertContains("Yo Adrian!\r\nRocky", $result);
+        $this->assertStringContainsString("Yo Adrian!\r\nRocky", $result);
     }
 
     public function testSendTextMessageNotSet()
@@ -820,9 +820,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
      */
     public function testCheckSmtpLog(string $log)
     {
-        $this->assertContains('EHLO [192.168.1.7]', $log);
-        $this->assertContains('MAIL FROM: <'.env('GMAIL_USERNAME').'>', $log);
-        $this->assertContains('RCPT TO: <'.env('GMAIL_USERNAME').'>', $log);
+        $this->assertStringContainsString('EHLO [192.168.1.7]', $log);
+        $this->assertStringContainsString('MAIL FROM: <'.env('GMAIL_USERNAME').'>', $log);
+        $this->assertStringContainsString('RCPT TO: <'.env('GMAIL_USERNAME').'>', $log);
     }
 
     /**
@@ -933,9 +933,9 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->returnPath('returnPath@originphp.com');
         $result = $email->send("Yo Adrian!\nRocky")->header();
     
-        $this->assertContains('Sender: sender@originphp.com', $result);
-        $this->assertContains('Reply-To: replyTo@originphp.com', $result);
-        $this->assertContains('Return-Path: returnPath@originphp.com', $result);
+        $this->assertStringContainsString('Sender: sender@originphp.com', $result);
+        $this->assertStringContainsString('Reply-To: replyTo@originphp.com', $result);
+        $this->assertStringContainsString('Return-Path: returnPath@originphp.com', $result);
     }
 
     public function testEmailHeaderInjectionAttack()
@@ -945,14 +945,14 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->from('mailer@originphp.com')
             ->subject("Injection test\nBcc: apollo@boxers.io");
         $result = $email->send("Yo Adrian!\nRocky")->message();
-        $this->assertContains('Subject: Injection =?UTF-8?B?dGVzdApCY2M6IGFwb2xsb0Bib3hlcnMuaW8=?=', $result);
+        $this->assertStringContainsString('Subject: Injection =?UTF-8?B?dGVzdApCY2M6IGFwb2xsb0Bib3hlcnMuaW8=?=', $result);
         $this->assertNotContains('apollo@boxers.io', $result);
         
         $email = new MockEmail(['engine' => 'Test']);
         $email->to('james@originphp.com', "James\nBcc: apollo@boxers.io")
             ->from('mailer@originphp.com')
             ->subject('Injection test');
-        $this->assertContains('To: James <james@originphp.com>', $result);
+        $this->assertStringContainsString('To: James <james@originphp.com>', $result);
         $this->assertNotContains('apollo@boxers.io', $result);
 
         $this->expectException(Exception::class);
@@ -976,8 +976,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             ->format('html') // use HTML or TEXT only message. Not both
             ->addAttachment($filename);
         $result = $email->send()->message();
-        $this->assertContains('Content-Type: text/html; charset="UTF-8"', $result);
-        $this->assertContains('Content-Transfer-Encoding: quoted-printable', $result);
-        $this->assertContains('The email message has non-ascii chars Ragnarr Lo=C3=BEbr=C3=B3k', $result);
+        $this->assertStringContainsString('Content-Type: text/html; charset="UTF-8"', $result);
+        $this->assertStringContainsString('Content-Transfer-Encoding: quoted-printable', $result);
+        $this->assertStringContainsString('The email message has non-ascii chars Ragnarr Lo=C3=BEbr=C3=B3k', $result);
     }
 }

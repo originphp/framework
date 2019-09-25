@@ -46,6 +46,6 @@ class ConsoleEngineTest extends \PHPUnit\Framework\TestCase
         $id = uniqid();
         $engine->log('error', 'Error code {value}', ['value' => $id]);
         $date = date('Y-m-d G:i:s');
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $bufferedOutput->read());
+        $this->assertStringContainsString("[{$date}] application ERROR: Error code {$id}", $bufferedOutput->read());
     }
 }

@@ -77,9 +77,9 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
         $message = $engine->email()->message();
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $message);
-        $this->assertContains('From: me@example.com', $message);
-        $this->assertContains('To: you@example.com', $message);
+        $this->assertStringContainsString("[{$date}] application ERROR: Error code {$id}", $message);
+        $this->assertStringContainsString('From: me@example.com', $message);
+        $this->assertStringContainsString('To: you@example.com', $message);
     }
 
     public function testLogEmailArray()
@@ -96,9 +96,9 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
         $date = date('Y-m-d G:i:s');
 
         $message = $engine->email()->message();
-        $this->assertContains("[{$date}] application ERROR: Error code {$id}", $message);
-        $this->assertContains('From: me@example.com', $message);
-        $this->assertContains('jimbo <you@example.com>', $message);
+        $this->assertStringContainsString("[{$date}] application ERROR: Error code {$id}", $message);
+        $this->assertStringContainsString('From: me@example.com', $message);
+        $this->assertStringContainsString('jimbo <you@example.com>', $message);
     }
 
     /**

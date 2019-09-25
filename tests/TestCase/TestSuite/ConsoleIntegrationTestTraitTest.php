@@ -34,7 +34,7 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     public function testOutput()
     {
         $this->exec('test say');
-        $this->assertContains('Hello world!', $this->output());
+        $this->assertStringContainsString('Hello world!', $this->output());
     }
 
     public function testExecInput()
@@ -57,7 +57,7 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
     public function testError()
     {
         $this->exec('test omg');
-        $this->assertContains('OMG! Its all Gone pete tong', $this->error());
+        $this->assertStringContainsString('OMG! Its all Gone pete tong', $this->error());
     }
 
     public function testEmpty()

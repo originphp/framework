@@ -75,7 +75,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertTrue($result);
-        $this->assertContains('<blue>Hello jim</blue>', $this->out->read());
+        $this->assertStringContainsString('<blue>Hello jim</blue>', $this->out->read());
     }
 
     public function testRunUnkownCommand()

@@ -47,11 +47,11 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         ];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('To: js@example.com', $message->header());
-        $this->assertContains('From: sam@example.com', $message->header());
-        $this->assertContains('Sender: web application <noreply@example.com', $message->header());
-        $this->assertContains('Reply-To: blackhole@example.com', $message->header());
-        $this->assertContains('Subject: test build 1', $message->header());
+        $this->assertStringContainsString('To: js@example.com', $message->header());
+        $this->assertStringContainsString('From: sam@example.com', $message->header());
+        $this->assertStringContainsString('Sender: web application <noreply@example.com', $message->header());
+        $this->assertStringContainsString('Reply-To: blackhole@example.com', $message->header());
+        $this->assertStringContainsString('Subject: test build 1', $message->header());
     }
 
     /**
@@ -75,12 +75,12 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         ];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Cc: cc1@example.com', $message->header());
+        $this->assertStringContainsString('Cc: cc1@example.com', $message->header());
 
         $options['cc'] = ['cc2@example.com','cc3@example.com' => 'Mr CC3'];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Cc: cc2@example.com, Mr CC3 <cc3@example.com>', $message->header());
+        $this->assertStringContainsString('Cc: cc2@example.com, Mr CC3 <cc3@example.com>', $message->header());
     }
 
     public function testBuildBcc()
@@ -99,12 +99,12 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         ];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Bcc: bcc1@example.com', $message->header());
+        $this->assertStringContainsString('Bcc: bcc1@example.com', $message->header());
 
         $options['bcc'] = ['bcc2@example.com','bcc3@example.com' => 'Mr bcc3'];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Bcc: bcc2@example.com, Mr bcc3 <bcc3@example.com>', $message->header());
+        $this->assertStringContainsString('Bcc: bcc2@example.com, Mr bcc3 <bcc3@example.com>', $message->header());
     }
 
     public function testBuildHeaders()
@@ -123,7 +123,7 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         ];
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Reply-To: noreply@example.com', $message->header());
+        $this->assertStringContainsString('Reply-To: noreply@example.com', $message->header());
     }
 
     public function testBuildAttachment()
@@ -144,8 +144,8 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
       
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
-        $this->assertContains('Content-Type: text/plain; name="Important.md"', $message->body());
-        $this->assertContains('Content-Type: text/plain; name="README.md"', $message->body());
+        $this->assertStringContainsString('Content-Type: text/plain; name="Important.md"', $message->body());
+        $this->assertStringContainsString('Content-Type: text/plain; name="README.md"', $message->body());
     }
 
     public function testRenderHtml()
@@ -164,8 +164,8 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
         // Check layout was rendered and values set
-        $this->assertContains("<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />", $message->body());
-        $this->assertContains('<p>Hi jon</p>', $message->body());
+        $this->assertStringContainsString("<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />", $message->body());
+        $this->assertStringContainsString('<p>Hi jon</p>', $message->body());
     }
 
     public function testRenderText()
@@ -184,8 +184,8 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
 
-        $this->assertContains('Content-Type: text/plain; charset="UTF-8"', $message->header());
-        $this->assertContains("Hi jon,\r\n", $message->body());
+        $this->assertStringContainsString('Content-Type: text/plain; charset="UTF-8"', $message->header());
+        $this->assertStringContainsString("Hi jon,\r\n", $message->body());
     }
 
     public function testRenderHtmlException()
@@ -236,8 +236,8 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $builder = new EmailBuilder($options);
         $message = $builder->build(true)->send();
       
-        $this->assertContains("Welcome jon\r\n", $message->body());
-        $this->assertContains('<h1>Welcome jon</h1>', $message->body());
+        $this->assertStringContainsString("Welcome jon\r\n", $message->body());
+        $this->assertStringContainsString('<h1>Welcome jon</h1>', $message->body());
     }
 
     public function testPluginpaths()

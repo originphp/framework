@@ -154,7 +154,7 @@ class HttpTest extends \PHPUnit\Framework\TestCase
         $http->post('https://www.example.com/upload', [
             'fields' => ['file' => '@' . ROOT . DS . 'README.md'],
         ]);
-        $this->assertContains(
+        $this->assertStringContainsString(
             '%2FREADME.md&file%5Bmime%5D=text%2Fplain&file%5Bpostname%5D=README.md',
             $http->options(CURLOPT_POSTFIELDS)
         );

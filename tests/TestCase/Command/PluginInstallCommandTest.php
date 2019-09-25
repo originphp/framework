@@ -58,7 +58,7 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
         $cmd->io = new ConsoleIo($bufferedOutput, new ConsoleOutput());
  
         $cmd->run(['originphp/framework','UserManagement']);
-        $this->assertContains('UserManagement Plugin installed', $bufferedOutput->read());
+        $this->assertStringContainsString('UserManagement Plugin installed', $bufferedOutput->read());
         $bootstrap = file_get_contents(CONFIG . '/bootstrap.php');
         file_put_contents(CONFIG . '/bootstrap.php', str_replace("Plugin::load('UserManagement');\n", '', $bootstrap));
     }
@@ -77,7 +77,7 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
         $cmd->io = new ConsoleIo($bufferedOutput, $bufferedOutput);
  
         $cmd->run(['originphp/framework','UserManagement']);
-        $this->assertContains('Plugin not downloaded from `https://github.com/originphp/framework.git`', $bufferedOutput->read());
+        $this->assertStringContainsString('Plugin not downloaded from `https://github.com/originphp/framework.git`', $bufferedOutput->read());
     }
 
     public function testInvalidPluginName()

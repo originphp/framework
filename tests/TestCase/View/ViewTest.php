@@ -207,8 +207,8 @@ class ViewTest extends \PHPUnit\Framework\TestCase
     {
         $this->View->loadHelper('Flash');
         $result = $this->View->render('/Posts/index', 'default');
-        $this->assertContains('<h1>Posts Home Page</h1>', $result); // view
-        $this->assertContains('<title>Tests</title>', $result); // Layout
+        $this->assertStringContainsString('<h1>Posts Home Page</h1>', $result); // view
+        $this->assertStringContainsString('<title>Tests</title>', $result); // Layout
     }
 
     public function testViewRenderPlugin()
