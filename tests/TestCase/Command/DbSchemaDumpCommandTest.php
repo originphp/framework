@@ -40,8 +40,6 @@ class DbSchemaDumpCommandTest extends OriginTestCase
             $this->assertContains('CREATE TABLE "posts" (', $contents);
             $this->assertContains('"title" VARCHAR(255) NOT NULL,', $contents);
         }
-
-        $this->deleteFile($filename);
     }
 
     public function testDumpSqlException()
@@ -49,6 +47,10 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->exec('db:schema:dump --connection=test --type=sql dump', ['n']);
         $this->assertExitError();
         $this->assertErrorContains('Error saving schema file');
+
+        // Cleanup
+        $filename = APP . DS . 'database' . DS . 'dump.sql';
+        $this->deleteFile($filename);
     }
 
     public function testDumpPHP()
@@ -71,8 +73,6 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->assertEquals('integer', $schema->posts['columns']['id']['type']);
         $this->assertNotEmpty($schema->posts['constraints']);
         $this->assertNotEmpty($schema->posts['constraints']['primary']);
-
-        $this->deleteFile($filename);
     }
 
     public function testDumpPHPException()
@@ -80,6 +80,8 @@ class DbSchemaDumpCommandTest extends OriginTestCase
         $this->exec('db:schema:dump --connection=test --type=php dump', ['n']);
         $this->assertExitError();
         $this->assertErrorContains('Error saving schema file');
+        $filename = APP . DS . 'database' . DS . 'dump.php';
+        $this->deleteFile($filename);
     }
 
     public function testDumpUnkownType()
