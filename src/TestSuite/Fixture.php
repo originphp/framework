@@ -15,9 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\TestSuite;
 
-use Origin\Core\Resolver;
 use Origin\Utility\Inflector;
-use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\TableSchema;
 
