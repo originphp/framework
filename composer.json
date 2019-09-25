@@ -39,11 +39,8 @@
     "ext-intl": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "7.5.2",
+    "phpunit/phpunit": "^8.0",
     "phpseclib/phpseclib": "*",
     "ext-curl": "*"
-  },
-  "suggest": {
-    "php-memcached": "To test the Memcached Cache engine"
   }
 }
