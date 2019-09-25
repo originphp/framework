@@ -34,7 +34,7 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDisabledMiddleware()
     {
-        $this->useMiddleware(false);
+        $this->disableMiddleware();
         
         $this->get('/posts/index');
         $this->assertEquals('GET', $_SERVER['REQUEST_METHOD']);

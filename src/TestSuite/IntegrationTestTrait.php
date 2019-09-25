@@ -93,17 +93,6 @@ trait IntegrationTestTrait
     protected $testWithErrorHandler = true;
 
     /**
-     * Enables and disables testing with middleware
-     *
-     * @param boolean $bool
-     * @return void
-     */
-    public function useMiddleware(bool $bool)
-    {
-        $this->testWithMiddleware = $bool;
-    }
-
-    /**
      * Undocumented function
      *
      * @return void
