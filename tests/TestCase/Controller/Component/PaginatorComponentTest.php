@@ -68,18 +68,25 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
       
         $connection = ConnectionManager::get('test');
-        $sql = $connection->adapter()->createTable('pets', [
-            'id' => ['type' => 'primaryKey'],
+        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $statements = $connection->adapter()->createTableSql('pets', [
+            'id' => ['type' => 'integer','autoIncrement'=>true],
             'owner_id' => ['type' => 'int','null' => false],
             'name' => ['type' => 'string','limit' => 20],
-        ]);
-        $connection->execute($sql);
-
-        $sql = $connection->adapter()->createTable('owners', [
-            'id' => ['type' => 'primaryKey'],
+        ], $options);
+        
+        foreach ($statements as $statement) {
+            $connection->execute($statement);
+        }
+        
+        $statements = $connection->adapter()->createTableSql('owners', [
+            'id' => ['type' => 'integer','autoIncrement'=>true],
             'name' => ['type' => 'string','limit' => 20],
-        ]);
-        $connection->execute($sql);
+        ], $options);
+
+        foreach ($statements as $statement) {
+            $connection->execute($statement);
+        }
         
         # Create Dummy Data
         $this->Pet = new Pet();

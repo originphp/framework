@@ -485,12 +485,15 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         # Create Table
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
-        $sql = $connection->adapter()->createTable('pets', [
-            'id' => ['type' => 'primaryKey'],
+        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $statements = $connection->adapter()->createTableSql('pets', [
+            'id' => ['type' => 'integer','autoIncrement'=>true],
             'name' => ['type' => 'string','limit' => 20],
-        ]);
-        $connection->execute($sql);
-
+        ], $options);
+        
+        foreach ($statements as $statement) {
+            $connection->execute($statement);
+        }
         # Create Dummy Data
         $Pet = new Pet();
         ModelRegistry::set('Pet', $Pet);
