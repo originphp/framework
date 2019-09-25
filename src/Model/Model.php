@@ -12,7 +12,6 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Model;
 
 /**
@@ -159,7 +158,7 @@ class Model
             'connection' => $this->connection,
             'table' => $this->table,
         ];
-
+     
         extract($config);
 
         if (is_null($name)) {
@@ -993,7 +992,7 @@ class Model
             try {
                 $result = $this->processSave($data, $options);
             } catch (\Exception $e) {
-                if ($options['callbacks']) {
+                if ($options['callbacks'] and method_exists($this, 'onError')) {
                     $this->onError($e);
                 }
                 if ($options['transaction']) {
@@ -1244,7 +1243,7 @@ class Model
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
             $entity->deleted($result);
         } catch (\Exception $e) {
-            if ($options['callbacks']) {
+            if ($options['callbacks'] and method_exists($this, 'onError')) {
                 $this->onError($e);
             }
             if ($options['transaction']) {
