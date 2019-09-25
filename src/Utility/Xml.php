@@ -50,7 +50,10 @@ class Xml
      *
      *
      * @param array $data
-     * @param array $options
+     * @param array $options The following options keys are supported
+     *   - version: default: 1.0
+     *   - encoding: default: UTF-8
+     *   - pretty: default false. Formats XML nicely
      * @return string
      */
     public static function fromArray(array $data, array $options = []) : string

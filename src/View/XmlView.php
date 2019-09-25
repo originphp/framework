@@ -16,6 +16,7 @@ namespace Origin\View;
 use Origin\Utility\Xml;
 use Origin\Http\Serializer;
 use Origin\Controller\Controller;
+use Origin\Utility\Inflector;
 
 class XmlView
 {
@@ -57,27 +58,86 @@ class XmlView
     /**
      * Does the rendering
      *
-     * @param [type] $data
-     * @param integer $status
-     * @return void
+     * @param mixed $data
+     * @return string
      */
-    public function render($data = null, $status = 200)
+    public function render($data = null) : string
     {
         /**
          * If user requests JSON and serialize is set then use that
          */
         if ($data === null and $this->request->type() === 'xml' and ! empty($this->serialize)) {
-            $serializer = new Serializer();
-            $data = $serializer->serialize($this->serialize, $this->viewVars);
-            $data = ['response' => $data];
+            $data = $this->serialize($this->serialize);
         }
 
         if (is_object($data) and method_exists($data, 'toXml')) {
             return $data->toXml();
-        } elseif (is_array($data)) {
+        }
+        
+        if (is_array($data)) {
             return Xml::fromArray($data);
         }
 
         return $data;
+    }
+
+    /**
+     * Serializes
+     *
+     * @param string|array $serialize
+     * @return array
+     */
+    private function serialize($serialize) : array
+    {
+        if (is_string($serialize)) {
+            $data = [];
+            if (isset($this->viewVars[$serialize])) {
+                $data = $this->toArray($this->viewVars[$serialize]);
+            }
+            
+            if ($this->isNumericArray($data)) {
+                $data = ['response' => [Inflector::singular($serialize) => $data]];
+            } else {
+                $data = ['response' => [$serialize => $data]];
+            }
+            
+            return $data;
+        }
+        
+        $data = ['response' => []];
+        foreach ($serialize as $key) {
+            if (isset($this->viewVars[$key])) {
+                $data['response'][$key] = $this->toArray($this->viewVars[$key]);
+            }
+        }
+        return $data;
+    }
+
+
+    /**
+     * Converts an object to an array
+     *
+     * @param mixed $mixed
+     * @return array
+     */
+    private function toArray($mixed) : array
+    {
+        if (is_object($mixed) and method_exists($mixed, 'toArray')) {
+            $mixed = $mixed->toArray();
+        }
+        return (array) $mixed;
+    }
+
+    /**
+     * Check if the array is a numerical one
+     *
+     * @param array $data
+     * @return boolean
+     */
+    private function isNumericArray(array $data) : bool
+    {
+        $keys  = array_keys($data);
+        $string = implode('', $keys);
+        return (bool) ctype_digit($string);
     }
 }
