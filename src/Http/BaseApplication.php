@@ -20,6 +20,7 @@ namespace Origin\Http;
 
 use Origin\Core\Resolver;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Middleware\DispatcherMiddleware;
 
 class BaseApplication
 {
@@ -27,13 +28,10 @@ class BaseApplication
 
     public function __construct(Request $request, Response $response, MiddlewareRunner $runner = null)
     {
-        if ($runner === null) {
-            $runner = new MiddlewareRunner();
-        }
-        $this->runner = $runner;
+        $this->runner = $runner ? $runner : new MiddlewareRunner();
 
         $this->initialize();
-        $this->loadMiddleware('Dispatcher'); # By running last it will run process/shutdown first
+        $this->addMiddleware(new DispatcherMiddleware); # By running last it will run process/shutdown first
         $this->runner->run($request, $response);
     }
 

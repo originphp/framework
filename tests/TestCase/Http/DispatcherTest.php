@@ -57,7 +57,7 @@ class AnotherMockRequest extends Request
 
 class MockDispatcher extends Dispatcher
 {
-    protected function getClass(string $controller, string $plugin = null)
+    protected function getClass(string $controller, string $plugin = null) : string
     {
         return 'Origin\Test\Http\\' . $controller . 'Controller';
     }
@@ -68,12 +68,16 @@ class MockDispatcher2 extends Dispatcher
     use TestTrait;
 }
 
+    /*
+$response = $this->dispatch(new Request($url), new Response());
+        $response->send();
+    */
 class DispatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testDispatch()
     {
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/index');
+        $Dispatcher->dispatch(new Request('blog_posts/index'), new Response());
         $this->assertInstanceOf(Controller::class, $Dispatcher->controller());
     }
     public function testGetClass()
@@ -87,21 +91,21 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
         $this->expectException(MissingControllerException::class);
 
         $Dispatcher = new Dispatcher();
-        $Dispatcher->start('apples/add');
+        $Dispatcher->dispatch(new Request('apples/add'), new Response());
     }
     public function testMissingControllerMethod()
     {
         $this->expectException(MissingMethodException::class);
 
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/does_not_exist');
+        $Dispatcher->dispatch(new Request('blog_posts/does_not_exist'), new Response());
     }
     public function testPrivateControllerMethod()
     {
         $this->expectException(PrivateMethodException::class);
 
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/reveal_password');
+        $Dispatcher->dispatch(new Request('blog_posts/reveal_password'), new Response());
     }
 
     /**

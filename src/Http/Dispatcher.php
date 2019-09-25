@@ -27,22 +27,23 @@ class Dispatcher
     /**
      * Singleton Instance of the Dispatcher
      *
-     * @var Dispatcher
+     * @var \Origin\Http\Dispatcher
      */
     protected static $instance = null;
+
     /**
      * Controller object
      *
-     * @var Controller
+     * @var \Origin\Controller\Controller
      */
     protected $controller = null;
 
     /**
        * Returns a single instance of the object
        *
-       * @return Dispatcher
+       * @return \Origin\Http\Dispatcher
        */
-    public static function instance()
+    public static function instance() : Dispatcher
     {
         if (static::$instance === null) {
             static::$instance = new Dispatcher();
@@ -52,18 +53,13 @@ class Dispatcher
     }
 
     /**
-     * Starts the disatch process by creating the request and response objects
+     * Determines the class name
      *
-     * @param string $url
-     * @return Controller
+     * @param string $controller
+     * @param string $plugin
+     * @return string
      */
-    public function start(string $url = null)
-    {
-        $response = $this->dispatch(new Request($url), new Response());
-        $response->send();
-    }
-
-    protected function getClass(string $controller, string $plugin = null)
+    protected function getClass(string $controller, string $plugin = null) : string
     {
         $namespace = Config::read('App.namespace');
         if ($plugin) {
@@ -76,11 +72,11 @@ class Dispatcher
     /**
      * This is the dispatch workhorse
      *
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @return \Origin\Http\Response
      */
-    public function dispatch(Request $request, Response $response)
+    public function dispatch(Request $request, Response $response) : Response
     {
         if ($request->params('controller')) {
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
@@ -104,9 +100,9 @@ class Dispatcher
      * @param object $request
      * @param object $response
      *
-     * @return Controller
+     * @return \Origin\Http\Controller
      */
-    protected function buildController(string $class, Request $request, Response $response)
+    protected function buildController(string $class, Request $request, Response $response) : Controller
     {
         $controller = new $class($request, $response);
         $action = $request->params('action');
@@ -123,6 +119,14 @@ class Dispatcher
 
     /**
      * Does the whole lifecylce
+     */
+    /**
+     * Undocumented function
+     *
+     * @param \Origin\Controller\Controller $controller
+     * @param string $action
+     * @param array $arguments
+     * @return \Origin\Http\Response|void
      */
     protected function invoke(Controller $controller, string $action, array $arguments)
     {
@@ -143,7 +147,7 @@ class Dispatcher
     /**
      * Gets the controller
      *
-     * @return Controller
+     * @return \Origin\Http\Controller
      */
     public function controller()
     {

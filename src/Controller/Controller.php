@@ -330,7 +330,7 @@ class Controller
     /**
      * The controller shutdown process
      *
-     * @return mixed
+     * @return \Origin\Http\Response|void
      */
     public function shutdownProcess()
     {
