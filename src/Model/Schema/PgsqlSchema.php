@@ -210,36 +210,6 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-     * Try to map types
-     *
-     * @param string $type
-     * @return string
-     */
-    private function column(string $type) : string
-    {
-        $result = 'string';
-        if (in_array($type, ['integer', 'text', 'date', 'time', 'boolean', 'bigint'])) {
-            $result = $type;
-        }
-        // Char and varchar
-        elseif (strpos($type, 'character') !== false or $type === 'uuid') {
-            $result = 'string';
-        } elseif (strpos($type, 'timestamp') !== false) {
-            $result = 'datetime';
-        } elseif (in_array($type, ['decimal', 'numeric'])) {
-            $result = 'decimal';
-        } elseif (strpos($type, 'time') !== false) { // time without time zone,with etc
-            $result = 'time';
-        } elseif (strpos($type, 'bytea') !== false) {
-            $result = 'binary';
-        } elseif (in_array($type, ['float', 'real', 'double', 'double precision'])) {
-            $result = 'float';
-        }
-
-        return $result;
-    }
-
-    /**
      * Returns an list of indexs for a table
      * @see https://www.postgresql.org/docs/current/view-pg-indexes.html
      *

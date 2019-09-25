@@ -665,22 +665,6 @@ class PgsqlSchemaTest extends OriginTestCase
         }
     }
     
-    public function testSchema()
-    {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
-        }
-        /**
-         * Results here are slightly different than MySQL cause integer column lengths
-         * are ignored (have no length)
-         */
-        $result = $adapter->schema('articles');
-
-        $expected = 'a2d4141301454b95e500e23cfb137344'; // Any slight change, needs to be investigated
-        $this->assertEquals($expected, md5(json_encode($result)));
-    }
-
     public function testShowCreateTable()
     {
         $adapter = new PgsqlSchema('test');
