@@ -47,6 +47,7 @@ trait EntityLocatorTrait
             }
             $this->entityLocatorCache[$model->name] = $entityClass;
         }
+      
         return $this->entityLocatorCache[$model->name];
     }
 }

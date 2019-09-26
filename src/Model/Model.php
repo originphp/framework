@@ -208,6 +208,7 @@ class Model
         $habtmModel = false;
 
         $association = $this->findAssociation($name);
+
         if ($association) {
             $className = $association['className'];
         } else {
@@ -243,7 +244,7 @@ class Model
             ModelRegistry::set($name, $object);
         }
 
-        $this->{$name} = $object;
+        $this->$name = $object;
 
         return true;
     }
@@ -261,8 +262,8 @@ class Model
 
             return $this->displayField;
         }
-        if (isset($this->{$name})) {
-            return $this->{$name};
+        if (isset($this->$name)) {
+            return $this->$name;
         }
 
         return null;
@@ -320,8 +321,8 @@ class Model
      */
     public function association(string $name): array
     {
-        if (in_array($name, $this->associations())) {
-            return $this->{$name};
+        if (in_array($name, $this->associations)) {
+            return $this->$name;
         }
         throw new Exception('Unkown association ' . $name);
     }
@@ -679,7 +680,7 @@ class Model
                 $data = $entity->get($needle);
 
                 if (is_array($data) or $data instanceof Collection) {
-                    $hasAndBelongsToMany[$alias] = $entity->{$needle};
+                    $hasAndBelongsToMany[$alias] = $entity->$needle;
                 }
             }
         }
@@ -835,8 +836,8 @@ class Model
         $links = [];
 
         foreach ($data as $row) {
-            $primaryKey = $this->{$association}->primaryKey;
-            $displayField = $this->{$association}->displayField;
+            $primaryKey = $this->$association->primaryKey;
+            $displayField = $this->$association->displayField;
 
             // Either primaryKey or DisplayField must be set in data
             if ($row->has($primaryKey)) {
@@ -847,7 +848,7 @@ class Model
                 return false;
             }
 
-            $tag = $this->{$association}->find('first', [
+            $tag = $this->$association->find('first', [
                 'conditions' => [$needle => $row->get($needle)],
                 'callbacks' => false,
             ]);
@@ -857,13 +858,13 @@ class Model
                 $links[] = $id;
                 $row->set($primaryKey, $id);
             } else {
-                if (! $this->{$association}->save($row, [
+                if (! $this->$association->save($row, [
                     'callbacks' => $callbacks,
                     'transaction' => false,
                 ])) {
                     return false;
                 }
-                $links[] = $this->{$association}->id;
+                $links[] = $this->$association->id;
             }
 
             $joinModel = $this->{$config['with']};
@@ -917,8 +918,8 @@ class Model
         }
         // add keys if not set
         if ($option === true) {
-            foreach ($this->associations() as $assocation) {
-                $associated = array_merge($associated, array_keys($this->{$assocation}));
+            foreach ($this->associations as $assocation) {
+                $associated = array_merge($associated, array_keys($this->$assocation));
             }
         }
 
@@ -968,17 +969,17 @@ class Model
         // Save BelongsTo
         foreach ($this->belongsTo as $alias => $config) {
             $key = lcfirst($alias);
-            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
+            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
                 continue;
             }
       
-            if ($data->{$key}->modified()) {
-                if (! $this->{$alias}->save($data->{$key}, $associatedOptions)) {
+            if ($data->$key->modified()) {
+                if (! $this->$alias->save($data->$key, $associatedOptions)) {
                     $result = false;
                     break;
                 }
                 $foreignKey = $this->belongsTo[$alias]['foreignKey'];
-                $data->$foreignKey = $this->{$alias}->id;
+                $data->$foreignKey = $this->$alias->id;
             }
         }
 
@@ -1008,14 +1009,14 @@ class Model
         if ($result) {
             foreach ($this->hasOne as $alias => $config) {
                 $key = lcfirst($alias);
-                if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
+                if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
                     continue;
                 }
-                if ($data->{$key}->modified()) {
+                if ($data->$key->modified()) {
                     $foreignKey = $this->hasOne[$alias]['foreignKey'];
-                    $data->{$key}->{$foreignKey} = $this->id;
+                    $data->$key->$foreignKey = $this->id;
 
-                    if (! $this->{$alias}->save($data->get($key), $associatedOptions)) {
+                    if (! $this->$alias->save($data->get($key), $associatedOptions)) {
                         $result = false;
                         break;
                     }
@@ -1037,7 +1038,7 @@ class Model
                     }
                     if ($record->modified()) {
                         $record->$foreignKey = $data->{$this->primaryKey};
-                        if (! $this->{$alias}->save($record, $associatedOptions)) {
+                        if (! $this->$alias->save($record, $associatedOptions)) {
                             $result = false;
                             break;
                         }
@@ -1280,12 +1281,12 @@ class Model
         foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
                 $conditions = [$config['foreignKey'] => $primaryKey];
-                $ids = $this->{$association}->find('list', ['conditions' => $conditions, 'fields' => [$this->primaryKey]]);
+                $ids = $this->$association->find('list', ['conditions' => $conditions, 'fields' => [$this->primaryKey]]);
                 foreach ($ids as $id) {
-                    $conditions = [$this->{$association}->primaryKey => $id];
-                    $result = $this->{$association}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
+                    $conditions = [$this->$association->primaryKey => $id];
+                    $result = $this->$association->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                     if ($result) {
-                        $this->{$association}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
+                        $this->$association->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
                     }
                 }
             }
@@ -1305,10 +1306,10 @@ class Model
             $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
 
             foreach ($ids as $id) {
-                $conditions = [$this->{$associatedModel}->primaryKey => $id];
-                $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
+                $conditions = [$this->$associatedModel->primaryKey => $id];
+                $result = $this->$associatedModel->find('first', ['conditions' => $conditions, 'callbacks' => false]);
                 if ($result) {
-                    $this->{$associatedModel}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
+                    $this->$associatedModel->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
                 }
             }
         }
@@ -1442,11 +1443,11 @@ class Model
 
         $query['associated'] = $this->associatedConfig($query);
         foreach (['belongsTo', 'hasOne'] as $association) {
-            foreach ($this->{$association} as $alias => $config) {
+            foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
                     $query['joins'][] = [
-                        'table' => $this->{$alias}->table,
+                        'table' => $this->$alias->table,
                         'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
@@ -1454,7 +1455,7 @@ class Model
                     ];
 
                     if (empty($config['fields'])) {
-                        $config['fields'] = $this->{$alias}->fields();
+                        $config['fields'] = $this->$alias->fields();
                     }
 
                     // If it throw an error, then it can be confusing to know source, so turn to array
@@ -1505,8 +1506,8 @@ class Model
     protected function findAssociation(string $name) : ?array
     {
         foreach ($this->associations as $association) {
-            if (isset($this->{$association}[$name])) {
-                return $this->{$association}[$name];
+            if (isset($this->$association[$name])) {
+                return $this->$association[$name];
             }
         }
 
@@ -1555,8 +1556,8 @@ class Model
         $conditions = [];
         foreach ($fields as $field) {
             $conditions[$field] = null;
-            if (isset($entity->{$field})) {
-                $conditions[$field] = $entity->{$field};
+            if (isset($entity->$field)) {
+                $conditions[$field] = $entity->$field;
             }
         }
 
