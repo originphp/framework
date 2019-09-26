@@ -195,24 +195,4 @@ class %name%Schema extends Schema
 
         return $out;
     }
-
-    /**
-     * VarExport using short version of array
-     *
-     * @param array $data
-     * @return string
-     */
-    protected function varExport(array $data) : string
-    {
-        $data = var_export($data, true);
-        $data = str_replace(
-            ['array (', "),\n", " => \n"],
-            ['[', "],\n", ' => '],
-            $data
-        );
-        $data = preg_replace('/=>\s\s+\[/i', '=> [', $data);
-        $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
-
-        return substr($data, 0, -1).']';
-    }
 }
