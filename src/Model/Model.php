@@ -747,16 +747,17 @@ class Model
         }
 
         /**
-         * Save HABTM. It is here, because control is needed on false result from here
-         */
-        foreach ($hasAndBelongsToMany as $alias => $data) {
-            if (! $this->saveHABTM($alias, $data, $options['callbacks'])) {
+        * Save HABTM. It is here, because control is needed on false result from here
+        */
+        if ($hasAndBelongsToMany) {
+            $association = new Association($this);
+            $result = $association->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks']);
+            if (!$result) {
                 return false;
             }
-            $result = true;
         }
 
-        unset($data, $options);
+        unset($data, $options, $hasAndBelongsToMany);
 
         if ($result) {
             $entity->reset();
@@ -818,83 +819,6 @@ class Model
         return $this->connection()->execute($sql, ['id' => $id]);
     }
 
-    /**
-     * Saves the hasAndBelongsToMany data
-     *
-     * @param string $association
-     * @param Collection|array $data
-     * @param boolean $callbacks
-     * @return bool
-     */
-    protected function saveHABTM(string $association, $data, bool $callbacks) : bool
-    {
-        $connection = $this->connection();
-
-        $config = $this->hasAndBelongsToMany[$association];
-        $joinModel = $this->{$config['with']};
-
-        $links = [];
-
-        foreach ($data as $row) {
-            $primaryKey = $this->$association->primaryKey;
-            $displayField = $this->$association->displayField;
-
-            // Either primaryKey or DisplayField must be set in data
-            if ($row->has($primaryKey)) {
-                $needle = $primaryKey;
-            } elseif ($row->has($displayField)) {
-                $needle = $displayField;
-            } else {
-                return false;
-            }
-
-            $tag = $this->$association->find('first', [
-                'conditions' => [$needle => $row->get($needle)],
-                'callbacks' => false,
-            ]);
-
-            if ($tag) {
-                $id = $tag->get($primaryKey);
-                $links[] = $id;
-                $row->set($primaryKey, $id);
-            } else {
-                if (! $this->$association->save($row, [
-                    'callbacks' => $callbacks,
-                    'transaction' => false,
-                ])) {
-                    return false;
-                }
-                $links[] = $this->$association->id;
-            }
-
-            $joinModel = $this->{$config['with']};
-        }
-
-        $existingJoins = $joinModel->find('list', [
-            'conditions' => [$config['foreignKey'] => $this->id],
-            'fields' => [$config['associationForeignKey']],
-        ]);
-
-        $connection = $joinModel->connection();
-        // By adding ID field we can do delete callbacks
-        if ($config['mode'] === 'replace') {
-            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->id]);
-        }
-
-        foreach ($links as $linkId) {
-            if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
-                continue;
-            }
-            $insertData = [
-                $config['foreignKey'] => $this->id,
-                $config['associationForeignKey'] => $linkId,
-            ];
-
-            $connection->insert($joinModel->table, $insertData);
-        }
-
-        return true;
-    }
 
     /**
      * Returns an normalized array of ssociated settings for dealing with
@@ -964,107 +888,36 @@ class Model
         if ($options['transaction']) {
             $this->begin();
         }
-
-        $result = true;
-        // Save BelongsTo
-        foreach ($this->belongsTo as $alias => $config) {
-            $key = lcfirst($alias);
-            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
-                continue;
-            }
-      
-            if ($data->$key->modified()) {
-                if (! $this->$alias->save($data->$key, $associatedOptions)) {
-                    $result = false;
-                    break;
-                }
-                $foreignKey = $this->belongsTo[$alias]['foreignKey'];
-                $data->$foreignKey = $this->$alias->id;
-            }
-        }
-
+        $assocation = new Association($this);
+        
+        $result = $assocation->saveBelongsTo($data, $options);
+  
         if ($result) {
-            /**
-             * This will save record and hasAndBelongsToMany records. This is because
-             * it can return false but HABTM is ok, and we need to capture false from
-             * callbacks.
-             */
-            
             try {
                 $result = $this->processSave($data, $options);
             } catch (\Exception $e) {
                 if ($options['callbacks'] and method_exists($this, 'onError')) {
                     $this->onError($e);
                 }
-                if ($options['transaction']) {
-                    $this->rollback();
-                    if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                        $this->dispatchCallback('afterRollback', [$data, $options], false);
-                    }
-                }
+                $this->cancelTransaction($data, $options);
                 throw $e;
             }
         }
 
         if ($result) {
-            foreach ($this->hasOne as $alias => $config) {
-                $key = lcfirst($alias);
-                if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
-                    continue;
-                }
-                if ($data->$key->modified()) {
-                    $foreignKey = $this->hasOne[$alias]['foreignKey'];
-                    $data->$key->$foreignKey = $this->id;
-
-                    if (! $this->$alias->save($data->get($key), $associatedOptions)) {
-                        $result = false;
-                        break;
-                    }
-                }
-            }
-
-            // Save hasMany
-            foreach ($this->hasMany as $alias => $config) {
-                $key = Inflector::plural(lcfirst($alias));
-                if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
-                    continue;
-                }
-
-                $foreignKey = $this->hasMany[$alias]['foreignKey'];
-
-                foreach ($data->get($key) as $record) {
-                    if (! $record instanceof Entity) {
-                        continue;
-                    }
-                    if ($record->modified()) {
-                        $record->$foreignKey = $data->{$this->primaryKey};
-                        if (! $this->$alias->save($record, $associatedOptions)) {
-                            $result = false;
-                            break;
-                        }
-                    }
-                }
-            }
+            $result = $assocation->saveHasOne($data, $options);
+        }
+        
+        if ($result) {
+            $result = $assocation->saveHasMany($data, $options);
         }
 
         if ($result) {
-            if ($options['transaction']) {
-                $this->commit();
-                if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                    $this->dispatchCallback('afterCommit', [$data, $options], false);
-                }
-            }
-
-            return true;
+            $this->commitTransaction($data, $options);
+        } else {
+            $this->cancelTransaction($data, $options);
         }
-        if ($options['transaction']) {
-            $this->rollback();
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                $this->dispatchCallback('afterRollback', [$data, $options], false);
-            }
-        }
-
-        return false;
+        return $result;
     }
 
     /**
@@ -1095,11 +948,7 @@ class Model
         }
 
         if ($options['transaction']) {
-            if ($result) {
-                $this->commit();
-            } else {
-                $this->rollback();
-            }
+            $result === true ? $this->commit() : $this->rollback();
         }
     
         return $result;
@@ -1223,15 +1072,13 @@ class Model
                 return false;
             }
         }
-        $afterCallbacks = $options['callbacks'] === true or $options['callbacks'] === 'after';
-
         if ($options['transaction']) {
             $this->begin();
         }
-
-        $this->deleteHABTM($this->id, $options['callbacks']);
+        $association = new Association($this);
+        $association->deleteHasAndBelongsToMany($this->id, $options['callbacks']);
         if ($options['cascade']) {
-            $this->deleteDependent($this->id, $options['callbacks']);
+            $association->deleteDependent($this->id, $options['callbacks']);
         }
 
         try {
@@ -1241,79 +1088,24 @@ class Model
             if ($options['callbacks'] and method_exists($this, 'onError')) {
                 $this->onError($e);
             }
-            if ($options['transaction']) {
-                $this->rollback();
-                if ($afterCallbacks) {
-                    $this->dispatchCallback('afterRollback', [$entity, $options], false);
-                }
-            }
+            $this->cancelTransaction($entity, $options);
             throw $e;
         }
         
-        if ($result and $afterCallbacks) {
+        if ($result and $options['callbacks'] === true or $options['callbacks'] === 'after') {
             $this->dispatchCallback('afterDelete', [$entity, $options], false);
         }
 
-        if ($options['transaction']) {
-            if ($result) {
-                $this->commit();
-                if ($afterCallbacks) {
-                    $this->dispatchCallback('afterCommit', [$entity, $options], false);
-                }
-            } else {
-                $this->rollback();
-                if ($afterCallbacks) {
-                    $this->dispatchCallback('afterRollback', [$entity, $options], false);
-                }
-            }
+        if ($result) {
+            $this->commitTransaction($entity, $options);
+        } else {
+            $this->cancelTransaction($entity, $options);
         }
 
         return $result;
     }
 
-    /**
-     * Deletes the hasOne and hasMany associated records.
-     *
-     * @var int|string
-     */
-    protected function deleteDependent($primaryKey, $callbacks) : void
-    {
-        foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
-            if (isset($config['dependent']) and $config['dependent'] === true) {
-                $conditions = [$config['foreignKey'] => $primaryKey];
-                $ids = $this->$association->find('list', ['conditions' => $conditions, 'fields' => [$this->primaryKey]]);
-                foreach ($ids as $id) {
-                    $conditions = [$this->$association->primaryKey => $id];
-                    $result = $this->$association->find('first', ['conditions' => $conditions, 'callbacks' => false]);
-                    if ($result) {
-                        $this->$association->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
-                    }
-                }
-            }
-        }
-    }
 
-    /**
-     * Deletes the hasAndBelongsToMany associated records.
-     *
-     * @var int|string $id
-     */
-    protected function deleteHABTM($id, $callbacks) : void
-    {
-        foreach ($this->hasAndBelongsToMany as $association => $config) {
-            $associatedModel = $config['with'];
-            $conditions = [$config['foreignKey'] => $id];
-            $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
-
-            foreach ($ids as $id) {
-                $conditions = [$this->$associatedModel->primaryKey => $id];
-                $result = $this->$associatedModel->find('first', ['conditions' => $conditions, 'callbacks' => false]);
-                if ($result) {
-                    $this->$associatedModel->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
-                }
-            }
-        }
-    }
 
     /**
      * Bulk deletes records, does not delete associated data, use model::delete for that.
@@ -1434,11 +1226,7 @@ class Model
     protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
     {
         if ($type === 'first' or $type === 'all') {
-            if (empty($query['fields'])) {
-                $query['fields'] = $this->fields();
-            } else {
-                $query['fields'] = $this->prepareFields($query['fields']);
-            }
+            $query['fields'] = empty($query['fields']) ? $this->fields() : $this->prepareFields($query['fields']);
         }
 
         $query['associated'] = $this->associatedConfig($query);
@@ -1707,5 +1495,40 @@ class Model
     public function disableBehavior(string $name) : bool
     {
         return $this->behaviorRegistry->disable($name);
+    }
+
+
+    /**
+     * Internal function for commiting a transaction, and triggering the callbacks
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
+    private function commitTransaction(Entity $entity, ArrayObject $options) : void
+    {
+        if ($options['transaction']) {
+            $this->commit();
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->dispatchCallback('afterCommit', [$entity, $options], false);
+            }
+        }
+    }
+
+    /**
+     * Internal function for rollingback a transaction, and triggering the callbacks
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
+    private function cancelTransaction(Entity $entity, ArrayObject $options) : void
+    {
+        if ($options['transaction']) {
+            $this->rollback();
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->dispatchCallback('afterRollback', [$entity, $options], false);
+            }
+        }
     }
 }
