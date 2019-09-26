@@ -745,16 +745,15 @@ class Model
         if ($result and $afterCallbacks) {
             $this->dispatchCallback('afterSave', [$entity, $options], false);
         }
-
+      
         /**
         * Save HABTM. It is here, because control is needed on false result from here
         */
         if ($hasAndBelongsToMany) {
-            if (!(new Association($this))->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks'])) {
-                return false;
-            }
+            $association = new Association($this);
+            $result = $association->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks']);
         }
-
+  
         unset($data, $options, $hasAndBelongsToMany);
 
         if ($result) {
