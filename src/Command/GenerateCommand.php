@@ -44,6 +44,7 @@ class GenerateCommand extends Command
         'command' => 'Generates a Command class',
         'component' => 'Generates a Component class',
         'controller' => 'Generates a Controller class',
+        'entity' => 'Generates an Entity class',
         'helper' => 'Generates a Helper class',
         'job' => 'Generates a Job class',
         'listener' => 'Generates a Listener class',
@@ -152,6 +153,21 @@ class GenerateCommand extends Command
         $this->generate(
             $this->getTemplateFilename('behavior_test'),
             $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Behavior'.DS."{$data['class']}BehaviorTest.php",
+            $data
+        );
+    }
+
+    protected function entity(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('entity'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Entity'.DS."{$data['class']}.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('entity_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Entity'.DS."{$data['class']}Test.php",
             $data
         );
     }
