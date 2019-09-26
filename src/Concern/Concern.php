@@ -44,11 +44,18 @@ class Concern
     public function __construct($object, array $config = [])
     {
         $this->object = $object;
-        if (method_exists($this, 'initialize')) {
-            $this->initialize($config);
-        }
+        $this->initialize($config);
     }
 
+    /**
+     * Construtor hook
+     *
+     * @param array $config
+     * @return void
+     */
+    public function initialize(array $config)
+    {
+    }
     /**
      * Magic for calling
      *
