@@ -148,4 +148,9 @@ class Collection implements ArrayAccess, Iterator, Countable
     {
         return isset($this->items[$this->position]);
     }
+    
+    public function first()
+    {
+        return $this->current();
+    }
 }

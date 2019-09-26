@@ -19,6 +19,7 @@ use Origin\Utility\Inflector;
 
 class Marshaller
 {
+    use EntityLocatorTrait;
     /**
      * Undocumented variable
      *
@@ -30,6 +31,7 @@ class Marshaller
     {
         $this->model = $model;
     }
+
 
     /**
      * Creates a map for entity fields.
@@ -97,7 +99,8 @@ class Marshaller
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
         
-        $entity = new Entity([], $options);
+        $entityClass = $this->entityClass($this->model);
+        $entity = new $entityClass([], $options);
 
         $properties = [];
      
@@ -113,14 +116,15 @@ class Marshaller
                     $alias = Inflector::singular($alias);
                 }
               
-                $model = ucfirst($alias);
-                if (isset($options['associated'][$model]['fields'])) {
-                    $fields = $options['associated'][$model]['fields'];
-                    unset($options['associated'][$model]['fields']);
+                $alias = ucfirst($alias);
+                if (isset($options['associated'][$alias]['fields'])) {
+                    $fields = $options['associated'][$alias]['fields'];
+                    unset($options['associated'][$alias]['fields']);
                 }
-     
-                $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                    'name' => ucfirst($alias),
+
+                $marshaller = new Marshaller($this->model->$alias);
+                $properties[$property] = $marshaller->{$propertyMap[$property]}($value, [
+                    'name' => $alias,
                     'fields' => $fields,
                     'associated' => $options['associated'],
                 ]);

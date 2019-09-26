@@ -22,6 +22,7 @@ use ArrayObject;
  */
 class Query
 {
+    use EntityLocatorTrait;
     protected $model = null;
 
     public function __construct(Model $model)
@@ -72,12 +73,13 @@ class Query
     }
 
     /**
-     * Takes results from the datasource and converts into an entity. Different
-     * from model::new which takes an array which can include hasMany
-     * and converts.
+     * Takes results from the datasource and converts into an entity. Different from model::new which
+     * takes an array which can include hasMany and converts.
+     *
+     * @internal using marshaller
      *
      * @param array $results results from datasource
-     * @return Mixed
+     * @return array
      */
     protected function prepareResults(array $results)
     {
@@ -88,11 +90,14 @@ class Query
         $belongsTo = $this->model->association('belongsTo');
         $hasOne = $this->model->association('hasOne');
        
+        $entityClass = $this->entityClass($this->model);
+
         foreach ($results as $record) {
             $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
-            $entity = new Entity($thisData, ['name' => $this->model->alias, 'exists' => true, 'markClean' => true]);
+            
+            $entity = new $entityClass($thisData, ['name' => $this->model->alias, 'exists' => true, 'markClean' => true]);
             unset($record[$alias]);
-           
+
             foreach ($record as $tableAlias => $data) {
                 if (is_string($tableAlias)) {
                     $model = Inflector::className($tableAlias);
@@ -116,8 +121,9 @@ class Query
                             continue;
                         }
                     }
-    
-                    $entity->{$associated} = new Entity($data, ['name' => $associated, 'exists' => true, 'markClean' => true]);
+        
+                    $associatedEntityClass = $this->entityClass($this->model->$model);
+                    $entity->{$associated} = new $associatedEntityClass($data, ['name' => $associated, 'exists' => true, 'markClean' => true]);
                 } else {
                     /**
                      * Any data is here is not matched to model, e.g. group by and non existant fields
@@ -133,7 +139,6 @@ class Query
             $buffer[] = $entity;
         }
         unset($belongsTo,$hasOne,$thisData,$entity);
-
         return $buffer;
     }
 

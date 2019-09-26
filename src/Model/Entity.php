@@ -17,6 +17,8 @@ declare(strict_types = 1);
  * Entity Object
  * Entity is an object that represents a single row in a database.
  * Moving away from arrays, we want this to work similar e.g isset, empty array_keys.
+ * @internal whilst using _ might be considered bad/old practice in this case we want to prevent clashes with column names
+ * in the database
  */
 
 namespace Origin\Model;
@@ -74,6 +76,27 @@ class Entity
      * @var boolean
      */
     protected $_deleted = false;
+
+    /**
+    * Cached lists of accessors
+    *
+    * @var array
+    */
+    protected static $accessors = [];
+
+    /**
+     * Virtual fields that will be exposed when using toArray,toJson,and toXml
+     *
+     * @var array
+     */
+    protected $_virtual = [];
+
+    /**
+     * Fields that should not be exposed when using toArray,toJson,and toXml
+     *
+     * @var array
+     */
+    protected $_hidden = [];
     
     /**
      * Constructor
@@ -152,7 +175,11 @@ class Entity
      */
     public function __debugInfo()
     {
-        return $this->_properties;
+        $properties = $this->_properties;
+        foreach ($this->_virtual as $field) {
+            $properties[$field] = $this->field;
+        }
+        return $properties;
     }
 
     /**
@@ -229,11 +256,42 @@ class Entity
     public function &get(string $property)
     {
         $result = null;
+
+        $method = static::accessor($property, 'get');
+
         if (isset($this->_properties[$property])) {
             $result = &$this->_properties[$property];
         }
-
+        if ($method) {
+            $result = $this->$method($result);
+        }
         return $result;
+    }
+
+    /**
+     * Gets the accessor method
+     *
+     * @param string $property
+     * @param string $type
+     * @return string|null
+     */
+    protected static function accessor(string $property, string $type) : ?string
+    {
+        $class = static::class;
+
+        if (isset(static::$accessors[$class][$type][$property])) {
+            return static::$accessors[$class][$type][$property];
+        }
+
+        if ($class === Entity::class) {
+            return null;
+        }
+
+        $method = $type . Inflector::studlyCaps($property);
+        if (!in_array($method, get_class_methods($class))) {
+            $method = '';
+        }
+        return static::$accessors[$class][$type][$property] = $method;
     }
 
     /**
@@ -248,9 +306,13 @@ class Entity
             $properties = [$properties => $value];
         }
 
-        foreach ($properties as $key => $value) {
-            $this->_properties[$key] = $value;
-            $this->_modified[$key] = true;
+        foreach ($properties as $property => $value) {
+            $method = static::accessor($property, 'set');
+            if ($method) {
+                $value = $this->$method($value);
+            }
+            $this->_properties[$property] = $value;
+            $this->_modified[$property] = true;
         }
 
         return $this;
@@ -369,7 +431,8 @@ class Entity
     public function toArray()
     {
         $result = [];
-        foreach ($this->_properties as $property => $value) {
+        foreach ($this->visibleProperties() as $property) {
+            $value = $this->$property;
             if (is_array($value) or $value instanceof Collection) {
                 foreach ($value as $k => $v) {
                     if ($v instanceof Entity) {
@@ -407,5 +470,46 @@ class Entity
         $root = Inflector::camelCase($this->_name ?? 'record');
 
         return Xml::fromArray([$root => $this->toArray()]);
+    }
+
+    /**
+     * Gets the visible properties
+     *
+     * @return array
+     */
+    private function visibleProperties() : array
+    {
+        $properties = array_keys($this->_properties);
+        $properties = array_merge($properties, $this->_virtual);
+
+        return array_diff($properties, $this->_hidden);
+    }
+
+    /**
+     * Sets and gets hidden properties
+     *
+     * @param array $properties
+     * @return array
+     */
+    public function hidden(array $properties = null) : array
+    {
+        if ($properties === null) {
+            return $this->_hidden;
+        }
+        return $this->_hidden = $properties;
+    }
+
+    /**
+     * Sets and gets virtual properties
+     *
+     * @param array $properties
+     * @return array
+     */
+    public function virtual(array $properties = null) : array
+    {
+        if ($properties === null) {
+            return $this->_virtual;
+        }
+        return $this->_virtual = $properties;
     }
 }

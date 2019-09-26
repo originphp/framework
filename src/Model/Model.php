@@ -638,13 +638,13 @@ class Model
         $exists = $this->exists($this->id);
 
         if ($options['validate'] === true) {
-            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', [$entity, $options])) {
+            if ($options['callbacks'] === true and ! $this->dispatchCallback('beforeValidate', [$entity, $options])) {
                 return false;
             }
             $validated = $this->validates($entity, ! $exists);
 
             if ($options['callbacks'] === true) {
-                $this->triggerCallback('afterValidate', [$entity, $options]);
+                $this->dispatchCallback('afterValidate', [$entity, $options]);
             }
 
             if (! $validated) {
@@ -655,15 +655,15 @@ class Model
         $beforeCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'before');
         $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
 
-        if ($beforeCallbacks and ! $this->triggerCallback('beforeSave', [$entity, $options])) {
+        if ($beforeCallbacks and ! $this->dispatchCallback('beforeSave', [$entity, $options])) {
             return false;
         }
 
-        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity, $options])) {
+        if ($exists and $beforeCallbacks and ! $this->dispatchCallback('beforeUpdate', [$entity, $options])) {
             return false;
         }
 
-        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity, $options])) {
+        if (! $exists and $beforeCallbacks and ! $this->dispatchCallback('beforeCreate', [$entity, $options])) {
             return false;
         }
 
@@ -718,7 +718,7 @@ class Model
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
 
                 if ($result and $afterCallbacks) {
-                    $this->triggerCallback('afterUpdate', [$entity, $options], false);
+                    $this->dispatchCallback('afterUpdate', [$entity, $options], false);
                 }
             } else {
                 $result = $connection->insert($this->table, $data);
@@ -736,13 +736,13 @@ class Model
                 $this->id = $entity->{$this->primaryKey};
 
                 if ($result and $afterCallbacks) {
-                    $this->triggerCallback('afterCreate', [$entity, $options], false);
+                    $this->dispatchCallback('afterCreate', [$entity, $options], false);
                 }
             }
         }
       
         if ($result and $afterCallbacks) {
-            $this->triggerCallback('afterSave', [$entity, $options], false);
+            $this->dispatchCallback('afterSave', [$entity, $options], false);
         }
 
         /**
@@ -998,7 +998,7 @@ class Model
                 if ($options['transaction']) {
                     $this->rollback();
                     if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                        $this->triggerCallback('afterRollback', [$data, $options], false);
+                        $this->dispatchCallback('afterRollback', [$data, $options], false);
                     }
                 }
                 throw $e;
@@ -1050,7 +1050,7 @@ class Model
             if ($options['transaction']) {
                 $this->commit();
                 if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                    $this->triggerCallback('afterCommit', [$data, $options], false);
+                    $this->dispatchCallback('afterCommit', [$data, $options], false);
                 }
             }
 
@@ -1059,7 +1059,7 @@ class Model
         if ($options['transaction']) {
             $this->rollback();
             if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                $this->triggerCallback('afterRollback', [$data, $options], false);
+                $this->dispatchCallback('afterRollback', [$data, $options], false);
             }
         }
 
@@ -1182,7 +1182,7 @@ class Model
         ]);
 
         if ($options['callbacks'] === true) {
-            if ($this->triggerCallback('beforeFind', [$options]) === false) {
+            if ($this->dispatchCallback('beforeFind', [$options]) === false) {
                 return null;
             }
         }
@@ -1218,7 +1218,7 @@ class Model
         }
 
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
-            if (! $this->triggerCallback('beforeDelete', [$entity, $options])) {
+            if (! $this->dispatchCallback('beforeDelete', [$entity, $options])) {
                 return false;
             }
         }
@@ -1243,26 +1243,26 @@ class Model
             if ($options['transaction']) {
                 $this->rollback();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity, $options], false);
+                    $this->dispatchCallback('afterRollback', [$entity, $options], false);
                 }
             }
             throw $e;
         }
         
         if ($result and $afterCallbacks) {
-            $this->triggerCallback('afterDelete', [$entity, $options], false);
+            $this->dispatchCallback('afterDelete', [$entity, $options], false);
         }
 
         if ($options['transaction']) {
             if ($result) {
                 $this->commit();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterCommit', [$entity, $options], false);
+                    $this->dispatchCallback('afterCommit', [$entity, $options], false);
                 }
             } else {
                 $this->rollback();
                 if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity, $options], false);
+                    $this->dispatchCallback('afterRollback', [$entity, $options], false);
                 }
             }
         }
@@ -1654,14 +1654,14 @@ class Model
     }
 
     /**
-     * triggerCallback.
+     * dispatchCallback.
      *
      * @param string $callback
      * @param array $arguments
      * @param boolean $isStoppable
      * @return void
      */
-    protected function triggerCallback(string $callback, array $arguments = [], bool $isStoppable = true)
+    protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true)
     {
         $callbacks = [];
 
