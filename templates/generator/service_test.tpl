@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Service;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Service\%class%Service;
+use %namespace%\Service\%class%Service;
 
 class %class%ServiceTest extends OriginTestCase
 {

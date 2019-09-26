@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Mailer;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Mailer\%class%Mailer;
+use %namespace%\Mailer\%class%Mailer;
 
 class %class%MailerTest extends OriginTestCase
 {

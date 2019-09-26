@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Model\Repository;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Model\Repository\%class%Repository;
+use %namespace%\Model\Repository\%class%Repository;
 
 class %class%RepositoryTest extends OriginTestCase
 {

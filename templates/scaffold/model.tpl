@@ -1,12 +1,12 @@
 <?php
 namespace App\Model;
 
+use Origin\Model\Collection;
 use Origin\Model\Entity;
 use ArrayObject;
 
 class %model% extends ApplicationModel
 {
-
     /**
      * Before find callback must return a bool. Returning false will stop the find operation.
      *
@@ -21,11 +21,11 @@ class %model% extends ApplicationModel
     /**
      * After find callback
      *
-     * @param mixed $results
+     * @param \Origin\Model\Collection $results
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind($results, ArrayObject $options) : void
+    public function afterFind(Collection $results, ArrayObject $options) : void
     {
     }
 

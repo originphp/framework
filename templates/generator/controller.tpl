@@ -2,7 +2,7 @@
 namespace %namespace%\Controller;
 
 /**
- * @property \App\Model\%model% $%model%
+ * @property \%namespace%\Model\%model% $%model%
  */
 class %class%Controller extends ApplicationController
 {

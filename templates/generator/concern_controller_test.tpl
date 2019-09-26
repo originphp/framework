@@ -2,8 +2,8 @@
 namespace %namespace%\Test\Controller\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Controller\Concern\%class%Concern;
-use %namespace%\Controller\ApplicationController;
+use App\Controller\ApplicationController;
+use %namespace%\Controller\Concern\%class%Concern;
 
 use Origin\Http\Request;
 use Origin\Http\Response;

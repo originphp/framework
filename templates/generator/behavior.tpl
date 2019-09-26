@@ -2,6 +2,7 @@
 namespace %namespace%\Model\Behavior;
 
 use Origin\Model\Behavior\Behavior;
+use Origin\Model\Collection;
 use Origin\Model\Entity;
 use ArrayObject;
 
@@ -31,11 +32,11 @@ class %class%Behavior extends Behavior
     /**
      * After find callback
      *
-     * @param mixed $results
+     * @param \Origin\Model\Collection $results
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind($results, ArrayObject $options) : void
+    public function afterFind(Collection $results, ArrayObject $options) : void
     {
     }
 

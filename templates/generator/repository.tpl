@@ -8,7 +8,7 @@ class %class%Repository extends Repository
      /**
      * The Model for this Repository
      *
-     * @param \App\Model\%model%
+     * @param \%namespace%\Model\%model%
      */
     public $%model%;
    

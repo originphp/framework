@@ -2,10 +2,9 @@
 namespace %namespace%\Model\Concern;
 
 use Origin\Concern\ModelConcern;
-use App\Model\ApplicationModel;
 
 /**
- * @method \%namespace%\Model\ApplicationModel model()
+ * @method \App\Model\ApplicationModel model()
  */
 class %class%Concern extends ModelConcern
 {

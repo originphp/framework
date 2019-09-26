@@ -1,6 +1,8 @@
 <?php
 namespace %namespace%\Model;
 
+use App\Model\ApplicationModel;
+use Origin\Model\Collection;
 use Origin\Model\Entity;
 use ArrayObject;
 
@@ -28,11 +30,11 @@ class %class% extends ApplicationModel
     /**
      * After find callback
      *
-     * @param mixed $results
+     * @param \Origin\Model\Collection $results
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind($results, ArrayObject $options) : void
+    public function afterFind(Collection $results, ArrayObject $options) : void
     {
     }
 
