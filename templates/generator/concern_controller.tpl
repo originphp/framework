@@ -2,7 +2,7 @@
 namespace %namespace%\Controller\Concern;
 
 use Origin\Concern\ControllerConcern;
-use App\Controller\ApplicationController;
+use %namespace%\Controller\ApplicationController;
 
 /**
  * @method \%namespace%\Controller\ApplicationController controller()

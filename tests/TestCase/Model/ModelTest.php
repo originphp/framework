@@ -766,6 +766,7 @@ class ModelTest extends OriginTestCase
             'fields' => ['COUNT(*) as total','author_id'],
             'group' => 'author_id','order' => 'author_id ASC', //mysql 8/5 return in different order
         ]);
+
         $this->assertEquals(1000, $result[0]->author_id);
         $this->assertEquals(2, $result[0]->total);
         $this->assertEquals(1001, $result[1]->author_id);

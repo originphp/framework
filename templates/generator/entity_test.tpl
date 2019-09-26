@@ -11,8 +11,8 @@ class %class%Test extends OriginTestCase
         $data = [];
         $options = [];
 
-        $user = new User($data, $options);
-        $user->test = true;
-        $this->assertTrue($user->has('test'));
+        $entity = new %class%($data, $options);
+        $entity->test = true;
+        $this->assertTrue($entity->has('test'));
     }
 }
