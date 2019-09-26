@@ -750,9 +750,7 @@ class Model
         * Save HABTM. It is here, because control is needed on false result from here
         */
         if ($hasAndBelongsToMany) {
-            $association = new Association($this);
-            $result = $association->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks']);
-            if (!$result) {
+            if (!(new Association($this))->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks'])) {
                 return false;
             }
         }
@@ -947,8 +945,22 @@ class Model
             }
         }
 
+        $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
+
         if ($options['transaction']) {
-            $result === true ? $this->commit() : $this->rollback();
+            $options = new ArrayObject($options);
+            ($result === true) ? $this->commit() : $this->rollback();
+        
+            if ($result and $afterCallbacks) {
+                foreach ($data as $row) {
+                    $this->dispatchCallback('afterCommmit', [$row,$options]);
+                }
+            }
+            if (!$result and $afterCallbacks) {
+                foreach ($data as $row) {
+                    $this->dispatchCallback('afterRollback', [$row,$options]);
+                }
+            }
         }
     
         return $result;
