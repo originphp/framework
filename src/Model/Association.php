@@ -107,7 +107,7 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($options['className']) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->extractClass($options['className'])) . '_id';
         }
         $alias = Inflector::tableName($this->model->alias);
         $associatedAlias = Inflector::tableName($association);
@@ -120,6 +120,16 @@ class Association
         $options['conditions'] = $conditions;
 
         return $options;
+    }
+
+    private function extractClass(string $class) : string
+    {
+        if (strpos($class, '\\')) {
+            list($namespace, $class) = namespaceSplit($class);
+        } elseif (strpos($class, '.')) {
+            list($plugin, $class) = pluginSplit($class);
+        }
+        return $class;
     }
 
     /**
@@ -212,8 +222,10 @@ class Association
             $options['mode'] = 'replace';
         }
 
+        $class = $this->extractClass($options['className']);
+
         // join table in alphabetic order
-        $models = [$this->model->name, $options['className']];
+        $models = [$this->model->name, $class];
         sort($models);
         $models = array_values($models);
 
@@ -228,10 +240,10 @@ class Association
             $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
         }
         if (is_null($options['associationForeignKey'])) {
-            $options['associationForeignKey'] = Inflector::underscored($options['className']) . '_id';
+            $options['associationForeignKey'] = Inflector::underscored($class) . '_id';
         }
         $withAlias = Inflector::tableName($options['with']);
-        $optionsClassAlias = Inflector::tableName($options['className']);
+        $optionsClassAlias = Inflector::tableName($class);
         $conditions = ["{$withAlias}.{$options['associationForeignKey']} = {$optionsClassAlias}.id"];
 
         if (! empty($options['conditions'])) {
