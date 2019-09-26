@@ -944,10 +944,10 @@ class Model
                 break;
             }
         }
-
-        $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
-
+       
         if ($options['transaction']) {
+            $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
+            
             $options = new ArrayObject($options);
             ($result === true) ? $this->commit() : $this->rollback();
         
