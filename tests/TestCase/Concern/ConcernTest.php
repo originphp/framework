@@ -18,6 +18,7 @@ use Origin\Model\Model;
 use Origin\Concern\ModelConcern;
 use Origin\Controller\Controller;
 use Origin\Concern\ControllerConcern;
+use Origin\Exception\Exception;
 
 class MockModel extends Model
 {
@@ -60,6 +61,8 @@ class ConcernTest extends \PHPUnit\Framework\TestCase
         $model = new MockModel(['name' => 'Article','connection' => 'test']);
         $concern = new  MyModelConcern($model);
         $this->assertEquals('bar', $concern->modelFoo());
+        $this->expectException(Exception::class);
+        $concern->generate1MillionBitcoins();
     }
 
     public function testModelCallConcernFromModel()
