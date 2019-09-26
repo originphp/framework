@@ -131,9 +131,9 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     }
     public function testUid()
     {
-        $this->assertRegExp('/^([a-z0-9]*){16}$/', Security::uid());
-        $this->assertRegExp('/^([a-z0-9]*){8}$/', Security::uid(8));
+        $this->assertRegExp('/^[a-z0-9]{16,16}$/', Security::uid());
+        $this->assertRegExp('/^[a-z0-9]{8,8}$/', Security::uid(8));
         $this->expectException(InvalidArgumentException::class);
-        Security::uid(6);
+        Security::uid(7);
     }
 }
