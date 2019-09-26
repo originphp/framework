@@ -406,7 +406,13 @@ class GenerateCommand extends Command
         );
     }
 
-    protected function varExport(array $data)
+    /**
+     * Modern version of varExport
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function varExport(array $data) : string
     {
         $data = var_export($data, true);
         $data = str_replace(
