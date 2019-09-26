@@ -1337,18 +1337,18 @@ class Model
         $options['limit'] = 1;
 
         // Run Query
-        $results = (new Query($this))->find($options);
+        $collection = (new Query($this))->find($options);
 
-        if (empty($results)) {
+        if (empty($collection)) {
             return null;
         }
 
         if ($options['callbacks'] === true) {
-            $this->triggerCallback('afterFind', [$results, $options], false);
+            $this->dispatchCallback('afterFind', [$collection , $options], false);
         }
 
         // Modify Results
-        return $results->first();
+        return $collection->first();
     }
 
     /**
@@ -1360,18 +1360,18 @@ class Model
     protected function finderAll(ArrayObject $options)
     {
         // Run Query
-        $results = (new Query($this))->find($options);
+        $collection = (new Query($this))->find($options);
 
         // Modify Results
-        if (empty($results)) {
+        if (empty($collection)) {
             return [];
         }
 
         if ($options['callbacks'] === true) {
-            $this->triggerCallback('afterFind', [$results, $options], false);
+            $this->dispatchCallback('afterFind', [$collection, $options], false);
         }
 
-        return new Collection($results->all(), ['name' => $this->alias]);
+        return $collection;
     }
 
     /**

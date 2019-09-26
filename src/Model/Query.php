@@ -64,7 +64,7 @@ class Query
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
-            $results = new ResultSet($results);
+            $results = new Collection($results, ['name' => $this->model->alias]);
         }
 
         unset($sql, $connection);
