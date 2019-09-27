@@ -4,7 +4,7 @@ namespace %namespace%\Test\Model\Behavior;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
-use App\Model\Behavior\%class%Behavior;
+use %namespace%\Model\Behavior\%class%Behavior;
 
 // Fake model - You can use any 
 class DummyModel extends Model

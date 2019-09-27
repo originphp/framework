@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Model\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Model\Concern\%class%Concern;
+use %namespace%\Model\Concern\%class%Concern;
 
 /**
  * @property \App\Model\User $User

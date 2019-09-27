@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Listener;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Listener\%class%Listener;
+use %namespace%\Listener\%class%Listener;
 
 class %class%ListenerTest extends OriginTestCase
 {

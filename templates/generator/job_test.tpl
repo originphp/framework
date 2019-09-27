@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Job;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Job\%class%Job;
+use %namespace%\Job\%class%Job;
 
 class %class%JobTest extends OriginTestCase
 {

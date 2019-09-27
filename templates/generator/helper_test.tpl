@@ -6,7 +6,7 @@ use Origin\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\View\View;
-use App\View\Helper\%class%Helper;
+use %namespace%\View\Helper\%class%Helper;
 
 class %class%HelperTest extends OriginTestCase
 {
