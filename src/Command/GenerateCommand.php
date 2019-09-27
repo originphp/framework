@@ -515,6 +515,12 @@ class GenerateCommand extends Command
         );
 
         $this->generate(
+            $this->getTemplateFilename('plugin_bootstrap'),
+            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'config'.DS.'bootstrap.php',
+            $data
+        );
+
+        $this->generate(
             $this->getTemplateFilename('phpunit'),
             $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'phpunit.xml',
             $data

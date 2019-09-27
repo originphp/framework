@@ -76,10 +76,4 @@ if (file_exists(CONFIG . DS . '.env.php')) {
  * Load Config
  */
 require CONFIG . DS . 'bootstrap.php';
-require CONFIG . DS . 'log.php';
-require CONFIG . DS . 'cache.php';
-require CONFIG . DS . 'database.php';
-require CONFIG . DS . 'storage.php';
-require CONFIG . DS . 'email.php';
-require CONFIG . DS . 'queue.php';
 require CONFIG . DS . 'routes.php';

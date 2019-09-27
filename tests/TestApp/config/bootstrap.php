@@ -13,7 +13,13 @@ $namespaces = [
 $autoloader->addNamespaces($namespaces);
 $autoloader->register();
 
-require 'application.php';
+include 'application.php';
+include 'log.php';
+include 'cache.php';
+include 'database.php';
+include 'storage.php';
+include 'email.php';
+include 'queue.php';
 
 if (env('ELASTICSEARCH_HOST')) {
     Elasticsearch::config('test', [
