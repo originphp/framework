@@ -20,7 +20,7 @@ class SaySomethingCommand extends Command
         ]);
     }
 
-    public function execute()
+    public function execute() : void
     {
         $what = $this->arguments('what');
         $color = $this->options('color');

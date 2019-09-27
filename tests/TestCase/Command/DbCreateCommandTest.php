@@ -73,7 +73,7 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertErrorContains('DatasourceException');
     }
 
-    public function shutdown()
+    public function shutdown() : void
     {
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS dummy');

@@ -77,7 +77,7 @@ class DelocalizeBehaviorTest extends OriginTestCase
         $this->assertEquals('10:27pm', $deal->confirmed);
     }
 
-    public function shutdown()
+    public function shutdown() : void
     {
         Date::locale([
             'timezone' => 'UTC',

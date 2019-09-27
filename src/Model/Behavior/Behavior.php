@@ -16,9 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Model\Behavior;
 
 use Origin\Model\Model;
-use Origin\Model\Entity;
 use Origin\Core\ConfigTrait;
-use ArrayObject;
 
 class Behavior
 {
@@ -54,7 +52,7 @@ class Behavior
      *
      * @return \Origin\Model\Model
      */
-    public function model()
+    public function model() : Model
     {
         return $this->_model;
     }

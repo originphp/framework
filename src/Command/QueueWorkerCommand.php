@@ -68,7 +68,7 @@ class QueueWorkerCommand extends Command
      *
      * @return void
      */
-    public function execute()
+    public function execute() : void
     {
         if ($this->supportsSignals()) {
             $this->setupSignalHandler();

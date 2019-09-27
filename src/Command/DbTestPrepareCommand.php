@@ -30,7 +30,7 @@ class DbTestPrepareCommand extends Command
             'default' => Config::read('Schema.format'),
         ]);
     }
-    public function execute()
+    public function execute() : void
     {
         $config = ConnectionManager::config('test');
         if (! $config) {

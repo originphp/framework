@@ -32,7 +32,7 @@ class ApplicationController extends Controller
     /**
      * This is called after the controller action is executed.
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 }

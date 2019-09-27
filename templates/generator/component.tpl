@@ -5,7 +5,8 @@ use Origin\Controller\Component\Component;
 
 class %class%Component extends Component
 {
-    public function initialize(array $config) : void{
+    public function initialize(array $config) : void
+    {
         
     } 
 }

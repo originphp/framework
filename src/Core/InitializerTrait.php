@@ -33,7 +33,7 @@ trait InitializerTrait
      *
      * @return void
      */
-    private function initializeTraits()
+    private function initializeTraits() : void
     {
         $class = $this;
      

@@ -33,7 +33,7 @@ class DbDropCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $datasource = $this->options('connection');
         $config = ConnectionManager::config($datasource);

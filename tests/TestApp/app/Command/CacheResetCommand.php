@@ -13,7 +13,7 @@ class CacheResetCommand extends Command
     {
     }
 
-    public function execute()
+    public function execute() : void
     {
         $this->out('Cache has been reset');
     }

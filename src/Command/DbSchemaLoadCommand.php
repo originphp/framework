@@ -41,7 +41,7 @@ class DbSchemaLoadCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $name = $this->arguments('name') ?? 'schema';
         $type = $this->options('type');

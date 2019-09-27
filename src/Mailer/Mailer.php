@@ -136,7 +136,7 @@ abstract class Mailer
      *
      * @return void
      */
-    public function startup()
+    public function startup() : void
     {
     }
 
@@ -145,7 +145,7 @@ abstract class Mailer
      *
      * @return void
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 

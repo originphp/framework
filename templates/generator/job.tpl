@@ -42,7 +42,7 @@ class %class%Job extends ApplicationJob
     *
     * @return void
     */
-    public function startup()
+    public function startup() : void
     {
     }
 
@@ -50,7 +50,7 @@ class %class%Job extends ApplicationJob
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
     */
-    public function execute()
+    public function execute() : void
     {
 
 
@@ -82,7 +82,7 @@ class %class%Job extends ApplicationJob
     *
     * @return void
     */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 

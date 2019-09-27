@@ -38,7 +38,7 @@ class Listener
      *
      * @return void
      */
-    public function startup()
+    public function startup() : void
     {
     }
     /**
@@ -46,7 +46,7 @@ class Listener
      *
      * @return void
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 }

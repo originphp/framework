@@ -281,17 +281,22 @@ class Controller
 
     /**
     * Callback before the action in the controller is called.
+    *
+    * @return \Origin\Http\Response|null
     */
     public function beforeAction()
     {
+        return null;
     }
 
     /**
      * Callback just prior to redirecting
+     *
      */
     public function beforeRedirect()
     {
     }
+
     /**
      * This is called after the startup, before shutdown
      */
@@ -303,10 +308,11 @@ class Controller
      * Called after the controller action and the component shutdown function.
      * Remember to call parent
      *
-     * @return \Origin\Http\Response|void
+     * @return \Origin\Http\Response|null
      */
     public function afterAction()
     {
+        return null;
     }
 
     /**

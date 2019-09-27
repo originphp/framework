@@ -510,21 +510,23 @@ abstract class Command
      *
      * @return void
      */
-    public function startup()
+    public function startup() : void
     {
     }
 
     /**
      * Place the command logic here.
+     *
+     * @return void
      */
-    abstract public function execute();
+    abstract public function execute() : void;
 
     /**
      * This is called after executed method
      *
      * @return void
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 

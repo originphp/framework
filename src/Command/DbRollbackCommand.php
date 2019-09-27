@@ -36,7 +36,7 @@ class DbRollbackCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $this->Migration = new Model([
             'name' => 'Migration',

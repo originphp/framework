@@ -18,7 +18,7 @@ class %class%MiddlewareTest extends OriginTestCase
     */
     protected $response = null;
 
-    public function startup()
+    public function startup() : void
     {
         $this->request = new Request();
         $this->response = new Response();

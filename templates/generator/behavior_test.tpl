@@ -25,10 +25,8 @@ class %class%BehaviorTest extends OriginTestCase
     */
     protected $%class% = null;
 
-    public function startup()
+    public function startup() : void
     {
-        parent::startup();
-
          $model = ModelRegistry::get('DummyModel', [
             'className' => DummyModel::class,
         ]);

@@ -25,7 +25,7 @@ class CacheEnableCommand extends Command
 {
     protected $name = 'cache:enable';
     protected $description = 'Enables cache';
-    public function execute()
+    public function execute() : void
     {
         $this->out('OK Cache enabled');
     }
@@ -36,7 +36,7 @@ class CacheDisableCommand extends Command
     protected $name = 'cache:disable';
     protected $description = 'Disables cache';
 
-    public function execute()
+    public function execute() : void
     {
         $this->out('OK Cache disabled');
     }
@@ -52,7 +52,7 @@ class CacheDeleteCommand extends Command
         $this->addArgument('key', ['required' => true]);
     }
 
-    public function execute()
+    public function execute() : void
     {
         $key = $this->arguments('key');
         $this->out("{$key} deleted");
@@ -61,7 +61,7 @@ class CacheDeleteCommand extends Command
 
 class FooCommand extends Command
 {
-    public function execute()
+    public function execute() : void
     {
         $this->abort();
     }

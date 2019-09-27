@@ -8,7 +8,7 @@ class %class%MailerTest extends OriginTestCase
 {
     public $fixtures = ['User'];
 
-    public function startup()
+    public function startup() : void
     {
         $this->loadModel('User');
     }

@@ -17,6 +17,8 @@ namespace Origin\Controller\Component;
 
 use Origin\Core\ConfigTrait;
 use Origin\Controller\Controller;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class Component
 {
@@ -93,6 +95,8 @@ class Component
 
     /**
      * This called after the controller startup but before the controller action.
+     *
+     * @return \Origin\Http\Response|null
      */
     public function startup()
     {
@@ -100,6 +104,8 @@ class Component
 
     /**
      * This is called after the controller action but before the controller shutdown
+     *
+     * @return \Origin\Http\Response|null
      */
     public function shutdown()
     {
@@ -109,7 +115,7 @@ class Component
      * Returns the controller
      * @return \Origin\Controller\Controller
      */
-    public function controller()
+    public function controller() : Controller
     {
         return $this->_controller;
     }
@@ -119,7 +125,7 @@ class Component
      *
      * @return \Origin\Http\Request
      */
-    public function request()
+    public function request() : Request
     {
         return $this->_controller->request;
     }
@@ -127,9 +133,9 @@ class Component
     /**
      * Returns the response object
      *
-    * @return \Origin\Http\Response
+     * @return \Origin\Http\Response
      */
-    public function response()
+    public function response() : Response
     {
         return $this->_controller->response;
     }

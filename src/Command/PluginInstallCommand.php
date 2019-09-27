@@ -106,7 +106,7 @@ class PluginInstallCommand extends Command
         file_put_contents($file, $contents);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $url = $this->getUrl($this->arguments('url'));
         $plugin = $this->getPlugin($url, $this->arguments('name'));

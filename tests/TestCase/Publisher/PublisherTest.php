@@ -58,7 +58,7 @@ class PublisherTest extends OriginTestCase
 {
     public $fixtures = ['Origin.User','Origin.Queue'];
 
-    public function startup()
+    public function startup() : void
     {
         $this->loadModel('User');
     }

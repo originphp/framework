@@ -20,7 +20,7 @@ class MailerJob extends Job
 {
     public $queue = 'mailers';
     
-    public function execute(array $params)
+    public function execute(array $params) : void
     {
         $params['mailer']->dispatch(...$params['arguments']);
     }

@@ -12,7 +12,7 @@ class %class%Command extends Command
 
     }
  
-    public function execute()
+    public function execute() : void
     {
        
     }

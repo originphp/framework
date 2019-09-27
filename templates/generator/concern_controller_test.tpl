@@ -10,7 +10,7 @@ use Origin\Http\Response;
 
 class %class%ConcernTest extends OriginTestCase
 {
-   public function startup()
+   public function startup() : void
     {
         $this->controller = new ApplicationController(
             new Request('/controller/action'),

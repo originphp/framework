@@ -38,7 +38,7 @@ class DbResetCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $datasource = $this->options('connection');
         $name = $this->arguments('name') ?? 'schema';

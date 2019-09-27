@@ -146,7 +146,7 @@ class Job
      *
      * @return void
      */
-    public function startup()
+    public function startup() : void
     {
     }
 
@@ -157,7 +157,7 @@ class Job
      *
      * @return void
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 

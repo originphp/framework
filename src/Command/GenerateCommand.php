@@ -94,7 +94,7 @@ class GenerateCommand extends Command
         ]);
     }
 
-    public function execute()
+    public function execute() : void
     {
         $generator = $this->arguments('generator');
         $name = $this->arguments('name');

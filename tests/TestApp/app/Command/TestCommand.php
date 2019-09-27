@@ -14,7 +14,7 @@ class TestCommand extends Command
         $this->addArgument('test', ['description' => 'Which test','required' => true]);
     }
 
-    public function execute()
+    public function execute() : void
     {
         $test = $this->arguments('test');
         $this->{$test}();

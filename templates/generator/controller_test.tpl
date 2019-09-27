@@ -13,7 +13,7 @@ class %class%ControllerTest extends OriginTestCase
 
     public $fixtures = ['%model%'];
 
-    public function startup()
+    public function startup() : void
     {
         $this->loadModel('%model%');
     }

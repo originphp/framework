@@ -37,7 +37,7 @@ class DbSetupCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $name = $this->arguments('name') ?? 'schema';
 

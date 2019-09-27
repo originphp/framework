@@ -48,14 +48,14 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     /**
      * This is called after initialize and after fixtures have been loaded, but before the tests starts.
      */
-    public function startup()
+    public function startup() : void
     {
     }
 
     /**
      * This is called after the test has run.
      */
-    public function shutdown()
+    public function shutdown() : void
     {
     }
 

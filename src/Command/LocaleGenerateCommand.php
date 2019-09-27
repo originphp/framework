@@ -73,7 +73,7 @@ class LocaleGenerateCommand extends Command
         $this->addArgument('locales', ['description' => 'The names of the locales you want to genreate seperated by space', 'type' => 'array']);
     }
 
-    public function execute()
+    public function execute() : void
     {
         $types = [];
         $locales = ResourceBundle::getLocales('');

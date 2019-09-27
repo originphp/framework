@@ -25,7 +25,7 @@ class ElasticsearchReindexCommand extends Command
         $this->addArgument('model', ['type' => 'array','required' => true,'description' => 'Model or list of models seperated by spaces']);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $models = $this->arguments('model');
         foreach ($models as $model) {

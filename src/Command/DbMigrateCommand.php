@@ -42,7 +42,7 @@ class DbMigrateCommand extends Command
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $version = $this->arguments('version');
 

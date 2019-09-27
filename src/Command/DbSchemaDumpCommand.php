@@ -54,7 +54,7 @@ class %name%Schema extends Schema
         ]);
     }
  
-    public function execute()
+    public function execute() : void
     {
         $name = $this->arguments('name') ?? 'schema';
 
