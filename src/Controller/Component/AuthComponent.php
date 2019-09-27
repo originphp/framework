@@ -77,7 +77,7 @@ class AuthComponent extends Component
      */
     private $user = null;
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if (! ModelRegistry::get($this->config['model'])) {
             throw new MissingModelException($this->config['model']);
