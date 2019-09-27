@@ -21,6 +21,11 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
+### Fixed
+- Fixed namespace for generators when using plugins
+- Fixed association when manually setting class name for belongsTo or hasAndBelongsToMany
+- Fixed issue when incorrectly posting blank id field on add causing model to not add id
+
 ## [1.33.2] - 2019-09-23
 
 ### Security
