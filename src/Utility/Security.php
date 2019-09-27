@@ -75,7 +75,8 @@ class Security
     }
 
     /**
-     * Compares two strings are equal in a safe way.
+     * Compares two strings are equal in a safe way. (Prevent timing attacks)
+     *
      * @see https://blog.ircmaxell.com/2014/11/its-all-about-time.html
      * @param string $original
      * @param string $compare
@@ -92,7 +93,9 @@ class Security
 
     /**
      * Generates a secure 256 bits (32 bytes) key
-     * @internal the size needs to be the same length as the cipher, the rest will be truncated
+     *
+     * The size needs to be the same length as the cipher, anything larger will be truncated.
+     *
      * @return string
      */
     public static function generateKey(): string
@@ -147,7 +150,7 @@ class Security
     }
 
     /**
-     * Generates a cryptographically secure random string
+     * Generates a cryptographically secure random string for a unique id
      *
      * @param integer $length greater than 8 and divisible by 2. e.g. 8,10,12,14 etc.
      * @return string
