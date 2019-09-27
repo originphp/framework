@@ -44,7 +44,7 @@ class FileEngine extends BaseEngine
       * @param array $context  ['what'='string']
       * @return bool
       */
-    public function log(string $level, string $message, array $context = [])
+    public function log(string $level, string $message, array $context = []) : bool
     {
         $message = $this->format($level, $message, $context) . "\n";
         $file = $this->config('path') . DS . $this->config('filename');

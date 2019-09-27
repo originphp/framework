@@ -139,7 +139,7 @@ class GenerateCommand extends Command
             'namespace' => $plugin ? $plugin : 'App',
         ];
 
-        return $this->{$generator}($data);
+        $this->{$generator}($data);
     }
 
     protected function behavior(array $data)

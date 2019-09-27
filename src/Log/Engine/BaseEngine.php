@@ -211,9 +211,9 @@ abstract class BaseEngine
     * @param string $level
     * @param string $message
     * @param array $context
-    * @return void
+    * @return bool
     */
-    abstract public function log(string $level, string $message, array $context = []);
+    abstract public function log(string $level, string $message, array $context = []) : bool;
 
     /**
      * Interpolates context values into the message placeholders.

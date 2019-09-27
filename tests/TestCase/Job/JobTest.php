@@ -30,17 +30,17 @@ class PassOrFailJob extends Job
         $this->status = 'new';
     }
 
-    public function execute(bool $pass = true)
+    public function execute(bool $pass = true) : void
     {
         if (! $pass) {
             $a = 1 / 0;
         }
     }
-    public function onSuccess(bool $pass = true)
+    public function onSuccess(bool $pass = true) : void
     {
         $this->status = 'success';
     }
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
         $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);

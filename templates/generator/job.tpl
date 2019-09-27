@@ -63,7 +63,7 @@ class %class%Job extends ApplicationJob
     * @param \Exception $exception
     * @return void
     */
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
 
     }
@@ -72,7 +72,8 @@ class %class%Job extends ApplicationJob
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
     */
-    public function onSuccess(){
+    public function onSuccess() : void
+    {
 
     }
 
