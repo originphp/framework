@@ -939,7 +939,7 @@ class Email
             $message[] = '';
         }
 
-        if ($this->textMessage) {
+        if (($emailFormat === 'text' or $emailFormat ==='both') and $this->textMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
                 $message[] = 'Content-Type: text/plain; charset="' . $this->charset . '"';
@@ -952,7 +952,7 @@ class Email
             $message[] = '';
         }
 
-        if ($this->htmlMessage) {
+        if (($emailFormat === 'html' or $emailFormat ==='both') and $this->htmlMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
                 $message[] = 'Content-Type: text/html; charset="' . $this->charset . '"';
