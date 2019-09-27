@@ -29,7 +29,7 @@ use Origin\Storage\Exception\NotFoundException;
 class MockSftpEngine extends SftpEngine
 {
     use TestTrait;
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         // dont do anthing
     }

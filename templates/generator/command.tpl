@@ -7,7 +7,7 @@ class %class%Command extends Command
     protected $name = '%custom%';
     protected $description = '';
 
-    public function initialize()
+    public function initialize() : void
     {
 
     }

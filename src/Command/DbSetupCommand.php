@@ -23,7 +23,7 @@ class DbSetupCommand extends Command
 
     protected $description = 'Creates the database,loads schema and seeds the database';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource','short' => 'c','default' => 'default',

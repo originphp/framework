@@ -8,7 +8,7 @@ class %class%Service extends ApplicationService
     /**
     * Dependencies will be sent here from constructor
     */
-    public function initialize()
+    public function initialize() : void
     {
   
     }

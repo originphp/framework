@@ -65,7 +65,7 @@ class LocaleGenerateCommand extends Command
         'mm' => 'i',
     ];
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('expected', ['description' => 'Adds the expected information', 'type' => 'boolean']);
         $this->addOption('single-file', ['description' => 'Put all definitions in a single file', 'type' => 'boolean']);

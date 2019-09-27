@@ -24,7 +24,7 @@ use Origin\Model\Behavior\ElasticsearchBehavior;
 class Article extends Model
 {
     use TestTrait;
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadBehavior('Timestamp');
         $this->loadBehavior('Elasticsearch', [

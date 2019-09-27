@@ -8,7 +8,7 @@ use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class Article extends Model
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadBehavior('Elasticsearch', [
             'connection' => 'test',

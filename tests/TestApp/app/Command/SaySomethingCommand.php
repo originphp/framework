@@ -9,7 +9,7 @@ class SaySomethingCommand extends Command
 
     protected $description = 'A command to say something';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('what', [
             'description' => 'What should be said','require' => true,

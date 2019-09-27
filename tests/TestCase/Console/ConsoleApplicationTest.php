@@ -47,7 +47,7 @@ class CacheDeleteCommand extends Command
     protected $name = 'cache:delete';
     protected $description = 'Deletes an item from the cache';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('key', ['required' => true]);
     }

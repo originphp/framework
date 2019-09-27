@@ -9,7 +9,7 @@ class CacheResetCommand extends Command
 
     protected $description = 'A command to reset the cache';
 
-    public function initialize()
+    public function initialize() : void
     {
     }
 

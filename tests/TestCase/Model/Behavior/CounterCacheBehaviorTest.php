@@ -23,7 +23,7 @@ use Origin\TestSuite\OriginTestCase;
  */
 class Post extends Model
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadBehavior('Timestamp');
         $this->hasMany('Reply');
@@ -32,7 +32,7 @@ class Post extends Model
 
 class Reply extends Model
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadBehavior('Timestamp');
         $this->belongsTo('Post', [

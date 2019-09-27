@@ -340,7 +340,7 @@ class Model
     /**
      * Hook to call just after model creation.
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
     /**
@@ -726,12 +726,12 @@ class Model
                 if ($result) {
                     $entity->created(true);
                 }
-                
+               
                 /**
-                * Postgresql lastInsertId error if you specify wrong id.
-                * @internal lastval is not yet defined in this session
-                */
-                if (empty($entity->{$this->primaryKey})) {
+                 * Postgresql lastInsertId error if you specify wrong id.
+                 * @internal lastval is not yet defined in this session
+                 */
+                if (! isset($entity->{$this->primaryKey})) {
                     $entity->{$this->primaryKey} = (int) $connection->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};

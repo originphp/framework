@@ -32,7 +32,7 @@ class DbMigrateCommand extends Command
      */
     protected $Migration = null;
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource','short' => 'c','default' => 'default',

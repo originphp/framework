@@ -87,7 +87,7 @@ class Component
      * This is called when component is loaded for the first time from the
      * controller.
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
 

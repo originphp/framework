@@ -29,7 +29,7 @@ class FileEngine extends BaseEngine
         'channels' => [],
     ];
     
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if ($this->config('filename') === null) {
             $this->config('filename', 'application.log');

@@ -23,7 +23,7 @@ class DbTestPrepareCommand extends Command
     protected $name = 'db:test:prepare';
     protected $description = 'Prepares the test database using the current schema file';
     
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('type', [
             'description' => 'Which schema type to be loaded sql or php',

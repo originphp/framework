@@ -38,7 +38,7 @@ class BaseApplication
     /**
      * This is where middleware is setup
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 

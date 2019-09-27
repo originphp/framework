@@ -6,7 +6,7 @@ namespace %namespace%\Controller;
  */
 class %class%Controller extends ApplicationController
 {
-    public function initialize()
+    public function initialize() : void
     {
         parent::initialize();
     }

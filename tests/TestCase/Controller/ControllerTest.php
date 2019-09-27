@@ -66,7 +66,7 @@ class TestsController extends Controller
     {
     }
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->initialized = true;
     }
@@ -93,7 +93,7 @@ class ApplesController extends Controller
 {
     protected $when = null;
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->loadComponent('Fruit', ['className' => FruitComponent::class]);
     }

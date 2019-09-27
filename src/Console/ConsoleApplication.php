@@ -109,7 +109,7 @@ class ConsoleApplication
         $this->commandRegistry = new LazyLoadContainer();
     }
 
-    public function initialize()
+    public function initialize() : void
     {
     }
 

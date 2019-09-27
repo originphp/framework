@@ -25,7 +25,7 @@ class LocalEngine extends BaseEngine
         'root' => APP . DS . 'storage',
     ];
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if (! file_exists($this->config('root')) and ! is_dir($this->config('root'))) {
             throw new InvalidArgumentException(sprintf('Invalid root %s.', $this->config('root')));

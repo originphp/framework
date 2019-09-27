@@ -34,7 +34,7 @@ class Repository
         $this->initialize();
     }
 
-    public function initialize()
+    public function initialize() : void
     {
     }
     /**

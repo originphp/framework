@@ -28,7 +28,7 @@ class DbSeedCommand extends Command
 
     protected $description = 'Seeds the database with initial records';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource',

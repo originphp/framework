@@ -26,13 +26,13 @@ class ApcuEngine extends BaseEngine
         'prefix' => 'origin_',
     ];
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $msg = 'Apcu extension not loaded.';
         if (extension_loaded('apcu')) {
             $msg = 'Apcu extension not enabled.';
             if ((PHP_SAPI !== 'cli' and ini_get('apc.enabled')) or (PHP_SAPI === 'cli' and ini_get('apc.enable_cli'))) {
-                return true;
+                return;
             }
         }
         throw new Exception($msg);

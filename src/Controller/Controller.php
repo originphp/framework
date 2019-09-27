@@ -257,7 +257,7 @@ class Controller
      * This is immediately after construct method. Use this Hook load components,
      * helpers or anything that needs to be done when a new controller is created.
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 

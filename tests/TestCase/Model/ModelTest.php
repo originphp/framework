@@ -66,11 +66,11 @@ class Article extends Model
     /**
      * After find callback
      *
-     * @param mixed $results
+     * @param Collection $results
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind($results, ArrayObject $options) : void
+    public function afterFind(Collection $results, ArrayObject $options) : void
     {
     }
 
@@ -1685,7 +1685,7 @@ class ModelTest extends OriginTestCase
             ],
         ];
         $article = $this->Article->new($data);
-       
+     
         $this->assertTrue($this->Article->save($article));
         # Postgre returns different id numbers
         $this->assertNotEmpty($article->tags[0]->id);

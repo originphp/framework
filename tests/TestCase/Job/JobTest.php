@@ -25,7 +25,7 @@ class PassOrFailJob extends Job
 {
     public $connection = 'default';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->status = 'new';
     }

@@ -20,7 +20,7 @@ namespace Origin\Controller\Component;
  */
 class FlashComponent extends Component
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadComponent('Session');
     }

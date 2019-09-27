@@ -55,7 +55,7 @@ class RedisEngine extends BaseEngine
      *
      * @param array $config  duration,prefix,path
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $mergedWithDefault = $this->config();
         $this->Redis = RedisConnection::connect($mergedWithDefault);

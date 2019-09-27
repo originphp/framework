@@ -25,7 +25,7 @@ class DbSchemaLoadCommand extends Command
     protected $name = 'db:schema:load';
     protected $description = 'Loads the database schema from file';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource',

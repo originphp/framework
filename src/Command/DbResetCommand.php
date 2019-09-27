@@ -23,7 +23,7 @@ class DbResetCommand extends Command
 
     protected $description = 'Drops the database and then runs setup';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource','short' => 'c','default' => 'default',

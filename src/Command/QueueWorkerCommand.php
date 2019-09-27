@@ -52,7 +52,7 @@ class QueueWorkerCommand extends Command
      *
      * @return void
      */
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('queue', [
             'description' => 'a queue name or a list of queues seperated by spaces',

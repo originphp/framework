@@ -141,7 +141,7 @@ abstract class Command
     /**
      * The initialize hook, called before command is executed. Setup your arguments and options for parsing.
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 

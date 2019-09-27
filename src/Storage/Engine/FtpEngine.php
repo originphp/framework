@@ -33,7 +33,7 @@ class FtpEngine extends BaseEngine
 
     protected $connection = null;
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if ($this->config('host') === null) {
             throw new InvalidArgumentException('No host set');

@@ -35,7 +35,7 @@ class Middleware
      *
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
     /**

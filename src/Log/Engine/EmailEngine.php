@@ -48,7 +48,7 @@ class EmailEngine extends BaseEngine
      * @param array $config
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if (! $this->validateEmail($this->config('to'))) {
             throw new InvalidArgumentException('Invalid Email Address for To.');

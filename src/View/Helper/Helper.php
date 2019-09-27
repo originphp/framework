@@ -81,7 +81,7 @@ class Helper
      * This is called when helper is loaded for the first time from the
      * controller.
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
 

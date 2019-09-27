@@ -22,7 +22,7 @@ use ArrayObject;
 
 class Tester extends Model
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->loadBehavior('Tester', ['className' => 'Origin\Test\Model\Behavior\BehaviorTesterBehavior']);
     }

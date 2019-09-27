@@ -20,7 +20,7 @@ class ElasticsearchReindexCommand extends Command
     protected $description = 'Deletes and then recreates indexes and adds data to the indexes from the database';
     protected $help = 'Deletes existing indexes, then creates the new one with the settings defined in the model, then imports the data into the index.';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('model', ['type' => 'array','required' => true,'description' => 'Model or list of models seperated by spaces']);
     }

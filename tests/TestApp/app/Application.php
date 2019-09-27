@@ -17,7 +17,7 @@ class Application extends BaseApplication
      * $this->loadMiddleware('RequestModifier');
      * $this->loadMiddleware('MyPlugin.RequestModifier')
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 }

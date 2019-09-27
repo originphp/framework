@@ -97,7 +97,7 @@ class Fixture
     /**
      * Use to create dynamic records.
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
    

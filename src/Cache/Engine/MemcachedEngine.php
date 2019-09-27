@@ -67,7 +67,7 @@ class MemcachedEngine extends BaseEngine
      *
      * @param array $config
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $msg = 'Memcached extension not loaded.';
         if (extension_loaded('memcached')) {
@@ -84,7 +84,7 @@ class MemcachedEngine extends BaseEngine
                     $this->Memcached->setSaslAuthData($this->config['username'], $this->config['password']);
                 }
                 if ($this->Memcached->set('---origin-php---', true, 1)) {
-                    return true;
+                    return;
                 }
             }
         }

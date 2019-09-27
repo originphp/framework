@@ -24,7 +24,7 @@ class DbDropCommand extends Command
 
     protected $description = 'Drops the database for the datasource';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource',

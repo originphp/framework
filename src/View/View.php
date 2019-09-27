@@ -100,7 +100,7 @@ class View
      *
      * @return void
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 

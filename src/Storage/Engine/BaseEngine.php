@@ -36,7 +36,7 @@ abstract class BaseEngine
      * @param array $config
      * @return void
      */
-    abstract public function initialize(array $config);
+    abstract public function initialize(array $config) : void;
 
     /**
      * Reads from the storage

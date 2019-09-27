@@ -22,7 +22,7 @@ class PluginInstallCommand extends Command
     protected $name = 'plugin:install';
     protected $description = 'Installs a plugin using a URL or github username/repo. GIT is required to be installed.';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('url', [
             'help' => 'github repo URL or github username/repo',

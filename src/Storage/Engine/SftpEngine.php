@@ -56,7 +56,7 @@ class SftpEngine extends BaseEngine
      */
     protected $connection = null;
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         if (! class_exists(SFTP::class)) {
             throw new Exception('phpseclib not installed.');

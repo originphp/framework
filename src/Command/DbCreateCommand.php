@@ -23,7 +23,7 @@ class DbCreateCommand extends Command
     protected $name = 'db:create';
     protected $description = 'Creates the database for the datasource';
     
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource','short' => 'c','default' => 'default',

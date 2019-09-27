@@ -34,7 +34,7 @@ abstract class BaseEngine
         $this->initialize($config);
     }
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
     /**

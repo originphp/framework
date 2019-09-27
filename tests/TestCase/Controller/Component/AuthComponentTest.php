@@ -38,7 +38,7 @@ class UsersController extends Controller
      */
     public $allow = false;
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->loadComponent('Auth');
     }

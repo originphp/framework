@@ -58,7 +58,7 @@ class GenerateCommand extends Command
         'service' => 'Generates a Service object class',
     ];
 
-    public function initialize()
+    public function initialize() : void
     {
         if (! file_exists($this->directory)) {
             $this->directory = ORIGIN . DS . 'templates'; // default

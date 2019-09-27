@@ -8,7 +8,7 @@ use ArrayObject;
 
 class ApplicationModel extends Model
 {
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
    

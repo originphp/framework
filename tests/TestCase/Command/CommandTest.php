@@ -44,7 +44,7 @@ class BackupCommand extends Command
     
     protected $description = ['Backup command'];
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', ['short' => 'c','description' => 'Which datasource to use','default' => 'main']);
         $this->addArgument('database', ['required' => true,'description' => 'The database to backup']);
@@ -65,7 +65,7 @@ class CacheCommand extends Command
     
     protected $description = ['This is a mock command'];
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addSubCommand('enable', ['description' => 'enables the cache']);
         $this->addSubCommand('disable', ['description' => 'disables the cache']);

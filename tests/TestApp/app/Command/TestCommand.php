@@ -9,7 +9,7 @@ class TestCommand extends Command
 
     protected $description = 'A command for testing';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addArgument('test', ['description' => 'Which test','required' => true]);
     }

@@ -41,7 +41,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Intialize Hook. This is called before a test starts.
      */
-    public function initialize()
+    public function initialize() : void
     {
     }
 

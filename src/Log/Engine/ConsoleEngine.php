@@ -37,7 +37,7 @@ class ConsoleEngine extends BaseEngine
         'channels' => [],
     ];
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         $this->output = new ConsoleOutput($this->config('stream'));
     }

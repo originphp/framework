@@ -38,7 +38,7 @@ class %name%Schema extends Schema
 }
 ';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->addOption('connection', [
             'description' => 'Use a different datasource',
