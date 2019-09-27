@@ -77,7 +77,7 @@ class AuthComponent extends Component
      */
     private $user = null;
 
-    public function initialize(array $config) : void
+    public function initialize(array $config)
     {
         if (! ModelRegistry::get($this->config['model'])) {
             throw new MissingModelException($this->config['model']);
@@ -307,16 +307,16 @@ class AuthComponent extends Component
 
         if (in_array('Form', $this->config['authenticate'])) {
             $fields = $this->config['fields'];
-            $username = $this->request()->data($fields['username']);
-            $password = $this->request()->data($fields['password']);
+            $username = (string) $this->request()->data($fields['username']);
+            $password = (string) $this->request()->data($fields['password']);
             if ($username and $password) {
                 return ['username' => $username, 'password' => $password];
             }
         }
 
         if (in_array('Http', $this->config['authenticate'])) {
-            $username = $this->request()->env('PHP_AUTH_USER');
-            $password = $this->request()->env('PHP_AUTH_PW');
+            $username = (string) $this->request()->env('PHP_AUTH_USER');
+            $password = (string) $this->request()->env('PHP_AUTH_PW');
             if ($username and $password) {
                 return ['username' => $username, 'password' => $password];
             }
