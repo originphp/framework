@@ -26,6 +26,51 @@ class MockEmailBuilder extends EmailBuilder
 class EmailBuilderTest extends \PHPUnit\Framework\TestCase
 {
     
+ /**
+     * To/from/sender/reply-to share the same loop so test em all using
+     * the different email types
+     *
+     * @return void
+     */
+    public function testSetBodyManually()
+    {
+        $options = [
+            'to' => 'js@example.com',
+            'from' => ['sam@example.com'],
+            'subject' => 'test build 1',
+            'format' => 'both',
+            'body' => '<p>This is line 1</p><p>This is line 2</p>',
+            'contentType' => 'html'
+        ];
+
+        $message = (new EmailBuilder($options))->build(true)->send();
+        
+        $this->assertStringContainsString('To: js@example.com', $message->header());
+        $this->assertStringContainsString('From: sam@example.com', $message->header());
+        $this->assertStringContainsString('Subject: test build 1', $message->header());
+        $this->assertStringContainsString('<p>This is line 1</p>', $message->body());
+        $this->assertStringContainsString("This is line 1\r\n", $message->body());
+
+        
+        $options['format'] = 'text';
+        $message = (new EmailBuilder($options))->build(true)->send();
+        $this->assertStringNotContainsString('<p>This is line 1</p>', $message->body());
+        $this->assertStringContainsString("This is line 1\r\n", $message->body());
+
+        $options['format'] = 'html';
+        $message = (new EmailBuilder($options))->build(true)->send();
+        $this->assertStringContainsString('<p>This is line 1</p>', $message->body());
+        $this->assertStringNotContainsString("This is line 1\r\n", $message->body());
+
+        $options['format'] = 'both';
+        $options['body'] = "This is a test\nThis is another test";
+        $options['contentType'] = 'text';
+        $message = (new EmailBuilder($options))->build(true)->send();
+        $this->assertStringContainsString('<p>This is a test<br>', $message->body());
+        $this->assertStringContainsString("This is a test\r\n", $message->body());
+    }
+
+
     /**
      * To/from/sender/reply-to share the same loop so test em all using
      * the different email types

@@ -160,6 +160,8 @@ abstract class Mailer
      *   - bcc: an array of emails in ['email'] or ['email'=>'name']
      *   - sender: ['email'] or ['email'=>'name']
      *   - replyTo: ['email'] or ['email'=>'name']
+     *   - body: manually set body of the message (set content type if its not html)
+     *   - contentType: default: text. The content type the body is in (html or text)
      * @return void
      */
     public function mail(array $options = [])
@@ -174,13 +176,15 @@ abstract class Mailer
             'cc' => null,
             'sender' => null,
             'replyTo' => null,
+            'body' => null,
+            'contentType' => 'text',
+            'format' => $this->format
         ];
       
         $options += $defaults;
       
         $options['headers'] = $this->headers;
         $options['attachments'] = $this->attachments;
-        $options['format'] = $this->format;
         $options['account'] = env('ORIGIN_ENV') === 'test' ? 'test' : $this->account;
         $options['folder'] = $this->folder;
         $options['viewVars'] = $this->viewVars;
