@@ -280,52 +280,19 @@ class Controller
     }
 
     /**
-    * Callback before the action in the controller is called.
-    *
-    * @return \Origin\Http\Response|null
-    */
-    public function beforeAction()
-    {
-        return null;
-    }
-
-    /**
-     * Callback just prior to redirecting
-     *
-     */
-    public function beforeRedirect()
-    {
-    }
-
-    /**
-     * This is called after the startup, before shutdown
-     */
-    public function beforeRender()
-    {
-    }
-
-    /**
-     * Called after the controller action and the component shutdown function.
-     * Remember to call parent
-     *
-     * @return \Origin\Http\Response|null
-     */
-    public function afterAction()
-    {
-        return null;
-    }
-
-    /**
      * The controller startup process
      *
      * @return mixed
      */
     public function startupProcess()
     {
-        $result = $this->beforeAction();
-        if ($this->isResponseOrRedirect($result)) {
-            return $this->response;
+        if (method_exists($this, 'beforeAction')) {
+            $result = $this->beforeAction();
+            if ($this->isResponseOrRedirect($result)) {
+                return $this->response;
+            }
         }
+       
         foreach ([$this->componentRegistry,$this->concernRegistry] as $registry) {
             if ($this->isResponseOrRedirect($registry->call('startup'))) {
                 return $this->response;
@@ -345,9 +312,11 @@ class Controller
                 return $this->response;
             }
         }
-        $result = $this->afterAction();
-        if ($this->isResponseOrRedirect($result)) {
-            return $this->response;
+        if (method_exists($this, 'afterAction')) {
+            $result = $this->afterAction();
+            if ($this->isResponseOrRedirect($result)) {
+                return $this->response;
+            }
         }
         //# Free Mem for no longer used items
         $this->componentRegistry->destroy();
@@ -549,7 +518,9 @@ class Controller
     public function renderJson($data, int $status = 200) : void
     {
         $this->autoRender = false; // Only render once
-        $this->beforeRender();
+        if (method_exists($this, 'beforeRender')) {
+            $this->beforeRender();
+        }
         $this->response->type('json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
         $this->response->body((new JsonView($this))->render($data)); //
@@ -577,7 +548,9 @@ class Controller
     public function renderXml($data, int $status = 200) : void
     {
         $this->autoRender = false; // Disable for dispatcher
-        $this->beforeRender();
+        if (method_exists($this, 'beforeRender')) {
+            $this->beforeRender();
+        }
         $this->response->type('xml');
         $this->response->statusCode($status); // 200
         $this->response->body((new XmlView($this))->render($data));
@@ -600,7 +573,9 @@ class Controller
     public function redirect($url, int $code = 302) : Response
     {
         $this->autoRender = false;
-        $this->beforeRedirect();
+        if (method_exists($this, 'beforeRedirect')) {
+            $this->beforeRedirect();
+        }
 
         $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));

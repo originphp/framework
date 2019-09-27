@@ -94,24 +94,6 @@ class Component
     }
 
     /**
-     * This called after the controller startup but before the controller action.
-     *
-     * @return \Origin\Http\Response|null
-     */
-    public function startup()
-    {
-    }
-
-    /**
-     * This is called after the controller action but before the controller shutdown
-     *
-     * @return \Origin\Http\Response|null
-     */
-    public function shutdown()
-    {
-    }
-
-    /**
      * Returns the controller
      * @return \Origin\Controller\Controller
      */
