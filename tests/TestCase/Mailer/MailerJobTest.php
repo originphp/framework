@@ -34,6 +34,8 @@ class AnotherDemoMailer extends Mailer
         $this->mail([
             'to' => $params['email'],
             'subject' => 'this is the subject message',
+            'body' => $params['html'],
+            'contentType' => 'html'
         ]);
     }
 }
@@ -55,6 +57,7 @@ class MailerJobTest extends OriginTestCase
                 [
                     'first_name' => 'jim',
                     'email' => 'demo@originphp.com',
+                    'html' => '<p>This is a test </p>'
                 ]
             ],
         ];
@@ -63,8 +66,28 @@ class MailerJobTest extends OriginTestCase
     }
 
     /**
-     * As there is template for this, this will call the on error and
-     * as a result return false
+     * This is fail cause of missing template exception
+     *
+     * @return void
+     */
+    public function testDispatch2()
+    {
+        $params = [
+            'mailer' => new AnotherDemoMailer(),
+            'arguments' => [
+                [
+                    'first_name' => 'jim',
+                    'email' => 'demo@originphp.com',
+                    'html' => '<p>This is a test </p>'
+                ]
+            ],
+        ];
+
+        $this->assertFalse((new MailerJob())->dispatchNow($params));
+    }
+
+    /**
+     * This is fail cause of missing template exception
      *
      * @return void
      */
@@ -76,6 +99,7 @@ class MailerJobTest extends OriginTestCase
                 [
                     'first_name' => 'jim',
                     'email' => 'demo@originphp.com',
+                    'html' => null
                 ]
             ],
         ];
