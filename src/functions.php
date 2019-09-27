@@ -209,21 +209,6 @@ function collection($items) : Collection
 }
 
 /**
- * Helper setter/getter for config
- *
- * @param string $key
- * @param mixed $value
- * @return mixed
- */
-function config(string $key, $value = null)
-{
-    if (func_num_args() === 1) {
-        return Config::read($key);
-    }
-    Config::write($key, $value);
-}
-
-/**
  * A helper function that Logs a deprecation warning and triggers an error if in debug mode
  *
  * @param string $message
