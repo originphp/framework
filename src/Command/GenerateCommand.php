@@ -519,6 +519,12 @@ class GenerateCommand extends Command
             $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'phpunit.xml',
             $data
         );
+
+        $this->generate(
+            $this->getTemplateFilename('plugin_composer'),
+            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'composer.json',
+            $data
+        );
     }
     /*
     %model% e.g. BookmarksTag

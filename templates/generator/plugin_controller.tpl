@@ -1,8 +1,7 @@
 <?php 
 namespace %namespace%\Controller;
+use Origin\Controller\Controller; // keep independent
 
-use App\Controller\ApplicationController;
-
-class %class%ApplicationController extends ApplicationController
+class %class%ApplicationController extends Controller
 {
 }

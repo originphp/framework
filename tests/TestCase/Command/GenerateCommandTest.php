@@ -445,11 +445,11 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Controller'.DS.'DummyApplicationController.php';
         $this->assertFileExists($filename);
-        $this->assertFileHash('35454f4c0e50b263185065768e4bb8d6', $filename);
+        $this->assertFileHash('4102428b27da8aefe73016ef792ebda7', $filename);
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Model'.DS.'DummyApplicationModel.php';
         $this->assertFileExists($filename);
-        $this->assertFileHash('11c1b483659c34c9b7ddb12549b5d36c', $filename);
+        $this->assertFileHash('fda67d202cc1cd6ea520661fc3f0740c', $filename);
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'config'.DS.'routes.php';
         $this->assertFileExists($filename);
@@ -458,6 +458,10 @@ class GenerateCommandTest extends OriginTestCase
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'phpunit.xml';
         $this->assertFileExists($filename);
         $this->assertFileHash('8cb27d99afeb20945a7ad5e0babebb27', $filename);
+
+        $filename = APP.DS.'plugins'.DS.'dummy'.DS.'composer.json';
+        $this->assertFileExists($filename);
+        $this->assertFileHash('3aac15995b02c9505537ccdb85130f31', $filename);
 
         Folder::delete(APP.DS.'plugins'.DS.'dummy', ['recursive' => true]);
     }
