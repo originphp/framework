@@ -65,12 +65,8 @@ class MailerJobTest extends OriginTestCase
         $this->assertTrue((new MailerJob())->dispatch($params));
     }
 
-    /**
-     * This is fail cause of missing template exception
-     *
-     * @return void
-     */
-    public function testDispatch2()
+ 
+    public function testDispatchNow()
     {
         $params = [
             'mailer' => new AnotherDemoMailer(),
@@ -83,7 +79,7 @@ class MailerJobTest extends OriginTestCase
             ],
         ];
 
-        $this->assertFalse((new MailerJob())->dispatchNow($params));
+        $this->assertTrue((new MailerJob())->dispatchNow($params));
     }
 
     /**
@@ -91,7 +87,7 @@ class MailerJobTest extends OriginTestCase
      *
      * @return void
      */
-    public function testThrowError()
+    public function testDispatchThrowError()
     {
         $params = [
             'mailer' => new AnotherDemoMailer(),

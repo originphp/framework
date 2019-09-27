@@ -130,6 +130,8 @@ class MailerTest extends OriginTestCase
             'folder' => 'Demo',
             'viewVars' => ['first_name' => 'jim'],
             'layout' => false,
+            'body' => null,
+            'contentType' => 'text'
         ];
         $this->assertEquals($expected, $options);
     }
