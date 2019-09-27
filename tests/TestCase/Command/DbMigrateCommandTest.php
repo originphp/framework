@@ -23,6 +23,7 @@ class DbMigrateCommandTest extends OriginTestCase
     public function testMigrate()
     {
         $this->exec('db:migrate --connection=test');
+ 
         $this->assertExitSuccess();
         $this->assertOutputContains('Migration Complete. 3 migrations in 0 ms');
     }

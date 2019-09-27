@@ -345,7 +345,7 @@ class GenerateCommandTest extends OriginTestCase
         
         $this->assertOutputContains("database/migrations/{$version}CreateDummyTable.php");
         $this->assertFileExists($filename);
-        $this->assertFileHash('f848e2ea56639696a82cbc080138a029', $filename);
+        $this->assertFileHash('c1ac45eb671fb571e313b97e4acf93d1', $filename);
         unlink($filename);
     }
 
@@ -434,7 +434,7 @@ class GenerateCommandTest extends OriginTestCase
         
         $this->assertOutputContains("database/migrations/{$version}Dummy.php");
         $this->assertFileExists($filename);
-        $this->assertFileHash('692f0f096c758b18dd3197f0ce1c6c2f', $filename);
+        $this->assertFileHash('7ae46d1b60868d54f09ccce43ca35068', $filename);
         unlink($filename);
     }
 

@@ -24,18 +24,18 @@ use Origin\Migration\Exception\IrreversibleMigrationException;
 
 class CreateProductTableMigration extends Migration
 {
-    public function up()
+    public function up() : void
     {
         $this->createTable('products', [
             'name' => 'string',
             'description' => 'text',
         ]);
     }
-    public function down()
+    public function down() : void
     {
         $this->dropTable('products');
     }
-    public function reset()
+    public function reset() : void
     {
         $this->statements = [];
     }
@@ -43,12 +43,12 @@ class CreateProductTableMigration extends Migration
 
 class DidNotReadTheManualMigration extends Migration
 {
-    public function change()
+    public function change() : void
     {
         $this->execute('SELECT * FROM read_the_manual');
     }
 
-    public function reversable()
+    public function reversable() : void
     {
         $this->execute('SELECT * FROM read_the_manual');
     }
@@ -56,11 +56,11 @@ class DidNotReadTheManualMigration extends Migration
 
 class UsingExecuteMigration extends Migration
 {
-    public function up()
+    public function up() : void
     {
         $this->execute('SELECT id,title,created from articles');
     }
-    public function down()
+    public function down() : void
     {
         $this->execute('SELECT id,title,created from articles');
     }

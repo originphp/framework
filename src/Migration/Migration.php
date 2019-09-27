@@ -86,7 +86,7 @@ class Migration
      *
      * @return void
      */
-    public function change()
+    public function change() : void
     {
     }
 
@@ -96,7 +96,7 @@ class Migration
      *
      * @return void
      */
-    public function reversable()
+    public function reversable() : void
     {
     }
 
@@ -105,7 +105,7 @@ class Migration
      *
      * @return void
      */
-    public function up()
+    public function up() : void
     {
     }
 
@@ -114,7 +114,7 @@ class Migration
      *
      * @return void
      */
-    public function down()
+    public function down() : void
     {
     }
 

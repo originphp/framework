@@ -3,7 +3,7 @@ use Origin\Migration\Migration;
 
 class CreateFooBarTableMigration extends Migration
 {
-    public function change()
+    public function change() : void
     {
         $this->createTable('foobar', [
             'name' => 'string',
