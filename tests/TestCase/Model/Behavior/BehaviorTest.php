@@ -14,6 +14,7 @@
 
 namespace Origin\Test\Model\Behavior;
 
+use Origin\Model\Collection;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Behavior\Behavior;
@@ -59,11 +60,11 @@ class BehaviorTesterBehavior extends Behavior
     /**
      * After find callback
      *
-     * @param mixed $results
+     * @param \Origin\Model\Collection $results
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind($results, ArrayObject $options) : void
+    public function afterFind(Collection $results, ArrayObject $options) : void
     {
     }
 
