@@ -21,46 +21,48 @@ class Resolver
      * Resolves the class name
      *
      * @param string $class
-     * @param [type] $objectType
-     * @param [type] $suffix
+     * @param string $objectType
+     * @param string $suffix
+     * @param string $group
      * @return string|null
      */
-    public static function className(string $class, $objectType = null, $suffix = null) : ?string
+    public static function className(string $class, string $objectType = null, string $suffix = null, string $group = null) : ?string
     {
         if (strpos($class, '\\') !== false) {
             return $class;
         }
+        
         $namespace = Config::read('App.namespace');
         list($plugin, $class) = pluginSplit($class);
         if ($plugin) {
             $namespace = $plugin;
         }
-        
-        if ($objectType === null) {
-            $path = '\\'.$class.$suffix;
-        } else {
-            $path = '\\'.str_replace('/', '\\', $objectType).'\\'.$class.$suffix;
+
+        $prefix =  $group === null ? null : ('\\' . $group);
+       
+        $path = $prefix . '\\'. $class . $suffix;
+        if ($objectType) {
+            $path = $prefix . '\\'.str_replace('/', '\\', $objectType).'\\'.$class. $suffix;
         }
-      
+       
         if (static::classExists($namespace.$path)) {
-            return $namespace.$path;
+            return $namespace . $path;
         }
 
-        if (static::classExists('Origin'.$path)) {
-            return 'Origin'.$path;
+        if (static::classExists('Origin' . $path)) {
+            return 'Origin' . $path;
         }
 
         return null;
     }
-
     /**
-     * To help with testing.
+     * Helper for testing
      *
-     * @param string $className
+     * @param string $class
      * @return boolean
      */
-    protected static function classExists(string $className) : bool
+    public static function classExists(string $class) : bool
     {
-        return class_exists($className);
+        return class_exists($class);
     }
 }

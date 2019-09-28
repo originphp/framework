@@ -278,4 +278,4 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         restore_exception_handler();
     }
 }
-// class AbcHelper extends NumberHelper{} // fatal error Class 'App\View\Helper\NumberHelper' not found
+// class AbcHelper extends NumberHelper{} // fatal error Class 'App\Http\View\Helper\NumberHelper' not found

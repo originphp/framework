@@ -17,7 +17,7 @@ namespace Origin\Test\TestSuite;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\TestSuite\TestTrait;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\TestSuite\IntegrationTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
 

@@ -1,5 +1,5 @@
 <?php
-namespace %namespace%\Test\Command;
+namespace %namespace%\Test\Console\Command;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;

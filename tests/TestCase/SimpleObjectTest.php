@@ -15,7 +15,7 @@
 namespace Origin\Test;
 
 use Origin\SimpleObject;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 
 class ValueObject extends SimpleObject
 {

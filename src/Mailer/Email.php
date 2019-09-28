@@ -427,9 +427,9 @@ class Email
     protected function loadTemplate(string $name) : void
     {
         list($plugin, $template) = pluginSplit($name);
-        $path = SRC . DS . 'View' . DS . 'Email';
+        $path = SRC . DS . 'Http' . DS . 'View' . DS . 'Email';
         if ($plugin) {
-            $path = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Email';
+            $path = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Email';
         }
 
         if ($this->format() === 'html' or $this->format() === 'both') {

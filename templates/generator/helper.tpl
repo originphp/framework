@@ -1,7 +1,7 @@
 <?php
 namespace %namespace%\View\Helper;
 
-use App\View\Helper\ApplicationHelper;
+use App\Http\View\Helper\ApplicationHelper;
 
 class %class%Helper extends ApplicationHelper
 {

@@ -1,6 +1,6 @@
 <?php
-namespace %namespace%\Command;
-use Origin\Command\Command;
+namespace %namespace%\Console\Command;
+use Origin\Console\Command\Command;
 
 class %class%Command extends Command
 {

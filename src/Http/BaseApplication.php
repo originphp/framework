@@ -20,7 +20,7 @@ namespace Origin\Http;
 
 use Origin\Core\Resolver;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Middleware\DispatcherMiddleware;
+use Origin\Http\Middleware\DispatcherMiddleware;
 
 class BaseApplication
 {
@@ -47,7 +47,7 @@ class BaseApplication
      *
      * $this->addMiddleware(new FormSecurity());
      *
-     * @param \Origin\Middleware\Middleware $object
+     * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
     public function addMiddleware(Middleware $object)
@@ -62,14 +62,14 @@ class BaseApplication
      *
      * $this->loadMiddleware('FormSecurity');
      * $this->loadMiddleware('MyPlugin.FormSecurity');
-     * $this->loadMiddleware('App\Middleware\FormSecurityMiddleware');
+     * $this->loadMiddleware('App\Http\Middleware\FormSecurityMiddleware');
      *
-     * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Middleware\FormSecurityMiddleware
+     * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Http\Middleware\FormSecurityMiddleware
      * @return void
      */
     public function loadMiddleware(string $name)
     {
-        $className = Resolver::className($name, 'Middleware', 'Middleware');
+        $className = Resolver::className($name, 'Middleware', 'Middleware', 'Http');
         if (empty($className)) {
             throw new InvalidArgumentException(sprintf('Unkown Middleware %s', $name));
         }

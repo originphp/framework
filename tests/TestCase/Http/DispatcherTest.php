@@ -19,12 +19,12 @@ use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 
 use Origin\TestSuite\TestTrait;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\Core\Exception\RouterException;
-use Origin\Controller\Exception\MissingMethodException;
+use Origin\Http\Controller\Exception\MissingMethodException;
 
-use Origin\Controller\Exception\PrivateMethodException;
-use Origin\Controller\Exception\MissingControllerException;
+use Origin\Http\Controller\Exception\PrivateMethodException;
+use Origin\Http\Controller\Exception\MissingControllerException;
 
 class BlogPostsController extends Controller
 {
@@ -83,8 +83,8 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
     public function testGetClass()
     {
         $Dispatcher = new MockDispatcher2();
-        $this->assertEquals('App\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets',null]));
-        $this->assertEquals('MyPlugin\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets','MyPlugin']));
+        $this->assertEquals('App\Http\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets',null]));
+        $this->assertEquals('MyPlugin\Http\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets','MyPlugin']));
     }
     public function testMissingController()
     {

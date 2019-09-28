@@ -14,7 +14,7 @@
 
 namespace Origin\Test\TestSuite;
 
-use Origin\Command\Command;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 

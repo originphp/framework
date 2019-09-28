@@ -1,7 +1,7 @@
 <?php
 namespace %namespace%\Controller\Component;
 
-use Origin\Controller\Component\Component;
+use Origin\Http\Controller\Component\Component;
 
 class %class%Component extends Component
 {

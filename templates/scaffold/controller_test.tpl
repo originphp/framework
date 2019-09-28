@@ -1,5 +1,5 @@
 <?php
-namespace App\Test\Controller;
+namespace App\Test\Http\Controller;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\IntegrationTestTrait;

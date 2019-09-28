@@ -1,8 +1,8 @@
 <?php
-namespace %namespace%\Test\Controller\Concern;
+namespace %namespace%\Test\Http\Controller\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Controller\ApplicationController;
+use App\Http\Controller\ApplicationController;
 use %namespace%\Controller\Concern\%class%Concern;
 
 use Origin\Http\Request;

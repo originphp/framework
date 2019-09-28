@@ -24,20 +24,20 @@ namespace Origin\Concern;
  *  Do not use Concern to reduce fat models, use Repos instead.
  *
  */
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 
 class ControllerConcern extends Concern
 {
     /**
      * The object that this concerns
      *
-     * @var \Origin\Controller\Controller
+     * @var \Origin\Http\Controller\Controller
      */
     protected $object = null;
     /**
      * Returns the controller
      *
-     * @return \Origin\Controller\Controller
+     * @return \Origin\Http\Controller\Controller
      */
     public function controller() : Controller
     {

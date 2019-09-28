@@ -227,10 +227,10 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Mailer' .DS . $name ;
+            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Mailer' .DS . $name ;
         }
 
-        return SRC . DS . 'View' . DS . 'Mailer' .DS . $name ;
+        return SRC . DS . 'Http' . DS . 'View' . DS . 'Mailer' .DS . $name ;
     }
 
     /**
@@ -243,9 +243,9 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
+            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
         }
 
-        return SRC . DS . 'View' . DS .  'Layout' . DS . $name . '.ctp';
+        return SRC . DS . 'Http' . DS . 'View' . DS .  'Layout' . DS . $name . '.ctp';
     }
 }

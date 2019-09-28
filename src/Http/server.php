@@ -15,7 +15,7 @@ namespace Origin\Http;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use App\Application;
+use App\Http\Application;
 
 $request = new Request();
 $response =  new Response();

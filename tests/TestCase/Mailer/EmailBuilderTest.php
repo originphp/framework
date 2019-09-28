@@ -297,10 +297,10 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
             'layout' => 'email',
         ];
         $builder = new MockEmailBuilder($options);
-        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'View' . DS . 'Mailer' .DS . 'SendUserNotification' ;
+        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Mailer' .DS . 'SendUserNotification' ;
         $this->assertEquals($expected, $builder->callMethod('getPath', ['MyPlugin.SendUserNotification']));
 
-        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'View' . DS . 'Layout' .DS . 'mailer.ctp' ;
+        $expected = PLUGINS .DS . 'my_plugin' . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Layout' .DS . 'mailer.ctp' ;
         $this->assertEquals($expected, $builder->callMethod('getLayoutFilename', ['MyPlugin.mailer']));
     }
 }

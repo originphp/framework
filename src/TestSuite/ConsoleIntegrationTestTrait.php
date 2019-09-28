@@ -217,7 +217,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Returns the Command Object.
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command
      */
     public function command()
     {

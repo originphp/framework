@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Middleware;
+namespace Origin\Test\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;

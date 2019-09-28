@@ -16,7 +16,7 @@ namespace Origin\Test\Concern;
 
 use Origin\Model\Model;
 use Origin\Concern\ModelConcern;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\Concern\ControllerConcern;
 use Origin\Exception\Exception;
 

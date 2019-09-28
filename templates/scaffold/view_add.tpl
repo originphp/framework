@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \App\View\ApplicationView $this
+ * @var \App\Http\View\ApplicationView $this
  */
 ?>
 <div class="page-header">

@@ -16,11 +16,11 @@ declare(strict_types = 1);
 namespace Origin\Http;
 
 use Origin\Core\Config;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\Core\Exception\RouterException;
-use Origin\Controller\Exception\MissingMethodException;
-use Origin\Controller\Exception\PrivateMethodException;
-use Origin\Controller\Exception\MissingControllerException;
+use Origin\Http\Controller\Exception\MissingMethodException;
+use Origin\Http\Controller\Exception\PrivateMethodException;
+use Origin\Http\Controller\Exception\MissingControllerException;
 
 class Dispatcher
 {
@@ -34,7 +34,7 @@ class Dispatcher
     /**
      * Controller object
      *
-     * @var \Origin\Controller\Controller
+     * @var \Origin\Http\Controller\Controller
      */
     protected $controller = null;
 
@@ -66,7 +66,7 @@ class Dispatcher
             $namespace = $plugin;
         }
 
-        return $namespace.'\Controller\\'. $controller . 'Controller';
+        return $namespace . '\Http\Controller\\' . $controller . 'Controller';
     }
 
     /**
@@ -123,7 +123,7 @@ class Dispatcher
     /**
      * Undocumented function
      *
-     * @param \Origin\Controller\Controller $controller
+     * @param \Origin\Http\Controller\Controller $controller
      * @param string $action
      * @param array $arguments
      * @return \Origin\Http\Response|void

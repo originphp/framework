@@ -27,7 +27,7 @@ class CommandRunner
     /**
      * Holds the Command from RUN
      *
-     * @var \Origin\Command\Command
+     * @var \Origin\Console\Command\Command
      */
     protected $command = null;
 
@@ -63,14 +63,15 @@ class CommandRunner
      */
     protected function buildNamespaceMap()
     {
+        $folder = 'Console' .DS .'Command';
         $this->namespaces = [
-            'Origin' => ORIGIN.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Command',
-            Config::read('App.namespace') => SRC.DIRECTORY_SEPARATOR.'Command',
+            'Origin' => ORIGIN . DS . 'src' . DS . $folder,
+            Config::read('App.namespace') => SRC . DS . $folder
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = PLUGINS.DS.Inflector::underscored($plugin).DIRECTORY_SEPARATOR.'src'.DS.'Command';
+            $this->namespaces[$plugin] = PLUGINS.DS.Inflector::underscored($plugin). DS . 'src' . DS . $folder;
         }
     }
 
@@ -90,9 +91,9 @@ class CommandRunner
     protected function getDescriptions()
     {
         $results = [];
+
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
-
             if (! class_exists($class)) {
                 throw new ConsoleException(sprintf('%s does not exist or cannot be found', $class));
             }
@@ -139,7 +140,7 @@ class CommandRunner
     /**
      * Returns the Command object that was created
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command
      */
     public function command()
     {
@@ -152,13 +153,13 @@ class CommandRunner
      *
      * @param string $command
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command
      */
     public function findCommand(string $command)
     {
         # Use Conventions - Faster
         $namespace = Config::read('App.namespace');
-        $className = $namespace.'\\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
+        $className = $namespace.'\Console\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
         if (class_exists($className)) {
             $object = new $className($this->io);
             if ($object->name() === $command) {
@@ -255,7 +256,7 @@ class CommandRunner
             if (substr($file, -11) === 'Command.php' and $file !== 'Command.php') {
                 $results[] = [
                     'className' => substr($file, 0, -4),
-                    'namespace' => $namespace.'\\Command',
+                    'namespace' => $namespace.'\Console\Command',
                     'filename' => $directory.DS.$file,
                 ];
             }

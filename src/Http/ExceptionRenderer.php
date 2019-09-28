@@ -84,9 +84,9 @@ class ExceptionRenderer
     protected function getFileToRender($exception)
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
-        $error400 = SRC . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
+        $error400 = SRC . DS . 'Http' . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
       
-        $file = SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+        $file = SRC . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
         if ($exception instanceof HttpException and file_exists($error400) and $exception->getCode() < 500) {
             $file = $error400;
         }

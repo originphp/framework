@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Exception;
-use App\Application;
+use App\Http\Application;
 use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\Response;
@@ -47,7 +47,7 @@ trait IntegrationTestTrait
     /**
      * Holds the controller for the most recent request
      *
-     * @var \Origin\Controller\Controller
+     * @var \Origin\Http\Controller\Controller
      */
     protected $controller = null;
 
@@ -234,7 +234,7 @@ trait IntegrationTestTrait
     /**
      * Gets the controller used in the request
      *
-     * @return \Origin\Controller\Controller
+     * @return \Origin\Http\Controller\Controller
      */
     public function controller()
     {

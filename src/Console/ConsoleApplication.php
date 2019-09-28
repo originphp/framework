@@ -234,7 +234,7 @@ class ConsoleApplication
      * Adds a command to this Console Application
      *
      * @param string $alias
-     * @param string $name Cache,Plugin.Cache, App\Command\Custom\Cache
+     * @param string $name Cache,Plugin.Cache, App\Console\Command\Custom\Cache
      * @return void
      */
     public function addCommand(string $alias, string $name) : void

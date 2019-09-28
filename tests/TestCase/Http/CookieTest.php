@@ -15,7 +15,7 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Cookie;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 
 class MockCookie extends Cookie
 {

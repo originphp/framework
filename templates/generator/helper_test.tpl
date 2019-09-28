@@ -2,10 +2,10 @@
 namespace %namespace%\View\Helper;
 
 use Origin\TestSuite\OriginTestCase;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\View\View;
+use Origin\Http\View\View;
 use %namespace%\View\Helper\%class%Helper;
 
 class %class%HelperTest extends OriginTestCase
