@@ -12,7 +12,10 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Http;
+namespace Origin\Http\Middleware;
+
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class MiddlewareRunner
 {
@@ -46,29 +49,26 @@ class MiddlewareRunner
      * @param \Origin\Http\Response $response
      * @return \Origin\Http\Response $response
      */
-    public function run(Request $request, Response $response)
+    public function run(Request $request, Response $response) : Response
     {
         return $this->__invoke($request, $response);
     }
-
     /**
      * Magic Method
      *
      * @param \Origin\Http\Request $request
      * @param \Origin\Http\Response $response
-     * @return Mixed
+     * @return \Origin\Http\Response $response
      */
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(Request $request, Response $response) : Response
     {
         if (isset($this->middlewareStack[$this->current])) {
             $next = $this->middlewareStack[$this->current];
             if ($next) {
                 $this->current ++;
-
                 return $next($request, $response, $this);
             }
         }
-
         return $response;
     }
 }

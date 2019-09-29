@@ -16,7 +16,7 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware;
+use Origin\Http\Middleware\Middleware;
 use Origin\Utility\Security;
 use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
@@ -43,7 +43,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function startup(Request $request)
+    public function handle(Request $request) : void
     {
         if ($request->params('csrfProtection') === false) {
             return ;
@@ -75,7 +75,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function shutdown(Request $request, Response $response)
+    public function process(Request $request, Response $response) : void
     {
         if ($request->params('csrfProtection') === false) {
             return ;

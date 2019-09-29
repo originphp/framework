@@ -16,18 +16,18 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware;
+use Origin\Http\Middleware\Middleware;
 use Origin\Http\BaseApplication;
-use Origin\Http\MiddlewareRunner;
+use Origin\Http\Middleware\MiddlewareRunner;
 use Origin\Exception\InvalidArgumentException;
 
 class FooMiddleware extends Middleware
 {
-    public function startup(Request $request)
+    public function handle(Request $request) : void
     {
         $request->data('foo', 'bar');
     }
-    public function shutdown(Request $request, Response $response)
+    public function process(Request $request, Response $response) : void
     {
         $response->header('Accept', 'application/foo');
     }
@@ -42,8 +42,9 @@ class FooApplication extends BaseApplication
  */
 class MockMiddlewareRunner extends MiddlewareRunner
 {
-    public function run(Request $request, Response $response)
+    public function run(Request $request, Response $response) : Response
     {
+        return $response;
     }
     public function getStack()
     {
@@ -57,7 +58,7 @@ class BaseApplicationTest extends \PHPUnit\Framework\TestCase
     {
         $middlewareRunner = $this->createMock(MiddlewareRunner::class);
         $middlewareRunner->method('run')
-            ->willReturn(null);
+            ->willReturn(new Response());
 
         $application = new FooApplication(new Request(), new Response(), $middlewareRunner);
         $this->expectException(InvalidArgumentException::class);
@@ -67,7 +68,7 @@ class BaseApplicationTest extends \PHPUnit\Framework\TestCase
     {
         $middlewareRunner = $this->createMock(MiddlewareRunner::class);
         $middlewareRunner->method('run')
-            ->willReturn(null);
+            ->willReturn(new Response());
 
         $application = new FooApplication(new Request(), new Response(), $middlewareRunner);
         $this->assertNull($application->loadMiddleware(FooMiddleware::class));

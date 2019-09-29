@@ -18,13 +18,10 @@ namespace Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
-use Origin\Http\Middleware;
+use Origin\Http\Middleware\Middleware;
 
 class DispatcherMiddleware extends Middleware
 {
-    public function startup(Request $request)
-    {
-    }
     /**
        * This dispatch process is being done through middleware since this will
        * create and process a response object. E.g. setting cookies in the controller, will
@@ -32,7 +29,7 @@ class DispatcherMiddleware extends Middleware
        *
        * @param \Origin\Http\Request $request
        */
-    public function shutdown(Request $request, Response $response)
+    public function process(Request $request, Response $response) : void
     {
         $dispatcher = Dispatcher::instance();
         $dispatcher->dispatch($request, $response);

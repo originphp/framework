@@ -15,9 +15,11 @@ declare(strict_types = 1);
 /**
  * You can use startup/shutdown or handle/process but not both.
  */
-namespace Origin\Http;
+namespace Origin\Http\Middleware;
 
 use Origin\Core\ConfigTrait;
+use Origin\Http\Request;
+use Origin\Http\Response;
 
 class Middleware
 {
@@ -30,6 +32,7 @@ class Middleware
         $this->config($config);
         $this->initialize($config);
     }
+
     /**
      * Hook called during construct
      *
@@ -39,23 +42,19 @@ class Middleware
     {
     }
     /**
-     * This HANDLES the request
+     * This is called before the middleware is invoked
      *
-     * @param \Origin\Http\Request $request
      * @return void
      */
-    public function startup(Request $request)
+    public function startup() : void
     {
     }
     /**
-     * This PROCESSES the response after all middleware requests have
-     * been handled
+     * This is called after the middleware has been processed
      *
-     * @param \Origin\Http\Request $request
-     * @param \Origin\Http\Response $response
      * @return void
      */
-    public function shutdown(Request $request, Response $response)
+    public function shutdown() : void
     {
     }
 
@@ -65,9 +64,8 @@ class Middleware
      * @param \Origin\Http\Request $request
      * @return void
      */
-    public function handle(Request $request)
+    public function handle(Request $request) : void
     {
-        $this->startup($request);
     }
     /**
      * This PROCESSES the response after all middleware requests have
@@ -77,9 +75,8 @@ class Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function process(Request $request, Response $response)
+    public function process(Request $request, Response $response) : void
     {
-        $this->shutdown($request, $response);
     }
 
     /**
@@ -92,12 +89,13 @@ class Middleware
      */
     public function __invoke(Request $request, Response $response, callable $next = null)
     {
+        $this->startup();
         $this->handle($request);
         if ($next) {
             $response = $next($request, $response);
         }
         $this->process($request, $response);
-
+        $this->shutdown();
         return $response;
     }
 }

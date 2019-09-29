@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,52 +13,25 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Http\Middleware;
+namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware;
-use Origin\Http\MiddlewareRunner;
+use Origin\Http\Dispatcher;
+use Origin\Http\Middleware\Middleware;
 
-class OneMiddleware extends Middleware
+class DispatcherMiddleware extends Middleware
 {
-    public function startup(Request $request)
+    /**
+       * This dispatch process is being done through middleware since this will
+       * create and process a response object. E.g. setting cookies in the controller, will
+       * modify the response object, and that should be available to other middlewares.
+       *
+       * @param \Origin\Http\Request $request
+       */
+    public function process(Request $request, Response $response) : void
     {
-        $request->data('one', 'one');
-    }
-    public function shutdown(Request $request, Response $response)
-    {
-        $response->header('X-One', 'one');
-    }
-}
-
-class TwoMiddleware extends Middleware
-{
-    public function startup(Request $request)
-    {
-        $request->data('two', 'two');
-    }
-    public function shutdown(Request $request, Response $response)
-    {
-        $response->header('X-Two', 'two');
-    }
-}
-
-class MiddlwareRunnerTest extends \PHPUnit\Framework\TestCase
-{
-    public function testRun()
-    {
-        $request = new Request();
-        $response = new Response();
-        $runner = new MiddlewareRunner();
-        $runner->add(new OneMiddleware());
-        $runner->add(new TwoMiddleware());
-
-        $runner->run($request, $response);
-
-        $this->assertEquals('one', $request->data('one'));
-        $this->assertEquals('two', $request->data('two'));
-        $this->assertEquals('one', $response->headers('X-One'));
-        $this->assertEquals('two', $response->headers('X-Two'));
+        $dispatcher = Dispatcher::instance();
+        $dispatcher->dispatch($request, $response);
     }
 }

@@ -21,6 +21,8 @@ namespace Origin\Http;
 use Origin\Core\Resolver;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Http\Middleware\DispatcherMiddleware;
+use Origin\Http\Middleware\MiddlewareRunner;
+use Origin\Http\Middleware\Middleware;
 
 class BaseApplication
 {
@@ -31,7 +33,8 @@ class BaseApplication
         $this->runner = $runner ? $runner : new MiddlewareRunner();
 
         $this->initialize();
-        $this->addMiddleware(new DispatcherMiddleware); # By running last it will run process/shutdown first
+        # By running last it will run it first during process
+        $this->addMiddleware(new DispatcherMiddleware);
         $this->runner->run($request, $response);
     }
 
@@ -45,12 +48,12 @@ class BaseApplication
     /**
      * Adds a middleware object to the queue
      *
-     * $this->addMiddleware(new FormSecurity());
+     * $this->addMiddleware(new FormSecurityMiddleware());
      *
      * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
-    public function addMiddleware(Middleware $object)
+    public function addMiddleware(Middleware $object) : void
     {
         $this->runner->add($object);
     }
@@ -67,7 +70,7 @@ class BaseApplication
      * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Http\Middleware\FormSecurityMiddleware
      * @return void
      */
-    public function loadMiddleware(string $name)
+    public function loadMiddleware(string $name) : void
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware', 'Http');
         if (empty($className)) {

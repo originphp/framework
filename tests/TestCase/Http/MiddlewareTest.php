@@ -16,15 +16,15 @@ namespace Origin\Test\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware;
+use Origin\Http\Middleware\Middleware;
 
 class MyMiddleware extends Middleware
 {
-    public function startup(Request $request)
+    public function handle(Request $request) : void
     {
         $request->data('foo', 'bar');
     }
-    public function shutdown(Request $request, Response $response)
+    public function process(Request $request, Response $response) : void
     {
         $response->header('Accept', 'application/foo');
     }
@@ -43,9 +43,8 @@ class MiddlwareTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $response = new Response();
         $middleware = new MyMiddleware();
-        $middleware->startup($request);
-        $middleware->shutdown($request, $response);
-
+        $middleware($request, $response);
+    
         $this->assertEquals('bar', $request->data('foo'));
         $this->assertEquals('application/foo', $response->headers('Accept'));
     }
