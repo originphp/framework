@@ -8,7 +8,7 @@ use Origin\Concern\ModelConcern;
  */
 class %class%Concern extends ModelConcern
 {
-    public function initialize(array $config=[])
+    public function initialize(array $config=[]) : void
     {
         
     }

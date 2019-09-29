@@ -59,7 +59,7 @@ class ConcernRegistry extends ObjectRegistry
      */
     protected function className(string $class) : ?string
     {
-        return Resolver::className($class, $this->type);
+        return Resolver::className($class, $this->type, null, 'Http');
     }
 
     /**

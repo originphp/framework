@@ -1,5 +1,5 @@
 <?php
-namespace %namespace%\Controller\Component;
+namespace %namespace%\Http\Controller\Component;
 
 use Origin\Http\Controller\Component\Component;
 

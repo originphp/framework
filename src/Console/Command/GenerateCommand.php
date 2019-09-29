@@ -479,10 +479,12 @@ class GenerateCommand extends Command
         $structure = [
             'config',
             'src',
-            'src'.DS.'Command',
-            'src'.DS.'Controller',
-            'src'.DS.'Model',
-            'src'.DS.'View',
+            'src' . DS . 'Http',
+            'src' . DS . 'Console',
+            'src' . DS . 'Console' . DS . 'Command',
+            'src' . DS .'Http' . DS . 'Controller',
+            'src' . DS .'Http' . DS . 'View',
+            'src' . DS .'Model',
             'tests',
             'database',
         ];

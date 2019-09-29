@@ -1,15 +1,15 @@
 <?php
-namespace %namespace%\Controller\Concern;
+namespace %namespace%\Http\Controller\Concern;
 
 use Origin\Concern\ControllerConcern;
-use %namespace%\Controller\ApplicationController;
+use %namespace%\Http\Controller\ApplicationController;
 
 /**
- * @method \%namespace%\Controller\ApplicationController controller()
+ * @method \%namespace%\Http\Controller\ApplicationController controller()
  */
 class %class%Concern extends ControllerConcern
 {
-    public function initialize(array $config=[])
+    public function initialize(array $config=[]) : void
     {
         
     }

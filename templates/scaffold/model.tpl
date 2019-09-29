@@ -8,6 +8,15 @@ use ArrayObject;
 class %model% extends ApplicationModel
 {
     /**
+    * This is called when the model is constructed. 
+    */
+    public function initialize(array $config) : void
+    {
+        parent::initialize($config);
+        %initialize%
+    }
+
+    /**
      * Before find callback must return a bool. Returning false will stop the find operation.
      *
      * @param ArrayObject $options

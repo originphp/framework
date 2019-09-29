@@ -1,17 +1,17 @@
 <?php
-namespace %namespace%\View\Helper;
+namespace %namespace%\Http\View\Helper;
 
 use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\View\View;
-use %namespace%\View\Helper\%class%Helper;
+use %namespace%\Http\View\Helper\%class%Helper;
 
 class %class%HelperTest extends OriginTestCase
 {
     /**
-    * @var \%namespace%\View\Helper\%class%Helper
+    * @var \%namespace%\Http\View\Helper\%class%Helper
     */
     protected $%class% = null;
 

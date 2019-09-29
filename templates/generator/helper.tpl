@@ -1,5 +1,5 @@
 <?php
-namespace %namespace%\View\Helper;
+namespace %namespace%\Http\View\Helper;
 
 use App\Http\View\Helper\ApplicationHelper;
 

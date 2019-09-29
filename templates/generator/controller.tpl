@@ -1,5 +1,5 @@
 <?php
-namespace %namespace%\Controller;
+namespace %namespace%\Http\Controller;
 
 /**
  * @property \%namespace%\Model\%model% $%model%

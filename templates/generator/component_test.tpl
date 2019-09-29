@@ -5,7 +5,7 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use %namespace%\Controller\Component\%class%Component;
+use %namespace%\Http\Controller\Component\%class%Component;
 
 class %class%ComponentTest extends OriginTestCase
 {
