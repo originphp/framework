@@ -111,7 +111,7 @@ class Security
      * @param string $key must must be 256 bits (32 bytes)
      * @return string
      */
-    public static function encrypt(string $string, string $key): string
+    public static function encrypt(string $string, string $key) : string
     {
         if (mb_strlen($key) !== 32) {
             throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
@@ -129,9 +129,9 @@ class Security
      *
      * @param string $string
      * @param string $key must must be 256 bits (32 bytes)
-     * @return string|bool encrypted string
+     * @return string|null decrypted string
      */
-    public static function decrypt(string $string, string $key)
+    public static function decrypt(string $string, string $key) : ?string
     {
         if (mb_strlen($key) !== 32) {
             throw new InvalidArgumentException('Invalid Key. Key must be 256 bits (32 bytes)');
@@ -142,11 +142,11 @@ class Security
         $hmac = substr($string, $length, 32);
         $raw = substr($string, $length + 32);
         $expected = hash_hmac('sha256', $raw, $key, true);
-        if (! static::compare($expected, $hmac)) {
-            return false;
+        if (static::compare($expected, $hmac)) {
+            return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
         }
 
-        return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+        return null;
     }
 
     /**
@@ -164,12 +164,12 @@ class Security
     /**
      * Generates a cryptographically secure random string that can be used for a unique id.
      * It is designed to be memory & diskspace efficient yet at the same time be unique enough
-     * to not have to check the database. This is a soluton where you are not required to use a UUID and
-     * you do not need to type
+     * to not have to check the database. This is a solution where you are not required to use a UUID and
+     * you do not need to type.
      *
      * @see https://en.wikipedia.org/wiki/Birthday_problem
      *
-     * @param integer $length default: 15 where there are 121,682,695,942,190,000,995,565,568 premuations
+     * @param integer $length default: 15
      * @return string
      */
     public static function uid(int $length = 15, string $prefix = '') : string
