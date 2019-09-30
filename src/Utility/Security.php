@@ -150,14 +150,13 @@ class Security
     }
 
     /**
-     * Generates a cryptographically secure random string for a unique id. Using 32 which will uses
-     * 16 random bytes (128 bits), means you don't need to check if the value exists.
+     * Generates a cryptographically secure random string for a unique id.
      * @see https://en.wikipedia.org/wiki/Birthday_problem
      *
      * @param integer $length greater than 8 and divisible by 2. e.g. 8,10,12,14 etc.
      * @return string
      */
-    public static function uid(int $length = 16) : string
+    public static function uid(int $length = 18) : string
     {
         if ($length % 2 == 0 and $length >= 8) {
             $random = random_bytes($length / 2);
