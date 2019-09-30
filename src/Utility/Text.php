@@ -27,14 +27,13 @@ class Text
      * @param integer $length
      * @return string
      */
-    public static function random(int $length = 16): string
+    public static function random(int $length = 12): string
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // 62 chars
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         $out = '';
         for ($i = 0; $i < $length; ++$i) {
-            $out .= $characters[random_int(0, 61)]; // 61 is count of chars - 1
+            $out .= $characters[random_int(0, 61)];
         }
-
         return $out;
     }
 

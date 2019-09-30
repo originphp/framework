@@ -6,11 +6,6 @@ use Origin\Exception\Exception;
 
 class TextTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRandom()
-    {
-        $this->assertRegExp('/^([a-z0-9]*){16}$/i', Text::random());
-        $this->assertRegExp('/^([a-z0-9]*){12}$/i', Text::random(12));
-    }
     public function testToAscii()
     {
         $this->assertEquals('Ragnarr Lodbrok', Text::toAscii('Ragnarr Loðbrók'));

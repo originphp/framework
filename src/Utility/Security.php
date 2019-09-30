@@ -150,19 +150,36 @@ class Security
     }
 
     /**
-     * Generates a cryptographically secure random string for a unique id.
-     * @see https://en.wikipedia.org/wiki/Birthday_problem
+     * Generates a cryptographically secure random string
      *
-     * @param integer $length greater than 8 and divisible by 2. e.g. 8,10,12,14 etc.
+     * @param integer $length
      * @return string
      */
-    public static function uid(int $length = 18) : string
+    public static function random(int $length = 18) : string
     {
-        if ($length % 2 == 0 and $length >= 8) {
-            $random = random_bytes($length / 2);
-            return bin2hex($random);
+        $random = random_bytes((int) ceil($length / 2));
+        return substr(bin2hex($random), 0, $length);
+    }
+
+    /**
+     * Generates a cryptographically secure random string that can be used for a unique id.
+     * It is designed to be memory & diskspace efficient yet at the same time be unique enough
+     * to not have to check the database. This is a soluton where you are not required to use a UUID and
+     * you do not need to type
+     *
+     * @see https://en.wikipedia.org/wiki/Birthday_problem
+     *
+     * @param integer $length default: 15 where there are 121,682,695,942,190,000,995,565,568 premuations
+     * @return string
+     */
+    public static function uid(int $length = 15, string $prefix = '') : string
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        $out = $prefix;
+        for ($i = 0; $i < $length; ++$i) {
+            $out .= $characters[random_int(0, 61)];
         }
-        throw new InvalidArgumentException('Invalid Length. Length must be 8 or higher and divisible by 2');
+        return $out;
     }
 
     /**
