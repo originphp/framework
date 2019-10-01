@@ -20,6 +20,7 @@ namespace Origin\Model;
  *
  */
 
+use ArrayObject;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
@@ -28,7 +29,6 @@ use Origin\Model\Behavior\BehaviorRegistry;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
-use ArrayObject;
 
 class Model
 {
@@ -635,13 +635,14 @@ class Model
         if ($entity->has($this->primaryKey)) {
             $this->id = $entity->{$this->primaryKey};
         }
-
+    
         $exists = $this->exists($this->id);
 
         if ($options['validate'] === true) {
             if ($options['callbacks'] === true and ! $this->dispatchCallback('beforeValidate', [$entity, $options])) {
                 return false;
             }
+
             $validated = $this->validates($entity, ! $exists);
 
             if ($options['callbacks'] === true) {
@@ -652,7 +653,7 @@ class Model
                 return false;
             }
         }
-
+      
         $beforeCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'before');
         $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
 
@@ -704,7 +705,7 @@ class Model
                 $entity->invalidate($key, 'Invalid data');
             }
         }
-
+     
         if (empty($data) or $entity->errors()) {
             return false;
         }
@@ -816,7 +817,6 @@ class Model
         return $this->connection()->execute($sql, ['id' => $id]);
     }
 
-
     /**
      * Returns an normalized array of ssociated settings for dealing with
      * creating entities and saving data. Different than used by find
@@ -880,15 +880,13 @@ class Model
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
-        $associatedOptions = ['transaction' => false] + (array) $options;
-       
         if ($options['transaction']) {
             $this->begin();
         }
         $assocation = new Association($this);
         
         $result = $assocation->saveBelongsTo($data, $options);
-  
+      
         if ($result) {
             try {
                 $result = $this->processSave($data, $options);
@@ -904,16 +902,17 @@ class Model
         if ($result) {
             $result = $assocation->saveHasOne($data, $options);
         }
-        
+
         if ($result) {
             $result = $assocation->saveHasMany($data, $options);
         }
-
+       
         if ($result) {
             $this->commitTransaction($data, $options);
         } else {
             $this->cancelTransaction($data, $options);
         }
+
         return $result;
     }
 
@@ -955,7 +954,7 @@ class Model
                     $this->dispatchCallback('afterCommmit', [$row,$options]);
                 }
             }
-            if (!$result and $afterCallbacks) {
+            if (! $result and $afterCallbacks) {
                 foreach ($data as $row) {
                     $this->dispatchCallback('afterRollback', [$row,$options]);
                 }
@@ -1069,7 +1068,7 @@ class Model
     public function delete(Entity $entity, array $options = []) : bool
     {
         $options = new ArrayObject($options + [
-           'cascade' => true,'callbacks' => true,'transaction' => true
+            'cascade' => true,'callbacks' => true,'transaction' => true
         ]);
 
         $this->id = $entity->get($this->primaryKey);
@@ -1116,8 +1115,6 @@ class Model
         return $result;
     }
 
-
-
     /**
      * Bulk deletes records, does not delete associated data, use model::delete for that.
      *
@@ -1148,7 +1145,7 @@ class Model
         }
 
         if ($options['callbacks'] === true) {
-            $this->dispatchCallback('afterFind', [$collection , $options], false);
+            $this->dispatchCallback('afterFind', [$collection, $options], false);
         }
 
         // Modify Results
@@ -1507,7 +1504,6 @@ class Model
     {
         return $this->behaviorRegistry->disable($name);
     }
-
 
     /**
      * Internal function for commiting a transaction, and triggering the callbacks

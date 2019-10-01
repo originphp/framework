@@ -15,9 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\Model;
 
-use Origin\Utility\Inflector;
-use Origin\Model\Model;
 use ArrayObject;
+use Origin\Utility\Inflector;
 
 class Association
 {
@@ -131,6 +130,7 @@ class Association
         } elseif (strpos($class, '.')) {
             list($plugin, $class) = pluginSplit($class);
         }
+
         return $class;
     }
 
@@ -281,6 +281,7 @@ class Association
                 $data->$foreignKey = $this->model->$alias->id;
             }
         }
+
         return true;
     }
 
@@ -301,6 +302,7 @@ class Association
                 }
             }
         }
+
         return true;
     }
 
@@ -327,17 +329,18 @@ class Association
                 }
             }
         }
+
         return true;
     }
-
 
     public function saveHasAndBelongsToMany(array $habtm, bool $callbacks) : bool
     {
         foreach ($habtm as $alias => $data) {
-            if (!$this->saveHABTM($alias, $data, $callbacks)) {
+            if (! $this->saveHABTM($alias, $data, $callbacks)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -419,7 +422,6 @@ class Association
         return true;
     }
 
-
     /**
      * Deletes the hasOne and hasMany associated records.
      *
@@ -435,20 +437,21 @@ class Association
                 $ids = $this->model->$association->find('list', [
                     'conditions' => $conditions,
                     'fields' => [$this->model->primaryKey]
-                    ]);
+                ]);
                 foreach ($ids as $id) {
                     $conditions = [$this->model->$association->primaryKey => $id];
                     $result = $this->model->$association->find('first', [
                         'conditions' => $conditions, 'callbacks' => false
-                        ]);
+                    ]);
                     if ($result) {
                         $this->model->$association->delete($result, [
                             'transaction' => false,'callbacks' => $callbacks
-                            ]);
+                        ]);
                     }
                 }
             }
         }
+
         return true;
     }
 
@@ -466,20 +469,21 @@ class Association
             $conditions = [$config['foreignKey'] => $id];
             $ids = $this->model->$associatedModel->find('list', [
                 'conditions' => $conditions
-                ]);
+            ]);
 
             foreach ($ids as $id) {
                 $conditions = [$this->model->$associatedModel->primaryKey => $id];
                 $result = $this->model->$associatedModel->find('first', [
                     'conditions' => $conditions, 'callbacks' => false
-                    ]);
+                ]);
                 if ($result) {
                     $this->model->$associatedModel->delete($result, [
                         'transaction' => false,'callbacks' => $callbacks
-                        ]);
+                    ]);
                 }
             }
         }
+
         return true;
     }
 }
