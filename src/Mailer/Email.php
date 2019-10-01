@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -185,7 +186,7 @@ class Email
      *
      * @return void
      */
-    protected function applyConfig() : void
+    protected function applyConfig(): void
     {
         foreach (['to', 'from', 'sender', 'replyTo'] as $method) {
             if (isset($this->account[$method])) {
@@ -220,7 +221,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function to(string $email, string $name = null) : Email
+    public function to(string $email, string $name = null): Email
     {
         $this->setEmail('to', $email, $name);
 
@@ -234,7 +235,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function addTo(string $email, string $name = null) : Email
+    public function addTo(string $email, string $name = null): Email
     {
         $this->addEmail('to', $email, $name);
 
@@ -248,7 +249,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function cc(string $email, string $name = null) : Email
+    public function cc(string $email, string $name = null): Email
     {
         $this->setEmail('cc', $email, $name);
 
@@ -262,7 +263,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function addCc(string $email, string $name = null) : Email
+    public function addCc(string $email, string $name = null): Email
     {
         $this->addEmail('cc', $email, $name);
 
@@ -276,7 +277,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function bcc(string $email, string $name = null) : Email
+    public function bcc(string $email, string $name = null): Email
     {
         $this->setEmail('bcc', $email, $name);
 
@@ -290,7 +291,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function addBcc(string $email, string $name = null) : Email
+    public function addBcc(string $email, string $name = null): Email
     {
         $this->addEmail('bcc', $email, $name);
 
@@ -304,7 +305,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function from(string $email, string $name = null) : Email
+    public function from(string $email, string $name = null): Email
     {
         $this->setEmailSingle('from', $email, $name);
 
@@ -318,7 +319,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function sender(string $email, string $name = null) : Email
+    public function sender(string $email, string $name = null): Email
     {
         $this->setEmailSingle('sender', $email, $name);
 
@@ -332,7 +333,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function replyTo(string $email, string $name = null) : Email
+    public function replyTo(string $email, string $name = null): Email
     {
         $this->setEmailSingle('replyTo', $email, $name);
 
@@ -346,7 +347,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function returnPath(string $email, string $name = null) : Email
+    public function returnPath(string $email, string $name = null): Email
     {
         $this->setEmailSingle('returnPath', $email, $name);
 
@@ -359,7 +360,7 @@ class Email
      * @param string $subject
      * @return \Origin\Mailer\Email
      */
-    public function subject(string $subject) : Email
+    public function subject(string $subject): Email
     {
         $this->subject = $subject;
 
@@ -372,7 +373,7 @@ class Email
      * @param string $message
      * @return \Origin\Mailer\Email
      */
-    public function textMessage(string $message) : Email
+    public function textMessage(string $message): Email
     {
         $this->textMessage = $message;
 
@@ -385,7 +386,7 @@ class Email
      * @param string $message
      * @return \Origin\Mailer\Email
      */
-    public function htmlMessage(string $message) : Email
+    public function htmlMessage(string $message): Email
     {
         $this->htmlMessage = $message;
 
@@ -398,7 +399,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function template(string $name) : Email
+    public function template(string $name): Email
     {
         $this->template = $name;
 
@@ -411,7 +412,7 @@ class Email
      * @param array $vars
      * @return \Origin\Mailer\Email
      */
-    public function set(array $vars) : Email
+    public function set(array $vars): Email
     {
         $this->viewVars = $vars;
 
@@ -424,7 +425,7 @@ class Email
      * @param string $name
      * @return void
      */
-    protected function loadTemplate(string $name) : void
+    protected function loadTemplate(string $name): void
     {
         list($plugin, $template) = pluginSplit($name);
         $path = SRC . DS . 'Http' . DS . 'View' . DS . 'Email';
@@ -460,7 +461,7 @@ class Email
      * @param string $template__filename
      * @return string
      */
-    protected function renderTemplate(string $template__filename) : string
+    protected function renderTemplate(string $template__filename): string
     {
         extract($this->viewVars);
 
@@ -478,7 +479,7 @@ class Email
      * @param string $value
      * @return \Origin\Mailer\Email
      */
-    public function addHeader(string $name, string $value) : Email
+    public function addHeader(string $name, string $value): Email
     {
         $this->additionalHeaders[$name] = $value;
 
@@ -492,7 +493,7 @@ class Email
      * @param string $name
      * @return \Origin\Mailer\Email
      */
-    public function addAttachment(string $filename, string $name = null) : Email
+    public function addAttachment(string $filename, string $name = null): Email
     {
         if ($name == null) {
             $name = basename($filename);
@@ -511,7 +512,7 @@ class Email
      * @param array $attachments ['/tmp/filename','/images/logo.png'=>'Your Logo.png']
      * @return \Origin\Mailer\Email
      */
-    public function addAttachments(array $attachments) : Email
+    public function addAttachments(array $attachments): Email
     {
         foreach ($attachments as $filename => $name) {
             if (is_int($filename)) {
@@ -530,7 +531,7 @@ class Email
      * @param string $message Text message if sending directly like this
      * @return \Origin\Mailer\Message
      */
-    public function send(string $message = null) : Message
+    public function send(string $message = null): Message
     {
         if (empty($this->from)) {
             throw new Exception('From email is not set.');
@@ -564,9 +565,9 @@ class Email
         if ($this->account === null) {
             throw new Exception('Email config has not been set.');
         }
-       
+
         $this->message = $this->render();
-       
+
         if ($this->account['engine'] === 'Smtp') {
             $this->smtpSend();
         }
@@ -579,7 +580,7 @@ class Email
      *
      * @return \Origin\Mailer\Message
      */
-    protected function render() : message
+    protected function render(): message
     {
         $headers = '';
         foreach ($this->buildHeaders() as $header => $value) {
@@ -596,7 +597,7 @@ class Email
      *
      * @return void
      */
-    protected function smtpSend() : void
+    protected function smtpSend(): void
     {
         $account = $this->account;
 
@@ -626,7 +627,7 @@ class Email
      * @param array $account
      * @return void
      */
-    protected function authenticate(array $account) : void
+    protected function authenticate(array $account): void
     {
         if (isset($account['username']) and isset($account['password'])) {
             $this->sendCommand('AUTH LOGIN', '334');
@@ -641,7 +642,7 @@ class Email
      * @param array $account
      * @return void
      */
-    protected function connect(array $account) : void
+    protected function connect(array $account): void
     {
         $this->sendCommand(null, '220');
 
@@ -657,7 +658,7 @@ class Email
         if (isset($account['domain'])) {
             $domain = $account['domain'];
         }
-        
+
         $this->sendCommand("EHLO {$domain}", '250');
         if ($account['tls']) {
             $this->sendCommand('STARTTLS', '220');
@@ -673,7 +674,7 @@ class Email
      *
      * @return boolean
      */
-    protected function isConnected() : bool
+    protected function isConnected(): bool
     {
         return is_resource($this->socket);
     }
@@ -685,7 +686,7 @@ class Email
      * @param string $code
      * @return string $code
      */
-    protected function sendCommand(string $data = null, $code = '250') : string
+    protected function sendCommand(string $data = null, $code = '250'): string
     {
         if ($data != null) {
             $this->socketLog($data);
@@ -695,6 +696,9 @@ class Email
         $startTime = time();
         while (is_resource($this->socket) and ! feof($this->socket)) {
             $buffer = @fgets($this->socket, 515);
+            if (! $buffer) {
+                break; // no more data or an error has occured
+            }
             $this->socketLog(rtrim($buffer));
             $response .= $buffer;
 
@@ -731,7 +735,7 @@ class Email
      * @param string $data
      * @return void
      */
-    protected function socketLog(string $data) : void
+    protected function socketLog(string $data): void
     {
         $this->smtpLog[] = $data;
     }
@@ -742,7 +746,7 @@ class Email
      * @param array $account
      * @return void
      */
-    protected function openSocket(array $account, array $options = []) : void
+    protected function openSocket(array $account, array $options = []): void
     {
         $protocol = 'tcp';
         if ($account['ssl']) {
@@ -781,7 +785,7 @@ class Email
      * @param string $message
      * @return void
      */
-    protected function connectionErrorHandler(int $code, string $message) : void
+    protected function connectionErrorHandler(int $code, string $message): void
     {
         $this->smtpLog[] = $message;
     }
@@ -791,7 +795,7 @@ class Email
      *
      * @return void
      */
-    protected function closeSocket() : void
+    protected function closeSocket(): void
     {
         if (is_resource($this->socket)) {
             fclose($this->socket);
@@ -803,24 +807,24 @@ class Email
      *
      * @return array
      */
-    public function smtpLog() : array
+    public function smtpLog(): array
     {
         return $this->smtpLog;
     }
 
-    protected function setEmail(string $var, string $email = null, string $name = null) : void
+    protected function setEmail(string $var, string $email = null, string $name = null): void
     {
         $this->{$var} = [];
         $this->addEmail($var, $email, $name);
     }
 
-    protected function addEmail(string $var, string $email = null, string $name = null) : void
+    protected function addEmail(string $var, string $email = null, string $name = null): void
     {
         $this->validateEmail($email);
         $this->{$var}[] = [$email, $name];
     }
 
-    protected function setEmailSingle(string $var, string $email = null, string $name = null) : void
+    protected function setEmailSingle(string $var, string $email = null, string $name = null): void
     {
         $this->validateEmail($email);
         $this->{$var} = [$email, $name];
@@ -834,7 +838,7 @@ class Email
      * @return bool
      * @throws Exception
      */
-    protected function validateEmail($email) : bool
+    protected function validateEmail($email): bool
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return true;
@@ -848,7 +852,7 @@ class Email
      * @param string $input
      * @return bool
      */
-    protected function validateHeader(string $input = null) : bool
+    protected function validateHeader(string $input = null): bool
     {
         return ($input === str_ireplace(["\r", "\n", '%0A', '%0D'], '', $input));
     }
@@ -858,7 +862,7 @@ class Email
      *
      * @return array
      */
-    protected function buildHeaders() : array
+    protected function buildHeaders(): array
     {
         $headers = [];
 
@@ -888,8 +892,8 @@ class Email
         }
 
         /**
-        * Look for Email Header Injection
-        */
+         * Look for Email Header Injection
+         */
         foreach ($headers as $header) {
             if (! $this->validateHeader($header)) {
                 throw new Exception(sprintf('Possible Email Header Injection `%s`', $header));
@@ -909,7 +913,7 @@ class Email
      *
      * @return array message
      */
-    protected function buildMessage() : array
+    protected function buildMessage(): array
     {
         $message = [];
 
@@ -925,7 +929,7 @@ class Email
             if ($emailFormat == 'html') {
                 $message[] = 'Content-Type: text/html; charset="' . $this->charset . '"';
             }
-            
+
             if ($needsEncoding) {
                 $message[] = 'Content-Transfer-Encoding: quoted-printable';
             }
@@ -939,7 +943,7 @@ class Email
             $message[] = '';
         }
 
-        if (($emailFormat === 'text' or $emailFormat ==='both') and $this->textMessage) {
+        if (($emailFormat === 'text' or $emailFormat === 'both') and $this->textMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
                 $message[] = 'Content-Type: text/plain; charset="' . $this->charset . '"';
@@ -952,7 +956,7 @@ class Email
             $message[] = '';
         }
 
-        if (($emailFormat === 'html' or $emailFormat ==='both') and $this->htmlMessage) {
+        if (($emailFormat === 'html' or $emailFormat === 'both') and $this->htmlMessage) {
             if ($emailFormat == 'both') {
                 $message[] = '--' . $altBoundary;
                 $message[] = 'Content-Type: text/html; charset="' . $this->charset . '"';
@@ -990,7 +994,7 @@ class Email
      * @param string $message
      * @return string
      */
-    protected function formatMessage(string $message, bool $needsEncoding) : string
+    protected function formatMessage(string $message, bool $needsEncoding): string
     {
         $message = preg_replace("/\r\n|\n/", "\r\n", $message);
         if ($needsEncoding) {
@@ -1006,7 +1010,7 @@ class Email
      *
      * @return string
      */
-    protected function getMessageId() : string
+    protected function getMessageId(): string
     {
         if ($this->messageId === null) {
             /**
@@ -1029,7 +1033,7 @@ class Email
      * Gets the domain to be used for message id generation
      * @return string
      */
-    public function getDomain() : string
+    public function getDomain(): string
     {
         $domain = php_uname('n');
         if ($this->from) {
@@ -1045,7 +1049,7 @@ class Email
      *
      * @return string
      */
-    protected function getBoundary() : string
+    protected function getBoundary(): string
     {
         if ($this->boundary === null) {
             $this->boundary = md5(random_bytes(16));
@@ -1059,7 +1063,7 @@ class Email
      *
      * @return string
      */
-    protected function getSubject() : string
+    protected function getSubject(): string
     {
         if ($this->subject) {
             $this->subject = mb_encode_mimeheader($this->subject, $this->charset, 'B');
@@ -1073,7 +1077,7 @@ class Email
      *
      * @return string
      */
-    protected function getContentType() : string
+    protected function getContentType(): string
     {
         if ($this->attachments) {
             return 'multipart/mixed; boundary="' . $this->getBoundary() . '"';
@@ -1113,10 +1117,10 @@ class Email
      *
      * @return bool
      */
-    protected function needsEncoding() : bool
+    protected function needsEncoding(): bool
     {
         $emailFormat = $this->format();
-        
+
         if (($emailFormat == 'text' or $emailFormat == 'both') and mb_check_encoding($this->textMessage, 'ASCII') === false) {
             return true;
         }
@@ -1133,7 +1137,7 @@ class Email
      * @param array $address
      * @return string james@originphp.com James <james@originphp.com>
      */
-    protected function formatAddress(array $address) : string
+    protected function formatAddress(array $address): string
     {
         list($email, $name) = $address;
         if ($name === null) {
@@ -1150,7 +1154,7 @@ class Email
      * @param array $addresses
      * @return string
      */
-    protected function formatAddresses(array $addresses) : string
+    protected function formatAddresses(array $addresses): string
     {
         $result = [];
         foreach ($addresses as $address) {
