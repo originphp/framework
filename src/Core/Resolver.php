@@ -38,13 +38,13 @@ class Resolver
             $namespace = $plugin;
         }
 
-        $prefix =  $group === null ? null : ('\\' . $group);
+        $prefix = $group === null ? null : ('\\' . $group);
        
         $path = $prefix . '\\'. $class . $suffix;
         if ($objectType) {
             $path = $prefix . '\\'.str_replace('/', '\\', $objectType).'\\'.$class. $suffix;
         }
-       
+
         if (static::classExists($namespace.$path)) {
             return $namespace . $path;
         }
