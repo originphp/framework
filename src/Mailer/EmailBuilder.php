@@ -50,7 +50,7 @@ class EmailBuilder
             'sender' => null,
             'replyTo' => null,
             'format' => null,
-            'folder' => null,
+            'template' => null,
             'headers' => null,
             'attachments' => null,
             'viewVars' => null, ];
@@ -144,7 +144,7 @@ class EmailBuilder
             $this->message->htmlMessage($this->content);
         }
         if (in_array($this->options['format'], ['text','both'])) {
-            $filename = $this->getPath($this->options['folder']) . '.text.ctp';
+            $filename = $this->getPath($this->options['template']) . '.text.ctp';
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
@@ -182,7 +182,7 @@ class EmailBuilder
     protected function renderHtmlMessage() : void
     {
         $this->content = $this->renderTemplate(
-            $this->getPath($this->options['folder']) . '.html.ctp'
+            $this->getPath($this->options['template']) . '.html.ctp'
         );
         if ($this->options['layout']) {
             $this->content = $this->renderTemplate(
@@ -227,10 +227,10 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' . DS . Inflector::underscored($name) ;
+            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' . DS . $name ;
         }
 
-        return SRC . DS . 'Mailer' . DS . 'Template' . DS . Inflector::underscored($name);
+        return SRC . DS . 'Mailer' . DS . 'Template' . DS . $name;
     }
 
     /**

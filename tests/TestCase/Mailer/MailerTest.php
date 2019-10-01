@@ -28,7 +28,13 @@ class DemoMailer extends Mailer
     public $defaults = [
         'from' => 'no-reply@example.com',
     ];
-    
+    /**
+     * Work with mocks
+     *
+     * @var string
+     */
+    protected $template = 'demo';
+
     public function execute(array $params) : void
     {
         $this->first_name = $params['first_name'];
@@ -129,7 +135,7 @@ class MailerTest extends OriginTestCase
             'attachments' => [],
             'format' => 'both',
             'account' => 'test',
-            'folder' => 'Demo',
+            'template' => 'demo',
             'viewVars' => ['first_name' => 'jim'],
             'layout' => false,
             'body' => null,

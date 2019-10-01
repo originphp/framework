@@ -14,6 +14,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Mailer;
 
+use Origin\Utility\Inflector;
+use Origin\Core\Plugin;
+
 /**
 * To set values in the view set public properties in the execute method
 *
@@ -47,16 +50,6 @@ abstract class Mailer
      * @var array
      */
     public $defaults = [];
-
-    /**
-     * Name of the mailer folder where templates are. Only set this
-     * if you want something custom.
-     *
-     * e.g SendUserWelcomeEmail,MyPlugin.SendWelcomeEmail, Orders/SendUserWelcomeEmail
-     *
-     * @var string
-     */
-    public $folder = null;
 
     /**
      * Email account to use
@@ -109,17 +102,39 @@ abstract class Mailer
      */
     protected $viewVars = [];
 
+    /**
+     * Name of the tempalate
+     * welcome or MyPlugin.welcome
+     *
+     * @var string
+     */
+    protected $template = null;
+
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];
         $this->account = $config['account'];
 
-        if ($this->folder === null) {
+        if ($this->template === null) {
+            # Determine template
             list($namespace, $class) = namespaceSplit(get_class($this));
-            $this->folder = substr($class, 0, -6);
+            
+            $class = Inflector::underscored(substr($class, 0, -6));
+
+            // could be mock
+            if ($namespace) {
+                $plugin = substr($namespace, 0, strpos($namespace, '\\'));
+                if (in_array($plugin, Plugin::loaded())) {
+                    $class = $plugin .'.' .$class; // its a Plugin
+                }
+            }
+            $this->template = $class;
         }
+       
+   
         $this->initialize($config);
     }
+
     /**
      * Constructor hook method, use this to avoid having to overwrite the constructor and
      * call the parent.
@@ -186,7 +201,7 @@ abstract class Mailer
         $options['headers'] = $this->headers;
         $options['attachments'] = $this->attachments;
         $options['account'] = env('ORIGIN_ENV') === 'test' ? 'test' : $this->account;
-        $options['folder'] = $this->folder;
+        $options['template'] = $this->template;
         $options['viewVars'] = $this->viewVars;
         $options['layout'] = $this->layout;
 
