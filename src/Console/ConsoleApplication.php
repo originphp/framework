@@ -167,7 +167,7 @@ class ConsoleApplication
         }
 
         // Detect and extract Command
-        $command = null;
+        $command = $commandName = null;
         if (count($commands) === 1) {
             $command = $commands[0]; # If its one command application load the first one by default
         }
@@ -193,9 +193,10 @@ class ConsoleApplication
             return false;
         }
       
+        $commandName = (count($commands) === 1) ? $this->name : $this->name . ' ' .$command;
         # Configure Command
         $this->{$command}->io = $this->io;
-        $this->{$command}->name($this->name . ' ' .$command);  // Rename for help
+        $this->{$command}->name($commandName);  // Rename for help
 
         try {
             return $this->{$command}->run($args);
