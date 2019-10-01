@@ -190,16 +190,17 @@ class Number
      *
      * @param string|float|integer $value
      * @param array $options
-     * @return string
+     * @return int|double
      */
-    public static function parse($value, array $options = []) : string
+    public static function parse($value, array $options = [])
     {
         $options += [
             'thousands' => static::$locale['thousands'],
             'decimals' => static::$locale['decimals'],
         ];
         $value = str_replace($options['thousands'], '', (string) $value);
+        $value = str_replace($options['decimals'], '.', $value);
 
-        return str_replace($options['decimals'], '.', $value);
+        return strpos($value, '.') !== false ? (float) $value : (int) $value;
     }
 }

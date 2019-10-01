@@ -22,6 +22,8 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Fixed return type for Number parsing
+- Fixed usage statement for single command console application
 - Fixed namespace for generators when using plugins
 - Fixed association when manually setting class name for belongsTo or hasAndBelongsToMany
 - Fixed issue when incorrectly posting blank id field on add causing model to not add id
