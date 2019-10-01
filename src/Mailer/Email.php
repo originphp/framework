@@ -428,13 +428,13 @@ class Email
     protected function loadTemplate(string $name): void
     {
         list($plugin, $template) = pluginSplit($name);
-        $path = SRC . DS . 'Http' . DS . 'View' . DS . 'Email';
+        $path = SRC . DS . 'Mailer' . DS . 'Template';
         if ($plugin) {
-            $path = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Email';
+            $path = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' ;
         }
 
         if ($this->format() === 'html' or $this->format() === 'both') {
-            $filename = $path . DS . 'html' . DS . $template . '.ctp';
+            $filename = $path . DS .  $template . '.html.ctp';
             if (file_exists($filename) === false) {
                 throw new MissingTemplateException(sprintf('Template %s not found', $filename));
             }
@@ -442,7 +442,7 @@ class Email
         }
 
         if ($this->format() === 'text' or $this->format() === 'both') {
-            $filename = $path . DS . 'text' . DS . $template . '.ctp';
+            $filename = $path . DS .  $template . '.text.ctp';
             if (file_exists($filename) === false) {
                 if ($this->format() === 'both') {
                     $this->textMessage = Html::toText($this->htmlMessage);

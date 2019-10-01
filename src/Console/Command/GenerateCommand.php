@@ -307,13 +307,14 @@ class GenerateCommand extends Command
             $this->getBaseFolder($data['name'], self::TEST).DS.'Mailer'.DS."{$data['class']}MailerTest.php",
             $data
         );
-
+ 
+        
         $input = $this->getTemplateFilename('mailer_html');
-        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'Http'.DS.'View'.DS.'Mailer'.DS. $data['class'] . DS . 'html.ctp';
+        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'Mailer'.DS.'Template'.DS. $data['underscored'] . '.html.ctp';
         $this->saveGeneratedCode($out, file_get_contents($input));
 
         $input = $this->getTemplateFilename('mailer_text');
-        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'Http'.DS.'View'.DS.'Mailer'.DS. $data['class'] . DS . 'text.ctp';
+        $out = $this->getBaseFolder($data['name'], self::SRC).DS.'Mailer'.DS.'Template'.DS. $data['underscored'] . '.text.ctp';
         $this->saveGeneratedCode($out, file_get_contents($input));
     }
 

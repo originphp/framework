@@ -77,7 +77,7 @@ abstract class Mailer
      *
      * @var boolean
      */
-    public $layout = false;
+    public $layout = 'default';
 
     /**
      * @var array
@@ -285,9 +285,7 @@ abstract class Mailer
         }
         $this->options['viewVars'] = $this->viewVars;
    
-        $message = new EmailBuilder($this->options);
-
-        return $message->build($debug);
+        return (new EmailBuilder($this->options))->build($debug);
     }
 
     /**

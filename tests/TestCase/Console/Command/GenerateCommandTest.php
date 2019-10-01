@@ -312,6 +312,16 @@ class GenerateCommandTest extends OriginTestCase
         
         $this->assertFileHash('2a5ec49ee5a166bd753f4af917811a45', $filename);
         unlink($filename);
+
+        $filename = SRC.DS.'Mailer'.DS.'Template'.DS .'dummy.html.ctp';
+        $this->assertOutputContains('app/Mailer/Template/dummy.html.ctp');
+        $this->assertFileHash('dcd7e3b40d5e4d840e8e2ba0a9721a81', $filename);
+        unlink($filename);
+
+        $filename = SRC.DS.'Mailer'.DS.'Template'.DS .'dummy.text.ctp';
+        $this->assertOutputContains('app/Mailer/Template/dummy.text.ctp');
+        $this->assertFileHash('b336631ad91ce8c22975f1bea7c0da4e', $filename);
+        unlink($filename);
     }
 
     public function testGenerateModel()

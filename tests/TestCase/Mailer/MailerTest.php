@@ -23,6 +23,8 @@ class DemoMailer extends Mailer
 {
     use TestTrait;
 
+    public $layout = false;
+    
     public $defaults = [
         'from' => 'no-reply@example.com',
     ];

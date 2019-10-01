@@ -144,7 +144,7 @@ class EmailBuilder
             $this->message->htmlMessage($this->content);
         }
         if (in_array($this->options['format'], ['text','both'])) {
-            $filename = $this->getPath($this->options['folder']) . DS . 'text.ctp';
+            $filename = $this->getPath($this->options['folder']) . '.text.ctp';
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
@@ -182,7 +182,7 @@ class EmailBuilder
     protected function renderHtmlMessage() : void
     {
         $this->content = $this->renderTemplate(
-            $this->getPath($this->options['folder']) . DS . 'html.ctp'
+            $this->getPath($this->options['folder']) . '.html.ctp'
         );
         if ($this->options['layout']) {
             $this->content = $this->renderTemplate(
@@ -227,10 +227,10 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Mailer' .DS . $name ;
+            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' . DS . Inflector::underscored($name) ;
         }
 
-        return SRC . DS . 'Http' . DS . 'View' . DS . 'Mailer' .DS . $name ;
+        return SRC . DS . 'Mailer' . DS . 'Template' . DS . Inflector::underscored($name);
     }
 
     /**
@@ -243,9 +243,9 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
+            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
         }
 
-        return SRC . DS . 'Http' . DS . 'View' . DS .  'Layout' . DS . $name . '.ctp';
+        return SRC . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
     }
 }
