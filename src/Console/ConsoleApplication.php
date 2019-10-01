@@ -244,7 +244,7 @@ class ConsoleApplication
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));
         }
 
-        $className = Resolver::className($name, 'Command', 'Command');
+        $className = Resolver::className($name, 'Command', 'Command', 'Console');
         if (! $className) {
             throw new InvalidArgumentException(sprintf('`%s` command not found.', $name));
         }
