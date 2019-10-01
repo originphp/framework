@@ -732,7 +732,7 @@ class Model
                  * Postgresql lastInsertId error if you specify wrong id.
                  * @internal lastval is not yet defined in this session
                  */
-                if (! isset($entity->{$this->primaryKey})) {
+                if (empty($entity->{$this->primaryKey})) {
                     $entity->{$this->primaryKey} = (int) $connection->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};
