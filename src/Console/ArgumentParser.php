@@ -444,6 +444,7 @@ class ArgumentParser
         }
 
         $usages = $this->generateUsage($this->command);
+       
         if ($this->usage) {
             $usages = $usages ."\n" . $this->usage;
         }
@@ -541,8 +542,6 @@ class ArgumentParser
      */
     protected function generateUsage(string $command = 'command') : string
     {
-        $results = [];
-     
         $options = $arguments = [];
         foreach ($this->options as $option) {
             if (! empty($option['required'])) {
@@ -567,7 +566,7 @@ class ArgumentParser
         if (! empty($this->commands)) {
             $command .= ' command';
         }
-     
+    
         return $command . ' ' .  implode(' ', array_merge($options, $arguments));
     }
 }
