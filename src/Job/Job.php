@@ -16,10 +16,11 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use \ArrayObject;
+use Origin\Log\Log;
 use Origin\Model\ModelTrait;
+use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Job\Engine\BaseEngine;
-use Origin\Utility\Security;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -241,6 +242,8 @@ class Job
             if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
+
+            Log::error($e->getMessage());
            
             $this->onError($e);
     
