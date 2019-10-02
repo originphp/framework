@@ -21,7 +21,7 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-## [1.33.2] - 2019-10-02
+## [1.33.3] - 2019-10-02
 
 ### Fixed
 - Fixed return type for Number parsing
