@@ -82,7 +82,7 @@ class CsrfProtectionMiddleware extends Middleware
         }
 
         if ($request->is(['get']) and $this->createCookie) {
-            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), $this->config('expires'));
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), ['expires'=>$this->config('expires')]);
         }
     }
 

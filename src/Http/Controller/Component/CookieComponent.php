@@ -35,9 +35,9 @@ class CookieComponent extends Component
      * Reads a value of a cookie from request
      *
      * @param string $name
-     * @return string|null
+     * @return string|array|null
      */
-    public function read(string $name) : ?string
+    public function read(string $name)
     {
         return $this->request()->cookies($name);
     }
@@ -50,13 +50,18 @@ class CookieComponent extends Component
      *
      * @param string $key
      * @param mixed $value
-     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
-     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
+     * @param array $options The options keys are:
+     *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
+     *   - encrypt: default:true. encrypt value
+     *   - path: default:'/' . Path on server
+     *   - domain: domains cookie will be available on
+     *   - secure: default:false. only send if through https
+     *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function write(string $name, $value, string $expire = '+1 month', $options = []) : void
+    public function write(string $name, $value, array $options = []) : void
     {
-        $this->response()->cookie($name, $value, $expire, $options);
+        $this->response()->cookie($name, $value, $options);
     }
 
     /**
@@ -67,7 +72,7 @@ class CookieComponent extends Component
      */
     public function delete(string $name) : void
     {
-        $this->response()->cookie($name, '', '-60 minutes');
+        $this->response()->cookie($name, '', ['expires'=>'-60 minutes']);
     }
 
     /**

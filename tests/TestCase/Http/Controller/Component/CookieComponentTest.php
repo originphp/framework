@@ -48,7 +48,7 @@ class CookieComponentTest extends \PHPUnit\Framework\TestCase
         $this->Cookie->delete('foo');
         $cookies = $this->Cookie->response()->cookies();
         $this->assertEquals('', $cookies['foo']['value']);
-        $this->assertTrue($cookies['foo']['expire'] < time());
+        $this->assertTrue($cookies['foo']['expires'] < time());
     }
 
     public function testdestroy()

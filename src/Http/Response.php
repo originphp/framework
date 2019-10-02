@@ -241,24 +241,30 @@ class Response
      *  $response->cookie('key',$value);
      *  $response->cookie('key',$value,'+5 days');
      *
-     * @param string $name
-     * @param mixed $value
-     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
-     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
+    * @param string $key
+     * @param mixed $value string, array etc
+     * @param array $options The options keys are:
+     *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
+     *   - encrypt: default:true. encrypt value
+     *   - path: default:'/' . Path on server
+     *   - domain: domains cookie will be available on
+     *   - secure: default:false. only send if through https
+     *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function cookie(string $name, $value, string $expire = '+1 month', array $options = []) : void
+    public function cookie(string $name, $value, array $options = []) : void
     {
         $options += [
             'name' => $name,
             'value' => $value,
+            'expires' => '+1 month',
             'path' => '/', // path on server
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => strtotime($expire),
             'encrypt' => true,
         ];
+        $options['expires'] = strtotime($options['expires']);
         
         $this->cookies[$name] = $options;
     }
@@ -345,7 +351,7 @@ class Response
         $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {
             // @codeCoverageIgnoreStart
-            $cookie->write($name, $options['value'], $options['expire'], $options);
+            $cookie->write($name, $options['value'], $options);
             // @codeCoverageIgnoreEnd
         }
     }

@@ -154,7 +154,7 @@ class Response
      * @param string $value
      * @return void
      */
-    public function cookie(string $name, string $value, int $expire = null, array $options = []) :void
+    public function cookie(string $name, string $value, array $options = []) :void
     {
         $options += [
             'name' => $name,
@@ -163,7 +163,7 @@ class Response
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => $expire, // convert from
+            'expire' => null, // convert from
         ];
         $this->cookies[$name] = $options;
     }
