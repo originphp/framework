@@ -29,6 +29,7 @@ Version 2 removes deprecated features and provides a more organized folder struc
 - Model::$datasource changed Model::$connection
 - Unit testing now uses PHPUnit 8.x
 - Migrations now expect version to be BIGINT format
+- Cookie writing, 3rd paramater is array and options array takes `expires` key
 
 ### Removed
 
