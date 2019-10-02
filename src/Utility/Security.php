@@ -163,31 +163,52 @@ class Security
 
     /**
      * Generates a cryptographically secure random string that can be used for a unique id.
+     *
      * It is designed to be memory & diskspace efficient yet at the same time be unique enough
      * to not have to check the database. This is a solution where you are not required to use a UUID and
-     * you do not need to type.
+     * a user does not need to type.
      *
      * @see https://en.wikipedia.org/wiki/Birthday_problem
      *
-     * @param integer $length default: 15
+     * @param integer $length default 15
      * @return string
      */
-    public static function uid(int $length = 15, string $prefix = '') : string
+    public static function uid(int $length = 15) : string
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        $out = $prefix;
-        for ($i = 0; $i < $length; ++$i) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        $out = '';
+        for ($i = 0; $i < $length; $i++) {
             $out .= $characters[random_int(0, 61)];
         }
         return $out;
     }
 
     /**
-     * Generates a v4 random UUID (Universally Unique IDentifier).
+     * Generates a UUID (Universally Unique IDentifier). By default it generates a
+     * random UUID (version 4), but if you pass the timestamp option key or provide a
+     * MAC address then it will generate a UUID version 1.
+     *
+     * @param array $options The options array supports the following keys
+     *   - timestamp: default:false Set to true to generate a UUID version 1
+     *   - macAddress: sets the MAC address to be used for a version 1 UUID
+     * @return string
+     */
+    public static function uuid(array $options = []) : string
+    {
+        $options += ['timestamp' => false,'macAddress' => null];
+        if ($options['timestamp'] or $options['macAddress']) {
+            return static::uuidv1($options['macAddress']);
+        }
+        return static::uuidv4();
+    }
+
+    /**
+     * Generates a UUID version 4 - Random
      *
      * @return string
      */
-    public static function uuid() : string
+    private static function uuidv4() : string
     {
         return implode('-', [
             bin2hex(random_bytes(4)),
@@ -195,6 +216,52 @@ class Security
             bin2hex(chr((ord(random_bytes(1)) & 0x0F) | 0x40)) . bin2hex(random_bytes(1)),
             bin2hex(chr((ord(random_bytes(1)) & 0x3F) | 0x80)) . bin2hex(random_bytes(1)),
             bin2hex(random_bytes(6)),
+        ]);
+    }
+
+    /**
+     * Generates a UUID version 1 - Sequential/Timestamp based
+     *
+     * @param string $macAddress e.g. 00:0a:95:9d:68:16
+     * @return string
+     */
+    private static function uuidv1(string $macAddress = null) : string
+    {
+        if (empty($macAddress)) {
+            $macAddress = bin2hex(random_bytes(6));
+        }
+        $macAddress = str_replace([':', '-'], '', $macAddress);
+        if (strlen($macAddress) !== 12 or ctype_xdigit($macAddress) === false) {
+            throw new InvalidArgumentException('Invalid MAC address');
+        }
+
+        $sequence = random_int(0, 0x3fff); // Not using a stable storage. (RFC 4122 - Section 4.2.1.1)
+      
+        // Calculate time
+        $time = gettimeofday();
+        $uuidTime = ($time['sec'] * 10000000) + ($time['usec'] * 10) + 0x01b21dd213814000;
+
+        $timeLow = sprintf('%08x', $uuidTime & 0xffffffff);
+        $timeMid = sprintf('%04x', ($uuidTime >> 32) & 0xffff);
+        $timeHi = sprintf('%04x', ($uuidTime >> 48) & 0x0fff);
+     
+        // Apply Version
+        $timeHi = hexdec($timeHi) & 0x0fff;
+        $timeHi &= ~(0xf000);
+        $timeHi |= 1 << 12;
+
+        $sequenceHi = $sequence >> 8;
+        $sequenceHi = $sequenceHi & 0x3f;
+        $sequenceHi &= ~(0xc0);
+        $sequenceHi |= 0x80;
+
+        return vsprintf('%08s-%04s-%04s-%02s%02s-%012s', [
+            $timeLow,
+            $timeMid,
+            sprintf('%04x', $timeHi),
+            sprintf('%02x', $sequenceHi),
+            sprintf('%02x', $sequence & 0xff),
+            $macAddress
         ]);
     }
 }
