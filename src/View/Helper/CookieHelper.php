@@ -25,9 +25,9 @@ class CookieHelper extends Helper
        * Reads a value of a cookie from request
        *
        * @param string $name
-       * @return string|null
+       * @return string|array|null
        */
-    public function read(string $name) : ?string
+    public function read(string $name)
     {
         return $this->request()->cookies($name);
     }

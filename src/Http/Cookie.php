@@ -56,7 +56,7 @@ class Cookie
      * Reads a value of a cookie
      *
      * @param string $name
-     * @return string|null
+     * @return string|array|null
      */
     public function read(string $name)
     {
@@ -110,7 +110,7 @@ class Cookie
      * Checks if a cookie exists
      *
      * @param string $name
-     * @return void
+     * @return bool
      */
     public function exists(string $name) : bool
     {
