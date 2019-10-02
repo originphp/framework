@@ -22,7 +22,7 @@ class %class%ControllerTest extends OriginTestCase
     {
         $this->get('/%underscored%/index');
         $this->assertResponseOk();
-        $this->assertResponseContains('<h1>%human%</h1>');
+        $this->assertResponseContains('<h2>%human%</h2>');
     }
 
     public function testNotFoundExample()

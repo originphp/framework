@@ -237,7 +237,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('tests/TestCase/Http/Controller/DummiesControllerTest.php');
         $this->assertFileExists($filename);
         
-        $this->assertFileHash('debb76088baebef8d5697183509db46c', $filename);
+        $this->assertFileHash('4688149c07b6d6312f6d7e064ab70a49', $filename);
         unlink($filename);
     }
 
@@ -269,7 +269,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('tests/TestCase/Http/Controller/DummiesControllerTest.php');
         $this->assertFileExists($filename);
       
-        $this->assertFileHash('b18a8f0b4ea5aac75d5f515a37df4002', $filename);
+        $this->assertFileHash('5749565e24245fea9a8cf2b132a09428', $filename);
         unlink($filename);
     }
 
