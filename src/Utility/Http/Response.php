@@ -151,10 +151,10 @@ class Response
      * Sets a cookie
      *
      * @param string $name
-     * @param string $value
+     * @param mixed $value
      * @return void
      */
-    public function cookie(string $name, string $value, array $options = []) :void
+    public function cookie(string $name, $value, array $options = []) :void
     {
         $options += [
             'name' => $name,
@@ -163,7 +163,7 @@ class Response
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => null, // convert from
+            'expires' => null, // convert from
         ];
         $this->cookies[$name] = $options;
     }

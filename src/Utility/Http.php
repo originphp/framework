@@ -286,7 +286,7 @@ class Http
         }
         
         foreach ($cookies as $name => $value) {
-            $response->cookie($name, $value['value'], $value['expires'], $value);
+            $response->cookie($name, $value['value'], $value);
             if ($this->persistCookies) {
                 $this->cookies[$name] = $value;
             }
