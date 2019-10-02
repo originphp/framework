@@ -47,7 +47,7 @@ $ vendor/bin/phpunit
 To run an individual test:
 
 ```linux
-$ phpunit tests/TestCase/Core/AutoloaderTest.php
+$ vendor/bin/phpunit tests/TestCase/Core/AutoloaderTest.php
 ```
 
 PHPUnit code coverage generation requires xdebug to be installed, however xdebug causes serious performance issues, so in the Docker container whilst it is installed, it is not enabled by default.
