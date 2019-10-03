@@ -145,7 +145,7 @@ class SocketTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($socket->connect());
         //$this->assertTrue($socket->enableCrypto('sslv3'));
         $this->assertEquals(65, $socket->write("GET https://about.google/intl/en/ HTTP/1.1\r\nConnection: close\r\n\r\n"));
-        $this->assertStringContainsString('<title>About | Google</title>', $socket->read(2500));
+        $this->assertStringContainsString('<title>About - Google</title>', $socket->read(2500));
     }
 
     public function testEnableCrypto()
