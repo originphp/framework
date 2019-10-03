@@ -19,7 +19,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Migrations - update your database using migrations
 - Code Generation and scaffolding
 - Integration Testing for Web and Console Applications
-- Queue System for background jobs
+- Queue System for background jobs, with both Database and Redis engines
 - Form helper
 - Date,time,and number formating,validation and delocalization support
 - Internationalization (I18n)
