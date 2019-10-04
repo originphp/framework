@@ -1,28 +1,25 @@
 <?php
-namespace %namespace%\Test\Http\Controller\Concern;
+namespace %namespace%\Test\Controller\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use App\Http\Controller\ApplicationController;
-use %namespace%\Http\Controller\Concern\%class%Concern;
+use %namespace%\Controller\Concern\%class%;
+use Origin\Http\Controller\Controller;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
-
-class %class%ConcernTest extends OriginTestCase
+class DummyController extends Controller
 {
-   public function startup() : void
-    {
-        $this->controller = new ApplicationController(
-            new Request('/controller/action'),
-            new Response()
-        );
-    }
+    use %class%;
+}
 
+/**
+ * @property \App\Model\User $User
+ */
+class %class%Test extends OriginTestCase
+{
     public function testConcernMethod()
     {
-        $concern = new %class%Concern($this->controller);
+        $controller = new DummyController();
         $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 }

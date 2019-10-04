@@ -19,7 +19,6 @@ use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Model\Entity;
 use Origin\Http\Response;
-use Origin\Concern\Concern;
 use Origin\Http\View\Helper\Helper;
 use Origin\Model\ModelRegistry;
 use Origin\Http\Controller\Controller;
@@ -27,16 +26,8 @@ use Origin\Model\ConnectionManager;
 use Origin\Http\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Http\Controller\Component\ComponentRegistry;
-use Origin\Concern\Exception\MissingConcernException;
 use Origin\Http\Controller\Component\Exception\MissingComponentException;
 
-class PublishableConcern extends Concern
-{
-    public function foo()
-    {
-        return 'bar';
-    }
-}
 class Pet extends Model
 {
     public $connection = 'test';
@@ -76,24 +67,9 @@ class TestsController extends Controller
     *
     * @return \Origin\Http\Response|null
     */
-    public function beforeAction()
+    public function startup()
     {
         return null;
-    }
-
-    /**
-     * Callback just prior to redirecting
-     *
-     */
-    public function beforeRedirect()
-    {
-    }
-
-    /**
-     * This is called after the startup, before shutdown
-     */
-    public function beforeRender()
-    {
     }
 
     /**
@@ -102,7 +78,7 @@ class TestsController extends Controller
      *
      * @return \Origin\Http\Response|null
      */
-    public function afterAction()
+    public function shutdown()
     {
         return null;
     }
@@ -137,15 +113,15 @@ class ApplesController extends Controller
     {
         $this->when = $when;
     }
-    public function beforeAction()
+    public function startup()
     {
-        if ($this->when === 'beforeAction') {
+        if ($this->when === 'startup') {
             return $this->response;
         }
     }
-    public function afterAction()
+    public function shutdown()
     {
-        if ($this->when === 'afterAction') {
+        if ($this->when === 'shutdown') {
             return $this->response;
         }
     }
@@ -288,12 +264,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Http\Controller\TestsController')
-            ->setMethods(['beforeAction'])
+            ->setMethods(['startup'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-            ->method('beforeAction');
+            ->method('startup');
 
         $components = $this->getMockBuilder('Origin\Http\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -305,7 +281,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->with('startup');
 
         $controller->setMockRegistry($components);
-
+      
         $controller->startupProcess();
     }
 
@@ -314,12 +290,12 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
 
         $controller = $this->getMockBuilder('Origin\Test\Http\Controller\TestsController')
-            ->setMethods(['afterAction'])
+            ->setMethods(['shutdown'])
             ->setConstructorArgs([$request, new Response()])
             ->getMock();
 
         $controller->expects($this->once())
-            ->method('afterAction');
+            ->method('shutdown');
 
         $components = $this->getMockBuilder('Origin\Http\Controller\Component\ComponentRegistry')
             ->setMethods(['call'])
@@ -339,7 +315,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new ApplesController($request, new Response());
-        $controller->setWhen('beforeAction');
+        $controller->setWhen('startup');
         $this->assertInstanceOf(Response::class, $controller->startupProcess());
     }
 
@@ -355,7 +331,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('tests/edit/2048');
         $controller = new ApplesController($request, new Response());
-        $controller->setWhen('afterAction');
+        $controller->setWhen('shutdown');
         $this->assertNull($controller->startupProcess());
         $this->assertInstanceOf(Response::class, $controller->shutdownProcess());
     }
@@ -586,15 +562,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     public function testComponentRegistry()
     {
         $this->assertInstanceOf(ComponentRegistry::class, $this->controller->componentRegistry());
-    }
-
-    public function testLoadConcern()
-    {
-        $this->controller->loadConcern('Publishable', ['className' => 'Origin\Test\Http\Controller\PublishableConcern']);
-        $this->assertEquals('bar', $this->controller->foo());
-
-        $this->expectException(MissingConcernException::class);
-        $this->controller->loadConcern('Zipable');
     }
 
     protected function tearDown(): void

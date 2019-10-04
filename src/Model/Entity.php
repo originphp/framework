@@ -104,13 +104,13 @@ class Entity
      * @param array $properties data
      * @param array $options
      * - name: Model name
-     * - exists: if the model exists in the database (set during find), null, means dont know
+     * - exists: if the model exists in the database (set during find)
      * - markClean: mark the entity as clean after creation. This is useful for when loading records
      * from the database.
      */
     public function __construct(array $properties = [], array $options = [])
     {
-        $options += ['name' => null, 'exists' => null, 'markClean' => false];
+        $options += ['name' => null, 'exists' => false, 'markClean' => false];
 
         $this->_name = $options['name'];
         $this->_exists = $options['exists'];
@@ -122,6 +122,8 @@ class Entity
             $this->reset();
         }
     }
+
+
 
     /**
      * Magic method for setting data on inaccessible properties.
@@ -327,6 +329,17 @@ class Entity
     {
         $this->_modified = [];
         $this->_errors = [];
+    }
+
+    /**
+     * If the record exists in the database (is set by save)
+     *
+     * @param boolean $exists
+     * @return boolean
+     */
+    public function exists(bool $exists = null) : bool
+    {
+        return $this->setGetPersisted('exists', $exists);
     }
 
     /**

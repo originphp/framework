@@ -16,8 +16,14 @@ declare(strict_types = 1);
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
+use Origin\Model\Concern\Timestampable;
 use Origin\Model\Model;
 use Origin\Model\Entity;
+
+class Queue extends Model
+{
+    use Timestampable;
+}
 
 class DatabaseEngine extends BaseEngine
 {
@@ -184,14 +190,12 @@ class DatabaseEngine extends BaseEngine
     public function model() : Model
     {
         if (! $this->model) {
-            $this->model = new Model([
+            $this->model = new Queue([
                 'name' => 'Queue',
                 'alias' => 'queue',
                 'table' => 'queue',
                 'connection' => $this->config('connection'),
             ]);
-       
-            $this->model->loadBehavior('Timestamp');
         }
 
         return $this->model;

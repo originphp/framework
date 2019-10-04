@@ -1,15 +1,15 @@
 <?php
 namespace %namespace%\Model\Concern;
 
-use Origin\Concern\ModelConcern;
-
-/**
- * @method \App\Model\ApplicationModel model()
- */
-class %class%Concern extends ModelConcern
+trait %class%
 {
-    public function initialize(array $config=[]) : void
+    /**
+     * Initialization method, here you can register callbacks or configure model associations
+     *
+     * @return void
+     */
+    protected function initialize%class%() : void
     {
-        
+
     }
 }

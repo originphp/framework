@@ -1,16 +1,15 @@
 <?php
 namespace %namespace%\Http\Controller\Concern;
 
-use Origin\Concern\ControllerConcern;
-use %namespace%\Http\Controller\ApplicationController;
-
-/**
- * @method \%namespace%\Http\Controller\ApplicationController controller()
- */
-class %class%Concern extends ControllerConcern
+trait %class%
 {
-    public function initialize(array $config=[]) : void
+    /**
+     * Initialization method, here you can register callbacks or configure the current Controller
+     *
+     * @return void
+     */
+    protected function initialize%class%() : void
     {
-        
+
     }
 }

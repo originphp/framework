@@ -1,6 +1,7 @@
 <?php
 namespace Origin\Test\Console\Command;
 
+use Origin\Model\Concern\Elasticsearch;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
@@ -8,12 +9,8 @@ use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class Article extends Model
 {
-    public function initialize(array $config) : void
-    {
-        $this->loadBehavior('Elasticsearch', [
-            'connection' => 'test',
-        ]);
-    }
+    use Elasticsearch;
+    protected $elasticsearchConnection = 'test';
 }
 
 class ElasticsearchReindexCommandTest extends OriginTestCase
@@ -24,7 +21,6 @@ class ElasticsearchReindexCommandTest extends OriginTestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         if (env('ELASTICSEARCH_HOST') === null) {
             $this->markTestSkipped('Elasticsearch not available');
         }
@@ -44,7 +40,7 @@ class ElasticsearchReindexCommandTest extends OriginTestCase
     {
         $this->exec('elasticsearch:reindex User');
         $this->assertExitSuccess();
-        $this->assertOutputContains('User does not have Elasticsearch Behavior loaded');
+        $this->assertOutputContains('User does not implement the Elasticsearch Concern');
     }
 
     public function testExecute()

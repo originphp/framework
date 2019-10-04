@@ -16,6 +16,7 @@ namespace Origin\Http\Controller;
 
 use ReflectionClass;
 use App\Http\View\ApplicationView;
+use Origin\Core\CallbackRegistrationTrait;
 use ReflectionMethod;
 use Origin\Http\Router;
 use Origin\Http\Request;
@@ -24,16 +25,13 @@ use Origin\Http\Response;
 use Origin\Http\View\JsonView;
 use Origin\Model\ModelTrait;
 use Origin\Utility\Inflector;
-use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
-use Origin\Concern\ConcernRegistry;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
 
 class Controller
 {
-    use ModelTrait;
-    use InitializerTrait;
+    use ModelTrait, InitializerTrait, CallbackRegistrationTrait;
     /**
      * Controller name.
      *
@@ -103,13 +101,6 @@ class Controller
     protected $componentRegistry = null;
 
     /**
-       * Holds the componentregistry object.
-       *
-       * @var \Origin\Concern\ConcernRegistry
-       */
-    protected $concernRegistry = null;
-
-    /**
      * Array keys to be serialized
      *
      * @var array
@@ -134,7 +125,10 @@ class Controller
         $this->response = $response ?: new Response();
 
         $this->componentRegistry = new ComponentRegistry($this);
-        $this->concernRegistry = new ConcernRegistry($this, 'Controller/Concern');
+
+        // Set default callbacks to be inline with framework
+        $this->registeredCallbacks['beforeAction']['startup'] = [];
+        $this->registeredCallbacks['afterAction']['shutdown'] = [];
 
         $this->initialize();
         $this->initializeTraits();
@@ -154,25 +148,6 @@ class Controller
         }
         return false;
     }
-
-
-    /**
-    * Magic method it call the first loaded behavior method if its available
-    *
-    * @param string $method
-    * @param array $arguments
-    * @return void
-    */
-    public function __call(string $method, array $arguments)
-    {
-        $concern = $this->concernRegistry->hasMethod($method);
-        if ($concern) {
-            return call_user_func_array([$concern, $method], $arguments);
-        }
-   
-        throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
-    }
-
     /**
      * Loads a Component for use with the controller.
      *
@@ -186,21 +161,6 @@ class Controller
         $config = array_merge(['className' => $name.'Component'], $config);
 
         return $this->$component = $this->componentRegistry->load($name, $config);
-    }
-
-    /**
-     * Loads a concern
-     *
-     * @param string $name
-     * @param array $config
-     * @return void
-     */
-    public function loadConcern(string $name, array $config = []) //no return type cause of mocking
-    {
-        list($plugin, $concern) = pluginSplit($name);
-        $config = array_merge(['className' => $name . 'Concern'], $config);
-
-        return $this->$concern = $this->concernRegistry->load($name, $config);
     }
 
     /**
@@ -286,17 +246,12 @@ class Controller
      */
     public function startupProcess()
     {
-        if (method_exists($this, 'beforeAction')) {
-            $result = $this->beforeAction();
-            if ($this->isResponseOrRedirect($result)) {
-                return $this->response;
-            }
+        if (!$this->triggerCallback('beforeAction')) {
+            return $this->response;
         }
        
-        foreach ([$this->componentRegistry,$this->concernRegistry] as $registry) {
-            if ($this->isResponseOrRedirect($registry->call('startup'))) {
-                return $this->response;
-            }
+        if ($this->isResponseOrRedirect($this->componentRegistry->call('startup'))) {
+            return $this->response;
         }
     }
    
@@ -307,23 +262,84 @@ class Controller
      */
     public function shutdownProcess()
     {
-        foreach ([$this->componentRegistry,$this->concernRegistry] as $registry) {
-            if ($this->isResponseOrRedirect($registry->call('shutdown'))) {
-                return $this->response;
-            }
+        if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
+            return $this->response;
         }
-        if (method_exists($this, 'afterAction')) {
-            $result = $this->afterAction();
-            if ($this->isResponseOrRedirect($result)) {
-                return $this->response;
-            }
+        if (!$this->triggerCallback('afterAction', true)) {
+            return $this->response;
         }
         //# Free Mem for no longer used items
         $this->componentRegistry->destroy();
-        $this->concernRegistry->destroy();
         unset($this->componentRegistry);
-        unset($this->concernRegistry);
     }
+
+    /**
+       * Triggers a callback, it always returns true unless a response or redirect
+       * is detected.
+       *
+       * @param string $type
+       * @return bool
+       */
+    protected function triggerCallback(string $type, bool $reverse = false) : bool
+    {
+        $callbacks = $this->registeredCallbacks($type);
+        if ($reverse) {
+            $callbacks = array_reverse($callbacks);
+        }
+        foreach ($callbacks as $callback => $options) {
+            if (method_exists($this, $callback)) {
+                if ($this->isResponseOrRedirect($this->$callback())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Registers a before action callback
+     *
+     * @param string $method
+     * @return void
+     */
+    public function beforeAction(string $method) : void
+    {
+        $this->registeredCallbacks['beforeAction'][$method] = [];
+    }
+
+    /**
+     * Registers an after action callback
+     *
+     * @param string $method
+     * @return void
+     */
+    public function afterAction(string $method) : void
+    {
+        $this->registeredCallbacks['afterAction'][$method] = [];
+    }
+
+    /**
+     * Registers a beforeRender callback
+     *
+     * @param string $method
+     * @return void
+     */
+    public function beforeRender(string $method) : void
+    {
+        $this->registeredCallbacks['beforeRender'][$method] = [];
+    }
+
+    /**
+    * Registers a beforeRedirect callback
+    *
+    * @param string $method
+    * @return void
+    */
+    public function beforeRedirect(string $method) : void
+    {
+        $this->registeredCallbacks['beforeRender'][$method] = [];
+    }
+
 
     /**
     * Checks if the result is a response object or redirect was called
@@ -518,9 +534,7 @@ class Controller
     public function renderJson($data, int $status = 200) : void
     {
         $this->autoRender = false; // Only render once
-        if (method_exists($this, 'beforeRender')) {
-            $this->beforeRender();
-        }
+        $this->triggerCallback('beforeRender');
         $this->response->type('json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
         $this->response->body((new JsonView($this))->render($data)); //
@@ -548,9 +562,7 @@ class Controller
     public function renderXml($data, int $status = 200) : void
     {
         $this->autoRender = false; // Disable for dispatcher
-        if (method_exists($this, 'beforeRender')) {
-            $this->beforeRender();
-        }
+        $this->triggerCallback('beforeRender');
         $this->response->type('xml');
         $this->response->statusCode($status); // 200
         $this->response->body((new XmlView($this))->render($data));
@@ -573,9 +585,7 @@ class Controller
     public function redirect($url, int $code = 302) : Response
     {
         $this->autoRender = false;
-        if (method_exists($this, 'beforeRedirect')) {
-            $this->beforeRedirect();
-        }
+        $this->triggerCallback('beforeRedirect');
 
         $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));

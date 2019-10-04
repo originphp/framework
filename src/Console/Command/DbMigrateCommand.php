@@ -17,6 +17,12 @@ namespace Origin\Console\Command;
 
 use Origin\Model\Model;
 use Origin\Exception\Exception;
+use Origin\Model\Concern\Timestampable;
+
+class Migration extends Model
+{
+    use Timestampable;
+}
 
 class DbMigrateCommand extends Command
 {
@@ -47,11 +53,10 @@ class DbMigrateCommand extends Command
         $version = $this->arguments('version');
 
         # Dynamically Create Migration Model for CRUD
-        $this->Migration = new Model([
-            'name' => 'Migration',
-            'connection' => $this->options('connection'),
-        ]);
-        $this->Migration->loadBehavior('Timestamp');
+        $this->Migration = $this->loadModel('Migration', [
+            'className' => Migration::class
+            ]);
+        $this->Migration->connection = $this->options('connection');
 
         $lastMigration = $this->lastMigration();
         if ($version === null or $version > $lastMigration) {

@@ -38,7 +38,6 @@ class GenerateCommand extends Command
      * @var array
      */
     protected $generators = [
-        'behavior' => 'Generates a Behavior class',
         'concern_controller' => 'Generates a Concern for a Controller',
         'concern_model' => 'Generates a Concern for a Model',
         'command' => 'Generates a Command class',
@@ -142,21 +141,6 @@ class GenerateCommand extends Command
         $this->{$generator}($data);
     }
 
-    protected function behavior(array $data)
-    {
-        $this->generate(
-            $this->getTemplateFilename('behavior'),
-            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Behavior'.DS."{$data['class']}Behavior.php",
-            $data
-        );
-
-        $this->generate(
-            $this->getTemplateFilename('behavior_test'),
-            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Behavior'.DS."{$data['class']}BehaviorTest.php",
-            $data
-        );
-    }
-
     protected function entity(array $data)
     {
         $this->generate(
@@ -240,13 +224,13 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('concern_controller'),
-            $this->getBaseFolder($data['name'], self::SRC).DS.'Http'.DS.'Controller'.DS.'Concern'.DS."{$data['class']}Concern.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Http'.DS.'Controller'.DS.'Concern'.DS."{$data['class']}.php",
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('concern_controller_test'),
-            $this->getBaseFolder($data['name'], self::TEST).DS.'Http'.DS.'Controller'.DS.'Concern'.DS."{$data['class']}ConcernTest.php",
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Http'.DS.'Controller'.DS.'Concern'.DS."{$data['class']}Test.php",
             $data
         );
     }
@@ -255,13 +239,13 @@ class GenerateCommand extends Command
     {
         $this->generate(
             $this->getTemplateFilename('concern_model'),
-            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Concern'.DS."{$data['class']}Concern.php",
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Concern'.DS."{$data['class']}.php",
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('concern_model_test'),
-            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Concern'.DS."{$data['class']}ConcernTest.php",
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Concern'.DS."{$data['class']}Test.php",
             $data
         );
     }

@@ -14,6 +14,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Console\Command;
 
+use Origin\Model\Concern\Elasticsearch;
+use Origin\Model\Model;
+
 class ElasticsearchReindexCommand extends Command
 {
     protected $name = 'elasticsearch:reindex';
@@ -31,12 +34,18 @@ class ElasticsearchReindexCommand extends Command
         foreach ($models as $model) {
             $this->loadModel($model);
 
-            if (isset($this->{$model}->Elasticsearch)) {
-                $count = $this->{$model}->reindex();
+            if ($this->hasConcern($this->$model)) {
+                $count = $this->$model->reindex();
                 $this->io->status('ok', "{$model} index created and {$count} record(s) added to index");
             } else {
-                $this->io->status('skipped', "{$model} does not have Elasticsearch Behavior loaded");
+                $this->io->status('skipped', "{$model} does not implement the Elasticsearch Concern");
             }
         }
+    }
+
+    private function hasConcern(Model $model) : bool
+    {
+        $class = get_class($model);
+        return in_array(Elasticsearch::class, class_uses($class));
     }
 }

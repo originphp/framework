@@ -22,7 +22,7 @@ namespace Origin\Test\ModelRefactored;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 
-use Origin\Concern\Concern;
+
 use Origin\Model\Collection;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
@@ -33,17 +33,9 @@ use Origin\Exception\InvalidArgumentException;
 
 use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;
-use Origin\Concern\Exception\MissingConcernException;
+
 use ArrayObject;
 use Origin\Utility\Security;
-
-class PublishableConcern extends Concern
-{
-    public function foo()
-    {
-        return 'bar';
-    }
-}
 
 /**
  * Used By Mocks
@@ -53,12 +45,38 @@ class Article extends Model
     public $connection = 'test';
 
     /**
+     * This will used later
+     *
+     * @return void
+     */
+    public function initCallbacks()
+    {
+        $this->beforeFind('beforeFindCallback');
+        $this->afterFind('afterFindCallback');
+        $this->beforeCreate('beforeCreateCallback');
+        $this->afterCreate('afterCreateCallback');
+        $this->beforeValidate('beforeValidateCallback');
+        $this->afterValidate('afterValidateCallback');
+        $this->beforeUpdate('beforeUpdateCallback');
+        $this->afterUpdate('afterUpdateCallback');
+
+        $this->beforeSave('beforeSaveCallback');
+        $this->afterSave('afterSaveCallback');
+
+        $this->beforeDelete('beforeDeleteCallback');
+        $this->afterDelete('afterDeleteCallback');
+
+        $this->afterRollback('afterRollbackCallback');
+        $this->afterCommit('afterCommitCallback');
+    }
+
+    /**
      * Before find callback must return a bool. Returning false will stop the find operation.
      *
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeFind(ArrayObject $options) : bool
+    public function beforeFindCallback(ArrayObject $options) : bool
     {
         return true;
     }
@@ -70,7 +88,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFind(Collection $results, ArrayObject $options) : void
+    public function afterFindCallback(Collection $results, ArrayObject $options) : void
     {
     }
 
@@ -81,7 +99,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeValidate(Entity $entity, ArrayObject $options) : bool
+    public function beforeValidateCallback(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -93,7 +111,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterValidate(Entity $entity, ArrayObject $options) : void
+    public function afterValidateCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -104,7 +122,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeSave(Entity $entity, ArrayObject $options) : bool
+    public function beforeSaveCallback(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -116,7 +134,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeCreate(Entity $entity, ArrayObject $options) : bool
+    public function beforeCreateCallback(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -128,7 +146,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeUpdate(Entity $entity, ArrayObject $options) : bool
+    public function beforeUpdateCallback(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -140,7 +158,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterCreate(Entity $entity, ArrayObject $options) : void
+    public function afterCreateCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -151,7 +169,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterUpdate(Entity $entity, ArrayObject $options) : void
+    public function afterUpdateCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -162,7 +180,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterSave(Entity $entity, ArrayObject $options) : void
+    public function afterSaveCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -173,7 +191,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return bool
      */
-    public function beforeDelete(Entity $entity, ArrayObject $options) : bool
+    public function beforeDeleteCallback(Entity $entity, ArrayObject $options) : bool
     {
         return true;
     }
@@ -185,7 +203,7 @@ class Article extends Model
      * @param boolean $sucess wether or not it deleted the record
      * @return void
      */
-    public function afterDelete(Entity $entity, ArrayObject $options) : void
+    public function afterDeleteCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -196,17 +214,7 @@ class Article extends Model
     * @param ArrayObject $options
     * @return bool
     */
-    public function afterCommit(Entity $entity, ArrayObject $options) : void
-    {
-    }
-
-    /**
-     * This is callback is called when an exception is caught
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onError(\Exception $exception) : void
+    public function afterCommitCallback(Entity $entity, ArrayObject $options) : void
     {
     }
 
@@ -217,7 +225,17 @@ class Article extends Model
     * @param ArrayObject $options
     * @return void
     */
-    public function afterRollback(Entity $entity, ArrayObject $options) : void
+    public function afterRollbackCallback(Entity $entity, ArrayObject $options) : void
+    {
+    }
+
+    /**
+     * This is a callback is called when an exception is caught
+     *
+     * @param \Exception $exception
+     * @return void
+     */
+    public function onError(\Exception $exception) : void
     {
     }
 }
@@ -277,8 +295,115 @@ class ModelTest extends OriginTestCase
         ModelRegistry::set('Comment', $this->Comment);
         ModelRegistry::set('Tag', $this->Tag);
         ModelRegistry::set('Address', $this->Address);
-       
-        parent::setUp();
+    }
+
+
+    public function testRegisterCallbackBeforeCreate()
+    {
+        $Article = new Article();
+        $Article->beforeCreate('beforeCreateCallback');
+
+        $expected = ['beforeCreateCallback' => ['on'=>'create']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('beforeCreate'));
+    }
+
+    public function testRegisterCallbackBeforeValidate()
+    {
+        $Article = new Article();
+        $Article->beforeValidate('beforeValidateCallback');
+
+        $expected = ['beforeValidateCallback' => ['on'=>['create','update']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('beforeValidate'));
+    }
+
+    public function testRegisterCallbackBeforeUpdate()
+    {
+        $Article = new Article();
+        $Article->beforeUpdate('beforeUpdateCallback');
+
+        $expected = ['beforeUpdateCallback' => ['on'=>'update']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('beforeUpdate'));
+    }
+
+    public function testRegisterCallbackBeforeSave()
+    {
+        $Article = new Article();
+        $Article->beforeSave('beforeSaveCallback');
+
+        $expected = ['beforeSaveCallback' => ['on'=>['create','update']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('beforeSave'));
+    }
+
+    public function testRegisterCallbackBeforeDelete()
+    {
+        $Article = new Article();
+        $Article->beforeDelete('beforeDeleteCallback');
+
+        $expected = ['beforeDeleteCallback' => ['on'=>'delete']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('beforeDelete'));
+    }
+
+    public function testRegisterCallbackAfterCreate()
+    {
+        $Article = new Article();
+        $Article->afterCreate('afterCreateCallback');
+
+        $expected = ['afterCreateCallback' => ['on'=>'create']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterCreate'));
+    }
+
+    public function testRegisterCallbackAfterValidate()
+    {
+        $Article = new Article();
+        $Article->afterValidate('afterValidateCallback');
+
+        $expected = ['afterValidateCallback' => ['on'=>['create','update']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterValidate'));
+    }
+
+    public function testRegisterCallbackAfterUpdate()
+    {
+        $Article = new Article();
+        $Article->afterUpdate('afterUpdateCallback');
+
+        $expected = ['afterUpdateCallback' => ['on'=>'update']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterUpdate'));
+    }
+
+    public function testRegisterCallbackAfterSave()
+    {
+        $Article = new Article();
+        $Article->afterSave('afterSaveCallback');
+
+        $expected = ['afterSaveCallback' => ['on'=>['create','update']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterSave'));
+    }
+
+    public function testRegisterCallbackAfterDelete()
+    {
+        $Article = new Article();
+        $Article->afterDelete('afterDeleteCallback');
+
+        $expected = ['afterDeleteCallback' => ['on'=>'delete']];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterDelete'));
+    }
+
+    public function testRegisterCallbackAfterRollback()
+    {
+        $Article = new Article();
+        $Article->afterRollback('afterRollbackCallback');
+
+        $expected = ['afterRollbackCallback' => ['on'=>['create','update','delete']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterRollback'));
+    }
+
+    public function testRegisterCallbackAfterCommit()
+    {
+        $Article = new Article();
+        $Article->afterCommit('afterCommitCallback');
+
+        $expected = ['afterCommitCallback' => ['on'=>['create','update','delete']]];
+        $this->assertEquals($expected, $Article->registeredCallbacks('afterCommit'));
     }
 
     public function testSaveExceptionRollback()
@@ -835,33 +960,16 @@ class ModelTest extends OriginTestCase
     {
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeFind','afterFind',
+            'beforeFindCallback','afterFindCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeFind')
+            ->method('beforeFindCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterFind');
+            ->method('afterFindCallback');
 
-        # Stub Behavior
-        $tsStub = $this->getMock(
-            'Origin\Core\Model\Behavhior\TimestampBehavior',
-            ['beforeFind','afterFind']
-        );
-
-        $tsStub->expects($this->once())
-            ->method('beforeFind')
-            ->willReturn(true);
-        
-        $tsStub->expects($this->once())
-            ->method('afterFind');
-
-        $stub->behaviorRegistry()->set('Timestamp', $tsStub);
-        $stub->loadBehavior('Timestamp');
-        $stub->enableBehavior('Timestamp');
-        
         $stub->find('first');
     }
 
@@ -869,15 +977,15 @@ class ModelTest extends OriginTestCase
     {
         //Article::class
         $stub = $this->getMockForModel('Article', [
-            'beforeFind','afterFind',
+            'beforeFindCallback','afterFindCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeFind')
+            ->method('beforeFindCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterFind');
+            ->method('afterFindCallback');
 
         $stub->find('first');
     }
@@ -885,14 +993,14 @@ class ModelTest extends OriginTestCase
     public function testFindCallbacksDisabled()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeFind','afterFind',
+            'beforeFindCallback','afterFindCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->never())
-            ->method('beforeFind');
+            ->method('beforeFindCallback');
 
         $stub->expects($this->never())
-            ->method('afterFind');
+            ->method('afterFindCallback');
 
         $stub->find('first', ['callbacks' => false]);
     }
@@ -983,18 +1091,6 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($result);
     }
 
-    public function testLoadBehavior()
-    {
-        $this->Article->loadBehavior('Timestamp', ['className' => 'Origin\Model\Behavior\TimestampBehavior']);
-        $this->AssertInstanceOf(Behavior::class, $this->Article->Timestamp);
-    }
-
-    public function testEnableDisableBehavior()
-    {
-        $this->Article->loadBehavior('Timestamp');
-        $this->assertTrue($this->Article->disableBehavior('Timestamp'));
-        $this->assertTrue($this->Article->enableBehavior('Timestamp'));
-    }
 
     public function testLoadModel()
     {
@@ -1127,179 +1223,92 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacks()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave','beforeCreate','afterCreate','afterCommit','beforeUpdate','afterUpdate','afterRollback'
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','beforeCreateCallback','afterCreateCallback','afterCommitCallback','beforeUpdateCallback','afterUpdateCallback','afterRollbackCallback'
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
 
         $stub->expects($this->once())
-            ->method('beforeSave')
+            ->method('beforeSaveCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('beforeCreate')
+            ->method('beforeCreateCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterCreate');
+            ->method('afterCreateCallback');
 
         $stub->expects($this->never())
-            ->method('beforeUpdate')
+            ->method('beforeUpdateCallback')
             ->willReturn(true);
 
         $stub->expects($this->never())
-            ->method('afterUpdate');
+            ->method('afterUpdateCallback');
 
         $stub->expects($this->once())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
 
         $stub->expects($this->once())
-            ->method('afterCommit');
+            ->method('afterCommitCallback');
 
         $stub->expects($this->never())
-            ->method('afterRollback');
-
-        # Stub Behavior
-        $tsStub = $this->getMock(
-            'Origin\Core\Model\Behavior\TimestampBehavior',
-            ['beforeValidate','afterValidate','beforeSave','afterSave','beforeCreate','afterCreate','afterCommit','beforeUpdate','afterUpdate','afterRollback']
-        );
-
-        $tsStub->expects($this->once())
-            ->method('beforeValidate')
-            ->willReturn(true);
-        
-        $tsStub->expects($this->once())
-            ->method('afterValidate');
-
-        $tsStub->expects($this->once())
-            ->method('beforeSave')
-            ->willReturn(true);
-
-        $tsStub->expects($this->once())
-            ->method('beforeCreate')
-            ->willReturn(true);
-
-        $tsStub->expects($this->once())
-            ->method('afterCreate');
-        
-        $tsStub->expects($this->never())
-            ->method('beforeUpdate')
-            ->willReturn(true);
-
-        $tsStub->expects($this->never())
-            ->method('afterUpdate');
-        
-        $tsStub->expects($this->once())
-            ->method('afterSave');
-
-        $tsStub->expects($this->once())
-            ->method('afterCommit');
-        
-        $tsStub->expects($this->never())
-            ->method('afterRollback');
-
-        $stub->behaviorRegistry()->set('Timestamp', $tsStub);
-        $stub->loadBehavior('Timestamp');
-        $stub->enableBehavior('Timestamp');
-
+            ->method('afterRollbackCallback');
+     
         $article = $stub->new();
         $article->title = 'Callback Test';
         $article->author_id = 512;
         $article->body = 'Article body goes here.';
 
+       
         $this->assertTrue($stub->save($article));
     }
 
     public function testSaveCallbacksUpdate()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave','beforeCreate','afterCreate','afterCommit','beforeUpdate','afterUpdate','afterRollback'
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','beforeCreateCallback','afterCreateCallback','afterCommitCallback','beforeUpdateCallback','afterUpdateCallback','afterRollbackCallback'
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
+
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
 
         $stub->expects($this->once())
-            ->method('beforeSave')
+            ->method('beforeSaveCallback')
             ->willReturn(true);
 
         $stub->expects($this->never())
-            ->method('beforeCreate')
+            ->method('beforeCreateCallback')
             ->willReturn(true);
 
         $stub->expects($this->never())
-            ->method('afterCreate');
+            ->method('afterCreateCallback');
 
         $stub->expects($this->once())
-            ->method('beforeUpdate')
+            ->method('beforeUpdateCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterUpdate');
+            ->method('afterUpdateCallback');
 
         $stub->expects($this->once())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
 
         $stub->expects($this->once())
-            ->method('afterCommit');
+            ->method('afterCommitCallback');
 
         $stub->expects($this->never())
-            ->method('afterRollback');
-
-        # Stub Behavior
-        $tsStub = $this->getMock(
-            'Origin\Core\Model\Behavior\TimestampBehavior',
-            ['beforeValidate','afterValidate','beforeSave','afterSave','beforeCreate','afterCreate','afterCommit','beforeUpdate','afterUpdate','afterRollback']
-        );
-
-        $tsStub->expects($this->once())
-            ->method('beforeValidate')
-            ->willReturn(true);
-        
-        $tsStub->expects($this->once())
-            ->method('afterValidate');
-
-        $tsStub->expects($this->once())
-            ->method('beforeSave')
-            ->willReturn(true);
-
-        $tsStub->expects($this->never())
-            ->method('beforeCreate')
-            ->willReturn(true);
-
-        $tsStub->expects($this->never())
-            ->method('afterCreate');
-        
-        $tsStub->expects($this->once())
-            ->method('beforeUpdate')
-            ->willReturn(true);
-
-        $tsStub->expects($this->once())
-            ->method('afterUpdate')
-            ->willReturn(true);
-        
-        $tsStub->expects($this->once())
-            ->method('afterSave');
-
-        $tsStub->expects($this->once())
-            ->method('afterCommit');
-        
-        $tsStub->expects($this->never())
-            ->method('afterRollback');
-
-        $stub->behaviorRegistry()->set('Timestamp', $tsStub);
-        $stub->loadBehavior('Timestamp');
-        $stub->enableBehavior('Timestamp');
+            ->method('afterRollbackCallback');
 
         $Article = new Model(['name' => 'Article','connection' => 'test']);
         $article = $Article->find('first');
@@ -1314,21 +1323,21 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksValidationFail()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave',
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
 
         $stub->expects($this->never())
-            ->method('beforeSave');
+            ->method('beforeSaveCallback');
 
         $stub->expects($this->never())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
 
         $article = $stub->new();
         $article->author_id = 1234;
@@ -1343,25 +1352,29 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksBeforeSaveReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave','afterRollback'
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','afterCommitCallback'
         ], ['className' => Article::class]);
-        
+
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
 
         $stub->expects($this->once())
-            ->method('beforeSave')
+            ->method('beforeSaveCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
+
+        $stub->expects($this->never())
+            ->method('afterCommitCallback');
 
         $stub->expects($this->once())
-            ->method('afterRollback');
+            ->method('afterRollbackCallback');
 
         $article = $stub->new();
         $article->author_id = 1234;
@@ -1377,38 +1390,38 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksBeforeCreateReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave','afterRollback','beforeCreate','afterCreate','beforeUpdate','afterUpdate'
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','beforeCreateCallback','afterCreateCallback','beforeUpdateCallback','afterUpdateCallback'
         ], ['className' => Article::class]);
-          
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(true);
   
         $stub->expects($this->once())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
   
         $stub->expects($this->once())
-            ->method('beforeSave')
+            ->method('beforeSaveCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('beforeCreate')
+            ->method('beforeCreateCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterCreate');
+            ->method('afterCreateCallback');
     
         $stub->expects($this->never())
-            ->method('beforeUpdate');
+            ->method('beforeUpdateCallback');
 
         $stub->expects($this->never())
-            ->method('afterUpdate');
+            ->method('afterUpdateCallback');
   
         $stub->expects($this->never())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
   
         $stub->expects($this->once())
-            ->method('afterRollback');
+            ->method('afterRollbackCallback');
   
         $article = $stub->new();
         $article->author_id = 1234;
@@ -1424,38 +1437,38 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksBeforeUpdateReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave','afterRollback','beforeCreate','afterCreate','beforeUpdate','afterUpdate'
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','beforeCreateCallback','afterCreateCallback','beforeUpdateCallback','afterUpdateCallback'
         ], ['className' => Article::class]);
-          
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeValidate')
+            ->method('beforeValidateCallback')
             ->willReturn(true);
   
         $stub->expects($this->once())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
   
         $stub->expects($this->once())
-            ->method('beforeSave')
+            ->method('beforeSaveCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('beforeUpdate')
+            ->method('beforeUpdateCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterUpdate');
+            ->method('afterUpdateCallback');
     
         $stub->expects($this->never())
-            ->method('beforeCreate');
+            ->method('beforeCreateCallback');
 
         $stub->expects($this->never())
-            ->method('afterCreate');
+            ->method('afterCreateCallback');
   
         $stub->expects($this->never())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
   
         $stub->expects($this->once())
-            ->method('afterRollback');
+            ->method('afterRollbackCallback');
   
         $Article = new Model(['name' => 'Article','connection' => 'test']);
         $article = $Article->find('first');
@@ -1470,20 +1483,20 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksDisabled()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidate','afterValidate','beforeSave','afterSave',
+            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->never())
-            ->method('beforeValidate');
+            ->method('beforeValidateCallback');
 
         $stub->expects($this->never())
-            ->method('afterValidate');
+            ->method('afterValidateCallback');
 
         $stub->expects($this->never())
-            ->method('beforeSave');
+            ->method('beforeSaveCallback');
 
         $stub->expects($this->never())
-            ->method('afterSave');
+            ->method('afterSaveCallback');
 
         $article = $stub->new();
         $article->author_id = 1234;
@@ -1826,18 +1839,18 @@ class ModelTest extends OriginTestCase
     
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDelete','afterDelete','afterCommit',
+            'beforeDeleteCallback','afterDeleteCallback','afterCommitCallback',
         ], ['className' => Article::class]);
-
+        $stub->initCallbacks();
         $stub->expects($this->never())
-            ->method('beforeDelete')
+            ->method('beforeDeleteCallback')
             ->willReturn(true);
 
         $stub->expects($this->never())
-            ->method('afterDelete');
+            ->method('afterDeleteCallback');
 
         $stub->expects($this->never())
-            ->method('afterCommit');
+            ->method('afterCommitCallback');
 
         $this->assertTrue($stub->delete($article, ['callbacks' => false]));
         $this->assertEquals(0, $stub->find('count', ['conditions' => ['id' => 1000]]));
@@ -1858,39 +1871,20 @@ class ModelTest extends OriginTestCase
 
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDelete','afterDelete','afterCommit',
+            'beforeDeleteCallback','afterDeleteCallback','afterCommitCallback',
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
+
         $stub->expects($this->once())
-            ->method('beforeDelete')
+            ->method('beforeDeleteCallback')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('afterDelete');
+            ->method('afterDeleteCallback');
 
         $stub->expects($this->once())
-            ->method('afterCommit');
+            ->method('afterCommitCallback');
 
-        # Stub Behavior
-        $tsStub = $this->getMock(
-            'Origin\Core\Model\Behavhior\TimestampBehavior',
-            ['beforeDelete','afterDelete','afterCommit']
-        );
-
-        $tsStub->expects($this->once())
-            ->method('beforeDelete')
-            ->willReturn(true);
-        
-        $tsStub->expects($this->once())
-            ->method('afterDelete');
-
-        $tsStub->expects($this->once())
-            ->method('afterCommit');
-
-        $stub->behaviorRegistry()->set('Timestamp', $tsStub);
-        $stub->loadBehavior('Timestamp');
-        $stub->enableBehavior('Timestamp');
-        
         $this->assertTrue($stub->delete($article));
     }
 
@@ -1900,21 +1894,21 @@ class ModelTest extends OriginTestCase
 
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDelete','afterDelete','afterRollback','afterCommit'
+            'beforeDeleteCallback','afterDeleteCallback','afterRollbackCallback','afterCommitCallback'
         ], ['className' => Article::class]);
-        
+        $stub->initCallbacks();
         $stub->expects($this->once())
-            ->method('beforeDelete')
+            ->method('beforeDeleteCallback')
             ->willReturn(false);
 
         $stub->expects($this->never())
-            ->method('afterDelete');
+            ->method('afterDeleteCallback');
 
         $stub->expects($this->never())
-            ->method('afterCommit');
+            ->method('afterCommitCallback');
 
         $stub->expects($this->never())
-            ->method('afterRollback');
+            ->method('afterRollbackCallback');
             
         $this->assertFalse($stub->delete($article));
     }
@@ -2068,14 +2062,5 @@ class ModelTest extends OriginTestCase
         $stub->expects($this->never())->method('begin');
         $stub->expects($this->never())->method('rollback');
         $this->assertFalse($stub->save($article, ['transaction' => false]));
-    }
-
-    public function testLoadConcern()
-    {
-        $this->Article->loadConcern('Publishable', ['className' => 'Origin\Test\ModelRefactored\PublishableConcern']);
-        $this->assertEquals('bar', $this->Article->foo());
-
-        $this->expectException(MissingConcernException::class);
-        $this->Article->loadConcern('Zipable');
     }
 }

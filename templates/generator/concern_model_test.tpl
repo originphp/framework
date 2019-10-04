@@ -2,25 +2,30 @@
 namespace %namespace%\Test\Model\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use %namespace%\Model\Concern\%class%Concern;
+use %namespace%\Model\Concern\%class%;
+use Origin\Model\Model;
+
+class User extends Model
+{
+    use %class%;
+}
 
 /**
  * @property \App\Model\User $User
  */
-class %class%ConcernTest extends OriginTestCase
+class %class%Test extends OriginTestCase
 {
     public $fixtures = ['User'];
 
     public function startup() : void
     {
-        $this->loadModel('User');
+        $this->loadModel('User', ['className' => User::class]);
     }
 
     public function testConcernMethod()
     {
-        $concern = new %class%Concern($this->User);
         $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 }
