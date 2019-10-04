@@ -273,8 +273,8 @@ class Folder
      *
      * @param string $directory filename with full path
      * @param string $user  e.g. root, www-data
-     * @param array options (recursive default false)
-     *  - recursive: If set to true, it will delete all contents and sub folders
+     * @param array options Support options keys are
+     *  - recursive: default false. If set to true, it will delete all contents and sub folders
      * @return bool
      */
     public static function chown(string $directory, string $user, array $options = []) : bool

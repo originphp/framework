@@ -42,7 +42,7 @@ class Http
     /**
      * Persist cookies in instance
      *
-     * @var array
+     * @var bool
      */
     protected $persistCookies = false;
 
@@ -296,12 +296,12 @@ class Http
     }
 
     /**
-     * Undocumented function
+     * Builds the request
      *
      * @param string $method
      * @param string $url
      * @param array $options
-     * @return Origin\Utility\Http\Response
+     * @return \Origin\Utility\Http\Response
      */
     protected function request(string $method, string $url, array $options = []) : Response
     {
@@ -314,7 +314,7 @@ class Http
 
     /**
      * Returns a cURL file object
-     * @return CURLFile
+     * @return \CURLFile
      */
     public static function file(string $filename) : CURLFile
     {

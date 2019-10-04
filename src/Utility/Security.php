@@ -26,12 +26,12 @@ class Security
      * Hashes a string. This is not for passwords.
      *
      * @param string $string
-     * @param string $string
      * @param array $options options keys are
      * - pepper: (default:false). Set to true to use Security.pepper or set a string to use.
      * - type: (default:sha256)
      * @return string
      */
+
     public static function hash(string $string, array $options = []): string
     {
         $options += ['pepper' => false, 'type' => 'sha256'];
@@ -67,7 +67,7 @@ class Security
      *
      * @param string $password
      * @param string $hash
-     * @return boolean
+     * @return bool
      */
     public static function verifyPassword(string $password, string $hash): bool
     {
@@ -142,10 +142,13 @@ class Security
         $hmac = substr($string, $length, 32);
         $raw = substr($string, $length + 32);
         $expected = hash_hmac('sha256', $raw, $key, true);
+       
         if (static::compare($expected, $hmac)) {
-            return openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+            $decrypted = openssl_decrypt($raw, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+            if ($decrypted) {
+                return $decrypted;
+            }
         }
-
         return null;
     }
 

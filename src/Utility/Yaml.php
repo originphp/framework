@@ -56,7 +56,7 @@ class YamlParser
     /**
      * Copy of the source
      *
-     * @var [type]
+     * @var string
      */
     protected $src = null;
 
@@ -70,7 +70,7 @@ class YamlParser
     /**
      * Holds the line counter
      *
-     * @var integer
+     * @var int
      */
     protected $i = 0;
 
@@ -333,7 +333,7 @@ class YamlParser
      * Checks if line is a list
      *
      * @param string $line
-     * @return boolean
+     * @return bool
      */
     protected function isList(string $line) : bool
     {
@@ -345,7 +345,7 @@ class YamlParser
     /**
      * Converts the string into an array
      *
-     * @return void
+     * @return array
      */
     public function toArray() : array
     {

@@ -142,7 +142,7 @@ class Inflector
     /**
      * Undersores a StudlyCased word.
      *
-     * @param string StudlyCasedWord e.g. UserEmail
+     * @param string $studlyCasedWord StudlyCasedWord e.g. UserEmail
      * @return string $underscored_word
      */
     public static function underscored(string $studlyCasedWord) : string
@@ -157,10 +157,10 @@ class Inflector
     }
 
     /**
-     * Takes a CamelCased word and underscores it, then converts to plural. Used for getting the table name
+     * Takes a studly cased word word and underscores it, then converts to plural. Used for getting the table name
      * from a model name.
      *
-     * @param string $camelCase
+     * @param string $studlyCasedWord
      * @return string $underscored
      */
     public static function tableName(string $studlyCasedWord) : string

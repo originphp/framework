@@ -219,7 +219,11 @@ class Text
             $transliterator = 'Any-Latin; Latin-ASCII; [\u0080-\u7fff] remove';
         }
 
-        return transliterator_transliterate($transliterator, $string);
+        $result = transliterator_transliterate($transliterator, $string);
+        if ($result) {
+            $string = $result;
+        }
+        return $string;
     }
 
     /**
@@ -231,8 +235,7 @@ class Text
      *  - separator: default:space
      *  - enclosure: default:"
      *  - escape: default:\ one character only
-
-     * @return void
+     * @return array
      */
     public static function tokenize(string $string, array $options = []) : array
     {
@@ -272,9 +275,9 @@ class Text
      *
      * @param string $string
      * @param array $options (length:30, end:...)
-     * @return void
+     * @return string
      */
-    public static function truncate(string $string, array $options = [])
+    public static function truncate(string $string, array $options = []) : string
     {
         $options += ['length' => 30,'end' => '...'];
         if (mb_strwidth($string) <= $options['length']) {
@@ -295,7 +298,7 @@ class Text
      *  - cut: default:false to cut string
      * @return string
      */
-    public static function wordWrap(string $string, array $options = [])
+    public static function wordWrap(string $string, array $options = []) : string
     {
         $options += ['width' => 80,'break' => "\n",'cut' => false];
 

@@ -122,7 +122,7 @@ class Markdown
     /**
      * Converts Markdown to HTML
      *
-     * @param string $text
+     * @param string $markdown
      * @param array $options The following option keys are supported:
      *   -escape: default is false. Escapes all text before passing. Code blocks are always escaped
      * @return string
@@ -357,8 +357,8 @@ class Markdown
      * Processes a tag from a DOMDocument
      *
      * @internal Attempting to modify the dom causes strange issues and even recursion
-     * @param Node $tag
-     * @param DomDocument $doc
+     * @param \Node $tag
+     * @param \DOMDocument $doc
      * @return void
      */
     protected static function processTag(DomNode $tag, DomDocument $doc): void
@@ -487,7 +487,7 @@ class Markdown
      *
      * @param array $array
      * @param boolean $headers
-     * @return string
+     * @return array
      */
     protected static function arrayToTable(array $array, bool $headers = true): array
     {

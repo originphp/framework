@@ -84,8 +84,8 @@ class Xml
     /**
      * Is is the workhorse for the fromArray
      *
-     * @param DOMDocument $dom
-     * @param DOMDocument/DOMElement $parent
+     * @param \DOMDocument $dom
+     * @param \DOMDocument|\DOMElement $parent
      * @param array $data
      * @return void
      */
@@ -199,12 +199,12 @@ class Xml
     /**
      * issue with getting root namespace
      *
-     * @param SimpleXMLElement $xml
-     * @param [type] $currentNamespace
+     * @param \SimpleXMLElement $xml
+     * @param string $currentNamespace
      * @param array $namespaces
      * @return array|string
      */
-    protected static function convertXml(SimpleXMLElement $xml, $currentNamespace, array $namespaces = [])
+    protected static function convertXml(SimpleXMLElement $xml, string $currentNamespace = null, array $namespaces = [])
     {
         $data = [];
 
