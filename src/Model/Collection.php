@@ -151,6 +151,6 @@ class Collection implements ArrayAccess, Iterator, Countable
     
     public function first()
     {
-        return $this->current();
+        return $this->items[0] ?? null;
     }
 }
