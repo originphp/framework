@@ -68,8 +68,6 @@ class RedisEngineTest extends OriginTestCase
 
     public function setUp() : void
     {
-        parent::setUp();
-
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension not loaded');
         }

@@ -258,14 +258,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         Router::request(new Request());
         Config::write('debug', true);
     }
     protected function tearDown() : void
     {
-        parent::tearDown();
-        
         Config::write('debug', true);
 
         $logger = Log::engine('default');

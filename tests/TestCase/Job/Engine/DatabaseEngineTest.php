@@ -64,8 +64,6 @@ class DatabaseEngineTest extends OriginTestCase
 
     public function setUp() : void
     {
-        parent::setUp();
-
         $this->engine = Queue::connection('test');
     }
 

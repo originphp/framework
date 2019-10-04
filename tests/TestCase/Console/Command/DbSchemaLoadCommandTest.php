@@ -10,7 +10,6 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         // Create copy
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP TABLE IF EXISTS authors');
@@ -90,7 +89,6 @@ class DbSchemaLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function tearDown() : void
     {
-        parent::tearDown();
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP TABLE IF EXISTS posts');
     }

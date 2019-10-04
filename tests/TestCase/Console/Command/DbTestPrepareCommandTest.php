@@ -11,7 +11,6 @@ class DbTestPrepareCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         $config = $this->config = ConnectionManager::config('test');
         $config['database'] = 'tmp123';
         ConnectionManager::config('test', $config);
@@ -26,7 +25,6 @@ class DbTestPrepareCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function tearDown() : void
     {
-        parent::tearDown();
         // ConnectionManager::execute('drop table migrations');
         ConnectionManager::drop('test');
         ConnectionManager::config('test', $this->config);

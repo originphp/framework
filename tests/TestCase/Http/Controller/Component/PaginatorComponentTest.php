@@ -62,8 +62,6 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->Controller = new PetsController(new Request('pets/index'), new Response());
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
       

@@ -13,7 +13,6 @@ class DbMigrateCommandTest extends OriginTestCase
 
     protected function tearDown() : void
     {
-        parent::tearDown();
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP table IF EXISTS foo');
         $ds->execute('DROP table IF EXISTS bar');

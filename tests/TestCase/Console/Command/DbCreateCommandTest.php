@@ -10,7 +10,6 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         $config = ConnectionManager::config('test');
         $config['database'] = 'dummy';
         ConnectionManager::config('dummy', $config);
@@ -18,7 +17,6 @@ class DbCreateCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function tearDown() : void
     {
-        parent::tearDown();
         ConnectionManager::drop('dummy'); // # PostgreIssues
         $ds = ConnectionManager::get('test');
         $ds->execute('DROP DATABASE IF EXISTS dummy');

@@ -116,13 +116,11 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
         $this->startup();
     }
 
     protected function tearDown() : void
     {
-        parent::tearDown();
         $this->shutdown();
     }
 }
