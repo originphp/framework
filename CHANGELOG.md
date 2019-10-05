@@ -40,6 +40,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Migrations now expect version to be BIGINT format
 - Cookie writing, 3rd paramater is array and options array takes `expires` key
 - Security::decrypt returns string or null
+- Middleware aliases startup and shutdown are now callbacks. Use invoke and process instead.
 
 ### Removed
 

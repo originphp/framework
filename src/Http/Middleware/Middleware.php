@@ -87,7 +87,7 @@ class Middleware
      * @param callable $next
      * @return \Origin\Http\Response $response
      */
-    public function __invoke(Request $request, Response $response, callable $next = null)
+    public function __invoke(Request $request, Response $response, callable $next = null) : Response
     {
         $this->startup();
         $this->handle($request);
