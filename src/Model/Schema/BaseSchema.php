@@ -209,7 +209,7 @@ abstract class BaseSchema
      *  - name: name of index
      * @return string
      */
-    abstract public function removeIndex(string $table, string $name);
+    abstract public function removeIndex(string $table, string $name) : string;
 
     /**
      * Renames an index
@@ -218,9 +218,9 @@ abstract class BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return void
+     * @return string
      */
-    abstract public function renameIndex(string $table, string $oldName, string $newName);
+    abstract public function renameIndex(string $table, string $oldName, string $newName) : string;
  
     /**
     * Returns SQL for adding a foreignKey

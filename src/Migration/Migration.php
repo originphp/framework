@@ -250,7 +250,7 @@ class Migration
     * @param string $name table name
     * @param array $schema This is an array to build the table, the key for each row should be the field name
     * and then pass either a string with type of field or an array with more specific options (type,limit,null,precision,default)
-    * @param $options The option keys are as follows (constraints/indexes are here but deliberately not documentated)
+    * @param array $options The option keys are as follows (constraints/indexes are here but deliberately not documentated)
     *   - id: default true wether to create primaryKey column and constraint.
     *   - primaryKey: default is 'id' the column name of the primary key. Set to false not to use primaryKey
     *   - engine: this is for MySQL only. e.g InnoDB
@@ -415,8 +415,6 @@ class Migration
     * constraint.
     * @param string $table table name
     * @param string $name column name
-    * @param string $table table name
-    * @param string $name column name
     * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
     * @param array $options The following options keys can be used:
     *   - limit: limits the column length for string and bytes for text,binary,and integer
@@ -549,7 +547,7 @@ class Migration
      *
      * @param string $table
      * @param string $column
-     * @param string $options
+     * @param array $options
      *  - type: type of field
      *  - default: if default true or false
      *  - null: if null values allowed
@@ -660,7 +658,7 @@ class Migration
      * Preps index options
      *
      * @param string $table
-     * @param string|array $options
+     * @param string|array $options (name,column)
      * @return array
      */
     private function indexOptions(string $table, $options) : array
@@ -694,7 +692,7 @@ class Migration
     /**
      * Checks if a table exists
      *
-     * @param string $name
+     * @param string $table
      * @return array
      */
     public function indexes(string $table) : array
@@ -703,14 +701,12 @@ class Migration
     }
 
     /**
-       * Checks if an index exists
-       * @param string $table
-       * @param string|array $column owner_id, [owner_id,tenant_id]
-       * @param array $options
-       *  - name: name of index
-       *  - unique: default false bool
-       * @return bool
-       */
+     * Checks if an index exists
+     *
+     * @param string $table
+     * @param array $options  'name', or ['id','title'] or ['name'=>'someting_index]
+     * @return bool
+     */
     public function indexExists(string $table, $options) : bool
     {
         $options = $this->indexOptions($table, $options);
@@ -863,7 +859,7 @@ class Migration
     /**
      * Checks if foreignKey exists
      * @param string $fromTable
-     * @param string|array $optionsOrToTable either table name e.g. users or array of options
+     * @param string|array $columnOrOptions either column name or array of options
      *  - column: column name
      *  - name: foreignkey name
      * @return bool
