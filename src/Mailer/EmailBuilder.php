@@ -39,6 +39,13 @@ class EmailBuilder
      */
     protected $viewVars = [];
 
+    /**
+     * Email message object
+     *
+     * @var \Origin\Mailer\Email
+     */
+    protected $message = null;
+
     public function __construct(array $options)
     {
         $options += [
@@ -221,7 +228,7 @@ class EmailBuilder
      * Gets the path
      *
      * @param string $name
-     * @return void
+     * @return string
      */
     protected function getPath(string $name) : string
     {

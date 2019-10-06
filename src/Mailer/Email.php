@@ -580,7 +580,7 @@ class Email
      *
      * @return \Origin\Mailer\Message
      */
-    protected function render(): message
+    protected function render() : Message
     {
         $headers = '';
         foreach ($this->buildHeaders() as $header => $value) {
@@ -662,7 +662,8 @@ class Email
         $this->sendCommand("EHLO {$domain}", '250');
         if ($account['tls']) {
             $this->sendCommand('STARTTLS', '220');
-            if (stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT) === false) {
+            // stream_socket can return bool or int
+            if (stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT) !== true) {
                 throw new Exception('The server did not accept the TLS connection.');
             }
             $this->sendCommand("EHLO {$domain}", '250');
@@ -682,11 +683,11 @@ class Email
     /**
      * Sends a command to the socket and waits for a response.
      *
-     * @param null,string $data
+     * @param string|null $data
      * @param string $code
      * @return string $code
      */
-    protected function sendCommand(string $data = null, $code = '250'): string
+    protected function sendCommand(string $data = null, string $code = '250'): string
     {
         if ($data != null) {
             $this->socketLog($data);
@@ -1097,7 +1098,7 @@ class Email
     /**
      * Gets/Sets the email format
      *
-     * @param string|null $type html, text or both
+     * @param string|null $format html, text or both
      * @return string|\Origin\Mailer\Email
      */
     public function format($format = null)

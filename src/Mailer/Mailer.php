@@ -16,6 +16,7 @@ namespace Origin\Mailer;
 
 use Origin\Utility\Inflector;
 use Origin\Core\Plugin;
+use Origin\Mailer\Email;
 
 /**
 * To set values in the view set public properties in the execute method
@@ -68,7 +69,7 @@ abstract class Mailer
     /**
      * The layout to use for HTML emails
      *
-     * @var boolean
+     * @var string|bool
      */
     public $layout = 'default';
 
@@ -179,7 +180,7 @@ abstract class Mailer
      *   - contentType: default: text. The content type the body is in (html or text)
      * @return void
      */
-    public function mail(array $options = [])
+    public function mail(array $options = []) : void
     {
         $defaults = $this->defaults;
 
@@ -206,15 +207,13 @@ abstract class Mailer
         $options['layout'] = $this->layout;
 
         $this->options = $options;
-
-        return $this->options;
     }
 
     /**
      * Sets values in the email templates
      *
      * @param string|array $name key name or array
-     * @param $value if key is a string set the value for this
+     * @param mixed $value if key is a string set the value for this
      * @return void
      */
     public function set($name, $value = null) : void
@@ -281,12 +280,12 @@ abstract class Mailer
     }
 
     /**
-     *
+     * Builds the Email Object
      *
      * @param boolean $debug
-     * @return void
+     * @return \Origin\Mailer\Email
      */
-    private function buildEmail(bool $debug = false)
+    private function buildEmail(bool $debug = false) : Email
     {
         $properties = array_keys(get_object_vars($this));
      
