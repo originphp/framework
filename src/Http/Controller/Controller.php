@@ -29,6 +29,9 @@ use Origin\Core\InitializerTrait;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
 
+/**
+ * @property \Origin\Http\Controller\Component\PaginatorComponent $Paginator
+ */
 class Controller
 {
     use ModelTrait, InitializerTrait, CallbackRegistrationTrait;
@@ -225,7 +228,7 @@ class Controller
      * Sends a value or array of values to the view array.
      *
      * @param string|array $name key name or array
-     * @param $value if key is a string set the value for this
+     * @param mixed $value if key is a string set the value for this
      * @return void
      */
     public function set($name, $value = null) : void
@@ -242,7 +245,7 @@ class Controller
     /**
      * The controller startup process
      *
-     * @return mixed
+     * @return \Origin\Http\Response|void
      */
     public function startupProcess()
     {
@@ -449,19 +452,23 @@ class Controller
          * so array key exists better than isset.
          */
         if (array_key_exists('json', $options)) {
-            return $this->renderJson($options['json'], $options['status']);
+            $this->renderJson($options['json'], $options['status']);
+            return;
         }
 
         if ($this->autoRender and $this->serialize and $this->request->type() === 'json') {
-            return $this->renderJson(null, $options['status']);
+            $this->renderJson(null, $options['status']);
+            return;
         }
         
         if (array_key_exists('xml', $options)) {
-            return $this->renderXml($options['xml'], $options['status']);
+            $this->renderXml($options['xml'], $options['status']);
+            return;
         }
 
         if ($this->autoRender and $this->serialize and $this->request->type() === 'xml') {
-            return $this->renderXml(null, $options['status']);
+            $this->renderXml(null, $options['status']);
+            return;
         }
         
         if (array_key_exists('text', $options)) {
@@ -492,7 +499,7 @@ class Controller
      * Sets the key or keys of the viewVars to be serialized
      *
      * @param string|array $keyOrKeys
-     * @return string|void
+     * @return string|array
      */
     public function serialize($keyOrKeys = null)
     {
@@ -579,8 +586,8 @@ class Controller
      * - # : fragment
      *
      * @param string|array $url
-     * @param int status code default 302
-     * @return \Origin\Http\Response
+     * @param int $code status code default 302
+     * @return \Origin\Http\Response $response
      */
     public function redirect($url, int $code = 302) : Response
     {

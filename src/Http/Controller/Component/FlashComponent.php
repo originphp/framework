@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Http\Controller\Component;
 
 /**
- * @property \App\Http\Controller\Component\SessionComponent $Session
+ * @property \Origin\Http\Controller\Component\SessionComponent $Session
  */
 class FlashComponent extends Component
 {
@@ -25,35 +25,34 @@ class FlashComponent extends Component
         $this->loadComponent('Session');
     }
     
-    public function error(string $message)
+    public function error(string $message) : void
     {
         $this->addMessage('error', $message);
     }
 
-    public function success(string $message)
+    public function success(string $message) : void
     {
         $this->addMessage('success', $message);
     }
 
-    public function warning(string $message)
+    public function warning(string $message) : void
     {
         $this->addMessage('warning', $message);
     }
 
-    public function info(string $message)
+    public function info(string $message) : void
     {
         $this->addMessage('info', $message);
     }
 
-    public function addMessage(string $type, string $message)
+    public function addMessage(string $type, string $message) : void
     {
         $messages = [];
-        $this->SessionKey = "Flash.{$type}";
-       
-        if ($this->Session->exists($this->SessionKey)) {
-            $messages = $this->Session->read($this->SessionKey);
+        $key = "Flash.{$type}";
+        if ($this->Session->exists($key)) {
+            $messages = $this->Session->read($key);
         }
         $messages[] = $message;
-        $this->Session->write($this->SessionKey, $messages);
+        $this->Session->write($key, $messages);
     }
 }

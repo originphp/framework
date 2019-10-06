@@ -48,7 +48,7 @@ class CookieComponent extends Component
      *  $cookie->write('key',$value);
      *  $cookie->write('key',$value,'+1 month');
      *
-     * @param string $key
+     * @param string $name cookie name
      * @param mixed $value
      * @param array $options The options keys are:
      *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55

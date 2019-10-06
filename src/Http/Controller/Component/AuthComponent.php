@@ -30,7 +30,8 @@ use Origin\Model\Exception\MissingModelException;
  * Scope - Additional fields e.g active = 1.
  */
 /**
- * @property \App\Http\Controller\Component\SessionComponent $Session
+ * @property \Origin\Http\Controller\Component\SessionComponent $Session
+ * @property \Origin\Http\Controller\Component\FlashComponent $Flash
  */
 class AuthComponent extends Component
 {
@@ -405,7 +406,7 @@ class AuthComponent extends Component
     /**
      * Starts the unauthorize process.
      *
-     * @throws ForibddenException
+     * @throws \Origin\Http\Exception\ForbiddenException
      * @return \Origin\Http\Response
      */
     protected function unauthorize() : Response

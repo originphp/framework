@@ -61,9 +61,8 @@ class SessionComponent extends Component
      *  $session->write('key',$value);
      *  $session->write('key',$value,strtotime('+1 day'));
      *
-     * @param string $key
+     * @param string $name
      * @param mixed $value
-     * @param integer $expire unix timestamp
      * @return void
      */
     public function write(string $name, $value) : void
