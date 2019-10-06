@@ -39,7 +39,7 @@ class Dot
      *
      * @var array
      */
-    public $items = [];
+    protected $items = [];
 
     /**
      * Set the items to use or leave blank.
@@ -55,9 +55,10 @@ class Dot
      * Sets an item in the path.
      *
      * @param string $key  The key to use, accepts also dot notation e.g. App.currency
-     * @param mixed  $mixed [string|array|integer]
+     * @param mixed  $value [string|array|integer]
+     * @return void
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value) : void
     {
         $items = &$this->items;
         foreach (explode('.', $key) as $key) {
@@ -73,7 +74,7 @@ class Dot
      * Gets an item in the path.
      *
      * @param string $key The key to get, accepts also dot notation e.g. App.currency
-     * @param $defaulValue this is what to return if not found e.g null, '' or []
+     * @param mixed $defaultValue this is what to return if not found e.g null, '' or []
      * @return mixed $value | $defaultValue
      */
     public function get(string $key, $defaultValue = null)
@@ -101,7 +102,7 @@ class Dot
      *
      * @return array $items
      */
-    public function items()
+    public function items() : array
     {
         return $this->items;
     }
@@ -112,7 +113,7 @@ class Dot
      * @param string $key The key to delete, accepts also dot notation e.g. App.currency
      * @return bool
      */
-    public function delete($key)
+    public function delete(string $key) : bool
     {
         if (array_key_exists($key, $this->items)) {
             unset($this->items[$key]);
@@ -148,7 +149,7 @@ class Dot
      * @param string $key The key to check, accepts also dot notation e.g. App.currency
      * @return bool
      */
-    public function has($key) : bool
+    public function has(string $key) : bool
     {
         if (array_key_exists($key, $this->items)) {
             return true;

@@ -226,7 +226,7 @@ class ObjectRegistry
      * This is will create the class, options will be passed for loaded for
      * extended classes to use if needed.
      *
-     * @param string $class
+     * @param string $name
      * @param array  $options
      * @return object
      */

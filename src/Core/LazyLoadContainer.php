@@ -40,7 +40,7 @@ class LazyLoadContainer
      * @param array $config An array of options that will be passed to the constructor
      * @return void
      */
-    public function add(string $alias, string $className, array $config = [])
+    public function add(string $alias, string $className, array $config = []) : void
     {
         $this->config[$alias] = ['className' => $className,'config' => $config];
     }
@@ -51,7 +51,7 @@ class LazyLoadContainer
      * @param string $alias
      * @return boolean
      */
-    public function has(string $alias)
+    public function has(string $alias) : bool
     {
         return isset($this->config[$alias]);
     }
@@ -59,9 +59,9 @@ class LazyLoadContainer
     /**
      * Returns a list of items in this container
      *
-     * @return void
+     * @return array
      */
-    public function list()
+    public function list() : array
     {
         return array_keys($this->config);
     }

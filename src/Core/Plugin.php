@@ -149,7 +149,6 @@ class Plugin
     /**
      * Loads  the routes for all the plugins
      *
-     * @param string $plugin
      * @return void
      */
     public static function loadRoutes() : void

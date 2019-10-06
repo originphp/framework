@@ -74,7 +74,7 @@ class DotEnv
         $quotes = '"';
         foreach ($lines as $row) {
             $row = trim($row);
-            if ($row === null or $row === '' or substr($row, 0, 1) === '#') {
+            if ($row === '' or substr($row, 0, 1) === '#') {
                 continue;
             }
             

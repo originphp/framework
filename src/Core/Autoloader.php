@@ -130,7 +130,7 @@ class Autoloader
      *      'Origin\\Test' => 'origin/tests/'
      *    ));
      *
-     * @param string $namespaces array ((namespacePrefix => baseDirectory))
+     * @param array $namespaces array ((namespacePrefix => baseDirectory))
      * @return void
      */
     public function addNamespaces(array $namespaces) : void
