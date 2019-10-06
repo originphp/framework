@@ -34,7 +34,7 @@ class MiddlewareRunner
     /**
      * Adds a middleware to the runner
      *
-     * @param \Origin\Http\Middleware $object
+     * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
     public function add(Middleware $object)

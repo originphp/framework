@@ -80,7 +80,6 @@ class Number
      * @param float $value
      * @param int   $precision number of decimal places
      * @param array $options   places|before|after|pattern|multiply
-     *
      * @return string 75.00%
      */
     public static function percent(float $value, int $precision = 2, array $options = [])
@@ -98,7 +97,6 @@ class Number
      * @param float $value
      * @param int   $precision number of decimal places
      * @param array $options   places|before|after|pattern
-     *
      * @return string 1234.56
      */
     public static function precision(float $value, int $precision = 2, array $options = [])
@@ -111,7 +109,6 @@ class Number
      *
      * @param float $value
      * @param array $options precision|places|before|after|pattern
-     *
      * @return string 1234.56
      */
     public static function format($value, array $options = [])

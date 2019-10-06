@@ -58,7 +58,7 @@ class HtmlHelper extends Helper
      * @param string $text
      * @param array|string $url
      * @param array $attributes
-     * @return void
+     * @return string
      */
     public function link(string $text, $url, array $attributes = []) : string
     {
@@ -91,7 +91,7 @@ class HtmlHelper extends Helper
      *
      * @param string $image
      * @param array $attributes
-     * @return void
+     * @return string
      */
     public function img(string $image, array $attributes = []) : string
     {

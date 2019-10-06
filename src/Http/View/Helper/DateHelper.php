@@ -30,9 +30,9 @@ class DateHelper extends Helper
      *
      * @param string|null $dateString
      * @param string $format date function compatiable string e.g 'H:i:s'
-     * @return string
+     * @return string|null
      */
-    public function format(string $dateString = null, string $format = null)
+    public function format(string $dateString = null, string $format = null) : ?string
     {
         if ($dateString) {
             return Date::format($dateString, $format);

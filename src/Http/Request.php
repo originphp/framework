@@ -115,7 +115,7 @@ class Request
      * This makes it easy for testing e.g $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
-     * @param array $environment $_SERVER array
+     * @param array $options environment $_SERVER array
      * @return void
      */
     public function __construct(string $url = null, array $options = [])
@@ -485,8 +485,7 @@ class Request
     /**
      * Checks the server request method.
      *
-     * @param string|array $method get|post|put|delete
-     *
+     * @param string|array $type get|post|put|delete
      * @return bool true or false
      */
     public function is($type): bool

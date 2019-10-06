@@ -49,7 +49,7 @@ class Cookie
      *  $cookie->write('key',$value);
      *  $cookie->write('key',$value,strtotime('+1 day'));
      *
-     * @param string $key
+     * @param string $name
      * @param mixed $value
      * @param array $options The options keys are:
      *   - expires: default:0. a strtotime string e.g. +5 days, 2019-01-01 10:23:55

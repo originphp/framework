@@ -96,11 +96,10 @@ class Dispatcher
     /**
      * Creates and returns the controller for the request.
      *
-     * @param string $class    Controller name
-     * @param object $request
-     * @param object $response
-     *
-     * @return \Origin\Http\Controller
+     * @param string $class Controller name
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @return \Origin\Http\Controller\Controller
      */
     protected function buildController(string $class, Request $request, Response $response) : Controller
     {
@@ -147,9 +146,9 @@ class Dispatcher
     /**
      * Gets the controller
      *
-     * @return \Origin\Http\Controller
+     * @return \Origin\Http\Controller\Controller
      */
-    public function controller()
+    public function controller() : Controller
     {
         return $this->controller;
     }

@@ -32,15 +32,15 @@ trait TemplateTrait
      * $this->templates(['input'=>'<input class="form-control">']);
      *
      * @param array|null $templates
-     * @return array|bool
+     * @return array
      */
-    public function templates($templates = null)
+    public function templates($templates = null) : array
     {
-        if (is_array($templates)) {
-            return $this->templater()->set($templates);
+        if (!is_array($templates)) {
+            return $this->templater()->get($templates);
         }
-
-        return $this->templater()->get($templates);
+        $this->templater()->set($templates);
+        return $templates;
     }
     
     /**
@@ -50,7 +50,7 @@ trait TemplateTrait
      *
      * @return \Origin\Http\View\Templater
      */
-    public function templater()
+    public function templater() : Templater
     {
         if (! isset($this->templater)) {
             $this->templater = new Templater();

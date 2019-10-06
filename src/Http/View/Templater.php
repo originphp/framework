@@ -28,7 +28,7 @@ class Templater
     /**
      * Wether to allow empty data.
      *
-     * @var bool
+     * @var array
      */
     protected $templates = [];
 
@@ -105,7 +105,7 @@ class Templater
     * @param array $templates
     * @return void
     */
-    public function set(array $templates)
+    public function set(array $templates) : void
     {
         foreach ($templates as $name => $template) {
             $this->templates[$name] = $template;

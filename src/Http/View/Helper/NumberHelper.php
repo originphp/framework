@@ -40,11 +40,10 @@ class NumberHelper extends Helper
     *
     *  $number->percent(50.55); // 50.55%
     *
-    * @param string|float $value 1234567.43
-    * @param string $currency USD|EUR|GBP|AUD etc.
-    * @return string
-    */
-    
+    * @param string|int|float $value 1234567.43
+     * @param integer $precision
+     * @return string
+     */
     public function percent($value, int $precision = 2) : string
     {
         return Number::percent($value, $precision);
@@ -54,7 +53,7 @@ class NumberHelper extends Helper
     *
     *  $number->precision(1024.10101010,4); // 1,024.1010
     *
-    * @param string|float $value 1234567.43
+    * @param string|int|float $value 1234567.43
     * @param int $precision max number of decimal places to show
     * @return string
     */
@@ -67,7 +66,7 @@ class NumberHelper extends Helper
      *
      * $number->format(1024.512); // 1,024.51
      *
-     * @param float|string $value
+     * @param string|int|float $value
      * @param array $options
      *   - before: something to be shown before
      *   - after: something to be added after

@@ -176,7 +176,7 @@ class Response
     /**
      * Gets all headers or a single header that will be sent
      *
-     * @param string $header
+     * @param string|array $header
      * @return mixed
      */
     public function headers($header = null)
@@ -204,7 +204,7 @@ class Response
             return $this->cookies;
         }
         if (is_array($cookie)) {
-            return $this->cookie = $cookie;
+            return $this->cookies = $cookie;
         }
 
         return $this->cookies[$cookie] ?? null;
@@ -241,7 +241,7 @@ class Response
      *  $response->cookie('key',$value);
      *  $response->cookie('key',$value,'+5 days');
      *
-    * @param string $key
+    * @param string $name
      * @param mixed $value string, array etc
      * @param array $options The options keys are:
      *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
@@ -278,7 +278,7 @@ class Response
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
      *
-     * @param string $contentType
+     * @param string|array $contentType
      * @return mixed
      */
     public function type($contentType = null)

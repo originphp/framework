@@ -57,7 +57,6 @@ class JsonView
      * Does the rendering
      *
      * @param mixed $data
-     * @param integer $status
      * @return string
      */
     public function render($data = null) : string

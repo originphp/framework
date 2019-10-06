@@ -874,9 +874,9 @@ class FormHelper extends Helper
      * Set and gets control defaults.
      *
      * @param string|array|null $defaults Use string or null to get and array of defaults to set
-     * @return array|void
+     * @return array|null
      */
-    public function controlDefaults($defaults = null)
+    public function controlDefaults($defaults = null) : ?array
     {
         if ($defaults === null) {
             return $this->config['controlDefaults'];
@@ -891,6 +891,7 @@ class FormHelper extends Helper
         foreach ($defaults as $key => $value) {
             $this->config['controlDefaults'][$key] = $value;
         }
+        return $this->config['controlDefaults'];
     }
 
     /**

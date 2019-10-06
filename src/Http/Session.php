@@ -139,7 +139,6 @@ class Session
     /**
      * This will validate the cookie and return the ID if it is correct
      *
-     * @param string $name
      * @return string|null
      */
     protected function validateCookie() : ?string

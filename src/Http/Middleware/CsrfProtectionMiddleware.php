@@ -40,7 +40,6 @@ class CsrfProtectionMiddleware extends Middleware
      * If the request is a get request and thre is no cookie (or it expired) it will generate a new token
      *
      * @param \Origin\Http\Request $request
-     * @param \Origin\Http\Response $response
      * @return void
      */
     public function handle(Request $request) : void

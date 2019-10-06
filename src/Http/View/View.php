@@ -27,6 +27,8 @@ class View
 
     /**
      * Name of controller that created this view.
+     *
+     * @var string
      */
     public $name = null;
 
@@ -51,10 +53,10 @@ class View
      */
     public $request = null;
     /**
-       * Response Object
-       *
-       * @var \Origin\Http\Response
-       */
+     * Response Object
+     *
+     * @var \Origin\Http\Response
+     */
     public $response = null;
 
     /**
@@ -65,8 +67,6 @@ class View
     protected $helperRegistry = null;
 
     /**
-     * There
-     *
      * @var array
      */
     protected $helpers = [];
@@ -122,7 +122,7 @@ class View
      * @param array $config An array of config that you want to pass to the helper.
      * @return \Origin\Http\View\Helper\Helper
      */
-    public function loadHelper(string $name, array $config = [])
+    public function loadHelper(string $name, array $config = []) : Helper
     {
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
         $config = array_merge(['className' => $name . 'Helper'], $config);
@@ -138,7 +138,7 @@ class View
      * @param array $vars Variables that will be made available in the element
      * @return string
      */
-    public function element(string $name, array $vars = [])
+    public function element(string $name, array $vars = []) : string
     {
         $element__filename = $this->getElementFilename($name);
 
@@ -158,7 +158,7 @@ class View
      *
      * @return string|null
      */
-    public function content()
+    public function content() : ?string
     {
         return $this->content;
     }
@@ -168,13 +168,9 @@ class View
      *
      * @return string|null
      */
-    public function title()
+    public function title() : ?string
     {
-        if (isset($this->vars['title'])) {
-            return $this->vars['title'];
-        }
-
-        return null;
+        return $this->vars['title'] ?? null;
     }
 
     /**
@@ -185,17 +181,16 @@ class View
      */
     public function fetch(string $key)
     {
-        if (isset($this->{$key})) {
-            return $this->{$key};
-        }
-
-        return null;
+        return $this->$key ?? null;
     }
 
     /**
      * Wrapper for testing.
+     *
+     * @param string $filename
+     * @return boolean
      */
-    protected function fileExists(string $filename)
+    protected function fileExists(string $filename) : bool
     {
         return file_exists($filename);
     }
@@ -204,24 +199,19 @@ class View
      * Gets a value from the view vars.
      *
      * @param string $key
-     *
-     * @return
+     * @return mixed
      */
     public function get(string $key)
     {
-        if (isset($this->vars[$key])) {
-            return $this->vars[$key];
-        }
-
-        return null;
+        return $this->vars[$key] ?? null;
     }
 
     /**
      * Returns the helper registry object
      *
-     * @return HelperRegistry
+     * @return \Origin\Http\View\Helper\HelperRegistry
      */
-    public function helperRegistry()
+    public function helperRegistry() : HelperRegistry
     {
         return $this->helperRegistry;
     }
@@ -232,7 +222,7 @@ class View
      * @param string $name
      * @return string
      */
-    protected function getElementFilename(string $name)
+    protected function getElementFilename(string $name) : string
     {
         $filename = $this->getFilename($name, 'Element');
         if ($this->fileExists($filename)) {
@@ -248,7 +238,7 @@ class View
      * @param string $name Template name e.g. controller_action, /Controller/action , Plugin.Controller/action
      * @return string filename
      */
-    protected function getViewFilename(string $name)
+    protected function getViewFilename(string $name) : string
     {
         $path = $this->getViewPath() . DS ;
 
@@ -273,7 +263,7 @@ class View
      * @param boolean $withControllerName
      * @return string
      */
-    protected function getViewPath($withControllerName = true)
+    protected function getViewPath($withControllerName = true) : string
     {
         $viewPath = $this->viewPath;
         $plugin = $this->request->params('plugin');
@@ -292,10 +282,9 @@ class View
      * Gets the layout filename for a layout.
      *
      * @param string $layout default or Plugin.default;
-     *
      * @return string filename
      */
-    protected function getLayoutFilename(string $layout)
+    protected function getLayoutFilename(string $layout) : string
     {
         $filename = $this->getFilename($layout, 'Layout');
         if ($this->fileExists($filename)) {
@@ -312,7 +301,7 @@ class View
      * @param string $folder
      * @return string
      */
-    protected function getFilename(string $name, string $folder)
+    protected function getFilename(string $name, string $folder) : string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
@@ -326,11 +315,10 @@ class View
      * renders the view.
      *
      * @param string $path index or Rest/json
-     * @param array  $vars
-
+     * @param string $layout
      * @return string $buffer;
      */
-    public function render(string $path, $layout = null)
+    public function render(string $path, string $layout = null) : string
     {
         $view__filename = $this->getViewFilename($path);
 
@@ -349,7 +337,7 @@ class View
         return $buffer;
     }
 
-    protected function renderLayout(string $layout)
+    protected function renderLayout(string $layout) : string
     {
         $layout_filename = $this->getLayoutFilename($layout);
 
@@ -358,7 +346,6 @@ class View
         }
        
         extract($this->vars);
-
         ob_start();
         require $layout_filename;
 
@@ -370,8 +357,9 @@ class View
      *
      * @param string $key
      * @param mixed  $value
+     * @return void
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value) : void
     {
         $this->vars[$key] = $value;
     }

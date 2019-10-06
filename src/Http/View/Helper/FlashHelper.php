@@ -18,7 +18,7 @@ namespace Origin\Http\View\Helper;
 use Origin\Http\View\TemplateTrait;
 
 /**
- * @property \App\Http\View\Helper\SessionHelper $Session
+ * @property \Origin\Http\View\Helper\SessionHelper $Session
  */
 class FlashHelper extends Helper
 {

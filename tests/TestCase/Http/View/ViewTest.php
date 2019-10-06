@@ -47,7 +47,7 @@ class MockView extends View
      */
     public $overideFiles = [];
 
-    public function fileExists(string $filename)
+    public function fileExists(string $filename) :bool
     {
         return in_array($filename, $this->mockFiles) or file_exists($filename);
     }
