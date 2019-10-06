@@ -34,7 +34,7 @@ class Publisher
     /**
      * Gets the instance of the EventDispatcher
      *
-     * @return void
+     * @return \Origin\Publisher\Publisher
      */
     public static function instance() : Publisher
     {
@@ -159,8 +159,7 @@ class Publisher
      */
     public function dispatch($object, string $event, array $args = [])
     {
-        $instanceOfListener = $object instanceof Listener;
-        if ($instanceOfListener) {
+        if ($object instanceof Listener) {
             $object->startup();
         }
         $result = null;
@@ -168,7 +167,7 @@ class Publisher
             $result = call_user_func_array([$object,$event], $args);
         }
 
-        if ($instanceOfListener) {
+        if ($object instanceof Listener) {
             $object->shutdown();
         }
 
