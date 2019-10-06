@@ -93,7 +93,7 @@ class Service
     /**
      * Creates an returns a Service Result object
      *
-     * @param array $properties e.g. ['success'=>true] or ['error'=>'Invalid credit card details']
+     * @param array $data e.g. ['success'=>true] or ['error'=>'Invalid credit card details']
      * @return \Origin\Service\Result
      */
     public function result(array $data = []) : Result
