@@ -41,7 +41,7 @@ class Repository
      * Lazyload the Model for this Repository
      *
      * @param string $name
-     * @return \Origin\Model\Model|
+     * @return \Origin\Model\Model|null
      */
     public function __get($name)
     {

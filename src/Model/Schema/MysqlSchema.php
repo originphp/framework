@@ -438,11 +438,10 @@ class MysqlSchema extends BaseSchema
 
     /**
      * Returns a remove index SQL statement
+     *
      * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
-     * @param string|array $column owner_id, [owner_id,tenant_id]
-     * @param array $options
-     *  - name: name of index
+     * @param string $name
      * @return string
      */
     public function removeIndex(string $table, string $name) : string
@@ -548,7 +547,7 @@ class MysqlSchema extends BaseSchema
      * Returns a remove foreignKey constraint SQL statement
      *
      * @param string $fromTable
-     * @param [type] $constraint
+     * @param string $constraint
      * @return string
      */
     public function removeForeignKey(string $fromTable, string $constraint) : string
@@ -564,7 +563,7 @@ class MysqlSchema extends BaseSchema
      * Undocumented function
      *
      * @param string $table
-     * @return strings
+     * @return string
      */
     public function showCreateTable(string $table) : string
     {
@@ -673,7 +672,7 @@ class MysqlSchema extends BaseSchema
     /**
     * This creates a foreignKey table parameter
     *
-    * @param array attributes name,columns,references, update,delete
+    * @param array $attributes name,columns,references, update,delete
     * @return string
     */
     protected function tableConstraintForeign(array $attributes) :string
@@ -694,12 +693,11 @@ class MysqlSchema extends BaseSchema
     }
 
     /**
-        * Creates the contraint code
-        *
-        * @param string $table
-        * @param array $attributes
-        * @return string
-        */
+    * Creates the constraint code
+    *
+    * @param array $attributes
+    * @return string
+    */
     protected function tableConstraint(array $attributes) : string
     {
         $columns = implode(',', (array) $attributes['column']);
@@ -772,7 +770,7 @@ class MysqlSchema extends BaseSchema
     * Returns a SQL statement for dropping a table
     *
     * @param string $table
-    * @param array options (ifExists)
+    * @param array $options (ifExists)
     * @return string
     */
     public function dropTableSql(string $table, array $options = []) : string

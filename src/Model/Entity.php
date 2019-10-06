@@ -52,7 +52,7 @@ class Entity
     /**
      * If the record exists in the database (set during find)
      *
-     * @var [type]
+     * @var bool
      */
     protected $_exists = null;
 
@@ -179,7 +179,7 @@ class Entity
     {
         $properties = $this->_properties;
         foreach ($this->_virtual as $field) {
-            $properties[$field] = $this->field;
+            $properties[$field] = $this->$field;
         }
         return $properties;
     }
@@ -202,8 +202,8 @@ class Entity
      *  $entity->errors('email','invalid email address');
      *
      * @param string $field
-     * @param string|array $error
-     * @return null|array
+     * @param string $error
+     * @return array|null|void
      */
     public function errors(string $field = null, string $error = null)
     {
@@ -227,7 +227,7 @@ class Entity
      * @param string $error
      * @return void
      */
-    public function invalidate(string $field, string $error)
+    public function invalidate(string $field, string $error) : void
     {
         if (! isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
@@ -241,7 +241,7 @@ class Entity
      * @param string|array $properties
      * @return \Origin\Model\Entity;
      */
-    public function unset($properties)
+    public function unset($properties) : Entity
     {
         foreach ((array)$properties as $key) {
             unset($this->_properties[$key]);
@@ -299,10 +299,10 @@ class Entity
     /**
      * Sets a property/properties of the entity.
      *
-     * @param string|array $property $properties
-     * @param mixed        $value
+     * @param string|array $properties
+     * @param mixed $value
      */
-    public function set($properties, $value = null)
+    public function set($properties, $value = null) : Entity
     {
         if (is_array($properties) === false) {
             $properties = [$properties => $value];
@@ -325,7 +325,7 @@ class Entity
      *
      * @return void
      */
-    public function reset()
+    public function reset() : void
     {
         $this->_modified = [];
         $this->_errors = [];
@@ -399,7 +399,7 @@ class Entity
      * @param string $property name of property
      * @return bool true of false
      */
-    public function has($property)
+    public function has($property) : bool
     {
         return isset($this->_properties[$property]);
     }
@@ -410,7 +410,7 @@ class Entity
      *
      * @return array properties
      */
-    public function properties()
+    public function properties() : array
     {
         return array_keys($this->_properties);
     }
@@ -421,7 +421,7 @@ class Entity
      * @param string $property
      * @return bool
      */
-    public function propertyExists(string $property)
+    public function propertyExists(string $property) : bool
     {
         return array_key_exists($property, $this->_properties);
     }
@@ -429,9 +429,9 @@ class Entity
     /**
      * Gets the entity name, aka the model or alias.
      *
-     * @return string model name
+     * @return string|null model name
      */
-    public function name()
+    public function name() : ?string
     {
         return $this->_name;
     }
@@ -441,7 +441,7 @@ class Entity
      *
      * @return array result
      */
-    public function toArray()
+    public function toArray() : array
     {
         $result = [];
         foreach ($this->visibleProperties() as $property) {
@@ -468,7 +468,7 @@ class Entity
      *
      * @return string
      */
-    public function toJson()
+    public function toJson() : string
     {
         return json_encode($this->toArray());
     }
@@ -478,7 +478,7 @@ class Entity
      *
      * @return string
      */
-    public function toXml()
+    public function toXml() : string
     {
         $root = Inflector::camelCase($this->_name ?? 'record');
 

@@ -17,6 +17,7 @@ namespace Origin\Model;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Model\Datasource;
 
 class ConnectionManager
 {
@@ -43,10 +44,9 @@ class ConnectionManager
      * Gets a datasource.
      *
      * @param string $name default
-     *
      * @return \Origin\Model\Datasource
      */
-    public static function get(string $name)
+    public static function get(string $name) : Datasource
     {
         if (isset(static::$datasources[$name])) {
             return static::$datasources[$name];
@@ -73,7 +73,7 @@ class ConnectionManager
         return static::$datasources[$name] = $datasource;
     }
 
-    public static function create(string $name, array $config)
+    public static function create(string $name, array $config) : Datasource
     {
         self::config($name, $config);
 
@@ -84,9 +84,9 @@ class ConnectionManager
      * Drops a connection
      *
      * @param string $name
-     * @return void
+     * @return bool
      */
-    public static function drop(string $name)
+    public static function drop(string $name) : bool
     {
         if (isset(static::$datasources[$name])) {
             static::config($name, null);
@@ -98,7 +98,13 @@ class ConnectionManager
         return false;
     }
 
-    public static function has(string $name)
+    /**
+     * Checks if there is a configured connection
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public static function has(string $name) : bool
     {
         return isset(static::$datasources[$name]);
     }
@@ -108,7 +114,7 @@ class ConnectionManager
      *
      * @return array
      */
-    public static function datasources()
+    public static function datasources() : array
     {
         return array_keys(static::$config);
     }

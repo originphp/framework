@@ -27,18 +27,28 @@ class ModelValidator
     protected $model = null;
     /**
      * Contains the validation rules.
+     * @var array
      */
     protected $validationRules = [];
 
     /**
-     * Holds the default date format for valdiation
-     *
-     * @var [type]
+     * @var string
      */
     protected $dateFormat = null;
+
+    /**
+     * @var string
+     */
     protected $datetimeFormat = null;
+
+    /**
+     * @var string
+     */
     protected $timeFormat = null;
 
+    /**
+     * @var array
+     */
     protected $defaultMessageMap = [
         'notBlank' => 'This field is required',
         'mimeType' => 'Invalid mime type',
@@ -55,9 +65,9 @@ class ModelValidator
      * Sets and gets rules
      *
      * @param array $rules
-     * @return array|void
+     * @return array
      */
-    public function rules(array $rules = null)
+    public function rules(array $rules = null) : array
     {
         if ($rules === null) {
             return $this->validationRules;
@@ -65,6 +75,7 @@ class ModelValidator
         foreach ($rules as $field => $params) {
             $this->setRule($field, $params);
         }
+        return $rules;
     }
 
     public function setRule(string $field, $params) :void
@@ -145,7 +156,7 @@ class ModelValidator
      * Handles the on
      *
      * @param bool $create
-     * @param string|bool $on null,'create','update'
+     * @param string|bool|null $on null,'create','update'
      * @return bool
      */
     protected function runRule(bool $create, $on)  : bool
@@ -263,11 +274,10 @@ class ModelValidator
      * Validates datetime using a format compatible with the php date function.
      *
      * @param string $value
-     * @param string $timeFormat Y-m-d
-     *
+     * @param string $dateFormat Y-m-d
      * @return bool
      */
-    public function date($value, $dateFormat = 'Y-m-d') : bool
+    public function date($value, string $dateFormat = 'Y-m-d') : bool
     {
         $dateTime = DateTime::createFromFormat($dateFormat, $value);
         if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
@@ -281,15 +291,14 @@ class ModelValidator
      * Validates datetime using a format compatible with the php date function.
      *
      * @param string $value
-     * @param string $timeFormat Y-m-d H:i:s
-     *
+     * @param string $dateTimeFormat Y-m-d H:i:s
      * @return bool
      */
-    public function datetime($value, $dateFormat = 'Y-m-d H:i:s') : bool
+    public function datetime($value, string $dateTimeFormat = 'Y-m-d H:i:s') : bool
     {
-        $dateTime = DateTime::createFromFormat($dateFormat, $value);
+        $dateTime = DateTime::createFromFormat($dateTimeFormat, $value);
       
-        if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
+        if ($dateTime !== false and $dateTime->format($dateTimeFormat) === $value) {
             return true;
         }
 
@@ -399,7 +408,7 @@ class ModelValidator
     /**
      * Finds whether the value is integer e.g. 123
      *
-     * @param integer $value e.g. 154
+     * @param integer|string $value e.g. 154
      * @return bool
      */
     public function integer($value) : bool
@@ -414,7 +423,7 @@ class ModelValidator
     /**
       * Finds whether the value is float e.g 123.56
       *
-      * @param float $value
+      * @param mixed $value
       * @return bool
       */
     public function float($value) : bool
@@ -485,7 +494,7 @@ class ModelValidator
      * Checks that file was uploaded ok
      *
      * @param array $result
-     * @param mixed $options
+     * @param bool $optional
      * @return boolean
      */
     public function upload($result, $optional = false) : bool
@@ -507,7 +516,7 @@ class ModelValidator
      * Checks the mime type of a file
      *
      * @param string|array $result
-     * @param array $mimeTypes
+     * @param string|array $mimeTypes
      * @return boolean
      */
     public function mimeType($result, $mimeTypes = []) : bool

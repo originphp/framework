@@ -267,7 +267,7 @@ class Association
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
        
-        foreach ($this->model->belongsTo as $alias => $config) {
+        foreach ($this->model->association('belongsTo') as $alias => $config) {
             $key = lcfirst($alias);
             if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
                 continue;
@@ -277,7 +277,7 @@ class Association
                 if (! $this->model->$alias->save($data->$key, $associatedOptions)) {
                     return false;
                 }
-                $foreignKey = $this->model->belongsTo[$alias]['foreignKey'];
+                $foreignKey = $this->model->association('belongsTo')[$alias]['foreignKey'];
                 $data->$foreignKey = $this->model->$alias->id;
             }
         }
@@ -288,13 +288,13 @@ class Association
     public function saveHasOne(Entity $data, ArrayObject $options) : bool
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
-        foreach ($this->model->hasOne as $alias => $config) {
+        foreach ($this->model->association('hasOne') as $alias => $config) {
             $key = lcfirst($alias);
             if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
                 continue;
             }
             if ($data->$key->modified()) {
-                $foreignKey = $this->model->hasOne[$alias]['foreignKey'];
+                $foreignKey = $this->model->association('hasOne')[$alias]['foreignKey'];
                 $data->$key->$foreignKey = $this->model->id;
 
                 if (! $this->model->$alias->save($data->get($key), $associatedOptions)) {
@@ -309,13 +309,13 @@ class Association
     public function saveHasMany(Entity $data, ArrayObject $options) : bool
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
-        foreach ($this->model->hasMany as $alias => $config) {
+        foreach ($this->model->association('hasMany') as $alias => $config) {
             $key = Inflector::plural(lcfirst($alias));
             if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
                 continue;
             }
 
-            $foreignKey = $this->model->hasMany[$alias]['foreignKey'];
+            $foreignKey = $this->model->association('hasMany')[$alias]['foreignKey'];
 
             foreach ($data->get($key) as $record) {
                 if (! $record instanceof Entity) {
@@ -356,7 +356,7 @@ class Association
     {
         $connection = $this->model->connection();
 
-        $config = $this->model->hasAndBelongsToMany[$association];
+        $config = $this->model->association('hasAndBelongsToMany')[$association];
         $joinModel = $this->model->{$config['with']};
 
         $links = [];
@@ -431,7 +431,7 @@ class Association
      */
     public function deleteDependent($primaryKey, bool $callbacks) : bool
     {
-        foreach (array_merge($this->model->hasOne, $this->model->hasMany) as $association => $config) {
+        foreach (array_merge($this->model->association('hasOne'), $this->model->association('hasMany')) as $association => $config) {
             if (isset($config['dependent']) and $config['dependent'] === true) {
                 $conditions = [$config['foreignKey'] => $primaryKey];
                 $ids = $this->model->$association->find('list', [
@@ -464,7 +464,7 @@ class Association
      */
     public function deleteHasAndBelongsToMany($id, bool $callbacks) : bool
     {
-        foreach ($this->model->hasAndBelongsToMany as $association => $config) {
+        foreach ($this->model->association('hasAndBelongsToMany') as $association => $config) {
             $associatedModel = $config['with'];
             $conditions = [$config['foreignKey'] => $id];
             $ids = $this->model->$associatedModel->find('list', [

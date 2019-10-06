@@ -220,7 +220,7 @@ class Model
         }
 
         $object = ModelRegistry::get($name, ['className' => $className, 'alias' => $name]);
-        if ($object === false and $habtmModel === false) {
+        if ($object === null and $habtmModel === false) {
             throw new MissingModelException($name);
         }
 
@@ -448,8 +448,8 @@ class Model
      *   'email' =>  ['rule' => 'email']
      *  ]);
      *
-     * @param string|array $field Field name to validate
-     * @param array $options either the rule name e.g. notBlank or an options array with any of the following keys:
+     * @param string $field Field name to validate
+     * @param string|array $options either the rule name e.g. notBlank or an options array with any of the following keys:
      *   - rule: name of rule e.g. date
      *   - message: the message to show if the rule fails
      *   - on: default null. set to create or update to run the rule only on those
@@ -536,7 +536,7 @@ class Model
     /**
      * Validates model data in the object.
      *
-     * @param array $data
+     * @param \Origin\Model\Entity $data
      * @return bool true or false
      */
     public function validates(Entity $data, bool $create = true) : bool
@@ -703,10 +703,10 @@ class Model
     }
 
     /**
-     * Updates a column in the table, no validation check and callbacks triggered
+     * Updates a column in the table, no validation checks and no callbacks are triggered
      *
-     * @params int|string $primaryKey the id for the record
-     * @param int|string $name column name
+     * @param int|string $primaryKey the id for the record
+     * @param string $name column name
      * @param mixed $value
      * @return bool true or false
      */
@@ -806,9 +806,9 @@ class Model
      * - beforeSave
      * - afterSave
      *
-     * @param entity $entity to save
-     * @param array  $options keys (validate,callbacks,transaction,associated)
-     * @return bool true or false
+     * @param \Origin\Model\Entity $data data to save
+     * @param array $options keys (validate,callbacks,transaction,associated)
+     * @return bool $result true or false
      */
     public function save(Entity $data, array $options = []) : bool
     {
@@ -966,7 +966,7 @@ class Model
      *   - group: the field to group by e.g. ['category']
      *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
-     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $resultSet
+     * @return mixed $result
      */
     public function find(string $type = 'first', array $options = [])
     {
@@ -1001,11 +1001,11 @@ class Model
      * Deletes a record.
      *
      * @param \Origin\Model\Entity $entity
-     * @param array options supports the following keys
+     * @param array $options supports the following keys
      *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
      *   - callbacks: call beforeDelete and afterDelete callbacks
      *  - transaction: wether to save through a database transaction (default:true)
-     * @return bool true or false
+     * @return bool $result true or false
      */
     public function delete(Entity $entity, array $options = []) : bool
     {
@@ -1025,11 +1025,11 @@ class Model
     * The delete process
     *
     * @param \Origin\Model\Entity $entity
-    * @param array options supports the following keys
+    * @param \ArrayObject $options supports the following keys
     *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
     *   - callbacks: call beforeDelete and afterDelete callbacks
     *  - transaction: wether to save through a database transaction (default:true)
-    * @return bool true or false
+    * @return bool $result true or false
     */
     protected function processDelete(Entity $entity, Arrayobject $options) : bool
     {
@@ -1085,8 +1085,8 @@ class Model
     /**
      * Finder for find('first').
      *
-     * @param \ArrayObject  $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     * @return array|null results
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @return \Origin\Model\Entity|null
      */
     protected function finderFirst(ArrayObject $options) : ?Entity
     {
@@ -1111,7 +1111,7 @@ class Model
     /**
      * Finder for find('all').
      *
-     * @param \ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Collection|array
      */
     protected function finderAll(ArrayObject $options)
@@ -1135,7 +1135,7 @@ class Model
      * Finder for find('list')
      *  3 different list types ['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']] depending upon how many columns are selected. If more than 3 columns selected it returns ['a'=>'b'].
      *
-     * @param ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array $results
      */
     protected function finderList(ArrayObject $options) : array
@@ -1163,7 +1163,7 @@ class Model
     /**
      * This is the find('count').
      *
-     * @param ArrayObject $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return int count
      */
     protected function finderCount(ArrayObject $options) : int
@@ -1184,7 +1184,8 @@ class Model
     /**
      * Add default keys, auto join models etc.
      *
-     * @param ArrayObject $query
+     * @param string $type e.g. first,all,list, count
+     * @param \ArrayObject $query
      * @return ArrayObject $query
      */
     protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
@@ -1368,7 +1369,7 @@ class Model
     /**
      * Creates many Entities from an array of data.
      *
-     * @param array $data
+     * @param array $requestData
      * @param array $options parse default is set to true
      * @var array
      */

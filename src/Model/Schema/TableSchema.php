@@ -200,21 +200,21 @@ class TableSchema
      * e.g ['engine'=>'InnoDB','collate'=>'utf8_unicode_ci']
      *
      * @param array $options
-     * @return array|void
+     * @return array
      */
-    public function options(array $options = null)
+    public function options(array $options = null) : array
     {
         if ($options === null) {
             return $this->options;
         }
-        $this->options = $options;
+        return $this->options = $options;
     }
 
     /**
      * Returns columns or information about column
      *
      * @param string $name
-     * @return array|void
+     * @return array|null
      */
     public function columns(string $name = null): ? array
     {

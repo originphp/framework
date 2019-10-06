@@ -44,12 +44,12 @@ class Marshaller
     {
         $map = [];
         $model = $this->model;
-        foreach (array_merge($model->hasOne, $model->belongsTo) as $alias => $config) {
+        foreach (array_merge($model->association('hasOne'), $model->association('belongsTo')) as $alias => $config) {
             if (in_array($alias, $associated)) {
                 $map[lcfirst($alias)] = 'one';
             }
         }
-        foreach (array_merge($model->hasMany, $model->hasAndBelongsToMany) as  $alias => $config) {
+        foreach (array_merge($model->association('hasMany'), $model->association('hasAndBelongsToMany')) as  $alias => $config) {
             if (in_array($alias, $associated)) {
                 $key = Inflector::plural(lcfirst($alias));
                 $map[$key] = 'many';

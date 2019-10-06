@@ -61,7 +61,7 @@ class PgsqlSchema extends BaseSchema
             }
             // pgsql does not support collate as default, use this option if its not supplied
             if (isset($options['collate']) and ! isset($definition['collate'])) {
-                $definition['collate'] = options['collation'];
+                $definition['collate'] = $options['collation'];
             }
             $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
         }
@@ -102,14 +102,16 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-        * This is the new create Table function
-        * @internal on pgsql indexes have to be created outside of the table definition
-        *
-        * @param string $table
-        * @param array $params array of columns with reserved keys indexes, constraints
-        * @param array $options (database specific options e.g mysql engine)
-        * @return array
-        */
+    * This is the new create Table function
+    * @internal on pgsql indexes have to be created outside of the table definition
+    *
+    * @param string $table
+    * @param array $columns
+    * @param array $constraints
+    * @param array $indexes
+    * @param array $options
+    * @return array
+    */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
     {
         $out = $comments = [];
@@ -139,7 +141,7 @@ class PgsqlSchema extends BaseSchema
     /**
     * This creates a foreignKey table parameter
     *
-    * @param array attributes name,columns,references, update,delete
+    * @param array $attributes name,columns,references, update,delete
     * @return string
     */
     protected function tableConstraintForeign(array $attributes) :string
@@ -162,7 +164,6 @@ class PgsqlSchema extends BaseSchema
     /**
     * Creates the contraint code
     *
-    * @param string $table
     * @param array $attributes
     * @return string
     */
@@ -333,9 +334,7 @@ class PgsqlSchema extends BaseSchema
      * Returns a remove index SQL stataement
      *
      * @param string $table
-     * @param string|array $column owner_id, [owner_id,tenant_id]
-     * @param array $options
-     *  - name: name of index
+     * @param string $name
      * @return string
      */
     public function removeIndex(string $table, string $name) : string
@@ -495,9 +494,10 @@ class PgsqlSchema extends BaseSchema
 
     /**
     * Returns a SQL statement for dropping a table
+    *
     * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
     * @param string $table
-    * @param array options (ifExists)
+    * @param array $options ifExists default is false
     * @return string
     */
     public function dropTableSql(string $table, array $options = []) : string
