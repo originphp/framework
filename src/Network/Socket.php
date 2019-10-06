@@ -47,12 +47,15 @@ class Socket
     /**
      * Holds the socket connection
      *
-     * @var resource
+     * @var resource|null
      */
     protected $connection = null;
 
     protected $lastError = null;
 
+    /**
+     * @var array
+     */
     protected $errors = [];
 
     public function __construct(array $options = [])
@@ -153,7 +156,8 @@ class Socket
             throw new SocketException($exception->getMessage());
         }
 
-        return $result;
+        // returns true, false or 0
+        return $result !== 0;
     }
 
     /**
