@@ -31,16 +31,17 @@ I been working full time on the framework to get this where it is now, changes g
 - Model callbacks have changed, now they need registering and arguments that will be passed have also been changed.
  See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
     Important: Model::afterFind now passes a collection for single or multiple results
-- Controller callbacks are now `startup` and `shutdown` inline with framework. beforeRedirect and beforeRender are used to register those callbacks.
+- Controller callbacks are now `startup` and `shutdown` inline with framework. beforeRedirect and beforeRender are used to registerx callbacks.
 - Folder structure (http,console and exception)
 - Mailer templates folder and filename structure
 - Error triggered in Jobs are now logged to help with debugging
 - Model::$datasource changed Model::$connection
 - Unit testing now uses PHPUnit 8.x
-- Migrations now expect version to be BIGINT format
+- Migrations now expect version field to be BIGINT format
 - Cookie writing, 3rd paramater is array and options array takes `expires` key
 - Security::decrypt returns string or null
 - Middleware aliases startup and shutdown are now callbacks. Use invoke and process instead.
+- SimpleObject class renamed to BaseObject
 
 ### Removed
 
