@@ -74,7 +74,7 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
             'account' => 'demo',
         ]);
         $id = uniqid();
-        $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
+        $this->assertNull($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
         $message = $engine->email()->message();
         $this->assertStringContainsString("[{$date}] application ERROR: Error code {$id}", $message);
@@ -92,7 +92,7 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
         ]);
         $id = uniqid();
      
-        $this->assertTrue($engine->log('error', 'Error code {value}', ['value' => $id]));
+        $this->assertNull($engine->log('error', 'Error code {value}', ['value' => $id]));
         $date = date('Y-m-d G:i:s');
 
         $message = $engine->email()->message();
@@ -114,6 +114,6 @@ class EmailEngineTest extends \PHPUnit\Framework\TestCase
             'from' => 'foo@example.com',
             'account' => 'your-personal-gmail-account', // joke
         ]);
-        $this->assertFalse($engine->log('error', 'This will go into a blackhole'));
+        $this->assertNull($engine->log('error', 'This will go into a blackhole'));
     }
 }

@@ -21,10 +21,9 @@ class NullEngine extends BaseEngine
 {
     protected $data = null;
 
-    public function log($level, $message, array $context = []) : bool
+    public function log(string $level, string $message, array $context = []) : void
     {
         $this->data = $this->format($level, $message, $context) . "\n";
-        return true;
     }
     
     public function getLog()
