@@ -118,8 +118,8 @@ class Date
     /**
      * Formats a MySQL date to the user date format either by autodetection or a specific format
      *
-     * @param string|null $value
-     * @param string|null $type date,datetime,time
+     * @param string $dateString
+     * @param string|null $format
      * @return string|null
      */
     public static function format(string $dateString, string $format = null) : ?string

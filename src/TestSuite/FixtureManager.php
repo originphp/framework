@@ -40,6 +40,7 @@ class FixtureManager
 
     /**
      * Loads fixtures defined in a test.
+     *
      * @internal so this can be tested not setting a type
      * @param \PHPUnit\Framework\Test $test
      * @return void
@@ -86,7 +87,7 @@ class FixtureManager
     }
 
     /**
-     * Gets the load fixtures or fixture
+     * Gets the loaded fixtures or fixture
      *
      * @param string $fixture
      * @return \Origin\TestSuite\Fixture|array|null

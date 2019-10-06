@@ -32,8 +32,6 @@ class Folder
      * @param array $options
      *  - recursive: default false. like -p creates all directories in one go
      *  - mode: default 0744. Folder permissions
-     * @param boolean $recursive like -p creates all directories in one go
-     * @param integer $mode e.g 0744
      * @return boolean
      */
     public static function create(string $directory, array $options = []) : bool
@@ -92,7 +90,7 @@ class Folder
      * since this will delete files etc.
      *
      * @param string $directory
-     * @param array options These are the options can you use:
+     * @param array $options These are the options can you use:
      *    - recursive: If set to true, it will delete all contents and sub folders
      * @return bool
      */
@@ -202,7 +200,7 @@ class Folder
     /**
     * Alias for mode. Gets the mode for a file aka permissions
     *
-    * @param string $filename
+    * @param string $directory
     * @return string|null
     */
     public static function perms(string $directory) : ?string
@@ -243,7 +241,7 @@ class Folder
     *
     * @param string $directory filename with full path
     * @param int $mode e.g 0755 (remember 0 infront)
-     * @param array options (recursive default false)
+     * @param array $options (recursive default false)
      *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool
     */
@@ -273,7 +271,7 @@ class Folder
      *
      * @param string $directory filename with full path
      * @param string $user  e.g. root, www-data
-     * @param array options Support options keys are
+     * @param array $options Support options keys are
      *  - recursive: default false. If set to true, it will delete all contents and sub folders
      * @return bool
      */
@@ -301,8 +299,8 @@ class Folder
     * Changes the group that the directory belongs to
     *
     * @param string $directory filename with full path
-    * @param string $user  e.g. root, www-data
-    * @param array options (recursive default false)
+    * @param string $group  e.g. root, www-data
+    * @param array $options (recursive default false)
     *  - recursive: If set to true, it will delete all contents and sub folders
     * @return bool
     */

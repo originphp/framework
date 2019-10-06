@@ -46,6 +46,13 @@ class Elasticsearch
     protected $response = null;
 
     /**
+     * Timeout in miliseconds
+     *
+     * @var integer
+     */
+    protected $timeout = 400;
+
+    /**
      * Gets the connection
      *
      * Example:
@@ -162,7 +169,7 @@ class Elasticsearch
     /**
      * Checks if an index exists
      *
-     * @param string $Name
+     * @param string $name
      * @return boolean
      */
     public function indexExists(string $name) : bool
@@ -177,7 +184,7 @@ class Elasticsearch
      *
      * @internal the naming on this is delicate since index is also the verb to index the document (not add or update)
      *
-     * @param string $name
+     * @param string $index
      * @return array|null
      */
     public function getIndex(string $index) : ?array
@@ -294,7 +301,7 @@ class Elasticsearch
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
      *
      * @param string|array $index index name e.g development_posts or ['posts','users']
-     * @param array|string a query string or array query.
+     * @param array|string $query a query string or array query.
      *  example query strings:  'php', '+php +framework', 'title:how to', '(new york city) OR (big apple)'
      *  example using request body
     *   $query = [
@@ -398,15 +405,15 @@ class Elasticsearch
     }
 
     /**
-       * Converts results from search into simple array.
-       *
-       *  [
-       *      [ 'id' => 1234, 'title' => 'this is test' ]
-       *  ]
-       *
-       * @param array $this->response
-       * @return array
-       */
+     * Converts results from search into simple array.
+     *
+     *  [
+     *      [ 'id' => 1234, 'title' => 'this is test' ]
+     *  ]
+     *
+     * @param array $response
+     * @return array
+     */
     protected function convertResults(array $response) : array
     {
         $out = [];

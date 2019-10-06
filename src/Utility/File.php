@@ -196,7 +196,7 @@ class File
      * Changes the group of the file
      *
      * @param string $filename filename with full path
-     * @param string $user  e.g. root, www-data
+     * @param string $group  e.g. root, www-data
      * @return bool
      */
     public static function chgrp(string $filename, string $group) : bool
@@ -211,7 +211,6 @@ class File
      * Gets the permissions of a file
      *
      * @param string $filename filename with full path
-     * @param int $mode e.g 0755 (remember 0 infront)
      * @return string
      */
     public static function mode(string $filename) : string

@@ -556,7 +556,7 @@ class Collection implements Iterator, Countable
     /**
     * Counts the number of items in the collection
     *
-    * @return array|object
+    * @return int
     */
     public function count()
     {
@@ -610,11 +610,12 @@ class Collection implements Iterator, Countable
 
     /**
     * Extracts a value of column from data
-    * @param  array $data
-    * @param  array $path explode('.','Student.name')
-    * @return $result
+
+    * @param array|object $data
+    * @param array $path explode('.','Student.name')
+    * @return mixed $result
     */
-    private function getColumn($data, $path)
+    private function getColumn($data, array $path)
     {
         $value = null;
         foreach ($path as $key) {
