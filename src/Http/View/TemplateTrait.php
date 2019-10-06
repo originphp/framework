@@ -32,9 +32,9 @@ trait TemplateTrait
      * $this->templates(['input'=>'<input class="form-control">']);
      *
      * @param array|null $templates
-     * @return array
+     * @return string|array
      */
-    public function templates($templates = null) : array
+    public function templates($templates = null)
     {
         if (!is_array($templates)) {
             return $this->templater()->get($templates);

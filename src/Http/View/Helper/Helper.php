@@ -52,7 +52,7 @@ class Helper
      * @param array $config
      * @return void
      */
-    public function loadHelper(string $name, array $config = [])
+    public function loadHelper(string $name, array $config = []) : void
     {
         list($plugin, $helper) = pluginSplit($name);
         if (! isset($this->_helpers[$helper])) {
@@ -92,7 +92,7 @@ class Helper
      * @param string $field
      * @return string id
      */
-    protected function domId(string $field)
+    protected function domId(string $field) : string
     {
         return preg_replace('/[^a-z0-9]+/', '-', mb_strtolower($field));
     }
@@ -102,10 +102,9 @@ class Helper
      * becomes.
      *
      * @param array $attributes ['class'=>'form-control']
-     *
      * @return string class="form-control"
      */
-    protected function attributesToString(array $attributes = [])
+    protected function attributesToString(array $attributes = []) : string
     {
         $result = [];
         foreach ($attributes as $key => $value) {
@@ -128,7 +127,7 @@ class Helper
     *
     * @return \Origin\Http\View\View
     */
-    public function view()
+    public function view() : View
     {
         return $this->_view;
     }
@@ -138,7 +137,7 @@ class Helper
      *
      * @return \Origin\Http\Request
      */
-    public function request()
+    public function request() : Request
     {
         return $this->_view->request;
     }
@@ -148,7 +147,7 @@ class Helper
      *
      * @return \Origin\Http\Response
      */
-    public function response()
+    public function response() : Response
     {
         return $this->_view->response;
     }

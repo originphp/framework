@@ -21,6 +21,7 @@ use Origin\Http\View\Helper\HelperRegistry;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
 use Origin\Http\View\Exception\MissingElementException;
+use Origin\Http\View\Helper\Helper;
 
 class View
 {
@@ -316,7 +317,7 @@ class View
      *
      * @param string $path index or Rest/json
      * @param string $layout
-     * @return string $buffer;
+     * @return string $buffer
      */
     public function render(string $path, string $layout = null) : string
     {
@@ -327,7 +328,7 @@ class View
         require $view__filename;
         $buffer = $this->content = ob_get_clean();
 
-        if ($layout != null) {
+        if ($layout) {
             $buffer = $this->renderLayout($layout);
         }
 

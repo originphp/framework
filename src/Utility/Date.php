@@ -64,6 +64,16 @@ class Date
     }
 
     /**
+     * Checks if timezone conversion is needed
+     *
+     * @return bool
+     */
+    protected static function convert() : bool
+    {
+        return (date_default_timezone_get() !== static::$locale['timezone']);
+    }
+
+    /**
      * Sets and gets the dateformat
      *
      * @param string $format

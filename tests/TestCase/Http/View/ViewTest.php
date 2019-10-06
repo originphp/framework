@@ -57,7 +57,7 @@ class MockView extends View
         $this->mockFiles = [$filename];
     }
 
-    protected function getElementFilename(string $name)
+    protected function getElementFilename(string $name) : string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];
@@ -66,7 +66,7 @@ class MockView extends View
         return parent::getElementFilename($name);
     }
 
-    protected function getLayoutFilename(string $name)
+    protected function getLayoutFilename(string $name) : string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];
@@ -75,7 +75,7 @@ class MockView extends View
         return parent::getLayoutFilename($name);
     }
 
-    protected function getViewFilename(string $name)
+    protected function getViewFilename(string $name) : string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];

@@ -47,7 +47,7 @@ abstract class BaseEngine
      * @param mixed $value
      * @return bool
      */
-    abstract public function write(string $key, $value);
+    abstract public function write(string $key, $value) : bool;
     
     /**
      * reads the value;
@@ -63,21 +63,21 @@ abstract class BaseEngine
      * @param string $key
      * @return boolean
      */
-    abstract public function exists(string $key);
+    abstract public function exists(string $key) : bool;
     /**
      * Deletes a key from the cache
      *
      * @param string $key
      * @return boolean
      */
-    abstract public function delete(string $key);
+    abstract public function delete(string $key) : bool;
 
     /**
      * Clears the Cache
      *
      * @return boolean
      */
-    abstract public function clear();
+    abstract public function clear() : bool;
 
     /**
      * Increases a value
@@ -86,7 +86,7 @@ abstract class BaseEngine
      * @param integer $offset
      * @return integer
      */
-    abstract public function increment(string $key, int $offset = 1);
+    abstract public function increment(string $key, int $offset = 1) : int;
 
     /**
      * Decreases a value
@@ -95,7 +95,7 @@ abstract class BaseEngine
      * @param integer $offset
      * @return integer
      */
-    abstract public function decrement(string $key, int $offset = 1);
+    abstract public function decrement(string $key, int $offset = 1) : int;
 
     /**
      * Creates a friendly key for use with caching engines

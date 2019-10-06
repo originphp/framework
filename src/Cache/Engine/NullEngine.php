@@ -76,7 +76,7 @@ class NullEngine extends BaseEngine
      * @param integer $offset
      * @return integer
      */
-    public function increment(string $key, int $offset = 1)
+    public function increment(string $key, int $offset = 1) : int
     {
         return 1;
     }
@@ -87,7 +87,7 @@ class NullEngine extends BaseEngine
      * @param integer $offset
      * @return integer
      */
-    public function decrement(string $key, int $offset = 1)
+    public function decrement(string $key, int $offset = 1) : int
     {
         return 1;
     }

@@ -483,10 +483,11 @@ class Controller
                 $template = $options['template'];
             }
             $view = new ApplicationView($this);
-            $body = $view->render(
-                $template,
-                $options['type'] === 'html' ? $this->layout : false
-            );
+            $layout = null;
+            if ($options['type'] === 'html' and $this->layout) {
+                $layout = $this->layout;
+            }
+            $body = $view->render($template, $layout);
             unset($view);
         }
     
