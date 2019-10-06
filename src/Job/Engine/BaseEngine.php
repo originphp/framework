@@ -40,7 +40,7 @@ abstract class BaseEngine
     /**
      * Add a job to the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param string $strtotime
      * @return bool
      */
@@ -50,14 +50,14 @@ abstract class BaseEngine
     * Get the next job from the queue
     *
     * @param string $queue
-    * @return \Origin\Queue\Job|null
+    * @return \Origin\Job\Job|null
     */
     abstract public function fetch(string $queue = 'default') : ?Job;
 
     /**
      * Deletes a job
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return bool
      */
     abstract public function delete(Job $job) : bool;
@@ -65,7 +65,7 @@ abstract class BaseEngine
     /**
      * Handles a failed job
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return bool
      */
     abstract public function fail(Job $job) : bool;
@@ -73,7 +73,7 @@ abstract class BaseEngine
     /**
     * Handles a successful job
     *
-    * @param \Origin\Queue\Job $job
+    * @param \Origin\Job\Job $job
     * @return bool
     */
     abstract public function success(Job $job) : bool;
@@ -81,7 +81,7 @@ abstract class BaseEngine
     /**
     * Retries a job
     *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool
@@ -109,7 +109,7 @@ abstract class BaseEngine
      * Returns a new job instance using serialized data
      *
      * @param string $data
-     * @return \Origin\Queue\Job
+     * @return \Origin\Job\Job
      */
     public function deserialize(string $data) : Job
     {

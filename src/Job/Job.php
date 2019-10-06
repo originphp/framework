@@ -175,8 +175,7 @@ class Job
     /**
      * Gets the id for this job
      *
-     * @param string|int
-     * @retun string
+     * @return string
      */
     public function id() : string
     {
@@ -200,7 +199,7 @@ class Job
     /**
     * Returns the connection for the Queue
     *
-    * @return void
+    * @return \Origin\Job\Engine\BaseEngine;
     */
     public function connection() : BaseEngine
     {

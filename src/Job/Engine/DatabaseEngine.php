@@ -47,7 +47,7 @@ class DatabaseEngine extends BaseEngine
     /**
      * Adds a message to the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param string $strtotime
      * @return boolean
      */
@@ -79,7 +79,7 @@ class DatabaseEngine extends BaseEngine
     * Gets the next message in the queue
     *
     * @param string $queue
-    * @return \Origin\Queue\Job|null
+    * @return \Origin\Job\Job|null
     */
     public function fetch(string $queue = 'default') : ?Job
     {
@@ -104,7 +104,7 @@ class DatabaseEngine extends BaseEngine
      * @internal in Job fail is called before OnException. If in other
      * engines the record is deleted, then job has to be rethought
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return boolean
      */
     public function fail(Job $job) : bool
@@ -124,7 +124,7 @@ class DatabaseEngine extends BaseEngine
     /**
     * Handles a job that was successful
     *
-    * @param \Origin\Queue\Job $job
+    * @param \Origin\Job\Job $job
     * @return boolean
     */
     public function success(Job $job) : bool
@@ -139,7 +139,7 @@ class DatabaseEngine extends BaseEngine
     /**
      * Deletes a Job from the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return boolean
      */
     public function delete(Job $job) : bool
@@ -158,7 +158,7 @@ class DatabaseEngine extends BaseEngine
     /**
      * Retry a failed job for a certain amount of times
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool

@@ -52,8 +52,8 @@ class RedisEngine extends BaseEngine
     /**
      * Add a job to the queue
      *
-     * @param \Origin\Queue\Job $job
-     * @return null
+     * @param \Origin\Job\Job $job
+     * @return bool
      */
     public function add(Job $job, string $strtotime = 'now') : bool
     {
@@ -74,7 +74,7 @@ class RedisEngine extends BaseEngine
     * Get the next job from the queue
     *
     * @param string $queue
-    * @return \Origin\Queue\Job|null
+    * @return \Origin\Job\Job|null
     */
     public function fetch(string $queue = 'default') : ?Job
     {
@@ -88,8 +88,8 @@ class RedisEngine extends BaseEngine
      * Deletes a job from both the queue and scheduled
      * @internal MySQL returns true if delete command run not if records were deleted
      *
-     * @param \Origin\Queue\Job $job
-     * @return null
+     * @param \Origin\Job\Job $job
+     * @return bool
      */
     public function delete(Job $job) : bool
     {
@@ -108,7 +108,7 @@ class RedisEngine extends BaseEngine
     /**
      * Handles a failed job
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return bool
      */
     public function fail(Job $job) : bool
@@ -124,7 +124,7 @@ class RedisEngine extends BaseEngine
     * Handles a successful job.
     * @internal If the job was fetched then its no longer available
     *
-    * @param \Origin\Queue\Job $job
+    * @param \Origin\Job\Job $job
     * @return bool
     */
     public function success(Job $job) : bool
@@ -137,7 +137,7 @@ class RedisEngine extends BaseEngine
     /**
     * Retries a failed job
     *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool
