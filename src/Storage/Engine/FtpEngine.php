@@ -104,7 +104,7 @@ class FtpEngine extends BaseEngine
      * Writes to the disk
      *
      * @param string $name
-     * @param mixed $data that can be converted to string
+     * @param string $data
      * @return bool
      */
     public function write(string $name, string $data) : bool

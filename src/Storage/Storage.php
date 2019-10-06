@@ -47,7 +47,7 @@ class Storage
     /**
      * Alias for Storage::engine. Gets the configured engine
      *
-     * @param string $config
+     * @param string $name
      * @return \Origin\Storage\Engine\BaseEngine
      */
     public static function volume(string $name) : BaseEngine
@@ -58,7 +58,7 @@ class Storage
     /**
      * Gets the configured Storage Engine
      *
-     * @param string $config
+     * @param string $name
      * @return \Origin\Storage\Engine\BaseEngine
      */
     public static function engine(string $name) : BaseEngine
@@ -129,7 +129,6 @@ class Storage
      * Checks if an item is in the Storage
      *
      * @param string $name
-     * @param mixed $value
      * @param array $options You can pass an array of options with the folling keys :
      *   - config: default:default the name of the config to use
      * @return bool
