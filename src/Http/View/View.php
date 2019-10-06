@@ -171,7 +171,7 @@ class View
      */
     public function title() : ?string
     {
-        return $this->vars['title'] ?? null;
+        return isset($this->vars['title']) ? $this->vars['title'] : null;
     }
 
     /**
@@ -182,7 +182,7 @@ class View
      */
     public function fetch(string $key)
     {
-        return $this->$key ?? null;
+        return isset($this->$key) ? $this->$key : null;
     }
 
     /**
@@ -204,7 +204,7 @@ class View
      */
     public function get(string $key)
     {
-        return $this->vars[$key] ?? null;
+        return isset($this->vars[$key]) ? $this->vars[$key] : null;
     }
 
     /**

@@ -207,9 +207,9 @@ class Date
      * Parses a date string
      *
      * @param string $dateString
-     * @return string
+     * @return string|null
      */
-    public static function parseDate(string $dateString) : string
+    public static function parseDate(string $dateString) : ?string
     {
         return static::convertFormat($dateString, static::$locale['date'], 'Y-m-d');
     }
@@ -218,9 +218,9 @@ class Date
      * Parses a time string
      *
      * @param string $dateString
-     * @return string
+     * @return string|null
      */
-    public static function parseDateTime(string $dateString) : string
+    public static function parseDateTime(string $dateString) : ?string
     {
         $dateString = static::convertFormat($dateString, static::$locale['datetime'], 'Y-m-d H:i:s');
         if ($dateString and static::convert()) {
@@ -235,9 +235,9 @@ class Date
      * Timezone for times are not converted because without date its impossbile to know DST
      *
      * @param string $timeString
-     * @return string
+     * @return string|null
      */
-    public static function parseTime(string $timeString) : string
+    public static function parseTime(string $timeString) : ?string
     {
         $timeString = static::convertFormat($timeString, static::$locale['time'], 'H:i:s');
     
