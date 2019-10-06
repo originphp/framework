@@ -45,7 +45,7 @@ class Log
     /**
     * Holds the loaded loggers
     *
-    * @var array
+    * @var array|null
     */
     protected static $loaded = null;
 
@@ -159,7 +159,7 @@ class Log
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level ('emergency', 'alert', 'critical', 'error',  'warning', 'notice', 'info', 'debug')
+     * @param string $level ('emergency', 'alert', 'critical', 'error',  'warning', 'notice', 'info', 'debug')
      *  - emergency: system is unusable
      *  - alert: action must be taken immediately
      *  - critical: critical conditions
@@ -228,9 +228,9 @@ class Log
      *
      * @param string $name
      * @throws \Origin\Exception\InvalidArgumentException
-     * @return \Origin\Log\BaseEngine
+     * @return \Origin\Log\Engine\BaseEngine
      */
-    public static function engine(string $name) : ?BaseEngine
+    public static function engine(string $name) : BaseEngine
     {
         if (static::$loaded === null) {
             static::loadEngines();

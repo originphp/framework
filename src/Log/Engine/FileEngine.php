@@ -45,13 +45,13 @@ class FileEngine extends BaseEngine
       * @param string $level e.g debug, info, notice, warning, error, critical, alert, emergency.
       * @param string $message 'this is a {what}'
       * @param array $context  ['what'='string']
-      * @return bool
+      * @return void
       */
-    public function log(string $level, string $message, array $context = []) : bool
+    public function log(string $level, string $message, array $context = []) : void
     {
         $message = $this->format($level, $message, $context) . "\n";
         $file = $this->config('path') . DS . $this->config('filename');
 
-        return (bool) file_put_contents($file, $message, FILE_APPEND | LOCK_EX);
+        file_put_contents($file, $message, FILE_APPEND | LOCK_EX);
     }
 }

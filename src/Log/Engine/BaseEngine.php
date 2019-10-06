@@ -17,14 +17,15 @@ namespace Origin\Log\Engine;
 
 use Origin\Core\ConfigTrait;
 
-/**
- * Base Engine for other engines
- * Based upon PSR3
- */
 abstract class BaseEngine
 {
     use ConfigTrait;
 
+    /**
+     * default config used by ConfigTrait
+     *
+     * @var array
+     */
     protected $defaultConfig = [];
 
     /**
@@ -58,14 +59,14 @@ abstract class BaseEngine
      * Sets or gets the channel
      *
      * @param string $channel
-     * @return string|void
+     * @return string
      */
-    public function channel(string $channel = null)
+    public function channel(string $channel = null) : string
     {
         if ($channel === null) {
             return $this->channel;
         }
-        $this->channel = $channel;
+        return $this->channel = $channel;
     }
 
     /**
@@ -105,7 +106,7 @@ abstract class BaseEngine
     * @param array $context
     * @return void
     */
-    public function emergency(string $message, array $context = [])
+    public function emergency(string $message, array $context = []) : void
     {
         $this->log('emergency', $message, $context);
     }
@@ -120,7 +121,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function alert(string $message, array $context = [])
+    public function alert(string $message, array $context = []) : void
     {
         $this->log('alert', $message, $context);
     }
@@ -134,7 +135,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function critical(string $message, array $context = [])
+    public function critical(string $message, array $context = []) : void
     {
         $this->log('critical', $message, $context);
     }
@@ -147,7 +148,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function error(string $message, array $context = [])
+    public function error(string $message, array $context = []) : void
     {
         $this->log('error', $message, $context);
     }
@@ -162,7 +163,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function warning(string $message, array $context = [])
+    public function warning(string $message, array $context = []) : void
     {
         $this->log('warning', $message, $context);
     }
@@ -174,7 +175,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function notice(string $message, array $context = [])
+    public function notice(string $message, array $context = []) : void
     {
         $this->log('notice', $message, $context);
     }
@@ -188,7 +189,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function info(string $message, array $context = [])
+    public function info(string $message, array $context = []) : void
     {
         $this->log('info', $message, $context);
     }
@@ -200,7 +201,7 @@ abstract class BaseEngine
      * @param array $context
      * @return void
      */
-    public function debug(string $message, array $context = [])
+    public function debug(string $message, array $context = []) : void
     {
         $this->log('debug', $message, $context);
     }
@@ -211,9 +212,9 @@ abstract class BaseEngine
     * @param string $level
     * @param string $message
     * @param array $context
-    * @return bool
+    * @return void
     */
-    abstract public function log(string $level, string $message, array $context = []) : bool;
+    abstract public function log(string $level, string $message, array $context = []) : void;
 
     /**
      * Interpolates context values into the message placeholders.

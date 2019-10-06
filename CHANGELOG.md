@@ -42,6 +42,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Security::decrypt returns string or null
 - Middleware aliases startup and shutdown are now callbacks. Use invoke and process instead.
 - SimpleObject class renamed to BaseObject
+- Log engine, log method changed to return void
 
 ### Removed
 

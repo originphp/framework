@@ -55,9 +55,9 @@ class SyslogEngine extends BaseEngine
       * @param string $level e.g debug, info, notice, warning, error, critical, alert, emergency.
       * @param string $message 'this is a {what}'
       * @param array $context  ['what'='string']
-      * @return bool
+      * @return void
       */
-    public function log(string $level, string $message, array $context = []) : bool
+    public function log(string $level, string $message, array $context = []) : void
     {
         if ($this->opened === false) {
             $this->openlog($this->config('identity'), $this->config('option'), $this->config('facility'));
@@ -69,7 +69,7 @@ class SyslogEngine extends BaseEngine
             $priority = $this->levelMap[$level];
         }
 
-        return $this->write($priority, $message);
+        $this->write($priority, $message);
     }
 
     /**
