@@ -78,7 +78,7 @@ class NullEngine extends BaseEngine
      */
     public function increment(string $key, int $offset = 1)
     {
-        return true;
+        return 1;
     }
     /**
      * Decreases a value
@@ -89,6 +89,6 @@ class NullEngine extends BaseEngine
      */
     public function decrement(string $key, int $offset = 1)
     {
-        return true;
+        return 1;
     }
 }

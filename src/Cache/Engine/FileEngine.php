@@ -58,10 +58,8 @@ class FileEngine extends BaseEngine
             if ($expires > time()) {
                 $data = file_get_contents($filename);
                 if ($data !== '' and $this->config['serialize'] === true) {
-                    $value = unserialize($data);
+                    return unserialize($data);
                 }
-
-                return $value;
             }
         }
 

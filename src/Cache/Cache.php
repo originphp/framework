@@ -54,10 +54,10 @@ class Cache
     /**
      * Alias for Cache::engine. Gets the configured engine
      *
-     * @param string $config
+     * @param string $name
      * @return \Origin\Cache\Engine\BaseEngine
      */
-    public static function store(string $name)
+    public static function store(string $name) : BaseEngine
     {
         return static::engine($name);
     }
@@ -65,10 +65,10 @@ class Cache
     /**
      * Gets the configured Cache Engine
      *
-     * @param string $config
+     * @param string $name
      * @return \Origin\Cache\Engine\BaseEngine
      */
-    public static function engine(string $name)
+    public static function engine(string $name) : BaseEngine
     {
         if (static::$disabled) {
             return static::$nullEngine;
@@ -206,7 +206,7 @@ class Cache
      * Clears the cache
      * @param array $options You can pass an array of options with the folling keys :
      *   - config: default:default the name of the config to use
-     * @return void
+     * @return bool
      */
     public static function clear(array $options = []) :bool
     {
@@ -221,7 +221,7 @@ class Cache
      *
      * @return void
      */
-    public static function disable()
+    public static function disable() : void
     {
         static::$nullEngine = new NullEngine();
         static::$disabled = true;
@@ -232,7 +232,7 @@ class Cache
      *
      * @return void
      */
-    public static function enable()
+    public static function enable() : void
     {
         static::$nullEngine = null;
         static::$disabled = false;
