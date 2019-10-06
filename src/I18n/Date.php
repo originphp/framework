@@ -29,22 +29,22 @@ class Date
 
     /**
      * Holds the default date format used by Date::format().
-     *
-     * @var string
+     * @example 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
+     * @var string|array
      */
     protected static $dateFormat = [IntlDateFormatter::SHORT, IntlDateFormatter::NONE];
 
     /**
      * Holds the default datetime format used by Date::format().
-     *
-     * @var string
+     * @example 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
+     * @var string|array
      */
     protected static $datetimeFormat = [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT];
 
     /**
      * Holds the default time format used by Date::format().
-     *
-     * @var string
+     * @example 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
+     * @var string|array
      */
     protected static $timeFormat = [IntlDateFormatter::NONE, IntlDateFormatter::SHORT];
 
@@ -52,67 +52,70 @@ class Date
      * Sets or gets the locale
      *
      * @param string $locale
-     * @return string|void
+     * @return string
      */
-    public static function locale(string $locale = null)
+    public static function locale(string $locale = null) : string
     {
         if ($locale === null) {
             return self::$locale;
         }
-        self::$locale = $locale;
+        return self::$locale = $locale;
     }
 
     /**
      * Sets or gets the timezone
      *
      * @param string $timezone
-     * @return string|void
+     * @return string
      */
-    public static function timezone(string $timezone = null)
+    public static function timezone(string $timezone = null) : string
     {
         if ($timezone === null) {
             return self::$timezone;
         }
-        self::$timezone = $timezone;
+        return self::$timezone = $timezone;
     }
 
     /**
      * Gets or sets the dateformat using pattern of intl settings.
      *
      * @param string|array $dateFormat 'dd MMM' or [IntlDateFormatter::SHORT, IntlDateFormatter::NONE]
+     * @return string|array
      */
     public static function dateformat($dateFormat = null)
     {
         if ($dateFormat === null) {
             return self::$dateFormat;
         }
-        self::$dateFormat = $dateFormat;
+        return self::$dateFormat = $dateFormat;
     }
 
     /**
      * Gets or sets the datetimeformat using pattern of intl settings. Possible patterns can be found at http://userguide.icu-project.org/formatparse/datetime.
      *
      * @param string|array $datetimeFormat 'dd MMM, y H:mm' or [IntlDateFormatter::SHORT, IntlDateFormatter::SHORT]
+     * @return string|array
      */
     public static function datetimeFormat($datetimeFormat = null)
     {
         if ($datetimeFormat === null) {
             return self::$datetimeFormat;
         }
-        self::$datetimeFormat = $datetimeFormat;
+        return self::$datetimeFormat = $datetimeFormat;
     }
 
     /**
      * Gets or sets the datetimeformat using pattern of intl settings.
      *
      * @param string|array $timeFormat 'H:mm' or [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]
+     * @return string|array
      */
     public static function timeFormat($timeFormat = null)
     {
         if ($timeFormat === null) {
             return self::$timeFormat;
         }
-        self::$timeFormat = $timeFormat;
+        return self::$timeFormat = $timeFormat;
     }
 
     // # # # i18n # # #
@@ -121,11 +124,11 @@ class Date
      * Formats a strtotime() valid string to local time and translates it.
      *
      * @internal careful of DST with time formatting
-     * @param string            $dateString
-     * @param null|array|string $format     we will autodetect
-     * @return string
+     * @param string $dateString
+     * @param array|string|null $format  we will autodetect
+     * @return string|null
      */
-    public static function format($dateString, $format = null)
+    public static function format(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
@@ -148,8 +151,9 @@ class Date
      * Formats a date using date defaults.
      *
      * @param string $dateString
+     * @return string|null
      */
-    public static function formatDate(string $dateString, $format = null)
+    public static function formatDate(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$dateFormat;
@@ -162,8 +166,9 @@ class Date
      * Formats a datetime using date defaults.
      *
      * @param string $dateString
+     * @return string|null
      */
-    public static function formatDatetime(string $dateString, $format = null)
+    public static function formatDatetime(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$datetimeFormat;
@@ -176,8 +181,9 @@ class Date
      * Formats a datetime using date defaults.
      *
      * @param string $dateString
+     * @return string|null
      */
-    public static function formatTime(string $dateString, $format = null)
+    public static function formatTime(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$timeFormat;
@@ -196,7 +202,7 @@ class Date
      *
      * @param string            $dateString
      * @param null|string|array $format
-     * @return null|dateString strtotime() valid string
+     * @return string|null strtotime() valid string
      */
     public static function parse(string $dateString, $format = null)
     {
@@ -225,12 +231,14 @@ class Date
 
     /**
      * Parses a date string
-     * Date::parseDate('27 Dec, 2018 15:00', 'dd MMM, y H:mm');
+     *
+     * @example Date::parseDate('27 Dec, 2018 15:00', 'dd MMM, y H:mm');
+     *
      * @param string $dateString
-     * @param [type] $format
+     * @param string|array $format
      * @return string|null
      */
-    public static function parseDate(string $dateString, $format = null)
+    public static function parseDate(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$dateFormat;
@@ -250,10 +258,10 @@ class Date
      * @internal Careful of dst
      *
      * @param string $dateString
-     * @param string $format
-     * @return void
+     * @param string|array $format
+     * @return string|null
      */
-    public static function parseTime(string $dateString, $format = null)
+    public static function parseTime(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$timeFormat;
@@ -269,7 +277,14 @@ class Date
         return null;
     }
 
-    public static function parseDatetime(string $dateString, $format = null)
+    /**
+     * Parses a datetime string
+     *
+     * @param string $dateString
+     * @param string|array $format
+     * @return string|null
+     */
+    public static function parseDatetime(string $dateString, $format = null) : ?string
     {
         if ($format === null) {
             $format = self::$datetimeFormat;
@@ -292,7 +307,7 @@ class Date
      * @param null|string|array $format
      * @return \IntlDateFormatter
      */
-    protected static function formatter($format = null)
+    protected static function formatter($format = null) : IntlDateFormatter
     {
         $dateFormat = $timeFormat = $pattern = null;
 

@@ -284,7 +284,7 @@ class I18n
     /**
      * Loads the message file for.
      *
-     * @param string $locale
+     * @param string $language
      */
     protected static function loadMessages(string $language) : void
     {
