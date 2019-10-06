@@ -167,11 +167,11 @@ class Html
      * Processes a tag from a DOMDocument
      *
      * @internal Attempting to modify the dom causes strange issues and even recursion
-     * @param Node $tag
-     * @param DomDocument $doc
+     * @param \DOMNode $tag
+     * @param \DOMDocument $doc
      * @return void
      */
-    protected static function processTag(DomNode $tag, DomDocument $doc): void
+    protected static function processTag(DOMNode $tag, DOMDocument $doc): void
     {
         $value = static::htmlspecialchars($tag->nodeValue);
 
@@ -324,7 +324,7 @@ class Html
      *
      * @param array $array
      * @param boolean $headers
-     * @return string
+     * @return array
      */
     protected static function arrayToTable(array $array, bool $headers = true): array
     {
@@ -377,7 +377,7 @@ class Html
      * Cleans up user inputted html for saving to a database
      *
      * @param string $html
-     * @param array tags An array of tags to be allowed e.g. ['p','h1'] or to
+     * @param array $tags An array of tags to be allowed e.g. ['p','h1'] or to
      * only allow certain attributes on tags ['p'=>['class','style]];
      * The defaults are :
      * ['h1', 'h2', 'h3', 'h4', 'h5', 'h6','p','i', 'em', 'strong', 'b', 'del', 'blockquote' => ['cite']
@@ -425,11 +425,11 @@ class Html
     /**
      * Workhorse
      *
-     * @param DomNode $node
-     * @param array $options
+     * @param \DOMNode $node
+     * @param array $tags
      * @return void
      */
-    protected static function _sanitize(DomNode $node, array $tags = []): void
+    protected static function _sanitize(DOMNode $node, array $tags = []): void
     {
         if ($node->hasChildNodes()) {
             for ($i = 0; $i < $node->childNodes->length; $i++) {
@@ -518,7 +518,7 @@ class Html
      * @param string $encoding
      * @return string
      */
-    public static function escape(string $html, $encoding = 'UTF-8'): string
+    public static function escape(string $html, string $encoding = 'UTF-8'): string
     {
         return htmlspecialchars($html, ENT_QUOTES, $encoding);
     }

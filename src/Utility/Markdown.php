@@ -357,11 +357,11 @@ class Markdown
      * Processes a tag from a DOMDocument
      *
      * @internal Attempting to modify the dom causes strange issues and even recursion
-     * @param \Node $tag
+     * @param \DOMNode $tag
      * @param \DOMDocument $doc
      * @return void
      */
-    protected static function processTag(DomNode $tag, DomDocument $doc): void
+    protected static function processTag(DOMNode $tag, DOMDocument $doc): void
     {
         $value = static::htmlspecialchars($tag->nodeValue);
 
@@ -552,7 +552,7 @@ class Markdown
     /**
      * Gets the indent level for ul/ol
      *
-     * @param DOMNode $node
+     * @param \DOMNode $node
      * @return integer
      */
     protected static function getIndentLevel(DOMNode $node): int
@@ -585,12 +585,11 @@ class Markdown
     }
   
     /**
-       * UnEscape markdown characters
-       *
-       * @param string $markdown
-       * @return string
-       */
-
+     * UnEscape markdown characters
+     *
+     * @param string $markdown
+     * @return string
+     */
     protected static function unescape(string $markdown) : string
     {
         return preg_replace('#\\\\([' . preg_quote(self::$characters, '#') . '])#', '$1', $markdown);

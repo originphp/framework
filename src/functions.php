@@ -109,7 +109,7 @@ function namespaceSplit(string $class) : array
  * Splits a name into an array of plugin and name.
  *
  * @example list($plugin,$name) = pluginSplit('ContactManager.contacts');
- * @param string $class 'ContactManager.contacts'
+ * @param string $name 'ContactManager.contacts'
  * @return array ('ContactManager','contacts')
  */
 function pluginSplit($name) : array
@@ -143,7 +143,7 @@ function commandSplit(string $command) : array
  *
  * @example __('Order with id {id} by user {name}...',['id'=>$user->id,'name'=>$user->name]);
  * @param string $string
- * @param mixed arg1 arg2
+ * @param array $vars array of vars e.g ['id'=>$user->id,'name'=>$user->name]
  * @return string|null formatted
  */
 function __(string $string = null, array $vars = []) : ?string
@@ -200,7 +200,7 @@ function now() : string
  * Returns a Origin\Utility\Collection object using the array (can be any array or array of objects such as from
  * results).
  *
- * @param array $array
+ * @param array $items
  * @return \Origin\Utility\Collection
  */
 function collection($items) : Collection
