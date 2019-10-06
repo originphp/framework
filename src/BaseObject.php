@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin;
 
-class SimpleObject
+class BaseObject
 {
     public function __construct()
     {

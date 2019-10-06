@@ -14,10 +14,10 @@
 
 namespace Origin\Test;
 
-use Origin\SimpleObject;
+use Origin\BaseObject;
 use Origin\Http\Controller\Controller;
 
-class ValueObject extends SimpleObject
+class ValueObject extends BaseObject
 {
     public $controller;
     public function initialize(Controller $controller)
@@ -26,7 +26,7 @@ class ValueObject extends SimpleObject
     }
 }
 
-class SimpleObjectTest extends \PHPUnit\Framework\TestCase
+class BaseObjectTest extends \PHPUnit\Framework\TestCase
 {
     public function testDi()
     {
