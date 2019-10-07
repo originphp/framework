@@ -21,14 +21,13 @@ namespace Origin\Model;
  */
 
 use ArrayObject;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
-use Origin\Model\Behavior\BehaviorRegistry;
+use Origin\Core\CallbackRegistrationTrait;
+use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\MissingModelException;
 
 class Model
@@ -122,8 +121,6 @@ class Model
      */
     protected $hasAndBelongsToMany = [];
 
-   
-
     /**
      * List of Associations
      * @var array
@@ -145,7 +142,6 @@ class Model
      * @var \Origin\Model\Marshaller
      */
     protected $marshaller = null;
-
 
     public function __construct(array $config = [])
     {
@@ -799,12 +795,15 @@ class Model
      *
      * # Callbacks
      *
-     * The following callbacks will called in this Model and enabled Behaviors
+     * The following callbacks will called in this Model
      *
      * - beforeValidate
      * - afterValidate
      * - beforeSave
+     * - beforeCreate/beforeCreate
+     * - afterCreate/afterUpdate
      * - afterSave
+     * - afterCommit/afterRollback
      *
      * @param \Origin\Model\Entity $data data to save
      * @param array $options keys (validate,callbacks,transaction,associated)
@@ -832,7 +831,7 @@ class Model
                 if ($options['callbacks'] and method_exists($this, 'onError')) {
                     $this->onError($e);
                 }
-                $this->cancelTransaction($data, $options, $data->exists()  === true ? 'update' : 'create');
+                $this->cancelTransaction($data, $options, $data->exists() === true ? 'update' : 'create');
                 throw $e;
             }
         }
@@ -845,7 +844,7 @@ class Model
             $result = $assocation->saveHasMany($data, $options);
         }
         
-        $event = $data->exists()  === true ? 'update' : 'create';
+        $event = $data->exists() === true ? 'update' : 'create';
 
         if ($result) {
             $this->commitTransaction($data, $options, $event);
@@ -1018,6 +1017,7 @@ class Model
         if (empty($this->id) or ! $this->exists($this->id)) {
             return false;
         }
+
         return $this->processDelete($entity, $options);
     }
 
@@ -1407,8 +1407,6 @@ class Model
         return new Marshaller($this);
     }
     
-    
-
     /**
      * Register a before find callback
      *
@@ -1416,7 +1414,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeFind(string $function, array $options =[]) : void
+    public function beforeFind(string $function, array $options = []) : void
     {
         $options += ['on' => 'find'];
         $this->registeredCallbacks['beforeFind'][$function] = $options;
@@ -1429,7 +1427,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function afterFind(string $function, array $options =[]) : void
+    public function afterFind(string $function, array $options = []) : void
     {
         $options += ['on' => 'find'];
         $this->registeredCallbacks['afterFind'][$function] = $options;
@@ -1443,7 +1441,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function beforeValidate(string $function, array $options =[]) : void
+    public function beforeValidate(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update']];
         $this->registeredCallbacks['beforeValidate'][$function] = $options;
@@ -1457,7 +1455,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function afterValidate(string $function, array $options =[]) : void
+    public function afterValidate(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update']];
         $this->registeredCallbacks['afterValidate'][$function] = $options;
@@ -1470,7 +1468,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeCreate(string $function, array $options =[]) : void
+    public function beforeCreate(string $function, array $options = []) : void
     {
         $options += ['on' => 'create'];
         $this->registeredCallbacks['beforeCreate'][$function] = $options;
@@ -1483,7 +1481,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterCreate(string $function, array $options =[]) : void
+    public function afterCreate(string $function, array $options = []) : void
     {
         $options += ['on' => 'create'];
         $this->registeredCallbacks['afterCreate'][$function] = $options;
@@ -1496,7 +1494,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeUpdate(string $function, array $options =[]) : void
+    public function beforeUpdate(string $function, array $options = []) : void
     {
         $options += ['on' => 'update'];
         $this->registeredCallbacks['beforeUpdate'][$function] = $options;
@@ -1509,7 +1507,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterUpdate(string $function, array $options =[]) : void
+    public function afterUpdate(string $function, array $options = []) : void
     {
         $options += ['on' => 'update'];
         $this->registeredCallbacks['afterUpdate'][$function] = $options;
@@ -1523,7 +1521,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function beforeSave(string $function, array $options =[]) : void
+    public function beforeSave(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update']];
         $this->registeredCallbacks['beforeSave'][$function] = $options;
@@ -1537,7 +1535,7 @@ class Model
     *   - on: default: ['create','update'] which events to run on create, update.
     * @return void
     */
-    public function afterSave(string $function, array $options =[]) : void
+    public function afterSave(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update']];
         $this->registeredCallbacks['afterSave'][$function] = $options;
@@ -1550,7 +1548,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function beforeDelete(string $function, array $options =[]) : void
+    public function beforeDelete(string $function, array $options = []) : void
     {
         $options += ['on' => 'delete'];
         $this->registeredCallbacks['beforeDelete'][$function] = $options;
@@ -1563,7 +1561,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterDelete(string $function, array $options =[]) : void
+    public function afterDelete(string $function, array $options = []) : void
     {
         $options += ['on' => 'delete'];
         $this->registeredCallbacks['afterDelete'][$function] = $options;
@@ -1577,7 +1575,7 @@ class Model
     *   - on: default: ['create','update','delete'] which events to run on create, update and delete
     * @return void
     */
-    public function afterCommit(string $function, array $options =[]) : void
+    public function afterCommit(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update','delete']];
         $this->registeredCallbacks['afterCommit'][$function] = $options;
@@ -1591,13 +1589,12 @@ class Model
     *   - on: default: ['create','update','delete'] which events to run on create, update and delete
     * @return void
     */
-    public function afterRollback(string $function, array $options =[]) : void
+    public function afterRollback(string $function, array $options = []) : void
     {
         $options += ['on' => ['create','update','delete']];
         $this->registeredCallbacks['afterRollback'][$function] = $options;
     }
 
-    
     /**
      * This is called when a callback is triggered, it looks up the registered callbacks and
      * then calls the dispatcher
@@ -1612,7 +1609,7 @@ class Model
     {
         if (isset($this->registeredCallbacks[$callback])) {
             foreach ($this->registeredCallbacks[$callback] as $method => $options) {
-                if (!in_array($event, (array) $options['on']) or in_array($callback, $this->disabledCallbacks)) {
+                if (! in_array($event, (array) $options['on']) or in_array($callback, $this->disabledCallbacks)) {
                     continue;
                 }
                 $result = $this->dispatchCallback($method, $arguments, $isStoppable);
@@ -1640,6 +1637,7 @@ class Model
                 return false;
             }
         }
+
         return true;
     }
 
