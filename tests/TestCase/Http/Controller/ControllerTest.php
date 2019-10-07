@@ -96,6 +96,11 @@ class TestsController extends Controller
     private function privateMethod()
     {
     }
+
+    public function setPaginate(array $data)
+    {
+        $this->paginate = $data;
+    }
 }
 
 /**
@@ -354,7 +359,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request('posts/index');
         $controller = new \App\Http\Controller\PostsController($request, new Response());
-        $controller->layout = false;
+        $controller->setProperty('layout', false);
         $controller->render();
 
         $this->assertEquals('<h1>Posts Home Page</h1>', $controller->response->body());
@@ -545,7 +550,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $results = $controller->paginate('Pet', ['limit' => 10]);
         $this->assertEquals(10, count($results));
 
-        $controller->paginate = ['Pet' => ['limit' => 7]];
+        $controller->setPaginate(['Pet' => ['limit' => 7]]);
         $results = $controller->paginate('Pet');
         $this->assertEquals(7, count($results));
     }

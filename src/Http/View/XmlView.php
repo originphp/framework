@@ -51,7 +51,7 @@ class XmlView
     {
         $this->request = & $controller->request;
         $this->response = & $controller->response;
-        $this->viewVars = & $controller->viewVars;
+        $this->viewVars = $controller->viewVars();
         $this->serialize = $controller->serialize();
     }
 

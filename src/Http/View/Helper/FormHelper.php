@@ -349,8 +349,9 @@ class FormHelper extends Helper
             $label = substr($name, 0, -3);
             $parts = explode('.', $label);
             $models = Inflector::camelCase(Inflector::plural($parts[0]));
-            if (isset($this->view()->vars[$models])) {
-                $selectOptions = $this->view()->vars[$models];
+            $value = $this->view()->get($models);
+            if ($value) {
+                $selectOptions = $value ;
             }
         } else {
             $parts = explode('.', $label);

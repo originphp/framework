@@ -12,4 +12,14 @@ class PostsController extends ApplicationController
         $this->layout = false;
         $this->set('data', ['error' => 'Noting to list']);
     }
+
+    // Nothing to do with controller, just to aid testing
+    public function setProperty($key, $value)
+    {
+        $this->$key = $value;
+    }
+    public function getProperty($key)
+    {
+        return $this->$key ?? null;
+    }
 }

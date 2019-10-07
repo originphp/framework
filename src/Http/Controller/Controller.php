@@ -40,53 +40,53 @@ class Controller
      *
      * @var string
      */
-    public $name = null;
+    protected $name = null;
 
     /**
      * Model name for this controller.
      *
      * @var string
      */
-    public $modelName = null;
+    protected $modelName = null;
 
     /**
      * These are vars passed to view.
      *
      * @var array
      */
-    public $viewVars = [];
+    protected $viewVars = [];
 
     /**
      * Automatically renders view.
      */
-    public $autoRender = true;
+    protected $autoRender = true;
 
     /**
      * Default layout, set to false to not use a layout.
      *
      * @var string
      */
-    public $layout = 'default';
+    protected $layout = 'default';
 
     /**
      * Holds the request object.
      *
      * @var \Origin\Http\Request
      */
-    public $request = null;
+    protected $request = null;
 
     /**
      * Holds the response object.
      *
      * @var \Origin\Http\Response
      */
-    public $response = null;
+    protected $response = null;
 
     /**
      * view helpers to load.
      * The core is default
      */
-    public $viewHelpers = [
+    protected $viewHelpers = [
         'Cookie' => ['className'=>'CookieHelper'],
         'Date' => ['className'=>'DateHelper'],
         'Flash' => ['className'=>'FlashHelper'],
@@ -115,7 +115,7 @@ class Controller
      *
      * @var array (limit,order,fields,conditions)
      */
-    public $paginate = [];
+    protected $paginate = [];
 
     public function __construct(Request $request = null, Response $response = null)
     {
@@ -241,6 +241,8 @@ class Controller
 
         $this->viewVars = array_merge($this->viewVars, $data);
     }
+
+
 
     /**
      * The controller startup process
@@ -487,6 +489,7 @@ class Controller
             if ($options['type'] === 'html' and $this->layout) {
                 $layout = $this->layout;
             }
+            $view->helpers($this->viewHelpers);
             $body = $view->render($template, $layout);
             unset($view);
         }
@@ -545,7 +548,7 @@ class Controller
         $this->triggerCallback('beforeRender');
         $this->response->type('json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
-        $this->response->body((new JsonView($this))->render($data)); //
+        $this->response->body((new JsonView($this))->render($data));
     }
 
     /**
@@ -612,5 +615,26 @@ class Controller
     public function componentRegistry() : ComponentRegistry
     {
         return $this->componentRegistry;
+    }
+
+    /**
+     * Gets the viewVars
+     *
+     * @param array $viewVars
+     * @return array
+     */
+    public function viewVars() : array
+    {
+        return $this->viewVars;
+    }
+
+    /**
+     * Gets the Controller name
+     *
+     * @return string
+     */
+    public function name() : string
+    {
+        return $this->name;
     }
 }

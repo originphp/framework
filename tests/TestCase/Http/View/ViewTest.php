@@ -25,6 +25,11 @@ use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
 use Origin\Http\View\Exception\MissingElementException;
 
+class MockController extends Controller
+{
+    use TestTrait;
+}
+
 class TestsController extends Controller
 {
     /*public function initalize(){
@@ -98,9 +103,9 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $response = new Response();
         $controller = new TestsController($request, $response);
         $controller->set('framework', 'Origin');
-        $view = new View($controller);
-        $this->assertEquals('Tests', $view->name);
-        $this->assertEquals(['framework' => 'Origin'], $view->vars);
+        $view = new MockView($controller);
+        $this->assertEquals('Tests', $view->getProperty('name'));
+        $this->assertEquals(['framework' => 'Origin'], $view->getProperty('vars'));
     }
 
     public function testLoadHelper()
@@ -218,8 +223,8 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('<h2>Widget Items</h2>', $result);
 
         $request = new Request('tests/edit/2048');
-        $controller = new Controller($request, new Response());
-        $controller->name = 'Widgets';
+        $controller = new MockController($request, new Response());
+        $controller->setProperty('name', 'Widgets');
         $controller->request->params('controller', 'Widgets');
         $controller->request->params('plugin', 'Widget');
 

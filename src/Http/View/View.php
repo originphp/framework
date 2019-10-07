@@ -81,17 +81,15 @@ class View
 
     public function __construct(Controller $controller = null)
     {
-        $this->name = $controller->name;
+        $this->name = $controller->name();
 
         $controller = $controller ?: new Controller();
 
         $this->request = & $controller->request;
         $this->response = & $controller->response;
-        $this->vars = & $controller->viewVars;
-
+        $this->vars = $controller->viewVars();
+        
         $this->helperRegistry = new HelperRegistry($this);
-
-        $this->helpers = $controller->viewHelpers;
 
         $this->initialize();
     }
@@ -104,6 +102,31 @@ class View
     public function initialize() : void
     {
     }
+
+    /**
+     * Gets the view vars
+     *
+     * @return mixed
+     */
+    public function vars() : array
+    {
+        return $this->vars;
+    }
+
+    /**
+     * Sets or gets helpers
+     *
+     * @param array $vars
+     * @return array
+     */
+    public function helpers(array $helpers = null) : array
+    {
+        if ($helpers === null) {
+            return $this->helpers;
+        }
+        return $this->helpers = $helpers;
+    }
+
 
     /**
      * Lazy load helpers.
