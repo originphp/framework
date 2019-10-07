@@ -25,20 +25,20 @@ class XmlView
      *
      * @var \Origin\Http\Request
      */
-    public $request = null;
+    protected $request = null;
     /**
        * Response Object
        *
        * @var \Origin\Http\Response
        */
-    public $response = null;
+    protected $response = null;
 
     /**
      * These are the view vars (needed by testing).
      *
      * @var array
      */
-    public $viewVars = [];
+    protected $viewVars = [];
 
     /**
      * Array keys to be serialized

@@ -137,7 +137,7 @@ class FormHelper extends Helper
          */
         if (is_string($entity)) {
             $model = $entity;
-            $requestData = $this->view()->request->data();
+            $requestData = $this->request()->data();
             $entity = new Entity($requestData, ['name' => $model]);
             if ($requestData) {
                 $object = ModelRegistry::get($model);
@@ -158,7 +158,7 @@ class FormHelper extends Helper
 
         $options += [
             'type' => 'post',
-            'url' => $this->view()->request->path(true),
+            'url' => $this->request()->path(true),
         ];
 
         if ($options['type'] == 'file') {
@@ -987,7 +987,7 @@ class FormHelper extends Helper
                 }
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
-                $requestData = $this->view()->request->data();
+                $requestData = $this->request()->data();
                 if ($requestData) {
                     $dot = new Dot($requestData);
                     $value = $dot->get($name);

@@ -111,7 +111,7 @@ class FormHelperTest extends OriginTestCase
 
         // Create the entity manually from string and validate.
         ModelRegistry::set('Post', new Post());
-        $FormHelper->view()->request->data(['title' => 'Article Title']);
+        $FormHelper->request()->data(['title' => 'Article Title']);
         $this->assertNotNull($FormHelper->create('Article'));
         $this->assertEquals('Article Title', $FormHelper->getProperty('data')->title);
     }

@@ -141,7 +141,7 @@ class Helper
      */
     public function request() : Request
     {
-        return $this->_view->request;
+        return $this->_view->request();
     }
 
     /**
@@ -151,6 +151,6 @@ class Helper
      */
     public function response() : Response
     {
-        return $this->_view->response;
+        return $this->_view->response();
     }
 }

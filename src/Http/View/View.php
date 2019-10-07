@@ -17,6 +17,8 @@ namespace Origin\Http\View;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Http\Controller\Controller;
+use Origin\Http\Request;
+use Origin\Http\Response;
 use Origin\Http\View\Helper\HelperRegistry;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
@@ -52,13 +54,13 @@ class View
      *
      * @var \Origin\Http\Request
      */
-    public $request = null;
+    protected $request = null;
     /**
      * Response Object
      *
      * @var \Origin\Http\Response
      */
-    public $response = null;
+    protected $response = null;
 
     /**
      * Holds the HelperRegistry object.
@@ -386,5 +388,26 @@ class View
     public function set(string $key, $value) : void
     {
         $this->vars[$key] = $value;
+    }
+
+
+    /**
+    * Gets the Response
+    *
+    * @return \Origin\Http\Response
+    */
+    public function response() : Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * Gets the request
+     *
+     * @return \Origin\Http\Request
+     */
+    public function request() : Request
+    {
+        return $this->request;
     }
 }
