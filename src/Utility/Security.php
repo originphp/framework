@@ -193,17 +193,40 @@ class Security
      * MAC address then it will generate a UUID version 1.
      *
      * @param array $options The options array supports the following keys
-     *   - timestamp: default:false Set to true to generate a UUID version 1
-     *   - macAddress: sets the MAC address to be used for a version 1 UUID
+     *   - macAddress: set to true to use the MAC address (linux) and generate a UUID version 1. If it can't get a MAC address
+     * will generate a random one. You can also set the MAC address manually.
      * @return string
      */
     public static function uuid(array $options = []) : string
     {
-        $options += ['timestamp' => false,'macAddress' => null];
-        if ($options['timestamp'] or $options['macAddress']) {
+        $options += ['macAddress' => null];
+        if ($options['macAddress']) {
+            if ($options['macAddress'] === true) {
+                $options['macAddress']  = static::macAddress() ?: bin2hex(random_bytes(6));
+            }
             return static::uuidv1($options['macAddress']);
         }
         return static::uuidv4();
+    }
+
+    /**
+     * Gets the MAC address (on Linux systems) or return a random one.
+     *
+     * @return string
+     */
+    private static function macAddress() : ?string
+    {
+        if (strtoupper(php_uname('s')) === 'LINUX') {
+            $files = glob('/sys/class/net/*/address', GLOB_NOSORT);
+            foreach ($files as $file) {
+                $macAddress = trim(file_get_contents($file));
+                if ($macAddress !== '00:00:00:00:00:00' and preg_match('/^([0-9a-f]{2}:){5}[0-9a-f]{2}$/', $macAddress)) {
+                    return $macAddress;
+                }
+            }
+        }
+       
+        return null;
     }
 
     /**
@@ -228,11 +251,8 @@ class Security
      * @param string $macAddress e.g. 00:0a:95:9d:68:16
      * @return string
      */
-    private static function uuidv1(string $macAddress = null) : string
+    private static function uuidv1(string $macAddress) : string
     {
-        if (empty($macAddress)) {
-            $macAddress = bin2hex(random_bytes(6));
-        }
         $macAddress = str_replace([':', '-'], '', $macAddress);
         if (strlen($macAddress) !== 12 or ctype_xdigit($macAddress) === false) {
             throw new InvalidArgumentException('Invalid MAC address');
