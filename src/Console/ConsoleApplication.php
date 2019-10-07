@@ -93,10 +93,7 @@ class ConsoleApplication
      */
     public function __construct(ConsoleIo $io = null)
     {
-        if ($io === null) {
-            $io = new ConsoleIo();
-        }
-        $this->io = $io;
+        $this->io = $io ?: new ConsoleIo();
 
         $this->argumentParser = new ArgumentParser();
 
@@ -186,7 +183,7 @@ class ConsoleApplication
         }
 
         try {
-            $this->{$command} = $this->commandRegistry->get($command);
+            $this->$command = $this->commandRegistry->get($command);
         } catch (Exception $ex) {
             $this->io->error("Invalid command {$command}.");
 
@@ -195,11 +192,11 @@ class ConsoleApplication
       
         $commandName = (count($commands) === 1) ? $this->name : $this->name . ' ' .$command;
         # Configure Command
-        $this->{$command}->io = $this->io;
-        $this->{$command}->name($commandName);  // Rename for help
+        $this->$command->io($this->io);
+        $this->$command->name($commandName);  // Rename for help
 
         try {
-            return $this->{$command}->run($args);
+            return $this->$command->run($args);
         } catch (StopExecutionException $ex) {
             return false;
         }

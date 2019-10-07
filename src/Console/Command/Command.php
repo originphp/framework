@@ -45,7 +45,7 @@ abstract class Command
      *
      * @var \Origin\Console\ConsoleIo
      */
-    public $io = null;
+    protected $io = null;
 
     /**
      * The name of the command.
@@ -569,5 +569,19 @@ abstract class Command
         }
 
         return $out;
+    }
+
+    /**
+     * Sets and gets the ConsoleIO object
+     *
+     * @param \Origin\Console\ConsoleIo $io
+     * @return \Origin\Console\ConsoleIo ConsoleIo
+     */
+    public function io(ConsoleIo $io = null) : ConsoleIo
+    {
+        if ($io === null) {
+            return $this->io;
+        }
+        return $this->io = $io;
     }
 }

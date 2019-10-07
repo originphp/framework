@@ -55,7 +55,8 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
     
         $bufferedOutput = new ConsoleOutput();
-        $cmd->io = new ConsoleIo($bufferedOutput, new ConsoleOutput());
+        $consoleIo = new ConsoleIo($bufferedOutput, new ConsoleOutput());
+        $cmd->io($consoleIo);
  
         $cmd->run(['originphp/framework','UserManagement']);
         $this->assertStringContainsString('UserManagement Plugin installed', $bufferedOutput->read());
@@ -74,7 +75,8 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
     
         $bufferedOutput = new ConsoleOutput();
-        $cmd->io = new ConsoleIo($bufferedOutput, $bufferedOutput);
+        $consoleIo = new ConsoleIo($bufferedOutput, $bufferedOutput);
+        $cmd->io($consoleIo);
  
         $cmd->run(['originphp/framework','UserManagement']);
         $this->assertStringContainsString('Plugin not downloaded from `https://github.com/originphp/framework.git`', $bufferedOutput->read());
