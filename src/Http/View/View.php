@@ -31,14 +31,14 @@ class View
      *
      * @var string
      */
-    public $name = null;
+    protected $controllerName = null;
 
     /**
      * These are the view vars (needed by testing).
      *
      * @var array
      */
-    public $vars = [];
+    protected $vars = [];
 
     /**
      * This is the rendered view
@@ -81,7 +81,7 @@ class View
 
     public function __construct(Controller $controller = null)
     {
-        $this->name = $controller->name();
+        $this->controllerName = $controller->name();
 
         $controller = $controller ?: new Controller();
 
@@ -278,7 +278,7 @@ class View
             return $filename;
         }
  
-        throw new MissingViewException([$this->name, $name]);
+        throw new MissingViewException([$this->controllerName, $name]);
     }
 
     /**
@@ -296,7 +296,7 @@ class View
         }
        
         if ($withControllerName) {
-            $viewPath = $viewPath . DS . $this->name;
+            $viewPath = $viewPath . DS . $this->controllerName;
         }
 
         return $viewPath;
@@ -366,7 +366,7 @@ class View
         $layout_filename = $this->getLayoutFilename($layout);
 
         if (! isset($this->vars['title'])) {
-            $this->vars['title'] = Inflector::human(Inflector::underscored($this->name));
+            $this->vars['title'] = Inflector::human(Inflector::underscored($this->controllerName));
         }
        
         extract($this->vars);

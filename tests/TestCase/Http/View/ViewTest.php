@@ -104,7 +104,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, $response);
         $controller->set('framework', 'Origin');
         $view = new MockView($controller);
-        $this->assertEquals('Tests', $view->getProperty('name'));
+        $this->assertEquals('Tests', $view->getProperty('controllerName'));
         $this->assertEquals(['framework' => 'Origin'], $view->getProperty('vars'));
     }
 
