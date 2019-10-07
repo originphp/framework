@@ -1,14 +1,26 @@
 # Changelog
 ## [Unreleased]
 
-## [2.0.0] - 2019-10-04
+## [2.0.0] - 2019-10-xxx
 
-Releasing version two, see the [upgrade guide](https://www.originphp.com/docs/upgrade) for information on how to upgrade from previous versions.
+Releasing version 2.0, see the [upgrade guide](https://www.originphp.com/docs/upgrade) for information on how to upgrade from previous versions.
 
-Version 2
-1. removes deprecated features and provides a more organized folder structure and makes it easier to work with given the number of folders that are now used.
+### Version 2
 
-2. Changed how callbacks work in Controllers and Models, so that can take advantage of PHP features.
+Summary of what has changed:
+
+1. Removed deprecated features and no longer needed or duplicate features
+
+2. Changed application folder a structure to a more organized way which makes it easier to work with given the number of folders that are now used. This affects Controllers, Middleware, Views and Mailers. see the [upgrade guide](http://localhost:8080/docs/upgrade) for more information on the folder structure.
+
+3. Changed how some features work
+    - changed how callbacks work in Controllers and Models, callbacks are now registered.
+    - changed Middleware callbacks and design
+    - Migrations store version in db as biginteger
+
+4. Added strict types and return types.
+
+5. Added some new features like custom Entity classes with mutators and accessors
 
 I been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
 
@@ -23,8 +35,6 @@ I been working full time on the framework to get this where it is now, changes g
 ### Changed
 
 - Change callbacks to require registering so can implement concerns properly.
-- Update docs on tests (concerns have changed, remove behavirs),
-- Remove behavior
 - Added strict types
 - Added return types
 - Security::uid now returns a 15 character base 62 random string.
@@ -43,6 +53,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Middleware aliases startup and shutdown are now callbacks. Use invoke and process instead.
 - SimpleObject class renamed to BaseObject
 - Log engine, log method changed to return void
+- Concerns - these were silently added in the last major releases but were not documented, these have been rewritten to use `traits` instead.
 
 ### Removed
 
