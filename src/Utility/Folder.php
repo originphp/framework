@@ -58,21 +58,26 @@ class Folder
      * @param string $directory
      * @param array $options Options keys are
      *  - directories: default false, includes directories
+     *  - recursive: default false. Recursively gets contents
      * @return array
      */
     public static function list(string $directory, array $options = []) : array
     {
-        $options += ['directories' => false];
+        $options += ['directories' => false,'recursive'=>false];
         if (self::exists($directory)) {
             $results = [];
             $files = array_diff(scandir($directory), ['.', '..']);
             foreach ($files as $file) {
+                if ($options['recursive'] and ! is_file($directory . DS . $file)) {
+                    $results = array_merge($results, static::list($directory . DS . $file, $options));
+                }
                 if (! $options['directories'] and ! is_file($directory . DS . $file)) {
                     continue;
                 }
                 $stats = stat($directory . DS . $file);
                 $results[] = [
                     'name' => $file,
+                    'path' => $directory,
                     'timestamp' => $stats['mtime'],
                     'size' => $stats['size'],
                     'type' => is_dir($directory. DS . $file)?'directory':'file',

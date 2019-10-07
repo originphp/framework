@@ -31,6 +31,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Security::uuid version 1 generation
 - Added post install command
 - Concerns
+- Folder::list now works with recursive
 
 ### Changed
 
