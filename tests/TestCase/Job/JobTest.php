@@ -19,10 +19,13 @@ use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
+use Origin\TestSuite\TestTrait;
 use Origin\Utility\Security;
 
 class PassOrFailJob extends Job
 {
+    use TestTrait;
+    
     public $connection = 'default';
 
     public function initialize() : void
@@ -83,7 +86,7 @@ class JobTest extends OriginTestCase
     {
         $job = new PassOrFailJob();
         $job->schedule('+10 minutes');
-        $this->assertEquals('+10 minutes', $job->wait);
+        $this->assertEquals('+10 minutes', $job->getProperty('wait'));
     }
 
     public function testBackendId()
@@ -213,7 +216,7 @@ class JobTest extends OriginTestCase
             'className' => 'Origin\Test\Job\PassOrFailJob',
             'id' => $job->id(),
             'backendId' => 1000,
-            'queue' => $job->queue,
+            'queue' => $job->queue(),
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => $job->attempts(),
             'enqueued' => null,
@@ -244,7 +247,7 @@ class JobTest extends OriginTestCase
         $job->deserialize($serialized);
         
         $this->assertEquals($id, $job->id());
-        $this->assertEquals('foo', $job->queue);
+        $this->assertEquals('foo', $job->queue());
         $this->assertInstanceOf(Model::class, $job->arguments()[0]);
         $this->assertEquals(['key' => 'value'], $job->arguments()[1]);
         $this->assertEquals(5, $job->attempts());

@@ -173,14 +173,14 @@ class QueueWorkerCommand extends Command
     {
         $result = true;
 
-        if ($job->timeout and $this->supportsSignals()) {
-            $this->setTimeout($job->timeout);
+        if ($job->timeout() and $this->supportsSignals()) {
+            $this->setTimeout($job->timeout());
         }
 
         $this->writeOutput('<text>[{date}]</text> <cyan>{type}</cyan> <text>{name}</text> <green>{id}</green>', [
             'date' => date('Y-m-d G:i:s'),
             'type' => $job->attempts() === 0 ? 'Run' : 'Retry #' . $job->attempts(),
-            'name' => $job->name,
+            'name' => $job->name(),
             'id' => $job->id(),
         ], false);
 
@@ -194,7 +194,7 @@ class QueueWorkerCommand extends Command
             'status' => $result ? '<pass> OK </pass>' : '<fail> FAILED </fail>',
         ]);
 
-        if ($job->timeout and $this->supportsSignals()) {
+        if ($job->timeout() and $this->supportsSignals()) {
             $this->unsetTimeout();
         }
     }

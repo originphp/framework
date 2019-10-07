@@ -55,7 +55,7 @@ class DatabaseEngine extends BaseEngine
     {
         $model = $this->model();
         $entity = $model->new([
-            'queue' => $job->queue,
+            'queue' => $job->queue(),
             'data' => '[]',
             'status' => 'new',
             'scheduled' => date('Y-m-d H:i:s', strtotime($strtotime)),

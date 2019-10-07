@@ -37,21 +37,21 @@ class Job
      *
      * @var string
      */
-    public $name = null;
+    protected $name = null;
 
     /**
      * The name of the queue for this job
      *
      * @var string
      */
-    public $queue = 'default';
+    protected $queue = 'default';
 
     /**
      * The name of the queue connection to use
      *
      * @var string
      */
-    public $connection = 'default';
+    protected $connection = 'default';
 
     /**
      * Default wait time before dispatching the job, this is a strtotime compatible
@@ -60,7 +60,7 @@ class Job
      * @example '+30 minutes'
      * @var string
      */
-    public $wait = null;
+    protected $wait = null;
 
     /**
      * The default timeout in seconds. Set to false
@@ -68,7 +68,7 @@ class Job
      *
      * @var integer
      */
-    public $timeout = 60;
+    protected $timeout = 60;
 
     /**
      * Job identifier
@@ -343,7 +343,7 @@ class Job
     }
 
     /**
-     * Undocumented function
+     * Schedules a job using wait
      *
      * @param string $strtotime a strtotime compatiable string e.g '+5 hours' ,'2020-01-01 10:40:00'
      * @return \Origin\Job\Job
@@ -353,5 +353,35 @@ class Job
         $this->wait = $strtotime;
 
         return $this;
+    }
+
+    /**
+     * Gets the queue name
+     *
+     * @return string
+     */
+    public function queue() : string
+    {
+        return $this->queue;
+    }
+
+    /**
+     * Gets the timeout for this job
+     *
+     * @return integer
+     */
+    public function timeout() : int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * Gets the display name for the job
+     *
+     * @return string
+     */
+    public function name() : string
+    {
+        return $this->name;
     }
 }
