@@ -23,7 +23,7 @@ class MockObject
     use TemplateTrait;
     use ConfigTrait; // TemplateTrait uses this
 
-    public $defaultConfig = [
+    protected $defaultConfig = [
         'templates' => [],
     ];
 }

@@ -24,7 +24,7 @@ class FlashHelper extends Helper
 {
     use TemplateTrait;
     
-    public $defaultConfig = [
+    protected $defaultConfig = [
         'templates' => [
             'error' => '<div class="alert alert-danger" role="alert">%s</div>',
             'success' => '<div class="alert alert-success" role="alert">%s</div>',

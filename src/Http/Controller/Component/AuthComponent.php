@@ -40,7 +40,7 @@ class AuthComponent extends Component
      *
      * @var array
      */
-    public $defaultConfig = [
+    protected $defaultConfig = [
         'authenticate' => ['Form'], // Form, Http, and API
         'loginAction' => [
             'controller' => 'Users',

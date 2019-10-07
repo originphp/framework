@@ -22,7 +22,7 @@ class PaginatorHelper extends Helper
 {
     use TemplateTrait;
 
-    public $defaultConfig = [
+    protected $defaultConfig = [
         'templates' => [
             'sort' => '<a href="{url}">{text}</a>',
             'sortAsc' => '<a href="{url}" class="asc">{text}</a>',
