@@ -23,8 +23,8 @@ class ConnectionManager
     use StaticConfigTrait;
 
     protected static $engines = [
-        'mysql' => __NAMESPACE__ . '\Engine\MySQLEngine',
-        'pgsql' => __NAMESPACE__ . '\Engine\PostgreSQLEngine',
+        'mysql' => __NAMESPACE__ . '\Engine\MysqlEngine',
+        'pgsql' => __NAMESPACE__ . '\Engine\PgsqlEngine',
     ];
     /**
      * Holds the driver

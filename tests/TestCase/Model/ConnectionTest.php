@@ -15,7 +15,7 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
-use Origin\Model\Engine\MySQLEngine;
+use Origin\Model\Engine\MysqlEngine;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Exception\ConnectionException;
 use Origin\Model\Exception\DatasourceException;
@@ -99,7 +99,7 @@ class ConnectionTest extends OriginTestCase
         $config = ConnectionManager::config('test');
         $config['password'] = 'fozzywozzy';
         $this->expectException(ConnectionException::class);
-        $ds = new MySQLEngine();
+        $ds = new MysqlEngine();
         $ds->connect($config);
     }
 
