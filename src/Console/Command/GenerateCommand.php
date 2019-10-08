@@ -189,8 +189,8 @@ class GenerateCommand extends Command
             foreach ($params as $method) {
                 if (preg_match('/^[a-z_0-9]+/', $method)) {
                     $method = Inflector::camelCase($method);
-                    $controllerMethods .= "    function {$method}()\n    {\n    }\n\n";
-                    $testMethods .= '    function test'. ucfirst($method) ."()\n    {\n        {$string}\n    }\n\n";
+                    $controllerMethods .= "    public function {$method}()\n    {\n    }\n\n";
+                    $testMethods .= '    public function test'. ucfirst($method) ."()\n    {\n        {$string}\n    }\n\n";
                 }
             }
         }
