@@ -60,9 +60,9 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
-        $tableAlias = Inflector::tableName($this->model->alias);
+        $tableAlias = Inflector::tableName($this->model->alias());
         $associationTableAlias = Inflector::tableName($association);
         $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
 
@@ -110,7 +110,7 @@ class Association
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscored($this->extractClass($options['className'])) . '_id';
         }
-        $alias = Inflector::tableName($this->model->alias);
+        $alias = Inflector::tableName($this->model->alias());
         $associatedAlias = Inflector::tableName($association);
 
         $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
@@ -168,7 +168,7 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
 
         return $options;
@@ -227,7 +227,7 @@ class Association
         $class = $this->extractClass($options['className']);
 
         // join table in alphabetic order
-        $models = [$this->model->name, $class];
+        $models = [$this->model->name(), $class];
         sort($models);
         $models = array_values($models);
 
@@ -239,7 +239,7 @@ class Association
             $options['joinTable'] = Inflector::plural(Inflector::underscored($options['with']));
         }
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
         if (is_null($options['associationForeignKey'])) {
             $options['associationForeignKey'] = Inflector::underscored($class) . '_id';
@@ -278,7 +278,7 @@ class Association
                     return false;
                 }
                 $foreignKey = $this->model->association('belongsTo')[$alias]['foreignKey'];
-                $data->$foreignKey = $this->model->$alias->id;
+                $data->$foreignKey = $this->model->$alias->id();
             }
         }
 
@@ -295,7 +295,7 @@ class Association
             }
             if ($data->$key->modified()) {
                 $foreignKey = $this->model->association('hasOne')[$alias]['foreignKey'];
-                $data->$key->$foreignKey = $this->model->id;
+                $data->$key->$foreignKey = $this->model->id();
 
                 if (! $this->model->$alias->save($data->get($key), $associatedOptions)) {
                     return false;
@@ -322,7 +322,7 @@ class Association
                     continue;
                 }
                 if ($record->modified()) {
-                    $record->$foreignKey = $data->{$this->model->primaryKey};
+                    $record->$foreignKey = $data->{$this->model->primaryKey()};
                     if (! $this->model->$alias->save($record, $associatedOptions)) {
                         return false;
                     }
@@ -362,8 +362,8 @@ class Association
         $links = [];
 
         foreach ($data as $row) {
-            $primaryKey = $this->model->$association->primaryKey;
-            $displayField = $this->model->$association->displayField;
+            $primaryKey = $this->model->$association->primaryKey();
+            $displayField = $this->model->$association->displayField();
 
             // Either primaryKey or DisplayField must be set in data
             if ($row->has($primaryKey)) {
@@ -390,21 +390,21 @@ class Association
                 ])) {
                     return false;
                 }
-                $links[] = $this->model->$association->id;
+                $links[] = $this->model->$association->id();
             }
 
             $joinModel = $this->model->{$config['with']};
         }
 
         $existingJoins = $joinModel->find('list', [
-            'conditions' => [$config['foreignKey'] => $this->model->id],
+            'conditions' => [$config['foreignKey'] => $this->model->id()],
             'fields' => [$config['associationForeignKey']],
         ]);
 
         $connection = $joinModel->connection();
         // By adding ID field we can do delete callbacks
         if ($config['mode'] === 'replace') {
-            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->model->id]);
+            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->model->id()]);
         }
 
         foreach ($links as $linkId) {
@@ -412,11 +412,10 @@ class Association
                 continue;
             }
             $insertData = [
-                $config['foreignKey'] => $this->model->id,
+                $config['foreignKey'] => $this->model->id(),
                 $config['associationForeignKey'] => $linkId,
             ];
-
-            $connection->insert($joinModel->table, $insertData);
+            $connection->insert($joinModel->table(), $insertData);
         }
 
         return true;
@@ -436,10 +435,10 @@ class Association
                 $conditions = [$config['foreignKey'] => $primaryKey];
                 $ids = $this->model->$association->find('list', [
                     'conditions' => $conditions,
-                    'fields' => [$this->model->primaryKey]
+                    'fields' => [$this->model->primaryKey()]
                 ]);
                 foreach ($ids as $id) {
-                    $conditions = [$this->model->$association->primaryKey => $id];
+                    $conditions = [$this->model->$association->primaryKey() => $id];
                     $result = $this->model->$association->find('first', [
                         'conditions' => $conditions, 'callbacks' => false
                     ]);
@@ -472,7 +471,7 @@ class Association
             ]);
 
             foreach ($ids as $id) {
-                $conditions = [$this->model->$associatedModel->primaryKey => $id];
+                $conditions = [$this->model->$associatedModel->primaryKey() => $id];
                 $result = $this->model->$associatedModel->find('first', [
                     'conditions' => $conditions, 'callbacks' => false
                 ]);

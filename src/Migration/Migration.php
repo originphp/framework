@@ -179,7 +179,7 @@ class Migration
     /**
      * Returns the connection
      *
-     * @return \Origin\Model\Datasource;
+     * @return \Origin\Model\Connection;
      */
     public function connection()
     {

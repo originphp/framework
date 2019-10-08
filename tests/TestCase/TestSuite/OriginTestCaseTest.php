@@ -97,7 +97,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->assertFalse($mock->true());
-        $this->assertEquals('userz', $mock->table);
+        $this->assertEquals('userz', $mock->table());
     }
 
     public function testUnkownClass()

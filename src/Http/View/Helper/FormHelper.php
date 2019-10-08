@@ -258,7 +258,7 @@ class FormHelper extends Helper
         $model = ModelRegistry::get($name);
        
         if ($model) {
-            $meta['primaryKey'] = $model->primaryKey;
+            $meta['primaryKey'] = $model->primaryKey();
           
             foreach ($model->schema()['columns'] as $column => $row) {
                 $type = $row['type'];

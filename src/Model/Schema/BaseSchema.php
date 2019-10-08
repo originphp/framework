@@ -476,7 +476,7 @@ abstract class BaseSchema
     /**
      * Returns the datasource
      *
-     * @return \Origin\Model\Datasource
+     * @return \Origin\Model\Connection
      */
     public function connection() : Connection
     {

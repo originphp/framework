@@ -226,14 +226,14 @@ class DatabaseEngine extends BaseEngine
         $model = $this->model();
         $model->begin();
         $result = $this->model->query(
-            "SELECT * FROM {$model->table} WHERE id = :id AND locked IS NULL FOR UPDATE;",
+            "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
             [
                 'id' => $record->id,
             ]
         );
 
         $model->query(
-            "UPDATE {$model->table} SET locked = :locked , modified = :modified WHERE id = :id;",
+            "UPDATE {$model->table()} SET locked = :locked , modified = :modified WHERE id = :id;",
             [
                 'id' => $record->id,
                 'locked' => now(),

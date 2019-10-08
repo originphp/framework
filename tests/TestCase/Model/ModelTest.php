@@ -20,7 +20,7 @@
 namespace Origin\Test\ModelRefactored;
 
 use ArrayObject;
-use Origin\Model\Model;
+use Origin\Model\Model as BaseModel;
 
 use Origin\Model\Entity;
 use Origin\Model\Collection;
@@ -34,6 +34,14 @@ use Origin\Exception\InvalidArgumentException;
 
 use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;
+
+class Model extends BaseModel
+{
+    public function connectionName() : string
+    {
+        return $this->connection;
+    }
+}
 
 /**
  * Used By Mocks
@@ -513,22 +521,22 @@ class ModelTest extends OriginTestCase
     public function testConstruct()
     {
         $Model = new Model();
-        $this->assertEquals('Model', $Model->name);
-        $this->assertEquals('Model', $Model->alias);
-        $this->assertEquals('models', $Model->table);
-        $this->assertEquals('default', $Model->connection);
+        $this->assertEquals('Model', $Model->name());
+        $this->assertEquals('Model', $Model->alias());
+        $this->assertEquals('models', $Model->table());
+        $this->assertEquals('default', $Model->connectionName());
 
         $Post = new Model(['name' => 'Post']);
-        $this->assertEquals('Post', $Post->name);
-        $this->assertEquals('Post', $Post->alias);
-        $this->assertEquals('posts', $Post->table);
-        $this->assertEquals('default', $Model->connection);
+        $this->assertEquals('Post', $Post->name());
+        $this->assertEquals('Post', $Post->alias());
+        $this->assertEquals('posts', $Post->table());
+        $this->assertEquals('default', $Model->connectionName());
 
         $Post = new Model(['name' => 'Post', 'alias' => 'BlogPost', 'connection' => 'test']);
-        $this->assertEquals('Post', $Post->name);
-        $this->assertEquals('BlogPost', $Post->alias);
-        $this->assertEquals('posts', $Post->table);
-        $this->assertEquals('test', $Post->connection);
+        $this->assertEquals('Post', $Post->name());
+        $this->assertEquals('BlogPost', $Post->alias());
+        $this->assertEquals('posts', $Post->table());
+        $this->assertEquals('test', $Post->connectionName());
     }
 
     public function testFields()
@@ -814,25 +822,25 @@ class ModelTest extends OriginTestCase
     {
         $User = new Model(['name' => 'User']);
         $User->hasOne('Profile');
-        $this->assertEquals('user_id', $User->hasOne['Profile']['foreignKey']);
+        $this->assertEquals('user_id', $User->association('hasOne')['Profile']['foreignKey']);
 
         $Profile = new Model(['name' => 'Profile']);
         $Profile->belongsTo('User');
-        $this->assertEquals('user_id', $Profile->belongsTo['User']['foreignKey']);
+        $this->assertEquals('user_id', $Profile->association('belongsTo')['User']['foreignKey']);
 
         $User = new Model(['name' => 'User']);
         $User->hasMany('Comment');
-        $this->assertEquals('user_id', $User->hasMany['Comment']['foreignKey']);
+        $this->assertEquals('user_id', $User->association('hasMany')['Comment']['foreignKey']);
 
         $Ingredient = new Model(['name' => 'Ingredient']);
         $Ingredient->hasAndBelongsToMany('Recipe');
         $this->assertEquals(
             'ingredient_id',
-            $Ingredient->hasAndBelongsToMany['Recipe']['foreignKey']
+            $Ingredient->association('hasAndBelongsToMany')['Recipe']['foreignKey']
       );
         $this->assertEquals(
             'recipe_id',
-            $Ingredient->hasAndBelongsToMany['Recipe']['associationForeignKey']
+            $Ingredient->association('hasAndBelongsToMany')['Recipe']['associationForeignKey']
       );
     }
 
@@ -1144,7 +1152,7 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($article->modified());
         $this->assertTrue($this->Article->save($article));
         $this->assertNotEmpty($article->id);
-        $this->assertNotEmpty($this->Article->id);
+        $this->assertNotEmpty($this->Article->id());
 
         $this->assertTrue($article->created());
         $this->assertFalse($article->deleted());

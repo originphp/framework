@@ -39,15 +39,15 @@ trait EntityLocatorTrait
             return Entity::class;
         }
 
-        if (! isset($this->entityLocatorCache[$model->name])) {
+        if (! isset($this->entityLocatorCache[$model->name()])) {
             list($namespace, ) = namespaceSplit(get_class($model));
-            $entityClass = $namespace . '\Entity\\' . $model->name ;
+            $entityClass = $namespace . '\Entity\\' . $model->name() ;
             if (! class_exists($entityClass)) {
                 $entityClass = Entity::class;
             }
-            $this->entityLocatorCache[$model->name] = $entityClass;
+            $this->entityLocatorCache[$model->name()] = $entityClass;
         }
       
-        return $this->entityLocatorCache[$model->name];
+        return $this->entityLocatorCache[$model->name()];
     }
 }

@@ -26,7 +26,7 @@ class GenerateCommandTest extends OriginTestCase
         /**
          * Run the generator on the bookmarks app and test its all working as accepted before changing Hashes
          */
-        $this->assertFileHash('2fcc05c2304c96b23fc71eae78843d2d', SRC . DS . 'Model' . DS . 'Bookmark.php');
+        $this->assertFileHash('06aafa6e7d30699ef9556987af8f34d3', SRC . DS . 'Model' . DS . 'Bookmark.php');
         unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
        
         $this->assertFileHash('ae4389221897c48b12d35b3755969059', SRC . DS .'Http'. DS . 'Controller' . DS . 'BookmarksController.php');
@@ -235,7 +235,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('app/Http/Controller/DummiesController.php');
         $this->assertFileExists($filename);
        
-        $this->assertFileHash('69c8ad23b08462259fb7434535e24bdc', $filename);
+        $this->assertFileHash('f5639a37bf302e2f0446a4ee4d9e6d54', $filename);
         unlink($filename);
 
         $filename = SRC.DS.'Http'.DS.'View'.DS.'Dummies'.DS .'index.ctp';
@@ -254,7 +254,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('tests/TestCase/Http/Controller/DummiesControllerTest.php');
         $this->assertFileExists($filename);
       
-        $this->assertFileHash('363f2f242d21c2a471653bd878243e7f', $filename);
+        $this->assertFileHash('ff02f4dabb3f0d9b19fc218231da2e3e', $filename);
         unlink($filename);
     }
 
@@ -317,7 +317,7 @@ class GenerateCommandTest extends OriginTestCase
         $filename = SRC.DS.'Model'.DS.'Dummy.php';
         $this->assertOutputContains('app/Model/Dummy.php');
         $this->assertFileExists($filename);
-        $this->assertFileHash('a1e3b0f0ea829c309dacd37d15b7f101', $filename);
+        $this->assertFileHash('cd97ee7d7e95e8860a034c2902b77413', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'DummyTest.php';
@@ -443,7 +443,7 @@ class GenerateCommandTest extends OriginTestCase
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'src'.DS.'Model'.DS.'DummyApplicationModel.php';
         $this->assertFileExists($filename);
-        $this->assertFileHash('fda67d202cc1cd6ea520661fc3f0740c', $filename);
+        $this->assertFileHash('bfe134b484d8f8e9446191c76cc2c5b0', $filename);
 
         $filename = APP.DS.'plugins'.DS.'dummy'.DS.'config'.DS.'routes.php';
         $this->assertFileExists($filename);

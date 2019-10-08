@@ -36,6 +36,11 @@ class MockModelRegistry extends ModelRegistry
 class MockModel extends Model
 {
     use TestTrait;
+
+    public function connectionName()
+    {
+        return $this->connection;
+    }
 }
 
 class ModelRegistryTest extends \PHPUnit\Framework\TestCase
@@ -93,7 +98,7 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
         $config = ['connection' => 'testGetConfig'];
         MockModelRegistry::config('Origin\Test\Model\MockModel', $config);
         $MockModel = MockModelRegistry::get('Origin\Test\Model\MockModel');
-        $this->assertEquals('testGetConfig', $MockModel->connection);
+        $this->assertEquals('testGetConfig', $MockModel->connectionName());
         $this->assertNull(MockModelRegistry::config('Foo'));
 
         $this->expectException(Exception::class);

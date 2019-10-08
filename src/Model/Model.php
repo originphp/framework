@@ -248,14 +248,11 @@ class Model
     public function __get(string $name)
     {
         if ($name === 'displayField') {
-            $this->displayField = $this->detectDisplayField();
-
-            return $this->displayField;
+            return $this->displayField = $this->detectDisplayField();
         }
         if (isset($this->$name) and $this->$name instanceof Model) {
             return $this->$name;
         }
-
         return null;
     }
 
@@ -563,10 +560,7 @@ class Model
      */
     protected function processSave(Entity $entity, ArrayObject $options) : bool
     {
-        $this->id = null;
-        if ($entity->has($this->primaryKey)) {
-            $this->id = $entity->{$this->primaryKey};
-        }
+        $this->id = $entity->get($this->primaryKey);
     
         $exists = $this->exists($this->id);
         $entity->exists($exists);
@@ -1290,7 +1284,7 @@ class Model
     /**
      * Returns the current connection for this model
      *
-     * @return \Origin\Model\Datasource
+     * @return \Origin\Model\Connection
      */
     public function connection() : Connection
     {
@@ -1675,5 +1669,56 @@ class Model
                 $this->triggerCallback('afterRollback', $event, [$entity, $options], false);
             }
         }
+    }
+
+    /**
+     * Gets the table name for this Model
+     *
+     * @return string
+     */
+    public function table() : string
+    {
+        return $this->table;
+    }
+
+    /**
+     * Gets the name of this Model
+     *
+     * @return string
+     */
+    public function name() : string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Gets the alias for this Model
+     *
+     * @return string
+     */
+    public function alias() : string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Returns the ID of the record that is being saved, deleted or that has just
+     * been created.
+     *
+     * @return int|string|null
+     */
+    public function id()
+    {
+        return $this->id;
+    }
+
+    public function primaryKey() : string
+    {
+        return $this->primaryKey;
+    }
+
+    public function displayField() : string
+    {
+        return $this->displayField;
     }
 }

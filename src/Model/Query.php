@@ -42,7 +42,7 @@ class Query
         $query = (array) $query;
         
         $connection = $this->model->connection();
-        $connection->select($this->model->table, $query + ['alias' => Inflector::tableName($this->model->alias)]);
+        $connection->select($this->model->table(), $query + ['alias' => Inflector::tableName($this->model->alias())]);
 
         if ($type === 'list') {
             return $connection->fetchList();
@@ -64,7 +64,7 @@ class Query
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
-            $results = new Collection($results, ['name' => $this->model->alias]);
+            $results = new Collection($results, ['name' => $this->model->alias()]);
         }
 
         unset($sql, $connection);
@@ -85,7 +85,7 @@ class Query
     {
         $buffer = [];
 
-        $alias = Inflector::tableName($this->model->alias);
+        $alias = Inflector::tableName($this->model->alias());
 
         $belongsTo = $this->model->association('belongsTo');
         $hasOne = $this->model->association('hasOne');
@@ -95,7 +95,7 @@ class Query
         foreach ($results as $record) {
             $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
             
-            $entity = new $entityClass($thisData, ['name' => $this->model->alias, 'exists' => true, 'markClean' => true]);
+            $entity = new $entityClass($thisData, ['name' => $this->model->alias(), 'exists' => true, 'markClean' => true]);
             unset($record[$alias]);
 
             foreach ($record as $tableAlias => $data) {
@@ -110,13 +110,13 @@ class Query
                     $foreignKey = null;
                     if (isset($belongsTo[$model])) {
                         $foreignKey = $belongsTo[$model]['foreignKey'];
-                        $primaryKey = $this->model->{$model}->primaryKey;
+                        $primaryKey = $this->model->$model->primaryKey();
                         if (empty($entity->{$foreignKey}) or empty($data[$primaryKey])) {
                             continue;
                         }
                     } elseif (isset($hasOne[$model])) {
                         $foreignKey = $hasOne[$model]['foreignKey'];
-                        $primaryKey = $this->model->primaryKey;
+                        $primaryKey = $this->model->primaryKey();
                         if (empty($entity->{$primaryKey}) or empty($data[$foreignKey])) {
                             continue;
                         }
@@ -159,7 +159,7 @@ class Query
                 $property = lcfirst($model);
                 foreach ($results as &$result) {
                     if (isset($result->$foreignKey)) {
-                        $config['conditions'] = [$this->model->{$model}->primaryKey => $result->{$foreignKey}];
+                        $config['conditions'] = [$this->model->{$model}->primaryKey() => $result->{$foreignKey}];
                         $result->$property = $this->model->{$model}->find('first', $config);
                     }
                 }
@@ -184,12 +184,12 @@ class Query
             if (isset($config['associated']) and isset($hasOne[$model])) {
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
-                $primaryKey = $this->model->{$model}->primaryKey;
+                $primaryKey = $this->model->{$model}->primaryKey();
                 $modelTableAlias = Inflector::tableName($model);
                 foreach ($results as &$result) {
-                    if (isset($result->{$this->model->primaryKey})) { // Author id
+                    if (isset($result->{$this->model->primaryKey()})) { // Author id
                         $config['conditions'] = $hasOne[$model]['conditions'];
-                        $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey}];
+                        $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey()}];
                         $result->$property = $this->model->{$model}->find('first', $config);
                     }
                 }
@@ -219,9 +219,9 @@ class Query
                 }
 
                 foreach ($results as $index => &$result) {
-                    if (isset($result->{$this->model->primaryKey})) {
+                    if (isset($result->{$this->model->primaryKey()})) {
                         $tableAlias = Inflector::tableName($alias);
-                        $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey};
+                        $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
                         $models = Inflector::plural(Inflector::camelCase($alias));
                         $result->{$models} = $this->model->{$alias}->find('all', $config);
                     }
@@ -258,9 +258,9 @@ class Query
                 }
 
                 foreach ($results as $index => &$result) {
-                    if (isset($result->{$this->model->primaryKey})) {
+                    if (isset($result->{$this->model->primaryKey()})) {
                         $withAlias = Inflector::tableName($config['with']);
-                        $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey};
+                        $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
                     }
 
                     $models = Inflector::plural(Inflector::camelCase($alias));
