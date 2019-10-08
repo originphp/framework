@@ -197,6 +197,7 @@ class Html
             case 'h4':
             case 'h5':
             case 'h6':
+
                 $repeat = '=';
                 if ($tag->tagName !== 'h1') {
                     $repeat = '-';
@@ -211,17 +212,18 @@ class Html
                 $tag->nodeValue = null;
 
                 break;
-            case 'li':
-                if ($tag->hasChildNodes()) {
-                    foreach ($tag->childNodes as $child) {
-                        if (in_array($child->nodeName, ['ul','ol'])) {
-                            static::processTag($child, $doc);
+                case 'li':
+                    if ($tag->hasChildNodes()) {
+                        foreach ($tag->childNodes as $child) {
+                            if (in_array($child->nodeName, ['ul','ol'])) {
+                                static::processTag($child, $doc);
+                            }
                         }
                     }
-                }
                 break;
 
             case 'img':
+   
                 $alt = '';
                 if ($tag->hasAttribute('alt')) {
                     $alt = $tag->getAttribute('alt') . ' ';
@@ -273,6 +275,7 @@ class Html
 
                 break;
             case 'ul':
+         
                 $lineBreak = PHP_EOL;
                 $indent = static::getIndentLevel($tag);
                 $pre = str_repeat(' ', $indent);

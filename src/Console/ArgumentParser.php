@@ -262,13 +262,13 @@ class ArgumentParser
                 $type = $this->arguments[$name]['type'];
                 $max = count($args);
                 if ($type === 'array') {
-                    for ($i = $key; $i < $max; $i++) {
+                    for ($i = $key;$i < $max;$i++) {
                         $values[] = $args[$i];
                     }
                     $arguments[$name] = $values;
                     break;
                 } elseif ($type === 'hash') {
-                    for ($i = $key; $i < $max; $i++) {
+                    for ($i = $key;$i < $max;$i++) {
                         if (strpos($args[$i], ':') !== false) {
                             list($k, $v) = explode(':', $args[$i]);
                             $values[$k] = $v;

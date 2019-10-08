@@ -533,7 +533,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         # Create Dummy Data
         $Pet = new Pet();
         ModelRegistry::set('Pet', $Pet);
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0;$i < 100;$i++) {
             $Pet->save($Pet->new(['name' => 'Pet' . $i]));
         }
         

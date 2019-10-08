@@ -91,7 +91,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
       
         ModelRegistry::set('Pet', $this->Pet);
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0;$i < 100;$i++) {
             $this->Pet->save($this->Pet->new(['owner_id' => $i + 1000, 'name' => 'Pet' . $i]));
         }
     }

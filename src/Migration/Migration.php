@@ -649,7 +649,7 @@ class Migration
                     $options['column'],
                     $options['name'],
                     ['unique' => ($index['type'] === 'unique')]
-                );
+                    );
             }
         }
     }

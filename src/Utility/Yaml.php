@@ -116,7 +116,7 @@ class YamlParser
         
         $start = null;
         
-        for ($w = $from; $w < $lines; $w++) {
+        for ($w = $from;$w < $lines;$w++) {
             $marker = ltrim($this->lines[$w]);
             if ($marker[0] === '-') {
                 if ($start !== null) {
@@ -152,7 +152,7 @@ class YamlParser
      
         $spaces = $lastSpaces = 0;
     
-        for ($i = $lineNo; $i < $lines; $i++) {
+        for ($i = $lineNo;$i < $lines;$i++) {
             $line = $this->lines[$i];
             $marker = trim($line);
        
@@ -184,7 +184,7 @@ class YamlParser
                     continue; // Skip if there is no parent
                 }
                 $block = trim($line);
-                for ($w = $i + 1; $w < $lines; $w++) {
+                for ($w = $i + 1;$w < $lines;$w++) {
                     $nextLine = trim($this->lines[$w]);
                     if (! $this->isList($nextLine) and ! $this->isScalar($nextLine) and ! $this->isParent($nextLine)) {
                         $block .= ' ' . $nextLine; // In the plain scalar,newlines become spaces
@@ -211,7 +211,7 @@ class YamlParser
                     $break = ' ';
                 }
  
-                for ($w = $i + 1; $w < $lines; $w++) {
+                for ($w = $i + 1;$w < $lines;$w++) {
                     $nextLine = trim($this->lines[$w]);
 
                     // Handle multilines which are on the last lastline
@@ -246,7 +246,7 @@ class YamlParser
                     $sets = $this->findRecordSets($i);
                     foreach ($sets as $start => $finish) {
                         $setLines = [];
-                        for ($ii = $start; $ii < $finish + 1; $ii++) {
+                        for ($ii = $start;$ii < $finish + 1;$ii++) {
                             $setLine = $this->lines[$ii];
                        
                             if ($ii === $start) {

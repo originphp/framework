@@ -207,7 +207,7 @@ class PgsqlSchema extends BaseSchema
             $this->quoteIdentifier($attributes['name']),
             $this->quoteIdentifier($attributes['table']),
             implode(', ', (array) $attributes['column'])
-        );
+     );
     }
 
     /**
@@ -397,7 +397,7 @@ class PgsqlSchema extends BaseSchema
             'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = %s AND  tc.table_name = %s AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'',
             $this->schemaValue($this->connection()->database()),
             $this->schemaValue($table)
-        );
+         );
         $out = [];
 
         foreach ($this->fetchAll($sql) as $result) {

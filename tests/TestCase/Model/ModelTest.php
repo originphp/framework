@@ -829,11 +829,11 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(
             'ingredient_id',
             $Ingredient->hasAndBelongsToMany['Recipe']['foreignKey']
-        );
+      );
         $this->assertEquals(
             'recipe_id',
             $Ingredient->hasAndBelongsToMany['Recipe']['associationForeignKey']
-        );
+      );
     }
 
     public function testFindFirst()
@@ -1809,7 +1809,7 @@ class ModelTest extends OriginTestCase
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions' => ['article_id' => 1000]])); // did not delete
         $this->assertNotEquals($tags, $this->Article->ArticlesTag->find('count', ['conditions' => ['article_id' => 1000]])); // Delete always
      
-        $this->Article->hasMany('Comment', ['dependent' => true]);
+       $this->Article->hasMany('Comment', ['dependent' => true]);
         $article = $this->Article->get(1002, ['associated' => ['Comment','Tag']]);
         $this->assertGreaterThan(0, count($article->comments));
         $this->assertTrue($this->Article->delete($article));

@@ -48,7 +48,7 @@ class Marshaller
                 $map[lcfirst($alias)] = 'one';
             }
         }
-        foreach (array_merge($model->association('hasMany'), $model->association('hasAndBelongsToMany')) as $alias => $config) {
+        foreach (array_merge($model->association('hasMany'), $model->association('hasAndBelongsToMany')) as  $alias => $config) {
             if (in_array($alias, $associated)) {
                 $key = Inflector::plural(lcfirst($alias));
                 $map[$key] = 'many';

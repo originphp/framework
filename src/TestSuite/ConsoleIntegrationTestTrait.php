@@ -116,7 +116,7 @@ trait ConsoleIntegrationTestTrait
                 ->method('read')
                 ->will(
                     $this->returnValue($data)
-                );
+            );
             ++$x;
         }
 

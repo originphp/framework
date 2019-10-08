@@ -373,6 +373,7 @@ class Markdown
                 $tag->nodeValue = PHP_EOL;
                 break;
             case 'code':
+
                 if (strpos($tag->nodeValue, PHP_EOL) !== false) {
                     // multiline
                     $tag->nodeValue = PHP_EOL . '```' . PHP_EOL . $value . PHP_EOL . '```'  . PHP_EOL;
@@ -436,6 +437,7 @@ class Markdown
                 $tag->nodeValue = PHP_EOL . $value . PHP_EOL;
                 break;
             case 'table':
+
                 $data = [];
                 $headers = false;
                 foreach ($tag->getElementsByTagName('tr') as $node) {

@@ -26,8 +26,8 @@ declare(strict_types = 1);
  * Tell the Autoloader where to find files for namespaces that you will use.
  *
  *  $autoloader->addNamespaces(array(
- *      'App' => 'src',
- *      'Origin' => 'origin/src/'
+ *  	'App' => 'src',
+ *  	'Origin' => 'origin/src/'
  *  ));
  *
  * $autoloader->register();
@@ -126,7 +126,7 @@ class Autoloader
      * Add base directories for namespace prefixes.
      *
      *  $Autoloader->addNamespaces(array(
-     *      'Origin' => 'origin/src/'
+     *     	'Origin' => 'origin/src/'
      *      'Origin\\Test' => 'origin/tests/'
      *    ));
      *

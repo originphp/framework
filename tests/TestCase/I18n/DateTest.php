@@ -125,7 +125,7 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             '2018-12-27',
             Date::parse('12/27/2018', [IntlDateFormatter::SHORT, IntlDateFormatter::NONE])
-        );
+            );
 
         $this->assertEquals('07:50:00', Date::parse('7:50 AM', [IntlDateFormatter::NONE, IntlDateFormatter::SHORT]));
     
