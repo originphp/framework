@@ -18,7 +18,7 @@ use Origin\Job\Job;
 
 class ListenerJob extends Job
 {
-    public $queue = 'listeners';
+    protected $queue = 'listeners';
 
     public function execute(string $className, string $method, array $args = [])
     {

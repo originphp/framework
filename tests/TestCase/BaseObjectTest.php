@@ -19,10 +19,14 @@ use Origin\Http\Controller\Controller;
 
 class ValueObject extends BaseObject
 {
-    public $controller;
+    protected $controller;
     public function initialize(Controller $controller)
     {
         $this->controller = $controller;
+    }
+    public function controller()
+    {
+        return $this->controller;
     }
 }
 
@@ -32,6 +36,6 @@ class BaseObjectTest extends \PHPUnit\Framework\TestCase
     {
         $controller = new Controller();
         $simpleObject = new ValueObject($controller);
-        $this->assertInstanceOf(Controller::class, $simpleObject->controller);
+        $this->assertInstanceOf(Controller::class, $simpleObject->controller());
     }
 }

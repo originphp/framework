@@ -23,7 +23,7 @@ class AnotherDemoMailer extends Mailer
 {
     use TestTrait;
 
-    public $defaults = [
+    protected $defaults = [
         'from' => 'no-reply@example.com',
     ];
     
@@ -42,7 +42,7 @@ class AnotherDemoMailer extends Mailer
 
 class MailerJobTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
 
     /**
      * Test add to queue

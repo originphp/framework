@@ -343,7 +343,7 @@ class Job
     }
 
     /**
-     * Schedules a job using wait
+     * Schedules a job using wait and returns this (chainable)
      *
      * @param string $strtotime a strtotime compatiable string e.g '+5 hours' ,'2020-01-01 10:40:00'
      * @return \Origin\Job\Job

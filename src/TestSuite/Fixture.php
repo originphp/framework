@@ -32,26 +32,26 @@ class Fixture
      *
      * @var string
      */
-    public $table = null;
+    protected $table = null;
 
     /**
      * Records to insert
      *
      * @var array
      */
-    public $records = [];
+    protected $records = [];
 
     /**
      * Drops and recreates tables between tests. Default behavior is always drop tables.
      * @var bool
      */
-    public $dropTables = true;
+    protected $dropTables = true;
 
 
     /**
     * Use this to create a custom table, using the information retreived from Model:describe('table');
     * example:
-    * public $schema = [
+    * protected $schema = [
     *        'columns' => [
     *            'id' => ['type' => 'integer','autoIncrement' => true],
     *            'author_id' => ['type' => 'integer'],
@@ -71,7 +71,7 @@ class Fixture
     *    ];
     * @var array
     */
-    public $schema = [];
+    protected $schema = [];
 
     public function __construct()
     {
@@ -104,9 +104,9 @@ class Fixture
     /**
      * Creates the table.
      *
-     * @return bool true or false
+     * @return void
      */
-    public function create() : bool
+    public function create() : void
     {
         $connection = ConnectionManager::get('test');
         $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
@@ -114,8 +114,6 @@ class Fixture
         foreach ($table->toSql($connection) as $statement) {
             $connection->execute($statement);
         }
-       
-        return true; // Backwards compatability
     }
 
     /**
@@ -156,5 +154,15 @@ class Fixture
         $sql = $connection->adapter()->truncateTableSql($this->table);
 
         return $connection->execute($sql);
+    }
+
+    /**
+     * Gets the drop tables flag
+     *
+     * @return boolean
+     */
+    public function dropTables() : bool
+    {
+        return $this->dropTables;
     }
 }

@@ -26,7 +26,7 @@ class PassOrFailJob extends Job
 {
     use TestTrait;
     
-    public $connection = 'default';
+    protected $connection = 'default';
 
     public function initialize() : void
     {
@@ -57,12 +57,12 @@ class PassOrFailJob extends Job
 }
 class PassOrFailRedis extends PassOrFailJob
 {
-    public $connection = 'redis-test';
+    protected $connection = 'redis-test';
 }
 
 class JobTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
 
     public function setUp() : void
     {

@@ -8,7 +8,7 @@ class DbSeedCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Post'];
+    protected $fixtures = ['Origin.Post'];
   
     public function testExecute()
     {

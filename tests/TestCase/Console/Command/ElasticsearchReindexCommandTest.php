@@ -15,7 +15,7 @@ class Article extends Model
 
 class ElasticsearchReindexCommandTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article'];
+    protected $fixtures = ['Origin.Article'];
 
     use ConsoleIntegrationTestTrait;
 

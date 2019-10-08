@@ -18,7 +18,7 @@ use Origin\Job\Job;
 
 class MailerJob extends Job
 {
-    public $queue = 'mailers';
+    protected $queue = 'mailers';
     
     public function execute(array $params) : void
     {

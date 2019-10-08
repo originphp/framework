@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class TagFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'title' => ['type' => 'string'],
@@ -30,7 +30,7 @@ class TagFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1000,
             'title' => 'Tag #1',

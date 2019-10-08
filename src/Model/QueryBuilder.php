@@ -170,7 +170,7 @@ class QueryBuilder
      *
      * @var string
      */
-    public $placeholder = null;
+    protected $placeholder = null;
 
     /**
      * Placeholder counter
@@ -185,7 +185,7 @@ class QueryBuilder
      *
      * @var string
      */
-    public $escape = '`';
+    protected $escape = '`';
 
     /**
      * List of operators

@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class AddressFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'author_id' => ['type' => 'integer'],
@@ -31,7 +31,7 @@ class AddressFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1000,
             'author_id' => 1003,

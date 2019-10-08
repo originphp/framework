@@ -18,7 +18,7 @@ Summary of what has changed:
     - changed Middleware callbacks and design
     - Migrations store version in db as biginteger
 
-4. Added strict types and return types.
+4. Added strict types,return types any public properties have been changed to protected
 
 5. Added some new features like custom Entity classes with mutators and accessors
 

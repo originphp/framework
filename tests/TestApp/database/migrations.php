@@ -10,7 +10,7 @@ class MigrationsSchema extends Schema
      *
      * @var array
      */
-    public $migrations = [
+    protected $migrations = [
         'columns' => [
             'id' => ['type' => 'integer', 'limit' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'autoIncrement' => true],
             'version' => ['type' => 'integer', 'limit' => 14, 'null' => false, 'default' => null],

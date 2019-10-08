@@ -29,7 +29,7 @@ abstract class BaseSchema
      *
      * @var string
      */
-    public $datasource = null;
+    protected $datasource = null;
 
     /**
      * Holds the column mapping information

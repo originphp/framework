@@ -23,9 +23,9 @@ class DemoMailer extends Mailer
 {
     use TestTrait;
 
-    public $layout = false;
+    protected $layout = false;
     
-    public $defaults = [
+    protected $defaults = [
         'from' => 'no-reply@example.com',
     ];
     /**
@@ -48,7 +48,7 @@ class DemoMailer extends Mailer
 
 class MailerTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
     public function testDispatch()
     {
         $mailer = new DemoMailer();

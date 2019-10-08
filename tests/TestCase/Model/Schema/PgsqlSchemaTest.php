@@ -20,7 +20,7 @@ use Origin\TestSuite\OriginTestCase;
 
 class PgsqlSchemaTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
+    protected $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
 
     public function testCreateTableColumns()
     {

@@ -25,9 +25,9 @@ class Movie extends Model
 
 class MovieFixture extends Fixture
 {
-    public $table = 'movies';
+    protected $table = 'movies';
 
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => [
@@ -54,7 +54,7 @@ class MovieFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1,
             'name' => 'The Godfather',
@@ -77,6 +77,11 @@ class MovieFixture extends Fixture
             'modified' => '2019-02-10 08:17:00',
         ],
     ];
+
+    public function table()
+    {
+        return $this->table;
+    }
 }
 
 class FixtureTest extends \PHPUnit\Framework\TestCase
@@ -89,12 +94,12 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testConstruct()
     {
         $fixture = new MovieFixture();
-        $this->assertEquals('movies', $fixture->table);
+        $this->assertEquals('movies', $fixture->table());
     }
     public function testCreate()
     {
         $fixture = new MovieFixture();
-        $this->assertTrue($fixture->create());
+        $this->assertNull($fixture->create());
     }
     /**
      * @dpends testCreate
@@ -107,8 +112,8 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture->create();
         $this->assertNull($fixture->insert());
 
-        $model = new Movie();
-        $model->connection = 'test';
+        $model = new Movie(['connection'=>'test']);
+       
         $this->assertEquals(3, $model->find('count'));
     }
 

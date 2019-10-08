@@ -10,7 +10,7 @@ class GenerateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
+    protected $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
 
     public function testScaffoldUnkownModel()
     {

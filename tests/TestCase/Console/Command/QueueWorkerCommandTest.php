@@ -7,7 +7,7 @@ use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class PassOrFailJob extends Job
 {
-    public $connection = 'test';
+    protected $connection = 'test';
 
     public function execute(bool $pass = true)
     {
@@ -25,7 +25,7 @@ class QueueWorkerCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
     
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
 
     public function testRunNothingInQueue()
     {

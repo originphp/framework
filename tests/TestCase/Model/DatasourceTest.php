@@ -23,7 +23,7 @@ use Origin\Model\Exception\DatasourceException;
 
 class DatasourceTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Author','Origin.Article'];
+    protected $fixtures = ['Origin.Author','Origin.Article'];
     
     protected function setUp(): void
     {

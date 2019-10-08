@@ -80,7 +80,7 @@ class MembersController extends Controller
 
 class AuthComponentTest extends OriginTestCase
 {
-    public $fixtures = ['Framework.User'];
+    protected $fixtures = ['Framework.User'];
     protected function setUp(): void
     {
         $request = new Request('/users/login');

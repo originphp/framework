@@ -53,7 +53,7 @@ class SftpEngineTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public $engine = null;
+    protected $engine = null;
 
     public function engine()
     {

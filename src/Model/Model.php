@@ -39,21 +39,21 @@ class Model
      *
      * @var string
      */
-    public $name = null;
+    protected $name = null;
 
     /**
      * The alias name for this model, again this generated automatically
      *
      * @var string
      */
-    public $alias = null;
+    protected $alias = null;
 
     /**
      * This is the Database connection to used by this model.
      *
      * @var string
      */
-    public $connection = 'default';
+    protected $connection = 'default';
 
     /**
      * This is the table name for the model this will be generated automatically
@@ -61,7 +61,7 @@ class Model
      *
      * @var string
      */
-    public $table = null;
+    protected $table = null;
 
     /**
      * Each table should have a primary key and it should be id, because
@@ -70,7 +70,7 @@ class Model
      * 3. it might get confusing later
      * @var string
      */
-    public $primaryKey = null;
+    protected $primaryKey = null;
 
     /**
      * This is the main field on the model, for a contact, it would be contact_name. Things
@@ -78,7 +78,7 @@ class Model
      *
      * @var string
      */
-    public $displayField = null;
+    protected $displayField = null;
 
     /**
      * Default order to used when finding.
@@ -88,7 +88,7 @@ class Model
      *
      * @var string|array
      */
-    public $order = null;
+    protected $order = null;
 
     /**
      * The ID of the last record created, updated, or deleted. When saving
@@ -96,7 +96,7 @@ class Model
      *
      * @var mixed
      */
-    public $id = null;
+    protected $id = null;
 
     /**
      * belongsTo keys className, foreignKey, conditions, fields, order).

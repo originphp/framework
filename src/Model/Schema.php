@@ -93,4 +93,15 @@ class Schema
         
         return $out;
     }
+
+    /**
+     * Gets the schema for a table
+     *
+     * @param string $table
+     * @return array|null
+     */
+    public function schema(string $table) : ?array
+    {
+        return $this->$table ?? null;
+    }
 }

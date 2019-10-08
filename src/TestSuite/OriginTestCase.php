@@ -30,7 +30,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      *
      * @var array
      */
-    public $fixtures = [];
+    protected $fixtures = [];
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
@@ -122,5 +122,19 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     protected function tearDown() : void
     {
         $this->shutdown();
+    }
+
+    /**
+     * Getter and setter for fixtures
+     *
+     * @param array $fixtures
+     * @return array
+     */
+    public function fixtures(array $fixtures = null) : array
+    {
+        if ($fixtures === null) {
+            return $this->fixtures;
+        }
+        return $this->fixtures = $fixtures;
     }
 }

@@ -62,9 +62,9 @@ class RedisEngine extends BaseEngine
         $when = strtotime($strtotime);
 
         if ($when <= time()) {
-            $status = $this->Redis->rpush('queue:'. $job->queue, $serialized);
+            $status = $this->Redis->rpush('queue:'. $job->queue(), $serialized);
         } else {
-            $status = $this->Redis->zadd('scheduled:' . $job->queue, $when, $serialized);
+            $status = $this->Redis->zadd('scheduled:' . $job->queue(), $when, $serialized);
         }
   
         return ! ($status < 1);
@@ -95,11 +95,11 @@ class RedisEngine extends BaseEngine
     {
         $serialized = $this->serialize($job);
   
-        if ($this->Redis->lrem('queue:'. $job->queue, $serialized) > 0) {
+        if ($this->Redis->lrem('queue:'. $job->queue(), $serialized) > 0) {
             return true;
         }
 
-        if ($this->Redis->lrem('scheduled:'. $job->queue, $serialized) > 0) {
+        if ($this->Redis->lrem('scheduled:'. $job->queue(), $serialized) > 0) {
             return true;
         }
 

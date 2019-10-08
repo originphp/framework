@@ -27,7 +27,7 @@ use Origin\Model\ConnectionManager;
 
 class PgsqlSchema extends BaseSchema
 {
-    public $typeMap = [
+    protected $typeMap = [
         'string' => 'VARCHAR',
         'text' => 'TEXT',
         'integer' => 'INTEGER',

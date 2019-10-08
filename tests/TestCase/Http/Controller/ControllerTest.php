@@ -30,7 +30,7 @@ use Origin\Http\Controller\Component\Exception\MissingComponentException;
 
 class Pet extends Model
 {
-    public $connection = 'test';
+    protected $connection = 'test';
 }
 
 class TesterComponent extends Component
@@ -51,7 +51,7 @@ class MockPaginator
 
 class TestsController extends Controller
 {
-    public $initialized = false;
+    protected $initialized = false;
 
     public function action()
     {
@@ -155,7 +155,7 @@ class FruitComponent extends Component
 
 class ControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public $controller = null;
+    protected $controller = null;
 
     protected function setUp(): void
     {

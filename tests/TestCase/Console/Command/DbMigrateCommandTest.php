@@ -9,7 +9,7 @@ class DbMigrateCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Migration'];
+    protected $fixtures = ['Origin.Migration'];
 
     protected function tearDown() : void
     {

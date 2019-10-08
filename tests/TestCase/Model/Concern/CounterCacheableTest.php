@@ -44,7 +44,7 @@ class Reply extends Model
 
 class CounterCacheableTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.CounterCachePost','Origin.CounterCacheReply'];
+    protected $fixtures = ['Origin.CounterCachePost','Origin.CounterCacheReply'];
 
     protected function setUp(): void
     {

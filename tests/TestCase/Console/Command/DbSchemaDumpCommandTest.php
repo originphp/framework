@@ -10,7 +10,7 @@ class DbSchemaDumpCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Post'];
+    protected $fixtures = ['Origin.Post'];
 
     protected function deleteFile(string $filename)
     {

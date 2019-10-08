@@ -19,9 +19,9 @@ use Origin\TestSuite\OriginTestCase;
 
 class RedisPassOrFailJob extends Job
 {
-    public $connection = 'redis-test';
+    protected $connection = 'redis-test';
 
-    public $queue = 'test';
+    protected $queue = 'test';
 
     public function execute(bool $pass = true)
     {

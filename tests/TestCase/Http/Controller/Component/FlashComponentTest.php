@@ -25,7 +25,7 @@ class MockFlashComponent extends FlashComponent
 
 class ApplesController extends Controller
 {
-    public $autoRender = false;
+    protected $autoRender = false;
 
     public function index()
     {

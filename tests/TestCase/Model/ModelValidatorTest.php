@@ -44,7 +44,7 @@ class MockValidator extends ModelValidator
 
 class ModelValidatorTest extends OriginTestCase
 {
-    public $fixtures = ['Framework.Article'];
+    protected $fixtures = ['Framework.Article'];
 
     protected function setUp(): void
     {

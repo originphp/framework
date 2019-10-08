@@ -26,17 +26,17 @@ use Origin\Http\Controller\Component\PaginatorComponent;
 
 class Pet extends Model
 {
-    public $connection = 'test';
+    protected $connection = 'test';
 }
 
 class Owner extends Model
 {
-    public $connection = 'test';
+    protected $connection = 'test';
 }
 
 class PetsController extends Controller
 {
-    public $autoRender = false;
+    protected $autoRender = false;
     public function index()
     {
     }

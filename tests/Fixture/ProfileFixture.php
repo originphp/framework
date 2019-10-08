@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class ProfileFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'user_id' => ['type' => 'integer'],
@@ -31,7 +31,7 @@ class ProfileFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1000,
             'user_id' => 1002,

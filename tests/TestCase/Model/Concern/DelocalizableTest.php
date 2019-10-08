@@ -24,12 +24,12 @@ use Origin\Model\Concern\Delocalizable;
 class Deal extends Model
 {
     use Delocalizable;
-    public $connection = 'test';
+    protected $connection = 'test';
 }
 
 class DelocalizeTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Deal'];
+    protected $fixtures = ['Origin.Deal'];
 
     /**
      * Deal model

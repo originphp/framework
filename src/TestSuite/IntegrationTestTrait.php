@@ -179,11 +179,8 @@ trait IntegrationTestTrait
         if ($this->controller === null) {
             $this->fail('No request');
         }
-        if (isset($this->controller->viewVars[$key])) {
-            return $this->controller->viewVars[$key];
-        }
-
-        return null;
+        $viewVars = $this->controller->viewVars();
+        return $viewVars[$key] ?? null;
     }
 
     /**

@@ -9,7 +9,7 @@ class DbRollbackCommandTest extends OriginTestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public $fixtures = ['Origin.Migration'];
+    protected $fixtures = ['Origin.Migration'];
 
     public function testRollback()
     {

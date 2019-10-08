@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class BookmarkFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'user_id' => [

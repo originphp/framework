@@ -45,12 +45,12 @@ class MockView extends View
 {
     use TestTrait; // add invokeMethod
 
-    public $mockFiles = [];
+    protected $mockFiles = [];
 
     /**
      * Used to overide files for testing rendering views etc.
      */
-    public $overideFiles = [];
+    protected $overideFiles = [];
 
     public function fileExists(string $filename) :bool
     {
@@ -60,6 +60,11 @@ class MockView extends View
     public function setFile(string $filename)
     {
         $this->mockFiles = [$filename];
+    }
+
+    public function overideFiles(array $files) : void
+    {
+        $this->overideFiles = $files;
     }
 
     protected function getElementFilename(string $name) : string
@@ -191,11 +196,11 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $view = new MockView($controller);
 
-        $view->overideFiles = [
+        $view->overideFiles([
             'layout' => ORIGIN.'/tests/TestCase/Http/View/layout.ctp',
             'edit' => ORIGIN.'/tests/TestCase/Http/View/action.ctp',
             'element' => ORIGIN.'/tests/TestCase/Http/View/element.ctp',
-        ];
+        ]);
 
         $view->set('title', 'Layout Loaded');
         $result = $view->callMethod('render', ['edit', 'layout']);

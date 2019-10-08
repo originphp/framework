@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class MigrationFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'version' => [

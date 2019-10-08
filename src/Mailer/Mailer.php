@@ -50,28 +50,28 @@ abstract class Mailer
      *   - replyTo: ['email'] or ['email'=>'name']
      * @var array
      */
-    public $defaults = [];
+    protected $defaults = [];
 
     /**
      * Email account to use
      *
      * @var string
      */
-    public $account = 'default';
+    protected $account = 'default';
 
     /**
      * The default format to use. Its best to send both html and text.
      *
      * @var string both,text,html
      */
-    public $format = 'both';
+    protected $format = 'both';
 
     /**
      * The layout to use for HTML emails
      *
      * @var string|bool
      */
-    public $layout = 'default';
+    protected $layout = 'default';
 
     /**
      * @var array

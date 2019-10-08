@@ -42,7 +42,7 @@ use Origin\Utility\Security;
  */
 class Article extends Model
 {
-    public $connection = 'test';
+    protected $connection = 'test';
 
     /**
      * This will used later
@@ -242,7 +242,7 @@ class Article extends Model
 
 class ModelTest extends OriginTestCase
 {
-    public $fixtures = [
+    protected $fixtures = [
         'Framework.Article',
         'Framework.ArticlesTag',
         'Framework.Author',
@@ -258,7 +258,7 @@ class ModelTest extends OriginTestCase
      *
      * @var \Origin\Model\Model;
      */
-    public $Article = null;
+    protected $Article = null;
 
     protected function setUp(): void
     {

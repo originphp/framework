@@ -53,7 +53,7 @@ abstract class Datasource
      *
      * @var string
      */
-    public $virtualFieldSeperator = '__';
+    protected $virtualFieldSeperator = '__';
 
     /**
      * Transaction Log.

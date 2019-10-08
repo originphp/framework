@@ -21,7 +21,7 @@ include_once 'EngineTestTrait.php'; // @todo recreate test with providers maybe
 class LocalEngineTest extends \PHPUnit\Framework\TestCase
 {
     use EngineTestTrait;
-    public $engine = null;
+    protected $engine = null;
 
     public function engine()
     {

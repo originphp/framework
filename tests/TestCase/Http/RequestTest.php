@@ -21,7 +21,7 @@ use Origin\Http\Exception\MethodNotAllowedException;
 class MockRequest extends Request
 {
     use TestTrait;
-    public $input = null;
+    protected $input = null;
     public function setInput($input)
     {
         $this->input = $input;

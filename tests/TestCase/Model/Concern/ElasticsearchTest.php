@@ -31,7 +31,7 @@ class Article extends Model
 
 class ElasticsearchTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article'];
+    protected $fixtures = ['Origin.Article'];
 
     protected function setUp(): void
     {

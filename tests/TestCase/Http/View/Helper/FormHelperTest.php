@@ -40,7 +40,7 @@ class Widget extends Model
      *
      * @var array
      */
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer', 'limit' => 11,'key' => 'primary'],
             'name' => ['type' => 'string', 'limit' => 80],
@@ -71,7 +71,7 @@ class MockFormHelper extends FormHelper
 
 class FormHelperTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Post'];
+    protected $fixtures = ['Origin.Post'];
     
     protected function setUp(): void
     {

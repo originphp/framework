@@ -56,7 +56,7 @@ class MockPublisher extends Publisher
  */
 class PublisherTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.User','Origin.Queue'];
+    protected $fixtures = ['Origin.User','Origin.Queue'];
 
     public function startup() : void
     {

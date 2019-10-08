@@ -29,8 +29,8 @@ class User extends Model
 
 class LemonPie
 {
-    public $name = 'LemonPie';
-    public $options = [];
+    protected $name = 'LemonPie';
+    protected $options = [];
     public function __construct(array $options)
     {
         $this->options = $options;
@@ -39,11 +39,19 @@ class LemonPie
     {
         return true;
     }
+
+    public function options(array $options = null) : array
+    {
+        if ($options === null) {
+            return $this->options;
+        }
+        return $this->options = $options;
+    }
 }
 
 class StrawberyTart
 {
-    public $name = 'StrawberryTart';
+    protected $name = 'StrawberryTart';
     public function true()
     {
         return true;
@@ -73,7 +81,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->assertFalse($mock->true());
-        $this->assertEquals('20 mins', $mock->options['cookingTime']);
+        $this->assertEquals('20 mins', $mock->options()['cookingTime']);
     }
     
     public function testGetMockForModel()

@@ -39,7 +39,7 @@ class MockCookie extends Cookie
 
 class OrangesController extends Controller
 {
-    public $autoRender = false;
+    protected $autoRender = false;
 
     public function index()
     {

@@ -54,10 +54,10 @@ class DbMigrateCommand extends Command
 
         # Dynamically Create Migration Model for CRUD
         $this->Migration = $this->loadModel('Migration', [
-            'className' => Migration::class
+            'className' => Migration::class,
+            'connection' => $this->options('connection')
             ]);
-        $this->Migration->connection = $this->options('connection');
-
+      
         $lastMigration = $this->lastMigration();
         if ($version === null or $version > $lastMigration) {
             $this->migrate($version);

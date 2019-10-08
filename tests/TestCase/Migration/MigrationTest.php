@@ -101,7 +101,7 @@ class MockMigration extends Migration
 
 class MigrationTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
+    protected $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
 
     public function adapter()
     {

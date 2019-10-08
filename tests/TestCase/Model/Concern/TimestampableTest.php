@@ -24,7 +24,7 @@ use Origin\Model\Entity;
 class AnotherArticle extends Model
 {
     use Timestampable;
-    public $table = 'articles';
+    protected $table = 'articles';
 
     public function runCallback(Entity $entity)
     {
@@ -34,7 +34,7 @@ class AnotherArticle extends Model
 
 class TimestampableTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article'];
+    protected $fixtures = ['Origin.Article'];
 
     public function startup() : void
     {

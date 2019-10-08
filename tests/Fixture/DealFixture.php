@@ -18,7 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class DealFixture extends Fixture
 {
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => [
