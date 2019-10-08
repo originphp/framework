@@ -252,7 +252,7 @@ class Model
 
             return $this->displayField;
         }
-        if (isset($this->$name)) {
+        if (isset($this->$name) and $this->$name instanceof Model) {
             return $this->$name;
         }
 
