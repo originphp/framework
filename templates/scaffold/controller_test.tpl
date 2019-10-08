@@ -12,7 +12,7 @@ class %controller%ControllerTest extends OriginTestCase
 {
     use IntegrationTestTrait;
 
-    public $fixtures = ['%model%'];
+    protected $fixtures = ['%model%'];
 
     protected function setUp(): void
     {

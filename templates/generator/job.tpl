@@ -9,7 +9,7 @@ class %class%Job extends ApplicationJob
     *
     * @var string
     */
-    public $queue = 'default';
+    protected $queue = 'default';
 
     /**
     * Default wait time before dispatching the job, this is a strtotime compatible
@@ -18,14 +18,14 @@ class %class%Job extends ApplicationJob
     * @example '+30 minutes'
     * @var string
     */
-    public $wait = null;
+    protected $wait = null;
 
     /**
     * The default timeout in seconds
     *
     * @var integer
     */
-    public $timeout = 60;
+    protected $timeout = 60;
 
     /**
     * This is called when the job is created for dispatching

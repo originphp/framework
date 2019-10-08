@@ -15,7 +15,7 @@ class PassOrFailJob extends Job
             $a = 1 / 0;
         }
     }
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
         $this->retry(['wait' => '+1 second','limit' => 1]);
     }

@@ -6,7 +6,7 @@ use %namespace%\Mailer\%class%Mailer;
 
 class %class%MailerTest extends OriginTestCase
 {
-    public $fixtures = ['User'];
+    protected $fixtures = ['User'];
 
     public function startup() : void
     {

@@ -8,7 +8,7 @@ use Origin\TestSuite\OriginTestCase;
  */
 class %class%Test extends OriginTestCase
 {
-    public $fixtures = ['%class%'];
+    protected $fixtures = ['%class%'];
 
     public function startup() : void
     {

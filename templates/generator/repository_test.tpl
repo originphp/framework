@@ -6,7 +6,7 @@ use %namespace%\Model\Repository\%class%Repository;
 
 class %class%RepositoryTest extends OriginTestCase
 {
-    public $fixtures = ['%model%'];
+    protected $fixtures = ['%model%'];
 
     public function testRepositoryMethod()
     {

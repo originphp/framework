@@ -5,5 +5,5 @@ use Origin\TestSuite\Fixture;
 
 class %class%Fixture extends Fixture
 {
-    public $records = [];
+    protected $records = [];
 }

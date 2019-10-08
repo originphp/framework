@@ -25,7 +25,7 @@ class MailerJob extends Job
         $params['mailer']->dispatch(...$params['arguments']);
     }
 
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
         $this->retry(['wait' => '+30 minutes','limit' => 3]);
     }

@@ -168,7 +168,7 @@ class Job
      * @param \Exception $exception
      * @return void
      */
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
     }
 

@@ -10,6 +10,6 @@ class %class%Repository extends Repository
      *
      * @param \%namespace%\Model\%model%
      */
-    public $%model%;
+    protected $%model%;
    
 }

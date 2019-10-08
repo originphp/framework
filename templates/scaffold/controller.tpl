@@ -8,7 +8,7 @@ namespace App\Http\Controller;
  */
 class %controller%Controller extends ApplicationController
 {
-    public $paginate = [
+    protected $paginate = [
       'limit' => 20,
       'associated' => [%associated%]
     ];
