@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Console\Command;
 
 use Origin\Core\Config;
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -93,12 +93,12 @@ class DbSeedCommand extends Command
     * @param Datasource $connection
     * @return integer
     */
-    protected function executePreparedStatements(array $statements, Datasource $connection) : int
+    protected function executePreparedStatements(array $statements, Connection $connection) : int
     {
         $connection->begin();
         $connection->disableForeignKeyConstraints();
 
-        foreach ($statements as $statement) {
+        foreach ($statements  as $statement) {
             try {
                 $sql = $this->unprepare($statement[0], $statement[1]);
                 $connection->execute($statement[0], $statement[1]);

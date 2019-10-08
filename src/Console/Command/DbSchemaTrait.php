@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Console\Command;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
@@ -98,12 +98,12 @@ trait DbSchemaTrait
     * @param Datasource $connection
     * @return integer
     */
-    protected function executeStatements(array $statements, Datasource $connection) : int
+    protected function executeStatements(array $statements, Connection $connection) : int
     {
         $connection->begin();
         $connection->disableForeignKeyConstraints();
         
-        foreach ($statements as $statement) {
+        foreach ($statements  as $statement) {
             try {
                 $connection->execute($statement);
             } catch (DatasourceException $ex) {

@@ -20,7 +20,7 @@ use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Exception\ConnectionException;
 use Origin\Model\Exception\DatasourceException;
 
-class DatasourceTest extends OriginTestCase
+class ConnectionTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Author','Origin.Article'];
     

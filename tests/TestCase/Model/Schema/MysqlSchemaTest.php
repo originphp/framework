@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Model\Schema;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Model\Schema\MysqlSchema;
 use Origin\TestSuite\OriginTestCase;
 
@@ -413,7 +413,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testConnection()
     {
         $adapter = new MysqlSchema('test');
-        $this->assertInstanceOf(Datasource::class, $adapter->connection());
+        $this->assertInstanceOf(Connection::class, $adapter->connection());
     }
 
     public function testDatasource()

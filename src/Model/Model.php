@@ -1292,7 +1292,7 @@ class Model
      *
      * @return \Origin\Model\Datasource
      */
-    public function connection() : Datasource
+    public function connection() : Connection
     {
         return ConnectionManager::get($this->connection);
     }

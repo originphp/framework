@@ -26,7 +26,7 @@ class Schema
      * @param Datasource $datasource
      * @return array
      */
-    public function createSql(Datasource $datasource) : array
+    public function createSql(Connection $datasource) : array
     {
         $out = [];
 
@@ -82,7 +82,7 @@ class Schema
      * @param Datasource $datasource
      * @return array
      */
-    public function dropSql(Datasource $datasource) : array
+    public function dropSql(Connection $datasource) : array
     {
         $out = [];
         $properties = get_object_vars($this);

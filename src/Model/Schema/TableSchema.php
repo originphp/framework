@@ -22,7 +22,7 @@ namespace Origin\Model\Schema;
  * I need a better way to create the table schema, in fixtures and when dumping.
  */
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Exception\Exception;
 
 class TableSchema
@@ -97,7 +97,7 @@ class TableSchema
      * @param Datasource $datasource
      * @return array
      */
-    public function toSql(Datasource $datasource) : array
+    public function toSql(Connection $datasource) : array
     {
         return $datasource->adapter()->createTableSql($this->table, $this->columns, [
             'constraints' => $this->constraints,'indexes' => $this->indexes,'options' => $this->options,

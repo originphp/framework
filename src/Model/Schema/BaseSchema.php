@@ -18,7 +18,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Model\Schema;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Model\ConnectionManager;
 
 abstract class BaseSchema
@@ -478,7 +478,7 @@ abstract class BaseSchema
      *
      * @return \Origin\Model\Datasource
      */
-    public function connection() : Datasource
+    public function connection() : Connection
     {
         return ConnectionManager::get($this->datasource);
     }

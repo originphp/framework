@@ -14,9 +14,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Model\Engine;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 
-class MySQLEngine extends Datasource
+class MySQLEngine extends Connection
 {
     protected $name = 'mysql';
       

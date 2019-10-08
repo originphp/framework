@@ -36,7 +36,7 @@ class Seed
      * @param Datasource $connection
      * @return array
      */
-    public function insertSql(Datasource $connection) : array
+    public function insertSql(Connection $connection) : array
     {
         $out = [];
         $properties = get_object_vars($this);

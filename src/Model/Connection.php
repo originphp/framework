@@ -28,7 +28,7 @@ use Origin\Model\Exception\DatasourceException;
 /**
  * This is the connection class.
  */
-abstract class Datasource
+abstract class Connection
 {
     /**
      * The datasource name e.g mysql or pgsql
@@ -517,7 +517,7 @@ abstract class Datasource
         $results = [];
         foreach ($records as $record) {
             $array = [];
-            for ($i = 0; $i < $count; $i++) {
+            for ($i = 0;$i < $count;$i++) {
                 $model = $index[$i]['model'];
                 $field = $index[$i]['field'];
                 $array[$model][$field] = $record[$i];
@@ -544,7 +544,7 @@ abstract class Datasource
         /**
          * Build an index
          */
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0;$i < $count;$i++) {
             $model = 0; // default value
             $field = $fields[$i];
             if (preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i', $field)) {

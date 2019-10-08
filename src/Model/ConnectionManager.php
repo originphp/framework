@@ -45,7 +45,7 @@ class ConnectionManager
      * @param string $name default
      * @return \Origin\Model\Datasource
      */
-    public static function get(string $name) : Datasource
+    public static function get(string $name) : Connection
     {
         if (isset(static::$datasources[$name])) {
             return static::$datasources[$name];
@@ -72,7 +72,7 @@ class ConnectionManager
         return static::$datasources[$name] = $datasource;
     }
 
-    public static function create(string $name, array $config) : Datasource
+    public static function create(string $name, array $config) : Connection
     {
         self::config($name, $config);
 

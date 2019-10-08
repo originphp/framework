@@ -14,9 +14,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Model\Engine;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 
-class PostgreSQLEngine extends Datasource
+class PostgreSQLEngine extends Connection
 {
     protected $name = 'pgsql';
 
