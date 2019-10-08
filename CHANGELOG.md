@@ -38,6 +38,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Change callbacks to require registering so can implement concerns properly.
 - Added strict types
 - Added return types
+- Changed public properties to protected
 - Security::uid now returns a 15 character base 62 random string.
 - Model callbacks have changed, now they need registering and arguments that will be passed have also been changed.
  See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
@@ -55,6 +56,7 @@ I been working full time on the framework to get this where it is now, changes g
 - SimpleObject class renamed to BaseObject
 - Log engine, log method changed to return void
 - Concerns - these were silently added in the last major releases but were not documented, these have been rewritten to use `traits` instead.
+- Datasource class renamed to Connection
 
 ### Removed
 
