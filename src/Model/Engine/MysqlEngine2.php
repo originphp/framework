@@ -16,7 +16,7 @@ namespace Origin\Model\Engine;
 
 use Origin\Model\Connection;
 
-class MySQLEngine extends Connection
+class MysqlEngine extends Connection
 {
     protected $name = 'mysql';
       
