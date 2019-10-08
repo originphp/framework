@@ -15,12 +15,12 @@ namespace Origin\Test\Job;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
+use Origin\Utility\Security;
 use Origin\Model\ModelRegistry;
+use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
-use Origin\TestSuite\TestTrait;
-use Origin\Utility\Security;
 
 class PassOrFailJob extends Job
 {

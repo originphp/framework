@@ -19,23 +19,21 @@
  */
 namespace Origin\Test\ModelRefactored;
 
+use ArrayObject;
 use Origin\Model\Model;
+
 use Origin\Model\Entity;
-
-
 use Origin\Model\Collection;
+use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
-use Origin\Model\Behavior\Behavior;
 use Origin\TestSuite\OriginTestCase;
+
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
 
 use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;
-
-use ArrayObject;
-use Origin\Utility\Security;
 
 /**
  * Used By Mocks
@@ -297,13 +295,12 @@ class ModelTest extends OriginTestCase
         ModelRegistry::set('Address', $this->Address);
     }
 
-
     public function testRegisterCallbackBeforeCreate()
     {
         $Article = new Article();
         $Article->beforeCreate('beforeCreateCallback');
 
-        $expected = ['beforeCreateCallback' => ['on'=>'create']];
+        $expected = ['beforeCreateCallback' => ['on' => 'create']];
         $this->assertEquals($expected, $Article->registeredCallbacks('beforeCreate'));
     }
 
@@ -312,7 +309,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeValidate('beforeValidateCallback');
 
-        $expected = ['beforeValidateCallback' => ['on'=>['create','update']]];
+        $expected = ['beforeValidateCallback' => ['on' => ['create','update']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('beforeValidate'));
     }
 
@@ -321,7 +318,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeUpdate('beforeUpdateCallback');
 
-        $expected = ['beforeUpdateCallback' => ['on'=>'update']];
+        $expected = ['beforeUpdateCallback' => ['on' => 'update']];
         $this->assertEquals($expected, $Article->registeredCallbacks('beforeUpdate'));
     }
 
@@ -330,7 +327,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeSave('beforeSaveCallback');
 
-        $expected = ['beforeSaveCallback' => ['on'=>['create','update']]];
+        $expected = ['beforeSaveCallback' => ['on' => ['create','update']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('beforeSave'));
     }
 
@@ -339,7 +336,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeDelete('beforeDeleteCallback');
 
-        $expected = ['beforeDeleteCallback' => ['on'=>'delete']];
+        $expected = ['beforeDeleteCallback' => ['on' => 'delete']];
         $this->assertEquals($expected, $Article->registeredCallbacks('beforeDelete'));
     }
 
@@ -348,7 +345,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterCreate('afterCreateCallback');
 
-        $expected = ['afterCreateCallback' => ['on'=>'create']];
+        $expected = ['afterCreateCallback' => ['on' => 'create']];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterCreate'));
     }
 
@@ -357,7 +354,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterValidate('afterValidateCallback');
 
-        $expected = ['afterValidateCallback' => ['on'=>['create','update']]];
+        $expected = ['afterValidateCallback' => ['on' => ['create','update']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterValidate'));
     }
 
@@ -366,7 +363,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterUpdate('afterUpdateCallback');
 
-        $expected = ['afterUpdateCallback' => ['on'=>'update']];
+        $expected = ['afterUpdateCallback' => ['on' => 'update']];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterUpdate'));
     }
 
@@ -375,7 +372,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterSave('afterSaveCallback');
 
-        $expected = ['afterSaveCallback' => ['on'=>['create','update']]];
+        $expected = ['afterSaveCallback' => ['on' => ['create','update']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterSave'));
     }
 
@@ -384,7 +381,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterDelete('afterDeleteCallback');
 
-        $expected = ['afterDeleteCallback' => ['on'=>'delete']];
+        $expected = ['afterDeleteCallback' => ['on' => 'delete']];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterDelete'));
     }
 
@@ -393,7 +390,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterRollback('afterRollbackCallback');
 
-        $expected = ['afterRollbackCallback' => ['on'=>['create','update','delete']]];
+        $expected = ['afterRollbackCallback' => ['on' => ['create','update','delete']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterRollback'));
     }
 
@@ -402,7 +399,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterCommit('afterCommitCallback');
 
-        $expected = ['afterCommitCallback' => ['on'=>['create','update','delete']]];
+        $expected = ['afterCommitCallback' => ['on' => ['create','update','delete']]];
         $this->assertEquals($expected, $Article->registeredCallbacks('afterCommit'));
     }
 
@@ -622,10 +619,10 @@ class ModelTest extends OriginTestCase
         $this->Article->hasAndBelongsToMany('Tag');
         $this->assertEquals('article_id', $this->Article->ArticlesTag->displayField);
 
-        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'not_id']]];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'not_id']]];
         $ds = $this->Article->connection();
         $statements = $ds->adapter()->createTableSql('foos', [
-            'not_id' => ['type'=>'integer','autoIncrement'=>true],
+            'not_id' => ['type' => 'integer','autoIncrement' => true],
             'undetectable' => 'string'
         ], $options);
       
@@ -1091,7 +1088,6 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($result);
     }
 
-
     public function testLoadModel()
     {
         $this->Article->loadModel('Author');
@@ -1265,7 +1261,6 @@ class ModelTest extends OriginTestCase
         $article->author_id = 512;
         $article->body = 'Article body goes here.';
 
-       
         $this->assertTrue($stub->save($article));
     }
 
@@ -1967,7 +1962,6 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($article->author->name);
         $this->assertEmpty($article->author->location);
     }
-
 
     public function testTransactions()
     {

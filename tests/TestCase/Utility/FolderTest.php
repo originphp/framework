@@ -54,7 +54,7 @@ class FolderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('file', $result[1]['type']);
 
         // check that /tmp/5d9b15f4f26f5/depth1/depth2/foo.txt can be found using recursive
-        $result = Folder::list($tmp, ['recursive'=>true]);
+        $result = Folder::list($tmp, ['recursive' => true]);
         $this->assertEquals('foo.txt', $result[0]['name']);
     }
 

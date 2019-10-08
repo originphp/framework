@@ -23,8 +23,8 @@ use Origin\Utility\Date;
 use Origin\Utility\Number;
 use Origin\Utility\Inflector;
 
-use Origin\Http\View\TemplateTrait;
 use Origin\Model\ModelRegistry;
+use Origin\Http\View\TemplateTrait;
 
 class FormHelper extends Helper
 {
@@ -892,6 +892,7 @@ class FormHelper extends Helper
         foreach ($defaults as $key => $value) {
             $this->config['controlDefaults'][$key] = $value;
         }
+
         return $this->config['controlDefaults'];
     }
 

@@ -60,6 +60,7 @@ class Date
             'datetime' => 'Y-m-d H:i',
             'time' => 'H:i',
         ];
+
         return static::$locale = $locale;
     }
 
@@ -84,6 +85,7 @@ class Date
         if ($format === null) {
             return static::$locale['date'];
         }
+
         return static::$locale['date'] = $format;
     }
 
@@ -98,6 +100,7 @@ class Date
         if ($format === null) {
             return static::$locale['datetime'];
         }
+
         return static::$locale['datetime'] = $format;
     }
 
@@ -112,6 +115,7 @@ class Date
         if ($format === null) {
             return static::$locale['time'];
         }
+
         return static::$locale['time'] = $format;
     }
 

@@ -16,8 +16,8 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware\Middleware;
 use Origin\Http\BaseApplication;
+use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
 use Origin\Exception\InvalidArgumentException;
 

@@ -26,7 +26,6 @@ declare(strict_types = 1);
 namespace Origin\Http;
 
 use Origin\Utility\Inflector;
-use Origin\Http\Request;
 
 class Router
 {

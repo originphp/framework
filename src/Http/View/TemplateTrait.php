@@ -36,10 +36,11 @@ trait TemplateTrait
      */
     public function templates($templates = null)
     {
-        if (!is_array($templates)) {
+        if (! is_array($templates)) {
             return $this->templater()->get($templates);
         }
         $this->templater()->set($templates);
+
         return $templates;
     }
     

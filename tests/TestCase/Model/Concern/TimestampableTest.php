@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Model\Concern;
 
-use Origin\Model\Model;
-use Origin\TestSuite\OriginTestCase;
 use ArrayObject;
-use Origin\Model\Concern\Timestampable;
-use Origin\Model\ModelRegistry;
+use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Model\ModelRegistry;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Concern\Timestampable;
 
 class AnotherArticle extends Model
 {
@@ -38,7 +38,7 @@ class TimestampableTest extends OriginTestCase
 
     public function startup() : void
     {
-        $this->AnotherArticle = ModelRegistry::get('AnotherArticle', ['className'=>AnotherArticle::class]);
+        $this->AnotherArticle = ModelRegistry::get('AnotherArticle', ['className' => AnotherArticle::class]);
     }
     public function testCreated()
     {
@@ -62,7 +62,7 @@ class TimestampableTest extends OriginTestCase
 
     public function testUpdate()
     {
-        $data = ['id'=>12345,'title' => 'Foo Bar','created' => '2019-03-02 20:00:00'];
+        $data = ['id' => 12345,'title' => 'Foo Bar','created' => '2019-03-02 20:00:00'];
         $entity = $this->AnotherArticle->new($data);
         $entity->reset();
         $entity->title = 'foo';
@@ -74,7 +74,7 @@ class TimestampableTest extends OriginTestCase
 
     public function testUpdateWithData()
     {
-        $data = ['id'=>'foo','title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
+        $data = ['id' => 'foo','title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
         $entity = $this->AnotherArticle->new($data);
         $timestamp = date('Y-m-d H:i:s');
         $this->AnotherArticle->runCallback($entity);

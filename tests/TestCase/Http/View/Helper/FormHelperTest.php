@@ -14,16 +14,16 @@
 
 namespace Origin\Test\Http\View\Helper;
 
-use Origin\Http\View\View;
 use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Utility\Date;
 use Origin\Http\Response;
+use Origin\Http\View\View;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Controller\Controller;
 use Origin\Http\View\Helper\FormHelper;
-use Origin\TestSuite\OriginTestCase;
 
 class ViewTestsController extends Controller
 {

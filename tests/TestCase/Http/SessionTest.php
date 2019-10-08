@@ -15,8 +15,8 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Session;
-use Origin\TestSuite\TestTrait;
 use Origin\Utility\Security;
+use Origin\TestSuite\TestTrait;
 
 class MockSession extends Session
 {

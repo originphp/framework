@@ -16,8 +16,8 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
-use Origin\Model\ModelRegistry;
 use Origin\Model\ModelTrait;
+use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
@@ -135,6 +135,7 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
         if ($fixtures === null) {
             return $this->fixtures;
         }
+
         return $this->fixtures = $fixtures;
     }
 }

@@ -75,7 +75,6 @@ class JsonView
         return json_encode($data);
     }
 
-
     /**
      * Serializes the data
      *
@@ -114,6 +113,7 @@ class JsonView
         if (is_object($mixed) and method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
         }
+
         return $mixed;
     }
 }

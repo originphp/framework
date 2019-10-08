@@ -104,6 +104,7 @@ class ModelRegistry
     {
         if (isset(static::$registry[$key])) {
             unset(static::$registry[$key]);
+
             return true;
         }
 
@@ -138,6 +139,7 @@ class ModelRegistry
         if ($className) {
             return new $className($options);
         }
+
         return null;
     }
 
@@ -165,6 +167,7 @@ class ModelRegistry
         if (isset(static::$registry[$alias])) {
             throw new Exception(sprintf('You cannot set the config for "%s" as it is  already in the registry', $alias));
         }
+
         return static::$config[$alias] = $config;
     }
 }

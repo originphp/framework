@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Association;
 use Origin\Model\Model;
+use Origin\Model\Association;
 
 /**
  * @todo migrate from model tests here, since this object was created and tests
@@ -25,26 +25,26 @@ class AssociationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNamespaceClass()
     {
-        $model = new Model(['name'=>'Foo']);
+        $model = new Model(['name' => 'Foo']);
         $assocation = new Association($model);
-        $result = $assocation->belongsTo('Member', ['className'=>'Custom\Model\User']);
+        $result = $assocation->belongsTo('Member', ['className' => 'Custom\Model\User']);
         $this->assertEquals('user_id', $result['foreignKey']);
 
-        $result = $assocation->hasAndBelongsToMany('Member', ['className'=>'Custom\Model\User']);
+        $result = $assocation->hasAndBelongsToMany('Member', ['className' => 'Custom\Model\User']);
         $this->assertEquals('user_id', $result['associationForeignKey']);
         $this->assertEquals('foos_users', $result['joinTable']);
     }
     
     public function testPluginClass()
     {
-        $model = new Model(['name'=>'Foo']);
+        $model = new Model(['name' => 'Foo']);
 
         $assocation = new Association($model);
 
-        $result = $assocation->belongsTo('Member', ['className'=>'Custom.User']);
+        $result = $assocation->belongsTo('Member', ['className' => 'Custom.User']);
         $this->assertEquals('user_id', $result['foreignKey']);
 
-        $result = $assocation->hasAndBelongsToMany('Member', ['className'=>'Custom.User']);
+        $result = $assocation->hasAndBelongsToMany('Member', ['className' => 'Custom.User']);
         $this->assertEquals('user_id', $result['associationForeignKey']);
         $this->assertEquals('foos_users', $result['joinTable']);
     }

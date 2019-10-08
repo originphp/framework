@@ -17,9 +17,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\Middleware;
 
-use Origin\Core\ConfigTrait;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Core\ConfigTrait;
 
 class Middleware
 {
@@ -96,6 +96,7 @@ class Middleware
         }
         $this->process($request, $response);
         $this->shutdown();
+
         return $response;
     }
 }

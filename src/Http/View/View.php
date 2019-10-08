@@ -14,16 +14,16 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\View;
 
-use Origin\Utility\Inflector;
-use Origin\Exception\Exception;
-use Origin\Http\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Utility\Inflector;
+use Origin\Exception\Exception;
+use Origin\Http\View\Helper\Helper;
+use Origin\Http\Controller\Controller;
 use Origin\Http\View\Helper\HelperRegistry;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
 use Origin\Http\View\Exception\MissingElementException;
-use Origin\Http\View\Helper\Helper;
 
 class View
 {
@@ -126,9 +126,9 @@ class View
         if ($helpers === null) {
             return $this->helpers;
         }
+
         return $this->helpers = $helpers;
     }
-
 
     /**
      * Lazy load helpers.
@@ -389,7 +389,6 @@ class View
     {
         $this->vars[$key] = $value;
     }
-
 
     /**
     * Gets the Response

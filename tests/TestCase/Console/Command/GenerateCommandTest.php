@@ -29,7 +29,6 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('2fcc05c2304c96b23fc71eae78843d2d', SRC . DS . 'Model' . DS . 'Bookmark.php');
         unlink(SRC . DS . 'Model' . DS . 'Bookmark.php');
        
-        
         $this->assertFileHash('ae4389221897c48b12d35b3755969059', SRC . DS .'Http'. DS . 'Controller' . DS . 'BookmarksController.php');
         unlink(SRC . DS .'Http'. DS .  'Controller' . DS . 'BookmarksController.php');
      
@@ -129,7 +128,6 @@ class GenerateCommandTest extends OriginTestCase
         unlink($filename);
     }
 
- 
     public function testInteractive()
     {
         // this can be annoying when changes are maded
@@ -371,7 +369,6 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('app/Job/DummyJob.php');
         $this->assertFileExists($filename);
        
-        
         $this->assertFileHash('83f3b5f8283867b52cc6b2eb3a238435', $filename);
         unlink($filename);
         

@@ -16,9 +16,9 @@ declare(strict_types = 1);
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Model\Concern\Timestampable;
 use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Model\Concern\Timestampable;
 
 class Queue extends Model
 {

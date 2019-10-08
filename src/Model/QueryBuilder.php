@@ -271,7 +271,7 @@ class QueryBuilder
      */
     public function select(array $fields = [], array $conditions = []) : QueryBuilder
     {
-//SELECT users.* FROM `users`
+        //SELECT users.* FROM `users`
         $this->query = [
             'type' => 'SELECT',
             'table' => $this->table,

@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Model\Concern;
 
-use Origin\Model\Concern\Timestampable;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Concern\Timestampable;
 
 /**
  * Counter cache should load Automatically

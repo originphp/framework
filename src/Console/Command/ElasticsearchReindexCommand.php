@@ -14,8 +14,8 @@ declare(strict_types = 1);
  */
 namespace Origin\Console\Command;
 
-use Origin\Model\Concern\Elasticsearch;
 use Origin\Model\Model;
+use Origin\Model\Concern\Elasticsearch;
 
 class ElasticsearchReindexCommand extends Command
 {
@@ -46,6 +46,7 @@ class ElasticsearchReindexCommand extends Command
     private function hasConcern(Model $model) : bool
     {
         $class = get_class($model);
+
         return in_array(Elasticsearch::class, class_uses($class));
     }
 }

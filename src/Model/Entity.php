@@ -123,8 +123,6 @@ class Entity
         }
     }
 
-
-
     /**
      * Magic method for setting data on inaccessible properties.
      *
@@ -181,6 +179,7 @@ class Entity
         foreach ($this->_virtual as $field) {
             $properties[$field] = $this->$field;
         }
+
         return $properties;
     }
 
@@ -267,6 +266,7 @@ class Entity
         if ($method) {
             $result = $this->$method($result);
         }
+
         return $result;
     }
 
@@ -290,9 +290,10 @@ class Entity
         }
 
         $method = $type . Inflector::studlyCaps($property);
-        if (!in_array($method, get_class_methods($class))) {
+        if (! in_array($method, get_class_methods($class))) {
             $method = '';
         }
+
         return static::$accessors[$class][$type][$property] = $method;
     }
 
@@ -509,6 +510,7 @@ class Entity
         if ($properties === null) {
             return $this->_hidden;
         }
+
         return $this->_hidden = $properties;
     }
 
@@ -523,6 +525,7 @@ class Entity
         if ($properties === null) {
             return $this->_virtual;
         }
+
         return $this->_virtual = $properties;
     }
 }

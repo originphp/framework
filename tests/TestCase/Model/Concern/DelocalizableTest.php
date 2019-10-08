@@ -46,7 +46,6 @@ class DelocalizeTest extends OriginTestCase
         Number::locale(['currency' => 'USD','thousands' => ',','decimals' => '.']);
     }
  
-
     public function testCallbackIsRegistered() : void
     {
         $result = $this->Deal->registeredCallbacks('beforeValidate');

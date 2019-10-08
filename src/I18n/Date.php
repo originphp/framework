@@ -59,6 +59,7 @@ class Date
         if ($locale === null) {
             return self::$locale;
         }
+
         return self::$locale = $locale;
     }
 
@@ -73,6 +74,7 @@ class Date
         if ($timezone === null) {
             return self::$timezone;
         }
+
         return self::$timezone = $timezone;
     }
 
@@ -87,6 +89,7 @@ class Date
         if ($dateFormat === null) {
             return self::$dateFormat;
         }
+
         return self::$dateFormat = $dateFormat;
     }
 
@@ -101,6 +104,7 @@ class Date
         if ($datetimeFormat === null) {
             return self::$datetimeFormat;
         }
+
         return self::$datetimeFormat = $datetimeFormat;
     }
 
@@ -115,6 +119,7 @@ class Date
         if ($timeFormat === null) {
             return self::$timeFormat;
         }
+
         return self::$timeFormat = $timeFormat;
     }
 

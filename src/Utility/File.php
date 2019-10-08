@@ -16,7 +16,6 @@ declare(strict_types = 1);
 namespace Origin\Utility;
 
 use Origin\Utility\Exception\NotFoundException;
-use Origin\Utility\Security;
 
 class File
 {

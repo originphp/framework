@@ -67,8 +67,8 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $stub = $this->createMock(PostFixture::class);
        
         $stub->expects($this->any())
-        ->method('dropTables')
-        ->will($this->returnValue(true));
+            ->method('dropTables')
+            ->will($this->returnValue(true));
    
         $stub->expects($this->once())->method('drop');
         $stub->expects($this->once())->method('create');
@@ -87,8 +87,8 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $stub = $this->createMock(PostFixture::class);
        
         $stub->expects($this->any())
-        ->method('dropTables')
-        ->will($this->returnValue(false));
+            ->method('dropTables')
+            ->will($this->returnValue(false));
 
         $stub->expects($this->never())->method('drop');
         $stub->expects($this->never())->method('create');
@@ -107,7 +107,7 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $TestCase = new MockTestCase();
 
         // Create bad fixture
-        $PostFixture  = new MockPostFixture;
+        $PostFixture = new MockPostFixture;
         $PostFixture->setProperty('schema', [
             'columns' => [
                 'id' => 'integer',
@@ -135,7 +135,7 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
     {
         $FixtureManager = new MockFixtureManager();
         $TestCase = new MockTestCase();
-        $PostFixture  = new MockPostFixture;
+        $PostFixture = new MockPostFixture;
         $PostFixture->setProperty('records', [
             ['id' => 'abc'],
         ]);

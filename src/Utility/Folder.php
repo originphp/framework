@@ -63,7 +63,7 @@ class Folder
      */
     public static function list(string $directory, array $options = []) : array
     {
-        $options += ['directories' => false,'recursive'=>false];
+        $options += ['directories' => false,'recursive' => false];
         if (self::exists($directory)) {
             $results = [];
             $files = array_diff(scandir($directory), ['.', '..']);

@@ -292,7 +292,6 @@ class GenerateCommand extends Command
             $data
         );
  
-        
         $input = $this->getTemplateFilename('mailer_html');
         $out = $this->getBaseFolder($data['name'], self::SRC).DS.'Mailer'.DS.'Template'.DS. $data['underscored'] . '.html.ctp';
         $this->saveGeneratedCode($out, file_get_contents($input));

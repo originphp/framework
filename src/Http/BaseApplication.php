@@ -19,10 +19,10 @@ namespace Origin\Http;
  */
 
 use Origin\Core\Resolver;
+use Origin\Http\Middleware\Middleware;
+use Origin\Http\Middleware\MiddlewareRunner;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Http\Middleware\DispatcherMiddleware;
-use Origin\Http\Middleware\MiddlewareRunner;
-use Origin\Http\Middleware\Middleware;
 
 class BaseApplication
 {

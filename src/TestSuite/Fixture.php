@@ -47,7 +47,6 @@ class Fixture
      */
     protected $dropTables = true;
 
-
     /**
     * Use this to create a custom table, using the information retreived from Model:describe('table');
     * example:

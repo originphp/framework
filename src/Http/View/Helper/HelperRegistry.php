@@ -15,8 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\Http\View\Helper;
 
-use Origin\Http\View\View;
 use Origin\Core\Resolver;
+use Origin\Http\View\View;
 use Origin\Core\ObjectRegistry;
 use Origin\Http\View\Exception\MissingHelperException;
 

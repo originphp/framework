@@ -15,10 +15,10 @@ declare(strict_types = 1);
 
 namespace Origin\Http\Controller\Component;
 
-use Origin\Core\ConfigTrait;
-use Origin\Http\Controller\Controller;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Core\ConfigTrait;
+use Origin\Http\Controller\Controller;
 
 class Component
 {

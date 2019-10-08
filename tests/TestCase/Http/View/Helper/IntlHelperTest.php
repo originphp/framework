@@ -15,9 +15,9 @@
 namespace Origin\Test\Http\View\Helper;
 
 use Origin\I18n\I18n;
-use Origin\Http\View\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Http\View\View;
 use Origin\Http\Controller\Controller;
 use Origin\Http\View\Helper\IntlHelper;
 

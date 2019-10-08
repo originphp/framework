@@ -15,8 +15,8 @@ declare(strict_types = 1);
 namespace Origin\Http\View;
 
 use Origin\Utility\Xml;
-use Origin\Http\Controller\Controller;
 use Origin\Utility\Inflector;
+use Origin\Http\Controller\Controller;
 
 class XmlView
 {
@@ -110,9 +110,9 @@ class XmlView
                 $data['response'][$key] = $this->toArray($this->viewVars[$key]);
             }
         }
+
         return $data;
     }
-
 
     /**
      * Converts an object to an array
@@ -125,6 +125,7 @@ class XmlView
         if (is_object($mixed) and method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
         }
+
         return (array) $mixed;
     }
 
@@ -136,8 +137,9 @@ class XmlView
      */
     private function isNumericArray(array $data) : bool
     {
-        $keys  = array_keys($data);
+        $keys = array_keys($data);
         $string = implode('', $keys);
+
         return (bool) ctype_digit($string);
     }
 }

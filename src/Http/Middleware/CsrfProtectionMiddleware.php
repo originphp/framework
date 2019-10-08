@@ -16,7 +16,6 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware\Middleware;
 use Origin\Utility\Security;
 use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
@@ -81,7 +80,7 @@ class CsrfProtectionMiddleware extends Middleware
         }
 
         if ($request->is(['get']) and $this->createCookie) {
-            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), ['expires'=>$this->config('expires')]);
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), ['expires' => $this->config('expires')]);
         }
     }
 

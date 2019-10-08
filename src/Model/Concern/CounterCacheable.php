@@ -14,9 +14,9 @@
 declare(strict_types = 1);
 namespace Origin\Model\Concern;
 
+use ArrayObject;
 use Origin\Model\Entity;
 use Origin\Utility\Inflector;
-use ArrayObject;
 
 /**
  * In Book belongsTo Author set counterCache = true or fieldName

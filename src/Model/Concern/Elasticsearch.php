@@ -14,10 +14,10 @@
 declare(strict_types = 1);
 namespace Origin\Model\Concern;
 
+use ArrayObject;
 use Origin\Model\Entity;
 use Origin\Exception\Exception;
 use Origin\Utility\Elasticsearch as Es;
-use ArrayObject;
 
 /**
  * By default it uses the default connection to use a different one
@@ -171,7 +171,6 @@ trait Elasticsearch
     
         return $this->indexes;
     }
-
 
     /**
      * Deletes an index

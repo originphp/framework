@@ -17,7 +17,6 @@ namespace Origin\Model;
 
 use Origin\Core\StaticConfigTrait;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Model\Datasource;
 
 class ConnectionManager
 {

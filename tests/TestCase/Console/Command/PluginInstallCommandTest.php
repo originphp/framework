@@ -4,8 +4,8 @@ namespace Origin\Test\Console\Command;
 use Origin\Utility\Folder;
 use Origin\Console\ConsoleIo;
 use Origin\TestSuite\TestTrait;
-use Origin\Console\Command\PluginInstallCommand;
 use Origin\TestSuite\Stub\ConsoleOutput;
+use Origin\Console\Command\PluginInstallCommand;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class MockPluginInstallCommand extends PluginInstallCommand

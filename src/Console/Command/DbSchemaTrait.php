@@ -15,8 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\Console\Command;
 
-use Origin\Utility\Inflector;
 use Origin\Model\Datasource;
+use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 

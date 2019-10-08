@@ -34,7 +34,7 @@ class FileEngine extends BaseEngine
         if ($this->config('filename') === null) {
             $this->config('filename', 'application.log');
         }
-        if (!is_dir($this->config['path'])) {
+        if (! is_dir($this->config['path'])) {
             mkdir($this->config['path'], 0775, true);
         }
     }

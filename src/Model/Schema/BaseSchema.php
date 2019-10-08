@@ -438,6 +438,7 @@ abstract class BaseSchema
         if ($datasource === null) {
             return $this->datasource;
         }
+
         return $this->datasource = $datasource;
     }
 

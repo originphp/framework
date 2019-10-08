@@ -38,7 +38,6 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(MockResolver::className('NameOnly'));
     }
 
-
     public function testClassName()
     {
         $expected = 'App\Apple';

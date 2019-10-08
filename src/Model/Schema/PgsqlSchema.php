@@ -282,7 +282,7 @@ class PgsqlSchema extends BaseSchema
             $type = $this->typeMap[$type];
 
             if ($agnoType === 'decimal') {
-                $options += ['precision'=>10,'scale'=>0];
+                $options += ['precision' => 10,'scale' => 0];
                 $type = "{$type}({$options['precision']},{$options['scale']})";
             } elseif ($agnoType === 'string') {
                 $options += ['limit' => 255];

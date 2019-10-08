@@ -56,7 +56,7 @@ class DbMigrateCommand extends Command
         $this->Migration = $this->loadModel('Migration', [
             'className' => Migration::class,
             'connection' => $this->options('connection')
-            ]);
+        ]);
       
         $lastMigration = $this->lastMigration();
         if ($version === null or $version > $lastMigration) {

@@ -32,7 +32,6 @@ class Marshaller
         $this->model = $model;
     }
 
-
     /**
      * Creates a map for entity fields.
      * Example:

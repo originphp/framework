@@ -65,7 +65,6 @@ class MailerJobTest extends OriginTestCase
         $this->assertTrue((new MailerJob())->dispatch($params));
     }
 
- 
     public function testDispatchNow()
     {
         $params = [

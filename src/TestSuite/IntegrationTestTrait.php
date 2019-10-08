@@ -16,9 +16,9 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Exception;
-use App\Http\Application;
 use Origin\Http\Router;
 use Origin\Http\Request;
+use App\Http\Application;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\ExceptionRenderer;
@@ -180,6 +180,7 @@ trait IntegrationTestTrait
             $this->fail('No request');
         }
         $viewVars = $this->controller->viewVars();
+
         return $viewVars[$key] ?? null;
     }
 

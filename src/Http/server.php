@@ -13,11 +13,9 @@
  */
 namespace Origin\Http;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
 use App\Http\Application;
 
 $request = new Request();
-$response =  new Response();
+$response = new Response();
 $Application = new Application($request, $response);
 $response->send();

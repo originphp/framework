@@ -15,9 +15,9 @@
 namespace Origin\Test\Core;
 
 use Origin\Core\DotEnv;
+use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Exception\InvalidArgumentException;
-use Origin\Utility\Security;
 
 class MockDotEnv extends DotEnv
 {

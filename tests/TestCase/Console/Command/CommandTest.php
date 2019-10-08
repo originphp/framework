@@ -15,10 +15,10 @@
 namespace Origin\Test\Console\Command;
 
 use Origin\Model\Model;
-use Origin\Console\Command\Command;
 use Origin\Console\ConsoleIo;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Model\Exception\MissingModelException;

@@ -19,11 +19,11 @@ use Origin\Model\Entity;
 use Origin\Http\Response;
 use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
-use Origin\Http\Controller\Controller;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Http\Controller\Controller;
 use Origin\Http\Exception\ForbiddenException;
-use Origin\Http\Controller\Component\AuthComponent;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Http\Controller\Component\AuthComponent;
 
 class MockAuthComponent extends AuthComponent
 {

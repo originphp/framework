@@ -19,10 +19,10 @@ use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Model\Entity;
 use Origin\Http\Response;
-use Origin\Http\View\Helper\Helper;
 use Origin\Model\ModelRegistry;
-use Origin\Http\Controller\Controller;
+use Origin\Http\View\Helper\Helper;
 use Origin\Model\ConnectionManager;
+use Origin\Http\Controller\Controller;
 use Origin\Http\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Http\Controller\Component\ComponentRegistry;
@@ -521,9 +521,9 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         # Create Table
         $connection = ConnectionManager::get('test');
         $connection->execute('DROP TABLE IF EXISTS pets');
-        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
         $statements = $connection->adapter()->createTableSql('pets', [
-            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','limit' => 20],
         ], $options);
         

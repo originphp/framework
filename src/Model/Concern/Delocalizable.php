@@ -52,6 +52,7 @@ trait Delocalizable
                 $entity->set($field, $value);
             }
         }
+
         return true;
     }
 

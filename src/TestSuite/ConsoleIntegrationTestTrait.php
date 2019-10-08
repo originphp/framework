@@ -20,7 +20,6 @@ namespace Origin\TestSuite;
 use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleInput;
 use Origin\Console\CommandRunner;
-use Origin\Console\ShellDispatcher;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 /**

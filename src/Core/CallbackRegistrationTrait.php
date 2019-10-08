@@ -41,6 +41,7 @@ trait CallbackRegistrationTrait
         if ($type === null) {
             return $this->registeredCallbacks;
         }
+
         return $this->registeredCallbacks[$type] ?? [];
     }
 
@@ -60,6 +61,7 @@ trait CallbackRegistrationTrait
                 break;
             }
         }
+
         return $result;
     }
 
@@ -76,6 +78,7 @@ trait CallbackRegistrationTrait
             unset($this->disabledCallbacks[$callback]);
             $result = true;
         }
+
         return $result;
     }
 }

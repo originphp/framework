@@ -415,7 +415,6 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertFalse($adapter->columnExists('posts', 'titles'));
     }
 
-
     public function testSchemaValue()
     {
         $adapter = new PgsqlSchema('test');
@@ -462,13 +461,13 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         $schema = [
-            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','default' => ''],
             'description' => ['type' => 'text'],
             'created' => ['type' => 'datetime'],
             'modified' => ['type' => 'datetime'],
         ];
-        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
         $result = $adapter->createTableSql('foo', $schema, $options);
     
         foreach ($result as $statement) {

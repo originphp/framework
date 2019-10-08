@@ -14,8 +14,8 @@
 
 namespace Origin\Test\TestSuite;
 
-use Origin\Console\Command\Command;
 use Origin\TestSuite\TestTrait;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase

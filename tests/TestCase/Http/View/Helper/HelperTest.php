@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Http\View\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Http\View\View;
 use Origin\Http\View\Helper\Helper;
 use Origin\Http\Controller\Controller;
 

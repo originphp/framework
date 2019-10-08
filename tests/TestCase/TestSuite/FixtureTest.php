@@ -16,7 +16,6 @@ namespace Origin\Test\TestSuite;
 
 use Origin\Model\Model;
 use Origin\TestSuite\Fixture;
-use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
 class Movie extends Model
@@ -112,7 +111,7 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture->create();
         $this->assertNull($fixture->insert());
 
-        $model = new Movie(['connection'=>'test']);
+        $model = new Movie(['connection' => 'test']);
        
         $this->assertEquals(3, $model->find('count'));
     }

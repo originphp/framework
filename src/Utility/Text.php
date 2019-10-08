@@ -34,6 +34,7 @@ class Text
         for ($i = 0; $i < $length; ++$i) {
             $out .= $characters[random_int(0, 61)];
         }
+
         return $out;
     }
 
@@ -223,6 +224,7 @@ class Text
         if ($result) {
             $string = $result;
         }
+
         return $string;
     }
 

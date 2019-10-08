@@ -39,11 +39,10 @@ class OriginTestListener extends OriginalTestListener
         if ($fixtureManager === null) {
             return $this->fixtureManager;
         }
+
         return $this->fixtureManager = $fixtureManager;
     }
 }
-
-
 
 class OriginTestListenerTest extends \PHPUnit\Framework\TestCase
 {

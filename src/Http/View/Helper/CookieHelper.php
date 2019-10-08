@@ -63,7 +63,7 @@ class CookieHelper extends Helper
      */
     public function delete(string $name) : void
     {
-        $this->response()->cookie($name, '', ['expires'=>'-60 minutes']);
+        $this->response()->cookie($name, '', ['expires' => '-60 minutes']);
     }
 
     /**

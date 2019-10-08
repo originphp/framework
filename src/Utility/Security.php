@@ -149,6 +149,7 @@ class Security
                 return $decrypted;
             }
         }
+
         return null;
     }
 
@@ -161,6 +162,7 @@ class Security
     public static function random(int $length = 18) : string
     {
         $random = random_bytes((int) ceil($length / 2));
+
         return substr(bin2hex($random), 0, $length);
     }
 
@@ -184,6 +186,7 @@ class Security
         for ($i = 0; $i < $length; $i++) {
             $out .= $characters[random_int(0, 61)];
         }
+
         return $out;
     }
 
@@ -202,10 +205,12 @@ class Security
         $options += ['macAddress' => null];
         if ($options['macAddress']) {
             if ($options['macAddress'] === true) {
-                $options['macAddress']  = static::macAddress() ?: bin2hex(random_bytes(6));
+                $options['macAddress'] = static::macAddress() ?: bin2hex(random_bytes(6));
             }
+
             return static::uuidv1($options['macAddress']);
         }
+
         return static::uuidv4();
     }
 

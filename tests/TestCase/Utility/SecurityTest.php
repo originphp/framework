@@ -95,7 +95,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         Security::encrypt('foo', 'secret');
     }
 
-
     public function testDecryptInvalidKey()
     {
         $key = '58024d70eb647a3d0654d5211af2ebfd';
@@ -131,16 +130,16 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
 
         $this->assertRegExp(
             '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
-            Security::uuid(['timestamp'=>true])
+            Security::uuid(['timestamp' => true])
         );
 
         $this->assertRegExp(
             '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
-            Security::uuid(['macAddress'=>'00:01:01:00:00:00'])
+            Security::uuid(['macAddress' => '00:01:01:00:00:00'])
         );
 
         $this->expectException(InvalidArgumentException::class);
-        Security::uuid(['macAddress'=>'example.com']);
+        Security::uuid(['macAddress' => 'example.com']);
     }
 
     public function testUid()

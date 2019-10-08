@@ -15,9 +15,9 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Csv;
-use Origin\Exception\InvalidArgumentException; # security
+use Origin\Utility\Security; # security
+use Origin\Exception\InvalidArgumentException;
 use Origin\Utility\Exception\NotFoundException;
-use Origin\Utility\Security;
 
 class CsvTest extends \PHPUnit\Framework\TestCase
 {

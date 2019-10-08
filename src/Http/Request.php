@@ -685,6 +685,7 @@ class Request
 
         $normalized = strtolower($header); // psr thing
         $key = $this->headersNames[$normalized] ?? $header;
+
         return $this->headers[$key] ?? null;
     }
 

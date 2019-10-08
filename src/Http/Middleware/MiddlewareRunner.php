@@ -66,9 +66,11 @@ class MiddlewareRunner
             $next = $this->middlewareStack[$this->current];
             if ($next) {
                 $this->current ++;
+
                 return $next($request, $response, $this);
             }
         }
+
         return $response;
     }
 }

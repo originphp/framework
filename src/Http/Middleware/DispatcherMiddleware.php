@@ -18,7 +18,6 @@ namespace Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
-use Origin\Http\Middleware\Middleware;
 
 class DispatcherMiddleware extends Middleware
 {

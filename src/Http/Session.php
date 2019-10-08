@@ -17,8 +17,8 @@ namespace Origin\Http;
 
 use Origin\Core\Dot;
 use Origin\Core\Config;
-use Origin\Exception\Exception;
 use Origin\Utility\Security;
+use Origin\Exception\Exception;
 
 class Session
 {

@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Http\View\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\View\Helper\Helper;
+use Origin\Http\View\View;
 use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
+use Origin\Http\View\Helper\Helper;
 use Origin\Http\Controller\Controller;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;

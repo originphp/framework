@@ -51,7 +51,6 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<p>This is line 1</p>', $message->body());
         $this->assertStringContainsString("This is line 1\r\n", $message->body());
 
-        
         $options['format'] = 'text';
         $message = (new EmailBuilder($options))->build(true)->send();
         $this->assertStringNotContainsString('<p>This is line 1</p>', $message->body());
@@ -69,7 +68,6 @@ class EmailBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<p>This is a test<br>', $message->body());
         $this->assertStringContainsString("This is a test\r\n", $message->body());
     }
-
 
     /**
      * To/from/sender/reply-to share the same loop so test em all using

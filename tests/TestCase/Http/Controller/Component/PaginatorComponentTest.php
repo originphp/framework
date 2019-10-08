@@ -19,8 +19,8 @@ use Origin\Http\Request; // callMethod + getProperty
 use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
-use Origin\Http\Controller\Controller;
 use Origin\Model\ConnectionManager;
+use Origin\Http\Controller\Controller;
 use Origin\Http\Exception\NotFoundException;
 use Origin\Http\Controller\Component\PaginatorComponent;
 
@@ -66,9 +66,9 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         $this->PaginatorComponent = new PaginatorComponent($this->Controller);
       
         $connection = ConnectionManager::get('test');
-        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
         $statements = $connection->adapter()->createTableSql('pets', [
-            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'owner_id' => ['type' => 'int','null' => false],
             'name' => ['type' => 'string','limit' => 20],
         ], $options);
@@ -78,7 +78,7 @@ class PaginatorComponentTest extends \PHPUnit\Framework\TestCase
         }
         
         $statements = $connection->adapter()->createTableSql('owners', [
-            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','limit' => 20],
         ], $options);
 

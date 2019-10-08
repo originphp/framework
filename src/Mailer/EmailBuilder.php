@@ -121,20 +121,18 @@ class EmailBuilder
             }
         }
   
-    
         if (empty($this->options['body'])) {
             $this->render();
         } else {
             $contentType = $this->options['contentType'] === 'text' ? 'text' : 'html';
           
-            $htmlVersion =  $contentType === 'html' ? $this->options['body'] : Html::fromText($this->options['body']);
-            $textVersion =  $contentType === 'text' ? $this->options['body'] : Html::toText($this->options['body']);
+            $htmlVersion = $contentType === 'html' ? $this->options['body'] : Html::fromText($this->options['body']);
+            $textVersion = $contentType === 'text' ? $this->options['body'] : Html::toText($this->options['body']);
             $this->message->htmlMessage($htmlVersion);
             $this->message->textMessage($textVersion);
             $this->message->format($this->options['format']);
         }
         
-       
         return $this->message;
     }
 

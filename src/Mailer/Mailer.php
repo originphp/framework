@@ -14,9 +14,8 @@ declare(strict_types = 1);
  */
 namespace Origin\Mailer;
 
-use Origin\Utility\Inflector;
 use Origin\Core\Plugin;
-use Origin\Mailer\Email;
+use Origin\Utility\Inflector;
 
 /**
 * To set values in the view set public properties in the execute method
@@ -132,7 +131,6 @@ abstract class Mailer
             $this->template = $class;
         }
        
-   
         $this->initialize($config);
     }
 

@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Http\View\Templater;
 use Origin\Core\ConfigTrait;
+use Origin\Http\View\Templater;
 use Origin\Http\View\TemplateTrait;
 
 class MockObject

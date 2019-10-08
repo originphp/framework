@@ -39,10 +39,10 @@ trait EntityLocatorTrait
             return Entity::class;
         }
 
-        if (!isset($this->entityLocatorCache[$model->name])) {
+        if (! isset($this->entityLocatorCache[$model->name])) {
             list($namespace, ) = namespaceSplit(get_class($model));
             $entityClass = $namespace . '\Entity\\' . $model->name ;
-            if (!class_exists($entityClass)) {
+            if (! class_exists($entityClass)) {
                 $entityClass = Entity::class;
             }
             $this->entityLocatorCache[$model->name] = $entityClass;

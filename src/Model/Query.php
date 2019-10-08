@@ -14,8 +14,8 @@ declare(strict_types = 1);
  */
 namespace Origin\Model;
 
-use Origin\Utility\Inflector;
 use ArrayObject;
+use Origin\Utility\Inflector;
 
 /**
  * This handles the model finds
@@ -139,6 +139,7 @@ class Query
             $buffer[] = $entity;
         }
         unset($belongsTo,$hasOne,$thisData,$entity);
+
         return $buffer;
     }
 

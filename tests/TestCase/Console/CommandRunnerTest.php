@@ -16,10 +16,10 @@ namespace Origin\Test\Console;
 
 use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
+use Origin\TestSuite\Stub\ConsoleOutput;
 use App\Console\Command\CacheResetCommand;
 use Origin\Console\Command\DbCreateCommand;
 use App\Console\Command\SaySomethingCommand;
-use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockCommandRunner extends CommandRunner
 {

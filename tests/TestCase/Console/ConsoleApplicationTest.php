@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Console;
 
-use Origin\Console\Command\Command;
 use Origin\Console\ConsoleIo;
+use Origin\Console\Command\Command;
 use Origin\Console\ConsoleApplication;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\Exception\ConsoleException;

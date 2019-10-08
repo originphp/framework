@@ -54,6 +54,7 @@ class Number
         if ($currency === null) {
             return self::$currency;
         }
+
         return self::$currency = $currency;
     }
 

@@ -66,6 +66,7 @@ abstract class BaseEngine
         if ($channel === null) {
             return $this->channel;
         }
+
         return $this->channel = $channel;
     }
 

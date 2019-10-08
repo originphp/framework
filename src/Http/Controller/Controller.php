@@ -15,17 +15,17 @@ declare(strict_types = 1);
 namespace Origin\Http\Controller;
 
 use ReflectionClass;
-use App\Http\View\ApplicationView;
-use Origin\Core\CallbackRegistrationTrait;
 use ReflectionMethod;
 use Origin\Http\Router;
 use Origin\Http\Request;
-use Origin\Http\View\XmlView;
 use Origin\Http\Response;
-use Origin\Http\View\JsonView;
 use Origin\Model\ModelTrait;
+use Origin\Http\View\XmlView;
 use Origin\Utility\Inflector;
+use Origin\Http\View\JsonView;
 use Origin\Core\InitializerTrait;
+use App\Http\View\ApplicationView;
+use Origin\Core\CallbackRegistrationTrait;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
 
@@ -87,13 +87,13 @@ class Controller
      * The core is default
      */
     protected $viewHelpers = [
-        'Cookie' => ['className'=>'CookieHelper'],
-        'Date' => ['className'=>'DateHelper'],
-        'Flash' => ['className'=>'FlashHelper'],
-        'Form' => ['className'=>'FormHelper'],
-        'Html' => ['className'=>'HtmlHelper'],
-        'Number' =>['className'=>'NumberHelper'],
-        'Session' => ['className'=>'SessionHelper'],
+        'Cookie' => ['className' => 'CookieHelper'],
+        'Date' => ['className' => 'DateHelper'],
+        'Flash' => ['className' => 'FlashHelper'],
+        'Form' => ['className' => 'FormHelper'],
+        'Html' => ['className' => 'HtmlHelper'],
+        'Number' => ['className' => 'NumberHelper'],
+        'Session' => ['className' => 'SessionHelper'],
     ];
 
     /**
@@ -147,8 +147,10 @@ class Controller
     {
         if (in_array($name, ['Session','Cookie','Flash'])) {
             $this->$name = $this->loadComponent($name);
+
             return true;
         }
+
         return false;
     }
     /**
@@ -242,8 +244,6 @@ class Controller
         $this->viewVars = array_merge($this->viewVars, $data);
     }
 
-
-
     /**
      * The controller startup process
      *
@@ -251,7 +251,7 @@ class Controller
      */
     public function startupProcess()
     {
-        if (!$this->triggerCallback('beforeAction')) {
+        if (! $this->triggerCallback('beforeAction')) {
             return $this->response;
         }
        
@@ -270,7 +270,7 @@ class Controller
         if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
             return $this->response;
         }
-        if (!$this->triggerCallback('afterAction', true)) {
+        if (! $this->triggerCallback('afterAction', true)) {
             return $this->response;
         }
         //# Free Mem for no longer used items
@@ -298,6 +298,7 @@ class Controller
                 }
             }
         }
+
         return true;
     }
 
@@ -344,7 +345,6 @@ class Controller
     {
         $this->registeredCallbacks['beforeRender'][$method] = [];
     }
-
 
     /**
     * Checks if the result is a response object or redirect was called
@@ -455,21 +455,25 @@ class Controller
          */
         if (array_key_exists('json', $options)) {
             $this->renderJson($options['json'], $options['status']);
+
             return;
         }
 
         if ($this->autoRender and $this->serialize and $this->request->type() === 'json') {
             $this->renderJson(null, $options['status']);
+
             return;
         }
         
         if (array_key_exists('xml', $options)) {
             $this->renderXml($options['xml'], $options['status']);
+
             return;
         }
 
         if ($this->autoRender and $this->serialize and $this->request->type() === 'xml') {
             $this->renderXml(null, $options['status']);
+
             return;
         }
         

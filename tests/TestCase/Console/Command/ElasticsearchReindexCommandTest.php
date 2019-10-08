@@ -1,10 +1,10 @@
 <?php
 namespace Origin\Test\Console\Command;
 
-use Origin\Model\Concern\Elasticsearch;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Concern\Elasticsearch;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class Article extends Model

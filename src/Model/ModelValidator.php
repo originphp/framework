@@ -75,6 +75,7 @@ class ModelValidator
         foreach ($rules as $field => $params) {
             $this->setRule($field, $params);
         }
+
         return $rules;
     }
 

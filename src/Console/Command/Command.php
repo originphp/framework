@@ -582,6 +582,7 @@ abstract class Command
         if ($io === null) {
             return $this->io;
         }
+
         return $this->io = $io;
     }
 }

@@ -57,7 +57,7 @@ trait InitializerTrait
                 $method = substr($className, 0, -5);
             }
 
-            $method =  'initialize' . $method;
+            $method = 'initialize' . $method;
             if ($this->hasMethod($this, $method)) {
                 $this->$method(...$args);
             }
@@ -75,9 +75,11 @@ trait InitializerTrait
     {
         try {
             $method = new ReflectionMethod($object, $method);
+
             return ($method->isPublic() or $method->isProtected());
         } catch (ReflectionException $e) {
         }
+
         return false;
     }
 }

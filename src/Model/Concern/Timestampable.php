@@ -14,8 +14,8 @@
 declare(strict_types = 1);
 namespace Origin\Model\Concern;
 
-use Origin\Model\Entity;
 use ArrayObject;
+use Origin\Model\Entity;
 
 /**
  * Timestampable Behavior
@@ -31,10 +31,10 @@ trait Timestampable
          *
          * $this->configConcern('Timestampable',['created'=>'created'])
          */
-        if (!isset($this->createdField)) {
+        if (! isset($this->createdField)) {
             $this->createdField = 'created';
         }
-        if (!isset($this->modifiedField)) {
+        if (! isset($this->modifiedField)) {
             $this->modifiedField = 'modified';
         }
         $this->beforeSave('timestambleBeforeSave');
@@ -62,10 +62,10 @@ trait Timestampable
 
     private function setTimestamp(Entity $entity, string $field, string $timestamp)
     {
-        if (!$this->hasField($field)) {
+        if (! $this->hasField($field)) {
             return;
         }
-        if (empty($entity->$field) or !in_array($field, $entity->modified())) {
+        if (empty($entity->$field) or ! in_array($field, $entity->modified())) {
             $entity->set($field, $timestamp);
         }
     }

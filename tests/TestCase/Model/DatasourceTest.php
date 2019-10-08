@@ -14,7 +14,6 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Datasource;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Engine\MySQLEngine;
 use Origin\TestSuite\OriginTestCase;

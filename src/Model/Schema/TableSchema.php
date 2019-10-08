@@ -207,6 +207,7 @@ class TableSchema
         if ($options === null) {
             return $this->options;
         }
+
         return $this->options = $options;
     }
 

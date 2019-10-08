@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Http\View\Templater;
 use Origin\Exception\Exception;
+use Origin\Http\View\Templater;
 
 class TemplaterTest extends \PHPUnit\Framework\TestCase
 {

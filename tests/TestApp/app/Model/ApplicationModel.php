@@ -2,10 +2,7 @@
 
 namespace App\Model;
 
-use Origin\Model\Collection;
 use Origin\Model\Model;
-use Origin\Model\Entity;
-use ArrayObject;
 
 class ApplicationModel extends Model
 {

@@ -15,7 +15,6 @@
 namespace Origin\Test\Model\Concern;
 
 use Origin\Model\Model;
-use Origin\Exception\Exception;
 
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
@@ -35,7 +34,7 @@ class ElasticsearchTest extends OriginTestCase
 
     protected function setUp(): void
     {
-        $this->Article = $this->loadModel('Article', ['className'=>Article::class]);
+        $this->Article = $this->loadModel('Article', ['className' => Article::class]);
 
         if (env('ELASTICSEARCH_HOST') === null) {
             $this->markTestSkipped('Elasticsearch not available');

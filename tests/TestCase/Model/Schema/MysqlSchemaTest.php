@@ -424,7 +424,6 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertEquals('bar', $adapter->datasource());
     }
 
-
     /**
      * Create a FOO table which next tests will depend upon
      */
@@ -436,13 +435,13 @@ class MysqlSchemaTest extends OriginTestCase
         }
 
         $schema = [
-            'id' => ['type' => 'integer','autoIncrement'=>true],
+            'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','default' => ''],
             'description' => ['type' => 'text'],
             'created' => ['type' => 'datetime'],
             'modified' => ['type' => 'datetime'],
         ];
-        $options = ['constraints'=>['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
         $result = $adapter->createTableSql('foo', $schema, $options);
         foreach ($result as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
