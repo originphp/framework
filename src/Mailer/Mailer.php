@@ -174,7 +174,7 @@ abstract class Mailer
      *   - bcc: an array of emails in ['email'] or ['email'=>'name']
      *   - sender: ['email'] or ['email'=>'name']
      *   - replyTo: ['email'] or ['email'=>'name']
-     *   - body: manually set body of the message (set content type if its not html)
+     *   - body: manually set body of the message (set content type if its not text)
      *   - contentType: default: text. The content type the body is in (html or text)
      * @return void
      */
