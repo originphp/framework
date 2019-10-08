@@ -270,7 +270,8 @@ class QueryBuilder
      * @return \Origin\Model\QueryBuilder
      */
     public function select(array $fields = [], array $conditions = []) : QueryBuilder
-    {//SELECT users.* FROM `users`
+    {
+//SELECT users.* FROM `users`
         $this->query = [
             'type' => 'SELECT',
             'table' => $this->table,
@@ -768,15 +769,15 @@ class QueryBuilder
               return $this->selectStatement($this->query);
             break;
             case 'INSERT':
-              return $this->insertStatement($this->query);
+                return $this->insertStatement($this->query);
             break;
             case 'UPDATE':
-              return $this->updateStatement($this->query);
+                return $this->updateStatement($this->query);
             break;
             case 'DELETE':
-              return $this->deleteStatement($this->query);
+                return $this->deleteStatement($this->query);
             break;
-          }
+        }
         throw new QueryBuilderException('Nothing to write.');
     }
 

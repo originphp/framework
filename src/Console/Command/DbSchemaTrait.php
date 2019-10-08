@@ -103,7 +103,7 @@ trait DbSchemaTrait
         $connection->begin();
         $connection->disableForeignKeyConstraints();
         
-        foreach ($statements  as $statement) {
+        foreach ($statements as $statement) {
             try {
                 $connection->execute($statement);
             } catch (DatasourceException $ex) {

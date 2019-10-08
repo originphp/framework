@@ -389,19 +389,19 @@ class Http
         ];
 
         switch ($method) {
-               case 'GET':
-                   $out[CURLOPT_HTTPGET] = true;
-               break;
-               case 'HEAD':
-                   $out[CURLOPT_NOBODY] = true;
-               break;
-               case 'POST':
-                   $out[CURLOPT_POST] = true;
-               break;
-               default:
-                   $out[CURLOPT_CUSTOMREQUEST] = $method;
-               break;
-           }
+            case 'GET':
+                $out[CURLOPT_HTTPGET] = true;
+                break;
+            case 'HEAD':
+                $out[CURLOPT_NOBODY] = true;
+                break;
+            case 'POST':
+                $out[CURLOPT_POST] = true;
+                break;
+            default:
+                $out[CURLOPT_CUSTOMREQUEST] = $method;
+                break;
+        }
 
         if ($options['verbose']) {
             $out[CURLOPT_VERBOSE] = true;

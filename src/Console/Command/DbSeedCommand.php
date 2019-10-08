@@ -98,7 +98,7 @@ class DbSeedCommand extends Command
         $connection->begin();
         $connection->disableForeignKeyConstraints();
 
-        foreach ($statements  as $statement) {
+        foreach ($statements as $statement) {
             try {
                 $sql = $this->unprepare($statement[0], $statement[1]);
                 $connection->execute($statement[0], $statement[1]);

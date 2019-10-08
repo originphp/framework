@@ -369,7 +369,7 @@ class MysqlSchema extends BaseSchema
             'RENAME TABLE %s TO %s',
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to)
-            );
+        );
         
         //return  "RENAME TABLE {$from} TO {$to}";
     }
@@ -556,7 +556,7 @@ class MysqlSchema extends BaseSchema
             'ALTER TABLE %s DROP FOREIGN KEY %s',
             $this->quoteIdentifier($fromTable),
             $this->quoteIdentifier($constraint)
-    );
+        );
         //return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
     }
     /**

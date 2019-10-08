@@ -102,7 +102,7 @@ class PluginInstallCommand extends Command
             'Plugin::initialize();',
             "Plugin::load('{$plugin}');\nPlugin::initialize();",
             $contents
-            );
+        );
         file_put_contents($file, $contents);
     }
  

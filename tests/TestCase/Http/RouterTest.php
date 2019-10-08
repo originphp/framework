@@ -140,7 +140,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         MockRouter::add(
             '/developers/:action/*',
             ['controller' => 'users']
-    );
+        );
         $result = MockRouter::parse('/developers/directory');
 
         $this->assertEquals('Users', $result['controller']);

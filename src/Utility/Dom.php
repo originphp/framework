@@ -56,9 +56,9 @@ use DOMDocument;
   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
   * @see https://www.w3schools.com/cssref/css_selectors.asp
   */
- trait QuerySelector
- {
-     /**
+trait QuerySelector
+{
+    /**
          * Returns the first element that matches the specifiied selector or group of selectors.
         *
         * @param string $path
@@ -75,16 +75,16 @@ use DOMDocument;
         * @param \DOMElement $dom
         * @return \DOMElement|null
         */
-     public function querySelector(string $path)
-     {
-         $result = $this->runQuery($path, $this);
-         if ($result) {
-             return $result[0];
-         }
+    public function querySelector(string $path)
+    {
+        $result = $this->runQuery($path, $this);
+        if ($result) {
+            return $result[0];
+        }
 
-         return null;
-     }
-     /**
+        return null;
+    }
+    /**
       * Examples
       *
       * @param string $path
@@ -99,122 +99,122 @@ use DOMDocument;
       * $dom->querySelectorAll('a[data-control-name="company-details"]);
       * @return array
       */
-     public function querySelectorAll(string $path)
-     {
-         return $this->runQuery($path);
-     }
+    public function querySelectorAll(string $path)
+    {
+        return $this->runQuery($path);
+    }
 
-     /**
+    /**
       * Handles multiple quries (seperated by commas)
       *
       * @param string $path
       * @return array
       */
-     protected function multiQuery(string $path) : array
-     {
-         $jobs = explode(',', str_replace(', ', ',', $path));
-         $results = [];
-         foreach ($jobs as $job) {
-             $results = array_merge($results, $this->querySelectorAll($job));
-         }
+    protected function multiQuery(string $path) : array
+    {
+        $jobs = explode(',', str_replace(', ', ',', $path));
+        $results = [];
+        foreach ($jobs as $job) {
+            $results = array_merge($results, $this->querySelectorAll($job));
+        }
 
-         return $results;
-     }
+        return $results;
+    }
 
-     /**
+    /**
       * THis is the internal function do not call,
       * @internal it is callable since it
       * @param string $path
       * @return array
       */
-     protected function runQuery(string $path, $dom = null) : array
-     {
-         $this->results = [];
+    protected function runQuery(string $path, $dom = null) : array
+    {
+        $this->results = [];
        
-         if ($dom === null) {
-             $dom = $this;
-         }
+        if ($dom === null) {
+            $dom = $this;
+        }
 
-         // Handle EITHER div.note, div.alert??
-         if (strpos($path, ',') !== false) {
-             return $this->multiQuery($path);
-         }
+        // Handle EITHER div.note, div.alert??
+        if (strpos($path, ',') !== false) {
+            return $this->multiQuery($path);
+        }
  
-         $paths = explode(' ', $path); // convert .class1 .class2 into array
-         $path = trim(array_shift($paths)); // get first time e.g. .class
+        $paths = explode(' ', $path); // convert .class1 .class2 into array
+        $path = trim(array_shift($paths)); // get first time e.g. .class
          
-         $class = null;
-         // Handle without marker.
-         if ($path[0] === '.') {
-             $path = '*' . $path;
-         }
+        $class = null;
+        // Handle without marker.
+        if ($path[0] === '.') {
+            $path = '*' . $path;
+        }
          
-         // Work with .class_name or H1
-         if (strpos($path, '.') !== false) {
-             list($tag, $class) = explode('.', $path);
-         } else {
-             $tag = $path;
-         }
+        // Work with .class_name or H1
+        if (strpos($path, '.') !== false) {
+            list($tag, $class) = explode('.', $path);
+        } else {
+            $tag = $path;
+        }
         
-         // handle attribute selectors li[data-control-name="company-details"],[data-control-name="company-details"]
-         $attrName = $attrValue = null;
-         // Attribute selector: div.note, div.alert
-         if (strpos($path, '[') !== false) {
-             if ($path[0] === '[') {
-                 $path = '*' . $path;
-             }
+        // handle attribute selectors li[data-control-name="company-details"],[data-control-name="company-details"]
+        $attrName = $attrValue = null;
+        // Attribute selector: div.note, div.alert
+        if (strpos($path, '[') !== false) {
+            if ($path[0] === '[') {
+                $path = '*' . $path;
+            }
             
-             // Maybe change this to regex
-             list($tag, $path) = explode('[', str_replace(']', '', $path));
-             $path = str_replace(['"',"'"], '', $path);
-             list($attrName, $attrValue) = explode('=', $path);
-         }
+            // Maybe change this to regex
+            list($tag, $path) = explode('[', str_replace(']', '', $path));
+            $path = str_replace(['"',"'"], '', $path);
+            list($attrName, $attrValue) = explode('=', $path);
+        }
  
-         # Find Ids
-         if ($path[0] === '#') {
-             $tag = '*';
-             $attrName = 'id';
-             $attrValue = substr($path, 1);
-         }
+        # Find Ids
+        if ($path[0] === '#') {
+            $tag = '*';
+            $attrName = 'id';
+            $attrValue = substr($path, 1);
+        }
          
-         // Handle last-child, first-child, nth etc
-         if (strpos($path, ':') !== false) {
-             list($tag, $n) = explode(':', $path);
-             $elements = $dom->getElementsByTagName($tag);
-             if ($elements) {
-                 // hanlde span:lastChild
-                 if ($n === 'first-child') {
-                     $this->results[] = $elements[0];
-                 } elseif ($n === 'last-child') {
-                     $this->results[] = $elements[count($elements) - 1];
-                 } elseif (preg_match('/nth-child\((\d+)\)/', $n, $matches)) {
-                     if (isset($matches[1]) and isset($elements[$matches[1]])) {
-                         $this->results[] = $elements[$matches[1]];
-                     }
-                 }
-             }
-         } else {
-             foreach ($dom->getElementsByTagName($tag) as $element) {
-                 if ($attrName) {
-                     if ($element->hasAttribute($attrName) and $element->getAttribute($attrName) === $attrValue) {
-                         $this->results[] = $element;
-                     }
-                 } elseif ($class === null or ($element->hasAttribute('class') and in_array($class, explode(' ', $element->getAttribute('class'))))) {
-                     $this->results[] = $element;
-                 }
-             }
-         }
+        // Handle last-child, first-child, nth etc
+        if (strpos($path, ':') !== false) {
+            list($tag, $n) = explode(':', $path);
+            $elements = $dom->getElementsByTagName($tag);
+            if ($elements) {
+                // hanlde span:lastChild
+                if ($n === 'first-child') {
+                    $this->results[] = $elements[0];
+                } elseif ($n === 'last-child') {
+                    $this->results[] = $elements[count($elements) - 1];
+                } elseif (preg_match('/nth-child\((\d+)\)/', $n, $matches)) {
+                    if (isset($matches[1]) and isset($elements[$matches[1]])) {
+                        $this->results[] = $elements[$matches[1]];
+                    }
+                }
+            }
+        } else {
+            foreach ($dom->getElementsByTagName($tag) as $element) {
+                if ($attrName) {
+                    if ($element->hasAttribute($attrName) and $element->getAttribute($attrName) === $attrValue) {
+                        $this->results[] = $element;
+                    }
+                } elseif ($class === null or ($element->hasAttribute('class') and in_array($class, explode(' ', $element->getAttribute('class'))))) {
+                    $this->results[] = $element;
+                }
+            }
+        }
 
-         # Go Next Level Down
-         if ($paths) {
-             foreach ($this->results as $result) {
-                 $this->runQuery(implode(' ', $paths), $result);
-             }
-         }
+        # Go Next Level Down
+        if ($paths) {
+            foreach ($this->results as $result) {
+                $this->runQuery(implode(' ', $paths), $result);
+            }
+        }
          
-         return $this->results;
-     }
- }
+        return $this->results;
+    }
+}
 
 /**
 * Turbo charge the DOMDocument and DOM Element
