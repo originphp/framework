@@ -16,7 +16,7 @@ namespace Origin\Model\Engine;
 
 use Origin\Model\Connection;
 
-class PostgreSQLEngine extends Connection
+class PgsqlEngine extends Connection
 {
     protected $name = 'pgsql';
 
