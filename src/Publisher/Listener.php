@@ -14,39 +14,32 @@ declare(strict_types = 1);
  */
 namespace Origin\Publisher;
 
+use \Origin\Core\EventDispatcher;
 use Origin\Model\ModelTrait;
 
 class Listener
 {
-    use ModelTrait;
+    use ModelTrait,EventDispatcher;
+
     public function __construct()
     {
-        $this->initialize();
+        $this->dispatchEvent('initialize');
     }
 
     /**
-     * This is called when the listener is created
+     * Dispatches a method
      *
-     * @return void
+     * @param string $method
+     * @param array $arguments
+     * @return boolean
      */
-    public function initialize() : void
+    public function dispatch(string $method,array $arguments = []) : bool
     {
-    }
-
-    /**
-     * This is called before the event method is called on this listener
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-    /**
-     * This is called after the event method is called on this listener
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
+        $this->dispatchEvent('startup');
+        if($this->dispatchEvent($method, $arguments) === false){
+            return false;
+        }
+        $this->dispatchEvent('shutdown');
+        return true;
     }
 }

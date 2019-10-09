@@ -20,7 +20,7 @@ class ListenerJob extends Job
 {
     protected $queue = 'listeners';
 
-    public function execute(string $className, string $method, array $args = [])
+    protected function execute(string $className, string $method, array $args = [])
     {
         ( new Publisher())->dispatch(new $className(), $method, $args);
     }

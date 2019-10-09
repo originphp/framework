@@ -150,28 +150,31 @@ class Publisher
 
     /**
      * Dispatches the event to the listener
-     * @internal return type can be anything only false is important to Publisher
+     * @internal return type can be anything only false is important to Publisher. Callbacks should
+     * only work on Listener instances
      *
      * @param object|callable $object
      * @param string $event
      * @param array $args
-     * @return mixed
+     * @return bool
      */
-    public function dispatch($object, string $event, array $args = [])
+    public function dispatch($object, string $event, array $args = []) : bool
     {
+        /**
+         * Work with listenter
+         */
         if ($object instanceof Listener) {
-            $object->startup();
+            return $object->dispatch($event,$args);
         }
-        $result = null;
+        /**
+         * Work with any object
+         */
         if (method_exists($object, $event)) {
-            $result = call_user_func_array([$object,$event], $args);
+            if(call_user_func_array([$object,$event], $args) === false){
+                return false;
+            }
         }
-
-        if ($object instanceof Listener) {
-            $object->shutdown();
-        }
-
-        return $result;
+        return true;
     }
 
     /**
