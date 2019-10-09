@@ -230,8 +230,8 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $request = new Request('tests/edit/2048');
         $controller = new MockController($request, new Response());
         $controller->setProperty('name', 'Widgets');
-        $controller->request->params('controller', 'Widgets');
-        $controller->request->params('plugin', 'Widget');
+        $controller->request()->params('controller', 'Widgets');
+        $controller->request()->params('plugin', 'Widget');
 
         $view = new View($controller);
         $result = $view->render('items');

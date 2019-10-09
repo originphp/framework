@@ -18,8 +18,6 @@ namespace Origin\Http;
 use Origin\Core\Config;
 use Origin\Http\Controller\Controller;
 use Origin\Core\Exception\RouterException;
-use Origin\Http\Controller\Exception\MissingMethodException;
-use Origin\Http\Controller\Exception\PrivateMethodException;
 use Origin\Http\Controller\Exception\MissingControllerException;
 
 class Dispatcher
@@ -84,65 +82,13 @@ class Dispatcher
                 throw new MissingControllerException($request->params('controller'));
             }
             
-            $this->controller = $this->buildController($class, $request, $response);
-          
-            $this->invoke($this->controller, $request->params('action'), $request->params());
-
-            return $this->controller->response;
+            $this->controller = new $class($request, $response);
+            return $this->controller->dispatch($request->params('action'));
         }
         throw new RouterException('No route found.', 404);
     }
 
-    /**
-     * Creates and returns the controller for the request.
-     *
-     * @param string $class Controller name
-     * @param \Origin\Http\Request $request
-     * @param \Origin\Http\Response $response
-     * @return \Origin\Http\Controller\Controller
-     */
-    protected function buildController(string $class, Request $request, Response $response) : Controller
-    {
-        $controller = new $class($request, $response);
-        $action = $request->params('action');
-        if (! method_exists($controller, $action)) {
-            throw new MissingMethodException([$controller->name, $action]);
-        }
-
-        if (! $controller->isAccessible($action)) {
-            throw new PrivateMethodException([$controller->name, $action]);
-        }
-
-        return $controller;
-    }
-
-    /**
-     * Does the whole lifecylce
-     */
-    /**
-     * Undocumented function
-     *
-     * @param \Origin\Http\Controller\Controller $controller
-     * @param string $action
-     * @param array $arguments
-     * @return \Origin\Http\Response|void
-     */
-    protected function invoke(Controller $controller, string $action, array $arguments)
-    {
-        $result = $controller->startupProcess();
-        if ($result instanceof Response or $controller->response->headers('Location')) {
-            return $result;
-        }
-
-        call_user_func_array([$controller, $action], $arguments['args']);
-     
-        if ($controller->autoRender and $controller->response->ready()) {
-            $controller->render();
-        }
-
-        return $controller->shutdownProcess();
-    }
-
+   
     /**
      * Gets the controller
      *

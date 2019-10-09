@@ -18,10 +18,12 @@ namespace Origin\Http\Controller\Component;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\ConfigTrait;
+use Origin\Core\EventDispatcher;
 use Origin\Http\Controller\Controller;
 
 class Component
 {
+    use EventDispatcher;
     use ConfigTrait;
     
     /**
@@ -29,7 +31,7 @@ class Component
      *
      * @var \Origin\Http\Controller\Controller
      */
-    protected $_controller = null;
+    private $controller = null;
 
     /**
      * Array of components and config. This poupulated during construct and is used
@@ -37,15 +39,14 @@ class Component
      *
      * @var array
      */
-    protected $_components = [];
+    private $components = [];
 
     public function __construct(Controller $controller, array $config = [])
     {
-        $this->_controller = $controller;
+        $this->controller = $controller;
  
         $this->config($config);
-      
-        $this->initialize($config);
+        $this->dispatchEvent('initialize', [$config]);
     }
 
     /**
@@ -64,8 +65,8 @@ class Component
     public function loadComponent(string $name, array $config = [])
     {
         list($plugin, $component) = pluginSplit($name);
-        if (! isset($this->_components[$component])) {
-            $this->_components[$component] = array_merge(['className' => $name . 'Component','enable' => false], $config);
+        if (! isset($this->components[$component])) {
+            $this->components[$component] = array_merge(['className' => $name . 'Component','enable' => false], $config);
         }
     }
 
@@ -74,8 +75,8 @@ class Component
      */
     public function __get($name)
     {
-        if (isset($this->_components[$name])) {
-            $this->{$name} = $this->controller()->componentRegistry()->load($name, $this->_components[$name]);
+        if (isset($this->components[$name])) {
+            $this->{$name} = $this->controller()->componentRegistry()->load($name, $this->components[$name]);
             
             if (isset($this->{$name})) {
                 return $this->{$name};
@@ -86,20 +87,12 @@ class Component
     }
 
     /**
-     * This is called when component is loaded for the first time from the
-     * controller.
-     */
-    public function initialize(array $config) : void
-    {
-    }
-
-    /**
      * Returns the controller
      * @return \Origin\Http\Controller\Controller
      */
     public function controller() : Controller
     {
-        return $this->_controller;
+        return $this->controller;
     }
 
     /**
@@ -109,7 +102,7 @@ class Component
      */
     public function request() : Request
     {
-        return $this->_controller->request;
+        return $this->controller->request();
     }
 
     /**
@@ -119,6 +112,6 @@ class Component
      */
     public function response() : Response
     {
-        return $this->_controller->response;
+        return $this->controller->response();
     }
 }

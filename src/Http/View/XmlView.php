@@ -49,8 +49,8 @@ class XmlView
 
     public function __construct(Controller $controller)
     {
-        $this->request = & $controller->request;
-        $this->response = & $controller->response;
+        $this->request = $controller->request();
+        $this->response = $controller->response();
         $this->viewVars = $controller->viewVars();
         $this->serialize = $controller->serialize();
     }

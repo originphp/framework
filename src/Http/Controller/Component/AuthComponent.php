@@ -23,6 +23,9 @@ use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Http\Exception\ForbiddenException;
 use Origin\Model\Exception\MissingModelException;
+use ReflectionMethod;
+use ReflectionClass;
+use Origin\Http\Controller\Controller;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -368,7 +371,16 @@ class AuthComponent extends Component
 
     protected function isPrivateOrProtected(string $action) : bool
     {
-        return ! $this->controller()->isAccessible($action);
+        $controller = new ReflectionClass(Controller::class);
+        if ($controller->hasMethod($action)) {
+            return false;
+        }
+
+        if (! method_exists($this->controller(), $action)) {
+            return false;
+        }
+
+        return !(new ReflectionMethod($this->controller(), $action))->isPublic();
     }
 
     /**

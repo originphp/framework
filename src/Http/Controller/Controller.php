@@ -26,8 +26,12 @@ use Origin\Http\View\JsonView;
 use Origin\Core\InitializerTrait;
 use App\Http\View\ApplicationView;
 use Origin\Core\CallbackRegistrationTrait;
+use Origin\Core\EventDispatcher;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
+use Origin\Model\Model;
+use Origin\Http\Controller\Exception\MissingMethodException;
+use Origin\Http\Controller\Exception\PrivateMethodException;
 
 /**
  * @property \Origin\Http\Controller\Component\PaginatorComponent $Paginator
@@ -35,6 +39,7 @@ use Origin\Http\Controller\Component\ComponentRegistry;
 class Controller
 {
     use ModelTrait, InitializerTrait, CallbackRegistrationTrait;
+    use EventDispatcher;
     /**
      * Controller name.
      *
@@ -130,10 +135,10 @@ class Controller
         $this->componentRegistry = new ComponentRegistry($this);
 
         // Set default callbacks to be inline with framework
-        $this->registeredCallbacks['beforeAction']['startup'] = [];
-        $this->registeredCallbacks['afterAction']['shutdown'] = [];
-
-        $this->initialize();
+        $this->beforeAction('startup');
+        $this->afterAction('shutdown');
+  
+        $this->dispatchEvent('initialize');
         $this->initializeTraits();
     }
 
@@ -191,7 +196,7 @@ class Controller
             return $this->loadModel($name);
         }
 
-        if (isset($this->$name)) {
+        if (isset($this->$name) and $this->$name instanceof Model) {
             return $this->$name;
         }
 
@@ -204,7 +209,7 @@ class Controller
      * @param string $action
      * @return bool
      */
-    public function isAccessible(string $action) : bool
+    protected function isAccessible(string $action) : bool
     {
         $controller = new ReflectionClass(Controller::class);
         if ($controller->hasMethod($action)) {
@@ -216,14 +221,6 @@ class Controller
         $reflection = new ReflectionMethod($this, $action);
 
         return $reflection->isPublic();
-    }
-
-    /**
-     * This is immediately after construct method. Use this Hook load components,
-     * helpers or anything that needs to be done when a new controller is created.
-     */
-    public function initialize() : void
-    {
     }
 
     /**
@@ -247,9 +244,9 @@ class Controller
     /**
      * The controller startup process
      *
-     * @return \Origin\Http\Response|void
+     * @return \Origin\Http\Response|null
      */
-    public function startupProcess()
+    protected function startupProcess() : ?Response
     {
         if (! $this->triggerCallback('beforeAction')) {
             return $this->response;
@@ -258,14 +255,15 @@ class Controller
         if ($this->isResponseOrRedirect($this->componentRegistry->call('startup'))) {
             return $this->response;
         }
+        return null;
     }
    
     /**
      * The controller shutdown process
      *
-     * @return \Origin\Http\Response|void
+     * @return \Origin\Http\Response|null
      */
-    public function shutdownProcess()
+    protected function shutdownProcess()  : ?Response
     {
         if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
             return $this->response;
@@ -276,6 +274,8 @@ class Controller
         //# Free Mem for no longer used items
         $this->componentRegistry->destroy();
         unset($this->componentRegistry);
+
+        return null;
     }
 
     /**
@@ -352,7 +352,7 @@ class Controller
     * @param mixed $result
     * @return boolean
     */
-    protected function isResponseOrRedirect($result) : bool
+    private function isResponseOrRedirect($result) : bool
     {
         return ($result instanceof Response or $this->response->headers('Location'));
     }
@@ -640,5 +640,56 @@ class Controller
     public function name() : string
     {
         return $this->name;
+    }
+
+
+    /**
+     * Gets the Controller Request Object
+     *
+     * @return \Origin\Http\Request
+     */
+    public function request() : Request
+    {
+        return $this->request;
+    }
+
+    /**
+     * Gets the Controller Response Object
+     *
+     * @return \Origin\Http\Request
+     */
+    public function response() : Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * Dispatches the controller action
+     *
+     * @param string $action
+     * @return \Origin\Http\Response
+     *
+     */
+    public function dispatch(string $action) : Response
+    {
+        if (! method_exists($this, $action)) {
+            throw new MissingMethodException([$this->name, $action]);
+        }
+
+        if (! $this->isAccessible($action)) {
+            throw new PrivateMethodException([$this->name, $action]);
+        }
+
+        if ($this->isResponseOrRedirect($this->startupProcess())) {
+            return $this->response;
+        }
+     
+        call_user_func_array([$this, $action], $this->request->params('args'));
+     
+        if ($this->autoRender and $this->response->ready()) {
+            $this->render();
+        }
+
+        return $this->shutdownProcess() ?: $this->response;
     }
 }

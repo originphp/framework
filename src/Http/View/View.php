@@ -14,6 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\View;
 
+use Origin\Core\EventDispatcher;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Utility\Inflector;
@@ -27,6 +28,7 @@ use Origin\Http\View\Exception\MissingElementException;
 
 class View
 {
+    use EventDispatcher;
 
     /**
      * Name of controller that created this view.
@@ -87,32 +89,13 @@ class View
 
         $controller = $controller ?: new Controller();
 
-        $this->request = & $controller->request;
-        $this->response = & $controller->response;
+        $this->request = $controller->request();
+        $this->response = $controller->response();
         $this->vars = $controller->viewVars();
         
         $this->helperRegistry = new HelperRegistry($this);
 
-        $this->initialize();
-    }
-
-    /**
-     * Called during construct
-     *
-     * @return void
-     */
-    public function initialize() : void
-    {
-    }
-
-    /**
-     * Gets the view vars
-     *
-     * @return mixed
-     */
-    public function vars() : array
-    {
-        return $this->vars;
+        $this->dispatchEvent('initialize');
     }
 
     /**

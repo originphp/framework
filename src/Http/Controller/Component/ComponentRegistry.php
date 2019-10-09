@@ -70,7 +70,7 @@ class ComponentRegistry extends ObjectRegistry
             if (method_exists($object, $method)) {
                 $result = call_user_func_array([$object, $method], $arguments);
                 // Redirect has been called
-                if ($result instanceof Response or $this->controller->response->headers('Location')) {
+                if ($result instanceof Response or $this->controller->response()->headers('Location')) {
                     return $result;
                 }
             }

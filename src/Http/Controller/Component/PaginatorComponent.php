@@ -167,7 +167,7 @@ class PaginatorComponent extends Component
     {
         // merge with defaults
         $settings += $this->config;
-        $query = $this->controller()->request->query();
+        $query = $this->controller()->request()->query();
         if ($query) {
             // Ensure page is a number (Security)
             $query = $this->filterArray($this->whitelist, $query);

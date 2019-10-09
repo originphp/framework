@@ -11,10 +11,6 @@ class ApplicationController extends Controller
      */
     public function initialize() : void
     {
-        parent::initialize();
-        
-        $this->loadComponent('Flash');
-
         $this->loadHelper('Html');
         $this->loadHelper('Form');
         $this->loadHelper('Flash');
@@ -25,7 +21,7 @@ class ApplicationController extends Controller
     /**
      * This is called before the controller action is executed.
      */
-    public function startup()
+    public function startup() : void
     {
     }
 

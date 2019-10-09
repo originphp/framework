@@ -159,7 +159,7 @@ class AuthComponentTest extends OriginTestCase
     public function testIsPrivateOrProtected()
     {
         $AuthComponent = $this->AuthComponent;
-        $this->assertTrue($AuthComponent->callMethod('IsPrivateOrProtected', ['initialize']));
+        $this->assertTrue($AuthComponent->callMethod('IsPrivateOrProtected', ['secret']));
         $this->assertFalse($AuthComponent->callMethod('IsPrivateOrProtected', ['index']));
     }
 
