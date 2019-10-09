@@ -33,13 +33,14 @@ class Listener
      * @param array $arguments
      * @return boolean
      */
-    public function dispatch(string $method,array $arguments = []) : bool
+    public function dispatch(string $method, array $arguments = []) : bool
     {
         $this->executeHook('startup');
-        if($this->executeHook($method, $arguments) === false){
+        if ($this->executeHook($method, $arguments) === false) {
             return false;
         }
         $this->executeHook('shutdown');
+
         return true;
     }
 }

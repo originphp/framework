@@ -17,8 +17,8 @@ namespace Origin\Http\Controller\Component;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Core\ConfigTrait;
 use Origin\Core\HookTrait;
+use Origin\Core\ConfigTrait;
 use Origin\Http\Controller\Controller;
 
 class Component

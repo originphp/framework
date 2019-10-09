@@ -17,9 +17,9 @@ namespace Origin\Http\View\Helper;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Core\HookTrait;
 use Origin\Http\View\View;
 use Origin\Core\ConfigTrait;
-use Origin\Core\HookTrait;
 
 class Helper
 {

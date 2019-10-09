@@ -17,8 +17,10 @@ namespace Origin\Http\Controller;
 use ReflectionClass;
 use ReflectionMethod;
 use Origin\Http\Router;
+use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 use Origin\Http\View\XmlView;
 use Origin\Utility\Inflector;
@@ -26,10 +28,8 @@ use Origin\Http\View\JsonView;
 use Origin\Core\InitializerTrait;
 use App\Http\View\ApplicationView;
 use Origin\Core\CallbackRegistrationTrait;
-use Origin\Core\HookTrait;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
-use Origin\Model\Model;
 use Origin\Http\Controller\Exception\MissingMethodException;
 use Origin\Http\Controller\Exception\PrivateMethodException;
 
@@ -255,6 +255,7 @@ class Controller
         if ($this->isResponseOrRedirect($this->componentRegistry->call('startup'))) {
             return $this->response;
         }
+
         return null;
     }
    
@@ -641,7 +642,6 @@ class Controller
     {
         return $this->name;
     }
-
 
     /**
      * Gets the Controller Request Object

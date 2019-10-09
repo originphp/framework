@@ -15,8 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\TestSuite;
 
-use Origin\Core\HookTrait;
 use Origin\Core\Resolver;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
@@ -38,8 +38,6 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
         parent::__construct($name, $data, $dataName);
         $this->executeHook('initialize');
     }
-
-   
 
     /**
      * Creates a Mock model, and adds to Registry at the same time. It will load

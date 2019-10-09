@@ -14,8 +14,8 @@ declare(strict_types = 1);
  */
 namespace Origin\Mailer;
 
-use Origin\Core\HookTrait;
 use Origin\Core\Plugin;
+use Origin\Core\HookTrait;
 use Origin\Utility\Inflector;
 
 /**
@@ -23,7 +23,7 @@ use Origin\Utility\Inflector;
 *
 * class SendWelcomeEmailMailer extends Mailer
 * {
-*    public function execute(Entity $user)
+*    protected function execute(Entity $user)
 *    {
 *        $this->user = $user; // this will become visible in the view
 *
@@ -135,7 +135,6 @@ abstract class Mailer
        
         $this->executeHook('initialize', [$config]);
     }
-
 
     /**
      * Sends an email

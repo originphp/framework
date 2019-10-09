@@ -20,13 +20,13 @@
 namespace Origin\Test\ModelRefactored;
 
 use ArrayObject;
-use Origin\Model\Model as BaseModel;
-
 use Origin\Model\Entity;
+
 use Origin\Model\Collection;
 use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
+use Origin\Model\Model as BaseModel;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Model\Exception\NotFoundException;

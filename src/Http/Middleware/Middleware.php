@@ -19,8 +19,8 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Core\ConfigTrait;
 use Origin\Core\HookTrait;
+use Origin\Core\ConfigTrait;
 
 class Middleware
 {

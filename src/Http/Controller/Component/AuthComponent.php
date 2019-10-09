@@ -15,17 +15,17 @@ declare(strict_types = 1);
 
 namespace Origin\Http\Controller\Component;
 
+use ReflectionClass;
+use ReflectionMethod;
 use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Http\Response;
 use Origin\Utility\Security;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
+use Origin\Http\Controller\Controller;
 use Origin\Http\Exception\ForbiddenException;
 use Origin\Model\Exception\MissingModelException;
-use ReflectionMethod;
-use ReflectionClass;
-use Origin\Http\Controller\Controller;
 
 /**
  * Authenticate, 'Form' and/Or 'Http' .
@@ -380,7 +380,7 @@ class AuthComponent extends Component
             return false;
         }
 
-        return !(new ReflectionMethod($this->controller(), $action))->isPublic();
+        return ! (new ReflectionMethod($this->controller(), $action))->isPublic();
     }
 
     /**

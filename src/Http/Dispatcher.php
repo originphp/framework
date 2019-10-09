@@ -83,12 +83,12 @@ class Dispatcher
             }
             
             $this->controller = new $class($request, $response);
+
             return $this->controller->dispatch($request->params('action'));
         }
         throw new RouterException('No route found.', 404);
     }
 
-   
     /**
      * Gets the controller
      *

@@ -20,6 +20,7 @@ use Origin\Http\Request;
 use Origin\Model\Entity;
 use Origin\Http\Response;
 use Origin\Model\ModelRegistry;
+use Origin\TestSuite\TestTrait;
 use Origin\Http\View\Helper\Helper;
 use Origin\Model\ConnectionManager;
 use Origin\Http\Controller\Controller;
@@ -27,7 +28,6 @@ use Origin\Http\Controller\Component\Component;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Http\Controller\Component\ComponentRegistry;
 use Origin\Http\Controller\Component\Exception\MissingComponentException;
-use Origin\TestSuite\TestTrait;
 
 class Pet extends Model
 {
@@ -303,7 +303,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->setProperty('autoRender', false);
         $controller->dispatch('action');
     }
-
 
     public function testStartupBeforeFilterResponse()
     {

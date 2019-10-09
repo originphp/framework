@@ -41,11 +41,11 @@ use Origin\Core\HookTrait;
  *
  *      protected $User = null;
  *
- *      public function initialize(User $user) {
+ *      protected function initialize(User $user) {
  *          $this->User = $user;
  *        }
  *
- *      public function execute(array $data) : Entity
+ *      protected function execute(array $data) : Entity
  *       {
  *          $user = $this->User->create($data);
  *          if($this->User->save($user)){

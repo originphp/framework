@@ -14,9 +14,9 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\View;
 
-use Origin\Core\HookTrait;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\Core\HookTrait;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Http\View\Helper\Helper;

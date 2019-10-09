@@ -21,11 +21,11 @@ namespace Origin\Model;
  */
 
 use ArrayObject;
+use Origin\Core\HookTrait;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
 use Origin\Core\CallbackRegistrationTrait;
-use Origin\Core\HookTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
@@ -254,6 +254,7 @@ class Model
         if (isset($this->$name) and $this->$name instanceof Model) {
             return $this->$name;
         }
+
         return null;
     }
 

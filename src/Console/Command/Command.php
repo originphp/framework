@@ -15,14 +15,14 @@ declare(strict_types = 1);
 
 namespace Origin\Console\Command;
 
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Console\ConsoleIo;
 
+use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
 use Origin\Console\ArgumentParser;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
-use Origin\Core\HookTrait;
 
 abstract class Command
 {

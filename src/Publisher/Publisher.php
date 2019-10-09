@@ -164,16 +164,17 @@ class Publisher
          * Work with listenter
          */
         if ($object instanceof Listener) {
-            return $object->dispatch($event,$args);
+            return $object->dispatch($event, $args);
         }
         /**
          * Work with any object
          */
         if (method_exists($object, $event)) {
-            if(call_user_func_array([$object,$event], $args) === false){
+            if (call_user_func_array([$object,$event], $args) === false) {
                 return false;
             }
         }
+
         return true;
     }
 
