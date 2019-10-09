@@ -42,7 +42,7 @@ use Origin\Console\Exception\StopExecutionException;
 
 class ConsoleApplication
 {
-
+    use HookTrait;
     /**
      * Name of the application. Should be the same name
      * as the bash script since this will be used to display help.
@@ -101,13 +101,9 @@ class ConsoleApplication
             'short' => 'h','description' => 'Displays this help message','type' => 'boolean',
         ]);
    
-        $this->initialize();
+        $this->executeHook('initialize');
         
         $this->commandRegistry = new LazyLoadContainer();
-    }
-
-    public function initialize() : void
-    {
     }
 
     /**
@@ -191,12 +187,16 @@ class ConsoleApplication
         }
       
         $commandName = (count($commands) === 1) ? $this->name : $this->name . ' ' .$command;
+        
         # Configure Command
         $this->$command->io($this->io);
         $this->$command->name($commandName);  // Rename for help
 
         try {
-            return $this->$command->run($args);
+            $this->executeHook('startup');
+            $result = $this->$command->run($args);
+            $this->executeHook('shutdown');
+            return $result;
         } catch (StopExecutionException $ex) {
             return false;
         }

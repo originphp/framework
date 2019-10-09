@@ -43,7 +43,6 @@ class Helper
         $this->_view = $view;
         
         $this->config($config);
-
         $this->executeHook('initialize', [$config]);
     }
 

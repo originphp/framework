@@ -16,10 +16,11 @@ declare(strict_types = 1);
 namespace Origin\Log\Engine;
 
 use Origin\Core\ConfigTrait;
+use Origin\Core\HookTrait;
 
 abstract class BaseEngine
 {
-    use ConfigTrait;
+    use ConfigTrait, HookTrait;
 
     /**
      * default config used by ConfigTrait
@@ -43,16 +44,7 @@ abstract class BaseEngine
     public function __construct(array $config = [])
     {
         $this->config($config);
-        $this->initialize($config);
-    }
-    /**
-     * Called after construct
-     *
-     * @param array $config
-     * @return void
-     */
-    public function initialize(array $config) : void
-    {
+        $this->executeHook('initialize', [$config]);
     }
 
     /**

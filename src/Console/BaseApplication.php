@@ -14,18 +14,26 @@ declare(strict_types = 1);
  */
 namespace Origin\Console;
 
+use Origin\Core\HookTrait;
+
 class BaseApplication
 {
+    use HookTrait;
+
     public function __construct()
     {
-        $this->initialize();
+        $this->executeHook('initialize');
     }
+
     /**
-     * Constructor hook
+     * Dispatches the command
      *
      * @return void
      */
-    public function initialize() : void
+    public function dispatch(array $arguments = []) : void
     {
+        $this->executeHook('startup');
+        (new CommandRunner())->run($arguments);
+        $this->executeHook('shutdown');
     }
 }

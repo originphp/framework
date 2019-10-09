@@ -15,7 +15,4 @@ namespace Origin\Http;
 
 use App\Http\Application;
 
-$request = new Request();
-$response = new Response();
-$Application = new Application($request, $response);
-$response->send();
+(new Application())->dispatch()->send();

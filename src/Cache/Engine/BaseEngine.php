@@ -16,10 +16,11 @@ declare(strict_types = 1);
 namespace Origin\Cache\Engine;
 
 use Origin\Core\ConfigTrait;
+use Origin\Core\HookTrait;
 
 abstract class BaseEngine
 {
-    use ConfigTrait;
+    use ConfigTrait, HookTrait;
 
     /**
      * Constructor
@@ -29,15 +30,11 @@ abstract class BaseEngine
     public function __construct(array $config = [])
     {
         $this->config($config);
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
 
         if (isset($config['duration']) and ! is_numeric($config['duration'])) {
             $this->config['duration'] = strtotime($this->config['duration']) - time();
         }
-    }
-
-    public function initialize(array $config) : void
-    {
     }
 
     /**

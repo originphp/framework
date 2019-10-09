@@ -15,20 +15,15 @@ declare(strict_types = 1);
 
 namespace Origin\Model;
 
+use Origin\Core\HookTrait;
+
 class Seed
 {
+    use HookTrait;
+    
     public function __construct()
     {
-        $this->initialize();
-    }
-
-    /**
-     * A hook for construct
-     *
-     * @return void
-     */
-    public function initialize() : void
-    {
+        $this->executeHook('initialize');
     }
     /**
      * Creates the SQL statements for inserting

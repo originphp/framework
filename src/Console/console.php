@@ -16,5 +16,6 @@ namespace Origin\Console;
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-$commandRunner = new CommandRunner();
-$commandRunner->run($argv);
+use App\Console\Application;
+
+(new Application())->dispatch($argv);

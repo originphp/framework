@@ -9,26 +9,22 @@ class ApplicationController extends Controller
      * This is called immediately after construct, so you don't have
      * to overload it. Load and configure components, helpers etc.
      */
-    public function initialize() : void
+    protected function initialize() : void
     {
-        $this->loadHelper('Html');
-        $this->loadHelper('Form');
-        $this->loadHelper('Flash');
-        $this->loadHelper('Number');
-        $this->loadHelper('Date');
+     
     }
 
     /**
      * This is called before the controller action is executed.
      */
-    public function startup() : void
+    protected function startup() : void
     {
     }
 
     /**
      * This is called after the controller action is executed.
      */
-    public function shutdown() : void
+    protected function shutdown() : void
     {
     }
 }

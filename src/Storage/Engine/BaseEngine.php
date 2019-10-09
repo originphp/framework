@@ -15,10 +15,11 @@
 namespace Origin\Storage\Engine;
 
 use Origin\Core\ConfigTrait;
+use Origin\Core\HookTrait;
 
 abstract class BaseEngine
 {
-    use ConfigTrait;
+    use ConfigTrait,HookTrait;
 
     /**
      * Constructor
@@ -28,15 +29,8 @@ abstract class BaseEngine
     public function __construct(array $config = [])
     {
         $this->config($config);
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
     }
-    /**
-     * Hook for construct
-     *
-     * @param array $config
-     * @return void
-     */
-    abstract public function initialize(array $config) : void;
 
     /**
      * Reads from the storage

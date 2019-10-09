@@ -15,6 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\TestSuite;
 
+use Origin\Core\HookTrait;
 use Origin\Utility\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\TableSchema;
@@ -26,6 +27,7 @@ use Origin\Model\Schema\TableSchema;
  */
 class Fixture
 {
+    use HookTrait;
     /**
      * The table name used by this fixture. It is
      * guessed using the class name. ArticleFixture treats table as articles
@@ -71,7 +73,7 @@ class Fixture
     * @var array
     */
     protected $schema = [];
-
+    
     public function __construct()
     {
         if ($this->table === null) {
@@ -79,8 +81,7 @@ class Fixture
             $name = substr($class, 0, -7);
             $this->table = Inflector::tableName($name);
         }
-
-        $this->initialize();
+        $this->executeHook('initialize');
     }
 
     /**
@@ -91,13 +92,6 @@ class Fixture
     public function insertOnly() :bool
     {
         return empty($this->schema);
-    }
-
-    /**
-     * Use to create dynamic records.
-     */
-    public function initialize() : void
-    {
     }
    
     /**

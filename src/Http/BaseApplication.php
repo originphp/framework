@@ -18,31 +18,69 @@ namespace Origin\Http;
  * Web Application holder
  */
 
+use Origin\Core\HookTrait;
 use Origin\Core\Resolver;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Http\Middleware\DispatcherMiddleware;
+use Origin\Http\Response;
 
 class BaseApplication
 {
+    use HookTrait;
+    
+    /**
+     * @var \Origin\Http\MiddlewareRunner $runner
+     */
     protected $runner = null;
 
-    public function __construct(Request $request, Response $response, MiddlewareRunner $runner = null)
-    {
-        $this->runner = $runner ? $runner : new MiddlewareRunner();
+    /**
+     * Holds the request object.
+     *
+     * @var \Origin\Http\Request
+     */
+    private $request = null;
 
-        $this->initialize();
-        # By running last it will run it first during process
-        $this->addMiddleware(new DispatcherMiddleware);
-        $this->runner->run($request, $response);
+    /**
+     * Holds the response object.
+     *
+     * @var \Origin\Http\Response
+     */
+    private $response = null;
+
+    /**
+     * This is the constructor, here you can inject different
+     *
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @param \Origin\Http\MiddlewareRunner $runner
+     */
+    public function __construct(Request $request = null, Response $response = null, MiddlewareRunner $runner = null)
+    {
+        $this->request = $request ?: new Request();
+        $this->response = $response ?: new Response();
+        $this->runner = $runner ?: new MiddlewareRunner();
+
+        $this->executeHook('initialize');
     }
 
     /**
-     * This is where middleware is setup
+     * Dispatches the application
+     *
+     * @return \Origin\Http\Response
      */
-    public function initialize() : void
+    public function dispatch() : Response
     {
+       
+        # By running last it will run it first during process
+        $this->addMiddleware(new DispatcherMiddleware);
+
+        $this->executeHook('startup');
+        $this->runner->run($this->request, $this->response);
+        $this->executeHook('shutdown');
+        
+        return $this->response;
     }
 
     /**
