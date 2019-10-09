@@ -14,12 +14,13 @@ declare(strict_types = 1);
  */
 namespace Origin;
 
+use Origin\Core\EventDispatcher;
+
 class BaseObject
 {
+    use EventDispatcher;
     public function __construct()
     {
-        if (method_exists($this, 'initialize')) {
-            $this->initialize(...func_get_args());
-        }
+        $this->dispatchEvent('initialize', func_get_args());
     }
 }

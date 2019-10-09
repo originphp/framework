@@ -16,6 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use \ArrayObject;
+use Origin\Core\EventDispatcher;
 use Origin\Log\Log;
 use Origin\Model\ModelTrait;
 use Origin\Utility\Security;
@@ -29,7 +30,7 @@ use Origin\Job\Engine\BaseEngine;
 
 class Job
 {
-    use ModelTrait;
+    use ModelTrait,EventDispatcher;
     /**
      * This is the display name for the job
      *
@@ -134,45 +135,6 @@ class Job
     }
 
     /**
-     * This is the hook when the job is created for sending
-     *
-     * @return void
-     */
-    public function initialize() : void
-    {
-    }
-
-    /**
-     * This is called just before execute
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-
-    ## execute method is not defined so user can add type hints etc
-
-    /**
-     * This is called after execute
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
-    }
-
-    /**
-     * This callback is triggered when an error occurs
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onError(\Exception $exception) : void
-    {
-    }
-
-    /**
      * Gets the id for this job
      *
      * @return string
@@ -232,11 +194,11 @@ class Job
         $this->arguments = func_get_args(); // proces the arguments
 
         try {
-            $this->initialize();
-            $this->startup();
+            $this->dispatchEvent('initialize');
+            $this->dispatchEvent('startup');
             $this->execute(...$this->arguments);
         } catch (\Exception $e) {
-            $this->shutdown();
+            $this->dispatchEvent('shutdown');
         
             if ($this->enqueued) {
                 $this->connection()->fail($this);
@@ -244,7 +206,8 @@ class Job
 
             Log::error($e->getMessage());
            
-            $this->onError($e);
+            $this->dispatchEvent('onError', [$e]);
+
     
             if ($this->enqueued and $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
@@ -253,16 +216,14 @@ class Job
             return false;
         }
 
-        $this->shutdown();
+        $this->dispatchEvent('shutdown');
 
         if ($this->enqueued) {
             $this->connection()->success($this);
         }
-       
-        if (method_exists($this, 'onSuccess')) {
-            $this->onSuccess(...$this->arguments);
-        }
 
+        $this->dispatchEvent('onSuccess', $this->arguments);
+     
         return true;
     }
 
