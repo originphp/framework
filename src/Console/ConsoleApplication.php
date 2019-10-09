@@ -39,6 +39,7 @@ use Origin\Exception\InvalidArgumentException;
  */
 
 use Origin\Console\Exception\StopExecutionException;
+use Origin\Core\HookTrait;
 
 class ConsoleApplication
 {
