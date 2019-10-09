@@ -26,7 +26,7 @@ use Origin\Http\View\JsonView;
 use Origin\Core\InitializerTrait;
 use App\Http\View\ApplicationView;
 use Origin\Core\CallbackRegistrationTrait;
-use Origin\Core\EventDispatcher;
+use Origin\Core\HookTrait;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
 use Origin\Model\Model;
@@ -39,7 +39,7 @@ use Origin\Http\Controller\Exception\PrivateMethodException;
 class Controller
 {
     use ModelTrait, InitializerTrait, CallbackRegistrationTrait;
-    use EventDispatcher;
+    use HookTrait;
     /**
      * Controller name.
      *
@@ -138,7 +138,7 @@ class Controller
         $this->beforeAction('startup');
         $this->afterAction('shutdown');
   
-        $this->dispatchEvent('initialize');
+        $this->executeHook('initialize');
         $this->initializeTraits();
     }
 

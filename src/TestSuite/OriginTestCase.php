@@ -15,6 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\TestSuite;
 
+use Origin\Core\HookTrait;
 use Origin\Core\Resolver;
 use Origin\Model\ModelTrait;
 use Origin\Model\ModelRegistry;
@@ -22,7 +23,7 @@ use Origin\Model\Exception\MissingModelException;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
-    use ModelTrait;
+    use ModelTrait, HookTrait;
     /**
      * Holds the Fixtures list
      * examples
@@ -35,29 +36,10 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->initialize();
+        $this->executeHook('initialize');
     }
 
-    /**
-     * Intialize Hook. This is called before a test starts.
-     */
-    public function initialize() : void
-    {
-    }
-
-    /**
-     * This is called after initialize and after fixtures have been loaded, but before the tests starts.
-     */
-    public function startup() : void
-    {
-    }
-
-    /**
-     * This is called after the test has run.
-     */
-    public function shutdown() : void
-    {
-    }
+   
 
     /**
      * Creates a Mock model, and adds to Registry at the same time. It will load
@@ -116,12 +98,12 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        $this->startup();
+        $this->executeHook('startup');
     }
 
     protected function tearDown() : void
     {
-        $this->shutdown();
+        $this->executeHook('shutdown');
     }
 
     /**

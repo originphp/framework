@@ -29,6 +29,8 @@ declare(strict_types = 1);
  */
 namespace Origin\Service;
 
+use Origin\Core\HookTrait;
+
 /**
  * Service object uses dependency injection, it does one thing, it contains business
  * logic and should follow the single responsibility principle.
@@ -61,35 +63,15 @@ namespace Origin\Service;
 
 class Service
 {
+    use HookTrait;
+
     public function __construct()
     {
         if (method_exists($this, 'initialize')) {
             $this->initialize(...func_get_args());
         }
     }
-    
-    # Initialize is not defined here so user can define with proper type hints and return types
-
-    /**
-     * This is called before execute
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-
-    # Execute is not defined here so user can define with proper type hints and return types
-
-    /**
-     * This is called after execute
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
-    }
-
+   
     /**
      * Creates an returns a Service Result object
      *
@@ -108,9 +90,9 @@ class Service
      */
     public function dispatch() : ?Result
     {
-        $this->startup();
+        $this->executeHook('startup');
         $result = $this->execute(...func_get_args());
-        $this->shutdown();
+        $this->executeHook('shutdown');
 
         return $result;
     }

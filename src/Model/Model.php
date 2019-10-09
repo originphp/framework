@@ -25,6 +25,7 @@ use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
 use Origin\Core\CallbackRegistrationTrait;
+use Origin\Core\HookTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
 use Origin\Exception\InvalidArgumentException;
@@ -32,7 +33,7 @@ use Origin\Model\Exception\MissingModelException;
 
 class Model
 {
-    use InitializerTrait, ModelTrait, CounterCacheable,CallbackRegistrationTrait;
+    use InitializerTrait, ModelTrait, CounterCacheable,CallbackRegistrationTrait, HookTrait;
     
     /**
      * The name for this model, this generated automatically.
@@ -180,7 +181,7 @@ class Model
             unset($this->displayField);
         }
 
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
         $this->initializeTraits($config);
     }
 
@@ -305,12 +306,6 @@ class Model
         return $this->associations;
     }
 
-    /**
-     * Hook to call just after model creation.
-     */
-    public function initialize(array $config) : void
-    {
-    }
     /**
      * JOINING MODELS TOGETHER - These functions help if models and fields
      * are named properly. Models should be CamelCase (with first letter capitalized)

@@ -14,6 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Mailer;
 
+use Origin\Core\HookTrait;
 use Origin\Core\Plugin;
 use Origin\Utility\Inflector;
 
@@ -37,6 +38,7 @@ use Origin\Utility\Inflector;
 
 abstract class Mailer
 {
+    use HookTrait;
     /**
      * You can set the default settings to be used by
      * each mailer (This can be overidden in any Mailer)
@@ -131,37 +133,9 @@ abstract class Mailer
             $this->template = $class;
         }
        
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
     }
 
-    /**
-     * Constructor hook method, use this to avoid having to overwrite the constructor and
-     * call the parent.
-     *
-     * @param array $config
-     * @return void
-     */
-    public function initialize(array $config) : void
-    {
-    }
-
-    /**
-     * Startup callback
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-
-    /**
-     * Shutdown callback
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
-    }
 
     /**
      * Sends an email
@@ -234,12 +208,9 @@ abstract class Mailer
     {
         $this->arguments = func_get_args();
 
-        $this->startup();
-        $object = $this->buildEmail();
-        
-        $result = $object->send();
-
-        $this->shutdown();
+        $this->executeHook('startup');
+        $result = $this->buildEmail()->send();
+        $this->executeHook('shutdown');
 
         return $result;
     }
@@ -268,11 +239,9 @@ abstract class Mailer
     {
         $this->arguments = func_get_args();
 
-        $this->startup();
-        $object = $this->buildEmail(true);
-
-        $result = $object->send();
-        $this->shutdown();
+        $this->executeHook('startup');
+        $result = $this->buildEmail(true)->send();
+        $this->executeHook('shutdown');
 
         return $result;
     }

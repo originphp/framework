@@ -14,16 +14,16 @@ declare(strict_types = 1);
  */
 namespace Origin\Publisher;
 
-use \Origin\Core\EventDispatcher;
+use \Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 
 class Listener
 {
-    use ModelTrait,EventDispatcher;
+    use ModelTrait,HookTrait;
 
     public function __construct()
     {
-        $this->dispatchEvent('initialize');
+        $this->executeHook('initialize');
     }
 
     /**
@@ -35,11 +35,11 @@ class Listener
      */
     public function dispatch(string $method,array $arguments = []) : bool
     {
-        $this->dispatchEvent('startup');
-        if($this->dispatchEvent($method, $arguments) === false){
+        $this->executeHook('startup');
+        if($this->executeHook($method, $arguments) === false){
             return false;
         }
-        $this->dispatchEvent('shutdown');
+        $this->executeHook('shutdown');
         return true;
     }
 }

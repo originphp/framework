@@ -19,10 +19,11 @@ use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\View\View;
 use Origin\Core\ConfigTrait;
+use Origin\Core\HookTrait;
 
 class Helper
 {
-    use ConfigTrait;
+    use ConfigTrait, HookTrait;
     /**
        * View Object
        *
@@ -43,7 +44,7 @@ class Helper
         
         $this->config($config);
 
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
     }
 
     /**
@@ -77,14 +78,6 @@ class Helper
                 return $this->{$name};
             }
         }
-    }
-
-    /**
-     * This is called when helper is loaded for the first time from the
-     * controller.
-     */
-    public function initialize(array $config) : void
-    {
     }
 
     /**

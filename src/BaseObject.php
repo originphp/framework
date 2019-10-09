@@ -14,13 +14,13 @@ declare(strict_types = 1);
  */
 namespace Origin;
 
-use Origin\Core\EventDispatcher;
+use Origin\Core\HookTrait;
 
 class BaseObject
 {
-    use EventDispatcher;
+    use HookTrait;
     public function __construct()
     {
-        $this->dispatchEvent('initialize', func_get_args());
+        $this->executeHook('initialize', func_get_args());
     }
 }

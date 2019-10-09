@@ -18,12 +18,12 @@ namespace Origin\Http\Controller\Component;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\ConfigTrait;
-use Origin\Core\EventDispatcher;
+use Origin\Core\HookTrait;
 use Origin\Http\Controller\Controller;
 
 class Component
 {
-    use EventDispatcher;
+    use HookTrait;
     use ConfigTrait;
     
     /**
@@ -46,7 +46,7 @@ class Component
         $this->controller = $controller;
  
         $this->config($config);
-        $this->dispatchEvent('initialize', [$config]);
+        $this->executeHook('initialize', [$config]);
     }
 
     /**

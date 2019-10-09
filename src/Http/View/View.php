@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\View;
 
-use Origin\Core\EventDispatcher;
+use Origin\Core\HookTrait;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Utility\Inflector;
@@ -28,7 +28,7 @@ use Origin\Http\View\Exception\MissingElementException;
 
 class View
 {
-    use EventDispatcher;
+    use HookTrait;
 
     /**
      * Name of controller that created this view.
@@ -95,7 +95,7 @@ class View
         
         $this->helperRegistry = new HelperRegistry($this);
 
-        $this->dispatchEvent('initialize');
+        $this->executeHook('initialize');
     }
 
     /**

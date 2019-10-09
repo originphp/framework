@@ -14,19 +14,19 @@ declare(strict_types = 1);
  */
 namespace Origin\Core;
 
-trait EventDispatcher
+trait HookTrait
 {
     /**
-     * Dispatches an event on object
+     * Executes a hook
      *
      * @param string $method
      * @param array $arguments
      * @return mixed any be anything or nothing
      */
-    protected function dispatchEvent(string $method,array $arguments=[])
+    protected function executeHook(string $method, array $arguments=[])
     {
-        if(method_exists($this,$method)){
-            return call_user_func_array([$this,$method],$arguments);
+        if (method_exists($this, $method)) {
+            return call_user_func_array([$this,$method], $arguments);
         }
     }
 }

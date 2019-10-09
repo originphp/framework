@@ -79,7 +79,6 @@ class FormHelperTest extends OriginTestCase
         $controller = new ViewTestsController($request, new Response());
         $View = new View($controller);
         $this->Form = new MockFormHelper($View);
-        $this->Form->initialize([]);
     }
 
     public function testCreate()

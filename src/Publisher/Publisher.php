@@ -32,7 +32,7 @@ class Publisher
     protected $listeners = [];
 
     /**
-     * Gets the instance of the EventDispatcher
+     * Gets the instance of the HookTrait
      *
      * @return \Origin\Publisher\Publisher
      */

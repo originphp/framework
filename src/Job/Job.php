@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use \ArrayObject;
-use Origin\Core\EventDispatcher;
+use Origin\Core\HookTrait;
 use Origin\Log\Log;
 use Origin\Model\ModelTrait;
 use Origin\Utility\Security;
@@ -30,7 +30,7 @@ use Origin\Job\Engine\BaseEngine;
 
 class Job
 {
-    use ModelTrait,EventDispatcher;
+    use ModelTrait,HookTrait;
     /**
      * This is the display name for the job
      *
@@ -194,11 +194,11 @@ class Job
         $this->arguments = func_get_args(); // proces the arguments
 
         try {
-            $this->dispatchEvent('initialize');
-            $this->dispatchEvent('startup');
+            $this->executeHook('initialize');
+            $this->executeHook('startup');
             $this->execute(...$this->arguments);
         } catch (\Exception $e) {
-            $this->dispatchEvent('shutdown');
+            $this->executeHook('shutdown');
         
             if ($this->enqueued) {
                 $this->connection()->fail($this);
@@ -206,7 +206,7 @@ class Job
 
             Log::error($e->getMessage());
            
-            $this->dispatchEvent('onError', [$e]);
+            $this->executeHook('onError', [$e]);
 
     
             if ($this->enqueued and $this->retryOptions) {
@@ -216,13 +216,13 @@ class Job
             return false;
         }
 
-        $this->dispatchEvent('shutdown');
+        $this->executeHook('shutdown');
 
         if ($this->enqueued) {
             $this->connection()->success($this);
         }
 
-        $this->dispatchEvent('onSuccess', $this->arguments);
+        $this->executeHook('onSuccess', $this->arguments);
      
         return true;
     }

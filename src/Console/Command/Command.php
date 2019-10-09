@@ -22,10 +22,11 @@ use Origin\Console\CommandRunner;
 use Origin\Console\ArgumentParser;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
+use Origin\Core\HookTrait;
 
 abstract class Command
 {
-    use ModelTrait;
+    use ModelTrait,HookTrait;
     /**
      * Default error code.
      *
@@ -137,14 +138,6 @@ abstract class Command
 
         $this->validateName($this->name);
     }
-
-    /**
-     * The initialize hook, called before command is executed. Setup your arguments and options for parsing.
-     */
-    public function initialize() : void
-    {
-    }
-
     /**
      * Runs another command from this command
      *
@@ -174,10 +167,6 @@ abstract class Command
         return $instance->run($argv);
     }
 
-    public function dontShow()
-    {
-    }
-
     /**
      * Runs this command used by Command Runner
      *
@@ -186,7 +175,7 @@ abstract class Command
      */
     public function run(array $args) : bool
     {
-        $this->initialize();
+        $this->executeHook('initialize');
       
         # Configure Help
         $this->parser->setCommand($this->name);
@@ -218,9 +207,9 @@ abstract class Command
             return true;
         }
 
-        $this->startup();
+        $this->executeHook('startup');
         $this->execute();
-        $this->shutdown();
+        $this->executeHook('shutdown');
         
         return true;
     }
@@ -503,31 +492,6 @@ abstract class Command
         }
         $this->io->err($msg);
         $this->abort($title);
-    }
-
-    /**
-     * This is called before the executed method
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-
-    /**
-     * Place the command logic here.
-     *
-     * @return void
-     */
-    abstract public function execute() : void;
-
-    /**
-     * This is called after executed method
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
     }
 
     /**

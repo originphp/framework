@@ -20,42 +20,18 @@ namespace Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\ConfigTrait;
+use Origin\Core\HookTrait;
 
 class Middleware
 {
-    use ConfigTrait;
+    use ConfigTrait, HookTrait;
     /**
      * Constructor
      */
     public function __construct(array $config = [])
     {
         $this->config($config);
-        $this->initialize($config);
-    }
-
-    /**
-     * Hook called during construct
-     *
-     * @return void
-     */
-    public function initialize(array $config) : void
-    {
-    }
-    /**
-     * This is called before the middleware is invoked
-     *
-     * @return void
-     */
-    public function startup() : void
-    {
-    }
-    /**
-     * This is called after the middleware has been processed
-     *
-     * @return void
-     */
-    public function shutdown() : void
-    {
+        $this->executeHook('initialize', [$config]);
     }
 
     /**
@@ -89,13 +65,13 @@ class Middleware
      */
     public function __invoke(Request $request, Response $response, callable $next = null) : Response
     {
-        $this->startup();
+        $this->executeHook('startup');
         $this->handle($request);
         if ($next) {
             $response = $next($request, $response);
         }
         $this->process($request, $response);
-        $this->shutdown();
+        $this->executeHook('shutdown');
 
         return $response;
     }
