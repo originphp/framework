@@ -15,6 +15,7 @@ use Origin\Log\Log;
 use Origin\I18n\I18n;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
+use Origin\Core\DeferredFunction;
 use Origin\Utility\Collection;
 
 /**
@@ -226,4 +227,29 @@ function deprecationWarning(string $message) : void
     if (Config::read('debug')) {
         trigger_error($message, E_USER_DEPRECATED);
     }
+}
+
+
+/**
+ * Defer the execution of a function until the surrounding function completes.
+ * Function calls are executed in Last In First Out. Defer is usually used for
+ * cleanup operations such as closing or unlocking files, even if there is an error.
+ *
+ * @example defer($a,[$this,'method'],'arg1','arg2');
+ *
+ * @param array|null $context A variable to defer functions into
+ * @param callable $callback [$this,'method']
+ * @return void
+ */
+function defer(?array &$context, callable $callback) : void
+{
+    if ($context === null) {
+        $context = [];
+    }
+
+    $arguments = func_get_args();
+    array_shift($arguments);
+    array_shift($arguments);
+    
+    array_unshift($context, new DeferredFunction($callback, $arguments));
 }
