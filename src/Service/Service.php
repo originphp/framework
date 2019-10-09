@@ -67,9 +67,7 @@ class Service
 
     public function __construct()
     {
-        if (method_exists($this, 'initialize')) {
-            $this->initialize(...func_get_args());
-        }
+        $this->executeHook('initialize', func_get_args());
     }
    
     /**
