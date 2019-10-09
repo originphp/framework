@@ -14,6 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Model\Repository;
 
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 use Origin\Utility\Inflector;
 
@@ -22,7 +23,13 @@ use Origin\Utility\Inflector;
  */
 class Repository
 {
-    use ModelTrait;
+    use ModelTrait, HookTrait;
+    
+    /**
+     * Model class name
+     *
+     * @var string
+     */
     private $modelClass = null;
 
     public function __construct()
@@ -31,12 +38,9 @@ class Repository
             list($namespace, $class) = namespaceSplit(get_class($this));
             $this->modelClass = Inflector::singular(substr($class, 0, -10));
         }
-        $this->initialize();
+        $this->executeHook('initialize');
     }
 
-    public function initialize() : void
-    {
-    }
     /**
      * Lazyload the Model for this Repository
      *
