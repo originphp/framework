@@ -324,7 +324,7 @@ trait IntegrationTestTrait
 
         try {
             if ($this->testWithMiddleware) {
-                $application = new Application($this->request, $this->response);
+                (new Application($this->request, $this->response))->dispatch();
                 $this->controller = Dispatcher::instance()->controller();
             } else {
                 $dispatcher = new Dispatcher();

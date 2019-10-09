@@ -342,7 +342,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     public function testLazyloadComponent()
     {
         $controller = new Controller();
-        $this->assertInstanceOf(Component::class,isset($controller->Flash));
+        $this->assertInstanceOf(Component::class,$controller->Flash);
     }
 
     /**
