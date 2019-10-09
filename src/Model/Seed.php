@@ -41,7 +41,7 @@ class Seed
         $out = [];
         $properties = get_object_vars($this);
         foreach (array_keys($properties) as $table) {
-            foreach ($this->{$table} as $record) {
+            foreach ($this->$table as $record) {
                 $builder = $connection->queryBuilder($table);
                 $sql = $builder->insert($record)->write();
                 $out[] = [$sql,$builder->getValues()];

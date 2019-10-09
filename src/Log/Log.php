@@ -199,7 +199,7 @@ class Log
                 continue;
             }
             $logger->channel($channel);
-            $logger->{$level}($message, $context);
+            $logger->$level($message, $context);
         }
     }
     

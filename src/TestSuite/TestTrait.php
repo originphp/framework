@@ -29,7 +29,7 @@ trait TestTrait
     public function callMethod(string $method, array $args = [])
     {
         if (empty($args)) {
-            return $this->{$method}();
+            return $this->$method();
         }
 
         return call_user_func_array([$this, $method], $args);
@@ -44,6 +44,6 @@ trait TestTrait
 
     public function setProperty(string $property, $value)
     {
-        $this->{$property} = $value;
+        $this->$property = $value;
     }
 }

@@ -76,10 +76,10 @@ class Component
     public function __get($name)
     {
         if (isset($this->components[$name])) {
-            $this->{$name} = $this->controller()->componentRegistry()->load($name, $this->components[$name]);
+            $this->$name = $this->controller()->componentRegistry()->load($name, $this->components[$name]);
             
-            if (isset($this->{$name})) {
-                return $this->{$name};
+            if (isset($this->$name)) {
+                return $this->$name;
             }
         }
 

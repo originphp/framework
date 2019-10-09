@@ -30,14 +30,14 @@ trait ModelTrait
     {
         list($plugin, $alias) = pluginSplit($model);
 
-        if (isset($this->{$alias})) {
-            return $this->{$alias};
+        if (isset($this->$alias)) {
+            return $this->$alias;
         }
 
-        $this->{$alias} = ModelRegistry::get($model, $options);
+        $this->$alias = ModelRegistry::get($model, $options);
 
-        if ($this->{$alias}) {
-            return $this->{$alias};
+        if ($this->$alias) {
+            return $this->$alias;
         }
         throw new MissingModelException($model);
     }

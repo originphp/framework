@@ -815,20 +815,20 @@ class Email
 
     protected function setEmail(string $var, string $email = null, string $name = null): void
     {
-        $this->{$var} = [];
+        $this->$var = [];
         $this->addEmail($var, $email, $name);
     }
 
     protected function addEmail(string $var, string $email = null, string $name = null): void
     {
         $this->validateEmail($email);
-        $this->{$var}[] = [$email, $name];
+        $this->$var[] = [$email, $name];
     }
 
     protected function setEmailSingle(string $var, string $email = null, string $name = null): void
     {
         $this->validateEmail($email);
-        $this->{$var} = [$email, $name];
+        $this->$var = [$email, $name];
     }
 
     /**
@@ -879,16 +879,16 @@ class Email
 
         $optionals = ['sender' => 'Sender', 'replyTo' => 'Reply-To', 'returnPath' => 'Return-Path'];
         foreach ($optionals as $var => $header) {
-            if ($this->{$var}) {
-                $headers[$header] = $this->formatAddress($this->{$var});
+            if ($this->$var) {
+                $headers[$header] = $this->formatAddress($this->$var);
             }
         }
 
         $headers['From'] = $this->formatAddress($this->from);
 
         foreach (['to', 'cc', 'bcc'] as $var) {
-            if ($this->{$var}) {
-                $headers[ucfirst($var)] = $this->formatAddresses($this->{$var});
+            if ($this->$var) {
+                $headers[ucfirst($var)] = $this->formatAddresses($this->$var);
             }
         }
 

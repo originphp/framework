@@ -444,7 +444,7 @@ class FormHelper extends Helper
 
             return $output;
         } else {
-            $fieldOutput = $this->{$type}($name, $options);
+            $fieldOutput = $this->$type($name, $options);
             if ($type === 'hidden') {
                 return $fieldOutput;
             }
@@ -978,8 +978,8 @@ class FormHelper extends Helper
                 $last = end($parts);
 
                 // Get value unless overridden
-                if (! isset($options['value']) and isset($entity->{$last}) and is_scalar($entity->{$last})) {
-                    $options['value'] = $entity->{$last};
+                if (! isset($options['value']) and isset($entity->$last) and is_scalar($entity->$last)) {
+                    $options['value'] = $entity->$last;
                 }
 
                 // Check Validation Errors
@@ -1045,8 +1045,8 @@ class FormHelper extends Helper
         }
         foreach (explode('.', $path) as $key) {
             $lastEntity = $entity;
-            if (is_object($entity) and isset($entity->{$key})) {
-                $entity = $entity->{$key};
+            if (is_object($entity) and isset($entity->$key)) {
+                $entity = $entity->$key;
             } elseif (is_array($entity) and isset($entity[$key])) {
                 $entity = $entity[$key];
             } else {

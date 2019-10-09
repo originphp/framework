@@ -72,10 +72,10 @@ class Helper
     public function __get($name)
     {
         if (isset($this->_helpers[$name])) {
-            $this->{$name} = $this->view()->helperRegistry()->load($name, $this->_helpers[$name]);
+            $this->$name = $this->view()->helperRegistry()->load($name, $this->_helpers[$name]);
             
-            if (isset($this->{$name})) {
-                return $this->{$name};
+            if (isset($this->$name)) {
+                return $this->$name;
             }
         }
     }

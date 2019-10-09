@@ -135,9 +135,7 @@ class View
     {
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
         $config = array_merge(['className' => $name . 'Helper'], $config);
-        $this->{$helper} = $this->helperRegistry()->load($name, $config);
-
-        return $this->{$helper};
+        return $this->$helper = $this->helperRegistry()->load($name, $config);
     }
 
     /**

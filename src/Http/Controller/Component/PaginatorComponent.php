@@ -93,9 +93,9 @@ class PaginatorComponent extends Component
             // intra model sorting by display field if configured
             $alias = $this->getModelFromField($sort);
             
-            if (isset($this->model->{$alias})) {
-                if ($displayField = $this->model->{$alias}->displayField()) {
-                    $tableAlias = Inflector::tableName($this->model->{$alias}->alias());
+            if (isset($this->model->$alias)) {
+                if ($displayField = $this->model->$alias->displayField()) {
+                    $tableAlias = Inflector::tableName($this->model->$alias->alias());
                     $settings['order'] = ["{$tableAlias}.{$displayField}" => $direction];
                 }
             }
