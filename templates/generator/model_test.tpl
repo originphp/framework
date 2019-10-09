@@ -10,7 +10,7 @@ class %class%Test extends OriginTestCase
 {
     protected $fixtures = ['%class%'];
 
-    public function startup() : void
+    protected function startup() : void
     {
         $this->loadModel('%class%');
     }

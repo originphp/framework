@@ -10,7 +10,7 @@ class %model% extends ApplicationModel
     /**
     * This is called when the model is constructed. 
     */
-    public function initialize(array $config) : void
+    protected function initialize(array $config) : void
     {
         parent::initialize($config);
         %initialize%

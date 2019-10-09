@@ -7,7 +7,7 @@ use Origin\Model\Entity;
 
 class %class%Mailer extends ApplicationMailer
 {
-    public function execute(Entity $user)
+    protected function execute(Entity $user) : void
     {
         $this->user = $user;
         $this->url = Config::read('App.url');

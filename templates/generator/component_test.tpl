@@ -14,7 +14,7 @@ class %class%ComponentTest extends OriginTestCase
     */
     protected $%class% = null;
 
-    public function startup() : void
+    protected function startup() : void
     {
         $controller = new Controller(new Request(),new Response());
         $this->%class% = new %class%Component($controller);

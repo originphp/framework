@@ -7,12 +7,12 @@ class %class%Command extends Command
     protected $name = '%custom%';
     protected $description = '';
 
-    public function initialize() : void
+    protected function initialize() : void
     {
 
     }
  
-    public function execute() : void
+    protected function execute() : void
     {
        
     }

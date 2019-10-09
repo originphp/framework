@@ -32,17 +32,7 @@ class %class%Job extends ApplicationJob
     *
     * @return void
     */
-    public function initialize() : void
-    {
-    }
-
-
-    /**
-    * This is called before execute
-    *
-    * @return void
-    */
-    public function startup() : void
+    protected function initialize() : void
     {
     }
 
@@ -50,11 +40,8 @@ class %class%Job extends ApplicationJob
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
     */
-    public function execute() : void
+    protected function execute() : void
     {
-
-
-
     }
 
     /**
@@ -63,29 +50,15 @@ class %class%Job extends ApplicationJob
     * @param \Exception $exception
     * @return void
     */
-    public function onError(\Exception $exception) : void
+    protected function onError(\Exception $exception) : void
     {
-
     }
 
     /**
     * Place the job logic here and define the arguments
     * e.g. function execute(User $User,$records);
     */
-    public function onSuccess() : void
+    protected function onSuccess() : void
     {
-
-    }
-
-
-    /**
-    * This is called after execute
-    *
-    * @return void
-    */
-    public function shutdown() : void
-    {
-    }
-
-    
+    }   
 }

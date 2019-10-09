@@ -15,7 +15,7 @@ class %class%HelperTest extends OriginTestCase
     */
     protected $%class% = null;
 
-    public function startup() : void
+    protected function startup() : void
     {
         $controller = new Controller(new Request(),new Response());
         $view = new View($controller);

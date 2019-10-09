@@ -2,21 +2,22 @@
 namespace %namespace%\Service;
 
 use App\Service\ApplicationService;
+use Origin\Service\Result;
 
 class %class%Service extends ApplicationService
 {
     /**
     * Dependencies will be sent here from constructor
     */
-    public function initialize() : void
+    protected function initialize() : void
     {
   
     }
 
     /*
-    * Service logic goes here and return a result object
+    * Service logic goes here and return a result object or null
     */
-    public function execute()
+    protected function execute() : ?Result
     {
         
         return $this->result([

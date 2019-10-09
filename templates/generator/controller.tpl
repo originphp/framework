@@ -6,7 +6,7 @@ namespace %namespace%\Http\Controller;
  */
 class %class%Controller extends ApplicationController
 {
-    public function initialize() : void
+    protected function initialize() : void
     {
         parent::initialize();
     }
