@@ -338,6 +338,13 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Response::class, $controller->callMethod('shutdownProcess'));
     }
 
+
+    public function testLazyloadComponent()
+    {
+        $controller = new Controller();
+        $this->assertInstanceOf(Component::class,isset($controller->Flash));
+    }
+
     /**
      * Create tmp view file
      *
