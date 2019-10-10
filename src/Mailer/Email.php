@@ -619,8 +619,6 @@ class Email
         $this->sendCommand($this->message . self::CRLF . self::CRLF . self::CRLF . '.', '250');
 
         $this->sendCommand('QUIT', '221');
-
-        $this->closeSocket();
     }
 
     /**
