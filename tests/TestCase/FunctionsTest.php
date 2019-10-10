@@ -110,7 +110,6 @@ EOF;
     }
 }
 
-
 class Foo
 {
     public $result = [];

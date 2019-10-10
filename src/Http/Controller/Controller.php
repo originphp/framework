@@ -152,6 +152,7 @@ class Controller
     {
         if (in_array($name, ['Session','Cookie','Flash'])) {
             $this->$name = $this->loadComponent($name);
+
             return true;
         }
 
@@ -195,8 +196,8 @@ class Controller
             return $this->loadModel($name);
         }
         // handle lazyloading
-        if(isset($this->$name)){
-            if ($this->$name instanceof Model OR $this->$name instanceof Component) {
+        if (isset($this->$name)) {
+            if ($this->$name instanceof Model or $this->$name instanceof Component) {
                 return $this->$name;
             }
         }

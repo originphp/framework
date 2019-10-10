@@ -12,7 +12,6 @@ class GenerateCommandTest extends OriginTestCase
 
     protected $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
 
-
     public function testGenerateException()
     {
         $this->exec('generate --force exception Dummy');

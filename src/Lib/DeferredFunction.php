@@ -37,7 +37,7 @@ class DeferredFunction
      * @param callable $callback
      * @param array $arguments
      */
-    public function __construct(callable $callback, array $arguments =[])
+    public function __construct(callable $callback, array $arguments = [])
     {
         $this->callback = $callback;
         $this->arguments = $arguments;

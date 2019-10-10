@@ -602,7 +602,7 @@ class Email
         $account = $this->account;
 
         $this->openSocket($account);
-        defer($context,'fclose', $this->socket);
+        defer($context, 'fclose', $this->socket);
 
         $this->connect($account);
 

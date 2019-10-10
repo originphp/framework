@@ -18,13 +18,12 @@ namespace Origin\Http;
  * Web Application holder
  */
 
-use Origin\Core\HookTrait;
 use Origin\Core\Resolver;
+use Origin\Core\HookTrait;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Http\Middleware\DispatcherMiddleware;
-use Origin\Http\Response;
 
 class BaseApplication
 {

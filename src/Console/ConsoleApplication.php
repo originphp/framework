@@ -16,10 +16,10 @@ declare(strict_types = 1);
 namespace Origin\Console;
 
 use Origin\Core\Resolver;
+use Origin\Core\HookTrait;
 use Origin\Exception\Exception;
 use Origin\Core\LazyLoadContainer;
 use Origin\Console\Exception\ConsoleException;
-use Origin\Exception\InvalidArgumentException;
 /**
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
@@ -38,8 +38,8 @@ use Origin\Exception\InvalidArgumentException;
  * $consoleApplication->run();
  */
 
+use Origin\Exception\InvalidArgumentException;
 use Origin\Console\Exception\StopExecutionException;
-use Origin\Core\HookTrait;
 
 class ConsoleApplication
 {
@@ -197,6 +197,7 @@ class ConsoleApplication
             $this->executeHook('startup');
             $result = $this->$command->run($args);
             $this->executeHook('shutdown');
+
             return $result;
         } catch (StopExecutionException $ex) {
             return false;

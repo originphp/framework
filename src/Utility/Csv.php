@@ -15,9 +15,9 @@ declare(strict_types = 1);
 
 namespace Origin\Utility;
 
+use Origin\Utility\Lib\CsvIterator;
 use Origin\Exception\InvalidArgumentException;
 use Origin\Utility\Exception\NotFoundException;
-use Origin\Utility\Lib\CsvIterator;
 
 class Csv
 {
@@ -113,6 +113,7 @@ class Csv
             fputcsv($stream, $row);
         }
         rewind($stream);
+
         return stream_get_contents($stream);
     }
 }

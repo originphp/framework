@@ -15,8 +15,8 @@ use Origin\Log\Log;
 use Origin\I18n\I18n;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Lib\DeferredFunction;
 use Origin\Utility\Collection;
+use Origin\Lib\DeferredFunction;
 
 /**
  * Runs a backtrace.
@@ -228,7 +228,6 @@ function deprecationWarning(string $message) : void
         trigger_error($message, E_USER_DEPRECATED);
     }
 }
-
 
 /**
  * Defer the execution of a function until the surrounding function completes.

@@ -14,8 +14,8 @@
 
 namespace Origin\Storage\Engine;
 
-use Origin\Core\ConfigTrait;
 use Origin\Core\HookTrait;
+use Origin\Core\ConfigTrait;
 
 abstract class BaseEngine
 {

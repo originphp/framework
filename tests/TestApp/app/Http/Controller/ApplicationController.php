@@ -11,7 +11,6 @@ class ApplicationController extends Controller
      */
     protected function initialize() : void
     {
-     
     }
 
     /**

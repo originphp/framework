@@ -15,8 +15,6 @@ declare(strict_types = 1);
 
 namespace Origin\Utility\Lib;
 
-use Origin\Utility\Lib\QuerySelectorTrait;
-
 /**
  * Turbocharged Dom Element
  */

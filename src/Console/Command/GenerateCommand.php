@@ -167,7 +167,6 @@ class GenerateCommand extends Command
         );
     }
 
-
     protected function entity(array $data)
     {
         $this->generate(

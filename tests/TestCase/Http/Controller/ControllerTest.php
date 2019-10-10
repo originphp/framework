@@ -338,11 +338,10 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Response::class, $controller->callMethod('shutdownProcess'));
     }
 
-
     public function testLazyloadComponent()
     {
         $controller = new Controller();
-        $this->assertInstanceOf(Component::class,$controller->Flash);
+        $this->assertInstanceOf(Component::class, $controller->Flash);
     }
 
     /**

@@ -15,8 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\Cache\Engine;
 
-use Origin\Core\ConfigTrait;
 use Origin\Core\HookTrait;
+use Origin\Core\ConfigTrait;
 
 abstract class BaseEngine
 {
