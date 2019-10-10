@@ -1138,9 +1138,7 @@ class Model
         }
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options, 'list');
-        // $results = $this->readDataSource($query, 'list');
+        $results = (new Query($this))->find($options, 'list');
 
         // Modify Results
         if (empty($results)) {
