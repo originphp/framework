@@ -783,9 +783,7 @@ class Request
     protected function readInput(): ?string
     {
         $fh = fopen('php://input', 'r');
-        $contents = stream_get_contents($fh);
-        fclose($fh);
-
-        return $contents;
+        defer($context,'fclose',$fh);
+        return stream_get_contents($fh);
     }
 }

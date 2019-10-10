@@ -88,14 +88,12 @@ class FtpEngine extends BaseEngine
         $filename = $this->addPathPrefix($name);
 
         $stream = fopen('php://temp', 'w+b'); // +b force binary
+        defer($context,'fclose',$stream);
         $result = @ftp_fget($this->connection, $stream, $filename, FTP_BINARY);
 
         if ($result) {
             rewind($stream);
-            $data = stream_get_contents($stream);
-            fclose($stream);
-
-            return $data;
+            return stream_get_contents($stream);
         }
         throw new NotFoundException(sprintf('File %s does not exist', $name));
     }
@@ -117,12 +115,12 @@ class FtpEngine extends BaseEngine
             $this->mkdir($path);
         }
         $stream = fopen('php://temp', 'w+b'); // +b force binary
+        defer($context,'fclose',$stream);
+
         fwrite($stream, $data);
         rewind($stream);
-        $result = @ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
-        fclose($stream);
-
-        return $result;
+        return @ftp_fput($this->connection, $filename, $stream, FTP_BINARY);
+    
         /*
         $tmpfile = sys_get_temp_dir() . DS . uniqid();
         file_put_contents($tmpfile,$data);

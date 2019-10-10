@@ -238,18 +238,25 @@ function deprecationWarning(string $message) : void
  * @example defer($a,[$this,'method'],'arg1','arg2');
  *
  * @param array|null $context A variable to defer functions into
- * @param callable $callback [$this,'method']
+ * @param callable|string $callable [$this,'method'] or string function e.g. fclose or MyClass::myCallbackMethod
  * @return void
  */
-function defer(?array &$context, callable $callback) : void
+function defer(?array &$context, $callable) : void
 {
     if ($context === null) {
         $context = [];
+    }
+
+    if(is_string($callable)){
+        $callable = function() use ($callable) {
+            $arguments = func_get_args();
+            call_user_func($callable,...$arguments);
+        };
     }
 
     $arguments = func_get_args();
     array_shift($arguments);
     array_shift($arguments);
     
-    array_unshift($context, new DeferredFunction($callback, $arguments));
+    array_unshift($context, new DeferredFunction($callable, $arguments));
 }

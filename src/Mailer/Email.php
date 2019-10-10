@@ -602,6 +602,8 @@ class Email
         $account = $this->account;
 
         $this->openSocket($account);
+        defer($context,'fclose', $this->socket);
+
         $this->connect($account);
 
         $this->authenticate($account);
@@ -789,18 +791,6 @@ class Email
     protected function connectionErrorHandler(int $code, string $message): void
     {
         $this->smtpLog[] = $message;
-    }
-
-    /**
-     * Closes the socket
-     *
-     * @return void
-     */
-    protected function closeSocket(): void
-    {
-        if (is_resource($this->socket)) {
-            fclose($this->socket);
-        }
     }
 
     /**

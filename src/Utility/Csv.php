@@ -86,12 +86,12 @@ class CsvIterator implements Iterator, Countable
     {
         $lines = 0;
         $fh = fopen($this->filename, 'rt');
+        defer($context,'fclose',$fh);
         while (! feof($fh)) {
             if (fgets($fh) !== false) {
                 $lines ++;
             }
         }
-        fclose($fh);
         if ($this->options['header']) {
             -- $lines;
         }
@@ -223,6 +223,8 @@ class Csv
 
         $result = [];
         $i = 0;
+
+        defer($context, 'fclose', $stream);
        
         while (($data = fgetcsv($stream, 0, $options['separator'], $options['enclosure'], $options['escape'])) !== false) {
             if ($i === 0 and $options['header']) {
@@ -240,7 +242,6 @@ class Csv
             }
             $i++;
         }
-        fclose($stream);
 
         return $result;
     }
@@ -259,6 +260,7 @@ class Csv
         $options += ['header' => false];
 
         $stream = fopen('php://temp', 'r+');
+        defer($context, 'fclose', $stream);
 
         if ($options['header'] === true) {
             $options['header'] = array_keys(current($data));
@@ -271,9 +273,8 @@ class Csv
             fputcsv($stream, $row);
         }
         rewind($stream);
-        $result = stream_get_contents($stream);
-        fclose($stream);
-
-        return $result;
+        return stream_get_contents($stream);
     }
 }
+
+
