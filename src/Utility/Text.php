@@ -22,23 +22,6 @@ use Origin\Exception\Exception;
 class Text
 {
     /**
-     * Generates a random string. It relies on random_int which uses random_bytes.
-     *
-     * @param integer $length
-     * @return string
-     */
-    public static function random(int $length = 12): string
-    {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        $out = '';
-        for ($i = 0; $i < $length; ++$i) {
-            $out .= $characters[random_int(0, 61)];
-        }
-
-        return $out;
-    }
-
-    /**
     * Checks if a string contains a substring
     *
     * @param string $needle
