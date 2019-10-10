@@ -179,7 +179,7 @@ class Markdown
             return "\n" . '<pre><code>' . $needle . '</code></pre>' . "\n" ; // add extra \n so that its not stropped
         }, $markdown);
   
-        $markdown = preg_replace_callback('/`([^`].*)`/', function ($matches) use ($options) {
+        $markdown = preg_replace_callback('#\`(.*?)`#', function ($matches) use ($options) {
             $needle = trim($matches[1]);
             if ($options['escape'] === false) {
                 $needle = htmlentities($needle, ENT_NOQUOTES);
