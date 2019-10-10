@@ -1,5 +1,5 @@
 <?php
-namespace %namespace%\Http\Controller\Concern;
+namespace %namespace%\Http\Controller\Concern\%class%;
 
 trait %class%
 {
