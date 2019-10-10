@@ -12,7 +12,7 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Core;
+namespace Origin\Lib;
 
 /**
  * A defered function which is dispatched upon destruction

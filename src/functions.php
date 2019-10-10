@@ -15,7 +15,7 @@ use Origin\Log\Log;
 use Origin\I18n\I18n;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Core\DeferredFunction;
+use Origin\Lib\DeferredFunction;
 use Origin\Utility\Collection;
 
 /**
@@ -247,10 +247,10 @@ function defer(?array &$context, $callable) : void
         $context = [];
     }
 
-    if(is_string($callable)){
-        $callable = function() use ($callable) {
+    if (is_string($callable)) {
+        $callable = function () use ($callable) {
             $arguments = func_get_args();
-            call_user_func($callable,...$arguments);
+            call_user_func($callable, ...$arguments);
         };
     }
 
