@@ -13,24 +13,14 @@ declare(strict_types = 1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * This extends the DOM extension, it gives the ability to use a javascript style query selectors
-  * to find elements.
-  */
+namespace Origin\Utility\Lib;
 
-namespace Origin\Utility;
-
-use DOMDocument;
-use Origin\Utility\Lib\DomElement;
 use Origin\Utility\Lib\QuerySelectorTrait;
 
-class Dom extends DOMDocument
+/**
+ * Turbocharged Dom Element
+ */
+class DomElement extends \DOMElement
 {
     use QuerySelectorTrait;
-
-    public function __construct(string $version = '', string $encoding = '')
-    {
-        parent::__construct($version, $encoding);
-        $this->registerNodeClass('DOMElement', DomElement::class);
-    }
 }
