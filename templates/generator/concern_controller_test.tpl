@@ -2,7 +2,7 @@
 namespace %namespace%\Test\Controller\Concern;
 
 use Origin\TestSuite\OriginTestCase;
-use %namespace%\Controller\Concern\%class%;
+use %namespace%\Http\Controller\Concern\%class%;
 use Origin\Http\Controller\Controller;
 
 class DummyController extends Controller
