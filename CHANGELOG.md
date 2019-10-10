@@ -32,6 +32,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Added post install command
 - Concerns
 - Folder::list now works with recursive
+- QueryObject
 
 ### Changed
 
@@ -69,6 +70,7 @@ I been working full time on the framework to get this where it is now, changes g
 
 These fixes have also been fixed in the version 1.x branch
 
+- Fixed bug in Markdown::toHtml when parsing multiple ` tags in the same line
 - Fixed XML serializer
 - Fixed custom class namespace issues with belongsTo/hasAndBelongsToMany
 - Fixed Number parse, now returns double or integer

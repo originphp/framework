@@ -12,6 +12,39 @@ class GenerateCommandTest extends OriginTestCase
 
     protected $fixtures = ['Origin.Bookmark','Origin.BookmarksTag','Origin.Tag','Origin.User'];
 
+
+    public function testGenerateException()
+    {
+        $this->exec('generate --force exception Dummy');
+        $this->assertExitSuccess();
+
+        $filename = SRC.DS.'Exception'.DS.'DummyException.php';
+        $this->assertOutputContains('app/Exception/DummyException.php');
+        $this->assertFileExists($filename);
+     
+        $this->assertFileHash('1a3e8fe379af40f6d4c70401a772bb2c', $filename);
+        unlink($filename);
+    }
+
+    public function testGenerateQuery()
+    {
+        $this->exec('generate --force query Dummy');
+        $this->assertExitSuccess();
+
+        $filename = SRC.DS.'Model'.DS.'Query'.DS.'DummyQuery.php';
+        $this->assertOutputContains('app/Model/Query/DummyQuery.php');
+        $this->assertFileExists($filename);
+     
+        $this->assertFileHash('79f0ce6885050b2a3895c5e26e116186', $filename);
+        unlink($filename);
+
+        $filename = TESTS.DS.'TestCase'.DS.'Model'.DS.'Query'.DS.'DummyQueryTest.php';
+        $this->assertOutputContains('TestCase/Model/Query/DummyQueryTest.php');
+        $this->assertFileExists($filename);
+        $this->assertFileHash('433184ce6814ebe56919e86794e3be2c', $filename);
+        unlink($filename);
+    }
+
     public function testScaffoldUnkownModel()
     {
         $this->exec('generate --force --connection=test scaffold Foo');
@@ -100,7 +133,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertOutputContains('app/Http/Controller/Concern/Dummy.php');
         $this->assertFileExists($filename);
        
-        $this->assertFileHash('dce76967472c9b05339258cd6136c6aa', $filename);
+        $this->assertFileHash('3bae903c64bf5f9529c38d3a1e48e703', $filename);
         unlink($filename);
 
         $filename = TESTS.DS.'TestCase'.DS.'Http'.DS.'Controller'.DS.'Concern'.DS.'DummyTest.php';

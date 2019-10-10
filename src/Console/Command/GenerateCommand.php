@@ -44,6 +44,7 @@ class GenerateCommand extends Command
         'component' => 'Generates a Component class',
         'controller' => 'Generates a Controller class',
         'entity' => 'Generates an Entity class',
+        'exception' => 'Generates an Exception class',
         'helper' => 'Generates a Helper class',
         'job' => 'Generates a Job class',
         'listener' => 'Generates a Listener class',
@@ -52,9 +53,10 @@ class GenerateCommand extends Command
         'middleware' => 'Generates a Middleware class',
         'migration' => 'Generates a Migration class',
         'plugin' => 'Generates a Plugin skeleton',
+        'query' => 'Generates a Query Object class',
         'repository' => 'Generates a Repository for a Model',
         'scaffold' => 'Generates a MVC using the database',
-        'service' => 'Generates a Service object class',
+        'service' => 'Generates a Service Object class',
     ];
 
     public function initialize() : void
@@ -140,6 +142,31 @@ class GenerateCommand extends Command
 
         $this->$generator($data);
     }
+
+    protected function exception(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('exception'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Exception'.DS."{$data['class']}Exception.php",
+            $data
+        );
+    }
+
+    protected function query(array $data)
+    {
+        $this->generate(
+            $this->getTemplateFilename('query'),
+            $this->getBaseFolder($data['name'], self::SRC).DS.'Model'.DS.'Query'.DS."{$data['class']}Query.php",
+            $data
+        );
+
+        $this->generate(
+            $this->getTemplateFilename('query_test'),
+            $this->getBaseFolder($data['name'], self::TEST).DS.'Model'.DS.'Query'.DS."{$data['class']}QueryTest.php",
+            $data
+        );
+    }
+
 
     protected function entity(array $data)
     {
