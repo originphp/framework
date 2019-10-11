@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Publisher;
 
-use \Origin\Core\HookTrait;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 
 class Listener
