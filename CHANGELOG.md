@@ -60,6 +60,8 @@ I been working full time on the framework to get this where it is now, changes g
 - Datasource class renamed to Connection
 - Locale file are now PHP changed from YAML
 
+- Collection is now a composer package and under a different `Origin\Collection`
+
 ### Removed
 
 - Text::random

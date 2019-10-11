@@ -15,7 +15,6 @@ use Origin\Log\Log;
 use Origin\I18n\I18n;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Utility\Collection;
 use Origin\Lib\DeferredFunction;
 
 /**
@@ -195,18 +194,6 @@ function env(string $variable, $default = null)
 function now() : string
 {
     return date('Y-m-d H:i:s');
-}
-
-/**
- * Returns a Origin\Utility\Collection object using the array (can be any array or array of objects such as from
- * results).
- *
- * @param array $items
- * @return \Origin\Utility\Collection
- */
-function collection($items) : Collection
-{
-    return new Collection($items);
 }
 
 /**
