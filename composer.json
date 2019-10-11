@@ -33,6 +33,7 @@
   },
   "require": {
     "php": "^7.2.0",
+    "originphp/defer" : "^1.0.0",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-openssl": "*",
