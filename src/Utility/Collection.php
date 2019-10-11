@@ -644,7 +644,7 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Gets the current position
+     * Gets the current item
      *
      * @return mixed
      */

@@ -35,7 +35,7 @@ use Origin\Core\HookTrait;
  * Service object uses dependency injection, it does one thing, it contains business
  * logic and should follow the single responsibility principle.
  *
- *  // A simple example
+ *  // A simple example how to use, but you would not create user in db from service object.
  *
  *  class CreateNewUserService extends ApplicationService {
  *
@@ -45,11 +45,14 @@ use Origin\Core\HookTrait;
  *          $this->User = $user;
  *        }
  *
- *      protected function execute(array $data) : Entity
+ *      protected function execute(array $data) : : ?Result
  *       {
  *          $user = $this->User->create($data);
  *          if($this->User->save($user)){
- *              return $user;
+ *              return $this->result([
+ *                  'success' => true,
+ *                   'data' => $user
+ *              ]);
  *          }
  *          throw new Exception('Error creating user');
  *      }

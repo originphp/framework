@@ -170,8 +170,8 @@ class Security
      * Generates a cryptographically secure random string that can be used for a unique id.
      *
      * It is designed to be memory & diskspace efficient yet at the same time be unique enough
-     * to not have to check the database. This is a solution where you are not required to use a UUID and
-     * a user does not need to type.
+     * to not have to check the database. This is a solution where you are not required to use a
+     * UUID and a user does not need to type.
      *
      * @see https://en.wikipedia.org/wiki/Birthday_problem
      *
@@ -215,7 +215,7 @@ class Security
     }
 
     /**
-     * Gets the MAC address (on Linux systems) or return a random one.
+     * Gets the MAC address (on Linux systems).
      *
      * @return string
      */
