@@ -17,9 +17,9 @@ namespace Origin\I18n;
 
 use Locale;
 use Origin\Utility\Date;
-use Origin\Utility\Yaml;
 use Origin\Utility\Number;
 use Origin\Exception\Exception;
+use Origin\Exception\InvalidArgumentException;
 use Origin\I18n\Date as I18nDate;
 use Origin\I18n\Number as I18nNumber;
 use Origin\I18n\Exception\LocaleNotAvailableException;
@@ -133,16 +133,19 @@ class I18n
         static::$definition = null;
 
         $filename = null;
-        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.yml')) {
-            $filename = CONFIG . DS . 'locales' . DS . $locale .'.yml';
+        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.php')) {
+            $filename = CONFIG . DS . 'locales' . DS . $locale .'.php';
         } elseif (strpos($locale, '_') !== false) {
             list($language, $void) = explode('_', $locale, 2);
-            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.yml')) {
-                $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
+            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.php')) {
+                $filename = CONFIG . DS . 'locales' . DS . $language .'.php';
             }
         }
         if ($filename) {
-            static::$definition = Yaml::toArray(file_get_contents($filename));
+            static::$definition = include $filename;
+            if (!is_array(static::$definition)) {
+                throw new InvalidArgumentException('Invalid Definition File');
+            }
         }
 
         return static::$definition;

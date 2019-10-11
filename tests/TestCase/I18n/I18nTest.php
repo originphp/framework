@@ -26,6 +26,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
         I18n::initialize(['locale' => 'en_GB']);
         $this->assertEquals('en', I18n::language());
         $this->assertEquals('en_GB', I18n::locale());
+        $this->assertEquals('£10,000', Number::currency(10000));
     }
 
     /**
@@ -33,40 +34,48 @@ class I18nTest extends \PHPUnit\Framework\TestCase
      */
     public function testLocaleNoCurrency()
     {
-        $locale = <<< EOF
-name: English (World)
-decimals: .
-thousands: ,
-currency: 
-before: ¤
-after: 
-date: d/m/Y
-time: g:i a
-datetime: d/m/Y, g:i a
-EOF;
-        file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml', $locale);
+        $locale = [
+            'name' => 'English (World)',
+            'decimals' => '.',
+            'thousands' => ',',
+            'currency' => null,
+            'before' => '¤',
+            'after' => null,
+            'date' => 'd/m/Y',
+            'time' => 'g:i a',
+            'datetime' => 'd/m/Y, g:i a',
+          ];
+
+
+        file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.php', $this->localeToString($locale));
         I18n::initialize(['locale' => 'en_001']);
         $this->assertEquals('$10,000', Number::currency(10000));
-        unlink(CONFIG . DS . 'locales' . DS . 'en_001' .'.yml');
+        unlink(CONFIG . DS . 'locales' . DS . 'en_001' .'.php');
+    }
+
+    private function localeToString(array $data)
+    {
+        return "<?php\nreturn ".var_export($data, true).";";
     }
 
     public function testLocaleGeneric()
     {
-        $locale = <<< EOF
-name: English (World)
-decimals: .
-thousands: ,
-currency: 
-before: ¤
-after: 
-date: d/m/Y
-time: g:i a
-datetime: d/m/Y, g:i a
-EOF;
-        file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.yml', $locale);
+        $locale = [
+            'name' => 'English (World)',
+            'decimals' => '.',
+            'thousands' => ',',
+            'currency' => null,
+            'before' => '¤',
+            'after' => null,
+            'date' => 'd/m/Y',
+            'time' => 'g:i a',
+            'datetime' => 'd/m/Y, g:i a',
+          ];
+
+        file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.php', $this->localeToString($locale));
         I18n::initialize(['locale' => 'en_NOT_EXIST']);
         $this->assertEquals('$10,000', Number::currency(10000));
-        unlink(CONFIG . DS . 'locales' . DS . 'en' .'.yml');
+        unlink(CONFIG . DS . 'locales' . DS . 'en' .'.php');
     }
 
     public function testDetectLocale()

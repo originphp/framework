@@ -20,7 +20,6 @@ use DateTime;
 use ResourceBundle;
 use NumberFormatter;
 use IntlDateFormatter;
-use Origin\Utility\Yaml;
 
 class LocaleGenerateCommand extends Command
 {
@@ -99,7 +98,7 @@ class LocaleGenerateCommand extends Command
             $result = $this->parseLocale($locale);
             $results[$locale] = $result;
             if ($this->options('single-file') === false) {
-                $this->io->createFile($this->path . DS . $locale . '.yml', Yaml::fromArray($result), $this->options('force'));
+                $this->io->createFile($this->path . DS . $locale . '.php', $this->toString($result), $this->options('force'));
             }
 
             $this->io->progressBar($i, $max);
@@ -108,9 +107,14 @@ class LocaleGenerateCommand extends Command
         }
 
         if ($this->options('single-file')) {
-            $this->io->createFile($this->path . DS . 'locales.yml', Yaml::fromArray($results), $this->options('force'));
+            $this->io->createFile($this->path . DS . 'locales.php', $this->toString($result), $this->options('force'));
         }
         $this->io->success(sprintf('Generated %d locale definitions', count($results)));
+    }
+
+    private function toString(array $result)
+    {
+        return "<?php\nreturn ".$this->varExport($result, true).";";
     }
 
     /**
@@ -119,7 +123,7 @@ class LocaleGenerateCommand extends Command
      * @param string $locale
      * @return array
      */
-    protected function parseLocale(string $locale = null): array
+    private function parseLocale(string $locale = null): array
     {
         $config = ['name' => null, 'decimals' => null, 'thousands' => null, 'currency' => null, 'before' => null, 'after' => null, 'date' => null, 'time' => null, 'datetime' => null];
 
@@ -167,7 +171,7 @@ class LocaleGenerateCommand extends Command
      * @param string $string
      * @return string
      */
-    public function convertDate(string $string): string
+    private function convertDate(string $string): string
     {
         return strtr($string, $this->dateMap);
     }
@@ -177,7 +181,7 @@ class LocaleGenerateCommand extends Command
      * @param string $string
      * @return string
      */
-    public function convertTime(string $string): string
+    private function convertTime(string $string): string
     {
         return strtr($string, $this->timeMap);
     }
@@ -188,10 +192,30 @@ class LocaleGenerateCommand extends Command
      * @param string $string
      * @return string
      */
-    public function convertDatetime(string $string): string
+    private function convertDatetime(string $string): string
     {
         $string = $this->convertDate($string);
 
         return strtr($string, $this->timeMap);
+    }
+
+    /**
+     * Modern version of varExport
+     *
+     * @param array $data
+     * @return string
+     */
+    private function varExport(array $data) : string
+    {
+        $data = var_export($data, true);
+        $data = str_replace(
+            ['array (', "),\n", " => \n"],
+            ['[', "],\n", ' => '],
+            $data
+        );
+        $data = preg_replace('/=>\s\s+\[/i', '=> [', $data);
+        $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
+
+        return substr($data, 0, -1).']';
     }
 }

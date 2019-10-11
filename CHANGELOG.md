@@ -58,6 +58,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Log engine, log method changed to return void
 - Concerns - these were silently added in the last major releases but were not documented, these have been rewritten to use `traits` instead.
 - Datasource class renamed to Connection
+- Locale file are now PHP changed from YAML
 
 ### Removed
 
