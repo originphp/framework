@@ -41,9 +41,5 @@ after_script:
 cache:
   directories:
     - $HOME/.composer/cache/files
-deploy:
-  on:
-    branch: master
-    tags: true
 after_success:
   - bash <(curl -s https://codecov.io/bash)
