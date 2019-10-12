@@ -14,9 +14,10 @@ declare(strict_types = 1);
  */
 namespace Origin\Mailer;
 
-use Origin\Utility\Html;
+use Origin\Html\Html;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
+use Origin\Email\Email as SmtpEmail;
 
 /**
  * This class builds an configured email from an arra for Mailer.
@@ -42,7 +43,7 @@ class EmailBuilder
     /**
      * Email message object
      *
-     * @var \Origin\Mailer\Email
+     * @var SmtpEmail
      */
     protected $message = null;
 
@@ -69,13 +70,15 @@ class EmailBuilder
      * Builds the email object
      *
      * @param boolean $debug set to true to ensure send does not send emails
-     * @return \Origin\Mailer\Email
+     * @return SmtpEmail
      */
-    public function build(bool $debug = false) : Email
+    public function build(bool $debug = false) : SmtpEmail
     {
-        $account = ($debug === true) ? ['engine' => 'Test'] : $this->options['account'];
-      
-        $this->message = new Email($account);
+        if ($debug) {
+            $this->message = new SmtpEmail(['engine' => 'Test']);
+        } else {
+            $this->message = Email::account($this->options['account']);
+        }
      
         extract($this->options);
         
@@ -153,12 +156,12 @@ class EmailBuilder
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
-                $this->message->textMessage($content);
             } elseif ($this->content and $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
                 throw new Exception(sprintf('Template %s does not exist', $filename));
             }
+            $this->message->textMessage($content);
         }
     }
 

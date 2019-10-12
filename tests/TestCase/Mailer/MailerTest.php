@@ -15,7 +15,7 @@
 namespace Origin\Test\Mailer;
 
 use Origin\Mailer\Mailer;
-use Origin\Mailer\Message;
+use Origin\Email\Message;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 

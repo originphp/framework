@@ -15,6 +15,7 @@
 namespace Origin\Test\Core;
 
 use Origin\Mailer\Email;
+use Origin\Email\Email as SmtpEmail;
 use Origin\Log\Engine\EmailEngine;
 use Origin\Exception\InvalidArgumentException;
 

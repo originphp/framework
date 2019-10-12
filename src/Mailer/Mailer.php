@@ -17,6 +17,8 @@ namespace Origin\Mailer;
 use Origin\Core\Plugin;
 use Origin\Core\HookTrait;
 use Origin\Utility\Inflector;
+use Origin\Email\Email;
+use Origin\Email\Message;
 
 /**
 * To set values in the view set public properties in the execute method
@@ -93,7 +95,7 @@ abstract class Mailer
     /**
      * Holds the Email Utility
      *
-     * @var \Origin\Mailer\Email;
+     * @var \Origin\Email\Email;
      */
     protected $email = null;
 
@@ -201,7 +203,7 @@ abstract class Mailer
     /**
     * Dispatches the email
     *
-    * @return \Origin\Mailer\Message
+    * @return \Origin\Email\Message
     */
     public function dispatch() : Message
     {
@@ -232,7 +234,7 @@ abstract class Mailer
     /**
      * Previews the message with headers
      *
-     * @return \Origin\Mailer\Message
+     * @return \Origin\Email\Message
      */
     public function preview() : Message
     {
@@ -249,7 +251,7 @@ abstract class Mailer
      * Builds the Email Object
      *
      * @param boolean $debug
-     * @return \Origin\Mailer\Email
+     * @return \Origin\Email\Email
      */
     private function buildEmail(bool $debug = false) : Email
     {

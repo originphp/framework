@@ -23,7 +23,7 @@ declare(strict_types = 1);
 
 namespace Origin\Model;
 
-use Origin\Utility\Xml;
+use Origin\Xml\Xml;
 use Origin\Utility\Inflector;
 
 class Entity

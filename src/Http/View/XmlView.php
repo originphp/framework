@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Http\View;
 
-use Origin\Utility\Xml;
+use Origin\Xml\Xml;
 use Origin\Utility\Inflector;
 use Origin\Http\Controller\Controller;
 

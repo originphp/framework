@@ -50,11 +50,14 @@ class LocaleGenerateCommandTest extends \PHPUnit\Framework\TestCase
      */
     private function recursiveDelete(string $directory)
     {
-        foreach (glob($directory."/*.*") as $filename) {
-            if (is_file($filename)) {
-                unlink($filename);
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if (is_dir($directory . DS . $filename)) {
+                $this->recursiveDelete($directory . DS . $filename);
+                continue;
             }
+            unlink($directory . DS . $filename);
         }
-        rmdir($directory);
+        return rmdir($directory);
     }
 }

@@ -85,7 +85,7 @@ class PluginInstallCommand extends Command
     {
         shell_exec("git clone {$url} {$folder}");
        
-        return file_exists($folder) and Folder::delete($folder . DS . '.git', ['recursive' => true]);
+        return file_exists($folder) and $this->recursiveDelete($folder . DS . '.git');
     }
 
     /**
@@ -126,5 +126,18 @@ class PluginInstallCommand extends Command
         } else {
             $this->io->status('error', sprintf('Plugin not downloaded from `%s`', $url));
         }
+    }
+
+    private function recursiveDelete(string $directory)
+    {
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if (is_dir($directory . DS . $filename)) {
+                $this->recursiveDelete($directory . DS . $filename);
+                continue;
+            }
+            unlink($directory . DS . $filename);
+        }
+        return rmdir($directory);
     }
 }

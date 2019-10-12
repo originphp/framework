@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Log\Engine;
 
 use Origin\Mailer\Email;
-use Origin\Exception\Exception;
+use Origin\Email\Email as SmtpEmail;
 use Origin\Exception\InvalidArgumentException;
 
 class EmailEngine extends BaseEngine
@@ -24,7 +24,7 @@ class EmailEngine extends BaseEngine
     /**
      * Holds the last email sent
      *
-     * @var \Origin\Mailer\Message;
+     * @var \Origin\Email\Message;
      */
     protected $lastEmail = null;
 
@@ -110,13 +110,15 @@ class EmailEngine extends BaseEngine
          * Prevent recursion
          */
         try {
-            $email = new Email($this->config('account'));
+            $email = Email::account($this->config('account'));
             $email->to($to[0], $to[1])
                 ->from($from[0], $from[1])
                 ->subject($subject)
-                ->htmlMessage("<p>{$message}</p>");
+                ->htmlMessage("<p>{$message}</p>")
+                ->textMessage($message)
+                ->format('both');
             $this->lastEmail = $email->send();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Don't log failures since this will create recursion
             return false;
         }

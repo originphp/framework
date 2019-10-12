@@ -1,7 +1,6 @@
 <?php
 namespace Origin\Test\Console\Command;
 
-use Origin\Utility\Folder;
 use Origin\Console\ConsoleIo;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\Stub\ConsoleOutput;
@@ -107,6 +106,19 @@ class PluginInstallCommandTest extends \PHPUnit\Framework\TestCase
         $result = $command->callMethod('download', ['https://github.com/originphp/debug-plugin',TMP . DS . 'debug-plugin']);
         
         $this->assertTrue($result);
-        Folder::delete(TMP . DS . 'debug-plugin', ['recursive' => true]);
+        $this->recursiveDelete(TMP . DS . 'debug-plugin');
+    }
+
+    private function recursiveDelete(string $directory)
+    {
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if (is_dir($directory . DS . $filename)) {
+                $this->recursiveDelete($directory . DS . $filename);
+                continue;
+            }
+            unlink($directory . DS . $filename);
+        }
+        return rmdir($directory);
     }
 }

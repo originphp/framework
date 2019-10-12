@@ -2,7 +2,6 @@
 
 namespace Origin\Test\Console\Command;
 
-use Origin\Utility\Folder;
 use Origin\TestSuite\OriginTestCase;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
@@ -218,7 +217,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('3df2fbe6dad0388ccc8f61afba77cb2c', $filename);
         unlink($filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'contact_manager', ['recursive' => true]);
+        $this->recursiveDelete(APP.DS.'plugins'.DS.'contact_manager');
     }
 
     public function testGenerateComponent()
@@ -489,7 +488,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileExists($filename);
         $this->assertFileHash('3aac15995b02c9505537ccdb85130f31', $filename);
 
-        Folder::delete(APP.DS.'plugins'.DS.'dummy', ['recursive' => true]);
+        $this->recursiveDelete(APP.DS.'plugins'.DS.'dummy');
     }
 
     /*
@@ -500,5 +499,18 @@ class GenerateCommandTest extends OriginTestCase
     protected function assertFileHash(string $hash, String $filename)
     {
         $this->assertEquals($hash, md5(file_get_contents($filename)));
+    }
+
+    private function recursiveDelete(string $directory)
+    {
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $filename) {
+            if (is_dir($directory . DS . $filename)) {
+                $this->recursiveDelete($directory . DS . $filename);
+                continue;
+            }
+            unlink($directory . DS . $filename);
+        }
+        return rmdir($directory);
     }
 }

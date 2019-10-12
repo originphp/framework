@@ -58,9 +58,15 @@ I been working full time on the framework to get this where it is now, changes g
 - Log engine, log method changed to return void
 - Concerns - these were silently added in the last major releases but were not documented, these have been rewritten to use `traits` instead.
 - Datasource class renamed to Connection
-- Locale file are now PHP changed from YAML
+- Locale files are now PHP changed from YAML
+- File::info renamed filename key to name
+- Backend Email utility has completely changed, it no longer uses configuration or templates. It is purely for constructing and sending messages by SMTP.
 
-- Collection is now a composer package and under a different `Origin\Collection`
+- Collection is now a composer package and under a different namespace `Origin\Collection`
+- CSV is now a composer package and under a different namespace `Origin\Csv`
+- DOM is now a composer package and under a different namespace `Origin\Dom`
+- Email is now a composer package and under a different namespace `Origin\Email`
+- File and Folder are now in a composer package (originphp/filesystem) and under a different namespace `Origin\Filesystem`
 
 ### Removed
 

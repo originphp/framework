@@ -17,7 +17,7 @@ namespace Origin\Model;
 use Iterator;
 use Countable;
 use ArrayAccess;
-use Origin\Utility\Xml;
+use Origin\Xml\Xml;
 use Origin\Utility\Inflector;
 
 class Collection implements ArrayAccess, Iterator, Countable
