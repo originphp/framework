@@ -22,6 +22,8 @@ Summary of what has changed:
 
 5. Added some new features like custom Entity classes with mutators and accessors
 
+6. Deocupled the framework into seperate packages.
+
 I been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
 
 ### Added
@@ -62,11 +64,20 @@ I been working full time on the framework to get this where it is now, changes g
 - File::info renamed filename key to name
 - Backend Email utility has completely changed, it no longer uses configuration or templates. It is purely for constructing and sending messages by SMTP.
 
+** Utilities **
+
 - Collection is now a composer package and under a different namespace `Origin\Collection`
 - CSV is now a composer package and under a different namespace `Origin\Csv`
 - DOM is now a composer package and under a different namespace `Origin\Dom`
 - Email is now a composer package and under a different namespace `Origin\Email`
 - File and Folder are now in a composer package (originphp/filesystem) and under a different namespace `Origin\Filesystem`
+- Yaml is now a composer package and under a different namespace `Origin\Yaml`
+- Html is now a composer package and under a different namespace `Origin\Html`
+- Text is now a composer package and under a different namespace `Origin\Text`
+- Markdown is now a composer package and under a different namespace `Origin\Markdown`
+
+** Libraries **
+- Cache is now a composer package and under a different namespace `Origin\Cache`
 
 ### Removed
 
