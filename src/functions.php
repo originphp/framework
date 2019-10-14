@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -11,6 +12,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 use Origin\Log\Log;
 use Origin\I18n\I18n;
 use Origin\Core\Config;
@@ -20,12 +22,12 @@ use Origin\Core\Debugger;
  * Runs a backtrace.
  * @codeCoverageIgnore
  */
-function backtrace() : void
+function backtrace(): void
 {
     if (Config::read('debug')) {
         $debugger = new Debugger();
         $debug = $debugger->backtrace();
-    
+
         if (PHP_SAPI === 'cli') {
             $errorHandler = new Origin\Console\ErrorHandler();
             $errorHandler->render($debug, true);
@@ -34,7 +36,7 @@ function backtrace() : void
             include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
         }
     }
-   
+
     exit();
 }
 
@@ -46,7 +48,7 @@ function backtrace() : void
  * @param boolean $isHtml if set to true data will passed through htmlspecialchars
  * @return void
  */
-function debug($data, bool $isHtml = false) : void
+function debug($data, bool $isHtml = false): void
 {
     if (Config::read('debug')) {
         $backtrace = debug_backtrace();
@@ -56,7 +58,7 @@ function debug($data, bool $isHtml = false) : void
         if ($isHtml) {
             $data = h($data);
         }
-        
+
         if (PHP_SAPI === 'cli') {
             $where = "{$filename} Line: {$line}";
             $template = sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
@@ -73,7 +75,7 @@ function debug($data, bool $isHtml = false) : void
  * @param mixed $data
  * @return void
  */
-function pr($data) : void
+function pr($data): void
 {
     if (Config::read('debug')) {
         $template = '<pre>%s</pre>';
@@ -92,7 +94,7 @@ function pr($data) : void
  * @param string $class Origin\Framework\Dispatcher
  * @return array ('Origin\Framework\','Dispatcher')
  */
-function namespaceSplit(string $class) : array
+function namespaceSplit(string $class): array
 {
     $namespace = null;
     $position = strrpos($class, '\\');
@@ -111,7 +113,7 @@ function namespaceSplit(string $class) : array
  * @param string $name 'ContactManager.contacts'
  * @return array ('ContactManager','contacts')
  */
-function pluginSplit($name) : array
+function pluginSplit($name): array
 {
     $plugin = null;
     if (strpos($name, '.') !== false) {
@@ -127,7 +129,7 @@ function pluginSplit($name) : array
  * @param string $command app:create-user,
  * @return array
  */
-function commandSplit(string $command) : array
+function commandSplit(string $command): array
 {
     $namespace = null;
     if (strpos($command, ':') !== false) {
@@ -145,7 +147,7 @@ function commandSplit(string $command) : array
  * @param array $vars array of vars e.g ['id'=>$user->id,'name'=>$user->name]
  * @return string|null formatted
  */
-function __(string $string = null, array $vars = []) : ?string
+function __(string $string = null, array $vars = []): ?string
 {
     if ($string) {
         return I18n::translate($string, $vars);
@@ -161,7 +163,7 @@ function __(string $string = null, array $vars = []) : ?string
  * @param string $encoding
  * @return string|null
  */
-function h(string $text = null, $encoding = 'UTF-8') : ?string
+function h(string $text = null, $encoding = 'UTF-8'): ?string
 {
     return htmlspecialchars($text, ENT_QUOTES, $encoding);
 }
@@ -190,7 +192,7 @@ function env(string $variable, $default = null)
  *
  * @return string date('Y-m-d H:i:s')
  */
-function now() : string
+function now(): string
 {
     return date('Y-m-d H:i:s');
 }
@@ -201,11 +203,11 @@ function now() : string
  * @param string $message
  * @return void
  */
-function deprecationWarning(string $message) : void
+function deprecationWarning(string $message): void
 {
     $trace = debug_backtrace();
     if (isset($trace[1])) {
-        $message = sprintf('%s - %s. Line: %s', $message, str_replace(ROOT .DS, '', $trace[1]['file']), $trace[1]['line']);
+        $message = sprintf('%s - %s. Line: %s', $message, str_replace(ROOT . DS, '', $trace[1]['file']), $trace[1]['line']);
     }
 
     Log::warning($message);
@@ -216,20 +218,20 @@ function deprecationWarning(string $message) : void
 }
 
 
-# Cache has been decoupled so need internal caching for objects/arrays
+# Cache has been decoupled so need internal caching for data including objects/arrays
 
 /**
-* Internal caching for array and objects. By default it uses PHP serialize method. Even without
-* serialization you can store arrays and/or stdclass objects
-*
-* @param string $key
-* @param mixed $data
-* @param array $options
-*   - serialize: default true. serializes data using PHP serialize method.
-*   - duration: 3600 seconds which it will be valid
-* @return boolean
-*/
-function cache_set(string $key, $data, array $options = []) : bool
+ * Internal caching for array and objects. By default it uses PHP serialize method. Even without
+ * serialization you can store arrays and/or stdclass objects
+ *
+ * @param string $key
+ * @param mixed $data
+ * @param array $options
+ *   - serialize: default true. serializes data using PHP serialize method.
+ *   - duration: 3600 seconds which it will be valid
+ * @return boolean
+ */
+function cache_set(string $key, $data, array $options = []): bool
 {
     $options += ['serialize' => true, 'duration' => 3600];
 

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,6 +13,7 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Origin\Publisher;
 
 use Origin\Core\HookTrait;
@@ -19,7 +21,7 @@ use Origin\Model\ModelTrait;
 
 class Listener
 {
-    use ModelTrait,HookTrait;
+    use ModelTrait, HookTrait;
 
     public function __construct()
     {
@@ -33,7 +35,7 @@ class Listener
      * @param array $arguments
      * @return boolean
      */
-    public function dispatch(string $method, array $arguments = []) : bool
+    public function dispatch(string $method, array $arguments = []): bool
     {
         $this->executeHook('startup');
         if ($this->executeHook($method, $arguments) === false) {
