@@ -20,7 +20,7 @@ define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__DIR__));
 define('ORIGIN', dirname(__DIR__));
 define('CONFIG', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'config');
-define('LOGS', sys_get_temp_dir());
+define('LOGS', sys_get_temp_dir() . '/logs');
 
 define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'app');
 define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'tests');
@@ -29,8 +29,12 @@ define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
 define('TMP', sys_get_temp_dir());
 define('WEBROOT', ROOT . DS . 'public');
 
+// create tmp folder structure
 if (! file_exists(TMP . DS . 'cache')) {
     @mkdir(TMP . DS . 'cache');
+}
+if (! file_exists(TMP . DS . 'logs')) {
+    @mkdir(TMP . DS . 'logs');
 }
 
 require ORIGIN . DS . 'src' . DS . 'bootstrap.php';
