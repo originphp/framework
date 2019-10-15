@@ -16,12 +16,12 @@ declare(strict_types = 1);
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Core\ConfigTrait;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 use Origin\Exception\Exception;
 
 abstract class BaseEngine
 {
-    use ConfigTrait;
+    use Configurable;
 
     /**
     * Constructor

@@ -15,12 +15,12 @@ declare(strict_types = 1);
 
 namespace Origin\Model;
 
-use Origin\Core\StaticConfigTrait;
+use Origin\Configurable\StaticConfigurable as Configurable;
 use Origin\Exception\InvalidArgumentException;
 
 class ConnectionManager
 {
-    use StaticConfigTrait;
+    use Configurable;
 
     protected static $engines = [
         'mysql' => __NAMESPACE__ . '\Engine\MysqlEngine',

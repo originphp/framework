@@ -21,12 +21,12 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use Origin\Job\Engine\BaseEngine;
-use Origin\Core\StaticConfigTrait;
+use Origin\Configurable\StaticConfigurable as Configurable;
 use Origin\Exception\InvalidArgumentException;
 
 class Queue
 {
-    use StaticConfigTrait;
+    use Configurable;
 
     /**
      * Holds the queue engines

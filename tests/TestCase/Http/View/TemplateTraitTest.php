@@ -14,14 +14,14 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Core\ConfigTrait;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 use Origin\Http\View\Templater;
 use Origin\Http\View\TemplateTrait;
 
 class MockObject
 {
     use TemplateTrait;
-    use ConfigTrait; // TemplateTrait uses this
+    use Configurable; // TemplateTrait uses this
 
     protected $defaultConfig = [
         'templates' => [],

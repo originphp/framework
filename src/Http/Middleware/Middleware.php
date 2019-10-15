@@ -20,11 +20,11 @@ namespace Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\HookTrait;
-use Origin\Core\ConfigTrait;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 
 class Middleware
 {
-    use ConfigTrait, HookTrait;
+    use Configurable, HookTrait;
     /**
      * Constructor
      */

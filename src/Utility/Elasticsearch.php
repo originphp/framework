@@ -15,14 +15,14 @@ declare(strict_types = 1);
 
 namespace Origin\Utility;
 
-use Origin\Core\StaticConfigTrait;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 use Origin\Utility\Exception\NotFoundException;
 use Origin\Utility\Exception\ElasticsearchException;
 
 class Elasticsearch
 {
-    use StaticConfigTrait;
+    use Configurable;
 
     protected static $defaultConfig = [
         'host' => '127.0.0.1',

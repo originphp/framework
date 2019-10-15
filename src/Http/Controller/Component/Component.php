@@ -18,13 +18,13 @@ namespace Origin\Http\Controller\Component;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\HookTrait;
-use Origin\Core\ConfigTrait;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 use Origin\Http\Controller\Controller;
 
 class Component
 {
     use HookTrait;
-    use ConfigTrait;
+    use Configurable;
     
     /**
      * Controller Object

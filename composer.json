@@ -34,6 +34,7 @@
   "require": {
     "php": "^7.2.0",
     "originphp/defer" : "^1.0",
+    "originphp/configurable" : "^1.0",
     "originphp/email" : "^1.0",
     "originphp/html" : "^1.0",
     "originphp/xml" : "^1.0",
