@@ -4,7 +4,7 @@ use Origin\Core\Autoloader;
 use Origin\Utility\Elasticsearch;
 
 $autoloader = Autoloader::instance();
-$autoloader->directory(APP);
+$autoloader->directory(dirname(__DIR__));
 
 $namespaces = [
     'App' => 'app'

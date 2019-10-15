@@ -16,8 +16,8 @@ namespace Origin\Test\Model;
 
 use Origin\Model\ConnectionManager;
 
-include_once APP . DS . 'database' . DS . 'schema.php';
-include_once APP . DS . 'database' . DS . 'seed.php';
+include_once DATABASE . DS . 'schema.php';
+include_once DATABASE . DS . 'seed.php';
 
 class SeedTest extends \PHPUnit\Framework\TestCase
 {

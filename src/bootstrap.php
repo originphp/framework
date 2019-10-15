@@ -21,16 +21,19 @@ if (! defined('DS')) {
     define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
 }
 
-if (! defined('SRC')) {
-    define('CONFIG', ROOT . DS . 'config');
-    define('LOGS', ROOT . DS . 'logs');
+if (! defined('APP')) {
     define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
+
+    define('APP', ROOT . DS . 'app');
+    define('CONFIG', ROOT . DS . 'config');
+    define('DATABASE', ROOT . DS . 'database');
     define('PLUGINS', ROOT . DS . 'plugins');
-    define('SRC', ROOT . DS . 'app');
-    define('APP', ROOT);
     define('TESTS', ROOT . DS . 'tests');
-    define('TMP', ROOT . DS . 'tmp');
     define('WEBROOT', ROOT . DS . 'public');
+
+    define('TMP', ROOT . DS . 'tmp');
+    define('LOGS', ROOT . DS . 'logs');
+    define('CACHE', TMP . DS . 'cache');
 }
 
 error_reporting(E_ALL);

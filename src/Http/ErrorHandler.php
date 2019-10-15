@@ -231,7 +231,7 @@ class ErrorHandler
         $debug = $debugger->exception($exception);
           
         ob_start();
-        include SRC . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
+        include APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
         $response = ob_get_clean();
       
         $this->sendResponse($response);

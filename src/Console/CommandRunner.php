@@ -66,7 +66,7 @@ class CommandRunner
         $folder = 'Console' .DS .'Command';
         $this->namespaces = [
             'Origin' => ORIGIN . DS . 'src' . DS . $folder,
-            Config::read('App.namespace') => SRC . DS . $folder
+            Config::read('App.namespace') => APP . DS . $folder
         ];
 
         $plugins = Plugin::loaded();
@@ -182,6 +182,7 @@ class CommandRunner
     protected function getCommandList()
     {
         $results = [];
+
         foreach ($this->discovered as $command) {
             $class = $command['namespace'].'\\'.$command['className'];
             if (class_exists($class)) {

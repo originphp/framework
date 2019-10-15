@@ -81,7 +81,7 @@ class View
      * @example /var/www/src/View
      * @var string
      */
-    protected $viewPath = SRC . DS . 'Http' . DS . 'View';
+    protected $viewPath = APP . DS . 'Http' . DS . 'View';
 
     public function __construct(Controller $controller = null)
     {

@@ -30,7 +30,7 @@ class GenerateCommand extends Command
      *
      * @var string
      */
-    protected $directory = SRC . '/templates';
+    protected $directory = ROOT . '/templates';
 
     /**
      * Generators array and list of templates they will process.
@@ -411,7 +411,7 @@ class GenerateCommand extends Command
         $version = date('Ymdhis');
         $this->generate(
             $this->getTemplateFilename('migration'),
-            APP .DS . 'database' . DS . 'migrations' . DS . "{$version}{$data['class']}.php",
+            DATABASE . DS . 'migrations' . DS . "{$version}{$data['class']}.php",
             $data
         );
     }
@@ -498,9 +498,10 @@ class GenerateCommand extends Command
             'tests',
             'database',
         ];
-        $pluginDirectory = APP.DS.'plugins';
 
-        $path = $pluginDirectory.DS.Inflector::underscored($data['class']);
+        
+
+        $path = PLUGINS .DS.Inflector::underscored($data['class']);
         foreach ($structure as $folder) {
             $directory = $path.DS.$folder;
             if (! file_exists($directory)) {
@@ -508,7 +509,7 @@ class GenerateCommand extends Command
             }
         }
 
-        $directory = $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'src';
+        $directory =  PLUGINS.DS.Inflector::underscored($data['class']).DS.'src';
 
         $this->generate(
             $this->getTemplateFilename('plugin_controller'),
@@ -522,25 +523,25 @@ class GenerateCommand extends Command
         );
         $this->generate(
             $this->getTemplateFilename('plugin_routes'),
-            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'config'.DS.'routes.php',
+            PLUGINS.DS.Inflector::underscored($data['class']).DS.'config'.DS.'routes.php',
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('plugin_bootstrap'),
-            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'config'.DS.'bootstrap.php',
+            PLUGINS.DS.Inflector::underscored($data['class']).DS.'config'.DS.'bootstrap.php',
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('phpunit'),
-            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'phpunit.xml',
+            PLUGINS.DS.Inflector::underscored($data['class']).DS.'phpunit.xml',
             $data
         );
 
         $this->generate(
             $this->getTemplateFilename('plugin_composer'),
-            $pluginDirectory.DS.Inflector::underscored($data['class']).DS.'composer.json',
+            PLUGINS.DS.Inflector::underscored($data['class']).DS.'composer.json',
             $data
         );
     }
@@ -703,7 +704,7 @@ class GenerateCommand extends Command
                 return PLUGINS.DS.$plugin.DS.'src';
             }
 
-            return SRC;
+            return APP;
         }
         // Tests
         if ($plugin) {

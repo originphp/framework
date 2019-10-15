@@ -236,7 +236,7 @@ class EmailBuilder
             return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' . DS . $name ;
         }
 
-        return SRC . DS . 'Mailer' . DS . 'Template' . DS . $name;
+        return APP . DS . 'Mailer' . DS . 'Template' . DS . $name;
     }
 
     /**
@@ -252,6 +252,6 @@ class EmailBuilder
             return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
         }
 
-        return SRC . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
+        return APP . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
     }
 }

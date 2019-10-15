@@ -33,7 +33,7 @@ function backtrace(): void
             $errorHandler->render($debug, true);
         } else {
             ob_clean();
-            include SRC . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+            include APP . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
         }
     }
 
@@ -255,7 +255,7 @@ function cache_set(string $key, $data, array $options = []): bool
 
     $tmp = tempnam(sys_get_temp_dir(), 'cache');
     file_put_contents($tmp, '<?php $data = ' . $data . ';', LOCK_EX);
-    return rename($tmp, TMP . '/cache/' . $key);
+    return rename($tmp, CACHE . DS . $key);
 }
 
 /**
@@ -272,7 +272,7 @@ function cache_get(string $key)
         throw new InvalidArgumentException('Invalid cache key');
     }
 
-    @include TMP . '/cache/' . $key;
+    @include  CACHE . DS . $key;
     if (isset($data) and $data[0] > time()) {
         return $data[2] ? unserialize($data[1]) : $data[1];
     }

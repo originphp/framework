@@ -36,7 +36,7 @@ trait DbSchemaTrait
             return PLUGINS . DS . Inflector::underscored($plugin) . DS . 'database' . DS .  $file . '.' . $extension;
         }
 
-        return APP . DS . 'database' . DS . $file . '.' . $extension;
+        return DATABASE . DS . $file . '.' . $extension;
     }
 
     /**

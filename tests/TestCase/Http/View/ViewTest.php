@@ -130,11 +130,11 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $view = new MockView($controller);
 
-        $expected = SRC.'/Http/View/Tests/index.ctp';
+        $expected = APP.'/Http/View/Tests/index.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getViewFilename', ['index']);
 
-        $expected = SRC.'/Http/View/Rest/json.ctp';
+        $expected = APP.'/Http/View/Rest/json.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getViewFilename', ['/Rest/json']);
 
@@ -152,7 +152,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $view = new MockView($controller);
 
-        $expected = SRC.'/Http/View/Layout/bootstrap.ctp';
+        $expected = APP.'/Http/View/Layout/bootstrap.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getLayoutFilename', ['bootstrap']);
 
@@ -169,7 +169,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $view = new MockView($controller);
 
-        $expected = SRC.'/Http/View/Element/recordTable.ctp';
+        $expected = APP.'/Http/View/Element/recordTable.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getElementFilename', ['recordTable']);
 

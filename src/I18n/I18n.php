@@ -291,7 +291,7 @@ class I18n
      */
     protected static function loadMessages(string $language) : void
     {
-        $filename = SRC . DS . 'Locale' . DS . $language . '.php';
+        $filename = APP . DS . 'Locale' . DS . $language . '.php';
         
         static::$messages = [];
 

@@ -18,23 +18,20 @@ ini_set('display_errors', true);
 
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__DIR__));
-define('ORIGIN', dirname(__DIR__));
-define('CONFIG', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'config');
-define('LOGS', sys_get_temp_dir() . '/logs');
+define('ORIGIN', ROOT);
 
-define('SRC', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'app');
-define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'tests');
-define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp');
+define('APP', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'app');
+define('CONFIG', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'config');
+define('DATABASE', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'database');
 define('PLUGINS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'plugins');
-define('TMP', sys_get_temp_dir());
+define('TESTS', ORIGIN . DS . 'tests' . DS . 'TestApp' . DS . 'tests');
 define('WEBROOT', ROOT . DS . 'public');
 
-// create tmp folder structure
-if (! file_exists(TMP . DS . 'cache')) {
-    @mkdir(TMP . DS . 'cache');
-}
-if (! file_exists(TMP . DS . 'logs')) {
-    @mkdir(TMP . DS . 'logs');
-}
+define('TMP', sys_get_temp_dir());
+define('LOGS', TMP . DS . 'logs');
+define('CACHE', TMP . DS . 'cache');
+
+@mkdir(LOGS);
+@mkdir(CACHE);
 
 require ORIGIN . DS . 'src' . DS . 'bootstrap.php';
