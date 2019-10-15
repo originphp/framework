@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Mailer;
 
 use Origin\Html\Html;
+use Origin\Email\Email;
 use Origin\Utility\Inflector;
 use Origin\Exception\Exception;
 use Origin\Email\Email as SmtpEmail;
@@ -74,11 +75,8 @@ class EmailBuilder
      */
     public function build(bool $debug = false) : SmtpEmail
     {
-        if ($debug) {
-            $this->message = new SmtpEmail(['engine' => 'Test']);
-        } else {
-            $this->message = Email::account($this->options['account']);
-        }
+        $account = $debug ? ['engine' => 'Test'] : $this->options['account'];
+        $this->message = new Email($account);
      
         extract($this->options);
         
