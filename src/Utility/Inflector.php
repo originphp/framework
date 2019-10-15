@@ -106,7 +106,7 @@ class Inflector
     }
 
     /**
-     * Converts an underscored word to mixed camelCase.
+     * Converts an underscored word to mixed CamelCase
      *
      * @param string $underscoredWord studly_caps
      * @return string lowerCamelCase
