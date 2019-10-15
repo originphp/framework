@@ -594,7 +594,7 @@ abstract class Connection
 
         if (! $schema) {
             $schema = $this->adapter()->describe($table);
-            cache_set($key, $schema, ['serialize'=>false,'duration' => 60 * 5]);
+            cache_set($key, $schema, ['serialize' => false,'duration' => 60 * 5]);
         }
 
         return $schema;

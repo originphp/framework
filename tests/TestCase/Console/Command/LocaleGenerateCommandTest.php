@@ -58,6 +58,7 @@ class LocaleGenerateCommandTest extends \PHPUnit\Framework\TestCase
             }
             unlink($directory . DS . $filename);
         }
+
         return rmdir($directory);
     }
 }

@@ -15,10 +15,10 @@ declare(strict_types = 1);
 
 namespace Origin\Utility;
 
-use Origin\Configurable\StaticConfigurable as Configurable;
-
 use Origin\Utility\Exception\NotFoundException;
+
 use Origin\Utility\Exception\ElasticsearchException;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Elasticsearch
 {

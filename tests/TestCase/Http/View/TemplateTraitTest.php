@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Http\View;
 
-use Origin\Configurable\InstanceConfigurable as Configurable;
 use Origin\Http\View\Templater;
 use Origin\Http\View\TemplateTrait;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 
 class MockObject
 {

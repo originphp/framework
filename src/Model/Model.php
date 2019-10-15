@@ -22,8 +22,8 @@ namespace Origin\Model;
 
 use ArrayObject;
 use Origin\Core\HookTrait;
-use Origin\Inflector\Inflector;
 use Origin\Exception\Exception;
+use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;

@@ -499,8 +499,6 @@ class GenerateCommand extends Command
             'database',
         ];
 
-        
-
         $path = PLUGINS .DS.Inflector::underscored($data['class']);
         foreach ($structure as $folder) {
             $directory = $path.DS.$folder;
@@ -509,7 +507,7 @@ class GenerateCommand extends Command
             }
         }
 
-        $directory =  PLUGINS.DS.Inflector::underscored($data['class']).DS.'src';
+        $directory = PLUGINS.DS.Inflector::underscored($data['class']).DS.'src';
 
         $this->generate(
             $this->getTemplateFilename('plugin_controller'),

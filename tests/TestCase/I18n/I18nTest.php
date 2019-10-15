@@ -44,8 +44,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
             'date' => 'd/m/Y',
             'time' => 'g:i a',
             'datetime' => 'd/m/Y, g:i a',
-          ];
-
+        ];
 
         file_put_contents(CONFIG . DS . 'locales' . DS . 'en_001' .'.php', $this->localeToString($locale));
         I18n::initialize(['locale' => 'en_001']);
@@ -55,7 +54,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
 
     private function localeToString(array $data)
     {
-        return "<?php\nreturn ".var_export($data, true).";";
+        return "<?php\nreturn ".var_export($data, true).';';
     }
 
     public function testLocaleGeneric()
@@ -70,7 +69,7 @@ class I18nTest extends \PHPUnit\Framework\TestCase
             'date' => 'd/m/Y',
             'time' => 'g:i a',
             'datetime' => 'd/m/Y, g:i a',
-          ];
+        ];
 
         file_put_contents(CONFIG . DS . 'locales' . DS . 'en' .'.php', $this->localeToString($locale));
         I18n::initialize(['locale' => 'en_NOT_EXIST']);

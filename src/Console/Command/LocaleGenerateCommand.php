@@ -114,7 +114,7 @@ class LocaleGenerateCommand extends Command
 
     private function toString(array $result)
     {
-        return "<?php\nreturn ".$this->varExport($result, true).";";
+        return "<?php\nreturn ".$this->varExport($result, true).';';
     }
 
     /**

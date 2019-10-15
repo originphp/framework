@@ -19,9 +19,9 @@ use Locale;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
 use Origin\Exception\Exception;
-use Origin\Exception\InvalidArgumentException;
 use Origin\I18n\Date as I18nDate;
 use Origin\I18n\Number as I18nNumber;
+use Origin\Exception\InvalidArgumentException;
 use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18n
@@ -143,7 +143,7 @@ class I18n
         }
         if ($filename) {
             static::$definition = include $filename;
-            if (!is_array(static::$definition)) {
+            if (! is_array(static::$definition)) {
                 throw new InvalidArgumentException('Invalid Definition File');
             }
         }

@@ -138,6 +138,7 @@ class PluginInstallCommand extends Command
             }
             unlink($directory . DS . $filename);
         }
+
         return rmdir($directory);
     }
 }

@@ -217,7 +217,6 @@ function deprecationWarning(string $message): void
     }
 }
 
-
 # Cache has been decoupled so need internal caching for data including objects/arrays
 
 /**
@@ -235,7 +234,7 @@ function cache_set(string $key, $data, array $options = []): bool
 {
     $options += ['serialize' => true, 'duration' => 3600];
 
-    if (!ctype_alnum(str_replace(['-', '_'], '', $key))) {
+    if (! ctype_alnum(str_replace(['-', '_'], '', $key))) {
         throw new InvalidArgumentException('Invalid cache key');
     }
 
@@ -255,6 +254,7 @@ function cache_set(string $key, $data, array $options = []): bool
 
     $tmp = tempnam(sys_get_temp_dir(), 'cache');
     file_put_contents($tmp, '<?php $data = ' . $data . ';', LOCK_EX);
+
     return rename($tmp, CACHE . DS . $key);
 }
 
@@ -268,7 +268,7 @@ function cache_set(string $key, $data, array $options = []): bool
  */
 function cache_get(string $key)
 {
-    if (!ctype_alnum(str_replace(['-', '_'], '', $key))) {
+    if (! ctype_alnum(str_replace(['-', '_'], '', $key))) {
         throw new InvalidArgumentException('Invalid cache key');
     }
 
@@ -276,5 +276,6 @@ function cache_get(string $key)
     if (isset($data) and $data[0] > time()) {
         return $data[2] ? unserialize($data[1]) : $data[1];
     }
+
     return null;
 }

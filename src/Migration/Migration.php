@@ -23,8 +23,8 @@ declare(strict_types = 1);
   */
 namespace Origin\Migration;
 
-use Origin\Inflector\Inflector;
 use Origin\Exception\Exception;
+use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\BaseSchema;
 use Origin\Exception\InvalidArgumentException;

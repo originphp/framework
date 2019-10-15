@@ -105,7 +105,7 @@ EOF;
         $id = uniqid();
         $this->assertTrue(cache_set($id, $now));
         $this->assertEquals($now, cache_get($id));
-        $this->assertTrue(cache_set($id, $now, ['duration'=>0]));
+        $this->assertTrue(cache_set($id, $now, ['duration' => 0]));
         $this->assertNull(cache_get($id));
     }
 
@@ -125,19 +125,19 @@ EOF;
         $this->assertTrue(cache_set($id, $data));
         $this->assertEquals($data, cache_get($id));
 
-        $this->assertTrue(cache_set($id, $data2, ['serialize'=>false]));
+        $this->assertTrue(cache_set($id, $data2, ['serialize' => false]));
         $this->assertEquals($data2, cache_get($id));
 
         // Test Array
-        $data = ['key'=>'value'];
+        $data = ['key' => 'value'];
         $this->assertTrue(cache_set($id, $data));
         $this->assertEquals($data, cache_get($id));
 
-        $this->assertTrue(cache_set($id, $data, ['serialize'=>false]));
+        $this->assertTrue(cache_set($id, $data, ['serialize' => false]));
         $this->assertEquals($data, cache_get($id));
 
         $data = [];
-        for ($i=0;$i<5;$i++) {
+        for ($i = 0;$i < 5;$i++) {
             $obj = new \StdClass;
             $obj->now = time();
             $data[] = $obj;
@@ -146,11 +146,10 @@ EOF;
         $this->assertTrue(cache_set($id, $data));
         $this->assertEquals($data, cache_get($id));
 
-        $this->assertTrue(cache_set($id, $data, ['serialize'=>false]));
+        $this->assertTrue(cache_set($id, $data, ['serialize' => false]));
         $this->assertEquals($data, cache_get($id));
     }
 }
-
 
 class SimpleObject
 {

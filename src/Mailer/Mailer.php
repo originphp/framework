@@ -15,10 +15,10 @@ declare(strict_types = 1);
 namespace Origin\Mailer;
 
 use Origin\Core\Plugin;
-use Origin\Core\HookTrait;
-use Origin\Inflector\Inflector;
 use Origin\Email\Email;
 use Origin\Email\Message;
+use Origin\Core\HookTrait;
+use Origin\Inflector\Inflector;
 
 /**
 * To set values in the view set public properties in the execute method

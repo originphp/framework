@@ -18,8 +18,8 @@ namespace Origin\Http\Controller\Component;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\HookTrait;
-use Origin\Configurable\InstanceConfigurable as Configurable;
 use Origin\Http\Controller\Controller;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 
 class Component
 {

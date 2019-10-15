@@ -15,8 +15,8 @@ declare(strict_types = 1);
 
 namespace Origin\Http\View;
 
-use Origin\Inflector\Inflector;
 use Origin\Exception\Exception;
+use Origin\Inflector\Inflector;
 
 /**
  * Templater

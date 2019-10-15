@@ -210,7 +210,7 @@ class GenerateCommandTest extends OriginTestCase
         $this->assertFileHash('3645eded9e53b8b4cc2561ee4c65741c', $filename);
         unlink($filename);
 
-        $filename =PLUGINS .DS.'contact_manager'.DS.'tests'.DS.'TestCase'.DS.'Console'.DS.'Command'.DS.'DuckCommandTest.php';
+        $filename = PLUGINS .DS.'contact_manager'.DS.'tests'.DS.'TestCase'.DS.'Console'.DS.'Command'.DS.'DuckCommandTest.php';
      
         $this->assertOutputContains('contact_manager/tests/TestCase/Console/Command/DuckCommandTest.php');
         $this->assertFileExists($filename);
@@ -511,6 +511,7 @@ class GenerateCommandTest extends OriginTestCase
             }
             unlink($directory . DS . $filename);
         }
+
         return rmdir($directory);
     }
 }

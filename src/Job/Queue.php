@@ -21,8 +21,8 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use Origin\Job\Engine\BaseEngine;
-use Origin\Configurable\StaticConfigurable as Configurable;
 use Origin\Exception\InvalidArgumentException;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Queue
 {
