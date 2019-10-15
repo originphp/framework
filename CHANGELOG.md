@@ -77,7 +77,10 @@ I been working full time on the framework to get this where it is now, changes g
 - Markdown is now a composer package and under a different namespace `Origin\Markdown`
 
 ** Libraries **
-- Cache is now a composer package and under a different namespace `Origin\Cache`
+
+- Log is now a composer package
+- Storage is now a composer package
+- Cache is now a composer package
 
 ### Removed
 
@@ -96,4 +99,5 @@ These fixes have also been fixed in the version 1.x branch
 - Fixed Number parse, now returns double or integer
 
 ### Security
+
 - Changed ElasticSearchException from extending HttpException
