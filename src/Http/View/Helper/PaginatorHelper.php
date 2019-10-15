@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Http\View\Helper;
 
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Http\View\TemplateTrait;
 
 class PaginatorHelper extends Helper

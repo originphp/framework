@@ -15,7 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Http\View;
 
 use Origin\Xml\Xml;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Http\Controller\Controller;
 
 class XmlView

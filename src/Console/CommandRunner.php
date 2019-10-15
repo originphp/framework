@@ -17,7 +17,7 @@ namespace Origin\Console;
 
 use Origin\Core\Config;
 use Origin\Core\Plugin;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 

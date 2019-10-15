@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Http\Controller\Component;
 
 use Origin\Model\Model;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Http\Exception\NotFoundException;
 
 class PaginatorComponent extends Component

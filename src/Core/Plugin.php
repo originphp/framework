@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Core;
 
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Core\Exception\MissingPluginException;
 
 /**

@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Model;
 
 use ArrayObject;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 class Association
 {

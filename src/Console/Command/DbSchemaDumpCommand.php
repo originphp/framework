@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Console\Command;
 
 use Origin\Core\Config;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 
 class DbSchemaDumpCommand extends Command

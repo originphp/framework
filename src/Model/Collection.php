@@ -18,7 +18,7 @@ use Iterator;
 use Countable;
 use ArrayAccess;
 use Origin\Xml\Xml;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 class Collection implements ArrayAccess, Iterator, Countable
 {

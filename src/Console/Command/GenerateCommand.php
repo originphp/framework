@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Console\Command;
 
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 
 class GenerateCommand extends Command

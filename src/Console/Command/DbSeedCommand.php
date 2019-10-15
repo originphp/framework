@@ -17,7 +17,7 @@ namespace Origin\Console\Command;
 
 use Origin\Core\Config;
 use Origin\Model\Connection;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;
 

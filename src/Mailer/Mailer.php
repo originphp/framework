@@ -16,7 +16,7 @@ namespace Origin\Mailer;
 
 use Origin\Core\Plugin;
 use Origin\Core\HookTrait;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Email\Email;
 use Origin\Email\Message;
 

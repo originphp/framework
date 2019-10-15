@@ -17,7 +17,7 @@ namespace Origin\Http\View\Helper;
 
 use Origin\Core\Plugin;
 use Origin\Http\Router;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Http\View\TemplateTrait;
 use Origin\Http\View\Exception\NotFoundException;
 

@@ -15,7 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Console\Command;
 
 use Origin\Utility\Folder;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 class PluginInstallCommand extends Command
 {

@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Origin\Core\HookTrait;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\TableSchema;
 

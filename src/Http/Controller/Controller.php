@@ -23,7 +23,7 @@ use Origin\Http\Response;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 use Origin\Http\View\XmlView;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Http\View\JsonView;
 use Origin\Core\InitializerTrait;
 use App\Http\View\ApplicationView;

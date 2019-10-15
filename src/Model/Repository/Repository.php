@@ -16,7 +16,7 @@ namespace Origin\Model\Repository;
 
 use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 /**
  * Provides the structure for Repository

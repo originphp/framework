@@ -21,7 +21,7 @@ use Origin\Model\Entity;
 use Origin\Utility\Date;
 
 use Origin\Utility\Number;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 use Origin\Model\ModelRegistry;
 use Origin\Http\View\TemplateTrait;

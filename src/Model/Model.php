@@ -22,7 +22,7 @@ namespace Origin\Model;
 
 use ArrayObject;
 use Origin\Core\HookTrait;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Exception\Exception;
 use Origin\Core\InitializerTrait;
 use Origin\Core\CallbackRegistrationTrait;

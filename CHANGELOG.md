@@ -75,6 +75,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Html is now a composer package and under a different namespace `Origin\Html`
 - Text is now a composer package and under a different namespace `Origin\Text`
 - Markdown is now a composer package and under a different namespace `Origin\Markdown`
+- Inflector is now a composer package and under a different namespace `Origin\Inflector`
 
 ** Libraries **
 
@@ -88,6 +89,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Helper functions, uid,left,right,contains and replace
 - Mailer::$folder removed, this is now autodetected
 - Behaviors
+- Inflector::add (use Inflector::rules which now accepts strings)
 
 ### Fixes
 
