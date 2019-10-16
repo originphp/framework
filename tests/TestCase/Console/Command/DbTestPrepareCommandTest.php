@@ -20,12 +20,21 @@ class DbTestPrepareCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->exec('db:test:prepare --type=php');
         $this->assertExitSuccess();
-        $this->assertRegExp('/Executed ([0-9]) statements/', $this->output());
+        $this->assertRegExp('/Executed ([1-9]) statements/', $this->output());
     }
 
     protected function tearDown() : void
     {
-        // ConnectionManager::execute('drop table migrations');
+        /**
+         * Clean up tables
+         */
+        
+        $connection = ConnectionManager::get('test');
+        foreach (['bookmarks', 'bookmarks_tags','tags','users'] as $table) {
+            $sql = $connection->adapter()->dropTableSql($table, ['ifExists' => true]);
+            $connection->execute($sql);
+        }
+     
         ConnectionManager::drop('test');
         ConnectionManager::config('test', $this->config);
     }
