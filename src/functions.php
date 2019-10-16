@@ -188,16 +188,6 @@ function env(string $variable, $default = null)
 }
 
 /**
- * Love this.
- *
- * @return string date('Y-m-d H:i:s')
- */
-function now(): string
-{
-    return date('Y-m-d H:i:s');
-}
-
-/**
  * A helper function that Logs a deprecation warning and triggers an error if in debug mode
  *
  * @param string $message
@@ -217,65 +207,25 @@ function deprecationWarning(string $message): void
     }
 }
 
-# Cache has been decoupled so need internal caching for data including objects/arrays
-
 /**
- * Internal caching for array and objects. By default it uses PHP serialize method. Even without
- * serialization you can store arrays and/or stdclass objects
+ * Generates a random string which can be used as a unique identifier.
  *
- * @param string $key
- * @param mixed $data
- * @param array $options
- *   - serialize: default true. serializes data using PHP serialize method.
- *   - duration: 3600 seconds which it will be valid
- * @return boolean
+ * @param integer $length
+ * @return string
  */
-function cache_set(string $key, $data, array $options = []): bool
+function uid(int $length = 12) : string
 {
-    $options += ['serialize' => true, 'duration' => 3600];
+    $randomBytes = random_bytes(ceil($length / 2));
 
-    if (! ctype_alnum(str_replace(['-', '_'], '', $key))) {
-        throw new InvalidArgumentException('Invalid cache key');
-    }
-
-    if ($options['serialize']) {
-        $data = serialize($data);
-    }
-
-    $expires = time() + $options['duration'];
-    $data = var_export([$expires, $data, $options['serialize']], true);
-
-    /**
-     * Handle Stdclass objects and arrays of Stdclass objects e.g. (obj) $array
-     */
-    if ($options['serialize'] === false) {
-        $data = str_replace('stdClass::__set_state', '(object)', $data);
-    }
-
-    $tmp = tempnam(sys_get_temp_dir(), 'cache');
-    file_put_contents($tmp, '<?php $data = ' . $data . ';', LOCK_EX);
-
-    return rename($tmp, CACHE . DS . $key);
+    return substr(bin2hex($randomBytes), 0, $length);
 }
 
 /**
- * Gets an item from internal cache
+ * Shortcut for date('Y-m-d H:i:s')
  *
- * Cache data is stored like this [int $expires,mixed $data,bool $serialized]
- *
- * @param string $key
- * @return mixed
+ * @return string date('Y-m-d H:i:s')
  */
-function cache_get(string $key)
+function now(): string
 {
-    if (! ctype_alnum(str_replace(['-', '_'], '', $key))) {
-        throw new InvalidArgumentException('Invalid cache key');
-    }
-
-    @include  CACHE . DS . $key;
-    if (isset($data) and $data[0] > time()) {
-        return $data[2] ? unserialize($data[1]) : $data[1];
-    }
-
-    return null;
+    return date('Y-m-d H:i:s');
 }

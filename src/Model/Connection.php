@@ -19,6 +19,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use Origin\Log\Log;
+use Origin\Core\Cache;
 use Origin\Core\Config;
 use Origin\Model\Schema\BaseSchema;
 use Origin\Model\Exception\ConnectionException;
@@ -590,12 +591,12 @@ abstract class Connection
     public function describe(string $table) : array
     {
         $key = $this->config['name'] . '_' . $table;
-        $schema = defined('PHPUNIT') ? null : cache_get($key);
+        $schema = defined('PHPUNIT') ? null : Cache::get($key);
 
         if (! $schema) {
             $schema = $this->adapter()->describe($table);
             if (! defined('PHPUNIT')) {
-                cache_set($key, $schema, ['serialize' => false,'duration' => 60 * 5]);
+                Cache::set($key, $schema, ['serialize' => false,'duration' => 60 * 5]);
             }
         }
 
