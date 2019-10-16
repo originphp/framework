@@ -54,6 +54,22 @@ class Plugin
     }
 
     /**
+     * Gets a path for a plugin
+     *
+     * @param string $plugin
+     * @return string
+     * @throws \Origin\Core\Exception\MissingPluginException
+     */
+    public static function path(string $plugin) : string
+    {
+        if (! isset(static::$loaded[$plugin])) {
+            throw new MissingPluginException($plugin);
+        }
+
+        return static::$loaded[$plugin]['path'];
+    }
+
+    /**
      * Checks if a plugin is loaded or returns a list of loaded plugins
      *
      * @param string|null $plugin

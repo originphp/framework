@@ -49,6 +49,12 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         Plugin::load('PluginThatDoesNotExist');
     }
 
+    public function testPathException()
+    {
+        $this->expectException(MissingPluginException::class);
+        Plugin::path('PluginThatDoesNotExist');
+    }
+
     public function testLoad()
     {
         // test with routes and bootstrap
@@ -57,6 +63,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(MockPlugin::loaded('Make'));
         $config = MockPlugin::getLoaded();
         $this->assertEquals(ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'plugins' . DS . 'make', $config['Make']['path']);
+        $this->assertEquals(ROOT . DS . 'tests' . DS . 'TestApp' . DS . 'plugins' . DS . 'make', Plugin::path('Make'));
         $this->assertTrue($config['Make']['routes']);
         $this->assertTrue($config['Make']['bootstrap']);
         

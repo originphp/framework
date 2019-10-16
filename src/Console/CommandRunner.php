@@ -71,7 +71,7 @@ class CommandRunner
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = PLUGINS.DS.Inflector::underscored($plugin). DS . 'src' . DS . $folder;
+            $this->namespaces[$plugin] = Plugin::path($plugin) . DS . 'src' . DS . $folder;
         }
     }
 
@@ -91,7 +91,6 @@ class CommandRunner
     protected function getDescriptions()
     {
         $results = [];
-
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
             if (! class_exists($class)) {
@@ -245,9 +244,11 @@ class CommandRunner
     public function scanDirectory(string $directory, string $namespace)
     {
         $results = [];
+
         if (! file_exists($directory)) {
             return [];
         }
+       
         $files = scandir($directory);
        
         foreach ($files as $file) {
