@@ -24,6 +24,8 @@ Summary of what has changed:
 
 6. Deocupled the framework into seperate packages.
 
+7. Changed the bootstrap process
+
 I been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
 
 ### Added
@@ -82,6 +84,9 @@ I been working full time on the framework to get this where it is now, changes g
 - Log is now a composer package
 - Storage is now a composer package
 - Cache is now a composer package
+
+- Changed Bootstrap process.  ConsoleApplications need to load config/bootstrap, previously this
+loaded the framework bootstrap file.
 
 ### Removed
 

@@ -12,6 +12,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+define('START_TIME', microtime(true));
+
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
