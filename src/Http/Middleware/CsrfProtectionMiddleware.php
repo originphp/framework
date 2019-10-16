@@ -16,7 +16,7 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
 class CsrfProtectionMiddleware extends Middleware

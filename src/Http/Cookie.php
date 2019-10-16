@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Http;
 
 use Origin\Core\Config;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 
 /**
  * Cookie Component - makes it easy to work with cookies, cookies are set using the response

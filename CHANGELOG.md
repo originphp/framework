@@ -78,6 +78,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Text is now a composer package and under a different namespace `Origin\Text`
 - Markdown is now a composer package and under a different namespace `Origin\Markdown`
 - Inflector is now a composer package and under a different namespace `Origin\Inflector`
+- Security is now a composer package and under a different namespace `Origin\Security`
 
 ** Libraries **
 

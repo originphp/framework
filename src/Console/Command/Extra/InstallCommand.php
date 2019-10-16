@@ -1,7 +1,7 @@
 <?php
 namespace Origin\Console\Command\Extra;
 
-use Origin\Utility\Security;
+use Origin\Security\Security;
 use Origin\Console\Command\Command;
 
 class InstallCommand extends Command

@@ -20,7 +20,7 @@ use ReflectionMethod;
 use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Http\Response;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Http\Controller\Controller;

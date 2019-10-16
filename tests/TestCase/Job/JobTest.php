@@ -15,7 +15,7 @@ namespace Origin\Test\Job;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;

@@ -19,7 +19,7 @@ use \ArrayObject;
 use Origin\Log\Log;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 use Origin\Job\Engine\BaseEngine;
 
 /**
