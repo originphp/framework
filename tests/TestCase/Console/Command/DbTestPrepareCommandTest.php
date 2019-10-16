@@ -30,11 +30,12 @@ class DbTestPrepareCommandTest extends \PHPUnit\Framework\TestCase
          */
         
         $connection = ConnectionManager::get('test');
+        $connection->disableForeignKeyConstraints();
         foreach (['bookmarks', 'bookmarks_tags','tags','users'] as $table) {
             $sql = $connection->adapter()->dropTableSql($table, ['ifExists' => true]);
             $connection->execute($sql);
         }
-     
+        $connection->enableForeignKeyConstraints();
         ConnectionManager::drop('test');
         ConnectionManager::config('test', $this->config);
     }
