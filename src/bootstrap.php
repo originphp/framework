@@ -12,30 +12,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-/**
- * Load the Paths constants, if not already set (e.g. Tests)
- */
-
-if (! defined('DS')) {
-    define('DS', DIRECTORY_SEPARATOR);
-    define('ROOT', dirname(dirname(dirname(dirname(__DIR__)))));
-}
-
-if (! defined('APP')) {
-    define('ORIGIN', ROOT . DS . 'vendor'. DS . 'originphp'. DS . 'framework');
-
-    define('APP', ROOT . DS . 'app');
-    define('CONFIG', ROOT . DS . 'config');
-    define('DATABASE', ROOT . DS . 'database');
-    define('PLUGINS', ROOT . DS . 'plugins');
-    define('TESTS', ROOT . DS . 'tests');
-    define('WEBROOT', ROOT . DS . 'public');
-
-    define('TMP', ROOT . DS . 'tmp');
-    define('LOGS', ROOT . DS . 'logs');
-    define('CACHE', TMP . DS . 'cache');
-}
-
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
@@ -44,29 +20,14 @@ ini_set('error_log', LOGS);
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 
-require ORIGIN . DS . 'src' . DS . 'Exception' .DS  . 'Exception.php';
+require ORIGIN . '/src/Exception/Exception.php';
+require ORIGIN . '/src/Core/Autoloader.php';
+require ROOT . '/vendor/autoload.php';
 
-/**
- * Load our own autoloader
- */
-require ORIGIN . DS . 'src' . DS  .'Core' . DS .'Autoloader.php';
+$errorHandler = (PHP_SAPI === 'cli') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
+$errorHandler->register();
 
-/**
- * Load the composer autoloader
- */
-require ROOT . DS . 'vendor' .DS . 'autoload.php';
-
-/**
- * Error and Exception handling.
- */
-if (PHP_SAPI === 'cli') {
-    $ErrorHandler = new Origin\Console\ErrorHandler();
-} else {
-    $ErrorHandler = new Origin\Http\ErrorHandler();
-}
-$ErrorHandler->register();
-
-require __DIR__ . DS . 'functions.php';
+require __DIR__ . '/functions.php';
 
 if (file_exists(CONFIG . DS . '.env.php')) {
     $result = include CONFIG . DS . '.env.php';
@@ -74,9 +35,3 @@ if (file_exists(CONFIG . DS . '.env.php')) {
         $_ENV[$key] = $value;
     }
 }
-
-/**
- * Load Config
- */
-require CONFIG . DS . 'bootstrap.php';
-require CONFIG . DS . 'routes.php';

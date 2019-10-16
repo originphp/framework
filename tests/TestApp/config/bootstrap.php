@@ -3,6 +3,9 @@ use Origin\Core\Plugin;
 use Origin\Core\Autoloader;
 use Origin\Utility\Elasticsearch;
 
+require __DIR__ . '/paths.php';
+require ORIGIN . '/src/bootstrap.php';
+
 $autoloader = Autoloader::instance();
 $autoloader->directory(dirname(__DIR__));
 
@@ -20,6 +23,7 @@ include 'database.php';
 include 'storage.php';
 include 'email.php';
 include 'queue.php';
+require 'routes.php';
 
 if (env('ELASTICSEARCH_HOST')) {
     Elasticsearch::config('test', [
