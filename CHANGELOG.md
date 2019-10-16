@@ -44,7 +44,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Added strict types
 - Added return types
 - Changed public properties to protected
-- Security::uid now returns a 15 character base 62 random string.
+- Security::uid now returns a 16 character base 62 random string.
 - Model callbacks have changed, now they need registering and arguments that will be passed have also been changed.
  See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
     Important: Model::afterFind now passes a collection for single or multiple results
@@ -100,10 +100,14 @@ loaded the framework bootstrap file.
 
 These fixes have also been fixed in the version 1.x branch
 
+
 - Fixed bug in Markdown::toHtml when parsing multiple ` tags in the same line
 - Fixed XML serializer
 - Fixed custom class namespace issues with belongsTo/hasAndBelongsToMany
 - Fixed Number parse, now returns double or integer
+
+#### pending update v1.
+- [ ] Fixed bug plugin path when installed with composer
 
 ### Security
 
