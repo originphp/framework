@@ -17,7 +17,7 @@ namespace Origin\Http\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\HookTrait;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
 use Origin\Http\View\Helper\Helper;
 use Origin\Http\Controller\Controller;

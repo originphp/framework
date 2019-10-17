@@ -21,7 +21,7 @@ use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Http\Response;
 use Origin\Security\Security;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Http\Controller\Controller;
 use Origin\Http\Exception\ForbiddenException;

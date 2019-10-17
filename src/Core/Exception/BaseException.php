@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Core\Exception;
 
 class BaseException extends \Exception
 {
@@ -33,8 +33,4 @@ class BaseException extends \Exception
 
         parent::__construct($message, $code);
     }
-}
-
-class Exception extends BaseException
-{
 }

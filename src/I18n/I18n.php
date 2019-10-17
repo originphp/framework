@@ -18,10 +18,10 @@ namespace Origin\I18n;
 use Locale;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\I18n\Date as I18nDate;
 use Origin\I18n\Number as I18nNumber;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18n

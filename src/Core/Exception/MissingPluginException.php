@@ -14,7 +14,7 @@
 
 namespace Origin\Core\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class MissingPluginException extends Exception
 {

@@ -19,7 +19,7 @@ use Origin\Http\Response;
 use Origin\Http\BaseApplication;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class FooMiddleware extends Middleware
 {

@@ -21,7 +21,7 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use Origin\Job\Engine\BaseEngine;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Queue
@@ -54,7 +54,7 @@ class Queue
      * Builds an engine using the configuration
      *
      * @param string $name
-     * @throws \Origin\Exception\InvalidArgumentException
+     * @throws \Origin\Core\Exception\InvalidArgumentException
      * @return \Origin\Job\Engine\BaseEngine
      */
     protected static function buildEngine(string $name) : BaseEngine

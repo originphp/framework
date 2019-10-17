@@ -22,13 +22,13 @@ namespace Origin\Model;
 
 use ArrayObject;
 use Origin\Core\HookTrait;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
 
 class Model

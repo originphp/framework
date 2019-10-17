@@ -17,7 +17,7 @@ namespace Origin\Console;
 
 use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Core\LazyLoadContainer;
 use Origin\Console\Command\Command;
 use Origin\Console\Exception\ConsoleException;
@@ -40,7 +40,7 @@ use Origin\Console\Exception\ConsoleException;
  * $consoleApplication->run();
  */
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Console\Exception\StopExecutionException;
 
 class ConsoleApplication

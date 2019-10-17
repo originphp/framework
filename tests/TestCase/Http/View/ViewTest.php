@@ -17,7 +17,7 @@ namespace Origin\Test\Http\View;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\View\View;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Http\View\Helper\Helper;
 use Origin\Http\Controller\Controller;

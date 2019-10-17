@@ -16,7 +16,7 @@ namespace Origin\Test\Job;
 use Origin\Job\Queue;
 
 use Origin\TestSuite\OriginTestCase;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class QueueTest extends OriginTestCase
 {

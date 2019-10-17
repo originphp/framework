@@ -14,12 +14,12 @@
 
 namespace Origin\Test\Migration;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Migration\Migration;
 use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Migration\Exception\IrreversibleMigrationException;
 
 class CreateProductTableMigration extends Migration

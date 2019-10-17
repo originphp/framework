@@ -12,15 +12,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Exception;
+namespace Origin\Core\Exception;
 
-class InvalidArgumentException extends Exception
+class Exception extends BaseException
 {
-    public function __construct($message = null, $code = 500)
-    {
-        if ($message === null) {
-            $message = 'Invalid Argument';
-        }
-        parent::__construct($message, $code);
-    }
 }

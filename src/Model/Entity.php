@@ -97,7 +97,7 @@ class Entity
      * @var array
      */
     protected $_hidden = [];
-    
+
     /**
      * Constructor
      *

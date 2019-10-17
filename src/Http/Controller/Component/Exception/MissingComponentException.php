@@ -14,7 +14,7 @@
 
 namespace Origin\Http\Controller\Component\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class MissingComponentException extends Exception
 {

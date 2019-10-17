@@ -15,7 +15,7 @@
 namespace Origin\Test\Console\ConsoleIo;
 
 use Origin\Console\ConsoleIo;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Console\ConsoleInput;
 use Origin\TestSuite\Stub\ConsoleOutput;
 

@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Core;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class LazyLoadContainer
 {

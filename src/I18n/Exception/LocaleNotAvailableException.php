@@ -14,7 +14,7 @@
 
 namespace Origin\I18n\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class LocaleNotAvailableException extends Exception
 {

@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Http\Exception;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class InvalidArgumentExceptionTest extends \PHPUnit\Framework\TestCase
 {

@@ -24,13 +24,13 @@ use Origin\Model\Entity;
 
 use Origin\Model\Collection;
 use Origin\Security\Security;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Model as BaseModel;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Model\Exception\NotFoundException;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 use Origin\Model\Exception\DatasourceException;
 use Origin\Model\Exception\MissingModelException;

@@ -16,7 +16,7 @@ namespace Origin\Test\Model;
 
 use Origin\Model\Connection;
 use Origin\Model\ConnectionManager;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 {

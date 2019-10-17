@@ -17,7 +17,7 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Config;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Exception\DatasourceException;

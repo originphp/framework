@@ -19,7 +19,7 @@ use Origin\Console\Command\Command;
 use Origin\Console\ConsoleApplication;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use Origin\Console\Exception\ConsoleException;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class CacheEnableCommand extends Command
 {

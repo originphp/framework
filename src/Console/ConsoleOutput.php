@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Console;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class ConsoleOutput
 {

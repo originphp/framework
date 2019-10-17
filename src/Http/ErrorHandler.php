@@ -26,7 +26,7 @@ namespace Origin\Http;
 use Origin\Log\Log;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class FatalErrorException extends Exception
 {

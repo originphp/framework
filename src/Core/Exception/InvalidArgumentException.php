@@ -14,9 +14,13 @@
 
 namespace Origin\Core\Exception;
 
-use Origin\Core\Exception\Exception;
-
-class MissingClassException extends Exception
+class InvalidArgumentException extends Exception
 {
-    protected $template = '%s could not be found.';
+    public function __construct($message = null, $code = 500)
+    {
+        if ($message === null) {
+            $message = 'Invalid Argument';
+        }
+        parent::__construct($message, $code);
+    }
 }

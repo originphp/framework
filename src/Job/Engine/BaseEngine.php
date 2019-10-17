@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Configurable\InstanceConfigurable as Configurable;
 
 abstract class BaseEngine

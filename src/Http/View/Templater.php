@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 namespace Origin\Http\View;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
 
 /**

@@ -28,7 +28,7 @@ namespace Origin\Redis;
 
 use Redis;
 use RedisException;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class RedisConnection
 {

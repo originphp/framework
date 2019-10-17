@@ -15,7 +15,7 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\Fixture;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Test\Fixture\PostFixture;
 use Origin\TestSuite\FixtureManager;

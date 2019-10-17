@@ -90,6 +90,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Changed Bootstrap process.  ConsoleApplications need to load config/bootstrap, previously this
 loaded the framework bootstrap file.
 - Console Commands return exit codes, added assertion for this
+- Origin\Exception\Exception and Origin\Exception\CoreException are now in Origin\Core\Exception
 
 ### Removed
 

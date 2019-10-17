@@ -14,7 +14,7 @@ declare(strict_types = 1);
  */
 namespace Origin\Publisher;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Publisher\Exception\PublisherException;
 
 class Publisher

@@ -14,7 +14,7 @@
 
 namespace Origin\Http\Controller\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class PrivateMethodException extends Exception
 {

@@ -15,7 +15,7 @@
 namespace Origin\Test\Console\ConsoleOutput;
 
 use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class MockConsoleOutput extends ConsoleOutput
 {

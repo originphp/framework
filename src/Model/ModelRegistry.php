@@ -16,7 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Model;
 
 use Origin\Core\Resolver;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class ModelRegistry
 {

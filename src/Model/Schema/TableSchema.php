@@ -23,7 +23,7 @@ namespace Origin\Model\Schema;
  */
 
 use Origin\Model\Connection;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class TableSchema
 {

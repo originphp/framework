@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Console;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\Console\ErrorHandler;
 use Origin\Console\ConsoleOutput;

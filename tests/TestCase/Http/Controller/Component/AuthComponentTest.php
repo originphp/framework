@@ -17,7 +17,7 @@ namespace Origin\Test\Http\Controller\Component;
 use Origin\Http\Request;
 use Origin\Model\Entity;
 use Origin\Http\Response;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Controller\Controller;

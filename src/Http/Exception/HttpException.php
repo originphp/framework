@@ -14,7 +14,7 @@
 
 namespace Origin\Http\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class HttpException extends Exception
 {

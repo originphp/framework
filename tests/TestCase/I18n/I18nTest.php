@@ -16,7 +16,7 @@ namespace Origin\Test\I8n;
 
 use Origin\I18n\I18n;
 use Origin\Utility\Number;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18nTest extends \PHPUnit\Framework\TestCase

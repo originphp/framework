@@ -23,11 +23,11 @@ declare(strict_types = 1);
   */
 namespace Origin\Migration;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\BaseSchema;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\DatasourceException;
 use Origin\Migration\Exception\IrreversibleMigrationException;
 

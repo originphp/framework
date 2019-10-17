@@ -14,7 +14,7 @@
 namespace Origin\Test\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Job\Engine\DatabaseEngine;

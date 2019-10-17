@@ -6,7 +6,7 @@ use Origin\Publisher\Listener;
 use Origin\Publisher\Publisher;
 use Origin\Publisher\PublisherTrait;
 use Origin\TestSuite\OriginTestCase;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class MockListener extends Listener
 {

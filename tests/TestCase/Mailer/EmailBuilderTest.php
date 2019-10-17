@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Mailer;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Mailer\EmailBuilder;
 use Origin\TestSuite\TestTrait;
 
