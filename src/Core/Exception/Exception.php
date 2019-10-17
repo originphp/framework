@@ -17,3 +17,24 @@ namespace Origin\Core\Exception;
 class Exception extends BaseException
 {
 }
+
+class BaseException extends \Exception
+{
+    protected $template = null;
+    protected $defaultErrorCode = null;
+
+    public function __construct($message, $code = 500)
+    {
+        if ($this->template !== null) {
+            if (! is_array($message)) {
+                $message = [$message];
+            }
+            $message = vsprintf($this->template, $message);
+        }
+        if ($this->defaultErrorCode !== null) {
+            $code = $this->defaultErrorCode;
+        }
+
+        parent::__construct($message, $code);
+    }
+}
