@@ -28,12 +28,14 @@ class BaseApplication
     /**
      * Dispatches the command
      *
-     * @return void
+     * @return int
      */
-    public function dispatch(array $arguments = []) : void
+    public function dispatch(array $arguments = []) : int
     {
         $this->executeHook('startup');
-        (new CommandRunner())->run($arguments);
+        $exitCode = (new CommandRunner())->run($arguments);
         $this->executeHook('shutdown');
+
+        return $exitCode;
     }
 }

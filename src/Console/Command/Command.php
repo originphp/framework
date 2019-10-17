@@ -144,9 +144,9 @@ abstract class Command
      * @param string $command
      * @param array $args  array of options e.g
      *    $args = ['my_database','--connection'=>'default','--help']
-     * @return bool
+     * @return int
      */
-    public function runCommand(string $command, array $args = []) : bool
+    public function runCommand(string $command, array $args = []) : int
     {
         $runner = new CommandRunner($this->io);
         $instance = $runner->findCommand($command);
@@ -171,9 +171,9 @@ abstract class Command
      * Runs this command used by Command Runner
      *
      * @param array $args
-     * @return bool $result
+     * @return int $result
      */
-    public function run(array $args) : bool
+    public function run(array $args) : int
     {
         $this->executeHook('initialize');
       
@@ -191,7 +191,7 @@ abstract class Command
             $this->io->nl();
             $this->out($this->parser->usage());
 
-            return false;
+            return self::ERROR;
         }
         $this->options = $options;
         $this->arguments = $arguments;
@@ -204,14 +204,14 @@ abstract class Command
         if ($this->options('help')) {
             $this->displayHelp();
 
-            return true;
+            return self::SUCCESS;
         }
 
         $this->executeHook('startup');
         $this->execute();
         $this->executeHook('shutdown');
         
-        return true;
+        return self::SUCCESS;
     }
 
     /**

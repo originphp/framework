@@ -18,6 +18,7 @@ namespace Origin\Console;
 use Origin\Core\Config;
 use Origin\Core\Plugin;
 use Origin\Inflector\Inflector;
+use Origin\Console\Command\Command;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 
@@ -109,15 +110,16 @@ class CommandRunner
     /**
      * This the workhorse, runs the command, displays help.
      *
-     * @param array     $args
+     * @param array $args
+     * @return integer exit code
      */
-    public function run(array $args)
+    public function run(array $args) : int
     {
         array_shift($args); // first arg is the script that called it
         if (empty($args)) {
             $this->displayHelp();
 
-            return;
+            return Command::SUCCESS;
         }
   
         $this->command = $this->findCommand($args[0]);
@@ -127,13 +129,13 @@ class CommandRunner
             try {
                 return $this->command->run($args);
             } catch (StopExecutionException $ex) {
-                return false;
+                return $ex->getCode();
             }
         } else {
             $this->io->error("Command `{$args[0]}` not found"); // Original
         }
 
-        return false;
+        return Command::ERROR;
     }
 
     /**

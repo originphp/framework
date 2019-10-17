@@ -20,6 +20,7 @@ namespace Origin\TestSuite;
 use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleInput;
 use Origin\Console\CommandRunner;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 /**
@@ -172,7 +173,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitSuccess()
     {
-        $this->assertTrue($this->result);
+        $this->assertEquals(Command::SUCCESS, $this->result);
     }
 
     /**
@@ -180,7 +181,15 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitError()
     {
-        $this->assertFalse($this->result);
+        $this->assertEquals(Command::ERROR, $this->result);
+    }
+
+    /**
+     * Asserts a particular exit code
+     */
+    public function assertExitCode(int $exitCode)
+    {
+        $this->assertEquals($exitCode, $this->result);
     }
 
     /**

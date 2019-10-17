@@ -19,7 +19,9 @@ use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
 use Origin\Exception\Exception;
 use Origin\Core\LazyLoadContainer;
+use Origin\Console\Command\Command;
 use Origin\Console\Exception\ConsoleException;
+
 /**
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
@@ -145,9 +147,9 @@ class ConsoleApplication
      * Runs the console application
      *
      * @param array $args default is argv
-     * @return bool
+     * @return int exit code
      */
-    public function run(array $args = null) : bool
+    public function run(array $args = null) : int
     {
         if ($args === null) {
             global $argv;
@@ -176,7 +178,7 @@ class ConsoleApplication
         if (! $command) {
             $this->displayHelp();
 
-            return true;
+            return Command::SUCCESS;
         }
 
         try {
@@ -184,7 +186,7 @@ class ConsoleApplication
         } catch (Exception $ex) {
             $this->io->error("Invalid command {$command}.");
 
-            return false;
+            return Command::ERROR;
         }
       
         $commandName = (count($commands) === 1) ? $this->name : $this->name . ' ' .$command;
@@ -195,12 +197,12 @@ class ConsoleApplication
 
         try {
             $this->executeHook('startup');
-            $result = $this->$command->run($args);
+            $exitCode = $this->$command->run($args);
             $this->executeHook('shutdown');
 
-            return $result;
+            return $exitCode;
         } catch (StopExecutionException $ex) {
-            return false;
+            return $ex->getCode();
         }
     }
 

@@ -16,6 +16,7 @@ namespace Origin\Test\Console;
 
 use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use App\Console\Command\CacheResetCommand;
 use Origin\Console\Command\DbCreateCommand;
@@ -51,7 +52,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     {
         $runner = $this->commandRunner();
         $runner->run([]);
-        $this->assertEquals('c83e8c00121c1e5b1bc0ad111b5301e5', md5($this->out->read())); // rest
+        $this->assertEquals('3f1cd9078994ca8b40a5f9d2eedc8dae', md5($this->out->read())); // rest
     }
 
     public function testFindCommand()
@@ -74,28 +75,17 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
             'jim',
         ]);
 
-        $this->assertTrue($result);
+        $this->assertEquals(Command::SUCCESS, $result);
         $this->assertStringContainsString('<blue>Hello jim</blue>', $this->out->read());
     }
 
     public function testRunUnkownCommand()
     {
-        $this->assertFalse($this->commandRunner()->run([
+        $result = $this->commandRunner()->run([
             '/vendor/somescript.php',
             'purple-disco-machine:player',
-        ]));
-    }
-    /**
-     * throw a Duplicate database: 7 ERROR:  database "origin" already exists
-     *
-     * @return void
-     */
-    public function testRunError()
-    {
-        $result = $this->commandRunner()->run([
-            '/path-to-script/script.php',
-            'db:create',
         ]);
-        $this->assertFalse($result);
+
+        $this->assertEquals(Command::ERROR, $result);
     }
 }
