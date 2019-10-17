@@ -22,7 +22,7 @@ ini_set('error_log', LOGS);
 date_default_timezone_set('UTC');
 mb_internal_encoding('UTF-8');
 
-require ORIGIN . '/src/Exception/Exception.php';
+require ORIGIN . '/src/Core/Exception/Exception.php';
 require ORIGIN . '/src/Core/Autoloader.php';
 require ROOT . '/vendor/autoload.php';
 
