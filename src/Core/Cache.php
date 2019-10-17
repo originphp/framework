@@ -67,7 +67,7 @@ class Cache
      * @param string $key
      * @return mixed
      */
-    public static function cache_get(string $key)
+    public static function get(string $key)
     {
         if (! ctype_alnum(str_replace(['-', '_'], '', $key))) {
             throw new InvalidArgumentException('Invalid cache key');
