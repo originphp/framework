@@ -19,7 +19,6 @@ use Origin\Console\CommandRunner;
 use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
 use App\Console\Command\CacheResetCommand;
-use Origin\Console\Command\DbCreateCommand;
 use App\Console\Command\SaySomethingCommand;
 
 class MockCommandRunner extends CommandRunner
@@ -52,15 +51,14 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     {
         $runner = $this->commandRunner();
         $runner->run([]);
-        $this->assertEquals('3f1cd9078994ca8b40a5f9d2eedc8dae', md5($this->out->read())); // rest
+        $this->assertEquals('4d5403cd991615610089918213c50626', md5($this->out->read())); // rest
     }
 
     public function testFindCommand()
     {
         $result = $this->commandRunner()->findCommand('say-hello');
         $this->assertInstanceOf(SaySomethingCommand::class, $result);
-        $result = $this->commandRunner()->findCommand('db:create'); // standard name
-        $this->assertInstanceOf(DbCreateCommand::class, $result);
+
         $result = $this->commandRunner()->findCommand('cache:reset'); // standard name + in app folder
         $this->assertInstanceOf(CacheResetCommand::class, $result);
         $this->assertNull($this->commandRunner()->findCommand('purple-disco-machine:player'));
