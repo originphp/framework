@@ -85,6 +85,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Log is now a composer package
 - Storage is now a composer package
 - Cache is now a composer package
+- Elasticsearch is now a composer package under a different namespace `Elasticsearch`
 
 - Changed Bootstrap process.  ConsoleApplications need to load config/bootstrap, previously this
 loaded the framework bootstrap file.
