@@ -35,7 +35,6 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
-        print get_class($this) . "\n";
         parent::__construct($name, $data, $dataName);
         $this->executeHook('initialize');
     }
