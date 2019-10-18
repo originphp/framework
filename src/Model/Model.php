@@ -1034,7 +1034,8 @@ class Model
                     }
                 }
             }
-
+        }
+        if ($result) {
             // Save hasMany
             foreach ($this->hasMany as $alias => $config) {
                 $key = Inflector::plural(lcfirst($alias));

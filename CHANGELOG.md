@@ -22,6 +22,7 @@ Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
 ### Fixed
+- Fixed cancelling hasMany save when hasOne fails
 - Fixed Command runner finding commands in plugins installed via composer
 - Markdown parser bug fix when using multiple code tags in same line
 - Fixed incorrect cookie return type which blocked arrays
