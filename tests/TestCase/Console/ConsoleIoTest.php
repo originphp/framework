@@ -15,8 +15,8 @@
 namespace Origin\Test\Console\ConsoleIo;
 
 use Origin\Console\ConsoleIo;
-use Origin\Core\Exception\Exception;
 use Origin\Console\ConsoleInput;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockConsoleInput extends ConsoleInput

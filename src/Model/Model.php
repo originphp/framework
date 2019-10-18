@@ -22,14 +22,14 @@ namespace Origin\Model;
 
 use ArrayObject;
 use Origin\Core\HookTrait;
-use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
+use Origin\Core\Exception\Exception;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
-use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class Model
 {

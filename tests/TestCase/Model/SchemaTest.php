@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Core\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 
 include_once DATABASE . DS . 'schema.php';
 

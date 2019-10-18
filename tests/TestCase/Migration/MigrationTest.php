@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Migration;
 
-use Origin\Core\Exception\Exception;
 use Origin\Migration\Migration;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Core\Exception\InvalidArgumentException;

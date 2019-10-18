@@ -14,8 +14,6 @@
 
 namespace Origin\Core\Exception;
 
-use Origin\Core\Exception\Exception;
-
 class RouterException extends Exception
 {
 }

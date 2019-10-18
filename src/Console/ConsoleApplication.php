@@ -17,9 +17,9 @@ namespace Origin\Console;
 
 use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
-use Origin\Core\Exception\Exception;
 use Origin\Core\LazyLoadContainer;
 use Origin\Console\Command\Command;
+use Origin\Core\Exception\Exception;
 use Origin\Console\Exception\ConsoleException;
 
 /**

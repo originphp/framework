@@ -16,8 +16,8 @@ namespace Origin\Mailer;
 
 use Origin\Html\Html;
 use Origin\Email\Email;
-use Origin\Core\Exception\Exception;
 use Origin\Inflector\Inflector;
+use Origin\Core\Exception\Exception;
 use Origin\Email\Email as SmtpEmail;
 
 /**

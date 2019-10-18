@@ -22,8 +22,8 @@ use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
-use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Http\Middleware\DispatcherMiddleware;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class BaseApplication
 {

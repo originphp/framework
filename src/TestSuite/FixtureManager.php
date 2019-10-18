@@ -17,9 +17,9 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Config;
 
-use Origin\Core\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 use Origin\Model\Exception\DatasourceException;
 
 class FixtureManager

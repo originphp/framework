@@ -14,8 +14,6 @@
 
 namespace Origin\Core\Exception;
 
-use Origin\Core\Exception\Exception;
-
 class MissingPluginException extends Exception
 {
     protected $template = '%s could not be found.';

@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Mailer;
 
-use Origin\Core\Exception\Exception;
 use Origin\Mailer\EmailBuilder;
 use Origin\TestSuite\TestTrait;
+use Origin\Core\Exception\Exception;
 
 class MockEmailBuilder extends EmailBuilder
 {

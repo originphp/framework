@@ -22,8 +22,8 @@ declare(strict_types = 1);
 
 namespace Origin\Model\Schema;
 
-use Origin\Core\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 
 class PgsqlSchema extends BaseSchema
 {
