@@ -329,7 +329,7 @@ class Response
         }
 
         if (! file_exists($filename)) {
-            throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $options['name']));
+            throw new NotFoundException('The requested file could not be found or read.');
         }
 
         if ($options['type'] === null) {
