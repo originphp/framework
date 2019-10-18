@@ -21,7 +21,8 @@ Upload: git push origin --tags
 Delete tag: git tag -d <tag_name>
 
 ## [Unreleased]
-
+### Fixed
+- Markdown parser bug fix when using multiple code tags in same line
 - Fixed incorrect cookie return type which blocked arrays
 
 ## [1.33.3] - 2019-10-02
