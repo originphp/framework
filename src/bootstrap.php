@@ -29,7 +29,7 @@ require ROOT . '/vendor/autoload.php';
 $errorHandler = (PHP_SAPI === 'cli') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
-require __DIR__ . '/functions.php';
+require ORIGIN . '/src/Core/functions.php';
 
 if (file_exists(CONFIG . DS . '.env.php')) {
     $result = include CONFIG . DS . '.env.php';
