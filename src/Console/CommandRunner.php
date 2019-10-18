@@ -63,16 +63,16 @@ class CommandRunner
     protected function buildNamespaceMap()
     {
         $this->namespaces = [
-            'Origin' => ORIGIN.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Command',
-            Config::read('App.namespace') => SRC.DIRECTORY_SEPARATOR.'Command',
+            'Origin' => ORIGIN.'/src/Command',
+            Config::read('App.namespace') => SRC.'/Command',
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = PLUGINS.DS.Inflector::underscored($plugin).DIRECTORY_SEPARATOR.'src'.DS.'Command';
+            $this->namespaces[$plugin] = Plugin::path($plugin).'/src/Command';
         }
     }
-
+  
     /**
      * Goes through discovery process.
      */
