@@ -32,7 +32,8 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 - Markdown parsing and converting
 - Storage system which supports local disk, FTP and SFTP
 - Service Objects
-- Repostitories
+- Repositories
+- Query Objects
 - Email using SMTP
 - Collections
 - and much more
