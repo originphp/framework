@@ -22,11 +22,11 @@ Summary of what has changed:
 
 5. Added some new features like custom Entity classes with mutators and accessors
 
-6. Deocupled the framework into seperate packages.
+6. Deocupled the framework into separate packages.
 
 7. Changed the bootstrap process
 
-I been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
+I have been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
 
 ### Added
 
@@ -49,7 +49,16 @@ I been working full time on the framework to get this where it is now, changes g
  See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
     Important: Model::afterFind now passes a collection for single or multiple results
 - Controller callbacks are now `startup` and `shutdown` inline with framework. beforeRedirect and beforeRender are used to register callbacks.
-- Folder structure (http,console and exception)
+- Folder structure has change for both App and Framework
+    - `App\Command` changed to `App\Console\Command`
+    - `App\Controller` change to `App\Http\View`
+    - `App\View` changed to `App\Http\View`
+    - `App\Middleware` changed to `App\Http\Middleware`
+    - `Origin\Command` change to `Origin\Console\Command`
+    - `Origin\Controller` change to `Origin\Http\View`
+    - `Origin\View` change to `Origin\Http\View`
+    - `Origin\Http\Middleware` class changed to `Origin\Http\Middleware\Middleware`
+    
 - Mailer templates folder and filename structure
 - Error triggered in Jobs are now logged to help with debugging
 - Model::$datasource changed Model::$connection
@@ -64,7 +73,7 @@ I been working full time on the framework to get this where it is now, changes g
 - Datasource class renamed to Connection
 - Locale files are now PHP changed from YAML
 - File::info renamed filename key to name
-- Backend Email utility has completely changed, it no longer uses configuration or templates. It is purely for constructing and sending messages by SMTP.
+- Backend Email utility has completely changed, it no longer works with templates. It is purely for constructing and sending messages by SMTP.
 
 ** Utilities **
 
@@ -104,14 +113,11 @@ loaded the framework bootstrap file.
 
 These fixes have also been fixed in the version 1.x branch
 
-
+- Fixed bug with paths for plugins installed using composer
 - Fixed bug in Markdown::toHtml when parsing multiple ` tags in the same line
 - Fixed XML serializer
 - Fixed custom class namespace issues with belongsTo/hasAndBelongsToMany
 - Fixed Number parse, now returns double or integer
-
-#### pending update v1.
-- [ ] Fixed bug plugin path when installed with composer
 
 ### Security
 
