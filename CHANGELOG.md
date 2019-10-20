@@ -5,6 +5,8 @@
 
 Releasing version 2.0, see the [upgrade guide](https://www.originphp.com/docs/upgrade) for information on how to upgrade from previous versions.
 
+There is an [upgrade tool](https://github.com/originphp/upgrade) which can handle moving and renaming and alerting to items that might need changing.
+
 ### Version 2
 
 Summary of what has changed:
@@ -22,20 +24,19 @@ Summary of what has changed:
 
 5. Added some new features like custom Entity classes with mutators and accessors
 
-6. Deocupled the framework into separate packages.
+6. Deocupled the framework into separate packages. The rest of the framework, Console/Http/Model/Mailer/Job etc stays as one but maybe in future will have split readonly repos using /splitsh.
 
-7. Changed the bootstrap process
+7. Changed the bootstrap process, this means less magic under the hood and more flexability. For example, plugins can now be standlone applications.
 
 I have been working full time on the framework to get this where it is now, changes going forward from here should be slow, with a focus on improving code base, developing and testing with future PHP versions, bug and security fixes.
 
 ### Added
 
 - Custom Entity classes, with mutators and accessors
-- Security::random
+- Security::random and other random string generation based upon hex,base62,base36,base58,base64
 - Security::uuid version 1 generation
-- Added post install command
 - Concerns
-- Folder::list now works with recursive
+- Folder::list now works recursively
 - QueryObject
 
 ### Changed
