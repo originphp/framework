@@ -32,13 +32,16 @@ class Repository
      */
     private $modelClass = null;
 
+    /**
+     * Constructor. Any arguments passed will be sent to the initialize method.
+     */
     public function __construct()
     {
         if ($this->modelClass === null) {
             list($namespace, $class) = namespaceSplit(get_class($this));
             $this->modelClass = Inflector::singular(substr($class, 0, -10));
         }
-        $this->executeHook('initialize');
+        $this->executeHook('initialize', func_get_args());
     }
 
     /**
