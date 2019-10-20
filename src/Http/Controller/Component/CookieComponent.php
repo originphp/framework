@@ -46,7 +46,7 @@ class CookieComponent extends Component
      * Writes a cookie through response
      *
      *  $cookie->write('key',$value);
-     *  $cookie->write('key',$value,'+1 month');
+     *  $cookie->write('key',$value,['expires'=>'+1 month');
      *
      * @param string $name cookie name
      * @param mixed $value

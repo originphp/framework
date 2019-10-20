@@ -37,7 +37,7 @@ class CookieHelper extends Helper
      * Writes a cookie through response
      *
      *  $cookie->write('key',$value);
-     *  $cookie->write('key',$value,'+1 month');
+     *  $cookie->write('key',$value,['expires'=>'+1 month');
      *
      * @param string $name
      * @param mixed $value

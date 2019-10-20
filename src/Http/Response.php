@@ -239,7 +239,7 @@ class Response
      * to be sent
      *
      *  $response->cookie('key',$value);
-     *  $response->cookie('key',$value,'+5 days');
+     *  $response->cookie('key',$value,['expires'=>'+5 days');
      *
     * @param string $name
      * @param mixed $value string, array etc
