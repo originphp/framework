@@ -124,7 +124,7 @@ class Job
         $this->wait = $options['wait'];
         $this->queue = $options['queue'];
         
-        $this->id = Security::uuid();
+        $this->id = Security::uuid(['macAddress' => true]);
 
         if ($this->name === null) {
             list($namespace, $name) = namespaceSplit(get_class($this));
