@@ -23,10 +23,12 @@ declare(strict_types = 1);
 
 namespace Origin\Model;
 
+use ArrayAccess;
 use Origin\Xml\Xml;
+use JsonSerializable;
 use Origin\Inflector\Inflector;
 
-class Entity
+class Entity implements ArrayAccess, JsonSerializable
 {
     /**
      * Holds the properties and values for this entity.
@@ -465,13 +467,13 @@ class Entity
     }
 
     /**
-     * Converts this entity into Json
+     * Converts this entity into JSON
      *
      * @return string
      */
     public function toJson() : string
     {
-        return json_encode($this->toArray());
+        return json_encode($this->jsonSerialize());
     }
 
     /**
@@ -527,5 +529,61 @@ class Entity
         }
 
         return $this->_virtual = $properties;
+    }
+
+    /**
+     * ArrayAcces Interface for isset($entity);
+     *
+     * @param mixed $offset
+     * @return bool result
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset);
+    }
+
+    /**
+     * ArrayAccess Interface for $entity[$offset];
+     *
+     * @param mixed $offset
+     * @return mixed
+     */
+    public function &offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    /**
+     * ArrayAccess Interface for $entity[$offset] = $value;
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->set($offset, $value);
+    }
+
+    /**
+     * ArrayAccess Interface for unset($entity[$offset]);
+     *
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->unset($offset);
+    }
+
+    /**
+     * JsonSerializable Interface for json_encode($entity). Returns the properties that will be serialized as
+     * json
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

@@ -38,6 +38,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1000, $entity->id);
         $entity->set('foo', 'bar');
         $this->assertEquals('bar', $entity->foo);
+
+        $entity['bar'] = 'foo';
+        $this->assertEquals('foo', $entity['bar']);
     }
 
     /**
@@ -56,6 +59,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1001, $entity->get('id'));
         $this->assertEquals(null, $entity->get('empty'));
         $this->assertEquals(null, $entity->get('nonExistant'));
+
+        $this->assertEquals(1001, $entity['id']);
+        $this->assertEquals(null, $entity['foo']);
     }
 
     /**
@@ -69,6 +75,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($entity->name));
         $this->assertTrue($entity->has('id'));
         $this->assertFalse($entity->has('name'));
+        $this->assertTrue($entity['id']);
+        $this->assertFalse($entity['name']);
     }
 
     /**
@@ -84,6 +92,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(isset($entity->foo));
         $entity->unset('foo');
         $this->assertTrue(! isset($entity->foo));
+
+        $entity['foo'] = 'bar';
+        unset($entity['foo']);
+        $this->assertTrue(! isset($entity['foo']));
     }
 
     /**

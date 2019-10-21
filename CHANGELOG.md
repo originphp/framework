@@ -102,6 +102,9 @@ loaded the framework bootstrap file.
 - Console Commands return exit codes, added assertion for this
 - Origin\Exception\Exception and Origin\Exception\CoreException are now in Origin\Core\Exception
 
+- Entity now implements ArrayAccess and JsonSerializable
+- Collection now implement JsonSerializable
+
 ### Removed
 
 - Text::random
