@@ -97,9 +97,8 @@ abstract class BaseEngine
     {
         $serialized = json_encode($job->serialize());
 
-        // https://www.php.net/manual/en/function.json-last-error.php
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('JSON decoding data Error: ' . json_last_error());
+            throw new Exception('JSON encoding data Error: ' . json_last_error());
         }
 
         return $serialized;
@@ -114,6 +113,7 @@ abstract class BaseEngine
     public function deserialize(string $data) : Job
     {
         $unserialized = json_decode($data, true);
+        
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('JSON decoding data Error: ' . json_last_error());
         }
