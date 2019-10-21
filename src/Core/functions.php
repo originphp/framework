@@ -71,19 +71,40 @@ function debug($data, bool $isHtml = false): void
 }
 
 /**
- * An easy to use print_r which only works in debug mode.
+ * Checks if running in console mode
+ *
+ * @return boolean
+ */
+function isConsole() : bool
+{
+    return (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg');
+}
+
+/**
+ * A print_r wrapper to print a variable in human friendly format when in debug mode.
+ *
  * @param mixed $data
  * @return void
  */
 function pr($data): void
 {
     if (Config::read('debug')) {
-        $template = '<pre>%s</pre>';
-        if (PHP_SAPI === 'cli') {
-            $template = "\n%s\n";
-        }
-        $data = print_r($data, true);
-        printf($template, $data);
+        $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
+        printf($template, print_r($data, true));
+    }
+}
+
+/**
+ * Prints a variable in JSON pretty print when in debug mode
+ *
+ * @param mixed $data
+ * @return void
+ */
+function pj($data) : void
+{
+    if (Config::read('debug')) {
+        $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
+        printf($template, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
 
