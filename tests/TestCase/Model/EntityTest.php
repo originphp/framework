@@ -75,8 +75,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($entity->name));
         $this->assertTrue($entity->has('id'));
         $this->assertFalse($entity->has('name'));
-        $this->assertTrue($entity['id']);
-        $this->assertFalse($entity['name']);
+        $this->assertTrue(isset($entity['id']));
+        $this->assertFalse(isset($entity['name']));
     }
 
     /**
