@@ -253,7 +253,8 @@ class Entity implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Added & to prevent Indirect modification of overloaded property errors.
+     * Gets a value from the entity
+     *
      * @return mixed
      */
     public function &get(string $property)
