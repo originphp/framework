@@ -125,7 +125,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      * @param mixed $offset
      * @return mixed
      */
-    public function &offsetGet($key)
+    public function offsetGet($key)
     {
         return $this->items[$key] ?? null;
     }
