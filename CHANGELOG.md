@@ -89,6 +89,7 @@ I have been working full time on the framework to get this where it is now, chan
 - Markdown is now a composer package and under a different namespace `Origin\Markdown`
 - Inflector is now a composer package and under a different namespace `Origin\Inflector`
 - Security is now a composer package and under a different namespace `Origin\Security`
+- Http is now a composer package and under a different namespace `Origin\HttpClient` (originphp/http-client). Note Response object for this namespace has changed one level up.
 
 ** Libraries **
 
