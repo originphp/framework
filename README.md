@@ -4,8 +4,6 @@
 [![build](https://travis-ci.org/originphp/framework.svg?branch=masterhttps://travis-ci.org/originphp/framework.svg?branch=master)](https://travis-ci.org/originphp/framework)
 [![coverage](https://coveralls.io/repos/github/originphp/framework/badge.svg?branch=master)](https://coveralls.io/github/originphp/framework?branch=master)
 ![memory](https://img.shields.io/badge/memory-950KB-brightGeen.svg)
-![diskspace](https://img.shields.io/badge/disk_space-1.75MB-brightGreen.svg)
-![rating](https://img.shields.io/badge/rating-awesome-blue.svg)
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
 
@@ -62,7 +60,7 @@ Create two databases `origin_test` and `origin` which are used by testing.
 Then run PHPUnit
 
 ```linux
-$ phpunit
+$ vendor/bin/phpunit
 ```
 
 You can send an email to <js@originphp.com>.
