@@ -13,6 +13,7 @@
  */
 namespace Origin\Test\Redis;
 
+use Origin\Core\Exception\Exception;
 use Origin\Redis\RedisConnection;
 use Redis;
 
@@ -37,6 +38,7 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
     {
         $result = RedisConnection::connect([
             'host' => getenv('REDIS_HOST'),
+            'port' => (int) getenv('REDIS_PORT'),
             'duration' => 0,
             'prefix' => 'origin_',
             'persistent' => 'persisten-id',
@@ -48,6 +50,7 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         RedisConnection::connect([
             'engine' => 'Redis',
+            'port' => (int) getenv('REDIS_PORT'),
             'path' => '/var/sockets/redis',
         ]);
     }
