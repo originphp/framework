@@ -11,7 +11,7 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Cache\Engine;
+namespace Origin\Test\Redis;
 
 use Origin\Redis\RedisConnection;
 use Redis;
