@@ -74,14 +74,14 @@ I have been working full time on the framework to get this where it is now, chan
 - Datasource class renamed to Connection
 - Locale files are now PHP changed from YAML
 - File::info renamed filename key to name
-- Backend Email utility has completely changed, it no longer works with templates. It is purely for constructing and sending messages by SMTP.
+
 
 ** Utilities **
 
 - Collection is now a composer package and under a different namespace `Origin\Collection`
 - CSV is now a composer package and under a different namespace `Origin\Csv`
 - DOM is now a composer package and under a different namespace `Origin\Dom`
-- Email is now a composer package and under a different namespace `Origin\Email`
+- Email is now a composer package and under a different namespace `Origin\Email`. The email utility has completely changed, it is now purely for constructing and sending messages by SMTP. The default message type is now text, and template features have been removed. Note. This does not affect mailers, which use this as the backend.
 - File and Folder are now in a composer package (originphp/filesystem) and under a different namespace `Origin\Filesystem`
 - Yaml is now a composer package and under a different namespace `Origin\Yaml`
 - Html is now a composer package and under a different namespace `Origin\Html`
@@ -89,7 +89,7 @@ I have been working full time on the framework to get this where it is now, chan
 - Markdown is now a composer package and under a different namespace `Origin\Markdown`
 - Inflector is now a composer package and under a different namespace `Origin\Inflector`
 - Security is now a composer package and under a different namespace `Origin\Security`
-- Http is now a composer package and under a different namespace `Origin\HttpClient` (originphp/http-client). Note Response object for this namespace has changed one level up.
+- Http is now a composer package and under a different namespace `Origin\HttpClient` (originphp/http-client). Note Response object for this namespace has changed to the same namespace, this was previously in a sub namespace Http.
 
 ** Libraries **
 
@@ -108,11 +108,11 @@ loaded the framework bootstrap file.
 
 ### Removed
 
-- Text::random
-- Helper functions, uid,left,right,contains and replace
+- Removed Text::random method (you can use Security::base62 for similar)
+- Removed Helper functions: uuid,left,right,contains and replace
 - Mailer::$folder removed, this is now autodetected
-- Behaviors
-- Inflector::add (use Inflector::rules which now accepts strings)
+- Removed Behaviors
+- Removed Inflector::add method (use Inflector::rules which now accepts strings)
 
 ### Fixes
 
