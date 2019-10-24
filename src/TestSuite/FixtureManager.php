@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,11 +15,11 @@
 
 namespace Origin\TestSuite;
 
-use Origin\Core\Configure;
+use Origin\Core\Config;
 
-use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 use Origin\Model\Exception\DatasourceException;
 
 class FixtureManager
@@ -39,6 +40,7 @@ class FixtureManager
 
     /**
      * Loads fixtures defined in a test.
+     *
      * @internal so this can be tested not setting a type
      * @param \PHPUnit\Framework\Test $test
      * @return void
@@ -47,17 +49,19 @@ class FixtureManager
     {
         $this->testCaseName = get_class($test);
         
-        if ($test->fixtures) {
+        $fixtures = $test->fixtures();
+
+        if ($fixtures) {
             # Create Tables or Truncate
             $this->disableForeignKeyConstraints();
-            foreach ($test->fixtures as $fixture) {
+            foreach ($fixtures as $fixture) {
                 $this->loadFixture($fixture);
             }
             $this->enableForeignKeyConstraints();
 
             # Insert Records for Fixtures
             $this->disableForeignKeyConstraints();
-            foreach ($test->fixtures as $fixture) {
+            foreach ($fixtures as $fixture) {
                 $this->loadRecords($fixture);
             }
             $this->enableForeignKeyConstraints();
@@ -72,9 +76,10 @@ class FixtureManager
      */
     public function unload($test) :void
     {
-        if ($test->fixtures) {
+        $fixtures = $test->fixtures();
+        if ($fixtures) {
             $this->disableForeignKeyConstraints();
-            foreach ($test->fixtures as $fixture) {
+            foreach ($fixtures as $fixture) {
                 $this->unloadFixture($fixture);
             }
             $this->enableForeignKeyConstraints();
@@ -85,7 +90,7 @@ class FixtureManager
     }
 
     /**
-     * Gets the load fixtures or fixture
+     * Gets the loaded fixtures or fixture
      *
      * @param string $fixture
      * @return \Origin\TestSuite\Fixture|array|null
@@ -117,7 +122,7 @@ class FixtureManager
 
         try {
             // create the table table or truncate existing
-            if (! $this->loaded[$fixture]->insertOnly() and ($createTable or $this->loaded[$fixture]->dropTables === true)) {
+            if (! $this->loaded[$fixture]->insertOnly() and ($createTable or $this->loaded[$fixture]->dropTables() === true)) {
                 $this->loaded[$fixture]->drop();
                 $this->loaded[$fixture]->create();
             } else {
@@ -202,7 +207,7 @@ class FixtureManager
 
         $namespace = '';
         if ($plugin === 'App' or $plugin === null) {
-            $namespace = Configure::read('App.namespace');
+            $namespace = Config::read('App.namespace');
         } elseif ($plugin == 'Framework') {
             $namespace = 'Origin';
         } elseif ($plugin) {

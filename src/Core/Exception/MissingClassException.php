@@ -14,8 +14,6 @@
 
 namespace Origin\Core\Exception;
 
-use Origin\Exception\Exception;
-
 class MissingClassException extends Exception
 {
     protected $template = '%s could not be found.';

@@ -18,9 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class ArticlesTagFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'article_id' => ['type' => 'integer'],
             'tag_id' => ['type' => 'integer'],
@@ -30,7 +28,7 @@ class ArticlesTagFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'article_id' => 1000,
             'tag_id' => 1001,

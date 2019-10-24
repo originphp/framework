@@ -15,31 +15,35 @@ namespace Origin\Test\Job;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
+use Origin\Security\Security;
 use Origin\Model\ModelRegistry;
+use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\DatabaseEngine;
 use Origin\Model\Exception\MissingModelException;
 
 class PassOrFailJob extends Job
 {
-    public $connection = 'default';
+    use TestTrait;
+    
+    protected $connection = 'default';
 
-    public function initialize()
+    public function initialize() : void
     {
         $this->status = 'new';
     }
 
-    public function execute(bool $pass = true)
+    public function execute(bool $pass = true) : void
     {
         if (! $pass) {
             $a = 1 / 0;
         }
     }
-    public function onSuccess(bool $pass = true)
+    public function onSuccess(bool $pass = true) : void
     {
         $this->status = 'success';
     }
-    public function onError(\Exception $exception)
+    public function onError(\Exception $exception) : void
     {
         $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);
@@ -53,16 +57,16 @@ class PassOrFailJob extends Job
 }
 class PassOrFailRedis extends PassOrFailJob
 {
-    public $connection = 'redis-test';
+    protected $connection = 'redis-test';
 }
 
 class JobTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
 
     public function setUp() : void
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         ModelRegistry::set('Article', $model);
     }
 
@@ -82,7 +86,7 @@ class JobTest extends OriginTestCase
     {
         $job = new PassOrFailJob();
         $job->schedule('+10 minutes');
-        $this->assertEquals('+10 minutes', $job->wait);
+        $this->assertEquals('+10 minutes', $job->getProperty('wait'));
     }
 
     public function testBackendId()
@@ -98,7 +102,7 @@ class JobTest extends OriginTestCase
         $job = new PassOrFailJob();
         $connection = $job->connection();
         $this->assertInstanceOf(DatabaseEngine::class, $connection);
-        $this->assertEquals('test', $connection->config('datasource'));
+        $this->assertEquals('test', $connection->config('connection'));
     }
 
     public function testDispatch()
@@ -202,7 +206,7 @@ class JobTest extends OriginTestCase
 
     public function testSerialize()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         $data = ['key' => 'value'];
         $job = new PassOrFailJob();
         $job->set(['arguments' => [$model, $data]]);
@@ -212,7 +216,7 @@ class JobTest extends OriginTestCase
             'className' => 'Origin\Test\Job\PassOrFailJob',
             'id' => $job->id(),
             'backendId' => 1000,
-            'queue' => $job->queue,
+            'queue' => $job->queue(),
             'arguments' => serialize(new \ArrayObject([$model,$data])),
             'attempts' => $job->attempts(),
             'enqueued' => null,
@@ -223,11 +227,11 @@ class JobTest extends OriginTestCase
 
     public function testDeserialize()
     {
-        $model = new Model(['name' => 'Article','datasource' => 'test']);
+        $model = new Model(['name' => 'Article','connection' => 'test']);
         $data = ['key' => 'value'];
         $job = new PassOrFailJob();
         $job->set(['arguments' => [$model, $data]]);
-        $id = uuid();
+        $id = Security::uuid();
     
         $serialized = [
             'className' => 'Origin\Test\Job\PassOrFailJob',
@@ -243,7 +247,7 @@ class JobTest extends OriginTestCase
         $job->deserialize($serialized);
         
         $this->assertEquals($id, $job->id());
-        $this->assertEquals('foo', $job->queue);
+        $this->assertEquals('foo', $job->queue());
         $this->assertInstanceOf(Model::class, $job->arguments()[0]);
         $this->assertEquals(['key' => 'value'], $job->arguments()[1]);
         $this->assertEquals(5, $job->attempts());

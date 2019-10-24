@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,7 +15,7 @@
 
 namespace Origin\Http;
 
-use Origin\Exception\HttpException;
+use Origin\Http\Exception\HttpException;
 
 class ExceptionRenderer
 {
@@ -84,9 +84,9 @@ class ExceptionRenderer
     protected function getFileToRender($exception)
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
-        $error400 = SRC . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
+        $error400 = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
       
-        $file = SRC . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
+        $file = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
         if ($exception instanceof HttpException and file_exists($error400) and $exception->getCode() < 500) {
             $file = $error400;
         }

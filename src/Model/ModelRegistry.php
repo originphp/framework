@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,7 +16,7 @@
 namespace Origin\Model;
 
 use Origin\Core\Resolver;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class ModelRegistry
 {
@@ -32,12 +33,11 @@ class ModelRegistry
      * Gets the model from the Registry. If the model is not in the registry
      * then it will create it and add it.
      *
-     * @param string $model
+     * @param string $alias
      * @param array  $options
-     *
-     * @var \Origin\Model\Model
+     * @return \Origin\Model\Model|null
      */
-    public static function get(string $alias, array $options = [])
+    public static function get(string $alias, array $options = []) : ?Model
     {
         list($plugin, $model) = pluginSplit($alias);
         
@@ -57,8 +57,8 @@ class ModelRegistry
         /**
          * Set the datasource to test when in the test environment
          */
-        if (env('ORIGIN_ENV') === 'test' and ! isset($options['datasource'])) {
-            $options['datasource'] = 'test';
+        if (env('ORIGIN_ENV') === 'test' and ! isset($options['connection'])) {
+            $options['connection'] = 'test';
         }
 
         $object = static::create($model, $options);
@@ -69,16 +69,17 @@ class ModelRegistry
             return $object;
         }
 
-        return false;
+        return null;
     }
 
     /**
      * Adds an object to the registry.
      *
-     * @param string $key    name of object
-     * @param object $object
+     * @param string $key name of object
+     * @param \Origin\Model\Model $object
+     * @return void
      */
-    public static function set(string $key = null, $object)
+    public static function set(string $key = null, Model $object) : void
     {
         static::$registry[$key] = $object;
     }
@@ -88,23 +89,18 @@ class ModelRegistry
      *
      * @param string $key name of object
      */
-    public static function has($key = null)
+    public static function has($key = null) : bool
     {
-        if (isset(static::$registry[$key])) {
-            return true;
-        }
-
-        return false;
+        return isset(static::$registry[$key]);
     }
 
     /**
      * Deletes an object from the registry.
      *
      * @param string $key name of object
-     *
      * @return bool true or false
      */
-    public static function delete($key = null)
+    public static function delete($key = null) : bool
     {
         if (isset(static::$registry[$key])) {
             unset(static::$registry[$key]);
@@ -117,8 +113,10 @@ class ModelRegistry
 
     /**
      * Clears the registry and resets state.
+     *
+     * @return void
      */
-    public static function clear()
+    public static function clear() : void
     {
         static::$config = static::$registry = [];
     }
@@ -127,10 +125,10 @@ class ModelRegistry
      * Undocumented function
      *
      * @param string $className
-     * @param [type] $options
-     * @var \Origin\Model\Model
+     * @param array $options
+     * @return \Origin\Model\Model|null
      */
-    protected static function create(string $className, $options)
+    protected static function create(string $className, array $options) : ?Model
     {
         if (isset($options['className'])) {
             $className = $options['className'];
@@ -142,7 +140,7 @@ class ModelRegistry
             return new $className($options);
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -150,11 +148,10 @@ class ModelRegistry
      * config for an alias dont supply config,.
      *
      * @param string $alias  model alias
-     * @param array  $config
-     *
-     * @return array
+     * @param array $config
+     * @return array|null
      */
-    public static function config(string $alias = null, array $config = null)
+    public static function config(string $alias = null, array $config = null) : ?array
     {
         if ($alias === null) {
             return static::$config;
@@ -170,8 +167,7 @@ class ModelRegistry
         if (isset(static::$registry[$alias])) {
             throw new Exception(sprintf('You cannot set the config for "%s" as it is  already in the registry', $alias));
         }
-        static::$config[$alias] = $config;
 
-        return $config;
+        return static::$config[$alias] = $config;
     }
 }

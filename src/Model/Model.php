@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -11,7 +12,6 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
 namespace Origin\Model;
 
 /**
@@ -20,39 +20,41 @@ namespace Origin\Model;
  *
  */
 
-use Origin\Utility\Inflector;
-use Origin\Exception\Exception;
+use ArrayObject;
+use Origin\Core\HookTrait;
+use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
-use Origin\Concern\ConcernRegistry;
-use Origin\Model\Behavior\BehaviorRegistry;
+use Origin\Core\Exception\Exception;
+use Origin\Core\CallbackRegistrationTrait;
+use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\NotFoundException;
-use Origin\Exception\InvalidArgumentException;
 use Origin\Model\Exception\MissingModelException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class Model
 {
-    use InitializerTrait;
-    use ModelTrait;
+    use InitializerTrait, ModelTrait, CounterCacheable,CallbackRegistrationTrait, HookTrait;
+    
     /**
      * The name for this model, this generated automatically.
      *
      * @var string
      */
-    public $name = null;
+    protected $name = null;
 
     /**
      * The alias name for this model, again this generated automatically
      *
      * @var string
      */
-    public $alias = null;
+    protected $alias = null;
 
     /**
-     * This is the Database configuration to used by model.
+     * This is the Database connection to used by this model.
      *
      * @var string
      */
-    public $datasource = 'default';
+    protected $connection = 'default';
 
     /**
      * This is the table name for the model this will be generated automatically
@@ -60,7 +62,7 @@ class Model
      *
      * @var string
      */
-    public $table = null;
+    protected $table = null;
 
     /**
      * Each table should have a primary key and it should be id, because
@@ -69,7 +71,7 @@ class Model
      * 3. it might get confusing later
      * @var string
      */
-    public $primaryKey = null;
+    protected $primaryKey = null;
 
     /**
      * This is the main field on the model, for a contact, it would be contact_name. Things
@@ -77,7 +79,7 @@ class Model
      *
      * @var string
      */
-    public $displayField = null;
+    protected $displayField = null;
 
     /**
      * Default order to used when finding.
@@ -87,7 +89,7 @@ class Model
      *
      * @var string|array
      */
-    public $order = null;
+    protected $order = null;
 
     /**
      * The ID of the last record created, updated, or deleted. When saving
@@ -95,7 +97,7 @@ class Model
      *
      * @var mixed
      */
-    public $id = null;
+    protected $id = null;
 
     /**
      * belongsTo keys className, foreignKey, conditions, fields, order).
@@ -142,22 +144,15 @@ class Model
      */
     protected $marshaller = null;
 
-    /**
-     * Behavior registry object
-     *
-     * @var \Origin\Model\Behavior\BehaviorRegistry
-     */
-    protected $behaviorRegistry = null;
-
     public function __construct(array $config = [])
     {
         $config += [
             'name' => $this->name,
             'alias' => $this->alias,
-            'datasource' => $this->datasource,
+            'connection' => $this->connection,
             'table' => $this->table,
         ];
-
+     
         extract($config);
 
         if (is_null($name)) {
@@ -179,17 +174,14 @@ class Model
             $this->primaryKey = 'id';
         }
 
-        $this->datasource = $datasource;
+        $this->connection = $connection;
 
         // Remove so we can autodetect when needed
         if (! $this->displayField) {
             unset($this->displayField);
         }
 
-        $this->behaviorRegistry = new BehaviorRegistry($this);
-        $this->concernRegistry = new ConcernRegistry($this, 'Model/Concern');
-
-        $this->initialize($config);
+        $this->executeHook('initialize', [$config]);
         $this->initializeTraits($config);
     }
 
@@ -207,6 +199,7 @@ class Model
         $habtmModel = false;
 
         $association = $this->findAssociation($name);
+
         if ($association) {
             $className = $association['className'];
         } else {
@@ -224,7 +217,7 @@ class Model
         }
 
         $object = ModelRegistry::get($name, ['className' => $className, 'alias' => $name]);
-        if ($object === false and $habtmModel === false) {
+        if ($object === null and $habtmModel === false) {
             throw new MissingModelException($name);
         }
 
@@ -232,7 +225,7 @@ class Model
             $object = new Model([
                 'name' => $className,
                 'table' => $this->hasAndBelongsToMany[$alias]['joinTable'],
-                'datasource' => $this->datasource,
+                'connection' => $this->connection,
             ]);
 
             if (count($object->fields()) === 2) {
@@ -242,7 +235,7 @@ class Model
             ModelRegistry::set($name, $object);
         }
 
-        $this->{$name} = $object;
+        $this->$name = $object;
 
         return true;
     }
@@ -256,34 +249,13 @@ class Model
     public function __get(string $name)
     {
         if ($name === 'displayField') {
-            $this->displayField = $this->detectDisplayField();
-
-            return $this->displayField;
+            return $this->displayField = $this->detectDisplayField();
         }
-        if (isset($this->{$name})) {
-            return $this->{$name};
+        if (isset($this->$name) and $this->$name instanceof Model) {
+            return $this->$name;
         }
 
         return null;
-    }
-
-    /**
-     * Magic method it call the first loaded behavior method if its available
-     *
-     * @param string $method
-     * @param array $arguments
-     * @return void
-     */
-    public function __call(string $method, array $arguments)
-    {
-        foreach (['behaviorRegistry','concernRegistry'] as $registryObject) {
-            $object = $this->$registryObject->hasMethod($method);
-            if ($object) {
-                return call_user_func_array([$object, $method], $arguments);
-            }
-        }
-  
-        throw new Exception('Call to undefined method '  . get_class($this) . '\\' .  $method . '()');
     }
 
     /**
@@ -319,8 +291,8 @@ class Model
      */
     public function association(string $name): array
     {
-        if (in_array($name, $this->associations())) {
-            return $this->{$name};
+        if (in_array($name, $this->associations)) {
+            return $this->$name;
         }
         throw new Exception('Unkown association ' . $name);
     }
@@ -333,44 +305,6 @@ class Model
     public function associations(): array
     {
         return $this->associations;
-    }
-
-    /**
-     * Hook to call just after model creation.
-     */
-    public function initialize(array $config)
-    {
-    }
-    /**
-     * Returns the behaviorRegistry object
-     *
-     * @return \Origin\Model\Behavior\BehaviorRegistry
-     */
-    public function behaviorRegistry(): BehaviorRegistry
-    {
-        return $this->behaviorRegistry;
-    }
-    /**
-     * Loads a model behavior
-     *
-     * @param string $name
-     * @param array $config
-     * @return \Origin\Model\Behavior\Behavior
-     */
-    public function loadBehavior(string $name, array $config = []) //no return type cause of mocking
-    {
-        list($plugin, $behavior) = pluginSplit($name);
-        $config = array_merge(['className' => $name . 'Behavior'], $config);
-
-        return $this->$behavior = $this->behaviorRegistry->load($name, $config);
-    }
-
-    public function loadConcern(string $name, array $config = []) //no return type cause of mocking
-    {
-        list($plugin, $concern) = pluginSplit($name);
-        $config = array_merge(['className' => $name . 'Concern'], $config);
-
-        return $this->$concern = $this->concernRegistry->load($name, $config);
     }
 
     /**
@@ -430,7 +364,7 @@ class Model
         $assoc = new Association($this);
         $this->belongsTo[$association] = $assoc->belongsTo($association, $options);
         if (isset($options['counterCache']) and ! isset($this->CounterCache)) {
-            $this->loadBehavior('CounterCache');
+            $this->enableCounterCache();
         }
 
         return $this->belongsTo[$association];
@@ -503,8 +437,8 @@ class Model
      *   'email' =>  ['rule' => 'email']
      *  ]);
      *
-     * @param string|array $field Field name to validate
-     * @param array $options either the rule name e.g. notBlank or an options array with any of the following keys:
+     * @param string $field Field name to validate
+     * @param string|array $options either the rule name e.g. notBlank or an options array with any of the following keys:
      *   - rule: name of rule e.g. date
      *   - message: the message to show if the rule fails
      *   - on: default null. set to create or update to run the rule only on those
@@ -591,7 +525,7 @@ class Model
     /**
      * Validates model data in the object.
      *
-     * @param array $data
+     * @param \Origin\Model\Entity $data
      * @return bool true or false
      */
     public function validates(Entity $data, bool $create = true) : bool
@@ -616,48 +550,47 @@ class Model
     /**
      * This does the save
      *
-     * @param Entity $entity
-     * @param array $options
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
      * @return bool
      */
-    protected function processSave(Entity $entity, array $options = []) : bool
+    protected function processSave(Entity $entity, ArrayObject $options) : bool
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
-
-        $this->id = null;
-        if ($entity->has($this->primaryKey)) {
-            $this->id = $entity->{$this->primaryKey};
-        }
-
+        $this->id = $entity->get($this->primaryKey);
+    
         $exists = $this->exists($this->id);
+        $entity->exists($exists);
+
+        $event = $exists === true ? 'update' : 'create';
 
         if ($options['validate'] === true) {
-            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', [$entity])) {
+            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', $event, [$entity, $options])) {
                 return false;
             }
+
             $validated = $this->validates($entity, ! $exists);
 
             if ($options['callbacks'] === true) {
-                $this->triggerCallback('afterValidate', [$entity, $validated]);
+                $this->triggerCallback('afterValidate', $event, [$entity, $options]);
             }
 
             if (! $validated) {
                 return false;
             }
         }
-
+      
         $beforeCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'before');
         $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
 
-        if ($beforeCallbacks and ! $this->triggerCallback('beforeSave', [$entity, $options])) {
+        if ($beforeCallbacks and ! $this->triggerCallback('beforeSave', $event, [$entity, $options])) {
             return false;
         }
 
-        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', [$entity])) {
+        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', $event, [$entity, $options])) {
             return false;
         }
 
-        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', [$entity])) {
+        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', $event, [$entity, $options])) {
             return false;
         }
 
@@ -673,7 +606,7 @@ class Model
                 $data = $entity->get($needle);
 
                 if (is_array($data) or $data instanceof Collection) {
-                    $hasAndBelongsToMany[$alias] = $entity->{$needle};
+                    $hasAndBelongsToMany[$alias] = $entity->$needle;
                 }
             }
         }
@@ -697,7 +630,7 @@ class Model
                 $entity->invalidate($key, 'Invalid data');
             }
         }
-
+     
         if (empty($data) or $entity->errors()) {
             return false;
         }
@@ -711,8 +644,8 @@ class Model
             if ($exists) {
                 $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
 
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterUpdate', [$entity]);
+                if ($result and $afterCallbacks) {
+                    $this->triggerCallback('afterUpdate', $event, [$entity, $options], false);
                 }
             } else {
                 $result = $connection->insert($this->table, $data);
@@ -725,33 +658,28 @@ class Model
                  * @internal lastval is not yet defined in this session
                  */
                 if (empty($entity->{$this->primaryKey})) {
-                    $entity->{$this->primaryKey} = $connection->lastInsertId();
+                    $entity->{$this->primaryKey} = (int) $connection->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};
 
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterCreate', [$entity]);
+                if ($result and $afterCallbacks) {
+                    $this->triggerCallback('afterCreate', $event, [$entity, $options], false);
                 }
             }
         }
       
-        if ($result) {
-            if ($afterCallbacks) {
-                $this->triggerCallback('afterSave', [$entity, ! $exists, $options]);
-            }
+        if ($result and $afterCallbacks) {
+            $this->triggerCallback('afterSave', $event, [$entity, $options], false);
         }
-
+      
         /**
-         * Save HABTM. It is here, because control is needed on false result from here
-         */
-        foreach ($hasAndBelongsToMany as $alias => $data) {
-            if (! $this->saveHABTM($alias, $data, $options['callbacks'])) {
-                return false;
-            }
-            $result = true;
+        * Save HABTM. It is here, because control is needed on false result from here
+        */
+        if ($hasAndBelongsToMany) {
+            $result = (new Association($this))->saveHasAndBelongsToMany($hasAndBelongsToMany, $options['callbacks']);
         }
-
-        unset($data, $options);
+  
+        unset($data, $options, $hasAndBelongsToMany);
 
         if ($result) {
             $entity->reset();
@@ -761,35 +689,16 @@ class Model
     }
 
     /**
-     * Updates a column in the table, no validation check and callbacks triggered
+     * Updates a column in the table, no validation checks and no callbacks are triggered
      *
-     * @params int|string $primaryKey the id for the record
-     * @param int|string $name column name
+     * @param int|string $primaryKey the id for the record
+     * @param string $name column name
      * @param mixed $value
      * @return bool true or false
      */
     public function updateColumn($primaryKey, string $name, $value) : bool
     {
         return $this->connection()->update($this->table, [$name => $value], [$this->primaryKey => $primaryKey]);
-    }
-
-    /**
-     * Saves a single field on a current record.
-     * @codeCoverageIgnore
-     * @params int|string $primaryKey the id for the record
-     * @param int|string $fieldName
-     * @param mixed  $fieldValue
-     * @param array  $options (callbacks, validate)
-     * @return bool true or false
-     */
-    public function saveField($primaryKey, string $fieldName, $fieldValue, array $options = []) : bool
-    {
-        deprecationWarning('Model:saveField has been deprecated use Model:updateColumn');
-
-        return $this->save(new Entity([
-            $this->primaryKey => $primaryKey,
-            $fieldName => $fieldValue,
-        ]), $options);
     }
 
     /**
@@ -833,84 +742,6 @@ class Model
     }
 
     /**
-     * Saves the hasAndBelongsToMany data
-     *
-     * @param string $association
-     * @param Collection|array $data
-     * @param boolean $callbacks
-     * @return bool
-     */
-    protected function saveHABTM(string $association, $data, bool $callbacks) : bool
-    {
-        $connection = $this->connection();
-
-        $config = $this->hasAndBelongsToMany[$association];
-        $joinModel = $this->{$config['with']};
-
-        $links = [];
-
-        foreach ($data as $row) {
-            $primaryKey = $this->{$association}->primaryKey;
-            $displayField = $this->{$association}->displayField;
-
-            // Either primaryKey or DisplayField must be set in data
-            if ($row->has($primaryKey)) {
-                $needle = $primaryKey;
-            } elseif ($row->has($displayField)) {
-                $needle = $displayField;
-            } else {
-                return false;
-            }
-
-            $tag = $this->{$association}->find('first', [
-                'conditions' => [$needle => $row->get($needle)],
-                'callbacks' => false,
-            ]);
-
-            if ($tag) {
-                $id = $tag->get($primaryKey);
-                $links[] = $id;
-                $row->set($primaryKey, $id);
-            } else {
-                if (! $this->{$association}->save($row, [
-                    'callbacks' => $callbacks,
-                    'transaction' => false,
-                ])) {
-                    return false;
-                }
-                $links[] = $this->{$association}->id;
-            }
-
-            $joinModel = $this->{$config['with']};
-        }
-
-        $existingJoins = $joinModel->find('list', [
-            'conditions' => [$config['foreignKey'] => $this->id],
-            'fields' => [$config['associationForeignKey']],
-        ]);
-
-        $connection = $joinModel->connection();
-        // By adding ID field we can do delete callbacks
-        if ($config['mode'] === 'replace') {
-            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->id]);
-        }
-
-        foreach ($links as $linkId) {
-            if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
-                continue;
-            }
-            $insertData = [
-                $config['foreignKey'] => $this->id,
-                $config['associationForeignKey'] => $linkId,
-            ];
-
-            $connection->insert($joinModel->table, $insertData);
-        }
-
-        return true;
-    }
-
-    /**
      * Returns an normalized array of ssociated settings for dealing with
      * creating entities and saving data. Different than used by find
      *
@@ -932,8 +763,8 @@ class Model
         }
         // add keys if not set
         if ($option === true) {
-            foreach ($this->associations() as $assocation) {
-                $associated = array_merge($associated, array_keys($this->{$assocation}));
+            foreach ($this->associations as $assocation) {
+                $associated = array_merge($associated, array_keys($this->$assocation));
             }
         }
 
@@ -954,130 +785,64 @@ class Model
      *
      * # Callbacks
      *
-     * The following callbacks will called in this Model and enabled Behaviors
+     * The following callbacks will called in this Model
      *
      * - beforeValidate
      * - afterValidate
      * - beforeSave
+     * - beforeCreate/beforeCreate
+     * - afterCreate/afterUpdate
      * - afterSave
+     * - afterCommit/afterRollback
      *
-     * @param entity $entity to save
-     * @param array  $options keys (validate,callbacks,transaction,associated)
-     * @return bool true or false
+     * @param \Origin\Model\Entity $data data to save
+     * @param array $options keys (validate,callbacks,transaction,associated)
+     * @return bool $result true or false
      */
     public function save(Entity $data, array $options = []) : bool
     {
-        $options += ['validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true];
+        $options = new ArrayObject($options + [
+            'validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true
+        ]);
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-
-        $associatedOptions = ['transaction' => false] + $options;
 
         if ($options['transaction']) {
             $this->begin();
         }
-
-        $result = true;
-        // Save BelongsTo
-        foreach ($this->belongsTo as $alias => $config) {
-            $key = lcfirst($alias);
-            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
-                continue;
-            }
+        $assocation = new Association($this);
+        
+        $result = $assocation->saveBelongsTo($data, $options);
       
-            if ($data->{$key}->modified()) {
-                if (! $this->{$alias}->save($data->{$key}, $associatedOptions)) {
-                    $result = false;
-                    break;
-                }
-                $foreignKey = $this->belongsTo[$alias]['foreignKey'];
-                $data->$foreignKey = $this->{$alias}->id;
-            }
-        }
-
         if ($result) {
-            /**
-             * This will save record and hasAndBelongsToMany records. This is because
-             * it can return false but HABTM is ok, and we need to capture false from
-             * callbacks.
-             */
-            
             try {
                 $result = $this->processSave($data, $options);
             } catch (\Exception $e) {
-                if ($options['callbacks']) {
+                if ($options['callbacks'] and method_exists($this, 'onError')) {
                     $this->onError($e);
                 }
-                if ($options['transaction']) {
-                    $this->rollback();
-                    if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                        $this->triggerCallback('afterRollback', [$data]);
-                    }
-                }
+                $this->cancelTransaction($data, $options, $data->exists() === true ? 'update' : 'create');
                 throw $e;
             }
         }
 
         if ($result) {
-            foreach ($this->hasOne as $alias => $config) {
-                $key = lcfirst($alias);
-                if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->{$key} instanceof Entity) {
-                    continue;
-                }
-                if ($data->{$key}->modified()) {
-                    $foreignKey = $this->hasOne[$alias]['foreignKey'];
-                    $data->{$key}->{$foreignKey} = $this->id;
-
-                    if (! $this->{$alias}->save($data->get($key), $associatedOptions)) {
-                        $result = false;
-                        break;
-                    }
-                }
-            }
-        }
-        if ($result) {
-            // Save hasMany
-            foreach ($this->hasMany as $alias => $config) {
-                $key = Inflector::plural(lcfirst($alias));
-                if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
-                    continue;
-                }
-
-                $foreignKey = $this->hasMany[$alias]['foreignKey'];
-
-                foreach ($data->get($key) as $record) {
-                    if (! $record instanceof Entity) {
-                        continue;
-                    }
-                    if ($record->modified()) {
-                        $record->$foreignKey = $data->{$this->primaryKey};
-                        if (! $this->{$alias}->save($record, $associatedOptions)) {
-                            $result = false;
-                            break;
-                        }
-                    }
-                }
-            }
+            $result = $assocation->saveHasOne($data, $options);
         }
 
         if ($result) {
-            if ($options['transaction']) {
-                $this->commit();
-                if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                    $this->triggerCallback('afterCommit', [$data]);
-                }
-            }
-
-            return true;
+            $result = $assocation->saveHasMany($data, $options);
         }
-        if ($options['transaction']) {
-            $this->rollback();
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
-                $this->triggerCallback('afterRollback', [$data]);
-            }
+        
+        $event = $data->exists() === true ? 'update' : 'create';
+
+        if ($result) {
+            $this->commitTransaction($data, $options, $event);
+        } else {
+            $this->cancelTransaction($data, $options, $event);
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -1106,12 +871,24 @@ class Model
                 break;
             }
         }
-
+       
         if ($options['transaction']) {
-            if ($result) {
-                $this->commit();
-            } else {
-                $this->rollback();
+            $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
+            
+            $options = new ArrayObject($options);
+            ($result === true) ? $this->commit() : $this->rollback();
+        
+            if ($result and $afterCallbacks) {
+                foreach ($data as $row) {
+                    $event = $row->exists() === true ? 'create' : 'update';
+                    $this->triggerCallback('afterCommmit', $event, [$row,$options]);
+                }
+            }
+            if (! $result and $afterCallbacks) {
+                foreach ($data as $row) {
+                    $event = $row->exists() === true ? 'create' : 'update';
+                    $this->triggerCallback('afterRollback', $event, [$row,$options]);
+                }
             }
         }
     
@@ -1178,11 +955,11 @@ class Model
      *   - group: the field to group by e.g. ['category']
      *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
-     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $resultSet
+     * @return mixed $result
      */
-    public function find(string $type = 'first', $options = [])
+    public function find(string $type = 'first', array $options = [])
     {
-        $options += [
+        $options = new ArrayObject($options + [
             'conditions' => null,
             'fields' => [],
             'joins' => [],
@@ -1193,26 +970,17 @@ class Model
             'offset' => null,
             'callbacks' => true,
             'associated' => [],
-        ];
-
+        ]);
+        
         if ($options['callbacks'] === true) {
-            $result = $this->triggerCallback('beforeFind', [$options], true);
-            if ($result === false) {
+            if ($this->triggerCallback('beforeFind', 'find', [$options]) === false) {
                 return null;
-            }
-            if (is_array($result)) {
-                $options = $result;
             }
         }
 
         $options = $this->prepareQuery($type, $options); // AutoJoin
 
         $results = $this->{'finder' . ucfirst($type)}($options);
-
-        if ($options['callbacks'] === true) {
-            $results = $this->triggerCallback('afterFind', [$results], true);
-        }
-
         unset($options);
 
         return $results;
@@ -1222,139 +990,75 @@ class Model
      * Deletes a record.
      *
      * @param \Origin\Model\Entity $entity
-     * @param array options supports the following keys
+     * @param array $options supports the following keys
      *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
      *   - callbacks: call beforeDelete and afterDelete callbacks
      *  - transaction: wether to save through a database transaction (default:true)
-     * @return bool true or false
+     * @return bool $result true or false
      */
-    public function delete(Entity $entity, $options = []) : bool
+    public function delete(Entity $entity, array $options = []) : bool
     {
-        /**
-         * @deprecated cascade bool argument
-         */
-        
-        if (is_bool($options)) {
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Model:delete now only accepts options array');
-            $options = ['cascade' => $options];
-            // @codeCoverageIgnoreEnd
-        }
-        
-        $options += ['cascade' => true,'callbacks' => true,'transaction' => true];
+        $options = new ArrayObject($options + [
+            'cascade' => true,'callbacks' => true,'transaction' => true
+        ]);
 
-        /**
-        * @deprecated callbacks bool argument
-        */
-        $args = func_get_args();
-        if (isset($args[2])) {
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Model:delete now only accepts options array');
-            $options['callbacks'] = $args[2];
-            // @codeCoverageIgnoreEnd
-        }
- 
         $this->id = $entity->get($this->primaryKey);
 
         if (empty($this->id) or ! $this->exists($this->id)) {
             return false;
         }
 
+        return $this->processDelete($entity, $options);
+    }
+
+    /**
+    * The delete process
+    *
+    * @param \Origin\Model\Entity $entity
+    * @param \ArrayObject $options supports the following keys
+    *   - cascade: delete hasOne,hasMany, hasAndBelongsToMany records that depend on this record
+    *   - callbacks: call beforeDelete and afterDelete callbacks
+    *  - transaction: wether to save through a database transaction (default:true)
+    * @return bool $result true or false
+    */
+    protected function processDelete(Entity $entity, Arrayobject $options) : bool
+    {
         if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
-            if (! $this->triggerCallback('beforeDelete', [$entity, $options['cascade']])) {
+            if (! $this->triggerCallback('beforeDelete', 'delete', [$entity, $options])) {
                 return false;
             }
         }
-        $afterCallbacks = $options['callbacks'] === true or $options['callbacks'] === 'after';
-
         if ($options['transaction']) {
             $this->begin();
         }
-
-        $this->deleteHABTM($this->id, $options['callbacks']);
+        $association = new Association($this);
+        $association->deleteHasAndBelongsToMany($this->id, $options['callbacks']);
         if ($options['cascade']) {
-            $this->deleteDependent($this->id, $options['callbacks']);
+            $association->deleteDependent($this->id, $options['callbacks']);
         }
 
         try {
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
             $entity->deleted($result);
         } catch (\Exception $e) {
-            if ($options['callbacks']) {
+            if ($options['callbacks'] and method_exists($this, 'onError')) {
                 $this->onError($e);
             }
-            if ($options['transaction']) {
-                $this->rollback();
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity]);
-                }
-            }
+            $this->cancelTransaction($entity, $options, 'delete');
             throw $e;
         }
-        
-        if ($afterCallbacks) {
-            $this->triggerCallback('afterDelete', [$entity, $result]);
+    
+        if ($result and $options['callbacks'] === true or $options['callbacks'] === 'after') {
+            $this->triggerCallback('afterDelete', 'delete', [$entity, $options], false);
         }
 
-        if ($options['transaction']) {
-            if ($result) {
-                $this->commit();
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterCommit', [$entity]);
-                }
-            } else {
-                $this->rollback();
-                if ($afterCallbacks) {
-                    $this->triggerCallback('afterRollback', [$entity]);
-                }
-            }
+        if ($result) {
+            $this->commitTransaction($entity, $options, 'delete');
+        } else {
+            $this->cancelTransaction($entity, $options, 'delete');
         }
 
         return $result;
-    }
-
-    /**
-     * Deletes the hasOne and hasMany associated records.
-     *
-     * @var int|string
-     */
-    protected function deleteDependent($primaryKey, $callbacks) : void
-    {
-        foreach (array_merge($this->hasOne, $this->hasMany) as $association => $config) {
-            if (isset($config['dependent']) and $config['dependent'] === true) {
-                $conditions = [$config['foreignKey'] => $primaryKey];
-                $ids = $this->{$association}->find('list', ['conditions' => $conditions, 'fields' => [$this->primaryKey]]);
-                foreach ($ids as $id) {
-                    $conditions = [$this->{$association}->primaryKey => $id];
-                    $result = $this->{$association}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
-                    if ($result) {
-                        $this->{$association}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Deletes the hasAndBelongsToMany associated records.
-     *
-     * @var int|string $id
-     */
-    protected function deleteHABTM($id, $callbacks) : void
-    {
-        foreach ($this->hasAndBelongsToMany as $association => $config) {
-            $associatedModel = $config['with'];
-            $conditions = [$config['foreignKey'] => $id];
-            $ids = $this->$associatedModel->find('list', ['conditions' => $conditions]);
-
-            foreach ($ids as $id) {
-                $conditions = [$this->{$associatedModel}->primaryKey => $id];
-                $result = $this->{$associatedModel}->find('first', ['conditions' => $conditions, 'callbacks' => false]);
-                if ($result) {
-                    $this->{$associatedModel}->delete($result, ['transaction' => false,'callbacks' => $callbacks]);
-                }
-            }
-        }
     }
 
     /**
@@ -1371,55 +1075,60 @@ class Model
     /**
      * Finder for find('first').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
-     * @return array|null results
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @return \Origin\Model\Entity|null
      */
-    protected function finderFirst(array $options = []) : ?Entity
+    protected function finderFirst(ArrayObject $options) : ?Entity
     {
         // Modify Query
         $options['limit'] = 1;
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options);
-        // $results = $this->readDataSource($query);
+        $collection = (new Query($this))->find($options);
 
-        if (empty($results)) {
+        if (empty($collection)) {
             return null;
         }
 
+        if ($options['callbacks'] === true) {
+            $this->triggerCallback('afterFind', 'find', [$collection, $options], false);
+        }
+
         // Modify Results
-        return $results[0];
+        return $collection->first();
     }
 
     /**
      * Finder for find('all').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Collection|array
      */
-    protected function finderAll(array $options = [])
+    protected function finderAll(ArrayObject $options)
     {
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options);
+        $collection = (new Query($this))->find($options);
 
         // Modify Results
-        if (empty($results)) {
+        if (empty($collection)) {
             return [];
         }
 
-        return new Collection($results, ['name' => $this->alias]);
+        if ($options['callbacks'] === true) {
+            $this->triggerCallback('afterFind', 'find', [$collection, $options], false);
+        }
+
+        return $collection;
     }
 
     /**
      * Finder for find('list')
      *  3 different list types ['a','b','c'] or ['a'=>'b'] or ['c'=>['a'=>'b']] depending upon how many columns are selected. If more than 3 columns selected it returns ['a'=>'b'].
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array $results
      */
-    protected function finderList(array $options): array
+    protected function finderList(ArrayObject $options) : array
     {
         if (empty($options['fields'])) {
             $options['fields'][] = $this->primaryKey;
@@ -1429,9 +1138,7 @@ class Model
         }
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options, 'list');
-        // $results = $this->readDataSource($query, 'list');
+        $results = (new Query($this))->find($options, 'list');
 
         // Modify Results
         if (empty($results)) {
@@ -1444,10 +1151,10 @@ class Model
     /**
      * This is the find('count').
      *
-     * @param array $query (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return int count
      */
-    protected function finderCount(array $options) : int
+    protected function finderCount(ArrayObject $options) : int
     {
         // Modify Query
         $options['fields'] = ['COUNT(*) AS count'];
@@ -1455,8 +1162,7 @@ class Model
         $options['limit'] = null;
 
         // Run Query
-        $query = new Query($this);
-        $results = $query->find($options, 'assoc');
+        $results = (new Query($this))->find($options, 'assoc');
         //$results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
@@ -1466,34 +1172,31 @@ class Model
     /**
      * Add default keys, auto join models etc.
      *
-     * @param array $query
-     * @return array $query
+     * @param string $type e.g. first,all,list, count
+     * @param \ArrayObject $query
+     * @return ArrayObject $query
      */
-    protected function prepareQuery(string $type, array $query) : array
+    protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
     {
         if ($type === 'first' or $type === 'all') {
-            if (empty($query['fields'])) {
-                $query['fields'] = $this->fields();
-            } else {
-                $query['fields'] = $this->prepareFields($query['fields']);
-            }
+            $query['fields'] = empty($query['fields']) ? $this->fields() : $this->prepareFields($query['fields']);
         }
 
         $query['associated'] = $this->associatedConfig($query);
         foreach (['belongsTo', 'hasOne'] as $association) {
-            foreach ($this->{$association} as $alias => $config) {
+            foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
                     $query['joins'][] = [
-                        'table' => $this->{$alias}->table,
+                        'table' => $this->$alias->table,
                         'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
                         'conditions' => $config['conditions'],
-                        'datasource' => $this->datasource,
+                        'connection' => $this->connection,
                     ];
 
                     if (empty($config['fields'])) {
-                        $config['fields'] = $this->{$alias}->fields();
+                        $config['fields'] = $this->$alias->fields();
                     }
 
                     // If it throw an error, then it can be confusing to know source, so turn to array
@@ -1509,10 +1212,10 @@ class Model
      * Standardizes the config for eager loading of related
      * data
      *
-     * @param array $query
+     * @param ArrayObject $query
      * @return array
      */
-    protected function associatedConfig(array $query) : array
+    protected function associatedConfig(ArrayObject $query) : array
     {
         $out = [];
         foreach ((array) $query['associated'] as $alias => $config) {
@@ -1544,8 +1247,8 @@ class Model
     protected function findAssociation(string $name) : ?array
     {
         foreach ($this->associations as $association) {
-            if (isset($this->{$association}[$name])) {
-                return $this->{$association}[$name];
+            if (isset($this->$association[$name])) {
+                return $this->$association[$name];
             }
         }
 
@@ -1575,181 +1278,11 @@ class Model
     /**
      * Returns the current connection for this model
      *
-     * @return \Origin\Model\Datasource
+     * @return \Origin\Model\Connection
      */
-    public function connection() : Datasource
+    public function connection() : Connection
     {
-        return ConnectionManager::get($this->datasource);
-    }
-
-    /**
-     * Callback that is triggered just before the request data is marshalled. This will
-     * be triggered when passing data through model::new, model::patch or model::newEntities
-     *
-     * @param array $requestData
-     * @return array
-     */
-    public function beforeMarshal(array $requestData = [])
-    {
-        return $requestData;
-    }
-
-    /**
-     * Before find callback. Must return either the query or true to continue
-     * @return array|bool query or bool
-     */
-    public function beforeFind(array $query = [])
-    {
-        return $query;
-    }
-
-    /**
-     * After find callback, this should return the results
-     * @return \Origin\Model\Entity|\Origin\Model\Collection|array|int $results
-     */
-    public function afterFind($results)
-    {
-        return $results;
-    }
-
-    /**
-     * Before Validation takes places, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool
-     */
-    public function beforeValidate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-     * Before Validation takes places, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param bool $success validation result
-     * @return bool
-     */
-    public function afterValidate(Entity $entity, bool $success)
-    {
-    }
-
-    /**
-     * Before save callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param array $options
-     * @return bool must return true to continue
-     */
-    public function beforeSave(Entity $entity, array $options = [])
-    {
-        return true;
-    }
-
-    /**
-     * Before create callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
-     */
-    public function beforeCreate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-     * Before update callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @return bool must return true to continue
-     */
-    public function beforeUpdate(Entity $entity)
-    {
-        return true;
-    }
-
-    /**
-    * After create callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterCreate(Entity $entity)
-    {
-    }
-
-    /**
-    * After update callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterUpdate(Entity $entity)
-    {
-    }
-
-    /**
-     * After save callback
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $created if this is a new record
-     * @param array $options these were the options passed to save
-     * @return void
-     */
-    public function afterSave(Entity $entity, bool $created, array $options = [])
-    {
-    }
-
-    /**
-     * Before delete, must return true to continue
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $cascade
-     * @return bool
-     */
-    public function beforeDelete(Entity $entity, bool $cascade = true)
-    {
-        return true;
-    }
-    /**
-     * After delete
-     *
-     * @param \Origin\Model\Entity $entity
-     * @param boolean $sucess wether or not it deleted the record
-     * @return bool
-     */
-    public function afterDelete(Entity $entity, bool $success)
-    {
-    }
-
-    /**
-    * After commit callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterCommit(Entity $entity)
-    {
-    }
-
-    /**
-     * This is callback is called when an exception is caught
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onError(\Exception $exception)
-    {
-    }
-
-    /**
-    * After rollback callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @return void
-    */
-    public function afterRollback(Entity $entity)
-    {
+        return ConnectionManager::get($this->connection);
     }
 
     /**
@@ -1764,8 +1297,8 @@ class Model
         $conditions = [];
         foreach ($fields as $field) {
             $conditions[$field] = null;
-            if (isset($entity->{$field})) {
-                $conditions[$field] = $entity->{$field};
+            if (isset($entity->$field)) {
+                $conditions[$field] = $entity->$field;
             }
         }
 
@@ -1818,15 +1351,13 @@ class Model
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
-
         return $this->marshaller()->one($requestData, $options);
     }
 
     /**
      * Creates many Entities from an array of data.
      *
-     * @param array $data
+     * @param array $requestData
      * @param array $options parse default is set to true
      * @var array
      */
@@ -1834,8 +1365,7 @@ class Model
     {
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
-
+    
         return $this->marshaller()->many($requestData, $options);
     }
 
@@ -1851,7 +1381,6 @@ class Model
     {
         $options += ['associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-        $requestData = $this->triggerCallback('beforeMarshal', [$requestData], true);
 
         return $this->marshaller()->patch($entity, $requestData, $options);
     }
@@ -1865,74 +1394,325 @@ class Model
     {
         return new Marshaller($this);
     }
+    
+    /**
+     * Register a before find callback
+     *
+     * @param string $function
+     * @param array $options (no options for this callback)
+     * @return void
+     */
+    public function beforeFind(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'find'];
+        $this->registeredCallbacks['beforeFind'][$function] = $options;
+    }
 
     /**
-     * triggerCallback.
+     * Register an after find callback
+     *
+     * @param string $function
+     * @param array $options (no options for this callback)
+     * @return void
+     */
+    public function afterFind(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'find'];
+        $this->registeredCallbacks['afterFind'][$function] = $options;
+    }
+
+    /**
+     * Register a before validate callback
+     *
+     * @param string $function
+     * @param array $options The options array supports the following keys:
+     *   - on: default: ['create','update'] which events to run on create, update.
+     * @return void
+     */
+    public function beforeValidate(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update']];
+        $this->registeredCallbacks['beforeValidate'][$function] = $options;
+    }
+
+    /**
+     * Register an after validate callback
+     *
+     * @param string $function
+     * @param array $options The options array supports the following keys:
+     *   - on: default: ['create','update'] which events to run on create, update.
+     * @return void
+     */
+    public function afterValidate(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update']];
+        $this->registeredCallbacks['afterValidate'][$function] = $options;
+    }
+
+    /**
+     * Register a before create callback
+     *
+     * @param string $function
+     * @param array $options (no options for this callback)
+     * @return void
+     */
+    public function beforeCreate(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'create'];
+        $this->registeredCallbacks['beforeCreate'][$function] = $options;
+    }
+
+    /**
+    * Register an after create callback
+    *
+    * @param string $function
+    * @param array $options (no options for this callback)
+    * @return void
+    */
+    public function afterCreate(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'create'];
+        $this->registeredCallbacks['afterCreate'][$function] = $options;
+    }
+
+    /**
+     * Register a before update callback
+     *
+     * @param string $function
+     * @param array $options (no options for this callback)
+     * @return void
+     */
+    public function beforeUpdate(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'update'];
+        $this->registeredCallbacks['beforeUpdate'][$function] = $options;
+    }
+
+    /**
+    * Register an after update callback
+    *
+    * @param string $function
+    * @param array $options (no options for this callback)
+    * @return void
+    */
+    public function afterUpdate(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'update'];
+        $this->registeredCallbacks['afterUpdate'][$function] = $options;
+    }
+
+    /**
+     * Register a before save callback
+     *
+     * @param string $function
+     * @param array $options The options array supports the following keys:
+     *   - on: default: ['create','update'] which events to run on create, update.
+     * @return void
+     */
+    public function beforeSave(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update']];
+        $this->registeredCallbacks['beforeSave'][$function] = $options;
+    }
+
+    /**
+    * Register an after save callback
+    *
+    * @param string $function
+    * @param array $options The options array supports the following keys:
+    *   - on: default: ['create','update'] which events to run on create, update.
+    * @return void
+    */
+    public function afterSave(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update']];
+        $this->registeredCallbacks['afterSave'][$function] = $options;
+    }
+
+    /**
+    * Register a before delete callback
+    *
+    * @param string $function
+    * @param array $options (no options for this callback)
+    * @return void
+    */
+    public function beforeDelete(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'delete'];
+        $this->registeredCallbacks['beforeDelete'][$function] = $options;
+    }
+
+    /**
+    * Register an after update callback
+    *
+    * @param string $function
+    * @param array $options (no options for this callback)
+    * @return void
+    */
+    public function afterDelete(string $function, array $options = []) : void
+    {
+        $options += ['on' => 'delete'];
+        $this->registeredCallbacks['afterDelete'][$function] = $options;
+    }
+
+    /**
+    * Register an after commit callback
+    *
+    * @param string $function
+    * @param array $options The options array supports the following keys:
+    *   - on: default: ['create','update','delete'] which events to run on create, update and delete
+    * @return void
+    */
+    public function afterCommit(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update','delete']];
+        $this->registeredCallbacks['afterCommit'][$function] = $options;
+    }
+
+    /**
+    * Register an after commit callback
+    *
+    * @param string $function
+    * @param array $options The options array supports the following keys:
+    *   - on: default: ['create','update','delete'] which events to run on create, update and delete
+    * @return void
+    */
+    public function afterRollback(string $function, array $options = []) : void
+    {
+        $options += ['on' => ['create','update','delete']];
+        $this->registeredCallbacks['afterRollback'][$function] = $options;
+    }
+
+    /**
+     * This is called when a callback is triggered, it looks up the registered callbacks and
+     * then calls the dispatcher
      *
      * @param string $callback
-     * @param array  $arguments
-     * @param bool   $passedArgs if result is array overwrite
-     * @return mixed
+     * @param string $event
+     * @param array $arguments
+     * @param boolean $isStoppable
+     * @return boolean
      */
-    protected function triggerCallback(string $callback, $arguments = [], $passedArgs = false)
+    protected function triggerCallback(string $callback, string $event, array $arguments = [], bool $isStoppable = true) : bool
     {
-        $callbacks = [
-            [$this, $callback],
-        ];
-
-        foreach ($this->behaviorRegistry->enabled() as $behavior) {
-            $callbacks[] = [$this->{$behavior}, $callback];
-        }
-
-        foreach ($callbacks as $callable) {
-            $result = call_user_func_array($callable, $arguments);
-
-            if ($result === false) {
-                return false;
+        if (isset($this->registeredCallbacks[$callback])) {
+            foreach ($this->registeredCallbacks[$callback] as $method => $options) {
+                if (! in_array($event, (array) $options['on']) or in_array($callback, $this->disabledCallbacks)) {
+                    continue;
+                }
+                $result = $this->dispatchCallback($method, $arguments, $isStoppable);
+                if ($isStoppable and $result === false) {
+                    return false;
+                }
             }
-            // overwrite first argument with last result if its array
-            if ($passedArgs and is_array($result)) {
-                $arguments[0] = $result;
-            }
-            /**
-             * @internal - this was fixed in the entity structure, need to test.
-             * Bug Fix. When reloading an entity with new belongsTo in afterFind
-             * and trying to replace result is overwritten by original after timestamp
-             * behavior is called. This only happened when overwriting the entire Entity
-             * not when adjusting eg. $entity->property = 'foo'
-             */
-            if ($result instanceof Entity) {
-                $arguments[0] = $result;
-            }
-        }
-        // Free Mem
-        unset($callbacks, $result);
-
-        if ($passedArgs) {
-            return $arguments[0]; // was if not exist return result
         }
 
         return true;
     }
 
     /**
-     * Enables a behavior that has been disabled
+     * dispatches a Callback.
      *
-     * @param string $name
+     * @param string $callback
+     * @param array $arguments
+     * @param boolean $isStoppable
      * @return bool
      */
-    public function enableBehavior(string $name) :bool
+    protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true)  : bool
     {
-        return $this->behaviorRegistry->enable($name);
+        if (method_exists($this, $callback)) {
+            if (call_user_func_array([$this,$callback], $arguments) === false and $isStoppable) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
     /**
-     * Disables a behavior
+     * Internal function for commiting a transaction, and triggering the callbacks
      *
-     * @param string $name
-     * @return bool
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @param string $event
+     * @return void
      */
-    public function disableBehavior(string $name) : bool
+    private function commitTransaction(Entity $entity, ArrayObject $options, string $event) : void
     {
-        return $this->behaviorRegistry->disable($name);
+        if ($options['transaction']) {
+            $this->commit();
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->triggerCallback('afterCommit', $event, [$entity, $options], false);
+            }
+        }
+    }
+
+    /**
+     * Internal function for rollingback a transaction, and triggering the callbacks
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @param string $event
+     * @return void
+     */
+    private function cancelTransaction(Entity $entity, ArrayObject $options, string $event) : void
+    {
+        if ($options['transaction']) {
+            $this->rollback();
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->triggerCallback('afterRollback', $event, [$entity, $options], false);
+            }
+        }
+    }
+
+    /**
+     * Gets the table name for this Model
+     *
+     * @return string
+     */
+    public function table() : string
+    {
+        return $this->table;
+    }
+
+    /**
+     * Gets the name of this Model
+     *
+     * @return string
+     */
+    public function name() : string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Gets the alias for this Model
+     *
+     * @return string
+     */
+    public function alias() : string
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Returns the ID of the record that is being saved, deleted or that has just
+     * been created.
+     *
+     * @return int|string|null
+     */
+    public function id()
+    {
+        return $this->id;
+    }
+
+    public function primaryKey() : string
+    {
+        return $this->primaryKey;
+    }
+
+    public function displayField() : string
+    {
+        return $this->displayField;
     }
 }

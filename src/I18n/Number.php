@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -45,14 +46,16 @@ class Number
     /**
      * Sets/gets the default currency.
      *
-     * @param string $locale EUR|USD|GBP
+     * @param string $currency EUR|USD|GBP
+     * @return string $currency
      */
-    public static function defaultCurrency(string $currency = null)
+    public static function defaultCurrency(string $currency = null) : string
     {
         if ($currency === null) {
             return self::$currency;
         }
-        self::$currency = $currency;
+
+        return self::$currency = $currency;
     }
 
     /**
@@ -61,10 +64,9 @@ class Number
      * @param float  $value
      * @param string $currency EUR,
      * @param array  $options  precision|places|before|after|pattern
-     *
-     * @return string result $1,234.56
+     * @return string|null result $1,234.56
      */
-    public static function currency(float $value, string $currency = null, array $options = [])
+    public static function currency(float $value, string $currency = null, array $options = []) : ?string
     {
         if ($currency === null) {
             $currency = self::$currency;
@@ -79,10 +81,9 @@ class Number
      * @param float $value
      * @param int   $precision number of decimal places
      * @param array $options   places|before|after|pattern|multiply
-     *
-     * @return string 75.00%
+     * @return string|null 75.00%
      */
-    public static function percent(float $value, int $precision = 2, array $options = [])
+    public static function percent(float $value, int $precision = 2, array $options = []) :? string
     {
         if (! empty($options['multiply'])) {
             $value = $value * 100;
@@ -97,10 +98,9 @@ class Number
      * @param float $value
      * @param int   $precision number of decimal places
      * @param array $options   places|before|after|pattern
-     *
-     * @return string 1234.56
+     * @return string|null 1234.56
      */
-    public static function precision(float $value, int $precision = 2, array $options = [])
+    public static function precision(float $value, int $precision = 2, array $options = []) : ?string
     {
         return static::format($value, ['precision' => $precision] + $options);
     }
@@ -110,10 +110,9 @@ class Number
      *
      * @param float $value
      * @param array $options precision|places|before|after|pattern
-     *
-     * @return string 1234.56
+     * @return string|null 1234.56
      */
-    public static function format($value, array $options = [])
+    public static function format($value, array $options = []) : ?string
     {
         $options += [
             'type' => NumberFormatter::DECIMAL, 'before' => null, 'after' => null,
@@ -124,8 +123,8 @@ class Number
         } else {
             $formatted = static::formatter($options)->format($value);
         }
-
-        return $options['before'].$formatted.$options['after'];
+        
+        return $options['before'] . $formatted . $options['after'];
     }
 
     /**
@@ -134,7 +133,7 @@ class Number
      *
      * @example 123,456,789.25 -> 123456789.25
      * @param string $string
-     * @param integer $format  NumberFormatter::DECIMAL,NumberFormatter::CURRENCY,NumberFormatter::INT_32
+     * @param mixed $type NumberFormatter::DECIMAL,NumberFormatter::CURRENCY,NumberFormatter::INT_32
      * @return int|double
      */
 
@@ -160,8 +159,16 @@ class Number
 
     /**
      * Creates a NumberFormatter object and sets the attributes.
+     *
+     * @param array $options Option keys are
+     *   - locale
+     *   - type
+     *   - places
+     *   - precision
+     *   - pattern
+     * @return NumberFormatter
      */
-    protected static function formatter(array $options = [])
+    protected static function formatter(array $options = []) : NumberFormatter
     {
         $locale = static::$locale;
         if (isset($options['locale'])) {

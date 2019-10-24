@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,10 +15,11 @@
 
 namespace Origin\Model;
 
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 class Marshaller
 {
+    use EntityLocatorTrait;
     /**
      * Undocumented variable
      *
@@ -41,12 +43,12 @@ class Marshaller
     {
         $map = [];
         $model = $this->model;
-        foreach (array_merge($model->hasOne, $model->belongsTo) as $alias => $config) {
+        foreach (array_merge($model->association('hasOne'), $model->association('belongsTo')) as $alias => $config) {
             if (in_array($alias, $associated)) {
                 $map[lcfirst($alias)] = 'one';
             }
         }
-        foreach (array_merge($model->hasMany, $model->hasAndBelongsToMany) as  $alias => $config) {
+        foreach (array_merge($model->association('hasMany'), $model->association('hasAndBelongsToMany')) as  $alias => $config) {
             if (in_array($alias, $associated)) {
                 $key = Inflector::plural(lcfirst($alias));
                 $map[$key] = 'many';
@@ -96,7 +98,8 @@ class Marshaller
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
         
-        $entity = new Entity([], $options);
+        $entityClass = $this->entityClass($this->model);
+        $entity = new $entityClass([], $options);
 
         $properties = [];
      
@@ -112,14 +115,15 @@ class Marshaller
                     $alias = Inflector::singular($alias);
                 }
               
-                $model = ucfirst($alias);
-                if (isset($options['associated'][$model]['fields'])) {
-                    $fields = $options['associated'][$model]['fields'];
-                    unset($options['associated'][$model]['fields']);
+                $alias = ucfirst($alias);
+                if (isset($options['associated'][$alias]['fields'])) {
+                    $fields = $options['associated'][$alias]['fields'];
+                    unset($options['associated'][$alias]['fields']);
                 }
-     
-                $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                    'name' => ucfirst($alias),
+
+                $marshaller = new Marshaller($this->model->$alias);
+                $properties[$property] = $marshaller->{$propertyMap[$property]}($value, [
+                    'name' => $alias,
                     'fields' => $fields,
                     'associated' => $options['associated'],
                 ]);

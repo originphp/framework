@@ -18,9 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class BookmarksTagFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'bookmark_id' => ['type' => 'integer'],
             'tag_id' => ['type' => 'integer'],

@@ -14,7 +14,7 @@
 
 namespace Origin\Publisher\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class PublisherException extends Exception
 {

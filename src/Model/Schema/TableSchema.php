@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -21,8 +22,8 @@ namespace Origin\Model\Schema;
  * I need a better way to create the table schema, in fixtures and when dumping.
  */
 
-use Origin\Model\Datasource;
-use Origin\Exception\Exception;
+use Origin\Model\Connection;
+use Origin\Core\Exception\Exception;
 
 class TableSchema
 {
@@ -96,7 +97,7 @@ class TableSchema
      * @param Datasource $datasource
      * @return array
      */
-    public function toSql(Datasource $datasource) : array
+    public function toSql(Connection $datasource) : array
     {
         return $datasource->adapter()->createTableSql($this->table, $this->columns, [
             'constraints' => $this->constraints,'indexes' => $this->indexes,'options' => $this->options,
@@ -199,21 +200,22 @@ class TableSchema
      * e.g ['engine'=>'InnoDB','collate'=>'utf8_unicode_ci']
      *
      * @param array $options
-     * @return array|void
+     * @return array
      */
-    public function options(array $options = null)
+    public function options(array $options = null) : array
     {
         if ($options === null) {
             return $this->options;
         }
-        $this->options = $options;
+
+        return $this->options = $options;
     }
 
     /**
      * Returns columns or information about column
      *
      * @param string $name
-     * @return array|void
+     * @return array|null
      */
     public function columns(string $name = null): ? array
     {

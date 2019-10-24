@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,6 +13,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace Origin\Core;
+
+use \Throwable;
 
 /**
  * Parses exception and backtrace objects into an array
@@ -38,10 +41,10 @@ class Debugger
     /**
      * Creates the exception array
      *
-     * @param Exception\ErrorException $exception
+     * @param \Throwable $exception
      * @return array
      */
-    public function exception($exception) : array
+    public function exception(Throwable $exception) : array
     {
         $result = [];
 

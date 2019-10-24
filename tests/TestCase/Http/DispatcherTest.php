@@ -19,12 +19,12 @@ use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 
 use Origin\TestSuite\TestTrait;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 use Origin\Core\Exception\RouterException;
-use Origin\Controller\Exception\MissingMethodException;
+use Origin\Http\Controller\Exception\MissingMethodException;
 
-use Origin\Controller\Exception\PrivateMethodException;
-use Origin\Controller\Exception\MissingControllerException;
+use Origin\Http\Controller\Exception\PrivateMethodException;
+use Origin\Http\Controller\Exception\MissingControllerException;
 
 class BlogPostsController extends Controller
 {
@@ -57,7 +57,7 @@ class AnotherMockRequest extends Request
 
 class MockDispatcher extends Dispatcher
 {
-    protected function getClass(string $controller, string $plugin = null)
+    protected function getClass(string $controller, string $plugin = null) : string
     {
         return 'Origin\Test\Http\\' . $controller . 'Controller';
     }
@@ -68,40 +68,44 @@ class MockDispatcher2 extends Dispatcher
     use TestTrait;
 }
 
+    /*
+$response = $this->dispatch(new Request($url), new Response());
+        $response->send();
+    */
 class DispatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testDispatch()
     {
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/index');
+        $Dispatcher->dispatch(new Request('blog_posts/index'), new Response());
         $this->assertInstanceOf(Controller::class, $Dispatcher->controller());
     }
     public function testGetClass()
     {
         $Dispatcher = new MockDispatcher2();
-        $this->assertEquals('App\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets',null]));
-        $this->assertEquals('MyPlugin\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets','MyPlugin']));
+        $this->assertEquals('App\Http\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets',null]));
+        $this->assertEquals('MyPlugin\Http\Controller\WidgetsController', $Dispatcher->callMethod('getClass', ['Widgets','MyPlugin']));
     }
     public function testMissingController()
     {
         $this->expectException(MissingControllerException::class);
 
         $Dispatcher = new Dispatcher();
-        $Dispatcher->start('apples/add');
+        $Dispatcher->dispatch(new Request('apples/add'), new Response());
     }
     public function testMissingControllerMethod()
     {
         $this->expectException(MissingMethodException::class);
 
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/does_not_exist');
+        $Dispatcher->dispatch(new Request('blog_posts/does_not_exist'), new Response());
     }
     public function testPrivateControllerMethod()
     {
         $this->expectException(PrivateMethodException::class);
 
         $Dispatcher = new MockDispatcher();
-        $Dispatcher->start('blog_posts/reveal_password');
+        $Dispatcher->dispatch(new Request('blog_posts/reveal_password'), new Response());
     }
 
     /**

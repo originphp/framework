@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -17,6 +18,12 @@ namespace Origin\Job\Engine;
 use Origin\Job\Job;
 use Origin\Model\Model;
 use Origin\Model\Entity;
+use Origin\Model\Concern\Timestampable;
+
+class Queue extends Model
+{
+    use Timestampable;
+}
 
 class DatabaseEngine extends BaseEngine
 {
@@ -34,13 +41,13 @@ class DatabaseEngine extends BaseEngine
      */
     protected $defaultConfig = [
         'engine' => 'Database',
-        'datasource' => 'default',
+        'connection' => 'default',
     ];
 
     /**
      * Adds a message to the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param string $strtotime
      * @return boolean
      */
@@ -48,7 +55,7 @@ class DatabaseEngine extends BaseEngine
     {
         $model = $this->model();
         $entity = $model->new([
-            'queue' => $job->queue,
+            'queue' => $job->queue(),
             'data' => '[]',
             'status' => 'new',
             'scheduled' => date('Y-m-d H:i:s', strtotime($strtotime)),
@@ -72,7 +79,7 @@ class DatabaseEngine extends BaseEngine
     * Gets the next message in the queue
     *
     * @param string $queue
-    * @return \Origin\Queue\Job|null
+    * @return \Origin\Job\Job|null
     */
     public function fetch(string $queue = 'default') : ?Job
     {
@@ -97,7 +104,7 @@ class DatabaseEngine extends BaseEngine
      * @internal in Job fail is called before OnException. If in other
      * engines the record is deleted, then job has to be rethought
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return boolean
      */
     public function fail(Job $job) : bool
@@ -117,7 +124,7 @@ class DatabaseEngine extends BaseEngine
     /**
     * Handles a job that was successful
     *
-    * @param \Origin\Queue\Job $job
+    * @param \Origin\Job\Job $job
     * @return boolean
     */
     public function success(Job $job) : bool
@@ -132,7 +139,7 @@ class DatabaseEngine extends BaseEngine
     /**
      * Deletes a Job from the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return boolean
      */
     public function delete(Job $job) : bool
@@ -151,7 +158,7 @@ class DatabaseEngine extends BaseEngine
     /**
      * Retry a failed job for a certain amount of times
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool
@@ -183,14 +190,12 @@ class DatabaseEngine extends BaseEngine
     public function model() : Model
     {
         if (! $this->model) {
-            $this->model = new Model([
+            $this->model = new Queue([
                 'name' => 'Queue',
                 'alias' => 'queue',
                 'table' => 'queue',
-                'datasource' => $this->config('datasource'),
+                'connection' => $this->config('connection'),
             ]);
-       
-            $this->model->loadBehavior('Timestamp');
         }
 
         return $this->model;
@@ -221,14 +226,14 @@ class DatabaseEngine extends BaseEngine
         $model = $this->model();
         $model->begin();
         $result = $this->model->query(
-            "SELECT * FROM {$model->table} WHERE id = :id AND locked IS NULL FOR UPDATE;",
+            "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
             [
                 'id' => $record->id,
             ]
         );
 
         $model->query(
-            "UPDATE {$model->table} SET locked = :locked , modified = :modified WHERE id = :id;",
+            "UPDATE {$model->table()} SET locked = :locked , modified = :modified WHERE id = :id;",
             [
                 'id' => $record->id,
                 'locked' => now(),

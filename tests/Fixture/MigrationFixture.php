@@ -18,14 +18,12 @@ use Origin\TestSuite\Fixture;
 
 class MigrationFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'version' => [
-                'type' => 'string',
-                'limit' => 14,
+                'type' => 'bigint',
+                'limit' => null,
                 'default' => null,
                 'null' => false,
             ],

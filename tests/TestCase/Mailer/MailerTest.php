@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Mailer;
 
+use Origin\Email\Message;
 use Origin\Mailer\Mailer;
-use Origin\Mailer\Message;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 
@@ -23,11 +23,19 @@ class DemoMailer extends Mailer
 {
     use TestTrait;
 
-    public $defaults = [
+    protected $layout = false;
+    
+    protected $defaults = [
         'from' => 'no-reply@example.com',
     ];
-    
-    public function execute(array $params)
+    /**
+     * Work with mocks
+     *
+     * @var string
+     */
+    protected $template = 'demo';
+
+    public function execute(array $params) : void
     {
         $this->first_name = $params['first_name'];
 
@@ -40,7 +48,7 @@ class DemoMailer extends Mailer
 
 class MailerTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
     public function testDispatch()
     {
         $mailer = new DemoMailer();
@@ -49,8 +57,8 @@ class MailerTest extends OriginTestCase
             'email' => 'demo@originphp.com',
         ]);
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertContains('To: demo@originphp.com', $message->header());
-        $this->assertContains('How is your day so far?', $message->body());
+        $this->assertStringContainsString('To: demo@originphp.com', $message->header());
+        $this->assertStringContainsString('How is your day so far?', $message->body());
     }
 
     public function testDispatchLater()
@@ -70,8 +78,8 @@ class MailerTest extends OriginTestCase
             'email' => 'demo@originphp.com',
         ]);
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertContains('To: demo@originphp.com', $message->header());
-        $this->assertContains('How is your day so far?', $message->body());
+        $this->assertStringContainsString('To: demo@originphp.com', $message->header());
+        $this->assertStringContainsString('How is your day so far?', $message->body());
     }
 
     public function testCallbacksDispatch()
@@ -127,9 +135,11 @@ class MailerTest extends OriginTestCase
             'attachments' => [],
             'format' => 'both',
             'account' => 'test',
-            'folder' => 'Demo',
+            'template' => 'demo',
             'viewVars' => ['first_name' => 'jim'],
             'layout' => false,
+            'body' => null,
+            'contentType' => 'text'
         ];
         $this->assertEquals($expected, $options);
     }

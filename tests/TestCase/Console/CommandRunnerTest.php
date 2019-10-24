@@ -16,10 +16,10 @@ namespace Origin\Test\Console;
 
 use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
-use App\Command\CacheResetCommand;
-use Origin\Command\DbCreateCommand;
-use App\Command\SaySomethingCommand;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
+use App\Console\Command\CacheResetCommand;
+use App\Console\Command\SaySomethingCommand;
 
 class MockCommandRunner extends CommandRunner
 {
@@ -51,15 +51,14 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
     {
         $runner = $this->commandRunner();
         $runner->run([]);
-        $this->assertEquals('e0a9209ed863fb7d1e1e0e1ae59c2f35', md5($this->out->read())); // rest
+        $this->assertEquals('4d5403cd991615610089918213c50626', md5($this->out->read())); // rest
     }
 
     public function testFindCommand()
     {
         $result = $this->commandRunner()->findCommand('say-hello');
         $this->assertInstanceOf(SaySomethingCommand::class, $result);
-        $result = $this->commandRunner()->findCommand('db:create'); // standard name
-        $this->assertInstanceOf(DbCreateCommand::class, $result);
+
         $result = $this->commandRunner()->findCommand('cache:reset'); // standard name + in app folder
         $this->assertInstanceOf(CacheResetCommand::class, $result);
         $this->assertNull($this->commandRunner()->findCommand('purple-disco-machine:player'));
@@ -74,28 +73,17 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
             'jim',
         ]);
 
-        $this->assertTrue($result);
-        $this->assertContains('<blue>Hello jim</blue>', $this->out->read());
+        $this->assertEquals(Command::SUCCESS, $result);
+        $this->assertStringContainsString('<blue>Hello jim</blue>', $this->out->read());
     }
 
     public function testRunUnkownCommand()
     {
-        $this->assertFalse($this->commandRunner()->run([
+        $result = $this->commandRunner()->run([
             '/vendor/somescript.php',
             'purple-disco-machine:player',
-        ]));
-    }
-    /**
-     * throw a Duplicate database: 7 ERROR:  database "origin" already exists
-     *
-     * @return void
-     */
-    public function testRunError()
-    {
-        $result = $this->commandRunner()->run([
-            '/path-to-script/script.php',
-            'db:create',
         ]);
-        $this->assertFalse($result);
+
+        $this->assertEquals(Command::ERROR, $result);
     }
 }

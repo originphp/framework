@@ -14,13 +14,13 @@
 
 namespace Origin\Test\Model\Schema;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Model\Schema\MysqlSchema;
 use Origin\TestSuite\OriginTestCase;
 
 class MysqlSchemaTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
+    protected $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
 
     public function testCreateTableColumns()
     {
@@ -413,49 +413,7 @@ class MysqlSchemaTest extends OriginTestCase
     public function testConnection()
     {
         $adapter = new MysqlSchema('test');
-        $this->assertInstanceOf(Datasource::class, $adapter->connection());
-    }
-
-    public function testCreateTable()
-    {
-        // test default null
-        $adapter = new MysqlSchema('test');
-
-        $schema = [
-            'id' => ['type' => 'primaryKey'],
-            'name' => ['type' => 'string','default' => ''],
-            'description' => ['type' => 'text'],
-            'created' => ['type' => 'datetime'],
-            'modified' => ['type' => 'datetime'],
-        ];
-        $result = $adapter->createTable('foo', $schema);
-        $this->assertEquals('4b3b4313b43ee197f245356bdcbc2b2d', md5($result));
-        
-        $schema = [
-            'id' => ['type' => 'primaryKey'],
-            'name' => ['type' => 'string','default' => 'placeholder'],
-            'description' => ['type' => 'text','null' => false],
-            'age' => ['type' => 'integer','default' => 1234],
-            'bi' => ['type' => 'bigint'],
-            'fn' => ['type' => 'float','precision' => 2], // ignored by postgres
-            'dn' => ['type' => 'decimal','precision' => 8,'scale' => 2],
-            'dt' => ['type' => 'datetime'],
-            'ts' => ['type' => 'timestamp'],
-            't' => ['type' => 'time'],
-            'd' => ['type' => 'date'],
-            'bf' => ['type' => 'binary'],
-            'bool' => ['type' => 'boolean'],
-        ];
-        $result = $adapter->createTable('foo', $schema);
-  
-        $expected = 'f7b0aee6659379a452b3ee6d1a2d75eb';
-      
-        $this->assertEquals($expected, md5($result));
-
-        # Sanity check
-        if ($adapter->connection()->engine() === 'mysql') {
-            $this->assertTrue($adapter->connection()->execute($result));
-        }
+        $this->assertInstanceOf(Connection::class, $adapter->connection());
     }
 
     public function testDatasource()
@@ -464,6 +422,30 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertEquals('foo', $adapter->datasource());
         $adapter->datasource('bar');
         $this->assertEquals('bar', $adapter->datasource());
+    }
+
+    /**
+     * Create a FOO table which next tests will depend upon
+     */
+    public function testCreateTable()
+    {
+        $adapter = new MysqlSchema('test');
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This is test is for mysql');
+        }
+
+        $schema = [
+            'id' => ['type' => 'integer','autoIncrement' => true],
+            'name' => ['type' => 'string','default' => ''],
+            'description' => ['type' => 'text'],
+            'created' => ['type' => 'datetime'],
+            'modified' => ['type' => 'datetime'],
+        ];
+        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $result = $adapter->createTableSql('foo', $schema, $options);
+        foreach ($result as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
+        }
     }
 
     public function testChangeAutoIncrementSql()
@@ -676,17 +658,6 @@ class MysqlSchemaTest extends OriginTestCase
             $this->assertTrue($adapter->connection()->execute($result)); // rename back for fixture manager
         }
     }
-    
-    public function testSchema()
-    {
-        $adapter = new MysqlSchema('test');
-        if ($adapter->connection()->engine() !== 'mysql') {
-            $this->markTestSkipped('This test is for mysql');
-        }
-        $result = $adapter->schema('articles');
-        $expected = '6376fe928793d0c7f9d899285b71bcfd'; // Any slight change, needs to be investigated
-        $this->assertEquals($expected, md5(json_encode($result)));
-    }
 
     public function testShowCreateTable()
     {
@@ -698,7 +669,7 @@ class MysqlSchemaTest extends OriginTestCase
         $result = $adapter->showCreateTable('articles');
         // Different mysql versions e.g. 5.x vs 8 will return slightly different result
         $expected = "CREATE TABLE `articles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `author_id` int(11) DEFAULT NULL,\n  `title` varchar(255) NOT NULL,\n  `body` text,\n  `created` datetime DEFAULT NULL,\n  `modified` datetime DEFAULT NULL,\n  PRIMARY KEY (`id`)\n)"; // Any slight change, needs to be investigated
-        $this->assertContains($expected, $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public function testTableExists()
@@ -718,13 +689,5 @@ class MysqlSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for mysql');
         }
         $this->assertEquals(['articles','deals','posts','users'], $adapter->tables());
-    }
-
-    # Test being deprecated
-
-    public function testColumnName()
-    {
-        $adapter = new MysqlSchema('test');
-        $this->assertEquals('foo', $adapter->columnName('foo'));
     }
 }

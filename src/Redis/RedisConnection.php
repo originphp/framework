@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -27,7 +28,7 @@ namespace Origin\Redis;
 
 use Redis;
 use RedisException;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class RedisConnection
 {

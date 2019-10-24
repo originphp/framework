@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -26,7 +26,7 @@ namespace Origin\Http;
 use Origin\Log\Log;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class FatalErrorException extends Exception
 {
@@ -231,7 +231,7 @@ class ErrorHandler
         $debug = $debugger->exception($exception);
           
         ob_start();
-        include SRC . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
+        include APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . 'debug.ctp';
         $response = ob_get_clean();
       
         $this->sendResponse($response);

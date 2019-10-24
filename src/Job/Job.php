@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,8 +16,10 @@
 namespace Origin\Job;
 
 use \ArrayObject;
+use Origin\Log\Log;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Exception\Exception;
+use Origin\Security\Security;
 use Origin\Job\Engine\BaseEngine;
 
 /**
@@ -26,7 +29,7 @@ use Origin\Job\Engine\BaseEngine;
 
 class Job
 {
-    use ModelTrait;
+    use ModelTrait,HookTrait;
     /**
      * This is the display name for the job
      *
@@ -34,21 +37,21 @@ class Job
      *
      * @var string
      */
-    public $name = null;
+    protected $name = null;
 
     /**
      * The name of the queue for this job
      *
      * @var string
      */
-    public $queue = 'default';
+    protected $queue = 'default';
 
     /**
      * The name of the queue connection to use
      *
      * @var string
      */
-    public $connection = 'default';
+    protected $connection = 'default';
 
     /**
      * Default wait time before dispatching the job, this is a strtotime compatible
@@ -57,7 +60,7 @@ class Job
      * @example '+30 minutes'
      * @var string
      */
-    public $wait = null;
+    protected $wait = null;
 
     /**
      * The default timeout in seconds. Set to false
@@ -65,7 +68,7 @@ class Job
      *
      * @var integer
      */
-    public $timeout = 60;
+    protected $timeout = 60;
 
     /**
      * Job identifier
@@ -121,7 +124,7 @@ class Job
         $this->wait = $options['wait'];
         $this->queue = $options['queue'];
         
-        $this->id = uuid();
+        $this->id = Security::uuid(['macAddress' => true]);
 
         if ($this->name === null) {
             list($namespace, $name) = namespaceSplit(get_class($this));
@@ -131,49 +134,9 @@ class Job
     }
 
     /**
-     * This is the hook when the job is created for sending
-     *
-     * @return void
-     */
-    public function initialize()
-    {
-    }
-
-    /**
-     * This is called just before execute
-     *
-     * @return void
-     */
-    public function startup()
-    {
-    }
-
-    ## execute method is not defined so user can add type hints etc
-
-    /**
-     * This is called after execute
-     *
-     * @return void
-     */
-    public function shutdown()
-    {
-    }
-
-    /**
-     * This callback is triggered when an error occurs
-     *
-     * @param \Exception $exception
-     * @return void
-     */
-    public function onError(\Exception $exception)
-    {
-    }
-
-    /**
      * Gets the id for this job
      *
-     * @param string|int
-     * @retun string
+     * @return string
      */
     public function id() : string
     {
@@ -197,7 +160,7 @@ class Job
     /**
     * Returns the connection for the Queue
     *
-    * @return void
+    * @return \Origin\Job\Engine\BaseEngine;
     */
     public function connection() : BaseEngine
     {
@@ -230,18 +193,20 @@ class Job
         $this->arguments = func_get_args(); // proces the arguments
 
         try {
-            $this->initialize();
-            $this->startup();
+            $this->executeHook('initialize');
+            $this->executeHook('startup');
             $this->execute(...$this->arguments);
         } catch (\Exception $e) {
-            $this->shutdown();
+            $this->executeHook('shutdown');
         
             if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
+
+            Log::error($e->getMessage());
            
-            $this->onError($e);
-    
+            $this->executeHook('onError', [$e]);
+
             if ($this->enqueued and $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
             }
@@ -249,16 +214,14 @@ class Job
             return false;
         }
 
-        $this->shutdown();
+        $this->executeHook('shutdown');
 
         if ($this->enqueued) {
             $this->connection()->success($this);
         }
-       
-        if (method_exists($this, 'onSuccess')) {
-            $this->onSuccess(...$this->arguments);
-        }
 
+        $this->executeHook('onSuccess', $this->arguments);
+     
         return true;
     }
 
@@ -339,7 +302,7 @@ class Job
     }
 
     /**
-     * Undocumented function
+     * Schedules a job using wait and returns this (chainable)
      *
      * @param string $strtotime a strtotime compatiable string e.g '+5 hours' ,'2020-01-01 10:40:00'
      * @return \Origin\Job\Job
@@ -349,5 +312,35 @@ class Job
         $this->wait = $strtotime;
 
         return $this;
+    }
+
+    /**
+     * Gets the queue name
+     *
+     * @return string
+     */
+    public function queue() : string
+    {
+        return $this->queue;
+    }
+
+    /**
+     * Gets the timeout for this job
+     *
+     * @return integer
+     */
+    public function timeout() : int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * Gets the display name for the job
+     *
+     * @return string
+     */
+    public function name() : string
+    {
+        return $this->name;
     }
 }

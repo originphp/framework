@@ -26,13 +26,17 @@ class MockObjectRegistry extends ObjectRegistry
 }
 class LemonPie
 {
-    public $name = 'LemonPie';
+    protected $name = 'LemonPie';
     
-    public $called = 0;
+    protected $called = 0;
 
     public function startup(int $x)
     {
         $this->called = $this->called + $x;
+    }
+    public function called()
+    {
+        return $this->called;
     }
 }
 class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
@@ -144,6 +148,6 @@ class ObjectRegistryTest extends \PHPUnit\Framework\TestCase
         $Registry->set('LemonPie', $LemonPie);
         $Registry->enable('LemonPie');
         $this->assertNull($Registry->call('startup', [1]));
-        $this->assertEquals(1, $LemonPie->called);
+        $this->assertEquals(1, $LemonPie->called());
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,7 +17,8 @@ namespace Origin\Http;
 
 use Origin\Core\Dot;
 use Origin\Core\Config;
-use Origin\Exception\Exception;
+use Origin\Security\Security;
+use Origin\Core\Exception\Exception;
 
 class Session
 {
@@ -76,7 +78,7 @@ class Session
     protected function setIniConfig(array $config) : void
     {
         foreach ($config as $option => $value) {
-            if (ini_set($option, $value) === false) {
+            if (ini_set($option, (string) $value) === false) {
                 throw new Exception(sprintf('Error configuring session for `%s`', $option));
             }
         }
@@ -121,7 +123,7 @@ class Session
     protected function startSession(string $id = null) : void
     {
         if ($id === null) {
-            $this->id(uuid());
+            $this->id(Security::uuid());
         }
         
         if (! session_start()) {
@@ -137,7 +139,6 @@ class Session
     /**
      * This will validate the cookie and return the ID if it is correct
      *
-     * @param string $name
      * @return string|null
      */
     protected function validateCookie() : ?string
@@ -236,19 +237,6 @@ class Session
 
     /**
      * Checks if a key exists in the session
-     * @codeCoverageIgnore
-     * @param string $key
-     * @return boolean
-     */
-    public function check(string $key = null) : bool
-    {
-        deprecationWarning('Session::check is depreciated use session:exists');
-
-        return $this->exists($key);
-    }
-
-    /**
-     * Checks if a key exists in the session
      *
      * @param string $key
      * @return boolean
@@ -336,16 +324,5 @@ class Session
     public function clear() : void
     {
         $_SESSION = [];
-    }
-    
-    /**
-     * Resets the session data
-     * @codeCoverageIgnore
-     * @return void
-     */
-    public function reset() : void
-    {
-        deprecationWarning('session::reset is deprecated use session:clear instead');
-        $this->clear();
     }
 }

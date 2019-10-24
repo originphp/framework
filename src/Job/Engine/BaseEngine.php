@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,12 +16,12 @@
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Core\ConfigTrait;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
+use Origin\Configurable\InstanceConfigurable as Configurable;
 
 abstract class BaseEngine
 {
-    use ConfigTrait;
+    use Configurable;
 
     /**
     * Constructor
@@ -33,13 +34,13 @@ abstract class BaseEngine
         $this->initialize($config);
     }
 
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
     }
     /**
      * Add a job to the queue
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param string $strtotime
      * @return bool
      */
@@ -49,14 +50,14 @@ abstract class BaseEngine
     * Get the next job from the queue
     *
     * @param string $queue
-    * @return \Origin\Queue\Job|null
+    * @return \Origin\Job\Job|null
     */
     abstract public function fetch(string $queue = 'default') : ?Job;
 
     /**
      * Deletes a job
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return bool
      */
     abstract public function delete(Job $job) : bool;
@@ -64,7 +65,7 @@ abstract class BaseEngine
     /**
      * Handles a failed job
      *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @return bool
      */
     abstract public function fail(Job $job) : bool;
@@ -72,7 +73,7 @@ abstract class BaseEngine
     /**
     * Handles a successful job
     *
-    * @param \Origin\Queue\Job $job
+    * @param \Origin\Job\Job $job
     * @return bool
     */
     abstract public function success(Job $job) : bool;
@@ -80,7 +81,7 @@ abstract class BaseEngine
     /**
     * Retries a job
     *
-     * @param \Origin\Queue\Job $job
+     * @param \Origin\Job\Job $job
      * @param integer $tries
      * @param string $strtotime
      * @return bool
@@ -96,9 +97,8 @@ abstract class BaseEngine
     {
         $serialized = json_encode($job->serialize());
 
-        // https://www.php.net/manual/en/function.json-last-error.php
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('JSON decoding data Error: ' . json_last_error());
+            throw new Exception('JSON encoding data Error: ' . json_last_error());
         }
 
         return $serialized;
@@ -108,11 +108,12 @@ abstract class BaseEngine
      * Returns a new job instance using serialized data
      *
      * @param string $data
-     * @return \Origin\Queue\Job
+     * @return \Origin\Job\Job
      */
     public function deserialize(string $data) : Job
     {
         $unserialized = json_decode($data, true);
+        
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('JSON decoding data Error: ' . json_last_error());
         }

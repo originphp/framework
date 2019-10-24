@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,13 +16,14 @@
 namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
-use Origin\Model\ModelRegistry;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
+use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
 class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
-    use ModelTrait;
+    use ModelTrait, HookTrait;
     /**
      * Holds the Fixtures list
      * examples
@@ -29,59 +31,12 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
      *
      * @var array
      */
-    public $fixtures = [];
+    protected $fixtures = [];
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->initialize();
-    }
-
-    /**
-     * Intialize Hook. This is called before a test starts.
-     */
-    public function initialize()
-    {
-    }
-
-    /**
-     * This is called after initialize and after fixtures have been loaded, but before the tests starts.
-     */
-    public function startup()
-    {
-    }
-
-    /**
-     * This is called after the test has run.
-     */
-    public function shutdown()
-    {
-    }
-
-    /**
-     * Loads a fixture (must be called from Initialize).
-     * @deprecated This going to be deprecated since this causing too much confusion. Loading model needs to be
-     * done in startup and this in initialize
-     * @param string $name Post or MyPlugin.Post
-     */
-    public function loadFixture(string $name)
-    {
-        if (! in_array($name, $this->fixtures)) {
-            $this->fixtures[] = $name;
-        }
-    }
-
-    /**
-     * Loads multiple fixtures (only works from Initialize).
-     * @deprecated This going to be deprecated since this causing too much confusion. Loading model needs to be
-     * done in startup and this in initialize
-     * @param array $fixtures
-     */
-    public function loadFixtures(array $fixtures)
-    {
-        foreach ($fixtures as $fixture) {
-            $this->loadFixture($fixture);
-        }
+        $this->executeHook('initialize');
     }
 
     /**
@@ -141,13 +96,26 @@ class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        parent::setUp();
-        $this->startup();
+        $this->executeHook('startup');
     }
 
     protected function tearDown() : void
     {
-        parent::tearDown();
-        $this->shutdown();
+        $this->executeHook('shutdown');
+    }
+
+    /**
+     * Getter and setter for fixtures
+     *
+     * @param array $fixtures
+     * @return array
+     */
+    public function fixtures(array $fixtures = null) : array
+    {
+        if ($fixtures === null) {
+            return $this->fixtures;
+        }
+
+        return $this->fixtures = $fixtures;
     }
 }

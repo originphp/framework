@@ -45,7 +45,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         ];
         $collection = new Collection($array);
         $data = print_r($collection, true);
-        $this->assertContains('[0] => Origin\Model\Entity Object', $data);
+        $this->assertStringContainsString('[0] => Origin\Model\Entity Object', $data);
     }
     public function testToJson()
     {

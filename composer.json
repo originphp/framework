@@ -33,17 +33,20 @@
   },
   "require": {
     "php": "^7.2.0",
+    "originphp/defer" : "^1.0",
+    "originphp/configurable" : "^1.0",
+    "originphp/inflector" : "^1.0",
+    "originphp/security" : "^1.0",
+    "originphp/email" : "^1.0",
+    "originphp/html" : "^1.0",
+    "originphp/xml" : "^1.0",
+    "originphp/log" : "^1.0",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-intl": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "7.5.2",
-    "phpseclib/phpseclib": "~2.0",
-    "ext-curl": "*"
-  },
-  "suggest": {
-    "php-memcached": "To test the Memcached Cache engine"
+    "phpunit/phpunit": "^8.0"
   }
 }

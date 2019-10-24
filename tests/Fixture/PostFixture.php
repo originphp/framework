@@ -18,9 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class PostFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'title' => [
@@ -44,7 +42,7 @@ class PostFixture extends Fixture
 
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1,
             'title' => 'First Post',

@@ -12,80 +12,16 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\TestSuite;
+namespace Origin\Test\Http\Controller\Component;
 
-use Origin\Http\Request;
-use Origin\Http\Response;
-use Origin\Http\ExceptionRenderer;
-use Origin\Exception\NotFoundException;
-use Origin\Exception\InternalErrorException;
+use Origin\Http\Exception\InternalErrorException;
 
-class ExceptionRendererTest extends \PHPUnit\Framework\TestCase
+class InternalErrorExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRenderNotFound()
+    public function testException()
     {
-        $exceptionRenderer = new ExceptionRenderer(new Request(), new Response());
-        $exception = new NotFoundException('Some Exception');
-        $response = $exceptionRenderer->render($exception);
-
-        $this->assertContains('Some Exception', $response->body());
-        $this->assertEquals(404, $response->statusCode());
-    }
-    public function testRenderInternalError()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request(), new Response());
-        $exception = new InternalErrorException('Its gone pete tong');
-        $response = $exceptionRenderer->render($exception);
-
-        $this->assertContains('An Internal Error Has Occured', $response->body());
-        $this->assertEquals(500, $response->statusCode());
-    }
-
-    public function testRenderNotFoundNonHttp()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request(), new Response());
-        $exception = new \Origin\Model\Exception\NotFoundException('id = 12345');
-        $response = $exceptionRenderer->render($exception);
-  
-        $this->assertNotContains('12345', $response->body());
-        $this->assertContains('Page not found', $response->body());
-        $this->assertEquals(404, $response->statusCode());
-    }
-
-    public function testRenderNotFoundAjax()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request('/somefile.json'), new Response());
-        $exception = new NotFoundException('Some Exception');
-        $response = $exceptionRenderer->render($exception);
-        $this->assertContains('{"error":{"message":"Some Exception","code":404}}', $response->body());
-        $this->assertEquals(404, $response->statusCode());
-    }
-
-    public function testRenderNotFoundNonHttpAjax()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request('/somefile.json'), new Response());
-        $exception = new \Origin\Model\Exception\NotFoundException('id = 12345');
-        $response = $exceptionRenderer->render($exception);
-        $this->assertContains('{"error":{"message":"Not Found","code":404}}', $response->body());
-        $this->assertEquals(404, $response->statusCode());
-    }
-    
-    public function testRenderInternalErrorAjax()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request('/somefile.json'), new Response());
-        $exception = new InternalErrorException('Its gone pete tong');
-        $response = $exceptionRenderer->render($exception);
-        $this->assertContains('{"error":{"message":"An Internal Error has Occured","code":500}}', $response->body());
-        $this->assertEquals(500, $response->statusCode());
-    }
-
-    public function testRenderDebug()
-    {
-        $exceptionRenderer = new ExceptionRenderer(new Request('/somefile.json'), new Response());
-        $exception = new InternalErrorException('Its gone pete tong');
-        $response = $exceptionRenderer->render($exception, true);
-
-        $this->assertContains('Its gone pete tong', $response->body());
-        $this->assertEquals(500, $response->statusCode());
+        $exception = new InternalErrorException();
+        $this->assertEquals(500, $exception->getCode());
+        $this->assertEquals('Internal Error', $exception->getMessage());
     }
 }

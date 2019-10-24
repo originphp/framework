@@ -15,7 +15,7 @@
 namespace Origin\Test\Core;
 
 use Origin\Http\ErrorHandler;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {

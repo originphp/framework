@@ -14,7 +14,7 @@
 
 namespace Origin\Model\Exception;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 
 class ConnectionException extends Exception
 {

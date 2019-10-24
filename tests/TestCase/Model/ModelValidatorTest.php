@@ -44,7 +44,7 @@ class MockValidator extends ModelValidator
 
 class ModelValidatorTest extends OriginTestCase
 {
-    public $fixtures = ['Framework.Article'];
+    protected $fixtures = ['Framework.Article'];
 
     protected function setUp(): void
     {
@@ -54,7 +54,7 @@ class ModelValidatorTest extends OriginTestCase
         // Add Non Existant Model to registry - if mock then create class above
         $this->Article = new Model([
             'name' => 'Article',
-            'datasource' => 'test',
+            'connection' => 'test',
         ]);
         ModelRegistry::set('Article', $this->Article);
     }

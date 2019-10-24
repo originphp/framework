@@ -2,6 +2,6 @@
 
 namespace App\Model;
 
-class User extends AppModel
+class User extends ApplicationModel
 {
 }

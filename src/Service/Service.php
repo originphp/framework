@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -28,25 +29,30 @@
  */
 namespace Origin\Service;
 
+use Origin\Core\HookTrait;
+
 /**
  * Service object uses dependency injection, it does one thing, it contains business
  * logic and should follow the single responsibility principle.
  *
- *  // A simple example
+ *  // A simple example how to use, but you would not create user in db from service object.
  *
  *  class CreateNewUserService extends ApplicationService {
  *
  *      protected $User = null;
  *
- *      public function initialize(User $user) {
+ *      protected function initialize(User $user) {
  *          $this->User = $user;
  *        }
  *
- *      public function execute(array $data) : Entity
+ *      protected function execute(array $data) : : ?Result
  *       {
  *          $user = $this->User->create($data);
  *          if($this->User->save($user)){
- *              return $user;
+ *              return $this->result([
+ *                  'success' => true,
+ *                   'data' => $user
+ *              ]);
  *          }
  *          throw new Exception('Error creating user');
  *      }
@@ -60,39 +66,17 @@ namespace Origin\Service;
 
 class Service
 {
+    use HookTrait;
+
     public function __construct()
     {
-        if (method_exists($this, 'initialize')) {
-            $this->initialize(...func_get_args());
-        }
+        $this->executeHook('initialize', func_get_args());
     }
-    
-    # Initialize is not defined here so user can define with proper type hints and return types
-
-    /**
-     * This is called before execute
-     *
-     * @return void
-     */
-    public function startup()
-    {
-    }
-
-    # Execute is not defined here so user can define with proper type hints and return types
-
-    /**
-     * This is called after execute
-     *
-     * @return void
-     */
-    public function shutdown()
-    {
-    }
-
+   
     /**
      * Creates an returns a Service Result object
      *
-     * @param array $properties e.g. ['success'=>true] or ['error'=>'Invalid credit card details']
+     * @param array $data e.g. ['success'=>true] or ['error'=>'Invalid credit card details']
      * @return \Origin\Service\Result
      */
     public function result(array $data = []) : Result
@@ -107,9 +91,9 @@ class Service
      */
     public function dispatch() : ?Result
     {
-        $this->startup();
+        $this->executeHook('startup');
         $result = $this->execute(...func_get_args());
-        $this->shutdown();
+        $this->executeHook('shutdown');
 
         return $result;
     }

@@ -16,6 +16,18 @@ namespace Origin\Test\Model;
 
 use Origin\Model\Entity;
 
+class User extends Entity
+{
+    protected function getFullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+    protected function setFirstName($value)
+    {
+        return ucfirst(strtolower($value));
+    }
+}
+
 class EntityTest extends \PHPUnit\Framework\TestCase
 {
     public function testSet()
@@ -26,6 +38,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1000, $entity->id);
         $entity->set('foo', 'bar');
         $this->assertEquals('bar', $entity->foo);
+
+        $entity['bar'] = 'foo';
+        $this->assertEquals('foo', $entity['bar']);
     }
 
     /**
@@ -44,6 +59,9 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1001, $entity->get('id'));
         $this->assertEquals(null, $entity->get('empty'));
         $this->assertEquals(null, $entity->get('nonExistant'));
+
+        $this->assertEquals(1001, $entity['id']);
+        $this->assertEquals(null, $entity['foo']);
     }
 
     /**
@@ -57,6 +75,8 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($entity->name));
         $this->assertTrue($entity->has('id'));
         $this->assertFalse($entity->has('name'));
+        $this->assertTrue(isset($entity['id']));
+        $this->assertFalse(isset($entity['name']));
     }
 
     /**
@@ -72,6 +92,10 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(isset($entity->foo));
         $entity->unset('foo');
         $this->assertTrue(! isset($entity->foo));
+
+        $entity['foo'] = 'bar';
+        unset($entity['foo']);
+        $this->assertTrue(! isset($entity['foo']));
     }
 
     /**
@@ -244,5 +268,45 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
         $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<record><title>Article Title</title><body>Article body</body></record>\n";
         $this->assertEquals($expected, $entity->toXml());
+    }
+
+    public function testAccessor()
+    {
+        $user = new User();
+        $user->first_name = 'Bob';
+        $user->last_name = 'Hope';
+        $this->assertEquals('Bob Hope', $user->fullName);
+    }
+
+    public function testMutator()
+    {
+        $user = new User();
+        $user->first_name = 'BOB';
+        $this->assertEquals('Bob', $user->first_name);
+    }
+
+    public function testVirtualFields()
+    {
+        $user = new User();
+        $user->first_name = 'bob';
+        $user->last_name = 'Hope';
+        $user->virtual(['full_name']);
+        $array = $user->toArray();
+        $this->assertEquals('Bob Hope', $array['full_name']);
+    }
+
+    public function testHidden()
+    {
+        $user = new User();
+        $user->first_name = 'bob';
+        $user->last_name = 'Hope';
+        $user->password = 'secret';
+
+        $array = $user->toArray();
+        $this->assertEquals('secret', $array['password']);
+
+        $user->hidden(['password']);
+        $array = $user->toArray();
+        $this->assertFalse(isset($array['password']));
     }
 }

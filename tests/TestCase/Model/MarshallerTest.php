@@ -28,7 +28,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildMap()
     {
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
 
         $Article->hasOne('Author');
         $Article->belongsTo('Category');
@@ -65,9 +65,9 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
             ],
             'created' => '2018-10-01 13:43:00',
         ];
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
-        $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
-        $Article->Author = new Model(['name' => 'User','alias' => 'Author', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
+        $Article->Tag = new Model(['name' => 'Tag', 'connection' => 'test']);
+        $Article->Author = new Model(['name' => 'User','alias' => 'Author', 'connection' => 'test']);
         $Marshaller = new Marshaller($Article);
 
         $entity = $Marshaller->one($data, ['name' => 'Article']);
@@ -128,9 +128,9 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
             'created' => ['date' => '22/01/2019','time' => '10:20am'],
         ];
 
-        $Article = new Model(['name' => 'Article', 'datasource' => 'test']);
-        $Article->Author = new Model(['name' => 'Author', 'datasource' => 'test']);
-        $Article->Tag = new Model(['name' => 'Tag', 'datasource' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
+        $Article->Author = new Model(['name' => 'Author', 'connection' => 'test']);
+        $Article->Tag = new Model(['name' => 'Tag', 'connection' => 'test']);
         
         $Article->hasOne('Author');
         $Article->hasMany('Tag');

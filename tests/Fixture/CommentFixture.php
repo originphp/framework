@@ -18,9 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class CommentFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'article_id' => ['type' => 'integer'],
@@ -33,7 +31,7 @@ class CommentFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1000,
             'article_id' => 1002,

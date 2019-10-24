@@ -1,8 +1,21 @@
 <?php
+declare(strict_types = 1);
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2019 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
 namespace Origin\Publisher;
 
-use Origin\Exception\InvalidArgumentException;
 use Origin\Publisher\Exception\PublisherException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class Publisher
 {
@@ -19,9 +32,9 @@ class Publisher
     protected $listeners = [];
 
     /**
-     * Gets the instance of the EventDispatcher
+     * Gets the instance of the HookTrait
      *
-     * @return void
+     * @return \Origin\Publisher\Publisher
      */
     public static function instance() : Publisher
     {
@@ -137,29 +150,32 @@ class Publisher
 
     /**
      * Dispatches the event to the listener
-     * @internal return type can be anything only false is important to Publisher
+     * @internal return type can be anything only false is important to Publisher. Callbacks should
+     * only work on Listener instances
      *
      * @param object|callable $object
      * @param string $event
      * @param array $args
-     * @return mixed
+     * @return bool
      */
-    public function dispatch($object, string $event, array $args = [])
+    public function dispatch($object, string $event, array $args = []) : bool
     {
-        $instanceOfListener = $object instanceof Listener;
-        if ($instanceOfListener) {
-            $object->startup();
+        /**
+         * Work with listenter
+         */
+        if ($object instanceof Listener) {
+            return $object->dispatch($event, $args);
         }
-        $result = null;
+        /**
+         * Work with any object
+         */
         if (method_exists($object, $event)) {
-            $result = call_user_func_array([$object,$event], $args);
+            if (call_user_func_array([$object,$event], $args) === false) {
+                return false;
+            }
         }
 
-        if ($instanceOfListener) {
-            $object->shutdown();
-        }
-
-        return $result;
+        return true;
     }
 
     /**

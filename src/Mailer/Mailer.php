@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -13,12 +14,18 @@
  */
 namespace Origin\Mailer;
 
+use Origin\Core\Plugin;
+use Origin\Email\Email;
+use Origin\Email\Message;
+use Origin\Core\HookTrait;
+use Origin\Inflector\Inflector;
+
 /**
 * To set values in the view set public properties in the execute method
 *
 * class SendWelcomeEmailMailer extends Mailer
 * {
-*    public function execute(Entity $user)
+*    protected function execute(Entity $user)
 *    {
 *        $this->user = $user; // this will become visible in the view
 *
@@ -33,6 +40,7 @@ namespace Origin\Mailer;
 
 abstract class Mailer
 {
+    use HookTrait;
     /**
      * You can set the default settings to be used by
      * each mailer (This can be overidden in any Mailer)
@@ -45,38 +53,28 @@ abstract class Mailer
      *   - replyTo: ['email'] or ['email'=>'name']
      * @var array
      */
-    public $defaults = [];
-
-    /**
-     * Name of the mailer folder where templates are. Only set this
-     * if you want something custom.
-     *
-     * e.g SendUserWelcomeEmail,MyPlugin.SendWelcomeEmail, Orders/SendUserWelcomeEmail
-     *
-     * @var string
-     */
-    public $folder = null;
+    protected $defaults = [];
 
     /**
      * Email account to use
      *
      * @var string
      */
-    public $account = 'default';
+    protected $account = 'default';
 
     /**
      * The default format to use. Its best to send both html and text.
      *
      * @var string both,text,html
      */
-    public $format = 'both';
+    protected $format = 'both';
 
     /**
      * The layout to use for HTML emails
      *
-     * @var boolean
+     * @var string|bool
      */
-    public $layout = false;
+    protected $layout = 'default';
 
     /**
      * @var array
@@ -97,7 +95,7 @@ abstract class Mailer
     /**
      * Holds the Email Utility
      *
-     * @var \Origin\Mailer\Email;
+     * @var \Origin\Email\Email;
      */
     protected $email = null;
 
@@ -108,44 +106,36 @@ abstract class Mailer
      */
     protected $viewVars = [];
 
+    /**
+     * Name of the tempalate
+     * welcome or MyPlugin.welcome
+     *
+     * @var string
+     */
+    protected $template = null;
+
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];
         $this->account = $config['account'];
 
-        if ($this->folder === null) {
+        if ($this->template === null) {
+            # Determine template
             list($namespace, $class) = namespaceSplit(get_class($this));
-            $this->folder = substr($class, 0, -6);
+            
+            $class = Inflector::underscored(substr($class, 0, -6));
+
+            // could be mock
+            if ($namespace) {
+                $plugin = substr($namespace, 0, strpos($namespace, '\\'));
+                if (in_array($plugin, Plugin::loaded())) {
+                    $class = $plugin .'.' .$class; // its a Plugin
+                }
+            }
+            $this->template = $class;
         }
-        $this->initialize($config);
-    }
-    /**
-     * Constructor hook method, use this to avoid having to overwrite the constructor and
-     * call the parent.
-     *
-     * @param array $config
-     * @return void
-     */
-    public function initialize(array $config)
-    {
-    }
-
-    /**
-     * Startup callback
-     *
-     * @return void
-     */
-    public function startup()
-    {
-    }
-
-    /**
-     * Shutdown callback
-     *
-     * @return void
-     */
-    public function shutdown()
-    {
+       
+        $this->executeHook('initialize', [$config]);
     }
 
     /**
@@ -159,9 +149,11 @@ abstract class Mailer
      *   - bcc: an array of emails in ['email'] or ['email'=>'name']
      *   - sender: ['email'] or ['email'=>'name']
      *   - replyTo: ['email'] or ['email'=>'name']
+     *   - body: manually set body of the message (set content type if its not text)
+     *   - contentType: default: text. The content type the body is in (html or text)
      * @return void
      */
-    public function mail(array $options = [])
+    public function mail(array $options = []) : void
     {
         $defaults = $this->defaults;
 
@@ -173,28 +165,28 @@ abstract class Mailer
             'cc' => null,
             'sender' => null,
             'replyTo' => null,
+            'body' => null,
+            'contentType' => 'text',
+            'format' => $this->format
         ];
       
         $options += $defaults;
       
         $options['headers'] = $this->headers;
         $options['attachments'] = $this->attachments;
-        $options['format'] = $this->format;
         $options['account'] = env('ORIGIN_ENV') === 'test' ? 'test' : $this->account;
-        $options['folder'] = $this->folder;
+        $options['template'] = $this->template;
         $options['viewVars'] = $this->viewVars;
         $options['layout'] = $this->layout;
 
         $this->options = $options;
-
-        return $this->options;
     }
 
     /**
      * Sets values in the email templates
      *
      * @param string|array $name key name or array
-     * @param $value if key is a string set the value for this
+     * @param mixed $value if key is a string set the value for this
      * @return void
      */
     public function set($name, $value = null) : void
@@ -211,18 +203,15 @@ abstract class Mailer
     /**
     * Dispatches the email
     *
-    * @return \Origin\Mailer\Message
+    * @return \Origin\Email\Message
     */
     public function dispatch() : Message
     {
         $this->arguments = func_get_args();
 
-        $this->startup();
-        $object = $this->buildEmail();
-        
-        $result = $object->send();
-
-        $this->shutdown();
+        $this->executeHook('startup');
+        $result = $this->buildEmail()->send();
+        $this->executeHook('shutdown');
 
         return $result;
     }
@@ -245,28 +234,26 @@ abstract class Mailer
     /**
      * Previews the message with headers
      *
-     * @return \Origin\Mailer\Message
+     * @return \Origin\Email\Message
      */
     public function preview() : Message
     {
         $this->arguments = func_get_args();
 
-        $this->startup();
-        $object = $this->buildEmail(true);
-
-        $result = $object->send();
-        $this->shutdown();
+        $this->executeHook('startup');
+        $result = $this->buildEmail(true)->send();
+        $this->executeHook('shutdown');
 
         return $result;
     }
 
     /**
-     *
+     * Builds the Email Object
      *
      * @param boolean $debug
-     * @return void
+     * @return \Origin\Email\Email
      */
-    private function buildEmail(bool $debug = false)
+    private function buildEmail(bool $debug = false) : Email
     {
         $properties = array_keys(get_object_vars($this));
      
@@ -280,9 +267,7 @@ abstract class Mailer
         }
         $this->options['viewVars'] = $this->viewVars;
    
-        $message = new EmailBuilder($this->options);
-
-        return $message->build($debug);
+        return (new EmailBuilder($this->options))->build($debug);
     }
 
     /**

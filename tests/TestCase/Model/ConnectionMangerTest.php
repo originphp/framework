@@ -14,15 +14,15 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Model\ConnectionManager;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet()
     {
-        $this->assertInstanceOf(Datasource::class, ConnectionManager::get('default'));
+        $this->assertInstanceOf(Connection::class, ConnectionManager::get('default'));
     }
 
     public function testGetException()

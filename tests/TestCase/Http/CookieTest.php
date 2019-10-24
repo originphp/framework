@@ -15,35 +15,31 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Cookie;
-use Origin\Controller\Controller;
+use Origin\Http\Controller\Controller;
 
 class MockCookie extends Cookie
 {
     protected $cookies = [];
 
-    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false)
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false) : void
     {
         $this->cookies[$name] = $value;
     }
     
-    public function cookies()
+    public function cookies() : array
     {
         return $this->cookies;
     }
 
     public function getCookie($name)
     {
-        if (isset($this->cookies[$name])) {
-            return $this->cookies[$name];
-        }
-
-        return null;
+        return $this->cookies[$name] ?? null;
     }
 }
 
 class OrangesController extends Controller
 {
-    public $autoRender = false;
+    protected $autoRender = false;
 
     public function index()
     {
@@ -100,7 +96,7 @@ class CookieTest extends \PHPUnit\Framework\TestCase
     public function testPack()
     {
         $cookie = new MockCookie();
-        $cookie->write('testPack', [1 => 'one'], 0, ['encrypt' => false]);
+        $cookie->write('testPack', [1 => 'one'], ['encrypt' => false]);
         $this->assertEquals('{"1":"one"}', $cookie->cookies()['testPack']);
         $_COOKIE['testPack'] = '{"1":"one"}';
         $this->assertEquals([1 => 'one'], $cookie->read('testPack'));

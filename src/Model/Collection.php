@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,10 +17,11 @@ namespace Origin\Model;
 use Iterator;
 use Countable;
 use ArrayAccess;
-use Origin\Utility\Xml;
-use Origin\Utility\Inflector;
+use Origin\Xml\Xml;
+use JsonSerializable;
+use Origin\Inflector\Inflector;
 
-class Collection implements ArrayAccess, Iterator, Countable
+class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
 {
     protected $items = null;
     protected $position = 0;
@@ -45,7 +47,7 @@ class Collection implements ArrayAccess, Iterator, Countable
     /**
     * Counts the number of items in the collection
     *
-    * @return array|object
+    * @return int
     */
     public function count()
     {
@@ -57,27 +59,28 @@ class Collection implements ArrayAccess, Iterator, Countable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray() : array
     {
         return $this->convertToArray($this->items);
     }
 
     /**
-     * Converts into Json
+     * Converts this collection into JSON
+     *
      * @see https://jsonapi.org/format/
      * @return string
      */
-    public function toJson()
+    public function toJson() : string
     {
-        return json_encode($this->toArray());
+        return json_encode($this->jsonSerialize());
     }
 
     /**
-     * Converts into XML
+     * Converts this collection into XML
      *
      * @return string
      */
-    public function toXml()
+    public function toXml() : string
     {
         $root = Inflector::camelCase(Inflector::plural($this->model ?? 'Record'));
         $data = [$root => [
@@ -87,7 +90,13 @@ class Collection implements ArrayAccess, Iterator, Countable
         return Xml::fromArray($data);
     }
 
-    protected function convertToArray($results)
+    /**
+     * Converts results into an array
+     *
+     * @param \Origin\Model\Entity|array $results
+     * @return array
+     */
+    protected function convertToArray($results) : array
     {
         if ($results instanceof Entity) {
             return $results->toArray();
@@ -99,16 +108,35 @@ class Collection implements ArrayAccess, Iterator, Countable
         return $results;
     }
 
+    /**
+     * ArrayAcces Interface for isset($collection);
+     *
+     * @param mixed $offset
+     * @return bool result
+     */
     public function offsetExists($key)
     {
         return array_key_exists($key, $this->items);
     }
  
+    /**
+     * ArrayAccess Interface for $collection[$offset];
+     *
+     * @param mixed $offset
+     * @return mixed
+     */
     public function offsetGet($key)
     {
         return $this->items[$key] ?? null;
     }
 
+    /**
+     * ArrayAccess Interface for $collection[$offset] = $value;
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
     public function offsetSet($key, $value)
     {
         if (is_null($key)) {
@@ -118,6 +146,12 @@ class Collection implements ArrayAccess, Iterator, Countable
         }
     }
  
+    /**
+     * ArrayAccess Interface for unset($collection[$offset]);
+     *
+     * @param mixed $offset
+     * @return void
+     */
     public function offsetUnset($key)
     {
         unset($this->items[$key]);
@@ -146,5 +180,21 @@ class Collection implements ArrayAccess, Iterator, Countable
     public function valid()
     {
         return isset($this->items[$this->position]);
+    }
+    
+    public function first()
+    {
+        return $this->items[0] ?? null;
+    }
+
+    /**
+     * JsonSerializable Interface for json_encode($collection). Returns the properties that will be serialized as
+     * json
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

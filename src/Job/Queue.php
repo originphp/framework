@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -20,12 +21,12 @@
 namespace Origin\Job;
 
 use Origin\Job\Engine\BaseEngine;
-use Origin\Core\StaticConfigTrait;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Queue
 {
-    use StaticConfigTrait;
+    use Configurable;
 
     /**
      * Holds the queue engines
@@ -53,7 +54,7 @@ class Queue
      * Builds an engine using the configuration
      *
      * @param string $name
-     * @throws \Origin\Exception\InvalidArgumentException
+     * @throws \Origin\Core\Exception\InvalidArgumentException
      * @return \Origin\Job\Engine\BaseEngine
      */
     protected static function buildEngine(string $name) : BaseEngine

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -19,7 +20,7 @@ namespace Origin\TestSuite;
 use Origin\Console\ConsoleIo;
 use Origin\Console\ConsoleInput;
 use Origin\Console\CommandRunner;
-use Origin\Console\ShellDispatcher;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 /**
@@ -90,18 +91,6 @@ trait ConsoleIntegrationTestTrait
     }
 
     /**
-     * Gets the stderr output (Errors)
-     * @codeCoverageIgnore
-     * @return string
-     */
-    public function errorOutput()
-    {
-        deprecationWarning('ConsoleIntegrationTestTrait::errorOutput deprecated use ConsoleIntegrationTestTrait::error instead');
-
-        return $this->error();
-    }
-
-    /**
      * Executes a console command.
      *
      * @param string $command e.g. db:schema:load
@@ -135,20 +124,10 @@ trait ConsoleIntegrationTestTrait
         $argv = explode(' ', "console {$command}");
         list($namespace, $class) = namespacesplit(get_class($this));
 
-        // Handle Legacy
-        if (substr($class, -9) === 'ShellTest') {
-            // @codeCoverageIgnoreStart
-            $this->stderr = $this->stdout; // Fixture Issue
-            $dispatcher = new ShellDispatcher($argv, $this->stdout, $this->stdin);
-            $this->result = $dispatcher->start();
-            $this->shell = $dispatcher->shell();
-        // @codeCoverageIgnoreEnd
-        } else {
-            $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
-            $commandRunner = new CommandRunner($io);
-            $this->result = $commandRunner->run($argv);
-            $this->command = $commandRunner->command();
-        }
+        $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
+        $commandRunner = new CommandRunner($io);
+        $this->result = $commandRunner->run($argv);
+        $this->command = $commandRunner->command();
     }
 
     /**
@@ -158,7 +137,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputContains(string $needle)
     {
-        $this->assertContains($needle, $this->stdout->read());
+        $this->assertStringContainsString($needle, $this->stdout->read());
     }
 
     /**
@@ -168,7 +147,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputNotContains(string $needle)
     {
-        $this->assertNotContains($needle, $this->stdout->read());
+        $this->assertStringNotContainsString($needle, $this->stdout->read());
     }
 
     /**
@@ -186,7 +165,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputEmpty()
     {
-        $this->assertContains('', $this->stdout->read());
+        $this->assertStringContainsString('', $this->stdout->read());
     }
 
     /**
@@ -194,7 +173,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitSuccess()
     {
-        $this->assertTrue($this->result);
+        $this->assertEquals(Command::SUCCESS, $this->result);
     }
 
     /**
@@ -202,7 +181,15 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitError()
     {
-        $this->assertFalse($this->result);
+        $this->assertEquals(Command::ERROR, $this->result);
+    }
+
+    /**
+     * Asserts a particular exit code
+     */
+    public function assertExitCode(int $exitCode)
+    {
+        $this->assertEquals($exitCode, $this->result);
     }
 
     /**
@@ -212,7 +199,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorContains(string $message)
     {
-        $this->assertContains($message, $this->stderr->read());
+        $this->assertStringContainsString($message, $this->stderr->read());
     }
 
     /**
@@ -222,7 +209,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorNotContains(string $message)
     {
-        $this->assertNotContains($message, $this->stderr->read());
+        $this->assertStringNotContainsString($message, $this->stderr->read());
     }
 
     /**
@@ -238,7 +225,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Returns the Command Object.
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command
      */
     public function command()
     {

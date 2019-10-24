@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,9 +16,9 @@
 namespace Origin\TestSuite;
 
 use Exception;
-use App\Application;
 use Origin\Http\Router;
 use Origin\Http\Request;
+use App\Http\Application;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\ExceptionRenderer;
@@ -47,7 +47,7 @@ trait IntegrationTestTrait
     /**
      * Holds the controller for the most recent request
      *
-     * @var \Origin\Controller\Controller
+     * @var \Origin\Http\Controller\Controller
      */
     protected $controller = null;
 
@@ -91,17 +91,6 @@ trait IntegrationTestTrait
      * @var boolean
      */
     protected $testWithErrorHandler = true;
-
-    /**
-     * Enables and disables testing with middleware
-     *
-     * @param boolean $bool
-     * @return void
-     */
-    public function useMiddleware(bool $bool)
-    {
-        $this->testWithMiddleware = $bool;
-    }
 
     /**
      * Undocumented function
@@ -190,11 +179,9 @@ trait IntegrationTestTrait
         if ($this->controller === null) {
             $this->fail('No request');
         }
-        if (isset($this->controller->viewVars[$key])) {
-            return $this->controller->viewVars[$key];
-        }
+        $viewVars = $this->controller->viewVars();
 
-        return null;
+        return $viewVars[$key] ?? null;
     }
 
     /**
@@ -245,7 +232,7 @@ trait IntegrationTestTrait
     /**
      * Gets the controller used in the request
      *
-     * @return \Origin\Controller\Controller
+     * @return \Origin\Http\Controller\Controller
      */
     public function controller()
     {
@@ -337,7 +324,7 @@ trait IntegrationTestTrait
 
         try {
             if ($this->testWithMiddleware) {
-                $application = new Application($this->request, $this->response);
+                (new Application($this->request, $this->response))->dispatch();
                 $this->controller = Dispatcher::instance()->controller();
             } else {
                 $dispatcher = new Dispatcher();
@@ -463,7 +450,7 @@ trait IntegrationTestTrait
     public function assertResponseContains(string $text)
     {
         $body = (string) $this->response()->body();
-        $this->assertContains($text, $body);
+        $this->assertStringContainsString($text, $body);
     }
 
     /**
@@ -472,7 +459,7 @@ trait IntegrationTestTrait
     public function assertResponseNotContains(string $text)
     {
         $body = (string) $this->response()->body();
-        $this->assertNotContains($text, $body);
+        $this->assertStringNotContainsString($text, $body);
     }
 
     /**
@@ -526,7 +513,7 @@ trait IntegrationTestTrait
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
-        $this->assertContains($text, $headers['Location']);
+        $this->assertStringContainsString($text, $headers['Location']);
     }
 
     /**
@@ -540,7 +527,7 @@ trait IntegrationTestTrait
         if (empty($headers['Location'])) {
             $this->fail('No location set');
         }
-        $this->assertNotContains($text, $headers['Location']);
+        $this->assertStringNotContainsString($text, $headers['Location']);
     }
 
     /**
@@ -590,7 +577,7 @@ trait IntegrationTestTrait
     {
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
-        $this->assertContains($value, $headers[$header]);
+        $this->assertStringContainsString($value, $headers[$header]);
     }
 
     /**
@@ -604,7 +591,7 @@ trait IntegrationTestTrait
     {
         $headers = $this->response()->headers();
         $this->assertArrayHasKey($header, $headers);
-        $this->assertNotContains($value, $headers[$header]);
+        $this->assertStringNotContainsString($value, $headers[$header]);
     }
 
     /**

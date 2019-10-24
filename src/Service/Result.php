@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -27,7 +28,7 @@ class Result
     public function __construct(array $properties)
     {
         foreach ($properties as $key => $value) {
-            $this->{$key} = $value;
+            $this->$key = $value;
         }
     }
 }

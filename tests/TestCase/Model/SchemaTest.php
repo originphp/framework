@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 
-include_once APP . DS . DATABASE_FOLDER . DS . 'schema.php';
+include_once DATABASE . DS . 'schema.php';
 
 class SchemaTest extends \PHPUnit\Framework\TestCase
 {
@@ -35,7 +35,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
 
-        $schema->bookmarks['constraints']['bookmarks_ibfk_1'] = ['key' => 'value'];
+        $schema->schema('bookmarks')['constraints']['bookmarks_ibfk_1'] = ['key' => 'value'];
 
         $this->executeStatements($schema->createSql($connection));
     }

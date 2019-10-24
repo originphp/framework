@@ -15,7 +15,7 @@
 namespace Origin\Test\Console\ConsoleOutput;
 
 use Origin\TestSuite\Stub\ConsoleOutput;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class MockConsoleOutput extends ConsoleOutput
 {
@@ -64,7 +64,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput->mode(ConsoleOutput::COLOR);
         $output = $ConsoleOutput->styleText('<yellow>hello world</yellow>');
     
-        $this->assertContains("\033[93mhello world\033[39m", $output);
+        $this->assertStringContainsString("\033[93mhello world\033[39m", $output);
     }
 
     public function testStyles()
@@ -88,7 +88,7 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("\033[97;101;4mTest\033[39;49;24m", $output);
 
         $output = $ConsoleOutput->styleText('<unkown>This is an unkown style</unkown>');
-        $this->assertContains('<unkown>This is an unkown style</unkown>', $output);
+        $this->assertStringContainsString('<unkown>This is an unkown style</unkown>', $output);
     }
 
     public function testNestedStyle()

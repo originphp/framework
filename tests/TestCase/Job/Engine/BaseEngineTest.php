@@ -14,14 +14,14 @@
 namespace Origin\Test\Job\Engine;
 
 use Origin\Job\Job;
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Job\Engine\DatabaseEngine;
 
 class MockJob extends Job
 {
-    public function execute()
+    public function execute() : void
     {
     }
     public function setArguments()

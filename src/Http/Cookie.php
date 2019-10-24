@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,7 +16,7 @@
 namespace Origin\Http;
 
 use Origin\Core\Config;
-use Origin\Utility\Security;
+use Origin\Security\Security;
 
 /**
  * Cookie Component - makes it easy to work with cookies, cookies are set using the response
@@ -32,27 +33,6 @@ class Cookie
     const prefix = 'T3JpZ2lu==.';
 
     /**
-     * Gets the encryption key
-     *
-     * @return string
-     */
-    protected function encryptionKey() : string
-    {
-        if (Config::exists('Security.key')) {
-            return Config::read('Security.key');
-        }
-        /**
-         * Backwards, Backwards comptability check
-         */
-        if (Config::exists('Cookie.key')) {
-            return Config::read('Cookie.key');
-        }
-        deprecationWarning('Add Security.key to your config/application.php.');
-
-        return md5(Config::read('Security.pepper')); //Create a key using thefor backwards compatability
-    }
-
-    /**
      * Reads a value of a cookie
      *
      * @param string $name
@@ -60,11 +40,7 @@ class Cookie
      */
     public function read(string $name)
     {
-        if (isset($_COOKIE[$name])) {
-            return $this->unpack($_COOKIE[$name]);
-        }
-
-        return null;
+        return isset($_COOKIE[$name]) ? $this->unpack($_COOKIE[$name]) : null;
     }
 
     /**
@@ -73,15 +49,21 @@ class Cookie
      *  $cookie->write('key',$value);
      *  $cookie->write('key',$value,strtotime('+1 day'));
      *
-     * @param string $key
+     * @param string $name
      * @param mixed $value
-     * @param int $expire unix time stamp
-     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
+     * @param array $options The options keys are:
+     *   - expires: default:0. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
+     *   - encrypt: default:true. encrypt value
+     *   - path: default:'/' . Path on server
+     *   - domain: domains cookie will be available on
+     *   - secure: default:false. only send if through https
+     *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function write(string $name, $value, int $expire = 0, array $options = [])
+    public function write(string $name, $value, array $options = []) : void
     {
         $options += [
+            'expires' => 0,
             'path' => '/', // path on server
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
@@ -91,7 +73,7 @@ class Cookie
     
         extract($options);
         $value = $this->pack($value, $options['encrypt']);
-        $this->setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+        $this->setCookie($name, $value, $options['expires'], $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -100,10 +82,10 @@ class Cookie
      * @param string $name
      * @return void
      */
-    public function delete(string $name)
+    public function delete(string $name): void
     {
         unset($_COOKIE[$name]);
-        $this->write($name, '', time() - 3600);
+        $this->write($name, '', ['expires' => time() - 3600]);
     }
 
     /**
@@ -114,11 +96,7 @@ class Cookie
      */
     public function exists(string $name) : bool
     {
-        if (isset($_COOKIE[$name])) {
-            return true;
-        }
-
-        return false;
+        return isset($_COOKIE[$name]);
     }
     
     /**
@@ -126,7 +104,7 @@ class Cookie
      *
      * @return void
      */
-    public function destroy()
+    public function destroy() : void
     {
         foreach ($_COOKIE as $name => $value) {
             $this->delete($name);
@@ -141,7 +119,7 @@ class Cookie
      * @return void
      * @codeCoverageIgnore
      */
-    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false)
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false) : void
     {
         setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
@@ -152,33 +130,33 @@ class Cookie
      * @param mixed $value
      * @return string
      */
-    protected function pack($value, $encrypt = true)
+    protected function pack($value, bool $encrypt = true) : string
     {
         if (is_array($value)) {
             $value = json_encode($value);
         }
        
         if ($encrypt) {
-            $value = self::prefix . Security::encrypt($value, $this->encryptionKey());
+            $value = self::prefix . Security::encrypt($value, Config::read('Security.key'));
         }
        
-        return $value;
+        return (string) $value;
     }
 
     /**
      * Handles the unpacking of the data, serializing, decrypting and decoding
      *
      * @param string $value
-     * @return mixed
+     * @return string|array|null
      */
     protected function unpack(string $value)
     {
         $length = strlen(self::prefix);
         if (substr($value, 0, $length) === self::prefix) {
             $value = substr($value, $length);
-            $value = Security::decrypt($value, $this->encryptionKey());
+            $value = Security::decrypt($value, Config::read('Security.key'));
         }
-        if (substr($value, 0, 1) === '{') {
+        if ($value and substr($value, 0, 1) === '{') {
             $value = json_decode($value, true);
         }
 

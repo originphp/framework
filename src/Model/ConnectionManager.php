@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,16 +15,16 @@
 
 namespace Origin\Model;
 
-use Origin\Core\StaticConfigTrait;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 class ConnectionManager
 {
-    use StaticConfigTrait;
+    use Configurable;
 
     protected static $engines = [
-        'mysql' => __NAMESPACE__ . '\Engine\MySQLEngine',
-        'pgsql' => __NAMESPACE__ . '\Engine\PostgreSQLEngine',
+        'mysql' => __NAMESPACE__ . '\Engine\MysqlEngine',
+        'pgsql' => __NAMESPACE__ . '\Engine\PgsqlEngine',
     ];
     /**
      * Holds the driver
@@ -42,10 +43,9 @@ class ConnectionManager
      * Gets a datasource.
      *
      * @param string $name default
-     *
-     * @return \Origin\Model\Datasource
+     * @return \Origin\Model\Connection
      */
-    public static function get(string $name)
+    public static function get(string $name) : Connection
     {
         if (isset(static::$datasources[$name])) {
             return static::$datasources[$name];
@@ -65,14 +65,14 @@ class ConnectionManager
         static::$driver = $config['engine'];
       
         $class = static::$engines[$config['engine']];
-        $datasource = new $class(['datasource' => $name] + $config);
+        $datasource = new $class(['connection' => $name] + $config);
 
         $datasource->connect($config);
 
         return static::$datasources[$name] = $datasource;
     }
 
-    public static function create(string $name, array $config)
+    public static function create(string $name, array $config) : Connection
     {
         self::config($name, $config);
 
@@ -83,9 +83,9 @@ class ConnectionManager
      * Drops a connection
      *
      * @param string $name
-     * @return void
+     * @return bool
      */
-    public static function drop(string $name)
+    public static function drop(string $name) : bool
     {
         if (isset(static::$datasources[$name])) {
             static::config($name, null);
@@ -97,7 +97,13 @@ class ConnectionManager
         return false;
     }
 
-    public static function has(string $name)
+    /**
+     * Checks if there is a configured connection
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public static function has(string $name) : bool
     {
         return isset(static::$datasources[$name]);
     }
@@ -107,7 +113,7 @@ class ConnectionManager
      *
      * @return array
      */
-    public static function datasources()
+    public static function datasources() : array
     {
         return array_keys(static::$config);
     }

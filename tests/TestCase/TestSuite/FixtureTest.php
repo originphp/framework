@@ -16,7 +16,6 @@ namespace Origin\Test\TestSuite;
 
 use Origin\Model\Model;
 use Origin\TestSuite\Fixture;
-use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
 
 class Movie extends Model
@@ -25,9 +24,9 @@ class Movie extends Model
 
 class MovieFixture extends Fixture
 {
-    public $table = 'movies';
+    protected $table = 'movies';
 
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => [
@@ -54,7 +53,7 @@ class MovieFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1,
             'name' => 'The Godfather',
@@ -77,6 +76,11 @@ class MovieFixture extends Fixture
             'modified' => '2019-02-10 08:17:00',
         ],
     ];
+
+    public function table()
+    {
+        return $this->table;
+    }
 }
 
 class FixtureTest extends \PHPUnit\Framework\TestCase
@@ -89,13 +93,12 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
     public function testConstruct()
     {
         $fixture = new MovieFixture();
-        $this->assertEquals('movies', $fixture->table);
-        $this->assertEquals('test', $fixture->datasource);
+        $this->assertEquals('movies', $fixture->table());
     }
     public function testCreate()
     {
         $fixture = new MovieFixture();
-        $this->assertTrue($fixture->create());
+        $this->assertNull($fixture->create());
     }
     /**
      * @dpends testCreate
@@ -108,8 +111,8 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture->create();
         $this->assertNull($fixture->insert());
 
-        $model = new Movie();
-        $model->datasource = 'test';
+        $model = new Movie(['connection' => 'test']);
+       
         $this->assertEquals(3, $model->find('count'));
     }
 
@@ -126,108 +129,5 @@ class FixtureTest extends \PHPUnit\Framework\TestCase
         $fixture->create();
         $fixture->insert();
         $this->assertTrue($fixture->drop());
-    }
-
-    /**
-     * This will create a table called movies
-     *
-     * @return void
-     */
-    public function createTableForImporting()
-    {
-        $connection = ConnectionManager::get('default');
-
-        // if existing datasource has movives then crash
-        $connection->execute('DROP TABLE IF EXISTS movies'); // TMP
-        $sql = $connection->adapter()->createTable('movies', [
-            'id' => 'primaryKey',
-            'name' => ['type' => 'string','null' => false],
-            'description' => 'text',
-            'year' => ['type' => 'integer','default' => 0,'null' => false],
-            'created' => 'datetime',
-            'modified' => 'datetime',
-        ]);
-    
-        $connection->execute($sql);
-        $Movie = new Movie();
-        $Movie->datasource = 'default';
-        $entity = $Movie->new(['name' => 'The Sound of Music','year' => 1965]);
-
-        return $Movie->save($entity);
-    }
-   
-    public function testImportNull()
-    {
-        $fixture = new MovieFixture();
-
-        $this->assertNull($fixture->import());
-    }
-    
-    /**
-     * Test unkown models - also dynamic models
-     *
-     * @return void
-     */
-    public function testImportDynamicModel()
-    {
-        $connection = ConnectionManager::get('default');
-        $connection->execute('DROP TABLE IF EXISTS guests'); // TMP
-
-        $fixture = new MovieFixture();
-        $fixture->import = ['model' => 'Guest']; // convert to table
-        
-        $sql = $connection->adapter()->createTable('guests', [
-            'id' => 'primaryKey',
-            'firstname' => ['type' => 'string','limit' => '30'],
-        ]);
-        
-        //$sql = "CREATE TABLE guests (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,firstname VARCHAR(30) NOT NULL)";
-        $connection->execute($sql);
-        $this->assertTrue($fixture->import());
-    }
-    public function testImportModel()
-    {
-        $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
-        $fixture->import = ['model' => 'Origin\Test\TestSuite\Movie'];
-        $this->assertTrue($fixture->create());
-    }
-
-    public function testImportTable()
-    {
-        $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
-        $fixture->import = ['table' => 'movies'];
-        $this->assertTrue($fixture->create());
-        $records = $fixture->loadRecords('test', 'movies');
-        $this->assertEmpty($records);
-    }
-
-    public function testLoadRecords()
-    {
-        $fixture = new MovieFixture();
-        $records = $fixture->loadRecords('default', 'movies');
-        $this->assertEquals('The Sound of Music', $records[0]['name']);
-    }
-
-    public function testImportTableWithRecords()
-    {
-        $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
-        $fixture->import = ['table' => 'movies','records' => true];
-        $this->assertTrue($fixture->create());
-        $fixture->insert();
-        $records = $fixture->loadRecords('test', 'movies');
-        $this->assertNotEmpty($records);
-        $this->assertEquals('The Sound of Music', $records[0]['name']);
-    }
-
-    public function testImportNoTableException()
-    {
-        $this->assertTrue($this->createTableForImporting());
-        $fixture = new MovieFixture();
-        $fixture->import = ['foo' => 'bar'];
-        $this->expectException(Exception::class);
-        $fixture->create();
     }
 }

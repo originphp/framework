@@ -8,10 +8,10 @@ use Origin\Job\Queue;
 
 Queue::config('default', [
     'engine' => 'Database',
-    'datasource' => 'default'
+    'connection' => 'default'
 ]);
 
 Queue::config('test', [
     'engine' => 'Database',
-    'datasource' => 'test'
+    'connection' => 'test'
 ]);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -13,9 +14,11 @@
  */
 namespace Origin\Mailer;
 
-use Origin\Utility\Html;
-use Origin\Utility\Inflector;
-use Origin\Exception\Exception;
+use Origin\Html\Html;
+use Origin\Email\Email;
+use Origin\Inflector\Inflector;
+use Origin\Core\Exception\Exception;
+use Origin\Email\Email as SmtpEmail;
 
 /**
  * This class builds an configured email from an arra for Mailer.
@@ -38,6 +41,13 @@ class EmailBuilder
      */
     protected $viewVars = [];
 
+    /**
+     * Email message object
+     *
+     * @var SmtpEmail
+     */
+    protected $message = null;
+
     public function __construct(array $options)
     {
         $options += [
@@ -49,7 +59,7 @@ class EmailBuilder
             'sender' => null,
             'replyTo' => null,
             'format' => null,
-            'folder' => null,
+            'template' => null,
             'headers' => null,
             'attachments' => null,
             'viewVars' => null, ];
@@ -61,12 +71,11 @@ class EmailBuilder
      * Builds the email object
      *
      * @param boolean $debug set to true to ensure send does not send emails
-     * @return \Origin\Mailer\Email
+     * @return SmtpEmail
      */
-    public function build(bool $debug = false) : Email
+    public function build(bool $debug = false) : SmtpEmail
     {
-        $account = ($debug === true) ? ['engine' => 'Test'] : $this->options['account'];
-      
+        $account = $debug ? ['engine' => 'Test'] : $this->options['account'];
         $this->message = new Email($account);
      
         extract($this->options);
@@ -113,8 +122,18 @@ class EmailBuilder
             }
         }
   
-        $this->render();
-       
+        if (empty($this->options['body'])) {
+            $this->render();
+        } else {
+            $contentType = $this->options['contentType'] === 'text' ? 'text' : 'html';
+          
+            $htmlVersion = $contentType === 'html' ? $this->options['body'] : Html::fromText($this->options['body']);
+            $textVersion = $contentType === 'text' ? $this->options['body'] : Html::toText($this->options['body']);
+            $this->message->htmlMessage($htmlVersion);
+            $this->message->textMessage($textVersion);
+            $this->message->format($this->options['format']);
+        }
+        
         return $this->message;
     }
 
@@ -131,16 +150,16 @@ class EmailBuilder
             $this->message->htmlMessage($this->content);
         }
         if (in_array($this->options['format'], ['text','both'])) {
-            $filename = $this->getPath($this->options['folder']) . DS . 'text.ctp';
+            $filename = $this->getPath($this->options['template']) . '.text.ctp';
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
-                $this->message->textMessage($content);
             } elseif ($this->content and $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
                 throw new Exception(sprintf('Template %s does not exist', $filename));
             }
+            $this->message->textMessage($content);
         }
     }
 
@@ -169,7 +188,7 @@ class EmailBuilder
     protected function renderHtmlMessage() : void
     {
         $this->content = $this->renderTemplate(
-            $this->getPath($this->options['folder']) . DS . 'html.ctp'
+            $this->getPath($this->options['template']) . '.html.ctp'
         );
         if ($this->options['layout']) {
             $this->content = $this->renderTemplate(
@@ -208,16 +227,16 @@ class EmailBuilder
      * Gets the path
      *
      * @param string $name
-     * @return void
+     * @return string
      */
     protected function getPath(string $name) : string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Mailer' .DS . $name ;
+            return PLUGINS .DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Template' . DS . $name ;
         }
 
-        return SRC . DS . 'View' . DS . 'Mailer' .DS . $name ;
+        return APP . DS . 'Mailer' . DS . 'Template' . DS . $name;
     }
 
     /**
@@ -230,9 +249,9 @@ class EmailBuilder
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
-            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'View' . DS . 'Layout' . DS . $name . '.ctp';
+            return PLUGINS .DS .Inflector::underscored($plugin) . DS . 'src' . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
         }
 
-        return SRC . DS . 'View' . DS .  'Layout' . DS . $name . '.ctp';
+        return APP . DS . 'Mailer' . DS . 'Layout' . DS . $name . '.ctp';
     }
 }

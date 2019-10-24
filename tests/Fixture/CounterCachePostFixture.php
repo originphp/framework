@@ -18,9 +18,7 @@ use Origin\TestSuite\Fixture;
 
 class CounterCachePostFixture extends Fixture
 {
-    public $datasource = 'test';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'title' => [
@@ -43,7 +41,7 @@ class CounterCachePostFixture extends Fixture
         ],
     ];
 
-    public $records = [
+    protected $records = [
         [
             'id' => 1,
             'title' => 'First Post',

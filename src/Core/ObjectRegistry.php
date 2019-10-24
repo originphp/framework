@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -225,7 +226,7 @@ class ObjectRegistry
      * This is will create the class, options will be passed for loaded for
      * extended classes to use if needed.
      *
-     * @param string $class
+     * @param string $name
      * @param array  $options
      * @return object
      */

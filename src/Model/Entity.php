@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,14 +17,18 @@
  * Entity Object
  * Entity is an object that represents a single row in a database.
  * Moving away from arrays, we want this to work similar e.g isset, empty array_keys.
+ * @internal whilst using _ might be considered bad/old practice in this case we want to prevent clashes with column names
+ * in the database
  */
 
 namespace Origin\Model;
 
-use Origin\Utility\Xml;
-use Origin\Utility\Inflector;
+use ArrayAccess;
+use Origin\Xml\Xml;
+use JsonSerializable;
+use Origin\Inflector\Inflector;
 
-class Entity
+class Entity implements ArrayAccess, JsonSerializable
 {
     /**
      * Holds the properties and values for this entity.
@@ -49,7 +54,7 @@ class Entity
     /**
      * If the record exists in the database (set during find)
      *
-     * @var [type]
+     * @var bool
      */
     protected $_exists = null;
 
@@ -73,20 +78,41 @@ class Entity
      * @var boolean
      */
     protected $_deleted = false;
-    
+
+    /**
+    * Cached lists of accessors
+    *
+    * @var array
+    */
+    protected static $accessors = [];
+
+    /**
+     * Virtual fields that will be exposed when using toArray,toJson,and toXml
+     *
+     * @var array
+     */
+    protected $_virtual = [];
+
+    /**
+     * Fields that should not be exposed when using toArray,toJson,and toXml
+     *
+     * @var array
+     */
+    protected $_hidden = [];
+
     /**
      * Constructor
      *
      * @param array $properties data
      * @param array $options
      * - name: Model name
-     * - exists: if the model exists in the database (set during find), null, means dont know
+     * - exists: if the model exists in the database (set during find)
      * - markClean: mark the entity as clean after creation. This is useful for when loading records
      * from the database.
      */
     public function __construct(array $properties = [], array $options = [])
     {
-        $options += ['name' => null, 'exists' => null, 'markClean' => false];
+        $options += ['name' => null, 'exists' => false, 'markClean' => false];
 
         $this->_name = $options['name'];
         $this->_exists = $options['exists'];
@@ -151,7 +177,12 @@ class Entity
      */
     public function __debugInfo()
     {
-        return $this->_properties;
+        $properties = $this->_properties;
+        foreach ($this->_virtual as $field) {
+            $properties[$field] = $this->$field;
+        }
+
+        return $properties;
     }
 
     /**
@@ -172,8 +203,8 @@ class Entity
      *  $entity->errors('email','invalid email address');
      *
      * @param string $field
-     * @param string|array $error
-     * @return null|array
+     * @param string $error
+     * @return array|null|void
      */
     public function errors(string $field = null, string $error = null)
     {
@@ -197,7 +228,7 @@ class Entity
      * @param string $error
      * @return void
      */
-    public function invalidate(string $field, string $error)
+    public function invalidate(string $field, string $error) : void
     {
         if (! isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
@@ -211,7 +242,7 @@ class Entity
      * @param string|array $properties
      * @return \Origin\Model\Entity;
      */
-    public function unset($properties)
+    public function unset($properties) : Entity
     {
         foreach ((array)$properties as $key) {
             unset($this->_properties[$key]);
@@ -222,34 +253,72 @@ class Entity
     }
 
     /**
-     * Added & to prevent Indirect modification of overloaded property errors.
+     * Gets a value from the entity
+     *
      * @return mixed
      */
     public function &get(string $property)
     {
         $result = null;
+
+        $method = static::accessor($property, 'get');
+
         if (isset($this->_properties[$property])) {
             $result = &$this->_properties[$property];
+        }
+        if ($method) {
+            $result = $this->$method($result);
         }
 
         return $result;
     }
 
     /**
+     * Gets the accessor method
+     *
+     * @param string $property
+     * @param string $type
+     * @return string|null
+     */
+    protected static function accessor(string $property, string $type) : ?string
+    {
+        $class = static::class;
+
+        if (isset(static::$accessors[$class][$type][$property])) {
+            return static::$accessors[$class][$type][$property];
+        }
+
+        if ($class === Entity::class) {
+            return null;
+        }
+
+        $method = $type . Inflector::studlyCaps($property);
+        if (! in_array($method, get_class_methods($class))) {
+            $method = '';
+        }
+
+        return static::$accessors[$class][$type][$property] = $method;
+    }
+
+    /**
      * Sets a property/properties of the entity.
      *
-     * @param string|array $property $properties
-     * @param mixed        $value
+     * @param string|array $properties
+     * @param mixed $value
      */
-    public function set($properties, $value = null)
+    public function set($properties, $value = null) : Entity
     {
         if (is_array($properties) === false) {
             $properties = [$properties => $value];
         }
 
-        foreach ($properties as $key => $value) {
-            $this->_properties[$key] = $value;
-            $this->_modified[$key] = true;
+        foreach ($properties as $property => $value) {
+            $method = static::accessor($property, 'set');
+            if ($method) {
+                $value = $this->$method($value);
+            }
+            $this->_properties[$property] = $value;
+            $this->_modified[$property] = true;
         }
 
         return $this;
@@ -260,10 +329,21 @@ class Entity
      *
      * @return void
      */
-    public function reset()
+    public function reset() : void
     {
         $this->_modified = [];
         $this->_errors = [];
+    }
+
+    /**
+     * If the record exists in the database (is set by save)
+     *
+     * @param boolean $exists
+     * @return boolean
+     */
+    public function exists(bool $exists = null) : bool
+    {
+        return $this->setGetPersisted('exists', $exists);
     }
 
     /**
@@ -323,7 +403,7 @@ class Entity
      * @param string $property name of property
      * @return bool true of false
      */
-    public function has($property)
+    public function has($property) : bool
     {
         return isset($this->_properties[$property]);
     }
@@ -334,7 +414,7 @@ class Entity
      *
      * @return array properties
      */
-    public function properties()
+    public function properties() : array
     {
         return array_keys($this->_properties);
     }
@@ -345,7 +425,7 @@ class Entity
      * @param string $property
      * @return bool
      */
-    public function propertyExists(string $property)
+    public function propertyExists(string $property) : bool
     {
         return array_key_exists($property, $this->_properties);
     }
@@ -353,9 +433,9 @@ class Entity
     /**
      * Gets the entity name, aka the model or alias.
      *
-     * @return string model name
+     * @return string|null model name
      */
-    public function name()
+    public function name() : ?string
     {
         return $this->_name;
     }
@@ -365,10 +445,11 @@ class Entity
      *
      * @return array result
      */
-    public function toArray()
+    public function toArray() : array
     {
         $result = [];
-        foreach ($this->_properties as $property => $value) {
+        foreach ($this->visibleProperties() as $property) {
+            $value = $this->$property;
             if (is_array($value) or $value instanceof Collection) {
                 foreach ($value as $k => $v) {
                     if ($v instanceof Entity) {
@@ -387,13 +468,13 @@ class Entity
     }
 
     /**
-     * Converts this entity into Json
+     * Converts this entity into JSON
      *
      * @return string
      */
-    public function toJson()
+    public function toJson() : string
     {
-        return json_encode($this->toArray());
+        return json_encode($this->jsonSerialize());
     }
 
     /**
@@ -401,10 +482,109 @@ class Entity
      *
      * @return string
      */
-    public function toXml()
+    public function toXml() : string
     {
         $root = Inflector::camelCase($this->_name ?? 'record');
 
         return Xml::fromArray([$root => $this->toArray()]);
+    }
+
+    /**
+     * Gets the visible properties
+     *
+     * @return array
+     */
+    private function visibleProperties() : array
+    {
+        $properties = array_keys($this->_properties);
+        $properties = array_merge($properties, $this->_virtual);
+
+        return array_diff($properties, $this->_hidden);
+    }
+
+    /**
+     * Sets and gets hidden properties
+     *
+     * @param array $properties
+     * @return array
+     */
+    public function hidden(array $properties = null) : array
+    {
+        if ($properties === null) {
+            return $this->_hidden;
+        }
+
+        return $this->_hidden = $properties;
+    }
+
+    /**
+     * Sets and gets virtual properties
+     *
+     * @param array $properties
+     * @return array
+     */
+    public function virtual(array $properties = null) : array
+    {
+        if ($properties === null) {
+            return $this->_virtual;
+        }
+
+        return $this->_virtual = $properties;
+    }
+
+    /**
+     * ArrayAcces Interface for isset($entity);
+     *
+     * @param mixed $offset
+     * @return bool result
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset);
+    }
+
+    /**
+     * ArrayAccess Interface for $entity[$offset];
+     *
+     * @param mixed $offset
+     * @return mixed
+     */
+    public function &offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    /**
+     * ArrayAccess Interface for $entity[$offset] = $value;
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->set($offset, $value);
+    }
+
+    /**
+     * ArrayAccess Interface for unset($entity[$offset]);
+     *
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->unset($offset);
+    }
+
+    /**
+     * JsonSerializable Interface for json_encode($entity). Returns the properties that will be serialized as
+     * json
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

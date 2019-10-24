@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,10 +16,12 @@
 namespace Origin\Console;
 
 use Origin\Core\Resolver;
-use Origin\Exception\Exception;
+use Origin\Core\HookTrait;
 use Origin\Core\LazyLoadContainer;
+use Origin\Console\Command\Command;
+use Origin\Core\Exception\Exception;
 use Origin\Console\Exception\ConsoleException;
-use Origin\Exception\InvalidArgumentException;
+
 /**
  * If you only add one command, by default it will become a single command application and the command
  * will be run automatically.
@@ -37,11 +40,12 @@ use Origin\Exception\InvalidArgumentException;
  * $consoleApplication->run();
  */
 
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Console\Exception\StopExecutionException;
 
 class ConsoleApplication
 {
-
+    use HookTrait;
     /**
      * Name of the application. Should be the same name
      * as the bash script since this will be used to display help.
@@ -92,10 +96,7 @@ class ConsoleApplication
      */
     public function __construct(ConsoleIo $io = null)
     {
-        if ($io === null) {
-            $io = new ConsoleIo();
-        }
-        $this->io = $io;
+        $this->io = $io ?: new ConsoleIo();
 
         $this->argumentParser = new ArgumentParser();
 
@@ -103,13 +104,9 @@ class ConsoleApplication
             'short' => 'h','description' => 'Displays this help message','type' => 'boolean',
         ]);
    
-        $this->initialize();
+        $this->executeHook('initialize');
         
         $this->commandRegistry = new LazyLoadContainer();
-    }
-
-    public function initialize()
-    {
     }
 
     /**
@@ -150,9 +147,9 @@ class ConsoleApplication
      * Runs the console application
      *
      * @param array $args default is argv
-     * @return bool
+     * @return int exit code
      */
-    public function run(array $args = null) : bool
+    public function run(array $args = null) : int
     {
         if ($args === null) {
             global $argv;
@@ -181,26 +178,31 @@ class ConsoleApplication
         if (! $command) {
             $this->displayHelp();
 
-            return true;
+            return Command::SUCCESS;
         }
 
         try {
-            $this->{$command} = $this->commandRegistry->get($command);
+            $this->$command = $this->commandRegistry->get($command);
         } catch (Exception $ex) {
             $this->io->error("Invalid command {$command}.");
 
-            return false;
+            return Command::ERROR;
         }
       
         $commandName = (count($commands) === 1) ? $this->name : $this->name . ' ' .$command;
+        
         # Configure Command
-        $this->{$command}->io = $this->io;
-        $this->{$command}->name($commandName);  // Rename for help
+        $this->$command->io($this->io);
+        $this->$command->name($commandName);  // Rename for help
 
         try {
-            return $this->{$command}->run($args);
+            $this->executeHook('startup');
+            $exitCode = $this->$command->run($args);
+            $this->executeHook('shutdown');
+
+            return $exitCode;
         } catch (StopExecutionException $ex) {
-            return false;
+            return $ex->getCode();
         }
     }
 
@@ -234,7 +236,7 @@ class ConsoleApplication
      * Adds a command to this Console Application
      *
      * @param string $alias
-     * @param string $name Cache,Plugin.Cache, App\Command\Custom\Cache
+     * @param string $name Cache,Plugin.Cache, App\Console\Command\Custom\Cache
      * @return void
      */
     public function addCommand(string $alias, string $name) : void
@@ -243,7 +245,7 @@ class ConsoleApplication
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));
         }
 
-        $className = Resolver::className($name, 'Command', 'Command');
+        $className = Resolver::className($name, 'Command', 'Command', 'Console');
         if (! $className) {
             throw new InvalidArgumentException(sprintf('`%s` command not found.', $name));
         }

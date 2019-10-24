@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -22,11 +22,26 @@
 
 namespace Origin\Model\Schema;
 
-use Origin\Exception\Exception;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 
 class PgsqlSchema extends BaseSchema
 {
+    protected $typeMap = [
+        'string' => 'VARCHAR',
+        'text' => 'TEXT',
+        'integer' => 'INTEGER',
+        'bigint' => 'BIGINT',
+        'float' => 'FLOAT',
+        'decimal' => 'DECIMAL',
+        'datetime' => 'TIMESTAMP',
+        'date' => 'DATE',
+        'time' => 'TIME',
+        'timestamp' => 'TIMESTAMP',
+        'binary' => 'BYTEA',
+        'boolean' => 'BOOLEAN'
+    ];
+
     /**
         * This is the new create Table function
         *
@@ -46,7 +61,7 @@ class PgsqlSchema extends BaseSchema
             }
             // pgsql does not support collate as default, use this option if its not supplied
             if (isset($options['collate']) and ! isset($definition['collate'])) {
-                $definition['collate'] = options['collation'];
+                $definition['collate'] = $options['collation'];
             }
             $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
         }
@@ -87,14 +102,16 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-        * This is the new create Table function
-        * @internal on pgsql indexes have to be created outside of the table definition
-        *
-        * @param string $table
-        * @param array $params array of columns with reserved keys indexes, constraints
-        * @param array $options (database specific options e.g mysql engine)
-        * @return array
-        */
+    * This is the new create Table function
+    * @internal on pgsql indexes have to be created outside of the table definition
+    *
+    * @param string $table
+    * @param array $columns
+    * @param array $constraints
+    * @param array $indexes
+    * @param array $options
+    * @return array
+    */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
     {
         $out = $comments = [];
@@ -124,7 +141,7 @@ class PgsqlSchema extends BaseSchema
     /**
     * This creates a foreignKey table parameter
     *
-    * @param array attributes name,columns,references, update,delete
+    * @param array $attributes name,columns,references, update,delete
     * @return string
     */
     protected function tableConstraintForeign(array $attributes) :string
@@ -147,7 +164,6 @@ class PgsqlSchema extends BaseSchema
     /**
     * Creates the contraint code
     *
-    * @param string $table
     * @param array $attributes
     * @return string
     */
@@ -192,36 +208,6 @@ class PgsqlSchema extends BaseSchema
             $this->quoteIdentifier($attributes['table']),
             implode(', ', (array) $attributes['column'])
      );
-    }
-
-    /**
-     * Try to map types
-     *
-     * @param string $type
-     * @return string
-     */
-    private function column(string $type) : string
-    {
-        $result = 'string';
-        if (in_array($type, ['integer', 'text', 'date', 'time', 'boolean', 'bigint'])) {
-            $result = $type;
-        }
-        // Char and varchar
-        elseif (strpos($type, 'character') !== false or $type === 'uuid') {
-            $result = 'string';
-        } elseif (strpos($type, 'timestamp') !== false) {
-            $result = 'datetime';
-        } elseif (in_array($type, ['decimal', 'numeric'])) {
-            $result = 'decimal';
-        } elseif (strpos($type, 'time') !== false) { // time without time zone,with etc
-            $result = 'time';
-        } elseif (strpos($type, 'bytea') !== false) {
-            $result = 'binary';
-        } elseif (in_array($type, ['float', 'real', 'double', 'double precision'])) {
-            $result = 'float';
-        }
-
-        return $result;
     }
 
     /**
@@ -291,14 +277,15 @@ class PgsqlSchema extends BaseSchema
     public function changeColumn(string $table, string $name, string $type, array $options = []) : string
     {
         $options += ['default' => null, 'null' => null];
-        if (isset($this->columns[$type])) {
-            $options = array_merge($this->columns[$type], $options);
+        if (isset($this->typeMap[$type])) {
             $agnoType = $type;
-            $type = $this->columns[$type]['name'];
+            $type = $this->typeMap[$type];
 
-            if ($agnoType === 'decimal' or $agnoType === 'float') {
+            if ($agnoType === 'decimal') {
+                $options += ['precision' => 10,'scale' => 0];
                 $type = "{$type}({$options['precision']},{$options['scale']})";
-            } elseif (in_array($agnoType, ['string']) and ! empty($options['limit'])) {
+            } elseif ($agnoType === 'string') {
+                $options += ['limit' => 255];
                 $type = "{$type}({$options['limit']})";
             }
         }
@@ -347,9 +334,7 @@ class PgsqlSchema extends BaseSchema
      * Returns a remove index SQL stataement
      *
      * @param string $table
-     * @param string|array $column owner_id, [owner_id,tenant_id]
-     * @param array $options
-     *  - name: name of index
+     * @param string $name
      * @return string
      */
     public function removeIndex(string $table, string $name) : string
@@ -509,9 +494,10 @@ class PgsqlSchema extends BaseSchema
 
     /**
     * Returns a SQL statement for dropping a table
+    *
     * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
     * @param string $table
-    * @param array options (ifExists)
+    * @param array $options ifExists default is false
     * @return string
     */
     public function dropTableSql(string $table, array $options = []) : string
@@ -603,28 +589,13 @@ class PgsqlSchema extends BaseSchema
     {
         $out = $this->quoteIdentifier($data['name']);
 
-        $typeMap = [
-            'string' => 'VARCHAR',
-            'text' => 'TEXT',
-            'integer' => 'INTEGER',
-            'bigint' => 'BIGINT',
-            'float' => 'FLOAT',
-            'decimal' => 'DECIMAL',
-            'datetime' => 'TIMESTAMP',
-            'date' => 'DATE',
-            'time' => 'TIME',
-            'timestamp' => 'TIMESTAMP',
-            'binary' => 'BYTEA',
-            'boolean' => 'BOOLEAN',
-        ];
-
         /**
          * Work with mapped or custom types
          */
         $type = $data['type'];
-        $isMapped = isset($typeMap[$data['type']]);
+        $isMapped = isset($this->typeMap[$data['type']]);
         if ($isMapped) {
-            $type = $typeMap[$data['type']];
+            $type = $this->typeMap[$data['type']];
         }
         
         /**
@@ -771,93 +742,5 @@ class PgsqlSchema extends BaseSchema
         }
 
         return ['type' => 'string'];
-    }
-
-    # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
-
-    /**
-        * This is the map for database agnostic, if its not found here then
-        * use what user supplies. @important. This will allow using char and medium text when testing
-        *
-        * @var array
-        */
-    protected $columns = [
-        'primaryKey' => ['name' => 'SERIAL NOT NULL'],
-        'string' => ['name' => 'VARCHAR', 'limit' => 255],
-        'text' => ['name' => 'TEXT'],
-        'integer' => ['name' => 'INTEGER'],
-        'bigint' => ['name' => 'BIGINT'],
-        'float' => ['name' => 'FLOAT'],  # Floats get complicated, float(2) converts to real(24).
-        'decimal' => ['name' => 'DECIMAL', 'precision' => 10, 'scale' => 0],
-        'datetime' => ['name' => 'TIMESTAMP'],
-        'timestamp' => ['name' => 'TIMESTAMP'],
-        'date' => ['name' => 'DATE'],
-        'time' => ['name' => 'TIME'],
-        'binary' => ['name' => 'BYTEA'],
-        'boolean' => ['name' => 'BOOLEAN'],
-    ];
-
-    /**
-    * Gets the schema
-    * @internal postgre
-    * @param string $table
-    * @return array
-    * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin_test'  AND table_name = 'articles' AND table_schema = 'public'
-    */
-    public function schema(string $table) : array
-    {
-        $sql = 'SELECT DISTINCT column_name AS name, data_type AS type, character_maximum_length AS "char_length",numeric_precision ,numeric_scale , column_default AS default,  is_nullable AS "null",character_octet_length AS oct_length, ordinal_position AS position FROM information_schema.columns
-        WHERE table_catalog = \'' . $this->connection()->database() . '\' AND  table_name = \'' . $table . '\' AND table_schema = \'public\'  ORDER BY position';
-
-        $schema = [];
-
-        if ($results = $this->fetchAll($sql)) {
-       
-            /**
-             * @todo defaults should be type,length,default,null (remove length if empty)
-             */
-
-            foreach ($results as $result) {
-                $data = ['type' => null, 'limit' => null, 'default' => null, 'null' => null];
-                $data['type'] = $this->column($result['type']);
-                if ($data['type'] === 'string' and $result['type'] === 'character varying') {
-                    $data['limit'] = $result['char_length'];
-                } elseif (in_array($data['type'], ['decimal', 'float'])) {
-                    if ($result['numeric_precision']) {
-                        $data['precision'] = $result['numeric_precision'];
-                    }
-                    if ($result['numeric_scale']) {
-                        $data['scale'] = $result['numeric_scale'];
-                    }
-                }
-
-                $data['null'] = ($result['null'] === 'YES' ? true : false);
-                //nextval
-                $position = strpos($result['default'], '::character varying');
-                $isAuto = (strpos($result['default'], 'nextval') !== false);
-                if ($position !== false and ! $isAuto) {
-                    $data['default'] = trim(substr($result['default'], 0, $position), "'"); // parse 'foo'::character varying
-                } elseif (! empty($result['default']) and ! $isAuto) {
-                    $data['default'] = $result['default'];
-                }
-
-                if ($isAuto) {
-                    $data['autoIncrement'] = true;
-                }
-
-                /**
-                 * Detect Primary Key
-                 * @see SELECT * from information_schema.columns WHERE table_catalog = 'origin'  AND table_name = 'bookmarks' AND table_schema = 'public'
-                 * @todo This wont work for join tables with two primary keys
-                 */
-                if ($isAuto or ($result['name'] === 'id' and $data['type'] === 'integer')) {
-                    $data['key'] = 'primary'; // Assume id is primary key
-                    $data['type'] = 'primaryKey';
-                }
-                $schema[$result['name']] = $data;
-            }
-        }
-
-        return $schema;
     }
 }

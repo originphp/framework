@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,11 +13,10 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-declare(strict_types=1);
-
 namespace Origin\Model;
 
-use Origin\Utility\Inflector;
+use ArrayObject;
+use Origin\Inflector\Inflector;
 
 class Association
 {
@@ -60,9 +60,9 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
-        $tableAlias = Inflector::tableName($this->model->alias);
+        $tableAlias = Inflector::tableName($this->model->alias());
         $associationTableAlias = Inflector::tableName($association);
         $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
 
@@ -110,7 +110,7 @@ class Association
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscored($this->extractClass($options['className'])) . '_id';
         }
-        $alias = Inflector::tableName($this->model->alias);
+        $alias = Inflector::tableName($this->model->alias());
         $associatedAlias = Inflector::tableName($association);
 
         $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
@@ -130,6 +130,7 @@ class Association
         } elseif (strpos($class, '.')) {
             list($plugin, $class) = pluginSplit($class);
         }
+
         return $class;
     }
 
@@ -167,7 +168,7 @@ class Association
         ];
 
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
 
         return $options;
@@ -226,7 +227,7 @@ class Association
         $class = $this->extractClass($options['className']);
 
         // join table in alphabetic order
-        $models = [$this->model->name, $class];
+        $models = [$this->model->name(), $class];
         sort($models);
         $models = array_values($models);
 
@@ -238,7 +239,7 @@ class Association
             $options['joinTable'] = Inflector::plural(Inflector::underscored($options['with']));
         }
         if (is_null($options['foreignKey'])) {
-            $options['foreignKey'] = Inflector::underscored($this->model->name) . '_id';
+            $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
         if (is_null($options['associationForeignKey'])) {
             $options['associationForeignKey'] = Inflector::underscored($class) . '_id';
@@ -253,5 +254,235 @@ class Association
         $options['conditions'] = $conditions;
 
         return $options;
+    }
+
+    /**
+     * Saves the parents
+     *
+     * @param Entity $data
+     * @param ArrayObject $options
+     * @return boolean
+     */
+    public function saveBelongsTo(Entity $data, ArrayObject $options) : bool
+    {
+        $associatedOptions = ['transaction' => false] + (array) $options;
+       
+        foreach ($this->model->association('belongsTo') as $alias => $config) {
+            $key = lcfirst($alias);
+            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
+                continue;
+            }
+
+            if ($data->$key->modified()) {
+                if (! $this->model->$alias->save($data->$key, $associatedOptions)) {
+                    return false;
+                }
+                $foreignKey = $this->model->association('belongsTo')[$alias]['foreignKey'];
+                $data->$foreignKey = $this->model->$alias->id();
+            }
+        }
+
+        return true;
+    }
+
+    public function saveHasOne(Entity $data, ArrayObject $options) : bool
+    {
+        $associatedOptions = ['transaction' => false] + (array) $options;
+        foreach ($this->model->association('hasOne') as $alias => $config) {
+            $key = lcfirst($alias);
+            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
+                continue;
+            }
+            if ($data->$key->modified()) {
+                $foreignKey = $this->model->association('hasOne')[$alias]['foreignKey'];
+                $data->$key->$foreignKey = $this->model->id();
+
+                if (! $this->model->$alias->save($data->get($key), $associatedOptions)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function saveHasMany(Entity $data, ArrayObject $options) : bool
+    {
+        $associatedOptions = ['transaction' => false] + (array) $options;
+        foreach ($this->model->association('hasMany') as $alias => $config) {
+            $key = Inflector::plural(lcfirst($alias));
+            if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
+                continue;
+            }
+
+            $foreignKey = $this->model->association('hasMany')[$alias]['foreignKey'];
+
+            foreach ($data->get($key) as $record) {
+                if (! $record instanceof Entity) {
+                    continue;
+                }
+                if ($record->modified()) {
+                    $record->$foreignKey = $data->{$this->model->primaryKey()};
+                    if (! $this->model->$alias->save($record, $associatedOptions)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function saveHasAndBelongsToMany(array $habtm, bool $callbacks) : bool
+    {
+        foreach ($habtm as $alias => $data) {
+            if (! $this->saveHABTM($alias, $data, $callbacks)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+    * Saves the hasAndBelongsToMany data
+    *
+    * @param string $association
+    * @param Collection|array $data
+    * @param boolean $callbacks
+    * @return bool
+    */
+    private function saveHABTM(string $association, $data, bool $callbacks) : bool
+    {
+        $connection = $this->model->connection();
+
+        $config = $this->model->association('hasAndBelongsToMany')[$association];
+        $joinModel = $this->model->{$config['with']};
+
+        $links = [];
+
+        foreach ($data as $row) {
+            $primaryKey = $this->model->$association->primaryKey();
+            $displayField = $this->model->$association->displayField();
+
+            // Either primaryKey or DisplayField must be set in data
+            if ($row->has($primaryKey)) {
+                $needle = $primaryKey;
+            } elseif ($row->has($displayField)) {
+                $needle = $displayField;
+            } else {
+                return false;
+            }
+
+            $tag = $this->model->$association->find('first', [
+                'conditions' => [$needle => $row->get($needle)],
+                'callbacks' => false,
+            ]);
+
+            if ($tag) {
+                $id = $tag->get($primaryKey);
+                $links[] = $id;
+                $row->set($primaryKey, $id);
+            } else {
+                if (! $this->model->$association->save($row, [
+                    'callbacks' => $callbacks,
+                    'transaction' => false,
+                ])) {
+                    return false;
+                }
+                $links[] = $this->model->$association->id();
+            }
+
+            $joinModel = $this->model->{$config['with']};
+        }
+
+        $existingJoins = $joinModel->find('list', [
+            'conditions' => [$config['foreignKey'] => $this->model->id()],
+            'fields' => [$config['associationForeignKey']],
+        ]);
+
+        $connection = $joinModel->connection();
+        // By adding ID field we can do delete callbacks
+        if ($config['mode'] === 'replace') {
+            $connection->delete($config['joinTable'], [$config['foreignKey'] => $this->model->id()]);
+        }
+
+        foreach ($links as $linkId) {
+            if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
+                continue;
+            }
+            $insertData = [
+                $config['foreignKey'] => $this->model->id(),
+                $config['associationForeignKey'] => $linkId,
+            ];
+            $connection->insert($joinModel->table(), $insertData);
+        }
+
+        return true;
+    }
+
+    /**
+     * Deletes the hasOne and hasMany associated records.
+     *
+     * @var int|string $primaryKey
+     * @param boolean $callbacks
+     * @return boolean
+     */
+    public function deleteDependent($primaryKey, bool $callbacks) : bool
+    {
+        foreach (array_merge($this->model->association('hasOne'), $this->model->association('hasMany')) as $association => $config) {
+            if (isset($config['dependent']) and $config['dependent'] === true) {
+                $conditions = [$config['foreignKey'] => $primaryKey];
+                $ids = $this->model->$association->find('list', [
+                    'conditions' => $conditions,
+                    'fields' => [$this->model->primaryKey()]
+                ]);
+                foreach ($ids as $id) {
+                    $conditions = [$this->model->$association->primaryKey() => $id];
+                    $result = $this->model->$association->find('first', [
+                        'conditions' => $conditions, 'callbacks' => false
+                    ]);
+                    if ($result) {
+                        $this->model->$association->delete($result, [
+                            'transaction' => false,'callbacks' => $callbacks
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Deletes the hasAndBelongsToMany associated records.
+     *
+     * @var int|string $id
+     * @param boolean $callbacks
+     * @return boolean
+     */
+    public function deleteHasAndBelongsToMany($id, bool $callbacks) : bool
+    {
+        foreach ($this->model->association('hasAndBelongsToMany') as $association => $config) {
+            $associatedModel = $config['with'];
+            $conditions = [$config['foreignKey'] => $id];
+            $ids = $this->model->$associatedModel->find('list', [
+                'conditions' => $conditions
+            ]);
+
+            foreach ($ids as $id) {
+                $conditions = [$this->model->$associatedModel->primaryKey() => $id];
+                $result = $this->model->$associatedModel->find('first', [
+                    'conditions' => $conditions, 'callbacks' => false
+                ]);
+                if ($result) {
+                    $this->model->$associatedModel->delete($result, [
+                        'transaction' => false,'callbacks' => $callbacks
+                    ]);
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -169,7 +170,7 @@ class QueryBuilder
      *
      * @var string
      */
-    public $placeholder = null;
+    protected $placeholder = null;
 
     /**
      * Placeholder counter
@@ -184,7 +185,7 @@ class QueryBuilder
      *
      * @var string
      */
-    public $escape = '`';
+    protected $escape = '`';
 
     /**
      * List of operators
@@ -529,7 +530,7 @@ class QueryBuilder
     /**
      * Converts an array of options into a insert statement.
      *
-     * @param array $data (data)
+     * @param array $params (data)
      * @return string $sql
      */
     public function insertStatement(array $params) : string
@@ -671,8 +672,7 @@ class QueryBuilder
      * Taks an array of fields, adds alaias, and then converts to string
      * for use in a statement.
      *
-     * @param array  $fields (id / user_name /email)
-     * @param string $alias  User
+     * @param array $fields (id / user_name /email)
      * @return string User.id, User.user_name, User.email
      */
     protected function fieldsToString(array $fields) : string
@@ -806,8 +806,7 @@ class QueryBuilder
     /**
      * Adds aliases to fields.
      *
-     * @param array  $fields
-     * @param string $alias
+     * @param array $fields
      * @return array
      */
     protected function addAliases(array $fields) : array
@@ -851,10 +850,10 @@ class QueryBuilder
     /**
      * Parses conditions to string, and adds aliases to the fields.
      *
-     * @param array  $alias      alias which conditions are for
-     * @param array  $conditions
-     * @param string $join       AND,OR,NOT
-     * @return string sql
+     * @param string $alias alias which conditions are for
+     * @param array $conditions
+     * @param string $join AND,OR,NOT
+     * @return string $sql
      */
     protected function conditions(string $alias, array $conditions, string $join = 'AND') : string
     {

@@ -15,8 +15,8 @@
 namespace Origin\Test\Console\ConsoleIo;
 
 use Origin\Console\ConsoleIo;
-use Origin\Exception\Exception;
 use Origin\Console\ConsoleInput;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 class MockConsoleInput extends ConsoleInput
@@ -255,7 +255,7 @@ EOF;
         $io = $this->io();
         $io->out('Hello World!');
         $io->clear();
-        $this->assertContains("\033c", $this->stdout->read());
+        $this->assertStringContainsString("\033c", $this->stdout->read());
     }
 
     public function testStyles()
@@ -270,7 +270,7 @@ EOF;
     {
         $io = $this->io();
         $io->progressBar(10, 20, ['ansi' => false]);
-        $this->assertContains('[#########################                         ] 50%', $this->stdout->read());
+        $this->assertStringContainsString('[#########################                         ] 50%', $this->stdout->read());
     }
 
     public function testAsk()
@@ -278,12 +278,12 @@ EOF;
         $io = $this->io();
         $this->stdin->set('y');
         $this->assertEquals('y', $io->ask('continue?'));
-        $this->assertContains('continue?', $this->stdout->read());
+        $this->assertStringContainsString('continue?', $this->stdout->read());
 
         $io = $this->io();
         $this->stdin->set('');
         $this->assertEquals('n', $io->ask('continue?', 'n'));
-        $this->assertContains('continue?', $this->stdout->read());
+        $this->assertStringContainsString('continue?', $this->stdout->read());
     }
 
     public function testAskChoice()
@@ -291,39 +291,39 @@ EOF;
         $io = $this->io();
         $this->stdin->set('y');
         $this->assertEquals('y', $io->askChoice('continue?', ['y','n']));
-        $this->assertContains('continue?', $this->stdout->read());
+        $this->assertStringContainsString('continue?', $this->stdout->read());
 
         $io = $this->io();
         $this->stdin->set('');
         $this->assertEquals('n', $io->askChoice('continue?', ['y','n'], 'n'));
-        $this->assertContains('continue?', $this->stdout->read());
+        $this->assertStringContainsString('continue?', $this->stdout->read());
     }
 
     public function testStatus()
     {
         $io = $this->io();
         $io->status('ok', 'All Good');
-        $this->assertContains('<white>[</white> <green>OK</green> <white>] All Good</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <green>OK</green> <white>] All Good</white>', $this->stdout->read());
 
         $io = $this->io();
         $io->status('error', 'An Error Occured');
-        $this->assertContains('<white>[</white> <red>ERROR</red> <white>] An Error Occured</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <red>ERROR</red> <white>] An Error Occured</white>', $this->stdout->read());
 
         $io = $this->io();
         $io->status('ignore', 'The Status Text');
-        $this->assertContains('<white>[</white> <yellow>IGNORE</yellow> <white>] The Status Text</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <yellow>IGNORE</yellow> <white>] The Status Text</white>', $this->stdout->read());
 
         $io = $this->io();
         $io->status('skipped', 'The Status Text');
-        $this->assertContains('<white>[</white> <cyan>SKIPPED</cyan> <white>] The Status Text</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <cyan>SKIPPED</cyan> <white>] The Status Text</white>', $this->stdout->read());
 
         $io = $this->io();
         $io->status('started', 'The Status Text');
-        $this->assertContains('<white>[</white> <green>STARTED</green> <white>] The Status Text</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <green>STARTED</green> <white>] The Status Text</white>', $this->stdout->read());
 
         $io = $this->io();
         $io->status('stopped', 'The Status Text');
-        $this->assertContains('<white>[</white> <yellow>STOPPED</yellow> <white>] The Status Text</white>', $this->stdout->read());
+        $this->assertStringContainsString('<white>[</white> <yellow>STOPPED</yellow> <white>] The Status Text</white>', $this->stdout->read());
 
         $this->expectException(Exception::class);
         $io = $this->io();

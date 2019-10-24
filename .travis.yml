@@ -2,21 +2,18 @@ language: php
 php:
   - 7.2
   - 7.3
+  - 7.4snapshot
 dist: xenial
 env:
   global:
-    - MEMCACHED_HOST=localhost MEMCACHED_PORT=11211
     - REDIS_HOST=localhost REDIS_PORT=6379
-    - ES_VERSION="7.3.0"
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
     - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
 services:
   - mysql
   - postgresql
-  - memcached
   - redis-server
-  - docker
 before_install:
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin;'; fi
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
@@ -26,13 +23,9 @@ before_install:
   - echo yes | pecl install -f apcu
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - echo 'extension = memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
-  - docker pull docker.elastic.co/elasticsearch/elasticsearch:7.3.0
-  - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.3.0
 before_script:
   - composer install --prefer-source --no-interaction
 script:
-  - sleep 10
   - vendor/bin/phpunit --coverage-clover=clover.xml
 after_script:
   - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
@@ -40,9 +33,5 @@ after_script:
 cache:
   directories:
     - $HOME/.composer/cache/files
-deploy:
-  on:
-    branch: master
-    tags: true
 after_success:
   - bash <(curl -s https://codecov.io/bash)

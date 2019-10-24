@@ -18,11 +18,11 @@ use Origin\I18n\Number;
 
 class NumberTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    protected function setUp() : void
     {
         Number::locale('en_US');
     }
-    protected function tearDown()
+    protected function tearDown() : void
     {
         Number::locale('en_US');
     }

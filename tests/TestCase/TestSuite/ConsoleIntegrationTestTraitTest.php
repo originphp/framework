@@ -14,8 +14,8 @@
 
 namespace Origin\Test\TestSuite;
 
-use Origin\Command\Command;
 use Origin\TestSuite\TestTrait;
+use Origin\Console\Command\Command;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
 
 class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
@@ -29,12 +29,13 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains('Hello world!');
         $this->assertOutputRegExp('/WORLD/i');
         $this->assertExitSuccess();
+        $this->assertExitCode(0);
     }
 
     public function testOutput()
     {
         $this->exec('test say');
-        $this->assertContains('Hello world!', $this->output());
+        $this->assertStringContainsString('Hello world!', $this->output());
     }
 
     public function testExecInput()
@@ -52,12 +53,13 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertErrorContains('OMG! Its all Gone pete tong');
         $this->assertErrorRegExp('/PETE/i');
         $this->assertErrorNotContains('Tony DeVit');
+        $this->assertExitCode(1);
     }
 
     public function testError()
     {
         $this->exec('test omg');
-        $this->assertContains('OMG! Its all Gone pete tong', $this->error());
+        $this->assertStringContainsString('OMG! Its all Gone pete tong', $this->error());
     }
 
     public function testEmpty()

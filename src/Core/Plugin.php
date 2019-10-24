@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,7 +15,7 @@
 
 namespace Origin\Core;
 
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 use Origin\Core\Exception\MissingPluginException;
 
 /**
@@ -50,6 +51,22 @@ class Plugin
                 static::load($plugin, ['path' => ROOT . $path, 'autoload' => false]);
             }
         }
+    }
+
+    /**
+     * Gets a path for a plugin
+     *
+     * @param string $plugin
+     * @return string
+     * @throws \Origin\Core\Exception\MissingPluginException
+     */
+    public static function path(string $plugin) : string
+    {
+        if (! isset(static::$loaded[$plugin])) {
+            throw new MissingPluginException($plugin);
+        }
+
+        return static::$loaded[$plugin]['path'];
     }
 
     /**
@@ -148,7 +165,6 @@ class Plugin
     /**
      * Loads  the routes for all the plugins
      *
-     * @param string $plugin
      * @return void
      */
     public static function loadRoutes() : void

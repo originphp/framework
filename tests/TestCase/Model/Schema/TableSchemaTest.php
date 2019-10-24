@@ -14,7 +14,7 @@
 
 namespace Origin\Test\Model\Schema;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Model\Schema\TableSchema;
 use Origin\TestSuite\OriginTestCase;
 

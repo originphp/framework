@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -13,17 +14,20 @@
  */
 namespace Origin\Core;
 
+use ReflectionMethod;
+use ReflectionException;
+
 trait InitializerTrait
 {
-
     /**
-     * Initializes Traits where their is a method with the name of the Trait.
+     * Initializes Traits where their is a method initializeTraitNameWithoutTraitSuffix
      *
      * Example
      *
      *   trait DeletableTrait
      *   {
-     *      public function deleteable(){
+     *      protected function intializeDeleteable()
+     *      {
      *
      *      }
      *    }
@@ -32,23 +36,50 @@ trait InitializerTrait
      *
      * @return void
      */
-    private function initializeTraits()
+    private function initializeTraits() : void
     {
         $class = $this;
+     
         $traits = [];
         while ($class) {
             $traits = array_merge(class_uses($class), $traits);
             $class = get_parent_class($class);
         }
-        
+    
         $traits = array_unique($traits);
 
+        $args = func_get_args() ?? [];
         foreach ($traits as $trait) {
             list($namespace, $className) = namespaceSplit($trait);
-            $method = substr($className, 0, -5);
-            if (method_exists($this, $method)) {
-                $this->$method(...func_get_args());
+          
+            $method = $className;
+            if (strpos($className, 'Trait') !== false) {
+                $method = substr($className, 0, -5);
+            }
+
+            $method = 'initialize' . $method;
+            if ($this->hasMethod($this, $method)) {
+                $this->$method(...$args);
             }
         }
+    }
+
+    /**
+     * Checks if the object has a method
+     *
+     * @param object $object
+     * @param string $method
+     * @return boolean
+     */
+    private function hasMethod(object $object, string $method) : bool
+    {
+        try {
+            $method = new ReflectionMethod($object, $method);
+
+            return ($method->isPublic() or $method->isProtected());
+        } catch (ReflectionException $e) {
+        }
+
+        return false;
     }
 }

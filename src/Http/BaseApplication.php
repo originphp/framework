@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -18,40 +19,78 @@ namespace Origin\Http;
  */
 
 use Origin\Core\Resolver;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\HookTrait;
+use Origin\Http\Middleware\Middleware;
+use Origin\Http\Middleware\MiddlewareRunner;
+use Origin\Http\Middleware\DispatcherMiddleware;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class BaseApplication
 {
+    use HookTrait;
+    
+    /**
+     * @var \Origin\Http\MiddlewareRunner $runner
+     */
     protected $runner = null;
 
-    public function __construct(Request $request, Response $response, MiddlewareRunner $runner = null)
-    {
-        if ($runner === null) {
-            $runner = new MiddlewareRunner();
-        }
-        $this->runner = $runner;
+    /**
+     * Holds the request object.
+     *
+     * @var \Origin\Http\Request
+     */
+    private $request = null;
 
-        $this->initialize();
-        $this->loadMiddleware('Dispatcher'); # By running last it will run process/shutdown first
-        $this->runner->run($request, $response);
+    /**
+     * Holds the response object.
+     *
+     * @var \Origin\Http\Response
+     */
+    private $response = null;
+
+    /**
+     * This is the constructor, here you can inject different
+     *
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @param \Origin\Http\MiddlewareRunner $runner
+     */
+    public function __construct(Request $request = null, Response $response = null, MiddlewareRunner $runner = null)
+    {
+        $this->request = $request ?: new Request();
+        $this->response = $response ?: new Response();
+        $this->runner = $runner ?: new MiddlewareRunner();
+
+        $this->executeHook('initialize');
     }
 
     /**
-     * This is where middleware is setup
+     * Dispatches the application
+     *
+     * @return \Origin\Http\Response
      */
-    public function initialize()
+    public function dispatch() : Response
     {
+       
+        # By running last it will run it first during process
+        $this->addMiddleware(new DispatcherMiddleware);
+
+        $this->executeHook('startup');
+        $this->runner->run($this->request, $this->response);
+        $this->executeHook('shutdown');
+        
+        return $this->response;
     }
 
     /**
      * Adds a middleware object to the queue
      *
-     * $this->addMiddleware(new FormSecurity());
+     * $this->addMiddleware(new FormSecurityMiddleware());
      *
-     * @param \Origin\Middleware\Middleware $object
+     * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
-    public function addMiddleware(Middleware $object)
+    public function addMiddleware(Middleware $object) : void
     {
         $this->runner->add($object);
     }
@@ -63,14 +102,14 @@ class BaseApplication
      *
      * $this->loadMiddleware('FormSecurity');
      * $this->loadMiddleware('MyPlugin.FormSecurity');
-     * $this->loadMiddleware('App\Middleware\FormSecurityMiddleware');
+     * $this->loadMiddleware('App\Http\Middleware\FormSecurityMiddleware');
      *
-     * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Middleware\FormSecurityMiddleware
+     * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Http\Middleware\FormSecurityMiddleware
      * @return void
      */
-    public function loadMiddleware(string $name)
+    public function loadMiddleware(string $name) : void
     {
-        $className = Resolver::className($name, 'Middleware', 'Middleware');
+        $className = Resolver::className($name, 'Middleware', 'Middleware', 'Http');
         if (empty($className)) {
             throw new InvalidArgumentException(sprintf('Unkown Middleware %s', $name));
         }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,7 +17,8 @@ namespace Origin\Console;
 
 use Origin\Core\Config;
 use Origin\Core\Plugin;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
+use Origin\Console\Command\Command;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 
@@ -26,10 +28,13 @@ class CommandRunner
     /**
      * Holds the Command from RUN
      *
-     * @var \Origin\Command\Command
+     * @var \Origin\Console\Command\Command
      */
-    protected $command = null;
+    protected $command;
 
+    /**
+     * @var array
+     */
     protected $commands = [];
 
     /**
@@ -41,7 +46,7 @@ class CommandRunner
     protected $namespaces = [];
 
     /**
-     * Undocumented variable.
+     * Console IO object
      *
      * @var \Origin\Console\ConsoleIo
      */
@@ -59,24 +64,29 @@ class CommandRunner
 
     /**
      * Builds a map of namespaces and directories. First the framework then App.
+     *
+     * @return void
      */
-    protected function buildNamespaceMap()
+    protected function buildNamespaceMap() : void
     {
+        $folder = 'Console' .DS .'Command';
         $this->namespaces = [
-            'Origin' => ORIGIN.'/src/Command',
-            Config::read('App.namespace') => SRC.'/Command',
+            'Origin' => ORIGIN . DS . 'src' . DS . $folder,
+            Config::read('App.namespace') => APP . DS . $folder
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = Plugin::path($plugin).'/src/Command';
+            $this->namespaces[$plugin] = Plugin::path($plugin) . DS . 'src' . DS . $folder;
         }
     }
-  
+
     /**
      * Goes through discovery process.
+     *
+     * @return void
      */
-    protected function autoDiscover()
+    protected function autoDiscover() : void
     {
         $this->buildNamespaceMap();
 
@@ -86,16 +96,20 @@ class CommandRunner
         }
     }
 
-    protected function getDescriptions()
+    /**
+     * Gets the list of descriptions of the commands
+     *
+     * @return array
+     */
+    protected function getDescriptions() : array
     {
         $results = [];
         foreach ($this->discovered as $index => $command) {
             $class = $command['namespace'].'\\'.$command['className'];
-
             if (! class_exists($class)) {
                 throw new ConsoleException(sprintf('%s does not exist or cannot be found', $class));
             }
-            $object = new $class();
+            $object = $this->createCommand($class);
             $name = $object->name();
   
             list($ns, $cmd) = commandSplit($name);
@@ -108,15 +122,16 @@ class CommandRunner
     /**
      * This the workhorse, runs the command, displays help.
      *
-     * @param array     $args
+     * @param array $args
+     * @return integer exit code
      */
-    public function run(array $args)
+    public function run(array $args) : int
     {
         array_shift($args); // first arg is the script that called it
         if (empty($args)) {
             $this->displayHelp();
 
-            return;
+            return Command::SUCCESS;
         }
   
         $this->command = $this->findCommand($args[0]);
@@ -126,21 +141,21 @@ class CommandRunner
             try {
                 return $this->command->run($args);
             } catch (StopExecutionException $ex) {
-                return false;
+                return $ex->getCode();
             }
         } else {
             $this->io->error("Command `{$args[0]}` not found"); // Original
         }
 
-        return false;
+        return Command::ERROR;
     }
 
     /**
      * Returns the Command object that was created
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command
      */
-    public function command()
+    public function command() : Command
     {
         return $this->command;
     }
@@ -151,39 +166,43 @@ class CommandRunner
      *
      * @param string $command
      *
-     * @return \Origin\Command\Command
+     * @return \Origin\Console\Command\Command|null
      */
-    public function findCommand(string $command)
+    public function findCommand(string $command) : ?Command
     {
         # Use Conventions - Faster
         $namespace = Config::read('App.namespace');
-        $className = $namespace.'\\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
-        if (class_exists($className)) {
-            $object = new $className($this->io);
-            if ($object->name() === $command) {
-                return $object;
-            }
+        $className = $namespace.'\Console\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
+       
+        $object = $this->createCommand($className);
+        if ($object and $object->name() === $command) {
+            return $object;
         }
-
+       
         $this->autoDiscover();
         $commands = $this->getCommandList();
      
+        $object = null;
         if (isset($commands[$command])) {
-            $className = $commands[$command];
-
-            return new $className($this->io);
+            $object = $this->createCommand($commands[$command]);
         }
 
-        return null;
+        return $object;
     }
 
-    protected function getCommandList()
+    /**
+     * Returns the list of commands
+     *
+     * @return array
+     */
+    protected function getCommandList() : array
     {
         $results = [];
+
         foreach ($this->discovered as $command) {
             $class = $command['namespace'].'\\'.$command['className'];
             if (class_exists($class)) {
-                $object = new $class();
+                $object = $this->createCommand($class);
                 $results[$object->name()] = $class;
             }
         }
@@ -191,7 +210,12 @@ class CommandRunner
         return $results;
     }
 
-    protected function displayHelp()
+    /**
+     * Displays help to screen
+     *
+     * @return void
+     */
+    protected function displayHelp() : void
     {
         $this->autoDiscover();
         $commands = $this->getDescriptions();
@@ -238,13 +262,16 @@ class CommandRunner
      *
      * @param string $directory
      * @param string $namespace
+     * @return array
      */
-    public function scanDirectory(string $directory, string $namespace)
+    public function scanDirectory(string $directory, string $namespace) : array
     {
         $results = [];
+
         if (! file_exists($directory)) {
             return [];
         }
+       
         $files = scandir($directory);
        
         foreach ($files as $file) {
@@ -254,12 +281,35 @@ class CommandRunner
             if (substr($file, -11) === 'Command.php' and $file !== 'Command.php') {
                 $results[] = [
                     'className' => substr($file, 0, -4),
-                    'namespace' => $namespace.'\\Command',
+                    'namespace' => $namespace.'\Console\Command',
                     'filename' => $directory.DS.$file,
                 ];
             }
         }
 
         return $results;
+    }
+
+    /**
+     * Creates a Command object and catches warnings
+     *
+     * @param string $class
+     * @return \Origin\Console\Command|null
+     */
+    protected function createCommand(string $class) : ?Command
+    {
+        $object = null;
+        if (class_exists($class)) {
+            try {
+                $object = new $class($this->io);
+            } catch (\ErrorException $exception) {
+                // there is an issue in the command
+                throw new ConsoleException(sprintf('%s in %s', $exception->getMessage(), $class));
+            }
+
+            return $object;
+        }
+
+        return null;
     }
 }

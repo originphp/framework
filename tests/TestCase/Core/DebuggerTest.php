@@ -42,7 +42,7 @@ class DebuggerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('stackFrames', $result);
         $frame = $result['stackFrames'][0];
-        $this->assertContains('/Framework/TestCase.php', $frame['file']);
+        $this->assertStringContainsString('/Framework/TestCase.php', $frame['file']);
         $this->assertNotNull($frame['line']); // This changes between systems or versions
         $this->assertEquals('Origin\Test\Core\DebuggerTest', $frame['class']);
         $this->assertEquals('testBacktrace', $frame['function']);

@@ -15,14 +15,24 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\TestSuite\Fixture;
-use Origin\Exception\Exception;
 use Origin\TestSuite\TestTrait;
+use Origin\Core\Exception\Exception;
 use Origin\Test\Fixture\PostFixture;
 use Origin\TestSuite\FixtureManager;
 
 class MockTestCase
 {
-    public $fixtures = ['Framework.Post'];
+    protected $fixtures = ['Framework.Post'];
+
+    public function fixtures() : array
+    {
+        return $this->fixtures;
+    }
+}
+
+class MockPostFixture extends PostFixture
+{
+    use TestTrait;
 }
 
 class MockFixtureManager extends FixtureManager
@@ -31,7 +41,7 @@ class MockFixtureManager extends FixtureManager
 
     public function setDropTables($fixture, $value)
     {
-        $this->loaded[$fixture]->dropTables = $value;
+        $this->loaded[$fixture]->dropTables($value);
     }
 
     public function setSchema(string $fixture, array $schema)
@@ -42,6 +52,11 @@ class MockFixtureManager extends FixtureManager
     {
         $this->loaded[$fixture]->records = $records;
     }
+
+    public function setFixture($name, $fixture)
+    {
+        $this->loaded[$name] = $fixture;
+    }
 }
 
 class FixtureManagerTest extends \PHPUnit\Framework\TestCase
@@ -51,7 +66,10 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         // Create a stub for the SomeClass class.
         $stub = $this->createMock(PostFixture::class);
        
-        $stub->dropTables = true;
+        $stub->expects($this->any())
+            ->method('dropTables')
+            ->will($this->returnValue(true));
+   
         $stub->expects($this->once())->method('drop');
         $stub->expects($this->once())->method('create');
         $stub->expects($this->once())->method('insert');
@@ -68,7 +86,10 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         // Create a stub for the SomeClass class.
         $stub = $this->createMock(PostFixture::class);
        
-        $stub->dropTables = false;
+        $stub->expects($this->any())
+            ->method('dropTables')
+            ->will($this->returnValue(false));
+
         $stub->expects($this->never())->method('drop');
         $stub->expects($this->never())->method('create');
         $stub->expects($this->once())->method('insert');
@@ -85,18 +106,28 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
         $FixtureManager = new MockFixtureManager();
         $TestCase = new MockTestCase();
 
-        // Load and Unload
-        $FixtureManager->load($TestCase);
-        $FixtureManager->unload($TestCase);
-
-        // Error creating Framework.Post fixture for test case Origin\Test\TestSuite\MockTestCase
-        $this->expectException(Exception::class);
-        $FixtureManager->setSchema('Framework.Post', [
+        // Create bad fixture
+        $PostFixture = new MockPostFixture;
+        $PostFixture->setProperty('schema', [
             'columns' => [
                 'id' => 'integer',
                 'text' => 'POSTTITLE(1234)',
             ],
         ]);
+
+        // Load and Unload
+        $FixtureManager->load($TestCase);
+        $FixtureManager->unload($TestCase);
+        
+        // Error creating Framework.Post fixture for test case Origin\Test\TestSuite\MockTestCase
+        $this->expectException(Exception::class);
+        $FixtureManager->setFixture('Framework.Post', $PostFixture);
+        /* $FixtureManager->setSchema('Framework.Post', [
+             'columns' => [
+                 'id' => 'integer',
+                 'text' => 'POSTTITLE(1234)',
+             ],
+         ]);*/
         $FixtureManager->load($TestCase);
     }
 
@@ -104,6 +135,10 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
     {
         $FixtureManager = new MockFixtureManager();
         $TestCase = new MockTestCase();
+        $PostFixture = new MockPostFixture;
+        $PostFixture->setProperty('records', [
+            ['id' => 'abc'],
+        ]);
 
         // Load and Unload
         $FixtureManager->load($TestCase);
@@ -111,9 +146,10 @@ class FixtureManagerTest extends \PHPUnit\Framework\TestCase
 
         // Error inserting records in Framework.Post fixture for test case Origin\Test\TestSuite\MockTestCase
         $this->expectException(Exception::class);
-        $FixtureManager->setRecords('Framework.Post', [
+        $FixtureManager->setFixture('Framework.Post', $PostFixture);
+        /*$FixtureManager->setRecords('Framework.Post', [
             ['id' => 'abc'],
-        ]);
+        ]);*/
         $FixtureManager->load($TestCase);
     }
 

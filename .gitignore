@@ -1,5 +1,7 @@
+/composer.lock
+/node_modules
 /phpunit.xml
-
-# ignore a file type
-#*.json
+/vendor
 .env
+.env.php
+.vscode

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,7 +15,7 @@
 
 namespace Origin\Model;
 
-use Origin\Exception\Exception;
+use Origin\Core\Exception\Exception;
 use Origin\Model\Schema\TableSchema;
 
 class Schema
@@ -25,7 +26,7 @@ class Schema
      * @param Datasource $datasource
      * @return array
      */
-    public function createSql(Datasource $datasource) : array
+    public function createSql(Connection $datasource) : array
     {
         $out = [];
 
@@ -81,7 +82,7 @@ class Schema
      * @param Datasource $datasource
      * @return array
      */
-    public function dropSql(Datasource $datasource) : array
+    public function dropSql(Connection $datasource) : array
     {
         $out = [];
         $properties = get_object_vars($this);
@@ -91,5 +92,16 @@ class Schema
         }
         
         return $out;
+    }
+
+    /**
+     * Gets the schema for a table
+     *
+     * @param string $table
+     * @return array|null
+     */
+    public function schema(string $table) : ?array
+    {
+        return $this->$table ?? null;
     }
 }

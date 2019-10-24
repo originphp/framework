@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,9 +13,6 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
- /**
-  * @todo implment array and hashes
-  */
 namespace Origin\Console;
 
 use Origin\Console\Exception\ConsoleException;
@@ -141,7 +139,7 @@ class ArgumentParser
      *  - default: null
      *  - required: default false
      *  - type: string, integer, boolean
-     *  - banner: for displayHelp. default is uppercase value e.g --datasource=DATASOURCE
+     *  - banner: for displayHelp. default is uppercase value e.g --connection=DATASOURCE
      * @return void
      */
     public function addOption(string $name, array $options = []) : void
@@ -212,9 +210,9 @@ class ArgumentParser
         $arguments = $options = [];
         $args = [];
         foreach ($argv as $key => $arg) {
-            if ($this->isLongOption($arg)) {
+            if (is_string($arg) and $this->isLongOption($arg)) {
                 $options = $this->parseLongOption($arg, $options);
-            } elseif ($this->isShortOption($arg)) {
+            } elseif (is_string($arg) and $this->isShortOption($arg)) {
                 $options = $this->parseShortOption($arg, $options);
             } else {
                 $args[] = $arg;
@@ -304,6 +302,10 @@ class ArgumentParser
             return (int) $value;
         }
 
+        if ($type === 'string') {
+            return (string) $value;
+        }
+
         return $value;
     }
     /**
@@ -336,13 +338,13 @@ class ArgumentParser
     }
 
     /**
-     * Parses a long option e.g. --datasource=1234
+     * Parses a long option e.g. --connection=1234
      *
-     * @param string $arg
+     * @param string|int $arg
      * @param array $options
      * @return array
      */
-    protected function parseLongOption(string $arg, array $options) : array
+    protected function parseLongOption($arg, array $options) : array
     {
         $option = substr($arg, 2);
         $name = $this->getOptionName($option);
@@ -356,11 +358,11 @@ class ArgumentParser
     /**
      * Parses a short option e.g. -ds=1234
      *
-     * @param string $arg
+     * @param int|string $arg
      * @param array $options
      * @return array
      */
-    protected function parseShortOption(string $arg, array $options) : array
+    protected function parseShortOption($arg, array $options) : array
     {
         $option = substr($arg, 1);
         $name = $this->getOptionName($option);
@@ -442,6 +444,7 @@ class ArgumentParser
         }
 
         $usages = $this->generateUsage($this->command);
+       
         if ($this->usage) {
             $usages = $usages ."\n" . $this->usage;
         }
@@ -539,8 +542,6 @@ class ArgumentParser
      */
     protected function generateUsage(string $command = 'command') : string
     {
-        $results = [];
-     
         $options = $arguments = [];
         foreach ($this->options as $option) {
             if (! empty($option['required'])) {
@@ -565,7 +566,7 @@ class ArgumentParser
         if (! empty($this->commands)) {
             $command .= ' command';
         }
-     
+    
         return $command . ' ' .  implode(' ', array_merge($options, $arguments));
     }
 }

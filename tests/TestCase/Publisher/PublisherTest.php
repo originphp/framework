@@ -6,7 +6,7 @@ use Origin\Publisher\Listener;
 use Origin\Publisher\Publisher;
 use Origin\Publisher\PublisherTrait;
 use Origin\TestSuite\OriginTestCase;
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class MockListener extends Listener
 {
@@ -56,9 +56,9 @@ class MockPublisher extends Publisher
  */
 class PublisherTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.User','Origin.Queue'];
+    protected $fixtures = ['Origin.User','Origin.Queue'];
 
-    public function startup()
+    public function startup() : void
     {
         $this->loadModel('User');
     }

@@ -15,9 +15,9 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\Model;
-use Origin\Exception\Exception;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
+use Origin\Core\Exception\Exception;
 
 class MockModelRegistry extends ModelRegistry
 {
@@ -36,6 +36,11 @@ class MockModelRegistry extends ModelRegistry
 class MockModel extends Model
 {
     use TestTrait;
+
+    public function connectionName()
+    {
+        return $this->connection;
+    }
 }
 
 class ModelRegistryTest extends \PHPUnit\Framework\TestCase
@@ -43,7 +48,7 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
     public function testConfig()
     {
         MockModelRegistry::resetInstance(); // Reset For Test
-        $config = ['datasource' => 'test'];
+        $config = ['connection' => 'test'];
         MockModelRegistry::config('User', $config);
         $this->assertEquals(['User' => $config], MockModelRegistry::config());
         $this->assertEquals($config, MockModelRegistry::config('User'));
@@ -90,10 +95,10 @@ class ModelRegistryTest extends \PHPUnit\Framework\TestCase
     public function testGetConfig()
     {
         MockModelRegistry::clear();
-        $config = ['datasource' => 'testGetConfig'];
+        $config = ['connection' => 'testGetConfig'];
         MockModelRegistry::config('Origin\Test\Model\MockModel', $config);
         $MockModel = MockModelRegistry::get('Origin\Test\Model\MockModel');
-        $this->assertEquals('testGetConfig', $MockModel->datasource);
+        $this->assertEquals('testGetConfig', $MockModel->connectionName());
         $this->assertNull(MockModelRegistry::config('Foo'));
 
         $this->expectException(Exception::class);

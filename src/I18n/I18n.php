@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -16,11 +17,11 @@ namespace Origin\I18n;
 
 use Locale;
 use Origin\Utility\Date;
-use Origin\Utility\Yaml;
 use Origin\Utility\Number;
-use Origin\Exception\Exception;
 use Origin\I18n\Date as I18nDate;
+use Origin\Core\Exception\Exception;
 use Origin\I18n\Number as I18nNumber;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\I18n\Exception\LocaleNotAvailableException;
 
 class I18n
@@ -132,16 +133,19 @@ class I18n
         static::$definition = null;
 
         $filename = null;
-        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.yml')) {
-            $filename = CONFIG . DS . 'locales' . DS . $locale .'.yml';
+        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.php')) {
+            $filename = CONFIG . DS . 'locales' . DS . $locale .'.php';
         } elseif (strpos($locale, '_') !== false) {
             list($language, $void) = explode('_', $locale, 2);
-            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.yml')) {
-                $filename = CONFIG . DS . 'locales' . DS . $language .'.yml';
+            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.php')) {
+                $filename = CONFIG . DS . 'locales' . DS . $language .'.php';
             }
         }
         if ($filename) {
-            static::$definition = Yaml::toArray(file_get_contents($filename));
+            static::$definition = include $filename;
+            if (! is_array(static::$definition)) {
+                throw new InvalidArgumentException('Invalid Definition File');
+            }
         }
 
         return static::$definition;
@@ -283,11 +287,11 @@ class I18n
     /**
      * Loads the message file for.
      *
-     * @param string $locale
+     * @param string $language
      */
     protected static function loadMessages(string $language) : void
     {
-        $filename = SRC . DS . 'Locale' . DS . $language . '.php';
+        $filename = APP . DS . 'Locale' . DS . $language . '.php';
         
         static::$messages = [];
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,20 +15,15 @@
 
 namespace Origin\Model;
 
+use Origin\Core\HookTrait;
+
 class Seed
 {
+    use HookTrait;
+    
     public function __construct()
     {
-        $this->initialize();
-    }
-
-    /**
-     * A hook for construct
-     *
-     * @return void
-     */
-    public function initialize()
-    {
+        $this->executeHook('initialize');
     }
     /**
      * Creates the SQL statements for inserting
@@ -35,12 +31,12 @@ class Seed
      * @param Datasource $connection
      * @return array
      */
-    public function insertSql(Datasource $connection) : array
+    public function insertSql(Connection $connection) : array
     {
         $out = [];
         $properties = get_object_vars($this);
         foreach (array_keys($properties) as $table) {
-            foreach ($this->{$table} as $record) {
+            foreach ($this->$table as $record) {
                 $builder = $connection->queryBuilder($table);
                 $sql = $builder->insert($record)->write();
                 $out[] = [$sql,$builder->getValues()];

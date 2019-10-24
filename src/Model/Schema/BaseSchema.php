@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -17,7 +18,7 @@
  */
 namespace Origin\Model\Schema;
 
-use Origin\Model\Datasource;
+use Origin\Model\Connection;
 use Origin\Model\ConnectionManager;
 
 abstract class BaseSchema
@@ -28,7 +29,7 @@ abstract class BaseSchema
      *
      * @var string
      */
-    public $datasource = null;
+    protected $datasource = null;
 
     /**
      * Holds the column mapping information
@@ -60,10 +61,9 @@ abstract class BaseSchema
      * This gets the createTable information from a table name
      *
      * @param string $table
-     * @param array $data
-     * @return void
+     * @return string
      */
-    abstract public function showCreateTable(string $table);
+    abstract public function showCreateTable(string $table) : string;
 
     /**
      * This describes the table in the database using the new format.
@@ -73,7 +73,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    abstract public function describe(string $table);
+    abstract public function describe(string $table) : array;
 
     /**
      * Generates the create table SQL, this is return as an array since some engines require
@@ -85,7 +85,7 @@ abstract class BaseSchema
      * @param array $options
      * @return array
      */
-    abstract public function createTableSql(string $table, array $schema, array $options = []);
+    abstract public function createTableSql(string $table, array $schema, array $options = []) : array;
    
     /**
      * Builds the create Table statements
@@ -109,21 +109,20 @@ abstract class BaseSchema
     * @param array $attributes
     * @return string
     */
-    abstract protected function tableIndex(array $attributes);
+    abstract protected function tableIndex(array $attributes) : string;
     
     /**
     * Creates the contraint code
     *
-    * @param string $table
     * @param array $attributes
     * @return string
     */
-    abstract protected function tableConstraint(array $attributes);
+    abstract protected function tableConstraint(array $attributes) : string;
 
     /**
     * This creates a foreignKey table parameter
     *
-    * @param array attributes name,columns,references, update,delete
+    * @param array $attributes name,columns,references, update,delete
     * @return string
     */
     abstract protected function tableConstraintForeign(array $attributes) :string;
@@ -132,9 +131,9 @@ abstract class BaseSchema
      * Maps the onclause value
      *
      * @param string $value
-     * @return void
+     * @return string
      */
-    protected function onClause(string $value)
+    protected function onClause(string $value) : string
     {
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
@@ -203,12 +202,10 @@ abstract class BaseSchema
      * Returns a string for removing an index on table
      *
      * @param string $table
-     * @param string|array $column owner_id, [owner_id,tenant_id]
-     * @param array $options
-     *  - name: name of index
+     * @param string $name
      * @return string
      */
-    abstract public function removeIndex(string $table, string $name);
+    abstract public function removeIndex(string $table, string $name) : string;
 
     /**
      * Renames an index
@@ -217,9 +214,9 @@ abstract class BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return void
+     * @return string
      */
-    abstract public function renameIndex(string $table, string $oldName, string $newName);
+    abstract public function renameIndex(string $table, string $oldName, string $newName) : string;
  
     /**
     * Returns SQL for adding a foreignKey
@@ -250,11 +247,10 @@ abstract class BaseSchema
      * Returns SQL for removing a foreignKey
      *
      * @param string $fromTable
-     * @param string $toTable
-     * @param array $options
+     * @param string $constraint
      * @return string
      */
-    abstract public function removeForeignKey(string $fromTable, string $constraint);
+    abstract public function removeForeignKey(string $fromTable, string $constraint) : string;
    
     /**
      * Gets a list of foreignKeys
@@ -276,7 +272,7 @@ abstract class BaseSchema
      * Checks if a foreignKey exists
      *
      * @param string $table
-     * @param string $foreignKey
+     * @param array $options uses keys column and name.
      * @return bool
      */
     public function foreignKeyExists(string $table, array $options) : bool
@@ -304,16 +300,16 @@ abstract class BaseSchema
      * @param array $options
      * @return string
      */
-    abstract public function changeColumn(string $table, string $name, string $type, array $options = []);
+    abstract public function changeColumn(string $table, string $name, string $type, array $options = []) : string;
 
     /**
      * Returns a SQL statement for dropping a table
      *
      * @param string $table
-     * @param array options (ifExists)
+     * @param array $options (ifExists)
      * @return string
      */
-    abstract public function dropTableSql(string $table, array $options = []);
+    abstract public function dropTableSql(string $table, array $options = []) : string;
 
     /**
      * Returns the sql for truncating the table
@@ -339,7 +335,7 @@ abstract class BaseSchema
      * @param string $to
      * @return string
      */
-    abstract public function renameTable(string $from, string $to);
+    abstract public function renameTable(string $from, string $to) : string;
 
     /**
      * Gets a SQL statement for renaming a table
@@ -349,7 +345,7 @@ abstract class BaseSchema
      * @param string $to
      * @return string
      */
-    abstract public function renameColumn(string $table, string $from, string $to);
+    abstract public function renameColumn(string $table, string $from, string $to) : string;
 
     /**
      * Removes a column from the table§
@@ -401,7 +397,7 @@ abstract class BaseSchema
      * @param string $name
      * @return bool
      */
-    public function tableExists(string $name)
+    public function tableExists(string $name) : bool
     {
         return in_array($name, $this->tables());
     }
@@ -412,7 +408,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    public function columns(string $table)
+    public function columns(string $table) : array
     {
         $schema = $this->describe($table)['columns'];
 
@@ -426,7 +422,7 @@ abstract class BaseSchema
      * @param string $column
      * @return bool
      */
-    public function columnExists(string $table, string $column)
+    public function columnExists(string $table, string $column) : bool
     {
         return in_array($column, $this->columns($table));
     }
@@ -435,14 +431,15 @@ abstract class BaseSchema
      * Sets and gets the datasource
      *
      * @param string $datasource
-     * @return string|null
+     * @return string|string
      */
-    public function datasource(string $datasource = null)
+    public function datasource(string $datasource = null) : string
     {
         if ($datasource === null) {
             return $this->datasource;
         }
-        $this->datasource = $datasource;
+
+        return $this->datasource = $datasource;
     }
 
     /**
@@ -479,9 +476,9 @@ abstract class BaseSchema
     /**
      * Returns the datasource
      *
-     * @return \Origin\Model\Datasource
+     * @return \Origin\Model\Connection
      */
-    public function connection() : Datasource
+    public function connection() : Connection
     {
         return ConnectionManager::get($this->datasource);
     }
@@ -522,197 +519,5 @@ abstract class BaseSchema
         }
 
         return $value;
-    }
-
-    # # # CODE HERE WILL BE DEPRECATED IN FUTURE # # #
-
-    /**
-        * Returns a MySQL string for creating a table. Should be agnostic and non-agnostic.
-        * @todo when this is removed, then createTableSQL might need to be renamed to be consistent.
-        * @param string $table
-        * @param array $data
-        * @return string
-        */
-    public function createTable(string $table, array $data, array $options = []) : string
-    {
-        $options += ['primaryKey' => null,'options' => null];
-        $append = '';
-        if (! empty($options['options'])) {
-            $append = ' '. $options['options'];
-        }
-
-        $result = [];
-        
-        /**
-         * Create table accepts primaryKey settings
-         * v1.25 +
-         */
-        $primaryKeys = [];
-        if ($options['primaryKey']) {
-            $primaryKeys = (array) $options['primaryKey'];
-        }
-
-        /**
-         * This is legacy handler. for key setting
-         */
-        foreach ($data as $field => $settings) {
-            if (! empty($settings['key']) and ! in_array($field, $primaryKeys)) {
-                $primaryKeys[] = $field;
-            }
-        }
-       
-        foreach ($data as $field => $settings) {
-            if (is_string($settings)) {
-                $settings = ['type' => $settings];
-            }
-            /**
-             * Cant set length on primaryKey
-             */
-            if ($settings['type'] === 'primaryKey') {
-                if (! in_array($field, $primaryKeys)) {
-                    $primaryKeys[] = $field;
-                }
-                $result[] = ' ' . $field . ' ' . $this->columns['primaryKey']['name'];
-                continue;
-            }
-
-            $output = $this->buildColumn(['name' => $field] + $settings);
-         
-            $result[] = ' '.$output;
-        }
-      
-        if ($primaryKeys) {
-            $result[] = ' PRIMARY KEY ('.implode(',', $primaryKeys).')';
-        }
-
-        return "CREATE TABLE {$table} (\n".implode(",\n", $result)."\n){$append}";
-    }
-
-    /**
-     * Prepares a column value
-     *
-     * @param mixed $value
-     * @return mixed
-     */
-    public function columnValue($value)
-    {
-        return $this->schemaValue($value);
-    }
-
-    /**
-        * Gets the schema for a table
-        *
-        * @param string $table
-        * @return array
-        */
-    abstract public function schema(string $table);
-
-    /**
-     * Build a native sql column string
-     *
-     * @param array $column
-     *  - name: name of column
-     *  - type: integer,bigint,float,decimail,datetime,date,binary or boolean
-     *  - limit: length of field
-     *  - precision: for decimals and floasts
-     *  - default: default value use ''
-     *  - null: allow null values
-     * @return string
-     */
-    protected function buildColumn(array $column) : string
-    {
-        $column += [
-            'name' => null,
-            'type' => null,
-            'limit' => null, // Max column limit [text, binary, integer]
-            'precision' => null, // decima, float
-            'null' => null,
-        ];
-
-        $real = [];
-        $type = $column['type'];
-
-        /**
-         * Temp solution until refactored
-         */
-        if (! empty($column['autoIncrement'])) {
-            $type = 'primaryKey'; // this will be redonne to
-        }
-        if (isset($this->columns[$type])) {
-            $real = $this->columns[$type];
-            $type = strtoupper($this->columns[$type]['name']); // tmp
-
-            /**
-                 * Convert Limits for MySQL
-                 * @todo how this be implemented in MySQL schema without duplicating
-                 * code
-                 */
-            if ($column['type'] === 'text' and isset($column['limit'])) {
-                $limit = $column['limit'];
-                $type = 'TEXT';
-                if ($limit === 16777215) {
-                    $type = 'MEDIUMTEXT';
-                } elseif ($limit === 4294967295) {
-                    $type = 'LONGTEXT';
-                }
-            }
-
-            //list($namespace, $class) = namespaceSplit(get_class($this));
-            # Remove limit,precision, scale if user has sent them (postgre can use int limit)
-            foreach (['limit','precision','scale'] as $remove) {
-                if (! isset($real[$remove]) and isset($column[$remove])) {
-                    $column[$remove] = null;
-                }
-            }
-        }
-     
-        # Lengths
-        $output = $this->columnName($column['name']) . ' ' . $type;
-     
-        /**
-         * Logic when using agnostic
-         * Get defaults if needed
-         */
-        if ($real) {
-            if (! empty($real['limit']) and empty($column['limit'])) {
-                $column['limit'] = $real['limit'];
-            }
-            if (isset($real['precision']) and ! isset($column['precision'])) {
-                $column['precision'] = $real['precision'];
-            }
-            if (isset($real['scale']) and ! isset($column['scale'])) {
-                $column['scale'] = $real['scale'];
-            }
-        }
-  
-        if ($column['limit']) {
-            $output .= "({$column['limit']})";
-        } elseif (! empty($column['precision'])) {
-            $output .= "({$column['precision']},{$column['scale']})";
-        }
-
-        /**
-         * First handle defaults, then nulls
-         */
-        if (! empty($column['default']) and $column['null'] === false) {
-            $output .= ' DEFAULT ' . $this->schemaValue($column['default']) .' NOT NULL';
-        } elseif (isset($column['default'])) { //isset catches ''
-            $output .= ' DEFAULT ' . $this->schemaValue($column['default']);
-        } elseif ($column['null'] === false) {
-            $output .= ' NOT NULL';
-        }
-      
-        return $output;
-    }
-
-    /**
-     * Formats the column name
-     *
-     * @param string $name
-     * @return string
-     */
-    public function columnName(string $name) : string
-    {
-        return $name;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -13,42 +14,41 @@
  */
 namespace Origin\Model\Repository;
 
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Utility\Inflector;
+use Origin\Inflector\Inflector;
 
 /**
  * Provides the structure for Repository
  */
 class Repository
 {
-    use ModelTrait;
+    use ModelTrait, HookTrait;
+    
+    /**
+     * Model class name
+     *
+     * @var string
+     */
     private $modelClass = null;
 
+    /**
+     * Constructor. Any arguments passed will be sent to the initialize method.
+     */
     public function __construct()
     {
-        if (func_get_args()) {
-            /**
-             * @deprecated version
-             */
-            // @codeCoverageIgnoreStart
-            deprecationWarning('Injecting dependencies in Repos has been deprectaed');
-            if (method_exists($this, 'initialize')) {
-                $this->initialize(...func_get_args());
-            }
-            // @codeCoverageIgnoreEnd
-        }
-        
         if ($this->modelClass === null) {
             list($namespace, $class) = namespaceSplit(get_class($this));
             $this->modelClass = Inflector::singular(substr($class, 0, -10));
         }
+        $this->executeHook('initialize', func_get_args());
     }
 
     /**
      * Lazyload the Model for this Repository
      *
      * @param string $name
-     * @return \Origin\Model\Model|
+     * @return \Origin\Model\Model|null
      */
     public function __get($name)
     {

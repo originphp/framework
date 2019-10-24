@@ -17,9 +17,9 @@ use Origin\Service\Service;
 
 class MockService extends Service
 {
-    public $arg = null;
-    public $arg2 = null;
-    public function initialize($arg1, $arg2)
+    protected $arg1 = null;
+    protected $arg2 = null;
+    public function initialize($arg1, $arg2) : void
     {
         $this->arg1 = $arg1;
         $this->arg2 = $arg2;
@@ -34,14 +34,22 @@ class MockService extends Service
             ],
         ]);
     }
+    public function arg1()
+    {
+        return $this->arg1;
+    }
+    public function arg2()
+    {
+        return $this->arg2;
+    }
 }
 class ServiceTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitialize()
     {
         $service = new MockService('value1', 'value2');
-        $this->assertEquals('value1', $service->arg1);
-        $this->assertEquals('value2', $service->arg2);
+        $this->assertEquals('value1', $service->arg1());
+        $this->assertEquals('value2', $service->arg2());
     }
 
     public function testDispatch()

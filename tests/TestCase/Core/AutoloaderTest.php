@@ -72,7 +72,7 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
 {
     protected $autoloader;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->autoloader = new MockAutoloader(ROOT);
         

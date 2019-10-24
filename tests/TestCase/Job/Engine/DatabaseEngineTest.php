@@ -19,7 +19,7 @@ use Origin\TestSuite\OriginTestCase;
 
 class PassOrFailJob extends Job
 {
-    public $connection = 'default';
+    protected $connection = 'default';
 
     public function execute(bool $pass = true)
     {
@@ -53,7 +53,7 @@ class PassOrFailJob extends Job
 
 class DatabaseEngineTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Queue'];
+    protected $fixtures = ['Origin.Queue'];
 
     /**
      * Engine
@@ -64,8 +64,6 @@ class DatabaseEngineTest extends OriginTestCase
 
     public function setUp() : void
     {
-        parent::setUp();
-
         $this->engine = Queue::connection('test');
     }
 

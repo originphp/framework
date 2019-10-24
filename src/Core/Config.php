@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,8 +13,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace Origin\Core;
-
-use Origin\Exception\NotFoundException;
 
 class Config
 {
@@ -56,7 +55,7 @@ class Config
             }
             return false;
         }
-        throw new NotFoundException(sprintf('%s could not be found.', $filename));
+        throw new Exception(sprintf('%s could not be found.', $filename));
     }
     */
    
@@ -71,7 +70,7 @@ class Config
     {
         static::dot()->set($key, $value);
         if ($key === 'debug') {
-            ini_set('display_errors', (int) $value);
+            ini_set('display_errors', (string) $value);
         }
     }
 

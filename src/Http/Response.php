@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,7 +15,7 @@
 
 namespace Origin\Http;
 
-use Origin\Exception\NotFoundException;
+use Origin\Http\Exception\NotFoundException;
 
 class Response
 {
@@ -128,19 +129,6 @@ class Response
     }
 
     /**
-     * Sets or gets the status code for sending.
-     * @codeCoverageIgnore
-     * @param int $status
-     * @return int status
-     */
-    public function status(int $status = null)
-    {
-        deprecationWarning('status has been depreciated use statusCode instead.');
-
-        return $this->statusCode($status);
-    }
-
-    /**
      * Sets or gets the HTTP status code for sending.
      *
      * @param int $code
@@ -175,7 +163,10 @@ class Response
         }
       
         foreach ($header as $key => &$value) {
-            $value = trim($value);
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+           
             $this->headers[$key] = $value;
         }
 
@@ -185,7 +176,7 @@ class Response
     /**
      * Gets all headers or a single header that will be sent
      *
-     * @param string $header
+     * @param string|array $header
      * @return mixed
      */
     public function headers($header = null)
@@ -213,7 +204,7 @@ class Response
             return $this->cookies;
         }
         if (is_array($cookie)) {
-            return $this->cookie = $cookie;
+            return $this->cookies = $cookie;
         }
 
         return $this->cookies[$cookie] ?? null;
@@ -248,26 +239,32 @@ class Response
      * to be sent
      *
      *  $response->cookie('key',$value);
-     *  $response->cookie('key',$value,'+5 days');
+     *  $response->cookie('key',$value,['expires'=>'+5 days');
      *
-     * @param string $name
-     * @param mixed $value
-     * @param string $expire a strtotime compatible string e.g. +5 days, 2019-01-01 10:23:55
-     * @param array $options setcookie params: encrypt,path,domain,secure,httpOnly
+    * @param string $name
+     * @param mixed $value string, array etc
+     * @param array $options The options keys are:
+     *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
+     *   - encrypt: default:true. encrypt value
+     *   - path: default:'/' . Path on server
+     *   - domain: domains cookie will be available on
+     *   - secure: default:false. only send if through https
+     *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function cookie(string $name, $value, string $expire = '+1 month', array $options = []) : void
+    public function cookie(string $name, $value, array $options = []) : void
     {
         $options += [
             'name' => $name,
             'value' => $value,
+            'expires' => '+1 month',
             'path' => '/', // path on server
             'domain' => '', // domains cookie will be available on
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
-            'expire' => strtotime($expire),
             'encrypt' => true,
         ];
+        $options['expires'] = strtotime($options['expires']);
         
         $this->cookies[$name] = $options;
     }
@@ -281,7 +278,7 @@ class Response
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
      *
-     * @param string $contentType
+     * @param string|array $contentType
      * @return mixed
      */
     public function type($contentType = null)
@@ -329,18 +326,18 @@ class Response
         }
 
         if (! file_exists($filename)) {
-            throw new NotFoundException('The requested file could not be found or read.');
+            throw new NotFoundException(sprintf('The requested file %s could not be found or read.', $options['name']));
         }
 
         if ($options['type'] === null) {
             $options['type'] = mime_content_type($filename);
         }
-        
+       
         if ($options['download']) {
             $this->header('Content-Disposition', 'attachment; filename="' . $options['name'] . '"');
         }
         $this->type($options['type']);
-      
+     
         $this->file = $filename;
     }
 
@@ -354,7 +351,7 @@ class Response
         $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {
             // @codeCoverageIgnoreStart
-            $cookie->write($name, $options['value'], $options['expire'], $options);
+            $cookie->write($name, $options['value'], $options);
             // @codeCoverageIgnoreEnd
         }
     }

@@ -18,11 +18,9 @@ use Origin\TestSuite\Fixture;
 
 class QueueFixture extends Fixture
 {
-    public $datasource = 'test';
+    protected $table = 'queue';
 
-    public $table = 'queue';
-
-    public $schema = [
+    protected $schema = [
         'columns' => [
             'id' => ['type' => 'integer', 'limit' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'autoIncrement' => true],
             'queue' => ['type' => 'string', 'limit' => 80, 'null' => false, 'default' => null],

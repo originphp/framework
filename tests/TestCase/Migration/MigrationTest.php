@@ -14,28 +14,28 @@
 
 namespace Origin\Test\Migration;
 
-use Origin\Exception\Exception;
 use Origin\Migration\Migration;
 use Origin\Model\ConnectionManager;
+use Origin\Core\Exception\Exception;
 use Origin\TestSuite\OriginTestCase;
 
-use Origin\Exception\InvalidArgumentException;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Migration\Exception\IrreversibleMigrationException;
 
 class CreateProductTableMigration extends Migration
 {
-    public function up()
+    public function up() : void
     {
         $this->createTable('products', [
             'name' => 'string',
             'description' => 'text',
         ]);
     }
-    public function down()
+    public function down() : void
     {
         $this->dropTable('products');
     }
-    public function reset()
+    public function reset() : void
     {
         $this->statements = [];
     }
@@ -43,12 +43,12 @@ class CreateProductTableMigration extends Migration
 
 class DidNotReadTheManualMigration extends Migration
 {
-    public function change()
+    public function change() : void
     {
         $this->execute('SELECT * FROM read_the_manual');
     }
 
-    public function reversable()
+    public function reversable() : void
     {
         $this->execute('SELECT * FROM read_the_manual');
     }
@@ -56,11 +56,11 @@ class DidNotReadTheManualMigration extends Migration
 
 class UsingExecuteMigration extends Migration
 {
-    public function up()
+    public function up() : void
     {
         $this->execute('SELECT id,title,created from articles');
     }
-    public function down()
+    public function down() : void
     {
         $this->execute('SELECT id,title,created from articles');
     }
@@ -101,7 +101,7 @@ class MockMigration extends Migration
 
 class MigrationTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
+    protected $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
 
     public function adapter()
     {
@@ -119,45 +119,6 @@ class MigrationTest extends OriginTestCase
         $migration->setCalledBy($calledBy);
 
         return $migration;
-    }
-
-    /**
-     * This uses the legacy options string
-     * @deprecated added here to keep track so its easy to remove later
-     * @return void
-     */
-    public function testCreateTableLegacy()
-    {
-        $migration = $this->migration();
-
-        $extra = 'ENGINE=InnoDB DEFAULT CHARSET=utf8';
-        $index = 'PRIMARY';
-        if ($migration->connection()->engine() === 'pgsql') {
-            $extra = '/* comment goes here */';
-            $index = 'products_pkey';
-        }
-
-        $migration->createTable('products', [
-            'name' => 'string',
-            'description' => 'text',
-            'column_1' => ['type' => 'string','default' => 'foo'],
-            'column_2' => ['type' => 'string','default' => 'foo','null' => true],
-            'column_3' => ['type' => 'string','default' => 'foo','null' => false],
-            'column_4' => ['type' => 'string','null' => false],
-            'column_5' => ['type' => 'string','null' => true],
-            'column_6' => ['type' => 'VARCHAR','limit' => 5], // test non agnostic#$
-        ], ['options' => $extra]);
-        
-        $reversableStatements = $migration->invokeStart();
- 
-        $this->assertTrue($migration->columnExists('products', 'id'));
-        $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
-
-        $this->assertTrue($migration->columnExists('products', 'name', ['type' => 'string']));
-        $this->assertTrue($migration->columnExists('products', 'description', ['type' => 'text']));
-        
-        $migration->rollback($reversableStatements);
-        $this->assertFalse($migration->tableExists('products'));
     }
 
     public function testCreateTable()

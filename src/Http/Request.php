@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,7 +15,7 @@
 
 namespace Origin\Http;
 
-use Origin\Exception\MethodNotAllowedException;
+use Origin\Http\Exception\MethodNotAllowedException;
 
 class Request
 {
@@ -115,7 +115,7 @@ class Request
      * This makes it easy for testing e.g $request = new Request('articles/edit/2048');
      *
      * @param string $url articles/edit/2048
-     * @param array $environment $_SERVER array
+     * @param array $options environment $_SERVER array
      * @return void
      */
     public function __construct(string $url = null, array $options = [])
@@ -456,9 +456,12 @@ class Request
         }
         if ($this->is(['post'])) {
             if ($this->env('CONTENT_TYPE') === 'application/json') {
-                $data = json_decode($this->readInput(), true);
-                if (! is_array($data)) {
-                    $data = [];
+                $input = $this->readInput();
+                if ($input) {
+                    $data = json_decode($this->readInput(), true);
+                    if (! is_array($data)) {
+                        $data = [];
+                    }
                 }
             }
         }
@@ -482,8 +485,7 @@ class Request
     /**
      * Checks the server request method.
      *
-     * @param string|array $method get|post|put|delete
-     *
+     * @param string|array $type get|post|put|delete
      * @return bool true or false
      */
     public function is($type): bool
@@ -665,10 +667,9 @@ class Request
      *
      * @see https://www.php-fig.org/psr/psr-7/
      * @param string|array $header
-     * @param string $value
      * @return mixed
      */
-    public function headers($header = null, string $value = null)
+    public function headers($header = null)
     {
         if ($header === null) {
             return $this->headers;
@@ -683,17 +684,9 @@ class Request
         }
 
         $normalized = strtolower($header); // psr thing
+        $key = $this->headersNames[$normalized] ?? $header;
 
-        if (func_num_args() === 1) {
-            $key = $this->headersNames[$normalized] ?? $header;
-
-            return $this->headers[$key] ?? null;
-        }
-
-        deprecationWarning('Use Request::header to set header');
-
-        $this->headers[$header] = $value;
-        $this->headersNames[$normalized] = $header;
+        return $this->headers[$key] ?? null;
     }
 
     /**
@@ -725,9 +718,11 @@ class Request
     /**
      * Gets a cookie or sets the cookies array
      *
-     * @return string|array|null
+     *
+     * @param string|array $key
+     * @return mixed
      */
-    public function cookies($key = null, string $value = null)
+    public function cookies($key = null)
     {
         if ($key === null) {
             return $this->cookies;
@@ -737,11 +732,7 @@ class Request
             return $this->cookies = $key;
         }
 
-        if (func_num_args() === 1) {
-            return $this->cookies[$key] ?? null;
-        }
-        deprecationWarning('Use Request::cookie for setting cookies on the request');
-        $this->cookies[$key] = $value;
+        return $this->cookies[$key] ?? null;
     }
     /**
      * Processes the $_COOKIE var
@@ -792,9 +783,8 @@ class Request
     protected function readInput(): ?string
     {
         $fh = fopen('php://input', 'r');
-        $contents = stream_get_contents($fh);
-        fclose($fh);
+        defer($context, 'fclose', $fh);
 
-        return $contents;
+        return stream_get_contents($fh);
     }
 }
