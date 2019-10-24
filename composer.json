@@ -47,8 +47,6 @@
     "ext-intl": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^8.0",
-    "phpseclib/phpseclib": "*",
-    "ext-curl": "*"
+    "phpunit/phpunit": "^8.0"
   }
 }
