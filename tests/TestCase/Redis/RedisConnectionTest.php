@@ -39,8 +39,7 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
         $result = RedisConnection::connect([
             'host' => getenv('REDIS_HOST'),
             'port' => (int) getenv('REDIS_PORT'),
-            'duration' => 0,
-            'prefix' => 'origin_',
+            'timeout' => 0,
             'persistent' => 'persisten-id',
         ]);
         $this->assertInstanceOf(Redis::class, $result);
@@ -49,8 +48,8 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(Exception::class);
         RedisConnection::connect([
-            'engine' => 'Redis',
             'port' => (int) getenv('REDIS_PORT'),
+            'timeout' => 0,
             'path' => '/var/sockets/redis',
         ]);
     }
@@ -60,6 +59,8 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
         RedisConnection::connect([
             'host' => 'foo',
             'port' => 1234,
+            'timeout' => 0,
+
         ]);
     }
     public function testInvalidPassword()
@@ -68,6 +69,7 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
         RedisConnection::connect([
             'host' => getenv('REDIS_HOST'),
             'port' => (int) getenv('REDIS_PORT'),
+            'timeout' => 0,
             'password' => 'secret',
         ]);
     }

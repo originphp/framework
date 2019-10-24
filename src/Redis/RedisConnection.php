@@ -40,6 +40,10 @@ class RedisConnection
      */
     public static function connect(array $config) : Redis
     {
+        $config += [
+            'host' => '127.0.0.1','port' => 6379,'password' => null,'timeout' => 0,'persistent' => true, // Faster!!!
+        'path' => null];
+
         if (! extension_loaded('redis')) {
             throw new Exception('Redis extension not loaded.');
         }
