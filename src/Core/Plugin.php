@@ -186,6 +186,7 @@ class Plugin
         if (! isset(static::$loaded[$plugin])) {
             throw new MissingPluginException($plugin);
         }
+
         return static::$loaded[$plugin]['path'];
     }
 
