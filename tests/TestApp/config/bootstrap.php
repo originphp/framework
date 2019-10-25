@@ -1,4 +1,5 @@
 <?php
+use Origin\Core\Config;
 use Origin\Core\Plugin;
 use Origin\Core\Autoloader;
 
@@ -15,14 +16,17 @@ $namespaces = [
 $autoloader->addNamespaces($namespaces);
 $autoloader->register();
 
-include 'application.php';
-include 'log.php';
-include 'cache.php';
-include 'database.php';
-include 'storage.php';
-include 'email.php';
-include 'queue.php';
-require 'routes.php';
+require 'application.php';
+
+mb_internal_encoding(Config::read('App.encoding'));
+date_default_timezone_set(Config::read('App.defaultTimezone'));
+
+require 'log.php';
+require 'cache.php';
+require 'database.php';
+require 'storage.php';
+require 'email.php';
+require 'queue.php';
 
 /*
  * Load your plugins here
@@ -35,3 +39,5 @@ Plugin::load('Make');
  * Initialize the plugins
  */
 Plugin::initialize();
+
+require 'routes.php';

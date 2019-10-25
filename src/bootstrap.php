@@ -14,13 +14,13 @@
 
 define('START_TIME', microtime(true));
 
+/*
+# This being removed
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
 ini_set('error_log', LOGS);
-
-date_default_timezone_set('UTC');
-mb_internal_encoding('UTF-8');
+*/
 
 require ORIGIN . '/src/Core/Exception/Exception.php';
 require ORIGIN . '/src/Core/Autoloader.php';
