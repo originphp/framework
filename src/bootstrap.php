@@ -22,18 +22,17 @@ ini_set('display_errors', true);
 ini_set('error_log', LOGS);
 */
 
+/**
+ * Load Autoloader
+ */
 require ORIGIN . '/src/Core/Exception/Exception.php';
 require ORIGIN . '/src/Core/Autoloader.php';
 require ROOT . '/vendor/autoload.php';
 
+/**
+ * Register error handler
+ */
 $errorHandler = (PHP_SAPI === 'cli') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
 require ORIGIN . '/src/Core/functions.php';
-
-if (file_exists(CONFIG . DS . '.env.php')) {
-    $result = include CONFIG . DS . '.env.php';
-    foreach ($result as $key => $value) {
-        $_ENV[$key] = $value;
-    }
-}
