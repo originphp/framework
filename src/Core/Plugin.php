@@ -47,8 +47,14 @@ class Plugin
     {
         if (file_exists(static::COMPOSER_PLUGINS)) {
             $composer = json_decode(file_get_contents(static::COMPOSER_PLUGINS), true);
+            /**
+             * [Commands] => vendor/originphp/commands
+             * [Debug] => vendor/originphp/debug-plugin
+             * [Generate] => vendor/originphp/generate
+             * [UserAuthentication] => plugins/user_authentication
+             */
             foreach ($composer as $plugin => $path) {
-                static::load($plugin, ['path' => ROOT . $path, 'autoload' => false]);
+                static::load($plugin, ['path' => ROOT . '/' . $path, 'autoload' => false]);
             }
         }
     }
