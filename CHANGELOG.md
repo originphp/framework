@@ -1,7 +1,6 @@
 # Changelog
 ## [Unreleased]
-
-## [2.0.0] - 2019-10-xxx
+## [2.0.0] - 2019-10-25
 
 Releasing version 2.0, see the [upgrade guide](https://www.originphp.com/docs/upgrade) for information on how to upgrade from previous versions.
 
