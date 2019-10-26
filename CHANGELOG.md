@@ -3,7 +3,7 @@
 
 ## [2.0.1] - 2019-10-26
 ### Fixed
-- Pagniator outofbounds exception
+- Pagniator behavior with pages that are out of bounds
 
 ## [2.0.0] - 2019-10-25
 
