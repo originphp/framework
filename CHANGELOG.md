@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+
+## [2.0.1] - 2019-10-26
+### Fixed
+- Pagniator outofbounds exception
+
 ## [2.0.0] - 2019-10-25
 
 Releasing version 2.0, see the [upgrade guide](https://www.originphp.com/docs/upgrade) for information on how to upgrade from previous versions.
