@@ -23,14 +23,10 @@ class CsrfProtectionMiddleware extends Middleware
 {
     protected $defaultConfig = [
         'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
-        'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions
+        'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions,
+        'httpOnly' => false, // only available to HTTP protocol (not javascript)
+        'secure' => false // cookie only transmitted over HTTPS
     ];
-
-    /**
-    * Internal flag
-    * @var boolean
-    */
-    private $createCookie = false;
 
     /**
      * This handles the request
@@ -46,7 +42,7 @@ class CsrfProtectionMiddleware extends Middleware
         if ($request->params('csrfProtection') === false) {
             return ;
         }
-        
+  
         # Generate the CSRF token
         $token = $request->cookies($this->config('cookieName'));
         if ($request->is(['get']) and $token === null) {
@@ -79,8 +75,12 @@ class CsrfProtectionMiddleware extends Middleware
             return ;
         }
 
-        if ($request->is(['get']) and $this->createCookie) {
-            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), ['expires' => $this->config('expires')]);
+        if ($request->is(['get','head'])) {
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), [
+                'expires' => $this->config('expires'),
+                'httpOnly' => $this->config['httpOnly'],
+                'secure' => $this->config['secure']
+            ]);
         }
     }
 
@@ -127,7 +127,6 @@ class CsrfProtectionMiddleware extends Middleware
     */
     private function generateToken() : string
     {
-        $this->createCookie = true;
         $randomBytes = random_bytes(64);
 
         return Security::hash($randomBytes, [
