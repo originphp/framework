@@ -1,7 +1,7 @@
 # Changelog
 ## [Unreleased]
 
-## [2.0.1] - 2019-10-26
+## [2.0.1] - 2019-10-xx
 ### Fixed
 - Pagniator behavior with pages that are out of bounds
 
