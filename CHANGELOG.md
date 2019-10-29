@@ -3,7 +3,7 @@
 
 ## [2.0.1] - 2019-10-xx
 ### Fixed
-- Fixed CSRF token, rewrites cookie with each GET/HEAD request
+- Fixed CSRF token now rewrites cookie with each GET request
 - Fixed loadMiddleware accepts options
 - Paginator behavior with pages that are out of bounds throws page not found instead of ignoring
 
