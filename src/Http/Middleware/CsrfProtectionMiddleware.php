@@ -25,7 +25,8 @@ class CsrfProtectionMiddleware extends Middleware
         'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
         'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions,
         'httpOnly' => false, // only available to HTTP protocol (not javascript)
-        'secure' => false // cookie only transmitted over HTTPS
+        'secure' => false, // cookie only transmitted over HTTPS,
+        'encrypt' => true
     ];
 
     /**
@@ -74,13 +75,9 @@ class CsrfProtectionMiddleware extends Middleware
         if ($request->params('csrfProtection') === false) {
             return ;
         }
-
-        if ($request->is(['get','head'])) {
-            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), [
-                'expires' => $this->config('expires'),
-                'httpOnly' => $this->config['httpOnly'],
-                'secure' => $this->config['secure']
-            ]);
+   
+        if ($request->method() === 'GET') {
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), $this->config);
         }
     }
 
