@@ -1,8 +1,9 @@
 # Changelog
 ## [Unreleased]
 
-## [2.0.1] - 2019-10-xx
+## [2.0.1] - 2019-10-30
 ### Fixed
+- OriginTestCase changed to Abstract class which was causing unexpected issues with PHPUnit
 - Fixed CSRF token now rewrites cookie with each GET request
 - Fixed loadMiddleware accepts options
 - Paginator behavior with pages that are out of bounds throws page not found instead of ignoring
