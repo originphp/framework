@@ -59,11 +59,13 @@ class StrawberyTart
     }
 }
 
+
+
 class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
 {
     public function testMock()
     {
-        $OriginTestCase = new OriginTestCase();
+        $OriginTestCase = new AnotherMockOriginTestCase();
         $mock = $OriginTestCase->getMock('Origin\Test\TestSuite\StrawberryTart', ['true']);
         
         $mock->expects($this->once())
@@ -74,7 +76,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
     }
     public function testMockOptions()
     {
-        $OriginTestCase = new OriginTestCase();
+        $OriginTestCase = new AnotherMockOriginTestCase();
         $mock = $OriginTestCase->getMock('Origin\Test\TestSuite\LemonPie', ['true'], ['cookingTime' => '20 mins']);
         
         $mock->expects($this->once())
@@ -88,7 +90,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
     public function testGetMockForModel()
     {
         ModelRegistry::config('User', ['table' => 'userz']);
-        $OriginTestCase = new OriginTestCase();
+        $OriginTestCase = new AnotherMockOriginTestCase();
         $mock = $OriginTestCase->getMockForModel('User', ['true'], ['className' => 'Origin\Test\TestSuite\User']);
         
         // Mock true to return false
@@ -104,13 +106,19 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(MissingModelException::class);
 
-        $OriginTestCase = new OriginTestCase();
+        $OriginTestCase = new AnotherMockOriginTestCase();
         $mock = $OriginTestCase->getMockForModel('Foo');
     }
     public function testCallbacks()
     {
-        $OriginTestCase = new OriginTestCase();
+        $OriginTestCase = new AnotherMockOriginTestCase();
         $this->assertNull($OriginTestCase->setUp());
         $this->assertNull($OriginTestCase->tearDown());
     }
+}
+/**
+ * This must be AFTER test case declaration
+ */
+class AnotherMockOriginTestCase extends OriginTestCase
+{
 }
