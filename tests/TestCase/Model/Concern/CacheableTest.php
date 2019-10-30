@@ -1,0 +1,139 @@
+<?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2019 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+namespace Origin\Test\Model\Concern;
+
+use Origin\Cache\Cache;
+use Origin\Model\Model;
+
+use Origin\Model\ModelRegistry;
+use Origin\Model\Concern\Cacheable;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Concern\Timestampable;
+use Origin\Model\Exception\NotFoundException;
+
+class YetAnotherArticle extends Model
+{
+    protected $cacheConfig = 'cache-test';
+    protected $table = 'articles';
+
+    use Timestampable,Cacheable;
+
+    public function initialize(array $config) : void
+    {
+        $this->hasMany('Comment', [
+            'className' => AnotherComment::class,
+            'foreignKey' => 'article_id'
+        ]);
+    }
+
+    public function find(string $type = 'first', array $options = [])
+    {
+        return $this->findCached($type, $options);
+    }
+}
+
+class AnotherComment extends Model
+{
+    protected $cacheConfig = 'cache-test';
+    protected $table = 'comments';
+
+    use Timestampable,Cacheable;
+
+    public function initialize(array $config) : void
+    {
+        $this->belongsTo('Comment', [
+            'className' => YetAnotherArticle::class,
+            'foreignKey' => 'article_id'
+        ]);
+    }
+
+    public function find(string $type = 'first', array $options = [])
+    {
+        return $this->findCached($type, $options);
+    }
+}
+
+class CacheableTest extends OriginTestCase
+{
+    protected $fixtures = ['Origin.Article','Origin.Comment'];
+
+    protected function setUp(): void
+    {
+        Cache::config('cache-test', ['engine' => 'Array']);
+        $this->Article = ModelRegistry::get('YetAnotherArticle', ['className' => YetAnotherArticle::class]);
+    }
+
+    protected function tearDown() : void
+    {
+        Cache::clear(['config' => 'cache-test']);
+    }
+
+    public function testFind()
+    {
+        // Load into cache and test its from cache
+        $article = $this->Article->get(1000);
+        $this->Article->updateColumn($article->id, 'title', 'cached');
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('Article #1', $cached->title);
+    }
+
+    /**
+     * @depends testFind
+     */
+    public function testCachedAssociated()
+    {
+        // Load into cache and test its from cache
+        $article = $this->Article->get(1000, ['associated' => ['Comment']]);
+       
+        // Update a different model that is associated with Article
+        $article->comments[0]->description = 'foo';
+        $this->Article->Comment->save($article->comments[0]);
+
+        // Load Data through Association
+        $clean = $this->Article->get(1000, ['associated' => ['Comment']]);
+        $this->assertEquals('foo', $clean->comments[0]->description);
+
+        // Load Data through normal Load
+        $comment = $this->Article->Comment->get(1001);
+        $this->assertEquals('foo', $comment->description);
+    }
+
+    /**
+     * @depends testFind
+     */
+    public function testSave()
+    {
+        $article = $this->Article->get(1000);
+     
+        # Check save clears the cache
+        $article->title = 'fooz';
+        $this->Article->save($article);
+        $article3 = $this->Article->get(1000);
+        $this->assertEquals('fooz', $article3->title);
+    }
+
+    /**
+     * @depends testFind
+     */
+    public function testDelete()
+    {
+        $article = $this->Article->get(1000);
+
+        // Check delete record no longer is retrived
+        $this->Article->delete($article);
+        $this->expectException(NotFoundException::class);
+        $this->Article->get(1000);
+    }
+}
