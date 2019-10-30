@@ -21,7 +21,7 @@ use Origin\Model\ModelTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
-class OriginTestCase extends \PHPUnit\Framework\TestCase
+abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
     use ModelTrait, HookTrait;
     /**

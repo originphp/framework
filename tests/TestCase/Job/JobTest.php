@@ -64,7 +64,7 @@ class JobTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Queue'];
 
-    public function setUp() : void
+    protected function setUp() : void
     {
         $model = new Model(['name' => 'Article','connection' => 'test']);
         ModelRegistry::set('Article', $model);

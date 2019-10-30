@@ -105,14 +105,15 @@ class BaseApplication
      * $this->loadMiddleware('App\Http\Middleware\FormSecurityMiddleware');
      *
      * @param string $name FormSecurity, MyPlugin.FormSecurity, App\Http\Middleware\FormSecurityMiddleware
+     * @param array $options array of options to be passed to middleware
      * @return void
      */
-    public function loadMiddleware(string $name) : void
+    public function loadMiddleware(string $name, array $options = []) : void
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware', 'Http');
         if (empty($className)) {
             throw new InvalidArgumentException(sprintf('Unkown Middleware %s', $name));
         }
-        $this->addMiddleware(new $className);
+        $this->addMiddleware(new $className($options));
     }
 }
