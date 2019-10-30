@@ -62,7 +62,7 @@ class DatabaseEngineTest extends OriginTestCase
      */
     protected $engine = null;
 
-    public function setUp() : void
+    protected function setUp() : void
     {
         $this->engine = Queue::connection('test');
     }
