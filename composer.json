@@ -37,6 +37,7 @@
     "originphp/configurable" : "^1.0",
     "originphp/inflector" : "^1.0",
     "originphp/security" : "^1.0",
+    "originphp/cache" : "^1.0",
     "originphp/email" : "^1.0",
     "originphp/html" : "^1.0",
     "originphp/xml" : "^1.0",
