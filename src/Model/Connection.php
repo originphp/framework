@@ -591,12 +591,12 @@ abstract class Connection
     public function describe(string $table) : array
     {
         $key = $this->config['name'] . '_' . $table;
-        $schema = Cache::read($key);
+        $schema = Cache::read($key, ['config'=>'origin']);
 
         if (! $schema) {
             $schema = $this->adapter()->describe($table);
             if (! defined('PHPUNIT')) {
-                Cache::write($key, $schema, ['serialize' => false,'duration' => 60 * 5]);
+                Cache::write($key, $schema, ['config'=>'origin']);
             }
         }
 
