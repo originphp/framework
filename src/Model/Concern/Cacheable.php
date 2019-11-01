@@ -110,7 +110,7 @@ trait Cacheable
      */
     protected function cacheableEvent() : void
     {
-        $this->invalidateCache(true);
+        $this->invalidateCache();
     }
 
     /**
@@ -125,10 +125,10 @@ trait Cacheable
      * - increment
      * - decrement
      *
-     * @param boolean $associated default: false. Clear cache on associated models
+     * @param boolean $associated default: true. Clear cache on associated models
      * @return void
      */
-    public function invalidateCache(bool $associated = false): void
+    public function invalidateCache(bool $associated = true): void
     {
         // Increment CacheID
         $cache = Cache::store($this->cacheConfig);
@@ -140,7 +140,7 @@ trait Cacheable
             foreach ([$this->belongsTo, $this->hasMany, $this->hasOne, $this->hasAndBelongsToMany] as $association) {
                 foreach ($association as $alias => $config) {
                     if (method_exists($this->$alias, 'invalidateCache')) {
-                        $this->$alias->invalidateCache();
+                        $this->$alias->invalidateCache(false);
                     }
                 }
             }

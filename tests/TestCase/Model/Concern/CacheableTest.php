@@ -109,7 +109,7 @@ class CacheableTest extends OriginTestCase
         $cached = $this->Article->get(1000);
         $this->assertEquals('Article #1', $cached->title);
 
-        $this->Article->invalidateCache();
+        $this->Article->invalidateCache(false);
         $cached = $this->Article->get(1000);
         $this->assertEquals('not cached', $cached->title);
     }
@@ -151,7 +151,7 @@ class CacheableTest extends OriginTestCase
         $this->assertEquals($article->comments[0]->description, $cached->comments[0]->description);
        
         // Clear cache on associated model then call on original model
-        $this->Article->Comment->invalidateCache(true);
+        $this->Article->Comment->invalidateCache();
         $article = $this->Article->get(1000, ['associated' => ['Comment']]);
         $this->assertEquals('foo bar', $article->comments[0]->description);
     }
