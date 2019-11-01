@@ -59,8 +59,6 @@ class StrawberyTart
     }
 }
 
-
-
 class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
 {
     public function testMock()
