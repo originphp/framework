@@ -59,7 +59,7 @@ function debug($data, bool $isHtml = false): void
             $data = h($data);
         }
 
-        if (PHP_SAPI === 'cli') {
+        if (isConsole()) {
             $where = "{$filename} Line: {$line}";
             $template = sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
         } else {
