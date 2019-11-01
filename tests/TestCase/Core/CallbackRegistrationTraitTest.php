@@ -14,13 +14,11 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Model;
 
 class Foo extends Model
 {
 }
-
 
 class CallbackRegistrationTraitTest extends \PHPUnit\Framework\TestCase
 {
