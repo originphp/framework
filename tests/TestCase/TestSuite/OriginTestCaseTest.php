@@ -113,6 +113,13 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($OriginTestCase->setUp());
         $this->assertNull($OriginTestCase->tearDown());
     }
+
+    public function testFixtures()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $OriginTestCase->fixtures(['Article']);
+        $this->assertEquals(['Article'], $OriginTestCase->fixtures());
+    }
 }
 /**
  * This must be AFTER test case declaration
