@@ -25,7 +25,6 @@ use Origin\Model\Exception\NotFoundException;
 
 class YetAnotherArticle extends Model
 {
-    protected $cacheConfig = 'cache-test';
     protected $table = 'articles';
 
     use Timestampable,Cacheable;
@@ -34,34 +33,27 @@ class YetAnotherArticle extends Model
     {
         $this->hasMany('Comment', [
             'className' => AnotherComment::class,
-            'foreignKey' => 'article_id'
+            'foreignKey' => 'article_id',
+            'order' => 'id ASC'
         ]);
-    }
-
-    public function find(string $type = 'first', array $options = [])
-    {
-        return $this->findCached($type, $options);
+       
+        $this->cacheConfig('cache-test');
     }
 }
 
 class AnotherComment extends Model
 {
-    protected $cacheConfig = 'cache-test';
     protected $table = 'comments';
 
     use Timestampable,Cacheable;
 
     public function initialize(array $config) : void
     {
-        $this->belongsTo('Comment', [
+        $this->belongsTo('Article', [
             'className' => YetAnotherArticle::class,
             'foreignKey' => 'article_id'
         ]);
-    }
-
-    public function find(string $type = 'first', array $options = [])
-    {
-        return $this->findCached($type, $options);
+        $this->cacheConfig('cache-test');
     }
 }
 
@@ -84,9 +76,42 @@ class CacheableTest extends OriginTestCase
     {
         // Load into cache and test its from cache
         $article = $this->Article->get(1000);
-        $this->Article->updateColumn($article->id, 'title', 'cached');
+        $this->Article->updateColumn($article->id, 'title', 'not cached');
         $cached = $this->Article->get(1000);
         $this->assertEquals('Article #1', $cached->title);
+    }
+
+    /**
+     * @depends testFind
+     */
+    public function testEnableDisableCache()
+    {
+        // Load into cache and test its from cache
+        $article = $this->Article->get(1000);
+        $this->Article->updateColumn($article->id, 'title', 'not cached');
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('Article #1', $cached->title);
+
+        $this->Article->disableCache();
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('not cached', $cached->title);
+
+        $this->Article->enableCache();
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('Article #1', $cached->title);
+    }
+
+    public function testClearCache()
+    {
+        // Load into cache and test its from cache
+        $article = $this->Article->get(1000);
+        $this->Article->updateColumn($article->id, 'title', 'not cached');
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('Article #1', $cached->title);
+
+        $this->Article->invalidateCache();
+        $cached = $this->Article->get(1000);
+        $this->assertEquals('not cached', $cached->title);
     }
 
     /**
@@ -108,6 +133,27 @@ class CacheableTest extends OriginTestCase
         // Load Data through normal Load
         $comment = $this->Article->Comment->get(1001);
         $this->assertEquals('foo', $comment->description);
+    }
+
+    /**
+     * @depends testFind
+     */
+    public function testClearCacheAssociated()
+    {
+       
+        // Load into cache and test its from cache
+        $article = $this->Article->get(1000, ['associated' => ['Comment']]);
+        $commentId = $article->comments[0]->id;
+    
+        $this->Article->Comment->updateColumn($commentId, 'description', 'foo bar');
+
+        $cached = $this->Article->get(1000, ['associated' => ['Comment']]);
+        $this->assertEquals($article->comments[0]->description, $cached->comments[0]->description);
+       
+        // Clear cache on associated model then call on original model
+        $this->Article->Comment->invalidateCache(true);
+        $article = $this->Article->get(1000, ['associated' => ['Comment']]);
+        $this->assertEquals('foo bar', $article->comments[0]->description);
     }
 
     /**

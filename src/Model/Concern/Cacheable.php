@@ -17,32 +17,46 @@ namespace Origin\Model\Concern;
 use Origin\Cache\Cache;
 
 /**
- * Cacheable Concern
+ * Cacheable Concern.
  *
- * Elegant model caching, does not work with file based cache as it requires increment and filebased caching will
- * be slower.
- *
- * To use either call the findCached method or override the your find method in your ApplicationModel or
- * any other model which you want all queries to be cached for.
- *
- * for example
- *
- *  public function find(string $type = 'first', array $options = [])
- *  {
- *       return $this->findCached($type, $options);
- *  }
  */
 trait Cacheable
 {
     /**
-     * Register callbacks
+     * Cache configuration to use
+     *
+     * @var string
+     */
+    private $cacheConfig = 'default';
+
+    private $cacheEnabled = true;
+
+    /**
+     * initialize cacheable
      *
      * @return void
      */
     protected function initializeCacheable(): void
     {
-        $this->afterSave('invalidateCache'); // create or update
-        $this->afterDelete('invalidateCache');
+        $this->afterCreate('cacheableEvent');
+        $this->afterUpdate('cacheableEvent');
+        $this->afterDelete('cacheableEvent');
+    }
+
+    /**
+     * Sets or gets the cache config. Set from initialize in the model.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function cacheConfig(string $name = null) : ?string
+    {
+        if ($name === null) {
+            return $this->cacheConfig;
+        }
+        $this->cacheConfig = $name;
+
+        return null;
     }
 
     /**
@@ -50,6 +64,7 @@ trait Cacheable
     *
     * @param string $type  (first,all,count,list)
     * @param array $options  The options array can work with the following keys
+    *   - cache: default true. Results are cached.
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
@@ -61,33 +76,48 @@ trait Cacheable
     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
     * @return mixed $result
     */
-    public function findCached(string $type = 'first', array $options = [])
+    public function find(string $type = 'first', array $options = [])
     {
-        $cache = Cache::store($this->cacheConfig ?? 'default');
+        $options += ['cache' => true];
+
+        if ($this->cacheEnabled === false or ! $options['cache']) {
+            return parent::find($type, $options);
+        }
+
+        $cache = Cache::store($this->cacheConfig);
 
         $key = md5($this->name . $type  . var_export($options, true));
-
+    
         $cacheId = $cache->read($this->name . '-id') ?: 1;
         $result = $cache->read($key);
-        
+    
         if ($result and $result['id'] === $cacheId) {
             return $result['data'];
         }
-
+ 
         $result = parent::find($type, $options);
-
+    
         $cache->write($key, ['id' => $cacheId, 'data' => $result]);
         $cache->write($this->name . '-id', $cacheId);
-
+    
         return $result;
     }
 
     /**
-     * Invalidate the cache for this model and associated models
+     * This is an event which is triggered using model callbacks
      *
-     * If you have used model methods which dont use callbacks, then you should call this method afterwards.
+     * @return void
+     */
+    protected function cacheableEvent() : void
+    {
+        $this->invalidateCache(true);
+    }
+
+    /**
+     * Invalidate the cache
      *
-     * The following model methods modify the database but do not trigger callbacks:
+     * If you have used model methods which dont use callbacks, then you should call this method afterwards. The
+     * following model methods modify the database but do not trigger callbacks:
      *
      * - updateColumn
      * - deleteAll
@@ -95,32 +125,55 @@ trait Cacheable
      * - increment
      * - decrement
      *
+     * @param boolean $associated default: false. Clear cache on associated models
      * @return void
      */
-    public function invalidateCache(): void
+    public function invalidateCache(bool $associated = false): void
     {
-        $this->incrementCacheId();
+        // Increment CacheID
+        $cache = Cache::store($this->cacheConfig);
+        if ($cache->exists($this->name . '-id')) {
+            $cache->increment($this->name . '-id');
+        }
 
-        foreach ([$this->belongsTo, $this->hasMany, $this->hasOne, $this->hasAndBelongsToMany] as $association) {
-            foreach ($association as $alias => $data) {
-                if (method_exists($this->$alias, 'incrementCacheId')) {
-                    $this->$alias->incrementCacheId();
+        if ($associated) {
+            foreach ([$this->belongsTo, $this->hasMany, $this->hasOne, $this->hasAndBelongsToMany] as $association) {
+                foreach ($association as $alias => $config) {
+                    if (method_exists($this->$alias, 'invalidateCache')) {
+                        $this->$alias->invalidateCache();
+                    }
                 }
             }
         }
     }
 
     /**
-     * This increments the cacheId, this used to when invalidating cache externally from a different
-     * model. Use invalidateCache instead.
-     *
-     * @return void
-     */
-    public function incrementCacheId(): void
+    * Enables cache after being disabled
+    *
+    * @return boolean
+    */
+    public function enableCache() : bool
     {
-        $cache = Cache::store($this->cacheConfig ?? 'default');
-        if ($cache->exists($this->name . '-id')) {
-            $cache->increment($this->name . '-id');
+        if ($this->cacheEnabled) {
+            return false;
         }
+
+        return $this->cacheEnabled = true;
+    }
+
+    /**
+     * Disables the caching
+     *
+     * @return boolean
+     */
+    public function disableCache() : bool
+    {
+        if ($this->cacheEnabled) {
+            $this->cacheEnabled = false;
+
+            return true;
+        }
+
+        return false;
     }
 }
