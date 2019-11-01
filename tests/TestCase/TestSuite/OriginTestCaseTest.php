@@ -59,8 +59,6 @@ class StrawberyTart
     }
 }
 
-
-
 class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
 {
     public function testMock()
@@ -114,6 +112,13 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $OriginTestCase = new AnotherMockOriginTestCase();
         $this->assertNull($OriginTestCase->setUp());
         $this->assertNull($OriginTestCase->tearDown());
+    }
+
+    public function testFixtures()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $OriginTestCase->fixtures(['Article']);
+        $this->assertEquals(['Article'], $OriginTestCase->fixtures());
     }
 }
 /**

@@ -99,8 +99,33 @@ EOF;
         $this->assertStringContainsString($expected, $out);
     }
 
+    public function testDebugHtml()
+    {
+        ob_start();
+        debug('<p>foo</p>', true);
+        $out = ob_get_clean();
+        
+        $expected = <<< EOF
+# # # # # DEBUG # # # # #
+tests/TestCase/FunctionsTest.php Line: 105
+
+&lt;p&gt;foo&lt;/p&gt;
+
+# # # # # # # # # # # # #
+EOF;
+        $this->assertStringContainsString($expected, $out);
+    }
+
     public function testUid()
     {
         $this->assertEquals(12, strlen(uid()));
+    }
+
+    public function testPj()
+    {
+        ob_start();
+        pj(['key' => 'value']);
+        $out = ob_get_clean();
+        $this->assertStringContainsString("{\n    \"key\": \"value\"\n}\n", $out);
     }
 }

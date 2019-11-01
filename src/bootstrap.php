@@ -12,6 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use Origin\Cache\Cache;
+use Origin\Core\Config;
+
 define('START_TIME', microtime(true));
 
 /*
@@ -36,3 +39,14 @@ $errorHandler = (PHP_SAPI === 'cli') ? new Origin\Console\ErrorHandler() : new O
 $errorHandler->register();
 
 require ORIGIN . '/src/Core/functions.php';
+
+/**
+ *
+ */
+Cache::config('origin', [
+    'engine' => 'File',
+    'path' => CACHE . '/origin',
+    'duration' => Config::read('debug') ? '+2 minutes' : '+24 hours',
+    'prefix' => 'cache_',
+    'serialize' => true
+]);

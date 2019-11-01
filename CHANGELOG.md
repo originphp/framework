@@ -1,6 +1,11 @@
 # Changelog
 ## [Unreleased]
 
+
+## [2.1.0] - 2019-11-01
+### Added
+- Added Cacheable concern for Models
+
 ## [2.0.1] - 2019-10-30
 ### Fixed
 - OriginTestCase changed to Abstract class which was causing unexpected issues with PHPUnit
