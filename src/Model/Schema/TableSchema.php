@@ -94,7 +94,7 @@ class TableSchema
     /**
      * Gets the statements
      *
-     * @param Datasource $datasource
+     * @param \Origin\Model\Connection $datasource
      * @return array
      */
     public function toSql(Connection $datasource) : array

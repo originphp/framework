@@ -25,12 +25,12 @@ class Association
      *
      * @var \Origin\Model\Model
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * The constructor
      *
-     * @param Model $model
+     * @param \Origin\Model\Model $model
      */
     public function __construct(Model $model)
     {
@@ -424,7 +424,7 @@ class Association
     /**
      * Deletes the hasOne and hasMany associated records.
      *
-     * @var int|string $primaryKey
+     * @param int|string $primaryKey
      * @param boolean $callbacks
      * @return boolean
      */
@@ -457,7 +457,7 @@ class Association
     /**
      * Deletes the hasAndBelongsToMany associated records.
      *
-     * @var int|string $id
+     * @param int|string $id
      * @param boolean $callbacks
      * @return boolean
      */

@@ -23,9 +23,25 @@ use Origin\Inflector\Inflector;
 
 class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
 {
-    protected $items = null;
+    /**
+     * Items in collection
+     *
+     * @var array
+     */
+    protected $items;
+
+    /**
+     * Position in items
+     *
+     * @var integer
+     */
     protected $position = 0;
-    protected $model = null;
+    /**
+     * Name of model
+     *
+     * @var string|null
+     */
+    protected $model;
     
     public function __construct(array $items, array $options = [])
     {
@@ -111,7 +127,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
     /**
      * ArrayAcces Interface for isset($collection);
      *
-     * @param mixed $offset
+     * @param mixed $key
      * @return bool result
      */
     public function offsetExists($key)
@@ -120,9 +136,9 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
     }
  
     /**
-     * ArrayAccess Interface for $collection[$offset];
+     * ArrayAccess Interface for $collection[$key];
      *
-     * @param mixed $offset
+     * @param mixed $key
      * @return mixed
      */
     public function offsetGet($key)
@@ -131,9 +147,9 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
     }
 
     /**
-     * ArrayAccess Interface for $collection[$offset] = $value;
+     * ArrayAccess Interface for $collection[$key] = $value;
      *
-     * @param mixed $offset
+     * @param mixed $key
      * @param mixed $value
      * @return void
      */
@@ -147,9 +163,9 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
     }
  
     /**
-     * ArrayAccess Interface for unset($collection[$offset]);
+     * ArrayAccess Interface for unset($collection[$key]);
      *
-     * @param mixed $offset
+     * @param mixed $key
      * @return void
      */
     public function offsetUnset($key)
@@ -182,6 +198,11 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
         return isset($this->items[$this->position]);
     }
     
+    /**
+     * Gets the first item in the collection
+     *
+     * @return \Origin\Model\Entity|null
+     */
     public function first()
     {
         return $this->items[0] ?? null;

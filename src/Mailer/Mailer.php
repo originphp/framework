@@ -114,6 +114,13 @@ abstract class Mailer
      */
     protected $template = null;
 
+    /**
+     * Arguments to be used
+     *
+     * @var array
+     */
+    protected $arguments = [];
+
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];

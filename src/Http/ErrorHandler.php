@@ -180,7 +180,7 @@ class ErrorHandler
             $errorCode = 404;
         }
 
-        $this->logException($exception, $errorCode);
+        $this->logException($exception);
         $this->cleanBuffer();
 
         /**
@@ -200,7 +200,7 @@ class ErrorHandler
     /**
      * Logs The exception
      *
-     * @param Exception $exception
+     * @param \Exception $exception
      * @return void
      */
     protected function logException($exception): void
