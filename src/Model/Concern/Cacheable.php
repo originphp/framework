@@ -18,7 +18,6 @@ use Origin\Cache\Cache;
 
 /**
  * Cacheable Concern.
- *
  */
 trait Cacheable
 {
@@ -29,6 +28,11 @@ trait Cacheable
      */
     private $cacheConfig = 'default';
 
+    /**
+     * Flag
+     *
+     * @var boolean
+     */
     private $cacheEnabled = true;
 
     /**
@@ -168,12 +172,11 @@ trait Cacheable
      */
     public function disableCache() : bool
     {
-        if ($this->cacheEnabled) {
-            $this->cacheEnabled = false;
-
-            return true;
+        if (!$this->cacheEnabled) {
+            return false;
         }
 
-        return false;
+        $this->cacheEnabled = false;
+        return true;
     }
 }
