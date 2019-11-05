@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.33.5] - 2019-11-05
+
+### Fixed
+- Fixed issue which triggers bug in PHP 7.3 (only)
+
 ## [1.33.4] - 2019-10-18
 
 ### Fixed

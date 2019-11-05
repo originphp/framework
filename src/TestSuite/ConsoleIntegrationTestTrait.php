@@ -63,11 +63,11 @@ trait ConsoleIntegrationTestTrait
     protected $command = null;
 
     /**
-     * Holds the result from the exec.
+     * Holds the commandResult from the exec.
      *
      * @var bool
      */
-    protected $result = null;
+    protected $commandResult = null;
 
     /**
      * Gets the stdout output (standard non errors)
@@ -111,7 +111,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function exec(string $command, array $input = [])
     {
-        $this->shell = $this->result = null;
+        $this->shell = $this->commandResult = null;
 
         $this->stdout = new ConsoleOutput();
         $this->stderr = new ConsoleOutput();
@@ -140,13 +140,13 @@ trait ConsoleIntegrationTestTrait
             // @codeCoverageIgnoreStart
             $this->stderr = $this->stdout; // Fixture Issue
             $dispatcher = new ShellDispatcher($argv, $this->stdout, $this->stdin);
-            $this->result = $dispatcher->start();
+            $this->commandResult = $dispatcher->start();
             $this->shell = $dispatcher->shell();
         // @codeCoverageIgnoreEnd
         } else {
             $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
             $commandRunner = new CommandRunner($io);
-            $this->result = $commandRunner->run($argv);
+            $this->commandResult = $commandRunner->run($argv);
             $this->command = $commandRunner->command();
         }
     }
@@ -194,7 +194,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitSuccess()
     {
-        $this->assertTrue($this->result);
+        $this->assertTrue($this->commandResult);
     }
 
     /**
@@ -202,7 +202,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertExitError()
     {
-        $this->assertFalse($this->result);
+        $this->assertFalse($this->commandResult);
     }
 
     /**
