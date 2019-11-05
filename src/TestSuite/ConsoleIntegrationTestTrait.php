@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -9,12 +8,10 @@ declare(strict_types = 1);
  * portions of the Software.
  *
  * @copyright   Copyright (c) Jamiel Sharief
- *
  * @see       https://www.originphp.com
- *
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Origin\Console\ConsoleIo;
@@ -50,32 +47,28 @@ trait ConsoleIntegrationTestTrait
     protected $stdin = null;
 
     /**
-     * This holds the legacy shell object.
-     *
-     * @var \Origin\Console\Shell;
-     */
-    protected $shell = null;
-
-    /**
      * This is the command object.
      *
-     * @var \Origin\Console\Command
+     * @var \Origin\Console\Command\Command
      */
     protected $command = null;
 
     /**
      * Holds the result from the exec.
      *
-     * @var bool
+     * @internal this has been renamed from result to strange bug in PHP 7.3 when reflected
+     * which was causing segmentation faults phpunit/phpstan
+     *
+     * @var int|null
      */
-    protected $result = null;
+    protected $commandResult = null;
 
     /**
      * Gets the stdout output (standard non errors)
      *
      * @return string
      */
-    public function output()
+    public function output() : string
     {
         return $this->stdout->read();
     }
@@ -85,7 +78,7 @@ trait ConsoleIntegrationTestTrait
     *
     * @return string
     */
-    public function error()
+    public function error() : string
     {
         return $this->stderr->read();
     }
@@ -98,9 +91,9 @@ trait ConsoleIntegrationTestTrait
      *
      * @return string $output The messages from the console output
      */
-    public function exec(string $command, array $input = [])
+    public function exec(string $command, array $input = []) : void
     {
-        $this->shell = $this->result = null;
+        $this->commandResult = null;
 
         $this->stdout = new ConsoleOutput();
         $this->stderr = new ConsoleOutput();
@@ -126,7 +119,7 @@ trait ConsoleIntegrationTestTrait
 
         $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
         $commandRunner = new CommandRunner($io);
-        $this->result = $commandRunner->run($argv);
+        $this->commandResult = $commandRunner->run($argv);
         $this->command = $commandRunner->command();
     }
 
@@ -135,7 +128,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $needle The text that you want to assert that is in the output
      */
-    public function assertOutputContains(string $needle)
+    public function assertOutputContains(string $needle) : void
     {
         $this->assertStringContainsString($needle, $this->stdout->read());
     }
@@ -145,7 +138,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $needle The text that you want to assert that is in the output
      */
-    public function assertOutputNotContains(string $needle)
+    public function assertOutputNotContains(string $needle) : void
     {
         $this->assertStringNotContainsString($needle, $this->stdout->read());
     }
@@ -155,7 +148,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertOutputRegExp(string $expression)
+    public function assertOutputRegExp(string $expression) : void
     {
         $this->assertRegexp($expression, $this->stdout->read());
     }
@@ -163,7 +156,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts that console output is empty.
      */
-    public function assertOutputEmpty()
+    public function assertOutputEmpty() : void
     {
         $this->assertStringContainsString('', $this->stdout->read());
     }
@@ -171,25 +164,25 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts that the command was run and was not halted using command::abort().
      */
-    public function assertExitSuccess()
+    public function assertExitSuccess() : void
     {
-        $this->assertEquals(Command::SUCCESS, $this->result);
+        $this->assertEquals(Command::SUCCESS, $this->commandResult);
     }
 
     /**
      * Asserts that the command was run was halted using command::abort().
      */
-    public function assertExitError()
+    public function assertExitError() : void
     {
-        $this->assertEquals(Command::ERROR, $this->result);
+        $this->assertEquals(Command::ERROR, $this->commandResult);
     }
 
     /**
      * Asserts a particular exit code
      */
-    public function assertExitCode(int $exitCode)
+    public function assertExitCode(int $exitCode) : void
     {
-        $this->assertEquals($exitCode, $this->result);
+        $this->assertEquals($exitCode, $this->commandResult);
     }
 
     /**
@@ -197,7 +190,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertErrorContains(string $message)
+    public function assertErrorContains(string $message) : void
     {
         $this->assertStringContainsString($message, $this->stderr->read());
     }
@@ -207,7 +200,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertErrorNotContains(string $message)
+    public function assertErrorNotContains(string $message) : void
     {
         $this->assertStringNotContainsString($message, $this->stderr->read());
     }
@@ -216,8 +209,9 @@ trait ConsoleIntegrationTestTrait
      * Assert error output against a regex expression
      *
      * @param string $message
+     * @return void;
      */
-    public function assertErrorRegExp(string $expression)
+    public function assertErrorRegExp(string $expression) : void
     {
         $this->assertRegexp($expression, $this->stderr->read());
     }
@@ -227,7 +221,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @return \Origin\Console\Command\Command
      */
-    public function command()
+    public function command() : Command
     {
         return $this->command;
     }
