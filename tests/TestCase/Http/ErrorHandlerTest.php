@@ -21,6 +21,7 @@ use Origin\Http\Request;
 use Origin\Http\ErrorHandler;
 use Origin\Http\Exception\NotFoundException;
 use Origin\Http\Exception\InternalErrorException;
+use Origin\Http\Exception\ServiceUnavailableException;
 
 class MockErrorHandler extends ErrorHandler
 {
@@ -67,7 +68,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>NOTICE:</strong>', $result);
         $this->assertStringContainsString('Undefined variable: unkown', $result);
-        $this->assertStringContainsString('line: <strong>64</strong>', $result);
+        $this->assertStringContainsString('line: <strong>65</strong>', $result);
     }
 
     public function testErrorHandlerWarning()
@@ -84,7 +85,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>WARNING:</strong>', $result);
         $this->assertStringContainsString('Invalid error type specified', $result);
-        $this->assertStringContainsString('line: <strong>81</strong>', $result);
+        $this->assertStringContainsString('line: <strong>82</strong>', $result);
     }
 
     public function testErrorHandlerError()
@@ -101,7 +102,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>ERROR:</strong>', $result);
         $this->assertStringContainsString('An error has occured', $result);
-        $this->assertStringContainsString('line: <strong>98</strong>', $result);
+        $this->assertStringContainsString('line: <strong>99</strong>', $result);
     }
     
     public function testErrorHandlerDeprecated()
@@ -118,7 +119,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>DEPRECATED:</strong>', $result);
         $this->assertStringContainsString('Function has been deprecated', $result);
-        $this->assertStringContainsString('line: <strong>115</strong>', $result);
+        $this->assertStringContainsString('line: <strong>116</strong>', $result);
     }
 
     public function testErrorHandlerSupressed()
@@ -182,6 +183,21 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<h1>Page not found</h1>', $errorHandler->response());
     }
 
+    public function testExceptionHandlerDebugDisabledNonHttp()
+    {
+        $errorHandler = new MockErrorHandler();
+        $errorHandler->register();
+
+        Config::write('debug', false);
+       
+        $errorHandler->exceptionHandler(
+            new \Origin\Core\Exception\Exception('passwords.txt could not be found')
+        );
+ 
+        $this->assertStringNotContainsString('passwords.txt could not be found', $errorHandler->response());
+        $this->assertStringContainsString('<h1>An Internal Error Has Occured</h1>', $errorHandler->response());
+    }
+
     public function testExceptionHandlerAjax()
     {
         $request = new Request('/api/users/fetch');
@@ -218,7 +234,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('{"error":{"message":"Index not found","code":404}}', $errorHandler->response());
     }
 
-    public function testExceptionHandlerAjaxDebugDisabledInternalError()
+    public function testExceptionHandlerAjaxDebugDisabledNonHttp()
     {
         $request = new Request('/api/users/fetch');
         $request->type('json');
@@ -230,10 +246,28 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         Config::write('debug', false);
        
         $errorHandler->exceptionHandler(
-            new InternalErrorException('Not Developed Yet')
+            new \Origin\Core\Exception\Exception('passwords.txt could not be found')
         );
 
         $this->assertStringContainsString('{"error":{"message":"An Internal Error has Occured","code":500}}', $errorHandler->response());
+    }
+
+    public function testExceptionHandlerAjaxDebugDisabledServiceUnavailable()
+    {
+        $request = new Request('/api/users/fetch');
+        $request->type('json');
+        Router::request($request);
+
+        $errorHandler = new MockErrorHandler();
+        $errorHandler->register();
+
+        Config::write('debug', false);
+       
+        $errorHandler->exceptionHandler(
+            new ServiceUnavailableException()
+        );
+
+        $this->assertStringContainsString('{"error":{"message":"Service Unavailable","code":503}}', $errorHandler->response());
     }
 
     public function testFatalError()
