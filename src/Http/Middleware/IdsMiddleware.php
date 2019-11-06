@@ -117,7 +117,7 @@ class IdsMiddleware extends Middleware
         //
    
         $this->run(['GET'=>$request->env('REQUEST_URI'),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
-        //debug($request->env('REQUEST_URI'));
+
         $this->report($request);
  
         $this->cleanUp();
@@ -239,6 +239,6 @@ class IdsMiddleware extends Middleware
      */
     protected function cleanUp() : void
     {
-        $this->rules = $this->events = [];
+        $this->rules = $this->events = null;
     }
 }
