@@ -1,8 +1,7 @@
 # Changelog
 ## [Unreleased]
 
-## [2.2.0] - 2019-11-xx
-
+## [2.2.0] - 2019-11-06
 
 ### Fixed
 - Fixed issue with group reflection of tests in PHP 7.3 only
