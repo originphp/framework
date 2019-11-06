@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -23,6 +22,12 @@ use Origin\Http\Request;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Exception\ServiceUnavailableException;
 
+/**
+ * A middleware for throttling requests from some bots and provides some protection ddos attacks.
+ *
+ * Note. Everything is handled at the request stage, so even requesting invalid pages would be counted.
+ * Make sure you have a fav icon if not each request will be counted as two.
+ */
 class ThrottleMiddleware extends Middleware
 {
     /**
@@ -35,8 +40,8 @@ class ThrottleMiddleware extends Middleware
      */
     protected $defaultConfig = [
         'limit' => 10,
-        'period' => 10,
-        'ban' => '+15 minutes',
+        'seconds' => 10,
+        'ban' => '+30 minutes',
         'blacklist' => TMP . '/blacklist.php'
     ];
 
@@ -58,7 +63,7 @@ class ThrottleMiddleware extends Middleware
     {
         // create copy of framework config and adjust duration
         $config = Cache::config('origin');
-        $config['duration'] = '+' . $this->config['period'] . ' seconds';
+        $config['duration'] = '+' . $this->config['seconds'] . ' seconds';
         Cache::config('throttle', $config);
     }
 
@@ -103,7 +108,9 @@ class ThrottleMiddleware extends Middleware
     }
 
     /**
-     * Throttles the request for an IP address
+     * Throttles the request for an IP address.
+     *
+     * Stores the the most recent requests, older requests are pushed out of the list.
      *
      * @param string $ipAddress
      * @return void
@@ -112,11 +119,35 @@ class ThrottleMiddleware extends Middleware
     {
         $cache = Cache::store('throttle');
         $requestId = md5('throttle-' . $ipAddress);
-        $requests = $cache->read($requestId) ?: 0;
-        if ($requests >= $this->config['limit']) {
+        $requests = $cache->read($requestId) ?: [];
+
+        $requests[] = time(); // count request
+    
+        $recent = $this->filterRequests($requests);
+
+        if (count($recent) > $this->config['limit']) {
             $this->ban($ipAddress);
         }
-        $cache->increment($requestId, 1);
+
+        $cache->write($requestId, $recent);
+    }
+
+    /**
+     * Filters older requests from list
+     *
+     * @param array $requests
+     * @return array
+     */
+    private function filterRequests(array $requests) : array
+    {
+        $from = strtotime('-' . $this->config['seconds'] . ' seconds');
+        $recent = [];
+        foreach ($requests as $request) {
+            if ($request >= $from) {
+                $recent[] = $request;
+            }
+        }
+        return $recent;
     }
 
     /**
@@ -148,9 +179,12 @@ class ThrottleMiddleware extends Middleware
             }
         }
 
-        (new PhpFile())->write($this->config['blacklist'], $out);
+        $tmpfile = tempnam(sys_get_temp_dir(), '');
+
+        (new PhpFile())->write($tmpfile, $out);
+        rename($tmpfile, $this->config['blacklist']);
 
         // Free memory
-        $this->blacklist = [];
+        $this->blacklist = null;
     }
 }
