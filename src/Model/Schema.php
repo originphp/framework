@@ -23,7 +23,7 @@ class Schema
     /**
      * Returns the SQL for creating tables, indexes and foreign keys
      *
-     * @param Datasource $datasource
+     * @param \Origin\Model\Connection $datasource
      * @return array
      */
     public function createSql(Connection $datasource) : array
@@ -79,7 +79,7 @@ class Schema
     /**
      * Returns the SQL for dropping tables
      *
-     * @param Datasource $datasource
+     * @param \Origin\Model\Connection $datasource
      * @return array
      */
     public function dropSql(Connection $datasource) : array

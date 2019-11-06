@@ -35,7 +35,8 @@ abstract class Connection
      *
      * @var string
      */
-    protected $name = null;
+    protected $name;
+    
     /**
      * Holds the connection to datasource.
      *
@@ -85,7 +86,7 @@ abstract class Connection
     /**
      * Holds the schema adapter
      *
-     * @var \Origin\Model\Schema\BaseSchema
+     * @var \Origin\Model\Schema\BaseSchema|null;
      */
     protected $adapter = null;
 
@@ -96,6 +97,9 @@ abstract class Connection
      */
     protected $transactionStarted = false;
 
+    /**
+     * @var string
+     */
     protected $quote = '`';
 
     /**
@@ -142,11 +146,7 @@ abstract class Connection
      */
     public function isConnected() : bool
     {
-        if ($this->connection === null) {
-            return false;
-        }
-        
-        return is_object($this->connection);
+        return $this->connection !== null;
     }
 
     /**

@@ -1,6 +1,25 @@
 # Changelog
 ## [Unreleased]
 
+## [2.2.0] - 2019-11-06
+
+### Fixed
+- Fixed issue with group reflection of tests in PHP 7.3 only
+
+### Changed
+- exceptions that extends HttpException will now show error message even if status code is 500 or above.
+
+### Added
+
+- PhpFile - class for reading/and writing arrays to files
+- AccessLogMiddleware
+- FirewallMiddleware
+- IdsMiddleware
+- ProfilerMiddleware
+- ThrottleMiddleware
+
+### Changed
+- Controller::redirect adjusted and now no longer stops script execution, it lets the dispatcher handle this.
 
 ## [2.1.0] - 2019-11-01
 ### Added

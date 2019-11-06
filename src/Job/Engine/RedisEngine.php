@@ -22,10 +22,10 @@ use Origin\Redis\RedisConnection;
 class RedisEngine extends BaseEngine
 {
     /**
-         * Redis Object
-         *
-         * @var \Redis
-         */
+     * Redis Object
+     *
+     * @var \Redis
+     */
     protected $Redis = null;
 
     protected $defaultConfig = [
@@ -176,7 +176,7 @@ class RedisEngine extends BaseEngine
      *
      * @return \Redis
      */
-    public function redis()
+    public function redis() : Redis
     {
         return $this->Redis;
     }

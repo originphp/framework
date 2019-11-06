@@ -28,7 +28,7 @@ class Seed
     /**
      * Creates the SQL statements for inserting
      *
-     * @param Datasource $connection
+     * @param \Origin\Model\Connection $connection
      * @return array
      */
     public function insertSql(Connection $connection) : array

@@ -502,9 +502,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             ->method('header')
             ->with('Location', '/tests/view/2048');
 
-        $response->expects($this->once())
-            ->method('send');
-
         $this->assertInstanceOf(Response::class, $controller->redirect([
             'action' => 'view', 2048,
         ]));

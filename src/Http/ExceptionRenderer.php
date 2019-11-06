@@ -74,13 +74,14 @@ class ExceptionRenderer
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
         $errorMessage = ($exception->getCode() === 404) ? 'Not Found' : 'An Internal Error has Occured';
-        if ($exception instanceof HttpException and $exception->getCode() < 500) {
+        if ($exception instanceof HttpException) {
             $errorCode = $exception->getCode();
             $errorMessage = $exception->getMessage(); # used in rendering
         }
 
         return [$errorCode,$errorMessage];
     }
+    
     protected function getFileToRender($exception)
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;

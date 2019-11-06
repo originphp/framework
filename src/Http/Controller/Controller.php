@@ -38,8 +38,7 @@ use Origin\Http\Controller\Exception\PrivateMethodException;
  */
 class Controller
 {
-    use ModelTrait, InitializerTrait, CallbackRegistrationTrait;
-    use HookTrait;
+    use ModelTrait, InitializerTrait, CallbackRegistrationTrait,HookTrait;
     /**
      * Controller name.
      *
@@ -607,9 +606,7 @@ class Controller
 
         $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));
-        $this->response->send();
-        $this->response->stop();
-
+ 
         // Return the response object once called
         return $this->response;
     }
