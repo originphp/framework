@@ -19,116 +19,111 @@ namespace App\Test\Http\Middleware;
  */
 class IdsRuleTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSqlInjectionParanoid()
+    public function testSqlInjectionWithHex()
     {
-        ///(\%27)|(\')|(?<!=)=(?!=)|(\%23)|(\#)|(\-\-)|(\%2D)/i
-        $pattern = '/(\')|(\%27)|(\#)|(\%23)|(\-\-)|(((\/|(\%2F))(\*|(\%2A))))/i';
-
-        # Test Matches
-        $this->assertRegExp($pattern, "This is a test %27 string");
-        $this->assertRegExp($pattern, "This is a test ' string");
-        $this->assertRegExp($pattern, "This is a test %23 string");
-        $this->assertRegExp($pattern, "This is a test # string");
-        $this->assertRegExp($pattern, "This is a test -- string");
-        $this->assertRegExp($pattern, "This is a test /* string");
-        $this->assertRegExp($pattern, "This is a test %2f* string");
-        $this->assertRegExp($pattern, "This is a test /%2a string");
-
-        # Test NonMatches
-        $this->assertNotRegExp($pattern, "This is a test - string"); //(?<!=)=(?!=)
-        $this->assertNotRegExp($pattern, "This is a test / string");
-        $this->assertNotRegExp($pattern, "This is a test * string");
+        $pattern = '/((\')|(\%27)).*((\%[a-f0-9]+))/';
+        $this->assertRegExp($pattern, "admin' %2F* inline comment ");
+        $this->assertRegExp($pattern, "admin'%20%6Fr 1>0");
+        $this->assertRegExp($pattern, "admin'%0#");
+        $this->assertRegExp($pattern, "admin' %2F* inline comment ");
+        $this->assertRegExp($pattern, "admin' /%2A inline comment ");
+        $this->assertRegExp($pattern, "admin' %41ND 1=0");
+        $this->assertRegExp($pattern, "admin' %61ND 1=0");
+        $this->assertRegExp($pattern, "admin'%20%6Fr 1>0");
+        $this->assertRegExp($pattern, "admin'%20 or 1>0");
+        $this->assertRegExp($pattern, "admin'%20AND 1=1");
+        $this->assertRegExp($pattern, "admin'%20 AND 1=1");
+        $this->assertRegExp($pattern, "admin' %6Fr 1>0");
     }
-
-    /**
-     * Tests Quote and Comment
-     *
-     * @return void
-     */
+    
     public function testSqlInjectionRuleQuoteAndComment()
     {
-        $pattern = '/\w*((\%27)|(\'))(?:((\%20)|\s+))?((\-\-)|(\%23)|(\#)|(\%3b)|;|((\/|(\%2F))(\*|(\%2A))))/i';
-        
-        # Test Matches
-
-        $this->assertRegExp($pattern, "admin'%20#");
+        $pattern = '/((\')|(\%27)).*(\#|\-\-|\/\*)/i';
+        ///((\d\)?)|(\')|(\%27)).*(\#|\-\-|\/\*)/i
         $this->assertRegExp($pattern, "admin'#");
         $this->assertRegExp($pattern, "admin'  #");
         $this->assertRegExp($pattern, "admin' #");
-        $this->assertRegExp($pattern, "admin%27%20#");
+        $this->assertRegExp($pattern, "admin%27 #");
         $this->assertRegExp($pattern, "admin'--");
         $this->assertRegExp($pattern, "admin' --");
         $this->assertRegExp($pattern, "admin'  --");
-        $this->assertRegExp($pattern, "admin' /* inline comment ");
-        $this->assertRegExp($pattern, "admin' %2F* inline comment ");
-        $this->assertRegExp($pattern, "admin' /%2A inline comment ");
+        $this->assertRegExp($pattern, "admin' /* inline comment */");
+        //  $this->assertRegExp($pattern, "1--");
+        
+        /**
+         * ; is issue, need to find out else to implement
+         * $this->assertRegExp($pattern, "admin';");
+         */
     
         # Test Non Matches
+        $this->assertNotRegExp($pattern, "'admin'");
         $this->assertNotRegExp($pattern, "admin'");
         $this->assertNotRegExp($pattern, "admin' ");
         $this->assertNotRegExp($pattern, "#'");
         $this->assertNotRegExp($pattern, "admin'  -");
+        $this->assertNotRegExp($pattern, "<script>alert('hello');</script");
     }
 
-    public function testSqlInjectionOr()
+
+    public function testSqlInjectionNumber()
     {
-        // ([(\%20)|\s]+)
-        $pattern = '/((\%27)|(\'))([(\%20)|\s]+)((\%6F)|o|(\%4F))((\%72)|r|(\%52))([(\%20)|\s]+)/i';
+        $pattern = '/((\')|(\d\)?)|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i';
+
+        $this->assertRegExp($pattern, "' HAVING 1=1 --");
+        $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
+        $this->assertRegExp($pattern, "admin' GROUP BY 'abc' HAVING 1=1--");
+        $this->assertRegExp($pattern, "admin' OR '1'='1' /*");
+
+        $this->assertRegExp($pattern, "1 HAVING 1=1 --");
+        $this->assertRegExp($pattern, "2 AND 1=0 UNION ALL SELECT");
+        $this->assertRegExp($pattern, "3 GROUP BY 'abc' HAVING 1=1--");
+        $this->assertRegExp($pattern, "4 OR '1'='1' /*");
+        $this->assertRegExp($pattern, "1 OR 2 = 2");
+        $this->assertRegExp($pattern, "1) OR ('foo' = 'foo')");
+
+        $this->assertRegExp($pattern, "admin' or 1>0");
+        $this->assertRegExp($pattern, "admin'  or 1>0");
+        $this->assertRegExp($pattern, "admin'  or 1>0");
+    
+        $this->assertRegExp($pattern, "admin' AND 1=0");
+        $this->assertRegExp($pattern, "admin'  AND 1=1");
+
+        $this->assertNotRegExp($pattern, "500 having babies");
+        $this->assertNotRegExp($pattern, "jim' and 'foo");
+        $this->assertNotRegExp($pattern, "1 = 2");
+        $this->assertNotRegExp($pattern, "FOR = 4");
+    }
+
+
+    public function testSqlInjectionOperators()
+    {
+        $pattern = '/((\')|(\%27))(?=\s).*(<[^\/]|>|=)/i';
         $this->assertRegExp($pattern, "admin' or 1>0");
         $this->assertRegExp($pattern, "admin'  or 1>0");
         $this->assertRegExp($pattern, "admin'  or 1>0");
         $this->assertRegExp($pattern, "admin' %6Fr 1>0");
-        $this->assertRegExp($pattern, "admin'%20%6Fr 1>0");
-        $this->assertRegExp($pattern, "admin'%20 or 1>0");
+        $this->assertRegExp($pattern, "admin' AND 1=0");
+        $this->assertRegExp($pattern, "admin'  AND 1=1");
+
+        $this->assertRegExp($pattern, "' HAVING 1=1 --");
+        $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
+        $this->assertRegExp($pattern, "admin' GROUP BY 'abc' HAVING 1=1--");
+        $this->assertRegExp($pattern, "admin' OR '1'='1' /*");
+
+        # Keep her for reference
+        $this->assertNotRegExp($pattern, "'gameofthrones' OR 'vikings'");
+        $this->assertNotRegExp($pattern, "'gameofthrones' AND -something else");
+        $this->assertNotRegExp($pattern, "<script>alert('hello');</script");
+        $this->assertNotRegExp($pattern, "<script> alert('hello'); </script");
     }
 
-    public function testSqlInjectionAnd()
-    {
-        //((((\%41)|a|(\%61))(n)(d))([(\%20)|\s]+)
-        $pattern = '/((\%27)|(\'))([(\%20)|\s]+)(((\%41)|a|(\%61))(n)(d))/i';
-        $this->assertRegExp($pattern, "admin' AND 1=0");
-        $this->assertRegExp($pattern, "admin' %41ND 1=0");
-        $this->assertRegExp($pattern, "admin' %61ND 1=0");
-        $this->assertRegExp($pattern, "admin'  AND 1=1");
-        $this->assertRegExp($pattern, "admin'%20AND 1=1");
-        $this->assertRegExp($pattern, "admin'%20 AND 1=1");
-    }
-    /*
-        public function testSqlInjectionRuleQuoteAndSql()
-        {
-            $pattern = '/\w*((\%27)|(\'))(?:((\%20)|\s+))?(or)/i';
-    
-            $this->assertRegExp($pattern, "admin' %6Fr 1=0");
-            $this->assertRegExp($pattern, "admin' or 1>0");
-            $this->assertRegExp($pattern, "admin' or 1<2");
-            $this->assertRegExp($pattern, "admin' or 1 > 0");
-            $this->assertRegExp($pattern, "admin' or 1 < 2");
-            $this->assertRegExp($pattern, "admin' or 1=1");
-            $this->assertRegExp($pattern, "admin' or 1=1--");
-            $this->assertRegExp($pattern, "admin' or 1=1#");
-            $this->assertRegExp($pattern, "admin' or 1 = 1--");
-            $this->assertRegExp($pattern, "admin' or 1 = 1#");
-            $this->assertRegExp($pattern, "admin' or 1 = 1 --");
-            $this->assertRegExp($pattern, "admin' or 1 = 1 #");
-            $this->assertRegExp($pattern, "admin') or '1'='1--");
-            $this->assertRegExp($pattern, "admin') or ('1'='1--");
-            $this->assertRegExp($pattern, "' HAVING 1=1 --");
-            $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
-            $this->assertRegExp($pattern, "admin' GROUP BY 'abc' HAVING 1=1--");
-            $this->assertRegExp($pattern, "admin' OR '1'='1' /*");
-    
-            # Check non matches (just as important)
-            $this->assertNotRegExp($pattern, "'gameofthrones' OR 'vikings'");
-            $this->assertNotRegExp($pattern, "'gameofthrones' = the best");
-            $this->assertNotRegExp($pattern, "'gameofthrones' AND -something else");
-        }
-    */
+   
     public function testSqlInjectionRuleUnion()
     {
-        $pattern = '/(union(([(\%20)(\%0)\s]+))(select|all select))/i';
+        $pattern = '/((\')|(\d\)?)|(\%27))\s+(union(([(\%20)(\%0)\s]+))(select|all select))/i';
         $this->assertRegExp($pattern, "' union select sum(id)");
         $this->assertRegExp($pattern, "12345) UNION SELECT");
-        $this->assertRegExp($pattern, "-1 UNION SELECT 1, 2, 3");
+        $this->assertRegExp($pattern, "1 UNION SELECT 1, 2, 3");
     }
 
     public function testXssAttackRule()

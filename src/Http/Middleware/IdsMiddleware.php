@@ -56,54 +56,57 @@ class IdsMiddleware extends Middleware
     protected $events = [];
 
     /**
-     * Core set of rules tests can be found can be found at
-     *
-     * https://github.com/originphp/framework/blob/master/tests/TestCase/Http/Middleware/IdsRuleTest.php
+     * The tests for these rules can be found in the IDSRuleTest.php
+     * @see https://github.com/originphp/framework/blob/master/tests/TestCase/Http/Middleware/IdsRuleTest.php
      *
      * @var array
      */
     private $rules = [
-        /**
-         * The purpose of this rule is to catch anything that might have an SQL meta character such as single quote or
-         * comment
+         /**
+         * Anything that starts with a single quote (or hex version) and follows with any hex chars
          */
         [
-            'name' => 'SQL Injection (paranoid)',
-            'signature' => '/(\')|(\%27)|(\#)|(\%23)|(\-\-)|(((\/|(\%2F))(\*|(\%2A))))/i',
-            'description' => 'Check for SQL specific meta-characters such as single quote or comments # -- /* and their hex equivalent', # No need for hex equivlent of - since this is not encoded by browser
-            'level' => 3
+            'name' => 'SQL Injection Attack',
+            'signature' => '/((\')|(\%27)).*((\%[a-f0-9]+))/i',
+            'description' => 'Check for single quote followed by any hex chars',
+            'level' => 1
         ],
         /**
-         * The purpose here is to check for a single quote followed by any comment or semi colon
+         * The purpose here is to check for a single quote followed by any comment or semi colon.
+         * This type of attack may or many not contain a space.
          */
         [
             'name' => 'SQL Injection Attack', // example admin'--
-            'signature' => '/\w*((\%27)|(\'))(?:((\%20)|\s+))?((\-\-)|(\%23)|(\#)|(\%3b)|;|((\/|(\%2F))(\*|(\%2A))))/i',
-            'description' => 'Check for single quote followed by comments or semi colon and their hex equivilents',
+            'signature' => '/((\')|(\%27)).*(\#|\-\-|\/\*)/i',
+            'description' => 'Check for single quote followed by comments',
             'level' => 1
         ],
+        /**
+         * The purpose here is to check for a single quote followed by any operator. This vector also
+         * means it will catch HTML, so additional checks ensure that it contains at least one space and < sign is
+         * not followed by a / e.g. </
+         */
         [
-            'name' => 'SQL Injection Attack', // example admin' OR
-            'signature' => '/((\%27)|(\'))([(\%20)|\s]+)((\%6F)|o|(\%4F))((\%72)|r|(\%52))([(\%20)|\s]+)/i',
-            'description' => 'Check for single quote followed by OR and their hex equivilents',
+            'name' => 'SQL Injection Attack', // example admin' OR 1=1
+            'signature' => '/((\')|(\%27))(?=\s).*(<[^\/]|>|=)/i',
+            'description' => 'Check for single quote followed by an operator',
             'level' => 1
         ],
+        /**
+         * Try and catch union SQL injection attack
+         */
         [
             'name' => 'SQL Injection Attack',
-            'signature' => '/((\%27)|(\'))([\)|(\%29)|\s]+)(and|or|select|having|union|group by|order|(\%[a-f0-9]{1,2}+)).*(=|>|<|;|\#|(\-\-)|(\%[a-f0-9]{1,2}+))/i',
-            'description' => 'Check for quote or hex equivilent and SQL statement/operator followed by anything that looks like SQL or hex character',
-            'level' => 1
-        ],
-        [
-            'name' => 'SQL Injection Attack',
-            'signature' => '/(union(([(\%20)(\%0)\s]+))(select|all select))/i',
+            'signature' => '/((\')|(\d\)?)|(\%27))\s+(union(([(\%20)(\%0)\s]+))(select|all select))/i',
             'description' => 'Checks for union select statement',
             'level' => 1
         ],
-      
+        /**
+         * Dont try to use get requests with HTML in the query
+         */
         [
             'name' => 'XSS Attack',
-            'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/ix',
+            'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/i',
             'description' => 'Detect XSS attack if there is a opening < or hex equivilent and then the use of hex/dec encoding or script/iframe/or onevent is found',
             'level' => 1
         ]
@@ -123,16 +126,11 @@ class IdsMiddleware extends Middleware
             $this->loadRules();
         }
         /**
-         * Check the REQUEST_URI before they are decoded into _GET e.g
-         * /bookmarks/view/1000?username=1%27%20or%20%271%27%20=%20%271&password=1%27%20or%20%271%27%20=%20%
-         * $_GET will not have the params, $request->query() has the decoded versions.
+         * Now checking $_GET and query which are decoded, this helps identify malicious attacks
+         * easier.
          */
-        //
-
-        debug($_REQUEST);
-
-        $this->run(['GET'=>$request->env('REQUEST_URI'),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
-
+        $this->run(['GET'=>$_GET,'QUERY'=>$request->query(),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
+        debug(['GET'=>$_GET,'QUERY'=>$request->query(),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
         $this->report($request);
  
         $this->cleanUp();
@@ -218,9 +216,11 @@ class IdsMiddleware extends Middleware
             }
 
             if (preg_match($rule['signature'], $value)) {
+                debug($rule);
                 $matches[] = $rule['name'];
             }
         }
+      
         return array_unique($matches);
     }
 
@@ -233,7 +233,7 @@ class IdsMiddleware extends Middleware
     private function report(Request $request)
     {
         $out = '';
-
+       
         foreach ($this->events as $event) {
             $out .= sprintf(
                 '[%s] %s %s %s "%s" "%s"',
