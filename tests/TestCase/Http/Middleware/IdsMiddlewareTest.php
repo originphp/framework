@@ -53,6 +53,12 @@ class IdsMiddlewareTest extends OriginTestCase
     public function sql()
     {
         return [
+            ["' OR 1=1"],
+            ["' OR 1 = 1"],
+            ["' OR 1<2"],
+            ["' OR 2<1"],
+            ["' OR 2 < 1"],
+            ["' OR 1 < 2"],
             ["' OR '1'='1'"],
             ["' OR '1'='1' #"],
             ["' OR 1 = 1 LIMIT 1' "],
@@ -74,7 +80,6 @@ class IdsMiddlewareTest extends OriginTestCase
 
         $middleware->run(['data' => ['input' => $data]]);
         $events = $middleware->events();
-     
         $this->assertNotEmpty($events);
         $this->assertContains('SQL Injection Attack', $events[0]['matches']);
     }

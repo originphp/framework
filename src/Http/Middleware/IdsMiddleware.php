@@ -56,41 +56,54 @@ class IdsMiddleware extends Middleware
     protected $events = [];
 
     /**
-     * Default Rules which look anemic but they are anything but.
+     * Core set of rules tests can be found can be found at
+     *
+     * https://github.com/originphp/framework/blob/master/tests/TestCase/Http/Middleware/IdsRuleTest.php
      *
      * @var array
      */
     private $rules = [
         /**
-         * MySQL comment is # and Postgresql comment is --
+         * The purpose of this rule is to catch anything that might have an SQL meta character such as single quote or
+         * comment
          */
         [
             'name' => 'SQL Injection (paranoid)',
-            'signature' => '/(\%27)|(\')|(?<!=)=(?!=)|(\%23)|(\#)|(\-\-)|(\%2D)/ix',
-            'description' => 'Check for SQL specific meta-characters such as quote, equals comments #/-- and their hex equivalent',
+            'signature' => '/(\')|(\%27)|(\#)|(\%23)|(\-\-)|(((\/|(\%2F))(\*|(\%2A))))/i',
+            'description' => 'Check for SQL specific meta-characters such as single quote or comments # -- /* and their hex equivalent', # No need for hex equivlent of - since this is not encoded by browser
             'level' => 3
         ],
+        /**
+         * The purpose here is to check for a single quote followed by any comment or semi colon
+         */
         [
-            'name' => 'SQL Injection Attack',
-            'signature' => '/(\%20|\s)(((\%6F)|o|(\%4F))((\%72)|r|(\%52)))(\%20|\s)*((\%3D)|=|(\%3E)|>)*/ix',
-            'description' => 'Check for OR or its hex equivalent and a condition',
+            'name' => 'SQL Injection Attack', // example admin'--
+            'signature' => '/\w*((\%27)|(\'))(?:((\%20)|\s+))?((\-\-)|(\%23)|(\#)|(\%3b)|;|((\/|(\%2F))(\*|(\%2A))))/i',
+            'description' => 'Check for single quote followed by comments or semi colon and their hex equivilents',
+            'level' => 1
+        ],
+        [
+            'name' => 'SQL Injection Attack', // example admin' OR
+            'signature' => '/((\%27)|(\'))([(\%20)|\s]+)((\%6F)|o|(\%4F))((\%72)|r|(\%52))([(\%20)|\s]+)/i',
+            'description' => 'Check for single quote followed by OR and their hex equivilents',
             'level' => 1
         ],
         [
             'name' => 'SQL Injection Attack',
-            'signature' => '/(union(\%20|\s)select)/i',
+            'signature' => '/((\%27)|(\'))([\)|(\%29)|\s]+)(and|or|select|having|union|group by|order|(\%[a-f0-9]{1,2}+)).*(=|>|<|;|\#|(\-\-)|(\%[a-f0-9]{1,2}+))/i',
+            'description' => 'Check for quote or hex equivilent and SQL statement/operator followed by anything that looks like SQL or hex character',
+            'level' => 1
+        ],
+        [
+            'name' => 'SQL Injection Attack',
+            'signature' => '/(union(([(\%20)(\%0)\s]+))(select|all select))/i',
             'description' => 'Checks for union select statement',
             'level' => 1
         ],
-        [
-            'name' => 'SQL Injection Attack',
-            'signature' => '/(?=.*(select|insert|update|delete|drop|union|truncate))(?=.*((\%3D)|(=)(\%27)|(\')|(\%23)|(\%3B)|(;)|(\#)|(\-\-)))/ix',
-            'description' => 'Checks for SQL reserved words with SQL meta-characters',
-            'level' => 1
-        ],
+      
         [
             'name' => 'XSS Attack',
-            'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-z0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/ix',
+            'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/ix',
             'description' => 'Detect XSS attack if there is a opening < or hex equivilent and then the use of hex/dec encoding or script/iframe/or onevent is found',
             'level' => 1
         ]
@@ -115,7 +128,9 @@ class IdsMiddleware extends Middleware
          * $_GET will not have the params, $request->query() has the decoded versions.
          */
         //
-   
+
+        debug($_REQUEST);
+
         $this->run(['GET'=>$request->env('REQUEST_URI'),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
 
         $this->report($request);
@@ -189,13 +204,13 @@ class IdsMiddleware extends Middleware
     private function match(string $name, string $value = null) : array
     {
         /**
-         * For better performance don't run rules on alphanumeric strings, and certain
-         * chars. Dont use &%#
-         */
+        * For better performance skip values which only contain word/number/-_@.i.
+        */
       
-        if (empty($value) or preg_match('/\w\s@\.!?-/i', $value)) {
+        if (empty($value) or !preg_match('/([^\w\s@\.-]+)/i', $value)) {
             return [];
         }
+
         $matches = [];
         foreach ($this->rules as $rule) {
             if ($rule['level'] > $this->config['level']) {
@@ -218,6 +233,7 @@ class IdsMiddleware extends Middleware
     private function report(Request $request)
     {
         $out = '';
+
         foreach ($this->events as $event) {
             $out .= sprintf(
                 '[%s] %s %s %s "%s" "%s"',
@@ -229,7 +245,9 @@ class IdsMiddleware extends Middleware
                 implode(',', $event['matches'])
             ) . "\n";
         }
-        file_put_contents($this->config['log'] ."\n", $out, FILE_APPEND);
+        if (!empty($out)) {
+            file_put_contents($this->config['log'], $out, FILE_APPEND);
+        }
     }
 
     /**
