@@ -1,9 +1,13 @@
 # Changelog
 ## [Unreleased]
-## [2.2.1] - 2019-11-10
+## [2.2.1] - 2019-11-11
+
+### Changed
+- improved IDS Middleware SQL injection attack rules.
 
 ### Fixed
-- Fixed IDS Middleware issue with log filename on unix and improved SQL injection attack rules.
+- Fixed IDS Middleware issue with log filename on unix
+- Fixed IDS Middleware performance rule 
 
 ## [2.2.0] - 2019-11-06
 
