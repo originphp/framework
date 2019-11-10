@@ -48,7 +48,7 @@ class IdsMiddlewareTest extends OriginTestCase
         // Invoke the middleware
         $middleware = new MockIdsMiddleware(['level'=>3]);
         $middleware->handle($this->request);
- 
+        $this->assertNotEmpty($middleware->events());
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
         $_GET = [];
     }
@@ -61,7 +61,23 @@ class IdsMiddlewareTest extends OriginTestCase
         // Invoke the middleware
         $middleware = new MockIdsMiddleware(['level'=>3]);
         $middleware->handle($this->request);
+        $this->assertNotEmpty($middleware->events());
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
+    }
+
+    public function testPost()
+    {
+        $_POST = [
+            'username' => "admin' AND 1>2"
+        ];
+
+        // Invoke the middleware
+        $middleware = new MockIdsMiddleware(['level'=>3]);
+        $middleware->handle($this->request);
+        $this->assertNotEmpty($middleware->events());
+        $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
+
+        $_POST = [];
     }
 
     public function sql()
