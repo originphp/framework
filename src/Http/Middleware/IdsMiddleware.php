@@ -62,48 +62,33 @@ class IdsMiddleware extends Middleware
      * @var array
      */
     private $rules = [
-         /**
-         * Anything that starts with a single quote (or hex version) and follows with any hex chars
-         */
         [
             'name' => 'SQL Injection Attack',
-            'signature' => '/((\')|(\%27)).*((\%[a-f0-9]+))/i',
-            'description' => 'Check for single quote followed by any hex chars',
+            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+))/i',
+            'description' => 'Check if starts with a digit or has single quote then followed by any hex chars',
             'level' => 1
         ],
-        /**
-         * The purpose here is to check for a single quote followed by any comment or semi colon.
-         * This type of attack may or many not contain a space.
-         */
+
         [
-            'name' => 'SQL Injection Attack', // example admin'--
-            'signature' => '/((\')|(\%27)).*(\#|\-\-|\/\*)/i',
-            'description' => 'Check for single quote followed by comments',
+            'name' => 'SQL Injection Attack', // example admin'-- 1#
+            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i',
+            'description' => 'Check if starts with a digit or has single quote then followed by SQL comments',
             'level' => 1
         ],
-        /**
-         * The purpose here is to check for a single quote followed by any operator. This vector also
-         * means it will catch HTML, so additional checks ensure that it contains at least one space and < sign is
-         * not followed by a / e.g. </
-         */
+
         [
-            'name' => 'SQL Injection Attack', // example admin' OR 1=1
-            'signature' => '/((\')|(\%27))(?=\s).*(<[^\/]|>|=)/i',
-            'description' => 'Check for single quote followed by an operator',
+            'name' => 'SQL Injection Attack', // example admin' OR 1=1 , 1 AND 2>1
+            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i',
+            'description' => 'Check if starts with a digit or has single quote then followed by SQL operator/statement and then operators such as greater than, less than and equals.',
             'level' => 1
         ],
-        /**
-         * Try and catch union SQL injection attack
-         */
         [
             'name' => 'SQL Injection Attack',
-            'signature' => '/((\')|(\d\)?)|(\%27))\s+(union(([(\%20)(\%0)\s]+))(select|all select))/i',
-            'description' => 'Checks for union select statement',
+            'signature' => '/((\')|(\d\)?)|(\%27))([(\%20)(\%0)\s]+)(union(([(\%20)(\%0)\s]+))(select|all select))/i',
+            'description' => 'Checks for union based SQL injection attack',
             'level' => 1
         ],
-        /**
-         * Dont try to use get requests with HTML in the query
-         */
+    
         [
             'name' => 'XSS Attack',
             'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/i',

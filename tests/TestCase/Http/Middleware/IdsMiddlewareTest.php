@@ -41,8 +41,22 @@ class IdsMiddlewareTest extends OriginTestCase
 
     public function testGet()
     {
-        $uri = '/bookmarks/view/1000?username=1%27%20or%20%271%27%20=%20%271&password=1%27%20or%20%271%27%20=%20%';
-        $this->request->env('REQUEST_URI', $uri);
+        $_GET = [
+            'url' => "bookmarks/view/1000') OR 1 = 1 --"
+        ];
+
+        // Invoke the middleware
+        $middleware = new MockIdsMiddleware(['level'=>3]);
+        $middleware->handle($this->request);
+ 
+        $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
+        $_GET = [];
+    }
+
+    public function testQuery()
+    {
+        //http://localhost:8000/bookmarks/view/1000?id=-1%20UNION%20SELECT%20password%20FROM%20users%20where%20id=1
+        $this->request->query('id', '-1 UNION SELECT password FROM users where id=1');
 
         // Invoke the middleware
         $middleware = new MockIdsMiddleware(['level'=>3]);

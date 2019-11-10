@@ -15,13 +15,30 @@ declare(strict_types=1);
 namespace App\Test\Http\Middleware;
 
 /**
- * I have decied to move REGEX pattern tests for core rules here for development and testing.
+ * Created this test class to help develop and test rules in a more refined way.
+ * Finding the blance between matches and false alarms is difficult.
+ *
+ * - dont use the ^ since this will skip urls
+ * - nor start with /w+ maybe
  */
 class IdsRuleTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Check the foundation of the SQL injection attack rules
+     *
+     * (-?(\d+\)?)) - check string with any number of digits (including optional -) e.g -1000
+     * (\')|(\%27) - Chcek for single quote or hex equivilent
+     * @return void
+     */
+    public function testStarterRegex()
+    {
+        $pattern = '/((-?(\d+\)?))|(\')|(\%27))/'; // cant use the ^ since this will skip urls
+        $this->assertRegExp($pattern, "password' union all select");
+        $this->assertRegExp($pattern, "1 or 2 = 2; union all select");
+    }
     public function testSqlInjectionWithHex()
     {
-        $pattern = '/((\')|(\%27)).*((\%[a-f0-9]+))/';
+        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+))/';
         $this->assertRegExp($pattern, "admin' %2F* inline comment ");
         $this->assertRegExp($pattern, "admin'%20%6Fr 1>0");
         $this->assertRegExp($pattern, "admin'%0#");
@@ -34,11 +51,12 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin'%20AND 1=1");
         $this->assertRegExp($pattern, "admin'%20 AND 1=1");
         $this->assertRegExp($pattern, "admin' %6Fr 1>0");
+        $this->assertRegExp($pattern, "1%0#");
     }
     
     public function testSqlInjectionRuleQuoteAndComment()
     {
-        $pattern = '/((\')|(\%27)).*(\#|\-\-|\/\*)/i';
+        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i';
         ///((\d\)?)|(\')|(\%27)).*(\#|\-\-|\/\*)/i
         $this->assertRegExp($pattern, "admin'#");
         $this->assertRegExp($pattern, "admin'  #");
@@ -48,7 +66,10 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin' --");
         $this->assertRegExp($pattern, "admin'  --");
         $this->assertRegExp($pattern, "admin' /* inline comment */");
-        //  $this->assertRegExp($pattern, "1--");
+        
+        $this->assertRegExp($pattern, "1--");
+        $this->assertRegExp($pattern, "-1#");
+        
         
         /**
          * ; is issue, need to find out else to implement
@@ -65,9 +86,9 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testSqlInjectionNumber()
+    public function testSqlInjection()
     {
-        $pattern = '/((\')|(\d\)?)|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i';
+        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i';
 
         $this->assertRegExp($pattern, "' HAVING 1=1 --");
         $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
@@ -80,6 +101,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "4 OR '1'='1' /*");
         $this->assertRegExp($pattern, "1 OR 2 = 2");
         $this->assertRegExp($pattern, "1) OR ('foo' = 'foo')");
+        $this->assertRegExp($pattern, "1  OR  2  =  2");
 
         $this->assertRegExp($pattern, "admin' or 1>0");
         $this->assertRegExp($pattern, "admin'  or 1>0");
@@ -88,44 +110,38 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin' AND 1=0");
         $this->assertRegExp($pattern, "admin'  AND 1=1");
 
+        $this->assertRegExp($pattern, "1' or '1'='1");
+        $this->assertRegExp($pattern, "1' or 2>1--");
+
         $this->assertNotRegExp($pattern, "500 having babies");
         $this->assertNotRegExp($pattern, "jim' and 'foo");
         $this->assertNotRegExp($pattern, "1 = 2");
         $this->assertNotRegExp($pattern, "FOR = 4");
-    }
-
-
-    public function testSqlInjectionOperators()
-    {
-        $pattern = '/((\')|(\%27))(?=\s).*(<[^\/]|>|=)/i';
-        $this->assertRegExp($pattern, "admin' or 1>0");
-        $this->assertRegExp($pattern, "admin'  or 1>0");
-        $this->assertRegExp($pattern, "admin'  or 1>0");
-        $this->assertRegExp($pattern, "admin' %6Fr 1>0");
-        $this->assertRegExp($pattern, "admin' AND 1=0");
-        $this->assertRegExp($pattern, "admin'  AND 1=1");
-
-        $this->assertRegExp($pattern, "' HAVING 1=1 --");
-        $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
-        $this->assertRegExp($pattern, "admin' GROUP BY 'abc' HAVING 1=1--");
-        $this->assertRegExp($pattern, "admin' OR '1'='1' /*");
-
-        # Keep her for reference
+//        $this->assertNoTRegExp($pattern, "abc 1 having equals (=) --");
+      
+        # Keep here for reference
         $this->assertNotRegExp($pattern, "'gameofthrones' OR 'vikings'");
         $this->assertNotRegExp($pattern, "'gameofthrones' AND -something else");
         $this->assertNotRegExp($pattern, "<script>alert('hello');</script");
-        $this->assertNotRegExp($pattern, "<script> alert('hello'); </script");
+        $this->assertNotRegExp($pattern, "<script> alert('hello'); </script"); // operator
     }
 
    
     public function testSqlInjectionRuleUnion()
     {
-        $pattern = '/((\')|(\d\)?)|(\%27))\s+(union(([(\%20)(\%0)\s]+))(select|all select))/i';
+        $pattern = '/((\')|(\d\)?)|(\%27))([(\%20)(\%0)\s]+)(union(([(\%20)(\%0)\s]+))(select|all select))/i';
+
         $this->assertRegExp($pattern, "' union select sum(id)");
         $this->assertRegExp($pattern, "12345) UNION SELECT");
         $this->assertRegExp($pattern, "1 UNION SELECT 1, 2, 3");
+        $this->assertRegExp($pattern, "1%20UNION SELECT 1, 2, 3");
     }
 
+    /**
+     * Examples of XSS attacks taken from https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
+     *
+     * @return void
+     */
     public function testXssAttackRule()
     {
         $pattern = '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/i';
