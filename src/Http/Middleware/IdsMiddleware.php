@@ -64,22 +64,22 @@ class IdsMiddleware extends Middleware
     private $rules = [
         [
             'name' => 'SQL Injection Attack',
-            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+))/i',
-            'description' => 'Check if starts with a digit or has single quote then followed by any hex chars',
+            'signature' => '/(((\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+)|(\%00)|(0x[a-f0-9]+))/i',
+            'description' => 'Check for digits or single quote then followed by any hex chars,hexdecimal or null byte',
             'level' => 1
         ],
 
         [
             'name' => 'SQL Injection Attack', // example admin'-- 1#
-            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i',
-            'description' => 'Check if starts with a digit or has single quote then followed by SQL comments',
+            'signature' => '/(((\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i',
+            'description' => 'Check for digits or single quote then followed by SQL comments',
             'level' => 1
         ],
 
         [
             'name' => 'SQL Injection Attack', // example admin' OR 1=1 , 1 AND 2>1
-            'signature' => '/((^-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i',
-            'description' => 'Check if starts with a digit or has single quote then followed by SQL operator/statement and then operators such as greater than, less than and equals.',
+            'signature' => '/(((\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i',
+            'description' => 'Check if for digits or single quote then followed by SQL operator/statement and then operators such as greater than, less than and equals.',
             'level' => 1
         ],
         [
@@ -88,7 +88,15 @@ class IdsMiddleware extends Middleware
             'description' => 'Checks for union based SQL injection attack',
             'level' => 1
         ],
-    
+        /**
+         * Identify harmful probes if no comments are used.
+         */
+        [
+            'name' => 'SQL Injection Attack',
+            'signature' => '/(;|(\%3b))(\s+)?(DROP TABLE|INSERT INTO)/i',
+            'description' => 'Checks for harmul SQL commands',
+            'level' => 1
+        ],
         [
             'name' => 'XSS Attack',
             'signature' => '/((\%3C)|<|(\x3c)|(\\\u003c)).*((\%[a-f0-9]+)|(0x[0-9]+)|(&\#[a-z0-9]+)|script|iframe|(on[a-z]+\s*((\%3D)|=)))+/i',

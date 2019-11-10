@@ -28,17 +28,19 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
      *
      * (-?(\d+\)?)) - check string with any number of digits (including optional -) e.g -1000
      * (\')|(\%27) - Chcek for single quote or hex equivilent
+     * [^\n]* - 0 or more non new line chars
+     *
      * @return void
      */
     public function testStarterRegex()
     {
-        $pattern = '/((-?(\d+\)?))|(\')|(\%27))/'; // cant use the ^ since this will skip urls
+        $pattern = '/(((\d+\)?))|(\')|(\%27))/'; // cant use the ^ since this will skip urls
         $this->assertRegExp($pattern, "password' union all select");
         $this->assertRegExp($pattern, "1 or 2 = 2; union all select");
     }
     public function testSqlInjectionWithHex()
     {
-        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+))/';
+        $pattern = '/(((\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+)|(\%00)|(0x[a-f0-9]+))/i';
         $this->assertRegExp($pattern, "admin' %2F* inline comment ");
         $this->assertRegExp($pattern, "admin'%20%6Fr 1>0");
         $this->assertRegExp($pattern, "admin'%0#");
@@ -52,12 +54,14 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin'%20 AND 1=1");
         $this->assertRegExp($pattern, "admin' %6Fr 1>0");
         $this->assertRegExp($pattern, "1%0#");
+        $this->assertRegExp($pattern, "1000' ORDER BY 2;%00"); // null byte
+        $this->assertRegExp($pattern, "1000' concat(0x3c62723e) "); // hexadecimal
     }
     
     public function testSqlInjectionRuleQuoteAndComment()
     {
-        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i';
-        ///((\d\)?)|(\')|(\%27)).*(\#|\-\-|\/\*)/i
+        $pattern = '/(((\d+\)?))|(\')|(\%27)).*(\#|\-\-|\/\*)/i';
+    
         $this->assertRegExp($pattern, "admin'#");
         $this->assertRegExp($pattern, "admin'  #");
         $this->assertRegExp($pattern, "admin' #");
@@ -66,6 +70,8 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin' --");
         $this->assertRegExp($pattern, "admin'  --");
         $this->assertRegExp($pattern, "admin' /* inline comment */");
+        $this->assertRegExp($pattern, "x' AND email is NULL; --");
+        
         
         $this->assertRegExp($pattern, "1--");
         $this->assertRegExp($pattern, "-1#");
@@ -88,7 +94,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testSqlInjection()
     {
-        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=)/i';
+        $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=|like)/i';
 
         $this->assertRegExp($pattern, "' HAVING 1=1 --");
         $this->assertRegExp($pattern, "admin' AND 1=0 UNION ALL SELECT");
@@ -109,6 +115,8 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
     
         $this->assertRegExp($pattern, "admin' AND 1=0");
         $this->assertRegExp($pattern, "admin'  AND 1=1");
+
+        $this->assertRegExp($pattern, "admin' OR name LIKE '%jon%");
 
         $this->assertRegExp($pattern, "1' or '1'='1");
         $this->assertRegExp($pattern, "1' or 2>1--");
@@ -134,7 +142,21 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "' union select sum(id)");
         $this->assertRegExp($pattern, "12345) UNION SELECT");
         $this->assertRegExp($pattern, "1 UNION SELECT 1, 2, 3");
+        $this->assertRegExp($pattern, "1 UNION %20SELECT 1, 2, 3");
         $this->assertRegExp($pattern, "1%20UNION SELECT 1, 2, 3");
+    }
+
+    public function testSqlInjectionRuleHarmful()
+    {
+        $pattern  = '/(;|(\%3b))(\s+)?(DROP TABLE|INSERT INTO)/i';
+
+
+        $this->assertRegExp($pattern, ";drop table FOO");
+        $this->assertRegExp($pattern, "; drop table FOO");
+        $this->assertRegExp($pattern, "%3bdrop table FOO");
+        $this->assertRegExp($pattern, ";insert into foos");
+        $this->assertNotRegExp($pattern, "DROP TABLE FOO");
+        $this->assertNotRegExp($pattern, "INSERT INTO foos");
     }
 
     /**
