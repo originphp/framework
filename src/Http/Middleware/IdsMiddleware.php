@@ -115,7 +115,6 @@ class IdsMiddleware extends Middleware
          * easier.
          */
         $this->run(['GET'=>$_GET,'QUERY'=>$request->query(),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
-        debug(['GET'=>$_GET,'QUERY'=>$request->query(),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
         $this->report($request);
  
         $this->cleanUp();
@@ -201,7 +200,6 @@ class IdsMiddleware extends Middleware
             }
 
             if (preg_match($rule['signature'], $value)) {
-                debug($rule);
                 $matches[] = $rule['name'];
             }
         }
