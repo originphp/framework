@@ -34,18 +34,30 @@ class MailFetcher
      */
     private $counter = 0;
 
+    /**
+     * Constructor
+     *
+     * @param array $config The following configuration keys
+     *  - host: hostname or ip address
+     *  - port: default: 143
+     *  - protocol: imap or pop3
+     *  - encryption: ssl, tls, or nontls
+     *  - validateCert: default:true set to false to not check the SSL cert
+     */
     public function __construct(array $config)
     {
         $config += [
             'host' => null,'port' => 143,'protocol' => 'imap','encryption' => null,'validateCert' => true,
             'username' => null, 'password' => null,'timeout' => 30
         ];
-        if ($config['encryption'] and ! in_array($config['encryption'], ['ssl','tls','notls'])) {
-            throw new InvalidArgumentException('Invalid encryption type');
-        }
+        
         if (! in_array($config['protocol'], ['pop3','imap'])) {
             throw new InvalidArgumentException('Only pop3 and imap supported');
         }
+        if ($config['encryption'] and ! in_array($config['encryption'], ['ssl','tls','notls'])) {
+            throw new InvalidArgumentException('Invalid encryption type');
+        }
+
         $this->config = $config;
 
         # Set timeout
@@ -57,7 +69,11 @@ class MailFetcher
         # Connect
         ini_set('default_socket_timeout', (string) $this->config['timeout']);
     }
-
+    /**
+     * Connects to the imap/pop server
+     *
+     * @return void
+     */
     private function connect() : void
     {
         $errorNo = $errorMessage = null;
@@ -101,7 +117,7 @@ class MailFetcher
      *
      * @param array $options Options support the following keys :
      *  - limit:
-     * @return Generator|null
+     * @return \Generator|null
      */
     public function download(array $options = []) : ?Generator
     {
@@ -180,15 +196,6 @@ class MailFetcher
     }
 
     /**
-     * Disconnect
-     *
-     * @return void
-     */
-    private function disconnect() : void
-    {
-    }
-
-    /**
      * Saves the message to a temp file
      *
      * @param integer $messageId
@@ -208,7 +215,7 @@ class MailFetcher
      * Creates the generator from the results
      *
      * @param array $out
-     * @return Generator
+     * @return \Generator
      */
     private function generator(array $out) : Generator
     {
@@ -222,10 +229,9 @@ class MailFetcher
     /**
      * Creates the connection string
      *
-     * @param array $config
-     * @return void
+     * @return string
      */
-    private function connectionString()
+    private function connectionString() : string
     {
         $args = [
             $this->config['host'] . ':' . $this->config['port']
