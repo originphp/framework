@@ -93,13 +93,23 @@ class MailParser
     }
 
     /**
-     * Returns the raw header
+     * Returns the header
      *
      * @return string
      */
-    public function rawHeader(): string
+    public function header(): string
     {
         return $this->extract(0, $this->parts[1]['starting-pos-body']);
+    }
+
+    /**
+     * Returns the message
+     *
+     * @return string
+     */
+    public function message() : string
+    {
+        return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
     }
 
     /**
@@ -123,7 +133,7 @@ class MailParser
     /**
      * Gets the message body
      *
-     * @param  string $type text,html,raw
+     * @param  string $type text or html
      * @return string body
      */
     public function body(string $type = null): string
@@ -132,12 +142,8 @@ class MailParser
             $type = $this->detectContentType();
         }
 
-        if (! in_array($type, ['text', 'html', 'raw'])) {
-            throw new InvalidArgumentException('Invalid type. text, html or raw only');
-        }
-
-        if ($type === 'raw') {
-            return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
+        if (! in_array($type, ['text', 'html'])) {
+            throw new InvalidArgumentException('Invalid type. text or html');
         }
 
         $mime = ($type === 'html') ? 'text/html' : 'text/plain';

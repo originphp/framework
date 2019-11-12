@@ -34,12 +34,19 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('<CAD05h8p3WCJLqVLVLebaE03KskpD8+AGEHEjZJ1JvnJpuh2+1w@mail.gmail.com>', $parser->headers('message-id'));
         $this->assertNull($parser->headers('foo'));
     }
-    public function testRawHeader()
+    public function testHeader()
     {
         $message = file_get_contents(__DIR__ . '/messages/text.eml');
-        $parser = new MailParser($message);
-        $this->assertEquals(2803017535, crc32($parser->rawHeader()));
+        $this->assertEquals(2803017535, crc32((new MailParser($message))->header()));
     }
+
+    public function testMessage()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/html.eml');
+        $parser = new MailParser($message);
+        $this->assertEquals(514953472, crc32((new MailParser($message))->message()));
+    }
+
 
     public function testParseAddresses()
     {
@@ -107,5 +114,24 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('text/plain', $attachments[0]['type']);
         $this->assertEquals(77, $attachments[0]['size']);
         $this->assertRegExp('/\/tmp\/([a-z0-9]+)$/i', $attachments[0]['tmp']);
+    }
+
+    public function testAttachmentsGetBody()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/html-attachment.eml');
+        $parser = new MailParser($message);
+        
+        $this->assertTrue($parser->hasAttachments());
+        $this->assertTrue($parser->hasAttachments());
+        $this->assertNotEmpty($parser->attachments());
+     
+        $this->assertEquals(1038361440, crc32($parser->body()));
+
+        $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
+        $parser = new MailParser($message);
+        
+        $this->assertTrue($parser->hasAttachments());
+        $this->assertNotEmpty($parser->attachments());
+        $this->assertEquals(1247987894, crc32($parser->body()));
     }
 }
