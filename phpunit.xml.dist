@@ -38,9 +38,18 @@
             <env name="DB_PASSWORD" value="root" />
             <env name="DB_ENGINE" value="mysql" />
         -->
-        <!-- # Email Testing
-            <env name="GMAIL_USERNAME" value="james@example.com"/>
-            <env name="GMAIl_PASSWORD" value="secret"/>
+        <!-- # MailFetcher Testing - Gmail blocks Travis IPs
+            <env name="EMAIL_IMAP_USERNAME" value="secret"/>
+            <env name="EMAIL_IMAP_PASSWORD" value="secret"/>
+            <env name="EMAIL_IMAP_HOST" value="imap.gmail.com"/>
+            <env name="EMAIL_IMAP_PORT" value="993"/>
+            <env name="EMAIL_IMAP_ENCRYPTION" value="ssl"/>
+           
+            <env name="EMAIL_POP3_USERNAME" value="secret"/>
+            <env name="EMAIL_POP3_PASSWORD" value="secret"/>
+            <env name="EMAIL_POP3_HOST" value="pop.gmail.com"/>
+            <env name="EMAIL_POP3_PORT" value="995"/>
+            <env name="EMAIL_POP3_ENCRYPTION" value="ssl"/>
         -->
         <!-- # Redis Testing
             <env name="REDIS_HOST" value="localhost"/>
