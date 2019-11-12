@@ -1,0 +1,22 @@
+MIME-Version: 1.0
+Date: Tue, 12 Nov 2019 08:42:02 +0100
+Message-ID: <CAD05h8rpXHqre+KKq02WX4aVLG8V1BLUfY56ZZCAUP9ijrMgzQ@mail.gmail.com>
+Subject: Html Message
+From: Jamiel Sharief <jamiel.sharief@gmail.com>
+To: Jamiel Sharief <jamiel.sharief@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000051da6505972162fb"
+
+--00000000000051da6505972162fb
+Content-Type: text/plain; charset="UTF-8"
+
+This is a HTML message.
+
+-- 
+Jamiel Sharief
+
+--00000000000051da6505972162fb
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr">This is a HTML message.<br><br>-- <br>Jamiel Sharief</div>
+
+--00000000000051da6505972162fb--

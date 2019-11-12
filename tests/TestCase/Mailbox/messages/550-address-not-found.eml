@@ -1,0 +1,191 @@
+Delivered-To: jamiel.sharief@gmail.com
+Received: by 2002:a19:5f1d:0:0:0:0:0 with SMTP id t29csp7611273lfb;
+        Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+X-Received: by 2002:a2e:6c0c:: with SMTP id h12mr10364500ljc.24.1573544781453;
+        Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1573544781; cv=none;
+        d=google.com; s=arc-20160816;
+        b=npLI6OVvUDHTN9xIrTyTL5Cy+4DtwpqDp5HVxS+PheRWOXS2wgVH36ehjr3+3kRnvl
+         Bz3i660XyUDLBZEckUW32jXbVWZzmxg8GwLY8e3vMZ+CnfJiRIZQPIlK32TghJyhfGbO
+         2NP9S+sHz+cw2ReGQ/hxj4qEwYx3nScvDuIWEJHWaudkux6KDZMdNMe8FlQs4xUiDHUt
+         JIARzEV6CjB+LwN3Pexdl+rKpC24Ct4KpjzN9vWXmzNW78JAXFlv7KczFfxxQiBPR7wl
+         /WItVl/KUxNH9+OfPnZAt5BgQTwZEyE2Nd+jJVyZbznZhu79G/ajv5owISzzIfNOq44R
+         kNpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=in-reply-to:references:subject:from:date:message-id:auto-submitted
+         :to:dkim-signature;
+        bh=s5BudIrTslUZSvzhAeMa0FRH+HqFQNObxwiEDFWzOc8=;
+        b=ceqLh03B0YwrSbxPt886Cl23acirf+BWurYoi1TrypmfyzsZnWI0tLPmElkg1vlYN8
+         7O0DMmwkSvrMppIgNE6ZnUcTkAAxPkijWb8xxsbl+ndGjhtfjmmfocSSzM/5n4gshS9J
+         xQXgTNSuBhCKf9dowdpZKG0V/5cUFTDF1VpGxLn4T0P7mp6eHUoht5hF+CcLJVo2ENQs
+         sAYpDp05NXqGwhta15IWctw5or0TMa6yoxfXRM2apPvbQ/mn3HFiwzAS7Zz9cw7uCLAV
+         V0rIvmNNVqtgs94z3aUV1vAEVOQUpzLI87OEqsNWjEeRBggZ6uRJsIO0jKllzk8XulWb
+         Qg1Q==
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@googlemail.com header.s=20161025 header.b=Gu3B2hfW;
+       spf=pass (google.com: best guess record for domain of postmaster@mail-sor-f69.google.com designates 209.85.220.69 as permitted sender) smtp.helo=mail-sor-f69.google.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=googlemail.com
+Return-Path: <>
+Received: from mail-sor-f69.google.com (mail-sor-f69.google.com. [209.85.220.69])
+        by mx.google.com with SMTPS id 5sor10049705ljr.19.2019.11.11.23.46.21
+        for <jamiel.sharief@gmail.com>
+        (Google Transport Security);
+        Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+Received-SPF: pass (google.com: best guess record for domain of postmaster@mail-sor-f69.google.com designates 209.85.220.69 as permitted sender) client-ip=209.85.220.69;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@googlemail.com header.s=20161025 header.b=Gu3B2hfW;
+       spf=pass (google.com: best guess record for domain of postmaster@mail-sor-f69.google.com designates 209.85.220.69 as permitted sender) smtp.helo=mail-sor-f69.google.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=googlemail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20161025;
+        h=to:auto-submitted:message-id:date:from:subject:references
+         :in-reply-to;
+        bh=s5BudIrTslUZSvzhAeMa0FRH+HqFQNObxwiEDFWzOc8=;
+        b=Gu3B2hfWzKaT74dfjgsnw6ztGTPBnGYl06kvtzPPmabQWmXqMEsLLK1ZbnQXAgKrRN
+         Wxt2ad0kS75s8p0KGbivWKKrQx3qjxbkNizmLR8Wzm5JkmmomeyvzVjeL6FmoiqyjgeI
+         8zwAeY0ATNsLViZ2iCyKtgzUw3pXnwfAITaut7TcNeNiZuon7bkY4p47PB3ZqKsdtW7G
+         zUQA/ccxlPKk6nDynkvoTiackrHIcfkXRbzWRm3NnZO9s+/aDgnWdInPQgmJ48J2QbIy
+         7LeJUAe2wFxYD8RpToie1/EAFDkVjA2uJORf6cJlSAAuif+XefCXkFTYQ3Mf9ge7RXrj
+         RnQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:auto-submitted:message-id:date:from:subject
+         :references:in-reply-to;
+        bh=s5BudIrTslUZSvzhAeMa0FRH+HqFQNObxwiEDFWzOc8=;
+        b=M5XGjhon8mvfJzLVjLiVEMTMcqB9zTCiOK1ZLGesjQHrzNStQOAUTioY3mrH0iz6yB
+         7Jw/8/ghYG2UpFO/xKXFd3fGDM+ezE8/Qorl9inapfI2VA9kWJoL2yZK2C527hsz8W2x
+         zspjaYBXW7SNj/UO7dIXghz/VHsagtSazTi+NULly2TdTZ+Z99f2R4ga+R/O6FJVxeWH
+         j6jlocMjurVmLqa+bIyfGrQ5YuM9PaFXOiNuOFW0sMIQNsJIhsdi6ZKPQ5rhbPO7iL7M
+         w0oYltSypPXB6xpTjfKLo7R10A39sLGlK2CJQtnXXhVUw4uYoOZO7tRSR7wWn2/MR12Z
+         W+Kg==
+X-Gm-Message-State: APjAAAX18Xv0KsF39aT3NopiM1P6szjeGoXlNtjLkB7jdy8hZuvkBvAW VfO9ouKznklll9Cvjc32vSV0EJfm2HZXEI9nNw3K3w==
+X-Google-Smtp-Source: APXvYqxNafw5NCm92lEpztKc7BydhuNWfDWhqznBPpRaUxaFyNPUBc07TVQPRCUDqQTGZ5fXImS9qjM5C51Jttaq0dO+hwD5q4ot/Oc=
+X-Received: by 2002:a2e:b604:: with SMTP id r4mr18707750ljn.134.1573544781402;
+        Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+Content-Type: multipart/report; boundary="000000000000bbc74605972171ae"; report-type=delivery-status
+To: jamiel.sharief@gmail.com
+Received: by 2002:a2e:b604:: with SMTP id r4mr11812629ljn.134; Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+Return-Path: <>
+Auto-Submitted: auto-replied
+Message-ID: <5dca634d.1c69fb81.fdb40.dad2.GMR@mx.google.com>
+Date: Mon, 11 Nov 2019 23:46:21 -0800 (PST)
+From: Mail Delivery Subsystem <mailer-daemon@googlemail.com>
+Subject: Delivery Status Notification (Failure)
+References: <CAD05h8rG=J8ak-gcVqZv7XYrswX4KnawZdpFUfzhrxaUB0KgLA@mail.gmail.com>
+In-Reply-To: <CAD05h8rG=J8ak-gcVqZv7XYrswX4KnawZdpFUfzhrxaUB0KgLA@mail.gmail.com>
+X-Failed-Recipients: nobody@originphp.com
+
+--000000000000bbc74605972171ae
+Content-Type: multipart/related; boundary="000000000000bbcfd105972171b2"
+
+--000000000000bbcfd105972171b2
+Content-Type: multipart/alternative; boundary="000000000000bbcfd905972171b3"
+
+--000000000000bbcfd905972171b3
+Content-Type: text/plain; charset="UTF-8"
+
+
+** Address not found **
+
+Your message wasn't delivered to nobody@originphp.com because the address couldn't be found or is unable to receive email.
+
+
+
+The response from the remote server was:
+550 5.1.1 <nobody@originphp.com>: Recipient address rejected: User unknown in virtual alias table
+
+--000000000000bbcfd905972171b3
+Content-Type: text/html; charset="UTF-8"
+
+
+<html>
+<head>
+<style>
+* {
+font-family:Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+</style>
+</head>
+<body>
+<table cellpadding="0" cellspacing="0" class="email-wrapper" style="padding-top:32px;background-color:#ffffff;"><tbody>
+<tr><td>
+<table cellpadding=0 cellspacing=0><tbody>
+<tr><td style="max-width:560px;padding:24px 24px 32px;background-color:#fafafa;border:1px solid #e0e0e0;border-radius:2px">
+<img style="padding:0 24px 16px 0;float:left" width=72 height=72 alt="Error Icon" src="cid:icon.png">
+<table style="min-width:272px;padding-top:8px"><tbody>
+<tr><td><h2 style="font-size:20px;color:#212121;font-weight:bold;margin:0">
+Address not found
+</h2></td></tr>
+<tr><td style="padding-top:20px;color:#757575;font-size:16px;font-weight:normal;text-align:left">
+Your message wasn't delivered to <a style='color:#212121;text-decoration:none'><b>nobody@originphp.com</b></a> because the address couldn't be found or is unable to receive email.
+</td></tr>
+</tbody></table>
+</td></tr>
+</tbody></table>
+</td></tr>
+<tr style="border:none;background-color:#fff;font-size:12.8px;width:90%">
+<td align="left" style="padding:48px 10px">
+The response from the remote server was:<br/>
+<p style="font-family:monospace">
+550 5.1.1 &lt;nobody@originphp.com&gt;: Recipient address rejected: User unknown in virtual alias table
+</p>
+</td>
+</tr>
+</tbody></table>
+</body>
+</html>
+
+--000000000000bbcfd905972171b3--
+--000000000000bbcfd105972171b2
+Content-Type: image/png; name="icon.png"
+Content-Disposition: attachment; filename="icon.png"
+Content-Transfer-Encoding: base64
+Content-ID: <icon.png>
+
+
+--000000000000bbcfd105972171b2--
+--000000000000bbc74605972171ae
+Content-Type: message/delivery-status
+
+
+--000000000000bbc74605972171ae
+Content-Type: message/rfc822
+
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=IMiw3k5RpON715+vwpzWYMqgWqwkfqd2jRhGZw0/dKw=;
+        b=T2Mfub1X2vDQUjKM4q6gW2Vd+JxM1WnXU1vlgP0jLW6nnlfqLSMipLbiOAspSMW353
+         LtIJXlA8MppEauEsrEi6BRypgHLGreZhQ+rT4/31u/SvDYGDs6wA7zNHLkOYE/jKTOgz
+         nTsaXe3tIJp5QLhKfPzXyAbLqnB48u4f9m3PGrZi/JOPfGSCwb06QUy/izF02/Lmmmjs
+         q2aMYhHNefKCQBeiIPpvwqa1pzODkJU51HVp/KyXjesDdsnO+72Xdq4mcePvnJGukqjy
+         6v7EI7OLiPSq7IwEG50PpAI4DCW+HNIfR3PVXzln94VPg22S8VNp3llwIf9fscVf7nh0
+         yBhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=IMiw3k5RpON715+vwpzWYMqgWqwkfqd2jRhGZw0/dKw=;
+        b=WPxV7Hb6Zyselw+J2lv9myXDrcVhFofhUE5No3dI0Wk/q63219vB24YOY3oEgz9gtz
+         VLLBevXj3rf8PnfHoqxUJnILZbNF8tquc54Xm5foI+QyulaT+9PgoGY59UOX44gYNGo0
+         QwslvGl+v1+JwoD+7OZsyzFnN9j92cbsuiYfVuzKOyFnT0NqYiQU9tvrx5cTY+P+Yhs/
+         EBmonOJtVWnVo06ze10JpbNwRBWKiZXUnn5zf1YMsxyvw1c+uT8bqESvBQPZFlswkw/c
+         3hFNYiMG9GUtpjsIlNhEp58NxLEHe6yQJ771sKy8EcT2AY5wcNeM2RrQdP0vT5wFCEut
+         o6SQ==
+X-Gm-Message-State: APjAAAWyH75Lh5MbmW5+x3qWUF/I6rEA0KDhNLxhG708MdCDZQYKBkuM pmBr4ktYVAhv8avLR+mUe2TGnJmni4Sx8SOOckBzZlL5
+X-Google-Smtp-Source: APXvYqwmIs+ELy24lb5t1PCIeLWriUUkPV6TbS4XdrkquXQ8tG4AoZ1wJ2n5Ox7SpiExei1Tzon+HF61adtjKKwnl0s=
+X-Received: by 2002:a2e:b604:: with SMTP id r4mr18707668ljn.134.1573544779734; Mon, 11 Nov 2019 23:46:19 -0800 (PST)
+MIME-Version: 1.0
+From: Jamiel Sharief <jamiel.sharief@gmail.com>
+Date: Tue, 12 Nov 2019 08:46:09 +0100
+Message-ID: <CAD05h8rG=J8ak-gcVqZv7XYrswX4KnawZdpFUfzhrxaUB0KgLA@mail.gmail.com>
+Subject: Hello
+To: nobody@originphp.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello world!
+
+-- 
+Jamiel Sharief
+
+
+--000000000000bbc74605972171ae--

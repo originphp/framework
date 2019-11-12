@@ -1,0 +1,35 @@
+MIME-Version: 1.0
+Date: Tue, 12 Nov 2019 08:44:06 +0100
+Message-ID: <CAD05h8qn0kEzhPJdDwZ4Z+dXc2Ky8+aN_yWDJ55S9wOn=52Amg@mail.gmail.com>
+Subject: HTML email with Attachment
+From: Jamiel Sharief <jamiel.sharief@gmail.com>
+To: Jamiel Sharief <jamiel.sharief@gmail.com>
+Content-Type: multipart/mixed; boundary="000000000000b6747d0597216902"
+
+--000000000000b6747d0597216902
+Content-Type: multipart/alternative; boundary="000000000000b6747a0597216900"
+
+--000000000000b6747a0597216900
+Content-Type: text/plain; charset="UTF-8"
+
+This is a test email with a attachment.
+
+-- 
+Jamiel Sharief
+
+--000000000000b6747a0597216900
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr">This is a test email with a attachment.<br clear="all"><div><br></div>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr">Jamiel Sharief</div></div></div>
+
+--000000000000b6747a0597216900--
+--000000000000b6747d0597216902
+Content-Type: application/octet-stream; name="README.md"
+Content-Disposition: attachment; filename="README.md"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_k2vjuo4e0
+Content-ID: <f_k2vjuo4e0>
+
+IyBSRUFETUUgCgpUaGlzIGlzIGZvciB0ZXN0aW5nIGVtYWlscyB3aXRoIGFuIGF0dGFjaG1lbnQu
+
+--000000000000b6747d0597216902--

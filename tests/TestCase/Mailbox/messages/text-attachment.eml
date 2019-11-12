@@ -1,0 +1,26 @@
+MIME-Version: 1.0
+Date: Tue, 12 Nov 2019 08:45:09 +0100
+Message-ID: <CAD05h8rssVenJ0SNwL_O7hb=EMS=auUVFmgs6tTZRj3igZMUww@mail.gmail.com>
+Subject: Text Email with Attachment
+From: Jamiel Sharief <jamiel.sharief@gmail.com>
+To: Jamiel Sharief <jamiel.sharief@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000079bdd60597216d7d"
+
+--00000000000079bdd60597216d7d
+Content-Type: text/plain; charset="UTF-8"
+
+This is a text email with an attachment.
+
+-- 
+Jamiel Sharief
+
+--00000000000079bdd60597216d7d
+Content-Type: application/octet-stream; name="README.md"
+Content-Disposition: attachment; filename="README.md"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_k2vjw0et0
+Content-ID: <f_k2vjw0et0>
+
+IyBSRUFETUUgCgpUaGlzIGlzIGZvciB0ZXN0aW5nIGVtYWlscyB3aXRoIGFuIGF0dGFjaG1lbnQu
+
+--00000000000079bdd60597216d7d--
