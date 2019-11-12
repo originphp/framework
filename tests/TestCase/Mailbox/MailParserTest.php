@@ -14,8 +14,8 @@
 
 namespace Origin\Test\Mailbox;
 
-use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Mailbox\MailParser;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class MailParserTest extends \PHPUnit\Framework\TestCase
 {

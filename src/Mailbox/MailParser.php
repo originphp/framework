@@ -56,7 +56,7 @@ class MailParser
     public function __construct(string $message)
     {
         # ubuntu: apt-get install php-mailparse
-        if (!extension_loaded('mailparse')) {
+        if (! extension_loaded('mailparse')) {
             throw new Exception('Mailparse extension not loaded');
         }
 
@@ -116,6 +116,7 @@ class MailParser
         } else {
             $out = $this->parts[1]['headers'][$header] ?? null;
         }
+
         return $out ? $this->decodeHeader($out) : null;
     }
 
@@ -131,7 +132,7 @@ class MailParser
             $type = $this->detectContentType();
         }
 
-        if (!in_array($type, ['text', 'html', 'raw'])) {
+        if (! in_array($type, ['text', 'html', 'raw'])) {
             throw new InvalidArgumentException('Invalid type. text, html or raw only');
         }
 
@@ -146,11 +147,11 @@ class MailParser
             if (isset($part['content-disposition']) and $part['content-disposition'] === 'attachment') {
                 continue;
             }
-            if (!isset($part['content-type']) or $part['content-type'] !== $mime) {
+            if (! isset($part['content-type']) or $part['content-type'] !== $mime) {
                 continue;
             }
-            $headers = $part['headers'];
-            $encoding = $headers['content-transfer-encoding'] ?? '';
+
+            $encoding = $part['headers']['content-transfer-encoding'] ?? '';
 
             if (is_array($encoding)) {
                 $encoding = $encoding[0];
@@ -163,6 +164,7 @@ class MailParser
 
             break;
         }
+
         return $body;
     }
 
@@ -178,6 +180,7 @@ class MailParser
                 return true;
             }
         }
+
         return false;
     }
 
@@ -205,6 +208,7 @@ class MailParser
                 ];
             }
         }
+
         return $attachments;
     }
 
@@ -227,6 +231,7 @@ class MailParser
                 ];
             }
         }
+
         return $out;
     }
 
@@ -275,8 +280,10 @@ class MailParser
             foreach ($header as $key => $value) {
                 $header[$key] = $this->decodeHeader($value);
             }
+
             return $header;
         }
+
         return iconv_mime_decode($header, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
     }
 
@@ -292,10 +299,9 @@ class MailParser
         fseek($this->stream, $start);
         $out = fread($this->stream, $end - $start);
         rewind($this->stream);
+
         return $out;
     }
-
-
 
     /**
      * Detects the body content type
@@ -304,7 +310,7 @@ class MailParser
      */
     private function detectContentType(): string
     {
-        $contentType =  $this->parts[1]['content-type'] ?? 'text/plain';
+        $contentType = $this->parts[1]['content-type'] ?? 'text/plain';
 
         if ($contentType === 'text/plain') {
             return 'text';
@@ -326,6 +332,7 @@ class MailParser
                     break;
                 }
             }
+
             return $out;
         }
 
