@@ -44,7 +44,8 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
     {
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
         $parser = new MailParser($message);
-        $this->assertEquals(514953472, crc32((new MailParser($message))->message()));
+
+        $this->assertEquals(47090491, crc32((new MailParser($message))->message()));
     }
 
 
@@ -74,7 +75,8 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
         
         $parser = new MailParser($message);
-        $body = $parser->body();
+        $body = $parser->body('auto');
+        
         $this->assertEquals(42397819, crc32($body));
         $this->assertEquals($body, $parser->body('html'));
         $this->assertEquals(3882162683, crc32($parser->body('text')));
@@ -85,7 +87,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/550-address-not-found.eml');
         
         $parser = new MailParser($message);
-        $body = $parser->body();
+        $body = $parser->body('auto');
         
         $this->assertEquals(4002126370, crc32($body));
         $this->assertEquals($body, $parser->body('html')); #  Check default version is html from gmail
@@ -125,13 +127,13 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
      
-        $this->assertEquals(1038361440, crc32($parser->body()));
+        $this->assertEquals(1038361440, crc32($parser->body('auto')));
 
         $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
         $parser = new MailParser($message);
         
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
-        $this->assertEquals(1247987894, crc32($parser->body()));
+        $this->assertEquals(1247987894, crc32($parser->body('auto')));
     }
 }

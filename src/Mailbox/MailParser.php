@@ -103,14 +103,16 @@ class MailParser
     }
 
     /**
-     * Returns the message
+     * Returns the full message (header and body)
      *
      * @return string
      */
     public function message() : string
     {
-        return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
+        rewind($this->stream);
+        return stream_get_contents($this->stream);
     }
+
 
     /**
      * Gets the header or array or specific header
@@ -133,17 +135,25 @@ class MailParser
     /**
      * Gets the message body
      *
-     * @param  string $type text or html
+     * @param  string $type You can use any of the following types:
+     *  - null : (default) this will return RAW body
+     *  - html : this will return HTML version
+     *  - text : wil return text version
+     *  - auto : autodetects type
      * @return string body
      */
     public function body(string $type = null): string
     {
         if ($type === null) {
-            $type = $this->detectContentType();
+            return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
         }
 
-        if (! in_array($type, ['text', 'html'])) {
-            throw new InvalidArgumentException('Invalid type. text or html');
+        if (! in_array($type, ['text', 'html','auto'])) {
+            throw new InvalidArgumentException('Invalid type. text, html or auto');
+        }
+
+        if ($type === 'auto') {
+            $type = $this->contentType();
         }
 
         $mime = ($type === 'html') ? 'text/html' : 'text/plain';
@@ -181,7 +191,7 @@ class MailParser
      */
     public function hasAttachments(): bool
     {
-        foreach ($this->parts as $key => $data) {
+        foreach ($this->parts as $data) {
             if (isset($data['content-disposition']) and strtolower($data['content-disposition']) == 'attachment') {
                 return true;
             }
@@ -314,7 +324,7 @@ class MailParser
      *
      * @return string
      */
-    private function detectContentType(): string
+    public function contentType(): string
     {
         $contentType = $this->parts[1]['content-type'] ?? 'text/plain';
 
@@ -367,5 +377,10 @@ class MailParser
         $this->parts = $this->headers = [];
         fclose($this->stream);
         mailparse_msg_free($this->resource);
+    }
+
+    public function __toString()
+    {
+        return $this->message();
     }
 }
