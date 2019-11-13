@@ -124,12 +124,12 @@ class MailFetcher
         $options += ['limit' => 0,'messageId' => null];
 
         $this->connect();
-
+    
         # Download the messages
-        if ($this->config['protocol'] === 'imap') {
-            $out = $this->downloadImapMessages($options);
+        if ($options['messageId']) {
+            $out = $this->downloadSync($options);
         } else {
-            $out = $this->downloadPop3Messages($options);
+            $out = $this->downloadStandard($options);
         }
         
         # Shutdown
@@ -137,13 +137,13 @@ class MailFetcher
         imap_alerts();
       
         imap_close($this->connection);
+        $this->connection = null;
 
         return $out ? $this->generator($out) : null;
     }
 
     /**
-     * Downloads messages using the Internet Message Access Protocol (IMAP), these messages
-     * are downloaded in reverse order first since messages are stored on server and starting from
+     * Downloads messages in reverse order first since messages are stored on server and starting from
      * top means each time we have to check emails that could be existing from years ago. Once the messages
      * are downloaded it then reverses the array so they are back in the order they were received.
      * Using the messageID, you can sync to last message that you downloaded
@@ -151,13 +151,14 @@ class MailFetcher
      * @param array $options
      * @return array
      */
-    private function downloadImapMessages(array $options) : array
+    private function downloadSync(array $options) : array
     {
         $count = imap_num_msg($this->connection);
 
         $out = [];
+        
         # Loop backwards for IMAP
-        for ($i = $count; $i >= 0;$i--) {
+        for ($i = $count; $i > 0;$i--) {
             $header = imap_headerinfo($this->connection, $i);
             if ($options['messageId'] === $header->message_id) {
                 break;
@@ -173,12 +174,12 @@ class MailFetcher
     }
 
     /**
-     * Downloads messages using POP3
+     * Downloads messages (first download for IMAP or download for POP3)
      *
      * @param array $options
      * @return array
      */
-    private function downloadPop3Messages(array $options) : array
+    private function downloadStandard(array $options) : array
     {
         $count = imap_num_msg($this->connection);
 
@@ -234,21 +235,19 @@ class MailFetcher
     private function connectionString() : string
     {
         $args = [
-            $this->config['host'] . ':' . $this->config['port']
+            $this->config['host'] . ':' . $this->config['port'],
+            $this->config['protocol']
         ];
         
-        $args[] = $this->config['protocol'];
-
         if ($this->config['encryption']) {
             $args[] = $this->config['encryption'];
         }
+        
         if ($this->config['validateCert'] === false) {
             $args[] = 'novalidate-cert';
         }
-        $mailbox = null;
-        if ($this->config['protocol'] === 'imap') {
-            $mailbox = 'INBOX';
-        }
+        
+        $mailbox = $this->config['protocol'] === 'imap' ? 'INBOX' : null;
 
         return '{' . implode('/', $args) . '}' . $mailbox;
     }
