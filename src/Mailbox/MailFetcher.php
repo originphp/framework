@@ -20,6 +20,9 @@ use Origin\Core\Exception\InvalidArgumentException;
 
 class MailFetcher
 {
+    /**
+     * @var array
+     */
     private $config = [];
 
     /**
@@ -162,7 +165,6 @@ class MailFetcher
         foreach ($emails as $msgnumber) {
             yield imap_fetchbody($this->connection, $msgnumber, '');
         }
-        print 'called';
         $this->disconnect();
     }
 
