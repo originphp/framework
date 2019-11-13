@@ -259,7 +259,7 @@ class MailParser
      */
     private function needsDecoding(string $encoding): bool
     {
-        return in_array(strtolower($encoding), ['base64', 'quoted-printable']);
+        return in_array(strtolower($encoding), ['base64', 'quoted-printable','8bit','binary']);
     }
 
     /**
@@ -273,12 +273,23 @@ class MailParser
     private function decodeContent(string $content, string $encoding): string
     {
         $encoding = strtolower($encoding);
-        if ($encoding == 'base64') {
+
+        if ($encoding === 'base64') {
             return base64_decode($content);
         }
 
-        if ($encoding == 'quoted-printable') {
+        if ($encoding === 'quoted-printable') {
             return quoted_printable_decode($content);
+        }
+
+        # not tested yet
+        if ($encoding === '8bit') {
+            return quoted_printable_decode(imap_8bit($content));
+        }
+
+        # never seen an email with binary
+        if ($encoding === 'binary') {
+            return base64_decode(imap_binary($content)); // is this correct?
         }
 
         throw new InvalidArgumentException('Invalid encoding ' . $encoding);
