@@ -117,7 +117,6 @@ class MailFetcher
 
         # If IMAP last message
         if ($options['messageId']) {
-            krsort($emails);
             $emails = $this->mailboxSync($emails, $options['messageId']);
         }
 
@@ -142,7 +141,7 @@ class MailFetcher
     private function mailboxSync(array $emails, string $messageId) : array
     {
         $out = [];
-        # Get messages to be fetched
+        krsort($emails); // reverse the order checking latest first
         foreach ($emails as $id) {
             $header = imap_headerinfo($this->connection, $id);
             if ($messageId === $header->message_id) {
