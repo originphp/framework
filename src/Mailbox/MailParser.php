@@ -110,9 +110,9 @@ class MailParser
     public function message() : string
     {
         rewind($this->stream);
+
         return stream_get_contents($this->stream);
     }
-
 
     /**
      * Gets the header or array or specific header

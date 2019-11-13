@@ -51,10 +51,10 @@ class MailFetcher
             'username' => null, 'password' => null, 'timeout' => 30
         ];
 
-        if (!in_array($config['protocol'], ['pop3', 'imap'])) {
+        if (! in_array($config['protocol'], ['pop3', 'imap'])) {
             throw new InvalidArgumentException('Only pop3 and imap supported');
         }
-        if ($config['encryption'] and !in_array($config['encryption'], ['ssl', 'tls', 'notls'])) {
+        if ($config['encryption'] and ! in_array($config['encryption'], ['ssl', 'tls', 'notls'])) {
             throw new InvalidArgumentException('Invalid encryption type');
         }
 
@@ -90,7 +90,7 @@ class MailFetcher
         restore_error_handler();
         ini_restore('default_socket_timeout');
 
-        if (!$this->connection or $errorMessage) {
+        if (! $this->connection or $errorMessage) {
             throw new Exception('Error connecting to ' . $this->config['host'] . ':' . $this->config['port']);
         }
     }
@@ -111,8 +111,6 @@ class MailFetcher
         $this->connect();
 
         $emails = imap_search($this->connection, 'ALL');
-
-        
 
         # If IMAP last message
         if ($options['messageId']) {
@@ -149,6 +147,7 @@ class MailFetcher
             }
             $out[] = $id;
         }
+
         return array_reverse($out);
     }
 
@@ -179,8 +178,10 @@ class MailFetcher
             imap_alerts();
             imap_close($this->connection);
             $this->connection = null;
+
             return true;
         }
+
         return false;
     }
 
