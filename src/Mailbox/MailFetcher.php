@@ -141,6 +141,7 @@ class MailFetcher
     private function mailboxSync(array $emails, string $messageId) : array
     {
         $out = [];
+
         krsort($emails); // reverse the order checking latest first
         foreach ($emails as $id) {
             $header = imap_headerinfo($this->connection, $id);
@@ -175,11 +176,8 @@ class MailFetcher
     private function disconnect() : bool
     {
         if ($this->connection) {
-            imap_errors();
-            imap_alerts();
             imap_close($this->connection);
             $this->connection = null;
-
             return true;
         }
 
@@ -223,6 +221,9 @@ class MailFetcher
 
     public function __destruct()
     {
+        imap_errors();
+        imap_alerts();
+        
         if ($this->connection) {
             $this->disconnect();
         }
