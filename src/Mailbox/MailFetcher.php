@@ -178,6 +178,7 @@ class MailFetcher
         if ($this->connection) {
             imap_close($this->connection);
             $this->connection = null;
+
             return true;
         }
 
@@ -219,6 +220,9 @@ class MailFetcher
         return '{' . implode('/', $args) . '}' . $mailbox;
     }
 
+    /**
+     * On destruction clear imap errors/alerts and disconnect if needed
+     */
     public function __destruct()
     {
         imap_errors();

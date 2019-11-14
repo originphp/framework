@@ -49,7 +49,6 @@ class MailParser
     */
     private $resource;
 
-
     /**
      * Destroy the MailParser when finished to clear up mem
      *
@@ -144,7 +143,6 @@ class MailParser
         return $out ? $this->decodeHeader($out) : null;
     }
 
-   
     /**
      * Gets the decoded message, if its a text message, it returns the text version, html returns html and
      * if its multipart, then it returns the highest priority version as defined by RFC
@@ -154,6 +152,7 @@ class MailParser
     public function decoded() : string
     {
         $type = $this->detectContentType();
+
         return $this->extractPart($type);
     }
 
@@ -388,6 +387,7 @@ class MailParser
     public function multipart() : bool
     {
         $contentType = $this->parts[1]['content-type'];
+
         return in_array($contentType, ['multipart/related', 'multipart/mixed','multipart/alternative']);
     }
 
@@ -413,7 +413,7 @@ class MailParser
      */
     public function bounced() : bool
     {
-        if (!$this->deliveryStatusReport()) {
+        if (! $this->deliveryStatusReport()) {
             return false;
         }
 
@@ -432,7 +432,7 @@ class MailParser
         /**
          * Check the message either has empty return path or from mailer-daemon or postmaster
          */
-        if (!preg_match('/^return-path: ?< ?>/im', $header) and !preg_match('/^from:.*(mailer-daemon|postmaster)/im', $header)) {
+        if (! preg_match('/^return-path: ?< ?>/im', $header) and ! preg_match('/^from:.*(mailer-daemon|postmaster)/im', $header)) {
             return false;
         }
        
@@ -525,6 +525,7 @@ class MailParser
          */
         if ($contentType === 'multipart/alternative') {
             $last = end($this->parts);
+
             return $last['content-type'] === 'text/html' ? 'html' : 'text';
         }
 
@@ -603,6 +604,6 @@ class MailParser
             'Delivery Failure',
             'Message status - undeliverable',
             'Delivery Status Notification \(Failure\)'
-           ];
+        ];
     }
 }
