@@ -22,19 +22,13 @@ use Origin\Core\Exception\InvalidArgumentException;
  */
 class MailParser
 {
-    /**
-     * Mailparser resource
-     *
-     * @var resource
-     */
-    private $resource;
-
+   
     /**
      * Array of headers
      *
      * @var array
      */
-    private $headers = [];
+    public $headers = [];
 
     /**
      * Parsed email parts
@@ -47,6 +41,14 @@ class MailParser
      * @var resource
      */
     private $stream;
+
+    /**
+    * Mailparser resource
+    *
+    * @var resource
+    */
+    private $resource;
+
 
     /**
      * Destroy the MailParser when finished to clear up mem
@@ -93,13 +95,23 @@ class MailParser
     }
 
     /**
-     * Returns the header
+     * Returns the message header (string)
      *
      * @return string
      */
     public function header(): string
     {
         return $this->extract(0, $this->parts[1]['starting-pos-body']);
+    }
+
+    /**
+    * Gets the raw body of the message
+    *
+    * @return string
+    */
+    public function body() : string
+    {
+        return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
     }
 
     /**
@@ -132,28 +144,56 @@ class MailParser
         return $out ? $this->decodeHeader($out) : null;
     }
 
+   
+    /**
+     * Gets the decoded message, if its a text message, it returns the text version, html returns html and
+     * if its multipart, then it returns the highest priority version as defined by RFC
+     *
+     * @return string
+     */
+    public function decoded() : string
+    {
+        $type = $this->detectContentType();
+        return $this->extractPart($type);
+    }
+
+    /**
+     * Gets the text part of the message
+     *
+     * @return string
+     */
+    public function textPart() : string
+    {
+        return $this->extractPart('text');
+    }
+
+    /**
+     * Gets the HTML part of the message
+     *
+     * @return string
+     */
+    public function htmlPart() : string
+    {
+        return $this->extractPart('html');
+    }
+
     /**
      * Gets the message body
      *
      * @param  string $type You can use any of the following types:
-     *  - null : (default) this will return RAW body
      *  - html : this will return HTML version
      *  - text : wil return text version
      *  - auto : autodetects type
      * @return string body
      */
-    public function body(string $type = null): string
+    private function extractPart(string $type): string
     {
-        if ($type === null) {
-            return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
-        }
-
-        if (! in_array($type, ['text', 'html','auto'])) {
-            throw new InvalidArgumentException('Invalid type. text, html or auto');
+        if (! in_array($type, ['text', 'html'])) {
+            throw new InvalidArgumentException('Invalid type. text or html');
         }
 
         if ($type === 'auto') {
-            $type = $this->contentType();
+            $type = $this->detectContentType();
         }
 
         $mime = ($type === 'html') ? 'text/html' : 'text/plain';
@@ -310,7 +350,7 @@ class MailParser
 
             return $header;
         }
-
+  
         return iconv_mime_decode($header, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
     }
 
@@ -331,13 +371,143 @@ class MailParser
     }
 
     /**
-     * Detects the body content type
+     * Checks if a message is a delivery status report
+     *
+     * @return bool
+     */
+    public function deliveryStatusReport() : bool
+    {
+        return $this->parts[1]['content-type'] === 'multipart/report';
+    }
+
+    /**
+     * Checks if a message has multiple parts
+     *
+     * @return boolean
+     */
+    public function multipart() : bool
+    {
+        $contentType = $this->parts[1]['content-type'];
+        return in_array($contentType, ['multipart/related', 'multipart/mixed','multipart/alternative']);
+    }
+
+    /**
+     * Gets the Content type of the message
      *
      * @return string
      */
     public function contentType(): string
     {
-        $contentType = $this->parts[1]['content-type'] ?? 'text/plain';
+        return $this->parts[1]['content-type']; //  ?? 'text/plain';
+    }
+
+    /**
+     * Checks if the message looks like its a bounced, impossible to find 100% since there is no common format. This
+     * should catch 90%+ of bounces.
+     *
+     * status codes beginning with 5 are permenent and 4 are temporary
+     *
+     * @link https://www.ietf.org/rfc/rfc3463.txt
+     *
+     * @return boolean
+     */
+    public function bounced() : bool
+    {
+        if (!$this->deliveryStatusReport()) {
+            return false;
+        }
+
+        /**
+         * Important: Use regex since some headers can multiple values
+         */
+        $header = $this->header();
+
+        /**
+         * Check for the x-failed-recipients header
+         */
+        if (preg_match('/^x-failed-recipients:/im', $header)) {
+            return true;
+        }
+
+        /**
+         * Check the message either has empty return path or from mailer-daemon or postmaster
+         */
+        if (!preg_match('/^return-path: ?< ?>/im', $header) and !preg_match('/^from:.*(mailer-daemon|postmaster)/im', $header)) {
+            return false;
+        }
+       
+        /**
+         * Check subject for standard delivery status notification messages
+         */
+        if (preg_match('/^subject:.*(' . implode('|', $this->dsns()) .')/im', $header)) {
+            return true;
+        }
+        /**
+         * Check for this which can be found in the delivery status message itself
+         */
+        if (preg_match('/^action: failed/im', $header)) {
+            return true;
+        }
+       
+        /**
+         * Check for a mail server error e.g 500 1.1.1 in the body
+         */
+        return (bool) preg_match('/(5|4)[\d\d]\s(\d\.\d\.\d)\s/', $this->body());
+    }
+
+    /**
+     * Checks if a message is an autoresponder. There are other methods
+     * as well but they are not official and unpredictable.
+     *
+     * @return boolean
+     */
+    public function autoResponder() : bool
+    {
+        if ($this->deliveryStatusReport()) {
+            return false;
+        }
+
+        $header = $this->header();
+
+        /**
+        * Check auto-submitted header defined in RFC 3834.
+        * Definition:
+        * Automatic responses SHOULD NOT be issued in response to any
+        * message which contains an Auto-Submitted header field (see below),
+        * where that field has any value other than "no".
+        *
+        * @link http://tools.ietf.org/html/rfc3834
+        */
+    
+        if (preg_match('/^auto-submitted:.*([^(no)])/im', $header)) {
+            return true;
+        }
+       
+        /**
+         * Check X-Auto-Response-Suppress header. This is defined by Microsoft
+         * and used by products such as Outlook, Exchange etc.
+         *
+         * @link https://msdn.microsoft.com/en-us/library/ee219609(v=EXCHG.80).aspx
+         */
+        if (preg_match('/^x-auto-response-suppress:.*(DR|ALL|AUTO)/im', $header)) {
+            return true;
+        }
+       
+        /**
+         * This is commonly used but is discouraged.
+         * @link http://www.faqs.org/rfcs/rfc2076.html
+         */
+        return (bool) preg_match('/^precedence:.*(auto-reply)/im', $header);
+    }
+
+    /**
+     * Detects the content type to be used by the body
+     *
+     * @return string
+     */
+    public function detectContentType(): string
+    {
+        $contentType = $this->contentType();
 
         if ($contentType === 'text/plain') {
             return 'text';
@@ -347,14 +517,26 @@ class MailParser
         }
 
         /**
+         * The order of the parts are significiant, later is more important.
+         * RFC1341 states: In general, user agents that compose multipart/alternative entities should place the
+         * body parts in increasing order of preference, that is, with the preferred format last.
+         *
+         * @link https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+         */
+        if ($contentType === 'multipart/alternative') {
+            $last = end($this->parts);
+            return $last['content-type'] === 'text/html' ? 'html' : 'text';
+        }
+
+        /**
          * Two versions of the same mesage are provided but check html version actually exists as
          * it could be richtext.
          * @link http://www.freesoft.org/CIE/RFC/1521/18.htm
          */
-        if (in_array($contentType, ['multipart/related', 'multipart/alternative', 'multipart/mixed'])) {
+        if (in_array($contentType, ['multipart/related', 'multipart/mixed'])) {
             $out = 'text';
             foreach ($this->parts as $part) {
-                if ($part['content-type'] == 'text/html') {
+                if ($part['content-type'] === 'text/html') {
                     $out = 'html';
                     break;
                 }
@@ -390,8 +572,37 @@ class MailParser
         mailparse_msg_free($this->resource);
     }
 
+    /**
+     * Converts this mail into a full message (string)
+     */
     public function __toString()
     {
         return $this->message();
+    }
+
+    /**
+    * Standard Delivery Status Notification messages
+    *
+    * @return array
+    */
+    private function dsns() : array
+    {
+        return [
+            'Mail delivery failed',
+            'Delivery Notification: Delivery has failed',
+            'Returned mail',
+            'Mail System Error - Returned Mail',
+            'Undeliverable message',
+            'Delivery Status Notification',
+            'Nondeliverable mail',
+            'Warning: could not send message',
+            'Undeliverable Mail',
+            'Undeliverable',
+            'Undelivered Mail Returned to Sender',
+            'Failure Notice',
+            'Delivery Failure',
+            'Message status - undeliverable',
+            'Delivery Status Notification \(Failure\)'
+           ];
     }
 }

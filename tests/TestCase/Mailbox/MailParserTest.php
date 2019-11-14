@@ -67,18 +67,30 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $parser = new MailParser($message);
         $body = $parser->body();
         $this->assertEquals(4257203596, crc32($body));
-        $this->assertEquals($body, $parser->body('text'));
+        $this->assertEquals(4257203596, crc32($parser->decoded()));
+        $this->assertEquals(4257203596, crc32($parser->textPart()));
     }
+    public function testMultiPart()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/text.eml');
+        $parser = new MailParser($message);
+        $this->assertFalse($parser->multipart());
+
+        $message = file_get_contents(__DIR__ . '/messages/html.eml');
+        $parser = new MailParser($message);
+        $this->assertTrue($parser->multipart());
+    }
+
     public function testBodyHtmlAndTextMessage()
     {
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
-        
         $parser = new MailParser($message);
-        $body = $parser->body('auto');
+        $body = $parser->body();
         
-        $this->assertEquals(42397819, crc32($body));
-        $this->assertEquals($body, $parser->body('html'));
-        $this->assertEquals(3882162683, crc32($parser->body('text')));
+        $this->assertEquals(514953472, crc32($body));
+        $this->assertEquals(42397819, crc32($parser->decoded()));
+        $this->assertEquals(42397819, crc32($parser->htmlPart()));
+        $this->assertEquals(3882162683, crc32($parser->textPart()));
     }
 
     public function testBodyDeliveryFailure()
@@ -86,11 +98,12 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/550-address-not-found.eml');
         
         $parser = new MailParser($message);
-        $body = $parser->body('auto');
-        
-        $this->assertEquals(4002126370, crc32($body));
-        $this->assertEquals($body, $parser->body('html')); #  Check default version is html from gmail
-        $this->assertEquals(2221129668, crc32($parser->body('text')));
+        $body = $parser->body();
+ 
+        $this->assertEquals(1517028626, crc32($body));
+        $this->assertEquals(4002126370, crc32($parser->decoded()));
+        $this->assertEquals(4002126370, crc32($parser->htmlPart()));
+        $this->assertEquals(2221129668, crc32($parser->textPart()));
     }
 
     public function testHasAttachments()
@@ -125,14 +138,62 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($parser->hasAttachments());
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
-     
-        $this->assertEquals(1038361440, crc32($parser->body('auto')));
+
+        $this->assertEquals(2060789787, crc32($parser->body()));
 
         $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
         $parser = new MailParser($message);
         
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
-        $this->assertEquals(1247987894, crc32($parser->body('auto')));
+        $this->assertEquals(3674939461, crc32($parser->body()));
+    }
+
+    public function testAutoResponder()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/text.eml');
+        $parser = new MailParser($message);
+        $this->assertFalse($parser->autoresponder());
+        
+        $message = file_get_contents(__DIR__ . '/messages/autoresponder.eml');
+        $parser = new MailParser($message);
+        $this->assertTrue($parser->autoresponder());
+
+        // modify header to other heuristic
+        $modified = str_replace('Auto-Submitted: auto-replied', 'X-Auto-Response-Suppress: ALL', $message);
+        $parser = new MailParser($modified);
+        $this->assertTrue($parser->autoresponder());
+        
+        // modify header to other heuristic
+        $modified = str_replace('Auto-Submitted: auto-replied', 'Precedence: auto-reply', $message);
+        $parser = new MailParser($modified);
+        $this->assertTrue($parser->autoresponder());
+    }
+
+    public function testBounced()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/text.eml');
+        $parser = new MailParser($message);
+        $this->assertFalse($parser->bounced());
+        
+        $message = file_get_contents(__DIR__ . '/messages/550-address-not-found.eml');
+        $parser = new MailParser($message);
+        $this->assertTrue($parser->bounced());
+
+        // modify header to other heuristic
+        $modified = str_replace('X-Failed-Recipients: nobody@originphp.com', 'Subject: Delivery Notification: Delivery has failed', $message);
+        $parser = new MailParser($modified);
+        $this->assertTrue($parser->bounced());
+
+        // Check Email Error e.g 500 1.1.1
+        $modified = str_replace('X-Failed-Recipients: nobody@originphp.com', 'Foo: bar', $message);
+        $modified = str_replace('550 5.1.1', 'Action: failed', $modified);
+        $parser = new MailParser($modified);
+        $this->assertTrue($parser->bounced());
+
+        // Check Email Error e.g 500 1.1.1
+        $modified = str_replace('X-Failed-Recipients: nobody@originphp.com', 'Foo: bar', $message);
+        $parser = new MailParser($modified);
+        $this->assertTrue($parser->bounced());
     }
 }
