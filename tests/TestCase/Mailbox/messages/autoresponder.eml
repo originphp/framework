@@ -1,0 +1,81 @@
+Delivered-To: somebodyelse@gmail.com
+Received: by 2002:a19:5f1d:0:0:0:0:0 with SMTP id t29csp10831420lfb;
+        Thu, 14 Nov 2019 04:07:18 -0800 (PST)
+X-Received: by 2002:a9d:64ce:: with SMTP id n14mr6582765otl.263.1573733238310;
+        Thu, 14 Nov 2019 04:07:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1573733238; cv=none;
+        d=google.com; s=arc-20160816;
+        b=t0lrWSsRXet0czwYGNI9PjSXZlxlh463pirzZzFCuStrMPMnJddziqcEramrwAv8Uw
+         wDkpp/e08c5HZCeU3j3sZQtqfajXzJOXDpzQVRb3H61quBx9ehNvB1vie5pxpzSvD6yW
+         odggNulHniRyoEOhb7BwgK638PJzOMfBAi5fFd93qu4cFzQ4O8JFVlYgnFLx7jbv/c14
+         FTe55PfcI7+/18kIVb5uaZhUNDyRBABL+KyvyzRvf6eFh1OKmoiNTEuRkcOs+Tpe5RgE
+         XID6bd20YeoOZ2rsiTdD8Wz7oqWHQYryquJLogyEthCfMlVOxWGH+onugQgPFFZ6AuO2
+         mqhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=auto-submitted:precedence:content-disposition
+         :content-transfer-encoding:mime-version:subject:message-id:date:from
+         :to:dkim-signature;
+        bh=mUAelOXZ+pFCCDwKNOCrNmD2wyW1Ak7OEUjtZ1r7F+s=;
+        b=lAyjlRR+EbjD80DnGItPEE09JT2UDCAIrmOcMvi4yStMa1tfLLp8jTwRqXcqFJTrLo
+         dIeUY6OLSeVlyxFCItdfMna3M61EdA5Fisl2PUzCHEJnxKcxQbBNGGW7KI8YYESVhdpf
+         lwmbK7dGFIoclmJ42rSVUyojToocpRiiJqBYZBIj3PR/I/rDjyppAES19mxt5yTg77Dt
+         EfiQn4S0QJWlW7GFCRh09ahKZ46f974MbX1LM1GpYrD9QC/X5FiZFsdCm0TJdKddYYXr
+         v9QGMM+iD3eRvq023HrdlCgwJQ8giC9FesewcKzP+cwZMOBnfVK9TbiaSFT0Uelh+/fp
+         IEKw==
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20161025 header.b=fcQ508gD;
+       spf=pass (google.com: domain of somebody@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=somebody@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com
+Return-Path: <somebody@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id j5sor3026180otk.9.2019.11.14.04.07.18
+        for <somebodyelse@gmail.com>
+        (Google Transport Security);
+        Thu, 14 Nov 2019 04:07:18 -0800 (PST)
+Received-SPF: pass (google.com: domain of somebody@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20161025 header.b=fcQ508gD;
+       spf=pass (google.com: domain of somebody@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=somebody@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:from:date:message-id:subject:mime-version
+         :content-transfer-encoding:content-disposition:precedence
+         :auto-submitted;
+        bh=mUAelOXZ+pFCCDwKNOCrNmD2wyW1Ak7OEUjtZ1r7F+s=;
+        b=fcQ508gDaCl0Me1Pb8miO2wCH0IqZXYZDprXMNjiS5WaF6ElcRwcs32GZz/xJXrRPd
+         aDNet9A5DZ4UA/ROB/NWnPem1/NmagAF4KVQvo1s/ntdsIB6hlIuy9ua0eroaENhot2f
+         NAuMGBVxaQVSp4qX4nXwwbpadWYEzpm+Ph2DBEAPr5JPXcl+tqeTU/M9Iz2jZ+YAYKrn
+         2+cnpfW4nf6V4kfHMnJhJCY4lqRbTqNOgbammsHGIBbmlLC6zHnHE1+7nMAO9SsQA1oM
+         337vtr9icPIvnbgNIeEGEwTrJSaOU5J/5gEBrlZJesfuKdohblBFHLp7MNLLwhhMPylj
+         W5oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:date:message-id:subject:mime-version
+         :content-transfer-encoding:content-disposition:precedence
+         :auto-submitted;
+        bh=mUAelOXZ+pFCCDwKNOCrNmD2wyW1Ak7OEUjtZ1r7F+s=;
+        b=AMzQ+eV1OG3mMrdPwgvcRhs6O79GkqmZI/ZQX0MCPx0uEflYcGYVhHi66qehqc8RqZ
+         HBIyqex2Yl+YDmFHkqiMDYB9sdiQq2rdN2XmqojzpLewlQPuoLRNBfFzAXY66QgsmJmg
+         jKApP/w83EnbPoezm2c6OIRInwI7ljXrx+XDcR9DcCRlyiZHwt6W+pi2299cfn2TLt66
+         pQzjKKc1gL8IiKlWQedYb0P4Fbwg9UZ9mY7mgBgMnItz3FOcXhj4RQuMjJHZwAF+hkeO
+         4sVMtgttoDpAKHXzGDSR8rTpZR7ohHdMqLAtt+ZnBvBGWclAvG/UlGEnSYg+SdayZGH7
+         ibhg==
+X-Gm-Message-State: APjAAAWwxFYn3hMiRZQY+5AkYMq2SUlkbTky3d9lfMi9U8R2css1nrIQ QpkOr8OUnAORW3zcMM7b8u/ibi8BUa9xxOuzURq3ds70dIaIhZZRcXhip64=
+X-Google-Smtp-Source: APXvYqxs9bknSkRovKd4+2qwIiZdrbS1EclXgA6tann+y8JikY5dhmZjd4cKPFT4j0MjgEcHXuDHTfHDEQo1n5JEzSsAgEWrO8EIelx/kUcS
+X-Received: by 2002:a9d:2266:: with SMTP id o93mr6667538ota.215.1573733237929;
+        Thu, 14 Nov 2019 04:07:17 -0800 (PST)
+To: somebodyelse@gmail.com
+From: James Sharief <somebody@gmail.com>
+Date: Thu, 14 Nov 2019 04:07:17 -0800
+Message-ID: <CADgSRMcbB+AtAyK=i9fmOTOkCOaW7LQFXVrwiLsCvK_JfwNsOw@mail.gmail.com>
+Subject: I am out of the office Re: Hi
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Precedence: bulk
+X-Autoreply: yes
+Auto-Submitted: auto-replied
+
+<div dir="ltr"><br>I am out of the office until next week.</div>

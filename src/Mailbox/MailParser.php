@@ -101,11 +101,11 @@ class MailParser
      */
     public function header(): string
     {
-        return $this->extract(0, $this->parts[1]['starting-pos-body']);
+        return trim($this->extract(0, $this->parts[1]['starting-pos-body'], "\r\n"));
     }
 
     /**
-    * Gets the raw body of the message
+    * Gets the body of the message (this includes all parts etc)
     *
     * @return string
     */
@@ -160,9 +160,9 @@ class MailParser
     /**
      * Gets the text part of the message
      *
-     * @return string
+     * @return string|null
      */
-    public function textPart() : string
+    public function textPart() :  ?string
     {
         return $this->extractPart('text');
     }
@@ -170,9 +170,9 @@ class MailParser
     /**
      * Gets the HTML part of the message
      *
-     * @return string
+     * @return string|null
      */
-    public function htmlPart() : string
+    public function htmlPart() : ?string
     {
         return $this->extractPart('html');
     }
@@ -184,9 +184,9 @@ class MailParser
      *  - html : this will return HTML version
      *  - text : wil return text version
      *  - auto : autodetects type
-     * @return string body
+     * @return string|null body
      */
-    private function extractPart(string $type): string
+    private function extractPart(string $type): ?string
     {
         if (! in_array($type, ['text', 'html'])) {
             throw new InvalidArgumentException('Invalid type. text or html');

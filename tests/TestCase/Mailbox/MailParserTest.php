@@ -37,7 +37,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
     public function testHeader()
     {
         $message = file_get_contents(__DIR__ . '/messages/text.eml');
-        $this->assertEquals(2803017535, crc32((new MailParser($message))->header()));
+        $this->assertEquals(2384335015, crc32((new MailParser($message))->header()));
     }
 
     public function testMessage()
