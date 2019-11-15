@@ -27,16 +27,22 @@ class Mail
     public $messageId;
 
     /**
+     * To email address(es)
+     *
      * @var string|array
      */
     public $to;
 
     /**
+     * CC email address(es)
+     *
      * @var string|array
      */
     public $cc;
 
     /**
+     * BCC email address(es)
+     *
      * @var string|array
      */
     public $bcc;
@@ -49,16 +55,22 @@ class Mail
     public $from;
 
     /**
+     * Reply-to email address
+     *
      * @var string
      */
     public $replyTo;
 
     /**
+     * Sender email address
+     *
      * @var string
      */
     public $sender;
 
     /**
+     * Return-path email address
+     *
      * @var string
      */
     public $returnPath;
@@ -85,11 +97,15 @@ class Mail
     public $body;
 
     /**
+     * The decoded HTML message or part
+     *
      * @var string|null
      */
     public $htmlPart;
 
     /**
+     * The text HTML message or part
+     *
      * @var string|null
      */
     public $textPart;
@@ -117,32 +133,42 @@ class Mail
     private $headers;
 
     /**
+     * Email content type as stated in header
+     *
      * @var string
      */
     private $contentType;
 
     /**
+     * Wether the email is bounce notification
+     *
      * @var boolean
      */
     private $bounced = false;
 
     /**
+     * Wether the email is an autoresponder
+     *
      * @var boolean
      */
     private $autoResponder = false;
 
     /**
+     * If the email is a multi-part email message
+     *
      * @var boolean
      */
     private $multipart = false;
 
     /**
+     * If the message is a delivery status report (DSR)
+     *
      * @var boolean
      */
     private $deliveryStatusReport = false;
 
     /**
-     * An array of all the recipients
+     * All the email addresses that this email is sent to (to,cc and bcc)
      *
      * @var array
      */
@@ -155,7 +181,13 @@ class Mail
         }
     }
 
-    private function parse(string $message)
+    /**
+     * Internal method for parsing and mapping the email message
+     *
+     * @param string $message
+     * @return void
+     */
+    private function parse(string $message) : void
     {
         $parser = new MailParser($message);
         $this->messageId = $parser->headers('message-id');
@@ -167,6 +199,7 @@ class Mail
         $this->from = $this->parseSingleAddress($parser->headers('from'));
         $this->sender = $this->parseSingleAddress($parser->headers('sender'));
         $this->returnPath = $this->parseSingleAddress($parser->headers('return-path'));
+        
         $this->header = $parser->header();
         $this->headers = $parser->headers();
         $this->body = $parser->body();
@@ -184,37 +217,57 @@ class Mail
     /**
      * Extracts a single email address from a header line
      *
-     * @param string $header
+     * @internal removed type hint due to google DSN having duplicate return-path headers
+     *
+     * @param string|array $header
      * @return string|null
      */
-    private function parseSingleAddress(string $header = null) : ?string
+    private function parseSingleAddress($header = null) : ?string
     {
         if ($header === null) {
             return null;
         }
-        $addresses = mailparse_rfc822_parse_addresses($header);
-
+        $addresses = $this->parseHeaderResult($header);
         return $addresses[0]['address'];
     }
 
     /**
      * Extracts multiple email addresss from a header line
      *
-     * @param string $header
+    * @internal removed type hint due to google DSN having duplicate return-path headers
+     *
+     * @param string|array $header
      * @return string|null
      */
-    private function parseAddresses(string $header = null)
+    private function parseAddresses($header = null)
     {
         if ($header === null) {
             return null;
         }
         $out = [];
-        $addresses = mailparse_rfc822_parse_addresses($header);
+
+        $addresses = $this->parseHeaderResult($header);
         foreach ($addresses as $address) {
             $out[] = $address['address'];
         }
 
         return count($out) === 1 ? $out[0] : $out;
+    }
+
+    /**
+     * Parses the results from a header for email addresses, if there
+     * are two headers with same name, it uses the first one. 15.07.19 gmail
+     * bounce message has two return paths.
+     *
+     * @param string|array $header
+     * @return array
+     */
+    private function parseHeaderResult($header) :array
+    {
+        if (is_array($header)) {
+            $header = $header[0];
+        }
+        return mailparse_rfc822_parse_addresses($header);
     }
 
     /**
