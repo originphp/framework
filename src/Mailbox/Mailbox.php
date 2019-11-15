@@ -25,15 +25,7 @@ use Origin\Core\Resolver;
 class Mailbox
 {
     use HookTrait, Configurable;
-    /**
-     * Holds the mailbox routes
-     *
-     * example ['/^support@/i' => 'Support']
-     *
-     * @var array
-     */
-    protected static $routes = [];
-
+  
     /**
      * Inbound email id (not email message id)
      *
@@ -44,7 +36,7 @@ class Mailbox
     /**
      * Mail object created when mailbox is dispatched.
      *
-     * Similar to how a request is placed in controller
+     * @internal Similar to how a request is placed in controller
      *
      * @var \Origin\Mailbox\Mail
      */
@@ -57,23 +49,29 @@ class Mailbox
      */
     protected $InboundEmail;
 
-    public function __construct()
-    {
-        $this->InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
-        $this->executeHook('initialize');
-    }
+    /**
+     * Holds the mailbox routes
+     *
+     * example ['/^support@/i' => 'Support']
+     *
+     * @var array
+     */
+    private static $routes = [];
 
     /**
-     * Bounces a message using a mailer, the \Origin\Mailbox\Mail object will be passed
-     * to the mailer.
+     * Constructor
      *
-     * @param \Origin\Mailer\Mailer $mailer
-     * @return void
+     * @param \Origin\Model\Entity $inboundEmai
      */
-    public function bounce(Mailer $mailer) : void
+    public function __construct(Entity $inboundEmail)
     {
-        $this->InboundEmail->setStatus($this->id, 'bounced');
-        $mailer->dispatchLater($this->mail);
+        if ($inboundEmail) {
+            $this->id = $inboundEmail->id;
+            $this->mail = new Mail($inboundEmail->message);
+        }
+       
+        $this->InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
+        $this->executeHook('initialize', [$inboundEmail]);
     }
 
     /**
@@ -82,27 +80,45 @@ class Mailbox
      * @param \Origin\Model\Entity $message
      * @return void
      */
-    public function dispatch(Entity $message) : bool
+    public function dispatch() : bool
     {
-        $result = false;
-
-        $this->id = $message->id;
-        $this->InboundEmail->setStatus($this->id, 'processing');
-
-        $this->mail = new Mail($message->message);
-        
         try {
+            $this->setStatus('processing');
             $this->executeHook('startup');
             $this->process();
-            $this->InboundEmail->setStatus($this->id, 'delivered');
-            $result = true;
+            $this->setStatus('delivered');
+            $this->executeHook('shutdown');
+            return true;
         } catch (Exception $exception) {
-            $this->InboundEmail->setStatus($this->id, 'failed');
+            $this->setStatus('failed');
         }
         
-        $this->executeHook('shutdown');
+        return false;
+    }
 
-        return $result;
+  
+    /**
+     * Bounces a message using a mailer, the \Origin\Mailbox\Mail object will be passed
+     * to the mailer.
+     *
+     * @param \Origin\Mailer\Mailer $mailer
+     * @return bool result of dispatchLater
+     */
+    public function bounce(Mailer $mailer) : bool
+    {
+        $this->setStatus('bounced');
+        return $mailer->dispatchLater($this->mail);
+    }
+
+    /**
+       * Sets the status for the inbound email
+       *
+       * @param string $status processing/delivered/failed/bounced
+       * @return void
+       */
+    private function setStatus(string $status) : void
+    {
+        $this->InboundEmail->setStatus($this->id, $status);
     }
 
     /**
@@ -137,7 +153,7 @@ class Mailbox
     }
 
     /**
-    * Detects a route for a message
+    * Detects which mailbox for the message
     *
     * @param string $message
     * @return string|null
@@ -146,7 +162,7 @@ class Mailbox
     {
         $mail = new Mail($message);
         foreach (static::routes() as $route => $mailbox) {
-            foreach ((array) $mail->to as $address) {
+            foreach ((array) $mail->recipients() as $address) {
                 if (preg_match($route, $address)) {
                     return Resolver::className($mailbox .'Mailbox', 'Mailbox');
                 }
