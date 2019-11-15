@@ -24,8 +24,6 @@ before_install:
   - echo yes | pecl install -f apcu
   - echo 'apc.enable_cli = 1' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - echo "extension = imap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - echo "extension = mailparse.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 before_script:
   - composer install --prefer-source --no-interaction
 script:
