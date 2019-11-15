@@ -207,6 +207,7 @@ class Mail
         $this->textPart = $parser->textPart();
         $this->decoded = $parser->decoded();
         $this->contentType = $parser->contentType();
+        $this->multipart = $parser->multipart();
         $this->bounced = $parser->bounced();
         $this->autoResponder = $parser->autoResponder();
         $this->deliveryStatusReport = $parser->deliveryStatusReport();
@@ -228,6 +229,7 @@ class Mail
             return null;
         }
         $addresses = $this->parseHeaderResult($header);
+
         return $addresses[0]['address'];
     }
 
@@ -267,6 +269,7 @@ class Mail
         if (is_array($header)) {
             $header = $header[0];
         }
+
         return mailparse_rfc822_parse_addresses($header);
     }
 

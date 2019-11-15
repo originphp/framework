@@ -23,18 +23,18 @@ class MailTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/text.eml');
         $mail = new Mail($message);
         #debug($mail);
-        $this->assertEquals(665972478, crc32(serialize($mail)));
+        $this->assertEquals(2518035855, crc32(serialize($mail)));
 
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
         $mail = new Mail($message);
-        #debug($mail);
-        $this->assertEquals(907516392, crc32(serialize($mail)));
+
+        $this->assertEquals(1475267297, crc32(serialize($mail)));
 
         $message = file_get_contents(__DIR__ . '/messages/html-attachment.eml');
         $mail = new Mail($message);
-
+  
         $mail->attachments[0]['tmp'] = '/tmp/foo'; // change from random
-        $this->assertEquals(746718972, crc32(serialize($mail)));
+        $this->assertEquals(202003145, crc32(serialize($mail)));
 
         /**
          * I want to reach reply-to, sender, return-path and add multiple cc/bcc
@@ -90,7 +90,6 @@ EOF;
         $mail = new Mail(file_get_contents(__DIR__ . '/messages/550-address-not-found.eml'));
         $this->assertTrue($mail->isBounce());
    
-
         $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
         $this->assertFalse($mail->isBounce());
     }
@@ -106,12 +105,62 @@ EOF;
 
     public function testIsAutoResponder()
     {
-        print __DIR__ . '/messages/autoresponder.eml';
-        debug(file_get_contents(__DIR__ . '/messages/autoresponder.eml'));
         $mail = new Mail(file_get_contents(__DIR__ . '/messages/autoresponder.eml'));
         $this->assertTrue($mail->isAutoResponder());
 
         $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
         $this->assertFalse($mail->isAutoResponder());
+    }
+
+    public function testIsMultiPart()
+    {
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/html.eml'));
+        $this->assertTrue($mail->isMultiPart());
+
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
+        $this->assertFalse($mail->isMultiPart());
+    }
+
+    public function testHasAttachments()
+    {
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/text-attachment.eml'));
+        $this->assertTrue($mail->hasAttachments());
+
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
+        $this->assertFalse($mail->hasAttachments());
+    }
+
+    public function testHasHtml()
+    {
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/html.eml'));
+        $this->assertTrue($mail->hasHtml());
+
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
+        $this->assertFalse($mail->hasHtml());
+    }
+
+    public function testHasText()
+    {
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/text.eml'));
+        $this->assertTrue($mail->hasText());
+
+        $mail = new Mail(file_get_contents(__DIR__ . '/messages/html-only.eml'));
+        $this->assertFalse($mail->hasText());
+    }
+
+    public function testMessage()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/html.eml');
+        $mail = new Mail($message);
+ 
+        $this->assertEquals($mail->header ."\r\n\r\n" . $mail->body, $mail->message());
+    }
+
+    public function testToString()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/html.eml');
+        $mail = new Mail($message);
+ 
+        $this->assertEquals($mail->header ."\r\n\r\n" . $mail->body, (string) $mail);
     }
 }

@@ -67,6 +67,8 @@ class MailParser
         'Delivery Status Notification \(Failure\)'
     ];
 
+    private $messageLength = 0;
+
     /**
      * Destroy the MailParser when finished to clear up mem
      *
@@ -82,6 +84,8 @@ class MailParser
         # Create resource
         $this->resource = mailparse_msg_create();
         mailparse_msg_parse($this->resource, $message);
+        
+        $this->messageLength = mb_strlen($message);
 
         # Get the structure
         $this->getStructure();
@@ -128,7 +132,7 @@ class MailParser
     */
     public function body() : string
     {
-        return $this->extract($this->parts[1]['starting-pos-body'], $this->parts[1]['ending-pos-body']);
+        return $this->extract($this->parts[1]['starting-pos-body'], $this->messageLength);
     }
 
     /**
@@ -165,9 +169,9 @@ class MailParser
      * Gets the decoded message, if its a text message, it returns the text version, html returns html and
      * if its multipart, then it returns the highest priority version as defined by RFC
      *
-     * @return string
+     * @return string|null
      */
-    public function decoded() : string
+    public function decoded() : ?string
     {
         $type = $this->detectContentType();
 
@@ -303,8 +307,6 @@ class MailParser
         return ($content and $this->needsDecoding($encoding)) ? $this->decodeContent($content, $encoding) : $content;
     }
 
-  
-
     /**
      * Parse RFC 822 compliant addresses list from the to, from, cc or bcc headers. Do not include
      * the header part. e.g. 'To: '
@@ -411,7 +413,6 @@ class MailParser
             rewind($this->stream);
         }
        
-
         return $out;
     }
 

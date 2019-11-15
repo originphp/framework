@@ -66,7 +66,8 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         
         $parser = new MailParser($message);
         $body = $parser->body();
-        $this->assertEquals(4257203596, crc32($body));
+      
+        $this->assertEquals(4246420406, crc32($body));
         $this->assertEquals(4257203596, crc32($parser->decoded()));
         $this->assertEquals(4257203596, crc32($parser->textPart()));
     }
@@ -86,8 +87,8 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
         $parser = new MailParser($message);
         $body = $parser->body();
-        
-        $this->assertEquals(514953472, crc32($body));
+      
+        $this->assertEquals(1064497483, crc32($body));
         $this->assertEquals(42397819, crc32($parser->decoded()));
         $this->assertEquals(42397819, crc32($parser->htmlPart()));
         $this->assertEquals(3882162683, crc32($parser->textPart()));
@@ -100,7 +101,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $parser = new MailParser($message);
         $body = $parser->body();
  
-        $this->assertEquals(1517028626, crc32($body));
+        $this->assertEquals(2932135163, crc32($body));
         $this->assertEquals(4002126370, crc32($parser->decoded()));
         $this->assertEquals(4002126370, crc32($parser->htmlPart()));
         $this->assertEquals(2221129668, crc32($parser->textPart()));
@@ -139,14 +140,14 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
   
-        $this->assertEquals(2060789787, crc32($parser->body()));
+        $this->assertEquals(2150665751, crc32($parser->body()));
 
         $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
         $parser = new MailParser($message);
         
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
-        $this->assertEquals(3674939461, crc32($parser->body()));
+        $this->assertEquals(2130664793, crc32($parser->body()));
     }
 
     public function testAutoResponder()
