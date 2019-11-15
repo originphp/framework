@@ -16,11 +16,11 @@ namespace Origin\Mailbox;
 
 use Exception;
 use Origin\Model\Entity;
+use Origin\Core\Resolver;
 use Origin\Mailer\Mailer;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Configurable\StaticConfigurable as Configurable;
-use Origin\Core\Resolver;
 
 class Mailbox
 {
@@ -88,6 +88,7 @@ class Mailbox
             $this->process();
             $this->setStatus('delivered');
             $this->executeHook('shutdown');
+
             return true;
         } catch (Exception $exception) {
             $this->setStatus('failed');
@@ -96,7 +97,6 @@ class Mailbox
         return false;
     }
 
-  
     /**
      * Bounces a message using a mailer, the \Origin\Mailbox\Mail object will be passed
      * to the mailer.
@@ -107,6 +107,7 @@ class Mailbox
     public function bounce(Mailer $mailer) : bool
     {
         $this->setStatus('bounced');
+
         return $mailer->dispatchLater($this->mail);
     }
 
