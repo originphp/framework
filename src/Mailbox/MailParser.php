@@ -49,6 +49,24 @@ class MailParser
     */
     private $resource;
 
+    private $dsns = [
+        'Mail delivery failed',
+        'Delivery Notification: Delivery has failed',
+        'Returned mail',
+        'Mail System Error - Returned Mail',
+        'Undeliverable message',
+        'Delivery Status Notification',
+        'Nondeliverable mail',
+        'Warning: could not send message',
+        'Undeliverable Mail',
+        'Undeliverable',
+        'Undelivered Mail Returned to Sender',
+        'Failure Notice',
+        'Delivery Failure',
+        'Message status - undeliverable',
+        'Delivery Status Notification \(Failure\)'
+    ];
+
     /**
      * Destroy the MailParser when finished to clear up mem
      *
@@ -248,11 +266,14 @@ class MailParser
     {
         $attachments = [];
         foreach ($this->parts as $key => $data) {
-            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) == 'attachment') {
+            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) === 'attachment') {
                 $tmp = tempnam(sys_get_temp_dir(), 'O');
-
                 $fh = fopen($tmp, 'w');
-                fwrite($fh, $this->extract($data['starting-pos-body'], $data['ending-pos-body']));
+                fwrite($fh, $this->extractAttachment(
+                    $data['starting-pos-body'],
+                    $data['ending-pos-body'],
+                    $data['transfer-encoding']
+                    ) ?: ''); // allow empty strings for invalid attachments @see 550-address-not-found.eml
                 fclose($fh);
 
                 $attachments[] = [
@@ -266,6 +287,23 @@ class MailParser
 
         return $attachments;
     }
+
+    /**
+     * Extracts and decodes an attachment if needed
+     *
+     * @param integer $start
+     * @param integer $end
+     * @param string $encoding
+     * @return string|null
+     */
+    private function extractAttachment(int $start, int $end, string $encoding): ?string
+    {
+        $content = $this->extract($start, $end);
+
+        return ($content and $this->needsDecoding($encoding)) ? $this->decodeContent($content, $encoding) : $content;
+    }
+
+  
 
     /**
      * Parse RFC 822 compliant addresses list from the to, from, cc or bcc headers. Do not include
@@ -354,17 +392,25 @@ class MailParser
     }
 
     /**
-     * Extracts a part of an email
+     * Extracts a part of an email.
+     *
+     * @internal in the GMAIL DSN there is an attachment which has no data (and two return-path headers) so
+     * I have added a quick check to ensure start/end positions are valid
      *
      * @param integer $start
      * @param integer $end
-     * @return string
+     * @return string|null
      */
-    private function extract(int $start, int $end): string
+    private function extract(int $start, int $end): ?string
     {
-        fseek($this->stream, $start);
-        $out = fread($this->stream, $end - $start);
-        rewind($this->stream);
+        $out = null;
+
+        if ($end > $start) {
+            fseek($this->stream, $start);
+            $out = fread($this->stream, $end - $start);
+            rewind($this->stream);
+        }
+       
 
         return $out;
     }
@@ -439,7 +485,7 @@ class MailParser
         /**
          * Check subject for standard delivery status notification messages
          */
-        if (preg_match('/^subject:.*(' . implode('|', $this->dsns()) .')/im', $header)) {
+        if (preg_match('/^subject:.*(' . implode('|', $this->dsns) .')/im', $header)) {
             return true;
         }
         /**
@@ -478,7 +524,6 @@ class MailParser
         *
         * @link http://tools.ietf.org/html/rfc3834
         */
-    
         if (preg_match('/^auto-submitted:.*([^(no)])/im', $header)) {
             return true;
         }
@@ -579,31 +624,5 @@ class MailParser
     public function __toString()
     {
         return $this->message();
-    }
-
-    /**
-    * Standard Delivery Status Notification messages
-    *
-    * @return array
-    */
-    private function dsns() : array
-    {
-        return [
-            'Mail delivery failed',
-            'Delivery Notification: Delivery has failed',
-            'Returned mail',
-            'Mail System Error - Returned Mail',
-            'Undeliverable message',
-            'Delivery Status Notification',
-            'Nondeliverable mail',
-            'Warning: could not send message',
-            'Undeliverable Mail',
-            'Undeliverable',
-            'Undelivered Mail Returned to Sender',
-            'Failure Notice',
-            'Delivery Failure',
-            'Message status - undeliverable',
-            'Delivery Status Notification \(Failure\)'
-        ];
     }
 }

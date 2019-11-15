@@ -126,7 +126,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($attachments);
         $this->assertEquals('README.md', $attachments[0]['name']);
         $this->assertEquals('text/plain', $attachments[0]['type']);
-        $this->assertEquals(77, $attachments[0]['size']);
+        $this->assertEquals(57, $attachments[0]['size']);
         $this->assertRegExp('/\/tmp\/([a-z0-9]+)$/i', $attachments[0]['tmp']);
     }
 
@@ -138,7 +138,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($parser->hasAttachments());
         $this->assertTrue($parser->hasAttachments());
         $this->assertNotEmpty($parser->attachments());
-
+  
         $this->assertEquals(2060789787, crc32($parser->body()));
 
         $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
