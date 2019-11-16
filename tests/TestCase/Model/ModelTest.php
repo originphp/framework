@@ -853,6 +853,16 @@ class ModelTest extends OriginTestCase
         $this->assertNull($result);
     }
 
+    public function testFindBy() {
+        $result = $this->Article->findBy(['id' => 1001]);
+        $this->assertEquals(1001, $result->id);
+    }
+
+    public function testFindAllBy() {
+        $result = $this->Article->findAllBy(['id' => 1001]);
+        $this->assertEquals(1001, $result[0]->id);
+    }
+
     public function testFindAll()
     {
         $result = $this->Article->find('all');

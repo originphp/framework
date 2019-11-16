@@ -16,6 +16,10 @@ namespace Origin\Model\Exception;
 
 use Origin\Core\Exception\Exception;
 
+/**
+ * @deprecated This will be deprecated in future major release, this is
+ * kept for backwards comptability
+ */
 class NotFoundException extends Exception
 {
     protected $defaultErrorCode = 404;

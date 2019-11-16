@@ -27,7 +27,7 @@ use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
-use Origin\Model\Exception\NotFoundException;
+use Origin\Model\Exception\RecordNotFoundException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
 
@@ -938,7 +938,7 @@ class Model
         if ($result = $this->find('first', $options)) {
             return $result;
         }
-        throw new NotFoundException(sprintf('Record not found in %s table with the primary key %s', $this->table, $id));
+        throw new RecordNotFoundException(sprintf('Record not found in %s table with the primary key %s', $this->table, $id));
     }
 
     /**
@@ -984,6 +984,46 @@ class Model
         unset($options);
 
         return $results;
+    }
+
+    /**
+     * Finds the first record by a set of conditions
+     *
+     * @param array $conditions
+     * @param array $options  The options array can work with the following keys
+     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     * 'conditions' => ['authors.id = articles.author_id']
+     *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+     *   - limit: the number of records to limit by
+     *   - group: the field to group by e.g. ['category']
+     *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+     * @return \Origin\Model\Entity|null
+     */
+    public function findBy(array $conditions =[], array $options = []) : ?Entity
+    {
+        return $this->find('first', array_merge($options, ['conditions'=>$conditions]));
+    }
+
+    /**
+     * Finds all records by array of conditions
+     *
+     * @param array $conditions
+     * @param array $options  The options array can work with the following keys
+     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     * 'conditions' => ['authors.id = articles.author_id']
+     *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+     *   - limit: the number of records to limit by
+     *   - group: the field to group by e.g. ['category']
+     *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+     * @return \Origin\Model\Collection|array
+     */
+    public function findAllBy(array $conditions =[], array $options = [])
+    {
+        return $this->find('all', array_merge($options, ['conditions'=>$conditions]));
     }
 
     /**
