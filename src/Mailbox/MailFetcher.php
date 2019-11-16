@@ -207,7 +207,7 @@ class MailFetcher
             $this->config['protocol']
         ];
 
-        if ($this->config['encryption']) {
+        if (!empty($this->config['encryption'])) {
             $args[] = $this->config['encryption'];
         }
 
@@ -216,7 +216,7 @@ class MailFetcher
         }
 
         $mailbox = $this->config['protocol'] === 'imap' ? 'INBOX' : null;
-
+  
         return '{' . implode('/', $args) . '}' . $mailbox;
     }
 
