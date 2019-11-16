@@ -14,17 +14,21 @@
 declare(strict_types = 1);
 namespace Origin\Mailbox;
 
-use Exception;
 use Origin\Model\Entity;
 use Origin\Core\Resolver;
 use Origin\Mailer\Mailer;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Configurable\StaticConfigurable as Configurable;
+use Origin\Core\CallbackRegistrationTrait;
+use Origin\Log\Log;
+use Origin\Model\ModelTrait;
+use Origin\Mailbox\Model\InboundEmail;
+use Origin\Core\Exception\Exception;
 
 class Mailbox
 {
-    use HookTrait, Configurable;
+    use HookTrait, Configurable, CallbackRegistrationTrait,ModelTrait;
   
     /**
      * Inbound email id (not email message id)
@@ -59,69 +63,149 @@ class Mailbox
     private static $routes = [];
 
     /**
+     * Bounced falg
+     *
+     * @var bool
+     */
+    private $bounced = false;
+
+    /**
      * Constructor
      *
      * @param \Origin\Model\Entity $inboundEmai
      */
     public function __construct(Entity $inboundEmail)
     {
-        if ($inboundEmail) {
-            $this->id = $inboundEmail->id;
-            $this->mail = new Mail($inboundEmail->message);
-        }
+        $this->id = $inboundEmail->id;
+        $this->mail = new Mail($inboundEmail->message);
        
         $this->InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
         $this->executeHook('initialize', [$inboundEmail]);
     }
 
     /**
+     * Registers a callback before an email is processed
+     *
+     * example
+     *
+     *    protected function initialize(): void
+     *    {
+     *        $this->loadModel('User');
+     *        $this->beforeProcess('checkIsUser');
+     *    }
+     *
+     *    protected function checkIsUser(): void
+     *    {
+     *        if (!$this->User->findBy(['email'=>$this->mail->from])) {
+     *            $this->bounceWith(UnkownUserMailer::class);
+     *        }
+     *    }
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function beforeProcess(string $method) : void
+    {
+        $this->registeredCallbacks['beforeProcess'][] = $method;
+    }
+
+    /**
+     * Registers a callback after an email is processed
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function afterProcess(string $method) : void
+    {
+        $this->registeredCallbacks['afterProcess'][] = $method;
+    }
+
+    /**
      * Dispatches the message to the mailbox
      *
      * @param \Origin\Model\Entity $message
-     * @return void
+     * @return bool
      */
     public function dispatch() : bool
     {
+        $this->executeHook('startup');
+        $result = $this->performProcessing();
+        $this->executeHook('shutdown');
+        return $result;
+    }
+    
+    /**
+     * Sets
+     *
+     * @return boolean
+     */
+    private function performProcessing() : bool
+    {
+        $this->setStatus('processing');
         try {
-            $this->setStatus('processing');
-            $this->executeHook('startup');
-            $this->process();
-            $this->setStatus('delivered');
-            $this->executeHook('shutdown');
+            $this->dispatchCallbacks('beforeProcess');
+
+            if ($this->bounced === false) {
+                $this->process();
+            }
+
+            if ($this->bounced === false) {
+                $this->dispatchCallbacks('afterProcess');
+            }
+
+            if ($this->bounced === false) {
+                $this->setStatus('delivered');
+            }
 
             return true;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->setStatus('failed');
+            Log::error($exception->getMessage());
+            $this->executeHook('onError', [$exception]);
         }
         
         return false;
     }
+    /**
+     * Dispatches the callbacks for the Mailbox
+     *
+     * @param string $callback
+     * @return void
+     */
+    private function dispatchCallbacks(string $callback) : void
+    {
+        $callbacks = $this->registeredCallbacks($callback);
+        foreach ($callbacks as $method) {
+            if (method_exists($this, $method)) {
+                if ($this->$method() === false or $this->bounced) {
+                    break;
+                }
+            }
+        }
+    }
 
     /**
-     * Bounces a message using a mailer, the \Origin\Mailbox\Mail object will be passed
-     * to the mailer.
+     * Bounces a message with a mailer, the \Origin\Mailbox\Mail object will be passed
+     * to the mailer. This will also halt futher processing
      *
-     * @param \Origin\Mailer\Mailer $mailer
+     * @param \Origin\Mailer\Mailer $mailer UnkownUserMailer::class or 'UnkownUser' or 'App\Mailer\UnownUserMailer'
      * @return bool result of dispatchLater
      */
-    public function bounce(Mailer $mailer) : bool
+    protected function bounceWith(string $mailerClass) : bool
     {
         $this->setStatus('bounced');
+       
+        $this->bounced = true;
 
-        return $mailer->dispatchLater($this->mail);
+        $className = Resolver::className($mailerClass, 'Mailer');
+
+        if ($className) {
+            return (new $className())->dispatchLater($this->mail);
+        }
+        throw new Exception('Missing class ' . $mailerClass);
     }
 
-    /**
-       * Sets the status for the inbound email
-       *
-       * @param string $status processing/delivered/failed/bounced
-       * @return void
-       */
-    private function setStatus(string $status) : void
-    {
-        $this->InboundEmail->setStatus($this->id, $status);
-    }
-
+   
     /**
      * Registers a route for the mailboxes
      *
@@ -142,9 +226,9 @@ class Mailbox
     /**
      * Gets the routes for the Mailboxes
      *
-     * @return array
+     * @return mixed
      */
-    public static function routes(string $regex = null) : ?array
+    public static function routes(string $regex = null)
     {
         if ($regex === null) {
             return static::$routes;
@@ -161,15 +245,36 @@ class Mailbox
     */
     public static function detect(string $message) : ?string
     {
-        $mail = new Mail($message);
+        $recipients = (array) (new Mail($message))->recipients();
         foreach (static::routes() as $route => $mailbox) {
-            foreach ((array) $mail->recipients() as $address) {
+            foreach ($recipients as $address) {
                 if (preg_match($route, $address)) {
-                    return Resolver::className($mailbox .'Mailbox', 'Mailbox');
+                    return Resolver::className($mailbox, 'Mailbox', 'Mailbox');
                 }
             }
         }
 
         return null;
+    }
+
+    /**
+      * Sets the status for the inbound email
+      *
+      * @param string $status processing/delivered/failed/bounced
+      * @return void
+      */
+    private function setStatus(string $status) : void
+    {
+        $this->InboundEmail->setStatus($this->id, $status);
+    }
+
+    /**
+     * Gets the mail object
+     *
+     * @return \Origin\Mailbox\Mail
+     */
+    public function mail() : Mail
+    {
+        return $this->mail;
     }
 }
