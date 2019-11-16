@@ -1,15 +1,19 @@
 # Changelog
+
 ## [Unreleased]
 
 ### Added
+
 - Mailbox feature - process incoming emails from pipe/imap or pop3 using controller like interface
 - Model::findBy
 - Model::findAllBy
 
 ### Fixed
+
 - Controller callbacks disabling
 
 ### Changed
+
 - Model now throws RecordNotFoundException future major release NotFoundException for Model will be deprecated
 
 ## [2.2.1] - 2019-11-11
