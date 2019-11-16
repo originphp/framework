@@ -133,10 +133,6 @@ class Controller
 
         $this->componentRegistry = new ComponentRegistry($this);
 
-        // Set default callbacks to be inline with framework
-        $this->beforeAction('startup');
-        $this->afterAction('shutdown');
-  
         $this->executeHook('initialize');
         $this->initializeTraits();
     }
@@ -249,10 +245,12 @@ class Controller
      */
     protected function startupProcess() : ?Response
     {
+        if ($this->isResponseOrRedirect($this->executeHook('startup'))) {
+            return $this->response;
+        }
         if (! $this->triggerCallback('beforeAction')) {
             return $this->response;
         }
-       
         if ($this->isResponseOrRedirect($this->componentRegistry->call('startup'))) {
             return $this->response;
         }
@@ -270,9 +268,13 @@ class Controller
         if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
             return $this->response;
         }
-        if (! $this->triggerCallback('afterAction', true)) {
+        if (! $this->triggerCallback('afterAction')) {
             return $this->response;
         }
+        if ($this->isResponseOrRedirect($this->executeHook('shutdown'))) {
+            return $this->response;
+        }
+
         //# Free Mem for no longer used items
         $this->componentRegistry->destroy();
         unset($this->componentRegistry);
@@ -287,14 +289,11 @@ class Controller
        * @param string $type
        * @return bool
        */
-    protected function triggerCallback(string $type, bool $reverse = false) : bool
+    protected function triggerCallback(string $type) : bool
     {
         $callbacks = $this->registeredCallbacks($type);
-        if ($reverse) {
-            $callbacks = array_reverse($callbacks);
-        }
         foreach ($callbacks as $callback => $options) {
-            if (method_exists($this, $callback)) {
+            if (method_exists($this, $callback) and  !in_array($callback, $this->disabledCallbacks)) {
                 if ($this->isResponseOrRedirect($this->$callback())) {
                     return false;
                 }
