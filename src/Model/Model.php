@@ -84,8 +84,8 @@ class Model
     /**
      * Default order to used when finding.
      *
-     * $order = 'Article.title ASC';
-     * $order = ['Article.title','Article.created ASC']
+     * $order = 'articles.title ASC';
+     * $order = ['articles.title','articles.created ASC']
      *
      * @var string|array
      */
@@ -1009,7 +1009,8 @@ class Model
     }
 
     /**
-    * Finds the first record ordered by primary key
+    * Finds the first record ordered by primary key (default). If the model has set a default order
+    * then this will be used instead.
     *
     * @param array $options  The options array can work with the following keys
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
@@ -1027,8 +1028,9 @@ class Model
     */
     public function first(array $options = []) : ?Entity
     {
-        $options += ['order' => Inflector::tableName($this->alias) . '.' . $this->primaryKey . ' ASC' ];
-        return $this->find('first', $options);
+        $order = $this->order ?? Inflector::tableName($this->alias) . '.' . $this->primaryKey . ' ASC';
+      
+        return $this->find('first', $options + ['order' =>  $order ]);
     }
 
     /**
