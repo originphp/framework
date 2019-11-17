@@ -14,8 +14,6 @@
 
 namespace Origin\Model\Exception;
 
-use Origin\Model\Exception\NotFoundException;
-
 class RecordNotFoundException extends NotFoundException
 {
     protected $defaultErrorCode = 404;
