@@ -281,6 +281,7 @@ class QueryBuilder
             'having' => null,
             'order' => null,
             'limit' => null,
+            'lock' => false
         ];
         $this->i = 0;
         $this->values = [];
@@ -664,8 +665,9 @@ class QueryBuilder
         if (! empty($params['limit'])) {
             $statement[] = "LIMIT {$this->limitToString($params)}";
         }
-
-        return implode(' ', $statement);
+        $lock = !empty($params['lock']) ? ' FOR UPDATE' : null;
+       
+        return implode(' ', $statement) . $lock;
     }
 
     /**
