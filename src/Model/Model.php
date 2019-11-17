@@ -1009,7 +1009,7 @@ class Model
     }
 
     /**
-    * Runs a find first query
+    * Finds the first record ordered by primary key
     *
     * @param array $options  The options array can work with the following keys
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
@@ -1023,10 +1023,11 @@ class Model
     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
     *   - lock: default false. set to true for a SELECT FOR UPDATE statement
     *   - having: an array of conditions for a having clause
-    * @return mixed $result
+    * @return \Origin\Model\Entity|null $result
     */
     public function first(array $options = []) : ?Entity
     {
+        $options += ['order' => Inflector::tableName($this->alias) . '.' . $this->primaryKey . ' ASC' ];
         return $this->find('first', $options);
     }
 
@@ -1046,7 +1047,7 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      *   - lock: default false. set to true for a SELECT FOR UPDATE statement
      *   - having: an array of conditions for a having clause
-     * @return mixed $result
+     * @return \Origin\Model\Collection|array $result
      */
     public function all(array $options = [])
     {
