@@ -848,17 +848,25 @@ class ModelTest extends OriginTestCase
     {
         $result = $this->Article->find('first');
         $this->assertInstanceOf(Entity::class, $result);
+
+        $result = $this->Article->first();
+        $this->assertInstanceOf(Entity::class, $result);
         
         $result = $this->Article->find('first', ['conditions' => ['id' => 123456789]]);
         $this->assertNull($result);
+
+        $result = $this->Article->first(['conditions' => ['id' => 123456789]]);
+        $this->assertNull($result);
     }
 
-    public function testFindBy() {
+    public function testFindBy()
+    {
         $result = $this->Article->findBy(['id' => 1001]);
         $this->assertEquals(1001, $result->id);
     }
 
-    public function testFindAllBy() {
+    public function testFindAllBy()
+    {
         $result = $this->Article->findAllBy(['id' => 1001]);
         $this->assertEquals(1001, $result[0]->id);
     }
@@ -867,8 +875,14 @@ class ModelTest extends OriginTestCase
     {
         $result = $this->Article->find('all');
         $this->assertInstanceOf(Collection::class, $result);
+
+        $result = $this->Article->all();
+        $this->assertInstanceOf(Collection::class, $result);
         
         $result = $this->Article->find('all', ['conditions' => ['id' => 123456789]]);
+        $this->assertTrue(is_array($result));
+
+        $result = $this->Article->all(['conditions' => ['id' => 123456789]]);
         $this->assertTrue(is_array($result));
     }
     public function testFindConditions()
@@ -955,6 +969,15 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(0, $result);
     }
 
+    public function testAggregates()
+    {
+        $this->assertEquals(3, $this->Article->count());
+        $this->assertEquals(1001.0000000000000000, $this->Article->average('id'));
+        $this->assertEquals(3003, $this->Article->sum('id'));
+        $this->assertEquals(1000, $this->Article->minimum('id'));
+        $this->assertEquals(1002, $this->Article->maximum('id'));
+    }
+    
     public function testFindList()
     {
         $list = $this->Article->find('list', ['fields' => ['id']]); // ['a','b','c']

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,6 +11,7 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
 namespace Origin\Model;
 
 /**
@@ -955,6 +955,8 @@ class Model
      *   - group: the field to group by e.g. ['category']
      *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+     *   - lock: default false. set to true for a SELECT FOR UPDATE statement
+     *   - having: an array of conditions for a having clause
      * @return mixed $result
      */
     public function find(string $type = 'first', array $options = [])
@@ -1007,6 +1009,51 @@ class Model
     }
 
     /**
+    * Runs a find first query
+    *
+    * @param array $options  The options array can work with the following keys
+    *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
+    *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+    *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+    * 'conditions' => ['authors.id = articles.author_id']
+    *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+    *   - limit: the number of records to limit by
+    *   - group: the field to group by e.g. ['category']
+    *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+    *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+    *   - lock: default false. set to true for a SELECT FOR UPDATE statement
+    *   - having: an array of conditions for a having clause
+    * @return mixed $result
+    */
+    public function first(array $options = []) : ?Entity
+    {
+        return $this->find('first', $options);
+    }
+
+    /**
+     * Runs a find all query
+     *
+     * @param string $type  (first,all,count,list)
+     * @param array $options  The options array can work with the following keys
+     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
+     *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     * 'conditions' => ['authors.id = articles.author_id']
+     *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+     *   - limit: the number of records to limit by
+     *   - group: the field to group by e.g. ['category']
+     *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+     *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+     *   - lock: default false. set to true for a SELECT FOR UPDATE statement
+     *   - having: an array of conditions for a having clause
+     * @return mixed $result
+     */
+    public function all(array $options = [])
+    {
+        return $this->find('all', $options);
+    }
+
+    /**
      * Finds all records by array of conditions
      *
      * @param array $conditions
@@ -1024,6 +1071,66 @@ class Model
     public function findAllBy(array $conditions =[], array $options = [])
     {
         return $this->find('all', array_merge($options, ['conditions'=>$conditions]));
+    }
+
+    /**
+     * Counts the number of rows
+     *
+     * @param string $columnName *, DISTINCT clients.id
+     * @param array $options You can use same query options as find
+     * @return integer
+     */
+    public function count(string $columnName = '*', array $options = []) : ?int
+    {
+        return $this->calculate('count', $columnName, $options);
+    }
+
+    /**
+     * Calculates the sum of a column
+     *
+     * @param string $columnName
+     * @param array $options You can use same query options as find
+     * @return integer|float
+     */
+    public function sum(string $columnName, array $options = [])
+    {
+        return $this->calculate('sum', $columnName, $options);
+    }
+
+    /**
+     * Calculates the average for a column
+     *
+     * @param string $columnName
+     * @param array $options You can use same query options as find
+     * @return float|null
+     */
+    public function average(string $columnName, array $options = [])
+    {
+        return $this->calculate('average', $columnName, $options);
+    }
+
+    /**
+     * Calculates the minimum for a column
+     *
+     * @param string $columnName
+     * @param array $options You can use same query options as find
+     * @return integer|float|null
+     */
+    public function minimum(string $columnName, array $options = [])
+    {
+        return $this->calculate('minimum', $columnName, $options);
+    }
+
+    /**
+     * Calculates the maximum for a column
+     *
+     * @param string $columnName
+     * @param array $options You can use same query options as find
+     * @return integer|float|null
+     */
+    public function maximum(string $columnName, array $options = [])
+    {
+        return $this->calculate('maximum', $columnName, $options);
     }
 
     /**
@@ -1124,7 +1231,7 @@ class Model
         $options['limit'] = 1;
 
         // Run Query
-        $collection = (new Query($this))->find($options);
+        $collection = (new Finder($this))->find($options);
 
         if (empty($collection)) {
             return null;
@@ -1147,7 +1254,7 @@ class Model
     protected function finderAll(ArrayObject $options)
     {
         // Run Query
-        $collection = (new Query($this))->find($options);
+        $collection = (new Finder($this))->find($options);
 
         // Modify Results
         if (empty($collection)) {
@@ -1178,7 +1285,7 @@ class Model
         }
 
         // Run Query
-        $results = (new Query($this))->find($options, 'list');
+        $results = (new Finder($this))->find($options, 'list');
 
         // Modify Results
         if (empty($results)) {
@@ -1191,7 +1298,7 @@ class Model
     /**
      * This is the find('count').
      *
-     * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
+     * @param \ArrayObject $options (conditions,fields, joins, group, callbacks,etc)
      * @return int count
      */
     protected function finderCount(ArrayObject $options) : int
@@ -1202,11 +1309,59 @@ class Model
         $options['limit'] = null;
 
         // Run Query
-        $results = (new Query($this))->find($options, 'assoc');
+        $results = (new Finder($this))->find($options, 'assoc');
         //$results = $this->readDataSource($query, 'assoc');
 
         // Modify Results
         return $results[0]['count'];
+    }
+
+    /**
+     * count, sum, average, minimum, and maximum
+     *
+     * @param string $operation
+     * @param string $columnName
+     * @return mixed
+     */
+    private function calculate(string $operation, string $columnName, array $options = [])
+    {
+        $options = new ArrayObject($options + [
+            'conditions' => null,
+            'fields' => [],
+            'joins' => [],
+            'order' => null,
+            'limit' => null,
+            'group' => null,
+            'page' => null,
+            'offset' => null,
+            'callbacks' => true,
+            'associated' => [],
+        ]);
+        
+        if ($options['callbacks'] === true) {
+            if ($this->triggerCallback('beforeFind', 'find', [$options]) === false) {
+                return null;
+            }
+        }
+
+        $options = $this->prepareQuery('all', $options); // AutoJoin
+
+        $operationMap = [
+            'count' => 'COUNT',
+            'sum' => 'SUM',
+            'average' => 'AVG',
+            'minimum' => 'MIN',
+            'maximum' => 'MAX'
+        ];
+        if (!isset($operationMap[$operation])) {
+            throw new Exception('Invalid Operation ' . $operation);
+        }
+
+        $options['fields'] = ["{$operationMap[$operation]}({$columnName}) AS calculate_result"];
+
+        $results = (new Finder($this))->find($options, 'assoc');
+    
+        return $results[0]['calculate_result'];
     }
 
     /**
