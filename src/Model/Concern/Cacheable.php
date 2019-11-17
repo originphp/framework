@@ -88,19 +88,52 @@ trait Cacheable
             return parent::find($type, $options);
         }
 
-        $cache = Cache::store($this->cacheConfig);
-
         $key = md5($this->name . $type  . var_export($options, true));
-    
+        $cache = Cache::store($this->cacheConfig);
         $cacheId = $cache->read($this->name . '-id') ?: 1;
+
+        # cache_get
         $result = $cache->read($key);
-    
         if ($result and $result['id'] === $cacheId) {
             return $result['data'];
         }
  
+        # cache_set
         $result = parent::find($type, $options);
+        $cache->write($key, ['id' => $cacheId, 'data' => $result]);
+        $cache->write($this->name . '-id', $cacheId);
     
+        return $result;
+    }
+
+    /**
+     * Runs count, sum, average, minimum, and maximum queries
+     *
+     * @param string $operation
+     * @param string $columnName
+     * @param array $options
+     * @return mixed
+     */
+    protected function calculate(string $operation, string $columnName, array $options = [])
+    {
+        $options += ['cache' => true];
+
+        if ($this->cacheEnabled === false or ! $options['cache']) {
+            return parent::calculate($operation, $columnName, $options);
+        }
+
+        $key = md5($this->name . $operation . $columnName  . var_export($options, true));
+        $cache = Cache::store($this->cacheConfig);
+        $cacheId = $cache->read($this->name . '-id') ?: 1;
+
+        # cache_get
+        $result = $cache->read($key);
+        if ($result and $result['id'] === $cacheId) {
+            return $result['data'];
+        }
+ 
+        # cache_set
+        $result = parent::calculate($operation, $columnName, $options);
         $cache->write($key, ['id' => $cacheId, 'data' => $result]);
         $cache->write($this->name . '-id', $cacheId);
     
@@ -172,11 +205,12 @@ trait Cacheable
      */
     public function disableCache() : bool
     {
-        if (!$this->cacheEnabled) {
+        if (! $this->cacheEnabled) {
             return false;
         }
 
         $this->cacheEnabled = false;
+
         return true;
     }
 }
