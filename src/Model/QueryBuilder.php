@@ -639,9 +639,10 @@ class QueryBuilder
         if (empty($params) or ! isset($params['fields'])) {
             throw new QueryBuilderException('No Fields.');
         }
+        $distinct = !empty($params['distinct']) ? 'DISTINCT ' : null;
         $statement = [];
         // SELECT
-        $statement[] = "SELECT {$this->fieldsToString($params['fields'])} FROM {$this->tableReference()}";
+        $statement[] = "SELECT {$distinct}{$this->fieldsToString($params['fields'])} FROM {$this->tableReference()}";
 
         if (! empty($params['joins'])) {
             foreach ($params['joins'] as $join) {
@@ -665,7 +666,7 @@ class QueryBuilder
         if (! empty($params['limit'])) {
             $statement[] = "LIMIT {$this->limitToString($params)}";
         }
-        $lock = !empty($params['lock']) ? ' FOR UPDATE' : null;
+        $lock = ! empty($params['lock']) ? ' FOR UPDATE' : null;
        
         return implode(' ', $statement) . $lock;
     }
@@ -705,7 +706,7 @@ class QueryBuilder
 
         $params['type'] = strtoupper($params['type']);
         $tableReference = $this->tableReference($params['table'], $params['alias']);
-
+        
         return "{$params['type']} JOIN {$tableReference} ON ({$this->conditions($params['alias'], $params['conditions'])})";
     }
 
