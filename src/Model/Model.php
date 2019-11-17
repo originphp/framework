@@ -27,9 +27,9 @@ use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
-use Origin\Model\Exception\RecordNotFoundException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
+use Origin\Model\Exception\RecordNotFoundException;
 
 class Model
 {
@@ -263,7 +263,7 @@ class Model
      *
      * @return string
      */
-    protected function detectDisplayField(): string
+    private function detectDisplayField(): string
     {
         $fields = array_keys($this->schema()['columns']);
 
@@ -948,7 +948,7 @@ class Model
      * @param array $options  The options array can work with the following keys
      *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
      *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
-     *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+     *   - joins: an array of join arrays e.g. 'table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
      * 'conditions' => ['authors.id = articles.author_id']
      *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
      *   - limit: the number of records to limit by
@@ -1003,14 +1003,13 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity|null
      */
-    public function findBy(array $conditions =[], array $options = []) : ?Entity
+    public function findBy(array $conditions = [], array $options = []) : ?Entity
     {
-        return $this->find('first', array_merge($options, ['conditions'=>$conditions]));
+        return $this->find('first', array_merge($options, ['conditions' => $conditions]));
     }
 
     /**
-    * Finds the first record ordered by primary key (default). If the model has set a default order
-    * then this will be used instead.
+    * Finds the first record ordered by primary key (default) unless model::order is set or order is provided
     *
     * @param array $options  The options array can work with the following keys
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
@@ -1030,7 +1029,7 @@ class Model
     {
         $order = $this->order ?? Inflector::tableName($this->alias) . '.' . $this->primaryKey . ' ASC';
       
-        return $this->find('first', $options + ['order' =>  $order ]);
+        return $this->find('first', $options + ['order' => $order]);
     }
 
     /**
@@ -1071,29 +1070,51 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Collection|array
      */
-    public function findAllBy(array $conditions =[], array $options = [])
+    public function findAllBy(array $conditions = [], array $options = [])
     {
-        return $this->find('all', array_merge($options, ['conditions'=>$conditions]));
+        return $this->find('all', array_merge($options, ['conditions' => $conditions]));
+    }
+
+    /**
+     * Starts a fluent query builder interface using conditions for the query
+     *
+     * @param array $conditions
+     * @return \Origin\Model\Query;
+     */
+    public function where(array $conditions) : Query
+    {
+        return new Query($this, $conditions);
+    }
+
+    /**
+     * Starts a fluent query builder interface by selecting columns to use in a query
+     *
+     * @param array $columns
+     * @return \Origin\Model\Query;
+     */
+    public function select(array $columns) : Query
+    {
+        return new Query($this, [], $columns);
     }
 
     /**
      * Counts the number of rows
      *
-     * @param string $columnName *, DISTINCT clients.id
-     * @param array $options You can use same query options as find
-     * @return integer
+     * @param string $columnName all (alias for *), DISTINCT clients.id
+     * @param array $options You can use some of the Model::find options. (group,having,joins,callbacks)
+     * @return integer|array
      */
-    public function count(string $columnName = '*', array $options = []) : ?int
+    public function count(string $columnName = 'all', array $options = [])
     {
-        return $this->calculate('count', $columnName, $options);
+        return $this->calculate('count', $columnName === 'all' ? '*' : $columnName, $options);
     }
 
     /**
      * Calculates the sum of a column
      *
      * @param string $columnName
-     * @param array $options You can use same query options as find
-     * @return integer|float
+     * @param array $options You can use some of the Model::find options. (group,having,joins,callbacks)
+     * @return integer|float|array|null
      */
     public function sum(string $columnName, array $options = [])
     {
@@ -1104,8 +1125,8 @@ class Model
      * Calculates the average for a column
      *
      * @param string $columnName
-     * @param array $options You can use same query options as find
-     * @return float|null
+     * @param array $options You can use some of the Model::find options. (group,having,joins,callbacks)
+     * @return float|array|null
      */
     public function average(string $columnName, array $options = [])
     {
@@ -1116,8 +1137,8 @@ class Model
      * Calculates the minimum for a column
      *
      * @param string $columnName
-     * @param array $options You can use same query options as find
-     * @return integer|float|null
+     * @param array $options You can use some of the Model::find options. (group,having,joins,callbacks)
+     * @return integer|array|null
      */
     public function minimum(string $columnName, array $options = [])
     {
@@ -1128,8 +1149,8 @@ class Model
      * Calculates the maximum for a column
      *
      * @param string $columnName
-     * @param array $options You can use same query options as find
-     * @return integer|float|null
+     * @param array $options You can use some of the Model::find options. (group,having,joins,callbacks)
+     * @return integer|array|null
      */
     public function maximum(string $columnName, array $options = [])
     {
@@ -1299,35 +1320,60 @@ class Model
     }
 
     /**
-     * This is the find('count').
+     * This is the count finder
+     *
+     * @internal In next major release maybe finders will be removed
      *
      * @param \ArrayObject $options (conditions,fields, joins, group, callbacks,etc)
-     * @return int count
+     * @return int|array count
      */
-    protected function finderCount(ArrayObject $options) : int
+    protected function finderCount(ArrayObject $options)
     {
-        // Modify Query
+        # Modify Query
         $options['fields'] = ['COUNT(*) AS count'];
-        $options['order'] = null;
-        $options['limit'] = null;
+        if (empty($options['group'])) {
+            $options['order'] = null;
+        }
 
-        // Run Query
+        /**
+         * Remove model::order from group queries
+         */
+        if (! empty($options['group']) and $options['order'] === $this->order) {
+            $options['order'] = null;
+        }
+
+        if (!empty($options['group'])) {
+            if ($options['order'] === $this->order) {
+                $options['order'] = null;
+            }
+            $options['fields'] = array_merge($options['fields'], (array) $options['group']);
+        }
+
         $results = (new Finder($this))->find($options, 'assoc');
-        //$results = $this->readDataSource($query, 'assoc');
 
-        // Modify Results
-        return $results[0]['count'];
+        /**
+         * handle results for group and none groups
+         */
+        if (empty($options['group'])) {
+            $results = $results[0]['count'];
+        } else {
+            $results = $results ? $results : [];
+        }
+
+        return $results;
     }
 
     /**
-     * count, sum, average, minimum, and maximum
+     * Runs count, sum, average, minimum, and maximum queries
      *
      * @param string $operation
      * @param string $columnName
+     * @param array $options
      * @return mixed
      */
-    private function calculate(string $operation, string $columnName, array $options = [])
+    protected function calculate(string $operation, string $columnName, array $options = [])
     {
+        // do not add default model order since this might caused sql errors on group queries
         $options = new ArrayObject($options + [
             'conditions' => null,
             'fields' => [],
@@ -1350,21 +1396,30 @@ class Model
         $options = $this->prepareQuery('all', $options); // AutoJoin
 
         $operationMap = [
-            'count' => 'COUNT',
-            'sum' => 'SUM',
-            'average' => 'AVG',
-            'minimum' => 'MIN',
-            'maximum' => 'MAX'
+            'count' => 'COUNT','sum' => 'SUM','average' => 'AVG','minimum' => 'MIN','maximum' => 'MAX'
         ];
-        if (!isset($operationMap[$operation])) {
+        if (! isset($operationMap[$operation])) {
             throw new Exception('Invalid Operation ' . $operation);
         }
 
-        $options['fields'] = ["{$operationMap[$operation]}({$columnName}) AS calculate_result"];
+        $options['fields'] = ["{$operationMap[$operation]}({$columnName}) AS {$operation}"];
+
+        if ($options['group']) {
+            $options['fields'] = array_merge($options['fields'], (array) $options['group']);
+        }
 
         $results = (new Finder($this))->find($options, 'assoc');
     
-        return $results[0]['calculate_result'];
+        /**
+         * handle results for group and none groups
+         */
+        if (empty($options['group'])) {
+            $results = $results[0][$operation];
+        } else {
+            $results = $results ? $results : [];
+        }
+ 
+        return $results;
     }
 
     /**

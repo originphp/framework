@@ -967,6 +967,13 @@ class ModelTest extends OriginTestCase
 
         $result = $this->Article->find('count', ['conditions' => ['id' => 123456789]]);
         $this->assertEquals(0, $result);
+
+        $result = $this->Article->find('count', ['group'=>'author_id','order'=>'author_id ASC']);
+        $expected = [
+            ['count' => 2, 'author_id' => 1000],
+            ['count' => 1, 'author_id' => 1001]
+        ];
+        $this->assertSame($expected, $result);
     }
 
     public function testAggregates()
@@ -976,6 +983,13 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(3003, $this->Article->sum('id'));
         $this->assertEquals(1000, $this->Article->minimum('id'));
         $this->assertEquals(1002, $this->Article->maximum('id'));
+
+        $result = $this->Article->count('all', ['group'=>'author_id','order'=>'author_id ASC']);
+        $expected = [
+            ['count' => 2, 'author_id' => 1000],
+            ['count' => 1, 'author_id' => 1001]
+        ];
+        $this->assertSame($expected, $result);
     }
     
     public function testFindList()
