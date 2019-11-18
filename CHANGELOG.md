@@ -7,6 +7,8 @@
 - Mailbox feature - process incoming emails from pipe/imap or pop3 using controller like interface
 - Model::findBy
 - Model::findAllBy
+- Model find params now can accept lock option for SELECT FOR UPDATE statements
+- Model aggregate minimum,maximum,sum and average through calculate
 
 ### Fixed
 
