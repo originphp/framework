@@ -14,8 +14,8 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
+use BadMethodCallException;
 use IteratorAggregate;
-use Origin\Core\Exception\Exception;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Inflector\Inflector;
 
@@ -46,7 +46,12 @@ class Query implements IteratorAggregate
         'associated' => []
     ];
 
-    private $joinFields = [];
+    /**
+     * Associated data to get
+     *
+     * @var array
+     */
+    private $associated = [];
 
     /**
      * Query starts with a model and where conditions
@@ -77,14 +82,37 @@ class Query implements IteratorAggregate
     }
 
     /**
+     * Sets the SELECT statement to return only distinct (different) values
+     *
+     * @return \Origin\Model\Query
+     */
+    public function distinct() : Query
+    {
+        $this->query['distinct'] = true;
+        return $this;
+    }
+    
+    /**
+     * The conditions to use for this query
+     *
+     * @param array $conditions
+     * @return \Origin\Model\Query
+     */
+    public function where(array $conditions) : Query
+    {
+        $this->query['conditions'] = $conditions;
+
+        return $this;
+    }
+    /**
      * Orders the results
      *
-     * @param string|array $order 'title DESC' or ['category','title ASC']
+     * @param string|array $order 'title DESC' , ['title' => 'DESC'] or ['category','title ASC']
      * @return \Origin\Model\Query
      */
     public function order($order) : Query
     {
-        $this->query['order'] = $order;
+        $this->query['order'] = (array) $order;
 
         return $this;
     }
@@ -118,18 +146,18 @@ class Query implements IteratorAggregate
     /**
     * Sets the columns to group the query by
     *
-    * @param array $columns
+    * @param string|array $columns
     * @return \Origin\Model\Query
     */
-    public function group(array $columns) : Query
+    public function group($columns) : Query
     {
-        $this->query['group'] = $columns;
+        $this->query['group'] = (array) $columns;
 
         return $this;
     }
 
     /**
-    * Sets the having conditions for the query
+    * Sets the HAVING clause for the query, used as conditions for group.
     *
     * @param array $conditions e.g ['COUNT(customer_id) >' =>  5]
     * @return \Origin\Model\Query
@@ -154,33 +182,20 @@ class Query implements IteratorAggregate
     }
 
     /**
-     * Joins tables to together, using either the name of a configurated association or a config array
+     * Joins tables to together. For autodetection assumes that you follow conventions, table name is lower underscored plural
+     * and primary key fields are ID.
      *
-     * @param string|arrray $options Association name e.g. User, Comment or array of join options with the following keys
+     * @param string|arrray $options table name or array of join options with the following keys
      *  - table: table name
      *  - alias: the alias for the table usually the lower case plural name of model
      *  - type: default: INNER. (INNER|LEFT|RIGHT|FULL)
-     *  - conditions: array of conditions
+     *  - conditions: array of conditions. e.g ['bookmarks.user_id = users.id']
     * @return \Origin\Model\Query
      */
     public function join($options) : Query
     {
         if (is_string($options)) {
-            foreach (['belongsTo', 'hasOne'] as $association) {
-                foreach ($this->model->association($association) as $alias => $assoc) {
-                    if ($options === $alias) {
-                        $options = $assoc;
-                        $options['alias'] = Inflector::tableName($alias);
-                        $options['table'] = $this->model->$alias->table();
-                        $options['fields'] = $this->model->$alias->fields();
-                        break;
-                    }
-                }
-            }
-            $this->query['fields'] = array_merge($this->query['fields'], (array) $options['fields']);
-            if (is_string($options)) {
-                throw new Exception('Unkown association ' . $$options);
-            }
+            $options = [ 'table' => $options];
         }
 
         # Add default Options
@@ -192,12 +207,21 @@ class Query implements IteratorAggregate
             'conditions' => []
         ];
 
-        if (!empty($options['fields'])) {
-            $this->joinFields = array_merge($this->joinFields, $options['fields']);
+        
+        if (empty($options['table'])) {
+            throw new InvalidArgumentException('No table name provided');
         }
 
-        if (empty($options['alias']) or empty($options['table'])) {
-            throw new InvalidArgumentException('Invalid Join options');
+        if (empty($options['alias'])) {
+            $options['alias'] = $options['table'];
+        }
+
+        if (empty($conditions)) {
+            $tableAlias = Inflector::tableName($this->model->alias());
+            $foreignKey = Inflector::singular($options['table']) . '_id';
+            $options['conditions'] = [
+                "{$tableAlias}.{$foreignKey} = {$options['alias']}.id"
+            ];
         }
    
         $this->query['joins'][] = $options;
@@ -206,13 +230,14 @@ class Query implements IteratorAggregate
     }
 
     /**
-     * Sets the SELECT statement to return only distinct (different) values
-     *
-     * @return \Origin\Model\Query
-     */
-    public function distinct() : Query
+    * Gets results with associated data.
+    *
+    * @param string|array $assocation User or ['User'=>['Comment']]
+    * @return \Origin\Model\Query
+    */
+    public function with($assocation) : Query
     {
-        $this->query['distinct'] = true;
+        $this->associated = (array) $assocation;
         return $this;
     }
 
@@ -223,7 +248,7 @@ class Query implements IteratorAggregate
      */
     public function first() :? Entity
     {
-        return $this->model->first($this->getQuery());
+        return $this->model->first($this->toArray());
     }
 
     /**
@@ -233,7 +258,7 @@ class Query implements IteratorAggregate
      */
     public function all()
     {
-        return $this->model->all($this->getQuery());
+        return $this->model->all($this->toArray());
     }
 
     /**
@@ -243,7 +268,7 @@ class Query implements IteratorAggregate
      */
     public function count(string $columnName = 'all')
     {
-        return $this->model->count($columnName === 'all' ? '*' : $columnName, $this->getQuery());
+        return $this->model->count($columnName === 'all' ? '*' : $columnName, $this->toArray());
     }
 
     /**
@@ -254,7 +279,7 @@ class Query implements IteratorAggregate
      */
     public function sum(string $columnName)
     {
-        return $this->model->sum($columnName, $this->getQuery());
+        return $this->model->sum($columnName, $this->toArray());
     }
 
     /**
@@ -266,7 +291,7 @@ class Query implements IteratorAggregate
      */
     public function average(string $columnName)
     {
-        return $this->model->average($columnName, $this->getQuery());
+        return $this->model->average($columnName, $this->toArray());
     }
 
     /**
@@ -277,7 +302,7 @@ class Query implements IteratorAggregate
      */
     public function minimum(string $columnName)
     {
-        return $this->model->minimum($columnName, $this->getQuery());
+        return $this->model->minimum($columnName, $this->toArray());
     }
 
     /**
@@ -288,24 +313,68 @@ class Query implements IteratorAggregate
      */
     public function maximum(string $columnName)
     {
-        return $this->model->maximum($columnName, $this->getQuery());
+        return $this->model->maximum($columnName, $this->toArray());
     }
 
     /**
-     * Gets the query, if select was not called then it will get all the fields for this model and any joins
-     * that were called.
+     * Gets the query as an array ready for use by the model
      *
      * @return array
      */
-    private function getQuery() : array
+    public function toArray() : array
     {
-        $query = $this->query;
-      
-        if (empty($query['fields'])) {
-            $query['fields'] = array_merge($this->model->fields(), $this->joinFields);
+        if ($this->associated) {
+            $this->processsAssociated();
         }
-         
+        $query = $this->query;
+
+        if (empty($query['fields'])) {
+            $query['fields'] = $this->model->fields();
+        }
+
         return $query;
+    }
+
+    /**
+     * Process associated before query is run to find out if select was used.
+     *
+     * @return \Origin\Model\Query
+     */
+    private function processsAssociated() : Query
+    {
+        $assocation = $this->normalizeAssociated($this->associated);
+        $this->query['associated'] = $assocation['associated'];
+        return $this;
+    }
+        
+    protected function normalizeAssociated(array $value)
+    {
+        $hasSelected = !empty($this->query['fields']);
+
+        $out = [] ;
+        foreach ($value as $key => $value) {
+            // ['Article'=>'Author'] is incorrect should be ['Article'=>['Author']]
+            if (is_string($key) and is_string($value)) {
+                $value = (array) $value;
+            }
+            if (is_array($value)) {
+                $out[$key] = $this->normalizeAssociated($value);
+            } else {
+                $out[$value] = ['fields' => $hasSelected ? [] : null ];
+            }
+        }
+        return ['associated' => $out,'fields' => $hasSelected ? [] : null ];
+    }
+
+    /**
+     * Gets the SQL statement for the query
+     *
+     * @return string
+     */
+    public function sql() : string
+    {
+        $builder = new QueryBuilder($this->model->table(), Inflector::tableName($this->model->alias()));
+        return $builder->selectStatement($this->toArray());
     }
 
     /**
@@ -319,6 +388,6 @@ class Query implements IteratorAggregate
 
     public function __debugInfo()
     {
-        return $this->query;
+        return $this->toArray();
     }
 }

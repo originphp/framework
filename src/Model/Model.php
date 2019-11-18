@@ -1009,7 +1009,7 @@ class Model
     }
 
     /**
-    * Finds the first record ordered by primary key (default) unless model::order is set or order is provided
+    * Finds the first record that matches
     *
     * @param array $options  The options array can work with the following keys
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
@@ -1027,15 +1027,12 @@ class Model
     */
     public function first(array $options = []) : ?Entity
     {
-        $order = $this->order ?? Inflector::tableName($this->alias) . '.' . $this->primaryKey . ' ASC';
-      
-        return $this->find('first', $options + ['order' => $order]);
+        return $this->find('first', $options);
     }
 
     /**
      * Runs a find all query
      *
-     * @param string $type  (first,all,count,list)
      * @param array $options  The options array can work with the following keys
      *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
      *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
@@ -1053,6 +1050,28 @@ class Model
     public function all(array $options = [])
     {
         return $this->find('all', $options);
+    }
+
+    /**
+    * Finds a list (using the List finder)
+    *
+    * @param array $options  The options array can work with the following keys
+    *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
+    *   - fields: an array of fields to fetch for this model. e.g ['id','title','description']
+    *   - joins: an array of join arrays e.g. table' => 'authors','alias' => 'authors', 'type' => 'LEFT' ,
+    * 'conditions' => ['authors.id = articles.author_id']
+    *   - order: the order to fetch e.g. ['title ASC'] or ['category','title ASC']
+    *   - limit: the number of records to limit by
+    *   - group: the field to group by e.g. ['category']
+    *   - callbacks: default is true. Set to false to disable running callbacks such as beforeFind and afterFind
+    *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
+    *   - lock: default false. set to true for a SELECT FOR UPDATE statement
+    *   - having: an array of conditions for a having clause
+    * @return array
+    */
+    public function list(array $options = []) : array
+    {
+        return $this->find('list', $options);
     }
 
     /**
@@ -1338,10 +1357,6 @@ class Model
         /**
          * Remove model::order from group queries
          */
-        if (! empty($options['group']) and $options['order'] === $this->order) {
-            $options['order'] = null;
-        }
-
         if (!empty($options['group'])) {
             if ($options['order'] === $this->order) {
                 $options['order'] = null;
@@ -1448,12 +1463,17 @@ class Model
                         'connection' => $this->connection,
                     ];
 
-                    if (empty($config['fields'])) {
+                    /**
+                     * If the value is null add, but not an empty array
+                     */
+                    if ($config['fields'] === null) {
                         $config['fields'] = $this->$alias->fields();
                     }
 
-                    // If it throw an error, then it can be confusing to know source, so turn to array
-                    $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
+                    if ($config['fields']) {
+                        // If it throw an error, then it can be confusing to know source, so turn to array
+                        $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
+                    }
                 }
             }
         }
@@ -1476,11 +1496,15 @@ class Model
                 $alias = $config;
                 $config = [];
             }
-            $config += ['fields' => []];
+            $config += ['fields' => null];
             $tableAlias = Inflector::tableName($alias);
-            foreach ($config['fields'] as $key => $value) {
-                $config['fields'][$key] = "{$tableAlias}.{$value}";
+            
+            if ($config['fields']) {
+                foreach ($config['fields'] as $key => $value) {
+                    $config['fields'][$key] = "{$tableAlias}.{$value}";
+                }
             }
+            
             $out[$alias] = $config;
 
             if (! $this->findAssociation($alias)) {
