@@ -204,19 +204,10 @@ class MailParser
      * @param  string $type You can use any of the following types:
      *  - html : this will return HTML version
      *  - text : wil return text version
-     *  - auto : autodetects type
      * @return string|null body
      */
     private function extractPart(string $type): ?string
     {
-        if (! in_array($type, ['text', 'html'])) {
-            throw new InvalidArgumentException('Invalid type. text or html');
-        }
-
-        if ($type === 'auto') {
-            $type = $this->detectContentType();
-        }
-
         $mime = ($type === 'html') ? 'text/html' : 'text/plain';
 
         $body = null;
