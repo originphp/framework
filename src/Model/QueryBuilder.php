@@ -721,7 +721,7 @@ class QueryBuilder
     }
 
     /**
-     * @param array $order [description]
+     * @param array $order
      * @return string clause ORDER BY Country,UserName ASC
      */
     protected function orderToString($order) : string
