@@ -49,14 +49,18 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
                 'EMAIL username and password not setup'
             );
         }
+
         $fetcher = new MailFetcher([
-            'host' => env('EMAIL_IMAP_HOST'),'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
-            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD')
+            'host' => env('EMAIL_IMAP_HOST') ,'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
+            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD'),'timeout'=>5
         ]);
 
         $messages = $fetcher->download(['limit' => 1]);
-        $this->assertEquals(1, $fetcher->count());
-        // its a generator
+        $this->assertGreaterThanOrEqual(1, $fetcher->count());
+
+        /**
+         * Trigger generator
+         */
         foreach ($messages as $message) {
             // do nothing
         }
