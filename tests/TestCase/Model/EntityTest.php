@@ -293,6 +293,7 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $user->virtual(['full_name']);
         $array = $user->toArray();
         $this->assertEquals('Bob Hope', $array['full_name']);
+        $this->assertEquals(['full_name'], $user->virtual());
     }
 
     public function testHidden()
@@ -308,5 +309,6 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $user->hidden(['password']);
         $array = $user->toArray();
         $this->assertFalse(isset($array['password']));
+        $this->assertEquals(['password'], $user->hidden());
     }
 }

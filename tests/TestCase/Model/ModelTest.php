@@ -991,6 +991,8 @@ class ModelTest extends OriginTestCase
         ];
         $this->assertSame($expected, $result);
     }
+
+   
     
     public function testFindList()
     {
@@ -1006,6 +1008,15 @@ class ModelTest extends OriginTestCase
             1000 => [1001 => 'Article #2',1002 => 'Article #3'],
         ];
         $this->assertEquals($expected, $list);
+    }
+
+    /**
+     * @depends testFindList
+     */
+    public function testList()
+    {
+        $list = $this->Article->list(['fields' => ['id']]); // ['a','b','c']
+        $this->assertEquals([1000,1001,1002], $list);
     }
 
     public function testFindCallbacks()
