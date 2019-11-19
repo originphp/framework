@@ -51,12 +51,11 @@ class InboundEmail extends Model
          
         (new MailboxCleanJob())->schedule($cleanAfter)->dispatch();
     }
-
+    
     public function checksumExists(int $checksum) : bool
     {
-        return (bool) $this->find('count', ['conditions' => ['checksum' => $checksum]]);
+        return (bool) $this->where(['checksum' => $checksum])->count();
     }
-
 
     /**
      * Creates a new entity from a message
