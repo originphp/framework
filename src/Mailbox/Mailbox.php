@@ -16,7 +16,7 @@ namespace Origin\Mailbox;
 
 use Origin\Model\Entity;
 use Origin\Core\Resolver;
-use Origin\Mailer\Mailer;
+
 use Origin\Core\HookTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Configurable\StaticConfigurable as Configurable;
@@ -28,7 +28,7 @@ use Origin\Core\Exception\Exception;
 
 class Mailbox
 {
-    use HookTrait, Configurable, CallbackRegistrationTrait,ModelTrait;
+    use HookTrait, Configurable, ModelTrait, CallbackRegistrationTrait;
   
     /**
      * Inbound email id (not email message id)
@@ -69,6 +69,7 @@ class Mailbox
      */
     private $bounced = false;
 
+
     /**
      * Constructor
      *
@@ -78,7 +79,7 @@ class Mailbox
     {
         $this->id = $inboundEmail->id;
         $this->mail = new Mail($inboundEmail->message);
-       
+
         $this->InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
         $this->executeHook('initialize', [$inboundEmail]);
     }
@@ -106,7 +107,7 @@ class Mailbox
      */
     protected function beforeProcess(string $method) : void
     {
-        $this->registeredCallbacks['beforeProcess'][] = $method;
+        $this->registerCallback('beforeProcess', $method);
     }
 
     /**
@@ -117,7 +118,7 @@ class Mailbox
      */
     protected function afterProcess(string $method) : void
     {
-        $this->registeredCallbacks['afterProcess'][] = $method;
+        $this->registerCallback('afterProcess', $method);
     }
 
     /**
@@ -174,8 +175,7 @@ class Mailbox
      */
     private function dispatchCallbacks(string $callback) : void
     {
-        $callbacks = $this->registeredCallbacks($callback);
-        foreach ($callbacks as $method) {
+        foreach ($this->registeredCallbacks($callback) as $method => $options) {
             if (method_exists($this, $method)) {
                 if ($this->$method() === false or $this->bounced) {
                     break;

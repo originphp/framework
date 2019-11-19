@@ -25,6 +25,12 @@ class Deal extends Model
 {
     use Delocalizable;
     protected $connection = 'test';
+
+    
+    public function callbacks(string $callback)
+    {
+        return array_keys($this->registeredCallbacks($callback));
+    }
 }
 
 class DelocalizeTest extends OriginTestCase
@@ -48,8 +54,8 @@ class DelocalizeTest extends OriginTestCase
  
     public function testCallbackIsRegistered() : void
     {
-        $result = $this->Deal->registeredCallbacks('beforeValidate');
-        $this->assertArrayHasKey('delocalize', $result);
+        $result = $this->Deal->callbacks('beforeValidate');
+        $this->assertContains('delocalize', $result);
     }
 
     public function testBehavior()

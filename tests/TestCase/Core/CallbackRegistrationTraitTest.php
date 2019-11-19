@@ -14,41 +14,74 @@
 
 namespace Origin\Test\Core;
 
-use Origin\Model\Model;
+use Origin\Core\CallbackRegistrationTrait;
 
-class Foo extends Model
+class CallbackRegistry
 {
-}
+    use CallbackRegistrationTrait;
 
-class CallbackRegistrationTraitTest extends \PHPUnit\Framework\TestCase
-{
-    public function testRegisteredCallbacks()
+    public function add($callback, $method, $options=[])
     {
-        $foo = new Foo();
-        $foo->beforeFind('doSomething');
-        $foo->afterFind('doSomethingElse');
-
-        $callbacks = $foo->registeredCallbacks();
-        $this->assertArrayHasKey('doSomething', $callbacks['beforeFind']);
-        $this->assertArrayHasKey('doSomethingElse', $callbacks['afterFind']);
+        $this->registerCallback($callback, $method, $options);
+    }
+    public function enable(string $method)
+    {
+        return $this->enableCallback($method);
+    }
+    public function disable(string $method)
+    {
+        return $this->disableCallback($method);
+    }
+    public function get($callback)
+    {
+        return $this->registeredCallbacks($callback);
     }
 
-    public function testDisableEnableCallback()
+    public function enabled($callback)
     {
-        $foo = new Foo();
-        $foo->beforeFind('doSomething');
+        return $this->registeredCallbacks($callback);
+    }
+}
 
-        $this->assertTrue($foo->disableCallback('doSomething'));
-        $this->assertFalse($foo->disableCallback('doSomethingElse'));
+class CallbackRegistrationTest extends \PHPUnit\Framework\TestCase
+{
+    public function testAddCallback()
+    {
+        $callback = new CallbackRegistry();
+
+        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
+        $this->assertEquals(['doSomething' => ['foo'=>'bar']], $callback->get('beforeFind'));
+    }
+
+    public function testDisableCallback()
+    {
+        $callback = new CallbackRegistry();
+        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
+
+        $this->assertTrue($callback->disable('doSomething'));
+        $this->assertFalse($callback->disable('doSomethingElse'));
     }
 
     public function testEnableCallback()
     {
-        $foo = new Foo();
-        $foo->beforeFind('doSomething');
+        $callback = new CallbackRegistry();
+        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
 
-        $this->assertTrue($foo->disableCallback('doSomething'));
-        $this->assertTrue($foo->enableCallback('doSomething'));
-        $this->assertFalse($foo->enableCallback('doSomething'));
+        $this->assertTrue($callback->disable('doSomething'));
+        $this->assertTrue($callback->enable('doSomething'));
+        $this->assertFalse($callback->enable('doSomething'));
+    }
+
+    public function testEnabledCallbacks()
+    {
+        $callback = new CallbackRegistry();
+        $callback->add('beforeFind', 'doSomething');
+        $callback->add('beforeFind', 'doSomethingElse');
+        $methods = array_keys($callback->enabled('beforeFind'));
+        $this->assertEquals(['doSomething','doSomethingElse'], $methods);
+
+        $callback->disable('doSomethingElse');
+        $methods = array_keys($callback->enabled('beforeFind'));
+        $this->assertEquals(['doSomething'], $methods);
     }
 }

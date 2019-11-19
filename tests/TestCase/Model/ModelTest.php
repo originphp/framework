@@ -244,6 +244,11 @@ class Article extends Model
     public function onError(\Exception $exception) : void
     {
     }
+
+    public function callbacks(string $callback)
+    {
+        return $this->registeredCallbacks($callback);
+    }
 }
 
 class ModelTest extends OriginTestCase
@@ -309,7 +314,7 @@ class ModelTest extends OriginTestCase
         $Article->beforeCreate('beforeCreateCallback');
 
         $expected = ['beforeCreateCallback' => ['on' => 'create']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('beforeCreate'));
+        $this->assertEquals($expected, $Article->callbacks('beforeCreate'));
     }
 
     public function testRegisterCallbackBeforeValidate()
@@ -318,7 +323,7 @@ class ModelTest extends OriginTestCase
         $Article->beforeValidate('beforeValidateCallback');
 
         $expected = ['beforeValidateCallback' => ['on' => ['create','update']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('beforeValidate'));
+        $this->assertEquals($expected, $Article->callbacks('beforeValidate'));
     }
 
     public function testRegisterCallbackBeforeUpdate()
@@ -327,7 +332,7 @@ class ModelTest extends OriginTestCase
         $Article->beforeUpdate('beforeUpdateCallback');
 
         $expected = ['beforeUpdateCallback' => ['on' => 'update']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('beforeUpdate'));
+        $this->assertEquals($expected, $Article->callbacks('beforeUpdate'));
     }
 
     public function testRegisterCallbackBeforeSave()
@@ -336,7 +341,7 @@ class ModelTest extends OriginTestCase
         $Article->beforeSave('beforeSaveCallback');
 
         $expected = ['beforeSaveCallback' => ['on' => ['create','update']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('beforeSave'));
+        $this->assertEquals($expected, $Article->callbacks('beforeSave'));
     }
 
     public function testRegisterCallbackBeforeDelete()
@@ -345,7 +350,7 @@ class ModelTest extends OriginTestCase
         $Article->beforeDelete('beforeDeleteCallback');
 
         $expected = ['beforeDeleteCallback' => ['on' => 'delete']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('beforeDelete'));
+        $this->assertEquals($expected, $Article->callbacks('beforeDelete'));
     }
 
     public function testRegisterCallbackAfterCreate()
@@ -354,7 +359,7 @@ class ModelTest extends OriginTestCase
         $Article->afterCreate('afterCreateCallback');
 
         $expected = ['afterCreateCallback' => ['on' => 'create']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterCreate'));
+        $this->assertEquals($expected, $Article->callbacks('afterCreate'));
     }
 
     public function testRegisterCallbackAfterValidate()
@@ -363,7 +368,7 @@ class ModelTest extends OriginTestCase
         $Article->afterValidate('afterValidateCallback');
 
         $expected = ['afterValidateCallback' => ['on' => ['create','update']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterValidate'));
+        $this->assertEquals($expected, $Article->callbacks('afterValidate'));
     }
 
     public function testRegisterCallbackAfterUpdate()
@@ -372,7 +377,7 @@ class ModelTest extends OriginTestCase
         $Article->afterUpdate('afterUpdateCallback');
 
         $expected = ['afterUpdateCallback' => ['on' => 'update']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterUpdate'));
+        $this->assertEquals($expected, $Article->callbacks('afterUpdate'));
     }
 
     public function testRegisterCallbackAfterSave()
@@ -381,7 +386,7 @@ class ModelTest extends OriginTestCase
         $Article->afterSave('afterSaveCallback');
 
         $expected = ['afterSaveCallback' => ['on' => ['create','update']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterSave'));
+        $this->assertEquals($expected, $Article->callbacks('afterSave'));
     }
 
     public function testRegisterCallbackAfterDelete()
@@ -390,7 +395,7 @@ class ModelTest extends OriginTestCase
         $Article->afterDelete('afterDeleteCallback');
 
         $expected = ['afterDeleteCallback' => ['on' => 'delete']];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterDelete'));
+        $this->assertEquals($expected, $Article->callbacks('afterDelete'));
     }
 
     public function testRegisterCallbackAfterRollback()
@@ -399,7 +404,7 @@ class ModelTest extends OriginTestCase
         $Article->afterRollback('afterRollbackCallback');
 
         $expected = ['afterRollbackCallback' => ['on' => ['create','update','delete']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterRollback'));
+        $this->assertEquals($expected, $Article->callbacks('afterRollback'));
     }
 
     public function testRegisterCallbackAfterCommit()
@@ -408,7 +413,7 @@ class ModelTest extends OriginTestCase
         $Article->afterCommit('afterCommitCallback');
 
         $expected = ['afterCommitCallback' => ['on' => ['create','update','delete']]];
-        $this->assertEquals($expected, $Article->registeredCallbacks('afterCommit'));
+        $this->assertEquals($expected, $Article->callbacks('afterCommit'));
     }
 
     public function testSaveExceptionRollback()

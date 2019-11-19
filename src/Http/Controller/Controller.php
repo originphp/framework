@@ -38,7 +38,7 @@ use Origin\Http\Controller\Exception\PrivateMethodException;
  */
 class Controller
 {
-    use ModelTrait, InitializerTrait, CallbackRegistrationTrait,HookTrait;
+    use ModelTrait, InitializerTrait, HookTrait, CallbackRegistrationTrait;
     /**
      * Controller name.
      *
@@ -277,8 +277,8 @@ class Controller
 
         //# Free Mem for no longer used items
         $this->componentRegistry->destroy();
-        unset($this->componentRegistry);
-
+        $this->componentRegistry = null;
+ 
         return null;
     }
 
@@ -286,15 +286,14 @@ class Controller
        * Triggers a callback, it always returns true unless a response or redirect
        * is detected.
        *
-       * @param string $type
+       * @param string $callback
        * @return bool
        */
-    protected function triggerCallback(string $type) : bool
+    protected function triggerCallback(string $callback) : bool
     {
-        $callbacks = $this->registeredCallbacks($type);
-        foreach ($callbacks as $callback => $options) {
-            if (method_exists($this, $callback) and  !in_array($callback, $this->disabledCallbacks)) {
-                if ($this->isResponseOrRedirect($this->$callback())) {
+        foreach ($this->registeredCallbacks($callback) as $method => $options) {
+            if (method_exists($this, $method)) {
+                if ($this->isResponseOrRedirect($this->$method())) {
                     return false;
                 }
             }
@@ -311,7 +310,7 @@ class Controller
      */
     public function beforeAction(string $method) : void
     {
-        $this->registeredCallbacks['beforeAction'][$method] = [];
+        $this->registerCallback('beforeAction', $method);
     }
 
     /**
@@ -322,7 +321,7 @@ class Controller
      */
     public function afterAction(string $method) : void
     {
-        $this->registeredCallbacks['afterAction'][$method] = [];
+        $this->registerCallback('afterAction', $method);
     }
 
     /**
@@ -333,7 +332,7 @@ class Controller
      */
     public function beforeRender(string $method) : void
     {
-        $this->registeredCallbacks['beforeRender'][$method] = [];
+        $this->registerCallback('beforeRender', $method);
     }
 
     /**
@@ -344,7 +343,7 @@ class Controller
     */
     public function beforeRedirect(string $method) : void
     {
-        $this->registeredCallbacks['beforeRender'][$method] = [];
+        $this->registerCallback('beforeRedirect', $method);
     }
 
     /**
