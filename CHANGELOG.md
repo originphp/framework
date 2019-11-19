@@ -4,15 +4,13 @@
 
 ### Added
 
-- Mailbox feature - process incoming emails from pipe/imap or pop3 using controller like interface
-- Model::findBy
-- Model::findAllBy
-- Model find params now can accept lock option for SELECT FOR UPDATE statements
-- Model aggregate minimum,maximum,sum and average through calculate
+- Added Mailbox process incoming emails from pipe/imap or pop3 using controller like interface. This requires the php-mailparse. If you are using docker, you will need to add this to the Dockerfile.
+- Added methods to Model: findBy, findAllBy, first, all, count, average, maximum, minimum.
+- Added Model find parameter `lock` for SELECT FOR UPDATE statements
 
 ### Fixed
-
 - Controller callbacks disabling
+- Console error render calls exit with exitcode 1
 
 ### Changed
 
