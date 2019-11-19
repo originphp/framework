@@ -123,6 +123,7 @@ class ErrorHandler
 
         $fullBacktrace = in_array('--verbose', $_SERVER['argv']); // (in_array('--backtrace', $_SERVER['argv']) OR defined('PHPUNIT'));
         $this->render($debug, $fullBacktrace);
+        $this->exit();
     }
 
     /**
@@ -184,5 +185,17 @@ class ErrorHandler
     protected function shortenPath(string $filename) : string
     {
         return str_replace(ROOT . DS, '', $filename);
+    }
+
+    /**
+     * Sends the exit command with the exit code for for an error
+     *
+     * @return void
+     */
+    protected function exit(int $exitCode = 1) : void
+    {
+        // @codeCoverageIgnoreStart
+        exit($exitCode);
+        // @codeCoverageIgnoreEnd
     }
 }

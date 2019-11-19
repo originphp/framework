@@ -32,6 +32,15 @@ class MockErrorHandler extends ErrorHandler
     {
         return $this->consoleOutput->read();
     }
+    /**
+     * Stub this
+     *
+     * @param integer $exitCode
+     * @return void
+     */
+    protected function exit(int $exitCode = 1) : void
+    {
+    }
 }
 
 class MockConsoleOutputErrorHandler extends ConsoleOutput
@@ -68,8 +77,8 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
          */
         $this->assertStringContainsString('<redBackground> Exception </redBackground> <yellow>Something went wrong</yellow>', $message);
  
-        $this->assertStringContainsString('<yellowBackground> 58 </yellowBackground>', $message);
-        $this->assertStringContainsString('<blue>54</blue>', $message);
+        $this->assertStringContainsString('<yellowBackground> 67 </yellowBackground>', $message);
+        $this->assertStringContainsString('<blue>65</blue>', $message);
         $this->assertStringContainsString('<cyan>Exception </cyan><green></green><white>tests/TestCase/Console/ErrorHandlerTest.php</white>', $message);
         $this->assertStringContainsString('<cyan>Origin\Test\Console\ErrorHandlerTest </cyan><green>testExceptionRender</green>', $message);
         $this->assertStringContainsString('<redBackground>            throw new Exception(\'Something went wrong\');</redBackground', $message);
