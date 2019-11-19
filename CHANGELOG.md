@@ -7,6 +7,7 @@
 - Added Mailbox process incoming emails from pipe/imap or pop3 using controller like interface. This requires the php-mailparse. If you are using docker, you will need to add this to the Dockerfile.
 - Added methods to Model: findBy, findAllBy, first, all, count, average, maximum, minimum.
 - Added Model find parameter `lock` for SELECT FOR UPDATE statements
+- Added callbacks to Job beforeQueue,afterQueue, beforeDispatch, afterDispatch
 
 ### Fixed
 - Controller callbacks disabling

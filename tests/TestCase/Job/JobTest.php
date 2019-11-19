@@ -54,6 +54,11 @@ class PassOrFailJob extends Job
             $this->{$key} = $value;
         }
     }
+
+    public function callbacks(string $callback)
+    {
+        return array_keys($this->registeredCallbacks($callback));
+    }
 }
 class PassOrFailRedis extends PassOrFailJob
 {
@@ -259,5 +264,37 @@ class JobTest extends OriginTestCase
             '/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/',
             $id
         );
+    }
+
+    public function testBeforeQueue()
+    {
+        $job = new PassOrFailJob();
+        $job->callMethod('beforeQueue', ['foo']);
+        $job->callMethod('beforeQueue', ['bar']);
+        $this->assertEquals(['foo','bar'], $job->callbacks('beforeQueue'));
+    }
+
+    public function testAfterQueue()
+    {
+        $job = new PassOrFailJob();
+        $job->callMethod('afterQueue', ['foo']);
+        $job->callMethod('afterQueue', ['bar']);
+        $this->assertEquals(['foo','bar'], $job->callbacks('afterQueue'));
+    }
+
+    public function testBeforeDispatch()
+    {
+        $job = new PassOrFailJob();
+        $job->callMethod('beforeDispatch', ['foo']);
+        $job->callMethod('beforeDispatch', ['bar']);
+        $this->assertEquals(['foo','bar'], $job->callbacks('beforeDispatch'));
+    }
+
+    public function testAfterDispatch()
+    {
+        $job = new PassOrFailJob();
+        $job->callMethod('afterDispatch', ['foo']);
+        $job->callMethod('afterDispatch', ['bar']);
+        $this->assertEquals(['foo','bar'], $job->callbacks('afterDispatch'));
     }
 }

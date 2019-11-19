@@ -16,6 +16,7 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use \ArrayObject;
+use Origin\Core\CallbackRegistrationTrait;
 use Origin\Log\Log;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
@@ -29,7 +30,7 @@ use Origin\Job\Engine\BaseEngine;
 
 class Job
 {
-    use ModelTrait,HookTrait;
+    use ModelTrait,HookTrait,CallbackRegistrationTrait;
     /**
      * This is the display name for the job
      *
@@ -125,12 +126,56 @@ class Job
         $this->queue = $options['queue'];
         
         $this->id = Security::uuid(['macAddress' => true]);
-
+        
         if ($this->name === null) {
             list($namespace, $name) = namespaceSplit(get_class($this));
   
             $this->name = substr($name, 0, -3);
         }
+    }
+
+    /**
+     * Registers a callback to be called before a job is queued
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function beforeQueue(string $method) : void
+    {
+        $this->registerCallback('beforeQueue', $method);
+    }
+
+    /**
+    * Registers a callback to be called before a job is queued
+    *
+    * @param string $method
+    * @return void
+    */
+    protected function afterQueue(string $method) : void
+    {
+        $this->registerCallback('afterQueue', $method);
+    }
+
+    /**
+     * Registers a callback to be called before a job is dispatch
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function beforeDispatch(string $method) : void
+    {
+        $this->registerCallback('beforeDispatch', $method);
+    }
+
+    /**
+    * Registers a callback to be called before a job is dispatch
+    *
+    * @param string $method
+    * @return void
+    */
+    protected function afterDispatch(string $method) : void
+    {
+        $this->registerCallback('afterDispatch', $method);
     }
 
     /**
@@ -179,7 +224,10 @@ class Job
         $this->arguments = func_get_args();
         $this->enqueued = date('Y-m-d H:i:s');
 
-        return $this->connection()->add($this, $this->wait ?: 'now');
+        $this->dispatchCallbacks('beforeQueue', [$this->arguments]);
+        $result = $this->connection()->add($this, $this->wait ?: 'now');
+        $this->dispatchCallbacks('afterQueue', [$this->arguments]);
+        return $result;
     }
 
     /**
@@ -195,7 +243,11 @@ class Job
         try {
             $this->executeHook('initialize');
             $this->executeHook('startup');
-            $this->execute(...$this->arguments);
+
+            if ($this->dispatchCallbacks('beforeDispatch', [$this->arguments])) {
+                $this->execute(...$this->arguments);
+                $this->dispatchCallbacks('afterDispatch', [$this->arguments]);
+            }
         } catch (\Exception $e) {
             $this->executeHook('shutdown');
         
@@ -222,6 +274,24 @@ class Job
 
         $this->executeHook('onSuccess', $this->arguments);
      
+        return true;
+    }
+
+    /**
+     * Dispatches callbacks, if stopped it will return false
+     *
+     * @param string $callback
+     * @return bool continue
+     */
+    private function dispatchCallbacks(string $callback, array $arguments =[]) : bool
+    {
+        foreach ($this->registeredCallbacks($callback) as $method => $options) {
+            if (method_exists($this, $method)) {
+                if ($this->$method(...$arguments) === false) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
