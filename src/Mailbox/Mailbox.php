@@ -207,7 +207,7 @@ class Mailbox
 
    
     /**
-     * Registers a route for the mailboxes
+     * Adds a route for a mailbox using a regex pattern
      *
      * Examples :
      * - /^support@/i
@@ -238,12 +238,12 @@ class Mailbox
     }
 
     /**
-    * Detects which mailbox for the message
+    * Finds the mailbox for the message
     *
     * @param string $message
     * @return string|null
     */
-    public static function detect(string $message) : ?string
+    public static function mailbox(string $message) : ?string
     {
         $recipients = (array) (new Mail($message))->recipients();
         foreach (static::routes() as $route => $mailbox) {

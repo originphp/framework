@@ -85,9 +85,9 @@ class MailboxTest extends OriginTestCase
         $this->assertEquals(SupportMailbox::class, Mailbox::routes('/^support@/i'));
         
         $inboundEmail = $this->InboundEmail->find('first');
-        $this->assertEquals(SupportMailbox::class, Mailbox::detect($inboundEmail->message));
+        $this->assertEquals(SupportMailbox::class, Mailbox::mailbox($inboundEmail->message));
         $modified = str_replace('support@', 'sales@', $inboundEmail->message);
-        $this->assertNull(Mailbox::detect($modified));
+        $this->assertNull(Mailbox::mailbox($modified));
     }
 
     public function testConstruct()

@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Origin\Mailbox\Job;
 
 use Origin\Job\Job;
+use Origin\Mailbox\Mailbox;
 use Origin\Model\Entity;
-use Origin\Mailbox\Router;
 use Origin\Mailbox\Model\InboundEmail;
 
 class MailboxJob extends Job
@@ -37,9 +37,9 @@ class MailboxJob extends Job
         $this->loadModel('InboundEmail', ['className' => InboundEmail::class]);
     }
 
-    protected function execute(Entity $inboundEmail): void
+    protected function execute(Entity $inboundEmail) : void
     {
-        $mailbox = Router::mailbox($inboundEmail->message);
+        $mailbox = Mailbox::mailbox($inboundEmail->message);
 
         if ($mailbox) {
             (new $mailbox($inboundEmail))->dispatch();
