@@ -1341,8 +1341,6 @@ class Model
     /**
      * This is the count finder
      *
-     * @internal In next major release maybe finders will be removed
-     *
      * @param \ArrayObject $options (conditions,fields, joins, group, callbacks,etc)
      * @return int|array count
      */
