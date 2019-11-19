@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Origin\Mailbox\Job;
 
 use Origin\Job\Job;
+use Origin\Mailbox\Mail;
 use Origin\Mailbox\Mailbox;
 use Origin\Model\Entity;
 use Origin\Mailbox\Model\InboundEmail;
@@ -39,7 +40,8 @@ class MailboxJob extends Job
 
     protected function execute(Entity $inboundEmail) : void
     {
-        $mailbox = Mailbox::mailbox($inboundEmail->message);
+        $mail = new Mail($inboundEmail->message);
+        $mailbox = Mailbox::mailbox($mail->recipients());
 
         if ($mailbox) {
             (new $mailbox($inboundEmail))->dispatch();

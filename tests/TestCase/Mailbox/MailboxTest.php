@@ -75,7 +75,9 @@ class MailboxTest extends OriginTestCase
 
     protected function initialize() : void
     {
-        $this->InboundEmail = $this->loadModel('InboundEmail', ['className'=>InboundEmail::class]);
+        $this->InboundEmail = $this->loadModel('InboundEmail', [
+            'className' => InboundEmail::class
+            ]);
     }
     public function testRouting()
     {
@@ -85,9 +87,10 @@ class MailboxTest extends OriginTestCase
         $this->assertEquals(SupportMailbox::class, Mailbox::routes('/^support@/i'));
         
         $inboundEmail = $this->InboundEmail->find('first');
-        $this->assertEquals(SupportMailbox::class, Mailbox::mailbox($inboundEmail->message));
-        $modified = str_replace('support@', 'sales@', $inboundEmail->message);
-        $this->assertNull(Mailbox::mailbox($modified));
+        $mail = new Mail($inboundEmail->message);
+        $this->assertEquals(SupportMailbox::class, Mailbox::mailbox($mail->recipients()));
+       
+        $this->assertNull(Mailbox::mailbox(['foo@example.com']));
     }
 
     public function testConstruct()

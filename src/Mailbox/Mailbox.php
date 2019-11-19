@@ -238,14 +238,13 @@ class Mailbox
     }
 
     /**
-    * Finds the mailbox for the message
+    * Finds the mailbox by matching recipient email address to route
     *
-    * @param string $message
+    * @param array $recipients
     * @return string|null
     */
-    public static function mailbox(string $message) : ?string
+    public static function mailbox(array $recipients) : ?string
     {
-        $recipients = (array) (new Mail($message))->recipients();
         foreach (static::routes() as $route => $mailbox) {
             foreach ($recipients as $address) {
                 if (preg_match($route, $address)) {
