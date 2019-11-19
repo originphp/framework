@@ -182,7 +182,6 @@ class Router
      * Converts a url array into a string;.
      *
      * @param array|string $url
-     *
      * @return string url
      */
     public static function url($url)
