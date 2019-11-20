@@ -96,7 +96,7 @@ class Mailbox
      *
      *    protected function checkIsUser(): void
      *    {
-     *        if (!$this->User->findBy(['email'=>$this->mail->from])) {
+     *        if (!$this->User->findBy(['email' => $this->mail->from])) {
      *            $this->bounceWith(UnkownUserMailer::class);
      *        }
      *    }
@@ -144,14 +144,11 @@ class Mailbox
     {
         $this->setStatus('processing');
         try {
-            $this->dispatchCallbacks('beforeProcess');
-
-            if ($this->bounced === false) {
+            if ($this->dispatchCallbacks('beforeProcess')) {
                 $this->process();
-            }
-
-            if ($this->bounced === false) {
-                $this->dispatchCallbacks('afterProcess');
+                if ($this->bounced === false) {
+                    $this->dispatchCallbacks('afterProcess');
+                }
             }
 
             if ($this->bounced === false) {
@@ -171,17 +168,18 @@ class Mailbox
      * Dispatches the callbacks for the Mailbox
      *
      * @param string $callback
-     * @return void
+     * @return bool
      */
-    private function dispatchCallbacks(string $callback) : void
+    private function dispatchCallbacks(string $callback) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             if (method_exists($this, $method)) {
                 if ($this->$method() === false or $this->bounced) {
-                    break;
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     /**
