@@ -38,11 +38,18 @@ class Server
     protected $inboundEmail = null;
 
     /**
+     * Pipe stream
+     *
+     * @var string
+     */
+    protected $stream = 'php://stdin';
+
+    /**
     * Dispatches the pipe process
     *
-    * @return void
+    * @return bool
     */
-    public function dispatch(): void
+    public function dispatch(): bool
     {
         # Set memory limit to prevent issues with large emails
         ini_set('memory_limit', '256M');
@@ -51,32 +58,19 @@ class Server
             'className' => InboundEmail::class
         ]);
 
-        $inboundEmail = $this->InboundEmail->fromMessage($this->requestData());
-        
-        if ($this->InboundEmail->checksumExists($inboundEmail->checksum)) {
-            return;
-        }
-
-        if (! $this->InboundEmail->save($inboundEmail)) {
-            throw new Exception('Error saving InboundEmail to database');
-        }
+        $inboundEmail = $this->InboundEmail->fromMessage($this->readData());
+      
+        return $this->InboundEmail->save($inboundEmail);
     }
 
     /**
-     * Reads the data from the request
+     * Reads the data that is being piped
      *
      * @param string $stream e.g 'php://stdin' or 'php://input'
      * @return string
      */
-    private function requestData(string $stream = 'php://stdin'): string
+    protected function readData(): string
     {
-        $data = '';
-        $fh = fopen($stream, 'r');
-        while (! feof($fh)) {
-            $data .= fread($fh, 1024);
-        }
-        fclose($fh);
-
-        return $data;
+        return file_get_contents($this->stream);
     }
 }

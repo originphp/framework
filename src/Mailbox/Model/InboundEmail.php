@@ -32,6 +32,11 @@ class InboundEmail extends Model
     protected function initialize(array $config) : void
     {
         $this->afterCreate('scheduleJobs');
+        $this->validate('message_id', [
+            ['rule' => 'notBlank'],
+            ['rule' => ['isUnique',['message_id','checksum']]],
+        ]);
+        $this->validate('message', 'notBlank');
     }
 
     /**
@@ -52,11 +57,6 @@ class InboundEmail extends Model
         (new MailboxCleanJob())->schedule($cleanAfter)->dispatch();
     }
     
-    public function checksumExists(int $checksum) : bool
-    {
-        return (bool) $this->where(['checksum' => $checksum])->count();
-    }
-
     /**
      * Creates a new entity from a message
      *
