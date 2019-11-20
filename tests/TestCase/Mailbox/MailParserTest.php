@@ -153,22 +153,30 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
     public function testAutoResponder()
     {
         $message = file_get_contents(__DIR__ . '/messages/text.eml');
-        $parser = new MailParser($message);
-        $this->assertFalse($parser->autoresponder());
+        $this->assertFalse((new MailParser($message))->autoresponder());
         
         $message = file_get_contents(__DIR__ . '/messages/autoresponder.eml');
-        $parser = new MailParser($message);
-        $this->assertTrue($parser->autoresponder());
+        $this->assertTrue((new MailParser($message))->autoresponder());
 
         // modify header to other heuristic
         $modified = str_replace('Auto-Submitted: auto-replied', 'X-Auto-Response-Suppress: ALL', $message);
-        $parser = new MailParser($modified);
-        $this->assertTrue($parser->autoresponder());
+        $this->assertTrue((new MailParser($modified))->autoresponder());
         
         // modify header to other heuristic
         $modified = str_replace('Auto-Submitted: auto-replied', 'Precedence: auto-reply', $message);
-        $parser = new MailParser($modified);
-        $this->assertTrue($parser->autoresponder());
+        $this->assertTrue((new MailParser($modified))->autoresponder());
+
+        $modified = str_replace('Auto-Submitted: auto-replied', 'Precedence: bulk', $message);
+        $this->assertFalse((new MailParser($modified))->autoresponder());
+
+        $message = file_get_contents(__DIR__ . '/messages/autoresponder-no-header.eml');
+        $this->assertTrue((new MailParser($message))->autoresponder());
+
+        $modified = str_replace('Subject: Out of Office', 'Subject: Out of Office: some reason', $message);
+        $this->assertTrue((new MailParser($modified))->autoresponder());
+
+        $modified = str_replace('Subject: Out of Office', 'Subject: Did you see the program Out of Office', $message);
+        $this->assertFalse((new MailParser($modified))->autoresponder());
     }
 
     public function testBounced()
