@@ -244,7 +244,7 @@ class MailParser
     public function hasAttachments(): bool
     {
         foreach ($this->parts as $data) {
-            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) == 'attachment') {
+            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) === 'attachment') {
                 return true;
             }
         }
@@ -260,7 +260,7 @@ class MailParser
     public function attachments(): array
     {
         $attachments = [];
-        foreach ($this->parts as $key => $data) {
+        foreach ($this->parts as $data) {
             if (isset($data['content-disposition']) and strtolower($data['content-disposition']) === 'attachment') {
                 $tmp = tempnam(sys_get_temp_dir(), 'O');
                 $fh = fopen($tmp, 'w');
@@ -480,17 +480,20 @@ class MailParser
         if (preg_match('/^subject:.*(' . implode('|', $this->dsns) .')/im', $header)) {
             return true;
         }
+
+        $body = $this->body();
+
         /**
          * Check for this which can be found in the delivery status message itself
          */
-        if (preg_match('/^action: failed/im', $header)) {
+        if (preg_match('/^action: failed/im', $body)) {
             return true;
         }
        
         /**
          * Check for a mail server error e.g 500 1.1.1 in the body
          */
-        return (bool) preg_match('/(5|4)[\d\d]\s(\d\.\d\.\d)\s/', $this->body());
+        return (bool) preg_match('/(5|4)[\d\d]\s(\d\.\d\.\d)\s/', $body);
     }
 
     /**
@@ -589,11 +592,11 @@ class MailParser
         if ($contentType === 'multipart/report') {
             $out = 'text';
             foreach ($this->parts as $part) {
-                if ($part['content-type'] == 'message/delivery-status') {
+                if ($part['content-type'] === 'message/delivery-status') {
                     $out = 'text';
                     break;
                 }
-                if ($part['content-type'] == 'text/html') {
+                if ($part['content-type'] === 'text/html') {
                     $out = 'html';
                     break;
                 }
