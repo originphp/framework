@@ -250,31 +250,30 @@ class Job
                 $this->dispatchCallbacks('afterDispatch', [$this->arguments]);
             }
         } catch (\Exception $e) {
-            $this->executeHook('shutdown');
+            Log::error($e->getMessage());
         
             if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
 
-            Log::error($e->getMessage());
-           
             $this->executeHook('onError', [$e]);
 
             if ($this->enqueued and $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
             }
+            
+            $this->executeHook('shutdown');
 
             return false;
         }
-
-        $this->executeHook('shutdown');
 
         if ($this->enqueued) {
             $this->connection()->success($this);
         }
 
         $this->executeHook('onSuccess', $this->arguments);
-     
+        $this->executeHook('shutdown');
+
         return true;
     }
 
