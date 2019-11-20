@@ -67,7 +67,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>NOTICE:</strong>', $result);
         $this->assertStringContainsString('Undefined variable: unkown', $result);
-        $this->assertStringContainsString('line: <strong>65</strong>', $result);
+        $this->assertStringContainsString('line: <strong>64</strong>', $result);
     }
 
     public function testErrorHandlerWarning()
@@ -84,7 +84,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>WARNING:</strong>', $result);
         $this->assertStringContainsString('Invalid error type specified', $result);
-        $this->assertStringContainsString('line: <strong>82</strong>', $result);
+        $this->assertStringContainsString('line: <strong>81</strong>', $result);
     }
 
     public function testErrorHandlerError()
@@ -101,7 +101,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>ERROR:</strong>', $result);
         $this->assertStringContainsString('An error has occured', $result);
-        $this->assertStringContainsString('line: <strong>99</strong>', $result);
+        $this->assertStringContainsString('line: <strong>98</strong>', $result);
     }
     
     public function testErrorHandlerDeprecated()
@@ -118,7 +118,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>DEPRECATED:</strong>', $result);
         $this->assertStringContainsString('Function has been deprecated', $result);
-        $this->assertStringContainsString('line: <strong>116</strong>', $result);
+        $this->assertStringContainsString('line: <strong>115</strong>', $result);
     }
 
     public function testErrorHandlerSupressed()
