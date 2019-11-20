@@ -2,9 +2,9 @@
 
 namespace App\Test\Http\Middleware;
 
-use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Middleware\IdsMiddleware;
 
 class MockIdsMiddleware extends IdsMiddleware
@@ -38,7 +38,6 @@ class IdsMiddlewareTest extends OriginTestCase
         $this->response = new Response();
     }
 
-
     public function testGet()
     {
         $_GET = [
@@ -46,7 +45,7 @@ class IdsMiddlewareTest extends OriginTestCase
         ];
 
         // Invoke the middleware
-        $middleware = new MockIdsMiddleware(['level'=>3]);
+        $middleware = new MockIdsMiddleware(['level' => 3]);
         $middleware->handle($this->request);
         $this->assertNotEmpty($middleware->events());
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
@@ -59,7 +58,7 @@ class IdsMiddlewareTest extends OriginTestCase
         $this->request->query('id', '-1 UNION SELECT password FROM users where id=1');
 
         // Invoke the middleware
-        $middleware = new MockIdsMiddleware(['level'=>3]);
+        $middleware = new MockIdsMiddleware(['level' => 3]);
         $middleware->handle($this->request);
         $this->assertNotEmpty($middleware->events());
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
@@ -72,7 +71,7 @@ class IdsMiddlewareTest extends OriginTestCase
         ];
 
         // Invoke the middleware
-        $middleware = new MockIdsMiddleware(['level'=>3]);
+        $middleware = new MockIdsMiddleware(['level' => 3]);
         $middleware->handle($this->request);
         $this->assertNotEmpty($middleware->events());
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
@@ -95,7 +94,7 @@ class IdsMiddlewareTest extends OriginTestCase
             ["' OR 1 = 1 LIMIT 1 #' "],
             ["') OR 1 = 1 --"],
             ["' OR 2>1"],
-            ["-1 UNION SELECT 1, 2, 3"],
+            ['-1 UNION SELECT 1, 2, 3'],
             ["'-1 UNION SELECT 1, 2, 3"],
         ];
     }
@@ -127,8 +126,6 @@ class IdsMiddlewareTest extends OriginTestCase
         $this->assertNotEmpty($events);
         $this->assertContains('XSS Attack', $events[0]['matches']);
     }
-
-    
 
     /**
      * Test data from https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
@@ -194,7 +191,6 @@ class IdsMiddlewareTest extends OriginTestCase
         $events = $middleware->events();
         $this->assertEmpty($events);
     }
-
 
     public function html()
     {

@@ -16,8 +16,8 @@ namespace Origin\Mailbox\Job;
 
 use Origin\Job\Job;
 use Origin\Mailbox\Mail;
-use Origin\Mailbox\Mailbox;
 use Origin\Model\Entity;
+use Origin\Mailbox\Mailbox;
 use Origin\Mailbox\Model\InboundEmail;
 
 class MailboxJob extends Job

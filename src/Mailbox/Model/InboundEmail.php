@@ -17,12 +17,12 @@ namespace Origin\Mailbox\Model;
 use ArrayObject;
 use Origin\Core\Config;
 use Origin\Model\Model;
+use Origin\Mailbox\Mail;
 use Origin\Model\Entity;
+use Origin\Security\Security;
 use Origin\Mailbox\Job\MailboxJob;
 use Origin\Mailbox\Job\MailboxCleanJob;
-use Origin\Mailbox\Mail;
 use Origin\Model\Concern\Timestampable;
-use Origin\Security\Security;
 
 class InboundEmail extends Model
 {
@@ -66,9 +66,10 @@ class InboundEmail extends Model
     public function fromMessage(string $message) : Entity
     {
         $mail = new Mail($message);
+
         return $this->new([
             'message_id' => $mail->messageId,
-            'checksum' => Security::hash($message, ['type'=>'sha1']),
+            'checksum' => Security::hash($message, ['type' => 'sha1']),
             'message' => $message,
             'status' => 'pending'
         ]);

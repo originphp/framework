@@ -51,8 +51,8 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
         }
 
         $fetcher = new MailFetcher([
-            'host' => env('EMAIL_IMAP_HOST') ,'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
-            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD'),'timeout'=>5
+            'host' => env('EMAIL_IMAP_HOST'),'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
+            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD'),'timeout' => 5
         ]);
 
         $messages = $fetcher->download(['limit' => 1]);

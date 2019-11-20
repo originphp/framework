@@ -14,10 +14,10 @@
 
 namespace Origin\Test\Mailbox\Job;
 
-use Origin\Mailbox\Job\MailboxJob;
 use Origin\Mailbox\Mailbox;
-use Origin\Mailbox\Model\InboundEmail;
+use Origin\Mailbox\Job\MailboxJob;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Mailbox\Model\InboundEmail;
 
 class SupportMailbox extends Mailbox
 {

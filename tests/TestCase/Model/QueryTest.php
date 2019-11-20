@@ -19,22 +19,20 @@
  */
 namespace Origin\Test\ModelRefactored;
 
-use BadMethodCallException;
 use Origin\Model\Model;
 
-
-use Origin\TestSuite\OriginTestCase;
-
-use Origin\Core\Exception\InvalidArgumentException;
-use Origin\Model\Collection;
 use Origin\Model\Entity;
+
+use Origin\Model\Collection;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Core\Exception\InvalidArgumentException;
 
 class QueryArticle extends Model
 {
     protected $table = 'articles';
     protected function initialize(array $config) : void
     {
-        $this->belongsTo('Author', ['className'=>QueryAuthor::class]);
+        $this->belongsTo('Author', ['className' => QueryAuthor::class]);
     }
 }
 
@@ -43,7 +41,7 @@ class QueryAuthor extends Model
     protected $table = 'authors';
     protected function initialize(array $config) : void
     {
-        $this->hasMany('Article', ['className'=>QueryArticle::class]);
+        $this->hasMany('Article', ['className' => QueryArticle::class]);
     }
 }
 
@@ -58,7 +56,7 @@ class QueryTest extends OriginTestCase
 
     public function testSelect()
     {
-        $query = $this->Article->where(['id'=>1001])->select(['id']);
+        $query = $this->Article->where(['id' => 1001])->select(['id']);
         $this->assertEquals('SELECT articles.id FROM `articles` WHERE articles.id = :a0', $query->sql());
     }
 
@@ -91,13 +89,13 @@ class QueryTest extends OriginTestCase
 
     public function testSelectDistinct()
     {
-        $query = $this->Article->where(['id'=>1001])->select(['id'])->distinct();
+        $query = $this->Article->where(['id' => 1001])->select(['id'])->distinct();
         $this->assertEquals('SELECT DISTINCT articles.id FROM `articles` WHERE articles.id = :a0', $query->sql());
     }
 
     public function testWhere()
     {
-        $query = $this->Article->select(['id'])->where(['id'=>1001]);
+        $query = $this->Article->select(['id'])->where(['id' => 1001]);
         $this->assertEquals('SELECT articles.id FROM `articles` WHERE articles.id = :a0', $query->sql());
     }
 
@@ -113,7 +111,7 @@ class QueryTest extends OriginTestCase
 
         $expected = 'SELECT articles.id FROM `articles` ORDER BY articles.id DESC';
 
-        $query = $this->Article->select(['id'])->order(['id'=>'DESC']);
+        $query = $this->Article->select(['id'])->order(['id' => 'DESC']);
         $this->assertEquals($expected, $query->sql());
     }
 
@@ -126,7 +124,7 @@ class QueryTest extends OriginTestCase
         /**
         * Test all fields selected
         */
-        $query = $this->Article->where(['id'=>1001])->order('id ASC');
+        $query = $this->Article->where(['id' => 1001])->order('id ASC');
         $expected = 'SELECT articles.id, articles.author_id, articles.title, articles.body, articles.created, articles.modified FROM `articles` WHERE articles.id = :a0 ORDER BY id ASC';
         $this->assertEquals($expected, $query->sql());
     }
@@ -176,11 +174,11 @@ class QueryTest extends OriginTestCase
         $query = $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join('authors');
         $this->assertEquals($expected, $query->sql());
        
-        $query = $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['table'=>'authors']);
+        $query = $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['table' => 'authors']);
         $this->assertEquals($expected, $query->sql());
 
         $this->expectException(InvalidArgumentException::class);
-        $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['foo'=>'bar']);
+        $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['foo' => 'bar']);
     }
 
     public function testWith()
@@ -215,11 +213,11 @@ class QueryTest extends OriginTestCase
         $this->assertEquals([], $query->toArray()['associated']['Author']['fields']);
 
         # As no fields are selected the value of Field in array should be NULL
-        $query = $this->Article->where(['id' => 1000])->with(['Author'=> ['Comment' => ['User']]]);
+        $query = $this->Article->where(['id' => 1000])->with(['Author' => ['Comment' => ['User']]]);
         $this->assertSame(3817391946, crc32(serialize($query->toArray())));
 
         # As fields are selected the value of Field in array should be []
-        $query = $this->Article->where(['id' => 1000])->select(['id'])->with(['Author'=> ['Comment' => ['User']]]);
+        $query = $this->Article->where(['id' => 1000])->select(['id'])->with(['Author' => ['Comment' => ['User']]]);
         $this->assertSame(1342860342, crc32(serialize($query->toArray())));
     }
 
@@ -234,7 +232,6 @@ class QueryTest extends OriginTestCase
         $query = $this->Article->select(['id','title']);
         $this->assertInstanceOf(Entity::class, $query->first());
     }
-
 
     public function testCount()
     {

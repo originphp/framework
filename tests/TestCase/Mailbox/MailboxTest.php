@@ -15,10 +15,10 @@
 namespace Origin\Test\Mailbox;
 
 use Origin\Mailbox\Mail;
-use Origin\Mailbox\Mailbox;
-use Origin\Mailbox\Model\InboundEmail;
 use Origin\Mailer\Mailer;
+use Origin\Mailbox\Mailbox;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Mailbox\Model\InboundEmail;
 
 class SupportMailbox extends Mailbox
 {
@@ -77,7 +77,7 @@ class MailboxTest extends OriginTestCase
     {
         $this->InboundEmail = $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class
-            ]);
+        ]);
     }
     public function testRouting()
     {

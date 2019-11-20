@@ -16,12 +16,12 @@ declare(strict_types = 1);
 namespace Origin\Job;
 
 use \ArrayObject;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Log\Log;
 use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
 use Origin\Security\Security;
 use Origin\Job\Engine\BaseEngine;
+use Origin\Core\CallbackRegistrationTrait;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -227,6 +227,7 @@ class Job
         $this->dispatchCallbacks('beforeQueue', [$this->arguments]);
         $result = $this->connection()->add($this, $this->wait ?: 'now');
         $this->dispatchCallbacks('afterQueue', [$this->arguments]);
+
         return $result;
     }
 
@@ -283,7 +284,7 @@ class Job
      * @param string $callback
      * @return bool continue
      */
-    private function dispatchCallbacks(string $callback, array $arguments =[]) : bool
+    private function dispatchCallbacks(string $callback, array $arguments = []) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             if (method_exists($this, $method)) {
@@ -292,6 +293,7 @@ class Job
                 }
             }
         }
+
         return true;
     }
 

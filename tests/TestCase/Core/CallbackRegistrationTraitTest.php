@@ -20,7 +20,7 @@ class CallbackRegistry
 {
     use CallbackRegistrationTrait;
 
-    public function add($callback, $method, $options=[])
+    public function add($callback, $method, $options = [])
     {
         $this->registerCallback($callback, $method, $options);
     }
@@ -49,14 +49,14 @@ class CallbackRegistrationTest extends \PHPUnit\Framework\TestCase
     {
         $callback = new CallbackRegistry();
 
-        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
-        $this->assertEquals(['doSomething' => ['foo'=>'bar']], $callback->get('beforeFind'));
+        $callback->add('beforeFind', 'doSomething', ['foo' => 'bar']);
+        $this->assertEquals(['doSomething' => ['foo' => 'bar']], $callback->get('beforeFind'));
     }
 
     public function testDisableCallback()
     {
         $callback = new CallbackRegistry();
-        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
+        $callback->add('beforeFind', 'doSomething', ['foo' => 'bar']);
 
         $this->assertTrue($callback->disable('doSomething'));
         $this->assertFalse($callback->disable('doSomethingElse'));
@@ -65,7 +65,7 @@ class CallbackRegistrationTest extends \PHPUnit\Framework\TestCase
     public function testEnableCallback()
     {
         $callback = new CallbackRegistry();
-        $callback->add('beforeFind', 'doSomething', ['foo'=>'bar']);
+        $callback->add('beforeFind', 'doSomething', ['foo' => 'bar']);
 
         $this->assertTrue($callback->disable('doSomething'));
         $this->assertTrue($callback->enable('doSomething'));

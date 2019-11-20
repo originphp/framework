@@ -33,14 +33,14 @@ class PgsqlEngineTest extends \PHPUnit\Framework\TestCase
     public function testTables() : void
     {
         $connection = ConnectionManager::get('test');
-        $tables  = $connection->tables();
+        $tables = $connection->tables();
         $this->assertIsArray($tables);
     }
 
     public function testDatabases() : void
     {
         $connection = ConnectionManager::get('test');
-        $databases  = $connection->databases();
+        $databases = $connection->databases();
         $this->assertContains('origin', $databases);
         $this->assertContains('origin_test', $databases);
     }

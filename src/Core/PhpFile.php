@@ -30,7 +30,7 @@ class PhpFile
      */
     public function read(string $filename) : array
     {
-        if (!file_exists($filename)) {
+        if (! file_exists($filename)) {
             throw new InvalidArgumentException(sprintf('File `%` does not exist', $filename));
         }
         $out = include $filename;
@@ -53,6 +53,7 @@ class PhpFile
     {
         $options += ['lock' => false];
         $out = '<?php' . "\n" . 'return ' . var_export($data, true) . ';';
+
         return (bool) file_put_contents($filename, $out, $options['lock'] ? LOCK_EX : 0);
     }
 }

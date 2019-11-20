@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
-use Origin\Http\Middleware\Middleware;
 
 /**
  * IDS - A lightweight intrusion detection system (IDS) at the application level.
@@ -105,8 +104,6 @@ class IdsMiddleware extends Middleware
         ]
     ];
 
- 
-
     /**
      * This HANDLES the request. Use this to make changes to the request.
      *
@@ -122,12 +119,11 @@ class IdsMiddleware extends Middleware
          * Now checking $_GET and query which are decoded, this helps identify malicious attacks
          * easier.
          */
-        $this->run(['GET'=>$_GET,'QUERY'=>$request->query(),'POST'=>$_POST,'COOKIE'=>$_COOKIE]);
+        $this->run(['GET' => $_GET,'QUERY' => $request->query(),'POST' => $_POST,'COOKIE' => $_COOKIE]);
         $this->report($request);
  
         $this->cleanUp();
     }
-
 
     /**
      * Clears default rules and loads the rules from the value or values set
@@ -172,6 +168,7 @@ class IdsMiddleware extends Middleware
             foreach ($data as $key => $value) {
                 $this->detect($name . '.' . $key, $value);
             }
+
             return;
         }
         $matches = $this->match($name, (string) $data);
@@ -197,7 +194,7 @@ class IdsMiddleware extends Middleware
         * For better performance skip values which only contain word/number/-_@.i.
         */
       
-        if (empty($value) or !preg_match('/([^\w\s@\.-]+)/i', $value)) {
+        if (empty($value) or ! preg_match('/([^\w\s@\.-]+)/i', $value)) {
             return [];
         }
 
@@ -236,7 +233,7 @@ class IdsMiddleware extends Middleware
                 implode(',', $event['matches'])
             ) . "\n";
         }
-        if (!empty($out)) {
+        if (! empty($out)) {
             file_put_contents($this->config['log'], $out, FILE_APPEND);
         }
     }

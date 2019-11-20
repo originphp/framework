@@ -1,9 +1,9 @@
 <?php
 namespace App\Test\Http\Middleware;
 
-use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Middleware\ProfilerMiddleware;
 
 class ProfilerMiddlewareTest extends OriginTestCase

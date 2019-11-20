@@ -14,10 +14,9 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
-use BadMethodCallException;
 use IteratorAggregate;
-use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Inflector\Inflector;
+use Origin\Core\Exception\InvalidArgumentException;
 
 /**
  * Fluent Query Interface for Models
@@ -89,6 +88,7 @@ class Query implements IteratorAggregate
     public function distinct() : Query
     {
         $this->query['distinct'] = true;
+
         return $this;
     }
     
@@ -195,19 +195,18 @@ class Query implements IteratorAggregate
     public function join($options) : Query
     {
         if (is_string($options)) {
-            $options = [ 'table' => $options];
+            $options = ['table' => $options];
         }
 
         # Add default Options
         $options += [
             'table' => null,
             'alias' => null,
-            'type'=> 'INNER',
+            'type' => 'INNER',
             'fields' => [],
             'conditions' => []
         ];
 
-        
         if (empty($options['table'])) {
             throw new InvalidArgumentException('No table name provided');
         }
@@ -238,6 +237,7 @@ class Query implements IteratorAggregate
     public function with($assocation) : Query
     {
         $this->associated = (array) $assocation;
+
         return $this;
     }
 
@@ -344,12 +344,13 @@ class Query implements IteratorAggregate
     {
         $assocation = $this->normalizeAssociated($this->associated);
         $this->query['associated'] = $assocation['associated'];
+
         return $this;
     }
         
     protected function normalizeAssociated(array $value)
     {
-        $hasSelected = !empty($this->query['fields']);
+        $hasSelected = ! empty($this->query['fields']);
 
         $out = [] ;
         foreach ($value as $key => $value) {
@@ -360,10 +361,11 @@ class Query implements IteratorAggregate
             if (is_array($value)) {
                 $out[$key] = $this->normalizeAssociated($value);
             } else {
-                $out[$value] = ['fields' => $hasSelected ? [] : null ];
+                $out[$value] = ['fields' => $hasSelected ? [] : null];
             }
         }
-        return ['associated' => $out,'fields' => $hasSelected ? [] : null ];
+
+        return ['associated' => $out,'fields' => $hasSelected ? [] : null];
     }
 
     /**
@@ -374,6 +376,7 @@ class Query implements IteratorAggregate
     public function sql() : string
     {
         $builder = new QueryBuilder($this->model->table(), Inflector::tableName($this->model->alias()));
+
         return $builder->selectStatement($this->toArray());
     }
 

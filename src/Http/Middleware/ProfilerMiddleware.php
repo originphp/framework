@@ -16,7 +16,6 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware\Middleware;
 
 /**
  * Profiler middleware keeps track of the memory usage and time it takes for each request. This is handy
@@ -100,6 +99,7 @@ class ProfilerMiddleware extends Middleware
     {
         $size = ['b', 'kb', 'mb', 'gb'];
         $factor = floor((strlen((string) $bytes) - 1) / 3);
-        return sprintf("%.2f", $bytes / pow(1024, $factor)) . $size[$factor];
+
+        return sprintf('%.2f', $bytes / pow(1024, $factor)) . $size[$factor];
     }
 }

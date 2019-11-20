@@ -14,17 +14,17 @@
 declare(strict_types = 1);
 namespace Origin\Mailbox;
 
-use Origin\Model\Entity;
-use Origin\Core\Resolver;
-
-use Origin\Core\HookTrait;
-use Origin\Model\ModelRegistry;
-use Origin\Configurable\StaticConfigurable as Configurable;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Log\Log;
+use Origin\Model\Entity;
+
+use Origin\Core\Resolver;
+use Origin\Core\HookTrait;
 use Origin\Model\ModelTrait;
-use Origin\Mailbox\Model\InboundEmail;
+use Origin\Model\ModelRegistry;
 use Origin\Core\Exception\Exception;
+use Origin\Mailbox\Model\InboundEmail;
+use Origin\Core\CallbackRegistrationTrait;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Mailbox
 {
@@ -68,7 +68,6 @@ class Mailbox
      * @var bool
      */
     private $bounced = false;
-
 
     /**
      * Constructor
@@ -132,6 +131,7 @@ class Mailbox
         $this->executeHook('startup');
         $result = $this->performProcessing();
         $this->executeHook('shutdown');
+
         return $result;
     }
     
@@ -205,7 +205,6 @@ class Mailbox
         throw new Exception('Missing class ' . $mailerClass);
     }
 
-   
     /**
      * Adds a route for a mailbox using a regex pattern
      *

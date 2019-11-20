@@ -1,10 +1,10 @@
 <?php
 namespace App\Test\Http\Middleware;
 
-use Origin\Http\Exception\ForbiddenException;
-use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Http\Exception\ForbiddenException;
 use Origin\Http\Middleware\FirewallMiddleware;
 
 class MockFirewallMiddleware extends FirewallMiddleware

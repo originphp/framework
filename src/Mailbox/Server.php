@@ -49,7 +49,7 @@ class Server
 
         $this->InboundEmail = ModelRegistry::get('InboundEmail', [
             'className' => InboundEmail::class
-            ]);
+        ]);
 
         $inboundEmail = $this->InboundEmail->fromMessage($this->requestData());
         

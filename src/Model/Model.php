@@ -21,11 +21,11 @@ namespace Origin\Model;
  */
 
 use ArrayObject;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Core\HookTrait;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;
+use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
@@ -1355,7 +1355,7 @@ class Model
         /**
          * Remove model::order from group queries
          */
-        if (!empty($options['group'])) {
+        if (! empty($options['group'])) {
             if ($options['order'] === $this->order) {
                 $options['order'] = null;
             }
@@ -1880,7 +1880,6 @@ class Model
             }
         }
     
-
         return true;
     }
 

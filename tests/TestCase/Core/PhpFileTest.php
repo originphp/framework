@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Core;
 
+use Origin\Core\PhpFile;
 use Origin\Core\Exception\Exception;
 use Origin\Core\Exception\InvalidArgumentException;
-use Origin\Core\PhpFile;
 
 class PhpFileTest extends \PHPUnit\Framework\TestCase
 {

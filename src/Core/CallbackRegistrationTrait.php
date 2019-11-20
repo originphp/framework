@@ -51,9 +51,11 @@ trait CallbackRegistrationTrait
         foreach ($this->registeredCallbacks as $callback => $registeredCallbacks) {
             if (isset($registeredCallbacks[$method])) {
                 $this->disabledCallbacks[] = $method;
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -68,8 +70,10 @@ trait CallbackRegistrationTrait
         $key = array_search($method, $this->disabledCallbacks);
         if ($key !== false) {
             unset($this->disabledCallbacks[$key]);
+
             return true;
         }
+
         return false;
     }
 

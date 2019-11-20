@@ -17,9 +17,8 @@ namespace Origin\Http\Middleware;
 
 use Origin\Cache\Cache;
 use Origin\Core\PhpFile;
-use Origin\Http\Exception\ForbiddenException;
 use Origin\Http\Request;
-use Origin\Http\Middleware\Middleware;
+use Origin\Http\Exception\ForbiddenException;
 use Origin\Http\Exception\ServiceUnavailableException;
 
 /**
@@ -76,7 +75,7 @@ class ThrottleMiddleware extends Middleware
     public function handle(Request $request): void
     {
         $ipAddress = $request->ip();
-        if (!$ipAddress) {
+        if (! $ipAddress) {
             throw new ForbiddenException('Invalid IP address');
         }
 
@@ -147,6 +146,7 @@ class ThrottleMiddleware extends Middleware
                 $recent[] = $request;
             }
         }
+
         return $recent;
     }
 
@@ -158,7 +158,7 @@ class ThrottleMiddleware extends Middleware
      */
     private function ban(string $ipAddress): void
     {
-        if (!isset($this->blacklist[$ipAddress])) {
+        if (! isset($this->blacklist[$ipAddress])) {
             $this->blacklist[$ipAddress] = strtotime($this->config['ban']);
         }
     }

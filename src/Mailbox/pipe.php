@@ -25,8 +25,6 @@
 declare(strict_types=1);
 namespace Origin\Mailbox;
 
-use Origin\Mailbox\Server;
-
 require dirname(__DIR__, 5) .  '/config/bootstrap.php';
 
 (new Server())->dispatch();

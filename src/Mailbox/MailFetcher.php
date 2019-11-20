@@ -207,7 +207,7 @@ class MailFetcher
             $this->config['protocol']
         ];
 
-        if (!empty($this->config['encryption'])) {
+        if (! empty($this->config['encryption'])) {
             $args[] = $this->config['encryption'];
         }
 

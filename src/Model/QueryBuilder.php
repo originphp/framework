@@ -639,7 +639,7 @@ class QueryBuilder
         if (empty($params) or ! isset($params['fields'])) {
             throw new QueryBuilderException('No Fields.');
         }
-        $distinct = !empty($params['distinct']) ? 'DISTINCT ' : null;
+        $distinct = ! empty($params['distinct']) ? 'DISTINCT ' : null;
         $statement = [];
         // SELECT
         $statement[] = "SELECT {$distinct}{$this->fieldsToString($params['fields'])} FROM {$this->tableReference()}";

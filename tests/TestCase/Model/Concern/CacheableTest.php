@@ -81,13 +81,12 @@ class CacheableTest extends OriginTestCase
         $this->assertEquals('Article #1', $cached->title);
     }
 
-
     public function testAggregate()
     {
         $article = $this->Article->find('first');
 
         $count = $this->Article->count();
-        $this->Article->deleteAll(['id'=>$article->id]); // avoid cache
+        $this->Article->deleteAll(['id' => $article->id]); // avoid cache
 
         $this->assertEquals($count, $this->Article->count());
     }

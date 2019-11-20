@@ -16,7 +16,6 @@ namespace Origin\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Middleware\Middleware;
 
 /**
  * Creates an access log using the Apache Common LOG format, with one main difference, the ability to detect users

@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Mailbox\Job;
 
-use Origin\Mailbox\Job\MailboxCleanJob;
-use Origin\Mailbox\Model\InboundEmail;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Mailbox\Model\InboundEmail;
+use Origin\Mailbox\Job\MailboxCleanJob;
 
 class MailboxCleanJobTest extends OriginTestCase
 {

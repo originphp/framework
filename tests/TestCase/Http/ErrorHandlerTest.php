@@ -20,7 +20,6 @@ use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\ErrorHandler;
 use Origin\Http\Exception\NotFoundException;
-use Origin\Http\Exception\InternalErrorException;
 use Origin\Http\Exception\ServiceUnavailableException;
 
 class MockErrorHandler extends ErrorHandler

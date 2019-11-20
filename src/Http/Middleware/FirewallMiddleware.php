@@ -14,10 +14,9 @@
 declare(strict_types=1);
 namespace Origin\Http\Middleware;
 
-use Origin\Http\Exception\ForbiddenException;
-use Origin\Http\Request;
-use Origin\Http\Middleware\Middleware;
 use Origin\Core\PhpFile;
+use Origin\Http\Request;
+use Origin\Http\Exception\ForbiddenException;
 
 /**
  * FirewallMiddleware is a for blacklisting IPs or restricting access to your web to only certain IPs
@@ -56,7 +55,7 @@ class FirewallMiddleware extends Middleware
     public function handle(Request $request) : void
     {
         $ipAddress = $request->ip();
-        if (!$ipAddress) {
+        if (! $ipAddress) {
             throw new ForbiddenException('Invalid IP address');
         }
 
@@ -83,7 +82,7 @@ class FirewallMiddleware extends Middleware
     protected function checkLists(string $ip) : void
     {
         if ($this->whitelist) {
-            if (!in_array($ip, $this->whitelist)) {
+            if (! in_array($ip, $this->whitelist)) {
                 throw new ForbiddenException('IP address is not allowed');
             }
         } elseif (in_array($ip, $this->blacklist)) {

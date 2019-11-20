@@ -36,7 +36,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
     {
         $pattern = '/(((\d+\)?))|(\')|(\%27))/'; // cant use the ^ since this will skip urls
         $this->assertRegExp($pattern, "password' union all select");
-        $this->assertRegExp($pattern, "1 or 2 = 2; union all select");
+        $this->assertRegExp($pattern, '1 or 2 = 2; union all select');
     }
     public function testSqlInjectionWithHex()
     {
@@ -53,7 +53,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin'%20AND 1=1");
         $this->assertRegExp($pattern, "admin'%20 AND 1=1");
         $this->assertRegExp($pattern, "admin' %6Fr 1>0");
-        $this->assertRegExp($pattern, "1%0#");
+        $this->assertRegExp($pattern, '1%0#');
         $this->assertRegExp($pattern, "1000' ORDER BY 2;%00"); // null byte
         $this->assertRegExp($pattern, "1000' concat(0x3c62723e) "); // hexadecimal
     }
@@ -65,17 +65,15 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin'#");
         $this->assertRegExp($pattern, "admin'  #");
         $this->assertRegExp($pattern, "admin' #");
-        $this->assertRegExp($pattern, "admin%27 #");
+        $this->assertRegExp($pattern, 'admin%27 #');
         $this->assertRegExp($pattern, "admin'--");
         $this->assertRegExp($pattern, "admin' --");
         $this->assertRegExp($pattern, "admin'  --");
         $this->assertRegExp($pattern, "admin' /* inline comment */");
         $this->assertRegExp($pattern, "x' AND email is NULL; --");
         
-        
-        $this->assertRegExp($pattern, "1--");
-        $this->assertRegExp($pattern, "-1#");
-        
+        $this->assertRegExp($pattern, '1--');
+        $this->assertRegExp($pattern, '-1#');
         
         /**
          * ; is issue, need to find out else to implement
@@ -91,7 +89,6 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertNotRegExp($pattern, "<script>alert('hello');</script");
     }
 
-
     public function testSqlInjection()
     {
         $pattern = '/((-?(\d+\)?))|(\')|(\%27)).*\s+(or|and|having|group by|order)\s+.*(<|>|=|like)/i';
@@ -101,13 +98,13 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "admin' GROUP BY 'abc' HAVING 1=1--");
         $this->assertRegExp($pattern, "admin' OR '1'='1' /*");
 
-        $this->assertRegExp($pattern, "1 HAVING 1=1 --");
-        $this->assertRegExp($pattern, "2 AND 1=0 UNION ALL SELECT");
+        $this->assertRegExp($pattern, '1 HAVING 1=1 --');
+        $this->assertRegExp($pattern, '2 AND 1=0 UNION ALL SELECT');
         $this->assertRegExp($pattern, "3 GROUP BY 'abc' HAVING 1=1--");
         $this->assertRegExp($pattern, "4 OR '1'='1' /*");
-        $this->assertRegExp($pattern, "1 OR 2 = 2");
+        $this->assertRegExp($pattern, '1 OR 2 = 2');
         $this->assertRegExp($pattern, "1) OR ('foo' = 'foo')");
-        $this->assertRegExp($pattern, "1  OR  2  =  2");
+        $this->assertRegExp($pattern, '1  OR  2  =  2');
 
         $this->assertRegExp($pattern, "admin' or 1>0");
         $this->assertRegExp($pattern, "admin'  or 1>0");
@@ -121,10 +118,10 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertRegExp($pattern, "1' or '1'='1");
         $this->assertRegExp($pattern, "1' or 2>1--");
 
-        $this->assertNotRegExp($pattern, "500 having babies");
+        $this->assertNotRegExp($pattern, '500 having babies');
         $this->assertNotRegExp($pattern, "jim' and 'foo");
-        $this->assertNotRegExp($pattern, "1 = 2");
-        $this->assertNotRegExp($pattern, "FOR = 4");
+        $this->assertNotRegExp($pattern, '1 = 2');
+        $this->assertNotRegExp($pattern, 'FOR = 4');
 //        $this->assertNoTRegExp($pattern, "abc 1 having equals (=) --");
       
         # Keep here for reference
@@ -134,29 +131,27 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertNotRegExp($pattern, "<script> alert('hello'); </script"); // operator
     }
 
-   
     public function testSqlInjectionRuleUnion()
     {
         $pattern = '/((\')|(\d\)?)|(\%27))([(\%20)(\%0)\s]+)(union(([(\%20)(\%0)\s]+))(select|all select))/i';
 
         $this->assertRegExp($pattern, "' union select sum(id)");
-        $this->assertRegExp($pattern, "12345) UNION SELECT");
-        $this->assertRegExp($pattern, "1 UNION SELECT 1, 2, 3");
-        $this->assertRegExp($pattern, "1 UNION %20SELECT 1, 2, 3");
-        $this->assertRegExp($pattern, "1%20UNION SELECT 1, 2, 3");
+        $this->assertRegExp($pattern, '12345) UNION SELECT');
+        $this->assertRegExp($pattern, '1 UNION SELECT 1, 2, 3');
+        $this->assertRegExp($pattern, '1 UNION %20SELECT 1, 2, 3');
+        $this->assertRegExp($pattern, '1%20UNION SELECT 1, 2, 3');
     }
 
     public function testSqlInjectionRuleHarmful()
     {
-        $pattern  = '/(;|(\%3b))(\s+)?(DROP TABLE|INSERT INTO)/i';
+        $pattern = '/(;|(\%3b))(\s+)?(DROP TABLE|INSERT INTO)/i';
 
-
-        $this->assertRegExp($pattern, ";drop table FOO");
-        $this->assertRegExp($pattern, "; drop table FOO");
-        $this->assertRegExp($pattern, "%3bdrop table FOO");
-        $this->assertRegExp($pattern, ";insert into foos");
-        $this->assertNotRegExp($pattern, "DROP TABLE FOO");
-        $this->assertNotRegExp($pattern, "INSERT INTO foos");
+        $this->assertRegExp($pattern, ';drop table FOO');
+        $this->assertRegExp($pattern, '; drop table FOO');
+        $this->assertRegExp($pattern, '%3bdrop table FOO');
+        $this->assertRegExp($pattern, ';insert into foos');
+        $this->assertNotRegExp($pattern, 'DROP TABLE FOO');
+        $this->assertNotRegExp($pattern, 'INSERT INTO foos');
     }
 
     /**

@@ -26,7 +26,6 @@ class Deal extends Model
     use Delocalizable;
     protected $connection = 'test';
 
-    
     public function callbacks(string $callback)
     {
         return array_keys($this->registeredCallbacks($callback));
