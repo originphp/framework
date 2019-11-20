@@ -50,7 +50,7 @@ trait CallbackRegistrationTrait
     {
         foreach ($this->registeredCallbacks as $callback => $registeredCallbacks) {
             if (isset($registeredCallbacks[$method])) {
-                $this->disabledCallbacks[$method] = true;
+                $this->disabledCallbacks[] = $method;
                 return true;
             }
         }
@@ -74,21 +74,21 @@ trait CallbackRegistrationTrait
     }
 
     /**
-     * Gets all the enabled registeredCallbacks
+     * Gets the registered callbacks to run on, disabled callbacks will be excluded
      *
      * @param string $callback
-     * @param boolean $disabled wether to get disabled callbacks as well
      * @return array
      */
-    protected function registeredCallbacks(string $callback, bool $disabled = false) : array
+    protected function registeredCallbacks(string $callback) : array
     {
-        $out = [];
         $registeredCallbacks = $this->registeredCallbacks[$callback] ?? [];
-        foreach ($registeredCallbacks as $method => $options) {
-            if ($disabled  === true or !isset($this->disabledCallbacks[$method])) {
-                $out[$method] = $options;
+
+        foreach ($this->disabledCallbacks as $method) {
+            if (isset($registeredCallbacks[$method])) {
+                unset($registeredCallbacks[$method]);
             }
         }
-        return $out;
+        
+        return $registeredCallbacks;
     }
 }
