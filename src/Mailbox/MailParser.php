@@ -49,7 +49,12 @@ class MailParser
     */
     private $resource;
 
-    private $dsns = [
+    /**
+     * Standard DSNS (some servers might reply with variation)
+     *
+     * @var array
+     */
+    protected $dsns = [
         'Mail delivery failed',
         'Delivery Notification: Delivery has failed',
         'Returned mail',
@@ -65,6 +70,17 @@ class MailParser
         'Delivery Failure',
         'Message status - undeliverable',
         'Delivery Status Notification \(Failure\)'
+    ];
+
+    /**
+     * English AutoReponder subjects
+     */
+    protected $autoResponses = [
+        'Auto\:',
+        'Automatic reply',
+        'Auto-Reply|autoreply',
+        'Auto Response',
+        'Out of Office|Out of the office'
     ];
 
     private $messageLength = 0;
@@ -493,7 +509,7 @@ class MailParser
         /**
          * Check for a mail server error e.g 500 1.1.1 in the body
          */
-        return (bool) preg_match('/(5|4)[\d\d]\s(\d\.\d\.\d)\s/', $body);
+        return (bool) preg_match('/5[\d\d]\s(\d\.\d\.\d)\s/', $body);
     }
 
     /**
@@ -537,7 +553,17 @@ class MailParser
          * This is commonly used but is discouraged.
          * @link http://www.faqs.org/rfcs/rfc2076.html
          */
-        return (bool) preg_match('/^precedence:.*(auto-reply)/im', $header);
+        if (preg_match('/^precedence:.*(auto-reply)/im', $header)) {
+            return true;
+        }
+
+        /**
+         * Check subject for standard auto responder subject text
+         *
+         * Office 365 autoresponders and unkown providers by well established bank not setting headers, so the
+         * best the thing to do here is to check the subject.
+         */
+        return (bool) preg_match('/^subject: (' . implode('|', $this->autoResponses) .')/im', $header);
     }
 
     /**
