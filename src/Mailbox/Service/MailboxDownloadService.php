@@ -32,6 +32,9 @@ class MailboxDownloadService extends Service
     {
         $this->InboundEmail = $InboundEmail;
         $this->Imap = $Imap;
+
+        # Set memory limit to prevent issues with large emails
+        ini_set('memory_limit', '256M');
     }
 
     /**
@@ -42,6 +45,17 @@ class MailboxDownloadService extends Service
     private function isIMAP() : bool
     {
         return $this->config['protocol'] === 'imap';
+    }
+
+    /**
+     * Wrapped to make it easier to test
+     *
+     * @param array $options
+     * @return void
+     */
+    protected function download(array $options)
+    {
+        return (new MailFetcher($this->config))->download($options);
     }
 
     /*
@@ -60,8 +74,8 @@ class MailboxDownloadService extends Service
 
         $downloadOptions = isset($lastImapMessage) ? ['messageId' => $lastImapMessage->message_id] : [];
 
-        $messages = (new MailFetcher($this->config))->download($downloadOptions);
-
+        $messages = $this->download($downloadOptions);
+       
         $messageIds = [];
 
         # Save downloaded messages to database

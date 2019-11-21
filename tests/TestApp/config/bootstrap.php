@@ -37,6 +37,7 @@ require 'database.php';
 require 'storage.php';
 require 'email.php';
 require 'queue.php';
+require 'mailbox.php';
 
 /*
  * Load your plugins here
