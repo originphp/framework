@@ -31,12 +31,23 @@ class InboundEmail extends Model
 
     protected function initialize(array $config) : void
     {
-        $this->afterCreate('scheduleJobs');
-        $this->validate('message_id', [
-            ['rule' => 'notBlank'],
-            ['rule' => ['isUnique',['message_id','checksum']]],
-        ]);
+        # Setup validation rules
+        $this->validate('message_id', 'notBlank');
         $this->validate('message', 'notBlank');
+
+        # Register callbacks
+        $this->afterCreate('scheduleJobs');
+    }
+
+    /**
+     * Make sure the message has not already been saved
+     *
+     * @param \Origin\Model\Entity $inboundEmail
+     * @return boolean
+     */
+    public function existsInDb(Entity $inboundEmail) : bool
+    {
+        return ! $this->isUnique($inboundEmail, ['message_id','checksum']);
     }
 
     /**

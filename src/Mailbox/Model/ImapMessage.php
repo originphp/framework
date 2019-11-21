@@ -22,6 +22,13 @@ class ImapMessage extends Model
     use Timestampable;
     protected $table = 'imap';
 
+    protected function initialize(array $config) : void
+    {
+        # Setup validation rules
+        $this->validate('account', 'notBlank');
+        $this->validate('message_id', 'notBlank');
+    }
+
     public function findByAccount(string $account)
     {
         $conditions = ['account' => $account];

@@ -19,11 +19,15 @@ use Origin\Model\Entity;
 
 use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
+use Origin\Service\Result;
 use Origin\Model\ModelTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Exception\Exception;
+use Origin\Mailbox\Model\ImapMessage;
 use Origin\Mailbox\Model\InboundEmail;
 use Origin\Core\CallbackRegistrationTrait;
+use Origin\Mailbox\Service\MailboxDownloadService;
+use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
 class Mailbox
@@ -63,7 +67,7 @@ class Mailbox
     private static $routes = [];
 
     /**
-     * Bounced falg
+     * Has the mail been bounced?
      *
      * @var bool
      */
@@ -179,6 +183,7 @@ class Mailbox
                 }
             }
         }
+
         return true;
     }
 
@@ -251,6 +256,46 @@ class Mailbox
         }
 
         return null;
+    }
+
+    /**
+     * Gets the configured email account
+     *
+     * @param string $account
+     * @return array
+     */
+    public static function account(string $account) : array
+    {
+        if (isset(static::$config[$account])) {
+            $config = static::$config[$account];
+            $config += [
+                'host' => 'localhost',
+                'port' => 143,
+                'username' => null,
+                'password' => null,
+                'encryption' => null,
+                'validateCert' => true,
+                'protocol' => 'imap',
+                'timeout' => 30
+            ];
+
+            return $config;
+        }
+        throw new InvalidArgumentException(sprintf('The email account `%s` does not exist.', $account));
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $account
+     * @return \Origin\Service\Result
+     */
+    public static function download(string $account) : Result
+    {
+        $Imap = ModelRegistry::get('Imap', ['className' => ImapMessage::class]);
+        $InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
+
+        return (new MailboxDownloadService($InboundEmail, $Imap))->dispatch($account);
     }
 
     /**
