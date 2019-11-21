@@ -11,18 +11,10 @@
  * @link         https://www.originphp.com
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
-/**
- * Instructions
- * make sure
- * - path to php is correct (above)
- * - permissions chmod a+x pipe.php
- */
 declare(strict_types=1);
 namespace Origin\Mailbox;
 
 use Origin\Model\ModelRegistry;
-
-use Origin\Core\Exception\Exception;
 use Origin\Mailbox\Model\InboundEmail;
 
 /**
