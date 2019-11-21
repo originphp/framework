@@ -371,7 +371,7 @@ abstract class Command
     }
 
     /**
-     * Displays debug information when the --verbose option is passed
+     * Displays debug (additional) information when the --verbose option is passed
      *
      * @internal this is correct, not --debug
      * @param string|array $message a message or array of messages
