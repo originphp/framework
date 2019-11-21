@@ -35,21 +35,4 @@ class ImapMessage extends Model
 
         return $this->find('first', ['conditions' => $conditions,'fields' => ['id','message_id']]);
     }
-
-    /**
-     * Sets the status of an inbound email
-     *
-     * @param integer $id
-     * @param string $status The following statuses :
-     *  - pending: this is newly added
-     *  - processing: this is currently being run in a job and processed
-     *  - delivered: everything went okay
-     *  - bounced: this message was bounced
-     *  - failed: an error occured when processing
-     * @return boolean
-     */
-    public function setStatus(int $id, string $status) : bool
-    {
-        return $this->updateColumn($id, 'status', $status);
-    }
 }
