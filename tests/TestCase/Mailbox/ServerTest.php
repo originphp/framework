@@ -14,9 +14,9 @@
 
 namespace Origin\Test\Mailbox;
 
-use Origin\Mailbox\Model\InboundEmail;
-use Origin\TestSuite\OriginTestCase;
 use Origin\Mailbox\Server;
+use Origin\TestSuite\OriginTestCase;
+use Origin\Mailbox\Model\InboundEmail;
 
 class MockServer extends Server
 {
@@ -34,7 +34,6 @@ class ServerTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Mailbox','Origin.Queue'];
 
-  
     /**
      * @var \Origin\Mailbox\Model\InboundEmail
      */

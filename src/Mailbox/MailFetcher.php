@@ -141,7 +141,6 @@ class MailFetcher
     private function mailboxSync(array $emails, string $messageId) : array
     {
         $out = [];
-
         krsort($emails); // reverse the order checking latest first
         foreach ($emails as $id) {
             $header = imap_headerinfo($this->connection, $id);
