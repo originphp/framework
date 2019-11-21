@@ -51,8 +51,12 @@ class Server
         ]);
 
         $inboundEmail = $this->InboundEmail->fromMessage($this->readData());
-      
-        return $this->InboundEmail->save($inboundEmail);
+
+        if (! $this->InboundEmail->existsInDb($inboundEmail)) {
+            return $this->InboundEmail->save($inboundEmail);
+        }
+    
+        return false;
     }
 
     /**
