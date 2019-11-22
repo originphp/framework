@@ -22,17 +22,23 @@ class ImapMessage extends Model
     use Timestampable;
     protected $table = 'imap';
 
+    /**
+     * constructor hook
+     *
+     * @todo this is being called but is not included in coverage, why?
+     * @param array $config
+     * @return void
+     */
     protected function initialize(array $config) : void
     {
-        # Setup validation rules
         $this->validate('account', 'notBlank');
         $this->validate('message_id', 'notBlank');
     }
 
     public function findByAccount(string $account)
     {
-        $conditions = ['account' => $account];
-
-        return $this->find('first', ['conditions' => $conditions,'fields' => ['id','message_id']]);
+        return $this->select(['id','message_id'])
+                    ->where(['account' => $account])
+                    ->first();
     }
 }
