@@ -25,7 +25,6 @@ class ImapMessage extends Model
     /**
      * constructor hook
      *
-     * @todo this is being called but is not included in coverage, why?
      * @param array $config
      * @return void
      */
