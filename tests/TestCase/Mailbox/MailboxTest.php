@@ -16,6 +16,7 @@ namespace Origin\Test\Mailbox;
 
 use Origin\Mailbox\Mail;
 use Origin\Mailer\Mailer;
+use Origin\Service\Result;
 use Origin\Mailbox\Mailbox;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Mailbox\Model\InboundEmail;
@@ -66,7 +67,7 @@ class BounceMailer extends Mailer
 
 class MailboxTest extends OriginTestCase
 {
-    public $fixtures = ['Origin.Mailbox','Origin.Queue'];
+    public $fixtures = ['Origin.Mailbox','Origin.Queue','Origin.Imap'];
     
     /**
      * @var \Origin\Mailbox\Model\InboundEmail
@@ -134,5 +135,17 @@ class MailboxTest extends OriginTestCase
         $this->assertFalse($mailbox->afterCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('failed', $inboundEmail->status);
+    }
+
+    public function testDownload()
+    {
+        if (! env('EMAIL_IMAP_USERNAME') or ! env('EMAIL_IMAP_PASSWORD')) {
+            $this->markTestSkipped(
+                'Imap username and password not setup'
+            );
+        }
+
+        $result = Mailbox::download('test', ['limit' => 1]);
+        $this->assertInstanceOf(Result::class, $result);
     }
 }

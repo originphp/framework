@@ -288,14 +288,18 @@ class Mailbox
      * Undocumented function
      *
      * @param string $account
+     * @param array $options The following options keys are supported
+     *   - limit: the maximum number of messages to download
+     *   - messageId: The last message id downloaded (IMAP)
      * @return \Origin\Service\Result
      */
-    public static function download(string $account) : Result
+    public static function download(string $account, array $options = []) : Result
     {
+        $options += ['limit' => null,'messageId' => null];
         $Imap = ModelRegistry::get('Imap', ['className' => ImapMessage::class]);
         $InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);
 
-        return (new MailboxDownloadService($InboundEmail, $Imap))->dispatch($account);
+        return (new MailboxDownloadService($InboundEmail, $Imap))->dispatch($account, $options);
     }
 
     /**

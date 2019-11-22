@@ -58,21 +58,29 @@ class MailboxDownloadService extends Service
         return (new MailFetcher($this->config))->download($options);
     }
 
-    /*
-    * Service logic goes here and return a result object or null
-    */
-    protected function execute(string $account) : ?Result
+    /**
+     * Executes the service object
+     *
+     * @param string $account
+     * @param array $downloadOptions Options keys supported are
+     *   - limit: max number of emails to download
+     * @return \Origin\Service\Result|null
+     */
+    protected function execute(string $account, array $downloadOptions = []) : ?Result
     {
+        $downloadOptions += ['limit' => null,'messageId' => null];
         $this->config = Mailbox::account($account);
         
         if ($this->isIMAP()) {
             $lastImapMessage = $this->Imap->findByAccount($account);
+            if ($lastImapMessage and ! $downloadOptions['messageId']) {
+                $downloadOptions['messageId'] = $lastImapMessage->message_id;
+            }
+
             if (! $lastImapMessage) {
                 $lastImapMessage = $this->Imap->new(['account' => $account]);
             }
         }
-
-        $downloadOptions = isset($lastImapMessage) ? ['messageId' => $lastImapMessage->message_id] : [];
 
         $messages = $this->download($downloadOptions);
        
