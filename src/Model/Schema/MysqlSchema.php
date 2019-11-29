@@ -211,7 +211,7 @@ class MysqlSchema extends BaseSchema
         }
 
         if ($col === 'tinyint' and $limit === 1) {
-            return ['type' => 'boolean'];
+            return ['type' => 'boolean','null' => false];
         }
 
         if ($col === 'bigint') {
@@ -269,6 +269,7 @@ class MysqlSchema extends BaseSchema
             }
         } elseif ($data['type'] === 'boolean') {
             $type = 'TINYINT(1)';
+            $data['null'] = false;
         }
 
         $out .= ' ' . $type;
