@@ -25,6 +25,7 @@ use Origin\Inflector\Inflector;
 
 use Origin\Model\ModelRegistry;
 use Origin\Http\View\TemplateTrait;
+use Origin\Model\Collection;
 
 class FormHelper extends Helper
 {
@@ -1034,20 +1035,21 @@ class FormHelper extends Helper
      * 'user.name' will return the user entity  (belongsTo/hasOne)
      * 'tags.0.tag' will return the tag entity number 0 (hasMany)
      * @internal this can return array when using models.x.name
-     * @param Entity $entity
+     * @param \Origin\Model\Entity $entity
      * @param string $path   name, model.name, models.x.name
-     * @return Entity|array|null
+     * @return \Origin\Model\Entity|array|null
      */
     protected function getEntity(Entity $entity, string $path)
     {
         if (strpos($path, '.') === false) {
             return $entity;
         }
+      
         foreach (explode('.', $path) as $key) {
             $lastEntity = $entity;
             if (is_object($entity) and isset($entity->$key)) {
                 $entity = $entity->$key;
-            } elseif (is_array($entity) and isset($entity[$key])) {
+            } elseif ((is_array($entity) or $entity instanceof Collection) and isset($entity[$key])) {
                 $entity = $entity[$key];
             } else {
                 return null;
