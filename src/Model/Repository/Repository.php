@@ -41,17 +41,10 @@ class Repository
             list($namespace, $class) = namespaceSplit(get_class($this));
             $this->modelClass = Inflector::singular(substr($class, 0, -10));
         }
+        /**
+         * Models are dependcies and should not be lazyloaded.
+         */
+        $this->loadModel($this->modelClass);
         $this->executeHook('initialize', func_get_args());
-    }
-
-    /**
-     * Lazyload the Model for this Repository
-     *
-     * @param string $name
-     * @return \Origin\Model\Model|null
-     */
-    public function __get($name)
-    {
-        return $name === $this->modelClass ? $this->loadModel($name) : null;
     }
 }
