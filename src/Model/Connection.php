@@ -218,14 +218,19 @@ abstract class Connection
 
     protected function unprepare(string $sql, array  $params) : string
     {
+        $data = [];
+
         foreach ($params as $needle => $replace) {
             if (is_string($replace)) {
                 $replace = "'{$replace}'";
             }
-            $sql = preg_replace("/\B:{$needle}/", $replace, $sql);
+            if ($replace === null) {
+                $replace = 'NULL';
+            }
+            $data[':' . $needle] = $replace;
         }
 
-        return $sql;
+        return strtr($sql, $data);
     }
 
     /**
