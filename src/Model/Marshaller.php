@@ -98,9 +98,17 @@ class Marshaller
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
         
-        $entityClass = $this->entityClass($this->model);
+        /**
+         * Load the model for the name
+         */
+        $model = null;
+        if ($options['name']) {
+            $model = $this->model->loadModel($options['name']);
+        }
+       
+        $entityClass = $this->entityClass($model);
         $entity = new $entityClass([], $options);
-
+       
         $properties = [];
      
         foreach ($data as $property => $value) {
@@ -180,8 +188,10 @@ class Marshaller
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
-
+      
         $properties = [];
+
+       
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
                 if (! is_array($value)) {
@@ -199,7 +209,7 @@ class Marshaller
                     $fields = $options['associated'][$model]['fields'];
                     unset($options['associated'][$model]['fields']);
                 }
-
+        
                 $properties[$property] = $this->{$propertyMap[$property]}($value, [
                     'name' => ucfirst($alias),
                     'fields' => $fields,

@@ -1654,9 +1654,9 @@ class Model
      */
     public function patch(Entity $entity, array $requestData, array $options = []) : Entity
     {
-        $options += ['associated' => true];
+        $options += ['name' => $this->alias,'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
-
+    
         return $this->marshaller()->patch($entity, $requestData, $options);
     }
 
