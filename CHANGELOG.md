@@ -1,4 +1,13 @@
 # Changelog
+## [2.3.1] - 2019-xx-xx
+
+### Changed
+- Repositories load dependent model on creation instead of lazyloading.
+
+### Fixed
+- Fixed Connection logging unpreparing SQL statements showing null values and unpreparing 10+ values
+- Fixed MySQL schema setting/getting null default to false for boolean
+- Fixed FormHelper not parsing deep collection objects
 
 ## [2.3.0] - 2019-11-22
 
