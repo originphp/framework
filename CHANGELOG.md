@@ -5,6 +5,7 @@
 - Repositories load dependent model on creation instead of lazyloading.
 
 ### Fixed
+- Fixed Entity naming issues on associated objects
 - Fixed Connection logging unpreparing SQL statements showing null values and unpreparing 10+ values
 - Fixed MySQL schema setting/getting null default to false for boolean
 - Fixed FormHelper not parsing deep collection objects
