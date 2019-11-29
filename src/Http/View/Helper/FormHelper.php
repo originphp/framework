@@ -423,8 +423,9 @@ class FormHelper extends Helper
 
         // Check if field is required to add required class
         $required = false;
-        if ($model and in_array($column, $this->requiredFields($model))) {
-            $required = true;
+        if ($model) {
+            $requiredFields = $this->requiredFields($model);
+            $required = ($requiredFields and in_array($column, $requiredFields));
         }
 
         if ($type === 'select') {
