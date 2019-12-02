@@ -121,9 +121,9 @@ class Finder
                             continue;
                         }
                     }
-        
+   
                     $associatedEntityClass = $this->entityClass($this->model->$model);
-                    $entity->$associated = new $associatedEntityClass($data, ['name' => $this->model->$model->alias(), 'exists' => true, 'markClean' => true]);
+                    $entity->$associated = new $associatedEntityClass($data, ['name' => ucfirst($associated), 'exists' => true, 'markClean' => true]);
                 } else {
                     /**
                      * Any data is here is not matched to model, e.g. group by and non existant fields

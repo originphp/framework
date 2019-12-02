@@ -99,11 +99,11 @@ class Marshaller
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
         
         /**
-         * Load the model for the name
+         * Get Model from the ModelRegistry
          */
         $model = null;
         if ($options['name']) {
-            $model = $this->model->loadModel($options['name']);
+            $model = ModelRegistry::get($options['name']);
         }
        
         $entityClass = $this->entityClass($model);

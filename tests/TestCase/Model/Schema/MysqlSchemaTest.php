@@ -64,7 +64,7 @@ class MysqlSchemaTest extends OriginTestCase
         
         $statements = $adapter->createTableSql('tposts', $schema, $options);
     
-        $this->assertEquals('87f2d0c8c92e5435e479dbbd388eb8ce', md5($statements[0]));
+        $this->assertEquals('b19d5510f223e5afc9ea69e5e0ae8a30', md5($statements[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
             $this->assertTrue($adapter->connection()->execute($statements[0]));
