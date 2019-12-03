@@ -241,7 +241,8 @@ class MarshallerTest extends OriginTestCase
         $this->assertNotNull($patched->author->description);
 
         # Test Patch wrong id
-        $record = $Article->first(['associated' => ['Author']]);
+        $record = $Article->get(1000, ['associated' => ['Author']]);
+ 
         $data = [
             'id' => 1000,
             'author' => [
@@ -310,8 +311,8 @@ class MarshallerTest extends OriginTestCase
         
         $Article->hasMany('Comment');
 
-        $record = $Article->first(['associated' => ['Comment']]);
-
+        $record = $Article->get(1000, ['associated' => ['Comment']]);
+ 
         $requestData = [
             'title' => 'Article #1',
             'comments' => [
@@ -348,12 +349,12 @@ class MarshallerTest extends OriginTestCase
         
         $Article->hasOne('Comment');
 
-        $record = $Article->first(['associated' => ['Comment']]);
+        $record = $Article->get(1000, ['associated' => ['Comment']]);
 
         $requestData = [
             'title' => 'Article #1',
             'comment' => [
-                'id' => 1000,
+                'id' => 1001,
                 'article_id' => 1002,
                 'description' => 'change comment'
             ]
@@ -362,10 +363,10 @@ class MarshallerTest extends OriginTestCase
         $patched = $Article->patch($record, $requestData);
 
         $this->assertEquals('change comment', $patched['comment']->description);
-        $this->assertEquals('2019-03-27 13:10:00', $patched['comment']->created); # important to see if it was patched or replaced
+        $this->assertEquals('2019-03-27 13:11:00', $patched['comment']->created); # important to see if it was patched or replaced
 
         # Test no match
-        $record = $Article->first(['associated' => ['Comment']]);
+        $record = $Article->get(1000, ['associated' => ['Comment']]);
         $requestData['comment']['id'] = 1234;
         $patched = $Article->patch($record, $requestData);
         $this->assertEquals('change comment', $patched['comment']->description);
