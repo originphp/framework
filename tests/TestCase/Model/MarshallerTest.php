@@ -366,7 +366,7 @@ class MarshallerTest extends OriginTestCase
 
         # Test no match
         $record = $Article->first(['associated' => ['Comment']]);
-        $requestData['comment']['article_id'] = 1234;
+        $requestData['comment']['id'] = 1234;
         $patched = $Article->patch($record, $requestData);
         $this->assertEquals('change comment', $patched['comment']->description);
         $this->assertNull($patched['comment']->created);
