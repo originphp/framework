@@ -1,5 +1,5 @@
 # Changelog
-## [2.3.1] - 2019-xx-xx
+## [2.3.1] - 2019-12-03
 
 ### Changed
 - Marhsaller now uses primary key for patching of associated models, previously data was just overwritten.
