@@ -185,7 +185,7 @@ class MarshallerTest extends OriginTestCase
         $this->assertNull($entity->author);
     }
 
-    public function xtestPatchOne()
+    public function testPatchOne()
     {
         $data = [
             'id' => 1024,
@@ -219,7 +219,7 @@ class MarshallerTest extends OriginTestCase
         $this->assertEquals('Author', $patched->author->name());
     }
 
-    public function xtestPatchOneExisting()
+    public function testPatchOneExisting()
     {
         // Load models into registry as we are using custom class
         $Article = $this->loadModel('Article', ['className' => Article::class]);
@@ -255,7 +255,7 @@ class MarshallerTest extends OriginTestCase
         $this->assertNull($patched->author->description);
     }
 
-    public function xtestPatchMany()
+    public function testPatchMany()
     {
         $data = [
             'id' => 1000,
@@ -339,5 +339,36 @@ class MarshallerTest extends OriginTestCase
         $this->assertEquals(99, $patched['comments'][1]->id);
         $this->assertEquals('unkown id', $patched['comments'][1]->description);
         $this->assertNull($patched['comments'][1]->created); # important to see if it was patched or replaced
+    }
+
+    public function testPatchHasOne()
+    {
+        $Article = $this->loadModel('Article', ['className' => Article::class]);
+        $this->loadModel('Comment', ['className' => Comment::class]);
+        
+        $Article->hasOne('Comment');
+
+        $record = $Article->first(['associated' => ['Comment']]);
+
+        $requestData = [
+            'title' => 'Article #1',
+            'comment' => [
+                'id' => 1000,
+                'article_id' => 1002,
+                'description' => 'change comment'
+            ]
+        ];
+
+        $patched = $Article->patch($record, $requestData);
+
+        $this->assertEquals('change comment', $patched['comment']->description);
+        $this->assertEquals('2019-03-27 13:10:00', $patched['comment']->created); # important to see if it was patched or replaced
+
+        # Test no match
+        $record = $Article->first(['associated' => ['Comment']]);
+        $requestData['comment']['article_id'] = 1234;
+        $patched = $Article->patch($record, $requestData);
+        $this->assertEquals('change comment', $patched['comment']->description);
+        $this->assertNull($patched['comment']->created);
     }
 }

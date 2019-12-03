@@ -176,7 +176,7 @@ class Marshaller
      * NOTE: Associated data will create new entity, as related data can contain references to changed
      * data.
      *
-     * @param Entity $entity
+     * @param \Origin\Model\Entity $entity
      * @param array  $data
      * @return \Origin\Model\Entity
      */
@@ -209,28 +209,30 @@ class Marshaller
                     unset($options['associated'][$model]['fields']);
                 }
 
-                $primaryKey = $this->getPrimaryKey(ucfirst($alias));
-                $matched = ($primaryKey and isset($value[$primaryKey]) and $value[$primaryKey] === $entity->$property->$primaryKey);
+                $patchOptions = [
+                    'name' => ucfirst($alias),
+                    'fields' => $fields,
+                    'associated' => $options['associated']
+                ];
 
-                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
-                    $properties[$property] = $this->patch($entity->$property, $value, [
-                        'name' => ucfirst($alias),
-                        'fields' => $fields,
-                        'associated' => $options['associated']
-                    ]);
-                } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
-                    $properties[$property] = $this->matchMany($entity->$property, $value, [
-                        'name' => ucfirst($alias),
-                        'fields' => $fields,
-                        'associated' => $options['associated']
-                    ]);
+                /**
+                 * Match records for hasOne and belongsTo
+                 */
+                if ($propertyMap[$property] === 'one' and isset($this->model->association('hasOne')[$model])) {
+                    $parentPrimaryKey = $this->getPrimaryKey($entity->name());
+                    $foreignKey = $this->model->association('hasOne')[$model]['foreignKey'];
+                    $matched = ($foreignKey and isset($value[$foreignKey]) and $value[$foreignKey] === $entity->{$parentPrimaryKey});
                 } else {
-                    # this creates
-                    $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                        'name' => ucfirst($alias),
-                        'fields' => $fields,
-                        'associated' => $options['associated'], // passing same data might
-                    ]);
+                    $primaryKey = $this->getPrimaryKey($model);
+                    $matched = ($primaryKey and isset($value[$primaryKey]) and $value[$primaryKey] === $entity->$property->$primaryKey);
+                }
+  
+                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
+                    $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
+                } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
+                    $properties[$property] = $this->matchMany($entity->$property, $value, $patchOptions);
+                } else {
+                    $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                 }
             } else {
                 $original = $entity->get($property);
@@ -252,10 +254,6 @@ class Marshaller
         $entity->set($properties);
 
         return $entity;
-    }
-
-    private function patchAssociated(Entity $entity, string $property, array $value, array $options = []) : array
-    {
     }
 
     /**
