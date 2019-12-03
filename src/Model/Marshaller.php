@@ -215,18 +215,9 @@ class Marshaller
                     'associated' => $options['associated']
                 ];
 
-                /**
-                 * Match records for hasOne and belongsTo
-                 */
-                if ($propertyMap[$property] === 'one' and isset($this->model->association('hasOne')[$model])) {
-                    $parentPrimaryKey = $this->getPrimaryKey($entity->name());
-                    $foreignKey = $this->model->association('hasOne')[$model]['foreignKey'];
-                    $matched = ($foreignKey and isset($value[$foreignKey]) and $value[$foreignKey] === $entity->{$parentPrimaryKey});
-                } else {
-                    $primaryKey = $this->getPrimaryKey($model);
-                    $matched = ($primaryKey and isset($value[$primaryKey]) and $value[$primaryKey] === $entity->$property->$primaryKey);
-                }
-  
+                $primaryKey = $this->getPrimaryKey($model);
+                $matched = ($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey);
+                
                 if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
                     $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
                 } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
@@ -277,7 +268,8 @@ class Marshaller
         foreach ($data as $index => $record) {
             $fields = count($record);
             $hasPrimaryKey = isset($record[$primaryKey]) and isset($collection[$index]->primaryKey);
-            if ($hasPrimaryKey and $fields > 1 and $collection[$index]->$primaryKey === $record[$primaryKey]) {
+
+            if ($hasPrimaryKey and $fields > 1 and (string) $collection[$index]->$primaryKey === (string) $record[$primaryKey]) {
                 $out[] = $this->patch($collection[$index], $record, $options);
             } else {
                 $out[] = $this->one($record, $options);
