@@ -215,9 +215,13 @@ class Marshaller
                     'associated' => $options['associated']
                 ];
 
-                $primaryKey = $this->getPrimaryKey($model);
-                $matched = ($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey);
-                
+               
+                $matched = false;
+                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity) {
+                    $primaryKey = $this->getPrimaryKey($model);
+                    $matched = ($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey);
+                }
+
                 if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
                     $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
                 } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
