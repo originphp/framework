@@ -21,11 +21,11 @@ use Origin\Model\Entity;
 use Origin\Utility\Date;
 
 use Origin\Utility\Number;
-use Origin\Inflector\Inflector;
+use Origin\Model\Collection;
 
+use Origin\Inflector\Inflector;
 use Origin\Model\ModelRegistry;
 use Origin\Http\View\TemplateTrait;
-use Origin\Model\Collection;
 
 class FormHelper extends Helper
 {

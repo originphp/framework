@@ -37,7 +37,7 @@ class ImapMessage extends Model
     public function findByAccount(string $account)
     {
         return $this->select(['id','message_id'])
-                    ->where(['account' => $account])
-                    ->first();
+            ->where(['account' => $account])
+            ->first();
     }
 }
