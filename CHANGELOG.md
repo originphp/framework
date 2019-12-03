@@ -2,6 +2,7 @@
 ## [2.3.1] - 2019-xx-xx
 
 ### Changed
+- Marhsaller now uses primary key for patching of associated models, previously data was just overwritten.
 - Repositories load dependent model on creation instead of lazyloading.
 
 ### Fixed

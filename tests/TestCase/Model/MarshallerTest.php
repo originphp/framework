@@ -18,14 +18,29 @@ use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\Marshaller;
 use Origin\Testsuite\TestTrait;
+use Origin\TestSuite\OriginTestCase;
 
 class MockMarkshaller extends Marshaller
 {
     use TestTrait;
 }
 
-class MarshallerTest extends \PHPUnit\Framework\TestCase
+class Article extends Model
 {
+}
+
+class Author extends Model
+{
+}
+
+class Comment extends Model
+{
+}
+
+class MarshallerTest extends OriginTestCase
+{
+    public $fixtures = ['Origin.Article','Origin.Author','Origin.Tag','Origin.Comment'];
+
     public function testBuildMap()
     {
         $Article = new Model(['name' => 'Article', 'connection' => 'test']);
@@ -109,7 +124,7 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @d epends testnew
+     * @depends testnew
      */
     public function testpatch()
     {
@@ -168,5 +183,161 @@ class MarshallerTest extends \PHPUnit\Framework\TestCase
         $data = ['name' => 'Article','author' => 'bad data'];
         $entity = $Marshaller->patch($Entity, $data, ['associated' => ['Author']]);
         $this->assertNull($entity->author);
+    }
+
+    public function xtestPatchOne()
+    {
+        $data = [
+            'id' => 1024,
+            'title' => 'Some article name',
+            'author' => [
+                'id' => 2048,
+                'name' => 'Jon',
+                'created' => ['date' => '22/01/2019','time' => '01:41pm'],
+            ]
+        ];
+
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
+        $Article->Author = new Model(['name' => 'Author', 'connection' => 'test']);
+        $Article->Tag = new Model(['name' => 'Tag', 'connection' => 'test']);
+        
+        $Article->hasOne('Author');
+        $Article->hasMany('Tag');
+        $Marshaller = new Marshaller($Article);
+     
+        $entity = $Marshaller->one($data, ['name' => 'Article']);
+
+        $requestData = [
+            'title' => 'New Article Name',
+            'unkown' => 'insert data',
+            'author' => [
+                'name' => 'Claire',
+            ],
+        ];
+        $patched = $Marshaller->patch($entity, $requestData, ['associated' => ['Author']]);
+        $this->assertInstanceOf(Entity::class, $patched->author);
+        $this->assertEquals('Author', $patched->author->name());
+    }
+
+    public function xtestPatchOneExisting()
+    {
+        // Load models into registry as we are using custom class
+        $Article = $this->loadModel('Article', ['className' => Article::class]);
+        $this->loadModel('Author', ['className' => Author::class]);
+        
+        $Article->belongsTo('Author');
+
+        $record = $Article->first(['associated' => ['Author']]);
+        $data = [
+            'id' => 1000,
+            'author' => [
+                'id' => 1001,
+                'name' => 'Neo'
+            ]
+        ];
+
+        $patched = $Article->patch($record, $data);
+        $this->assertEquals('Neo', $patched->author->name);
+        $this->assertNotNull($patched->author->description);
+
+        # Test Patch wrong id
+        $record = $Article->first(['associated' => ['Author']]);
+        $data = [
+            'id' => 1000,
+            'author' => [
+                'id' => 99,
+                'name' => 'Fred'
+            ]
+        ];
+
+        $patched = $Article->patch($record, $data);
+        $this->assertEquals('Fred', $patched->author->name);
+        $this->assertNull($patched->author->description);
+    }
+
+    public function xtestPatchMany()
+    {
+        $data = [
+            'id' => 1000,
+            'title' => 'Some article name',
+            'comments' => [
+                [
+                    'id' => 123,
+                    'article_id' => 1000,
+                    'description' => 'foo',
+                ],
+                [
+                    'id' => 456,
+                    'article_id' => 1000,
+                    'description' => 'bar',
+                ]
+            ]
+        ];
+
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
+        $Article->Comment = new Model(['name' => 'Comment', 'connection' => 'test']);
+        $Article->hasMany('Comment');
+
+        $entity = $Article->new($data, ['associated' => true]);
+        $requestData = [
+            'title' => 'New Article Name',
+            'unkown' => 'insert data',
+            'comments' => [
+                [
+                    'article_id' => 1000,
+                    'description' => 'bar-foo',
+                ],
+                [
+                    'id' => 456,
+                    'article_id' => 1000,
+                    'description' => 'foo-bar',
+                ]
+            ],
+        ];
+        $patched = $Article->patch($entity, $requestData);
+
+        $this->assertNull($patched['comments'][0]->id);
+        $this->assertEquals('bar-foo', $patched['comments'][0]->description);
+
+        $this->assertEquals(456, $patched['comments'][1]->id);
+        $this->assertEquals('foo-bar', $patched['comments'][1]->description);
+    }
+
+    public function testPatchManyExisting()
+    {
+        $Article = $this->loadModel('Article', ['className' => Article::class]);
+        $this->loadModel('Comment', ['className' => Comment::class]);
+        
+        $Article->hasMany('Comment');
+
+        $record = $Article->first(['associated' => ['Comment']]);
+
+        $requestData = [
+            'title' => 'Article #1',
+            'comments' => [
+                [
+                    'id' => 1001,
+                    'article_id' => 1000,
+                    'description' => 'change comment',
+                ],
+                [
+                    'id' => 99,
+                    'article_id' => 1000,
+                    'description' => 'unkown id',
+                ],
+            ],
+        ];
+
+        $patched = $Article->patch($record, $requestData);
+
+        // Test data is patched
+        $this->assertEquals(1001, $patched['comments'][0]->id);
+        $this->assertEquals('change comment', $patched['comments'][0]->description);
+        $this->assertEquals('2019-03-27 13:11:00', $patched['comments'][0]->created); # important to see if it was patched or replaced
+
+        // Test data is overwritten as it cant be patched
+        $this->assertEquals(99, $patched['comments'][1]->id);
+        $this->assertEquals('unkown id', $patched['comments'][1]->description);
+        $this->assertNull($patched['comments'][1]->created); # important to see if it was patched or replaced
     }
 }

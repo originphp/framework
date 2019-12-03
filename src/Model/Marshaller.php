@@ -191,7 +191,6 @@ class Marshaller
       
         $properties = [];
 
-       
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
                 if (! is_array($value)) {
@@ -209,12 +208,30 @@ class Marshaller
                     $fields = $options['associated'][$model]['fields'];
                     unset($options['associated'][$model]['fields']);
                 }
-        
-                $properties[$property] = $this->{$propertyMap[$property]}($value, [
-                    'name' => ucfirst($alias),
-                    'fields' => $fields,
-                    'associated' => $options['associated'], // passing same data might
-                ]);
+
+                $primaryKey = $this->getPrimaryKey(ucfirst($alias));
+                $matched = ($primaryKey and isset($value[$primaryKey]) and $value[$primaryKey] === $entity->$property->$primaryKey);
+
+                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
+                    $properties[$property] = $this->patch($entity->$property, $value, [
+                        'name' => ucfirst($alias),
+                        'fields' => $fields,
+                        'associated' => $options['associated']
+                    ]);
+                } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
+                    $properties[$property] = $this->matchMany($entity->$property, $value, [
+                        'name' => ucfirst($alias),
+                        'fields' => $fields,
+                        'associated' => $options['associated']
+                    ]);
+                } else {
+                    # this creates
+                    $properties[$property] = $this->{$propertyMap[$property]}($value, [
+                        'name' => ucfirst($alias),
+                        'fields' => $fields,
+                        'associated' => $options['associated'], // passing same data might
+                    ]);
+                }
             } else {
                 $original = $entity->get($property);
                 if ($value !== $original) {
@@ -235,5 +252,53 @@ class Marshaller
         $entity->set($properties);
 
         return $entity;
+    }
+
+    private function patchAssociated(Entity $entity, string $property, array $value, array $options = []) : array
+    {
+    }
+
+    /**
+     * Part of the patch process, check each record if the primaryKey matches then patch, if not overwrite the
+     * data. Issues here are hasAndBelongsToMany with just ID, ids not matching up.
+     *
+     * @param \Origin\Model\Collection $collection
+     * @param array $data
+     * @param array $options
+     * @return void
+     */
+    private function matchMany(Collection $collection, array $data, array $options = [])
+    {
+        // for matching we need a model
+        $primaryKey = $this->getPrimaryKey($options['name']);
+        if (! $primaryKey) {
+            return $this->many($data, $options);
+        }
+
+        $out = [];
+        foreach ($data as $index => $record) {
+            $fields = count($record);
+            $hasPrimaryKey = isset($record[$primaryKey]) and isset($collection[$index]->primaryKey);
+            if ($hasPrimaryKey and $fields > 1 and $collection[$index]->$primaryKey === $record[$primaryKey]) {
+                $out[] = $this->patch($collection[$index], $record, $options);
+            } else {
+                $out[] = $this->one($record, $options);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Finds a primary key for an entity
+     *
+     * @param string $name
+     * @return string|null
+     */
+    private function getPrimaryKey(string $name) : ?string
+    {
+        $model = ModelRegistry::get($name);
+
+        return $model ? $model->primaryKey() : null;
     }
 }
