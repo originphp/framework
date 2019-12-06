@@ -33,7 +33,7 @@ function backtrace(): void
             $errorHandler->render($debug, true);
         } else {
             ob_clean();
-            include APP . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+            include APP .  DS . 'Http' . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
         }
     }
 
