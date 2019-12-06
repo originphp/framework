@@ -1,8 +1,15 @@
 # Changelog
+
+### Fixed
+- Fixed form helper adding error class on associated objects with validation errors
+- Fixed backtrace path
+- Marshaller patching detecting posted integer/null fields were treated as modified due to different
+types, but were not.
+
 ## [2.3.1] - 2019-12-03
 
 ### Changed
-- Marhsaller now uses primary key for patching of associated models, previously data was just overwritten.
+- Marshaller now uses primary key for patching of associated models, previously data was just overwritten.
 - Repositories load dependent model on creation instead of lazyloading.
 
 ### Fixed
