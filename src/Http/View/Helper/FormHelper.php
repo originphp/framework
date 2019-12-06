@@ -983,9 +983,9 @@ class FormHelper extends Helper
                 if (! isset($options['value']) and isset($entity->$last) and is_scalar($entity->$last)) {
                     $options['value'] = $entity->$last;
                 }
-
+             
                 // Check Validation Errors
-                if ($this->data->errors($last)) {
+                if ($entity and $entity->errors($last)) {
                     $options = $this->addClass('error', $options);
                 }
             } else {
