@@ -117,21 +117,22 @@ class Marshaller
                     $properties[$property] = null;// remove inconsistent data
                     continue;
                 }
-                $alias = $property;
-                $fields = [];
+                // determine model
+                $model = ucfirst($property);
                 if ($propertyMap[$property] === 'many') {
-                    $alias = Inflector::singular($alias);
+                    $model = Inflector::singular($model);
                 }
-              
-                $alias = ucfirst($alias);
-                if (isset($options['associated'][$alias]['fields'])) {
-                    $fields = $options['associated'][$alias]['fields'];
-                    unset($options['associated'][$alias]['fields']);
+ 
+                // extract fields
+                $fields = [];
+                if (isset($options['associated'][$model]['fields'])) {
+                    $fields = $options['associated'][$model]['fields'];
+                    unset($options['associated'][$model]['fields']);
                 }
 
-                $marshaller = new Marshaller($this->model->$alias);
+                $marshaller = new Marshaller($this->model->$model);
                 $properties[$property] = $marshaller->{$propertyMap[$property]}($value, [
-                    'name' => $alias,
+                    'name' => $model,
                     'fields' => $fields,
                     'associated' => $options['associated'],
                 ]);
@@ -140,18 +141,7 @@ class Marshaller
             }
         }
        
-        if ($options['fields'] and is_array($options['fields'])) {
-            foreach ($properties as $property => $value) {
-                if (in_array($property, $options['fields'])) {
-                    $entity->set($property, $value);
-                }
-            }
-
-            return $entity;
-        }
-        $entity->set($properties);
-
-        return $entity;
+        return $this->setProperties($entity, $properties, $options);
     }
     
     /**
@@ -193,61 +183,87 @@ class Marshaller
 
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
+                // remove inconsistent data
                 if (! is_array($value)) {
-                    $properties[$property] = null;// remove inconsistent data
+                    $properties[$property] = null;
                     continue;
                 }
-                $alias = $property;
-                $fields = [];
+               
+                // determine model
+                $model = ucfirst($property);
                 if ($propertyMap[$property] === 'many') {
-                    $alias = Inflector::singular($alias);
+                    $model = Inflector::singular($model);
                 }
 
-                $model = ucfirst($alias);
+                // extract fields
+                $fields = [];
                 if (isset($options['associated'][$model]['fields'])) {
                     $fields = $options['associated'][$model]['fields'];
                     unset($options['associated'][$model]['fields']);
                 }
 
                 $patchOptions = [
-                    'name' => ucfirst($alias),
-                    'fields' => $fields,
-                    'associated' => $options['associated']
+                    'name' =>$model, 'fields' => $fields,'associated' => $options['associated']
                 ];
 
-               
-                $matched = false;
-                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity) {
-                    $primaryKey = $this->getPrimaryKey($model);
-                    $matched = ($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey);
+                if (!$entity->$property instanceof Entity and !$entity->$property instanceof Collection) {
+                    $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
+                    continue;
                 }
 
-                if ($propertyMap[$property] === 'one' and $entity->$property instanceof Entity and $matched) {
-                    $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
-                } elseif ($propertyMap[$property] === 'many' and $entity->$property instanceof Collection) {
+                // entities will be patched in primary key matches, if not a new entity will be created
+                // with patched data.
+                
+                // Match hasOne and belongsTo using primaryKey
+                if ($propertyMap[$property] === 'one') {
+                    $primaryKey = $this->getPrimaryKey($model);
+                    if (($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey)) {
+                        $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
+                        continue;
+                    }
+                }
+
+                // Match hasMany and hasAndBelongsToMany
+                if ($propertyMap[$property] === 'many') {
                     $properties[$property] = $this->matchMany($entity->$property, $value, $patchOptions);
                 } else {
                     $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                 }
             } else {
                 $original = $entity->get($property);
-                if ($value !== $original) {
+                // only set properties that have values that were changed
+                // forms posting of null values are "" and integers are strings
+                if ($value !== $original and !($value === '' and $original === null)  and
+                !(is_numeric($original) and (string) $value === (string) $original)) {
                     $properties[$property] = $value;
                 }
             }
         }
-       
-        if ($options['fields'] and is_array($options['fields'])) {
+
+        return $this->setProperties($entity, $properties, $options);
+    }
+
+    /**
+     * Sets the
+     *
+     * @param Entity $entity
+     * @param array $properties
+     * @param array $options
+     * @return Entity
+     */
+    private function setProperties(Entity $entity, array $properties, array $options)  : Entity
+    {
+        if ($options['fields']) {
+            $fields = (array) $options['fields'];
             foreach ($properties as $property => $value) {
-                if (in_array($property, $options['fields'])) {
+                if (in_array($property, $fields)) {
                     $entity->set($property, $value);
                 }
             }
-
             return $entity;
         }
+    
         $entity->set($properties);
-
         return $entity;
     }
 

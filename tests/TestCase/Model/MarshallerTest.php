@@ -372,4 +372,25 @@ class MarshallerTest extends OriginTestCase
         $this->assertEquals('change comment', $patched['comment']->description);
         $this->assertNull($patched['comment']->created);
     }
+
+    public function testPatchSameValueDifferentTypes()
+    {
+        // Load models into registry as we are using custom class
+        $Article = $this->loadModel('Article', ['className' => Article::class]);
+    
+        $record = $Article->get(1000);
+        $record->created = null;
+
+        $data = [
+            'id' => '1000', // string
+            'created' => '', // null string
+            'modified' => 'foo'
+        ];
+    
+        $patched = $Article->patch($record, $data);
+        $this->assertTrue($record->modified('modified')); // sanity check
+
+        $this->assertFalse($record->modified('id'));
+        $this->assertFalse($record->modified('created'));
+    }
 }
