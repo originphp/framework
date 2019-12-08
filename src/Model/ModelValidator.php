@@ -321,7 +321,7 @@ class ModelValidator
 
     public function equalTo($value, $comparedTo = null) : bool
     {
-        return $value === $comparedTo;
+        return $value == $comparedTo;
     }
 
     /**

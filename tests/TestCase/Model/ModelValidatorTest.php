@@ -304,6 +304,7 @@ class ModelValidatorTest extends OriginTestCase
     {
         $Validator = $this->Validator;
         $this->assertTrue($Validator->equalTo(5, 5));
+        $this->assertTrue($Validator->equalTo(7, '7'));
         $this->assertFalse($Validator->equalTo(10, 5));
     }
 
