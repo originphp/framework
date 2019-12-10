@@ -1,7 +1,8 @@
 # Changelog
+## [2.3.2] - 2019-12-10
 
 ### Fixed
-- Fixed validation equals to change operator to == from ===
+- Fixed validation equals to changed operator to compare value only (not datatype)
 - Fixed form helper adding error class on associated objects with validation errors
 - Fixed backtrace path
 - Marshaller patching detecting posted integer/null fields were treated as modified due to different
