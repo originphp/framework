@@ -227,7 +227,7 @@ class MarshallerTest extends OriginTestCase
         
         $Article->belongsTo('Author');
 
-        $record = $Article->get(1000, ['associated'=>['Author']]);
+        $record = $Article->get(1000, ['associated' => ['Author']]);
         $data = [
             'id' => 1000,
             'author' => [

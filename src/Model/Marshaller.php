@@ -203,10 +203,10 @@ class Marshaller
                 }
 
                 $patchOptions = [
-                    'name' =>$model, 'fields' => $fields,'associated' => $options['associated']
+                    'name' => $model, 'fields' => $fields,'associated' => $options['associated']
                 ];
 
-                if (!$entity->$property instanceof Entity and !$entity->$property instanceof Collection) {
+                if (! $entity->$property instanceof Entity and ! $entity->$property instanceof Collection) {
                     $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                     continue;
                 }
@@ -233,8 +233,8 @@ class Marshaller
                 $original = $entity->get($property);
                 // only set properties that have values that were changed
                 // forms posting of null values are "" and integers are strings
-                if ($value !== $original and !($value === '' and $original === null)  and
-                !(is_numeric($original) and (string) $value === (string) $original)) {
+                if ($value !== $original and ! ($value === '' and $original === null) and
+                ! (is_numeric($original) and (string) $value === (string) $original)) {
                     $properties[$property] = $value;
                 }
             }
@@ -260,10 +260,12 @@ class Marshaller
                     $entity->set($property, $value);
                 }
             }
+
             return $entity;
         }
     
         $entity->set($properties);
+
         return $entity;
     }
 

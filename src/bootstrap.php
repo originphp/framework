@@ -12,12 +12,11 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use Origin\Log\Log;
 use Origin\Cache\Cache;
 use Origin\Core\Config;
-use Origin\Log\Log;
 
 define('START_TIME', microtime(true));
-
 
 # This being removed
 error_reporting(E_ALL);
