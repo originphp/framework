@@ -14,8 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
-use DateTime;
-use Origin\Core\Exception\Exception;
+use Origin\Validation\Validation;
 use Origin\Model\Exception\ValidatorException;
 
 class ModelValidator
@@ -135,7 +134,12 @@ class ModelValidator
             $args = [$value];
         }
      
-        // Validation methods here
+        // Check validation class
+        if (method_exists(Validation::class, $rule)) {
+            return forward_static_call([Validation::class,$rule], ...$args);
+        }
+
+        // Legacy for deprecated or backwards comptabile rules
         if (method_exists($this, $rule)) {
             return call_user_func_array([$this, $rule], $args);
         }
@@ -146,7 +150,7 @@ class ModelValidator
         }
         // Regex expressions
         if ($rule[0] === '/') {
-            return $this->custom($value, $rule);
+            return Validation::regex($value, $rule);
         }
 
         throw new ValidatorException('Unkown Validation Rule');
@@ -253,99 +257,35 @@ class ModelValidator
     }
 
     /**
-     * VALIDATORS.
+     * Legacy rules
+     * @deprecated custom, inList and notEmpty
      */
-    public function alphaNumeric($value) : bool
-    {
-        return ctype_alnum($value);
-    }
 
-    public function boolean($value) : bool
-    {
-        return is_bool($value);
-    }
-
+    /**
+     * Custom validation rule, when
+     * @codeCoverageIgnore
+     * @param string $value
+     * @param string $regex
+     * @return boolean
+     */
     public function custom($value, $regex) : bool
     {
+        deprecationWarning('Validation rule `custom` has been deprecated use `regex` instead');
+
         return (bool) preg_match($regex, $value);
     }
 
     /**
-     * Validates datetime using a format compatible with the php date function.
-     *
-     * @param string $value
-     * @param string $dateFormat Y-m-d
-     * @return bool
+     * Checks a value is in a list
+     * @codeCoverageIgnore
+     * @param string|int|float $value
+     * @param array $values
+     * @param boolean $caseInSensitive
+     * @return boolean
      */
-    public function date($value, string $dateFormat = 'Y-m-d') : bool
-    {
-        $dateTime = DateTime::createFromFormat($dateFormat, $value);
-        if ($dateTime !== false and $dateTime->format($dateFormat) === $value) {
-            return true;
-        }
-        
-        return false;
-    }
-
-    /**
-     * Validates datetime using a format compatible with the php date function.
-     *
-     * @param string $value
-     * @param string $dateTimeFormat Y-m-d H:i:s
-     * @return bool
-     */
-    public function datetime($value, string $dateTimeFormat = 'Y-m-d H:i:s') : bool
-    {
-        $dateTime = DateTime::createFromFormat($dateTimeFormat, $value);
-      
-        if ($dateTime !== false and $dateTime->format($dateTimeFormat) === $value) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * This is alias for float
-     */
-    public function decimal($value) : bool
-    {
-        return $this->float($value);
-    }
-
-    public function email($value) : bool
-    {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
-    }
-
-    public function equalTo($value, $comparedTo = null) : bool
-    {
-        return $value == $comparedTo;
-    }
-
-    /**
-     * Checks that value has an extension.
-     *
-     * @param string|array $value
-     * @param string|array $extensions [description]
-     *
-     * @return bool true or false
-     */
-    public function extension($value, $extensions = []) : bool
-    {
-        if (is_array($value)) {
-            $value = $value['name'] ?? 'none';
-        }
-        if (is_string($extensions)) {
-            $extensions = [$extensions];
-        }
-        $extension = mb_strtolower(pathinfo($value, PATHINFO_EXTENSION));
-
-        return $this->inList($extension, $extensions, true);
-    }
-
     public function inList($value, $values, $caseInSensitive = false) : bool
     {
+        deprecationWarning('Validation rule `inList` has been deprecated use `in` instead');
         if ($caseInSensitive) {
             $values = array_map('mb_strtolower', $values);
 
@@ -355,183 +295,19 @@ class ModelValidator
         return in_array($value, $values);
     }
 
-    public function ip($value, $options = null) : bool
-    {
-        return (bool) filter_var($value, FILTER_VALIDATE_IP);
-    }
-
-    /**
-     * Checks if string is less than or equals to the max length.
-     */
-    public function maxLength($value, $max) : bool
-    {
-        return mb_strlen($value) <= $max;
-    }
-
-    /**
-     * Checks if a string is greater or equal to the min length.
-     */
-    public function minLength($value, $min) : bool
-    {
-        return mb_strlen($value) >= $min;
-    }
-
-    /**
-     * Checks if a string is not blank (not empty and not made up of whitespaces).
-     */
-    public function notBlank($value) : bool
-    {
-        if (empty($value) and (string) $value !== '0') {
-            return false;
-        }
-
-        return (bool) preg_match('/[^\s]+/', (string) $value);
-    }
-
     /**
      * Checks that value is not empty whilst dealing with 0 values.
+     * @codeCoverageIgnore
+     * @param mixed $value
+     * @return boolean
      */
     public function notEmpty($value) : bool
     {
+        deprecationWarning('Validation rule `notEmpty` has been deprecated use `notBlank` instead');
         if (empty($value) and (string) $value !== '0') {
             return false;
         }
 
         return true;
-    }
-
-    public function numeric($value) : bool
-    {
-        return ($this->integer($value) or $this->float($value));
-    }
-
-    /**
-     * Finds whether the value is integer e.g. 123
-     *
-     * @param integer|string $value e.g. 154
-     * @return bool
-     */
-    public function integer($value) : bool
-    {
-        if (is_string($value)) {
-            return (bool) filter_var($value, FILTER_VALIDATE_INT);
-        }
-
-        return is_int($value);
-    }
-
-    /**
-      * Finds whether the value is float e.g 123.56
-      *
-      * @param mixed $value
-      * @return bool
-      */
-    public function float($value) : bool
-    {
-        if (is_string($value)) {
-            return (bool) filter_var($value, FILTER_VALIDATE_FLOAT) and filter_var($value, FILTER_VALIDATE_INT) === false;
-        }
-
-        return is_float($value);
-    }
-
-    /**
-     * Checks if a number is in a range
-     *
-     * @param int $value
-     * @param int $min
-     * @param int $max
-     * @return boolean
-     */
-    public function range($value, $min = null, $max = null) : bool
-    {
-        if (! is_numeric($value) or ! isset($min) or ! isset($max)) {
-            return false;
-        }
-
-        return $value >= $min and $value <= $max;
-    }
-
-    /**
-     * Validates date using a format compatible with the php date function.
-     *
-     * @param string $value
-     * @param string $timeFormat H:i:s
-     * @return bool
-     */
-    public function time($value, $timeFormat = 'H:i:s') : bool
-    {
-        $dateTime = DateTime::createFromFormat($timeFormat, $value);
-    
-        if ($dateTime !== false and $dateTime->format($timeFormat) === $value) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks that a url is valid.
-     *
-     * @param string $url
-     * @param bool   $protocol set to false if you want a valid url not to include the protocol
-     * @return bool true or false
-     */
-    public function url($url, $protocol = true) : bool
-    {
-        if ($protocol) {
-            return (bool) filter_var($url, FILTER_VALIDATE_URL);
-        }
-
-        if (preg_match('/^http|https|:\/\//i', $url)) {
-            return false;
-        }
-
-        return (bool) filter_var('https://'.$url, FILTER_VALIDATE_URL);
-    }
-
-    /**
-     * Checks that file was uploaded ok
-     *
-     * @param array $result
-     * @param bool $optional
-     * @return boolean
-     */
-    public function upload($result, $optional = false) : bool
-    {
-        if (is_array($result) and isset($result['error'])) {
-            $result = $result['error'];
-        }
-        /**
-         * Let test pass if the upload is optional and no file was uploaded
-         */
-        if ($optional and $result === UPLOAD_ERR_NO_FILE) {
-            return true;
-        }
-
-        return $result === UPLOAD_ERR_OK;
-    }
-
-    /**
-     * Checks the mime type of a file
-     *
-     * @param string|array $result
-     * @param string|array $mimeTypes
-     * @return boolean
-     */
-    public function mimeType($result, $mimeTypes = []) : bool
-    {
-        if (is_array($result) and isset($result['tmp_name'])) {
-            $result = $result['tmp_name'];
-        }
-        if (is_string($mimeTypes)) {
-            $mimeTypes = [$mimeTypes];
-        }
-        $mimeType = mime_content_type($result);
-        if ($mimeType === false) {
-            throw new Exception('Unable to determine the mimetype'); // Cant reach here
-        }
-
-        return in_array($mimeType, $mimeTypes);
     }
 }

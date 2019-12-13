@@ -42,6 +42,7 @@
     "originphp/html" : "^1.0",
     "originphp/xml" : "^1.0",
     "originphp/log" : "^1.0",
+    "originphp/validation" : "^0.1",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-openssl": "*",

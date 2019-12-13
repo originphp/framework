@@ -1,8 +1,17 @@
 # Changelog
 ## [unreleased]
 
+### Changed
+- Changed validation to use `originphp/validation` package, this gives more validations but does not affect how its used, apart from deprecations listed below.
+
 ### Fixed
 - Error logging during early bootstrap stage, example parse error in application.php
+
+### Deprecated
+
+- Validation rule notEmpty use notBlank
+- Validation rule inList use in instead
+- Validation rule custom use regex instead
 
 ## [2.3.2] - 2019-12-10
 
