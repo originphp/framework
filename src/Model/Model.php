@@ -1009,7 +1009,7 @@ class Model
     }
 
     /**
-    * Finds the first record that matches
+    * Finds the first record that matches conditions
     *
     * @param array $options  The options array can work with the following keys
     *   - conditions: an array of conditions to find by. e.g ['id'=>1234,'status !=>'=>'new]
