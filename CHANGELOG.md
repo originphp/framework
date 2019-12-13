@@ -1,4 +1,9 @@
 # Changelog
+## [unreleased]
+
+### Fixed
+- Error logging during early bootstrap stage, example parse error in application.php
+
 ## [2.3.2] - 2019-12-10
 
 ### Fixed
