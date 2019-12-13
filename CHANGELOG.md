@@ -1,6 +1,9 @@
 # Changelog
 ## [unreleased]
 
+### Added
+- Validation confirm rule
+
 ### Changed
 - Changed validation to use `originphp/validation` package, this gives more validations but does not affect how its used, apart from deprecations listed below.
 

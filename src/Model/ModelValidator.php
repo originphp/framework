@@ -139,7 +139,7 @@ class ModelValidator
             return forward_static_call([Validation::class,$rule], ...$args);
         }
 
-        // Legacy for deprecated or backwards comptabile rules
+        // This is includes deprecated features but non as well
         if (method_exists($this, $rule)) {
             return call_user_func_array([$this, $rule], $args);
         }
@@ -226,6 +226,10 @@ class ModelValidator
                 if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
+
+                if ($validationRule['rule'] === 'confirm') {
+                    $validationRule['rule'] = ['confirm',$entity->get($field . '_confirm')];
+                }
                
                 if (! $this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
@@ -309,5 +313,17 @@ class ModelValidator
         }
 
         return true;
+    }
+
+    /**
+     * This is used by the confirm rule, it checks that same value in another field e.g. password_confirm
+     *
+     * @param mixed $value1
+     * @param mixed $value2
+     * @return bool
+     */
+    public function confirm($value1, $value2) : bool
+    {
+        return (!is_null($value2) and $value1 == $value2);
     }
 }

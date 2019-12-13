@@ -258,6 +258,20 @@ class ModelValidatorTest extends OriginTestCase
     }
 
     /**
+    * Test the new Validation class is being called
+    */
+    public function testValidationConfirm()
+    {
+        $this->Article->validate('password', 'confirm');
+        $article = $this->Article->new(['password' => 'foo','password_confirm' => 'foo']);
+        $this->assertTrue($this->Article->validates($article));
+        $article->password_confirm = 'foo123';
+        $this->assertFalse($this->Article->validates($article));
+        unset($article->password_confirm);
+        $this->assertFalse($this->Article->validates($article));
+    }
+
+    /**
      * This is a bit of mess, so we have to test through model.
      */
     public function testIsUnique()
