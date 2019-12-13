@@ -151,9 +151,11 @@ class Cookie
     protected function unpack(string $value)
     {
         $length = strlen(self::prefix);
-        if (substr($value, 0, $length) === self::prefix) {
+        // a parse error in application will trigger type error with security::decrypt
+        $key = Config::read('Security.key');
+        if (substr($value, 0, $length) === self::prefix and $key) {
             $value = substr($value, $length);
-            $value = Security::decrypt($value, Config::read('Security.key'));
+            $value = Security::decrypt($value, $key);
         }
         if ($value and substr($value, 0, 1) === '{') {
             $value = json_decode($value, true);
