@@ -52,6 +52,10 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
         $ConsoleOutput = new ConsoleOutput();
         $ConsoleOutput->write('hello world');
         $this->assertEquals("hello world\n", $ConsoleOutput->read());
+
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->write(['line 1','line 2']);
+        $this->assertEquals("line 1\nline 2\n", $ConsoleOutput->read());
     }
 
     public function testTags()
@@ -89,6 +93,11 @@ class ConsoleOutputTest extends \PHPUnit\Framework\TestCase
 
         $output = $ConsoleOutput->styleText('<unkown>This is an unkown style</unkown>');
         $this->assertStringContainsString('<unkown>This is an unkown style</unkown>', $output);
+
+        $ConsoleOutput = new ConsoleOutput();
+        $ConsoleOutput->mode(ConsoleOutput::RAW);
+        $output = $ConsoleOutput->styleText('<warning>Show me the RAW</warning>');
+        $this->assertStringContainsString('<warning>Show me the RAW</warning>', $output);
     }
 
     public function testNestedStyle()
