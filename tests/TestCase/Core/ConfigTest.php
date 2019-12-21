@@ -16,6 +16,8 @@ namespace Origin\Test\Core;
 
 use Origin\Core\Dot;
 use Origin\Core\Config;
+use Origin\Core\Exception\FileNotFoundException;
+use Origin\Core\Exception\Exception;
 
 class MockConfig extends Config
 {
@@ -103,5 +105,28 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         MockConfig::exists('foo');
         $this->assertInstanceOf(Dot::class, MockConfig::getDot());
         MockConfig::setDot($dot);// restore
+    }
+
+    public function testLoad()
+    {
+        $sampleConfig = CONFIG . '/sample-config.php';
+        MockConfig::load($sampleConfig);
+
+        $this->assertEquals('bar', MockConfig::read('foo'));
+        $this->assertEquals('foo', MockConfig::read('bar'));
+    }
+
+    public function testLoadFileNotFound()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $sampleConfig = CONFIG . '/sample-config-does not exist.php';
+        MockConfig::load($sampleConfig);
+    }
+
+    public function testLoaDoesNotReturnArray()
+    {
+        $this->expectException(Exception::class);
+        $sampleConfig = CONFIG . '/sample-config-does not exist.php';
+        MockConfig::load($sampleConfig);
     }
 }

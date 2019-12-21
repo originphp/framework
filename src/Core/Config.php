@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,7 +11,11 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
 namespace Origin\Core;
+
+use Origin\Core\Exception\Exception;
+use Origin\Core\Exception\FileNotFoundException;
 
 class Config
 {
@@ -38,27 +41,28 @@ class Config
     }
  
     /**
-     * Loads values from a file e.g. config/application.php
+     * Loads values from a PHP file that returns an array
      *
      * @param string $filename
-     * @return bool
+     * @return void
      */
-    /* @todo not implemented or tested
-    public static function load(string $filename){
-        if(is_readable($filename)){
-            $result = include $filename;
-            if(is_array($result)){
-                foreach($result as $key => $value){
-                    static::dot()->set($key, $value);
-                }
-                return true;
-            }
-            return false;
+    public static function load(string $filename) : void
+    {
+        if (!is_file($filename)) {
+            throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
         }
-        throw new Exception(sprintf('%s could not be found.', $filename));
+
+        $array = include $filename;
+
+        if (!is_array($array)) {
+            throw new Exception(sprintf('Configuration file %s did not return an array'));
+        }
+
+        foreach ($array as $key => $value) {
+            static::dot()->set($key, $value);
+        }
     }
-    */
-   
+
     /**
      * Writes to global config
      *
@@ -91,7 +95,7 @@ class Config
      * @param string $key The key to check, accepts also dot notation e.g. Session.timeout
      * @return bool
      */
-    public static function exists(string $key = null) :bool
+    public static function exists(string $key = null) : bool
     {
         return static::dot()->has($key);
     }

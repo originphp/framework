@@ -2,6 +2,7 @@
 ## [unreleased]
 
 ### Added
+- Core/Exception/FileNotFoundExcepton
 - Validation confirm rule
 
 ### Changed
