@@ -232,7 +232,6 @@ class ArgumentParser
             }
         }
 
-        $requiredArguments = [];
         foreach ($this->arguments as $argument) {
             if (! empty($options['help'])) {
                 break;
@@ -297,6 +296,7 @@ class ArgumentParser
         if ($type === 'boolean') {
             return (bool) $value;
         }
+        
         if ($type === 'integer') {
             return (int) $value;
         }
