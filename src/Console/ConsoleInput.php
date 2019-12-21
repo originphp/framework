@@ -22,6 +22,7 @@ class ConsoleInput
      * @var resource
      */
     protected $stream = null;
+    
     /**
     * Constructs a new instance
     * @param string $stream fopen stream php://stdin
@@ -34,11 +35,12 @@ class ConsoleInput
     /**
      * Reads from the stream
      *
-     * @return void
+     * @return string|null
      */
-    public function read()
+    public function read() : ?string
     {
-        return trim(fgets($this->stream));
+        $data = fgets($this->stream);
+        return $data ? trim($data) : null;
     }
 
     /**
@@ -46,7 +48,7 @@ class ConsoleInput
      *
      * @return void
      */
-    public function close()
+    public function close() : void
     {
         if (is_resource($this->stream)) {
             fclose($this->stream);
