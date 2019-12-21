@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,7 +11,7 @@ declare(strict_types = 1);
  * @link         https://www.originphp.com
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types = 1);
 namespace Origin\Console\Command;
 
 use Origin\Core\HookTrait;
@@ -157,11 +156,7 @@ abstract class Command
         // Convert args
         $argv = [];
         foreach ($args as $key => $value) {
-            if (is_int($key)) {
-                $argv[] = $value;
-            } else {
-                $argv[] = "{$key}={$value}";
-            }
+            $argv[] = is_int($key) ? $value : "{$key}={$value}";
         }
 
         return $instance->run($argv);
@@ -225,11 +220,7 @@ abstract class Command
         if ($name === null) {
             return $this->options;
         }
-        if (isset($this->options[$name])) {
-            return $this->options[$name];
-        }
-
-        return null;
+        return $this->options[$name] ?? null;
     }
 
     /**
@@ -243,11 +234,7 @@ abstract class Command
         if ($name === null) {
             return $this->arguments;
         }
-        if (isset($this->arguments[$name])) {
-            return $this->arguments[$name];
-        }
-
-        return null;
+        return $this->arguments[$name] ?? null;
     }
 
     /**
@@ -466,15 +453,11 @@ abstract class Command
      */
     protected function addTags(string $tag, $message)
     {
-        if (is_array($message)) {
-            foreach ($message as $i => $line) {
-                $message[$i] = "<{$tag}>{$line}</{$tag}>";
-            }
-
-            return $message;
+        foreach ((array) $message as $i => $line) {
+            $message[$i] = "<{$tag}>{$line}</{$tag}>";
         }
 
-        return "<{$tag}>{$message}</{$tag}>";
+        return $message;
     }
 
     /**

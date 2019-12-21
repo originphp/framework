@@ -290,6 +290,16 @@ EOF;
         $this->assertStringContainsString('<blue>Hello jon</blue>', $this->out->read());
     }
 
+    public function testRunCommandWithArgs2()
+    {
+        $command = new MockCommand($this->io());
+        $command->runCommand('say-hello', [
+            '--color'=>'red',
+            'jim',
+        ]);
+        $this->assertStringContainsString('<red>Hello jim</red>', $this->out->read());
+    }
+
     public function testAbort()
     {
         $this->expectException(StopExecutionException::class);
