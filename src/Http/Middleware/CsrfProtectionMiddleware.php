@@ -88,7 +88,7 @@ class CsrfProtectionMiddleware extends Middleware
      */
     protected function isTestEnvironment() : bool
     {
-        return ((PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') and env('ORIGIN_ENV') === 'test');
+        return (isConsole() and env('ORIGIN_ENV') === 'test');
     }
 
     /**

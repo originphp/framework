@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -28,7 +27,7 @@ function backtrace(): void
         $debugger = new Debugger();
         $debug = $debugger->backtrace();
 
-        if (PHP_SAPI === 'cli') {
+        if (isConsole()) {
             $errorHandler = new Origin\Console\ErrorHandler();
             $errorHandler->render($debug, true);
         } else {

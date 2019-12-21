@@ -29,8 +29,9 @@ class Session
      */
     protected $started = false;
 
-    protected $cli = false;
-
+    /**
+     * @var integer
+     */
     protected $timeout = 3600;
 
     /**
@@ -38,7 +39,6 @@ class Session
      */
     public function __construct()
     {
-        $this->cli = (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg');
         /**
         * Security considerations:
         *
@@ -95,7 +95,7 @@ class Session
             return false;
         }
 
-        if ($this->cli) {
+        if (isConsole()) {
             return $this->started = true;
         }
 
@@ -278,7 +278,7 @@ class Session
             session_start();
             // @codeCoverageIgnoreEnd
         }
-        if ($this->cli === false) {
+        if (isConsole() === false) {
             // @codeCoverageIgnoreStart
             session_destroy();
             // @codeCoverageIgnoreEnd

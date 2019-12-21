@@ -34,7 +34,7 @@ require ROOT . '/vendor/autoload.php';
 /**
  * Register error handler
  */
-$errorHandler = (PHP_SAPI === 'cli') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
+$errorHandler = isConsole() ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
 require ORIGIN . '/src/Core/functions.php';
