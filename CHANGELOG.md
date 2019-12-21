@@ -12,9 +12,9 @@
 
 ### Deprecated
 
-- Validation rule notEmpty use notBlank
-- Validation rule inList use in instead
-- Validation rule custom use regex instead
+- Validation rule `notEmpty` use `notBlank`, these originally were different, however notEmpty was not useful.
+- Validation rule `inList` use `in` instead.
+- Validation rule `custom` use `regex` instead.
 
 ## [2.3.2] - 2019-12-10
 
