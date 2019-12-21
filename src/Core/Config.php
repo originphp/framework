@@ -48,13 +48,13 @@ class Config
      */
     public static function load(string $filename) : void
     {
-        if (!is_file($filename)) {
+        if (! is_file($filename)) {
             throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
         }
 
         $array = include $filename;
 
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             throw new Exception(sprintf('Configuration file %s did not return an array'));
         }
 

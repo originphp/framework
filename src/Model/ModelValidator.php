@@ -324,6 +324,6 @@ class ModelValidator
      */
     public function confirm($value1, $value2) : bool
     {
-        return (!is_null($value2) and $value1 == $value2);
+        return (! is_null($value2) and $value1 == $value2);
     }
 }

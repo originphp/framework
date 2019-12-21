@@ -220,6 +220,7 @@ abstract class Command
         if ($name === null) {
             return $this->options;
         }
+
         return $this->options[$name] ?? null;
     }
 
@@ -234,6 +235,7 @@ abstract class Command
         if ($name === null) {
             return $this->arguments;
         }
+
         return $this->arguments[$name] ?? null;
     }
 

@@ -16,8 +16,8 @@ namespace Origin\Test\Core;
 
 use Origin\Core\Dot;
 use Origin\Core\Config;
-use Origin\Core\Exception\FileNotFoundException;
 use Origin\Core\Exception\Exception;
+use Origin\Core\Exception\FileNotFoundException;
 
 class MockConfig extends Config
 {

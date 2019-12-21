@@ -294,7 +294,7 @@ EOF;
     {
         $command = new MockCommand($this->io());
         $command->runCommand('say-hello', [
-            '--color'=>'red',
+            '--color' => 'red',
             'jim',
         ]);
         $this->assertStringContainsString('<red>Hello jim</red>', $this->out->read());
