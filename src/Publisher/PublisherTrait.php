@@ -52,11 +52,12 @@ trait PublisherTrait
         if (is_string($object)) {
             $object = Resolver::className($object, 'Listener', 'Listener');
         }
-        if (! is_object($object) and ! is_string($object)) {
-            return false;
-        }
 
-        return $this->publisher()->subscribe($object, $options);
+        if (is_object($object) or is_string($object)) {
+            return $this->publisher()->subscribe($object, $options);
+        }
+        
+        return false;
     }
 
     /**

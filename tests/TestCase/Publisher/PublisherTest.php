@@ -71,6 +71,9 @@ class PublisherTest extends OriginTestCase
         $user = $this->User->find('first');
         $simple->publish('create', $user, 12345);
         $this->assertEquals(12345, $user->id);
+
+
+        $this->assertFalse($simple->subscribe(1234));
     }
 
     public function testSubscribeString()
