@@ -55,7 +55,7 @@ class Config
         $array = include $filename;
 
         if (! is_array($array)) {
-            throw new Exception(sprintf('Configuration file %s did not return an array'));
+            throw new Exception(sprintf('Configuration file %s did not return an array', $filename));
         }
 
         foreach ($array as $key => $value) {

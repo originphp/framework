@@ -123,10 +123,10 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         MockConfig::load($sampleConfig);
     }
 
-    public function testLoaDoesNotReturnArray()
+    public function testLoadDoesNotReturnArray()
     {
         $this->expectException(Exception::class);
-        $sampleConfig = CONFIG . '/sample-config-does not exist.php';
+        $sampleConfig = CONFIG . '/storage.php';
         MockConfig::load($sampleConfig);
     }
 }
