@@ -18,12 +18,6 @@ use Origin\Core\Config;
 
 define('START_TIME', microtime(true));
 
-# This being removed
-error_reporting(E_ALL);
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', true);
-ini_set('error_log', LOGS);
-
 /**
  * Load Autoloader
  */
@@ -34,7 +28,7 @@ require ROOT . '/vendor/autoload.php';
 /**
  * Register error handler
  */
-$errorHandler = isConsole() ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
+$errorHandler = (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
 require ORIGIN . '/src/Core/functions.php';
