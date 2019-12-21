@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,6 +11,8 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
+namespace Origin\Core;
 
 /**
  *  use Origin\Core\Autoloader;
@@ -33,14 +34,12 @@ declare(strict_types = 1);
  * $autoloader->register();
  */
 
-namespace Origin\Core;
-
 class Autoloader
 {
     /**
      * Singleton Instance of the Autoloader
      *
-     * @var Autoloader
+     * @var \Origin\Core\Autoloader
      */
     protected static $instance = null;
 
@@ -171,7 +170,6 @@ class Autoloader
 
     /**
      * Loads the required file.
-     * @todo add caching to reduce io
      *
      * @param string $filename
      * @return bool
