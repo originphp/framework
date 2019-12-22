@@ -1,38 +1,45 @@
 # Changelog
-## [unreleased]
+
+## [2.4.0] - 2019-12-22
 
 ### Added
-- Core/Exception/FileNotFoundExcepton
-- Validation confirm rule
+
+- Added Core/Exception/FileNotFoundExcepton
+- Added Validation confirm rule
 
 ### Changed
+
 - Changed validation to use `originphp/validation` package, this gives more validations but does not affect how its used, apart from deprecations listed below.
 
 ### Fixed
-- Error logging during early bootstrap stage, example parse error in application.php
+
+- Fixed error logging during early bootstrap stage, example parse error in application.php
 
 ### Deprecated
 
-- Validation rule `notEmpty` use `notBlank`, these originally were different, however notEmpty was not useful.
-- Validation rule `inList` use `in` instead.
-- Validation rule `custom` use `regex` instead.
+- Deprecated Validation rule `notEmpty` use `notBlank` instead
+- Deprecated Validation rule `inList` use `in` instead.
+- Deprecated Validation rule `custom` use `regex` instead.
 
 ## [2.3.2] - 2019-12-10
 
 ### Fixed
+
 - Fixed validation equals to changed operator to compare value only (not datatype)
 - Fixed form helper adding error class on associated objects with validation errors
 - Fixed backtrace path
-- Marshaller patching detecting posted integer/null fields were treated as modified due to different
+- Fixed marshaller patching detecting posted integer/null fields were treated as modified due to different
 types, but were not.
 
 ## [2.3.1] - 2019-12-03
 
 ### Changed
-- Marshaller now uses primary key for patching of associated models, previously data was just overwritten.
-- Repositories load dependent model on creation instead of lazyloading.
+
+- Changed Marshaller now uses primary key for patching of associated models, previously data was just overwritten.
+- Changed Repositories load dependent model on creation instead of lazyloading.
 
 ### Fixed
+
 - Fixed Entity naming issues on associated objects
 - Fixed Connection logging unpreparing SQL statements showing null values and unpreparing 10+ values
 - Fixed MySQL schema setting/getting null default to false for boolean
