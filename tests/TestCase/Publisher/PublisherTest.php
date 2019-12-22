@@ -72,7 +72,6 @@ class PublisherTest extends OriginTestCase
         $simple->publish('create', $user, 12345);
         $this->assertEquals(12345, $user->id);
 
-
         $this->assertFalse($simple->subscribe(1234));
     }
 

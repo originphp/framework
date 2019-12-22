@@ -40,6 +40,7 @@ class ConsoleInput
     public function read() : ?string
     {
         $data = fgets($this->stream);
+
         return $data ? trim($data) : null;
     }
 
