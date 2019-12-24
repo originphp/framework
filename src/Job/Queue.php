@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -14,10 +13,9 @@ declare(strict_types = 1);
  */
 
 /**
- * This is a Queue System with a MySQL backend. For now I want to keep it as one file, until packages are ready.
- * @todo investigate using pcntl_signal/ pcntl_alarm for timing out tasks
+ * OriginPHP Queue System
  */
-
+declare(strict_types = 1);
 namespace Origin\Job;
 
 use Origin\Job\Engine\BaseEngine;
