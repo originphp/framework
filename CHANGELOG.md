@@ -1,4 +1,9 @@
 # Changelog
+## [2.4.1] - 2019-12-xx
+
+### Fixed
+
+- Timestampable concern not adding created timestamp to associated record after failing validation.
 
 ## [2.4.0] - 2019-12-22
 
