@@ -873,21 +873,14 @@ class Model
         }
        
         if ($options['transaction']) {
-            $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
-            
-            $options = new ArrayObject($options);
-            ($result === true) ? $this->commit() : $this->rollback();
-        
-            if ($result and $afterCallbacks) {
+            $result === true ? $this->commit() : $this->rollback();
+    
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $options = new ArrayObject($options);
                 foreach ($data as $row) {
                     $event = $row->exists() === true ? 'create' : 'update';
-                    $this->triggerCallback('afterCommmit', $event, [$row,$options]);
-                }
-            }
-            if (! $result and $afterCallbacks) {
-                foreach ($data as $row) {
-                    $event = $row->exists() === true ? 'create' : 'update';
-                    $this->triggerCallback('afterRollback', $event, [$row,$options]);
+                    $callback = $result ? 'afterCommmit' : 'afterRollback';
+                    $this->triggerCallback($callback, $event, [$row,$options]);
                 }
             }
         }
