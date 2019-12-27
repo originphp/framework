@@ -25,11 +25,6 @@ class AnotherArticle extends Model
 {
     use Timestampable;
     protected $table = 'articles';
-
-    public function runCallback(Entity $entity)
-    {
-        $this->timestambleBeforeSave($entity, new ArrayObject);
-    }
 }
 
 class TimestampableTest extends OriginTestCase
@@ -45,7 +40,7 @@ class TimestampableTest extends OriginTestCase
         $data = ['title' => 'Foo Bar'];
         $entity = $this->AnotherArticle->new($data);
         $timestamp = date('Y-m-d H:i:s');
-        $this->AnotherArticle->runCallback($entity);
+        $this->assertTrue($this->AnotherArticle->save($entity));
         $this->assertEquals($timestamp, $entity->created);
         $this->assertEquals($timestamp, $entity->modified);
     }
@@ -55,29 +50,41 @@ class TimestampableTest extends OriginTestCase
         $data = ['title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
         $entity = $this->AnotherArticle->new($data);
         $timestamp = date('Y-m-d H:i:s');
-        $this->AnotherArticle->runCallback($entity);
+        $this->assertTrue($this->AnotherArticle->save($entity));
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
         $this->assertEquals('2019-03-02 20:00:00', $entity->modified);
     }
 
     public function testUpdate()
     {
-        $data = ['id' => 12345,'title' => 'Foo Bar','created' => '2019-03-02 20:00:00'];
+        // Create the entity
+        $data = ['title' => 'Foo Bar'];
         $entity = $this->AnotherArticle->new($data);
-        $entity->reset();
+        $this->assertTrue($this->AnotherArticle->save($entity));
+        $this->assertTrue($this->AnotherArticle->updateColumn($entity->id, 'created', '2019-03-02 20:00:00'));
+        $entity = $this->AnotherArticle->get($entity->id);
+
         $entity->title = 'foo';
         $timestamp = date('Y-m-d H:i:s');
-        $this->AnotherArticle->runCallback($entity);
+        $this->assertTrue($this->AnotherArticle->save($entity));
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
         $this->assertEquals($timestamp, $entity->modified);
     }
 
     public function testUpdateWithData()
     {
-        $data = ['id' => 'foo','title' => 'Foo Bar','created' => '2019-03-02 20:00:00','modified' => '2019-03-02 20:00:00'];
+        // Create the entity
+        $data = ['title' => 'Foo Bar'];
         $entity = $this->AnotherArticle->new($data);
-        $timestamp = date('Y-m-d H:i:s');
-        $this->AnotherArticle->runCallback($entity);
+        $this->assertTrue($this->AnotherArticle->save($entity));
+        $entity = $this->AnotherArticle->get($entity->id);
+
+        // modifiy data
+        $entity->title = 'foo';
+        $entity->created =  '2019-03-02 20:00:00';
+        $entity->modified =  '2019-03-02 20:00:00';
+        
+        $this->assertTrue($this->AnotherArticle->save($entity));
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
         $this->assertEquals('2019-03-02 20:00:00', $entity->modified);
     }
