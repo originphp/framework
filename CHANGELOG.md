@@ -1,9 +1,10 @@
 # Changelog
-## [2.4.1] - 2019-12-xx
+
+## [2.4.1] - 2019-12-28
 
 ### Fixed
 
-- Fixed Model after delete callback triggered when result is false when setting callbacks to `after`
+- Fixed Model after delete callback triggered when result is false when setting callbacks to only `after`
 - Fixed Timestampable concern not adding created timestamp to associated record after failing validation.
 
 ## [2.4.0] - 2019-12-22
