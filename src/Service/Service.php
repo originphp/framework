@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,6 +11,9 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
+namespace Origin\Service;
+
 /**
  * # Service Object
  * ## Origin
@@ -27,7 +29,6 @@ declare(strict_types = 1);
  * ## Notes
  *  - Services should not call other services (controversial), because then its not a single responsability
  */
-namespace Origin\Service;
 
 use Origin\Core\HookTrait;
 
