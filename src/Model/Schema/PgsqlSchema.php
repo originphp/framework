@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -13,17 +13,17 @@ declare(strict_types = 1);
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-/**
- * Migrations - This is designed for editing the schema, sometimes data might need to modified but
- * it should not be used to insert data. (if you have too then use connection manager)
- * There are suttle changes here, so this cannot be just droped in model driver. E.g. decimal and numeric does not have limit
- *
- */
-
+declare(strict_types = 1);
 namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
 use Origin\Core\Exception\Exception;
+
+/**
+ * Migrations - This is designed for editing the schema, sometimes data might need to modified but
+ * it should not be used to insert data. (if you have too then use connection manager)
+ * There are suttle changes here, so this cannot be just droped in model driver. E.g. decimal and numeric does not have limit
+ */
 
 class PgsqlSchema extends BaseSchema
 {
