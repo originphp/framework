@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -12,16 +12,17 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
- /**
-  * Migrations - This is designed for editing the schema, sometimes data might need to modified but
-  * it should not be used to insert data. (if you have too then use connection manager)
-  *
-  * @internal Originaly wanted change to automatically reverse changes, some changes to be reversed need
-  * actual schema, which means data needs to be stored somewhere.
-  *
-  */
+declare(strict_types = 1);
 namespace Origin\Migration;
+
+/**
+ * Migrations - This is designed for editing the schema, sometimes data might need to modified but
+ * it should not be used to insert data. (if you have too then use connection manager)
+ *
+ * @internal Originaly wanted change to automatically reverse changes, some changes to be reversed need
+ * actual schema, which means data needs to be stored somewhere.
+ *
+ */
 
 use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
