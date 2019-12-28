@@ -3,7 +3,8 @@
 
 ### Fixed
 
-- Timestampable concern not adding created timestamp to associated record after failing validation.
+- Fixed Model after delete callback triggered when result is false when setting callbacks to `after`
+- Fixed Timestampable concern not adding created timestamp to associated record after failing validation.
 
 ## [2.4.0] - 2019-12-22
 
@@ -61,12 +62,12 @@ types, but were not.
 - Added callbacks to Job beforeQueue,afterQueue, beforeDispatch, afterDispatch
 
 ### Fixed
-- Controller callbacks disabling
-- Console error render calls exit with exitcode 1
+- Fixed Controller callbacks disabling
+- Fixed Console error render calls exit with exitcode 1
 
 ### Changed
 
-- Model now throws RecordNotFoundException future major release NotFoundException for Model will be deprecated
+- Changed Model now throws RecordNotFoundException future major release NotFoundException for Model will be deprecated
 
 ## [2.2.1] - 2019-11-11
 
