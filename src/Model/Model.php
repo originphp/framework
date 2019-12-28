@@ -331,9 +331,7 @@ class Model
      */
     public function hasOne(string $association, array $options = []): array
     {
-        $assoc = new Association($this);
-
-        return  $this->hasOne[$association] = $assoc->hasOne($association, $options);
+        return $this->hasOne[$association] = (new Association($this))->hasOne($association, $options);
     }
 
     /**
@@ -361,8 +359,7 @@ class Model
      */
     public function belongsTo(string $association, array $options = []): array
     {
-        $assoc = new Association($this);
-        $this->belongsTo[$association] = $assoc->belongsTo($association, $options);
+        $this->belongsTo[$association] = (new Association($this))->belongsTo($association, $options);
         if (isset($options['counterCache']) and ! isset($this->CounterCache)) {
             $this->enableCounterCache();
         }
@@ -392,9 +389,7 @@ class Model
      */
     public function hasMany(string $association, array $options = []): array
     {
-        $assoc = new Association($this);
-
-        return  $this->hasMany[$association] = $assoc->hasMany($association, $options);
+        return  $this->hasMany[$association] = (new Association($this))->hasMany($association, $options);
     }
 
     /**
@@ -422,9 +417,7 @@ class Model
      */
     public function hasAndBelongsToMany(string $association, array $options = []): array
     {
-        $assoc = new Association($this);
-
-        return  $this->hasAndBelongsToMany[$association] = $assoc->hasAndBelongsToMany($association, $options);
+        return $this->hasAndBelongsToMany[$association] = (new Association($this))->hasAndBelongsToMany($association, $options);
     }
 
     /**
@@ -515,11 +508,8 @@ class Model
         if ($field === null) {
             return $this->schema;
         }
-        if (isset($this->schema['columns'][$field])) {
-            return $this->schema['columns'][$field];
-        }
 
-        return null;
+        return $this->schema['columns'][$field] ?? null;
     }
 
     /**
@@ -538,7 +528,7 @@ class Model
      *
      * @return \Origin\Model\ModelValidator
      */
-    public function validator(): ModelValidator
+    public function validator() : ModelValidator
     {
         if (! isset($this->ModelValidator)) {
             $this->ModelValidator = new ModelValidator($this);
@@ -579,19 +569,15 @@ class Model
             }
         }
       
-        $beforeCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'before');
-        $afterCallbacks = ($options['callbacks'] === true or $options['callbacks'] === 'after');
+        if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
+            if (! $this->triggerCallback('beforeSave', $event, [$entity, $options])) {
+                return false;
+            }
 
-        if ($beforeCallbacks and ! $this->triggerCallback('beforeSave', $event, [$entity, $options])) {
-            return false;
-        }
-
-        if ($exists and $beforeCallbacks and ! $this->triggerCallback('beforeUpdate', $event, [$entity, $options])) {
-            return false;
-        }
-
-        if (! $exists and $beforeCallbacks and ! $this->triggerCallback('beforeCreate', $event, [$entity, $options])) {
-            return false;
+            $callback = $exists ? 'beforeUpdate' : 'beforeCreate';
+            if (!$this->triggerCallback($callback, $event, [$entity, $options])) {
+                return false;
+            }
         }
 
         /**
@@ -639,16 +625,11 @@ class Model
 
         // Don't save if only field set is id (e.g savingHABTM)
         if (count($data) > 1 or ! isset($data[$this->primaryKey])) {
-            $connection = $this->connection();
- 
             if ($exists) {
-                $result = $connection->update($this->table, $data, [$this->primaryKey => $this->id]);
-
-                if ($result and $afterCallbacks) {
-                    $this->triggerCallback('afterUpdate', $event, [$entity, $options], false);
-                }
+                $result = $this->connection()->update($this->table, $data, [$this->primaryKey => $this->id]);
             } else {
-                $result = $connection->insert($this->table, $data);
+                $result = $this->connection()->insert($this->table, $data);
+                
                 if ($result) {
                     $entity->created(true);
                 }
@@ -658,18 +639,16 @@ class Model
                  * @internal lastval is not yet defined in this session
                  */
                 if (empty($entity->{$this->primaryKey})) {
-                    $entity->{$this->primaryKey} = (int) $connection->lastInsertId();
+                    $entity->{$this->primaryKey} = (int) $this->connection()->lastInsertId();
                 }
                 $this->id = $entity->{$this->primaryKey};
-
-                if ($result and $afterCallbacks) {
-                    $this->triggerCallback('afterCreate', $event, [$entity, $options], false);
-                }
             }
-        }
-      
-        if ($result and $afterCallbacks) {
-            $this->triggerCallback('afterSave', $event, [$entity, $options], false);
+            // handle callbacks
+            if ($result and ($options['callbacks'] === true or $options['callbacks'] === 'after')) {
+                $callback = $exists ? 'afterUpdate' : 'afterCreate';
+                $this->triggerCallback($callback, $event, [$entity, $options], false);
+                $this->triggerCallback('afterSave', $event, [$entity, $options], false);
+            }
         }
       
         /**
@@ -1230,12 +1209,11 @@ class Model
             $this->cancelTransaction($entity, $options, 'delete');
             throw $e;
         }
-    
-        if ($result and $options['callbacks'] === true or $options['callbacks'] === 'after') {
-            $this->triggerCallback('afterDelete', 'delete', [$entity, $options], false);
-        }
 
         if ($result) {
+            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+                $this->triggerCallback('afterDelete', 'delete', [$entity, $options], false);
+            }
             $this->commitTransaction($entity, $options, 'delete');
         } else {
             $this->cancelTransaction($entity, $options, 'delete');
@@ -1972,11 +1950,21 @@ class Model
         return $this->id;
     }
 
+    /**
+     * Gets the primaryKey for this Model
+     *
+     * @return string $primaryKey
+     */
     public function primaryKey() : string
     {
         return $this->primaryKey;
     }
 
+    /**
+     * Gets the displayField for this Model
+     *
+     * @return string $primaryKey
+     */
     public function displayField() : string
     {
         return $this->displayField;
