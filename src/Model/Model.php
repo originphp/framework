@@ -575,7 +575,7 @@ class Model
             }
 
             $callback = $exists ? 'beforeUpdate' : 'beforeCreate';
-            if (!$this->triggerCallback($callback, $event, [$entity, $options])) {
+            if (! $this->triggerCallback($callback, $event, [$entity, $options])) {
                 return false;
             }
         }
