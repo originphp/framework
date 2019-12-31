@@ -22,7 +22,6 @@ namespace Origin\Model;
  * in the database
  */
 
-
 use ArrayAccess;
 use Origin\Xml\Xml;
 use JsonSerializable;

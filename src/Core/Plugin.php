@@ -28,7 +28,7 @@ class Plugin
     /**
      * File where the composer plugins are stored.
      *
-     * @var [type]
+     * @var string
      */
     const COMPOSER_PLUGINS = ROOT . DS . 'vendor' . DS . 'originphp-plugins.json';
 
