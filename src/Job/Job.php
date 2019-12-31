@@ -285,7 +285,8 @@ class Job
     private function dispatchCallbacks(string $callback, array $arguments = []) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if (is_callable([$this, $method]) and $this->$method(...$arguments) === false) {
+            $this->validateCallback($method);
+            if ($this->$method(...$arguments) === false) {
                 return false;
             }
         }

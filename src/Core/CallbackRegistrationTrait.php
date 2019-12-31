@@ -15,6 +15,8 @@
 declare(strict_types = 1);
 namespace Origin\Core;
 
+use BadMethodCallException;
+
 trait CallbackRegistrationTrait
 {
     /**
@@ -94,5 +96,18 @@ trait CallbackRegistrationTrait
         }
         
         return $registeredCallbacks;
+    }
+
+    /**
+     * Validates a callback exists
+     *
+     * @param string $callback
+     * @return void
+     */
+    private function validateCallback(string $callback) : void
+    {
+        if (!method_exists($this, $callback)) {
+            throw new BadMethodCallException(sprintf('%s method does not exist', $callback));
+        }
     }
 }

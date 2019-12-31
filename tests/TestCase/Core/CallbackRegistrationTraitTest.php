@@ -14,6 +14,7 @@
 
 namespace Origin\Test\Core;
 
+use BadMethodCallException;
 use Origin\Core\CallbackRegistrationTrait;
 
 class CallbackRegistry
@@ -40,6 +41,15 @@ class CallbackRegistry
     public function enabled($callback)
     {
         return $this->registeredCallbacks($callback);
+    }
+
+    public function dispatch(string $callback)
+    {
+        $callbacks = $this->registeredCallbacks($callback);
+        foreach ($callbacks as $callback => $options) {
+            $this->validateCallback($callback);
+            call_user_func([$this,$callback]);
+        }
     }
 }
 
@@ -83,5 +93,13 @@ class CallbackRegistrationTest extends \PHPUnit\Framework\TestCase
         $callback->disable('doSomethingElse');
         $methods = array_keys($callback->enabled('beforeFind'));
         $this->assertEquals(['doSomething'], $methods);
+    }
+
+    public function testValidateCallback()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $callback = new CallbackRegistry();
+        $callback->add('beforeFind', 'reddit');
+        $callback->dispatch('beforeFind');
     }
 }

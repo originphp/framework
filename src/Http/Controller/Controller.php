@@ -292,7 +292,8 @@ class Controller
     protected function triggerCallback(string $callback) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if (is_callable([$this,$method]) and $this->isResponseOrRedirect($this->$method())) {
+            $this->validateCallback($callback);
+            if ($this->isResponseOrRedirect($this->$method())) {
                 return false;
             }
         }
