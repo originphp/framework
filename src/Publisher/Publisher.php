@@ -169,10 +169,8 @@ class Publisher
         /**
          * Work with any object
          */
-        if (method_exists($object, $event)) {
-            if (call_user_func_array([$object,$event], $args) === false) {
-                return false;
-            }
+        if (is_callable([$object, $event]) and call_user_func_array([$object,$event], $args) === false) {
+            return false;
         }
 
         return true;

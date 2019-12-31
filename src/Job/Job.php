@@ -285,10 +285,8 @@ class Job
     private function dispatchCallbacks(string $callback, array $arguments = []) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if (method_exists($this, $method)) {
-                if ($this->$method(...$arguments) === false) {
-                    return false;
-                }
+            if (is_callable([$this, $method]) and $this->$method(...$arguments) === false) {
+                return false;
             }
         }
 
@@ -307,7 +305,7 @@ class Job
     {
         $options += ['wait' => '+ 5 seconds','limit' => 3];
 
-        if ($this->attempts() < $options['limit'] + 1) {
+        if ($this->attempts < $options['limit'] + 1) {
             $this->retryOptions = $options;
 
             return true;

@@ -19,14 +19,25 @@ use Origin\Core\Exception\MissingClassException;
 
 class ObjectRegistry
 {
+    /**
+     * Objects that have been loaded
+     *
+     * @var array
+     */
     protected $loaded = [];
+
+    /**
+     * Enabled object list
+     *
+     * @var array
+     */
     protected $enabled = [];
 
     /**
      * Magic get method
      *
      * @param string $name
-     * @return Mixed
+     * @return mixed
      */
     public function &__get($name)
     {
@@ -54,7 +65,7 @@ class ObjectRegistry
     {
         foreach ($this->enabled as $name) {
             $object = $this->loaded[$name];
-            if (method_exists($object, $method)) {
+            if (is_callable([$object, $method])) {
                 call_user_func_array([$object, $method], $arguments);
             }
         }
@@ -142,7 +153,7 @@ class ObjectRegistry
     }
 
     /**
-     * Adds an objec to the object registry
+     * Adds an object to the object registry
      *
      * @param string $name
      * @param mixed $object

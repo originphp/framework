@@ -177,10 +177,8 @@ class Mailbox
     private function dispatchCallbacks(string $callback) : bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if (method_exists($this, $method)) {
-                if ($this->$method() === false or $this->bounced) {
-                    return false;
-                }
+            if (is_callable([$this, $method]) and ($this->$method() === false or $this->bounced)) {
+                return false;
             }
         }
 

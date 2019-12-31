@@ -141,7 +141,7 @@ class AuthComponent extends Component
         }
         if (in_array('Controller', $this->config['authenticate'])) {
             $controller = $this->controller();
-            if (! method_exists($controller, 'isAuthorized')) {
+            if (! is_callable([$controller, 'isAuthorized'])) {
                 throw new Exception(sprintf('%s does have an isAuthorized() method.', get_class($controller)));
             }
 
