@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2019 Jamiel Sharief.
@@ -15,9 +14,6 @@
 declare(strict_types = 1);
 namespace Origin\Core;
 
-use ReflectionMethod;
-use ReflectionException;
-
 trait InitializerTrait
 {
     /**
@@ -27,17 +23,40 @@ trait InitializerTrait
      *
      *   trait DeletableTrait
      *   {
-     *      protected function intializeDeleteable()
+     *      protected function intializeDeleteable() : void
      *      {
      *
      *      }
      *    }
      *
-     *  in the construct you call this method
+     *  in the construct of the class you call `initializeTraits`
      *
      * @return void
      */
     private function initializeTraits() : void
+    {
+        $args = func_get_args() ?? [];
+        foreach ($this->classUses() as $trait) {
+            list($namespace, $className) = namespaceSplit($trait);
+          
+            $method = $className;
+            if (strpos($className, 'Trait') !== false) {
+                $method = substr($className, 0, -5);
+            }
+
+            $method = 'initialize' . $method;
+            if (method_exists($this, $method)) {
+                $this->$method(...$args);
+            }
+        }
+    }
+
+    /**
+     * Gets the traits used by this class
+     *
+     * @return array
+     */
+    private function classUses() : array
     {
         $class = $this;
      
@@ -47,40 +66,6 @@ trait InitializerTrait
             $class = get_parent_class($class);
         }
     
-        $traits = array_unique($traits);
-
-        $args = func_get_args() ?? [];
-        foreach ($traits as $trait) {
-            list($namespace, $className) = namespaceSplit($trait);
-          
-            $method = $className;
-            if (strpos($className, 'Trait') !== false) {
-                $method = substr($className, 0, -5);
-            }
-
-            $method = 'initialize' . $method;
-            if ($this->hasMethod($this, $method)) {
-                $this->$method(...$args);
-            }
-        }
-    }
-
-    /**
-     * Checks if the object has a method
-     *
-     * @param object $object
-     * @param string $method
-     * @return boolean
-     */
-    private function hasMethod(object $object, string $method) : bool
-    {
-        try {
-            $method = new ReflectionMethod($object, $method);
-
-            return ($method->isPublic() or $method->isProtected());
-        } catch (ReflectionException $e) {
-        }
-
-        return false;
+        return array_unique($traits);
     }
 }
