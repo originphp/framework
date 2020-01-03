@@ -65,7 +65,7 @@ class ObjectRegistry
     {
         foreach ($this->enabled as $name) {
             $object = $this->loaded[$name];
-            if (is_callable([$object, $method])) {
+            if (method_exists($object, $method)) {
                 call_user_func_array([$object, $method], $arguments);
             }
         }

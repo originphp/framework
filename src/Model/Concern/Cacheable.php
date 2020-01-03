@@ -176,7 +176,7 @@ trait Cacheable
         if ($associated) {
             foreach ([$this->belongsTo, $this->hasMany, $this->hasOne, $this->hasAndBelongsToMany] as $association) {
                 foreach ($association as $alias => $config) {
-                    if (is_callable([$this->$alias, 'invalidateCache'])) {
+                    if (method_exists($this->$alias, 'invalidateCache')) {
                         $this->$alias->invalidateCache(false);
                     }
                 }

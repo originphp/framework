@@ -67,7 +67,7 @@ class ComponentRegistry extends ObjectRegistry
     {
         foreach ($this->enabled as $name) {
             $object = $this->loaded[$name];
-            if (is_callable([$object, $method])) {
+            if (method_exists($object, $method)) {
                 $result = call_user_func_array([$object, $method], $arguments);
                 // Redirect has been called
                 if ($result instanceof Response or $this->controller->response()->headers('Location')) {
