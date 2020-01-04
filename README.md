@@ -4,7 +4,6 @@
 [![build](https://travis-ci.org/originphp/framework.svg?branch=master)](https://travis-ci.org/originphp/framework)
 [![coverage](https://coveralls.io/repos/github/originphp/framework/badge.svg?branch=master)](https://coveralls.io/github/originphp/framework?branch=master)
 ![memory](https://img.shields.io/badge/memory-950KB-brightGeen.svg)
-[![HitCount](http://hits.dwyl.io/originphp/framework.svg)](http://hits.dwyl.io/originphp/framework)
 
 OriginPHP is a MVC web application framework for PHP developers designed to be fast, easy to use (and learn) and highly scalable. It is modeled upon CakePHP and Ruby On Rails (Which CakePHP was modeled upon). It comes with a Dockerized development environment.
 
