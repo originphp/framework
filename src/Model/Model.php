@@ -1868,6 +1868,7 @@ class Model
         if (call_user_func_array([$this,$callback], $arguments) === false and $isStoppable) {
             return false;
         }
+
         return true;
     }
 

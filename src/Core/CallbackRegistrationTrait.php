@@ -106,7 +106,7 @@ trait CallbackRegistrationTrait
      */
     private function validateCallback(string $callback) : void
     {
-        if (!method_exists($this, $callback)) {
+        if (! method_exists($this, $callback)) {
             throw new BadMethodCallException(sprintf('%s method does not exist', $callback));
         }
     }

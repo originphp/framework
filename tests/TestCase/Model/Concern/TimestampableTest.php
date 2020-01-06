@@ -14,7 +14,6 @@
 
 namespace Origin\Test\Model\Concern;
 
-use ArrayObject;
 use Origin\Model\Model;
 use Origin\Model\Entity;
 use Origin\Model\ModelRegistry;
@@ -81,8 +80,8 @@ class TimestampableTest extends OriginTestCase
 
         // modifiy data
         $entity->title = 'foo';
-        $entity->created =  '2019-03-02 20:00:00';
-        $entity->modified =  '2019-03-02 20:00:00';
+        $entity->created = '2019-03-02 20:00:00';
+        $entity->modified = '2019-03-02 20:00:00';
         
         $this->assertTrue($this->AnotherArticle->save($entity));
         $this->assertEquals('2019-03-02 20:00:00', $entity->created);
