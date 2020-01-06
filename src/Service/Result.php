@@ -49,28 +49,6 @@ class Result
     }
 
     /**
-     * Checks if the result was successful, this is done by checking if there is a data property or
-     * success property set to true
-     *
-     * @return boolean
-     */
-    public function success() : bool
-    {
-        return ((isset($this->success) and $this->success === true) or isset($this->data));
-    }
-
-    /**
-     * Checks if the result was an error, this is done by checking if there is a error property or
-     * success property set to false
-     *
-     * @return boolean
-     */
-    public function error() : bool
-    {
-        return ((isset($this->success) and $this->success === false) or isset($this->error));
-    }
-
-    /**
     * Magic method is trigged when the object is treated as string.
     *
     * @return string
