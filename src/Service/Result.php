@@ -71,7 +71,7 @@ class Result
     }
 
     /**
-    * Magic method is trigged when the object is treated as string,
+    * Magic method is trigged when the object is treated as string.
     *
     * @return string
     */
