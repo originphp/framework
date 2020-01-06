@@ -187,11 +187,12 @@ class Entity implements ArrayAccess, JsonSerializable
     /**
      * Magic method is trigged when the object is treated as string,
      * e.g. echo $entity
+     *
      * @return string
      */
     public function __toString()
     {
-        return json_encode($this->toArray(), JSON_PRETTY_PRINT);
+        return $this->toJson(['pretty' => true]);
     }
 
     /**
@@ -469,11 +470,16 @@ class Entity implements ArrayAccess, JsonSerializable
     /**
      * Converts this entity into JSON
      *
+     * @param array $options Supported options are
+     *   - pretty: default:false for json pretty print
+     *
      * @return string
-     */
-    public function toJson() : string
+    */
+    public function toJson(array $options = []) : string
     {
-        return json_encode($this->jsonSerialize());
+        $options += ['pretty' => false];
+
+        return json_encode($this->jsonSerialize(), $options['pretty'] ? JSON_PRETTY_PRINT : 0);
     }
 
     /**
@@ -577,8 +583,8 @@ class Entity implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * JsonSerializable Interface for json_encode($entity). Returns the properties that will be serialized as
-     * json
+     * JsonSerializable Interface for json_encode($entity). Returns the properties that will be
+     * serialized as JSON
      *
      * @return array
      */
