@@ -51,7 +51,7 @@ trait TemplateTrait
      *
      * @return \Origin\Http\View\Templater
      */
-    public function templater() : Templater
+    private function templater() : Templater
     {
         if (! isset($this->templater)) {
             $this->templater = new Templater();
