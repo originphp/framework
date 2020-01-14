@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -12,6 +12,8 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
+namespace Origin\Http;
 
 /**
  * Using ajax post (e.g. $.post( url, data)), the content type for the request is 'application/x-www-form-urlencoded', instead of json. This causes
@@ -20,8 +22,6 @@ declare(strict_types = 1);
  * render json errors when json type detected.
  * Currently setting response->type json would not affect error handler
  */
-
-namespace Origin\Http;
 
 use Origin\Log\Log;
 use Origin\Core\Config;

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -12,13 +11,14 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-/**
- * Helper for non Intl extension
- */
+declare(strict_types = 1);
 namespace Origin\Http\View\Helper;
 
 use Origin\Utility\Date;
 
+/**
+ * Date Helper for non Intl extension
+ */
 class DateHelper extends Helper
 {
     /**

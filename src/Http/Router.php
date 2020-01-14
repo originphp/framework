@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -12,8 +12,10 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
+declare(strict_types = 1);
+namespace Origin\Http;
 
- /**
+/**
   * Rest routing
   * Router::add('/:controller', ['action'=>'index','method'=>'GET']);
   * Router::add('/:controller/*', ['action'=>'view','method'=>'GET']);
@@ -22,9 +24,6 @@ declare(strict_types = 1);
   * Router::add('/:controller/*', ['action'=>'edit','method'=>'PATCH']);
   * Router::add('/:controller/*', ['action'=>'delete','method'=>'DELETE']);
   */
-
-namespace Origin\Http;
-
 use Origin\Inflector\Inflector;
 
 class Router

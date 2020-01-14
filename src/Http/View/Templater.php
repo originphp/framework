@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -12,7 +11,7 @@ declare(strict_types = 1);
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
+declare(strict_types=1);
 namespace Origin\Http\View;
 
 use Origin\Inflector\Inflector;
@@ -45,17 +44,17 @@ class Templater
      * @param array $data
      * @return string
      */
-    public function format(string $name, array $data) : string
+    public function format(string $name, array $data): string
     {
-        if (! isset($this->templates[$name])) {
+        if (!isset($this->templates[$name])) {
             throw new Exception("Template '{$name}' does not exist");
         }
-        
+
         $template = $this->templates[$name];
-        
+
         if (preg_match_all('/\{([a-z0-9_]+)\}/i', $template, $matches)) {
             foreach ($matches[1] as $placeholder) {
-                $value = isset($data[$placeholder])?$data[$placeholder]:null;
+                $value = isset($data[$placeholder]) ? $data[$placeholder] : null;
                 $template = str_replace("{{$placeholder}}", $value, $template);
             }
         }
@@ -77,7 +76,7 @@ class Templater
      * @param string $name
      * @return bool
      */
-    public function load(string $name) : bool
+    public function load(string $name): bool
     {
         $filename = CONFIG . DS . $name . '.php';
         list($plugin, $name) = pluginSplit($name);
@@ -100,12 +99,12 @@ class Templater
     }
 
     /**
-    * Sets templates
-    *
-    * @param array $templates
-    * @return void
-    */
-    public function set(array $templates) : void
+     * Sets templates
+     *
+     * @param array $templates
+     * @return void
+     */
+    public function set(array $templates): void
     {
         foreach ($templates as $name => $template) {
             $this->templates[$name] = $template;
@@ -113,11 +112,11 @@ class Templater
     }
 
     /**
-    * Gets template
-    *
-    * @param string|null $template
-    * @return array|string|null
-    */
+     * Gets template
+     *
+     * @param string|null $template
+     * @return array|string|null
+     */
     public function get($template = null)
     {
         if ($template === null) {
