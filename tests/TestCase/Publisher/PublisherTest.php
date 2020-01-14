@@ -58,7 +58,7 @@ class PublisherTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.User','Origin.Queue'];
 
-    public function startup() : void
+    protected function startup() : void
     {
         $this->loadModel('User');
     }
@@ -66,9 +66,10 @@ class PublisherTest extends OriginTestCase
     public function testSubscribe()
     {
         $simple = new SimpleObject();
-        $simple->subscribe(new MockListener);
+        $this->assertTrue($simple->subscribe(new MockListener));
 
         $user = $this->User->find('first');
+
         $simple->publish('create', $user, 12345);
         $this->assertEquals(12345, $user->id);
 
@@ -78,7 +79,7 @@ class PublisherTest extends OriginTestCase
     public function testSubscribeString()
     {
         $simple = new SimpleObject();
-        $simple->subscribe(MockListener::class);
+        $this->assertTrue($simple->subscribe(new MockListener));
 
         $user = $this->User->find('first');
         $simple->publish('create', $user, 12345);
