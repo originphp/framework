@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.2] - 2019-01-19
+
+### Changed
+- Updated Copyright License Dates
+
 ## [2.4.1] - 2019-12-28
 
 ### Fixed
