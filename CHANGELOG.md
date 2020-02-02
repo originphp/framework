@@ -2,9 +2,7 @@
 
 ## [unreleased]
 
-- cleaned up code: 
-    * changed protected methods to private
-    * changed issets to null collescating operator
+cleaned up code, changed visibility on methods and properties, and fixed docblocks.
 
 ### Added
 - Mail::attachments method
