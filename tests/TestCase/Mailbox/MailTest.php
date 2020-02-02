@@ -130,6 +130,23 @@ EOF;
         $this->assertFalse($mail->hasAttachments());
     }
 
+    public function testAttachments()
+    {
+        $message = file_get_contents(__DIR__ . '/messages/text-attachment.eml');
+        $mail = new Mail($message);
+        $this->assertTrue($mail->hasAttachments());
+
+        $attachments = $mail->attachments();
+        $this->assertIsArray($attachments);
+        $this->assertNotEmpty($attachments);
+
+        // no need to test parsing as this in MailParserTest::testAttachments
+        $this->assertArrayHasKey('name', $attachments[0]);
+        $this->assertArrayHasKey('type', $attachments[0]);
+        $this->assertArrayHasKey('size', $attachments[0]);
+        $this->assertArrayHasKey('tmp', $attachments[0]);
+    }
+
     public function testHasHtml()
     {
         $mail = new Mail(file_get_contents(__DIR__ . '/messages/html.eml'));

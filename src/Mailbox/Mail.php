@@ -14,6 +14,9 @@
 declare(strict_types=1);
 namespace Origin\Mailbox;
 
+/**
+ * Mail Object Class
+ */
 class Mail
 {
     /**
@@ -117,6 +120,7 @@ class Mail
 
     /**
      * Array of attachments
+     * @internal this will be deprecated in next major release use ::atachments() instead.
      *
      * @var array
      */
@@ -268,6 +272,16 @@ class Mail
         }
 
         return mailparse_rfc822_parse_addresses($header);
+    }
+
+    /**
+     * Returns an array of attachments
+     *
+     * @return array
+     */
+    public function attachments() : array
+    {
+        return $this->attachments;
     }
 
     /**
