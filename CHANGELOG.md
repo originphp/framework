@@ -1,5 +1,10 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+- Mail::attachments method
+
 ## [2.4.2] - 2019-01-19
 
 ### Changed
