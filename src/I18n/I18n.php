@@ -26,6 +26,7 @@ use Origin\I18n\Exception\LocaleNotAvailableException;
 class I18n
 {
     const DEFAULT_LOCALE = 'en_US';
+
     /**
      * The default locale to be used.
      *
@@ -132,12 +133,13 @@ class I18n
         static::$definition = null;
 
         $filename = null;
-        if (file_exists(CONFIG . DS . 'locales' . DS . $locale .'.php')) {
-            $filename = CONFIG . DS . 'locales' . DS . $locale .'.php';
+        $path = CONFIG . DS . 'locales' . DS;
+        if (file_exists($path . $locale .'.php')) {
+            $filename = $path . $locale .'.php';
         } elseif (strpos($locale, '_') !== false) {
             list($language, $void) = explode('_', $locale, 2);
-            if (file_exists(CONFIG . DS . 'locales' . DS . $language .'.php')) {
-                $filename = CONFIG . DS . 'locales' . DS . $language .'.php';
+            if (file_exists($path . $language .'.php')) {
+                $filename = $path . $language .'.php';
             }
         }
         if ($filename) {
@@ -198,6 +200,7 @@ class I18n
      * Sets or gets the language.
      *
      * @param string $language
+     * @return string|void
      */
     public static function language(string $language = null)
     {
@@ -213,7 +216,7 @@ class I18n
      *
      * @return string
      */
-    public static function detectLocale()
+    public static function detectLocale() : string
     {
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);

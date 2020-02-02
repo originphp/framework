@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Core;
 
 use \Throwable;
@@ -28,7 +31,7 @@ class Debugger
      * @param string $class
      * @return array
      */
-    protected function namespaceSplit(string $class) : array
+    protected function namespaceSplit(string $class): array
     {
         $position = strrpos($class, '\\');
         if ($position === false) {
@@ -44,7 +47,7 @@ class Debugger
      * @param \Throwable $exception
      * @return array
      */
-    public function exception(Throwable $exception) : array
+    public function exception(Throwable $exception): array
     {
         $result = [];
 
@@ -80,7 +83,7 @@ class Debugger
      *
      * @return array
      */
-    public function backtrace() : array
+    public function backtrace(): array
     {
         $result = [
             'namespace' => '',
@@ -93,9 +96,9 @@ class Debugger
         unset($debug[0]);
         foreach ($debug as $stack) {
             $result['stackFrames'][] = [
-                'file' => isset($stack['file']) ? $stack['file'] : '',
-                'line' => isset($stack['line']) ? $stack['line'] : '',
-                'class' => isset($stack['class']) ? $stack['class'] : '',
+                'file' => $stack['file'] ?? '',
+                'line' => $stack['line'] ?? '',
+                'class' => $stack['class'] ?? '',
                 'function' => $stack['function'],
                 'args' => $stack['args'],
             ];

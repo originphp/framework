@@ -2,6 +2,10 @@
 
 ## [unreleased]
 
+- cleaned up code: 
+    * changed protected methods to private
+    * changed issets to null collescating operator
+
 ### Added
 - Mail::attachments method
 

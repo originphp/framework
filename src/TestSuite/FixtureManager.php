@@ -100,7 +100,7 @@ class FixtureManager
             return $this->loaded;
         }
 
-        return isset($this->loaded[$fixture])?$this->loaded[$fixture]:null;
+        return $this->loaded[$fixture] ?? null;
     }
 
     /**

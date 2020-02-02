@@ -46,7 +46,7 @@ class Templater
      */
     public function format(string $name, array $data): string
     {
-        if (!isset($this->templates[$name])) {
+        if (! isset($this->templates[$name])) {
             throw new Exception("Template '{$name}' does not exist");
         }
 
@@ -54,7 +54,7 @@ class Templater
 
         if (preg_match_all('/\{([a-z0-9_]+)\}/i', $template, $matches)) {
             foreach ($matches[1] as $placeholder) {
-                $value = isset($data[$placeholder]) ? $data[$placeholder] : null;
+                $value = $data[$placeholder] ?? null;
                 $template = str_replace("{{$placeholder}}", $value, $template);
             }
         }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.

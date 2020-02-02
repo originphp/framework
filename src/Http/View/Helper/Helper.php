@@ -70,12 +70,14 @@ class Helper
     public function __get($name)
     {
         if (isset($this->_helpers[$name])) {
-            $this->$name = $this->view()->helperRegistry()->load($name, $this->_helpers[$name]);
+            $this->$name = $this->_view->helperRegistry()->load($name, $this->_helpers[$name]);
             
             if (isset($this->$name)) {
                 return $this->$name;
             }
         }
+
+        return null;
     }
 
     /**
@@ -108,11 +110,7 @@ class Helper
             }
         }
 
-        if ($result) {
-            return ' '.implode(' ', $result);
-        }
-
-        return '';
+        return $result ? ' ' . implode(' ', $result) : '';
     }
 
     /**

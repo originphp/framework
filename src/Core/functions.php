@@ -233,7 +233,7 @@ function deprecationWarning(string $message): void
  * @param integer $length
  * @return string
  */
-function uid(int $length = 12) : string
+function uid(int $length = 12): string
 {
     $randomBytes = random_bytes(ceil($length / 2));
 
@@ -245,7 +245,7 @@ function uid(int $length = 12) : string
  *
  * @return string date('Y-m-d H:i:s')
  */
-function now(): string
+function now() : string
 {
     return date('Y-m-d H:i:s');
 }

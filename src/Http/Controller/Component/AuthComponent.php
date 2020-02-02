@@ -185,7 +185,7 @@ class AuthComponent extends Component
      * This will try to identify the user. Check if there are credentials
      * based upon auth methods (form, http).
      *
-     * @return Entity|bool $user false
+     * @return \Origin\Model\Entity|bool $user false
      */
     public function identify()
     {
@@ -223,7 +223,7 @@ class AuthComponent extends Component
      * does not check credientials. User data is converted
      * into an array to be stored in the session.
      *
-     * @param Entity $user
+     * @param \Origin\Model\Entity $user
      * @return void
      */
     public function login(Entity $user) : void
@@ -240,13 +240,13 @@ class AuthComponent extends Component
      */
     public function redirectUrl()
     {
-        if ($redirectUrl = $this->Session->read('Auth.redirect')) {
-            $this->Session->delete('Auth.redirect');
+        $redirectUrl = $this->Session->read('Auth.redirect');
 
-            return $redirectUrl;
+        if ($redirectUrl) {
+            $this->Session->delete('Auth.redirect');
         }
 
-        return $this->config['loginRedirect'];
+        return $redirectUrl ?: $this->config['loginRedirect'];
     }
 
     /**
@@ -260,11 +260,7 @@ class AuthComponent extends Component
     public function logout() : string
     {
         $this->Session->delete('Auth');
-
-        $logoutRedirect = $this->config['loginAction'];
-        if ($this->config['logoutRedirect']) {
-            $logoutRedirect = $this->config['logoutRedirect'];
-        }
+        $logoutRedirect = $this->config['logoutRedirect'] ?? $this->config['loginAction'];
 
         return Router::url($logoutRedirect);
     }
@@ -388,7 +384,7 @@ class AuthComponent extends Component
      *
      * @param string $username
      * @param string $password
-     * @return bool|Entity user
+     * @return bool|\Origin\Model\Entity user
      */
     protected function loadUser(string $username, string $password)
     {
@@ -404,11 +400,10 @@ class AuthComponent extends Component
 
         $result = $model->find('first', ['conditions' => $conditions]);
 
-        if (empty($result)) {
-            return false;
-        }
-        if (Security::verifyPassword($password, $result->get($this->config['fields']['password']))) {
-            return $result;
+        if ($result) {
+            if (Security::verifyPassword($password, $result->get($this->config['fields']['password']))) {
+                return $result;
+            }
         }
 
         return false;

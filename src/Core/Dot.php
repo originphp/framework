@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Core;
 
 /**
@@ -58,7 +61,7 @@ class Dot
      * @param mixed  $value [string|array|integer]
      * @return void
      */
-    public function set(string $key, $value) : void
+    public function set(string $key, $value): void
     {
         $items = &$this->items;
         foreach (explode('.', $key) as $key) {
@@ -102,7 +105,7 @@ class Dot
      *
      * @return array $items
      */
-    public function items() : array
+    public function items(): array
     {
         return $this->items;
     }
@@ -113,7 +116,7 @@ class Dot
      * @param string $key The key to delete, accepts also dot notation e.g. App.currency
      * @return bool
      */
-    public function delete(string $key) : bool
+    public function delete(string $key): bool
     {
         if (array_key_exists($key, $this->items)) {
             unset($this->items[$key]);
@@ -149,7 +152,7 @@ class Dot
      * @param string $key The key to check, accepts also dot notation e.g. App.currency
      * @return bool
      */
-    public function has(string $key) : bool
+    public function has(string $key): bool
     {
         if (array_key_exists($key, $this->items)) {
             return true;
