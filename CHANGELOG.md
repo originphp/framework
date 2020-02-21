@@ -2,19 +2,19 @@
 
 ## [unreleased]
 
+## [2.4.3] - 2019-02-21
+
 cleaned up code, changed visibility on methods and properties, and fixed docblocks.
 
 ### Fixed
 
 - Fixed Console command names validation to allow numbers e.g. oauth2 or oauth2:foo
-
-### Added
-
-- Addded Mail::attachments method
+- Fixed added Mail::attachments method (public property remains)
 
 ## [2.4.2] - 2019-01-19
 
 ### Changed
+
 - Updated Copyright License Dates
 
 ## [2.4.1] - 2019-12-28
