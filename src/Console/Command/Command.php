@@ -265,7 +265,7 @@ abstract class Command
     protected function validateName(string $name) : void
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
-        if (! preg_match_all('/^[a-z][a-z-]++(?:\:[a-z-]++)*$/', $name)) {
+        if (! preg_match_all('/^[a-z0-9-]++(?:\:[a-z0-9-]++)*$/', $name)) {
             throw new ConsoleException(sprintf('Command name `%s` is invalid', $name));
         }
     }

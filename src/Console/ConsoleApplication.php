@@ -240,7 +240,7 @@ class ConsoleApplication
      */
     public function addCommand(string $alias, string $name) : void
     {
-        if (! preg_match('/^[a-z-]+$/', $alias)) {
+        if (! preg_match('/^[a-z0-9-]+$/', $alias)) {
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));
         }
 

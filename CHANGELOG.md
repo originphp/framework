@@ -4,8 +4,13 @@
 
 cleaned up code, changed visibility on methods and properties, and fixed docblocks.
 
+### Fixed
+
+- Fixed Console command names validation to allow numbers e.g. oauth2 or oauth2:foo
+
 ### Added
-- Mail::attachments method
+
+- Addded Mail::attachments method
 
 ## [2.4.2] - 2019-01-19
 
