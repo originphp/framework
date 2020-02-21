@@ -119,7 +119,7 @@ class View
     public function __get($name)
     {
         if (isset($this->helpers[$name])) {
-            return $this->helperRegistry()->load($name.'Helper', $this->helpers[$name]);
+            return $this->helperRegistry->load($name.'Helper', $this->helpers[$name]);
         }
         throw new Exception(sprintf('%sHelper is not loaded.', $name));
     }
@@ -136,7 +136,7 @@ class View
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
         $config = array_merge(['className' => $name . 'Helper'], $config);
 
-        return $this->$helper = $this->helperRegistry()->load($name, $config);
+        return $this->$helper = $this->helperRegistry->load($name, $config);
     }
 
     /**
@@ -155,9 +155,7 @@ class View
         extract($vars);
 
         ob_start();
-
         include $element__filename;
-
         return ob_get_clean();
     }
 
@@ -189,7 +187,8 @@ class View
      */
     public function fetch(string $key)
     {
-        return $this->$key ?? null;
+        // $this->$key ?? null # not compatible with __get
+        return isset($this->$key) ? $this->$key : null;
     }
 
     /**
@@ -339,7 +338,7 @@ class View
             $buffer = $this->renderLayout($layout);
         }
 
-        $this->helperRegistry()->destroy();
+        $this->helperRegistry->destroy();
         unset($this->helperRegistry);
 
         return $buffer;
@@ -355,8 +354,8 @@ class View
        
         extract($this->vars);
         ob_start();
-        require $layout_filename;
 
+        require $layout_filename;
         return ob_get_clean();
     }
 
