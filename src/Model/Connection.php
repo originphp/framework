@@ -161,7 +161,7 @@ abstract class Connection
     /**
      * Gets the database that its connected to
      *
-     * @return string
+     * @return string|null
      */
     public function database() : ?string
     {

@@ -187,7 +187,6 @@ class View
      */
     public function fetch(string $key)
     {
-        // $this->$key ?? null # not compatible with __get
         return isset($this->$key) ? $this->$key : null;
     }
 
