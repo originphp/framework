@@ -13,8 +13,7 @@
  */
 
 declare(strict_types=1);
-
-namespace App\Model\Query;
+namespace Origin\Model\Query;
 
 use Origin\Model\Model;
 use InvalidArgumentException;
@@ -30,25 +29,31 @@ class BatchInsertQuery extends QueryObject
     /**
      * Runs a batch insert query. Note there is a limit on number of placeholderes.
      *
-     * @param string $table
      * @param array $records
      * @param array $options The following options keys are supported
-     *   - transactions: default true. To wrap in begin/commit
+     *   - transactions: default true. To wrap insert in a transaction begin/commit
+     *   - table: default is the Model table.
      * @return bool|array|null
      */
 
-    public function execute(string $table, array $records, array $options = [])
+    public function execute(array $records, array $options = [])
     {
-        $options += ['transaction' => true];
+        $options += ['transaction' => true ,'table' => $this->Model->table()];
         $fields = $questionMarks = $values = $buffer = [];
 
         if (empty($records)) {
             throw new InvalidArgumentException('No records');
         }
 
-        $firstKey = array_key_first($records);
+        /**
+         * work with older PHP version
+         */
+        $firstKey = key($records);
+        reset($records);
+        
         $fields = array_keys($records[$firstKey]);
         $questionMarks = array_fill(0, count($fields), '?');
+
 
         foreach ($records as $record) {
             $values = array_merge($values, array_values($record));
@@ -62,17 +67,12 @@ class BatchInsertQuery extends QueryObject
             $this->Model->begin();
         }
 
-        $result = $this->executeQuery("INSERT INTO {$table} ({$fields}) VALUES {$buffer}", $values);
-        if ($result) {
-            if ($options['transaction']) {
-                $this->Model->commit();
-            }
+        $this->executeQuery("INSERT INTO {$options['table']} ({$fields}) VALUES {$buffer}", $values);
 
-            return $result;
-        }
         if ($options['transaction']) {
-            $this->Model->rollback();
+            $this->Model->commit();
         }
+        return true;
     }
 
     protected function executeQuery(string $query, array $values = [])
