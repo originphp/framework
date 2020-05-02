@@ -191,7 +191,7 @@ class MysqlSchema extends BaseSchema
          * Handle floats and decimals. map doubles to decimal
          */
         if (in_array($col, ['float','decimal','double'])) {
-            if (strpos($matches[2], ',') !== false) {
+            if (isset($matches[2]) and strpos($matches[2], ',') !== false) {
                 list($precision, $scale) = explode(',', $matches[2]);
                 $precision = (int) $precision; // important
                 $scale = (int) $scale;
