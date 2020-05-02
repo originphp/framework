@@ -33,6 +33,14 @@ class BatchInsertQueryTest extends OriginTestCase
     }
     public function testInsert()
     {
+        /**
+         * PostgreSQL error  "duplicate key value violates unique constraint "posts_pkey" probably because of old fixture setup which bypassed
+         * autoincrement. Truncating table for now.
+         * @todo investigate this behavior
+         */
+        $this->Post->query('TRUNCATE table posts');
+        
+        $this->assertEquals(0, $this->Post->find('count'));
         $records = [];
         for ($i=0;$i<1000;$i++) {
             $records[] = [
@@ -45,6 +53,6 @@ class BatchInsertQueryTest extends OriginTestCase
         }
 
         $this->assertTrue((new BatchInsertQuery($this->Post))->execute($records));
-        $this->assertEquals(1003, $this->Post->find('count'));
+        $this->assertEquals(1000, $this->Post->find('count'));
     }
 }
