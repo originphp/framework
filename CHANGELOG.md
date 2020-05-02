@@ -1,8 +1,15 @@
 # Changelog
 
-## [unreleased]
+## [2.5.0] - 2020-05-02
 
-## [2.4.3] - 2019-02-21
+### Added
+- Added BatchInsertQuery for doing batch inserts
+
+### Fixed 
+- Fixed bug in MysqlSchema when mapping from generic float definition
+- Fixed changelog date to show correct year :(
+
+## [2.4.3] - 2020-02-21
 
 cleaned up code, changed visibility on methods and properties, and fixed docblocks.
 
@@ -11,7 +18,7 @@ cleaned up code, changed visibility on methods and properties, and fixed docbloc
 - Fixed Console command names validation to allow numbers e.g. oauth2 or oauth2:foo
 - Fixed added Mail::attachments method (public property remains)
 
-## [2.4.2] - 2019-01-19
+## [2.4.2] - 2020-01-19
 
 ### Changed
 
