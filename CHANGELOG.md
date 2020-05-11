@@ -1,5 +1,10 @@
 # Changelog
 
+## [unreleased]
+### Fixed
+- Fixed Model::new not using entity locator for custom entity classes
+- Fixed FormHelper radio custom class
+
 ## [2.5.0] - 2020-05-02
 
 ### Added
