@@ -33,7 +33,7 @@ use Origin\Model\Exception\RecordNotFoundException;
 
 class Model
 {
-    use InitializerTrait, ModelTrait, CounterCacheable, HookTrait, CallbackRegistrationTrait;
+    use InitializerTrait, ModelTrait, CounterCacheable, HookTrait, CallbackRegistrationTrait, EntityLocatorTrait;
     
     /**
      * The name for this model, this generated automatically.
@@ -1591,8 +1591,10 @@ class Model
      */
     public function new(array $requestData = null, array $options = []) : Entity
     {
+        $entityClass = $this->entityClass($this);
+
         if ($requestData === null) {
-            return new Entity([], ['name' => $this->alias]);
+            return new $entityClass([], ['name' => $this->alias]);
         }
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
