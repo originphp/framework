@@ -358,7 +358,6 @@ class FormHelper extends Helper
         }
 
         $label = Inflector::human(end($parts));
-
         $options += [
             'label' => $label,
             'id' => $this->domId($name),
@@ -393,7 +392,7 @@ class FormHelper extends Helper
             if (empty($labelOptions['text'])) {
                 $labelOptions['text'] = $label;
             }
-
+           
             $labelOutput = $this->formatTemplate('label', $labelOptions);
             unset($options['label']);
         }
@@ -419,20 +418,22 @@ class FormHelper extends Helper
                 }
             }
         }
-
+    
         // Check if field is required to add required class
         $required = false;
         if ($model) {
             $requiredFields = $this->requiredFields($model);
             $required = ($requiredFields and in_array($column, $requiredFields));
         }
-
+       
         if ($type === 'select') {
             $fieldOutput = $this->select($name, $selectOptions, $options);
         } elseif ($type === 'radio') {
             // $fieldOutput = $this->radio($name, $selectOptions, $options);
             // Each radio needs to be in its own div
             $output = '';
+
+            $options['label'] = $labelOptions;
 
             foreach ($selectOptions as $key => $value) {
                 $output .= $this->formatTemplate($template, ['class' => $div] + [
@@ -451,7 +452,7 @@ class FormHelper extends Helper
             }
         }
 
-        if ($type === 'checkbox' or $type === 'radio') {
+        if ($type === 'checkbox') {
             $output = $fieldOutput . $labelOutput;
         } else {
             $output = $labelOutput . $fieldOutput;
@@ -818,6 +819,16 @@ class FormHelper extends Helper
 
         $output = '';
 
+        /**
+         * Radios work a bit different, get attributes
+         */
+        $labelOptions = [];
+        if (isset($radioOptions['label'])) {
+            $labelOptions = is_array($radioOptions['label']) ? $radioOptions['label'] : [];
+            unset($labelOptions['name'],$labelOptions['text']);
+            unset($radioOptions['label']);
+        }
+      
         $radioId = $radioOptions['id'];
 
         $checked = null;
@@ -835,7 +846,7 @@ class FormHelper extends Helper
                 $additionalOptions = ['checked' => true];
             }
             $output .= $this->formatTemplate('radio', $radioOptions + $additionalOptions);
-            $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $value]);
+            $output .= $this->formatTemplate('label', ['name' => $radioOptions['id'], 'text' => $value] + $labelOptions);
         }
 
         return $output;
