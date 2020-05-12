@@ -2,6 +2,7 @@
 
 ## [unreleased]
 ### Fixed
+- Fixed Number::parser returning 0 when non numeric strings were passed
 - Fixed Model::new not using entity locator for custom entity classes
 - Fixed FormHelper radio custom class
 

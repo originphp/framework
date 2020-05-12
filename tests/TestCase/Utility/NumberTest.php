@@ -58,5 +58,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1234, Number::parse('1,234'));
         $this->assertEquals(1234.789, Number::parse('1,234.789'));
         $this->assertEquals(1234.789, Number::parse('1.234,789', ['thousands' => '.','decimals' => ',']));
+
+        $this->assertNull(Number::parse('abc'));
     }
 }

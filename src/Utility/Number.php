@@ -191,7 +191,7 @@ class Number
      *
      * @param string|float|integer $value
      * @param array $options
-     * @return int|double
+     * @return mixed
      */
     public static function parse($value, array $options = [])
     {
@@ -202,6 +202,9 @@ class Number
         $value = str_replace($options['thousands'], '', (string) $value);
         $value = str_replace($options['decimals'], '.', $value);
 
-        return strpos($value, '.') !== false ? (float) $value : (int) $value;
+        if (is_numeric($value)) {
+            return strpos($value, '.') !== false ? (float) $value : (int) $value;
+        }
+        return null;
     }
 }
