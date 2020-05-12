@@ -389,10 +389,10 @@ class FormHelperTest extends OriginTestCase
     {
         $FormHelper = $this->Form;
         $result = $FormHelper->control('plan', ['type' => 'radio','options' => [1000 => 'standard',10001 => 'premium']]);
-        $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001"><label for="plan-10001">premium</label></div>';
+        $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000" class="form-check-label">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001"><label for="plan-10001" class="form-check-label">premium</label></div>';
         $this->assertEquals($expected, $result);
         $result = $FormHelper->control('plan', ['type' => 'radio','options' => [1000 => 'standard',10001 => 'premium'],'value' => 10001]);
-        $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001" checked><label for="plan-10001">premium</label></div>';
+        $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000" class="form-check-label">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001" checked><label for="plan-10001" class="form-check-label">premium</label></div>';
         $this->assertEquals($expected, $result);
     }
 
