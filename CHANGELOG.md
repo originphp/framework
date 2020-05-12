@@ -1,6 +1,9 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.5.1] - 2020-05-12
+
 ### Fixed
 - Fixed Number::parser returning 0 when non numeric strings were passed
 - Fixed Model::new not using entity locator for custom entity classes
