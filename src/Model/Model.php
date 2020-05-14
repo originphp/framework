@@ -422,21 +422,32 @@ class Model
 
     /**
      * Sets the validation rule/s
+     *
      * Examples:
+     *
      * $this->validate('first_name','notBlank');
-     * $this->validate('first_name',['rule'=>'notBlank']);
+     *
+     * $this->validate('first_name',[
+     *      'required'
+     * ]);
+     *
+     * $this->validate('first_name',[
+     *      'rule' => 'required'
+     * ]);
+     *
      * $this->validate('email', [
-     *   'notBlank' =>  ['rule' => 'notBlank'],
-     *   'email' =>  ['rule' => 'email']
+     *   'required',
+     *   'email' =>  ['rule' => 'email','message'=>'Invalid email address']
      *  ]);
      *
      * @param string $field Field name to validate
      * @param string|array $options either the rule name e.g. notBlank or an options array with any of the following keys:
-     *   - rule: name of rule e.g. date
-     *   - message: the message to show if the rule fails
-     *   - on: default null. set to create or update to run the rule only on those
-     *   - required: the key must be present
-     *   - allowBlank: dont run rule on blank value
+     *   - rule: name of rule e.g. required, numeric, ['date', 'Y-m-d']
+     *   - message: the error message to show if the rule fails
+     *   - on: default:null. set to create or update to run the rule only on those
+     *   - present: default:false the field (key) must be present but can be empty
+     *   - nullable: default:false accepts null values
+     *   - stop: default:true stop on validation failure
      * @return void
      *
      */

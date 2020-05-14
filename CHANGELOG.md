@@ -4,7 +4,20 @@
 
 ## [2.5.1] - 2020-05-12
 
+### Added
+- Valdation rule setting `continue` 
+
+### Changed
+- Valdation rule settings renamed with BC
+    - `required` changed to `present`
+    - `allowBlank` changed to `nullable`
+
+### Added
+
+- FormHelper now accepts a `default` value when creating form control.
+
 ### Fixed
+
 - Fixed Number::parser returning 0 when non numeric strings were passed
 - Fixed Model::new not using entity locator for custom entity classes
 - Fixed FormHelper radio custom class

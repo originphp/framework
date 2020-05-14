@@ -289,20 +289,20 @@ class FormHelper extends Helper
     }
 
     /**
-     * Gets the required fields for the form, in terms of a form, reuqired field is one
+     * Gets the required fields for the form, in terms of a form, required field is one
      * that cannot be blank, in terms of the validator required means the key must be present.
      *
      * @param array $validationRules
      * @param boolean $create
      * @return array
      */
-    protected function parseRequiredFields(array $validationRules, bool $create = true) : array
+    protected function parseRequiredFields(array $validationRules, bool $create = true): array
     {
         $result = [];
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['rule'] === 'notBlank' or $validationRule['required']) {
+                if ($validationRule['rule'] === 'required' or $validationRule['present']) {
                     $result[] = $field;
                 }
             }

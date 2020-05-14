@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Model;
 
 use Origin\Validation\Validation;
@@ -44,16 +47,6 @@ class ModelValidator
      */
     protected $timeFormat = null;
 
-    /**
-     * @var array
-     */
-    protected $defaultMessageMap = [
-        'notBlank' => 'This field is required',
-        'mimeType' => 'Invalid mime type',
-        'extension' => 'Invalid file extension',
-        'upload' => 'File upload error',
-    ];
-
     public function __construct(Model $model)
     {
         $this->model = $model;
@@ -65,7 +58,7 @@ class ModelValidator
      * @param array $rules
      * @return array
      */
-    public function rules(array $rules = null) : array
+    public function rules(array $rules = null): array
     {
         if ($rules === null) {
             return $this->validationRules;
@@ -77,43 +70,18 @@ class ModelValidator
         return $rules;
     }
 
-    public function setRule(string $field, $params) :void
+    /**
+     * Sets the validation rule
+     *
+     * @param string $field
+     * @param string|array $params
+     * @return void
+     */
+    public function setRule(string $field, $params): void
     {
-        if (is_string($params)) {
-            $params = ['rule1' => ['rule' => $params]];
-        }
-        if (isset($params['rule'])) {
-            $params = ['rule1' => $params];
-        }
-
-        foreach ($params as $key => $value) {
-            $value += [
-                'rule' => null,
-                'message' => null,
-                'required' => false,
-                'on' => null,
-                'allowBlank' => false,
-            ];
-            if ($value['message'] === null) {
-                $value['message'] = 'Invalid value';
-                if ($value['rule'] === 'notBlank') {
-                    $value['message'] = 'This field is required';
-                }
-                $rule = $value['rule'];
-                if (is_array($value['rule'])) {
-                    $rule = $value['rule'][0];
-                }
-        
-                if (isset($this->defaultMessageMap[$rule])) {
-                    $value['message'] = $this->defaultMessageMap[$rule];
-                }
-            }
-           
-            $params[$key] = $value;
-        }
-        $this->validationRules[$field] = $params;
+        $this->validationRules[$field] = (new ValidationRuleSet($params))->toArray();
     }
-    
+
     /**
      * Validates a value
      *
@@ -121,9 +89,8 @@ class ModelValidator
      * @param string|array $ruleSet email or ['equalTo', 'origin']
      * @return bool
      */
-    public function validate($value, $ruleSet) : bool
+    public function validate($value, $ruleSet): bool
     {
-       
         // ['extension',['csv','txt']]
         if (is_array($ruleSet)) {
             $rule = $ruleSet[0];
@@ -133,17 +100,17 @@ class ModelValidator
             $rule = $ruleSet;
             $args = [$value];
         }
-     
+
         // Check validation class
         if (method_exists(Validation::class, $rule)) {
-            return forward_static_call([Validation::class,$rule], ...$args);
+            return forward_static_call([Validation::class, $rule], ...$args);
         }
 
         // This is includes deprecated features but non as well
         if (method_exists($this, $rule)) {
             return call_user_func_array([$this, $rule], $args);
         }
-       
+
         // Validation methods in model
         if (method_exists($this->model, $rule)) {
             return call_user_func_array([$this->model, $rule], $args);
@@ -163,7 +130,7 @@ class ModelValidator
      * @param string|bool|null $on null,'create','update'
      * @return bool
      */
-    protected function runRule(bool $create, $on)  : bool
+    protected function runRule(bool $create, $on): bool
     {
         if ($on === null or ($create and $on === 'create') or (! $create and $on === 'update')) {
             return true;
@@ -181,10 +148,10 @@ class ModelValidator
      * @param boolean $create
      * @return bool
      */
-    public function validates(Entity $entity, bool $create = true) : bool
+    public function validates(Entity $entity, bool $create = true): bool
     {
         $modified = $entity->modified();
-        
+
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] and ! $this->runRule($create, $validationRule['on'])) {
@@ -192,47 +159,63 @@ class ModelValidator
                 }
 
                 // Don't run validation rule on field if its not in the entity
-                if (! $validationRule['required'] and in_array($field, $modified) === false) {
+                if (! $validationRule['present'] and in_array($field, $modified) === false) {
                     continue;
                 }
-            
+
                 $value = $entity->get($field);
-  
+
                 // Required means the key must be present not wether it has a value or not
-                if ($validationRule['required'] and ! in_array($field, $entity->properties())) {
+                if ($validationRule['present'] and ! in_array($field, $entity->properties())) {
                     $entity->invalidate($field, 'This field is required');
-                    break; // dont run any more validation rules on this field if blank
+                    if ($validationRule['continue']) {
+                        continue;
+                    }
+                    break;
                 }
 
-                // If its required rule (which does not exist), check and break or continue
-                if ($validationRule['rule'] === 'notBlank') {
-                    if (! $this->validate($value, 'notBlank')) {
+                /**
+                 * The required rule does not exit, it checks that the value is not empty or there was a file
+                 * upload
+                 */
+                if ($validationRule['rule'] === 'required') {
+                    if (! $this->validate($value, 'notBlank') and ! $this->validate($value, 'upload')) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
-                    continue; // goto next rule
+                    if ($validationRule['continue']) {
+                        continue;
+                    }
+                    break;
                 }
 
-                // If the value is not required and value is empty then don't validate
                 if ($this->isBlank($value)) {
-                    if ($validationRule['allowBlank'] === true) {
+                    // special rule: optional, on blank values skip rest of validation rules
+                    if ($validationRule['rule'] === 'optional') {
+                        break;
+                    }
+                    // go to next rule as this validation rule allows null value
+                    if ($validationRule['nullable'] === true) {
                         continue;
                     }
                 }
-         
+
                 // Handle both types
                 if ($validationRule['rule'] === 'isUnique') {
-                    $validationRule['rule'] = ['isUnique',[$field]];
+                    $validationRule['rule'] = ['isUnique', [$field]];
                 }
                 if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
 
                 if ($validationRule['rule'] === 'confirm') {
-                    $validationRule['rule'] = ['confirm',$entity->get($field . '_confirm')];
+                    $validationRule['rule'] = ['confirm', $entity->get($field . '_confirm')];
                 }
-               
+
                 if (! $this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
+                    if ($validationRule['continue'] === false) {
+                        break;
+                    }
                 }
             }
         }
@@ -247,12 +230,12 @@ class ModelValidator
      * @param mixed $value
      * @return boolean
      */
-    protected function isBlank($value) : bool
+    protected function isBlank($value): bool
     {
         if ($value === '' or $value === null) {
             return true;
         }
-        
+
         if (is_array($value) and isset($value['error'])) {
             return $value['error'] === UPLOAD_ERR_NO_FILE;
         }
@@ -272,7 +255,7 @@ class ModelValidator
      * @param string $regex
      * @return boolean
      */
-    public function custom($value, $regex) : bool
+    public function custom($value, $regex): bool
     {
         deprecationWarning('Validation rule `custom` has been deprecated use `regex` instead');
 
@@ -287,7 +270,7 @@ class ModelValidator
      * @param boolean $caseInSensitive
      * @return boolean
      */
-    public function inList($value, $values, $caseInSensitive = false) : bool
+    public function inList($value, $values, $caseInSensitive = false): bool
     {
         deprecationWarning('Validation rule `inList` has been deprecated use `in` instead');
         if ($caseInSensitive) {
@@ -305,7 +288,7 @@ class ModelValidator
      * @param mixed $value
      * @return boolean
      */
-    public function notEmpty($value) : bool
+    public function notEmpty($value): bool
     {
         deprecationWarning('Validation rule `notEmpty` has been deprecated use `notBlank` instead');
         if (empty($value) and (string) $value !== '0') {
@@ -322,7 +305,7 @@ class ModelValidator
      * @param mixed $value2
      * @return bool
      */
-    public function confirm($value1, $value2) : bool
+    public function confirm($value1, $value2): bool
     {
         return (! is_null($value2) and $value1 == $value2);
     }
