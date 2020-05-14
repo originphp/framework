@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Http\View\Helper;
 
 use Origin\Core\Dot;
@@ -47,7 +50,7 @@ class FormHelper extends Helper
             'date' => ['div' => 'form-group', 'class' => 'form-control'],
             'time' => ['div' => 'form-group', 'class' => 'form-control'],
             'datetime' => ['div' => 'form-group', 'class' => 'form-control'], // Date time appended,
-            'file' => ['div' => 'form-group','class' => 'form-control-file'],
+            'file' => ['div' => 'form-group', 'class' => 'form-control-file'],
         ],
         'templates' => [
             // Controls
@@ -124,10 +127,10 @@ class FormHelper extends Helper
      * @param array $options type, url and html attributes
      * @return string
      */
-    public function create($entity = null, array $options = []) : string
+    public function create($entity = null, array $options = []): string
     {
         $attributes = [];
-       
+
         $model = $this->data = null;
 
         /**
@@ -146,7 +149,7 @@ class FormHelper extends Helper
                 }
             }
         }
-        
+
         if ($entity instanceof Entity) {
             $this->data = $entity;
             $model = $entity->name();
@@ -182,10 +185,10 @@ class FormHelper extends Helper
      * @param array $options  Set type = button or attributes
      * @return string
      */
-    public function button(string $name, array $options = []) : string
+    public function button(string $name, array $options = []): string
     {
         $options += ['name' => $name, 'type' => 'button'];
-       
+
         return $this->formatTemplate('button', $options);
     }
 
@@ -196,7 +199,7 @@ class FormHelper extends Helper
      * @param array $options  Set type = button or attributes
      * @return string
      */
-    public function submit(string $name, array $options = []) : string
+    public function submit(string $name, array $options = []): string
     {
         $options['type'] = 'submit';
 
@@ -210,7 +213,7 @@ class FormHelper extends Helper
      * @param array $options checked and/or html attributes
      * @return string
      */
-    public function checkbox(string $name, array $options = []) : string
+    public function checkbox(string $name, array $options = []): string
     {
         $options = array_merge(['hiddenField' => true], $options);
         $options = $this->prepareOptions($name, $options);
@@ -241,7 +244,7 @@ class FormHelper extends Helper
      * @param string $name
      * @return array
      */
-    protected function introspectModel(string $name) : array
+    protected function introspectModel(string $name): array
     {
         if (isset($this->meta[$name])) {
             return $this->meta[$name];
@@ -256,10 +259,10 @@ class FormHelper extends Helper
         $entity = $this->data;
 
         $model = ModelRegistry::get($name);
-       
+
         if ($model) {
             $meta['primaryKey'] = $model->primaryKey();
-          
+
             foreach ($model->schema()['columns'] as $column => $row) {
                 $type = $row['type'];
 
@@ -273,7 +276,7 @@ class FormHelper extends Helper
                     $meta['maxlength'][$column] = $row['limit'];
                 }
             }
-            
+
             // Only work if entity is supplied
             if ($entity) {
                 $meta['requiredFields'] = $this->parseRequiredFields($model->validator()->rules());
@@ -322,7 +325,7 @@ class FormHelper extends Helper
      * @param array  $options
      * @return string
      */
-    public function control(string $name, array $options = []) : string
+    public function control(string $name, array $options = []): string
     {
         $selectOptions = [];
 
@@ -333,7 +336,7 @@ class FormHelper extends Helper
         if (empty($options['type'])) {
             $options['type'] = $this->detectType($name);
         }
-    
+
         if (isset($this->config['controlDefaults'][$options['type']])) {
             $options += $this->config['controlDefaults'][$options['type']];
         }
@@ -351,7 +354,7 @@ class FormHelper extends Helper
             $models = Inflector::camelCase(Inflector::plural($parts[0]));
             $value = $this->view()->get($models);
             if ($value) {
-                $selectOptions = $value ;
+                $selectOptions = $value;
             }
         } else {
             $parts = explode('.', $label);
@@ -392,7 +395,7 @@ class FormHelper extends Helper
             if (empty($labelOptions['text'])) {
                 $labelOptions['text'] = $label;
             }
-           
+
             $labelOutput = $this->formatTemplate('label', $labelOptions);
             unset($options['label']);
         }
@@ -418,14 +421,14 @@ class FormHelper extends Helper
                 }
             }
         }
-    
+
         // Check if field is required to add required class
         $required = false;
         if ($model) {
             $requiredFields = $this->requiredFields($model);
             $required = ($requiredFields and in_array($column, $requiredFields));
         }
-       
+
         if ($type === 'select') {
             $fieldOutput = $this->select($name, $selectOptions, $options);
         } elseif ($type === 'radio') {
@@ -477,7 +480,7 @@ class FormHelper extends Helper
      * @param string $model
      * @return array|null
      */
-    protected function requiredFields(string $model) : ?array
+    protected function requiredFields(string $model): ?array
     {
         $result = null;
         if (isset($this->meta[$model])) {
@@ -499,23 +502,23 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function date(string $name, array $options = []) : string
+    public function date(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options += ['format' => $this->config('format')];
         $options['type'] = 'text';
 
         /**
-           * Only format database values (if validation fails dont format)
-           */
+         * Only format database values (if validation fails dont format)
+         */
         if ($options['format']) {
             if ($options['format'] === true) {
                 $options['format'] = Date::locale()['date'];
             }
             if (empty($options['placeholder'])) {
-                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d'), $options['format']);
+                $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d'), $options['format']);
             }
-            
+
             if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
@@ -538,7 +541,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function datetime(string $name, array $options = []) : string
+    public function datetime(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options += ['format' => $this->config('format')];
@@ -552,7 +555,7 @@ class FormHelper extends Helper
                 $options['format'] = Date::locale()['datetime'];
             }
             if (empty($options['placeholder'])) {
-                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
+                $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
             if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
@@ -570,7 +573,7 @@ class FormHelper extends Helper
      * @param array  $options html attributes
      * @return string html
      */
-    public function file(string $name, array $options = []) : string
+    public function file(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         unset($options['value']); // remove value array as this cant be escaped or displayed
@@ -585,7 +588,7 @@ class FormHelper extends Helper
      * @param array $options Html attributes
      * @return string
      */
-    public function hidden(string $name, array $options = []) : string
+    public function hidden(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
 
@@ -597,7 +600,7 @@ class FormHelper extends Helper
      *
      * @return string
      */
-    public function end() : string
+    public function end(): string
     {
         return $this->formatTemplate('formEnd');
     }
@@ -609,7 +612,7 @@ class FormHelper extends Helper
      * @param array $options Html attributes
      * @return string
      */
-    public function label(string $name, string $text = null, array $options = []) : string
+    public function label(string $name, string $text = null, array $options = []): string
     {
         $options['name'] = $name;
 
@@ -633,7 +636,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function text(string $name, array $options = []) : string
+    public function text(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'text';
@@ -652,7 +655,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function textarea(string $name, array $options = []) : string
+    public function textarea(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
 
@@ -671,7 +674,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function time(string $name, array $options = []) : string
+    public function time(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options += ['format' => $this->config('format')];
@@ -685,7 +688,7 @@ class FormHelper extends Helper
                 $options['format'] = Date::locale()['time'];
             }
             if (empty($options['placeholder'])) {
-                $options['placeholder'] = 'e.g. '. Date::format(date('Y-m-d H:i:s'), $options['format']);
+                $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
             if (! empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']); // Daylight saving issue with timefields
@@ -709,7 +712,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function number(string $name, array $options = []) : string
+    public function number(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options += ['format' => $this->config('format')];
@@ -718,7 +721,7 @@ class FormHelper extends Helper
         /**
          * Only format database values (if validation fails dont format)
          */
-  
+
         if ($options['format']) {
             if (! empty($options['value']) and (is_int($options['value']) or is_float($options['value']))) {
                 $options['value'] = Number::format($options['value']);
@@ -741,7 +744,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function password(string $name, array $options = []) : string
+    public function password(string $name, array $options = []): string
     {
         $options = $this->prepareOptions($name, $options);
         $options['type'] = 'password';
@@ -763,7 +766,7 @@ class FormHelper extends Helper
      * @param array $options confirm message and html attrbutes
      * @return string
      */
-    public function postLink(string $name, $url, $options = []) : string
+    public function postLink(string $name, $url, $options = []): string
     {
         $options += ['method' => 'post', 'confirm' => null];
         if (is_array($url)) {
@@ -812,7 +815,7 @@ class FormHelper extends Helper
      *  - any other HTML attribute
      * @return string
      */
-    public function radio(string $name, array $options = [], array $radioOptions = []) : string
+    public function radio(string $name, array $options = [], array $radioOptions = []): string
     {
         $radioOptions['id'] = true;
         $radioOptions = $this->prepareOptions($name, $radioOptions);
@@ -825,10 +828,10 @@ class FormHelper extends Helper
         $labelOptions = [];
         if (isset($radioOptions['label'])) {
             $labelOptions = is_array($radioOptions['label']) ? $radioOptions['label'] : [];
-            unset($labelOptions['name'],$labelOptions['text']);
+            unset($labelOptions['name'], $labelOptions['text']);
             unset($radioOptions['label']);
         }
-      
+
         $radioId = $radioOptions['id'];
 
         $checked = null;
@@ -836,7 +839,7 @@ class FormHelper extends Helper
             $checked = $radioOptions['value'];
             unset($radioOptions['value']);
         }
-       
+
         foreach ($options as $key => $value) {
             $radioOptions['id'] = $radioId . '-' . $key;
             $radioOptions['value'] = $key;
@@ -863,7 +866,7 @@ class FormHelper extends Helper
      * @param array $selectOptions Html attributes
      * @return string
      */
-    public function select(string $name, array $options = [], array $selectOptions = []) : string
+    public function select(string $name, array $options = [], array $selectOptions = []): string
     {
         $selectOptions = $this->prepareOptions($name, $selectOptions);
 
@@ -879,7 +882,7 @@ class FormHelper extends Helper
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);
         }
-        
+
         return $this->formatTemplate('select', $selectOptions);
     }
 
@@ -889,7 +892,7 @@ class FormHelper extends Helper
      * @param string|array|null $defaults Use string or null to get and array of defaults to set
      * @return array|null
      */
-    public function controlDefaults($defaults = null) : ?array
+    public function controlDefaults($defaults = null): ?array
     {
         if ($defaults === null) {
             return $this->config['controlDefaults'];
@@ -915,7 +918,7 @@ class FormHelper extends Helper
      * @param array $options
      * @return string
      */
-    public function error(string $message, array $options = []) : string
+    public function error(string $message, array $options = []): string
     {
         return $this->formatTemplate('error', ['content' => $message]);
     }
@@ -927,12 +930,12 @@ class FormHelper extends Helper
      * @param array $selectOptions
      * @return string
      */
-    private function buildSelectOptions(array $options, array $selectOptions = []) : string
+    private function buildSelectOptions(array $options, array $selectOptions = []): string
     {
         $selectOptions += ['value' => null];
 
         $noneSelected = $selectOptions['value'] === null or $selectOptions['value'] === '';
-        
+
         $output = '';
         foreach ($options as $key => $value) {
             if (is_array($value)) {
@@ -964,7 +967,7 @@ class FormHelper extends Helper
      * @param array $options
      * @return array
      */
-    protected function prepareOptions(string $name, array $options = []) : array
+    protected function prepareOptions(string $name, array $options = []): array
     {
         if (isset($options['id']) and $options['id'] === true) {
             $options['id'] = $this->domId($name);
@@ -990,10 +993,10 @@ class FormHelper extends Helper
                 $last = end($parts);
 
                 // Get value unless overridden
-                if (! isset($options['value']) and isset($entity->$last) and is_scalar($entity->$last)) {
+                if (isset($entity->$last) and is_scalar($entity->$last)) {
                     $options['value'] = $entity->$last;
                 }
-             
+
                 // Check Validation Errors
                 if ($entity and $entity->errors($last)) {
                     $options = $this->addClass('error', $options);
@@ -1011,6 +1014,13 @@ class FormHelper extends Helper
             }
         }
 
+        /**
+         * If the value is not set then add (0.00 or '' will not be overridden)
+         */
+        if (! isset($options['value']) and isset($options['default'])) {
+            $options['value'] = $options['default'];
+        }
+
         return $options;
     }
 
@@ -1020,7 +1030,7 @@ class FormHelper extends Helper
      * @param string $name
      * @return int|null
      */
-    protected function getMaxlength(string $name) : ?int
+    protected function getMaxlength(string $name): ?int
     {
         $model = $this->modelName;
 
@@ -1055,7 +1065,7 @@ class FormHelper extends Helper
         if (strpos($path, '.') === false) {
             return $entity;
         }
-      
+
         foreach (explode('.', $path) as $key) {
             $lastEntity = $entity;
             if (is_object($entity) and isset($entity->$key)) {
@@ -1077,7 +1087,7 @@ class FormHelper extends Helper
      * @param array $options
      * @return array
      */
-    protected function addClass(string $class, array $options = []) : array
+    protected function addClass(string $class, array $options = []): array
     {
         if (isset($options['class'])) {
             $options['class'] = "{$options['class']} {$class}";
@@ -1094,7 +1104,7 @@ class FormHelper extends Helper
      * @param string $column
      * @return string
      */
-    protected function detectType(string $column) : string
+    protected function detectType(string $column): string
     {
         $model = $this->modelName;
         if (strpos($column, '.') !== false) {
@@ -1132,7 +1142,7 @@ class FormHelper extends Helper
      * @param array $options
      * @return string
      */
-    protected function formatTemplate(string $name, array $options = []) : string
+    protected function formatTemplate(string $name, array $options = []): string
     {
         $template = $this->templates($name);
         $options += ['escape' => true];
@@ -1161,7 +1171,7 @@ class FormHelper extends Helper
                 $options['value'] = h($options['value']);
             }
         }
-        unset($options['escape'],$data['escape']);
+        unset($options['escape'], $data['escape']);
 
         // Remaining items in options are attributes
         $data['attributes'] = $this->attributesToString($options);
@@ -1174,13 +1184,13 @@ class FormHelper extends Helper
      *
      * @return string|null
      */
-    protected function csrf() : ?string
+    protected function csrf(): ?string
     {
         $token = $this->request()->params('csrfToken');
         if ($token === null) {
             return null;
         }
 
-        return $this->formatTemplate('hidden', ['name' => 'csrfToken','value' => $token]);
+        return $this->formatTemplate('hidden', ['name' => 'csrfToken', 'value' => $token]);
     }
 }

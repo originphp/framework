@@ -158,7 +158,7 @@ class QueryTest extends OriginTestCase
         $this->assertEquals(
             'SELECT count(id) as count, articles.author_id FROM `articles` GROUP BY articles.author_id HAVING author_id > 1',
             $query->sql()
-            );
+        );
     }
 
     public function testLock()

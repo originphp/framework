@@ -842,11 +842,11 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(
             'ingredient_id',
             $Ingredient->association('hasAndBelongsToMany')['Recipe']['foreignKey']
-      );
+        );
         $this->assertEquals(
             'recipe_id',
             $Ingredient->association('hasAndBelongsToMany')['Recipe']['associationForeignKey']
-      );
+        );
     }
 
     public function testFindFirst()

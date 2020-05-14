@@ -15,9 +15,8 @@
 namespace Origin\Test\Query;
 
 use Origin\Model\Model;
-use Origin\Model\Query\BatchInsertQuery;
-use Origin\Model\Query\QueryObject;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Query\BatchInsertQuery;
 
 class BatchInsertQueryTest extends OriginTestCase
 {
@@ -42,7 +41,7 @@ class BatchInsertQueryTest extends OriginTestCase
         
         $this->assertEquals(0, $this->Post->find('count'));
         $records = [];
-        for ($i=0;$i<1000;$i++) {
+        for ($i = 0;$i < 1000;$i++) {
             $records[] = [
                 'title' => uniqid(),
                 'body' => bin2hex(random_bytes(mt_rand(10, 200))),

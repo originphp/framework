@@ -284,7 +284,7 @@ class MailParser
                     $data['starting-pos-body'],
                     $data['ending-pos-body'],
                     $data['transfer-encoding']
-                    ) ?: ''); // allow empty strings for invalid attachments @see 550-address-not-found.eml
+                ) ?: ''); // allow empty strings for invalid attachments @see 550-address-not-found.eml
                 fclose($fh);
 
                 $attachments[] = [

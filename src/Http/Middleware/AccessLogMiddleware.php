@@ -66,6 +66,6 @@ class AccessLogMiddleware extends Middleware
             $request->env('SERVER_PROTOCOL'),
             $response->statusCode(),
             mb_strlen($response->body() ?? '')
-            );
+        );
     }
 }

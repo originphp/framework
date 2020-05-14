@@ -205,6 +205,7 @@ class Number
         if (is_numeric($value)) {
             return strpos($value, '.') !== false ? (float) $value : (int) $value;
         }
+
         return null;
     }
 }

@@ -17,7 +17,6 @@ namespace Origin\Model\Query;
 
 use Origin\Model\Model;
 use InvalidArgumentException;
-use Origin\Model\Query\QueryObject;
 
 class BatchInsertQuery extends QueryObject
 {
@@ -38,7 +37,7 @@ class BatchInsertQuery extends QueryObject
 
     public function execute(array $records, array $options = [])
     {
-        $options += ['transaction' => true ,'table' => $this->Model->table()];
+        $options += ['transaction' => true,'table' => $this->Model->table()];
         $fields = $questionMarks = $values = $buffer = [];
 
         if (empty($records)) {
@@ -53,7 +52,6 @@ class BatchInsertQuery extends QueryObject
         
         $fields = array_keys($records[$firstKey]);
         $questionMarks = array_fill(0, count($fields), '?');
-
 
         foreach ($records as $record) {
             $values = array_merge($values, array_values($record));
@@ -72,6 +70,7 @@ class BatchInsertQuery extends QueryObject
         if ($options['transaction']) {
             $this->Model->commit();
         }
+
         return true;
     }
 

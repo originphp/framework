@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -42,14 +43,14 @@ class Widget extends Model
      */
     protected $schema = [
         'columns' => [
-            'id' => ['type' => 'integer', 'limit' => 11,'key' => 'primary'],
+            'id' => ['type' => 'integer', 'limit' => 11, 'key' => 'primary'],
             'name' => ['type' => 'string', 'limit' => 80],
             'description' => ['type' => 'text'],
             'active' => ['type' => 'boolean', 'limit' => 1],
         ],
     ];
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->validate('name', ['rule' => 'notBlank']);
     }
@@ -72,7 +73,7 @@ class MockFormHelper extends FormHelper
 class FormHelperTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Post'];
-    
+
     protected function setUp(): void
     {
         $request = new Request('widgets/edit');
@@ -104,7 +105,7 @@ class FormHelperTest extends OriginTestCase
         $expected = '<form enctype="multipart/form-data" method="post" action="/widgets/edit">';
         $this->assertEquals($expected, $result);
 
-        $result = $FormHelper->create($widget, ['class' => 'my-class','id' => 'my-id']);
+        $result = $FormHelper->create($widget, ['class' => 'my-class', 'id' => 'my-id']);
         $expected = '<form method="post" accept-charset="utf-8" action="/widgets/edit" class="my-class" id="my-id">';
         $this->assertEquals($expected, $result);
 
@@ -283,12 +284,12 @@ class FormHelperTest extends OriginTestCase
     public function testDate()
     {
         $now = date('Y-m-d H:i:s');
-        Date::locale(['date' => 'd/m/Y','time' => 'H:i','datetime' => 'd/m/Y H:i','timezone' => 'Europe/London']);
+        Date::locale(['date' => 'd/m/Y', 'time' => 'H:i', 'datetime' => 'd/m/Y H:i', 'timezone' => 'Europe/London']);
         $FormHelper = $this->Form;
-        $expected = '<input type="text" name="date" placeholder="e.g. ' .Date::formatDate($now) . '">';
+        $expected = '<input type="text" name="date" placeholder="e.g. ' . Date::formatDate($now) . '">';
         $this->assertEquals($expected, $FormHelper->date('date'));
 
-        $expected = '<input type="text" name="date" value="' .Date::formatDate($now) . '" placeholder="e.g. ' .Date::formatDate($now) . '">';
+        $expected = '<input type="text" name="date" value="' . Date::formatDate($now) . '" placeholder="e.g. ' . Date::formatDate($now) . '">';
         $this->assertEquals($expected, $FormHelper->date('date', ['value' => $now]));
     }
 
@@ -296,10 +297,10 @@ class FormHelperTest extends OriginTestCase
     {
         $now = date('Y-m-d H:i:s');
         $FormHelper = $this->Form;
-        $expected = '<input type="text" name="time" placeholder="e.g. ' .Date::formatTime($now) . '">';
+        $expected = '<input type="text" name="time" placeholder="e.g. ' . Date::formatTime($now) . '">';
         $this->assertEquals($expected, $FormHelper->time('time'));
 
-        $expected = '<input type="text" name="time" value="' .Date::formatTime($now) . '" placeholder="e.g. ' .Date::formatTime($now) . '">';
+        $expected = '<input type="text" name="time" value="' . Date::formatTime($now) . '" placeholder="e.g. ' . Date::formatTime($now) . '">';
         $this->assertEquals($expected, $FormHelper->time('time', ['value' => $now]));
     }
 
@@ -308,10 +309,10 @@ class FormHelperTest extends OriginTestCase
         $now = date('Y-m-d H:i:s');
         $FormHelper = $this->Form;
 
-        $expected = '<input type="text" name="datetime" placeholder="e.g. ' .Date::formatDateTime($now) . '">';
+        $expected = '<input type="text" name="datetime" placeholder="e.g. ' . Date::formatDateTime($now) . '">';
         $this->assertEquals($expected, $FormHelper->datetime('datetime'));
 
-        $expected = '<input type="text" name="datetime" value="' .Date::formatDateTime($now) . '" placeholder="e.g. ' .Date::formatDateTime($now) . '">';
+        $expected = '<input type="text" name="datetime" value="' . Date::formatDateTime($now) . '" placeholder="e.g. ' . Date::formatDateTime($now) . '">';
         $this->assertEquals($expected, $FormHelper->datetime('datetime', ['value' => $now]));
     }
 
@@ -380,7 +381,7 @@ class FormHelperTest extends OriginTestCase
 
         $expected = '<input type="checkbox" name="active" value="1" checked>';
         $this->assertEquals($expected, $FormHelper->checkbox('active', ['hiddenField' => false]));
-        
+
         $expected = '<input type="checkbox" name="in_stock" value="1">';
         $this->assertEquals($expected, $FormHelper->checkbox('in_stock', ['hiddenField' => false]));
     }
@@ -388,10 +389,10 @@ class FormHelperTest extends OriginTestCase
     public function testControlRadio()
     {
         $FormHelper = $this->Form;
-        $result = $FormHelper->control('plan', ['type' => 'radio','options' => [1000 => 'standard',10001 => 'premium']]);
+        $result = $FormHelper->control('plan', ['type' => 'radio', 'options' => [1000 => 'standard', 10001 => 'premium']]);
         $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000" class="form-check-label">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001"><label for="plan-10001" class="form-check-label">premium</label></div>';
         $this->assertEquals($expected, $result);
-        $result = $FormHelper->control('plan', ['type' => 'radio','options' => [1000 => 'standard',10001 => 'premium'],'value' => 10001]);
+        $result = $FormHelper->control('plan', ['type' => 'radio', 'options' => [1000 => 'standard', 10001 => 'premium'], 'value' => 10001]);
         $expected = '<div class="form-check radio"><input type="radio" name="plan" value="1000" class="form-check-input" id="plan-1000"><label for="plan-1000" class="form-check-label">standard</label></div><div class="form-check radio"><input type="radio" name="plan" value="10001" class="form-check-input" id="plan-10001" checked><label for="plan-10001" class="form-check-label">premium</label></div>';
         $this->assertEquals($expected, $result);
     }
@@ -403,7 +404,7 @@ class FormHelperTest extends OriginTestCase
         $expected = '<input type="radio" name="duplicates" value="0" id="duplicates-0"><label for="duplicates-0">Create New</label><input type="radio" name="duplicates" value="1" id="duplicates-1"><label for="duplicates-1">Overwrite</label><input type="radio" name="duplicates" value="2" id="duplicates-2"><label for="duplicates-2">Delete</label>';
         $this->assertEquals($expected, $FormHelper->radio('duplicates', ['Create New', 'Overwrite', 'Delete']));
 
-        $result = $this->Form->radio('package', [123 => 'Premium',456 => 'Basic'], ['value' => 123]);
+        $result = $this->Form->radio('package', [123 => 'Premium', 456 => 'Basic'], ['value' => 123]);
         $expected = '<input type="radio" name="package" value="123" id="package-123" checked><label for="package-123">Premium</label><input type="radio" name="package" value="456" id="package-456"><label for="package-456">Basic</label>';
         $this->assertSame($expected, $result);
     }
@@ -417,7 +418,7 @@ class FormHelperTest extends OriginTestCase
         $result = preg_replace('/link_[a-zA-Z0-9]+/', 'link_123456789', $result);
         $this->assertEquals($expected, $result);
 
-        $newResult = $this->Form->postLink('delete', ['controller' => 'Articles','action' => 'delete',123]);
+        $newResult = $this->Form->postLink('delete', ['controller' => 'Articles', 'action' => 'delete', 123]);
         $newResult = preg_replace('/link_[a-zA-Z0-9]+/', 'link_123456789', $newResult);
         $this->assertSame($result, $newResult);
 
@@ -475,18 +476,18 @@ class FormHelperTest extends OriginTestCase
         $result = $FormHelper->control('active', ['type' => 'checkbox']);
         $this->assertEquals($expected, $result);
 
-        $result = $this->Form->control('my-select', ['options' => [1 => 'One',2 => 'Two']]);
+        $result = $this->Form->control('my-select', ['options' => [1 => 'One', 2 => 'Two']]);
         $expected = '<div class="form-group select"><label for="my-select">My-select</label><select name="my-select" class="form-control" id="my-select"><option value="1">One</option><option value="2">Two</option></select></div>';
         $this->assertSame($expected, $result);
 
-        $this->Form->view()->set('owners', [1 => 'One',2 => 'Two']);
+        $this->Form->view()->set('owners', [1 => 'One', 2 => 'Two']);
         $result = $this->Form->control('owner_id');
         $expected = '<div class="form-group select"><label for="owner-id">Owner</label><select name="owner_id" class="form-control" id="owner-id"><option value="1">One</option><option value="2">Two</option></select></div>';
         $this->assertsame($expected, $result);
 
         $expected = '<input type="hidden" name="id" id="id" maxlength="11">';
         $this->assertSame($expected, $this->Form->control('id', ['type' => 'hidden']));
-        
+
         $Widget = new Widget();
         $widget = $Widget->new();
         $widget->id = 1234;
@@ -551,7 +552,7 @@ class FormHelperTest extends OriginTestCase
 
         $this->Form->controlDefaults(['dz' => ['class' => 'new-class']]);
         $defaults = $this->Form->controlDefaults();
-        
+
         $this->assertEquals(['class' => 'new-class'], $this->Form->controlDefaults('dz'));
         $this->assertNull($this->Form->controlDefaults('----'));
     }
@@ -580,7 +581,7 @@ class FormHelperTest extends OriginTestCase
         $this->Form->request()->data('email', '"><script>alert(1)</script><"');
         $expected = '<input type="text" name="email" value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;&quot;">';
         $this->assertSame($expected, $this->Form->text('email'));
-       
+
         $this->Form->request()->data('name', '>Foo');
         $expected = '<input type="text" name="name" value=">Foo">';
         $this->assertSame($expected, $this->Form->text('name', ['escape' => false]));

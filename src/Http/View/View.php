@@ -156,6 +156,7 @@ class View
 
         ob_start();
         include $element__filename;
+
         return ob_get_clean();
     }
 
@@ -355,6 +356,7 @@ class View
         ob_start();
 
         require $layout_filename;
+
         return ob_get_clean();
     }
 
