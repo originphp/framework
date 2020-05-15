@@ -326,11 +326,11 @@ class ModelValidatorTest extends OriginTestCase
     public function testValidatesMultipleStop()
     {
         $this->Article->validate('title', [
-            ['rule' => 'required', 'stop' => false],
-            ['rule' => 'alphaNumeric', 'stop' => false],
-            ['rule' => 'alpha', 'stop' => false],
-            ['rule' => 'numeric', 'stop' => false, 'message' => 'numeriic'],
-            ['rule' => 'alpha', 'stop' => false],
+            ['rule' => 'notEmpty', 'stopOnFail' => false],
+            ['rule' => 'alphaNumeric', 'stopOnFail' => false],
+            ['rule' => 'alpha', 'stopOnFail' => false],
+            ['rule' => 'numeric', 'stopOnFail' => false, 'message' => 'numeriic'],
+            ['rule' => 'alpha', 'stopOnFail' => false],
         ]);
         $article = $this->Article->new(['title' => 'abcd', 'body' => ['bad data']]);
         $this->assertFalse($this->Article->validates($article));
@@ -338,9 +338,7 @@ class ModelValidatorTest extends OriginTestCase
         $this->assertEquals('numeriic', $article->errors('title')[0]);
     }
 
-    /**
-     * A fake rule to put in front of other rules
-     */
+    /*
     public function testOptionalRule()
     {
         $this->Article->validate('title', 'alphaNumeric');
@@ -351,4 +349,5 @@ class ModelValidatorTest extends OriginTestCase
         $article = $this->Article->new(['title' => '', 'body' => ['bad data']]);
         $this->assertTrue($this->Article->validates($article));
     }
+    */
 }

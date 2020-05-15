@@ -119,7 +119,7 @@ class ModelValidator
         if ($rule[0] === '/') {
             return Validation::regex($value, $rule);
         }
-
+ 
         throw new ValidatorException('Unkown Validation Rule');
     }
 
@@ -158,45 +158,45 @@ class ModelValidator
                     continue;
                 }
 
-                // Don't run validation rule on field if its not in the entity
-                if (! $validationRule['present'] and in_array($field, $modified) === false) {
+                $isPresent = in_array($field, $entity->properties());
+
+                // Don't run validation rule on field if its not in the entity regardless if its modified or not
+                if (! $validationRule['present'] and $validationRule['rule'] !== 'required' and ! $isPresent) {
                     continue;
                 }
 
                 $value = $entity->get($field);
 
                 // Required means the key must be present not wether it has a value or not
-                if ($validationRule['present'] and ! in_array($field, $entity->properties())) {
+                if (($validationRule['present'] or $validationRule['rule'] === 'present') and ! $isPresent) {
                     $entity->invalidate($field, 'This field is required');
-                    if ($validationRule['continue']) {
-                        continue;
+                    if ($validationRule['rule'] === 'present' or $validationRule['stopOnFail']) {
+                        break;
                     }
-                    break;
+                    continue;
                 }
 
                 /**
-                 * The required rule does not exit, it checks that the value is not empty or there was a file
-                 * upload
+                 * Handle special validation rules that are not in library
                  */
-                if ($validationRule['rule'] === 'required') {
-                    if (! $this->validate($value, 'notBlank') and ! $this->validate($value, 'upload')) {
+                if (in_array($validationRule['rule'], ['notEmpty','required'])) {
+                    if ($this->empty($value)) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
-                    if ($validationRule['continue']) {
-                        continue;
+                    if ($validationRule['rule'] === 'required' or $validationRule['stopOnFail']) {
+                        break;
                     }
+                    continue;
+                }
+
+                // new in 2.6 - setting this rule will void other rules if the value is empty
+                if ($validationRule['rule'] === 'optional' and $this->empty($value)) {
                     break;
                 }
 
-                if ($this->isBlank($value)) {
-                    // special rule: optional, on blank values skip rest of validation rules
-                    if ($validationRule['rule'] === 'optional') {
-                        break;
-                    }
-                    // go to next rule as this validation rule allows null value
-                    if ($validationRule['nullable'] === true) {
-                        continue;
-                    }
+                // go to next rule as this validation rule does not require this
+                if ($validationRule['allowEmpty'] === true and $this->empty($value)) {
+                    continue;
                 }
 
                 // Handle both types
@@ -213,7 +213,7 @@ class ModelValidator
 
                 if (! $this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
-                    if ($validationRule['continue'] === false) {
+                    if ($validationRule['stopOnFail']) {
                         break;
                     }
                 }
@@ -224,20 +224,27 @@ class ModelValidator
     }
 
     /**
-     * Check if a value is considered blank for running a rule.
-     * It also checks for empty file uploads
+     * Checks if a value is empty, it is only empty when
+     *
+     * - value is `null`
+     * - value is an empty string
+     * - value is an empty array
+     * - value is an empty file upload
      *
      * @param mixed $value
      * @return boolean
      */
-    protected function isBlank($value): bool
+    protected function empty($value): bool
     {
-        if ($value === '' or $value === null) {
+        if (is_null($value)) {
             return true;
         }
-
-        if (is_array($value) and isset($value['error'])) {
-            return $value['error'] === UPLOAD_ERR_NO_FILE;
+        if (is_string($value) and trim($value) === '') {
+            return true;
+        }
+      
+        if (is_array($value)) {
+            return empty($value) or empty($value['tmp_name']);
         }
 
         return false;
@@ -245,7 +252,7 @@ class ModelValidator
 
     /**
      * Legacy rules
-     * @deprecated custom, inList and notEmpty
+     * @deprecated custom, inList
      */
 
     /**
@@ -280,22 +287,6 @@ class ModelValidator
         }
 
         return in_array($value, $values);
-    }
-
-    /**
-     * Checks that value is not empty whilst dealing with 0 values.
-     * @codeCoverageIgnore
-     * @param mixed $value
-     * @return boolean
-     */
-    public function notEmpty($value): bool
-    {
-        deprecationWarning('Validation rule `notEmpty` has been deprecated use `notBlank` instead');
-        if (empty($value) and (string) $value !== '0') {
-            return false;
-        }
-
-        return true;
     }
 
     /**

@@ -19,6 +19,11 @@ namespace Origin\Model;
 
 use InvalidArgumentException;
 
+/**
+ * Validation Rule Set setup and parsing
+ *
+ * @internal 15.05.20 Despite the original move more towards ruby style blank, feedback suggests that empty is more appropriate
+ */
 class ValidationRuleSet
 {
     /**
@@ -77,16 +82,16 @@ class ValidationRuleSet
      * @param array $params
      *   - rule: name of rule e.g. required, numeric, ['date', 'Y-m-d']
      *   - message: the error message to show if the rule fails
-     *   - on: default:null. set to create or update to run the rule only on those
-     *   - present: default:false the field (key) must be present but can be empty
-     *   - nullable: default:false accepts null values
-     *   - continue: default:true wether to continue if validation fails
+     *   - on: default:null. set to create or update to run the rule only on thos
+     *   - allowEmpty: default:false validation will be pass on empty values
+     *   - stopOnFail: default:false wether to continue if validation fails
+     *   - present: default:false the field (key) must be present (but can be empty)
      * @return array
      */
     private function add(array $params): array
     {
         $params += [
-            'rule' => null, 'message' => null, 'on' => null, 'present' => false, 'nullable' => false, 'continue' => true,
+            'rule' => null, 'message' => null, 'on' => null, 'present' => false, 'allowEmpty' => false, 'stopOnFail' => false,
         ];
 
         $rule = $params['rule'];
@@ -151,10 +156,10 @@ class ValidationRuleSet
     }
 
     /**
-     * Handle deprecated keys required, allowBlank. Does not adjust rule notBlank required, as this could
+     * Handle deprecated keys required, allowEmpty. Does not adjust rule notBlank required, as this could
      * break bc.
      *
-     * @deprecated required and allowBlank keys, and notBlank rule now changed to required.
+     * @deprecated required and allowEmpty keys, and notBlank rule now changed to required.
      * @param array $params
      * @return array
      */
@@ -165,7 +170,7 @@ class ValidationRuleSet
             unset($params['required']);
         }
         if (isset($params['allowBlank'])) {
-            $params['nullable'] = $params['allowBlank'];
+            $params['allowEmpty'] = $params['allowBlank'];
             unset($params['allowBlank']);
         }
 

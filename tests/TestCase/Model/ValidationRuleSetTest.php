@@ -30,8 +30,8 @@ class ValidationRuleSetTest extends OriginTestCase
             'message' => 'This field is required',
             'on' => null,
             'present' => false,
-            'nullable' => false,
-            'continue' => true,
+            'allowEmpty' => false,
+            'stopOnFail' => false,
         ];
         $this->assertEquals(['rule-1' => $expected], $rule->toArray());
 
@@ -49,8 +49,8 @@ class ValidationRuleSetTest extends OriginTestCase
             'message' => 'Invalid value',
             'on' => null,
             'present' => false,
-            'nullable' => false,
-            'continue' => true,
+            'allowEmpty' => false,
+            'stopOnFail' => false,
         ];
         $this->assertEquals(['rule-1' => $expected], $rule->toArray());
     }
@@ -67,8 +67,8 @@ class ValidationRuleSetTest extends OriginTestCase
             'message' => 'To short',
             'on' => null,
             'present' => false,
-            'nullable' => false,
-            'continue' => true,
+            'allowEmpty' => false,
+            'stopOnFail' => false,
         ];
         $this->assertEquals(['rule-1' => $expected], $rule->toArray());
     }
@@ -121,7 +121,7 @@ class ValidationRuleSetTest extends OriginTestCase
         $out = $rule->toArray();
 
         $this->assertArrayNotHasKey('allowBlank', $out['rule-1']);
-        $this->assertTrue($out['rule-1']['nullable']);
+        $this->assertTrue($out['rule-1']['allowEmpty']);
 
         $this->assertArrayNotHasKey('required', $out['rule-2']);
         $this->assertTrue($out['rule-2']['present']);
