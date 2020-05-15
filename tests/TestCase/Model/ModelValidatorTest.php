@@ -445,7 +445,13 @@ class ModelValidatorTest extends OriginTestCase
     public function testStopOnFail()
     {
         # Check Present termination
-        $this->Article->validate('title', ['present', 'alphaNumeric']);
+        $this->Article->validate('title', [
+            'alphaNumeric' => [
+                'rule' => 'alphaNumeric',
+                'present' => true,
+                'stopOnFail' => true
+            ],
+        ]);
         $articleValid = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
         $articleInvalid = $this->Article->new(['body' => 'not important']);
 
@@ -454,7 +460,7 @@ class ModelValidatorTest extends OriginTestCase
 
         # Check notEmpty
         $this->Article->validate('title', [
-            'notEmpty' => ['rule' => 'notEmpty','present' => true],
+            'notEmpty' => ['rule' => 'notEmpty','stopOnFail' => true],
             'alphaNumeric'
         ]);
         $this->assertFalse($this->Article->validates($articleInvalid));
@@ -468,9 +474,38 @@ class ModelValidatorTest extends OriginTestCase
 
         # Check Required (this is same as notEmpty but for sanity)
         $this->Article->validate('title', [
-            'notEmpty' => ['rule' => 'alphaNumeric','present' => true],
+            'notEmpty' => ['rule' => 'alphaNumeric','stopOnFail' => true],
             'numeric'
         ]);
         $this->assertFalse($this->Article->validates($articleInvalid));
+    }
+
+    public function testNotEmptyFileUpload()
+    {
+        $this->Article->validate('file', 'notEmpty');
+     
+        $entity = $this->Article->new([
+            'file' => [
+                'name' => '', // exactly like from request
+                'type' => '',
+                'tmp_name' => '',
+                'error' => 4,
+                'size' => 0
+            ]
+        ]);
+
+        $this->assertFalse($this->Article->validates($entity));
+
+        $entity = $this->Article->new([
+            'file' => [
+                'name' => 'image.png',
+                'type' => 'image/png',
+                'tmp_name' => '/tmp/phpq2Ev5I',
+                'error' => 0,
+                'size' => 137306
+            ]
+        ]);
+
+        $this->assertTrue($this->Article->validates($entity));
     }
 }

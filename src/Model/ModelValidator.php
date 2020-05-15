@@ -250,7 +250,7 @@ class ModelValidator
         }
       
         if (is_array($value)) {
-            return empty($value) or empty($value['tmp_name']);
+            return empty($value) || empty($value['tmp_name']);
         }
 
         return false;
