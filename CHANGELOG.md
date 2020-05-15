@@ -5,12 +5,18 @@
 ## [2.5.1] - 2020-05-12
 
 ### Added
-- Valdation rule setting `continue` 
+
+- Added `stopOnFail` validation setting
+- Added `notEmpty` validation rule (checks value and file uploads)
+- Added special Validation rule `required`
+- Added special Validation rule `optional`
+- Added special Validation rule `present`
 
 ### Changed
-- Valdation rule settings renamed with BC
-    - `required` changed to `present`
-    - `allowBlank` changed to `nullable`
+
+- Changed validation settings key with backwards compatibility
+  - renamed validation setting key `required` to `present`
+  - validation setting key `allowBlank` to `allowEmpty`
 
 ### Added
 
