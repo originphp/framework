@@ -18,6 +18,9 @@
   - renamed validation setting key `required` to `present`
   - validation setting key `allowBlank` to `allowEmpty`
 
+- Changed behavior of `required`, previously this was checking modified fields, to work with a certain form 
+behavior, however this was incorrect, now it checks if key is present full stop.
+
 ### Added
 
 - FormHelper now accepts a `default` value when creating form control.

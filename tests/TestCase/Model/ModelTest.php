@@ -1260,7 +1260,7 @@ class ModelTest extends OriginTestCase
         $this->Article->validate('title', [
             'rule' => 'notBlank',
             'required' => true,
-            'on' => 'create', ]);
+            'on' => 'create']);
         
         $article->author_id = 1001;
         $article->title = null;

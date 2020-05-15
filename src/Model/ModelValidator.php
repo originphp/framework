@@ -158,28 +158,34 @@ class ModelValidator
                     continue;
                 }
 
+                $checkPresent = $validationRule['present'] || $validationRule['rule'] === 'present';
+    
                 $isPresent = in_array($field, $entity->properties());
 
                 // Don't run validation rule on field if its not in the entity regardless if its modified or not
-                if (! $validationRule['present'] and $validationRule['rule'] !== 'required' and ! $isPresent) {
+                if (! $checkPresent and $validationRule['rule'] !== 'required' and ! $isPresent) {
                     continue;
                 }
 
                 $value = $entity->get($field);
 
                 // Required means the key must be present not wether it has a value or not
-                if (($validationRule['present'] or $validationRule['rule'] === 'present') and ! $isPresent) {
-                    $entity->invalidate($field, 'This field is required');
-                    if ($validationRule['rule'] === 'present' or $validationRule['stopOnFail']) {
-                        break;
+                if ($checkPresent) {
+                    if (! $isPresent) {
+                        $entity->invalidate($field, 'This field is required');
+                        if ($validationRule['rule'] === 'present' || $validationRule['stopOnFail']) {
+                            break;
+                        }
                     }
-                    continue;
+                    if ($validationRule['rule'] === 'present') {
+                        continue;
+                    }
                 }
-
+          
                 /**
-                 * Handle special validation rules that are not in library
+                 * Handle all blank validation rules, including the special
                  */
-                if (in_array($validationRule['rule'], ['notEmpty','required'])) {
+                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required'])) {
                     if ($this->empty($value)) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
