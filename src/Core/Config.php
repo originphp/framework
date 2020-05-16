@@ -110,4 +110,18 @@ class Config
     {
         return static::dot()->delete($key);
     }
+
+    /**
+     * Reads a variable from configuration and then deletes it
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public static function consume(string $key)
+    {
+        $value = static::read($key);
+        static::delete($key);
+
+        return $value;
+    }
 }

@@ -1,11 +1,10 @@
 # Changelog
-
 ## [unreleased]
 
-## [2.5.1] - 2020-05-12
+## [2.5.1] - 2020-05-18
 
 ### Added
-
+- Added Config::consume
 - Added `stopOnFail` validation setting
 - Added `notEmpty` validation rule (checks value and file uploads)
 - Added special Validation rule `required`

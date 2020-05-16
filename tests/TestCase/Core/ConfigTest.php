@@ -129,4 +129,16 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $sampleConfig = CONFIG . '/storage.php';
         MockConfig::load($sampleConfig);
     }
+
+    public function testConsume()
+    {
+        // add data
+        $token = uid();
+        Config::write('ApiCompany', ['token' => $token]);
+        $this->assertEquals($token, Config::read('ApiCompany.token'));
+        
+        $data = Config::consume('ApiCompany');
+        $this->assertEquals($data, ['token' => $token]);
+        $this->assertNull(Config::read('ApiCompany'));
+    }
 }
