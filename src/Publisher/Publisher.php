@@ -91,7 +91,7 @@ class Publisher
     public function subscribe($object, array $options = []) : bool
     {
         $options += ['on' => null,'queue' => null];
-        if ($options['queue'] and is_object($object)) {
+        if ($options['queue'] && is_object($object)) {
             throw new InvalidArgumentException('Subscribe using queue requires a class name');
         }
         $this->listeners[] = [

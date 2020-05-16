@@ -113,7 +113,7 @@ class Response
      */
     public function ready() : bool
     {
-        return empty($this->body) and empty($this->file);
+        return empty($this->body) && empty($this->file);
     }
 
     /**
@@ -155,7 +155,7 @@ class Response
     public function header($header, $value = null) : array
     {
         if (is_string($header)) {
-            if ($value === null and strpos($header, ':') !== false) {
+            if ($value === null && strpos($header, ':') !== false) {
                 list($header, $value) = explode(':', $header, 2);
             }
             $header = [$header => $value];

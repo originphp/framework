@@ -274,17 +274,17 @@ class ConsoleOutput
     {
         $set = [];
         $unset = [];
-        if (isset($settings['color']) and isset($this->foregroundColors[$settings['color']])) {
+        if (isset($settings['color']) && isset($this->foregroundColors[$settings['color']])) {
             $set[] = $this->foregroundColors[$settings['color']];
             $unset[] = 39;
         }
-        if (isset($settings['background']) and isset($this->backgroundColors[$settings['background']])) {
+        if (isset($settings['background']) && isset($this->backgroundColors[$settings['background']])) {
             $set[] = $this->backgroundColors[$settings['background']];
             $unset[] = 49;
         }
         unset($settings['color'], $settings['background']);
         foreach ($settings as $option => $value) {
-            if ($value and isset($this->options[$option])) {
+            if ($value && isset($this->options[$option])) {
                 $set[] = $this->options[$option];
                 $unset[] = $this->optionsUnset[$option];
             }

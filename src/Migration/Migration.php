@@ -578,13 +578,13 @@ class Migration
             return false;
         }
 
-        if (isset($options['limit']) and isset($schema[$column]['limit']) && (int) $schema[$column]['limit'] !== (int) $options['limit']) {
+        if (isset($options['limit']) && isset($schema[$column]['limit']) && (int) $schema[$column]['limit'] !== (int) $options['limit']) {
             return false;
         }
-        if (isset($options['precision']) and isset($schema[$column]['precision']) && (int) $schema[$column]['precision'] !== (int) $options['precision']) {
+        if (isset($options['precision']) && isset($schema[$column]['precision']) && (int) $schema[$column]['precision'] !== (int) $options['precision']) {
             return false;
         }
-        if (isset($options['scale']) and isset($schema[$column]['scale']) && (int) $schema[$column]['scale'] !== (int) $options['scale']) {
+        if (isset($options['scale']) && isset($schema[$column]['scale']) && (int) $schema[$column]['scale'] !== (int) $options['scale']) {
             return false;
         }
 
@@ -818,7 +818,7 @@ class Migration
         }
         $options += ['name' => null,'column' => null,'primaryKey' => 'id'];
   
-        if (empty($options['column']) and empty($options['name'])) {
+        if (empty($options['column']) && empty($options['name'])) {
             throw new InvalidArgumentException('Column or name needs to be specified');
         }
   

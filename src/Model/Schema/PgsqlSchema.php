@@ -88,7 +88,7 @@ class PgsqlSchema extends BaseSchema
         }
         $databaseOptions['comments'] = $comments;
 
-        if (isset($options['options']['autoIncrement']) and isset($options['constraints']['primary']['column'])) {
+        if (isset($options['options']['autoIncrement']) && isset($options['constraints']['primary']['column'])) {
             if (is_string($options['constraints']['primary']['column'])) {
                 $databaseOptions['setAutoIncrement'] = $this->changeAutoIncrementSql(
                     $table,
@@ -637,7 +637,7 @@ class PgsqlSchema extends BaseSchema
             $out .= ' NOT NULL';
         }
 
-        if (isset($data['default']) && $data['type'] === 'timestamp' and strtolower($data['default']) === 'current_timestamp') {
+        if (isset($data['default']) && $data['type'] === 'timestamp' && strtolower($data['default']) === 'current_timestamp') {
             $out .= ' DEFAULT CURRENT_TIMESTAMP';
         } elseif (isset($data['default'])) {
             $out .= ' DEFAULT ' . $this->schemaValue($data['default']);

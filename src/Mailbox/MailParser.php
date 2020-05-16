@@ -260,7 +260,7 @@ class MailParser
     public function hasAttachments(): bool
     {
         foreach ($this->parts as $data) {
-            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) === 'attachment') {
+            if (isset($data['content-disposition']) && strtolower($data['content-disposition']) === 'attachment') {
                 return true;
             }
         }
@@ -277,7 +277,7 @@ class MailParser
     {
         $attachments = [];
         foreach ($this->parts as $data) {
-            if (isset($data['content-disposition']) and strtolower($data['content-disposition']) === 'attachment') {
+            if (isset($data['content-disposition']) && strtolower($data['content-disposition']) === 'attachment') {
                 $tmp = tempnam(sys_get_temp_dir(), 'O');
                 $fh = fopen($tmp, 'w');
                 fwrite($fh, $this->extractAttachment(

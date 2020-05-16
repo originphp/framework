@@ -70,7 +70,7 @@ class XmlView
             $data = $this->serialize($this->serialize);
         }
 
-        if (is_object($data) and method_exists($data, 'toXml')) {
+        if (is_object($data) && method_exists($data, 'toXml')) {
             return $data->toXml();
         }
         
@@ -122,7 +122,7 @@ class XmlView
      */
     private function toArray($mixed) : array
     {
-        if (is_object($mixed) and method_exists($mixed, 'toArray')) {
+        if (is_object($mixed) && method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
         }
 

@@ -62,7 +62,7 @@ class RedisConnection
             // result still false
         }
 
-        if ($result and isset($config['password'])) {
+        if ($result && isset($config['password'])) {
             $result = $redis->auth($config['password']);
         }
 

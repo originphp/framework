@@ -497,7 +497,7 @@ class Model
     {
         $alias = Inflector::tableName($this->alias);
         foreach ($fields as $index => $field) {
-            if (strpos($field, ' ') === false and strpos($field, '.') === false and strpos($field, '(') === false) {
+            if (strpos($field, ' ') === false && strpos($field, '.') === false && strpos($field, '(') === false) {
                 $fields[$index] = "{$alias}.{$field}";
             }
         }
@@ -623,7 +623,7 @@ class Model
          * e.g. unvalidated datetime fields.
          */
         foreach ($data as $key => $value) {
-            if (is_array($value) or is_object($value)) {
+            if (is_array($value) || is_object($value)) {
                 $entity->invalidate($key, 'Invalid data');
             }
         }
@@ -812,7 +812,7 @@ class Model
             try {
                 $result = $this->processSave($data, $options);
             } catch (\Exception $e) {
-                if ($options['callbacks'] and method_exists($this, 'onError')) {
+                if ($options['callbacks'] && method_exists($this, 'onError')) {
                     $this->onError($e);
                 }
                 $this->cancelTransaction($data, $options, $data->exists() === true ? 'update' : 'create');
@@ -1218,7 +1218,7 @@ class Model
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
             $entity->deleted($result);
         } catch (\Exception $e) {
-            if ($options['callbacks'] and method_exists($this, 'onError')) {
+            if ($options['callbacks'] && method_exists($this, 'onError')) {
                 $this->onError($e);
             }
             $this->cancelTransaction($entity, $options, 'delete');

@@ -222,7 +222,7 @@ class ArgumentParser
         $arguments = $this->parseArguments($args);
 
         foreach ($this->options as $option) {
-            if (! empty($option['required']) and empty($options[$option['name']])) {
+            if (! empty($option['required']) && empty($options[$option['name']])) {
                 throw new ConsoleException(sprintf('Missing required option `%s`', $option['name']));
             }
             if ($option['type'] === 'boolean' && ! isset($options[$option['name']])) {

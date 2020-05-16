@@ -140,7 +140,7 @@ class Router
  
         foreach (self::$routes as $routedParams) {
             if (preg_match($routedParams['pattern'], $url, $matches)) {
-                if (empty($routedParams['method']) || ($routedParams['method'] and strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
+                if (empty($routedParams['method']) || ($routedParams['method'] && strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
                     unset($routedParams['method'],$routedParams['pattern']);
                     $params = array_merge($template, $routedParams);
                     foreach ($matches as $key => $value) {
@@ -214,12 +214,12 @@ class Router
         unset($url['controller'],$url['action'],$url['plugin']);
 
         $queryString = '';
-        if (isset($url['?']) and is_array($url['?'])) {
+        if (isset($url['?']) && is_array($url['?'])) {
             $queryString = '?'.http_build_query($url['?']);
             unset($url['?']);
         }
 
-        if (isset($url['#']) and is_string($url['#'])) {
+        if (isset($url['#']) && is_string($url['#'])) {
             $queryString .= '#'.$url['#'];
             unset($url['#']);
         }

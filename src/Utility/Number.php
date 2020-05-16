@@ -145,7 +145,7 @@ class Number
         $locale = static::$locale;
 
         $places = 0;
-        if (is_float($value) || (is_string($value) and strpos($value, '.') !== false)) {
+        if (is_float($value) || (is_string($value) && strpos($value, '.') !== false)) {
             $places = $locale['places'];
         }
 

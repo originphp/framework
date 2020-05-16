@@ -263,7 +263,7 @@ class I18n
         }
 
         // Handle plurals
-        if (strpos($message, '|') !== false and isset($vars['count'])) {
+        if (strpos($message, '|') !== false && isset($vars['count'])) {
             $messages = explode('|', $message);
 
             if (count($messages) === 2) {

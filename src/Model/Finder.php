@@ -111,13 +111,13 @@ class Finder
                     if (isset($belongsTo[$model])) {
                         $foreignKey = $belongsTo[$model]['foreignKey'];
                         $primaryKey = $this->model->$model->primaryKey();
-                        if (empty($entity->$foreignKey) or empty($data[$primaryKey])) {
+                        if (empty($entity->$foreignKey) || empty($data[$primaryKey])) {
                             continue;
                         }
                     } elseif (isset($hasOne[$model])) {
                         $foreignKey = $hasOne[$model]['foreignKey'];
                         $primaryKey = $this->model->primaryKey();
-                        if (empty($entity->$primaryKey) or empty($data[$foreignKey])) {
+                        if (empty($entity->$primaryKey) || empty($data[$foreignKey])) {
                             continue;
                         }
                     }
@@ -154,7 +154,7 @@ class Finder
     {
         $belongsTo = $this->model->association('belongsTo');
         foreach ($query['associated'] as $model => $config) {
-            if (isset($config['associated']) and isset($belongsTo[$model])) {
+            if (isset($config['associated']) && isset($belongsTo[$model])) {
                 $foreignKey = $belongsTo[$model]['foreignKey'];
                 $property = lcfirst($model);
                 foreach ($results as &$result) {
@@ -181,7 +181,7 @@ class Finder
     {
         $hasOne = $this->model->association('hasOne');
         foreach ($query['associated'] as $model => $config) {
-            if (isset($config['associated']) and isset($hasOne[$model])) {
+            if (isset($config['associated']) && isset($hasOne[$model])) {
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
                 $primaryKey = $this->model->$model->primaryKey();

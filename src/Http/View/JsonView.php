@@ -68,7 +68,7 @@ class JsonView
             $data = $this->serialize($this->serialize);
         }
 
-        if (is_object($data) and method_exists($data, 'toJson')) {
+        if (is_object($data) && method_exists($data, 'toJson')) {
             return $data->toJson();
         }
 
@@ -110,7 +110,7 @@ class JsonView
      */
     private function toArray($mixed)
     {
-        if (is_object($mixed) and method_exists($mixed, 'toArray')) {
+        if (is_object($mixed) && method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
         }
 

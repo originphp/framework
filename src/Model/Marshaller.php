@@ -38,7 +38,7 @@ class Marshaller
      *
      * @return array
      */
-    protected function buildAssociationMap($associated) : array
+    protected function buildAssociationMap($associated): array
     {
         $map = [];
         $model = $this->model;
@@ -53,7 +53,7 @@ class Marshaller
                 $map[$key] = 'many';
             }
         }
-      
+
         return $map;
     }
 
@@ -63,16 +63,16 @@ class Marshaller
      * @param array $array
      * @return array
      */
-    protected function normalizeAssociated(array $array) : array
+    protected function normalizeAssociated(array $array): array
     {
         $result = [];
-      
+
         foreach ($array as $key => $value) {
             if (is_int($key)) {
                 $key = $value;
                 $value = [];
             }
-            
+
             $value += ['fields' => []];
             $result[$key] = $value;
         }
@@ -90,13 +90,13 @@ class Marshaller
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function one(array $data, array $options = []) : Entity
+    public function one(array $data, array $options = []): Entity
     {
-        $options += ['name' => null,'associated' => [],'fields' => []];
+        $options += ['name' => null, 'associated' => [], 'fields' => []];
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
-        
+
         /**
          * Get Model from the ModelRegistry
          */
@@ -104,16 +104,16 @@ class Marshaller
         if ($options['name']) {
             $model = ModelRegistry::get($options['name']);
         }
-       
+
         $entityClass = $this->entityClass($model);
         $entity = new $entityClass([], $options);
-       
+
         $properties = [];
-     
+
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
-                if (! is_array($value)) {
-                    $properties[$property] = null;// remove inconsistent data
+                if (!is_array($value)) {
+                    $properties[$property] = null; // remove inconsistent data
                     continue;
                 }
                 // determine model
@@ -121,7 +121,7 @@ class Marshaller
                 if ($propertyMap[$property] === 'many') {
                     $model = Inflector::singular($model);
                 }
- 
+
                 // extract fields
                 $fields = [];
                 if (isset($options['associated'][$model]['fields'])) {
@@ -139,10 +139,10 @@ class Marshaller
                 $properties[$property] = $value;
             }
         }
-       
+
         return $this->setProperties($entity, $properties, $options);
     }
-    
+
     /**
      * Handles the hasMany and hasAndBelongsToMany
      *
@@ -150,7 +150,7 @@ class Marshaller
      * @param array $options
      * @return array
      */
-    public function many(array $data, array $options = []) : array
+    public function many(array $data, array $options = []): array
     {
         $result = [];
         foreach ($data as $row) {
@@ -169,25 +169,25 @@ class Marshaller
      * @param array  $data
      * @return \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $data, array $options = []) : Entity
+    public function patch(Entity $entity, array $data, array $options = []): Entity
     {
-        $options += ['name' => $entity->name(),'associated' => [],'fields' => []];
-        
+        $options += ['name' => $entity->name(), 'associated' => [], 'fields' => []];
+
         $entity->reset(); // reset modified
 
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
-      
+
         $properties = [];
 
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
                 // remove inconsistent data
-                if (! is_array($value)) {
+                if (!is_array($value)) {
                     $properties[$property] = null;
                     continue;
                 }
-               
+
                 // determine model
                 $model = ucfirst($property);
                 if ($propertyMap[$property] === 'many') {
@@ -202,21 +202,21 @@ class Marshaller
                 }
 
                 $patchOptions = [
-                    'name' => $model, 'fields' => $fields,'associated' => $options['associated']
+                    'name' => $model, 'fields' => $fields, 'associated' => $options['associated']
                 ];
 
-                if (! $entity->$property instanceof Entity && ! $entity->$property instanceof Collection) {
+                if (!$entity->$property instanceof Entity && !$entity->$property instanceof Collection) {
                     $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                     continue;
                 }
 
                 // entities will be patched in primary key matches, if not a new entity will be created
                 // with patched data.
-                
+
                 // Match hasOne and belongsTo using primaryKey
                 if ($propertyMap[$property] === 'one') {
                     $primaryKey = $this->getPrimaryKey($model);
-                    if (($primaryKey and isset($value[$primaryKey]) && (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey)) {
+                    if (($primaryKey && isset($value[$primaryKey]) && (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey)) {
                         $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
                         continue;
                     }
@@ -232,8 +232,10 @@ class Marshaller
                 $original = $entity->get($property);
                 // only set properties that have values that were changed
                 // forms posting of null values are "" and integers are strings
-                if ($value !== $original && ! ($value === '' && $original === null) and
-                ! (is_numeric($original) && (string) $value === (string) $original)) {
+                if (
+                    $value !== $original && !($value === '' && $original === null) and
+                    !(is_numeric($original) && (string) $value === (string) $original)
+                ) {
                     $properties[$property] = $value;
                 }
             }
@@ -250,7 +252,7 @@ class Marshaller
      * @param array $options
      * @return Entity
      */
-    private function setProperties(Entity $entity, array $properties, array $options)  : Entity
+    private function setProperties(Entity $entity, array $properties, array $options): Entity
     {
         if ($options['fields']) {
             $fields = (array) $options['fields'];
@@ -262,7 +264,7 @@ class Marshaller
 
             return $entity;
         }
-    
+
         $entity->set($properties);
 
         return $entity;
@@ -281,14 +283,15 @@ class Marshaller
     {
         // for matching we need a model
         $primaryKey = $this->getPrimaryKey($options['name']);
-        if (! $primaryKey) {
+        if (!$primaryKey) {
             return $this->many($data, $options);
         }
 
         $out = [];
         foreach ($data as $index => $record) {
             $fields = count($record);
-            $hasPrimaryKey = isset($record[$primaryKey]) and isset($collection[$index]->primaryKey);
+
+            $hasPrimaryKey = isset($record[$primaryKey]) && isset($collection[$index]->$primaryKey);
 
             if ($hasPrimaryKey && $fields > 1 && (string) $collection[$index]->$primaryKey === (string) $record[$primaryKey]) {
                 $out[] = $this->patch($collection[$index], $record, $options);
@@ -306,7 +309,7 @@ class Marshaller
      * @param string $name
      * @return string|null
      */
-    private function getPrimaryKey(string $name) : ?string
+    private function getPrimaryKey(string $name): ?string
     {
         $model = ModelRegistry::get($name);
 

@@ -723,7 +723,7 @@ class FormHelper extends Helper
          */
 
         if ($options['format']) {
-            if (! empty($options['value']) && (is_int($options['value']) or is_float($options['value']))) {
+            if (! empty($options['value']) && (is_int($options['value']) || is_float($options['value']))) {
                 $options['value'] = Number::format($options['value']);
             }
         }
@@ -950,7 +950,7 @@ class FormHelper extends Helper
              * @internal careful here url params vs database values can be string/int but same so use
              * strval
              */
-            if (! $noneSelected and strval($selectOptions['value']) === strval($key)) {
+            if (! $noneSelected && strval($selectOptions['value']) === strval($key)) {
                 $template = $this->config['templates']['optionSelected'];
             }
             $template = str_replace('{value}', $key, $template);
@@ -993,7 +993,7 @@ class FormHelper extends Helper
                 $last = end($parts);
 
                 // Get value unless overridden
-                if (isset($entity->$last) and is_scalar($entity->$last)) {
+                if (isset($entity->$last) && is_scalar($entity->$last)) {
                     $options['value'] = $entity->$last;
                 }
 
@@ -1017,7 +1017,7 @@ class FormHelper extends Helper
         /**
          * If the value is not set then add (0.00 or '' will not be overridden)
          */
-        if (! isset($options['value']) and isset($options['default'])) {
+        if (! isset($options['value']) && isset($options['default'])) {
             $options['value'] = $options['default'];
         }
 
@@ -1068,9 +1068,9 @@ class FormHelper extends Helper
 
         foreach (explode('.', $path) as $key) {
             $lastEntity = $entity;
-            if (is_object($entity) and isset($entity->$key)) {
+            if (is_object($entity) && isset($entity->$key)) {
                 $entity = $entity->$key;
-            } elseif ((is_array($entity) || $entity instanceof Collection) and isset($entity[$key])) {
+            } elseif ((is_array($entity) || $entity instanceof Collection) && isset($entity[$key])) {
                 $entity = $entity[$key];
             } else {
                 return null;
@@ -1164,10 +1164,10 @@ class FormHelper extends Helper
         }
         // To prevent XSS attacks escape all output
         if ($options['escape']) {
-            if (isset($data['value']) and is_string($data['value'])) {
+            if (isset($data['value']) && is_string($data['value'])) {
                 $data['value'] = h($data['value']);
             }
-            if (isset($options['value']) and is_string($options['value'])) {
+            if (isset($options['value']) && is_string($options['value'])) {
                 $options['value'] = h($options['value']);
             }
         }

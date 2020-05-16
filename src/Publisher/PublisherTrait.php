@@ -54,7 +54,7 @@ trait PublisherTrait
             $object = Resolver::className($object, 'Listener', 'Listener');
         }
 
-        if (is_object($object) or is_string($object)) {
+        if (is_object($object) || is_string($object)) {
             return $this->publisher()->subscribe($object, $options);
         }
         

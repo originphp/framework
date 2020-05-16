@@ -191,7 +191,7 @@ class MysqlSchema extends BaseSchema
          * Handle floats and decimals. map doubles to decimal
          */
         if (in_array($col, ['float','decimal','double'])) {
-            if (isset($matches[2]) and strpos($matches[2], ',') !== false) {
+            if (isset($matches[2]) && strpos($matches[2], ',') !== false) {
                 list($precision, $scale) = explode(',', $matches[2]);
                 $precision = (int) $precision; // important
                 $scale = (int) $scale;
@@ -296,7 +296,7 @@ class MysqlSchema extends BaseSchema
             if (isset($data['null']) && $data['null'] === true) {
                 $out .= ' NULL';
             }
-            if (isset($data['default']) and strtolower($data['default']) === 'current_timestamp') {
+            if (isset($data['default']) && strtolower($data['default']) === 'current_timestamp') {
                 $out .= ' DEFAULT CURRENT_TIMESTAMP';
                 unset($data['default'],$data['null']);
             }
@@ -614,7 +614,7 @@ class MysqlSchema extends BaseSchema
             }
         }
 
-        if (isset($options['options']['autoIncrement']) and isset($options['constraints']['primary']['column'])) {
+        if (isset($options['options']['autoIncrement']) && isset($options['constraints']['primary']['column'])) {
             if (is_string($options['constraints']['primary']['column'])) {
                 $databaseOptions['setAutoIncrement'] = $this->changeAutoIncrementSql(
                     $table,

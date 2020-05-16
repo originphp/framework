@@ -198,7 +198,7 @@ class AuthComponent extends Component
                 $model = ModelRegistry::get($this->config['model']);
                 
                 $conditions = [$this->config['fields']['api_token'] => $token];
-                if (! empty($this->config['scope']) and is_array($this->config['scope'])) {
+                if (! empty($this->config['scope']) && is_array($this->config['scope'])) {
                     $conditions = array_merge($conditions, $this->config['scope']);
                 }
           
@@ -394,7 +394,7 @@ class AuthComponent extends Component
             $this->config['fields']['username'] => $username,
         ];
 
-        if (! empty($this->config['scope']) and is_array($this->config['scope'])) {
+        if (! empty($this->config['scope']) && is_array($this->config['scope'])) {
             $conditions = array_merge($conditions, $this->config['scope']);
         }
 

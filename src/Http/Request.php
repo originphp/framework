@@ -645,11 +645,11 @@ class Request
         /**
          * Backwards comptability check :
          */
-        if (func_num_args() === 1 and strpos($header, ':') === false) {
+        if (func_num_args() === 1 && strpos($header, ':') === false) {
             return $this->headers($header);
         }
         // allow for HTTP/1.0 404 Not Found ? is this really needed
-        if ($value === null and strpos($header, ':') != false) {
+        if ($value === null && strpos($header, ':') != false) {
             list($header, $value) = explode(':', $header, 2);
         }
         $value = trim($value);

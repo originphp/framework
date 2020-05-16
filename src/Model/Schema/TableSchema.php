@@ -178,7 +178,7 @@ class TableSchema
              * Default behavior restrict
              * @see https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
              */
-            if (isset($attributes['update']) or isset($attributes['delete'])) {
+            if (isset($attributes['update']) || isset($attributes['delete'])) {
                 $attributes += ['update' => 'restrict','delete' => 'restrict'];
             }
             if (isset($attributes['update']) && ! isset($map[$attributes['update']])) {

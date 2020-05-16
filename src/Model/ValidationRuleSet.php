@@ -62,7 +62,7 @@ class ValidationRuleSet
             $name = 'rule-' . $counter;
 
             # Transform string name, e.g rule or ['range',10, 20]
-            if (is_int($key) and is_string($definition) || (is_array($definition) && ! isset($definition['rule']))) {
+            if (is_int($key) && is_string($definition) || (is_array($definition) && ! isset($definition['rule']))) {
                 $definition = ['rule' => $definition];
             }
 

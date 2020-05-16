@@ -42,7 +42,7 @@ trait Delocalizable
         $columns = $this->schema()['columns'];
         foreach ($entity->modified() as $field) {
             $value = $entity->get($field);
-            if ($value and isset($columns[$field])) {
+            if ($value && isset($columns[$field])) {
                 $value = $this->processField($columns[$field]['type'], $value);
                 
                 // Restore value incase of invalid value etc

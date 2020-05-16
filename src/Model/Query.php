@@ -355,7 +355,7 @@ class Query implements IteratorAggregate
         $out = [] ;
         foreach ($value as $key => $value) {
             // ['Article'=>'Author'] is incorrect should be ['Article'=>['Author']]
-            if (is_string($key) and is_string($value)) {
+            if (is_string($key) && is_string($value)) {
                 $value = (array) $value;
             }
             if (is_array($value)) {

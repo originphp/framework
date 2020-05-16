@@ -535,7 +535,7 @@ class QueryBuilder
      */
     public function insertStatement(array $params) : string
     {
-        if (empty($params) || ! isset($params['data']) or empty($params['data'])) {
+        if (empty($params) || ! isset($params['data']) || empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -564,7 +564,7 @@ class QueryBuilder
      */
     public function updateStatement(array $params) : string
     {
-        if (empty($params) || ! isset($params['data']) or empty($params['data'])) {
+        if (empty($params) || ! isset($params['data']) || empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -863,7 +863,7 @@ class QueryBuilder
        
         foreach ($conditions as $key => $value) {
             //array("Post.created = Post.modified")
-            if (is_int($key) and is_string($value)) {
+            if (is_int($key) && is_string($value)) {
                 $block[] = $value;
                 continue;
             }
@@ -874,9 +874,9 @@ class QueryBuilder
                 $end = ')';
                 foreach ($value as $k => $v) {
                     $data = [$k => $v];
-                    if (is_integer($k) and is_string($v)) {
+                    if (is_integer($k) && is_string($v)) {
                         $data = [$v]; // e.g ['Post.due_date >= NOW()']
-                    } elseif (is_integer($k) and is_array($v)) {
+                    } elseif (is_integer($k) && is_array($v)) {
                         $data = $v;
                     }
 
@@ -910,7 +910,7 @@ class QueryBuilder
                 continue;
             }
             // array(0=>array('tenant_id'=>123))
-            if (is_integer($key) and is_array($value)) {
+            if (is_integer($key) && is_array($value)) {
                 $block[] = $this->conditions($alias, $value, $join);
             }
         }
@@ -954,7 +954,7 @@ class QueryBuilder
             }
         }
         //(SELECT STATEMENT) || (value1, value2)
-        if (($expression == 'IN' || $expression == 'NOT IN') and is_string($value)) {
+        if (($expression == 'IN' || $expression == 'NOT IN') && is_string($value)) {
             return "{$field} {$expression} ( {$value} )";
         }
 

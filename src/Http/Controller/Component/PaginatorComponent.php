@@ -199,7 +199,7 @@ class PaginatorComponent extends Component
 
         if (isset($settings['sort'])) {
             $direction = 'asc';
-            if (isset($settings['direction']) and strtolower($settings['direction']) === 'desc') {
+            if (isset($settings['direction']) && strtolower($settings['direction']) === 'desc') {
                 $direction = 'desc';
             }
 
@@ -207,7 +207,7 @@ class PaginatorComponent extends Component
             unset($settings['sort'],$settings['direction']);
         }
 
-        if (isset($settings['order']) and is_string($settings['order'])) {
+        if (isset($settings['order']) && is_string($settings['order'])) {
             $settings['order'] = (array) $settings['order'];
         }
 
