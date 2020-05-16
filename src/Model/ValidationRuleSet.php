@@ -108,7 +108,7 @@ class ValidationRuleSet
         }
 
         # Parse minLength:2 etc
-        if (is_string($params['rule']) and mb_strpos($params['rule'], ':') !== false) {
+        if (is_string($params['rule']) && mb_strpos($params['rule'], ':') !== false) {
             $params['rule'] = $this->convertRule($params['rule']);
         }
 
