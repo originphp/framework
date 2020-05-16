@@ -527,7 +527,7 @@ class Model
      * Validates model data in the object.
      *
      * @param \Origin\Model\Entity $data
-     * @return bool true or false
+     * @return bool $create set to false if this is update
      */
     public function validates(Entity $data, bool $create = true) : bool
     {
@@ -786,7 +786,11 @@ class Model
      * - afterCommit/afterRollback
      *
      * @param \Origin\Model\Entity $data data to save
-     * @param array $options keys (validate,callbacks,transaction,associated)
+     * @param array $options
+     *   - validate: set to false to skip validation
+     *   - callbacks: call the callbacks duing each stage.  You can also put only before or after
+     *   - transaction: wether to save through a database transaction (default:true)
+     *   - associated: default true. boolean or an array of associated data to save as well
      * @return bool $result true or false
      */
     public function save(Entity $data, array $options = []) : bool

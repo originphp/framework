@@ -163,7 +163,7 @@ class ModelValidator
                 $isPresent = in_array($field, $entity->properties());
 
                 // Don't run validation rule on field if its not in the entity regardless if its modified or not
-                if (! $checkPresent and $validationRule['rule'] !== 'required' and ! $isPresent) {
+                if (! $checkPresent and $validationRule['rule'] !== 'required' && ! $isPresent) {
                     continue;
                 }
 
@@ -181,27 +181,28 @@ class ModelValidator
                         continue;
                     }
                 }
-          
+             
                 /**
-                 * Handle all blank validation rules, including the special
+                 * Handle special 'notEmpty' and 'required' since these validation rules do
+                 * not exist in the validation library.
                  */
-                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required'])) {
+                if (in_array($validationRule['rule'], ['notEmpty','required'])) {
                     if ($this->empty($value)) {
                         $entity->invalidate($field, $validationRule['message']);
                     }
-                    if ($validationRule['rule'] === 'required' or $validationRule['stopOnFail']) {
+                    if ($validationRule['rule'] === 'required' || $validationRule['stopOnFail']) {
                         break;
                     }
                     continue;
                 }
 
                 // new in 2.6 - setting this rule will void other rules if the value is empty
-                if ($validationRule['rule'] === 'optional' and $this->empty($value)) {
+                if ($validationRule['rule'] === 'optional' && $this->empty($value)) {
                     break;
                 }
 
                 // go to next rule as this validation rule does not require this
-                if ($validationRule['allowEmpty'] === true and $this->empty($value)) {
+                if ($validationRule['allowEmpty'] === true && $this->empty($value)) {
                     continue;
                 }
 
