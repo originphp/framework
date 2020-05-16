@@ -194,7 +194,7 @@ class IdsMiddleware extends Middleware
         * For better performance skip values which only contain word/number/-_@.i.
         */
       
-        if (empty($value) or ! preg_match('/([^\w\s@\.-]+)/i', $value)) {
+        if (empty($value) || ! preg_match('/([^\w\s@\.-]+)/i', $value)) {
             return [];
         }
 

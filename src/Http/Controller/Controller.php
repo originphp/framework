@@ -192,7 +192,7 @@ class Controller
         }
         // handle lazyloading
         if (isset($this->$name)) {
-            if ($this->$name instanceof Model or $this->$name instanceof Component) {
+            if ($this->$name instanceof Model || $this->$name instanceof Component) {
                 return $this->$name;
             }
         }
@@ -353,7 +353,7 @@ class Controller
     */
     private function isResponseOrRedirect($result) : bool
     {
-        return ($result instanceof Response or $this->response->headers('Location'));
+        return ($result instanceof Response || $this->response->headers('Location'));
     }
 
     /**
@@ -458,7 +458,7 @@ class Controller
             return;
         }
 
-        if ($this->autoRender and $this->serialize and $this->request->type() === 'json') {
+        if ($this->autoRender && $this->serialize && $this->request->type() === 'json') {
             $this->renderJson(null, $options['status']);
 
             return;
@@ -470,7 +470,7 @@ class Controller
             return;
         }
 
-        if ($this->autoRender and $this->serialize and $this->request->type() === 'xml') {
+        if ($this->autoRender && $this->serialize && $this->request->type() === 'xml') {
             $this->renderXml(null, $options['status']);
 
             return;
@@ -489,7 +489,7 @@ class Controller
             }
             $view = new ApplicationView($this);
             $layout = null;
-            if ($options['type'] === 'html' and $this->layout) {
+            if ($options['type'] === 'html' && $this->layout) {
                 $layout = $this->layout;
             }
             $view->helpers($this->viewHelpers);
@@ -682,7 +682,7 @@ class Controller
      
         call_user_func_array([$this, $action], $this->request->params('args'));
      
-        if ($this->autoRender and $this->response->ready()) {
+        if ($this->autoRender && $this->response->ready()) {
             $this->render();
         }
 

@@ -268,7 +268,7 @@ class Association
        
         foreach ($this->model->association('belongsTo') as $alias => $config) {
             $key = lcfirst($alias);
-            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
+            if (! in_array($alias, $options['associated']) || ! $data->has($key) || ! $data->$key instanceof Entity) {
                 continue;
             }
 
@@ -289,7 +289,7 @@ class Association
         $associatedOptions = ['transaction' => false] + (array) $options;
         foreach ($this->model->association('hasOne') as $alias => $config) {
             $key = lcfirst($alias);
-            if (! in_array($alias, $options['associated']) or ! $data->has($key) or ! $data->$key instanceof Entity) {
+            if (! in_array($alias, $options['associated']) || ! $data->has($key) || ! $data->$key instanceof Entity) {
                 continue;
             }
             if ($data->$key->modified()) {
@@ -310,7 +310,7 @@ class Association
         $associatedOptions = ['transaction' => false] + (array) $options;
         foreach ($this->model->association('hasMany') as $alias => $config) {
             $key = Inflector::plural(lcfirst($alias));
-            if (! in_array($alias, $options['associated']) or ! $data->has($key)) {
+            if (! in_array($alias, $options['associated']) || ! $data->has($key)) {
                 continue;
             }
 
@@ -430,7 +430,7 @@ class Association
     public function deleteDependent($primaryKey, bool $callbacks) : bool
     {
         foreach (array_merge($this->model->association('hasOne'), $this->model->association('hasMany')) as $association => $config) {
-            if (isset($config['dependent']) and $config['dependent'] === true) {
+            if (isset($config['dependent']) && $config['dependent'] === true) {
                 $conditions = [$config['foreignKey'] => $primaryKey];
                 $ids = $this->model->$association->find('list', [
                     'conditions' => $conditions,

@@ -281,10 +281,10 @@ abstract class BaseSchema
         $foreignKeys = $this->foreignKeys($table);
       
         foreach ($foreignKeys as $fk) {
-            if ($options['column'] and $fk['column'] == $options['column']) {
+            if ($options['column'] && $fk['column'] == $options['column']) {
                 return true;
             }
-            if ($options['name'] and $fk['name'] == $options['name']) {
+            if ($options['name'] && $fk['name'] == $options['name']) {
                 return true;
             }
         }

@@ -464,7 +464,7 @@ class QueryBuilder
             'conditions' => [],
         ];
         
-        if (! isset($this->query['joins']) or $this->query['joins'] == null) {
+        if (! isset($this->query['joins']) || $this->query['joins'] == null) {
             $this->query['joins'] = [];
         }
 
@@ -535,7 +535,7 @@ class QueryBuilder
      */
     public function insertStatement(array $params) : string
     {
-        if (empty($params) or ! isset($params['data']) or empty($params['data'])) {
+        if (empty($params) || ! isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -564,7 +564,7 @@ class QueryBuilder
      */
     public function updateStatement(array $params) : string
     {
-        if (empty($params) or ! isset($params['data']) or empty($params['data'])) {
+        if (empty($params) || ! isset($params['data']) or empty($params['data'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -604,7 +604,7 @@ class QueryBuilder
      */
     public function deleteStatement(array $params) : string
     {
-        if (empty($params) or ! isset($params['conditions'])) {
+        if (empty($params) || ! isset($params['conditions'])) {
             throw new QueryBuilderException('Data is empty');
         }
         $this->clear();
@@ -635,7 +635,7 @@ class QueryBuilder
      */
     public function selectStatement(array $params) : string
     {
-        if (empty($params) or ! isset($params['fields'])) {
+        if (empty($params) || ! isset($params['fields'])) {
             throw new QueryBuilderException('No Fields.');
         }
         $distinct = ! empty($params['distinct']) ? 'DISTINCT ' : null;
@@ -953,12 +953,12 @@ class QueryBuilder
                 return "{$field} IS NOT NULL";
             }
         }
-        //(SELECT STATEMENT) or (value1, value2)
-        if (($expression == 'IN' or $expression == 'NOT IN') and is_string($value)) {
+        //(SELECT STATEMENT) || (value1, value2)
+        if (($expression == 'IN' || $expression == 'NOT IN') and is_string($value)) {
             return "{$field} {$expression} ( {$value} )";
         }
 
-        if ($expression == 'BETWEEN' or $expression == 'NOT BETWEEN') {
+        if ($expression == 'BETWEEN' || $expression == 'NOT BETWEEN') {
             if (! is_array($value) or count($value) !== 2) {
                 throw new QueryBuilderException('Bad paramaters');
             }

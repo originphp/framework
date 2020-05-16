@@ -55,7 +55,7 @@ class Session
             $config['session.cookie_secure'] = 1;
         }
 
-        if (! $this->started() and ! headers_sent()) {
+        if (! $this->started() && ! headers_sent()) {
             $this->setIniConfig($config);
         }
 
@@ -148,7 +148,7 @@ class Session
         if (isset($_COOKIE[$name])) {
             $id = $_COOKIE[$name];
         }
-        if ($id and ! preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
+        if ($id && ! preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
             $this->destroy();
 
             return null;

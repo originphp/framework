@@ -239,7 +239,7 @@ abstract class Connection
      */
     public function hasResults() :bool
     {
-        return is_a($this->statement, 'PDOStatement') and $this->statement->rowCount() > 0;
+        return is_a($this->statement, 'PDOStatement') && $this->statement->rowCount() > 0;
     }
 
     /**
@@ -396,7 +396,7 @@ abstract class Connection
     protected function fetchResult(string $type = 'assoc')
     {
         $fetchType = PDO::FETCH_ASSOC;
-        if ($type === 'num' or $type == 'model') {
+        if ($type === 'num' || $type == 'model') {
             $fetchType = PDO::FETCH_NUM;
         } elseif ($type === 'obj') {
             $fetchType = PDO::FETCH_OBJ;
@@ -485,7 +485,7 @@ abstract class Connection
         $numberOfFields = $statement->columnCount();
         for ($i = 0; $i < $numberOfFields; ++$i) {
             $column = $statement->getColumnMeta($i); // could be bottle neck on
-            if (empty($column['table']) or $this->isVirtualField($column['name'])) {
+            if (empty($column['table']) || $this->isVirtualField($column['name'])) {
                 $this->columnMap[$i] = [0, $column['name']];
             } else {
                 $this->columnMap[$i] = [$column['table'], $column['name']];

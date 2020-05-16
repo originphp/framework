@@ -228,10 +228,10 @@ class MailParser
 
         $body = null;
         foreach ($this->parts as $part) {
-            if (isset($part['content-disposition']) and $part['content-disposition'] === 'attachment') {
+            if (isset($part['content-disposition']) && $part['content-disposition'] === 'attachment') {
                 continue;
             }
-            if (! isset($part['content-type']) or $part['content-type'] !== $mime) {
+            if (! isset($part['content-type']) || $part['content-type'] !== $mime) {
                 continue;
             }
 
@@ -311,7 +311,7 @@ class MailParser
     {
         $content = $this->extract($start, $end);
 
-        return ($content and $this->needsDecoding($encoding)) ? $this->decodeContent($content, $encoding) : $content;
+        return ($content && $this->needsDecoding($encoding)) ? $this->decodeContent($content, $encoding) : $content;
     }
 
     /**
@@ -486,7 +486,7 @@ class MailParser
         /**
          * Check the message either has empty return path or from mailer-daemon or postmaster
          */
-        if (! preg_match('/^return-path: ?< ?>/im', $header) and ! preg_match('/^from:.*(mailer-daemon|postmaster)/im', $header)) {
+        if (! preg_match('/^return-path: ?< ?>/im', $header) && ! preg_match('/^from:.*(mailer-daemon|postmaster)/im', $header)) {
             return false;
         }
        

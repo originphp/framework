@@ -55,7 +55,7 @@ class ExceptionRenderer
             list($errorCode, $errorMessage) = $this->getErrorCodeAndMessage($exception);
         }
        
-        if ($this->request->ajax() or $this->request->type() === 'json') {
+        if ($this->request->ajax() || $this->request->type() === 'json') {
             $body = json_encode(['error' => ['message' => $errorMessage, 'code' => $errorCode]]);
         } else {
             ob_start();
@@ -87,7 +87,7 @@ class ExceptionRenderer
         $error400 = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
       
         $file = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
-        if ($exception instanceof HttpException and file_exists($error400) and $exception->getCode() < 500) {
+        if ($exception instanceof HttpException and file_exists($error400) && $exception->getCode() < 500) {
             $file = $error400;
         }
 

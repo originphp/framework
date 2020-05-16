@@ -219,9 +219,9 @@ class Date
         $hasTime = (stripos($pattern, 'h') !== false);
    
         $returnFormat = 'Y-m-d H:i:s';
-        if ($hasTime and ! $hasDate) {
+        if ($hasTime && ! $hasDate) {
             $returnFormat = 'H:i:s';
-        } elseif ($hasDate and ! $hasTime) {
+        } elseif ($hasDate && ! $hasTime) {
             $returnFormat = 'Y-m-d';
         }
 

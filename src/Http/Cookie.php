@@ -153,7 +153,7 @@ class Cookie
         $length = strlen(self::prefix);
         // a parse error in application will trigger type error with security::decrypt
         $key = Config::read('Security.key');
-        if (substr($value, 0, $length) === self::prefix and $key) {
+        if (substr($value, 0, $length) === self::prefix && $key) {
             $value = substr($value, $length);
             $value = Security::decrypt($value, $key);
         }

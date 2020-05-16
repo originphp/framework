@@ -257,7 +257,7 @@ class Job
 
             $this->executeHook('onError', [$e]);
 
-            if ($this->enqueued and $this->retryOptions) {
+            if ($this->enqueued && $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
             }
             

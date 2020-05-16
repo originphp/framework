@@ -264,7 +264,7 @@ class Migration
         $tableOptions = ['options' => $options];
 
         $options += ['id' => true,'primaryKey' => 'id'];
-        if ($options['id'] and $options['primaryKey']) {
+        if ($options['id'] && $options['primaryKey']) {
             $schema = [$options['primaryKey'] => [
                 'type' => 'integer',
                 'autoIncrement' => true,
@@ -438,12 +438,12 @@ class Migration
         $engine = $this->connection()->engine();
        
         // Drop DEFAULT constraint if it exists (same in both MySQL and PgSQL)
-        if (in_array($engine, ['pgsql','mysql']) and $schema[$name]['default']) {
+        if (in_array($engine, ['pgsql','mysql']) && $schema[$name]['default']) {
             $this->statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT";
         }
 
         // In PgSQL not null is constraint.
-        if ($engine === 'pgsql' and $schema[$name]['null'] === false) {
+        if ($engine === 'pgsql' && $schema[$name]['null'] === false) {
             $this->statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL";
         }
         
@@ -566,25 +566,25 @@ class Migration
         if (! isset($schema[$column])) {
             return false;
         }
-        if (isset($options['type']) and $schema[$column]['type'] !== $options['type']) {
+        if (isset($options['type']) && $schema[$column]['type'] !== $options['type']) {
             return false;
         }
 
-        if (array_key_exists('default', $options) and $schema[$column]['default'] !== $options['default']) {
+        if (array_key_exists('default', $options) && $schema[$column]['default'] !== $options['default']) {
             return false;
         }
 
-        if (array_key_exists('null', $options) and $schema[$column]['null'] !== $options['null']) {
+        if (array_key_exists('null', $options) && $schema[$column]['null'] !== $options['null']) {
             return false;
         }
 
-        if (isset($options['limit']) and isset($schema[$column]['limit']) and (int) $schema[$column]['limit'] !== (int) $options['limit']) {
+        if (isset($options['limit']) and isset($schema[$column]['limit']) && (int) $schema[$column]['limit'] !== (int) $options['limit']) {
             return false;
         }
-        if (isset($options['precision']) and isset($schema[$column]['precision']) and (int) $schema[$column]['precision'] !== (int) $options['precision']) {
+        if (isset($options['precision']) and isset($schema[$column]['precision']) && (int) $schema[$column]['precision'] !== (int) $options['precision']) {
             return false;
         }
-        if (isset($options['scale']) and isset($schema[$column]['scale']) and (int) $schema[$column]['scale'] !== (int) $options['scale']) {
+        if (isset($options['scale']) and isset($schema[$column]['scale']) && (int) $schema[$column]['scale'] !== (int) $options['scale']) {
             return false;
         }
 
@@ -601,7 +601,7 @@ class Migration
       */
     public function addIndex(string $table, $column, array $options = []) : void
     {
-        if (! $this->tableExists($table) and ! in_array($table, $this->pendingTables)) {
+        if (! $this->tableExists($table) && ! in_array($table, $this->pendingTables)) {
             throw new Exception("{$table} table does not exist");
         }
         $options += ['unique' => false,'name' => null];
@@ -663,7 +663,7 @@ class Migration
      */
     private function indexOptions(string $table, $options) : array
     {
-        if (is_string($options) or (! isset($options['name']) and ! isset($options['column']))) {
+        if (is_string($options) || (! isset($options['name']) && ! isset($options['column']))) {
             $options = ['column' => $options];
         }
         if (! empty($options['column'])) {
@@ -765,11 +765,11 @@ class Migration
      */
     public function addForeignKey(string $fromTable, string $toTable, array $options = []) : void
     {
-        if (! $this->tableExists($fromTable) and ! in_array($fromTable, $this->pendingTables)) {
+        if (! $this->tableExists($fromTable) && ! in_array($fromTable, $this->pendingTables)) {
             throw new Exception("{$fromTable} does not exist");
         }
 
-        if (! $this->tableExists($toTable) and ! in_array($toTable, $this->pendingTables)) {
+        if (! $this->tableExists($toTable) && ! in_array($toTable, $this->pendingTables)) {
             throw new Exception("{$toTable} does not exist");
         }
 
@@ -826,11 +826,11 @@ class Migration
         $foreignKeys = $this->foreignKeys($fromTable);
           
         foreach ($foreignKeys as $foreignKey) {
-            if ($options['column'] and $foreignKey['column'] === $options['column']) {
+            if ($options['column'] && $foreignKey['column'] === $options['column']) {
                 $options['name'] = $foreignKey['name'];
                 break;
             }
-            if ($options['name'] and $foreignKey['name'] === $options['name']) {
+            if ($options['name'] && $foreignKey['name'] === $options['name']) {
                 $options['column'] = $foreignKey['column'];
                 break;
             }

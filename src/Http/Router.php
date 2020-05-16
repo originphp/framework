@@ -110,7 +110,7 @@ class Router
      */
     public static function parse(string $url)
     {
-        if (strlen($url) and $url[0] == '/') {
+        if (strlen($url) && $url[0] == '/') {
             $url = substr($url, 1);
         }
 
@@ -140,7 +140,7 @@ class Router
  
         foreach (self::$routes as $routedParams) {
             if (preg_match($routedParams['pattern'], $url, $matches)) {
-                if (empty($routedParams['method']) or ($routedParams['method'] and strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
+                if (empty($routedParams['method']) || ($routedParams['method'] and strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
                     unset($routedParams['method'],$routedParams['pattern']);
                     $params = array_merge($template, $routedParams);
                     foreach ($matches as $key => $value) {

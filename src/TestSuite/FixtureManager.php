@@ -121,7 +121,7 @@ class FixtureManager
 
         try {
             // create the table table or truncate existing
-            if (! $this->loaded[$fixture]->insertOnly() and ($createTable or $this->loaded[$fixture]->dropTables() === true)) {
+            if (! $this->loaded[$fixture]->insertOnly() && ($createTable || $this->loaded[$fixture]->dropTables() === true)) {
                 $this->loaded[$fixture]->drop();
                 $this->loaded[$fixture]->create();
             } else {
@@ -205,7 +205,7 @@ class FixtureManager
         list($plugin, $fixture) = pluginSplit($fixture);
 
         $namespace = '';
-        if ($plugin === 'App' or $plugin === null) {
+        if ($plugin === 'App' || $plugin === null) {
             $namespace = Config::read('App.namespace');
         } elseif ($plugin == 'Framework') {
             $namespace = 'Origin';

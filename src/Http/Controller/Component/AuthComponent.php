@@ -284,7 +284,7 @@ class AuthComponent extends Component
          * from session.
          */
      
-        if (in_array('Api', $this->config['authenticate']) and $this->user) {
+        if (in_array('Api', $this->config['authenticate']) && $this->user) {
             $user = $this->user->toArray();
         }
       
@@ -308,7 +308,7 @@ class AuthComponent extends Component
             $fields = $this->config['fields'];
             $username = (string) $this->request()->data($fields['username']);
             $password = (string) $this->request()->data($fields['password']);
-            if ($username and $password) {
+            if ($username && $password) {
                 return ['username' => $username, 'password' => $password];
             }
         }
@@ -316,7 +316,7 @@ class AuthComponent extends Component
         if (in_array('Http', $this->config['authenticate'])) {
             $username = (string) $this->request()->env('PHP_AUTH_USER');
             $password = (string) $this->request()->env('PHP_AUTH_PW');
-            if ($username and $password) {
+            if ($username && $password) {
                 return ['username' => $username, 'password' => $password];
             }
         }

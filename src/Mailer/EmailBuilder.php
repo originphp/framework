@@ -154,7 +154,7 @@ class EmailBuilder
             
             if (file_exists($filename)) {
                 $content = $this->renderTemplate($filename);
-            } elseif ($this->content and $this->options['format'] === 'both') {
+            } elseif ($this->content && $this->options['format'] === 'both') {
                 $content = Html::toText($this->content);
             } else {
                 throw new Exception(sprintf('Template %s does not exist', $filename));

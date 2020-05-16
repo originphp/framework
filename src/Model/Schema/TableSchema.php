@@ -156,7 +156,7 @@ class TableSchema
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
         $attributes += ['name' => $name,'type' => null,'column' => null];
-        if (empty($attributes['type']) or ! in_array($attributes['type'], ['primary','unique','foreign'])) {
+        if (empty($attributes['type']) || ! in_array($attributes['type'], ['primary','unique','foreign'])) {
             throw new Exception(sprintf('Invalid or missing constraint type for %s', $name));
         }
         
@@ -181,10 +181,10 @@ class TableSchema
             if (isset($attributes['update']) or isset($attributes['delete'])) {
                 $attributes += ['update' => 'restrict','delete' => 'restrict'];
             }
-            if (isset($attributes['update']) and ! isset($map[$attributes['update']])) {
+            if (isset($attributes['update']) && ! isset($map[$attributes['update']])) {
                 throw new Exception(sprintf('Update action %s is invalid must be %s', $attributes['update'], implode(', ', array_keys($map))));
             }
-            if (isset($attributes['delete']) and ! isset($map[$attributes['delete']])) {
+            if (isset($attributes['delete']) && ! isset($map[$attributes['delete']])) {
                 throw new Exception(sprintf('Delete action %s is invalid must be %s', $attributes['delete'], implode(', ', array_keys($map))));
             }
         }

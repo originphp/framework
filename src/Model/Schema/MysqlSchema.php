@@ -147,7 +147,7 @@ class MysqlSchema extends BaseSchema
                 $definition['comment'] = $row['Comment'];
             }
 
-            if (isset($row['Extra']) and $row['Extra'] === 'auto_increment') {
+            if (isset($row['Extra']) && $row['Extra'] === 'auto_increment') {
                 $definition['autoIncrement'] = true;
             }
             $out[$row['Field']] = $definition;
@@ -208,7 +208,7 @@ class MysqlSchema extends BaseSchema
             return ['type' => 'text'];
         }
 
-        if ($col === 'tinyint' and $limit === 1) {
+        if ($col === 'tinyint' && $limit === 1) {
             return ['type' => 'boolean','null' => false];
         }
 
@@ -273,27 +273,27 @@ class MysqlSchema extends BaseSchema
         $out .= ' ' . $type;
 
         // deal with types that have limits or custom types with limit set
-        if (! empty($data['limit']) and (in_array($data['type'], ['integer','string','bigint']) or ! $isMapped)) {
+        if (! empty($data['limit']) && (in_array($data['type'], ['integer','string','bigint']) || ! $isMapped)) {
             $out .= '(' . $data['limit'] . ')';
-        } elseif (! empty($data['precision']) and (in_array($data['type'], ['decimal','float']) or ! $isMapped)) {
+        } elseif (! empty($data['precision']) && (in_array($data['type'], ['decimal','float']) || ! $isMapped)) {
             $out .= '(' . $data['precision'] .',' . ($data['scale'] ?? 0) . ')'; // 0 is MySQL default
         }
 
         // deal with unsigned
-        if (in_array($data['type'], ['integer','bigint','decimal','float']) and ! empty($data['unsigned'])) {
+        if (in_array($data['type'], ['integer','bigint','decimal','float']) && ! empty($data['unsigned'])) {
             $out .= ' UNSIGNED';
         }
 
-        if (in_array($data['type'], ['string','text']) and ! empty($data['collate'])) {
+        if (in_array($data['type'], ['string','text']) && ! empty($data['collate'])) {
             $out .= ' COLLATE ' . $data['collate'];
         }
         
-        if (isset($data['null']) and $data['null'] === false) {
+        if (isset($data['null']) && $data['null'] === false) {
             $out .= ' NOT NULL';
         }
 
         if ($data['type'] === 'timestamp') {
-            if (isset($data['null']) and $data['null'] === true) {
+            if (isset($data['null']) && $data['null'] === true) {
                 $out .= ' NULL';
             }
             if (isset($data['default']) and strtolower($data['default']) === 'current_timestamp') {
@@ -302,7 +302,7 @@ class MysqlSchema extends BaseSchema
             }
         }
 
-        if (in_array($data['type'], ['integer','bigint']) and ! empty($data['autoIncrement'])) {
+        if (in_array($data['type'], ['integer','bigint']) && ! empty($data['autoIncrement'])) {
             $out .= ' AUTO_INCREMENT';
         } elseif (isset($data['default'])) {
             $out .= ' DEFAULT ' . $this->schemaValue($data['default']);
@@ -684,7 +684,7 @@ class MysqlSchema extends BaseSchema
             $attributes['references'][1]
         );
         
-        if (! empty($attributes['update']) or ! empty($attributes['delete'])) {
+        if (! empty($attributes['update']) || ! empty($attributes['delete'])) {
             $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $this->onClause($attributes['update']), $this->onClause($attributes['delete']));
         }
 
@@ -748,7 +748,7 @@ class MysqlSchema extends BaseSchema
      */
     public function schemaValue($value)
     {
-        if ($value === '' or $value === null) {
+        if ($value === '' || $value === null) {
             return 'NULL';
         }
         if (is_bool($value)) {

@@ -272,7 +272,7 @@ class FormHelper extends Helper
 
                 $meta['columnMap'][$column] = $type;
 
-                if (empty($row['limit']) === false and $type != 'boolean') {
+                if (empty($row['limit']) === false && $type != 'boolean') {
                     $meta['maxlength'][$column] = $row['limit'];
                 }
             }
@@ -302,7 +302,7 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required']) or $validationRule['present']) {
+                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required']) || $validationRule['present']) {
                     $result[] = $field;
                 }
             }
@@ -329,7 +329,7 @@ class FormHelper extends Helper
     {
         $selectOptions = [];
 
-        if (empty($options['type']) and ! empty($options['options'])) {
+        if (empty($options['type']) && ! empty($options['options'])) {
             $options['type'] = 'select';
         }
 
@@ -723,7 +723,7 @@ class FormHelper extends Helper
          */
 
         if ($options['format']) {
-            if (! empty($options['value']) and (is_int($options['value']) or is_float($options['value']))) {
+            if (! empty($options['value']) && (is_int($options['value']) or is_float($options['value']))) {
                 $options['value'] = Number::format($options['value']);
             }
         }
@@ -934,7 +934,7 @@ class FormHelper extends Helper
     {
         $selectOptions += ['value' => null];
 
-        $noneSelected = $selectOptions['value'] === null or $selectOptions['value'] === '';
+        $noneSelected = $selectOptions['value'] === null || $selectOptions['value'] === '';
 
         $output = '';
         foreach ($options as $key => $value) {
@@ -969,7 +969,7 @@ class FormHelper extends Helper
      */
     protected function prepareOptions(string $name, array $options = []): array
     {
-        if (isset($options['id']) and $options['id'] === true) {
+        if (isset($options['id']) && $options['id'] === true) {
             $options['id'] = $this->domId($name);
         }
         if (! isset($options['name'])) {
@@ -998,7 +998,7 @@ class FormHelper extends Helper
                 }
 
                 // Check Validation Errors
-                if ($entity and $entity->errors($last)) {
+                if ($entity && $entity->errors($last)) {
                     $options = $this->addClass('error', $options);
                 }
             } else {
@@ -1070,7 +1070,7 @@ class FormHelper extends Helper
             $lastEntity = $entity;
             if (is_object($entity) and isset($entity->$key)) {
                 $entity = $entity->$key;
-            } elseif ((is_array($entity) or $entity instanceof Collection) and isset($entity[$key])) {
+            } elseif ((is_array($entity) || $entity instanceof Collection) and isset($entity[$key])) {
                 $entity = $entity[$key];
             } else {
                 return null;

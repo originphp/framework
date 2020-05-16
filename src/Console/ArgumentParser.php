@@ -144,7 +144,7 @@ class ArgumentParser
     public function addOption(string $name, array $options = []) : void
     {
         $options += ['name' => $name,'short' => null,'default' => null,'required' => false,'type' => 'string','description' => '','banner' => strtoupper($name)];
-        if ($options['default'] and $options['required']) {
+        if ($options['default'] && $options['required']) {
             throw new ConsoleException("Option {$name} cannot be required and have default value");
         }
         if (! in_array($options['type'], ['string','boolean','integer','array','hash'])) {
@@ -183,7 +183,7 @@ class ArgumentParser
     public function addArgument(string $name, array $options = []) : void
     {
         $options += ['name' => $name,'default' => null,'required' => false,'type' => 'string','description' => ''];
-        if ($options['required'] and $this->arguments) {
+        if ($options['required'] && $this->arguments) {
             $arg = end($this->arguments);
             if ($arg['required'] === false) {
                 throw new ConsoleException('You cannot add a required argument after an optional one.');
@@ -191,7 +191,7 @@ class ArgumentParser
         }
         if ($this->arguments) {
             $arg = end($this->arguments);
-            if ($arg['type'] === 'array' or $arg['type'] === 'hash') {
+            if ($arg['type'] === 'array' || $arg['type'] === 'hash') {
                 throw new ConsoleException('You cannot add an argument after an array or hash argument');
             }
         }
@@ -209,9 +209,9 @@ class ArgumentParser
         $arguments = $options = [];
         $args = [];
         foreach ($argv as $key => $arg) {
-            if (is_string($arg) and $this->isLongOption($arg)) {
+            if (is_string($arg) && $this->isLongOption($arg)) {
                 $options = $this->parseLongOption($arg, $options);
-            } elseif (is_string($arg) and $this->isShortOption($arg)) {
+            } elseif (is_string($arg) && $this->isShortOption($arg)) {
                 $options = $this->parseShortOption($arg, $options);
             } else {
                 $args[] = $arg;
@@ -225,9 +225,9 @@ class ArgumentParser
             if (! empty($option['required']) and empty($options[$option['name']])) {
                 throw new ConsoleException(sprintf('Missing required option `%s`', $option['name']));
             }
-            if ($option['type'] === 'boolean' and ! isset($options[$option['name']])) {
+            if ($option['type'] === 'boolean' && ! isset($options[$option['name']])) {
                 $options[$option['name']] = false;
-            } elseif (! empty($option['default']) and ! isset($options[$option['name']])) {
+            } elseif (! empty($option['default']) && ! isset($options[$option['name']])) {
                 $options[$option['name']] = $option['default'];
             }
         }
@@ -236,7 +236,7 @@ class ArgumentParser
             if (! empty($options['help'])) {
                 break;
             }
-            if (! empty($argument['required']) and ! isset($arguments[$argument['name']])) {
+            if (! empty($argument['required']) && ! isset($arguments[$argument['name']])) {
                 throw new ConsoleException(sprintf('Missing required argument `%s`', $argument['name']));
             }
         }
@@ -518,7 +518,7 @@ class ArgumentParser
                 $text .= '=' . $option['banner'] ;
             }
             $help = $option['description'];
-            if (array_key_exists('default', $option) and $option['default'] !== null) {
+            if (array_key_exists('default', $option) && $option['default'] !== null) {
                 $default = " <yellow>[default: {$option['default']}]</yellow>";
                 if (is_array($help)) {
                     $rows = count($help);

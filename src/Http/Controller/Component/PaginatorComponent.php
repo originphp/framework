@@ -80,7 +80,7 @@ class PaginatorComponent extends Component
             'nextPage' => ($settings['page'] < $pages),
         ]);
 
-        if ($settings['page'] > 1 and $settings['page'] > $pages) {
+        if ($settings['page'] > 1 && $settings['page'] > $pages) {
             throw new NotFoundException();
         }
  
@@ -132,7 +132,7 @@ class PaginatorComponent extends Component
         $found = [];
     
         foreach ($belongsTo as $alias => $config) {
-            if (isset($config['foreignKey']) and $config['foreignKey'] == $field) {
+            if (isset($config['foreignKey']) && $config['foreignKey'] == $field) {
                 $found[] = $alias;
             }
         }
@@ -191,7 +191,7 @@ class PaginatorComponent extends Component
          * 1. Check field exists to prevent injections
          * 2. Use pre-defined values for sort
          */
-        if (isset($settings['sort']) and ! $this->model->hasField($settings['sort'])) {
+        if (isset($settings['sort']) && ! $this->model->hasField($settings['sort'])) {
             unset($settings['sort']);
 
             return $settings;

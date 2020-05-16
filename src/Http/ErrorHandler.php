@@ -97,7 +97,7 @@ class ErrorHandler
         $result = false;
         $request = Router::request();
         if ($request) {
-            $result = ($request->ajax() or $request->type() === 'json');
+            $result = ($request->ajax() || $request->type() === 'json');
         }
 
         return $result;
@@ -159,7 +159,7 @@ class ErrorHandler
         }
 
         # Log
-        if ($error === 'deprecated' or $error === 'strict') {
+        if ($error === 'deprecated' || $error === 'strict') {
             $error = 'notice';
         }
         Log::write($error, $message . ' in {file}, line: {line}', [
@@ -186,7 +186,7 @@ class ErrorHandler
         /**
          * Display debug backtrace
          */
-        if (Config::read('debug') === true and ! $this->isAjax()) {
+        if (Config::read('debug') === true && ! $this->isAjax()) {
             $this->debugExceptionHandler($exception);
         } else {
             $renderer = new ExceptionRenderer(Router::request());

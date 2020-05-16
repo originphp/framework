@@ -86,7 +86,7 @@ class MailboxDownloadService extends Service
         
         if ($this->isIMAP()) {
             $lastImapMessage = $this->Imap->findByAccount($account);
-            if ($lastImapMessage and ! $downloadOptions['messageId']) {
+            if ($lastImapMessage && ! $downloadOptions['messageId']) {
                 $downloadOptions['messageId'] = $lastImapMessage->message_id;
             }
 

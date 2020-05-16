@@ -144,7 +144,7 @@ class Request
             $url = $this->uri();
         }
        
-        if (strlen($url) and $url[0] === '/') {
+        if (strlen($url) && $url[0] === '/') {
             $url = substr($url, 1);
         }
 
@@ -287,7 +287,7 @@ class Request
     public function url(bool $includeQuery = false): string
     {
         $url = $this->url;
-        if ($includeQuery and $this->query) {
+        if ($includeQuery && $this->query) {
             $url .= '?' . http_build_query($this->query);
         }
 
@@ -305,7 +305,7 @@ class Request
     public function path(bool $includeQuery = false): string
     {
         $path = $this->path;
-        if ($includeQuery and $this->query) {
+        if ($includeQuery && $this->query) {
             $path .= '?' . http_build_query($this->query);
         }
 
@@ -377,7 +377,7 @@ class Request
      */
     public function ssl(): bool
     {
-        return ($this->env('HTTPS') == 1 or $this->env('HTTPS') === 'on');
+        return ($this->env('HTTPS') == 1 || $this->env('HTTPS') === 'on');
     }
 
     /**

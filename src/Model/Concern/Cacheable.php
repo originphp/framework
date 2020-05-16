@@ -84,7 +84,7 @@ trait Cacheable
     {
         $options += ['cache' => true];
 
-        if ($this->cacheEnabled === false or ! $options['cache']) {
+        if ($this->cacheEnabled === false || ! $options['cache']) {
             return parent::find($type, $options);
         }
 
@@ -94,7 +94,7 @@ trait Cacheable
 
         # cache_get
         $result = $cache->read($key);
-        if ($result and $result['id'] === $cacheId) {
+        if ($result && $result['id'] === $cacheId) {
             return $result['data'];
         }
  
@@ -118,7 +118,7 @@ trait Cacheable
     {
         $options += ['cache' => true];
 
-        if ($this->cacheEnabled === false or ! $options['cache']) {
+        if ($this->cacheEnabled === false || ! $options['cache']) {
             return parent::calculate($operation, $columnName, $options);
         }
 
@@ -128,7 +128,7 @@ trait Cacheable
 
         # cache_get
         $result = $cache->read($key);
-        if ($result and $result['id'] === $cacheId) {
+        if ($result && $result['id'] === $cacheId) {
             return $result['data'];
         }
  

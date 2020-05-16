@@ -488,7 +488,7 @@ class ConsoleIo
         $this->stdout->write("\033[32;49m".$prompt);
         $this->stdout->write("\033[97;49m> ", false);
         $input = $this->stdin->read();
-        if ($input === '' and $default) {
+        if ($input === '' && $default) {
             return $default;
         }
 
@@ -519,11 +519,11 @@ class ConsoleIo
             array_map('strtoupper', $options)
         );
        
-        while ($input === '' or ! in_array($input, $options)) {
+        while ($input === '' || ! in_array($input, $options)) {
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
             $input = $this->stdin->read();
-            if ($input === '' and $default) {
+            if ($input === '' && $default) {
                 return $default;
             }
             # Catch out errors caused by not sending data via ConsoleIntegratioTest::exec
@@ -545,7 +545,7 @@ class ConsoleIo
      */
     public function createFile(string $filename, string $contents, $forceOverwrite = false) : bool
     {
-        if (file_exists($filename) and $forceOverwrite !== true) {
+        if (file_exists($filename) && $forceOverwrite !== true) {
             $this->warning("File {$filename} already exists");
             $input = $this->askChoice('Do you want to overwrite?', ['y', 'n'], 'n');
             if ($input === 'n') {

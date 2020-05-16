@@ -66,7 +66,7 @@ class XmlView
         /**
          * If user requests JSON and serialize is set then use that
          */
-        if ($data === null and $this->request->type() === 'xml' and ! empty($this->serialize)) {
+        if ($data === null && $this->request->type() === 'xml' && ! empty($this->serialize)) {
             $data = $this->serialize($this->serialize);
         }
 

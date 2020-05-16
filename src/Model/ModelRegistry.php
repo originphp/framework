@@ -56,7 +56,7 @@ class ModelRegistry
         /**
          * Set the datasource to test when in the test environment
          */
-        if (env('ORIGIN_ENV') === 'test' and ! isset($options['connection'])) {
+        if (env('ORIGIN_ENV') === 'test' && ! isset($options['connection'])) {
             $options['connection'] = 'test';
         }
 

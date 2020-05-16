@@ -450,7 +450,7 @@ class Entity implements ArrayAccess, JsonSerializable
         $result = [];
         foreach ($this->visibleProperties() as $property) {
             $value = $this->$property;
-            if (is_array($value) or $value instanceof Collection) {
+            if (is_array($value) || $value instanceof Collection) {
                 foreach ($value as $k => $v) {
                     if ($v instanceof Entity) {
                         $result[$property][$k] = $v->toArray();

@@ -174,7 +174,7 @@ class CommandRunner
         $className = $namespace.'\Console\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
        
         $object = $this->createCommand($className);
-        if ($object and $object->name() === $command) {
+        if ($object && $object->name() === $command) {
             return $object;
         }
        
@@ -277,7 +277,7 @@ class CommandRunner
             if (substr($file, -4) !== '.php') {
                 continue;
             }
-            if (substr($file, -11) === 'Command.php' and $file !== 'Command.php') {
+            if (substr($file, -11) === 'Command.php' && $file !== 'Command.php') {
                 $results[] = [
                     'className' => substr($file, 0, -4),
                     'namespace' => $namespace.'\Console\Command',

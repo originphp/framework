@@ -57,7 +57,7 @@ class MailFetcher
         if (! in_array($config['protocol'], ['pop3', 'imap'])) {
             throw new InvalidArgumentException('Only pop3 and imap supported');
         }
-        if ($config['encryption'] and ! in_array($config['encryption'], ['ssl', 'tls', 'notls'])) {
+        if ($config['encryption'] && ! in_array($config['encryption'], ['ssl', 'tls', 'notls'])) {
             throw new InvalidArgumentException('Invalid encryption type');
         }
 
@@ -93,7 +93,7 @@ class MailFetcher
         restore_error_handler();
         ini_restore('default_socket_timeout');
 
-        if (! $this->connection or $errorMessage) {
+        if (! $this->connection || $errorMessage) {
             throw new Exception('Error connecting to ' . $this->config['host'] . ':' . $this->config['port']);
         }
     }

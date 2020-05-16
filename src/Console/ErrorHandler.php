@@ -145,7 +145,7 @@ class ErrorHandler
             $on = $debug['stackFrames'][0]['line'] - 1;
 
             foreach ($contents as $line => $data) {
-                if ($line >= ($on - 5) and $line <= ($on + 5)) {
+                if ($line >= ($on - 5) && $line <= ($on + 5)) {
                     $data = rtrim($data);
                     if ($line === $on) {
                         $data = "<redBackground>{$data}</redBackground>";
@@ -160,7 +160,7 @@ class ErrorHandler
         // Show Partial Stack Trace
         $this->out("\n<blueBackground> Stack Trace </blueBackground>");
         foreach ($stackFrames as $i => $stackFrame) {
-            if ($i > 2 and ! $fullBacktrace) {
+            if ($i > 2 && ! $fullBacktrace) {
                 continue;
             }
             $class = $stackFrame['class'] ? $stackFrame['class'] . ' ' : '';
@@ -170,7 +170,7 @@ class ErrorHandler
                 $this->out('<white>' . $this->shortenPath($stackFrame['file']) . "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
             }
         }
-        if ($fullBacktrace === false and $i > 3) {
+        if ($fullBacktrace === false && $i > 3) {
             $this->out("\n<yellow>Use --verbose to see the full backtrace.</yellow>\n");
         }
     }

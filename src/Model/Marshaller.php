@@ -205,7 +205,7 @@ class Marshaller
                     'name' => $model, 'fields' => $fields,'associated' => $options['associated']
                 ];
 
-                if (! $entity->$property instanceof Entity and ! $entity->$property instanceof Collection) {
+                if (! $entity->$property instanceof Entity && ! $entity->$property instanceof Collection) {
                     $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                     continue;
                 }
@@ -216,7 +216,7 @@ class Marshaller
                 // Match hasOne and belongsTo using primaryKey
                 if ($propertyMap[$property] === 'one') {
                     $primaryKey = $this->getPrimaryKey($model);
-                    if (($primaryKey and isset($value[$primaryKey]) and (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey)) {
+                    if (($primaryKey and isset($value[$primaryKey]) && (string) $value[$primaryKey] === (string) $entity->$property->$primaryKey)) {
                         $properties[$property] = $this->patch($entity->$property, $value, $patchOptions);
                         continue;
                     }
@@ -232,8 +232,8 @@ class Marshaller
                 $original = $entity->get($property);
                 // only set properties that have values that were changed
                 // forms posting of null values are "" and integers are strings
-                if ($value !== $original and ! ($value === '' and $original === null) and
-                ! (is_numeric($original) and (string) $value === (string) $original)) {
+                if ($value !== $original && ! ($value === '' && $original === null) and
+                ! (is_numeric($original) && (string) $value === (string) $original)) {
                     $properties[$property] = $value;
                 }
             }
@@ -290,7 +290,7 @@ class Marshaller
             $fields = count($record);
             $hasPrimaryKey = isset($record[$primaryKey]) and isset($collection[$index]->primaryKey);
 
-            if ($hasPrimaryKey and $fields > 1 and (string) $collection[$index]->$primaryKey === (string) $record[$primaryKey]) {
+            if ($hasPrimaryKey && $fields > 1 && (string) $collection[$index]->$primaryKey === (string) $record[$primaryKey]) {
                 $out[] = $this->patch($collection[$index], $record, $options);
             } else {
                 $out[] = $this->one($record, $options);

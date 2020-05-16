@@ -165,7 +165,7 @@ class I18n
             return static::$locale;
         }
 
-        if (static::$availableLocales and ! in_array($locale, static::$availableLocales)) {
+        if (static::$availableLocales && ! in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
         static::$locale = $locale;
@@ -190,7 +190,7 @@ class I18n
             return static::$defaulLocale;
         }
 
-        if (static::$availableLocales and ! in_array($locale, static::$availableLocales)) {
+        if (static::$availableLocales && ! in_array($locale, static::$availableLocales)) {
             throw new LocaleNotAvailableException($locale);
         }
         static::$defaulLocale = $locale;
@@ -278,7 +278,7 @@ class I18n
 
         $replace = [];
         foreach ($vars as $key => $value) {
-            if (! is_array($value) and ! is_object($value)) {
+            if (! is_array($value) && ! is_object($value)) {
                 $replace['{'.$key.'}'] = $value;
             }
         }

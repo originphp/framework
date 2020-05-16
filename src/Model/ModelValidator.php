@@ -132,7 +132,7 @@ class ModelValidator
      */
     protected function runRule(bool $create, $on): bool
     {
-        if ($on === null or ($create and $on === 'create') or (! $create and $on === 'update')) {
+        if ($on === null || ($create && $on === 'create') || (! $create && $on === 'update')) {
             return true;
         }
 
@@ -154,7 +154,7 @@ class ModelValidator
 
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if ($validationRule['on'] and ! $this->runRule($create, $validationRule['on'])) {
+                if ($validationRule['on'] && ! $this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
 
@@ -163,7 +163,7 @@ class ModelValidator
                 $isPresent = in_array($field, $entity->properties());
 
                 // Don't run validation rule on field if its not in the entity regardless if its modified or not
-                if (! $checkPresent and $validationRule['rule'] !== 'required' && ! $isPresent) {
+                if (! $checkPresent && $validationRule['rule'] !== 'required' && ! $isPresent) {
                     continue;
                 }
 
@@ -210,7 +210,7 @@ class ModelValidator
                 if ($validationRule['rule'] === 'isUnique') {
                     $validationRule['rule'] = ['isUnique', [$field]];
                 }
-                if (is_array($validationRule['rule']) and $validationRule['rule'][0] === 'isUnique') {
+                if (is_array($validationRule['rule']) && $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
 
@@ -305,6 +305,6 @@ class ModelValidator
      */
     public function confirm($value1, $value2): bool
     {
-        return (! is_null($value2) and $value1 == $value2);
+        return (! is_null($value2) && $value1 == $value2);
     }
 }

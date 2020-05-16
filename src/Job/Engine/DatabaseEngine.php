@@ -89,7 +89,7 @@ class DatabaseEngine extends BaseEngine
             'order' => ['id ASC'],
         ]);
         
-        if ($record and $this->lockRecord($record)) {
+        if ($record && $this->lockRecord($record)) {
             $job = $this->deserialize($record->data);
 
             return $job;

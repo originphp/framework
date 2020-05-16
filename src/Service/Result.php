@@ -89,7 +89,7 @@ class Result
      */
     private function convertToArray(object $object) : array
     {
-        if (method_exists($object, 'toArray') and ! $object instanceof Result) {
+        if (method_exists($object, 'toArray') && ! $object instanceof Result) {
             return $object->toArray();
         }
         $array = (array) $object;

@@ -52,7 +52,7 @@ class PaginatorHelper extends Helper
         $paging = $this->params();
 
         $query['sort'] = $column;
-        if ($paging and $column === $paging['sort']) {
+        if ($paging && $column === $paging['sort']) {
             $query['direction'] = ($paging['direction'] == 'asc' ? 'desc' : 'asc');
             $template = 'sort'.ucfirst($paging['direction']);
         } else {

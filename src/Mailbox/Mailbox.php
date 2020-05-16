@@ -178,7 +178,7 @@ class Mailbox
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($callback);
-            if ($this->$method() === false or $this->bounced) {
+            if ($this->$method() === false || $this->bounced) {
                 return false;
             }
         }

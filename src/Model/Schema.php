@@ -42,7 +42,7 @@ class Schema
             $data = $properties[$table];
             if (isset($data['constraints'])) {
                 foreach ($data['constraints'] as $name => $settings) {
-                    if (isset($settings['type']) and $settings['type'] === 'foreign') {
+                    if (isset($settings['type']) && $settings['type'] === 'foreign') {
                         $foreignKeys[$table][$name] = $settings;
                         unset($properties[$table]['constraints'][$name]);
                     }
@@ -65,7 +65,7 @@ class Schema
          */
         foreach (array_keys($properties) as $table) {
             foreach ($foreignKeys[$table] as $name => $settings) {
-                if (! isset($settings['column']) or ! isset($settings['references'][0]) or ! isset($settings['references'][1])) {
+                if (! isset($settings['column']) || ! isset($settings['references'][0]) || ! isset($settings['references'][1])) {
                     throw new Exception(sprintf('Invalid foreign key settings for %s on table %s ', $name, $table));
                 }
                 $out[] = $datasource->adapter()->addForeignKey($table, $name, $settings['column'], $settings['references'][0], $settings['references'][1]);

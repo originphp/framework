@@ -46,12 +46,12 @@ class CsrfProtectionMiddleware extends Middleware
   
         # Generate the CSRF token
         $token = $request->cookies($this->config('cookieName'));
-        if ($request->is(['get']) and $token === null) {
+        if ($request->is(['get']) && $token === null) {
             $token = $this->generateToken();
         }
          
         # Works it
-        if ($request->is(['post', 'put', 'patch', 'delete']) or $request->data()) {
+        if ($request->is(['post', 'put', 'patch', 'delete']) || $request->data()) {
             $this->validateToken($request);
             # Remove csrfToken field that posted with form
             $post = $request->data();
@@ -112,7 +112,7 @@ class CsrfProtectionMiddleware extends Middleware
             throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
         }
  
-        if (! Security::compare($token, $request->data('csrfToken')) and ! Security::compare($token, $request->headers('X-CSRF-Token'))) {
+        if (! Security::compare($token, $request->data('csrfToken')) && ! Security::compare($token, $request->headers('X-CSRF-Token'))) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
     }

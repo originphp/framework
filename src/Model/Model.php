@@ -204,7 +204,7 @@ class Model
             $className = $association['className'];
         } else {
             foreach ($this->hasAndBelongsToMany as $alias => $config) {
-                if (isset($config['with']) and $config['with'] === $name) {
+                if (isset($config['with']) && $config['with'] === $name) {
                     $className = $config['with'];
                     $habtmModel = true;
                     break;
@@ -212,12 +212,12 @@ class Model
             }
         }
 
-        if ($className === null and $habtmModel === false) {
+        if ($className === null && $habtmModel === false) {
             return false;
         }
 
         $object = ModelRegistry::get($name, ['className' => $className, 'alias' => $name]);
-        if ($object === null and $habtmModel === false) {
+        if ($object === null && $habtmModel === false) {
             throw new MissingModelException($name);
         }
 
@@ -251,7 +251,7 @@ class Model
         if ($name === 'displayField') {
             return $this->displayField = $this->detectDisplayField();
         }
-        if (isset($this->$name) and $this->$name instanceof Model) {
+        if (isset($this->$name) && $this->$name instanceof Model) {
             return $this->$name;
         }
 
@@ -360,7 +360,7 @@ class Model
     public function belongsTo(string $association, array $options = []): array
     {
         $this->belongsTo[$association] = (new Association($this))->belongsTo($association, $options);
-        if (isset($options['counterCache']) and ! isset($this->CounterCache)) {
+        if (isset($options['counterCache']) && ! isset($this->CounterCache)) {
             $this->enableCounterCache();
         }
 
@@ -565,7 +565,7 @@ class Model
         $event = $exists === true ? 'update' : 'create';
 
         if ($options['validate'] === true) {
-            if ($options['callbacks'] === true and ! $this->triggerCallback('beforeValidate', $event, [$entity, $options])) {
+            if ($options['callbacks'] === true && ! $this->triggerCallback('beforeValidate', $event, [$entity, $options])) {
                 return false;
             }
 
@@ -580,7 +580,7 @@ class Model
             }
         }
       
-        if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
+        if ($options['callbacks'] === true || $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeSave', $event, [$entity, $options])) {
                 return false;
             }
@@ -602,7 +602,7 @@ class Model
             if (in_array($alias, $options['associated'])) {
                 $data = $entity->get($needle);
 
-                if (is_array($data) or $data instanceof Collection) {
+                if (is_array($data) || $data instanceof Collection) {
                     $hasAndBelongsToMany[$alias] = $entity->$needle;
                 }
             }
@@ -628,14 +628,14 @@ class Model
             }
         }
      
-        if (empty($data) or $entity->errors()) {
+        if (empty($data) || $entity->errors()) {
             return false;
         }
 
         $result = false;
 
         // Don't save if only field set is id (e.g savingHABTM)
-        if (count($data) > 1 or ! isset($data[$this->primaryKey])) {
+        if (count($data) > 1 || ! isset($data[$this->primaryKey])) {
             if ($exists) {
                 $result = $this->connection()->update($this->table, $data, [$this->primaryKey => $this->id]);
             } else {
@@ -655,7 +655,7 @@ class Model
                 $this->id = $entity->{$this->primaryKey};
             }
             // handle callbacks
-            if ($result and ($options['callbacks'] === true or $options['callbacks'] === 'after')) {
+            if ($result && ($options['callbacks'] === true || $options['callbacks'] === 'after')) {
                 $callback = $exists ? 'afterUpdate' : 'afterCreate';
                 $this->triggerCallback($callback, $event, [$entity, $options], false);
                 $this->triggerCallback('afterSave', $event, [$entity, $options], false);
@@ -869,7 +869,7 @@ class Model
         if ($options['transaction']) {
             $result === true ? $this->commit() : $this->rollback();
     
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+            if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $options = new ArrayObject($options);
                 foreach ($data as $row) {
                     $event = $row->exists() === true ? 'create' : 'update';
@@ -1181,7 +1181,7 @@ class Model
 
         $this->id = $entity->get($this->primaryKey);
 
-        if (empty($this->id) or ! $this->exists($this->id)) {
+        if (empty($this->id) || ! $this->exists($this->id)) {
             return false;
         }
 
@@ -1200,7 +1200,7 @@ class Model
     */
     protected function processDelete(Entity $entity, Arrayobject $options) : bool
     {
-        if ($options['callbacks'] === true or $options['callbacks'] === 'before') {
+        if ($options['callbacks'] === true || $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeDelete', 'delete', [$entity, $options])) {
                 return false;
             }
@@ -1226,7 +1226,7 @@ class Model
         }
 
         if ($result) {
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+            if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterDelete', 'delete', [$entity, $options], false);
             }
             $this->commitTransaction($entity, $options, 'delete');
@@ -1430,7 +1430,7 @@ class Model
      */
     protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
     {
-        if ($type === 'first' or $type === 'all') {
+        if ($type === 'first' || $type === 'all') {
             $query['fields'] = empty($query['fields']) ? $this->fields() : $this->prepareFields($query['fields']);
         }
 
@@ -1863,7 +1863,7 @@ class Model
                 continue;
             }
             $result = $this->dispatchCallback($method, $arguments, $isStoppable);
-            if ($isStoppable and $result === false) {
+            if ($isStoppable && $result === false) {
                 return false;
             }
         }
@@ -1882,7 +1882,7 @@ class Model
     protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true)  : bool
     {
         $this->validateCallback($callback);
-        if (call_user_func_array([$this,$callback], $arguments) === false and $isStoppable) {
+        if (call_user_func_array([$this,$callback], $arguments) === false && $isStoppable) {
             return false;
         }
 
@@ -1901,7 +1901,7 @@ class Model
     {
         if ($options['transaction']) {
             $this->commit();
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+            if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterCommit', $event, [$entity, $options], false);
             }
         }
@@ -1919,7 +1919,7 @@ class Model
     {
         if ($options['transaction']) {
             $this->rollback();
-            if ($options['callbacks'] === true or $options['callbacks'] === 'after') {
+            if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterRollback', $event, [$entity, $options], false);
             }
         }
