@@ -387,7 +387,7 @@ class Request
      */
     public function ajax(): bool
     {
-        return ($this->env('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest');
+        return ($this->env('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest');
     }
 
     /**

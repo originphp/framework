@@ -717,7 +717,7 @@ class PgsqlSchema extends BaseSchema
             return ['type' => 'string','limit' => $row['limit'],'fixed' => true];
         }
 
-        if ($col === 'integer' || $col == 'bigint') {
+        if ($col === 'integer' || $col === 'bigint') {
             return ['type' => $col,'limit' => $row['precision']];
         }
 

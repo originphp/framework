@@ -110,7 +110,7 @@ class Router
      */
     public static function parse(string $url)
     {
-        if (strlen($url) && $url[0] == '/') {
+        if (strlen($url) && $url[0] === '/') {
             $url = substr($url, 1);
         }
 

@@ -164,7 +164,7 @@ class FormHelper extends Helper
             'url' => $this->request()->path(true),
         ];
 
-        if ($options['type'] == 'file') {
+        if ($options['type'] === 'file') {
             $attributes['enctype'] = 'multipart/form-data';
             $attributes['method'] = 'post';
         } else {

@@ -794,7 +794,7 @@ class QueryBuilder
         foreach ($statements as $needle) {
             $position = strpos($haystack, $needle);
             $replace = "\n".$needle."\n ";
-            if ($needle == 'LIMIT') {
+            if ($needle === 'LIMIT') {
                 $replace = "\n".$needle;
             }
             if ($position !== false) {
@@ -947,18 +947,18 @@ class QueryBuilder
         // Handle Null Values
         if ($value === null) {
             // Handle Null Values
-            if ($expression == '=') {
+            if ($expression === '=') {
                 return "{$field} IS NULL";
-            } elseif ($expression == '!=') {
+            } elseif ($expression === '!=') {
                 return "{$field} IS NOT NULL";
             }
         }
         //(SELECT STATEMENT) || (value1, value2)
-        if (($expression == 'IN' || $expression == 'NOT IN') && is_string($value)) {
+        if (($expression === 'IN' || $expression === 'NOT IN') && is_string($value)) {
             return "{$field} {$expression} ( {$value} )";
         }
 
-        if ($expression == 'BETWEEN' || $expression == 'NOT BETWEEN') {
+        if ($expression === 'BETWEEN' || $expression === 'NOT BETWEEN') {
             if (! is_array($value) or count($value) !== 2) {
                 throw new QueryBuilderException('Bad paramaters');
             }
@@ -986,9 +986,9 @@ class QueryBuilder
             $placeholders[] = $placeholder = $this->nextPlaceholder();
             $this->values[$placeholder] = $v;
         }
-        if ($expression == '=') {
+        if ($expression === '=') {
             $expression = 'IN';
-        } elseif ($expression == '!=') {
+        } elseif ($expression === '!=') {
             $expression = 'NOT IN';
         }
 

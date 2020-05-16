@@ -207,7 +207,7 @@ class FixtureManager
         $namespace = '';
         if ($plugin === 'App' || $plugin === null) {
             $namespace = Config::read('App.namespace');
-        } elseif ($plugin == 'Framework') {
+        } elseif ($plugin === 'Framework') {
             $namespace = 'Origin';
         } elseif ($plugin) {
             $namespace = $plugin;

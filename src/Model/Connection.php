@@ -337,7 +337,7 @@ abstract class Connection
     public function fetch(string $type = 'assoc')
     {
         if ($this->hasResults()) {
-            if ($type == 'model') {
+            if ($type === 'model') {
                 $this->mapColumns();
             }
 
@@ -372,7 +372,7 @@ abstract class Connection
         if ($this->hasResults()) {
             $rows = [];
        
-            if ($type == 'model') {
+            if ($type === 'model') {
                 $this->mapColumns();
             }
        
@@ -396,14 +396,14 @@ abstract class Connection
     protected function fetchResult(string $type = 'assoc')
     {
         $fetchType = PDO::FETCH_ASSOC;
-        if ($type === 'num' || $type == 'model') {
+        if ($type === 'num' || $type === 'model') {
             $fetchType = PDO::FETCH_NUM;
         } elseif ($type === 'obj') {
             $fetchType = PDO::FETCH_OBJ;
         }
 
         if ($row = $this->statement->fetch($fetchType)) {
-            if ($type == 'model') {
+            if ($type === 'model') {
                 $row = $this->toModel($row, $this->columnMap);
             }
 
