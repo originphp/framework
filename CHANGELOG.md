@@ -13,6 +13,8 @@
 
 ### Changed
 
+- Changed .env.php is now the cached version of the .env
+
 - Changed validation settings key with backwards compatibility
   - renamed validation setting key `required` to `present`
   - validation setting key `allowBlank` to `allowEmpty`

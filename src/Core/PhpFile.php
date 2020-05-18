@@ -47,13 +47,36 @@ class PhpFile
      * @param array $data
      * @param array $options The following options key are supported
      *  - lock: default false. Wether to lock the file write.
+     *  - short: default false. Export array using short array syntax should be used with caution on selected
+     *  data.
      * @return boolean
      */
     public function write(string $filename, array $data, array $options = []) : bool
     {
-        $options += ['lock' => false];
-        $out = '<?php' . "\n" . 'return ' . var_export($data, true) . ';';
-
+        $options += ['lock' => false , 'short' => false ,'before' => null, 'after' => null];
+        $out = $options['short'] ? $this->varExport($data) : var_export($data, true);
+        $out = '<?php' . "\n" . $options['before'] . "\n" . 'return ' . $out . ';' .  "\n" . $options['after'] ;
+       
         return (bool) file_put_contents($filename, $out, $options['lock'] ? LOCK_EX : 0);
+    }
+
+    /**
+     * Modern version of varExport
+     *
+     * @param array $data
+     * @return string
+     */
+    private function varExport(array $data) : string
+    {
+        $data = var_export($data, true);
+        $data = str_replace(
+            ['array (', "),\n", " => \n"],
+            ['[', "],\n", ' => '],
+            $data
+        );
+        $data = preg_replace('/=>\s\s+\[/i', '=> [', $data);
+        $data = preg_replace("/=> \[\s\s+\]/m", '=> []', $data);
+
+        return substr($data, 0, -1).']';
     }
 }

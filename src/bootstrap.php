@@ -15,6 +15,8 @@
 use Origin\Log\Log;
 use Origin\Cache\Cache;
 use Origin\Core\Config;
+use Origin\Core\PhpFile;
+use Origin\DotEnv\DotEnv;
 
 define('START_TIME', microtime(true));
 
@@ -48,3 +50,23 @@ Cache::config('origin', [
     'prefix' => 'cache_',
     'serialize' => true
 ]);
+
+
+/**
+ * As version 2.5 .env.php is the cached version of .env. Prior
+ * to this config was set manually .env.php
+ */
+$configFile = ROOT . '/config/.env.php';
+if (file_exists($configFile)) {
+    $result = include $configFile;
+    foreach ($result as $key => $value) {
+        $_ENV[$key] = $value;
+    }
+} elseif (file_exists(ROOT . '/config/.env')) {
+    $vars = (new DotEnv())->load(ROOT. '/config');
+    $header = [
+        '# .env (cached version) - Do not edit, delete instead',
+        '# Automatically generated ' . now(),
+    ];
+    (new PhpFile())->write($configFile, $vars, ['short' => true ,'before' => implode("\n", $header)]);
+}
