@@ -39,6 +39,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         Config::write('Test.value', $expected);
         $this->assertEquals($expected, Config::read('Test.value'));
         $this->assertEquals(['value' => $expected], Config::read('Test'));
+        $this->assertEquals(['Test' => ['value' => $expected]], Config::read());
     }
 
     public function testWrite()

@@ -44,9 +44,10 @@ class Config
      * Loads values from a PHP file that returns an array
      *
      * @param string $filename
+     * @param string $key
      * @return void
      */
-    public static function load(string $filename) : void
+    public static function load(string $filename, string $key = null) : void
     {
         if (! is_file($filename)) {
             throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
@@ -56,6 +57,10 @@ class Config
 
         if (! is_array($array)) {
             throw new Exception(sprintf('Configuration file %s did not return an array', $filename));
+        }
+
+        if ($key) {
+            $array = [$key => $array];
         }
 
         foreach ($array as $key => $value) {
@@ -86,6 +91,10 @@ class Config
      */
     public static function read(string $key = null)
     {
+        if ($key === null) {
+            return static::dot()->items();
+        }
+
         return static::dot()->get($key);
     }
 
