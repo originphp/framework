@@ -5,10 +5,10 @@ use Origin\Job\Queue;
 use Origin\Core\Config;
 use Origin\Core\Plugin;
 use Origin\Email\Email;
+use Origin\DotEnv\DotEnv;
+use Origin\Core\Autoloader;
 use Origin\Mailbox\Mailbox;
 use Origin\Model\ConnectionManager;
-use Origin\Core\Autoloader;
-use Origin\DotEnv\DotEnv;
 
 require __DIR__ . '/paths.php';
 require ORIGIN . '/src/bootstrap.php';
