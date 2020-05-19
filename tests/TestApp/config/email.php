@@ -1,10 +1,15 @@
 <?php
+
 /**
  * Email Configuration
- * @see https://www.originphp.com/docs/utility/email/
+ * @link https://www.originphp.com/docs/utility/email/
  */
-use Origin\Email\Email;
 
-Email::config('test', [
-    'engine' => 'Test'
-]);
+return [
+    /**
+     * Test engine does not actually send the email
+     */
+    'test' => [
+        'engine' => 'Test'
+    ]
+];

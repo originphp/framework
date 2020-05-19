@@ -1,17 +1,20 @@
 <?php
+
 /**
  * Queue Configuration
  * Engines are Database and Redis
- * @see https://www.originphp.com/docs/queue/
+ * @link https://www.originphp.com/docs/queue/
  */
-use Origin\Job\Queue;
 
-Queue::config('default', [
-    'engine' => 'Database',
-    'connection' => 'default'
-]);
+use Origin\Job\Engine\DatabaseEngine;
 
-Queue::config('test', [
-    'engine' => 'Database',
-    'connection' => 'test'
-]);
+return [
+    'default' => [
+        'className' => DatabaseEngine::class,
+        'connection' => 'default'
+    ],
+    'test' => [
+        'className' => DatabaseEngine::class,
+        'connection' => 'test'
+    ]
+];
