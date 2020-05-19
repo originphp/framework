@@ -132,7 +132,7 @@ class ValidationRuleSet
 
         $setting = array_map(function ($value) {
             if (is_numeric($value)) {
-                $value = is_int($value) ?  intval($value) : floatval($value);
+                $value = ctype_digit($value) ? (int) $value : (float) $value;
             }
 
             return $value;
