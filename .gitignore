@@ -5,3 +5,5 @@
 .env
 .env.php
 .vscode
+/tests/TestApp/config/.env.php
+!/tests/TestApp/config/.env
