@@ -14,6 +14,8 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
+use Origin\Model\Engine\MysqlEngine;
+use Origin\Model\Engine\PgsqlEngine;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
@@ -21,6 +23,17 @@ class ConnectionManager
 {
     use Configurable;
 
+    protected static $engineMap = [
+        'mysql' => MysqlEngine::class,
+        'pgsql' => PgsqlEngine::class
+    ];
+
+    /**
+     * Holds the driver
+     *
+     * @var string
+     */
+    public static $driver = null;
     /**
      * Holds all the connections.
      *
@@ -44,20 +57,21 @@ class ConnectionManager
             throw new InvalidArgumentException(sprintf('The connection configuration `%s` does not exist.', $name));
         }
 
-        $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
+        $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null];
         
         $config = array_merge($defaults, static::config($name));
-    
-        /**
-         * ucfirst is for backwards compatability
-         */
+       
         if (isset($config['engine'])) {
-            $config['className'] = __NAMESPACE__  . '\Engine\\' . ucfirst($config['engine']) .'Engine';
+            $config['className'] = static::$engineMap[$config['engine']] ?? null;
+        } elseif (isset($config['className'])) {
+            $classMap = array_flip(static::$engineMap);
+            $config['engine'] = $classMap[$config['className']] ?? null;
         }
+      
         if (empty($config['className']) || ! class_exists($config['className'])) {
-            throw new InvalidArgumentException("Unkown engine `{$config['engine']}` in `{$name}` connection.");
+            throw new InvalidArgumentException('Invalid database engine');
         }
-    
+         
         $datasource = new $config['className'](['connection' => $name] + $config);
 
         $datasource->connect($config);
