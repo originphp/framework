@@ -56,7 +56,7 @@ Cache::config('origin', [
 ]);
 
 /**
- * As version 2.5 .env.php is the cached version of .env. Prior
+ * As of version 2.6 .env.php is the cached version of .env. Prior
  * to this config was set manually .env.php
  */
 $configFile = ROOT . '/config/.env.php';
