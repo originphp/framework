@@ -81,8 +81,8 @@ function isConsole(): bool
 
 /**
  * Check wether debug is enabled in a backward compatabile way.
- * @deprecated This will be deprecated in 3.0 don't rely on this.
  *
+ * @deprecated This will be deprecated in 3.0 don't rely on this.
  * @return boolean
  */
 function debugEnabled(): bool
