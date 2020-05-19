@@ -30,10 +30,34 @@ class ValidationRuleSet
      * @var array
      */
     private $messageMap = [
-        'required' => 'This field is required',
-        'mimeType' => 'Invalid mime type',
+        'accepted' => 'This must be accepted',
+        'boolean' => 'This value must be true or false',
+        'alpha' => 'This value can only contain letters',
+        'alphaNumeric' => 'This value can only contain letters, numbers, dashes and underscores',
+        'array' => 'This value must be an array',
+        'confirm' => 'The confirmed value does not match',
+        'date' => 'Invalid date',
+        'datetime' => 'Invalid datetime',
+        'dateFormat' => 'Invalid date format',
+        'email' => 'Invalid email address',
+        'ext' => 'Invalid file type',
         'extension' => 'Invalid file extension',
+        'fqdn' => 'Invalid domain',
+        'ip' => 'Invalid IP address',
+        'ipRange' => 'Invalid IP address',
+        'isUnique' => 'Has already been taken',
+        'in' => 'Invalid value',
+        'notIn' => 'Invalid value',
+        'json' => 'Invalid JSON string',
+        'macAddress' => 'Invalid MAC address',
+        'mimeType' => 'Invalid mime type',
+        'notBlank' => 'This field cannot be blank',
+        'notEmpty' => 'This field cannot be empty',
+        'required' => 'This field is required',
+        'time' => 'Invalid time',
+        'uid' => 'Invalid UUID string',
         'upload' => 'File upload error',
+        'url' => 'Invalid URL',
     ];
 
     /**
@@ -72,6 +96,7 @@ class ValidationRuleSet
             $definition = $this->backwardsComptability($definition);
 
             $this->rules[$name] = $this->add($definition);
+       
             $counter++;
         }
     }
