@@ -24,7 +24,6 @@ namespace Origin\Http;
  */
 
 use Origin\Log\Log;
-use Origin\Core\Config;
 use Origin\Core\Debugger;
 use Origin\Core\Exception\Exception;
 
@@ -153,7 +152,7 @@ class ErrorHandler
 
         $error = $this->levelMap[$level];
 
-        if (Config::read('App.debug')) {
+        if (debugEnabled()) {
             # Output
             echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
         }
@@ -184,13 +183,13 @@ class ErrorHandler
         $this->cleanBuffer();
 
         /**
-         * Display debug backtrace
+         * Display debug backtrace use App.debug
          */
-        if (Config::read('App.debug') === true && ! $this->isAjax()) {
+        if (debugEnabled() && ! $this->isAjax()) {
             $this->debugExceptionHandler($exception);
         } else {
             $renderer = new ExceptionRenderer(Router::request());
-            $response = $renderer->render($exception, Config::read('App.debug'));
+            $response = $renderer->render($exception, debugEnabled());
             $this->sendResponse($response->body(), $response->statusCode());
         }
         

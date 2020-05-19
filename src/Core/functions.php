@@ -23,7 +23,7 @@ use Origin\Core\Debugger;
  */
 function backtrace(): void
 {
-    if (Config::read('App.debug')) {
+    if (debugEnabled()) {
         $debugger = new Debugger();
         $debug = $debugger->backtrace();
 
@@ -49,7 +49,7 @@ function backtrace(): void
  */
 function debug($data, bool $isHtml = false): void
 {
-    if (Config::read('App.debug')) {
+    if (debugEnabled()) {
         $backtrace = debug_backtrace();
         $filename = str_replace(ROOT . DS, '', $backtrace[0]['file']);
         $line = $backtrace[0]['line'];
@@ -80,6 +80,21 @@ function isConsole(): bool
 }
 
 /**
+ * Check wether debug is enabled in a backward compatabile way.
+ * @deprecated This will be deprecated in 3.0 don't rely on this.
+ *
+ * @return boolean
+ */
+function debugEnabled(): bool
+{
+    if (Config::exists('App.debug')) {
+        return Config::read('App.debug') == true;
+    }
+
+    return Config::read('debug') == true;
+}
+
+/**
  * A print_r wrapper to print a variable in human friendly format when in debug mode.
  *
  * @param mixed $data
@@ -87,7 +102,7 @@ function isConsole(): bool
  */
 function pr($data): void
 {
-    if (Config::read('App.debug')) {
+    if (debugEnabled()) {
         $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
         printf($template, print_r($data, true));
     }
@@ -101,7 +116,7 @@ function pr($data): void
  */
 function pj($data): void
 {
-    if (Config::read('App.debug')) {
+    if (debugEnabled()) {
         $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
         printf($template, json_encode($data, JSON_PRETTY_PRINT));
     }
@@ -222,7 +237,7 @@ function deprecationWarning(string $message): void
 
     Log::warning($message);
 
-    if (Config::read('App.debug')) {
+    if (debugEnabled()) {
         trigger_error($message, E_USER_DEPRECATED);
     }
 }

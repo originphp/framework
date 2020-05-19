@@ -133,6 +133,7 @@ class ValidationRuleSetTest extends OriginTestCase
             'unique:email', 'minLength:5', 'range:10,20', 'in:a,b,c', 'notIn:1,2,3'
         ]);
         $out = $rule->toArray();
+     
         $this->assertSame(['unique', 'email'], $out['rule-1']['rule']);
         $this->assertSame(['minLength', 5], $out['rule-2']['rule']);
         $this->assertSame(['range', 10, 20], $out['rule-3']['rule']);

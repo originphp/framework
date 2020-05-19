@@ -39,7 +39,6 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         Config::write('Test.value', $expected);
         $this->assertEquals($expected, Config::read('Test.value'));
         $this->assertEquals(['value' => $expected], Config::read('Test'));
-        $this->assertEquals(['Test' => ['value' => $expected]], Config::read());
     }
 
     public function testWrite()
@@ -110,11 +109,10 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
 
     public function testLoad()
     {
-        $sampleConfig = CONFIG . '/sample-config.php';
-        MockConfig::load($sampleConfig);
+        MockConfig::load('sample-config');
 
-        $this->assertEquals('bar', MockConfig::read('foo'));
-        $this->assertEquals('foo', MockConfig::read('bar'));
+        $this->assertEquals('bar', MockConfig::read('Sample-config.foo'));
+        $this->assertEquals('foo', MockConfig::read('Sample-config.bar'));
     }
 
     public function testLoadFileNotFound()

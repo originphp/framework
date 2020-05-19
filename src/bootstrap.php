@@ -43,12 +43,6 @@ Log::config('default', [
     'file' => LOGS . '/application.log'
 ]);
 
-/**
- * @deprecated debug
- */
-$isDebug = Config::read('App.debug') || Config::read('debug') ;
-
-
 // internal caching
 /**
  * Backwards comptability
@@ -56,7 +50,7 @@ $isDebug = Config::read('App.debug') || Config::read('debug') ;
 Cache::config('origin', [
     'engine' => 'File',
     'path' => CACHE . '/origin',
-    'duration' => $isDebug ? '+2 minutes' : '+24 hours',
+    'duration' => debugEnabled() ? '+2 minutes' : '+24 hours',
     'prefix' => 'cache_',
     'serialize' => true
 ]);
