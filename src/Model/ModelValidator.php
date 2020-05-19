@@ -172,7 +172,7 @@ class ModelValidator
                 // Required means the key must be present not wether it has a value or not
                 if ($checkPresent) {
                     if (! $isPresent) {
-                        $entity->invalidate($field, 'This field is required');
+                        $entity->invalidate($field, 'This field must be present');
                         if ($validationRule['rule'] === 'present' || $validationRule['stopOnFail']) {
                             break;
                         }
