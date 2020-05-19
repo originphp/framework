@@ -30,7 +30,7 @@ class Message
      *
      * @return string
      */
-    public function header() : string
+    public function header(): string
     {
         return $this->header;
     }
@@ -40,7 +40,7 @@ class Message
      *
      * @return string
      */
-    public function body() : string
+    public function body(): string
     {
         return $this->body;
     }
@@ -50,7 +50,7 @@ class Message
      *
      * @return string
      */
-    public function message() : string
+    public function message(): string
     {
         return $this->header . "\r\n\r\n" . $this->body;
     }

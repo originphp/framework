@@ -108,7 +108,7 @@ class Mailbox
      * @param string $method
      * @return void
      */
-    protected function beforeProcess(string $method) : void
+    protected function beforeProcess(string $method): void
     {
         $this->registerCallback('beforeProcess', $method);
     }
@@ -119,7 +119,7 @@ class Mailbox
      * @param string $method
      * @return void
      */
-    protected function afterProcess(string $method) : void
+    protected function afterProcess(string $method): void
     {
         $this->registerCallback('afterProcess', $method);
     }
@@ -130,7 +130,7 @@ class Mailbox
      * @param \Origin\Model\Entity $message
      * @return bool
      */
-    public function dispatch() : bool
+    public function dispatch(): bool
     {
         $this->executeHook('startup');
         $result = $this->performProcessing();
@@ -144,7 +144,7 @@ class Mailbox
      *
      * @return boolean
      */
-    private function performProcessing() : bool
+    private function performProcessing(): bool
     {
         $this->setStatus('processing');
         try {
@@ -174,7 +174,7 @@ class Mailbox
      * @param string $callback
      * @return bool
      */
-    private function dispatchCallbacks(string $callback) : bool
+    private function dispatchCallbacks(string $callback): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($callback);
@@ -193,7 +193,7 @@ class Mailbox
      * @param \Origin\Mailer\Mailer $mailer UnkownUserMailer::class or 'UnkownUser' or 'App\Mailer\UnownUserMailer'
      * @return bool result of dispatchLater
      */
-    protected function bounceWith(string $mailerClass) : bool
+    protected function bounceWith(string $mailerClass): bool
     {
         $this->setStatus('bounced');
        
@@ -219,7 +219,7 @@ class Mailbox
      * @param string $mailbox name of the mailbox in studly caps without Mailbox prefix
      * @return void
      */
-    public static function route(string $regex, string $mailbox) : void
+    public static function route(string $regex, string $mailbox): void
     {
         static::$routes[$regex] = $mailbox;
     }
@@ -244,7 +244,7 @@ class Mailbox
     * @param array $recipients
     * @return string|null
     */
-    public static function mailbox(array $recipients) : ?string
+    public static function mailbox(array $recipients): ?string
     {
         foreach (static::routes() as $route => $mailbox) {
             foreach ($recipients as $address) {
@@ -263,7 +263,7 @@ class Mailbox
      * @param string $account
      * @return array
      */
-    public static function account(string $account) : array
+    public static function account(string $account): array
     {
         if (isset(static::$config[$account])) {
             $config = static::$config[$account];
@@ -292,7 +292,7 @@ class Mailbox
      *   - messageId: The last message id downloaded (IMAP)
      * @return \Origin\Service\Result
      */
-    public static function download(string $account, array $options = []) : Result
+    public static function download(string $account, array $options = []): Result
     {
         $options += ['limit' => null,'messageId' => null];
         $Imap = ModelRegistry::get('Imap', ['className' => ImapMessage::class]);
@@ -307,7 +307,7 @@ class Mailbox
       * @param string $status processing/delivered/failed/bounced
       * @return void
       */
-    private function setStatus(string $status) : void
+    private function setStatus(string $status): void
     {
         $this->InboundEmail->setStatus($this->id, $status);
     }
@@ -317,7 +317,7 @@ class Mailbox
      *
      * @return \Origin\Mailbox\Mail
      */
-    public function mail() : Mail
+    public function mail(): Mail
     {
         return $this->mail;
     }

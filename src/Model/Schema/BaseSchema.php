@@ -63,7 +63,7 @@ abstract class BaseSchema
      * @param string $table
      * @return string
      */
-    abstract public function showCreateTable(string $table) : string;
+    abstract public function showCreateTable(string $table): string;
 
     /**
      * This describes the table in the database using the new format.
@@ -73,7 +73,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    abstract public function describe(string $table) : array;
+    abstract public function describe(string $table): array;
 
     /**
      * Generates the create table SQL, this is return as an array since some engines require
@@ -85,7 +85,7 @@ abstract class BaseSchema
      * @param array $options
      * @return array
      */
-    abstract public function createTableSql(string $table, array $schema, array $options = []) : array;
+    abstract public function createTableSql(string $table, array $schema, array $options = []): array;
    
     /**
      * Builds the create Table statements
@@ -97,11 +97,11 @@ abstract class BaseSchema
      * @param array $options
      * @return array
      */
-    abstract protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array;
+    abstract protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array;
 
-    abstract public function disableForeignKeySql() : string;
+    abstract public function disableForeignKeySql(): string;
     
-    abstract public function enableForeignKeySql() : string;
+    abstract public function enableForeignKeySql(): string;
 
     /**
     * creates the table index
@@ -109,7 +109,7 @@ abstract class BaseSchema
     * @param array $attributes
     * @return string
     */
-    abstract protected function tableIndex(array $attributes) : string;
+    abstract protected function tableIndex(array $attributes): string;
     
     /**
     * Creates the contraint code
@@ -117,7 +117,7 @@ abstract class BaseSchema
     * @param array $attributes
     * @return string
     */
-    abstract protected function tableConstraint(array $attributes) : string;
+    abstract protected function tableConstraint(array $attributes): string;
 
     /**
     * This creates a foreignKey table parameter
@@ -125,7 +125,7 @@ abstract class BaseSchema
     * @param array $attributes name,columns,references, update,delete
     * @return string
     */
-    abstract protected function tableConstraintForeign(array $attributes) :string;
+    abstract protected function tableConstraintForeign(array $attributes): string;
 
     /**
      * Maps the onclause value
@@ -133,7 +133,7 @@ abstract class BaseSchema
      * @param string $value
      * @return string
      */
-    protected function onClause(string $value) : string
+    protected function onClause(string $value): string
     {
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
@@ -153,7 +153,7 @@ abstract class BaseSchema
      *   - scale: the numbers after the decimal point
      * @return string
      */
-    public function addColumn(string $table, string $name, string $type, array $options = []) : string
+    public function addColumn(string $table, string $name, string $type, array $options = []): string
     {
         $definition = $this->columnSql(array_merge(['name' => $name,'type' => $type], $options));
 
@@ -171,7 +171,7 @@ abstract class BaseSchema
      *  - type: use this to set a specific type. e.g fulltext
      * @return string
      */
-    public function addIndex(string $table, $column, string $name, array $options = []) : string
+    public function addIndex(string $table, $column, string $name, array $options = []): string
     {
         if (is_array($column)) {
             $column = implode(', ', $column);
@@ -205,7 +205,7 @@ abstract class BaseSchema
      * @param string $name
      * @return string
      */
-    abstract public function removeIndex(string $table, string $name) : string;
+    abstract public function removeIndex(string $table, string $name): string;
 
     /**
      * Renames an index
@@ -216,7 +216,7 @@ abstract class BaseSchema
      * @param string $newName
      * @return string
      */
-    abstract public function renameIndex(string $table, string $oldName, string $newName) : string;
+    abstract public function renameIndex(string $table, string $oldName, string $newName): string;
  
     /**
     * Returns SQL for adding a foreignKey
@@ -230,7 +230,7 @@ abstract class BaseSchema
     * @param string $onDelete (cascade,restrict,setNull,setDefault,noAction)
     * @return string
     */
-    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null) : string
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): string
     {
         $fragment = $this->tableConstraintForeign([
             'name' => $name,
@@ -250,7 +250,7 @@ abstract class BaseSchema
      * @param string $constraint
      * @return string
      */
-    abstract public function removeForeignKey(string $fromTable, string $constraint) : string;
+    abstract public function removeForeignKey(string $fromTable, string $constraint): string;
    
     /**
      * Gets a list of foreignKeys
@@ -258,7 +258,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    abstract public function foreignKeys(string $table) : array;
+    abstract public function foreignKeys(string $table): array;
 
     /**
      * Returns a list of indexes on a table
@@ -266,7 +266,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    abstract public function indexes(string $table) : array;
+    abstract public function indexes(string $table): array;
 
     /**
      * Checks if a foreignKey exists
@@ -275,7 +275,7 @@ abstract class BaseSchema
      * @param array $options uses keys column and name.
      * @return bool
      */
-    public function foreignKeyExists(string $table, array $options) : bool
+    public function foreignKeyExists(string $table, array $options): bool
     {
         $options += ['column' => null,'name' => null];
         $foreignKeys = $this->foreignKeys($table);
@@ -300,7 +300,7 @@ abstract class BaseSchema
      * @param array $options
      * @return string
      */
-    abstract public function changeColumn(string $table, string $name, string $type, array $options = []) : string;
+    abstract public function changeColumn(string $table, string $name, string $type, array $options = []): string;
 
     /**
      * Returns a SQL statement for dropping a table
@@ -309,7 +309,7 @@ abstract class BaseSchema
      * @param array $options (ifExists)
      * @return string
      */
-    abstract public function dropTableSql(string $table, array $options = []) : string;
+    abstract public function dropTableSql(string $table, array $options = []): string;
 
     /**
      * Returns the sql for truncating the table
@@ -317,7 +317,7 @@ abstract class BaseSchema
      * @param string $table
      * @return string
      */
-    abstract public function truncateTableSql(string $table) : string;
+    abstract public function truncateTableSql(string $table): string;
 
     /**
      * Sets the auto increment value for a auto increment/serial colun
@@ -327,7 +327,7 @@ abstract class BaseSchema
      * @param integer $counter
      * @return string
      */
-    abstract public function changeAutoIncrementSql(string $table, string $column, int $counter) : string;
+    abstract public function changeAutoIncrementSql(string $table, string $column, int $counter): string;
     /**
      * Gets a SQL statement for renaming a table
      *
@@ -335,7 +335,7 @@ abstract class BaseSchema
      * @param string $to
      * @return string
      */
-    abstract public function renameTable(string $from, string $to) : string;
+    abstract public function renameTable(string $from, string $to): string;
 
     /**
      * Gets a SQL statement for renaming a table
@@ -345,7 +345,7 @@ abstract class BaseSchema
      * @param string $to
      * @return string
      */
-    abstract public function renameColumn(string $table, string $from, string $to) : string;
+    abstract public function renameColumn(string $table, string $from, string $to): string;
 
     /**
      * Removes a column from the table§
@@ -354,7 +354,7 @@ abstract class BaseSchema
      * @param string $column
      * @return string
      */
-    public function removeColumn(string $table, string $column) : string
+    public function removeColumn(string $table, string $column): string
     {
         return sprintf(
             'ALTER TABLE %s DROP COLUMN %s',
@@ -371,7 +371,7 @@ abstract class BaseSchema
      * @param array $columns
      * @return string
      */
-    public function removeColumns(string $table, array $columns) : string
+    public function removeColumns(string $table, array $columns): string
     {
         $out = [];
         foreach ($columns as $column) {
@@ -386,7 +386,7 @@ abstract class BaseSchema
      *
      * @return array
      */
-    public function tables() : array
+    public function tables(): array
     {
         return $this->connection()->tables();
     }
@@ -397,7 +397,7 @@ abstract class BaseSchema
      * @param string $name
      * @return bool
      */
-    public function tableExists(string $name) : bool
+    public function tableExists(string $name): bool
     {
         return in_array($name, $this->tables());
     }
@@ -408,7 +408,7 @@ abstract class BaseSchema
      * @param string $table
      * @return array
      */
-    public function columns(string $table) : array
+    public function columns(string $table): array
     {
         $schema = $this->describe($table)['columns'];
 
@@ -422,7 +422,7 @@ abstract class BaseSchema
      * @param string $column
      * @return bool
      */
-    public function columnExists(string $table, string $column) : bool
+    public function columnExists(string $table, string $column): bool
     {
         return in_array($column, $this->columns($table));
     }
@@ -433,7 +433,7 @@ abstract class BaseSchema
      * @param string $datasource
      * @return string|string
      */
-    public function datasource(string $datasource = null) : string
+    public function datasource(string $datasource = null): string
     {
         if ($datasource === null) {
             return $this->datasource;
@@ -448,7 +448,7 @@ abstract class BaseSchema
      * @param string $sql
      * @return array
      */
-    protected function fetchRow(string $sql) : array
+    protected function fetchRow(string $sql): array
     {
         $connection = $this->connection();
         $connection->execute($sql);
@@ -461,7 +461,7 @@ abstract class BaseSchema
      * @param string $sql
      * @return array
      */
-    protected function fetchAll(string $sql) : array
+    protected function fetchAll(string $sql): array
     {
         $connection = $this->connection();
         $connection->execute($sql);
@@ -478,7 +478,7 @@ abstract class BaseSchema
      *
      * @return \Origin\Model\Connection
      */
-    public function connection() : Connection
+    public function connection(): Connection
     {
         return ConnectionManager::get($this->datasource);
     }
@@ -489,7 +489,7 @@ abstract class BaseSchema
     * @param string $value
     * @return string
     */
-    public function quoteIdentifier(string $value) : string
+    public function quoteIdentifier(string $value): string
     {
         return $this->quote . $value . $this->quote;
     }

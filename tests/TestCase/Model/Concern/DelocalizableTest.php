@@ -43,7 +43,7 @@ class DelocalizeTest extends OriginTestCase
      */
     protected $Deal;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->Deal = new Deal();
         
@@ -51,7 +51,7 @@ class DelocalizeTest extends OriginTestCase
         Number::locale(['currency' => 'USD','thousands' => ',','decimals' => '.']);
     }
  
-    public function testCallbackIsRegistered() : void
+    public function testCallbackIsRegistered(): void
     {
         $result = $this->Deal->callbacks('beforeValidate');
         $this->assertContains('delocalize', $result);
@@ -98,7 +98,7 @@ class DelocalizeTest extends OriginTestCase
         $this->assertEquals('10:27pm', $deal->confirmed);
     }
 
-    public function shutdown() : void
+    public function shutdown(): void
     {
         Date::locale([
             'timezone' => 'UTC',

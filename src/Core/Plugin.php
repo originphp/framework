@@ -80,7 +80,7 @@ class Plugin
      * @param array $options
      * @return void
      */
-    public static function load(string $plugin, array $options = []) : void
+    public static function load(string $plugin, array $options = []): void
     {
         $options += [
             'routes' => true,
@@ -107,7 +107,7 @@ class Plugin
      * @param string $plugin
      * @return bool
      */
-    public static function unload(string $plugin) : bool
+    public static function unload(string $plugin): bool
     {
         if (isset(static::$loaded[$plugin])) {
             unset(static::$loaded[$plugin]);
@@ -124,7 +124,7 @@ class Plugin
      * @param string $plugin
      * @return void
      */
-    protected static function autoload(string $plugin) : void
+    protected static function autoload(string $plugin): void
     {
         $autoloader = Autoloader::instance();
         $options = static::$loaded[$plugin];
@@ -141,7 +141,7 @@ class Plugin
      * @param string $plugin
      * @return bool
      */
-    public static function bootstrap(string $plugin) : bool
+    public static function bootstrap(string $plugin): bool
     {
         $options = static::$loaded[$plugin];
         if ($options['bootstrap']) {
@@ -156,7 +156,7 @@ class Plugin
      *
      * @return void
      */
-    public static function loadRoutes() : void
+    public static function loadRoutes(): void
     {
         foreach (static::$loaded as $plugin => $options) {
             static::routes($plugin);
@@ -169,7 +169,7 @@ class Plugin
      * @param string $plugin
      * @return boolean
      */
-    public static function routes(string $plugin) : bool
+    public static function routes(string $plugin): bool
     {
         $options = static::$loaded[$plugin];
         if ($options['routes']) {
@@ -186,7 +186,7 @@ class Plugin
     * @return string
     * @throws \Origin\Core\Exception\MissingPluginException
     */
-    public static function path(string $plugin) : string
+    public static function path(string $plugin): string
     {
         if (! isset(static::$loaded[$plugin])) {
             throw new MissingPluginException($plugin);
@@ -201,7 +201,7 @@ class Plugin
      * @param string $filename
      * @return bool
      */
-    protected static function include(string $filename) : bool
+    protected static function include(string $filename): bool
     {
         if (file_exists($filename)) {
             return (bool) include $filename;

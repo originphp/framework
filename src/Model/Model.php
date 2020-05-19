@@ -451,7 +451,7 @@ class Model
      * @return void
      *
      */
-    public function validate(string $field, $options) : void
+    public function validate(string $field, $options): void
     {
         $this->validator()->setRule($field, $options);
     }
@@ -461,7 +461,7 @@ class Model
      *
      * @return array fields
      */
-    public function fields(bool $quote = true) : array
+    public function fields(bool $quote = true): array
     {
         $schema = $this->schema()['columns'];
 
@@ -477,7 +477,7 @@ class Model
      * @param string $field
      * @return boolean
      */
-    public function hasField(string $field) : bool
+    public function hasField(string $field): bool
     {
         $fieldSchema = $this->schema($field);
 
@@ -493,7 +493,7 @@ class Model
      * @param array $fields [description]
      * @return array quotedFields
      */
-    protected function prepareFields(array $fields) : array
+    protected function prepareFields(array $fields): array
     {
         $alias = Inflector::tableName($this->alias);
         foreach ($fields as $index => $field) {
@@ -529,7 +529,7 @@ class Model
      * @param \Origin\Model\Entity $data
      * @return bool $create set to false if this is update
      */
-    public function validates(Entity $data, bool $create = true) : bool
+    public function validates(Entity $data, bool $create = true): bool
     {
         return $this->validator()->validates($data, $create);
     }
@@ -539,7 +539,7 @@ class Model
      *
      * @return \Origin\Model\ModelValidator
      */
-    public function validator() : ModelValidator
+    public function validator(): ModelValidator
     {
         if (! isset($this->ModelValidator)) {
             $this->ModelValidator = new ModelValidator($this);
@@ -555,7 +555,7 @@ class Model
      * @param ArrayObject $options
      * @return bool
      */
-    protected function processSave(Entity $entity, ArrayObject $options) : bool
+    protected function processSave(Entity $entity, ArrayObject $options): bool
     {
         $this->id = $entity->get($this->primaryKey);
     
@@ -686,7 +686,7 @@ class Model
      * @param mixed $value
      * @return bool true or false
      */
-    public function updateColumn($primaryKey, string $name, $value) : bool
+    public function updateColumn($primaryKey, string $name, $value): bool
     {
         return $this->connection()->update($this->table, [$name => $value], [$this->primaryKey => $primaryKey]);
     }
@@ -698,7 +698,7 @@ class Model
      * @param array $conditions
      * @return bool true or false
      */
-    public function updateAll(array $data, array $conditions) : bool
+    public function updateAll(array $data, array $conditions): bool
     {
         return $this->connection()->update($this->table, $data, $conditions);
     }
@@ -742,7 +742,7 @@ class Model
      * @param array|bool $option
      * @return array
      */
-    protected function normalizeAssociated($option) : array
+    protected function normalizeAssociated($option): array
     {
         $associated = [];
         if ($option === false) {
@@ -793,7 +793,7 @@ class Model
      *   - associated: default true. boolean or an array of associated data to save as well
      * @return bool $result true or false
      */
-    public function save(Entity $data, array $options = []) : bool
+    public function save(Entity $data, array $options = []): bool
     {
         $options = new ArrayObject($options + [
             'validate' => true, 'callbacks' => true, 'transaction' => true, 'associated' => true
@@ -851,7 +851,7 @@ class Model
      *
      * @return bool true or false
      */
-    public function saveMany(array $data, array $options = []) : bool
+    public function saveMany(array $data, array $options = []): bool
     {
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
@@ -888,7 +888,7 @@ class Model
      * @param int|string $id
      * @return bool true if the record exists
      */
-    public function exists($id = null) : bool
+    public function exists($id = null): bool
     {
         if ($id === null) {
             return false;
@@ -917,7 +917,7 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity
      */
-    public function get($id, array $options = []) : Entity
+    public function get($id, array $options = []): Entity
     {
         $options += ['conditions' => []];
 
@@ -990,7 +990,7 @@ class Model
      *   - associated: an array of models to get data for e.g. ['Comment'] or ['Comment'=>['fields'=>['id','body']]]
      * @return \Origin\Model\Entity|null
      */
-    public function findBy(array $conditions = [], array $options = []) : ?Entity
+    public function findBy(array $conditions = [], array $options = []): ?Entity
     {
         return $this->find('first', array_merge($options, ['conditions' => $conditions]));
     }
@@ -1012,7 +1012,7 @@ class Model
     *   - having: an array of conditions for a having clause
     * @return \Origin\Model\Entity|null $result
     */
-    public function first(array $options = []) : ?Entity
+    public function first(array $options = []): ?Entity
     {
         return $this->find('first', $options);
     }
@@ -1056,7 +1056,7 @@ class Model
     *   - having: an array of conditions for a having clause
     * @return array
     */
-    public function list(array $options = []) : array
+    public function list(array $options = []): array
     {
         return $this->find('list', $options);
     }
@@ -1087,7 +1087,7 @@ class Model
      * @param array $conditions
      * @return \Origin\Model\Query;
      */
-    public function where(array $conditions) : Query
+    public function where(array $conditions): Query
     {
         return new Query($this, $conditions);
     }
@@ -1098,7 +1098,7 @@ class Model
      * @param array $columns
      * @return \Origin\Model\Query;
      */
-    public function select(array $columns) : Query
+    public function select(array $columns): Query
     {
         return new Query($this, [], $columns);
     }
@@ -1173,7 +1173,7 @@ class Model
      *  - transaction: wether to save through a database transaction (default:true)
      * @return bool $result true or false
      */
-    public function delete(Entity $entity, array $options = []) : bool
+    public function delete(Entity $entity, array $options = []): bool
     {
         $options = new ArrayObject($options + [
             'cascade' => true,'callbacks' => true,'transaction' => true
@@ -1198,7 +1198,7 @@ class Model
     *  - transaction: wether to save through a database transaction (default:true)
     * @return bool $result true or false
     */
-    protected function processDelete(Entity $entity, Arrayobject $options) : bool
+    protected function processDelete(Entity $entity, Arrayobject $options): bool
     {
         if ($options['callbacks'] === true || $options['callbacks'] === 'before') {
             if (! $this->triggerCallback('beforeDelete', 'delete', [$entity, $options])) {
@@ -1243,7 +1243,7 @@ class Model
      * @param array $conditions e.g ('Article.status' => 'draft')
      * @return bool true or false
      */
-    public function deleteAll(array $conditions) : bool
+    public function deleteAll(array $conditions): bool
     {
         return $this->connection()->delete($this->table, $conditions);
     }
@@ -1254,7 +1254,7 @@ class Model
      * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return \Origin\Model\Entity|null
      */
-    protected function finderFirst(ArrayObject $options) : ?Entity
+    protected function finderFirst(ArrayObject $options): ?Entity
     {
         // Modify Query
         $options['limit'] = 1;
@@ -1304,7 +1304,7 @@ class Model
      * @param \ArrayObject $options (conditions,fields, joins, order,limit, group, callbacks,etc)
      * @return array $results
      */
-    protected function finderList(ArrayObject $options) : array
+    protected function finderList(ArrayObject $options): array
     {
         if (empty($options['fields'])) {
             $options['fields'][] = $this->primaryKey;
@@ -1428,7 +1428,7 @@ class Model
      * @param \ArrayObject $query
      * @return ArrayObject $query
      */
-    protected function prepareQuery(string $type, ArrayObject $query) : ArrayObject
+    protected function prepareQuery(string $type, ArrayObject $query): ArrayObject
     {
         if ($type === 'first' || $type === 'all') {
             $query['fields'] = empty($query['fields']) ? $this->fields() : $this->prepareFields($query['fields']);
@@ -1472,7 +1472,7 @@ class Model
      * @param ArrayObject $query
      * @return array
      */
-    protected function associatedConfig(ArrayObject $query) : array
+    protected function associatedConfig(ArrayObject $query): array
     {
         $out = [];
         foreach ((array) $query['associated'] as $alias => $config) {
@@ -1505,7 +1505,7 @@ class Model
      * @param string $name
      * @return array|null
      */
-    protected function findAssociation(string $name) : ?array
+    protected function findAssociation(string $name): ?array
     {
         foreach ($this->associations as $association) {
             if (isset($this->$association[$name])) {
@@ -1541,7 +1541,7 @@ class Model
      *
      * @return \Origin\Model\Connection
      */
-    public function connection() : Connection
+    public function connection(): Connection
     {
         return ConnectionManager::get($this->connection);
     }
@@ -1553,7 +1553,7 @@ class Model
      * @param array  $fields array of fields to check values in entity
      * @return bool
      */
-    public function isUnique(Entity $entity, array $fields = []) : bool
+    public function isUnique(Entity $entity, array $fields = []): bool
     {
         $conditions = [];
         foreach ($fields as $field) {
@@ -1571,7 +1571,7 @@ class Model
      *
      * @return bool
      */
-    public function begin() : bool
+    public function begin(): bool
     {
         return $this->connection()->begin();
     }
@@ -1581,7 +1581,7 @@ class Model
      *
      * @return boolean
      */
-    public function commit() : bool
+    public function commit(): bool
     {
         return $this->connection()->commit();
     }
@@ -1591,7 +1591,7 @@ class Model
      *
      * @return boolean
      */
-    public function rollback() : bool
+    public function rollback(): bool
     {
         return $this->connection()->rollBack();
     }
@@ -1604,7 +1604,7 @@ class Model
      * @param array $options
      * @return \Origin\Model\Entity
      */
-    public function new(array $requestData = null, array $options = []) : Entity
+    public function new(array $requestData = null, array $options = []): Entity
     {
         $entityClass = $this->entityClass($this);
 
@@ -1624,7 +1624,7 @@ class Model
      * @param array $options parse default is set to true
      * @var array
      */
-    public function newEntities(array $requestData, array $options = []) : array
+    public function newEntities(array $requestData, array $options = []): array
     {
         $options += ['name' => $this->alias, 'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
@@ -1640,7 +1640,7 @@ class Model
      * @param array $options parse
      * @var \Origin\Model\Entity
      */
-    public function patch(Entity $entity, array $requestData, array $options = []) : Entity
+    public function patch(Entity $entity, array $requestData, array $options = []): Entity
     {
         $options += ['name' => $this->alias,'associated' => true];
         $options['associated'] = $this->normalizeAssociated($options['associated']);
@@ -1653,7 +1653,7 @@ class Model
      *
      * @var \Origin\Model\Marshaller
      */
-    protected function marshaller() : Marshaller
+    protected function marshaller(): Marshaller
     {
         return new Marshaller($this);
     }
@@ -1665,7 +1665,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeFind(string $method, array $options = []) : void
+    public function beforeFind(string $method, array $options = []): void
     {
         $options['on'] = 'find';
         $this->registerCallback('beforeFind', $method, $options);
@@ -1678,7 +1678,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function afterFind(string $method, array $options = []) : void
+    public function afterFind(string $method, array $options = []): void
     {
         $options['on'] = 'find';
         $this->registerCallback('afterFind', $method, $options);
@@ -1692,7 +1692,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function beforeValidate(string $method, array $options = []) : void
+    public function beforeValidate(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update']];
         $this->registerCallback('beforeValidate', $method, $options);
@@ -1706,7 +1706,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function afterValidate(string $method, array $options = []) : void
+    public function afterValidate(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update']];
         $this->registerCallback('afterValidate', $method, $options);
@@ -1719,7 +1719,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeCreate(string $method, array $options = []) : void
+    public function beforeCreate(string $method, array $options = []): void
     {
         $options['on'] = 'create';
         $this->registerCallback('beforeCreate', $method, $options);
@@ -1732,7 +1732,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterCreate(string $method, array $options = []) : void
+    public function afterCreate(string $method, array $options = []): void
     {
         $options['on'] = 'create';
         $this->registerCallback('afterCreate', $method, $options);
@@ -1745,7 +1745,7 @@ class Model
      * @param array $options (no options for this callback)
      * @return void
      */
-    public function beforeUpdate(string $method, array $options = []) : void
+    public function beforeUpdate(string $method, array $options = []): void
     {
         $options['on'] = 'update';
         $this->registerCallback('beforeUpdate', $method, $options);
@@ -1758,7 +1758,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterUpdate(string $method, array $options = []) : void
+    public function afterUpdate(string $method, array $options = []): void
     {
         $options['on'] = 'update';
         $this->registerCallback('afterUpdate', $method, $options);
@@ -1772,7 +1772,7 @@ class Model
      *   - on: default: ['create','update'] which events to run on create, update.
      * @return void
      */
-    public function beforeSave(string $method, array $options = []) : void
+    public function beforeSave(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update']];
         $this->registerCallback('beforeSave', $method, $options);
@@ -1786,7 +1786,7 @@ class Model
     *   - on: default: ['create','update'] which events to run on create, update.
     * @return void
     */
-    public function afterSave(string $method, array $options = []) : void
+    public function afterSave(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update']];
         $this->registerCallback('afterSave', $method, $options);
@@ -1799,7 +1799,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function beforeDelete(string $method, array $options = []) : void
+    public function beforeDelete(string $method, array $options = []): void
     {
         $options['on'] = 'delete';
         $this->registerCallback('beforeDelete', $method, $options);
@@ -1812,7 +1812,7 @@ class Model
     * @param array $options (no options for this callback)
     * @return void
     */
-    public function afterDelete(string $method, array $options = []) : void
+    public function afterDelete(string $method, array $options = []): void
     {
         $options['on'] = 'delete';
         $this->registerCallback('afterDelete', $method, $options);
@@ -1826,7 +1826,7 @@ class Model
     *   - on: default: ['create','update','delete'] which events to run on create, update and delete
     * @return void
     */
-    public function afterCommit(string $method, array $options = []) : void
+    public function afterCommit(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update','delete']];
         $this->registerCallback('afterCommit', $method, $options);
@@ -1840,7 +1840,7 @@ class Model
     *   - on: default: ['create','update','delete'] which events to run on create, update and delete
     * @return void
     */
-    public function afterRollback(string $method, array $options = []) : void
+    public function afterRollback(string $method, array $options = []): void
     {
         $options += ['on' => ['create','update','delete']];
         $this->registerCallback('afterRollback', $method, $options);
@@ -1856,7 +1856,7 @@ class Model
      * @param boolean $isStoppable
      * @return boolean
      */
-    protected function triggerCallback(string $callback, string $event, array $arguments = [], bool $isStoppable = true) : bool
+    protected function triggerCallback(string $callback, string $event, array $arguments = [], bool $isStoppable = true): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             if (! in_array($event, (array) $options['on'])) {
@@ -1879,7 +1879,7 @@ class Model
      * @param boolean $isStoppable
      * @return bool
      */
-    protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true)  : bool
+    protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true): bool
     {
         $this->validateCallback($callback);
         if (call_user_func_array([$this,$callback], $arguments) === false && $isStoppable) {
@@ -1897,7 +1897,7 @@ class Model
      * @param string $event
      * @return void
      */
-    private function commitTransaction(Entity $entity, ArrayObject $options, string $event) : void
+    private function commitTransaction(Entity $entity, ArrayObject $options, string $event): void
     {
         if ($options['transaction']) {
             $this->commit();
@@ -1915,7 +1915,7 @@ class Model
      * @param string $event
      * @return void
      */
-    private function cancelTransaction(Entity $entity, ArrayObject $options, string $event) : void
+    private function cancelTransaction(Entity $entity, ArrayObject $options, string $event): void
     {
         if ($options['transaction']) {
             $this->rollback();
@@ -1930,7 +1930,7 @@ class Model
      *
      * @return string
      */
-    public function table() : string
+    public function table(): string
     {
         return $this->table;
     }
@@ -1940,7 +1940,7 @@ class Model
      *
      * @return string
      */
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
@@ -1950,7 +1950,7 @@ class Model
      *
      * @return string
      */
-    public function alias() : string
+    public function alias(): string
     {
         return $this->alias;
     }
@@ -1971,7 +1971,7 @@ class Model
      *
      * @return string $primaryKey
      */
-    public function primaryKey() : string
+    public function primaryKey(): string
     {
         return $this->primaryKey;
     }
@@ -1981,7 +1981,7 @@ class Model
      *
      * @return string $primaryKey
      */
-    public function displayField() : string
+    public function displayField(): string
     {
         return $this->displayField;
     }

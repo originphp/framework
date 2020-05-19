@@ -30,7 +30,7 @@ class IntlHelper extends Helper
      * @param string|array $format pattern, IntlDateFormatter options
      * @return string
      */
-    public function date($dateString, $format = null) : string
+    public function date($dateString, $format = null): string
     {
         return Date::formatDate($dateString, $format);
     }
@@ -44,7 +44,7 @@ class IntlHelper extends Helper
      * @param string|array $format pattern, IntlDateFormatter options
      * @return string
      */
-    public function time($dateString, $format = null) : string
+    public function time($dateString, $format = null): string
     {
         return Date::formatTime($dateString, $format);
     }
@@ -57,7 +57,7 @@ class IntlHelper extends Helper
     * @param string|array $format pattern, IntlDateFormatter options
     * @return string
     */
-    public function datetime($dateString, $format = null) : string
+    public function datetime($dateString, $format = null): string
     {
         return Date::formatDateTime($dateString, $format);
     }
@@ -70,7 +70,7 @@ class IntlHelper extends Helper
      * @param array  $options  precision|places|before|after|pattern
      * @return string result $1,234.56
      */
-    public function currency(float $value, string $currency = null, array $options = []) : string
+    public function currency(float $value, string $currency = null, array $options = []): string
     {
         return Number::currency($value, $currency, $options);
     }
@@ -81,7 +81,7 @@ class IntlHelper extends Helper
      * @param array $options precision|places|before|after|pattern
      * @return string 1,234.56
      */
-    public function number(float $value, array $options = []) : string
+    public function number(float $value, array $options = []): string
     {
         return Number::format($value, $options);
     }
@@ -94,7 +94,7 @@ class IntlHelper extends Helper
      * @return string 1234.56
      */
     
-    public function precision(float $value, int $precision = 2, array $options = []) : string
+    public function precision(float $value, int $precision = 2, array $options = []): string
     {
         return Number::precision($value, $precision, $options);
     }
@@ -107,7 +107,7 @@ class IntlHelper extends Helper
      * @param array $options   places|before|after|pattern|multiply
      * @return string 75.00%
      */
-    public function percent(float $value, int $precision = 2, array $options = []) : string
+    public function percent(float $value, int $precision = 2, array $options = []): string
     {
         return Number::percent($value, $precision, $options);
     }
@@ -119,7 +119,7 @@ class IntlHelper extends Helper
      * @param string $language
      * @return array $locales [en_GB => English (United Kingdom)]
      */
-    public function locales(string $language = null) : array
+    public function locales(string $language = null): array
     {
         $list = [];
         if ($language === null) {

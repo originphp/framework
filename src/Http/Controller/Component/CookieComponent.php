@@ -58,7 +58,7 @@ class CookieComponent extends Component
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function write(string $name, $value, array $options = []) : void
+    public function write(string $name, $value, array $options = []): void
     {
         $this->response()->cookie($name, $value, $options);
     }
@@ -69,7 +69,7 @@ class CookieComponent extends Component
      * @param string $name
      * @return void
      */
-    public function delete(string $name) : void
+    public function delete(string $name): void
     {
         $this->response()->cookie($name, '', ['expires' => '-60 minutes']);
     }
@@ -80,7 +80,7 @@ class CookieComponent extends Component
     * @param string $name
     * @return bool
     */
-    public function exists(string $name) : bool
+    public function exists(string $name): bool
     {
         $cookies = $this->request()->cookies();
 
@@ -92,7 +92,7 @@ class CookieComponent extends Component
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         unset($_COOKIE);
         $_COOKIE = [];

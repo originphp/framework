@@ -40,7 +40,7 @@ class Dispatcher
        *
        * @return \Origin\Http\Dispatcher
        */
-    public static function instance() : Dispatcher
+    public static function instance(): Dispatcher
     {
         if (static::$instance === null) {
             static::$instance = new Dispatcher();
@@ -56,7 +56,7 @@ class Dispatcher
      * @param string $plugin
      * @return string
      */
-    protected function getClass(string $controller, string $plugin = null) : string
+    protected function getClass(string $controller, string $plugin = null): string
     {
         $namespace = Config::read('App.namespace');
         if ($plugin) {
@@ -73,7 +73,7 @@ class Dispatcher
      * @param \Origin\Http\Response $response
      * @return \Origin\Http\Response
      */
-    public function dispatch(Request $request, Response $response) : Response
+    public function dispatch(Request $request, Response $response): Response
     {
         if ($request->params('controller')) {
             $class = $this->getClass($request->params('controller'), $request->params('plugin'));
@@ -93,7 +93,7 @@ class Dispatcher
      *
      * @return \Origin\Http\Controller\Controller
      */
-    public function controller() : Controller
+    public function controller(): Controller
     {
         return $this->controller;
     }

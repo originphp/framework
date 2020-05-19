@@ -9,11 +9,11 @@ class CacheResetCommand extends Command
 
     protected $description = 'A command to reset the cache';
 
-    public function initialize() : void
+    public function initialize(): void
     {
     }
 
-    public function execute() : void
+    public function execute(): void
     {
         $this->out('Cache has been reset');
     }

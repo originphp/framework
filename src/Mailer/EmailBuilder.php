@@ -73,7 +73,7 @@ class EmailBuilder
      * @param boolean $debug set to true to ensure send does not send emails
      * @return SmtpEmail
      */
-    public function build(bool $debug = false) : SmtpEmail
+    public function build(bool $debug = false): SmtpEmail
     {
         $account = $debug ? ['engine' => 'Test'] : $this->options['account'];
         $this->message = new Email($account);
@@ -143,7 +143,7 @@ class EmailBuilder
      *
      * @return void
      */
-    protected function render() : void
+    protected function render(): void
     {
         if (in_array($this->options['format'], ['html','both'])) {
             $this->renderHtmlMessage();
@@ -170,7 +170,7 @@ class EmailBuilder
      * @param string|null $name
      * @return array
      */
-    protected function buildArguments($email, $name) : array
+    protected function buildArguments($email, $name): array
     {
         if (is_int($email)) {
             $email = $name;
@@ -185,7 +185,7 @@ class EmailBuilder
      *
      * @return void
      */
-    protected function renderHtmlMessage() : void
+    protected function renderHtmlMessage(): void
     {
         $this->content = $this->renderTemplate(
             $this->getPath($this->options['template']) . '.html.ctp'
@@ -200,7 +200,7 @@ class EmailBuilder
     /**
      * Renders a file
      */
-    protected function renderTemplate($__filename) : string
+    protected function renderTemplate($__filename): string
     {
         if (! file_exists($__filename)) {
             throw new Exception(sprintf('Template %s does not exist', $__filename));
@@ -218,7 +218,7 @@ class EmailBuilder
     *
     * @return string|null
     */
-    public function content() : ?string
+    public function content(): ?string
     {
         return $this->content;
     }
@@ -229,7 +229,7 @@ class EmailBuilder
      * @param string $name
      * @return string
      */
-    protected function getPath(string $name) : string
+    protected function getPath(string $name): string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
@@ -245,7 +245,7 @@ class EmailBuilder
      * @param string $name
      * @return string
      */
-    protected function getLayoutFilename(string $name) : string
+    protected function getLayoutFilename(string $name): string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {

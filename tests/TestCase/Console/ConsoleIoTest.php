@@ -25,7 +25,7 @@ class MockConsoleInput extends ConsoleInput
     {
         $this->in = $result;
     }
-    public function read() : ?string
+    public function read(): ?string
     {
         return $this->in;
     }

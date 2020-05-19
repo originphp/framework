@@ -44,7 +44,7 @@ class HelperRegistry extends ObjectRegistry
      * @param string $class
      * @return string|null $namespacedClass
      */
-    protected function className(string $class) : ?string
+    protected function className(string $class): ?string
     {
         return Resolver::className($class, 'View/Helper', null, 'Http');
     }
@@ -56,7 +56,7 @@ class HelperRegistry extends ObjectRegistry
      * @param array $options
      * @return \Origin\Http\View\Helper\Helper
      */
-    protected function createObject(string $class, array $options = []) : Helper
+    protected function createObject(string $class, array $options = []): Helper
     {
         return new $class($this->view, $options);
     }
@@ -67,7 +67,7 @@ class HelperRegistry extends ObjectRegistry
      * @param string $object
      * @return void
      */
-    protected function throwException(string $object) : void
+    protected function throwException(string $object): void
     {
         throw new MissingHelperException($object);
     }
@@ -77,7 +77,7 @@ class HelperRegistry extends ObjectRegistry
      *
      * @return View
      */
-    public function view() : View
+    public function view(): View
     {
         return $this->view;
     }

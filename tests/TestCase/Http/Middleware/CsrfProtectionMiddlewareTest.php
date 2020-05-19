@@ -21,7 +21,7 @@ use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
 class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware
 {
-    protected function isTestEnvironment() : bool
+    protected function isTestEnvironment(): bool
     {
         return false;
     }

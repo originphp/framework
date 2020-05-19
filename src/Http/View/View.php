@@ -104,7 +104,7 @@ class View
      * @param array $vars
      * @return array
      */
-    public function helpers(array $helpers = null) : array
+    public function helpers(array $helpers = null): array
     {
         if ($helpers === null) {
             return $this->helpers;
@@ -131,7 +131,7 @@ class View
      * @param array $config An array of config that you want to pass to the helper.
      * @return \Origin\Http\View\Helper\Helper
      */
-    public function loadHelper(string $name, array $config = []) : Helper
+    public function loadHelper(string $name, array $config = []): Helper
     {
         list($plugin, $helper) = pluginSplit($name); // split so we can name properly
         $config = array_merge(['className' => $name . 'Helper'], $config);
@@ -146,7 +146,7 @@ class View
      * @param array $vars Variables that will be made available in the element
      * @return string
      */
-    public function element(string $name, array $vars = []) : string
+    public function element(string $name, array $vars = []): string
     {
         $element__filename = $this->getElementFilename($name);
 
@@ -165,7 +165,7 @@ class View
      *
      * @return string|null
      */
-    public function content() : ?string
+    public function content(): ?string
     {
         return $this->content;
     }
@@ -175,7 +175,7 @@ class View
      *
      * @return string|null
      */
-    public function title() : ?string
+    public function title(): ?string
     {
         return $this->vars['title'] ?? null;
     }
@@ -197,7 +197,7 @@ class View
      * @param string $filename
      * @return boolean
      */
-    protected function fileExists(string $filename) : bool
+    protected function fileExists(string $filename): bool
     {
         return file_exists($filename);
     }
@@ -218,7 +218,7 @@ class View
      *
      * @return \Origin\Http\View\Helper\HelperRegistry
      */
-    public function helperRegistry() : HelperRegistry
+    public function helperRegistry(): HelperRegistry
     {
         return $this->helperRegistry;
     }
@@ -229,7 +229,7 @@ class View
      * @param string $name
      * @return string
      */
-    protected function getElementFilename(string $name) : string
+    protected function getElementFilename(string $name): string
     {
         $filename = $this->getFilename($name, 'Element');
         if ($this->fileExists($filename)) {
@@ -245,7 +245,7 @@ class View
      * @param string $name Template name e.g. controller_action, /Controller/action , Plugin.Controller/action
      * @return string filename
      */
-    protected function getViewFilename(string $name) : string
+    protected function getViewFilename(string $name): string
     {
         $path = $this->getViewPath() . DS ;
 
@@ -270,7 +270,7 @@ class View
      * @param boolean $withControllerName
      * @return string
      */
-    protected function getViewPath($withControllerName = true) : string
+    protected function getViewPath($withControllerName = true): string
     {
         $viewPath = $this->viewPath;
         $plugin = $this->request->params('plugin');
@@ -291,7 +291,7 @@ class View
      * @param string $layout default or Plugin.default;
      * @return string filename
      */
-    protected function getLayoutFilename(string $layout) : string
+    protected function getLayoutFilename(string $layout): string
     {
         $filename = $this->getFilename($layout, 'Layout');
         if ($this->fileExists($filename)) {
@@ -308,7 +308,7 @@ class View
      * @param string $folder
      * @return string
      */
-    protected function getFilename(string $name, string $folder) : string
+    protected function getFilename(string $name, string $folder): string
     {
         list($plugin, $name) = pluginSplit($name);
         if ($plugin) {
@@ -325,7 +325,7 @@ class View
      * @param string $layout
      * @return string $buffer
      */
-    public function render(string $path, string $layout = null) : string
+    public function render(string $path, string $layout = null): string
     {
         $view__filename = $this->getViewFilename($path);
 
@@ -344,7 +344,7 @@ class View
         return $buffer;
     }
 
-    protected function renderLayout(string $layout) : string
+    protected function renderLayout(string $layout): string
     {
         $layout_filename = $this->getLayoutFilename($layout);
 
@@ -367,7 +367,7 @@ class View
      * @param mixed  $value
      * @return void
      */
-    public function set(string $key, $value) : void
+    public function set(string $key, $value): void
     {
         $this->vars[$key] = $value;
     }
@@ -377,7 +377,7 @@ class View
     *
     * @return \Origin\Http\Response
     */
-    public function response() : Response
+    public function response(): Response
     {
         return $this->response;
     }
@@ -387,7 +387,7 @@ class View
      *
      * @return \Origin\Http\Request
      */
-    public function request() : Request
+    public function request(): Request
     {
         return $this->request;
     }

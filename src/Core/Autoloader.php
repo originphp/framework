@@ -62,7 +62,7 @@ class Autoloader
      *
      * @return \Origin\Core\Autoloader
      */
-    public static function instance() : Autoloader
+    public static function instance(): Autoloader
     {
         if (static::$instance === null) {
             static::$instance = new Autoloader();
@@ -100,7 +100,7 @@ class Autoloader
     *
     * @return boolean
     */
-    public function register() : bool
+    public function register(): bool
     {
         return spl_autoload_register([$this, 'load']);
     }
@@ -114,7 +114,7 @@ class Autoloader
      * @param string $baseDirectory a base directory where classes are for namespace
      * @return void
      */
-    public function addNamespace(string $prefix, string $baseDirectory) : void
+    public function addNamespace(string $prefix, string $baseDirectory): void
     {
         $prefix = trim($prefix, '\\').'\\';
         $path = rtrim($baseDirectory, DS).'/';
@@ -132,7 +132,7 @@ class Autoloader
      * @param array $namespaces array ((namespacePrefix => baseDirectory))
      * @return void
      */
-    public function addNamespaces(array $namespaces) : void
+    public function addNamespaces(array $namespaces): void
     {
         foreach ($namespaces as $namespace => $baseDirectory) {
             $this->addNamespace($namespace, $baseDirectory);
@@ -145,7 +145,7 @@ class Autoloader
      * @param string $class
      * @return string|null
      */
-    public function load(string $class) : ?string
+    public function load(string $class): ?string
     {
         $prefix = $class;
     
@@ -174,7 +174,7 @@ class Autoloader
      * @param string $filename
      * @return bool
      */
-    protected function requireFile(string $filename) : bool
+    protected function requireFile(string $filename): bool
     {
         if (file_exists($filename)) {
             require $filename;

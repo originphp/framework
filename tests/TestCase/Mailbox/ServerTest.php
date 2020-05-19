@@ -39,7 +39,7 @@ class ServerTest extends OriginTestCase
      */
     protected $InboundEmail;
 
-    protected function initialize() : void
+    protected function initialize(): void
     {
         $this->InboundEmail = $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class

@@ -145,7 +145,7 @@ abstract class Command
      *    $args = ['my_database','--connection'=>'default','--help']
      * @return int
      */
-    public function runCommand(string $command, array $args = []) : int
+    public function runCommand(string $command, array $args = []): int
     {
         $runner = new CommandRunner($this->io);
         $instance = $runner->findCommand($command);
@@ -168,7 +168,7 @@ abstract class Command
      * @param array $args
      * @return int $result
      */
-    public function run(array $args) : int
+    public function run(array $args): int
     {
         $this->executeHook('initialize');
       
@@ -262,7 +262,7 @@ abstract class Command
      * @param string $name
      * @return void
      */
-    protected function validateName(string $name) : void
+    protected function validateName(string $name): void
     {
         // Valid syntax name, some-name, app:some-name, app:name-a:name-b
         if (! preg_match_all('/^[a-z0-9-]++(?:\:[a-z0-9-]++)*$/', $name)) {
@@ -290,7 +290,7 @@ abstract class Command
      * @param string $usage
      * @return void
      */
-    public function addUsage(string $usage) : void
+    public function addUsage(string $usage): void
     {
         $this->usages[] = $usage;
     }
@@ -307,7 +307,7 @@ abstract class Command
      *  - default: default value
      * @return void
      */
-    public function addOption(string $name, array $options = []) : void
+    public function addOption(string $name, array $options = []): void
     {
         $this->parser->addOption($name, $options);
     }
@@ -321,7 +321,7 @@ abstract class Command
      *  - type: string, integer, array, hash
      *  - required: default false
      */
-    public function addArgument(string $name, array $options = []) : void
+    public function addArgument(string $name, array $options = []): void
     {
         $this->parser->addArgument($name, $options);
     }
@@ -330,7 +330,7 @@ abstract class Command
      * Displays the help for this command
      * @return void
      */
-    public function displayHelp() : void
+    public function displayHelp(): void
     {
         $content = $this->parser->help();
 
@@ -343,7 +343,7 @@ abstract class Command
      * @param string $status
      * @return void
      */
-    public function abort(string $message = 'Command Aborted', $exitCode = self::ERROR) : void
+    public function abort(string $message = 'Command Aborted', $exitCode = self::ERROR): void
     {
         throw new StopExecutionException($message, $exitCode);
     }
@@ -354,7 +354,7 @@ abstract class Command
      * @param string $status
      * @return void
      */
-    public function exit(string $message = 'Exited Command', $exitCode = self::SUCCESS) : void
+    public function exit(string $message = 'Exited Command', $exitCode = self::SUCCESS): void
     {
         throw new StopExecutionException($message, $exitCode);
     }
@@ -367,7 +367,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function debug($message, array $context = []) : void
+    public function debug($message, array $context = []): void
     {
         if ($this->verbose) {
             $message = $this->interpolate($message, $context);
@@ -383,7 +383,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function info($message, array $context = []) : void
+    public function info($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $message = $this->addTags('info', $message);
@@ -397,7 +397,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function notice($message, array $context = []) : void
+    public function notice($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $message = $this->addTags('notice', $message);
@@ -411,7 +411,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function success($message, array $context = []) : void
+    public function success($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $message = $this->addTags('success', $message);
@@ -425,7 +425,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function warning($message, array $context = []) : void
+    public function warning($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $message = $this->addTags('warning', $message);
@@ -439,7 +439,7 @@ abstract class Command
     * @param array $context
     * @return void
     */
-    public function error($message, array $context = []) : void
+    public function error($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $message = $this->addTags('error', $message);
@@ -469,7 +469,7 @@ abstract class Command
      * @param string $message
      * @return void
      */
-    public function throwError(string $title, string $message = null) : void
+    public function throwError(string $title, string $message = null): void
     {
         $msg = "<exception> ERROR </exception> <heading>{$title}</heading>\n";
         if ($message) {
@@ -486,7 +486,7 @@ abstract class Command
      * @param array $context
      * @return void
      */
-    public function out($message, array $context = []) : void
+    public function out($message, array $context = []): void
     {
         $message = $this->interpolate($message, $context);
         $this->io->out($message, $context);
@@ -499,7 +499,7 @@ abstract class Command
     * @param array $context
     * @return array
     */
-    protected function interpolate($messages, array $context = []) : array
+    protected function interpolate($messages, array $context = []): array
     {
         if (is_string($messages)) {
             $messages = [$messages];
@@ -526,7 +526,7 @@ abstract class Command
      * @param \Origin\Console\ConsoleIo $io
      * @return \Origin\Console\ConsoleIo ConsoleIo
      */
-    public function io(ConsoleIo $io = null) : ConsoleIo
+    public function io(ConsoleIo $io = null): ConsoleIo
     {
         if ($io === null) {
             return $this->io;

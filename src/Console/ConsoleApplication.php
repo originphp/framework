@@ -148,7 +148,7 @@ class ConsoleApplication
      * @param array $args default is argv
      * @return int exit code
      */
-    public function run(array $args = null) : int
+    public function run(array $args = null): int
     {
         if ($args === null) {
             global $argv;
@@ -210,7 +210,7 @@ class ConsoleApplication
      *
      * @return void
      */
-    public function displayHelp() : void
+    public function displayHelp(): void
     {
         $formatter = new ConsoleHelpFormatter();
       
@@ -238,7 +238,7 @@ class ConsoleApplication
      * @param string $name Cache,Plugin.Cache, App\Console\Command\Custom\Cache
      * @return void
      */
-    public function addCommand(string $alias, string $name) : void
+    public function addCommand(string $alias, string $name): void
     {
         if (! preg_match('/^[a-z0-9-]+$/', $alias)) {
             throw new ConsoleException(sprintf('Alias `%s` is invalid', $alias));

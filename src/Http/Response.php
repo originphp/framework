@@ -87,7 +87,7 @@ class Response
      *
      * @return void
      */
-    public function send() : void
+    public function send(): void
     {
         http_response_code($this->statusCode);
 
@@ -111,7 +111,7 @@ class Response
      *
      * @return bool
      */
-    public function ready() : bool
+    public function ready(): bool
     {
         return empty($this->body) && empty($this->file);
     }
@@ -152,7 +152,7 @@ class Response
      * @param mixed $value
      * @return array
      */
-    public function header($header, $value = null) : array
+    public function header($header, $value = null): array
     {
         if (is_string($header)) {
             if ($value === null && strpos($header, ':') !== false) {
@@ -219,7 +219,7 @@ class Response
      * @param string $value
      * @return void
      */
-    protected function sendHeader(string $name, $value = null) : void
+    protected function sendHeader(string $name, $value = null): void
     {
         $header = $name;
         if ($value) {
@@ -251,7 +251,7 @@ class Response
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function cookie(string $name, $value, array $options = []) : void
+    public function cookie(string $name, $value, array $options = []): void
     {
         $options += [
             'name' => $name,
@@ -315,7 +315,7 @@ class Response
      * @param array $options (name,download)
      * @return void
      */
-    public function file(string $filename, array $options = []) : void
+    public function file(string $filename, array $options = []): void
     {
         # Setup Options
         $options += ['name' => null,'download' => false,'type' => null];
@@ -345,7 +345,7 @@ class Response
      *
      * @return void
      */
-    protected function sendCookies() : void
+    protected function sendCookies(): void
     {
         $cookie = new Cookie();
         foreach ($this->cookies as $name => $options) {

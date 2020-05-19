@@ -20,11 +20,11 @@ use Origin\Http\Middleware\Middleware;
 
 class MyMiddleware extends Middleware
 {
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
         $request->data('foo', 'bar');
     }
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
         $response->header('Accept', 'application/foo');
     }

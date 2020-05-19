@@ -119,7 +119,7 @@ class PaginatorComponent extends Component
      * @param string $field
      * @return string model/alias
      */
-    protected function getModelFromField(string $field) : ?string
+    protected function getModelFromField(string $field): ?string
     {
         $needle = Inflector::studlyCaps(substr($field, 0, -3)); // owner_id -> Owner;
         $belongsTo = $this->model->association('belongsTo');
@@ -149,7 +149,7 @@ class PaginatorComponent extends Component
      * @param array $settings
      * @return integer
      */
-    protected function getTotal(array $settings) : int
+    protected function getTotal(array $settings): int
     {
         unset($settings['page'],$settings['limit']);
 
@@ -162,7 +162,7 @@ class PaginatorComponent extends Component
      * @param array $settings
      * @return array
      */
-    protected function mergeSettings(array $settings) : array
+    protected function mergeSettings(array $settings): array
     {
         // merge with defaults
         $settings += $this->config;
@@ -182,7 +182,7 @@ class PaginatorComponent extends Component
      * @param array $settings
      * @return array
      */
-    protected function prepareSort(array $settings) : array
+    protected function prepareSort(array $settings): array
     {
         /**
          * Security issues to consider

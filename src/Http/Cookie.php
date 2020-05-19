@@ -59,7 +59,7 @@ class Cookie
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function write(string $name, $value, array $options = []) : void
+    public function write(string $name, $value, array $options = []): void
     {
         $options += [
             'expires' => 0,
@@ -93,7 +93,7 @@ class Cookie
      * @param string $name
      * @return bool
      */
-    public function exists(string $name) : bool
+    public function exists(string $name): bool
     {
         return isset($_COOKIE[$name]);
     }
@@ -103,7 +103,7 @@ class Cookie
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         foreach ($_COOKIE as $name => $value) {
             $this->delete($name);
@@ -118,7 +118,7 @@ class Cookie
      * @return void
      * @codeCoverageIgnore
      */
-    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false) : void
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false): void
     {
         setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
@@ -129,7 +129,7 @@ class Cookie
      * @param mixed $value
      * @return string
      */
-    protected function pack($value, bool $encrypt = true) : string
+    protected function pack($value, bool $encrypt = true): string
     {
         if (is_array($value)) {
             $value = json_encode($value);

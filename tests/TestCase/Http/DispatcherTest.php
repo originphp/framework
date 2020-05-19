@@ -57,7 +57,7 @@ class AnotherMockRequest extends Request
 
 class MockDispatcher extends Dispatcher
 {
-    protected function getClass(string $controller, string $plugin = null) : string
+    protected function getClass(string $controller, string $plugin = null): string
     {
         return 'Origin\Test\Http\\' . $controller . 'Controller';
     }

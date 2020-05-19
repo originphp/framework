@@ -80,7 +80,7 @@ class AuthComponent extends Component
      */
     private $user = null;
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         if (! ModelRegistry::get($this->config['model'])) {
             throw new MissingModelException($this->config['model']);
@@ -122,7 +122,7 @@ class AuthComponent extends Component
      * @param string|array $actions
      * @return void
      */
-    public function allow($actions) : void
+    public function allow($actions): void
     {
         $this->allowedActions = array_merge($this->allowedActions, (array) $actions);
     }
@@ -133,7 +133,7 @@ class AuthComponent extends Component
      * @param array $user
      * @return boolean
      */
-    protected function isAuthorized(array $user = null) : bool
+    protected function isAuthorized(array $user = null): bool
     {
         if ($user === null) {
             return false;
@@ -156,7 +156,7 @@ class AuthComponent extends Component
      * @param string $password
      * @return string $hashedPassword
      */
-    public function hashPassword(string $password) : string
+    public function hashPassword(string $password): string
     {
         return Security::hashPassword($password); // 255 characters is pref for future proofing
     }
@@ -166,7 +166,7 @@ class AuthComponent extends Component
      *
      * @return array|null
      */
-    public function getUser() : ?array
+    public function getUser(): ?array
     {
         if ($this->user()) {
             return $this->user();
@@ -226,7 +226,7 @@ class AuthComponent extends Component
      * @param \Origin\Model\Entity $user
      * @return void
      */
-    public function login(Entity $user) : void
+    public function login(Entity $user): void
     {
         $this->Session = $this->Session;
         $this->Session->write('Auth.User', $user->toArray());
@@ -257,7 +257,7 @@ class AuthComponent extends Component
      *
      * @return string url where to redirect too
      */
-    public function logout() : string
+    public function logout(): string
     {
         $this->Session->delete('Auth');
         $logoutRedirect = $this->config['logoutRedirect'] ?? $this->config['loginAction'];
@@ -330,7 +330,7 @@ class AuthComponent extends Component
      * @param string $action
      * @return boolean
      */
-    protected function isAllowed(string $action) : bool
+    protected function isAllowed(string $action): bool
     {
         return (in_array($action, $this->allowedActions) or in_array('*', $this->allowedActions));
     }
@@ -340,7 +340,7 @@ class AuthComponent extends Component
      *
      * @return boolean
      */
-    protected function isLoginPage() : bool
+    protected function isLoginPage(): bool
     {
         $loginUrl = Router::url($this->config['loginAction']);
         $params = Router::parse($loginUrl);
@@ -359,12 +359,12 @@ class AuthComponent extends Component
      *
      * @return boolean
      */
-    public function isLoggedIn() : bool
+    public function isLoggedIn(): bool
     {
         return $this->user() !== null;
     }
 
-    protected function isPrivateOrProtected(string $action) : bool
+    protected function isPrivateOrProtected(string $action): bool
     {
         $controller = new ReflectionClass(Controller::class);
         if ($controller->hasMethod($action)) {
@@ -415,7 +415,7 @@ class AuthComponent extends Component
      * @throws \Origin\Http\Exception\ForbiddenException
      * @return \Origin\Http\Response
      */
-    protected function unauthorize() : Response
+    protected function unauthorize(): Response
     {
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);

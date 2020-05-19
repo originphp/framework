@@ -89,7 +89,7 @@ class ConsoleIo
      * @param string|array $message a message or array of messages
      * @return void
      */
-    public function out($message) : void
+    public function out($message): void
     {
         $this->stdout->write($message, true);
     }
@@ -100,7 +100,7 @@ class ConsoleIo
     * @param string|array $message a message or array of messages
     * @return void
     */
-    public function write($message) : void
+    public function write($message): void
     {
         $this->lastWrittenLength = $this->stdout->write($message, false);
     }
@@ -111,7 +111,7 @@ class ConsoleIo
     * @param string|array $message a message or array of messages
     * @return void
     */
-    public function err($message) : void
+    public function err($message): void
     {
         $this->stderr->write($message);
     }
@@ -125,7 +125,7 @@ class ConsoleIo
      * @param string|array $message
      * @return void
      */
-    public function overwrite($message, $newLine = true) : void
+    public function overwrite($message, $newLine = true): void
     {
         if (is_array($message)) {
             $message = implode("\n", $message);
@@ -151,7 +151,7 @@ class ConsoleIo
      * @param string $style
      * @return void
      */
-    public function title(string $title, string $style = 'heading') : void
+    public function title(string $title, string $style = 'heading'): void
     {
         $this->out("<{$style}>{$title}</{$style}>");
         $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
@@ -165,7 +165,7 @@ class ConsoleIo
      * @param string $style
      * @return void
      */
-    public function heading(string $heading, string $style = 'heading') : void
+    public function heading(string $heading, string $style = 'heading'): void
     {
         $this->out("<{$style}>{$heading}</{$style}>");
         $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
@@ -179,7 +179,7 @@ class ConsoleIo
      * @param integer $indent
      * @return void
      */
-    public function text($text, int $indent = 2) : void
+    public function text($text, int $indent = 2): void
     {
         $text = (array) $text;
         foreach ($text as $line) {
@@ -194,7 +194,7 @@ class ConsoleIo
      * @param boolean $headers wether first row contains headers
      * @return void
      */
-    public function table(array $array, bool $headers = true) : void
+    public function table(array $array, bool $headers = true): void
     {
         if (empty($array)) {
             return;
@@ -251,7 +251,7 @@ class ConsoleIo
      * @param integer $indent indent amount
      * @return void
      */
-    public function list($elements, string $bullet = '*', int $indent = 2) : void
+    public function list($elements, string $bullet = '*', int $indent = 2): void
     {
         foreach ((array) $elements as $element) {
             $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
@@ -265,7 +265,7 @@ class ConsoleIo
      * @param array $options (background,color,blink=true etc)
      * @return string
      */
-    public function format(string $text, array $options = []) : string
+    public function format(string $text, array $options = []): string
     {
         return $this->stdout->color($text, $options);
     }
@@ -277,7 +277,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function info($messages, array $options = []) : void
+    public function info($messages, array $options = []): void
     {
         $options += ['background' => 'blue', 'color' => 'white', 'bold' => true];
         $this->highlight($messages, $options);
@@ -290,7 +290,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function success($messages, array $options = []) : void
+    public function success($messages, array $options = []): void
     {
         $options += ['background' => 'green', 'color' => 'white', 'bold' => true];
         $this->highlight($messages, $options);
@@ -303,7 +303,7 @@ class ConsoleIo
     * @param array $options  (background,color,blink,bold,underline,reverse)
     * @return void
     */
-    public function warning($messages, array $options = []) : void
+    public function warning($messages, array $options = []): void
     {
         $options += ['background' => 'yellow', 'color' => 'black', 'bold' => true];
         foreach ((array) $messages as $message) {
@@ -319,7 +319,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function error($messages, array $options = []) : void
+    public function error($messages, array $options = []): void
     {
         $options += ['background' => 'lightRed', 'color' => 'white', 'bold' => true];
         foreach ((array) $messages as $message) {
@@ -337,7 +337,7 @@ class ConsoleIo
      * @return void
      * @see http://ascii-table.com/ansi-escape-sequences-vt-100.php
      */
-    public function progressBar(int $value, int $max, array $options = []) : void
+    public function progressBar(int $value, int $max, array $options = []): void
     {
         $options += ['color' => 'green','ansi' => $this->stdout->supportsAnsi()];
         
@@ -383,7 +383,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function highlight($messages, array $options = []) : void
+    public function highlight($messages, array $options = []): void
     {
         $options += ['background' => 'black', 'color' => 'white'];
 
@@ -402,7 +402,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function alert($messages, array $options = []) : void
+    public function alert($messages, array $options = []): void
     {
         $options += ['background' => 'black', 'color' => 'white'];
 
@@ -427,7 +427,7 @@ class ConsoleIo
      * @param array $options (background,color,blink,bold,underline,reverse)
      * @return void
      */
-    public function block($messages, array $options = []) : void
+    public function block($messages, array $options = []): void
     {
         $options += ['background' => 'black', 'color' => 'white', 'padding' => 4];
 
@@ -456,7 +456,7 @@ class ConsoleIo
      * @param int $count number of newlines
      * @return void
      */
-    public function nl($count = 1) : void
+    public function nl($count = 1): void
     {
         $this->stdout->write(str_repeat("\n", $count), false);
     }
@@ -466,7 +466,7 @@ class ConsoleIo
      *
      * @return void
      */
-    public function clear() : void
+    public function clear(): void
     {
         $this->stdout->write("\033c", false);
     }
@@ -478,7 +478,7 @@ class ConsoleIo
      * @param string $default default value if user presses enter
      * @return string
      */
-    public function ask(string $prompt, string $default = null) : ?string
+    public function ask(string $prompt, string $default = null): ?string
     {
         $input = '';
         if ($default) {
@@ -504,7 +504,7 @@ class ConsoleIo
      * @param string $default default value if user presses enter
      * @return string
      */
-    public function askChoice(string $prompt, array $options, string $default = null) : ?string
+    public function askChoice(string $prompt, array $options, string $default = null): ?string
     {
         $input = $defaultString = '';
         $optionsString = implode('/', $options);
@@ -543,7 +543,7 @@ class ConsoleIo
      * @param bool   $forceOverwrite
      * @return bool
      */
-    public function createFile(string $filename, string $contents, $forceOverwrite = false) : bool
+    public function createFile(string $filename, string $contents, $forceOverwrite = false): bool
     {
         if (file_exists($filename) && $forceOverwrite !== true) {
             $this->warning("File {$filename} already exists");
@@ -572,7 +572,7 @@ class ConsoleIo
      * @param string $message
      * @return void
      */
-    public function status(string $status, string $message) : void
+    public function status(string $status, string $message): void
     {
         if (! isset($this->statusCodes[$status])) {
             throw new ConsoleException(sprintf('Unkown status %s', $status));
@@ -588,7 +588,7 @@ class ConsoleIo
      * @param array $lines
      * @return int
      */
-    protected function getMaxLength(array $lines) : int
+    protected function getMaxLength(array $lines): int
     {
         $maxLength = 0;
         foreach ($lines as $line) {
@@ -624,7 +624,7 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleOutput;
      */
-    public function stderr() : ConsoleOutput
+    public function stderr(): ConsoleOutput
     {
         return $this->stderr;
     }
@@ -633,7 +633,7 @@ class ConsoleIo
     *
     * @return \Origin\Console\ConsoleOutput;
     */
-    public function stdout() : ConsoleOutput
+    public function stdout(): ConsoleOutput
     {
         return $this->stdout;
     }
@@ -642,7 +642,7 @@ class ConsoleIo
      *
      * @return \Origin\Console\ConsoleInput;
      */
-    public function stdin() : ConsoleInput
+    public function stdin(): ConsoleInput
     {
         return $this->stdin;
     }
@@ -654,7 +654,7 @@ class ConsoleIo
      * @param array  $options
      * @return void
      */
-    protected function writeFormatted(string $text, array $options = []) : void
+    protected function writeFormatted(string $text, array $options = []): void
     {
         $string = $this->format($text, $options);
         $this->stdout->write($string);

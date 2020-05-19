@@ -37,7 +37,7 @@ class Middleware
      * @param \Origin\Http\Request $request
      * @return void
      */
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
     }
     /**
@@ -48,7 +48,7 @@ class Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
     }
 
@@ -60,7 +60,7 @@ class Middleware
      * @param callable $next
      * @return \Origin\Http\Response $response
      */
-    public function __invoke(Request $request, Response $response, callable $next = null) : Response
+    public function __invoke(Request $request, Response $response, callable $next = null): Response
     {
         $this->executeHook('startup');
         $this->handle($request);

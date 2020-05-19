@@ -20,12 +20,12 @@ class SuperQuery extends QueryObject
 {
     private $initialized = false;
 
-    protected function initialize() : void
+    protected function initialize(): void
     {
         $this->initialized = true;
     }
 
-    public function execute(bool $result) : bool
+    public function execute(bool $result): bool
     {
         return $this->initialized and $result;
     }

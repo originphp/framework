@@ -139,7 +139,7 @@ class Job
      * @param string $method
      * @return void
      */
-    protected function beforeQueue(string $method) : void
+    protected function beforeQueue(string $method): void
     {
         $this->registerCallback('beforeQueue', $method);
     }
@@ -150,7 +150,7 @@ class Job
     * @param string $method
     * @return void
     */
-    protected function afterQueue(string $method) : void
+    protected function afterQueue(string $method): void
     {
         $this->registerCallback('afterQueue', $method);
     }
@@ -161,7 +161,7 @@ class Job
      * @param string $method
      * @return void
      */
-    protected function beforeDispatch(string $method) : void
+    protected function beforeDispatch(string $method): void
     {
         $this->registerCallback('beforeDispatch', $method);
     }
@@ -172,7 +172,7 @@ class Job
     * @param string $method
     * @return void
     */
-    protected function afterDispatch(string $method) : void
+    protected function afterDispatch(string $method): void
     {
         $this->registerCallback('afterDispatch', $method);
     }
@@ -182,7 +182,7 @@ class Job
      *
      * @return string
      */
-    public function id() : string
+    public function id(): string
     {
         return $this->id;
     }
@@ -206,7 +206,7 @@ class Job
     *
     * @return \Origin\Job\Engine\BaseEngine;
     */
-    public function connection() : BaseEngine
+    public function connection(): BaseEngine
     {
         $connection = env('ORIGIN_ENV') === 'test' ? 'test' : $this->connection;
 
@@ -218,7 +218,7 @@ class Job
      *
      * @return bool
      */
-    public function dispatch() : bool
+    public function dispatch(): bool
     {
         $this->arguments = func_get_args();
         $this->enqueued = date('Y-m-d H:i:s');
@@ -235,7 +235,7 @@ class Job
      *
      * @return bool
      */
-    public function dispatchNow() : bool
+    public function dispatchNow(): bool
     {
         $this->attempts ++;
         $this->arguments = func_get_args(); // proces the arguments
@@ -282,7 +282,7 @@ class Job
      * @param string $callback
      * @return bool continue
      */
-    private function dispatchCallbacks(string $callback, array $arguments = []) : bool
+    private function dispatchCallbacks(string $callback, array $arguments = []): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($method);
@@ -302,7 +302,7 @@ class Job
     *   - limit: The maximum number of retries to do. Default:3
     * @return bool
     */
-    public function retry(array $options = []) : bool
+    public function retry(array $options = []): bool
     {
         $options += ['wait' => '+ 5 seconds','limit' => 3];
 
@@ -320,7 +320,7 @@ class Job
      *
      * @return int
      */
-    public function attempts() : int
+    public function attempts(): int
     {
         return $this->attempts;
     }
@@ -330,7 +330,7 @@ class Job
      *
      * @return array
      */
-    public function arguments() : array
+    public function arguments(): array
     {
         return $this->arguments;
     }
@@ -339,7 +339,7 @@ class Job
      * Returns an array of data to be passed to connection
      * to be serialized
      */
-    public function serialize() : array
+    public function serialize(): array
     {
         return [
             'className' => get_class($this),
@@ -359,7 +359,7 @@ class Job
      * @param array $data
      * @return void
      */
-    public function deserialize(array $data) : void
+    public function deserialize(array $data): void
     {
         $this->id = $data['id'];
         $this->backendId = $data['backendId'];
@@ -376,7 +376,7 @@ class Job
      * @param string $strtotime a strtotime compatiable string e.g '+5 hours' ,'2020-01-01 10:40:00'
      * @return \Origin\Job\Job
      */
-    public function schedule(string $strtotime) : Job
+    public function schedule(string $strtotime): Job
     {
         $this->wait = $strtotime;
 
@@ -388,7 +388,7 @@ class Job
      *
      * @return string
      */
-    public function queue() : string
+    public function queue(): string
     {
         return $this->queue;
     }
@@ -398,7 +398,7 @@ class Job
      *
      * @return integer
      */
-    public function timeout() : int
+    public function timeout(): int
     {
         return $this->timeout;
     }
@@ -408,7 +408,7 @@ class Job
      *
      * @return string
      */
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }

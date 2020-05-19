@@ -36,7 +36,7 @@ trait CallbackRegistrationTrait
      * @param array $options
      * @return void
      */
-    protected function registerCallback(string $callback, string $method, array $options = []) : void
+    protected function registerCallback(string $callback, string $method, array $options = []): void
     {
         $this->registeredCallbacks[$callback][$method] = $options;
     }
@@ -47,7 +47,7 @@ trait CallbackRegistrationTrait
      * @param string $method e.g. checkUser
      * @return boolean
      */
-    protected function disableCallback(string $method) : bool
+    protected function disableCallback(string $method): bool
     {
         foreach ($this->registeredCallbacks as $callback => $registeredCallbacks) {
             if (isset($registeredCallbacks[$method])) {
@@ -66,7 +66,7 @@ trait CallbackRegistrationTrait
     * @param string $method
     * @return boolean
     */
-    protected function enableCallback(string $method) : bool
+    protected function enableCallback(string $method): bool
     {
         $key = array_search($method, $this->disabledCallbacks);
         if ($key !== false) {
@@ -84,7 +84,7 @@ trait CallbackRegistrationTrait
      * @param string $callback
      * @return array
      */
-    protected function registeredCallbacks(string $callback) : array
+    protected function registeredCallbacks(string $callback): array
     {
         $registeredCallbacks = $this->registeredCallbacks[$callback] ?? [];
 
@@ -103,7 +103,7 @@ trait CallbackRegistrationTrait
      * @param string $callback
      * @return void
      */
-    private function validateCallback(string $callback) : void
+    private function validateCallback(string $callback): void
     {
         if (! method_exists($this, $callback)) {
             throw new BadMethodCallException(sprintf('%s method does not exist', $callback));

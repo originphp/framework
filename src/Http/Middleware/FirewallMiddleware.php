@@ -52,7 +52,7 @@ class FirewallMiddleware extends Middleware
      * @param \Origin\Http\Request $request
      * @return void
      */
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
         $ipAddress = $request->ip();
         if (! $ipAddress) {
@@ -79,7 +79,7 @@ class FirewallMiddleware extends Middleware
      * @param string $ip
      * @return void
      */
-    protected function checkLists(string $ip) : void
+    protected function checkLists(string $ip): void
     {
         if ($this->whitelist) {
             if (! in_array($ip, $this->whitelist)) {

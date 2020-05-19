@@ -24,7 +24,7 @@ class MailboxDownloadServiceTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Mailbox','Origin.Queue','Origin.Imap'];
 
-    protected function initialize() : void
+    protected function initialize(): void
     {
         $this->InboundEmail = $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class

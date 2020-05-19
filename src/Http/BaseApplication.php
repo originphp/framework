@@ -65,7 +65,7 @@ class BaseApplication
      *
      * @return \Origin\Http\Response
      */
-    public function dispatch() : Response
+    public function dispatch(): Response
     {
        
         # By running last it will run it first during process
@@ -86,7 +86,7 @@ class BaseApplication
      * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
-    public function addMiddleware(Middleware $object) : void
+    public function addMiddleware(Middleware $object): void
     {
         $this->runner->add($object);
     }
@@ -104,7 +104,7 @@ class BaseApplication
      * @param array $options array of options to be passed to middleware
      * @return void
      */
-    public function loadMiddleware(string $name, array $options = []) : void
+    public function loadMiddleware(string $name, array $options = []): void
     {
         $className = Resolver::className($name, 'Middleware', 'Middleware', 'Http');
         if (empty($className)) {

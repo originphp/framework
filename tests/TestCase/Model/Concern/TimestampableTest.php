@@ -30,7 +30,7 @@ class TimestampableTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Article'];
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->AnotherArticle = ModelRegistry::get('AnotherArticle', ['className' => AnotherArticle::class]);
     }

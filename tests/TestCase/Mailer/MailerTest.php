@@ -35,7 +35,7 @@ class DemoMailer extends Mailer
      */
     protected $template = 'demo';
 
-    public function execute(array $params) : void
+    public function execute(array $params): void
     {
         $this->first_name = $params['first_name'];
 

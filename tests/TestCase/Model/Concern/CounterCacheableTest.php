@@ -25,7 +25,7 @@ use Origin\Model\Concern\Timestampable;
 class Post extends Model
 {
     use Timestampable;
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->hasMany('Reply');
     }
@@ -34,7 +34,7 @@ class Post extends Model
 class Reply extends Model
 {
     use Timestampable;
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->belongsTo('Post', [
             'counterCache' => true,

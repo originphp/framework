@@ -48,7 +48,7 @@ class ErrorHandler
      *
      * @return void
      */
-    public function register() : void
+    public function register(): void
     {
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
@@ -61,7 +61,7 @@ class ErrorHandler
      * @param string $file Filename where the error was raised
      * @param int    $line the corresponding line number
      */
-    public function errorHandler($level, $message, $file, $line) : void
+    public function errorHandler($level, $message, $file, $line): void
     {
         /**
          * @internal This is original version. Not sure how to refactor like web based handler since
@@ -78,7 +78,7 @@ class ErrorHandler
      *
      * @return \Origin\Console\ConsoleOutput
      */
-    protected function consoleOutput() : ConsoleOutput
+    protected function consoleOutput(): ConsoleOutput
     {
         if ($this->consoleOutput) {
             return $this->consoleOutput;
@@ -98,7 +98,7 @@ class ErrorHandler
      * @param boolean $newLine
      * @return int
      */
-    protected function out(string $message, $newLine = true) : int
+    protected function out(string $message, $newLine = true): int
     {
         return $this->consoleOutput()->write($message, $newLine);
     }
@@ -108,7 +108,7 @@ class ErrorHandler
      * @param \Exception $exception
      * @return void
      */
-    public function exceptionHandler($exception) : void
+    public function exceptionHandler($exception): void
     {
         $debugger = new Debugger();
         $debug = $debugger->exception($exception);
@@ -131,7 +131,7 @@ class ErrorHandler
      * @param array $debug
      * @return void
      */
-    public function render(array $debug, $fullBacktrace = false) : void
+    public function render(array $debug, $fullBacktrace = false): void
     {
         extract($debug);
 
@@ -181,7 +181,7 @@ class ErrorHandler
      * @param string $filename
      * @return string
      */
-    protected function shortenPath(string $filename) : string
+    protected function shortenPath(string $filename): string
     {
         return str_replace(ROOT . DS, '', $filename);
     }
@@ -191,7 +191,7 @@ class ErrorHandler
      *
      * @return void
      */
-    protected function exit(int $exitCode = 1) : void
+    protected function exit(int $exitCode = 1): void
     {
         // @codeCoverageIgnoreStart
         exit($exitCode);

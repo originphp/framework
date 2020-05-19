@@ -86,7 +86,7 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @return array
      */
-    public function describe(string $table) : array
+    public function describe(string $table): array
     {
         $results = $this->fetchAll('SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($table));
         $columns = $this->convertTableDescription($results);
@@ -130,7 +130,7 @@ class MysqlSchema extends BaseSchema
      * @param array $data
      * @return array
      */
-    protected function convertTableDescription(array $data) : array
+    protected function convertTableDescription(array $data): array
     {
         $out = [];
     
@@ -165,7 +165,7 @@ class MysqlSchema extends BaseSchema
      * @param string $column e.g int(11) unsigned
      * @return array
      */
-    protected function parseColumn(string $column) : array
+    protected function parseColumn(string $column): array
     {
         preg_match('/([a-z]+)(?:\(([0-9,]+)\))*/i', $column, $matches); //'int(10) unsigned'
         if (empty($matches)) {
@@ -237,7 +237,7 @@ class MysqlSchema extends BaseSchema
      * @param array $data
      * @return string
      */
-    protected function columnSql(array $data) : string
+    protected function columnSql(array $data): string
     {
         $out = $this->quoteIdentifier($data['name']);
 
@@ -321,7 +321,7 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @return array
      */
-    public function indexes(string $table) : array
+    public function indexes(string $table): array
     {
         $sql = sprintf('SHOW INDEX FROM %s', $this->quoteIdentifier($table));
         $results = $this->fetchAll($sql);
@@ -362,7 +362,7 @@ class MysqlSchema extends BaseSchema
      * @param string $to
      * @return string
      */
-    public function renameTable(string $from, string $to) : string
+    public function renameTable(string $from, string $to): string
     {
         return sprintf(
             'RENAME TABLE %s TO %s',
@@ -381,7 +381,7 @@ class MysqlSchema extends BaseSchema
      * @param array $options
      * @return string
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []) : string
+    public function changeColumn(string $table, string $name, string $type, array $options = []): string
     {
         $options += ['name' => $name, 'type' => $type];
 
@@ -401,7 +401,7 @@ class MysqlSchema extends BaseSchema
      * @param string $to
      * @return string
      */
-    public function renameColumn(string $table, string $from, string $to) : string
+    public function renameColumn(string $table, string $from, string $to): string
     {
         $tableSchema = $this->describe($table)['columns'];
         $definition = '';
@@ -443,7 +443,7 @@ class MysqlSchema extends BaseSchema
      * @param string $name
      * @return string
      */
-    public function removeIndex(string $table, string $name) : string
+    public function removeIndex(string $table, string $name): string
     {
         return sprintf(
             'DROP INDEX %s ON %s',
@@ -462,7 +462,7 @@ class MysqlSchema extends BaseSchema
      * @param string $newName
      * @return string
      */
-    public function renameIndex(string $table, string $oldName, string $newName) : string
+    public function renameIndex(string $table, string $oldName, string $newName): string
     {
         return sprintf(
             'ALTER TABLE %s RENAME INDEX %s TO %s',
@@ -479,7 +479,7 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @return string
      */
-    public function truncateTableSql(string $table) : string
+    public function truncateTableSql(string $table): string
     {
         return sprintf(
             'TRUNCATE TABLE %s',
@@ -497,7 +497,7 @@ class MysqlSchema extends BaseSchema
      *
      * @return string
      */
-    public function disableForeignKeySql() : string
+    public function disableForeignKeySql(): string
     {
         return 'SET FOREIGN_KEY_CHECKS = 0';
     }
@@ -507,7 +507,7 @@ class MysqlSchema extends BaseSchema
      *
      * @return string
      */
-    public function enableForeignKeySql() : string
+    public function enableForeignKeySql(): string
     {
         return 'SET FOREIGN_KEY_CHECKS = 1';
     }
@@ -518,7 +518,7 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @return array
      */
-    public function foreignKeys(string $table) : array
+    public function foreignKeys(string $table): array
     {
         $config = ConnectionManager::config($this->datasource);
 
@@ -549,7 +549,7 @@ class MysqlSchema extends BaseSchema
      * @param string $constraint
      * @return string
      */
-    public function removeForeignKey(string $fromTable, string $constraint) : string
+    public function removeForeignKey(string $fromTable, string $constraint): string
     {
         return sprintf(
             'ALTER TABLE %s DROP FOREIGN KEY %s',
@@ -564,7 +564,7 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @return string
      */
-    public function showCreateTable(string $table) : string
+    public function showCreateTable(string $table): string
     {
         $result = $this->fetchRow('SHOW CREATE TABLE ' . $this->quoteIdentifier($table));
 
@@ -579,7 +579,7 @@ class MysqlSchema extends BaseSchema
     * @param array $options
     * @return array
     */
-    public function createTableSql(string $table, array $schema, array $options = []) : array
+    public function createTableSql(string $table, array $schema, array $options = []): array
     {
         $columns = $constraints = $indexes = $databaseOptions = [];
         
@@ -637,7 +637,7 @@ class MysqlSchema extends BaseSchema
      * @param array $options
      * @return array
      */
-    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
+    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array
     {
         $out = sprintf(
             "CREATE TABLE %s (\n%s\n)",
@@ -674,7 +674,7 @@ class MysqlSchema extends BaseSchema
     * @param array $attributes name,columns,references, update,delete
     * @return string
     */
-    protected function tableConstraintForeign(array $attributes) :string
+    protected function tableConstraintForeign(array $attributes): string
     {
         $sql = sprintf(
             'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
@@ -697,7 +697,7 @@ class MysqlSchema extends BaseSchema
     * @param array $attributes
     * @return string
     */
-    protected function tableConstraint(array $attributes) : string
+    protected function tableConstraint(array $attributes): string
     {
         $columns = implode(',', (array) $attributes['column']);
         if ($attributes['type'] === 'primary') {
@@ -720,7 +720,7 @@ class MysqlSchema extends BaseSchema
     * @param array $attributes
     * @return string
     */
-    protected function tableIndex(array $attributes) : string
+    protected function tableIndex(array $attributes): string
     {
         $string = null;
 
@@ -772,7 +772,7 @@ class MysqlSchema extends BaseSchema
     * @param array $options (ifExists)
     * @return string
     */
-    public function dropTableSql(string $table, array $options = []) : string
+    public function dropTableSql(string $table, array $options = []): string
     {
         $sql = 'DROP TABLE %s';
         if (! empty($options['ifExists'])) {

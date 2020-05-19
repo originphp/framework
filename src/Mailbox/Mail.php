@@ -188,7 +188,7 @@ class Mail
      * @param string $message
      * @return void
      */
-    private function parse(string $message) : void
+    private function parse(string $message): void
     {
         $parser = new MailParser($message);
         $this->messageId = $parser->headers('message-id');
@@ -224,7 +224,7 @@ class Mail
      * @param string|array $header
      * @return string|null
      */
-    private function parseSingleAddress($header = null) : ?string
+    private function parseSingleAddress($header = null): ?string
     {
         if ($header === null) {
             return null;
@@ -265,7 +265,7 @@ class Mail
      * @param string|array $header
      * @return array
      */
-    private function parseHeaderResult($header) :array
+    private function parseHeaderResult($header): array
     {
         if (is_array($header)) {
             $header = $header[0];
@@ -279,7 +279,7 @@ class Mail
      *
      * @return array
      */
-    public function attachments() : array
+    public function attachments(): array
     {
         return $this->attachments;
     }
@@ -370,7 +370,7 @@ class Mail
      *
      * @return boolean
      */
-    public function hasHtml() : bool
+    public function hasHtml(): bool
     {
         return ! empty($this->htmlPart);
     }
@@ -380,7 +380,7 @@ class Mail
      *
      * @return boolean
      */
-    public function hasText() : bool
+    public function hasText(): bool
     {
         return ! empty($this->textPart);
     }
@@ -390,7 +390,7 @@ class Mail
      *
      * @return string
      */
-    public function message() : string
+    public function message(): string
     {
         return $this->header . "\r\n\r\n" . $this->body;
     }

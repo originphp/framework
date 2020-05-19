@@ -116,7 +116,7 @@ abstract class Connection
      *
      * @param array $config
      */
-    public function connect(array $config) : void
+    public function connect(array $config): void
     {
         $config += ['engine' => 'mysql'];
        
@@ -143,7 +143,7 @@ abstract class Connection
      *
      * @return boolean
      */
-    public function isConnected() : bool
+    public function isConnected(): bool
     {
         return $this->connection !== null;
     }
@@ -153,7 +153,7 @@ abstract class Connection
      *
      * @return string
      */
-    public function engine() : string
+    public function engine(): string
     {
         return $this->name;
     }
@@ -163,7 +163,7 @@ abstract class Connection
      *
      * @return string|null
      */
-    public function database() : ?string
+    public function database(): ?string
     {
         return $this->config['database'] ?? null;
     }
@@ -175,7 +175,7 @@ abstract class Connection
      * @param array $params ['name'=>'John'] or ['p1'=>'John']
      * @return bool
      */
-    public function execute(string $sql, array $params = []) :bool
+    public function execute(string $sql, array $params = []): bool
     {
         try {
             $start = microtime(true);
@@ -215,7 +215,7 @@ abstract class Connection
         return true;
     }
 
-    protected function unprepare(string $sql, array  $params) : string
+    protected function unprepare(string $sql, array  $params): string
     {
         $data = [];
 
@@ -237,7 +237,7 @@ abstract class Connection
      *
      * @return bool
      */
-    public function hasResults() :bool
+    public function hasResults(): bool
     {
         return is_a($this->statement, 'PDOStatement') && $this->statement->rowCount() > 0;
     }
@@ -247,7 +247,7 @@ abstract class Connection
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function begin() :bool
+    public function begin(): bool
     {
         if ($this->transactionStarted === false) {
             $this->transactionStarted = $this->connection->beginTransaction();
@@ -261,7 +261,7 @@ abstract class Connection
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function commit() :bool
+    public function commit(): bool
     {
         if ($this->transactionStarted) {
             $this->transactionStarted = false;
@@ -277,7 +277,7 @@ abstract class Connection
      *
      * @return bool returns TRUE on success or FALSE on failure
      */
-    public function rollback() :bool
+    public function rollback(): bool
     {
         if ($this->transactionStarted) {
             $this->transactionStarted = false;
@@ -293,7 +293,7 @@ abstract class Connection
      *
      * @return string
      */
-    public function lastInsertId() : string
+    public function lastInsertId(): string
     {
         return $this->connection->lastInsertId();
     }
@@ -303,7 +303,7 @@ abstract class Connection
      *
      * @return integer
      */
-    public function lastAffected() :int
+    public function lastAffected(): int
     {
         if ($this->hasResults()) {
             return $this->statement->rowCount();
@@ -316,7 +316,7 @@ abstract class Connection
      *
      * @return void
      */
-    public function disconnect() : void
+    public function disconnect(): void
     {
         /*
         if ($this->connection) {
@@ -352,7 +352,7 @@ abstract class Connection
      *
      * @return array|null
      */
-    public function fetchList() : ?array
+    public function fetchList(): ?array
     {
         if ($this->hasResults()) {
             return $this->toList($this->statement->fetchAll(PDO::FETCH_NUM));
@@ -367,7 +367,7 @@ abstract class Connection
      * @param string $type (num,assoc,model,object)
      * @return array|null
      */
-    public function fetchAll(string $type = 'assoc') : ?array
+    public function fetchAll(string $type = 'assoc'): ?array
     {
         if ($this->hasResults()) {
             $rows = [];
@@ -422,7 +422,7 @@ abstract class Connection
      * @param array $rows fetchAll rows
      * @return array
      */
-    protected function toList(array $rows) : array
+    protected function toList(array $rows): array
     {
         $result = [];
         $columnCount = count($rows[0]);
@@ -454,7 +454,7 @@ abstract class Connection
      * @param array $map array(model,column)
      * @return array
      */
-    protected function toModel(array $row, array $map) : array
+    protected function toModel(array $row, array $map): array
     {
         $result = [];
         foreach ($map as $index => $meta) {
@@ -476,7 +476,7 @@ abstract class Connection
      * @param PDOStatement $statement
      * @return void
      */
-    public function mapColumns(PDOStatement $statement = null) : void
+    public function mapColumns(PDOStatement $statement = null): void
     {
         $this->columnMap = [];
         if ($statement == null) {
@@ -499,7 +499,7 @@ abstract class Connection
      * @param string $column
      * @return bool
      */
-    public function isVirtualField(string $column) : bool
+    public function isVirtualField(string $column): bool
     {
         return strpos($column, $this->virtualFieldSeperator) != false;
     }
@@ -513,7 +513,7 @@ abstract class Connection
     * @param array $fields
     * @return array
     */
-    public function mapNumericResults(array $records, array $fields) : array
+    public function mapNumericResults(array $records, array $fields): array
     {
         $count = count($fields);
         $index = $this->getColumnMetaData($fields);
@@ -540,7 +540,7 @@ abstract class Connection
      * @param array $fields
      * @return array
      */
-    private function getColumnMetaData(array $fields) : array
+    private function getColumnMetaData(array $fields): array
     {
         $index = [];
         $count = count($fields);
@@ -576,7 +576,7 @@ abstract class Connection
      *
      * @return \Origin\Model\Schema\BaseSchema
      */
-    public function adapter() : BaseSchema
+    public function adapter(): BaseSchema
     {
         if ($this->adapter === null) {
             $adapterClass = __NAMESPACE__ . '\Schema\\'. ucfirst($this->name) . 'Schema';
@@ -592,7 +592,7 @@ abstract class Connection
      * @param string $table
      * @return array
      */
-    public function describe(string $table) : array
+    public function describe(string $table): array
     {
         $key = $this->config['name'] . '_' . $table;
         $schema = Cache::read($key, ['config' => 'origin']);
@@ -626,14 +626,14 @@ abstract class Connection
      *
      * @return array
      */
-    abstract public function tables() : array;
+    abstract public function tables(): array;
     
     /**
     * Enables Foreign Key Constraints
     *
     * @return void
     */
-    public function enableForeignKeyConstraints() : void
+    public function enableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->enableForeignKeySql());
     }
@@ -643,7 +643,7 @@ abstract class Connection
      *
      * @return void
      */
-    public function disableForeignKeyConstraints() : void
+    public function disableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->disableForeignKeySql());
     }
@@ -655,7 +655,7 @@ abstract class Connection
      * @param array $options
      * @return bool
      */
-    public function select(string $table, array $options) : bool
+    public function select(string $table, array $options): bool
     {
         $builder = $this->queryBuilder($table, $options['alias']);
         $sql = $builder->selectStatement($options);// How to handle this elegently without having to do same work as selct
@@ -669,7 +669,7 @@ abstract class Connection
      * @param array  $data
      * @return bool
      */
-    public function insert(string $table, array $data) : bool
+    public function insert(string $table, array $data): bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->insert($data)
@@ -686,7 +686,7 @@ abstract class Connection
      * @param array  $conditions
      * @return bool
      */
-    public function update(string $table, array $data, array $conditions = []) : bool
+    public function update(string $table, array $data, array $conditions = []): bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->update($data)
@@ -703,7 +703,7 @@ abstract class Connection
      * @param array  $conditions
      * @return bool
      */
-    public function delete(string $table, array $conditions = []) : bool
+    public function delete(string $table, array $conditions = []): bool
     {
         $builder = $this->queryBuilder($table);
         $sql = $builder->delete($conditions)
@@ -718,7 +718,7 @@ abstract class Connection
      * @param string $table [description]
      * @return \Origin\Model\QueryBuilder QueryBuilder
      */
-    public function queryBuilder(string $table, $alias = null) :QueryBuilder
+    public function queryBuilder(string $table, $alias = null): QueryBuilder
     {
         return new QueryBuilder($table, $alias, [
             'escape' => $this->quote,
@@ -730,7 +730,7 @@ abstract class Connection
      *
      * @return array
      */
-    public function log() : array
+    public function log(): array
     {
         return $this->log;
     }

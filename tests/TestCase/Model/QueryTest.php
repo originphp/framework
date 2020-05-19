@@ -30,7 +30,7 @@ use Origin\Core\Exception\InvalidArgumentException;
 class QueryArticle extends Model
 {
     protected $table = 'articles';
-    protected function initialize(array $config) : void
+    protected function initialize(array $config): void
     {
         $this->belongsTo('Author', ['className' => QueryAuthor::class]);
     }
@@ -39,7 +39,7 @@ class QueryArticle extends Model
 class QueryAuthor extends Model
 {
     protected $table = 'authors';
-    protected function initialize(array $config) : void
+    protected function initialize(array $config): void
     {
         $this->hasMany('Article', ['className' => QueryArticle::class]);
     }
@@ -49,7 +49,7 @@ class QueryTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Article','Origin.Author'];
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->Article = $this->loadModel('Article', ['className' => QueryArticle::class]);
     }

@@ -137,7 +137,7 @@ class ThrottleMiddleware extends Middleware
      * @param array $requests
      * @return array
      */
-    private function filterRequests(array $requests) : array
+    private function filterRequests(array $requests): array
     {
         $from = strtotime('-' . $this->config['seconds'] . ' seconds');
         $recent = [];

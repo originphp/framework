@@ -25,7 +25,7 @@ class ListenerJob extends Job
         ( new Publisher())->dispatch(new $className(), $method, $args);
     }
 
-    public function onError(\Exception $exception) : void
+    public function onError(\Exception $exception): void
     {
         $this->retry();
     }

@@ -32,7 +32,7 @@ class DateHelper extends Helper
      * @param string $format date function compatiable string e.g 'H:i:s'
      * @return string|null
      */
-    public function format(string $dateString = null, string $format = null) : ?string
+    public function format(string $dateString = null, string $format = null): ?string
     {
         if ($dateString) {
             return Date::format($dateString, $format);
@@ -47,7 +47,7 @@ class DateHelper extends Helper
      * @param string $datetime
      * @return string|null
      */
-    public function timeAgoInWords(string $datetime = null) : ?string
+    public function timeAgoInWords(string $datetime = null): ?string
     {
         $time = strtotime($datetime);
         if ($time === false) {

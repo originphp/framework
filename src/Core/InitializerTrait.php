@@ -33,7 +33,7 @@ trait InitializerTrait
      *
      * @return void
      */
-    private function initializeTraits() : void
+    private function initializeTraits(): void
     {
         $args = func_get_args() ?? [];
         foreach ($this->classUses() as $trait) {
@@ -56,7 +56,7 @@ trait InitializerTrait
      *
      * @return array
      */
-    private function classUses() : array
+    private function classUses(): array
     {
         $class = $this;
      

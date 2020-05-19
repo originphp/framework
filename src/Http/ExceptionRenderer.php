@@ -46,7 +46,7 @@ class ExceptionRenderer
         $this->response = $response ? $response : new Response();
     }
 
-    public function render($exception, $debug = false) : Response
+    public function render($exception, $debug = false): Response
     {
         if ($debug) {
             $errorCode = $exception->getCode();
@@ -69,7 +69,7 @@ class ExceptionRenderer
         return $this->response;
     }
 
-    protected function getErrorCodeAndMessage($exception) : array
+    protected function getErrorCodeAndMessage($exception): array
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
         $errorMessage = ($exception->getCode() === 404) ? 'Not Found' : 'An Internal Error has Occured';

@@ -160,7 +160,7 @@ class Controller
      * @param array  $config array of config to be passed to component. Class name
      * @return \Origin\Http\Controller\Component\Component
      */
-    public function loadComponent(string $name, array $config = []) : Component
+    public function loadComponent(string $name, array $config = []): Component
     {
         list($plugin, $component) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Component'], $config);
@@ -175,7 +175,7 @@ class Controller
      * @param array  $config array of config to be passed to helper
      * @return void
      */
-    public function loadHelper(string $name, array $config = []) : void
+    public function loadHelper(string $name, array $config = []): void
     {
         list($plugin, $helper) = pluginSplit($name);
         $config = array_merge(['className' => $name.'Helper'], $config);
@@ -206,7 +206,7 @@ class Controller
      * @param string $action
      * @return bool
      */
-    protected function isAccessible(string $action) : bool
+    protected function isAccessible(string $action): bool
     {
         $controller = new ReflectionClass(Controller::class);
         if ($controller->hasMethod($action)) {
@@ -227,7 +227,7 @@ class Controller
      * @param mixed $value if key is a string set the value for this
      * @return void
      */
-    public function set($name, $value = null) : void
+    public function set($name, $value = null): void
     {
         if (is_array($name)) {
             $data = $name;
@@ -243,7 +243,7 @@ class Controller
      *
      * @return \Origin\Http\Response|null
      */
-    protected function startupProcess() : ?Response
+    protected function startupProcess(): ?Response
     {
         if ($this->isResponseOrRedirect($this->executeHook('startup'))) {
             return $this->response;
@@ -263,7 +263,7 @@ class Controller
      *
      * @return \Origin\Http\Response|null
      */
-    protected function shutdownProcess()  : ?Response
+    protected function shutdownProcess(): ?Response
     {
         if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
             return $this->response;
@@ -289,7 +289,7 @@ class Controller
        * @param string $callback
        * @return bool
        */
-    protected function triggerCallback(string $callback) : bool
+    protected function triggerCallback(string $callback): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($callback);
@@ -307,7 +307,7 @@ class Controller
      * @param string $method
      * @return void
      */
-    public function beforeAction(string $method) : void
+    public function beforeAction(string $method): void
     {
         $this->registerCallback('beforeAction', $method);
     }
@@ -318,7 +318,7 @@ class Controller
      * @param string $method
      * @return void
      */
-    public function afterAction(string $method) : void
+    public function afterAction(string $method): void
     {
         $this->registerCallback('afterAction', $method);
     }
@@ -329,7 +329,7 @@ class Controller
      * @param string $method
      * @return void
      */
-    public function beforeRender(string $method) : void
+    public function beforeRender(string $method): void
     {
         $this->registerCallback('beforeRender', $method);
     }
@@ -340,7 +340,7 @@ class Controller
     * @param string $method
     * @return void
     */
-    public function beforeRedirect(string $method) : void
+    public function beforeRedirect(string $method): void
     {
         $this->registerCallback('beforeRedirect', $method);
     }
@@ -351,7 +351,7 @@ class Controller
     * @param mixed $result
     * @return boolean
     */
-    private function isResponseOrRedirect($result) : bool
+    private function isResponseOrRedirect($result): bool
     {
         return ($result instanceof Response || $this->response->headers('Location'));
     }
@@ -545,7 +545,7 @@ class Controller
      * @param array|string $data data which will be json encoded
      * @return void
      */
-    public function renderJson($data, int $status = 200) : void
+    public function renderJson($data, int $status = 200): void
     {
         $this->autoRender = false; // Only render once
         $this->triggerCallback('beforeRender');
@@ -573,7 +573,7 @@ class Controller
      * @param integer $status
      * @return void
      */
-    public function renderXml($data, int $status = 200) : void
+    public function renderXml($data, int $status = 200): void
     {
         $this->autoRender = false; // Disable for dispatcher
         $this->triggerCallback('beforeRender');
@@ -596,7 +596,7 @@ class Controller
      * @param int $code status code default 302
      * @return \Origin\Http\Response $response
      */
-    public function redirect($url, int $code = 302) : Response
+    public function redirect($url, int $code = 302): Response
     {
         $this->autoRender = false;
         $this->triggerCallback('beforeRedirect');
@@ -613,7 +613,7 @@ class Controller
      *
      * @return \Origin\Http\Controller\Component\ComponentRegistry
      */
-    public function componentRegistry() : ComponentRegistry
+    public function componentRegistry(): ComponentRegistry
     {
         return $this->componentRegistry;
     }
@@ -624,7 +624,7 @@ class Controller
      * @param array $viewVars
      * @return array
      */
-    public function viewVars() : array
+    public function viewVars(): array
     {
         return $this->viewVars;
     }
@@ -634,7 +634,7 @@ class Controller
      *
      * @return string
      */
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
@@ -644,7 +644,7 @@ class Controller
      *
      * @return \Origin\Http\Request
      */
-    public function request() : Request
+    public function request(): Request
     {
         return $this->request;
     }
@@ -654,7 +654,7 @@ class Controller
      *
      * @return \Origin\Http\Request
      */
-    public function response() : Response
+    public function response(): Response
     {
         return $this->response;
     }
@@ -666,7 +666,7 @@ class Controller
      * @return \Origin\Http\Response
      *
      */
-    public function dispatch(string $action) : Response
+    public function dispatch(string $action): Response
     {
         if (! method_exists($this, $action)) {
             throw new MissingMethodException([$this->name, $action]);

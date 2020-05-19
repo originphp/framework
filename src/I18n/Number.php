@@ -48,7 +48,7 @@ class Number
      * @param string $currency EUR|USD|GBP
      * @return string $currency
      */
-    public static function defaultCurrency(string $currency = null) : string
+    public static function defaultCurrency(string $currency = null): string
     {
         if ($currency === null) {
             return self::$currency;
@@ -65,7 +65,7 @@ class Number
      * @param array  $options  precision|places|before|after|pattern
      * @return string|null result $1,234.56
      */
-    public static function currency(float $value, string $currency = null, array $options = []) : ?string
+    public static function currency(float $value, string $currency = null, array $options = []): ?string
     {
         if ($currency === null) {
             $currency = self::$currency;
@@ -82,7 +82,7 @@ class Number
      * @param array $options   places|before|after|pattern|multiply
      * @return string|null 75.00%
      */
-    public static function percent(float $value, int $precision = 2, array $options = []) :? string
+    public static function percent(float $value, int $precision = 2, array $options = []): ? string
     {
         if (! empty($options['multiply'])) {
             $value = $value * 100;
@@ -99,7 +99,7 @@ class Number
      * @param array $options   places|before|after|pattern
      * @return string|null 1234.56
      */
-    public static function precision(float $value, int $precision = 2, array $options = []) : ?string
+    public static function precision(float $value, int $precision = 2, array $options = []): ?string
     {
         return static::format($value, ['precision' => $precision] + $options);
     }
@@ -111,7 +111,7 @@ class Number
      * @param array $options precision|places|before|after|pattern
      * @return string|null 1234.56
      */
-    public static function format($value, array $options = []) : ?string
+    public static function format($value, array $options = []): ?string
     {
         $options += [
             'type' => NumberFormatter::DECIMAL, 'before' => null, 'after' => null,
@@ -167,7 +167,7 @@ class Number
      *   - pattern
      * @return NumberFormatter
      */
-    protected static function formatter(array $options = []) : NumberFormatter
+    protected static function formatter(array $options = []): NumberFormatter
     {
         $locale = static::$locale;
         if (isset($options['locale'])) {

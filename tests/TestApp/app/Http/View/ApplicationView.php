@@ -18,7 +18,7 @@ class ApplicationView extends View
      *
      * @return void
      */
-    public function initialize() : void
+    public function initialize(): void
     {
     }
 }

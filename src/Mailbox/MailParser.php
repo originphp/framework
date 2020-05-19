@@ -146,7 +146,7 @@ class MailParser
     *
     * @return string
     */
-    public function body() : string
+    public function body(): string
     {
         return $this->extract($this->parts[1]['starting-pos-body'], $this->messageLength);
     }
@@ -156,7 +156,7 @@ class MailParser
      *
      * @return string
      */
-    public function message() : string
+    public function message(): string
     {
         rewind($this->stream);
 
@@ -187,7 +187,7 @@ class MailParser
      *
      * @return string|null
      */
-    public function decoded() : ?string
+    public function decoded(): ?string
     {
         $type = $this->detectContentType();
 
@@ -199,7 +199,7 @@ class MailParser
      *
      * @return string|null
      */
-    public function textPart() :  ?string
+    public function textPart(): ?string
     {
         return $this->extractPart('text');
     }
@@ -209,7 +209,7 @@ class MailParser
      *
      * @return string|null
      */
-    public function htmlPart() : ?string
+    public function htmlPart(): ?string
     {
         return $this->extractPart('html');
     }
@@ -428,7 +428,7 @@ class MailParser
      *
      * @return bool
      */
-    public function deliveryStatusReport() : bool
+    public function deliveryStatusReport(): bool
     {
         return $this->parts[1]['content-type'] === 'multipart/report';
     }
@@ -438,7 +438,7 @@ class MailParser
      *
      * @return boolean
      */
-    public function multipart() : bool
+    public function multipart(): bool
     {
         $contentType = $this->parts[1]['content-type'];
 
@@ -465,7 +465,7 @@ class MailParser
      *
      * @return boolean
      */
-    public function bounced() : bool
+    public function bounced(): bool
     {
         if (! $this->deliveryStatusReport()) {
             return false;
@@ -518,7 +518,7 @@ class MailParser
      *
      * @return boolean
      */
-    public function autoResponder() : bool
+    public function autoResponder(): bool
     {
         if ($this->deliveryStatusReport()) {
             return false;

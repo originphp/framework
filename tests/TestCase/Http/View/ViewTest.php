@@ -52,7 +52,7 @@ class MockView extends View
      */
     protected $overideFiles = [];
 
-    public function fileExists(string $filename) :bool
+    public function fileExists(string $filename): bool
     {
         return in_array($filename, $this->mockFiles) or file_exists($filename);
     }
@@ -62,12 +62,12 @@ class MockView extends View
         $this->mockFiles = [$filename];
     }
 
-    public function overideFiles(array $files) : void
+    public function overideFiles(array $files): void
     {
         $this->overideFiles = $files;
     }
 
-    protected function getElementFilename(string $name) : string
+    protected function getElementFilename(string $name): string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];
@@ -76,7 +76,7 @@ class MockView extends View
         return parent::getElementFilename($name);
     }
 
-    protected function getLayoutFilename(string $name) : string
+    protected function getLayoutFilename(string $name): string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];
@@ -85,7 +85,7 @@ class MockView extends View
         return parent::getLayoutFilename($name);
     }
 
-    protected function getViewFilename(string $name) : string
+    protected function getViewFilename(string $name): string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];

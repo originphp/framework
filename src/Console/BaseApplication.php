@@ -31,7 +31,7 @@ class BaseApplication
      *
      * @return int
      */
-    public function dispatch(array $arguments = []) : int
+    public function dispatch(array $arguments = []): int
     {
         $this->executeHook('startup');
         $exitCode = (new CommandRunner())->run($arguments);

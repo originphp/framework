@@ -27,7 +27,7 @@ class AnotherDemoMailer extends Mailer
         'from' => 'no-reply@example.com',
     ];
     
-    public function execute(array $params)  : void
+    public function execute(array $params): void
     {
         $this->first_name = $params['first_name'];
 

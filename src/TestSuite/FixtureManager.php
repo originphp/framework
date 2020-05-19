@@ -44,7 +44,7 @@ class FixtureManager
      * @param \PHPUnit\Framework\Test $test
      * @return void
      */
-    public function load($test) : void
+    public function load($test): void
     {
         $this->testCaseName = get_class($test);
         
@@ -73,7 +73,7 @@ class FixtureManager
      * @param \PHPUnit\Framework\Test $test
      * @return void
      */
-    public function unload($test) :void
+    public function unload($test): void
     {
         $fixtures = $test->fixtures();
         if ($fixtures) {
@@ -109,7 +109,7 @@ class FixtureManager
      * @param string $fixture
      * @return void
      */
-    public function loadFixture(string $fixture) : void
+    public function loadFixture(string $fixture): void
     {
         $class = $this->resolveFixture($fixture);
    
@@ -139,7 +139,7 @@ class FixtureManager
      * @param string $fixture
      * @return void
      */
-    public function loadRecords(string $fixture) : void
+    public function loadRecords(string $fixture): void
     {
         try {
             $this->loaded[$fixture]->insert();
@@ -155,7 +155,7 @@ class FixtureManager
      * @param string $fixture
      * @return void
      */
-    public function unloadFixture(string $fixture) : void
+    public function unloadFixture(string $fixture): void
     {
         if (isset($this->loaded[$fixture])) {
             $this->loaded[$fixture]->truncate();
@@ -167,7 +167,7 @@ class FixtureManager
      *
      * @return void
      */
-    public function shutdown() : void
+    public function shutdown(): void
     {
         $this->disableForeignKeyConstraints();
 
@@ -179,14 +179,14 @@ class FixtureManager
         $this->enableForeignKeyConstraints();
     }
 
-    protected function disableForeignKeyConstraints() : void
+    protected function disableForeignKeyConstraints(): void
     {
         $connection = ConnectionManager::get('test');
         $connection->begin();
         $connection->disableForeignKeyConstraints();
     }
 
-    protected function enableForeignKeyConstraints() : void
+    protected function enableForeignKeyConstraints(): void
     {
         $connection = ConnectionManager::get('test');
       
@@ -200,7 +200,7 @@ class FixtureManager
      * @param string $fixture
      * @return string
      */
-    protected function resolveFixture(string $fixture) : string
+    protected function resolveFixture(string $fixture): string
     {
         list($plugin, $fixture) = pluginSplit($fixture);
 

@@ -50,7 +50,7 @@ class DatabaseEngine extends BaseEngine
      * @param string $strtotime
      * @return boolean
      */
-    public function add(Job $job, string $strtotime = 'now') : bool
+    public function add(Job $job, string $strtotime = 'now'): bool
     {
         $model = $this->model();
         $entity = $model->new([
@@ -80,7 +80,7 @@ class DatabaseEngine extends BaseEngine
     * @param string $queue
     * @return \Origin\Job\Job|null
     */
-    public function fetch(string $queue = 'default') : ?Job
+    public function fetch(string $queue = 'default'): ?Job
     {
         $record = $this->model()->find('first', [
             'conditions' => [
@@ -106,7 +106,7 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Job\Job $job
      * @return boolean
      */
-    public function fail(Job $job) : bool
+    public function fail(Job $job): bool
     {
         if (! $job->backendId()) {
             return false;
@@ -126,7 +126,7 @@ class DatabaseEngine extends BaseEngine
     * @param \Origin\Job\Job $job
     * @return boolean
     */
-    public function success(Job $job) : bool
+    public function success(Job $job): bool
     {
         if (! $job->backendId()) {
             return false;
@@ -141,7 +141,7 @@ class DatabaseEngine extends BaseEngine
      * @param \Origin\Job\Job $job
      * @return boolean
      */
-    public function delete(Job $job) : bool
+    public function delete(Job $job): bool
     {
         if (! $job->backendId()) {
             return false;
@@ -162,7 +162,7 @@ class DatabaseEngine extends BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    public function retry(Job $job, int $tries, $strtotime = 'now') : bool
+    public function retry(Job $job, int $tries, $strtotime = 'now'): bool
     {
         if (! $job->backendId()) {
             return false;
@@ -186,7 +186,7 @@ class DatabaseEngine extends BaseEngine
      *
      * @return Model
      */
-    public function model() : Model
+    public function model(): Model
     {
         if (! $this->model) {
             $this->model = new Queue([
@@ -206,7 +206,7 @@ class DatabaseEngine extends BaseEngine
      * @param array $data
      * @return bool
      */
-    protected function updateDatabase(array $data) : bool
+    protected function updateDatabase(array $data): bool
     {
         $model = $this->model();
         $entity = $model->new($data);
@@ -220,7 +220,7 @@ class DatabaseEngine extends BaseEngine
      * @param Entity $record
      * @return boolean
      */
-    protected function lockRecord(Entity $record) : bool
+    protected function lockRecord(Entity $record): bool
     {
         $model = $this->model();
         $model->begin();

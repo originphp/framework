@@ -36,7 +36,7 @@ class ModelRegistry
      * @param array  $options
      * @return \Origin\Model\Model|null
      */
-    public static function get(string $alias, array $options = []) : ?Model
+    public static function get(string $alias, array $options = []): ?Model
     {
         list($plugin, $model) = pluginSplit($alias);
         
@@ -78,7 +78,7 @@ class ModelRegistry
      * @param \Origin\Model\Model $object
      * @return void
      */
-    public static function set(string $key = null, Model $object) : void
+    public static function set(string $key = null, Model $object): void
     {
         static::$registry[$key] = $object;
     }
@@ -88,7 +88,7 @@ class ModelRegistry
      *
      * @param string $key name of object
      */
-    public static function has($key = null) : bool
+    public static function has($key = null): bool
     {
         return isset(static::$registry[$key]);
     }
@@ -99,7 +99,7 @@ class ModelRegistry
      * @param string $key name of object
      * @return bool true or false
      */
-    public static function delete($key = null) : bool
+    public static function delete($key = null): bool
     {
         if (isset(static::$registry[$key])) {
             unset(static::$registry[$key]);
@@ -115,7 +115,7 @@ class ModelRegistry
      *
      * @return void
      */
-    public static function clear() : void
+    public static function clear(): void
     {
         static::$config = static::$registry = [];
     }
@@ -127,7 +127,7 @@ class ModelRegistry
      * @param array $options
      * @return \Origin\Model\Model|null
      */
-    protected static function create(string $className, array $options) : ?Model
+    protected static function create(string $className, array $options): ?Model
     {
         if (isset($options['className'])) {
             $className = $options['className'];
@@ -150,7 +150,7 @@ class ModelRegistry
      * @param array $config
      * @return array|null
      */
-    public static function config(string $alias = null, array $config = null) : ?array
+    public static function config(string $alias = null, array $config = null): ?array
     {
         if ($alias === null) {
             return static::$config;

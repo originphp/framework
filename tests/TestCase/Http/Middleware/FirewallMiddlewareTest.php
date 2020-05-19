@@ -32,7 +32,7 @@ class FirewallMiddlewareTest extends OriginTestCase
     */
     protected $response = null;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->request = new Request();
         $this->response = new Response();

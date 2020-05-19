@@ -19,32 +19,32 @@ namespace Origin\Http\Controller\Component;
  */
 class FlashComponent extends Component
 {
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->loadComponent('Session');
     }
     
-    public function error(string $message) : void
+    public function error(string $message): void
     {
         $this->addMessage('error', $message);
     }
 
-    public function success(string $message) : void
+    public function success(string $message): void
     {
         $this->addMessage('success', $message);
     }
 
-    public function warning(string $message) : void
+    public function warning(string $message): void
     {
         $this->addMessage('warning', $message);
     }
 
-    public function info(string $message) : void
+    public function info(string $message): void
     {
         $this->addMessage('info', $message);
     }
 
-    public function addMessage(string $type, string $message) : void
+    public function addMessage(string $type, string $message): void
     {
         $messages = [];
         $key = "Flash.{$type}";

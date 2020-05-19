@@ -32,7 +32,7 @@ trait EntityLocatorTrait
      * @param \Origin\Model\Model $model
      * @return string
      */
-    protected function entityClass(Model $model = null) : string
+    protected function entityClass(Model $model = null): string
     {
         if ($model === null) {
             return Entity::class;

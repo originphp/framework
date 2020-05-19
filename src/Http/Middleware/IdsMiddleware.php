@@ -110,7 +110,7 @@ class IdsMiddleware extends Middleware
      * @param \Origin\Http\Request $request
      * @return void
      */
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
         if ($this->config['rules']) {
             $this->loadRules();
@@ -148,7 +148,7 @@ class IdsMiddleware extends Middleware
      * @param array $items key/value pair ['get'=>$_GET]
      * @return void
      */
-    public function run(array $items) : void
+    public function run(array $items): void
     {
         foreach ($items as $name => $data) {
             $this->detect($name, $data);
@@ -188,7 +188,7 @@ class IdsMiddleware extends Middleware
      * @param string $value
      * @return array
      */
-    private function match(string $name, string $value = null) : array
+    private function match(string $name, string $value = null): array
     {
         /**
         * For better performance skip values which only contain word/number/-_@.i.
@@ -243,7 +243,7 @@ class IdsMiddleware extends Middleware
      *
      * @return void
      */
-    protected function cleanUp() : void
+    protected function cleanUp(): void
     {
         $this->rules = $this->events = null;
     }

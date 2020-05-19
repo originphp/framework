@@ -96,7 +96,7 @@ class TableSchema
      * @param \Origin\Model\Connection $datasource
      * @return array
      */
-    public function toSql(Connection $datasource) : array
+    public function toSql(Connection $datasource): array
     {
         return $datasource->adapter()->createTableSql($this->table, $this->columns, [
             'constraints' => $this->constraints,'indexes' => $this->indexes,'options' => $this->options,
@@ -110,7 +110,7 @@ class TableSchema
      * @param string|array $attributes
      * @return \Origin\Model\Schema\TableSchema
      */
-    public function addColumn(string $name, $attributes) : TableSchema
+    public function addColumn(string $name, $attributes): TableSchema
     {
         if (is_string($attributes)) {
             $attributes = ['type' => $attributes];
@@ -130,7 +130,7 @@ class TableSchema
      * @param string|array $attributes
      * @return \Origin\Model\Schema\TableSchema
      */
-    public function addIndex(string $name, $attributes) : TableSchema
+    public function addIndex(string $name, $attributes): TableSchema
     {
         if (is_string($attributes)) {
             $attributes = ['column' => [$attributes]];
@@ -151,7 +151,7 @@ class TableSchema
      * @param array $attributes
      * @return \Origin\Model\Schema\TableSchema
      */
-    public function addConstraint(string $name, array $attributes) : TableSchema
+    public function addConstraint(string $name, array $attributes): TableSchema
     {
         $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
 
@@ -201,7 +201,7 @@ class TableSchema
      * @param array $options
      * @return array
      */
-    public function options(array $options = null) : array
+    public function options(array $options = null): array
     {
         if ($options === null) {
             return $this->options;

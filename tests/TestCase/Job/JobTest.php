@@ -28,22 +28,22 @@ class PassOrFailJob extends Job
     
     protected $connection = 'default';
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->status = 'new';
     }
 
-    public function execute(bool $pass = true) : void
+    public function execute(bool $pass = true): void
     {
         if (! $pass) {
             $a = 1 / 0;
         }
     }
-    public function onSuccess(bool $pass = true) : void
+    public function onSuccess(bool $pass = true): void
     {
         $this->status = 'success';
     }
-    public function onError(\Exception $exception) : void
+    public function onError(\Exception $exception): void
     {
         $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);
@@ -69,7 +69,7 @@ class JobTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Queue'];
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $model = new Model(['name' => 'Article','connection' => 'test']);
         ModelRegistry::set('Article', $model);

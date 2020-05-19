@@ -112,7 +112,7 @@ class Marshaller
 
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
-                if (!is_array($value)) {
+                if (! is_array($value)) {
                     $properties[$property] = null; // remove inconsistent data
                     continue;
                 }
@@ -183,7 +183,7 @@ class Marshaller
         foreach ($data as $property => $value) {
             if (isset($propertyMap[$property])) {
                 // remove inconsistent data
-                if (!is_array($value)) {
+                if (! is_array($value)) {
                     $properties[$property] = null;
                     continue;
                 }
@@ -205,7 +205,7 @@ class Marshaller
                     'name' => $model, 'fields' => $fields, 'associated' => $options['associated']
                 ];
 
-                if (!$entity->$property instanceof Entity && !$entity->$property instanceof Collection) {
+                if (! $entity->$property instanceof Entity && ! $entity->$property instanceof Collection) {
                     $properties[$property] = $this->{$propertyMap[$property]}($value, $patchOptions);
                     continue;
                 }
@@ -233,8 +233,8 @@ class Marshaller
                 // only set properties that have values that were changed
                 // forms posting of null values are "" and integers are strings
                 if (
-                    $value !== $original && !($value === '' && $original === null) and
-                    !(is_numeric($original) && (string) $value === (string) $original)
+                    $value !== $original && ! ($value === '' && $original === null) and
+                    ! (is_numeric($original) && (string) $value === (string) $original)
                 ) {
                     $properties[$property] = $value;
                 }
@@ -283,7 +283,7 @@ class Marshaller
     {
         // for matching we need a model
         $primaryKey = $this->getPrimaryKey($options['name']);
-        if (!$primaryKey) {
+        if (! $primaryKey) {
             return $this->many($data, $options);
         }
 

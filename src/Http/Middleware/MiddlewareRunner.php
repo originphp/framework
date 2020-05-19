@@ -49,7 +49,7 @@ class MiddlewareRunner
      * @param \Origin\Http\Response $response
      * @return \Origin\Http\Response $response
      */
-    public function run(Request $request, Response $response) : Response
+    public function run(Request $request, Response $response): Response
     {
         return $this->__invoke($request, $response);
     }
@@ -60,7 +60,7 @@ class MiddlewareRunner
      * @param \Origin\Http\Response $response
      * @return \Origin\Http\Response $response
      */
-    public function __invoke(Request $request, Response $response) : Response
+    public function __invoke(Request $request, Response $response): Response
     {
         if (isset($this->middlewareStack[$this->current])) {
             $next = $this->middlewareStack[$this->current];

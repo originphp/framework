@@ -28,7 +28,7 @@ class MockAutoloader extends Autoloader
         $this->mockFiles = $files;
     }
 
-    protected function requireFile(string $file) : bool
+    protected function requireFile(string $file): bool
     {
         return in_array($file, $this->mockFiles);
     }
@@ -72,7 +72,7 @@ class AutoloaderTest extends \PHPUnit\Framework\TestCase
 {
     protected $autoloader;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->autoloader = new MockAutoloader(ROOT);
         

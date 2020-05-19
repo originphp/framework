@@ -36,7 +36,7 @@ class Publisher
      *
      * @return \Origin\Publisher\Publisher
      */
-    public static function instance() : Publisher
+    public static function instance(): Publisher
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -88,7 +88,7 @@ class Publisher
      *   - queue: default:false set to true to queue in the background
      * @return bool
      */
-    public function subscribe($object, array $options = []) : bool
+    public function subscribe($object, array $options = []): bool
     {
         $options += ['on' => null,'queue' => null];
         if ($options['queue'] && is_object($object)) {
@@ -112,7 +112,7 @@ class Publisher
      * @param string $event
      * @return void
      */
-    public function publish(string $event) : void
+    public function publish(string $event): void
     {
         $args = func_get_args();
         array_shift($args);
@@ -158,7 +158,7 @@ class Publisher
      * @param array $args
      * @return bool
      */
-    public function dispatch($object, string $event, array $args = []) : bool
+    public function dispatch($object, string $event, array $args = []): bool
     {
         /**
          * Work with listenter
@@ -181,7 +181,7 @@ class Publisher
      *
      * @return array
      */
-    public function listeners() : array
+    public function listeners(): array
     {
         return $this->listeners;
     }
@@ -191,7 +191,7 @@ class Publisher
      *
      * @return void
      */
-    public function clear() : void
+    public function clear(): void
     {
         $this->listeners = [];
     }

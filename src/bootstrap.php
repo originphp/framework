@@ -51,7 +51,6 @@ Cache::config('origin', [
     'serialize' => true
 ]);
 
-
 /**
  * As version 2.5 .env.php is the cached version of .env. Prior
  * to this config was set manually .env.php
@@ -68,5 +67,5 @@ if (file_exists($configFile)) {
         '# .env (cached version) - Do not edit, delete instead',
         '# Automatically generated ' . now(),
     ];
-    (new PhpFile())->write($configFile, $vars, ['short' => true ,'before' => implode("\n", $header)]);
+    (new PhpFile())->write($configFile, $vars, ['short' => true,'before' => implode("\n", $header)]);
 }

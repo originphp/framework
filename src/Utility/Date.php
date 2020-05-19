@@ -49,7 +49,7 @@ class Date
      * @param array $locale
      * @return array
      */
-    public static function locale(array $locale = null) : array
+    public static function locale(array $locale = null): array
     {
         if ($locale === null) {
             return static::$locale;
@@ -69,7 +69,7 @@ class Date
      *
      * @return bool
      */
-    protected static function convert() : bool
+    protected static function convert(): bool
     {
         return (date_default_timezone_get() !== static::$locale['timezone']);
     }
@@ -80,7 +80,7 @@ class Date
      * @param string $format
      * @return string
      */
-    public static function dateFormat(string $format = null) : string
+    public static function dateFormat(string $format = null): string
     {
         if ($format === null) {
             return static::$locale['date'];
@@ -95,7 +95,7 @@ class Date
      * @param string $format
      * @return string
      */
-    public static function datetimeFormat(string $format = null) : string
+    public static function datetimeFormat(string $format = null): string
     {
         if ($format === null) {
             return static::$locale['datetime'];
@@ -110,7 +110,7 @@ class Date
      * @param string $format
      * @return string
      */
-    public static function timeFormat(string $format = null) : string
+    public static function timeFormat(string $format = null): string
     {
         if ($format === null) {
             return static::$locale['time'];
@@ -126,7 +126,7 @@ class Date
      * @param string|null $format
      * @return string|null
      */
-    public static function format(string $dateString, string $format = null) : ?string
+    public static function format(string $dateString, string $format = null): ?string
     {
         if ($format) {
             if (static::convert()) {
@@ -157,7 +157,7 @@ class Date
      * @param string $dateString
      * @return string
      */
-    public static function formatDate(string $dateString) : string
+    public static function formatDate(string $dateString): string
     {
         if (strpos($dateString, ':') === false) {
             $dateString .= ' 00:00:00';
@@ -176,7 +176,7 @@ class Date
      * @param string $dateString
      * @return string
      */
-    public static function formatDateTime(string $dateString) : string
+    public static function formatDateTime(string $dateString): string
     {
         if (static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
@@ -191,7 +191,7 @@ class Date
      * @param string $dateString
      * @return string
      */
-    public static function formatTime(string $dateString) : string
+    public static function formatTime(string $dateString): string
     {
         $hasDate = (strpos($dateString, ' ') !== false);
 
@@ -213,7 +213,7 @@ class Date
      * @param string $dateString
      * @return string|null
      */
-    public static function parseDate(string $dateString) : ?string
+    public static function parseDate(string $dateString): ?string
     {
         return static::convertFormat($dateString, static::$locale['date'], 'Y-m-d');
     }
@@ -224,7 +224,7 @@ class Date
      * @param string $dateString
      * @return string|null
      */
-    public static function parseDateTime(string $dateString) : ?string
+    public static function parseDateTime(string $dateString): ?string
     {
         $dateString = static::convertFormat($dateString, static::$locale['datetime'], 'Y-m-d H:i:s');
         if ($dateString and static::convert()) {
@@ -241,7 +241,7 @@ class Date
      * @param string $timeString
      * @return string|null
      */
-    public static function parseTime(string $timeString) : ?string
+    public static function parseTime(string $timeString): ?string
     {
         $timeString = static::convertFormat($timeString, static::$locale['time'], 'H:i:s');
     
@@ -260,7 +260,7 @@ class Date
      * @param string $toFormat
      * @return string|null
      */
-    public static function convertFormat(string $datetime, string $fromFormat, string $toFormat) : ?string
+    public static function convertFormat(string $datetime, string $fromFormat, string $toFormat): ?string
     {
         $date = DateTime::createFromFormat($fromFormat, $datetime);
         if ($date) {
@@ -280,7 +280,7 @@ class Date
      * @param string $toTimezone
      * @return string|null Y-m-d H:i:s (new timezone)
      */
-    public static function convertTimezone(string $datetime, string $fromTimezone, string $toTimezone) : ?string
+    public static function convertTimezone(string $datetime, string $fromTimezone, string $toTimezone): ?string
     {
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new DateTimeZone($fromTimezone));
         if ($date) {

@@ -26,7 +26,7 @@ class MockRequest extends Request
     {
         $this->input = $input;
     }
-    protected function readInput() : ?string
+    protected function readInput(): ?string
     {
         return $this->input;
     }

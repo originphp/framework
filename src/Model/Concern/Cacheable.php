@@ -53,7 +53,7 @@ trait Cacheable
      * @param string $name
      * @return string
      */
-    protected function cacheConfig(string $name = null) : ?string
+    protected function cacheConfig(string $name = null): ?string
     {
         if ($name === null) {
             return $this->cacheConfig;
@@ -145,7 +145,7 @@ trait Cacheable
      *
      * @return void
      */
-    protected function cacheableEvent() : void
+    protected function cacheableEvent(): void
     {
         $this->invalidateCache();
     }
@@ -189,7 +189,7 @@ trait Cacheable
     *
     * @return boolean
     */
-    public function enableCache() : bool
+    public function enableCache(): bool
     {
         if ($this->cacheEnabled) {
             return false;
@@ -203,7 +203,7 @@ trait Cacheable
      *
      * @return boolean
      */
-    public function disableCache() : bool
+    public function disableCache(): bool
     {
         if (! $this->cacheEnabled) {
             return false;

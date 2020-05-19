@@ -37,7 +37,7 @@ use Origin\Core\Exception\InvalidArgumentException;
 
 class Model extends BaseModel
 {
-    public function connectionName() : string
+    public function connectionName(): string
     {
         return $this->connection;
     }
@@ -82,7 +82,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeFindCallback(ArrayObject $options) : bool
+    public function beforeFindCallback(ArrayObject $options): bool
     {
         return true;
     }
@@ -94,7 +94,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterFindCallback(Collection $results, ArrayObject $options) : void
+    public function afterFindCallback(Collection $results, ArrayObject $options): void
     {
     }
 
@@ -105,7 +105,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeValidateCallback(Entity $entity, ArrayObject $options) : bool
+    public function beforeValidateCallback(Entity $entity, ArrayObject $options): bool
     {
         return true;
     }
@@ -117,7 +117,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterValidateCallback(Entity $entity, ArrayObject $options) : void
+    public function afterValidateCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -128,7 +128,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeSaveCallback(Entity $entity, ArrayObject $options) : bool
+    public function beforeSaveCallback(Entity $entity, ArrayObject $options): bool
     {
         return true;
     }
@@ -140,7 +140,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeCreateCallback(Entity $entity, ArrayObject $options) : bool
+    public function beforeCreateCallback(Entity $entity, ArrayObject $options): bool
     {
         return true;
     }
@@ -152,7 +152,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return boolean
      */
-    public function beforeUpdateCallback(Entity $entity, ArrayObject $options) : bool
+    public function beforeUpdateCallback(Entity $entity, ArrayObject $options): bool
     {
         return true;
     }
@@ -164,7 +164,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterCreateCallback(Entity $entity, ArrayObject $options) : void
+    public function afterCreateCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -175,7 +175,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterUpdateCallback(Entity $entity, ArrayObject $options) : void
+    public function afterUpdateCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -186,7 +186,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return void
      */
-    public function afterSaveCallback(Entity $entity, ArrayObject $options) : void
+    public function afterSaveCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -197,7 +197,7 @@ class Article extends Model
      * @param ArrayObject $options
      * @return bool
      */
-    public function beforeDeleteCallback(Entity $entity, ArrayObject $options) : bool
+    public function beforeDeleteCallback(Entity $entity, ArrayObject $options): bool
     {
         return true;
     }
@@ -209,7 +209,7 @@ class Article extends Model
      * @param boolean $sucess wether or not it deleted the record
      * @return void
      */
-    public function afterDeleteCallback(Entity $entity, ArrayObject $options) : void
+    public function afterDeleteCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -220,7 +220,7 @@ class Article extends Model
     * @param ArrayObject $options
     * @return bool
     */
-    public function afterCommitCallback(Entity $entity, ArrayObject $options) : void
+    public function afterCommitCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -231,7 +231,7 @@ class Article extends Model
     * @param ArrayObject $options
     * @return void
     */
-    public function afterRollbackCallback(Entity $entity, ArrayObject $options) : void
+    public function afterRollbackCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
@@ -241,7 +241,7 @@ class Article extends Model
      * @param \Exception $exception
      * @return void
      */
-    public function onError(\Exception $exception) : void
+    public function onError(\Exception $exception): void
     {
     }
 

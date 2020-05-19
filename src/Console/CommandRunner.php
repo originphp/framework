@@ -66,7 +66,7 @@ class CommandRunner
      *
      * @return void
      */
-    protected function buildNamespaceMap() : void
+    protected function buildNamespaceMap(): void
     {
         $folder = 'Console' .DS .'Command';
         $this->namespaces = [
@@ -85,7 +85,7 @@ class CommandRunner
      *
      * @return void
      */
-    protected function autoDiscover() : void
+    protected function autoDiscover(): void
     {
         $this->buildNamespaceMap();
 
@@ -100,7 +100,7 @@ class CommandRunner
      *
      * @return array
      */
-    protected function getDescriptions() : array
+    protected function getDescriptions(): array
     {
         $results = [];
         foreach ($this->discovered as $index => $command) {
@@ -124,7 +124,7 @@ class CommandRunner
      * @param array $args
      * @return integer exit code
      */
-    public function run(array $args) : int
+    public function run(array $args): int
     {
         array_shift($args); // first arg is the script that called it
         if (empty($args)) {
@@ -154,7 +154,7 @@ class CommandRunner
      *
      * @return \Origin\Console\Command\Command
      */
-    public function command() : Command
+    public function command(): Command
     {
         return $this->command;
     }
@@ -167,7 +167,7 @@ class CommandRunner
      *
      * @return \Origin\Console\Command\Command|null
      */
-    public function findCommand(string $command) : ?Command
+    public function findCommand(string $command): ?Command
     {
         # Use Conventions - Faster
         $namespace = Config::read('App.namespace');
@@ -194,7 +194,7 @@ class CommandRunner
      *
      * @return array
      */
-    protected function getCommandList() : array
+    protected function getCommandList(): array
     {
         $results = [];
 
@@ -214,7 +214,7 @@ class CommandRunner
      *
      * @return void
      */
-    protected function displayHelp() : void
+    protected function displayHelp(): void
     {
         $this->autoDiscover();
         $commands = $this->getDescriptions();
@@ -263,7 +263,7 @@ class CommandRunner
      * @param string $namespace
      * @return array
      */
-    public function scanDirectory(string $directory, string $namespace) : array
+    public function scanDirectory(string $directory, string $namespace): array
     {
         $results = [];
 
@@ -295,7 +295,7 @@ class CommandRunner
      * @param string $class
      * @return \Origin\Console\Command|null
      */
-    protected function createCommand(string $class) : ?Command
+    protected function createCommand(string $class): ?Command
     {
         $object = null;
         if (class_exists($class)) {

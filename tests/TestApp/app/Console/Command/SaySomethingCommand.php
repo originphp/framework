@@ -9,7 +9,7 @@ class SaySomethingCommand extends Command
 
     protected $description = 'A command to say something';
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->addArgument('what', [
             'description' => 'What should be said','require' => true,
@@ -20,7 +20,7 @@ class SaySomethingCommand extends Command
         ]);
     }
 
-    public function execute() : void
+    public function execute(): void
     {
         $what = $this->arguments('what');
         $color = $this->options('color');

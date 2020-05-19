@@ -30,7 +30,7 @@ class Seed
      * @param \Origin\Model\Connection $connection
      * @return array
      */
-    public function insertSql(Connection $connection) : array
+    public function insertSql(Connection $connection): array
     {
         $out = [];
         $properties = get_object_vars($this);

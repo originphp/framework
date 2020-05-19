@@ -76,7 +76,7 @@ class ObjectRegistry
      *
      * @return void
      */
-    public function clear() : void
+    public function clear(): void
     {
         unset($this->loaded);
         $this->loaded = $this->enabled = [];
@@ -88,7 +88,7 @@ class ObjectRegistry
      * @param string $object
      * @return bool
      */
-    public function disable(string $object) : bool
+    public function disable(string $object): bool
     {
         $key = array_search($object, $this->enabled);
         if ($key !== false) {
@@ -106,7 +106,7 @@ class ObjectRegistry
      * @param string $object
      * @return bool
      */
-    public function enable(string $object) : bool
+    public function enable(string $object): bool
     {
         if (! isset($this->loaded[$object]) or in_array($object, $this->enabled)) {
             return false;
@@ -121,7 +121,7 @@ class ObjectRegistry
      *
      * @return array
      */
-    public function enabled() : array
+    public function enabled(): array
     {
         return $this->enabled;
     }
@@ -147,7 +147,7 @@ class ObjectRegistry
      * @param string $name
      * @return boolean
      */
-    public function has(string $name) : bool
+    public function has(string $name): bool
     {
         return isset($this->loaded[$name]);
     }
@@ -159,7 +159,7 @@ class ObjectRegistry
      * @param mixed $object
      * @return void
      */
-    public function set(string $name, $object) : void
+    public function set(string $name, $object): void
     {
         if (isset($this->loaded[$name])) {
             $this->unload($name);
@@ -197,7 +197,7 @@ class ObjectRegistry
      *
      * @return array
      */
-    public function loaded() : array
+    public function loaded(): array
     {
         return array_keys($this->loaded);
     }
@@ -208,7 +208,7 @@ class ObjectRegistry
      * @param string $name
      * @return boolean
      */
-    public function unload(string $name) : bool
+    public function unload(string $name): bool
     {
         if (isset($this->loaded[$name])) {
             unset($this->loaded[$name]);
@@ -225,7 +225,7 @@ class ObjectRegistry
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         foreach ($this->loaded as $name => $object) {
             $this->unload($name);
@@ -275,7 +275,7 @@ class ObjectRegistry
      * @param string $class
      * @return string|null $namespacedClass
      */
-    protected function className(string $class) : ?string
+    protected function className(string $class): ?string
     {
         return Resolver::className($class);
     }
@@ -286,7 +286,7 @@ class ObjectRegistry
      * @param string $object
      * @return void
      */
-    protected function throwException(string $object) : void
+    protected function throwException(string $object): void
     {
         throw new MissingClassException($object);
     }

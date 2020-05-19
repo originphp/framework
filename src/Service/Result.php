@@ -64,7 +64,7 @@ class Result
      * @param array $options
      * @return string
      */
-    public function toJson(array $options = []) : string
+    public function toJson(array $options = []): string
     {
         $options += ['pretty' => false];
 
@@ -76,7 +76,7 @@ class Result
      *
      * @return array
      */
-    public function toArray()  : array
+    public function toArray(): array
     {
         return $this->convertToArray($this);
     }
@@ -87,7 +87,7 @@ class Result
      * @param object $object
      * @return array
      */
-    private function convertToArray(object $object) : array
+    private function convertToArray(object $object): array
     {
         if (method_exists($object, 'toArray') && ! $object instanceof Result) {
             return $object->toArray();

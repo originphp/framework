@@ -22,7 +22,7 @@ class MailboxCleanJobTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Mailbox'];
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class

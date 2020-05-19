@@ -21,7 +21,7 @@ use Origin\Job\Engine\DatabaseEngine;
 
 class MockJob extends Job
 {
-    public function execute() : void
+    public function execute(): void
     {
     }
     public function setArguments()

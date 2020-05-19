@@ -50,7 +50,7 @@ class PgsqlSchema extends BaseSchema
         * @param array $options
         * @return array
         */
-    public function createTableSql(string $table, array $schema, array $options = []) : array
+    public function createTableSql(string $table, array $schema, array $options = []): array
     {
         $columns = $constraints = $indexes = $databaseOptions = [];
         
@@ -112,7 +112,7 @@ class PgsqlSchema extends BaseSchema
     * @param array $options
     * @return array
     */
-    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []) : array
+    protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array
     {
         $out = $comments = [];
         $definition = implode(",\n", array_merge($columns, $constraints));
@@ -144,7 +144,7 @@ class PgsqlSchema extends BaseSchema
     * @param array $attributes name,columns,references, update,delete
     * @return string
     */
-    protected function tableConstraintForeign(array $attributes) :string
+    protected function tableConstraintForeign(array $attributes): string
     {
         $sql = sprintf(
             'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
@@ -167,7 +167,7 @@ class PgsqlSchema extends BaseSchema
     * @param array $attributes
     * @return string
     */
-    protected function tableConstraint(array $attributes) : string
+    protected function tableConstraint(array $attributes): string
     {
         $columns = implode(',', (array) $attributes['column']);
         if ($attributes['type'] === 'primary') {
@@ -192,7 +192,7 @@ class PgsqlSchema extends BaseSchema
     * @param array $attributes
     * @return string
     */
-    protected function tableIndex(array $attributes) : string
+    protected function tableIndex(array $attributes): string
     {
         if (empty($attributes['table'])) {
             throw new Exception(sprintf('No table name provided for index %s', $attributes['name']));
@@ -217,7 +217,7 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @return array
      */
-    public function indexes(string $table) : array
+    public function indexes(string $table): array
     {
         $sql = sprintf(
             'SELECT i.relname AS name, a.attname AS column, ix.indisunique AS unique, ix.indisprimary AS primary FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY (ix.indkey) AND t.relkind = \'r\' AND t.relname = %s ORDER BY t.relname, i.relname',
@@ -256,7 +256,7 @@ class PgsqlSchema extends BaseSchema
      * @param string $to
      * @return string
      */
-    public function renameTable(string $from, string $to) : string
+    public function renameTable(string $from, string $to): string
     {
         return sprintf(
             'ALTER TABLE %s RENAME TO %s',
@@ -274,7 +274,7 @@ class PgsqlSchema extends BaseSchema
      * @param array $options
      * @return string
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []) : string
+    public function changeColumn(string $table, string $name, string $type, array $options = []): string
     {
         $options += ['default' => null, 'null' => null];
         if (isset($this->typeMap[$type])) {
@@ -319,7 +319,7 @@ class PgsqlSchema extends BaseSchema
      * @param string $to
      * @return string
      */
-    public function renameColumn(string $table, string $from, string $to) : string
+    public function renameColumn(string $table, string $from, string $to): string
     {
         return sprintf(
             'ALTER TABLE %s RENAME COLUMN %s TO %s',
@@ -337,7 +337,7 @@ class PgsqlSchema extends BaseSchema
      * @param string $name
      * @return string
      */
-    public function removeIndex(string $table, string $name) : string
+    public function removeIndex(string $table, string $name): string
     {
         return sprintf(
             'DROP INDEX %s',
@@ -368,7 +368,7 @@ class PgsqlSchema extends BaseSchema
          *
          * @return string
          */
-    public function disableForeignKeySql() : string
+    public function disableForeignKeySql(): string
     {
         return 'SET CONSTRAINTS ALL DEFERRED';
     }
@@ -378,7 +378,7 @@ class PgsqlSchema extends BaseSchema
      *
      * @return string
      */
-    public function enableForeignKeySql() : string
+    public function enableForeignKeySql(): string
     {
         return 'SET CONSTRAINTS ALL IMMEDIATE';
     }
@@ -389,7 +389,7 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @return array
      */
-    public function foreignKeys(string $table) : array
+    public function foreignKeys(string $table): array
     {
         $config = ConnectionManager::config($this->datasource);
 
@@ -479,7 +479,7 @@ class PgsqlSchema extends BaseSchema
     * @param string $table
     * @return string
     */
-    public function truncateTableSql(string $table) : string
+    public function truncateTableSql(string $table): string
     {
         return sprintf(
             'TRUNCATE TABLE %s RESTART IDENTITY CASCADE',
@@ -500,7 +500,7 @@ class PgsqlSchema extends BaseSchema
     * @param array $options ifExists default is false
     * @return string
     */
-    public function dropTableSql(string $table, array $options = []) : string
+    public function dropTableSql(string $table, array $options = []): string
     {
         $sql = 'DROP TABLE %s CASCADE';
         if (! empty($options['ifExists'])) {
@@ -519,7 +519,7 @@ class PgsqlSchema extends BaseSchema
     * @param string $table
     * @return array
     */
-    public function describe(string $table) : array
+    public function describe(string $table): array
     {
         $database = $this->connection()->database();
 
@@ -585,7 +585,7 @@ class PgsqlSchema extends BaseSchema
      * @param array $data
      * @return string
      */
-    protected function columnSql(array $data) : string
+    protected function columnSql(array $data): string
     {
         $out = $this->quoteIdentifier($data['name']);
 
@@ -652,7 +652,7 @@ class PgsqlSchema extends BaseSchema
      * @param array $data
      * @return array
      */
-    protected function convertTableDescription(array $data) : array
+    protected function convertTableDescription(array $data): array
     {
         $out = [];
               
@@ -701,7 +701,7 @@ class PgsqlSchema extends BaseSchema
      * @param array $row
      * @return array
      */
-    protected function parseColumn(array $row) : array
+    protected function parseColumn(array $row): array
     {
         $out = [];
         $col = $row['type'];

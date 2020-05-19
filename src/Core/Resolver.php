@@ -25,7 +25,7 @@ class Resolver
      * @param string $group
      * @return string|null
      */
-    public static function className(string $class, string $objectType = null, string $suffix = null, string $group = null) : ?string
+    public static function className(string $class, string $objectType = null, string $suffix = null, string $group = null): ?string
     {
         if (strpos($class, '\\') !== false) {
             return $class;
@@ -60,7 +60,7 @@ class Resolver
      * @param string $class
      * @return boolean
      */
-    public static function classExists(string $class) : bool
+    public static function classExists(string $class): bool
     {
         return class_exists($class);
     }

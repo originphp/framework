@@ -61,7 +61,7 @@ class XmlView
      * @param mixed $data
      * @return string
      */
-    public function render($data = null) : string
+    public function render($data = null): string
     {
         /**
          * If user requests JSON and serialize is set then use that
@@ -87,7 +87,7 @@ class XmlView
      * @param string|array $serialize
      * @return array
      */
-    private function serialize($serialize) : array
+    private function serialize($serialize): array
     {
         if (is_string($serialize)) {
             $data = [];
@@ -120,7 +120,7 @@ class XmlView
      * @param mixed $mixed
      * @return array
      */
-    private function toArray($mixed) : array
+    private function toArray($mixed): array
     {
         if (is_object($mixed) && method_exists($mixed, 'toArray')) {
             $mixed = $mixed->toArray();
@@ -135,7 +135,7 @@ class XmlView
      * @param array $data
      * @return boolean
      */
-    private function isNumericArray(array $data) : bool
+    private function isNumericArray(array $data): bool
     {
         $keys = array_keys($data);
         $string = implode('', $keys);

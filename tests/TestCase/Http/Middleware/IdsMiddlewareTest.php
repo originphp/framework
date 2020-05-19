@@ -14,7 +14,7 @@ class MockIdsMiddleware extends IdsMiddleware
         return $this->events;
     }
 
-    protected function cleanUp() : void
+    protected function cleanUp(): void
     {
         // don do anything
     }

@@ -41,7 +41,7 @@ class MailboxDownloadService extends Service
      * @param \Origin\Mailbox\Model\ImapMessage $Imap
      * @return void
      */
-    protected function initialize(InboundEmail $InboundEmail, ImapMessage $Imap) : void
+    protected function initialize(InboundEmail $InboundEmail, ImapMessage $Imap): void
     {
         $this->InboundEmail = $InboundEmail;
         $this->Imap = $Imap;
@@ -55,7 +55,7 @@ class MailboxDownloadService extends Service
      *
      * @return boolean
      */
-    private function isIMAP() : bool
+    private function isIMAP(): bool
     {
         return $this->config['protocol'] === 'imap';
     }
@@ -79,7 +79,7 @@ class MailboxDownloadService extends Service
      *   - limit: max number of emails to download
      * @return \Origin\Service\Result|null
      */
-    protected function execute(string $account, array $downloadOptions = []) : ?Result
+    protected function execute(string $account, array $downloadOptions = []): ?Result
     {
         $downloadOptions += ['limit' => null,'messageId' => null];
         $this->config = Mailbox::account($account);

@@ -74,7 +74,7 @@ class Session
      *
      * @return void
      */
-    protected function setIniConfig(array $config) : void
+    protected function setIniConfig(array $config): void
     {
         foreach ($config as $option => $value) {
             if (ini_set($option, (string) $value) === false) {
@@ -88,7 +88,7 @@ class Session
      *
      * @return bool
      */
-    public function start() : bool
+    public function start(): bool
     {
         if ($this->started) {
             return false;
@@ -119,7 +119,7 @@ class Session
      * @param string $id
      * @return void
      */
-    protected function startSession(string $id = null) : void
+    protected function startSession(string $id = null): void
     {
         if ($id === null) {
             $this->id(Security::uuid());
@@ -140,7 +140,7 @@ class Session
      *
      * @return string|null
      */
-    protected function validateCookie() : ?string
+    protected function validateCookie(): ?string
     {
         $name = session_name();
 
@@ -163,7 +163,7 @@ class Session
      * @param integer $timeout
      * @return boolean
      */
-    protected function timedOut($timeout = 3600) : bool
+    protected function timedOut($timeout = 3600): bool
     {
         if (Config::exists('Session.timeout')) {
             $timeout = Config::read('Session.timeout');
@@ -186,7 +186,7 @@ class Session
      * @param mixed $value
      * @return void
      */
-    public function write(string $key = null, $value = null) : void
+    public function write(string $key = null, $value = null): void
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
@@ -205,7 +205,7 @@ class Session
      * @param array $data
      * @return void
      */
-    protected function overwrite(array $data) : void
+    protected function overwrite(array $data): void
     {
         foreach ($_SESSION as $key => $value) {
             if (! isset($data[$key])) {
@@ -240,7 +240,7 @@ class Session
      * @param string $key
      * @return boolean
      */
-    public function exists(string $key = null) : bool
+    public function exists(string $key = null): bool
     {
         $Dot = new Dot($_SESSION);
 
@@ -252,7 +252,7 @@ class Session
      * @param string $key
      * @return boolean
      */
-    public function delete(string $key = null) :bool
+    public function delete(string $key = null): bool
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
@@ -270,7 +270,7 @@ class Session
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         if (! $this->started()) {
             // @codeCoverageIgnoreStart
@@ -291,7 +291,7 @@ class Session
      *
      * @return bool
      */
-    public function started() : bool
+    public function started(): bool
     {
         return ($this->started or session_status() === PHP_SESSION_ACTIVE);
     }
@@ -320,7 +320,7 @@ class Session
      *
      * @return void
      */
-    public function clear() : void
+    public function clear(): void
     {
         $_SESSION = [];
     }

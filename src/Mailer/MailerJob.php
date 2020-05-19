@@ -20,12 +20,12 @@ class MailerJob extends Job
 {
     protected $queue = 'mailers';
     
-    public function execute(array $params) : void
+    public function execute(array $params): void
     {
         $params['mailer']->dispatch(...$params['arguments']);
     }
 
-    public function onError(\Exception $exception) : void
+    public function onError(\Exception $exception): void
     {
         $this->retry(['wait' => '+30 minutes','limit' => 3]);
     }

@@ -73,7 +73,7 @@ class Query implements IteratorAggregate
      * @param array $columns ['id','user_id','users.id']
      * @return \Origin\Model\Query
      */
-    public function select(array $columns) : Query
+    public function select(array $columns): Query
     {
         $this->query['fields'] = $columns;
 
@@ -85,7 +85,7 @@ class Query implements IteratorAggregate
      *
      * @return \Origin\Model\Query
      */
-    public function distinct() : Query
+    public function distinct(): Query
     {
         $this->query['distinct'] = true;
 
@@ -98,7 +98,7 @@ class Query implements IteratorAggregate
      * @param array $conditions
      * @return \Origin\Model\Query
      */
-    public function where(array $conditions) : Query
+    public function where(array $conditions): Query
     {
         $this->query['conditions'] = $conditions;
 
@@ -110,7 +110,7 @@ class Query implements IteratorAggregate
      * @param string|array $order 'title DESC' , ['title' => 'DESC'] or ['category','title ASC']
      * @return \Origin\Model\Query
      */
-    public function order($order) : Query
+    public function order($order): Query
     {
         $this->query['order'] = (array) $order;
 
@@ -123,7 +123,7 @@ class Query implements IteratorAggregate
      * @param integer $limit
      * @return \Origin\Model\Query
      */
-    public function limit(int $limit) : Query
+    public function limit(int $limit): Query
     {
         $this->query['limit'] = $limit;
 
@@ -136,7 +136,7 @@ class Query implements IteratorAggregate
      * @param integer $offset
      * @return \Origin\Model\Query
      */
-    public function offset(int $offset) : Query
+    public function offset(int $offset): Query
     {
         $this->query['offset'] = $offset;
 
@@ -149,7 +149,7 @@ class Query implements IteratorAggregate
     * @param string|array $columns
     * @return \Origin\Model\Query
     */
-    public function group($columns) : Query
+    public function group($columns): Query
     {
         $this->query['group'] = (array) $columns;
 
@@ -162,7 +162,7 @@ class Query implements IteratorAggregate
     * @param array $conditions e.g ['COUNT(customer_id) >' =>  5]
     * @return \Origin\Model\Query
     */
-    public function having(array $conditions) : Query
+    public function having(array $conditions): Query
     {
         $this->query['having'] = $conditions;
 
@@ -174,7 +174,7 @@ class Query implements IteratorAggregate
      *
     * @return \Origin\Model\Query
      */
-    public function lock() : Query
+    public function lock(): Query
     {
         $this->query['lock'] = true;
 
@@ -192,7 +192,7 @@ class Query implements IteratorAggregate
      *  - conditions: array of conditions. e.g ['bookmarks.user_id = users.id']
     * @return \Origin\Model\Query
      */
-    public function join($options) : Query
+    public function join($options): Query
     {
         if (is_string($options)) {
             $options = ['table' => $options];
@@ -234,7 +234,7 @@ class Query implements IteratorAggregate
     * @param string|array $assocation User or ['User'=>['Comment']]
     * @return \Origin\Model\Query
     */
-    public function with($assocation) : Query
+    public function with($assocation): Query
     {
         $this->associated = (array) $assocation;
 
@@ -246,7 +246,7 @@ class Query implements IteratorAggregate
      *
      * @return \Origin\Model\Entity|null
      */
-    public function first() :? Entity
+    public function first(): ? Entity
     {
         return $this->model->first($this->toArray());
     }
@@ -321,7 +321,7 @@ class Query implements IteratorAggregate
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         if ($this->associated) {
             $this->processsAssociated();
@@ -340,7 +340,7 @@ class Query implements IteratorAggregate
      *
      * @return \Origin\Model\Query
      */
-    private function processsAssociated() : Query
+    private function processsAssociated(): Query
     {
         $assocation = $this->normalizeAssociated($this->associated);
         $this->query['associated'] = $assocation['associated'];
@@ -373,7 +373,7 @@ class Query implements IteratorAggregate
      *
      * @return string
      */
-    public function sql() : string
+    public function sql(): string
     {
         $builder = new QueryBuilder($this->model->table(), Inflector::tableName($this->model->alias()));
 

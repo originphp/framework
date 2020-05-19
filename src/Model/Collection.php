@@ -75,7 +75,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return $this->convertToArray($this->items);
     }
@@ -86,7 +86,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      * @see https://jsonapi.org/format/
      * @return string
      */
-    public function toJson() : string
+    public function toJson(): string
     {
         return json_encode($this->jsonSerialize());
     }
@@ -96,7 +96,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      *
      * @return string
      */
-    public function toXml() : string
+    public function toXml(): string
     {
         $root = Inflector::camelCase(Inflector::plural($this->model ?? 'Record'));
         $data = [$root => [
@@ -112,7 +112,7 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      * @param \Origin\Model\Entity|array $results
      * @return array
      */
-    protected function convertToArray($results) : array
+    protected function convertToArray($results): array
     {
         if ($results instanceof Entity) {
             return $results->toArray();

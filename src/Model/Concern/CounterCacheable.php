@@ -31,7 +31,7 @@ trait CounterCacheable
      *
      * @return void
      */
-    protected function enableCounterCache() : void
+    protected function enableCounterCache(): void
     {
         $this->afterSave('counterCacheAfterSave');
         $this->afterDelete('counterCacheAfterDelete');
@@ -42,7 +42,7 @@ trait CounterCacheable
      *
      * @return array
      */
-    private function getFields() : array
+    private function getFields(): array
     {
         $belongsTo = $this->association('belongsTo');
         // Check internal cache
@@ -78,7 +78,7 @@ trait CounterCacheable
      * @param ArrayObject $options
      * @return void
      */
-    protected function counterCacheAfterSave(Entity $entity, ArrayObject $options) : void
+    protected function counterCacheAfterSave(Entity $entity, ArrayObject $options): void
     {
         $items = $this->getFields();
         
@@ -97,7 +97,7 @@ trait CounterCacheable
      * @param ArrayObject $options
      * @return void
      */
-    protected function counterCacheAfterDelete(Entity $entity, ArrayObject $options) : void
+    protected function counterCacheAfterDelete(Entity $entity, ArrayObject $options): void
     {
         $items = $this->getFields();
         foreach ($items as $alias => $config) {

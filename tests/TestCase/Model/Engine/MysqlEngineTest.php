@@ -22,7 +22,7 @@ use Origin\Model\ConnectionManager;
  */
 class MysqlEngineTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $connection = ConnectionManager::get('test');
         if ($connection->engine() !== 'mysql') {
@@ -30,14 +30,14 @@ class MysqlEngineTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testTables() : void
+    public function testTables(): void
     {
         $connection = ConnectionManager::get('test');
         $tables = $connection->tables();
         $this->assertIsArray($tables);
     }
 
-    public function testDatabases() : void
+    public function testDatabases(): void
     {
         $connection = ConnectionManager::get('test');
         $databases = $connection->databases();

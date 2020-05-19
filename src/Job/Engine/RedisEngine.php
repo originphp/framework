@@ -42,7 +42,7 @@ class RedisEngine extends BaseEngine
        *
        * @param array $config  duration,prefix,path
        */
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $mergedWithDefault = $this->config();
         $this->Redis = RedisConnection::connect($mergedWithDefault);
@@ -54,7 +54,7 @@ class RedisEngine extends BaseEngine
      * @param \Origin\Job\Job $job
      * @return bool
      */
-    public function add(Job $job, string $strtotime = 'now') : bool
+    public function add(Job $job, string $strtotime = 'now'): bool
     {
         $serialized = $this->serialize($job);
    
@@ -75,7 +75,7 @@ class RedisEngine extends BaseEngine
     * @param string $queue
     * @return \Origin\Job\Job|null
     */
-    public function fetch(string $queue = 'default') : ?Job
+    public function fetch(string $queue = 'default'): ?Job
     {
         $this->migrateScheduledJobs($queue);
         $serialized = $this->Redis->lpop('queue:'. $queue);
@@ -90,7 +90,7 @@ class RedisEngine extends BaseEngine
      * @param \Origin\Job\Job $job
      * @return bool
      */
-    public function delete(Job $job) : bool
+    public function delete(Job $job): bool
     {
         $serialized = $this->serialize($job);
   
@@ -110,7 +110,7 @@ class RedisEngine extends BaseEngine
      * @param \Origin\Job\Job $job
      * @return bool
      */
-    public function fail(Job $job) : bool
+    public function fail(Job $job): bool
     {
         $serialized = $this->serialize($job);
 
@@ -126,7 +126,7 @@ class RedisEngine extends BaseEngine
     * @param \Origin\Job\Job $job
     * @return bool
     */
-    public function success(Job $job) : bool
+    public function success(Job $job): bool
     {
         $this->delete($job);
 
@@ -141,7 +141,7 @@ class RedisEngine extends BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    public function retry(Job $job, int $tries, $strtotime = 'now') : bool
+    public function retry(Job $job, int $tries, $strtotime = 'now'): bool
     {
         if ($job->attempts() < $tries + 1) {
             $serialized = $this->serialize($job);
@@ -159,7 +159,7 @@ class RedisEngine extends BaseEngine
      * @param string $queue
      * @return void
      */
-    protected function migrateScheduledJobs(string $queue) : void
+    protected function migrateScheduledJobs(string $queue): void
     {
         $results = $this->Redis->zrangebyscore('scheduled:' . $queue, '-inf', (string) time());
         if ($results) {
@@ -175,7 +175,7 @@ class RedisEngine extends BaseEngine
      *
      * @return \Redis
      */
-    public function redis() : Redis
+    public function redis(): Redis
     {
         return $this->Redis;
     }

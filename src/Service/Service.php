@@ -80,7 +80,7 @@ class Service
      * @param array $data e.g. ['success'=>true] or ['error'=>'Invalid credit card details']
      * @return \Origin\Service\Result
      */
-    public function result(array $data = []) : Result
+    public function result(array $data = []): Result
     {
         return new Result($data);
     }
@@ -90,7 +90,7 @@ class Service
      *
      * @return \Origin\Service\Result|null
      */
-    public function dispatch() : ?Result
+    public function dispatch(): ?Result
     {
         $this->executeHook('startup');
         $result = $this->execute(...func_get_args());

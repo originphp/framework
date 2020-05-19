@@ -49,7 +49,7 @@ class CookieHelper extends Helper
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
      * @return void
      */
-    public function write(string $name, $value, array $options = []) : void
+    public function write(string $name, $value, array $options = []): void
     {
         $this->response()->cookie($name, $value, $options);
     }
@@ -60,7 +60,7 @@ class CookieHelper extends Helper
      * @param string $name
      * @return void
      */
-    public function delete(string $name) : void
+    public function delete(string $name): void
     {
         $this->response()->cookie($name, '', ['expires' => '-60 minutes']);
     }
@@ -71,7 +71,7 @@ class CookieHelper extends Helper
     * @param string $name
     * @return bool
     */
-    public function exists(string $name) : bool
+    public function exists(string $name): bool
     {
         $cookies = $this->request()->cookies();
 
@@ -83,7 +83,7 @@ class CookieHelper extends Helper
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         unset($_COOKIE);
         $_COOKIE = [];

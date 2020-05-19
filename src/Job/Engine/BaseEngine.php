@@ -33,7 +33,7 @@ abstract class BaseEngine
         $this->initialize($config);
     }
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
     }
     /**
@@ -43,7 +43,7 @@ abstract class BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    abstract public function add(Job $job, string $strtotime = 'now') : bool;
+    abstract public function add(Job $job, string $strtotime = 'now'): bool;
 
     /**
     * Get the next job from the queue
@@ -51,7 +51,7 @@ abstract class BaseEngine
     * @param string $queue
     * @return \Origin\Job\Job|null
     */
-    abstract public function fetch(string $queue = 'default') : ?Job;
+    abstract public function fetch(string $queue = 'default'): ?Job;
 
     /**
      * Deletes a job
@@ -59,7 +59,7 @@ abstract class BaseEngine
      * @param \Origin\Job\Job $job
      * @return bool
      */
-    abstract public function delete(Job $job) : bool;
+    abstract public function delete(Job $job): bool;
 
     /**
      * Handles a failed job
@@ -67,7 +67,7 @@ abstract class BaseEngine
      * @param \Origin\Job\Job $job
      * @return bool
      */
-    abstract public function fail(Job $job) : bool;
+    abstract public function fail(Job $job): bool;
 
     /**
     * Handles a successful job
@@ -75,7 +75,7 @@ abstract class BaseEngine
     * @param \Origin\Job\Job $job
     * @return bool
     */
-    abstract public function success(Job $job) : bool;
+    abstract public function success(Job $job): bool;
 
     /**
     * Retries a job
@@ -85,14 +85,14 @@ abstract class BaseEngine
      * @param string $strtotime
      * @return bool
      */
-    abstract public function retry(Job $job, int $tries, $strtotime = 'now') : bool;
+    abstract public function retry(Job $job, int $tries, $strtotime = 'now'): bool;
 
     /**
     * Serializes a job
     *
     * @return string
     */
-    public function serialize(Job $job) : string
+    public function serialize(Job $job): string
     {
         $serialized = json_encode($job->serialize());
 
@@ -109,7 +109,7 @@ abstract class BaseEngine
      * @param string $data
      * @return \Origin\Job\Job
      */
-    public function deserialize(string $data) : Job
+    public function deserialize(string $data): Job
     {
         $unserialized = json_decode($data, true);
         

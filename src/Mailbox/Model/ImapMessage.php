@@ -28,7 +28,7 @@ class ImapMessage extends Model
      * @param array $config
      * @return void
      */
-    protected function initialize(array $config) : void
+    protected function initialize(array $config): void
     {
         $this->validate('account', 'notBlank');
         $this->validate('message_id', 'notBlank');

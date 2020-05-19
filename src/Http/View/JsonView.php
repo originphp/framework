@@ -59,7 +59,7 @@ class JsonView
      * @param mixed $data
      * @return string
      */
-    public function render($data = null) : string
+    public function render($data = null): string
     {
         /**
          * If user requests JSON and serialize is set then use that
@@ -81,7 +81,7 @@ class JsonView
      * @param string|array $serialize
      * @return array
      */
-    private function serialize($serialize) : array
+    private function serialize($serialize): array
     {
         $result = [];
    

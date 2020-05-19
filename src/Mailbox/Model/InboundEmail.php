@@ -29,7 +29,7 @@ class InboundEmail extends Model
     use Timestampable;
     protected $table = 'mailbox';
 
-    protected function initialize(array $config) : void
+    protected function initialize(array $config): void
     {
         # Setup validation rules
         $this->validate('message_id', 'notBlank');
@@ -45,7 +45,7 @@ class InboundEmail extends Model
      * @param \Origin\Model\Entity $inboundEmail
      * @return boolean
      */
-    public function existsInDb(Entity $inboundEmail) : bool
+    public function existsInDb(Entity $inboundEmail): bool
     {
         return ! $this->isUnique($inboundEmail, ['message_id','checksum']);
     }
@@ -57,7 +57,7 @@ class InboundEmail extends Model
      * @param ArrayObject $options
      * @return void
      */
-    protected function scheduleJobs(Entity $inboundEmail, ArrayObject $options) : void
+    protected function scheduleJobs(Entity $inboundEmail, ArrayObject $options): void
     {
         # Dispatch for Processing
         (new MailboxJob())->dispatch($inboundEmail);
@@ -74,7 +74,7 @@ class InboundEmail extends Model
      * @param string $message
      * @return \Origin\Model\Entity
      */
-    public function fromMessage(string $message) : Entity
+    public function fromMessage(string $message): Entity
     {
         $mail = new Mail($message);
 
@@ -98,7 +98,7 @@ class InboundEmail extends Model
      *  - failed: an error occured when processing
      * @return boolean
      */
-    public function setStatus(int $id, string $status) : bool
+    public function setStatus(int $id, string $status): bool
     {
         return $this->updateColumn($id, 'status', $status);
     }

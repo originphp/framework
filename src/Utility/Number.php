@@ -140,7 +140,7 @@ class Number
      * @param array $options
      * @return string
      */
-    public static function format($value, array $options = []) : string
+    public static function format($value, array $options = []): string
     {
         $locale = static::$locale;
 
@@ -170,7 +170,7 @@ class Number
      * @param array $options
      * @return string
      */
-    public static function currency($value, string $currency = null, array $options = []) : string
+    public static function currency($value, string $currency = null, array $options = []): string
     {
         if ($currency === null) {
             $currency = static::$locale['currency'];

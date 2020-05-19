@@ -28,7 +28,7 @@ class PhpFile
      * @param string $filename /var/www/config/data.php
      * @return array
      */
-    public function read(string $filename) : array
+    public function read(string $filename): array
     {
         if (! file_exists($filename)) {
             throw new InvalidArgumentException(sprintf('File `%` does not exist', $filename));
@@ -51,9 +51,9 @@ class PhpFile
      *  data.
      * @return boolean
      */
-    public function write(string $filename, array $data, array $options = []) : bool
+    public function write(string $filename, array $data, array $options = []): bool
     {
-        $options += ['lock' => false , 'short' => false ,'before' => null, 'after' => null];
+        $options += ['lock' => false, 'short' => false,'before' => null, 'after' => null];
         $out = $options['short'] ? $this->varExport($data) : var_export($data, true);
         $out = '<?php' . "\n" . $options['before'] . "\n" . 'return ' . $out . ';' .  "\n" . $options['after'] ;
        
@@ -66,7 +66,7 @@ class PhpFile
      * @param array $data
      * @return string
      */
-    private function varExport(array $data) : string
+    private function varExport(array $data): string
     {
         $data = var_export($data, true);
         $data = str_replace(

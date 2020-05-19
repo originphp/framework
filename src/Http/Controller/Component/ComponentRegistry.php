@@ -49,7 +49,7 @@ class ComponentRegistry extends ObjectRegistry
      * @param string $class
      * @return string|null $namespacedClass
      */
-    protected function className(string $class) : ?string
+    protected function className(string $class): ?string
     {
         return Resolver::className($class, 'Controller/Component', null, 'Http');
     }
@@ -94,7 +94,7 @@ class ComponentRegistry extends ObjectRegistry
      * @param string $object
      * @return void
      */
-    protected function throwException(string $object) : void
+    protected function throwException(string $object): void
     {
         throw new MissingComponentException($object);
     }
@@ -104,7 +104,7 @@ class ComponentRegistry extends ObjectRegistry
      *
      * @return \Origin\Http\Controller\Controller
      */
-    public function controller() : Controller
+    public function controller(): Controller
     {
         return $this->controller;
     }

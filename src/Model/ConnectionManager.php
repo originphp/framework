@@ -44,7 +44,7 @@ class ConnectionManager
      * @param string $name default
      * @return \Origin\Model\Connection
      */
-    public static function get(string $name) : Connection
+    public static function get(string $name): Connection
     {
         if (isset(static::$datasources[$name])) {
             return static::$datasources[$name];
@@ -71,7 +71,7 @@ class ConnectionManager
         return static::$datasources[$name] = $datasource;
     }
 
-    public static function create(string $name, array $config) : Connection
+    public static function create(string $name, array $config): Connection
     {
         self::config($name, $config);
 
@@ -84,7 +84,7 @@ class ConnectionManager
      * @param string $name
      * @return bool
      */
-    public static function drop(string $name) : bool
+    public static function drop(string $name): bool
     {
         if (isset(static::$datasources[$name])) {
             static::config($name, null);
@@ -102,7 +102,7 @@ class ConnectionManager
      * @param string $name
      * @return boolean
      */
-    public static function has(string $name) : bool
+    public static function has(string $name): bool
     {
         return isset(static::$datasources[$name]);
     }
@@ -112,7 +112,7 @@ class ConnectionManager
      *
      * @return array
      */
-    public static function datasources() : array
+    public static function datasources(): array
     {
         return array_keys(static::$config);
     }

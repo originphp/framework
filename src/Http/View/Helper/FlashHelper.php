@@ -32,7 +32,7 @@ class FlashHelper extends Helper
         ],
     ];
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->loadHelper('Session');
     }

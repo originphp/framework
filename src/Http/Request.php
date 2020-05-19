@@ -693,7 +693,7 @@ class Request
      *
      * @return Session
      */
-    public function session() : Session
+    public function session(): Session
     {
         if ($this->session === null) {
             $this->session = new Session();
@@ -709,7 +709,7 @@ class Request
      * @param string $value
      * @return string
      */
-    public function cookie(string $header, string $value) : string
+    public function cookie(string $header, string $value): string
     {
         return $this->cookies[$header] = $value;
     }
@@ -738,7 +738,7 @@ class Request
      *
      * @return array
      */
-    protected function processCookies() : array
+    protected function processCookies(): array
     {
         $cookie = new Cookie();
         $cookies = [];

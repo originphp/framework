@@ -29,7 +29,7 @@ class YetAnotherArticle extends Model
 
     use Timestampable,Cacheable;
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->hasMany('Comment', [
             'className' => AnotherComment::class,
@@ -47,7 +47,7 @@ class AnotherComment extends Model
 
     use Timestampable,Cacheable;
 
-    public function initialize(array $config) : void
+    public function initialize(array $config): void
     {
         $this->belongsTo('Article', [
             'className' => YetAnotherArticle::class,
@@ -67,7 +67,7 @@ class CacheableTest extends OriginTestCase
         $this->Article = ModelRegistry::get('YetAnotherArticle', ['className' => YetAnotherArticle::class]);
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         Cache::clear(['config' => 'cache-test']);
     }

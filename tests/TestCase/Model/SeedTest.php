@@ -21,7 +21,7 @@ include_once DATABASE . DS . 'seed.php';
 
 class SeedTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $connection = ConnectionManager::get('test');
         $schema = new \ApplicationSchema();
@@ -43,7 +43,7 @@ class SeedTest extends \PHPUnit\Framework\TestCase
         $connection->commit();
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         $connection = ConnectionManager::get('test');
         $schema = new \ApplicationSchema();

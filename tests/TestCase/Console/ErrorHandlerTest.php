@@ -38,7 +38,7 @@ class MockErrorHandler extends ErrorHandler
      * @param integer $exitCode
      * @return void
      */
-    protected function exit(int $exitCode = 1) : void
+    protected function exit(int $exitCode = 1): void
     {
     }
 }
@@ -51,7 +51,7 @@ class MockConsoleOutputErrorHandler extends ConsoleOutput
     {
         return $this->buffer;
     }
-    public function write($data, $newLine = true) : int
+    public function write($data, $newLine = true): int
     {
         $this->buffer .= $data;
 

@@ -41,7 +41,7 @@ class AccessLogMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
         file_put_contents($this->config['file'], $this->commonFormat($request, $response) . "\n", FILE_APPEND);
     }
@@ -54,7 +54,7 @@ class AccessLogMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return string
      */
-    private function commonFormat(Request $request, Response $response) : string
+    private function commonFormat(Request $request, Response $response): string
     {
         return sprintf(
             '%s %s [%s] "%s %s %s" %d %d',

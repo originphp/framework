@@ -20,7 +20,7 @@ class ThrottleMiddlewareTest extends OriginTestCase
     */
     protected $response = null;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->request = new Request();
         $this->response = new Response();
@@ -49,7 +49,7 @@ class ThrottleMiddlewareTest extends OriginTestCase
         $middleware($this->request, $this->response);
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         Cache::clear(['config' => 'throttle']);
         @unlink(TMP . '/blacklist.php');

@@ -35,7 +35,7 @@ class SessionComponent extends Component
      *
      * @return \Origin\Http\Session
      */
-    protected function session() : Session
+    protected function session(): Session
     {
         if ($this->session === null) {
             $this->session = new Session();
@@ -64,7 +64,7 @@ class SessionComponent extends Component
      * @param mixed $value
      * @return void
      */
-    public function write(string $name, $value) : void
+    public function write(string $name, $value): void
     {
         $this->session()->write($name, $value);
     }
@@ -75,7 +75,7 @@ class SessionComponent extends Component
      * @param string $name
      * @return void
      */
-    public function delete(string $name) : void
+    public function delete(string $name): void
     {
         $this->session()->delete($name);
     }
@@ -86,7 +86,7 @@ class SessionComponent extends Component
      * @param string $name
      * @return bool
      */
-    public function exists(string $name) : bool
+    public function exists(string $name): bool
     {
         return $this->session()->exists($name);
     }
@@ -96,7 +96,7 @@ class SessionComponent extends Component
      *
      * @return void
      */
-    public function clear() : void
+    public function clear(): void
     {
         $this->session()->clear();
     }
@@ -106,7 +106,7 @@ class SessionComponent extends Component
      *
      * @return void
      */
-    public function destroy() : void
+    public function destroy(): void
     {
         $this->session()->destroy();
     }

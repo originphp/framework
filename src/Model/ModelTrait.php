@@ -25,7 +25,7 @@ trait ModelTrait
       * @param array $options
       * @return \Origin\Model\Model
       */
-    public function loadModel(string $model, array $options = []) : Model
+    public function loadModel(string $model, array $options = []): Model
     {
         list($plugin, $alias) = pluginSplit($model);
 

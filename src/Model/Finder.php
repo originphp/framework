@@ -150,7 +150,7 @@ class Finder
      * @param array $results
      * @return array
      */
-    protected function loadAssociatedBelongsTo(array $query, array $results) : array
+    protected function loadAssociatedBelongsTo(array $query, array $results): array
     {
         $belongsTo = $this->model->association('belongsTo');
         foreach ($query['associated'] as $model => $config) {
@@ -177,7 +177,7 @@ class Finder
      * @param array $results
      * @return array
      */
-    public function loadAssociatedHasOne(array $query, array  $results) : array
+    public function loadAssociatedHasOne(array $query, array  $results): array
     {
         $hasOne = $this->model->association('hasOne');
         foreach ($query['associated'] as $model => $config) {
@@ -207,7 +207,7 @@ class Finder
      * @param array $results
      * @return array
      */
-    protected function loadAssociatedHasMany(array $query, array $results) : array
+    protected function loadAssociatedHasMany(array $query, array $results): array
     {
         $hasMany = $this->model->association('hasMany');
         foreach ($hasMany as $alias => $config) {
@@ -239,7 +239,7 @@ class Finder
      * @param array $results
      * @return array
      */
-    protected function loadAssociatedHasAndBelongsToMany(array $query, array $results) : array
+    protected function loadAssociatedHasAndBelongsToMany(array $query, array $results): array
     {
         $hasAndBelongsToMany = $this->model->association('hasAndBelongsToMany');
         foreach ($hasAndBelongsToMany as $alias => $config) {

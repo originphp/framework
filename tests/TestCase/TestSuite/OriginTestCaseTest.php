@@ -40,7 +40,7 @@ class LemonPie
         return true;
     }
 
-    public function options(array $options = null) : array
+    public function options(array $options = null): array
     {
         if ($options === null) {
             return $this->options;

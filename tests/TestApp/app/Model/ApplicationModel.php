@@ -12,7 +12,7 @@ class ApplicationModel extends Model
      * @param \Exception $exception
      * @return void
      */
-    public function onError(\Exception $exception) : void
+    public function onError(\Exception $exception): void
     {
     }
 }

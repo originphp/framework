@@ -88,7 +88,7 @@ class Fixture
      *
      * @return bool
      */
-    public function insertOnly() :bool
+    public function insertOnly(): bool
     {
         return empty($this->schema);
     }
@@ -98,7 +98,7 @@ class Fixture
      *
      * @return void
      */
-    public function create() : void
+    public function create(): void
     {
         $connection = ConnectionManager::get('test');
         $table = new TableSchema($this->table, $this->schema['columns'], $this->schema);
@@ -113,7 +113,7 @@ class Fixture
      *
      * @return void
      */
-    public function insert() : void
+    public function insert(): void
     {
         $connection = ConnectionManager::get('test');
    
@@ -127,7 +127,7 @@ class Fixture
      *
      * @return bool true or false
      */
-    public function drop() : bool
+    public function drop(): bool
     {
         $connection = ConnectionManager::get('test');
         $sql = $connection->adapter()->dropTableSql($this->table, ['ifExists' => true]);
@@ -140,7 +140,7 @@ class Fixture
      *
      * @return bool true or false
      */
-    public function truncate() : bool
+    public function truncate(): bool
     {
         $connection = ConnectionManager::get('test');
         $sql = $connection->adapter()->truncateTableSql($this->table);
@@ -153,7 +153,7 @@ class Fixture
      *
      * @return boolean
      */
-    public function dropTables() : bool
+    public function dropTables(): bool
     {
         return $this->dropTables;
     }

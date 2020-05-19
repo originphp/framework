@@ -104,7 +104,7 @@ class ConsoleHelpFormatter
      *
      * @return string
      */
-    public function generate() : string
+    public function generate(): string
     {
         $out = [];
     
@@ -157,7 +157,7 @@ class ConsoleHelpFormatter
      *
      * @return int
      */
-    protected function calculateWidth() : int
+    protected function calculateWidth(): int
     {
         $minWidth = 20;
         foreach ([$this->commands,$this->arguments,$this->options] as $table) {
@@ -176,7 +176,7 @@ class ConsoleHelpFormatter
      * @param string|array $description
      * @return void
      */
-    public function setDescription($description) : void
+    public function setDescription($description): void
     {
         $this->description = '<white>' . $this->toText($description) . '</white>';
     }
@@ -187,7 +187,7 @@ class ConsoleHelpFormatter
      * @param string|array $usage
      * @return void
      */
-    public function setUsage($usage) : void
+    public function setUsage($usage): void
     {
         $usage = $this->toText($usage, "\n  ");
         $this->usage = '<white>' . $this->wrapText($usage, 2) .'</white>';
@@ -198,7 +198,7 @@ class ConsoleHelpFormatter
      * @param array $commands
      * @return void
      */
-    public function setCommands(array $commands) : void
+    public function setCommands(array $commands): void
     {
         $this->commands = $commands;
     }
@@ -209,7 +209,7 @@ class ConsoleHelpFormatter
      * @param array $options
      * @return void
      */
-    public function setOptions(array $options) : void
+    public function setOptions(array $options): void
     {
         $this->options = $options;
     }
@@ -220,7 +220,7 @@ class ConsoleHelpFormatter
      * @param array $arguments
      * @return void
      */
-    public function setArguments(array $arguments) : void
+    public function setArguments(array $arguments): void
     {
         $this->arguments = $arguments;
     }
@@ -231,7 +231,7 @@ class ConsoleHelpFormatter
      * @param string|array $epilog
      * @return void
      */
-    public function setEpilog($epilog) : void
+    public function setEpilog($epilog): void
     {
         $this->epilog = '<white>' . $this->toText($epilog) . '</white>';
     }
@@ -242,7 +242,7 @@ class ConsoleHelpFormatter
      * @param string|array $help
      * @return void
      */
-    public function setHelp($help) : void
+    public function setHelp($help): void
     {
         $help = $this->toText($help, "\n  ");
         $this->help = '<white>' . $this->wrapText($help, 2) .'</white>';
@@ -255,7 +255,7 @@ class ConsoleHelpFormatter
      * @param string $glue
      * @return string
      */
-    protected function toText($mixed, $glue = "\n") : string
+    protected function toText($mixed, $glue = "\n"): string
     {
         if (is_string($mixed)) {
             $mixed = [$mixed];
@@ -270,7 +270,7 @@ class ConsoleHelpFormatter
      * @param array $array
      * @return string
      */
-    protected function createTable(array $array, int $width = 20) : string
+    protected function createTable(array $array, int $width = 20): string
     {
         $out = [];
         foreach ($array as $left => $right) {
@@ -293,7 +293,7 @@ class ConsoleHelpFormatter
      * @param array $array
      * @return int
      */
-    protected function getMaxWidth(array $array) : int
+    protected function getMaxWidth(array $array): int
     {
         $maxLength = 0;
         foreach ($array as $left => $right) {
@@ -313,7 +313,7 @@ class ConsoleHelpFormatter
      * @param integer $indent
      * @return string
      */
-    protected function wrapText(string $string, int $indent = 0) : string
+    protected function wrapText(string $string, int $indent = 0): string
     {
         $string = wordwrap($string, self::WIDTH);
         if ($indent > 0) {
@@ -330,7 +330,7 @@ class ConsoleHelpFormatter
      * @param integer $indent
      * @return string
      */
-    protected function indentText(string $string, int $indent) : string
+    protected function indentText(string $string, int $indent): string
     {
         $padding = str_repeat(' ', $indent);
 

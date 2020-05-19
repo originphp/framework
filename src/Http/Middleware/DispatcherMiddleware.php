@@ -27,7 +27,7 @@ class DispatcherMiddleware extends Middleware
        *
        * @param \Origin\Http\Request $request
        */
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
         $dispatcher = Dispatcher::instance();
         $dispatcher->dispatch($request, $response);

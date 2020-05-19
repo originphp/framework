@@ -37,7 +37,7 @@ class SupportMailbox extends Mailbox
         $this->bounceClass = 'NonExistantClass';
     }
 
-    protected function initialize() : void
+    protected function initialize(): void
     {
         $this->beforeProcess('beforeProcessCallback');
         $this->afterProcess('afterProcessCallback');
@@ -74,7 +74,7 @@ class MailboxTest extends OriginTestCase
      */
     protected $InboundEmail;
 
-    protected function initialize() : void
+    protected function initialize(): void
     {
         $this->InboundEmail = $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class

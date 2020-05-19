@@ -31,7 +31,7 @@ class MockCommand extends Command
     
     protected $description = ['Mock command'];
 
-    public function execute() : void
+    public function execute(): void
     {
         $this->out('This is a mock command');
     }
@@ -44,14 +44,14 @@ class BackupCommand extends Command
     
     protected $description = ['Backup command'];
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->addOption('connection', ['short' => 'c','description' => 'Which datasource to use','default' => 'main']);
         $this->addArgument('database', ['required' => true,'description' => 'The database to backup']);
         $this->addArgument('filename', ['description' => 'The filename to output too']);
     }
 
-    public function execute() : void
+    public function execute(): void
     {
         $msg = sprintf('The database %s was backedup from the %s datasource', $this->arguments('database'), $this->options('connection'));
         $this->out($msg);
@@ -65,13 +65,13 @@ class CacheCommand extends Command
     
     protected $description = ['This is a mock command'];
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->addSubCommand('enable', ['description' => 'enables the cache']);
         $this->addSubCommand('disable', ['description' => 'disables the cache']);
     }
 
-    public function execute() : void
+    public function execute(): void
     {
     }
     public function enable()

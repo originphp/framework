@@ -25,7 +25,7 @@ trait Delocalizable
      *
      * @return void
      */
-    protected function initializeDelocalizable() : void
+    protected function initializeDelocalizable(): void
     {
         $this->beforeValidate('delocalize');
     }
@@ -37,7 +37,7 @@ trait Delocalizable
     * @param \Origin\Model\Entity $entity
     * @return bool
     */
-    public function delocalize(Entity $entity) : bool
+    public function delocalize(Entity $entity): bool
     {
         $columns = $this->schema()['columns'];
         foreach ($entity->modified() as $field) {

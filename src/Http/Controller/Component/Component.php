@@ -89,7 +89,7 @@ class Component
      * Returns the controller
      * @return \Origin\Http\Controller\Controller
      */
-    public function controller() : Controller
+    public function controller(): Controller
     {
         return $this->controller;
     }
@@ -99,7 +99,7 @@ class Component
      *
      * @return \Origin\Http\Request
      */
-    public function request() : Request
+    public function request(): Request
     {
         return $this->controller->request();
     }
@@ -109,7 +109,7 @@ class Component
      *
      * @return \Origin\Http\Response
      */
-    public function response() : Response
+    public function response(): Response
     {
         return $this->controller->response();
     }

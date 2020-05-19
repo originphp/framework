@@ -93,12 +93,12 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->executeHook('startup');
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         $this->executeHook('shutdown');
     }
@@ -109,7 +109,7 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
      * @param array $fixtures
      * @return array
      */
-    public function fixtures(array $fixtures = null) : array
+    public function fixtures(array $fixtures = null): array
     {
         if ($fixtures === null) {
             return $this->fixtures;

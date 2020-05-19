@@ -18,7 +18,7 @@ class ProfilerMiddlewareTest extends OriginTestCase
     */
     protected $response = null;
 
-    protected function startup() : void
+    protected function startup(): void
     {
         $this->request = new Request();
         $this->response = new Response();

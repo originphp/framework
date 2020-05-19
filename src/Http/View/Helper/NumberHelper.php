@@ -29,7 +29,7 @@ class NumberHelper extends Helper
      * @param array $options before,after,places,thousands,decimals
      * @return string
      */
-    public function currency($value, string $currency = null, array $options = []) : string
+    public function currency($value, string $currency = null, array $options = []): string
     {
         return Number::currency($value, $currency, $options);
     }
@@ -43,7 +43,7 @@ class NumberHelper extends Helper
      * @param integer $precision
      * @return string
      */
-    public function percent($value, int $precision = 2) : string
+    public function percent($value, int $precision = 2): string
     {
         return Number::percent($value, $precision);
     }
@@ -56,7 +56,7 @@ class NumberHelper extends Helper
     * @param int $precision max number of decimal places to show
     * @return string
     */
-    public function precision($value, int $precision = 2) : string
+    public function precision($value, int $precision = 2): string
     {
         return Number::precision($value, $precision);
     }
@@ -74,7 +74,7 @@ class NumberHelper extends Helper
      *   - places: how many decimal points to show
      * @return string
      */
-    public function format($value, array $options = []) : string
+    public function format($value, array $options = []): string
     {
         return Number::format($value, $options);
     }

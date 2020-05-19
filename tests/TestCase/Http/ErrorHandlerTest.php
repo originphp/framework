@@ -30,23 +30,23 @@ class MockErrorHandler extends ErrorHandler
     protected $response = null;
     protected $statusCode = null;
 
-    public function sendResponse(string $response = null, int $statusCode = 200) : void
+    public function sendResponse(string $response = null, int $statusCode = 200): void
     {
         $this->response = $response;
         $this->statusCode = $statusCode;
     }
 
     // stub
-    protected function cleanBuffer() : void
+    protected function cleanBuffer(): void
     {
     }
 
     // stub
-    public function stop() : void
+    public function stop(): void
     {
     }
 
-    public function response() : string
+    public function response(): string
     {
         return $this->response;
     }
@@ -297,12 +297,12 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('<h1>An Internal Error Has Occured</h1>', $errorHandler->response());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         Router::request(new Request());
         Config::write('debug', true);
     }
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         Config::write('debug', true);
 

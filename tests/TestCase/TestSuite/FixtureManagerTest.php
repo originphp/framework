@@ -24,7 +24,7 @@ class MockTestCase
 {
     protected $fixtures = ['Framework.Post'];
 
-    public function fixtures() : array
+    public function fixtures(): array
     {
         return $this->fixtures;
     }

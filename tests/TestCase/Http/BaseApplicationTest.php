@@ -23,11 +23,11 @@ use Origin\Core\Exception\InvalidArgumentException;
 
 class FooMiddleware extends Middleware
 {
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
         $request->data('foo', 'bar');
     }
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
         $response->header('Accept', 'application/foo');
     }
@@ -42,7 +42,7 @@ class FooApplication extends BaseApplication
  */
 class MockMiddlewareRunner extends MiddlewareRunner
 {
-    public function run(Request $request, Response $response) : Response
+    public function run(Request $request, Response $response): Response
     {
         return $response;
     }

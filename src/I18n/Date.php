@@ -53,7 +53,7 @@ class Date
      * @param string $locale
      * @return string
      */
-    public static function locale(string $locale = null) : string
+    public static function locale(string $locale = null): string
     {
         if ($locale === null) {
             return self::$locale;
@@ -68,7 +68,7 @@ class Date
      * @param string $timezone
      * @return string
      */
-    public static function timezone(string $timezone = null) : string
+    public static function timezone(string $timezone = null): string
     {
         if ($timezone === null) {
             return self::$timezone;
@@ -132,7 +132,7 @@ class Date
      * @param array|string|null $format  we will autodetect
      * @return string|null
      */
-    public static function format(string $dateString, $format = null) : ?string
+    public static function format(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             if (preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $dateString)) {
@@ -157,7 +157,7 @@ class Date
      * @param string $dateString
      * @return string|null
      */
-    public static function formatDate(string $dateString, $format = null) : ?string
+    public static function formatDate(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$dateFormat;
@@ -172,7 +172,7 @@ class Date
      * @param string $dateString
      * @return string|null
      */
-    public static function formatDatetime(string $dateString, $format = null) : ?string
+    public static function formatDatetime(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$datetimeFormat;
@@ -187,7 +187,7 @@ class Date
      * @param string $dateString
      * @return string|null
      */
-    public static function formatTime(string $dateString, $format = null) : ?string
+    public static function formatTime(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$timeFormat;
@@ -242,7 +242,7 @@ class Date
      * @param string|array $format
      * @return string|null
      */
-    public static function parseDate(string $dateString, $format = null) : ?string
+    public static function parseDate(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$dateFormat;
@@ -265,7 +265,7 @@ class Date
      * @param string|array $format
      * @return string|null
      */
-    public static function parseTime(string $dateString, $format = null) : ?string
+    public static function parseTime(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$timeFormat;
@@ -288,7 +288,7 @@ class Date
      * @param string|array $format
      * @return string|null
      */
-    public static function parseDatetime(string $dateString, $format = null) : ?string
+    public static function parseDatetime(string $dateString, $format = null): ?string
     {
         if ($format === null) {
             $format = self::$datetimeFormat;
@@ -311,7 +311,7 @@ class Date
      * @param null|string|array $format
      * @return \IntlDateFormatter
      */
-    protected static function formatter($format = null) : IntlDateFormatter
+    protected static function formatter($format = null): IntlDateFormatter
     {
         $dateFormat = $timeFormat = $pattern = null;
 

@@ -38,7 +38,7 @@ class RedisConnection
      * @param array $config
      * @return Redis
      */
-    public static function connect(array $config) : Redis
+    public static function connect(array $config): Redis
     {
         $config += [
             'host' => '127.0.0.1','port' => 6379,'password' => null,'timeout' => 0,'persistent' => true, // Faster!!!

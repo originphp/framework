@@ -160,7 +160,7 @@ abstract class Mailer
      *   - contentType: default: text. The content type the body is in (html or text)
      * @return void
      */
-    public function mail(array $options = []) : void
+    public function mail(array $options = []): void
     {
         $defaults = $this->defaults;
 
@@ -196,7 +196,7 @@ abstract class Mailer
      * @param mixed $value if key is a string set the value for this
      * @return void
      */
-    public function set($name, $value = null) : void
+    public function set($name, $value = null): void
     {
         if (is_array($name)) {
             $data = $name;
@@ -212,7 +212,7 @@ abstract class Mailer
     *
     * @return \Origin\Email\Message
     */
-    public function dispatch() : Message
+    public function dispatch(): Message
     {
         $this->arguments = func_get_args();
 
@@ -228,7 +228,7 @@ abstract class Mailer
       *
       * @return bool
       */
-    public function dispatchLater() : bool
+    public function dispatchLater(): bool
     {
         $params = [
             'mailer' => $this,
@@ -243,7 +243,7 @@ abstract class Mailer
      *
      * @return \Origin\Email\Message
      */
-    public function preview() : Message
+    public function preview(): Message
     {
         $this->arguments = func_get_args();
 
@@ -260,7 +260,7 @@ abstract class Mailer
      * @param boolean $debug
      * @return \Origin\Email\Email
      */
-    private function buildEmail(bool $debug = false) : Email
+    private function buildEmail(bool $debug = false): Email
     {
         $properties = array_keys(get_object_vars($this));
      
@@ -284,7 +284,7 @@ abstract class Mailer
      * @param string $name invoice-12345.pdf
      * @return void
      */
-    public function attachment(string $file, string $name = null) : void
+    public function attachment(string $file, string $name = null): void
     {
         if ($name === null) {
             $name = basename($file);
@@ -298,7 +298,7 @@ abstract class Mailer
      * @param array $attachments an array ['/tmp/filename','/images/logo.png'=>'Your Logo.png']
      * @return array
      */
-    public function attachments(array $attachments = null) : array
+    public function attachments(array $attachments = null): array
     {
         if ($attachments === null) {
             return $this->attachments;
@@ -314,7 +314,7 @@ abstract class Mailer
      * @param string $value e.g. 'header value'
      * @return void
      */
-    public function header(string $name, string $value) : void
+    public function header(string $name, string $value): void
     {
         $this->headers[$name] = $value;
     }
@@ -325,7 +325,7 @@ abstract class Mailer
      * @param array $headers an array ['Disposition-Notification-To' => 'me@example.com']
      * @return array
      */
-    public function headers(array $headers = null) : array
+    public function headers(array $headers = null): array
     {
         if ($headers === null) {
             return $this->headers;

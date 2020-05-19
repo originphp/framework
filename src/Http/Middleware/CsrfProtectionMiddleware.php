@@ -38,7 +38,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param \Origin\Http\Request $request
      * @return void
      */
-    public function handle(Request $request) : void
+    public function handle(Request $request): void
     {
         if ($request->params('csrfProtection') === false) {
             return ;
@@ -70,7 +70,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param \Origin\Http\Response $response
      * @return void
      */
-    public function process(Request $request, Response $response) : void
+    public function process(Request $request, Response $response): void
     {
         if ($request->params('csrfProtection') === false) {
             return ;
@@ -86,7 +86,7 @@ class CsrfProtectionMiddleware extends Middleware
      *
      * @return bool
      */
-    protected function isTestEnvironment() : bool
+    protected function isTestEnvironment(): bool
     {
         return (isConsole() and env('ORIGIN_ENV') === 'test');
     }
@@ -97,7 +97,7 @@ class CsrfProtectionMiddleware extends Middleware
      * @param Request $request
      * @return void
      */
-    private function validateToken(Request $request) : void
+    private function validateToken(Request $request): void
     {
         /**
          * Disable when runing unit tests
@@ -122,7 +122,7 @@ class CsrfProtectionMiddleware extends Middleware
     * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
     * @return string
     */
-    private function generateToken() : string
+    private function generateToken(): string
     {
         $randomBytes = random_bytes(64);
 

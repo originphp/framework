@@ -38,7 +38,7 @@ class UsersController extends Controller
      */
     public $allow = false;
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->loadComponent('Auth');
     }
@@ -61,7 +61,7 @@ class UsersController extends Controller
     /*
     * @return \Origin\Http\Response
     */
-    public function redirect($url, int $code = 302) : Response
+    public function redirect($url, int $code = 302): Response
     {
         return $this->response;
     }

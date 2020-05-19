@@ -68,7 +68,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @return string
      */
-    public function output() : string
+    public function output(): string
     {
         return $this->stdout->read();
     }
@@ -78,7 +78,7 @@ trait ConsoleIntegrationTestTrait
     *
     * @return string
     */
-    public function error() : string
+    public function error(): string
     {
         return $this->stderr->read();
     }
@@ -91,7 +91,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @return string $output The messages from the console output
      */
-    public function exec(string $command, array $input = []) : void
+    public function exec(string $command, array $input = []): void
     {
         $this->commandResult = null;
 
@@ -128,7 +128,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $needle The text that you want to assert that is in the output
      */
-    public function assertOutputContains(string $needle) : void
+    public function assertOutputContains(string $needle): void
     {
         $this->assertStringContainsString($needle, $this->stdout->read());
     }
@@ -138,7 +138,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $needle The text that you want to assert that is in the output
      */
-    public function assertOutputNotContains(string $needle) : void
+    public function assertOutputNotContains(string $needle): void
     {
         $this->assertStringNotContainsString($needle, $this->stdout->read());
     }
@@ -148,7 +148,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertOutputRegExp(string $expression) : void
+    public function assertOutputRegExp(string $expression): void
     {
         $this->assertRegexp($expression, $this->stdout->read());
     }
@@ -156,7 +156,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts that console output is empty.
      */
-    public function assertOutputEmpty() : void
+    public function assertOutputEmpty(): void
     {
         $this->assertStringContainsString('', $this->stdout->read());
     }
@@ -164,7 +164,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts that the command was run and was not halted using command::abort().
      */
-    public function assertExitSuccess() : void
+    public function assertExitSuccess(): void
     {
         $this->assertEquals(Command::SUCCESS, $this->commandResult);
     }
@@ -172,7 +172,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts that the command was run was halted using command::abort().
      */
-    public function assertExitError() : void
+    public function assertExitError(): void
     {
         $this->assertEquals(Command::ERROR, $this->commandResult);
     }
@@ -180,7 +180,7 @@ trait ConsoleIntegrationTestTrait
     /**
      * Asserts a particular exit code
      */
-    public function assertExitCode(int $exitCode) : void
+    public function assertExitCode(int $exitCode): void
     {
         $this->assertEquals($exitCode, $this->commandResult);
     }
@@ -190,7 +190,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertErrorContains(string $message) : void
+    public function assertErrorContains(string $message): void
     {
         $this->assertStringContainsString($message, $this->stderr->read());
     }
@@ -200,7 +200,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @param string $message
      */
-    public function assertErrorNotContains(string $message) : void
+    public function assertErrorNotContains(string $message): void
     {
         $this->assertStringNotContainsString($message, $this->stderr->read());
     }
@@ -211,7 +211,7 @@ trait ConsoleIntegrationTestTrait
      * @param string $message
      * @return void;
      */
-    public function assertErrorRegExp(string $expression) : void
+    public function assertErrorRegExp(string $expression): void
     {
         $this->assertRegexp($expression, $this->stderr->read());
     }
@@ -221,7 +221,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @return \Origin\Console\Command\Command
      */
-    public function command() : Command
+    public function command(): Command
     {
         return $this->command;
     }

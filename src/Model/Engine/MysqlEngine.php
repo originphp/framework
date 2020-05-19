@@ -33,7 +33,7 @@ class MysqlEngine extends Connection
      * @param array $config
      * @return string
      */
-    public function dsn(array $config) : string
+    public function dsn(array $config): string
     {
         extract($config);
         if ($database) {
@@ -48,7 +48,7 @@ class MysqlEngine extends Connection
      * @todo when this is refactored test each item individually.
      * @return array
      */
-    public function tables() : array
+    public function tables(): array
     {
         $tables = [];
         $this->execute('SHOW TABLES;');
@@ -67,7 +67,7 @@ class MysqlEngine extends Connection
     *
     * @return array
     */
-    public function databases() : array
+    public function databases(): array
     {
         $out = [];
         $this->execute('SHOW DATABASES;');

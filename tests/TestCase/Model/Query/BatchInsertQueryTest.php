@@ -23,7 +23,7 @@ class BatchInsertQueryTest extends OriginTestCase
     protected $fixtures = [
         'Framework.Post'
     ];
-    protected function setUp()  : void
+    protected function setUp(): void
     {
         $this->Post = new Model([
             'name' => 'Post',

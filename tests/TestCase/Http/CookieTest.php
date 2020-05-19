@@ -21,12 +21,12 @@ class MockCookie extends Cookie
 {
     protected $cookies = [];
 
-    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false) : void
+    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false): void
     {
         $this->cookies[$name] = $value;
     }
     
-    public function cookies() : array
+    public function cookies(): array
     {
         return $this->cookies;
     }

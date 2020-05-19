@@ -228,7 +228,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string $error
      * @return void
      */
-    public function invalidate(string $field, string $error) : void
+    public function invalidate(string $field, string $error): void
     {
         if (! isset($this->_errors[$field])) {
             $this->_errors[$field] = [];
@@ -242,7 +242,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string|array $properties
      * @return \Origin\Model\Entity;
      */
-    public function unset($properties) : Entity
+    public function unset($properties): Entity
     {
         foreach ((array)$properties as $key) {
             unset($this->_properties[$key]);
@@ -280,7 +280,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string $type
      * @return string|null
      */
-    protected static function accessor(string $property, string $type) : ?string
+    protected static function accessor(string $property, string $type): ?string
     {
         $class = static::class;
 
@@ -306,7 +306,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string|array $properties
      * @param mixed $value
      */
-    public function set($properties, $value = null) : Entity
+    public function set($properties, $value = null): Entity
     {
         if (is_array($properties) === false) {
             $properties = [$properties => $value];
@@ -329,7 +329,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return void
      */
-    public function reset() : void
+    public function reset(): void
     {
         $this->_modified = [];
         $this->_errors = [];
@@ -341,7 +341,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param boolean $exists
      * @return boolean
      */
-    public function exists(bool $exists = null) : bool
+    public function exists(bool $exists = null): bool
     {
         return $this->setGetPersisted('exists', $exists);
     }
@@ -352,7 +352,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param boolean $created
      * @return boolean
      */
-    public function created(bool $created = null) : bool
+    public function created(bool $created = null): bool
     {
         return $this->setGetPersisted('created', $created);
     }
@@ -362,7 +362,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param boolean $deleted
      * @return boolean
      */
-    public function deleted(bool $deleted = null) : bool
+    public function deleted(bool $deleted = null): bool
     {
         return $this->setGetPersisted('deleted', $deleted);
     }
@@ -403,7 +403,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string $property name of property
      * @return bool true of false
      */
-    public function has($property) : bool
+    public function has($property): bool
     {
         return isset($this->_properties[$property]);
     }
@@ -414,7 +414,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return array properties
      */
-    public function properties() : array
+    public function properties(): array
     {
         return array_keys($this->_properties);
     }
@@ -425,7 +425,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param string $property
      * @return bool
      */
-    public function propertyExists(string $property) : bool
+    public function propertyExists(string $property): bool
     {
         return array_key_exists($property, $this->_properties);
     }
@@ -435,7 +435,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return string|null model name
      */
-    public function name() : ?string
+    public function name(): ?string
     {
         return $this->_name;
     }
@@ -445,7 +445,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return array result
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         $result = [];
         foreach ($this->visibleProperties() as $property) {
@@ -475,7 +475,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return string
     */
-    public function toJson(array $options = []) : string
+    public function toJson(array $options = []): string
     {
         $options += ['pretty' => false];
 
@@ -487,7 +487,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return string
      */
-    public function toXml() : string
+    public function toXml(): string
     {
         $root = Inflector::camelCase($this->_name ?? 'record');
 
@@ -499,7 +499,7 @@ class Entity implements ArrayAccess, JsonSerializable
      *
      * @return array
      */
-    private function visibleProperties() : array
+    private function visibleProperties(): array
     {
         $properties = array_keys($this->_properties);
         $properties = array_merge($properties, $this->_virtual);
@@ -513,7 +513,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param array $properties
      * @return array
      */
-    public function hidden(array $properties = null) : array
+    public function hidden(array $properties = null): array
     {
         if ($properties === null) {
             return $this->_hidden;
@@ -528,7 +528,7 @@ class Entity implements ArrayAccess, JsonSerializable
      * @param array $properties
      * @return array
      */
-    public function virtual(array $properties = null) : array
+    public function virtual(array $properties = null): array
     {
         if ($properties === null) {
             return $this->_virtual;

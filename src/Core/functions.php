@@ -74,7 +74,7 @@ function debug($data, bool $isHtml = false): void
  *
  * @return boolean
  */
-function isConsole() : bool
+function isConsole(): bool
 {
     return (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg');
 }
@@ -99,7 +99,7 @@ function pr($data): void
  * @param mixed $data
  * @return void
  */
-function pj($data) : void
+function pj($data): void
 {
     if (Config::read('debug')) {
         $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
@@ -245,7 +245,7 @@ function uid(int $length = 12): string
  *
  * @return string date('Y-m-d H:i:s')
  */
-function now() : string
+function now(): string
 {
     return date('Y-m-d H:i:s');
 }

@@ -86,7 +86,7 @@ class Migration
      *
      * @return void
      */
-    public function change() : void
+    public function change(): void
     {
     }
 
@@ -96,7 +96,7 @@ class Migration
      *
      * @return void
      */
-    public function reversable() : void
+    public function reversable(): void
     {
     }
 
@@ -105,7 +105,7 @@ class Migration
      *
      * @return void
      */
-    public function up() : void
+    public function up(): void
     {
     }
 
@@ -114,7 +114,7 @@ class Migration
      *
      * @return void
      */
-    public function down() : void
+    public function down(): void
     {
     }
 
@@ -123,7 +123,7 @@ class Migration
      *
      * @return array $statements
      */
-    public function start() : array
+    public function start(): array
     {
         $this->up();
         $this->change(); // only run in start
@@ -141,7 +141,7 @@ class Migration
      * @param array $statements - additional statement
      * @return array $statements
      */
-    public function rollback($statements = []) : array
+    public function rollback($statements = []): array
     {
         $this->down();
         $this->reversable(); // Do not run change here
@@ -161,7 +161,7 @@ class Migration
      * @param array $statements
      * @return void
      */
-    private function executeStatements(array $statements) : void
+    private function executeStatements(array $statements): void
     {
         $this->connection()->begin();
      
@@ -201,7 +201,7 @@ class Migration
      * @param string $sql
      * @return void
      */
-    public function execute(string $sql) : void
+    public function execute(string $sql): void
     {
         if (! in_array($this->calledBy(), ['up','down'])) {
             throw new Exception('Execute can only be called from up/down');
@@ -214,7 +214,7 @@ class Migration
      *
      * @return string
      */
-    public function calledBy() : string
+    public function calledBy(): string
     {
         $result = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
         $calledBy = null;
@@ -231,7 +231,7 @@ class Migration
      *
      * @return void
      */
-    public function throwIrreversibleMigrationException() : void
+    public function throwIrreversibleMigrationException(): void
     {
         throw new IrreversibleMigrationException('Irreversible Migration');
     }
@@ -259,7 +259,7 @@ class Migration
     *   - autoIncrement: this sets the auto increment (mysql) or serial (pgsql) value. e.g. 10000
     * @return void
     */
-    public function createTable(string $name, array $schema = [], array $options = []) : void
+    public function createTable(string $name, array $schema = [], array $options = []): void
     {
         $tableOptions = ['options' => $options];
 
@@ -294,7 +294,7 @@ class Migration
      * @param array $options same options as create table
      * @return void
      */
-    public function createJoinTable(string $table1, string $table2, array $options = []) : void
+    public function createJoinTable(string $table1, string $table2, array $options = []): void
     {
         $tables = [$table1,$table2];
         sort($tables);
@@ -327,7 +327,7 @@ class Migration
      *   - ifExists: default false
      * @return void
      */
-    public function dropTable(string $table, array $options = []) : void
+    public function dropTable(string $table, array $options = []): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -350,7 +350,7 @@ class Migration
      * @param string $to
      * @return void
      */
-    public function renameTable(string $from, string $to) : void
+    public function renameTable(string $from, string $to): void
     {
         $this->statements[] = $this->adapter()->renameTable($from, $to);
         if ($this->calledBy() === 'change') {
@@ -363,7 +363,7 @@ class Migration
        *
        * @return array
        */
-    public function tables() : array
+    public function tables(): array
     {
         return $this->adapter()->tables();
     }
@@ -374,7 +374,7 @@ class Migration
      * @param string $name
      * @return bool
      */
-    public function tableExists(string $name) : bool
+    public function tableExists(string $name): bool
     {
         return in_array($name, $this->tables());
     }
@@ -393,7 +393,7 @@ class Migration
      *   - scale: the numbers after the decimal point
      * @return void
      */
-    public function addColumn(string $table, string $name, string $type, array $options = []) : void
+    public function addColumn(string $table, string $name, string $type, array $options = []): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -424,7 +424,7 @@ class Migration
     *   - scale: the numbers after the decimal point
      * @return void
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []) : void
+    public function changeColumn(string $table, string $name, string $type, array $options = []): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -463,7 +463,7 @@ class Migration
      * @param string $to
      * @return void
      */
-    public function renameColumn(string $table, string $from, string $to) : void
+    public function renameColumn(string $table, string $from, string $to): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -489,7 +489,7 @@ class Migration
      * @param string $column
      * @return void
      */
-    public function removeColumn(string $table, string $column) : void
+    public function removeColumn(string $table, string $column): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -513,7 +513,7 @@ class Migration
      * @param array $columns
      * @return void
      */
-    public function removeColumns(string $table, array $columns) : void
+    public function removeColumns(string $table, array $columns): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -537,7 +537,7 @@ class Migration
      * @param string $table
      * @return array
      */
-    public function columns(string $table) : array
+    public function columns(string $table): array
     {
         return $this->adapter()->columns($table);
     }
@@ -555,7 +555,7 @@ class Migration
      *  - limit: value
      * @return bool
      */
-    public function columnExists(string $table, string $column, array $options = []) : bool
+    public function columnExists(string $table, string $column, array $options = []): bool
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -599,7 +599,7 @@ class Migration
       * @param array $options
       *  - name: name of index
       */
-    public function addIndex(string $table, $column, array $options = []) : void
+    public function addIndex(string $table, $column, array $options = []): void
     {
         if (! $this->tableExists($table) && ! in_array($table, $this->pendingTables)) {
             throw new Exception("{$table} table does not exist");
@@ -625,7 +625,7 @@ class Migration
      * @param string|array $options owner_id, [owner_id,tenant_id] or ['name'=>'index_name']
      * @return void
      */
-    public function removeIndex(string $table, $options) : void
+    public function removeIndex(string $table, $options): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
@@ -661,7 +661,7 @@ class Migration
      * @param string|array $options (name,column)
      * @return array
      */
-    private function indexOptions(string $table, $options) : array
+    private function indexOptions(string $table, $options): array
     {
         if (is_string($options) || (! isset($options['name']) && ! isset($options['column']))) {
             $options = ['column' => $options];
@@ -681,7 +681,7 @@ class Migration
      * @param string $newName new_name_of_index
      * @return void
      */
-    public function renameIndex(string $table, string $oldName, string $newName) : void
+    public function renameIndex(string $table, string $oldName, string $newName): void
     {
         $this->statements[] = $this->adapter()->renameIndex($table, $oldName, $newName);
         if ($this->calledBy() === 'change') {
@@ -695,7 +695,7 @@ class Migration
      * @param string $table
      * @return array
      */
-    public function indexes(string $table) : array
+    public function indexes(string $table): array
     {
         return $this->adapter()->indexes($table);
     }
@@ -707,7 +707,7 @@ class Migration
      * @param array $options  'name', or ['id','title'] or ['name'=>'someting_index]
      * @return bool
      */
-    public function indexExists(string $table, $options) : bool
+    public function indexExists(string $table, $options): bool
     {
         $options = $this->indexOptions($table, $options);
 
@@ -721,7 +721,7 @@ class Migration
      * @param string $indexName table_column_name_index
      * @return bool
      */
-    public function indexNameExists(string $table, string $indexName) : bool
+    public function indexNameExists(string $table, string $indexName): bool
     {
         $indexes = $this->indexes($table);
         foreach ($indexes as $index) {
@@ -740,7 +740,7 @@ class Migration
      * @param string|array $column , [column_1,column_2]
      * @return string table_column_name_index
      */
-    private function getIndexName(string $table, $column) : string
+    private function getIndexName(string $table, $column): string
     {
         $name = implode('_', (array) $column);
 
@@ -763,7 +763,7 @@ class Migration
      * - delete: action to carry out on delete. (cascade,restrict,setNull,setDefault,noAction)
      * @return void
      */
-    public function addForeignKey(string $fromTable, string $toTable, array $options = []) : void
+    public function addForeignKey(string $fromTable, string $toTable, array $options = []): void
     {
         if (! $this->tableExists($fromTable) && ! in_array($fromTable, $this->pendingTables)) {
             throw new Exception("{$fromTable} does not exist");
@@ -804,7 +804,7 @@ class Migration
      *  - primaryKey: the primary key defaults to id
      * @return void
      */
-    public function removeForeignKey(string $fromTable, $optionsOrToTable) : void
+    public function removeForeignKey(string $fromTable, $optionsOrToTable): void
     {
         if (! $this->tableExists($fromTable)) {
             throw new Exception("{$fromTable} does not exist");
@@ -851,7 +851,7 @@ class Migration
      * @param string $table
      * @return array
      */
-    public function foreignKeys(string $table) : array
+    public function foreignKeys(string $table): array
     {
         return $this->adapter()->foreignKeys($table);
     }
@@ -864,7 +864,7 @@ class Migration
      *  - name: foreignkey name
      * @return bool
      */
-    public function foreignKeyExists(string $fromTable, $columnOrOptions) : bool
+    public function foreignKeyExists(string $fromTable, $columnOrOptions): bool
     {
         if (! $this->tableExists($fromTable)) {
             throw new Exception("{$fromTable} does not exist");
@@ -885,7 +885,7 @@ class Migration
     * @param string $column
     * @return string
     */
-    private function getForeignKeyIdentifier(string $table, string $column) : string
+    private function getForeignKeyIdentifier(string $table, string $column): string
     {
         return hash('crc32', $table . '__' . $column);
     }
@@ -896,7 +896,7 @@ class Migration
         * @param string $sql
         * @return array|null
         */
-    public function fetchRow(string $sql) : ?array
+    public function fetchRow(string $sql): ?array
     {
         $ds = $this->connection();
         $result = null;
@@ -913,7 +913,7 @@ class Migration
     * @param string $sql
     * @return array
     */
-    public function fetchAll(string $sql) : ?array
+    public function fetchAll(string $sql): ?array
     {
         $ds = $this->connection();
         $result = null;
@@ -929,7 +929,7 @@ class Migration
      *
      * @return array
      */
-    public function statements() : array
+    public function statements(): array
     {
         return $this->statements;
     }
@@ -939,7 +939,7 @@ class Migration
      *
      * @return array
      */
-    public function reverseStatements() : array
+    public function reverseStatements(): array
     {
         return array_reverse($this->reverseStatements);
     }

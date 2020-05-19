@@ -33,7 +33,7 @@ class PgsqlEngine extends Connection
      * @param array $config
      * @return string
      */
-    public function dsn(array $config) : string
+    public function dsn(array $config): string
     {
         extract($config);
         if ($database) {
@@ -48,7 +48,7 @@ class PgsqlEngine extends Connection
      *
      * @return array
      */
-    public function tables() : array
+    public function tables(): array
     {
         $sql = 'SELECT table_name as "table" FROM information_schema.tables WHERE table_schema=\'public\'';
        
@@ -69,7 +69,7 @@ class PgsqlEngine extends Connection
      *
      * @return array
      */
-    public function databases() : array
+    public function databases(): array
     {
         $sql = 'SELECT datname FROM pg_database WHERE datistemplate = false;';
         $out = [];

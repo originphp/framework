@@ -143,7 +143,7 @@ class ConsoleOutput
      *
      * @return bool
      */
-    public function supportsAnsi() : bool
+    public function supportsAnsi(): bool
     {
         return function_exists('posix_isatty') and posix_isatty($this->stream);
     }
@@ -171,7 +171,7 @@ class ConsoleOutput
      * @param string|array $data
      * @return int
      */
-    public function write($data, $newLine = true) : int
+    public function write($data, $newLine = true): int
     {
         if (is_array($data)) {
             $data = implode("\n", $data);
@@ -194,7 +194,7 @@ class ConsoleOutput
      * @param string $text
      * @return string
      */
-    public function styleText(string $text) : string
+    public function styleText(string $text): string
     {
         if ($this->mode === SELF::RAW) {
             return $text;
@@ -214,7 +214,7 @@ class ConsoleOutput
      *
      * @return void
      */
-    public function close() : void
+    public function close(): void
     {
         if (is_resource($this->stream)) {
             fclose($this->stream);
@@ -226,7 +226,7 @@ class ConsoleOutput
     * @param  string $string text
     * @return string text
     */
-    public function parseTags($string) : string
+    public function parseTags($string): string
     {
         $regex = '/<([a-z0-9]+)>(.*?)<\/(\1)>/ims';
         if (preg_match_all($regex, $string, $matches)) {
@@ -254,7 +254,7 @@ class ConsoleOutput
      * @param string $text
      * @return string
      */
-    protected function style(string $tag, string $text) : string
+    protected function style(string $tag, string $text): string
     {
         if (isset($this->styles[$tag]) === false) {
             return "<{$tag}>{$text}</{$tag}>";
@@ -270,7 +270,7 @@ class ConsoleOutput
      * @param array $settings ['color'=>'blue','background'=>'red','blink'=>true]
      * @return string
      */
-    public function color(string $text, array $settings) : string
+    public function color(string $text, array $settings): string
     {
         $set = [];
         $unset = [];

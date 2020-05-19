@@ -31,7 +31,7 @@ class Config
      *
      * @return \Origin\Core\Dot
      */
-    protected static function dot() : Dot
+    protected static function dot(): Dot
     {
         if (static::$dot === null) {
             static::$dot = new Dot();
@@ -47,7 +47,7 @@ class Config
      * @param string $key
      * @return void
      */
-    public static function load(string $filename, string $key = null) : void
+    public static function load(string $filename, string $key = null): void
     {
         if (! is_file($filename)) {
             throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
@@ -75,7 +75,7 @@ class Config
      * @param mixed $value The value to set
      * @return void
      */
-    public static function write(string $key = null, $value = null) : void
+    public static function write(string $key = null, $value = null): void
     {
         static::dot()->set($key, $value);
         if ($key === 'debug') {
@@ -104,7 +104,7 @@ class Config
      * @param string $key The key to check, accepts also dot notation e.g. Session.timeout
      * @return bool
      */
-    public static function exists(string $key = null) : bool
+    public static function exists(string $key = null): bool
     {
         return static::dot()->has($key);
     }
@@ -115,7 +115,7 @@ class Config
      * @param string $key The key to use, accepts also dot notation e.g. Session.timeout
      * @return bool
      */
-    public static function delete(string $key = null) : bool
+    public static function delete(string $key = null): bool
     {
         return static::dot()->delete($key);
     }

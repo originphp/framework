@@ -39,7 +39,7 @@ class Queue
      * @param string $name
      * @return \Origin\Job\Engine\BaseEngine
      */
-    public static function connection(string $name) : BaseEngine
+    public static function connection(string $name): BaseEngine
     {
         if (isset(static::$loaded[$name])) {
             return static::$loaded[$name];
@@ -55,7 +55,7 @@ class Queue
      * @throws \Origin\Core\Exception\InvalidArgumentException
      * @return \Origin\Job\Engine\BaseEngine
      */
-    protected static function buildEngine(string $name) : BaseEngine
+    protected static function buildEngine(string $name): BaseEngine
     {
         $config = static::config($name);
         if ($config) {

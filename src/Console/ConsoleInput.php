@@ -37,7 +37,7 @@ class ConsoleInput
      *
      * @return string|null
      */
-    public function read() : ?string
+    public function read(): ?string
     {
         $data = fgets($this->stream);
 
@@ -49,7 +49,7 @@ class ConsoleInput
      *
      * @return void
      */
-    public function close() : void
+    public function close(): void
     {
         if (is_resource($this->stream)) {
             fclose($this->stream);

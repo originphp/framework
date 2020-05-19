@@ -59,7 +59,7 @@ class TestsController extends Controller
     {
     }
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->initialized = true;
     }
@@ -119,7 +119,7 @@ class ApplesController extends Controller
         $this->autoRender = false;
     }
 
-    public function initialize() : void
+    public function initialize(): void
     {
         $this->loadComponent('Fruit', ['className' => FruitComponent::class]);
     }

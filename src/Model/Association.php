@@ -122,7 +122,7 @@ class Association
         return $options;
     }
 
-    private function extractClass(string $class) : string
+    private function extractClass(string $class): string
     {
         if (strpos($class, '\\')) {
             list($namespace, $class) = namespaceSplit($class);
@@ -262,7 +262,7 @@ class Association
      * @param ArrayObject $options
      * @return boolean
      */
-    public function saveBelongsTo(Entity $data, ArrayObject $options) : bool
+    public function saveBelongsTo(Entity $data, ArrayObject $options): bool
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
        
@@ -284,7 +284,7 @@ class Association
         return true;
     }
 
-    public function saveHasOne(Entity $data, ArrayObject $options) : bool
+    public function saveHasOne(Entity $data, ArrayObject $options): bool
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
         foreach ($this->model->association('hasOne') as $alias => $config) {
@@ -305,7 +305,7 @@ class Association
         return true;
     }
 
-    public function saveHasMany(Entity $data, ArrayObject $options) : bool
+    public function saveHasMany(Entity $data, ArrayObject $options): bool
     {
         $associatedOptions = ['transaction' => false] + (array) $options;
         foreach ($this->model->association('hasMany') as $alias => $config) {
@@ -332,7 +332,7 @@ class Association
         return true;
     }
 
-    public function saveHasAndBelongsToMany(array $habtm, bool $callbacks) : bool
+    public function saveHasAndBelongsToMany(array $habtm, bool $callbacks): bool
     {
         foreach ($habtm as $alias => $data) {
             if (! $this->saveHABTM($alias, $data, $callbacks)) {
@@ -351,7 +351,7 @@ class Association
     * @param boolean $callbacks
     * @return bool
     */
-    private function saveHABTM(string $association, $data, bool $callbacks) : bool
+    private function saveHABTM(string $association, $data, bool $callbacks): bool
     {
         $connection = $this->model->connection();
 
@@ -427,7 +427,7 @@ class Association
      * @param boolean $callbacks
      * @return boolean
      */
-    public function deleteDependent($primaryKey, bool $callbacks) : bool
+    public function deleteDependent($primaryKey, bool $callbacks): bool
     {
         foreach (array_merge($this->model->association('hasOne'), $this->model->association('hasMany')) as $association => $config) {
             if (isset($config['dependent']) && $config['dependent'] === true) {
@@ -460,7 +460,7 @@ class Association
      * @param boolean $callbacks
      * @return boolean
      */
-    public function deleteHasAndBelongsToMany($id, bool $callbacks) : bool
+    public function deleteHasAndBelongsToMany($id, bool $callbacks): bool
     {
         foreach ($this->model->association('hasAndBelongsToMany') as $association => $config) {
             $associatedModel = $config['with'];

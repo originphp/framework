@@ -75,7 +75,7 @@ class I18n
      * @param array $config (locale,language,timezone)
      * @return void
      */
-    public static function initialize(array $config = []) : void
+    public static function initialize(array $config = []): void
     {
         $config += ['locale' => static::defaultLocale(),'language' => null,'timezone' => 'UTC'];
 
@@ -128,7 +128,7 @@ class I18n
      * @param string $locale
      * @return array|null
      */
-    protected static function loadLocale(string $locale) : ?array
+    protected static function loadLocale(string $locale): ?array
     {
         static::$definition = null;
 
@@ -216,7 +216,7 @@ class I18n
      *
      * @return string
      */
-    public static function detectLocale() : string
+    public static function detectLocale(): string
     {
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -249,7 +249,7 @@ class I18n
      * @param array  $vars - to use plurals you must use the placeholder {count} ['name'=>'jon', 'count'=>5]
      * @return string
      */
-    public static function translate(string $message, array $vars = []) : string
+    public static function translate(string $message, array $vars = []): string
     {
         /**
          * Handle if not locale set
@@ -291,7 +291,7 @@ class I18n
      *
      * @param string $language
      */
-    protected static function loadMessages(string $language) : void
+    protected static function loadMessages(string $language): void
     {
         $filename = APP . DS . 'Locale' . DS . $language . '.php';
         

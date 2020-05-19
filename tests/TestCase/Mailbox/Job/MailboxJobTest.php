@@ -21,7 +21,7 @@ use Origin\Mailbox\Model\InboundEmail;
 
 class SupportMailbox extends Mailbox
 {
-    protected function process() : void
+    protected function process(): void
     {
     }
 }
@@ -30,7 +30,7 @@ class MailboxJobTest extends OriginTestCase
 {
     public $fixtures = ['Origin.Mailbox'];
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->loadModel('InboundEmail', [
             'className' => InboundEmail::class

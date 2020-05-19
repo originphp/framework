@@ -25,7 +25,7 @@ class Schema
      * @param \Origin\Model\Connection $datasource
      * @return array
      */
-    public function createSql(Connection $datasource) : array
+    public function createSql(Connection $datasource): array
     {
         $out = [];
 
@@ -81,7 +81,7 @@ class Schema
      * @param \Origin\Model\Connection $datasource
      * @return array
      */
-    public function dropSql(Connection $datasource) : array
+    public function dropSql(Connection $datasource): array
     {
         $out = [];
         $properties = get_object_vars($this);
@@ -99,7 +99,7 @@ class Schema
      * @param string $table
      * @return array|null
      */
-    public function schema(string $table) : ?array
+    public function schema(string $table): ?array
     {
         return $this->$table ?? null;
     }

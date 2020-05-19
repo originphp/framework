@@ -32,7 +32,7 @@ class MockPlugin extends Plugin
     }
     public static $fileFound = true;
  
-    public static function include(string $filename) : bool
+    public static function include(string $filename): bool
     {
         return static::$fileFound;
     }

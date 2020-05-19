@@ -19,7 +19,7 @@ class MockService extends Service
 {
     protected $arg1 = null;
     protected $arg2 = null;
-    public function initialize($arg1, $arg2) : void
+    public function initialize($arg1, $arg2): void
     {
         $this->arg1 = $arg1;
         $this->arg2 = $arg2;

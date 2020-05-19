@@ -55,7 +55,7 @@ trait Timestampable
     * @param ArrayObject $options
     * @return void
     */
-    protected function timestambleBeforeCreate(Entity $entity, ArrayObject $options) : void
+    protected function timestambleBeforeCreate(Entity $entity, ArrayObject $options): void
     {
         $this->setTimestamp($entity, $this->createdField);
     }
@@ -67,7 +67,7 @@ trait Timestampable
      * @param ArrayObject $options
      * @return void
      */
-    protected function timestambleBeforeSave(Entity $entity, ArrayObject $options) : void
+    protected function timestambleBeforeSave(Entity $entity, ArrayObject $options): void
     {
         $this->setTimestamp($entity, $this->modifiedField);
     }
@@ -79,7 +79,7 @@ trait Timestampable
      * @param string $field
      * @return void
      */
-    private function setTimestamp(Entity $entity, string $field) : void
+    private function setTimestamp(Entity $entity, string $field): void
     {
         if (! $this->hasField($field)) {
             return;

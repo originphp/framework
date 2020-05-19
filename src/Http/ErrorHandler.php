@@ -173,7 +173,7 @@ class ErrorHandler
      * @param Exception $exception
      * @return void
      */
-    public function exceptionHandler($exception) : void
+    public function exceptionHandler($exception): void
     {
         $errorCode = 500;
         if ($exception->getCode() === 404) {
@@ -257,7 +257,7 @@ class ErrorHandler
      * @codeCoverageIgnore
      * @return void
      */
-    protected function sendResponse(string $response = null, int $statusCode = 200) : void
+    protected function sendResponse(string $response = null, int $statusCode = 200): void
     {
         http_response_code($statusCode);
         echo $response;

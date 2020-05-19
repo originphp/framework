@@ -138,7 +138,7 @@ class MailFetcher
      * @param string $messageId
      * @return array
      */
-    private function mailboxSync(array $emails, string $messageId) : array
+    private function mailboxSync(array $emails, string $messageId): array
     {
         $out = [];
         krsort($emails); // reverse the order checking latest first
@@ -172,7 +172,7 @@ class MailFetcher
      *
      * @return boolean
      */
-    private function disconnect() : bool
+    private function disconnect(): bool
     {
         if ($this->connection) {
             imap_close($this->connection);

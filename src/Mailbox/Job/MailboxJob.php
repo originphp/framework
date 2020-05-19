@@ -38,7 +38,7 @@ class MailboxJob extends Job
         $this->loadModel('InboundEmail', ['className' => InboundEmail::class]);
     }
 
-    protected function execute(Entity $inboundEmail) : void
+    protected function execute(Entity $inboundEmail): void
     {
         $mail = new Mail($inboundEmail->message);
         $mailbox = Mailbox::mailbox($mail->recipients());
