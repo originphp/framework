@@ -41,14 +41,16 @@ class Config
     }
  
     /**
-     * Loads values from a PHP file that returns an array
+     * Loads values from a PHP config file. app will load config into App.
+     * @internal this is for backwards compatability for now
      *
-     * @param string $filename
-     * @param string $key
+     * @param string $config e.g. app, cache, database, email, log
      * @return void
      */
-    public static function load(string $filename, string $key = null): void
+    public static function load(string $name): void
     {
+        $filename = CONFIG . '/' . $name . '.php';
+
         if (! is_file($filename)) {
             throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
         }
@@ -56,14 +58,10 @@ class Config
         $array = include $filename;
 
         if (! is_array($array)) {
-            throw new Exception(sprintf('Configuration file %s did not return an array', $filename));
+            throw new Exception(sprintf('Config file %s did not return an array', $filename));
         }
 
-        if ($key) {
-            $array = [$key => $array];
-        }
-
-        foreach ($array as $key => $value) {
+        foreach ([ucfirst($name) => $array] as $key => $value) {
             static::dot()->set($key, $value);
         }
     }

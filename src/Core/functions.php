@@ -23,7 +23,7 @@ use Origin\Core\Debugger;
  */
 function backtrace(): void
 {
-    if (Config::read('debug')) {
+    if (Config::read('App.debug')) {
         $debugger = new Debugger();
         $debug = $debugger->backtrace();
 
@@ -49,7 +49,7 @@ function backtrace(): void
  */
 function debug($data, bool $isHtml = false): void
 {
-    if (Config::read('debug')) {
+    if (Config::read('App.debug')) {
         $backtrace = debug_backtrace();
         $filename = str_replace(ROOT . DS, '', $backtrace[0]['file']);
         $line = $backtrace[0]['line'];
@@ -87,7 +87,7 @@ function isConsole(): bool
  */
 function pr($data): void
 {
-    if (Config::read('debug')) {
+    if (Config::read('App.debug')) {
         $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
         printf($template, print_r($data, true));
     }
@@ -101,7 +101,7 @@ function pr($data): void
  */
 function pj($data): void
 {
-    if (Config::read('debug')) {
+    if (Config::read('App.debug')) {
         $template = isConsole() ? "\n%s\n" : '<pre>%s</pre>';
         printf($template, json_encode($data, JSON_PRETTY_PRINT));
     }
@@ -222,7 +222,7 @@ function deprecationWarning(string $message): void
 
     Log::warning($message);
 
-    if (Config::read('debug')) {
+    if (Config::read('App.debug')) {
         trigger_error($message, E_USER_DEPRECATED);
     }
 }

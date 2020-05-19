@@ -136,7 +136,7 @@ class Cookie
         }
        
         if ($encrypt) {
-            $value = self::prefix . Security::encrypt($value, Config::read('Security.key'));
+            $value = self::prefix . Security::encrypt($value, $this->securityKey());
         }
        
         return (string) $value;
@@ -152,7 +152,7 @@ class Cookie
     {
         $length = strlen(self::prefix);
         // a parse error in application will trigger type error with security::decrypt
-        $key = Config::read('Security.key');
+        $key = $this->securityKey();
         if (substr($value, 0, $length) === self::prefix && $key) {
             $value = substr($value, $length);
             $value = Security::decrypt($value, $key);
@@ -162,5 +162,15 @@ class Cookie
         }
 
         return $value;
+    }
+
+    /**
+     * Gets the security key
+     * @deprecated Security.key has been deprecated
+     * @return string
+     */
+    private function securityKey() : string
+    {
+        return Config::read('App.securityKey') ?? Config::read('Security.key');
     }
 }

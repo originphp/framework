@@ -165,6 +165,12 @@ class Session
      */
     protected function timedOut($timeout = 3600): bool
     {
+        if (Config::exists('App.sessionTimeout')) {
+            $timeout = Config::read('App.sessionTimeout');
+        }
+        /**
+         * @deprecated left for backwards comptability
+         */
         if (Config::exists('Session.timeout')) {
             $timeout = Config::read('Session.timeout');
         }

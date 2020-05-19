@@ -182,7 +182,7 @@ abstract class Connection
             $this->statement = $query = $this->connection->prepare($sql);
            
             $result = $query->execute($params);
-            if (Config::read('debug')) {
+            if (Config::read('App.debug')) {
                 $this->log[] = [
                     'query' => $this->unprepare($sql, $params),
                     'error' => ! $result,

@@ -21,16 +21,6 @@ class ConnectionManager
 {
     use Configurable;
 
-    protected static $engines = [
-        'mysql' => __NAMESPACE__ . '\Engine\MysqlEngine',
-        'pgsql' => __NAMESPACE__ . '\Engine\PgsqlEngine',
-    ];
-    /**
-     * Holds the driver
-     *
-     * @var string
-     */
-    public static $driver = null;
     /**
      * Holds all the connections.
      *
@@ -57,14 +47,18 @@ class ConnectionManager
         $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null,'engine' => 'mysql'];
         
         $config = array_merge($defaults, static::config($name));
-       
-        if (! isset(static::$engines[$config['engine']])) {
+    
+        /**
+         * ucfirst is for backwards compatability
+         */
+        if (isset($config['engine'])) {
+            $config['className'] = __NAMESPACE__  . '\Engine\\' . ucfirst($config['engine']) .'Engine';
+        }
+        if (empty($config['className']) || ! class_exists($config['className'])) {
             throw new InvalidArgumentException("Unkown engine `{$config['engine']}` in `{$name}` connection.");
         }
-        static::$driver = $config['engine'];
-      
-        $class = static::$engines[$config['engine']];
-        $datasource = new $class(['connection' => $name] + $config);
+    
+        $datasource = new $config['className'](['connection' => $name] + $config);
 
         $datasource->connect($config);
 

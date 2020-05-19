@@ -153,7 +153,7 @@ class ErrorHandler
 
         $error = $this->levelMap[$level];
 
-        if (Config::read('debug')) {
+        if (Config::read('App.debug')) {
             # Output
             echo sprintf('<div class="origin-error"><strong>%s:</strong> %s in <strong>%s</strong> line: <strong>%d</strong></div>', strtoupper($error), $message, $file, $line);
         }
@@ -186,11 +186,11 @@ class ErrorHandler
         /**
          * Display debug backtrace
          */
-        if (Config::read('debug') === true && ! $this->isAjax()) {
+        if (Config::read('App.debug') === true && ! $this->isAjax()) {
             $this->debugExceptionHandler($exception);
         } else {
             $renderer = new ExceptionRenderer(Router::request());
-            $response = $renderer->render($exception, Config::read('debug'));
+            $response = $renderer->render($exception, Config::read('App.debug'));
             $this->sendResponse($response->body(), $response->statusCode());
         }
         
