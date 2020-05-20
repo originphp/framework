@@ -1,9 +1,9 @@
 # Changelog
-## [unreleased]
 
-## [2.5.1] - 2020-05-18
+## [2.6.0] - 2020-05-20
 
 ### Added
+
 - Added Config::consume
 - Added `stopOnFail` validation setting
 - Added `notEmpty` validation rule (checks value and file uploads)
@@ -13,21 +13,24 @@
 
 ### Changed
 
-- Changed .env.php is now the cached version of the .env
-
-- Changed validation settings key with backwards compatibility
+- Changed .env.php is now the cached version of the parsed .env
+- Changed validation settings key with full backwards compatibility
   - renamed validation setting key `required` to `present`
   - validation setting key `allowBlank` to `allowEmpty`
-
 - Changed behavior of `required`, previously this was checking modified fields, to work with a certain form 
 behavior, however this was incorrect, now it checks if key is present full stop.
+
+### Notice
+
+`Config::load` was developed but never implemented, however this has now been implemented in a different way and adjusted accordingly. The first argument no longer filename. If you have used this internal feature then it is a breaking change.
 
 ### Added
 
 - FormHelper now accepts a `default` value when creating form control.
 
-### Fixed
+## [2.5.1] - 2020-05-12
 
+### Fixed
 - Fixed Number::parser returning 0 when non numeric strings were passed
 - Fixed Model::new not using entity locator for custom entity classes
 - Fixed FormHelper radio custom class
