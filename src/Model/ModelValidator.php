@@ -150,25 +150,22 @@ class ModelValidator
      */
     public function validates(Entity $entity, bool $create = true): bool
     {
-        $modified = $entity->modified();
-
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] && ! $this->runRule($create, $validationRule['on'])) {
                     continue;
                 }
-
+                       
                 $checkPresent = $validationRule['present'] || $validationRule['rule'] === 'present';
-    
                 $isPresent = in_array($field, $entity->properties());
-
+        
                 // Don't run validation rule on field if its not in the entity regardless if its modified or not
                 if (! $checkPresent && $validationRule['rule'] !== 'required' && ! $isPresent) {
                     continue;
                 }
-
+        
                 $value = $entity->get($field);
-
+        
                 // Required means the key must be present not wether it has a value or not
                 if ($checkPresent) {
                     if (! $isPresent) {
@@ -177,11 +174,12 @@ class ModelValidator
                             break;
                         }
                     }
+                    // all done here
                     if ($validationRule['rule'] === 'present') {
                         continue;
                     }
                 }
-             
+                  
                 /**
                  * Handle special 'notEmpty' and 'required' since these validation rules do
                  * not exist in the validation library.
@@ -189,23 +187,27 @@ class ModelValidator
                 if (in_array($validationRule['rule'], ['notEmpty','required'])) {
                     if ($this->empty($value)) {
                         $entity->invalidate($field, $validationRule['message']);
+                        if ($validationRule['rule'] === 'required' || $validationRule['stopOnFail']) {
+                            break;
+                        }
                     }
-                    if ($validationRule['rule'] === 'required' || $validationRule['stopOnFail']) {
+                           
+                    continue;
+                }
+        
+                // new in 2.6 - setting this rule will void other rules if the value is empty
+                if ($validationRule['rule'] === 'optional') {
+                    if ($this->empty($value)) {
                         break;
                     }
                     continue;
                 }
-
-                // new in 2.6 - setting this rule will void other rules if the value is empty
-                if ($validationRule['rule'] === 'optional' && $this->empty($value)) {
-                    break;
-                }
-
+        
                 // go to next rule as this validation rule does not require this
                 if ($validationRule['allowEmpty'] === true && $this->empty($value)) {
                     continue;
                 }
-
+        
                 // Handle both types
                 if ($validationRule['rule'] === 'isUnique') {
                     $validationRule['rule'] = ['isUnique', [$field]];
@@ -213,11 +215,11 @@ class ModelValidator
                 if (is_array($validationRule['rule']) && $validationRule['rule'][0] === 'isUnique') {
                     $value = $entity;
                 }
-
+        
                 if ($validationRule['rule'] === 'confirm') {
                     $validationRule['rule'] = ['confirm', $entity->get($field . '_confirm')];
                 }
-
+        
                 if (! $this->validate($value, $validationRule['rule'])) {
                     $entity->invalidate($field, $validationRule['message']);
                     if ($validationRule['stopOnFail']) {

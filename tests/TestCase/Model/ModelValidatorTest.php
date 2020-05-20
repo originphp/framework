@@ -373,13 +373,40 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testOptionalRule()
     {
-        $this->Article->validate('title', 'alphaNumeric');
-        $article = $this->Article->new(['title' => '', 'body' => ['bad data']]);
-        $this->assertFalse($this->Article->validates($article));
+        $this->Article->validate('url', [
+            'optional',
+            'url'
+        ]);
 
-        $this->Article->validate('title', ['optional', 'alphaNumeric']);
-        $article = $this->Article->new(['title' => '', 'body' => ['bad data']]);
-        $this->assertTrue($this->Article->validates($article));
+        $articleValid1 = $this->Article->new(['title' => 'foo', 'url' => null]);
+        $articleValid2 = $this->Article->new(['title' => 'foo', 'url' => 'https://www.originphp.com/docs/getting-started/']);
+       
+        $articleInvalid = $this->Article->new(['title' => 'foo', 'url' => 'not a url']);
+       
+        $this->assertTrue($this->Article->validates($articleValid1));
+        $this->assertTrue($this->Article->validates($articleValid2));
+        $this->assertFalse($this->Article->validates($articleInvalid));
+    }
+
+    /**
+    * This was added after bug found which the presentKey test was
+    * not checking, which was subsequent rules. Left as bug fix as a
+    * reminder
+    */
+    public function testRequiredRule()
+    {
+        $this->Article->validate('url', [
+            'required',
+            'url'
+        ]);
+
+        $articleValid = $this->Article->new(['title' => 'foo', 'url' => 'https://www.originphp.com/docs/getting-started/']);
+        $articleInvalid1 = $this->Article->new(['title' => 'foo']);
+        $articleInvalid2 = $this->Article->new(['title' => 'foo', 'url' => 'not a url']);
+       
+        $this->assertTrue($this->Article->validates($articleValid));
+        $this->assertFalse($this->Article->validates($articleInvalid1));
+        $this->assertFalse($this->Article->validates($articleInvalid2));
     }
 
     public function testNotEmpty()
@@ -414,13 +441,18 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testPresentRule()
     {
-        $this->Article->validate('title', 'alphaNumeric');
-        $article = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
-        $this->assertTrue($this->Article->validates($article));
+        $this->Article->validate('url', [
+            'present',
+            'url'
+        ]);
 
-        $this->Article->validate('title', ['present', 'alphaNumeric']);
-        $article = $this->Article->new(['body' => 'not important']);
-        $this->assertFalse($this->Article->validates($article));
+        $articleValid = $this->Article->new(['title' => 'foo', 'url' => 'https://www.originphp.com/docs/getting-started/']);
+        $articleInvalid1 = $this->Article->new(['title' => 'foo']);
+        $articleInvalid2 = $this->Article->new(['title' => 'foo', 'url' => 'not a url']);
+       
+        $this->assertTrue($this->Article->validates($articleValid));
+        $this->assertFalse($this->Article->validates($articleInvalid1));
+        $this->assertFalse($this->Article->validates($articleInvalid2));
     }
 
     public function testPresentKey()
