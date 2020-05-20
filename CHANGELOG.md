@@ -10,6 +10,7 @@
 - Added special Validation rule `required`
 - Added special Validation rule `optional`
 - Added special Validation rule `present`
+- FormHelper now accepts a `default` value when creating form control.
 
 ### Changed
 
@@ -23,10 +24,6 @@ behavior, however this was incorrect, now it checks if key is present full stop.
 ### Notice
 
 `Config::load` was developed but never implemented, however this has now been implemented in a different way and adjusted accordingly. The first argument no longer filename. If you have used this internal feature then it is a breaking change.
-
-### Added
-
-- FormHelper now accepts a `default` value when creating form control.
 
 ## [2.5.1] - 2020-05-12
 
