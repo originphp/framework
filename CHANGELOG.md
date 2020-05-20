@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.6.1] - 2020-05-20
+
+### Fixed
+
+- Fixed bug with new validation rules `required` and `optional`
+
 ## [2.6.0] - 2020-05-20
 
 ### Added
