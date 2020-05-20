@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added Config::consume
+- Added `Config::consume`
 - Added `stopOnFail` validation setting
 - Added `notEmpty` validation rule (checks value and file uploads)
 - Added special Validation rule `required`
