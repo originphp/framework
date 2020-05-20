@@ -30,7 +30,7 @@ web application
 - XML reading and writing
 - Html parsing and converting
 - Markdown parsing and converting
-- Storage system which supports local disk, FTP and SFTP
+- Storage system which supports local disk, FTP, SFTP, S3 and ZIP.
 - Service Objects
 - Repositories
 - Query Objects
