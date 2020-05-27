@@ -514,7 +514,11 @@ class Model
     public function schema(string $field = null)
     {
         if ($this->schema === null) {
-            $this->schema = $this->connection()->describe($this->table);
+            $this->schema = $this->table ? $this->connection()->describe($this->table) : [
+                'columns' => [],
+                'indexes' => [],
+                'constraints' => []
+            ];
         }
         if ($field === null) {
             return $this->schema;
