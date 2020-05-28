@@ -61,4 +61,14 @@ class NumberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull(Number::parse('abc'));
     }
+
+    public function testFormatNegative()
+    {
+        $this->assertEquals('(1,234,567)', Number::format('-1234567')); // test integer
+        $this->assertEquals('(1,234,567)', Number::format(-1234567)); // test integer
+        $this->assertEquals('-1,234,567', Number::format('-1234567', ['negative' => 'not brackets'])); // test integer
+
+        $this->assertEquals('($1,234.57)', Number::currency(-1234.56789, 'USD'));
+        $this->assertEquals('-$1,234.57', Number::currency(-1234.56789, 'USD', ['negative' => 'not brackets']));
+    }
 }

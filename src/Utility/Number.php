@@ -155,7 +155,19 @@ class Number
             'places' => $places,
             'thousands' => $locale['thousands'],
             'decimals' => $locale['decimals'],
+            'negative' => '()'
         ];
+
+        $value = (float) $value;
+        if ($value < 0) {
+            if ($options['negative'] === '()') {
+                $options['before'] = '(' . $options['before'];
+                $options['after'] .= ')';
+            } else {
+                $options['before'] = '-'. $options['before'];
+            }
+            $value = abs($value);
+        }
 
         $formatted = number_format((float) $value, $options['places'], $options['decimals'], $options['thousands']);
     
