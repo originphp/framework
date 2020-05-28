@@ -151,7 +151,7 @@ class ModelValidator
     public function validates(Entity $entity, bool $create = true): bool
     {
         $modified = $entity->modified();
-        
+
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] && ! $this->runRule($create, $validationRule['on'])) {
@@ -184,7 +184,7 @@ class ModelValidator
                  * Validation should only occur on modified fields, such as from
                  * forms or changes, custom rules or isUnique can break.
                  */
-                if (! in_array($field, $modified)) {
+                if ($validationRule['rule'] !== 'required' && ! in_array($field, $modified)) {
                     continue;
                 }
 
