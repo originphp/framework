@@ -150,6 +150,8 @@ class ModelValidator
      */
     public function validates(Entity $entity, bool $create = true): bool
     {
+        $modified = $entity->modified();
+        
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
                 if ($validationRule['on'] && ! $this->runRule($create, $validationRule['on'])) {
@@ -164,8 +166,6 @@ class ModelValidator
                     continue;
                 }
         
-                $value = $entity->get($field);
-        
                 // Required means the key must be present not wether it has a value or not
                 if ($checkPresent) {
                     if (! $isPresent) {
@@ -179,6 +179,16 @@ class ModelValidator
                         continue;
                     }
                 }
+                
+                /**
+                 * Validation should only occur on modified fields, such as from
+                 * forms or changes, custom rules or isUnique can break.
+                 */
+                if (! in_array($field, $modified)) {
+                    continue;
+                }
+
+                $value = $entity->get($field);
                   
                 /**
                  * Handle special 'notEmpty' and 'required' since these validation rules do
