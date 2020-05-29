@@ -71,7 +71,9 @@ if (file_exists($configFile)) {
         '# .env (cached version) - Do not edit, delete instead',
         '# Automatically generated ' . now(),
     ];
-    (new PhpFile())->write($configFile, $vars, ['short' => true,'before' => implode("\n", $header)]);
+    if (env('APP_DEBUG') === false) {
+        (new PhpFile())->write($configFile, $vars, ['short' => true,'before' => implode("\n", $header)]);
+    }
 }
 
 /**
