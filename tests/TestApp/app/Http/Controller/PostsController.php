@@ -22,4 +22,8 @@ class PostsController extends ApplicationController
     {
         return $this->$key ?? null;
     }
+
+    public function info()
+    {
+    }
 }

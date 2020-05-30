@@ -21,6 +21,7 @@ use Origin\TestSuite\TestTrait;
 use Origin\Http\View\Helper\Helper;
 use Origin\Core\Exception\Exception;
 use Origin\Http\Controller\Controller;
+use App\Http\Controller\PostsController;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
 use Origin\Http\View\Exception\MissingElementException;
@@ -99,7 +100,9 @@ class ViewTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
-        $this->View = new View(new TestsController(new Request(), new Response()));
+        $this->View = new View(
+            new TestsController(new Request(), new Response())
+        );
     }
 
     public function testConstruct()
@@ -217,8 +220,18 @@ class ViewTest extends \PHPUnit\Framework\TestCase
     {
         $this->View->loadHelper('Flash');
         $result = $this->View->render('/Posts/index', 'default');
+
         $this->assertStringContainsString('<h1>Posts Home Page</h1>', $result); // view
         $this->assertStringContainsString('<title>Tests</title>', $result); // Layout
+    }
+
+    public function testViewView()
+    {
+        $request = new Request('posts/info');
+        $controller = new PostsController($request, new Response());
+        $view = new View($controller);
+        $expected = "<h1>Info</h1>\n<div class=\"tab\"></div>";
+        $this->assertStringContainsString($expected, $view->render('info'));
     }
 
     public function testViewRenderPlugin()
