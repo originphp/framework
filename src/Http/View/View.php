@@ -161,6 +161,28 @@ class View
     }
 
     /**
+     * This renders a view within a view, it does not render a template, this is used
+     * to break up large view files, as opposed to elements which are for sharing.
+     *
+     * @param string $name
+     * @param array $vars
+     * @return string
+     */
+    public function view(string $name, array $vars = []): string
+    {
+        $view__filename = $this->getViewFilename($name);
+
+        $vars = array_merge($this->vars, $vars);
+       
+        extract($vars);
+
+        ob_start();
+        include $view__filename;
+
+        return ob_get_clean();
+    }
+
+    /**
      * Returns the rendered view
      *
      * @return string|null
