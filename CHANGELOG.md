@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.6.2] - 2020-05-30
+
+### Fixed
+
+- Fixed issue with `isUnique` caused by recent change to validation
+
+### Added
+
+- Added View::view method to be able to split large views into smaller ones, such as when using nav pills with javascript.
+- Added negative number formatting to Number `Utility\Number`
+
+### Changed
+
+- Changed dotenv parsing to only cache when debug is disabled.
+
 ## [2.6.1] - 2020-05-20
 
 ### Fixed
