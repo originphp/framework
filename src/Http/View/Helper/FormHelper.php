@@ -329,7 +329,7 @@ class FormHelper extends Helper
     {
         $selectOptions = [];
 
-        if (empty($options['type']) && ! empty($options['options'])) {
+        if (empty($options['type']) && array_key_exists('options', $options)) {
             $options['type'] = 'select';
         }
 
