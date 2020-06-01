@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+- Added HtmlHelper::tag for cleaner code with views
+
 ## [2.6.2] - 2020-05-30
 
 ### Fixed
