@@ -2,6 +2,10 @@
 
 ## [unreleased]
 
+### Fixed
+
+- Fixed Form select control type detect with empty value
+
 ### Added
 
 - Added HtmlHelper::tag for cleaner code with views
