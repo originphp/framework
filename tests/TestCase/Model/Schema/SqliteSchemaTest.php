@@ -185,9 +185,6 @@ class SqliteSchemaTest extends OriginTestCase
     {
         $adapter = new SqliteSchema('test');
 
-        // tmp
-        $adapter->connection()->execute($adapter->dropTableSql('tusers', ['ifExists' => true]));
-
         $schema = [
             'id' => 'integer',
             'user_id' => 'integer',
