@@ -34,7 +34,6 @@ class HtmlHelper extends Helper
         ],
     ];
 
-
     /**
      * Formats content in a block, such as span, small, etc
      *
