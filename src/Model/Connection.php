@@ -102,6 +102,18 @@ abstract class Connection
     protected $quote = '`';
 
     /**
+     * internal mapping to PDO
+     *
+     * @param array $config
+     */
+    private $typeMap = [
+        'assoc' => PDO::FETCH_ASSOC,
+        'num' => PDO::FETCH_NUM,
+        'model' => PDO::FETCH_NUM,
+        'obj' => PDO::FETCH_OBJ
+    ];
+
+    /**
      * Constructor
      *
      * @param array $config
@@ -180,7 +192,7 @@ abstract class Connection
         try {
             $start = microtime(true);
             $this->statement = $query = $this->connection->prepare($sql);
-           
+
             $result = $query->execute($params);
             if (debugEnabled()) {
                 $this->log[] = [
@@ -215,6 +227,13 @@ abstract class Connection
         return true;
     }
 
+    /**
+     * Inperpolates SQL params into a SQL statement for debugging purposes.
+     *
+     * @param string $sql
+     * @param array $params
+     * @return string
+     */
     protected function unprepare(string $sql, array  $params): string
     {
         $data = [];
@@ -234,6 +253,8 @@ abstract class Connection
 
     /**
      * Check result object is part of PDOStatement.
+     *
+     * @internal Sqlite returning 0 for row count when running pragma.
      *
      * @return bool
      */
@@ -305,11 +326,11 @@ abstract class Connection
      */
     public function lastAffected(): int
     {
-        if ($this->hasResults()) {
-            return $this->statement->rowCount();
+        if ($this->statement === null) {
+            return 0;
         }
 
-        return 0;
+        return $this->statement->rowCount();
     }
     /**
      * Disconnects the database
@@ -336,15 +357,22 @@ abstract class Connection
      */
     public function fetch(string $type = 'assoc')
     {
-        if ($this->hasResults()) {
-            if ($type === 'model') {
-                $this->mapColumns();
-            }
+        $fetchType = $this->typeMap[$type] ?? 'assoc';
 
-            return $this->fetchResult($type);
+        $result = $this->statement->fetch($fetchType);
+        if ($result === false) {
+            $this->statement->closeCursor();
+
+            return null;
         }
 
-        return null;
+        if ($type === 'model') {
+            $this->mapColumns();
+
+            return $this->toModel($result, $this->columnMap);
+        }
+
+        return $result;
     }
 
     /**
@@ -354,11 +382,14 @@ abstract class Connection
      */
     public function fetchList(): ?array
     {
-        if ($this->hasResults()) {
-            return $this->toList($this->statement->fetchAll(PDO::FETCH_NUM));
-        }
+        $results = $this->statement->fetchAll(PDO::FETCH_NUM);
+        if ($results === false) {
+            $this->statement->closeCursor();
 
-        return null;
+            return null;
+        }
+        
+        return ! empty($results) ?  $this->toList($results) : null;
     }
 
     /**
@@ -369,50 +400,28 @@ abstract class Connection
      */
     public function fetchAll(string $type = 'assoc'): ?array
     {
-        if ($this->hasResults()) {
-            $rows = [];
-       
-            if ($type === 'model') {
-                $this->mapColumns();
-            }
-       
-            while ($row = $this->fetchResult($type)) {
-                $rows[] = $row;
-            }
- 
-            return $rows;
+        $fetchType = $this->typeMap[$type] ?? 'assoc';
+
+        $results = $this->statement->fetchAll($fetchType);
+        if ($results === false) {
+            $this->statement->closeCursor();
+
+            return null;
         }
 
-        return null;
-    }
-
-    /**
-     * Fetches the next row from the database. Model method does not work with postgresql
-     * cause meta for table does not return alias.
-     *
-     * @param string $type (num | assoc | model | object)
-     * @return array|bool row
-     */
-    protected function fetchResult(string $type = 'assoc')
-    {
-        $fetchType = PDO::FETCH_ASSOC;
-        if ($type === 'num' || $type === 'model') {
-            $fetchType = PDO::FETCH_NUM;
-        } elseif ($type === 'obj') {
-            $fetchType = PDO::FETCH_OBJ;
+        if ($type !== 'model') {
+            return $results;
         }
 
-        if ($row = $this->statement->fetch($fetchType)) {
-            if ($type === 'model') {
-                $row = $this->toModel($row, $this->columnMap);
-            }
+        $this->mapColumns();
 
-            return $row;
+        $rows = [];
+
+        foreach ($results as $row) {
+            $rows[] = $this->toModel($row, $this->columnMap);
         }
-       
-        $this->statement->closeCursor();
 
-        return false;
+        return $rows;
     }
 
     /**
@@ -425,6 +434,7 @@ abstract class Connection
     protected function toList(array $rows): array
     {
         $result = [];
+ 
         $columnCount = count($rows[0]);
         foreach ($rows as $row) {
             if ($columnCount == 1) {
