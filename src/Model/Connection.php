@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Model;
 
 use PDO;
+use Exception;
 use PDOException;
 use PDOStatement;
 use Origin\Log\Log;
@@ -368,7 +369,7 @@ abstract class Connection
 
         if ($type === 'model') {
             $this->mapColumns();
-
+         
             return $this->toModel($result, $this->columnMap);
         }
 
@@ -402,18 +403,20 @@ abstract class Connection
     {
         $fetchType = $this->typeMap[$type] ?? 'assoc';
 
+        if ($this->statement && $type === 'model') {
+            $this->mapColumns();
+        }
+
         $results = $this->statement->fetchAll($fetchType);
         if ($results === false) {
             $this->statement->closeCursor();
 
             return null;
         }
-
+    
         if ($type !== 'model') {
             return $results;
         }
-
-        $this->mapColumns();
 
         $rows = [];
 
@@ -483,6 +486,7 @@ abstract class Connection
     /**
      * Builds a map so that an assoc array can be setup.
      * @internal getColumnMeta does not work with PostgreSql, table returns table name instead of alias
+     *
      * @param PDOStatement $statement
      * @return void
      */
@@ -492,9 +496,14 @@ abstract class Connection
         if ($statement == null) {
             $statement = $this->statement;
         }
+     
         $numberOfFields = $statement->columnCount();
+        
         for ($i = 0; $i < $numberOfFields; ++$i) {
             $column = $statement->getColumnMeta($i); // could be bottle neck on
+            if ($column === false) {
+                debug([$numberOfFields,$i]);
+            }
             if (empty($column['table']) || $this->isVirtualField($column['name'])) {
                 $this->columnMap[$i] = [0, $column['name']];
             } else {
