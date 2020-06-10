@@ -15,6 +15,7 @@
 namespace Origin\Test\Query;
 
 use Origin\Model\Model;
+use Origin\Model\ConnectionManager;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Query\BatchInsertQuery;
 
@@ -37,7 +38,9 @@ class BatchInsertQueryTest extends OriginTestCase
          * autoincrement. Truncating table for now.
          * @todo investigate this behavior
          */
-        $this->Post->query('TRUNCATE table posts');
+        $connection = ConnectionManager::get('test');
+        $sql = $connection->adapter()->truncateTableSql('posts');
+        $this->Post->query($sql);
         
         $this->assertEquals(0, $this->Post->find('count'));
         $records = [];
