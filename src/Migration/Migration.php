@@ -164,7 +164,9 @@ class Migration
     private function executeStatements(array $statements): void
     {
         $this->connection()->begin();
-     
+        
+        $statements = array_filter($statements);
+        
         foreach ($statements as $statement) {
             try {
                 $this->connection()->execute($statement);
