@@ -40,7 +40,7 @@ class ConnectionTest extends OriginTestCase
         unset($config['database']);
         $connection = ConnectionManager::create('nodb', $config);
         $this->assertNull($connection->database());
-        $this->assertEquals('origin_test', $this->connection->database());
+        $this->assertStringContainsString('origin_test', $this->connection->database());
         ConnectionManager::drop('nodb');
     }
 
@@ -125,26 +125,54 @@ class ConnectionTest extends OriginTestCase
         $this->connection->execute('SELECT id, name, description FROM authors LIMIT 1');
         $this->assertNotEmpty($this->connection->log());
     }
-    /**
-     * @depends testCreate
-     */
-    public function testExecuteSelect()
+
+    public function testExecuteSelectNoRecord()
     {
         $sql = 'SELECT name FROM authors WHERE id = 1024';
         $this->connection->execute($sql);
         $this->assertNull($this->connection->fetch());
- 
+    }
+
+    public function testExecuteSelectFoundRecord()
+    {
         $sql = 'SELECT id, name, description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
         $expected = ['id' => 1000, 'name' => 'Author #1', 'description' => 'Description about Author #1'];
         $this->assertEquals($expected, $this->connection->fetch());
+    }
+
+    public function testExcecuteSelectWithAlias()
+    {
         $sql = 'SELECT authors.id , authors.name, authors.description FROM authors LIMIT 1';
         $this->assertTrue($this->connection->execute($sql));
         $expected = ['authors' => ['id' => 1000, 'name' => 'Author #1', 'description' => 'Description about Author #1']];
         $result = $this->connection->fetch('model');
         $this->assertEquals($expected, $result);
+    }
+
+    public function testExcecuteSelectModelWithJoin()
+    {
+        $sql = 'SELECT articles.id, articles.title, authors.id, authors.name FROM articles LEFT JOIN authors  ON ( articles.author_id = authors.id )  WHERE articles.id = 1000 LIMIT 1';
+        $this->assertTrue($this->connection->execute($sql));
+        $result = $this->connection->fetch('model');
+        
+        // Check in Right Places
+        $this->assertArrayHasKey('articles', $result);
+        $this->assertArrayHasKey('title', $result['articles']);
+        $this->assertNotEmpty($result['articles']['title']);
+ 
+        // Check Join fields
+        $this->assertArrayHasKey('authors', $result);
+        $this->assertArrayHasKey('name', $result['authors']);
+        $this->assertEquals('Author #2', $result['authors']['name']);
+    }
+
+    public function testVirtualFields()
+    {
+        if ($this->connection->engine() === 'sqlite') {
+            $this->markTestSkipped('Concat does not work with sqlite');
+        }
         $sql = 'SELECT articles.id, articles.title,authors.id,authors.name, CONCAT(articles.id, \':\', authors.name) AS articles__ref FROM articles LEFT JOIN authors  ON ( articles.author_id = authors.id )  WHERE articles.id = 1000 LIMIT 1';
-       
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetch('model');
         
@@ -156,6 +184,10 @@ class ConnectionTest extends OriginTestCase
         $this->assertArrayHasKey('authors', $result);
         $this->assertArrayHasKey('name', $result['authors']);
         $this->assertEquals('Author #2', $result['authors']['name']);
+    }
+
+    public function testSelectReadMany()
+    {
         // Read Many
         $sql = 'SELECT id, name, description FROM authors';
         $this->assertTrue($this->connection->execute($sql));
@@ -164,12 +196,24 @@ class ConnectionTest extends OriginTestCase
         $this->assertEquals(3, count($result));
         $this->assertEquals('Author #1', $result[0]['name']);
         $this->assertEquals('Author #2', $result[1]['name']);
+    }
+
+    public function testSelectAllModel()
+    {
         $sql = 'SELECT authors.id , authors.name, authors.description FROM authors';
         $this->assertTrue($this->connection->execute($sql));
         $result = $this->connection->fetchAll('model');
         $this->assertEquals(3, count($result));
         $this->assertEquals('Author #1', $result[0]['authors']['name']);
         $this->assertEquals('Author #2', $result[1]['authors']['name']);
+    }
+
+    public function testSelectAllVirtualFields()
+    {
+        if ($this->connection->engine() === 'sqlite') {
+            $this->markTestSkipped('Concat does not work with sqlite');
+        }
+
         $sql = 'SELECT articles.id, articles.title,authors.id,authors.name, CONCAT(articles.id, \':\', authors.name) AS articles__ref FROM articles LEFT JOIN authors  ON ( articles.author_id = authors.id )';
        
         $this->assertTrue($this->connection->execute($sql));
@@ -178,6 +222,9 @@ class ConnectionTest extends OriginTestCase
         $this->assertArrayHasKey('ref', $result[0]['articles']);
         $this->assertArrayHasKey('ref', $result[1]['articles']);
         $this->assertArrayHasKey('ref', $result[2]['articles']);
+    }
+    public function testSelectLists()
+    {
         $timestamp = now();
         // Test Lists
         $data = [
@@ -194,6 +241,7 @@ class ConnectionTest extends OriginTestCase
         $expected = [1002, 1001, 1000,999];
         $this->assertTrue($this->connection->execute($sql));
         $this->assertEquals($expected, $this->connection->fetchList());
+
         $sql = 'SELECT id,name FROM authors ORDER BY id DESC';
         $expected = [1002 => 'Author #3', 1001 => 'Author #2', 1000 => 'Author #1', 999 => 'Sean'];
         $this->assertTrue($this->connection->execute($sql));
@@ -211,9 +259,6 @@ class ConnectionTest extends OriginTestCase
         $this->assertEquals($expected, $result['2019-03-27 13:11:00']);
     }
 
-    /**
-     * @depends testExecuteSelect
-     */
     public function testExecuteUpdate()
     {
         $sql = "UPDATE authors SET name ='Anthony Robbins' WHERE name ='Author #1'";
