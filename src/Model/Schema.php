@@ -72,7 +72,7 @@ class Schema
             }
         }
 
-        return $out;
+        return array_filter($out);
     }
 
     /**
