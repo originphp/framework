@@ -30,7 +30,7 @@ return [
     ],
     'test' => [
         'host' => env('DB_HOST', '127.0.0.1'),
-        'database' => $engine === 'sqlite' ? ROOT . '/origin_test.db' : 'origin',
+        'database' => $engine === 'sqlite' ? ROOT . '/origin_test.db' : 'origin_test',
         'username' => env('DB_USERNAME'),
         'password' => env('DB_PASSWORD'),
         'className' => $engineMap[$engine]
