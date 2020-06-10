@@ -10,6 +10,7 @@ env:
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
     - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
+    - DB_ENGINE=sqlite DB_HOST=localhost DB_USERNAME=jim
 services:
   - mysql
   - postgresql
