@@ -164,15 +164,15 @@ class Migration
     private function executeStatements(array $statements): void
     {
         $this->connection()->begin();
-        
-        $statements = array_filter($statements);
-        
-        foreach ($statements as $statement) {
-            try {
-                $this->connection()->execute($statement);
-            } catch (DatasourceException $ex) {
-                $this->connection()->rollback();
-                throw new Exception($ex->getMessage());
+
+        foreach ($statements as $collection) {
+            foreach ($collection->statements() as $sql) {
+                try {
+                    $this->connection()->execute($sql);
+                } catch (DatasourceException $ex) {
+                    $this->connection()->rollback();
+                    throw new Exception($ex->getMessage());
+                }
             }
         }
         $this->connection()->commit();
@@ -208,7 +208,7 @@ class Migration
         if (! in_array($this->calledBy(), ['up','down'])) {
             throw new Exception('Execute can only be called from up/down');
         }
-        $this->statements[] = $sql;
+        $this->statements[] = new Sql($sql);
     }
 
     /**
@@ -219,12 +219,8 @@ class Migration
     public function calledBy(): string
     {
         $result = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
-        $calledBy = null;
-        if (isset($result[2]['function'])) {
-            $calledBy = $result[2]['function'];
-        }
 
-        return $calledBy;
+        return $result[2]['function'] ?? null;
     }
 
     /**
@@ -280,11 +276,13 @@ class Migration
         $this->pendingColumns[$name] = array_keys($schema);
   
         foreach ($this->adapter()->createTableSql($name, $schema, $tableOptions) as $statement) {
-            $this->statements[] = $statement;
+            $this->statements[] = new Sql($statement);
         }
 
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->dropTableSql($name);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->dropTableSql($name)
+            );
         }
     }
 
@@ -313,11 +311,13 @@ class Migration
   
         // do not run through this->createTable due to called by
         foreach ($this->adapter()->createTableSql($name, $schema, $options) as $statement) {
-            $this->statements[] = $statement;
+            $this->statements[] = new Sql($statement);
         }
 
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->dropTableSql($name);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->dropTableSql($name)
+            );
         }
     }
 
@@ -335,12 +335,14 @@ class Migration
             throw new Exception("{$table} table does not exist");
         }
 
-        $this->statements[] = $this->adapter()->dropTableSql($table, $options);
+        $this->statements[] = new Sql(
+            $this->adapter()->dropTableSql($table, $options)
+        );
 
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->describe($table);
             foreach ($this->adapter()->createTableSql($table, $schema['columns'], $schema) as $statement) {
-                $this->reverseStatements[] = $statement;
+                $this->reverseStatements[] = new Sql($statement);
             }
         }
     }
@@ -354,9 +356,14 @@ class Migration
      */
     public function renameTable(string $from, string $to): void
     {
-        $this->statements[] = $this->adapter()->renameTable($from, $to);
+        $this->statements[] = new Sql(
+            $this->adapter()->renameTable($from, $to)
+        );
+
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->renameTable($to, $from);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->renameTable($to, $from)
+            );
         }
     }
 
@@ -404,9 +411,14 @@ class Migration
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingColumns[$table][] = $name;
 
-        $this->statements[] = $this->adapter()->addColumn($table, $name, $type, $options);
+        $this->statements[] = new Sql(
+            $this->adapter()->addColumn($table, $name, $type, $options)
+        );
+
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->removeColumn($table, $name);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->removeColumn($table, $name)
+            );
         }
     }
 
@@ -439,21 +451,31 @@ class Migration
         $schema = $this->adapter()->describe($table)['columns'];
         $engine = $this->connection()->engine();
        
+        // @todo move to Schema:changeColumn
         // Drop DEFAULT constraint if it exists (same in both MySQL and PgSQL)
         if (in_array($engine, ['pgsql','mysql']) && $schema[$name]['default']) {
-            $this->statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT";
+            $this->statements[] = new Sql(
+                "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT"
+            );
         }
 
         // In PgSQL not null is constraint.
         if ($engine === 'pgsql' && $schema[$name]['null'] === false) {
-            $this->statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL";
+            $this->statements[] = new Sql(
+                "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL"
+            );
         }
         
-        $this->statements[] = $this->adapter()->changeColumn($table, $name, $type, $options);
+        $this->statements[] = new Sql(
+            $this->adapter()->changeColumn($table, $name, $type, $options)
+        );
 
         if ($this->calledBy() === 'change') {
             $options = $schema[$name];
-            $this->reverseStatements[] = $this->adapter()->changeColumn($table, $name, $options['type'], $options);
+
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->changeColumn($table, $name, $options['type'], $options)
+            );
         }
     }
 
@@ -478,9 +500,13 @@ class Migration
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingColumns[$table][] = $to;
 
-        $this->statements[] = $this->adapter()->renameColumn($table, $from, $to);
+        $this->statements[] = new Sql(
+            $this->adapter()->renameColumn($table, $from, $to)
+        );
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->renameColumn($table, $to, $from);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->renameColumn($table, $to, $from)
+            );
         }
     }
 
@@ -502,9 +528,15 @@ class Migration
         }
 
         $schema = $this->adapter()->describe($table)['columns'];
-        $this->statements[] = $this->adapter()->removeColumn($table, $column);
+
+        $this->statements[] = new Sql(
+            $this->adapter()->removeColumn($table, $column)
+        );
+
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column])
+            );
         }
     }
 
@@ -527,9 +559,16 @@ class Migration
         }
         $schema = $this->adapter()->describe($table)['columns'];
 
-        $this->statements[] = $this->adapter()->removeColumns($table, $columns);
-        foreach ($columns as $column) {
-            $this->reverseStatements[] = $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column]);
+        $this->statements[] = new Sql(
+            $this->adapter()->removeColumns($table, $columns)
+        );
+
+        if ($this->calledBy() === 'change') {
+            foreach ($columns as $column) {
+                $this->reverseStatements[] = new Sql(
+                    $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column])
+                );
+            }
         }
     }
 
@@ -614,9 +653,14 @@ class Migration
             $columnString = implode(',', $columnString);
         }
       
-        $this->statements[] = $this->adapter()->addIndex($table, $columnString, $options['name'], $options);
+        $this->statements[] = new Sql(
+            $this->adapter()->addIndex($table, $columnString, $options['name'], $options)
+        );
+        
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->removeIndex($table, $options['name']);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->removeIndex($table, $options['name'])
+            );
         }
     }
   
@@ -642,15 +686,19 @@ class Migration
             }
             $index = null;
         }
-        $this->statements[] = $this->adapter()->removeIndex($table, $options['name']);
+        $this->statements[] = new Sql(
+            $this->adapter()->removeIndex($table, $options['name'])
+        );
 
         if ($this->indexNameExists($table, $options['name'])) {
             if ($this->calledBy() === 'change') {
-                $this->reverseStatements[] = $this->adapter()->addIndex(
-                    $table,
-                    $options['column'],
-                    $options['name'],
-                    ['unique' => ($index['type'] === 'unique')]
+                $this->reverseStatements[] = new Sql(
+                    $this->adapter()->addIndex(
+                        $table,
+                        $options['column'],
+                        $options['name'],
+                        ['unique' => ($index['type'] === 'unique')]
+                    )
                 );
             }
         }
@@ -685,9 +733,14 @@ class Migration
      */
     public function renameIndex(string $table, string $oldName, string $newName): void
     {
-        $this->statements[] = $this->adapter()->renameIndex($table, $oldName, $newName);
+        $this->statements[] = new Sql(
+            $this->adapter()->renameIndex($table, $oldName, $newName)
+        );
+
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->renameIndex($table, $newName, $oldName);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->renameIndex($table, $newName, $oldName)
+            );
         }
     }
   
@@ -788,9 +841,14 @@ class Migration
             $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
         }
         //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
-        $this->statements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete']);
+        $this->statements[] = new Sql(
+            $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete'])
+        );
+
         if ($this->calledBy() === 'change') {
-            $this->reverseStatements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
+            $this->reverseStatements[] = new Sql(
+                $this->adapter()->removeForeignKey($fromTable, $options['name'])
+            );
         }
     }
   
@@ -838,11 +896,16 @@ class Migration
             }
             $foreignKey = null;
         }
-        $this->statements[] = $this->adapter()->removeForeignKey($fromTable, $options['name']);
+        $this->statements[] = new Sql(
+            $this->adapter()->removeForeignKey($fromTable, $options['name'])
+        );
+
         //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
         if ($foreignKey) {
             if ($this->calledBy() === 'change') {
-                $this->reverseStatements[] = $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $foreignKey['referencedTable'], $options['primaryKey']);
+                $this->reverseStatements[] = new Sql(
+                    $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $foreignKey['referencedTable'], $options['primaryKey'])
+                );
             }
         }
     }
