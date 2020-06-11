@@ -632,7 +632,7 @@ class MysqlSchemaTest extends OriginTestCase
 
         $expected = 'ALTER TABLE `articles` CHANGE `author_id` `user_id` INT(11)';
         $result = $adapter->renameColumn('articles', 'author_id', 'user_id');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
         $this->assertTrue($adapter->connection()->execute($result[0]));
 
         $expected = 'ALTER TABLE `deals` CHANGE `amount` `deal_amount` DECIMAL(15,2)';
