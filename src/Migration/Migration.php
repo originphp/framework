@@ -453,14 +453,14 @@ class Migration
         $engine = $this->connection()->engine();
         
         $this->statements[] = new Sql(
-            $this->adapter()->changeColumnSql($table, $name, $type, $options)
+            $this->adapter()->changeColumn($table, $name, $type, $options)
         );
 
         if ($this->calledBy() === 'change') {
             $options = $schema[$name];
 
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->changeColumnSql($table, $name, $options['type'], $options)
+                $this->adapter()->changeColumn($table, $name, $options['type'], $options)
             );
         }
     }

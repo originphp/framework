@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Model\Schema;
 
+use InvalidArgumentException;
 use Origin\Core\Exception\Exception;
 
 /**
@@ -351,7 +352,7 @@ class SqliteSchema extends BaseSchema
      * @param array $options
      * @return array
      */
-    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
+    public function changeColumn(string $table, string $name, string $type, array $options = []): array
     {
         $out = [];
         // store adjusted schema for future calls
@@ -375,12 +376,10 @@ class SqliteSchema extends BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return string
+     * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): string
+    public function renameColumn(string $table, string $from, string $to): array
     {
-        return '';
-        /*
         $out = [];
 
         $schema = $this->describe($table);
@@ -402,7 +401,7 @@ class SqliteSchema extends BaseSchema
             $out[] = $this->dropTableSql('schema_tmp');
         }
 
-        return $out;*/
+        return $out;
     }
 
     /**
@@ -410,14 +409,11 @@ class SqliteSchema extends BaseSchema
     *
     * @param string $table
     * @param string $column
-    * @return string
+    * @return array
     */
-    public function removeColumn(string $table, string $column): string
+    public function removeColumn(string $table, string $column): array
     {
-        return '';
-        /*
         return $this->removeColumns($table, [$column]);
-        **/
     }
 
     /**
@@ -427,26 +423,25 @@ class SqliteSchema extends BaseSchema
      * @param array $columns
      * @return string
      */
-    public function removeColumns(string $table, array $columns): string
+    public function removeColumns(string $table, array $columns): array
     {
-        return '';
-        /* $schema = $this->describe($table);
+        $schema = $this->describe($table);
 
-         foreach ($columns as $column) {
-             if (isset($schema['columns'][$column])) {
-                 unset($schema['columns'][$column]);
-             }
-         }
+        foreach ($columns as $column) {
+            if (isset($schema['columns'][$column])) {
+                unset($schema['columns'][$column]);
+            }
+        }
 
-         $out = $this->createTableSql($table, $schema['columns'], $schema);
-         array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
 
-         $fields = implode(', ', array_keys($schema['columns']));
+        $fields = implode(', ', array_keys($schema['columns']));
 
-         $out[] = sprintf('INSERT INTO %s SELECT %s FROM schema_tmp', $this->quoteIdentifier($table), $fields);
-         $out[] = $this->dropTableSql('schema_tmp');
+        $out[] = sprintf('INSERT INTO %s SELECT %s FROM schema_tmp', $this->quoteIdentifier($table), $fields);
+        $out[] = $this->dropTableSql('schema_tmp');
 
-         return $out;*/
+        return $out;
     }
 
     /**
@@ -455,14 +450,16 @@ class SqliteSchema extends BaseSchema
      * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
      * @param string $name
-     * @return string
+     * @return array
      */
-    public function removeIndex(string $table, string $name): string
+    public function removeIndex(string $table, string $name): array
     {
-        return sprintf(
+        $sql = sprintf(
             'DROP INDEX %s',
             $this->quoteIdentifier($name)
         );
+
+        return [$sql];
     }
 
     /**
@@ -472,12 +469,10 @@ class SqliteSchema extends BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return string
+     * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): string
+    public function renameIndex(string $table, string $oldName, string $newName): array
     {
-        return '';
-        /*
         $indexes = $this->indexes($table);
 
         $data = [];
@@ -487,7 +482,7 @@ class SqliteSchema extends BaseSchema
                 break;
             }
         }
-
+        // tmp remove
         if (empty($data)) {
             throw new InvalidArgumentException(sprintf('Index %s does not exist', $oldName));
         }
@@ -495,7 +490,7 @@ class SqliteSchema extends BaseSchema
         return [
             $this->removeIndex($table, $oldName),
             $this->addIndex($table, $data['column'], $newName, ['unique' => $data['uniqe'] ?? false])
-        ];*/
+        ];
     }
 
     /**
@@ -588,12 +583,10 @@ class SqliteSchema extends BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
-     * @return string
+     * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): string
+    public function removeForeignKey(string $fromTable, string $constraint): array
     {
-        return '';
-        /*
         $schema = $this->describe($fromTable);
 
         if (! isset($schema['constraints'][$constraint])) {
@@ -607,7 +600,7 @@ class SqliteSchema extends BaseSchema
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
         $out[] = $this->dropTableSql('schema_tmp');
 
-        return $out;*/
+        return $out;
     }
     /**
      * Undocumented function
@@ -834,12 +827,10 @@ class SqliteSchema extends BaseSchema
      * @param string $primaryKey
      * @param string $onUpdate
      * @param string $onDelete
-     * @return string
+     * @return array
      */
-    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): string
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): array
     {
-        return '';
-        /*
         $schema = $this->describe($fromTable);
 
         $schema['constraints'][$name] = [
@@ -856,6 +847,6 @@ class SqliteSchema extends BaseSchema
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
         $out[] = $this->dropTableSql('schema_tmp');
 
-        return $out;*/
+        return $out;
     }
 }

@@ -274,7 +274,7 @@ class PgsqlSchema extends BaseSchema
      * @param array $options
      * @return array
      */
-    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
+    public function changeColumn(string $table, string $name, string $type, array $options = []): array
     {
         $options += ['default' => null, 'null' => null];
         $out = [];
@@ -306,7 +306,7 @@ class PgsqlSchema extends BaseSchema
         $sql = sprintf(
             'ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s',
             $this->quoteIdentifier($table),
-            $name,
+            $this->quoteIdentifier($name),
             $type
         );
 
@@ -333,17 +333,18 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return string
+     * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): string
+    public function renameColumn(string $table, string $from, string $to): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s RENAME COLUMN %s TO %s',
             $this->quoteIdentifier($table),
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to)
         );
-        //return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
+
+        return [$sql];
     }
 
     /**
@@ -351,14 +352,16 @@ class PgsqlSchema extends BaseSchema
      *
      * @param string $table
      * @param string $name
-     * @return string
+     * @return array
      */
-    public function removeIndex(string $table, string $name): string
+    public function removeIndex(string $table, string $name): array
     {
-        return sprintf(
+        $sql = sprintf(
             'DROP INDEX %s',
             $this->quoteIdentifier($name)
         );
+
+        return [$sql];
     }
 
     /**
@@ -368,15 +371,17 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return string
+     * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): string
+    public function renameIndex(string $table, string $oldName, string $newName): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER INDEX %s RENAME TO %s',
             $this->quoteIdentifier($oldName),
             $this->quoteIdentifier($newName)
         );
+
+        return [$sql];
     }
 
     /**
@@ -433,15 +438,17 @@ class PgsqlSchema extends BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
-     * @return string
+     * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): string
+    public function removeForeignKey(string $fromTable, string $constraint): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s DROP CONSTRAINT %s',
             $this->quoteIdentifier($fromTable),
             $this->quoteIdentifier($constraint)
         );
+
+        return [$sql];
     }
 
     /**

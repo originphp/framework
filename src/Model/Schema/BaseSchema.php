@@ -203,9 +203,9 @@ abstract class BaseSchema
      *
      * @param string $table
      * @param string $name
-     * @return string
+     * @return array
      */
-    abstract public function removeIndex(string $table, string $name): string;
+    abstract public function removeIndex(string $table, string $name): array;
 
     /**
      * Renames an index
@@ -214,9 +214,9 @@ abstract class BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return string
+     * @return array
      */
-    abstract public function renameIndex(string $table, string $oldName, string $newName): string;
+    abstract public function renameIndex(string $table, string $oldName, string $newName): array;
  
     /**
     * Returns SQL for adding a foreignKey
@@ -228,9 +228,9 @@ abstract class BaseSchema
     * @param string $primaryKey
     * @param string $onUpdate (cascade,restrict,setNull,setDefault,noAction)
     * @param string $onDelete (cascade,restrict,setNull,setDefault,noAction)
-    * @return string
+    * @return array
     */
-    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): string
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): array
     {
         $fragment = $this->tableConstraintForeign([
             'name' => $name,
@@ -240,7 +240,9 @@ abstract class BaseSchema
             'delete' => $onDelete,
         ]);
 
-        return sprintf('ALTER TABLE %s ADD ', $this->quoteIdentifier($fromTable)) . $fragment;
+        $sql = sprintf('ALTER TABLE %s ADD ', $this->quoteIdentifier($fromTable)) . $fragment;
+
+        return [$sql];
     }
 
     /**
@@ -248,9 +250,9 @@ abstract class BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
-     * @return string
+     * @return array
      */
-    abstract public function removeForeignKey(string $fromTable, string $constraint): string;
+    abstract public function removeForeignKey(string $fromTable, string $constraint): array;
    
     /**
      * Gets a list of foreignKeys
@@ -300,7 +302,7 @@ abstract class BaseSchema
      * @param array $options
      * @return array
      */
-    abstract public function changeColumnSql(string $table, string $name, string $type, array $options = []): array;
+    abstract public function changeColumn(string $table, string $name, string $type, array $options = []): array;
 
     /**
      * Returns a SQL statement for dropping a table
@@ -343,25 +345,26 @@ abstract class BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return string
+     * @return array
      */
-    abstract public function renameColumn(string $table, string $from, string $to): string;
+    abstract public function renameColumn(string $table, string $from, string $to): array;
 
     /**
      * Removes a column from the table§
      *
      * @param string $table
      * @param string $column
-     * @return string
+     * @return array
      */
-    public function removeColumn(string $table, string $column): string
+    public function removeColumn(string $table, string $column): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s DROP COLUMN %s',
             $this->quoteIdentifier($table),
             $this->quoteIdentifier($column)
         );
-        //return "ALTER TABLE {$table} DROP COLUMN {$column}";
+
+        return [$sql];
     }
 
     /**
@@ -369,16 +372,18 @@ abstract class BaseSchema
      *
      * @param string $table
      * @param array $columns
-     * @return string
+     * @return array
      */
-    public function removeColumns(string $table, array $columns): string
+    public function removeColumns(string $table, array $columns): array
     {
         $out = [];
         foreach ($columns as $column) {
             $out[] = 'DROP COLUMN ' . $this->quoteIdentifier($column);  //$sql .= "\nDROP COLUMN {$column},";
         }
 
-        return 'ALTER TABLE ' . $this->quoteIdentifier($table) . "\n" . implode(",\n", $out);
+        $sql = 'ALTER TABLE ' . $this->quoteIdentifier($table) . "\n" . implode(",\n", $out);
+
+        return [$sql];
     }
 
     /**

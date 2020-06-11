@@ -381,7 +381,7 @@ class MysqlSchema extends BaseSchema
      * @param array $options
      * @return array
      */
-    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
+    public function changeColumn(string $table, string $name, string $type, array $options = []): array
     {
         $options += ['name' => $name, 'type' => $type];
 
@@ -408,9 +408,9 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return string
+     * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): string
+    public function renameColumn(string $table, string $from, string $to): array
     {
         $tableSchema = $this->describe($table)['columns'];
         $definition = '';
@@ -435,13 +435,15 @@ class MysqlSchema extends BaseSchema
             }
         }
 
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s CHANGE %s %s %s',
             $this->quoteIdentifier($table),
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to),
             $definition
         );
+
+        return [$sql];
     }
 
     /**
@@ -450,16 +452,17 @@ class MysqlSchema extends BaseSchema
      * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
      * @param string $name
-     * @return string
+     * @return array
      */
-    public function removeIndex(string $table, string $name): string
+    public function removeIndex(string $table, string $name): array
     {
-        return sprintf(
+        $sql = sprintf(
             'DROP INDEX %s ON %s',
             $this->quoteIdentifier($name),
             $this->quoteIdentifier($table)
         );
-        //return "DROP INDEX {$name} ON {$table}";
+
+        return [$sql];
     }
 
     /**
@@ -469,17 +472,18 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return string
+     * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): string
+    public function renameIndex(string $table, string $oldName, string $newName): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s RENAME INDEX %s TO %s',
             $this->quoteIdentifier($table),
             $this->quoteIdentifier($oldName),
             $this->quoteIdentifier($newName)
         );
-        //return "ALTER TABLE {$table} RENAME INDEX {$oldName} TO {$newName}";
+
+        return [$sql];
     }
 
     /**
@@ -555,16 +559,17 @@ class MysqlSchema extends BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
-     * @return string
+     * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): string
+    public function removeForeignKey(string $fromTable, string $constraint): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s DROP FOREIGN KEY %s',
             $this->quoteIdentifier($fromTable),
             $this->quoteIdentifier($constraint)
         );
-        //return "ALTER TABLE {$fromTable} DROP FOREIGN KEY {$constraint}";
+
+        return [$sql];
     }
     /**
      * Undocumented function

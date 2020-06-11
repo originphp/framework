@@ -319,9 +319,9 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'ALTER TABLE "articles" ADD CONSTRAINT "fk_origin_12345" FOREIGN KEY (author_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE';
         $result = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            $this->assertTrue($adapter->connection()->execute($result[0]));
         }
     }
 
@@ -362,9 +362,8 @@ class PgsqlSchemaTest extends OriginTestCase
         // ALTER TABLE "articles" ALTER COLUMN "id DROP NOT NULL
         // ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER
 
-        $statements = $adapter->changeColumnSql('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
+        $this->assertEquals('ca3761b3e33512e8505835edfa3a5b47', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -374,9 +373,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         // 'ALTER TABLE "deals" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(8,4)';
-        $statements = $adapter->changeColumnSql('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
+        $this->assertEquals('ffde3a6d6c40debd10b7a90ef24ffd4f', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -386,9 +384,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\'';
-        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
+        $this->assertEquals('e7b5172df6f323ffd8bcb9c3819651d9', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -397,9 +394,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         //  'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\', ALTER COLUMN "name" SET NOT NULL';
-        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
+        $this->assertEquals('349392995b042a89d73286bc1ed1c8aa', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -408,9 +404,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT NULL';
-        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
+        $this->assertEquals('86cb040929ee8fa8ffdf285be5693b64', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -419,9 +414,8 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET NOT NULL';
-        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $statements = $adapter->changeColumn('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
+        $this->assertEquals('d822355f58599d4396120ab3dd98c2ac', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -559,7 +553,7 @@ class PgsqlSchemaTest extends OriginTestCase
         }
 
         $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertTrue($adapter->connection()->execute($sql));
+        $this->assertTrue($adapter->connection()->execute($sql[0]));
  
         $expected = [
             'name' => 'fk_origin_12345',
@@ -604,10 +598,10 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'ALTER TABLE "articles" DROP COLUMN "modified"';
         $result = $adapter->removeColumn('articles', 'modified');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
     
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            $this->assertTrue($adapter->connection()->execute($result[0]));
         }
     }
 
@@ -617,10 +611,10 @@ class PgsqlSchemaTest extends OriginTestCase
        
         $expected = "ALTER TABLE \"articles\"\nDROP COLUMN \"created\",\nDROP COLUMN \"modified\"";
         $result = $adapter->removeColumns('articles', ['created','modified']);
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
  
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            $this->assertTrue($adapter->connection()->execute($result[0]));
         }
     }
 
@@ -632,12 +626,12 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'ALTER TABLE "articles" DROP CONSTRAINT "fk_origin_12345"';
         $result = $adapter->removeForeignKey('articles', 'fk_origin_12345');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
 
         if ($adapter->connection()->engine() === 'pgsql') {
             $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-            $this->assertTrue($adapter->connection()->execute($sql));
-            $this->assertTrue($adapter->connection()->execute($result));
+            $this->assertTrue($adapter->connection()->execute($sql[0]));
+            $this->assertTrue($adapter->connection()->execute($result[0]));
         }
     }
 
@@ -646,7 +640,7 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'DROP INDEX "author_id"'; // Different on pgsql no table name used
         $result = $adapter->removeIndex('articles', 'author_id');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
     }
     
     public function testRenameColumn()
@@ -662,8 +656,8 @@ class PgsqlSchemaTest extends OriginTestCase
 
         $expected = 'ALTER TABLE "articles" RENAME COLUMN "author_id" TO "user_id"'; // different on pgsql
         $result = $adapter->renameColumn('articles', 'author_id', 'user_id');
-        $this->assertEquals($expected, $result);
-        $this->assertTrue($adapter->connection()->execute($result));
+        $this->assertEquals($expected, $result[0]);
+        $this->assertTrue($adapter->connection()->execute($result[0]));
     }
 
     /**
@@ -674,12 +668,12 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'ALTER INDEX "search_title" RENAME TO "title_search"'; // different on pgsql
         $result = $adapter->renameIndex('articles', 'search_title', 'title_search');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
 
         if ($adapter->connection()->engine() === 'pgsql') {
             $sql = $adapter->addIndex('articles', 'title', 'search_title');
             $this->assertTrue($adapter->connection()->execute($sql));
-            $this->assertTrue($adapter->connection()->execute($result));
+            $this->assertTrue($adapter->connection()->execute($result[0]));
         }
     }
     

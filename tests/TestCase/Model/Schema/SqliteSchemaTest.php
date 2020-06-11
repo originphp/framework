@@ -324,8 +324,7 @@ class SqliteSchemaTest extends OriginTestCase
     {
         $adapter = new SqliteSchema('test');
         $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertEquals('', $statements);
-        /*
+       
         $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
         $this->assertEquals('cebbf262e5c2956368af58cc9d582ed2', md5(json_encode($statements)));
 
@@ -334,7 +333,6 @@ class SqliteSchemaTest extends OriginTestCase
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
         }
-        */
     }
 
     public function testAddIndex()
@@ -370,7 +368,7 @@ class SqliteSchemaTest extends OriginTestCase
             $this->markTestSkipped('Requires sqlite');
         }
        
-        $statements = $adapter->changeColumnSql('articles', 'title', 'string', ['limit' => '15']);
+        $statements = $adapter->changeColumn('articles', 'title', 'string', ['limit' => '15']);
         $this->assertEquals('4fbafb0c1ae18ec5ae8b0933c5ee5ecd', md5(json_encode($statements)));
 
         foreach ($statements as $statement) {
@@ -508,10 +506,7 @@ class SqliteSchemaTest extends OriginTestCase
             $this->markTestSkipped('This test is for sqlite');
         }
         $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertEquals('', $statements);
-        /*
-
-
+      
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
@@ -524,7 +519,7 @@ class SqliteSchemaTest extends OriginTestCase
             'referencedTable' => 'users',
             'referencedColumn' => 'id',
         ];
-        $this->assertEquals([$expected], $adapter->foreignKeys('articles'));*/
+        $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }
 
     public function testIndexes()
@@ -566,30 +561,28 @@ class SqliteSchemaTest extends OriginTestCase
         $adapter = new SqliteSchema('test');
       
         $statements = $adapter->removeColumn('articles', 'modified');
-        $this->assertEquals('', $statements);
-        /*
+      
         $this->assertEquals('1e9ebf5ffef547f150ed11aa5b8b0aab', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'sqlite') {
             foreach ($statements as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
-        }*/
+        }
     }
 
     public function testRemoveColumns()
     {
         $adapter = new SqliteSchema('test');
         $statements = $adapter->removeColumns('articles', ['created','modified']);
-        $this->assertEquals('', $statements);
-        /*
+
         $this->assertEquals('10f6fb602326d3483f1fa8229c4fc8a6', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'sqlite') {
             foreach ($statements as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
-        }*/
+        }
     }
 
     /**
@@ -603,8 +596,7 @@ class SqliteSchemaTest extends OriginTestCase
         }
 
         $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertEquals('', $statements);
-        /*
+     
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
@@ -616,7 +608,7 @@ class SqliteSchemaTest extends OriginTestCase
         }
 
         $this->expectException(InvalidArgumentException::class);
-        $adapter->removeForeignKey('articles', 'foo');*/
+        $adapter->removeForeignKey('articles', 'foo');
     }
 
     public function testRemoveIndex()
@@ -624,7 +616,7 @@ class SqliteSchemaTest extends OriginTestCase
         $adapter = new SqliteSchema('test');
         $expected = 'DROP INDEX "author_id"'; // Different on pgsql no table name used
         $result = $adapter->removeIndex('articles', 'author_id');
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result[0]);
     }
     
     public function testRenameColumn()
@@ -639,8 +631,7 @@ class SqliteSchemaTest extends OriginTestCase
         }
     
         $statements = $adapter->renameColumn('articles', 'author_id', 'user_id');
-        $this->assertEquals('', $statements);
-        /*
+    
         $this->assertEquals('d65f7c45ed6d8dc2b4284e01e7f55e56', md5(json_encode($statements)));
 
         foreach ($statements as $statement) {
@@ -651,7 +642,7 @@ class SqliteSchemaTest extends OriginTestCase
         $this->assertArrayHasKey('user_id', $schema['columns']);
 
         $this->expectException(InvalidArgumentException::class);
-        $adapter->renameColumn('articles', 'foo', 'bar');*/
+        $adapter->renameColumn('articles', 'foo', 'bar');
     }
 
     public function testRenameIndex()
@@ -659,20 +650,18 @@ class SqliteSchemaTest extends OriginTestCase
         $adapter = new SqliteSchema('test');
    
         if ($adapter->connection()->engine() !== 'sqlite') {
-            $this->markTestIncomplete('This test requires sqlite');
+            $this->markTestSkipped();
         }
 
         $sql = $adapter->addIndex('articles', 'title', 'search_title');
         $this->assertTrue($adapter->connection()->execute($sql));
         
         $statements = $adapter->renameIndex('articles', 'search_title', 'title_search');
-        $this->assertEquals('', $statements);
-        
-        /*
+        debug($statements);
         $this->assertEquals('fa8aae5397107b1cd933b8f7301d1912', md5(json_encode($statements)));
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
-        }*/
+        }
     }
     
     public function testRenameTable()
