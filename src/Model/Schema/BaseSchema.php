@@ -522,6 +522,9 @@ abstract class BaseSchema
         } elseif ($type === 'boolean') {
             return (bool) $value;
         }
+        if ($type === 'string' && ! is_null($value)) {
+            $value = trim($value, '\'');
+        }
 
         return $value;
     }
