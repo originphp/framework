@@ -191,6 +191,7 @@ class Migration
                 try {
                     $this->connection()->execute($sql);
                 } catch (DatasourceException $ex) {
+                    debug($sql);
                     $this->connection()->rollback();
                     throw new Exception($ex->getMessage());
                 }
