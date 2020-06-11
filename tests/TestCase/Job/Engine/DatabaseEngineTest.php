@@ -82,10 +82,14 @@ class DatabaseEngineTest extends OriginTestCase
 
         $job = $this->engine->fetch();
         $this->assertInstanceOf(Job::class, $job);
-        $this->assertEquals(1000, $job->backendId());
+
+        $id = $job->backendId();
+        $this->assertIsInt($id);
+        $this->assertGreaterThanOrEqual(1, $id);
+   
         $this->assertEquals([true], $job->get('arguments')); # Check Serialization
 
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertNotNull($result->locked);
 
         // Check it was locked
@@ -104,10 +108,12 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
         
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->backendId());
+        $id = $job->backendId();
+
+        $this->assertEquals($id, $job->backendId());
         $this->assertTrue($this->engine->fail($job));
 
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertEquals('failed', $result->status);
         $this->assertNull($result->locked);
 
@@ -122,10 +128,12 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->backendId());
+        $id = $job->backendId();
+
+        $this->assertEquals($id, $job->backendId());
         $this->assertTrue($this->engine->success($job));
 
-        $result = $this->engine->model()->exists(1000);
+        $result = $this->engine->model()->exists($id);
         $this->assertFalse($result);
 
         $newJobWithNoId = new PassOrFailJob();
@@ -144,10 +152,12 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
-        $this->assertEquals(1000, $job->backendId());
+        $id = $job->backendId();
+
+        $this->assertEquals($id, $job->backendId());
         $this->assertTrue($this->engine->delete($job));
 
-        $result = $this->engine->model()->exists(1000);
+        $result = $this->engine->model()->exists($id);
         $this->assertFalse($result);
 
         $newJobWithNoId = new PassOrFailJob();
@@ -161,13 +171,15 @@ class DatabaseEngineTest extends OriginTestCase
         $this->assertTrue($this->engine->add($job));
 
         $job = $this->engine->fetch();
+        $id = $job->backendId();
+
         $job->increment();
         $this->assertTrue($this->engine->fail($job));
         
         # Retry 1
         $expected = date('Y-m-d H:i:s', strtotime('-5 hours'));
         $this->engine->retry($job, 3, '-5 hours');
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertEquals($expected, $result->scheduled);
         $this->assertEquals('queued', $result->status);
         $this->assertEquals([true], $job->get('arguments'));
@@ -179,7 +191,7 @@ class DatabaseEngineTest extends OriginTestCase
         # Retry 2
         $expected = date('Y-m-d H:i:s');
         $this->engine->retry($job, 3);
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertEquals($expected, $result->scheduled);
         $this->assertEquals('queued', $result->status);
         $this->assertEquals([true], $job->get('arguments'));
@@ -190,7 +202,7 @@ class DatabaseEngineTest extends OriginTestCase
 
         # Retry 3
         $this->engine->retry($job, 3, '-5 hours');
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertEquals('queued', $result->status);
         $this->assertEquals([true], $job->get('arguments'));
 
@@ -200,7 +212,7 @@ class DatabaseEngineTest extends OriginTestCase
 
         # Retry 4 - Fail
         $this->engine->retry($job, 3, '-5 hours');
-        $result = $this->engine->model()->get(1000);
+        $result = $this->engine->model()->get($id);
         $this->assertEquals('failed', $result->status);
 
         $newJobWithNoId = new PassOrFailJob();

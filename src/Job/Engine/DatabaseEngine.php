@@ -224,14 +224,17 @@ class DatabaseEngine extends BaseEngine
     {
         $model = $this->model();
         $model->begin();
-        $result = $this->model->query(
-            "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
-            [
-                'id' => $record->id,
-            ]
-        );
 
-        $model->query(
+        if (in_array($model->connection()->engine(), ['mysql','pgsql'])) {
+            $result = $this->model->query(
+                "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
+                [
+                    'id' => $record->id,
+                ]
+            );
+        }
+
+        $result = $model->query(
             "UPDATE {$model->table()} SET locked = :locked , modified = :modified WHERE id = :id;",
             [
                 'id' => $record->id,

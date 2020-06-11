@@ -133,12 +133,14 @@ class JobTest extends OriginTestCase
         $connection = $job->connection();
 
         $job = $connection->fetch();
+        $id = $job->backendId();
+
         $this->assertEquals(0, $job->attempts());
 
         $this->assertTrue($job->dispatchNow());
 
         $this->assertEquals(1, $job->attempts());
-        $this->assertFalse($connection->model()->exists(1000)); # for Databasedrive
+        $this->assertFalse($connection->model()->exists($id)); # for Databasedriver
 
         $this->assertEquals('success', $job->status);
     }
@@ -157,11 +159,13 @@ class JobTest extends OriginTestCase
         $connection = $job->connection();
 
         $job = $connection->fetch();
+        $id = $job->backendId();
+
         $this->assertEquals(0, $job->attempts());
 
         $this->assertFalse($job->dispatchNow(false));
         $this->assertEquals(1, $job->attempts());
-        $this->assertTrue($connection->model()->exists(1000));
+        $this->assertTrue($connection->model()->exists($id));
     }
 
     /**
@@ -178,19 +182,21 @@ class JobTest extends OriginTestCase
         $connection = $job->connection();
   
         $job = $connection->fetch();
+        $id = $job->backendId();
+
         $this->assertEquals(0, $job->attempts());
 
         $this->assertFalse($job->dispatchNow(false));
         $this->assertEquals(1, $job->attempts());
 
-        $record = $connection->model()->get(1000);
+        $record = $connection->model()->get($id);
         $this->assertEquals('queued', $record->status);
 
         $job = $connection->fetch();
         $this->assertEquals(1, $job->attempts());
 
         $this->assertFalse($job->dispatchNow(false));
-        $record = $connection->model()->get(1000);
+        $record = $connection->model()->get($id);
         $this->assertEquals('failed', $record->status);
     }
 

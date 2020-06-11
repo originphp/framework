@@ -17,14 +17,9 @@ namespace Origin\Model\Schema;
 use Origin\Core\Exception\Exception;
 
 /**
- * Initial concept done, number of features are missing, when I added pollyfils it seemed to be fine
- * but then migrations broke. Migrations break for two reasons, if you throw an invalid arugment because field
- * does not exist, then on reverse statement it blows up before executing, and poly fils dont work because it
- * tries to reverse all the messing around to get it working. Other features are missing like SELECT FOR UPDATE
- * which causes issue with QUEUE.
- *
- * For now, I am going to remove/disable the polyfils, since the priority of this project has always been mysql/postgresql
- * and accept limited sqlite suport for now.
+ * Sqlite is a bit problametic as it is missing many Sql features or has is more restricted, for example
+ * foreign keys can only be added at the time of table creation, Concat not supported. Can set the autoIncrement value
+ * with no records in the database, are just some of the problems encountered.
  */
 
 class SqliteSchema extends BaseSchema
@@ -690,7 +685,7 @@ class SqliteSchema extends BaseSchema
      */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array
     {
-        $out = $comments = [];
+        $out = [];
         $definition = implode(",\n", array_merge($columns, $constraints));
         $out[] = sprintf("CREATE TABLE \"%s\" (\n%s\n)", $table, $definition);
         foreach ($indexes as $index) {
