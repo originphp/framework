@@ -509,7 +509,7 @@ class MysqlSchemaTest extends OriginTestCase
         if ($adapter->connection()->engine() !== 'mysql') {
             $this->markTestSkipped('This test is for mysql');
         }
-        $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+        $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id', 'noAction', 'noAction');
  
         $this->assertTrue($adapter->connection()->execute($sql[0]));
        
