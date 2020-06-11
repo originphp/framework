@@ -554,11 +554,11 @@ class Migration
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->describe($table)['columns'];
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->addColumn($table, $column, $this->schema[$table][$column]['type'], $this->schema[$table][$column])
+                $this->adapter()->addColumn($table, $column, $this->schema[$table]['columns'][$column]['type'], $this->schema[$table])
             );
         }
 
-        unset($this->schema[$table]['column']);
+        unset($this->schema[$table][$column]);
     }
 
     /**
