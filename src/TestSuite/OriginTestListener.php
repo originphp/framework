@@ -18,9 +18,11 @@ namespace Origin\TestSuite;
  *
  * @link https://phpunit.readthedocs.io/en/7.4/extending-phpunit.html
  */
+
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\Warning;
 use PHPUnit\Framework\TestSuite;
+use Origin\Model\ConnectionManager;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\AssertionFailedError;
 
@@ -34,6 +36,11 @@ class OriginTestListener implements TestListener
     protected $fixtureManager = null;
 
     /**
+     * @var boolean
+     */
+    private $enabled = true;
+
+    /**
      * A test suite started.
      *
      * @param \PHPUnit\Framework\TestSuite $suite
@@ -41,7 +48,10 @@ class OriginTestListener implements TestListener
      */
     public function startTestSuite(TestSuite $suite): void
     {
-        $this->fixtureManager = new FixtureManager();
+        $this->enabled = ConnectionManager::has('test');
+        if ($this->enabled) {
+            $this->fixtureManager = new FixtureManager();
+        }
     }
 
     /**
@@ -52,7 +62,7 @@ class OriginTestListener implements TestListener
      */
     public function startTest(Test $test): void
     {
-        if ($test instanceof OriginTestCase) {
+        if ($test instanceof OriginTestCase && $this->enabled) {
             $this->fixtureManager->load($test);
         }
     }
@@ -66,7 +76,7 @@ class OriginTestListener implements TestListener
      */
     public function endTest(Test $test, float $time): void
     {
-        if ($test instanceof OriginTestCase) {
+        if ($test instanceof OriginTestCase && $this->enabled) {
             $this->fixtureManager->unload($test);
         }
     }
@@ -79,7 +89,9 @@ class OriginTestListener implements TestListener
      */
     public function endTestSuite(TestSuite $suite): void
     {
-        $this->fixtureManager->shutdown();
+        if ($this->enabled) {
+            $this->fixtureManager->shutdown();
+        }
     }
     /**
      * An error occurred.

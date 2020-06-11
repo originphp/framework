@@ -2,8 +2,16 @@
 
 ## [unreleased]
 
-### Fixed
 
+
+### Added
+- Added Sqlite engine
+- Added reading database constraint actions 
+
+### Changed
+- Changed Fixture Manager to not try to load fixtures if not database settings are present
+
+### Fixed
 - Fixed Form select control type detect with empty value
 
 ### Added
