@@ -60,6 +60,7 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
         $connection = ConnectionManager::get('test');
         $connection->begin();
         $connection->disableForeignKeyConstraints();
+ 
         foreach ($statements as $statement) {
             $this->assertTrue($connection->execute($statement));
         }

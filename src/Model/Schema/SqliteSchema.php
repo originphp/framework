@@ -382,11 +382,14 @@ class SqliteSchema extends BaseSchema
     {
         $out = [];
 
-        $schema = $this->describe($table);
+        // store adjusted schema for future calls
+        if (! isset($this->schema[$table])) {
+            $this->schema[$table] = $this->describe($table);
+        }
 
-        if (isset($schema['columns'][$from])) {
+        if (isset($this->schema[$table]['columns'][$from])) {
             $columns = [];
-            foreach ($schema['columns'] as $column => $definition) {
+            foreach ($this->schema[$table]['columns'] as $column => $definition) {
                 if ($column === $from) {
                     $columns[$to] = $definition;
                 } else {
@@ -394,7 +397,7 @@ class SqliteSchema extends BaseSchema
                 }
             }
 
-            $out = $this->createTableSql($table, $columns, $schema);
+            $out = $this->createTableSql($table, $columns, $this->schema[$table]);
 
             array_unshift($out, $this->renameTable($table, 'schema_tmp'));
             $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
@@ -482,15 +485,11 @@ class SqliteSchema extends BaseSchema
                 break;
             }
         }
-        // tmp remove
-        if (empty($data)) {
-            throw new InvalidArgumentException(sprintf('Index %s does not exist', $oldName));
-        }
 
-        return [
-            $this->removeIndex($table, $oldName),
-            $this->addIndex($table, $data['column'], $newName, ['unique' => $data['uniqe'] ?? false])
-        ];
+        $out = $this->removeIndex($table, $oldName);
+        $out[] = $this->addIndex($table, $data['column'], $newName, ['unique' => $data['uniqe'] ?? false]);
+
+        return $out;
     }
 
     /**
