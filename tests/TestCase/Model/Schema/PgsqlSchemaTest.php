@@ -350,57 +350,79 @@ class PgsqlSchemaTest extends OriginTestCase
         $result = $adapter->addIndex('topics', 'title', 'idx_title', ['type' => 'prefix']);
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * Leave SQL comments in place.
+     */
     public function testChangeColumn()
     {
         $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER';
-        $result = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER';
+        $statements = $adapter->changeColumnSql('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
 
-        $expected = 'ALTER TABLE "deals" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(8,4)';
-        $result = $adapter->changeColumn('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE "deals" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(8,4)';
+        $statements = $adapter->changeColumnSql('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
 
-        $expected = 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\'';
-        $result = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\'';
+        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
 
-        $expected = 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\', ALTER COLUMN "name" SET NOT NULL';
-        $result = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        //  'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\', ALTER COLUMN "name" SET NOT NULL';
+        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
 
-        $expected = 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT NULL';
-        $result = $adapter->changeColumn('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT NULL';
+        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
 
-        $expected = 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET NOT NULL';
-        $result = $adapter->changeColumn('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET NOT NULL';
+        $statements = $adapter->changeColumnSql('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
     }
 
@@ -456,10 +478,7 @@ class PgsqlSchemaTest extends OriginTestCase
     public function testCreateTable()
     {
         $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This is test is for pgsql');
-        }
-
+       
         $schema = [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','default' => ''],
@@ -467,10 +486,19 @@ class PgsqlSchemaTest extends OriginTestCase
             'created' => ['type' => 'datetime'],
             'modified' => ['type' => 'datetime'],
         ];
-        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
-        $result = $adapter->createTableSql('foo', $schema, $options);
-    
-        foreach ($result as $statement) {
+        $options = [
+            'constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']],
+            'indexes' => [
+                'idx_name' => ['type' => 'index', 'column' => 'name'],
+            ]
+        ];
+        $statements = $adapter->createTableSql('foo', $schema, $options);
+        $this->assertEquals('851886f807b42951dce4017a2686be57', md5(json_encode($statements)));
+
+        if ($adapter->connection()->engine() !== 'pgsql') {
+            $this->markTestSkipped('This is test is for pgsql');
+        }
+        foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
     }

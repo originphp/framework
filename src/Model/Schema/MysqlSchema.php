@@ -379,18 +379,27 @@ class MysqlSchema extends BaseSchema
      * @param string $table
      * @param string $name
      * @param array $options
-     * @return string
+     * @return array
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []): string
+    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
     {
         $options += ['name' => $name, 'type' => $type];
 
-        return sprintf(
+        $out = [];
+
+        $out[] = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($name)
+        );
+
+        $out[] = sprintf(
             'ALTER TABLE %s MODIFY COLUMN %s',
             $this->quoteIdentifier($table),
             $this->columnSql($options)
         );
-        //return "ALTER TABLE {$table} MODIFY COLUMN {$definition}";
+
+        return $out;
     }
 
     /**

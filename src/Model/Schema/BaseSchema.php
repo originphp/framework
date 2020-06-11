@@ -298,9 +298,9 @@ abstract class BaseSchema
      * @param string $table
      * @param string $name
      * @param array $options
-     * @return string
+     * @return array
      */
-    abstract public function changeColumn(string $table, string $name, string $type, array $options = []): string;
+    abstract public function changeColumnSql(string $table, string $name, string $type, array $options = []): array;
 
     /**
      * Returns a SQL statement for dropping a table

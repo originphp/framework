@@ -366,20 +366,18 @@ class SqliteSchemaTest extends OriginTestCase
     public function testChangeColumn()
     {
         $adapter = new SqliteSchema('test');
-        $statements = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']);
-        $this->assertEquals('', $statements);
-        /*
-
-        $result = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']);
-
-        $this->assertEquals('8f7caf9f7ed38308da9f34c27455be1b', md5(json_encode($result)));
+       
+        $statements = $adapter->changeColumnSql('articles', 'title', 'string', ['limit' => '15']);
+        $this->assertEquals('4fbafb0c1ae18ec5ae8b0933c5ee5ecd', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'sqlite') {
-            foreach ($result as $statement) {
+            foreach ($statements as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
-        }*/
+            $meta = $adapter->describe('articles')['columns'];
+            $this->assertEquals('15', $meta['title']['limit']);
+        }
     }
 
     public function testColumnExists()
@@ -445,9 +443,15 @@ class SqliteSchemaTest extends OriginTestCase
             'created' => ['type' => 'datetime'],
             'modified' => ['type' => 'datetime'],
         ];
-        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
+        $options = [
+            'constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']],
+            'indexes' => [
+                'idx_name' => ['type' => 'index', 'column' => 'name'],
+            ]
+        ];
         $result = $adapter->createTableSql('foo', $schema, $options);
-    
+        $this->assertEquals('2066db80f80aded3e9f108be2ec987b3', md5(json_encode($result)));
+        
         foreach ($result as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }

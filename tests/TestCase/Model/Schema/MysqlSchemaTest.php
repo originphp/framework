@@ -368,13 +368,16 @@ class MysqlSchemaTest extends OriginTestCase
     public function testChangeColumn()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)';
-        $result = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']);
-        $this->assertEquals($expected, $result);
+        // 'ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)';
+        $statements = $adapter->changeColumnSql('articles', 'id', 'integer', ['limit' => '15']);
+        debug($statements);
+        $this->assertEquals('', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'mysql') {
-            $this->assertTrue($adapter->connection()->execute($result));
+            foreach ($statements as $statement) {
+                $this->assertTrue($adapter->connection()->execute($statement));
+            }
         }
     }
 
@@ -430,9 +433,6 @@ class MysqlSchemaTest extends OriginTestCase
     public function testCreateTable()
     {
         $adapter = new MysqlSchema('test');
-        if ($adapter->connection()->engine() !== 'mysql') {
-            $this->markTestSkipped('This is test is for mysql');
-        }
 
         $schema = [
             'id' => ['type' => 'integer','autoIncrement' => true],
@@ -441,9 +441,19 @@ class MysqlSchemaTest extends OriginTestCase
             'created' => ['type' => 'datetime'],
             'modified' => ['type' => 'datetime'],
         ];
-        $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']]];
-        $result = $adapter->createTableSql('foo', $schema, $options);
-        foreach ($result as $statement) {
+        $options = [
+            'constraints' => ['primary' => ['type' => 'primary', 'column' => 'id']],
+            'indexes' => [
+                'idx_name' => ['type' => 'index', 'column' => 'name'],
+            ]
+        ];
+        $statements = $adapter->createTableSql('foo', $schema, $options);
+        $this->assertEquals('e5ec7835527bd04fe3f7ac8bfc480fca', md5(json_encode($statements)));
+
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('This is test is for mysql');
+        }
+        foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
     }

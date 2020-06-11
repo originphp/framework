@@ -131,6 +131,7 @@ class Migration
         if (empty($this->statements)) {
             throw new Exception('Migration does not do anything.');
         }
+       
         $this->executeStatements($this->statements);
 
         return $this->statements;
@@ -423,7 +424,7 @@ class Migration
     }
 
     /**
-    * Changes a column according to the new definition
+    * Changes a column according to the new definition.
     *
     * @internal pgsql works differently to mysql. In mysql whole column is redefined, and null value is not
     * constraint.
@@ -450,31 +451,16 @@ class Migration
 
         $schema = $this->adapter()->describe($table)['columns'];
         $engine = $this->connection()->engine();
-       
-        // @todo move to Schema:changeColumn
-        // Drop DEFAULT constraint if it exists (same in both MySQL and PgSQL)
-        if (in_array($engine, ['pgsql','mysql']) && $schema[$name]['default']) {
-            $this->statements[] = new Sql(
-                "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT"
-            );
-        }
-
-        // In PgSQL not null is constraint.
-        if ($engine === 'pgsql' && $schema[$name]['null'] === false) {
-            $this->statements[] = new Sql(
-                "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL"
-            );
-        }
         
         $this->statements[] = new Sql(
-            $this->adapter()->changeColumn($table, $name, $type, $options)
+            $this->adapter()->changeColumnSql($table, $name, $type, $options)
         );
 
         if ($this->calledBy() === 'change') {
             $options = $schema[$name];
 
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->changeColumn($table, $name, $options['type'], $options)
+                $this->adapter()->changeColumnSql($table, $name, $options['type'], $options)
             );
         }
     }

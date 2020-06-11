@@ -127,11 +127,6 @@ class MigrationTest extends OriginTestCase
 
         $options = ['engine' => 'InnoDB','autoIncrement' => 10000,'charset' => 'utf8','collate' => 'utf8_unicode_ci'];
 
-        $index = 'PRIMARY';
-        if ($migration->connection()->engine() === 'pgsql') {
-            $index = 'products_pkey';
-        }
-
         $migration->createTable('products', [
             'name' => 'string',
             'description' => 'text',
@@ -146,10 +141,17 @@ class MigrationTest extends OriginTestCase
         $this->assertEquals(2, count($migration->statements())); // second statement should be setting autoincrement
 
         $reversableStatements = $migration->invokeStart();
-      
+        
         $this->assertTrue($migration->columnExists('products', 'id'));
-        $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
 
+        $engine = $migration->connection()->engine();
+
+        if ($engine !== 'sqlite') {
+            $index = $engine === 'pgsql' ? 'products_pkey' :  'PRIMARY';
+    
+            $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
+        }
+       
         $this->assertTrue($migration->columnExists('products', 'name', ['type' => 'string']));
         $this->assertTrue($migration->columnExists('products', 'description', ['type' => 'text']));
         
@@ -195,9 +197,34 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->tableExists('ez_articles'));
     }
 
+    /**
+     * Test add column works
+     */
     public function testAddColumn()
     {
         $migration = $this->migration();
+        $migration->addColumn('articles', 'category_id', 'integer');
+      
+        $reversableStatements = $migration->invokeStart();
+
+        $this->assertTrue($migration->columnExists('articles', 'category_id'));
+
+        $migration->rollback($reversableStatements);
+        $this->assertFalse($migration->columnExists('articles', 'category_id'));
+    }
+
+    /**
+     * This tests with all settings, there is an issue with sqlite
+     * `NOT NULL column with default value NULL error` which is caused by test design, but is
+     * ok so i am keeping seperate for now as its tested using mysql + pgsql
+     */
+    public function testAddColumnComprehensive()
+    {
+        $migration = $this->migration();
+        // NOT NULL column with default value NULL error
+        if ($migration->connection()->engine() === 'sqlite') {
+            $this->markTestSkipped('Skipped for sqlite');
+        }
 
         $migration->createTable('articles2');
         $reversableStatements = $migration->invokeStart(); // Can only add columns on existing tables
@@ -246,19 +273,31 @@ class MigrationTest extends OriginTestCase
         $this->assertSame($expected, $migration->columns('articles'));
     }
 
-    public function testChangeColumn()
+    public function testChangeColumnSetting()
     {
         $migration = $this->migration();
  
         $migration->changeColumn('articles', 'title', 'string', ['limit' => 10]);
+
+        $reversableStatements = $migration->invokeStart();
+        
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 10]));
+    
+        $migration->rollback($reversableStatements);
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255]));
+    }
+
+    public function testChangeColumnType()
+    {
+        $migration = $this->migration();
+ 
         $migration->changeColumn('articles', 'body', 'string');
     
         $reversableStatements = $migration->invokeStart();
-        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 10]));
+   
         $this->assertTrue($migration->columnExists('articles', 'body', ['type' => 'string']));
         
         $migration->rollback($reversableStatements);
-        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255]));
         $this->assertTrue($migration->columnExists('articles', 'body', ['type' => 'text']));
     }
 

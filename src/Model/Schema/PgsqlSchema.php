@@ -272,11 +272,12 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $name
      * @param array $options
-     * @return string
+     * @return array
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []): string
+    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
     {
         $options += ['default' => null, 'null' => null];
+        $out = [];
         if (isset($this->typeMap[$type])) {
             $agnoType = $type;
             $type = $this->typeMap[$type];
@@ -290,6 +291,18 @@ class PgsqlSchema extends BaseSchema
             }
         }
         $name = $this->quoteIdentifier($name);
+
+        $out[] = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($name)
+        );
+
+        $out[] = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL',
+            $this->quoteIdentifier($table),
+            $this->quoteIdentifier($name)
+        );
 
         $sql = sprintf(
             'ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s',
@@ -308,7 +321,9 @@ class PgsqlSchema extends BaseSchema
             $sql .= ", ALTER COLUMN {$name} SET NOT NULL";
         }
 
-        return $sql;
+        $out[] = $sql;
+
+        return $out;
     }
 
     /**

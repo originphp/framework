@@ -50,6 +50,12 @@ class SqliteSchema extends BaseSchema
         'binary' => 'BLOB',
         'boolean' => 'BOOLEAN',
     ];
+
+    /**
+     * Caches schema
+     * @var array
+     */
+    private $schema = [];
   
     /**
      * This describes the table in the database using the new format. This will require caching due to the amount
@@ -338,30 +344,29 @@ class SqliteSchema extends BaseSchema
     }
 
     /**
-     * Changes a column according to the new definition
+     * Changes a column according to the new definition.
      *
      * @param string $table
      * @param string $name
      * @param array $options
-     * @return string
+     * @return array
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []): string
+    public function changeColumnSql(string $table, string $name, string $type, array $options = []): array
     {
-        return '';
-        /*
         $out = [];
-        $schema = $this->describe($table);
-        if (isset($schema['columns'][$name])) {
-            $schema['columns'][$name] = ['type' => $type, 'null' => true,'default' => null] + $options;
-
-            $out = $this->createTableSql($table, $schema['columns'], $schema);
-
-            array_unshift($out, $this->renameTable($table, 'schema_tmp'));
-            $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
-            $out[] = $this->dropTableSql('schema_tmp');
+        // store adjusted schema for future calls
+        if (! isset($this->schema[$table])) {
+            $this->schema[$table] = $this->describe($table);
         }
 
-        return $out;*/
+        $this->schema[$table]['columns'][$name] = ['type' => $type, 'null' => true,'default' => null] + $options;
+        $out = $this->createTableSql($table, $this->schema[$table]['columns'], $this->schema[$table]);
+
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
     }
 
     /**
