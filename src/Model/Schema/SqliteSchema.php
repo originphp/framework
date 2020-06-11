@@ -480,19 +480,16 @@ class SqliteSchema extends BaseSchema
             $schema = $this->describe($table);
         }
 
-        $indexes = $this->indexes($table);
-
         $data = [];
-        foreach ($indexes as $i => $index) {
+        foreach ($schema['indexes'] as $i => $index) {
             if ($index['name'] === $oldName) {
                 $data = $index;
-                unset($indexes[$i]);
                 break;
             }
         }
 
         $out = $this->removeIndex($table, $oldName);
-        $out[] = $this->addIndex($table, $data['column'], $newName, ['unique' => $data['uniqe'] ?? false]);
+        $out[] = $this->addIndex($table, $data['column'], $newName, ['unique' => $data['unique'] ?? false]);
 
         return $out;
     }

@@ -358,12 +358,10 @@ class PgsqlSchemaTest extends OriginTestCase
     {
         $adapter = new PgsqlSchema('test');
         
-        // ALTER TABLE "articles" ALTER COLUMN "id" DROP DEFAULT
-        // ALTER TABLE "articles" ALTER COLUMN "id DROP NOT NULL
         // ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER
 
         $statements = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
-        $this->assertEquals('ca3761b3e33512e8505835edfa3a5b47', md5(json_encode($statements)));
+        $this->assertEquals('ba0890c051a468e8d25c3d6a9d1ebf35', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -374,7 +372,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
         // 'ALTER TABLE "deals" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(8,4)';
         $statements = $adapter->changeColumn('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
-        $this->assertEquals('ffde3a6d6c40debd10b7a90ef24ffd4f', md5(json_encode($statements)));
+        $this->assertEquals('e589a55b83286b440f90bb9204175f8f', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'pgsql') {
@@ -385,7 +383,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\'';
         $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
-        $this->assertEquals('e7b5172df6f323ffd8bcb9c3819651d9', md5(json_encode($statements)));
+        $this->assertEquals('0b961ad551c728e430960ecad47fe1c9', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -395,7 +393,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
         //  'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\', ALTER COLUMN "name" SET NOT NULL';
         $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals('349392995b042a89d73286bc1ed1c8aa', md5(json_encode($statements)));
+        $this->assertEquals('b0597c132ae18e7775a905d47437838b', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -405,7 +403,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT NULL';
         $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
-        $this->assertEquals('86cb040929ee8fa8ffdf285be5693b64', md5(json_encode($statements)));
+        $this->assertEquals('e32bb9d3a6f5cd264692d845a19c9abb', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -415,7 +413,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
         // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET NOT NULL';
         $statements = $adapter->changeColumn('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals('d822355f58599d4396120ab3dd98c2ac', md5(json_encode($statements)));
+        $this->assertEquals('83af110d7fc35b9fd5eaa56fda6854b8', md5(json_encode($statements)));
 
         if ($adapter->connection()->engine() === 'pgsql') {
             foreach ($statements as $statement) {
@@ -559,11 +557,10 @@ class PgsqlSchemaTest extends OriginTestCase
             'name' => 'fk_origin_12345',
             'table' => 'articles',
             'column' => 'author_id',
-            'references' => ['users','id'],
-            'update' => 'noAction',
-            'delete' => 'noAction',
             'referencedTable' => 'users',
             'referencedColumn' => 'id',
+            'update' => 'noAction',
+            'delete' => 'noAction'
         ];
         $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }

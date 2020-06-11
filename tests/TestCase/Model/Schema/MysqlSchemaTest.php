@@ -369,11 +369,10 @@ class MysqlSchemaTest extends OriginTestCase
     {
         $adapter = new MysqlSchema('test');
 
-        // ALTER TABLE `articles` ALTER COLUMN `id` DROP DEFAULT
         // ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)
 
         $statements = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']);
-        $this->assertEquals('c9edb715f7db7c276569910e1b0b5778', md5(json_encode($statements)));
+        $this->assertEquals('e11c5824867c439975eb736d4742c3b4', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'mysql') {
@@ -518,11 +517,10 @@ class MysqlSchemaTest extends OriginTestCase
             'name' => 'fk_origin_12345',
             'table' => 'articles',
             'column' => 'author_id',
-            'references' => ['users','id'],
-            'update' => 'noAction',
-            'delete' => 'noAction',
             'referencedTable' => 'users',
             'referencedColumn' => 'id',
+            'update' => 'noAction',
+            'delete' => 'noAction'
         ];
         $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }

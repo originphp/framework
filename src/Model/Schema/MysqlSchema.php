@@ -385,21 +385,13 @@ class MysqlSchema extends BaseSchema
     {
         $options += ['name' => $name, 'type' => $type];
 
-        $out = [];
-
-        $out[] = sprintf(
-            'ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($name)
-        );
-
-        $out[] = sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s MODIFY COLUMN %s',
             $this->quoteIdentifier($table),
             $this->columnSql($options)
         );
 
-        return $out;
+        return [$sql];
     }
 
     /**
@@ -555,14 +547,10 @@ class MysqlSchema extends BaseSchema
                 'name' => $result['CONSTRAINT_NAME'],
                 'table' => $result['TABLE_NAME'],
                 'column' => $result['COLUMN_NAME'],
-                'references' => [$result['REFERENCED_TABLE_NAME'], $result['REFERENCED_COLUMN_NAME']], // as 2.7 match schema style
-                'update' => $actionMap[$result['UPDATE_RULE']],
-                'delete' => $actionMap[$result['DELETE_RULE']],
-                /**
-                 * @deprecated in 3.0 so that this works fluently with migrations and schema
-                 */
                 'referencedTable' => $result['REFERENCED_TABLE_NAME'],
                 'referencedColumn' => $result['REFERENCED_COLUMN_NAME'],
+                'update' => $actionMap[$result['UPDATE_RULE']],
+                'delete' => $actionMap[$result['DELETE_RULE']],
             ];
         }
 

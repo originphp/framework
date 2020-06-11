@@ -291,18 +291,6 @@ class PgsqlSchema extends BaseSchema
             }
         }
 
-        $out[] = sprintf(
-            'ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($name)
-        );
-
-        $out[] = sprintf(
-            'ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($name)
-        );
-
         $sql = sprintf(
             'ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s',
             $this->quoteIdentifier($table),
@@ -441,14 +429,10 @@ class PgsqlSchema extends BaseSchema
                 'name' => $result['name'],
                 'table' => $table,
                 'column' => $result['column'],
-                'references' => [$result['referencedTable'],$result['referencedColumn']],
-                'update' => $actionMap[$result['update']],
-                'delete' => $actionMap[$result['delete']],
-                /**
-                 * @deprecated in 3.0 so that this works fluently with migrations and schema
-                 */
                 'referencedTable' => $result['referencedTable'],
                 'referencedColumn' => $result['referencedColumn'],
+                'update' => $actionMap[$result['update']],
+                'delete' => $actionMap[$result['delete']],
             ];
         }
 

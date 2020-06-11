@@ -518,6 +518,8 @@ class SqliteSchemaTest extends OriginTestCase
             'column' => 'author_id',
             'referencedTable' => 'users',
             'referencedColumn' => 'id',
+            'update' => 'noAction',
+            'delete' => 'noAction'
         ];
         $this->assertEquals([$expected], $adapter->foreignKeys('articles'));
     }

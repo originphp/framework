@@ -71,13 +71,6 @@ class Migration
     protected $pendingColumns = [];
 
     /**
-     * Tracks changes to schema
-     *
-     * @var array
-     */
-    private $schema = [];
-
-    /**
      * Constructor
      *
      * @param \Origin\Model\Schema\BaseSchema $adapter
@@ -86,19 +79,6 @@ class Migration
     {
         $this->adapter = $adapter;
         $this->datasource = $adapter->datasource();
-    }
-
-    /**
-     * The schema tracker helps deals with features lacking in sqlite,
-     *
-     * @param string $table
-     * @return void
-     */
-    private function initSchemaTracker(string $table): void
-    {
-        if (! isset($this->schema[$table])) {
-            $this->schema[$table] = $this->adapter()->describe($table);
-        }
     }
 
     /**
@@ -191,7 +171,6 @@ class Migration
                 try {
                     $this->connection()->execute($sql);
                 } catch (DatasourceException $ex) {
-                    debug($sql);
                     $this->connection()->rollback();
                     throw new Exception($ex->getMessage());
                 }
@@ -293,7 +272,7 @@ class Migration
             $tableOptions['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
         }
 
-        # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
+        # For the benefit of working with Indexes and Foreign Keys  on new tables/columns
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
   
@@ -429,22 +408,17 @@ class Migration
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
         }
-
-        $this->initSchemaTracker($table);
-
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingColumns[$table][] = $name;
 
         $this->statements[] = new Sql(
             $this->adapter()->addColumn($table, $name, $type, $options)
         );
-
-        # track changes
-        $this->schema[$table]['columns'][$name] = ['type' => $type,'null' => true, 'default' => null] + $options;
         
         if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->describe($table);
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->removeColumn($table, $name, $this->schema[$table])
+                $this->adapter()->removeColumn($table, $name, $schema)
             );
         }
     }
@@ -475,21 +449,33 @@ class Migration
             throw new Exception("{$name} does not exist in the {$table}");
         }
 
-        $this->initSchemaTracker($table);
+        $engine = $this->connection()->engine();
+        $schema = $this->adapter()->describe($table);
         
+        $statements = [];
+        // This is here because it relies on information, could add as dropConstrint
+        // Drop DEFAULT constraint if it exists (same in both MySQL and PgSQL)
+        if (in_array($engine, ['pgsql','mysql']) && $schema['columns'][$name]['default']) {
+            $statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT";
+        }
+
+        // In PgSQL not null is constraint.
+        if ($engine === 'pgsql' && $schema['columns'][$name]['null'] === false) {
+            $statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL";
+        }
+        if ($statements) {
+            $this->statements[] = new Sql($statements);
+        }
+
         $this->statements[] = new Sql(
             $this->adapter()->changeColumn($table, $name, $type, $options)
         );
 
-        $options = $this->schema[$table]['columns'][$name];
-
         if ($this->calledBy() === 'change') {
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->changeColumn($table, $name, $options['type'], $options, $this->schema[$table])
+                $this->adapter()->changeColumn($table, $name, $schema['columns'][$name]['type'], $schema['columns'][$name], $schema)
             );
         }
-
-        $this->schema[$table]['columns'][$name] = $options;
     }
 
     /**
@@ -509,8 +495,6 @@ class Migration
         if (! $this->columnExists($table, $from)) {
             throw new Exception("{$from} column does not exist in the {$table}");
         }
-
-        $this->initSchemaTracker($table);
        
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingColumns[$table][] = $to;
@@ -520,13 +504,11 @@ class Migration
         );
 
         if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->describe($table);
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->renameColumn($table, $to, $from, $this->schema[$table])
+                $this->adapter()->renameColumn($table, $to, $from, $schema)
             );
         }
-
-        $this->schema[$table]['columns'][$to] = $this->schema[$table]['columns'][$from];
-        unset($this->schema[$table]['columns'][$from]);
     }
 
     /**
@@ -546,20 +528,17 @@ class Migration
             throw new Exception("{$column} does not exist in the {$table}");
         }
 
-        $this->initSchemaTracker($table);
-
         $this->statements[] = new Sql(
             $this->adapter()->removeColumn($table, $column)
         );
 
         if ($this->calledBy() === 'change') {
-            $schema = $this->adapter()->describe($table)['columns'];
+            $schema = $this->adapter()->describe($table);
+
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->addColumn($table, $column, $this->schema[$table]['columns'][$column]['type'], $this->schema[$table])
+                $this->adapter()->addColumn($table, $column, $schema['columns'][$column]['type'], $schema)
             );
         }
-
-        unset($this->schema[$table][$column]);
     }
 
     /**
@@ -585,10 +564,10 @@ class Migration
         );
 
         if ($this->calledBy() === 'change') {
-            $schema = $this->adapter()->describe($table)['columns'];
+            $schema = $this->adapter()->describe($table);
             foreach ($columns as $column) {
                 $this->reverseStatements[] = new Sql(
-                    $this->adapter()->addColumn($table, $column, $schema[$column]['type'], $schema[$column])
+                    $this->adapter()->addColumn($table, $column, $schema['columns'][$column]['type'], $schema['columns'][$column], $schema)
                 );
             }
         }
@@ -670,6 +649,7 @@ class Migration
         $options += ['unique' => false,'name' => null];
          
         $options = $this->indexOptions($table, array_merge(['column' => $column], $options));
+
         $columnString = $options['column'];
         if (is_array($columnString)) {
             $columnString = implode(',', $columnString);
@@ -755,15 +735,14 @@ class Migration
      */
     public function renameIndex(string $table, string $oldName, string $newName): void
     {
-        $this->initSchemaTracker($table);
-
         $this->statements[] = new Sql(
             $this->adapter()->renameIndex($table, $oldName, $newName)
         );
 
         if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->describe($table);
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->renameIndex($table, $newName, $oldName)
+                $this->adapter()->renameIndex($table, $newName, $oldName, $schema)
             );
         }
     }
@@ -852,8 +831,6 @@ class Migration
             throw new Exception("{$toTable} does not exist");
         }
 
-        $this->initSchemaTracker($fromTable);
-
         $options += [
             'column' => strtolower(Inflector::singular($toTable)).'_id',
             'primaryKey' => 'id',
@@ -871,11 +848,11 @@ class Migration
             $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete'])
         );
 
-        $this->schema[$fromTable]['constraints'][$options['name']] = $options;
-
         if ($this->calledBy() === 'change') {
+            $schema = $this->adapter()->describe($fromTable);
+
             $this->reverseStatements[] = new Sql(
-                $this->adapter()->removeForeignKey($fromTable, $options['name'], $this->schema[$fromTable])
+                $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)
             );
         }
     }
@@ -910,8 +887,6 @@ class Migration
             throw new InvalidArgumentException('Column or name needs to be specified');
         }
 
-        $this->initSchemaTracker($fromTable);
-  
         $foreignKey = null;
         $foreignKeys = $this->foreignKeys($fromTable);
           
@@ -919,8 +894,7 @@ class Migration
             if ($options['column'] && $foreignKey['column'] === $options['column']) {
                 $options['name'] = $foreignKey['name'];
                 break;
-            }
-            if ($options['name'] && $foreignKey['name'] === $options['name']) {
+            } elseif ($options['name'] && $foreignKey['name'] === $options['name']) {
                 $options['column'] = $foreignKey['column'];
                 break;
             }
@@ -933,13 +907,13 @@ class Migration
         //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
         if ($foreignKey) {
             if ($this->calledBy() === 'change') {
+                $schema = $this->adapter()->describe($fromTable);
+   
                 $this->reverseStatements[] = new Sql(
-                    $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $foreignKey['referencedTable'], $options['primaryKey'], $this->schema[$fromTable])
+                    $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $foreignKey['referencedTable'], $options['primaryKey'], $foreignKey['update'], $foreignKey['delete'], $schema)
                 );
             }
         }
-
-        unset($this->schema[$fromTable]['constraints'][$options['name']]);
     }
   
     /**
