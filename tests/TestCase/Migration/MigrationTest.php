@@ -89,11 +89,19 @@ class MockMigration extends Migration
      *
      * @return array
      */
-    public function invokeStart()
+    public function invokeStart(bool $debug = false)
     {
-        $this->start();
+        $statementsRan = $this->start();
+
         $reversableStatements = $this->reverseStatements();
         $this->statements = [];
+
+        if ($debug) {
+            debug([
+                'statements' => $statementsRan,
+                'reversable' => $reversableStatements
+            ]);
+        }
 
         return $reversableStatements;
     }
@@ -351,8 +359,9 @@ class MigrationTest extends OriginTestCase
         $migration = $this->migration();
         $migration->addColumn('articles', 'remove_me', 'string', ['null' => true,'default' => 'test']);
         $migration->addColumn('articles', 'remove_me_as_well', 'string', ['null' => true,'default' => 'test']);
+        
         $migration->start();
-
+        
         # Test Up
         $migration = $this->migration();
         $migration->removeColumns('articles', ['remove_me','remove_me_as_well']);
