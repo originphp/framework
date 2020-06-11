@@ -31,17 +31,24 @@ class BatchInsertQueryTest extends OriginTestCase
             'connection' => 'test',
         ]);
     }
+    /**
+    * PostgreSQL error  "duplicate key value violates unique constraint "posts_pkey" probably because of old fixture setup which bypassed
+    * autoincrement. Truncating table for now.
+    * @todo investigate this behavior
+    */
+    private function truncateTable()
+    {
+        $connection = ConnectionManager::get('test');
+        $statements = $connection->adapter()->truncateTableSql('posts');
+        foreach ($statements as $sql) {
+            $connection->execute($sql);
+        }
+    }
+    
     public function testInsert()
     {
-        /**
-         * PostgreSQL error  "duplicate key value violates unique constraint "posts_pkey" probably because of old fixture setup which bypassed
-         * autoincrement. Truncating table for now.
-         * @todo investigate this behavior
-         */
-        $connection = ConnectionManager::get('test');
-        $sql = $connection->adapter()->truncateTableSql('posts');
-        $this->Post->query($sql);
-        
+        $this->truncateTable();
+
         $this->assertEquals(0, $this->Post->find('count'));
         $records = [];
         for ($i = 0;$i < 1000;$i++) {

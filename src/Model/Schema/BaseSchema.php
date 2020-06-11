@@ -315,9 +315,9 @@ abstract class BaseSchema
      * Returns the sql for truncating the table
      *
      * @param string $table
-     * @return string
+     * @return array
      */
-    abstract public function truncateTableSql(string $table): string;
+    abstract public function truncateTableSql(string $table): array;
 
     /**
      * Sets the auto increment value for a auto increment/serial colun

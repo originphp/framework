@@ -497,19 +497,27 @@ class SqliteSchema extends BaseSchema
      * Sql for truncating a table
      *
      * @param string $table
-     * @return string
+     * @return array
      */
-    public function truncateTableSql(string $table): string
+    public function truncateTableSql(string $table): array
     {
-        /**
-         * @todo this should probably clear sequences usign a second query
-         */
-        return sprintf(
-            'DELETE FROM %s',
-            $this->quoteIdentifier($table)
-        );
+        $out = [];
+        
+        $out[] = sprintf('DELETE from sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table));
+        $out[] = sprintf('DELETE FROM %s', $this->quoteIdentifier($table));
+
+        return $out;
     }
 
+    /**
+     * Changes the autoincrement number. Due to how sqlite works, you can't set the number to start with, unless
+     * you create a record, set the number then delete the record.
+     *
+     * @param string $table
+     * @param string $column
+     * @param integer $counter
+     * @return string
+     */
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string
     {
         return sprintf('UPDATE SQLITE_SEQUENCE SET seq = %d WHERE name = %s', $counter, $this->quoteIdentifier($table));

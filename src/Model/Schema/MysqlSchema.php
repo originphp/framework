@@ -477,14 +477,13 @@ class MysqlSchema extends BaseSchema
      * Sql for truncating a table
      *
      * @param string $table
-     * @return string
+     * @return array
      */
-    public function truncateTableSql(string $table): string
+    public function truncateTableSql(string $table): array
     {
-        return sprintf(
-            'TRUNCATE TABLE %s',
-            $this->quoteIdentifier($table)
-        );
+        $sql = sprintf('TRUNCATE TABLE %s', $this->quoteIdentifier($table));
+
+        return [$sql];
     }
 
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string

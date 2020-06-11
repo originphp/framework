@@ -143,9 +143,13 @@ class Fixture
     public function truncate(): bool
     {
         $connection = ConnectionManager::get('test');
-        $sql = $connection->adapter()->truncateTableSql($this->table);
+        
+        $statements = $connection->adapter()->truncateTableSql($this->table);
+        foreach ($statements as $sql) {
+            $connection->execute($sql);
+        }
 
-        return $connection->execute($sql);
+        return true;
     }
 
     /**
