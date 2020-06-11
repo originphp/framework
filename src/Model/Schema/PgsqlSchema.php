@@ -413,21 +413,42 @@ class PgsqlSchema extends BaseSchema
     public function foreignKeys(string $table): array
     {
         $config = ConnectionManager::config($this->datasource);
-
+        // constraint info is in
         $sql = sprintf(
-            'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = %s AND  tc.table_name = %s AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'',
-            $this->schemaValue($this->connection()->database()),
+            'SELECT c1.conname AS name, a1.attname AS "column",
+            c1.confupdtype AS "update", c1.confdeltype AS "delete", c1.confrelid::regclass AS "referencedTable", a2.attname AS "referencedColumn"
+            FROM pg_catalog.pg_namespace n1
+            INNER JOIN pg_catalog.pg_class c2 ON (n1.oid = c2.relnamespace)
+            INNER JOIN pg_catalog.pg_constraint c1 ON (n1.oid = c1.connamespace)
+            INNER JOIN pg_catalog.pg_attribute a1 ON (a1.attrelid = c2.oid AND c1.conrelid = a1.attrelid AND a1.attnum = ANY(c1.conkey))
+            INNER JOIN pg_catalog.pg_attribute a2 ON (a1.attrelid = c2.oid AND c1.confrelid = a2.attrelid AND a2.attnum = ANY(c1.confkey))
+            WHERE n1.nspname = \'public\' AND c1.contype = \'f\' AND c2.relname = %s',
             $this->schemaValue($table)
         );
+
         $out = [];
+
+        $actionMap = [
+            'c' => 'cascade',
+            'r' => 'restrict',
+            'a' => 'noAction',
+            null => 'setDefault', // @todo investigate this
+            null => 'setNull',
+        ];
 
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => $result['constraint_name'],
-                'table' => $result['table_name'],
-                'column' => $result['column_name'],
-                'referencedTable' => $result['referenced_table_name'],
-                'referencedColumn' => $result['referenced_column_name'],
+                'name' => $result['name'],
+                'table' => $table,
+                'column' => $result['column'],
+                'references' => [$result['referencedTable'],$result['referencedColumn']],
+                'update' => $actionMap[$result['update']],
+                'delete' => $actionMap[$result['delete']],
+                /**
+                 * @deprecated in 3.0 so that this works fluently with migrations and schema
+                 */
+                'referencedTable' => $result['referencedTable'],
+                'referencedColumn' => $result['referencedColumn'],
             ];
         }
 
@@ -764,5 +785,18 @@ class PgsqlSchema extends BaseSchema
         }
 
         return ['type' => 'string'];
+    }
+
+    /**
+    * Maps the onclause value
+    *
+    * @param string $value
+    * @return string
+    */
+    protected function onClause(string $value): string
+    {
+        $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
+
+        return $map[$value] ?? 'RESTRICT';
     }
 }

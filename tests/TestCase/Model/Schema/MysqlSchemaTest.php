@@ -518,6 +518,9 @@ class MysqlSchemaTest extends OriginTestCase
             'name' => 'fk_origin_12345',
             'table' => 'articles',
             'column' => 'author_id',
+            'references' => ['users','id'],
+            'update' => 'noAction',
+            'delete' => 'noAction',
             'referencedTable' => 'users',
             'referencedColumn' => 'id',
         ];
