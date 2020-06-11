@@ -526,9 +526,24 @@ class MysqlSchema extends BaseSchema
     {
         $config = ConnectionManager::config($this->datasource);
 
-        /*$sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = '{$config['database']}' AND TABLE_NAME = '{$table}';";*/
+        //SELECT TABLE_NAME as 'table',COLUMN_NAME as 'column',CONSTRAINT_NAME as 'name', REFERENCED_TABLE_NAME as 'referencedTable',REFERENCED_COLUMN_NAME as 'referencedColumn' FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = 'origin' AND TABLE_NAME = 'bookmarks'
+
         $sql = sprintf(
-            'SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = %s AND TABLE_NAME = %s',
+            "SELECT 
+            s1.TABLE_NAME AS 'table',
+            s1.COLUMN_NAME AS 'column',
+            s1.CONSTRAINT_NAME AS 'name', 
+            s1.REFERENCED_TABLE_NAME AS 'referencedTable',
+            s1.REFERENCED_COLUMN_NAME AS 'referencedColumn',
+            c1.UPDATE_RULE as 'update',
+            c1.DELETE_RULE as 'delete'
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS s1 
+        INNER JOIN information_schema.referential_constraints AS c1
+        WHERE 
+            REFERENCED_TABLE_SCHEMA = %s AND 
+            s1.CONSTRAINT_NAME = c1.CONSTRAINT_NAME AND 
+            s1.CONSTRAINT_SCHEMA = c1.CONSTRAINT_SCHEMA AND 
+            s1.TABLE_NAME = %s",
             $this->schemaValue($config['database']),
             $this->schemaValue($table)
         );
@@ -544,13 +559,13 @@ class MysqlSchema extends BaseSchema
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => $result['CONSTRAINT_NAME'],
-                'table' => $result['TABLE_NAME'],
-                'column' => $result['COLUMN_NAME'],
-                'referencedTable' => $result['REFERENCED_TABLE_NAME'],
-                'referencedColumn' => $result['REFERENCED_COLUMN_NAME'],
-                'update' => $actionMap[$result['UPDATE_RULE']],
-                'delete' => $actionMap[$result['DELETE_RULE']],
+                'name' => $result['name'],
+                'table' => $table,
+                'column' => $result['column'],
+                'referencedTable' => $result['referencedTable'],
+                'referencedColumn' => $result['referencedColumn'],
+                'update' => $actionMap[$result['update']],
+                'delete' => $actionMap[$result['delete']],
             ];
         }
 
