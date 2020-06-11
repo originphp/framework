@@ -357,7 +357,11 @@ class PgsqlSchemaTest extends OriginTestCase
     public function testChangeColumn()
     {
         $adapter = new PgsqlSchema('test');
-        // 'ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER';
+        
+        // ALTER TABLE "articles" ALTER COLUMN "id" DROP DEFAULT
+        // ALTER TABLE "articles" ALTER COLUMN "id DROP NOT NULL
+        // ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER
+
         $statements = $adapter->changeColumnSql('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
         debug($statements);
         $this->assertEquals('', md5(json_encode($statements)));

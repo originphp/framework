@@ -290,7 +290,6 @@ class PgsqlSchema extends BaseSchema
                 $type = "{$type}({$options['limit']})";
             }
         }
-        $name = $this->quoteIdentifier($name);
 
         $out[] = sprintf(
             'ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT',
@@ -310,6 +309,8 @@ class PgsqlSchema extends BaseSchema
             $name,
             $type
         );
+
+        $name = $this->quoteIdentifier($name);
        
         $default = $this->schemaValue($options['default']);
         

@@ -366,18 +366,18 @@ class SqliteSchemaTest extends OriginTestCase
     public function testChangeColumn()
     {
         $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() != 'sqlite') {
+            $this->markTestSkipped('Requires sqlite');
+        }
        
         $statements = $adapter->changeColumnSql('articles', 'title', 'string', ['limit' => '15']);
         $this->assertEquals('4fbafb0c1ae18ec5ae8b0933c5ee5ecd', md5(json_encode($statements)));
 
-        # check for syntax errors
-        if ($adapter->connection()->engine() === 'sqlite') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
-            $meta = $adapter->describe('articles')['columns'];
-            $this->assertEquals('15', $meta['title']['limit']);
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
+        $meta = $adapter->describe('articles')['columns'];
+        $this->assertEquals('15', $meta['title']['limit']);
     }
 
     public function testColumnExists()

@@ -368,10 +368,12 @@ class MysqlSchemaTest extends OriginTestCase
     public function testChangeColumn()
     {
         $adapter = new MysqlSchema('test');
-        // 'ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)';
+
+        // ALTER TABLE `articles` ALTER COLUMN `id` DROP DEFAULT
+        // ALTER TABLE `articles` MODIFY COLUMN `id` INT(15)
+
         $statements = $adapter->changeColumnSql('articles', 'id', 'integer', ['limit' => '15']);
-        debug($statements);
-        $this->assertEquals('', md5(json_encode($statements)));
+        $this->assertEquals('c9edb715f7db7c276569910e1b0b5778', md5(json_encode($statements)));
 
         # check for syntax errors
         if ($adapter->connection()->engine() === 'mysql') {
