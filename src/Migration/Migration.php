@@ -768,7 +768,7 @@ class Migration
     public function indexExists(string $table, $options): bool
     {
         $options = $this->indexOptions($table, $options);
-
+       
         return $this->indexNameExists($table, $options['name']);
     }
 
@@ -781,6 +781,10 @@ class Migration
      */
     public function indexNameExists(string $table, string $indexName): bool
     {
+        if (! $this->tableExists($table)) {
+            return false;
+        }
+        
         $indexes = $this->indexes($table);
         foreach ($indexes as $index) {
             if ($index['name'] === $indexName) {

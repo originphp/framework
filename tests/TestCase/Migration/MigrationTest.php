@@ -387,6 +387,27 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->columnExists('articles', 'article_title'));
     }
 
+    public function testAddIndexAfterCreateTable()
+    {
+        $migration = $this->migration();
+
+        # Create tables first
+        $migration->createTable('c1', [
+            'name' => 'string',
+            'account_id' => 'integer',
+            'owner_id' => 'integer',
+        ]);
+        $migration->addIndex('c1', 'account_id');
+        $reversableStatements = $migration->invokeStart();
+      
+        $this->assertTrue(
+            $migration->indexExists('c1', 'account_id')
+        );
+       
+        $migration->rollback($reversableStatements);
+        $this->assertFalse($migration->indexExists('c1', 'account_id'));
+    }
+
     public function testAddIndex()
     {
         $migration = $this->migration();
@@ -474,7 +495,6 @@ class MigrationTest extends OriginTestCase
 
     public function testAddForeignKeyCustom()
     {
-       
         # Prepare
         $migration = $this->migration();
         $migration->renameColumn('users', 'id', 'lng_id');
