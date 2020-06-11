@@ -70,7 +70,7 @@ class SqliteSchema extends BaseSchema
     public function describe(string $table): array
     {
         $results = $this->fetchAll('PRAGMA table_info(' . $this->quoteIdentifier($table) .  ')');
-
+    
         $isAutoincrement = (bool) $this->fetchRow('SELECT count(*) FROM sqlite_master WHERE tbl_name="' . $table . '" AND sql LIKE "%AUTOINCREMENT%"');
        
         $indexes = $constraints = [];
@@ -121,6 +121,7 @@ class SqliteSchema extends BaseSchema
     
         foreach ($data as $row) {
             $definition = $this->parseColumn($row['type']);
+
             $definition += [
                 'null' => ! $row['notnull'],
                 'default' => $this->defaultvalue($definition['type'], $row['dflt_value']),
@@ -356,12 +357,10 @@ class SqliteSchema extends BaseSchema
     {
         $out = [];
         // store adjusted schema for future calls
-        if (! isset($this->schema[$table])) {
-            $this->schema[$table] = $this->describe($table);
-        }
+        $schema = $this->describe($table);
 
-        $this->schema[$table]['columns'][$name] = ['type' => $type, 'null' => true,'default' => null] + $options;
-        $out = $this->createTableSql($table, $this->schema[$table]['columns'], $this->schema[$table]);
+        $schema['columns'][$name] = ['type' => $type, 'null' => true,'default' => null] + $options;
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($table, 'schema_tmp'));
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
@@ -382,22 +381,19 @@ class SqliteSchema extends BaseSchema
     {
         $out = [];
 
-        // store adjusted schema for future calls
-        if (! isset($this->schema[$table])) {
-            $this->schema[$table] = $this->describe($table);
-        }
+        $schema = $this->describe($table);
 
-        if (isset($this->schema[$table]['columns'][$from])) {
+        if (isset($schema['columns'][$from])) {
             $columns = [];
-            foreach ($this->schema[$table]['columns'] as $column => $definition) {
+            foreach ($schema['columns'] as $column => $definition) {
                 if ($column === $from) {
                     $columns[$to] = $definition;
                 } else {
                     $columns[$column] = $definition;
                 }
             }
-
-            $out = $this->createTableSql($table, $columns, $this->schema[$table]);
+            
+            $out = $this->createTableSql($table, $columns, $schema[$table]);
 
             array_unshift($out, $this->renameTable($table, 'schema_tmp'));
             $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
@@ -408,15 +404,16 @@ class SqliteSchema extends BaseSchema
     }
 
     /**
-    * Removes a column from the table§
+    * Removes a column from the table
     *
     * @param string $table
     * @param string $column
-    * @return array
-    */
-    public function removeColumn(string $table, string $column): array
+    * @param array $schema optionally pass an array of schema to use
+     * @return array
+     */
+    public function removeColumn(string $table, string $column, array $schema = null): array
     {
-        return $this->removeColumns($table, [$column]);
+        return $this->removeColumns($table, [$column], $schema);
     }
 
     /**
@@ -424,12 +421,15 @@ class SqliteSchema extends BaseSchema
      *
      * @param string $table
      * @param array $columns
-     * @return string
+     * @param array $schema optionally pass an array of schema to use
+     * @return array
      */
-    public function removeColumns(string $table, array $columns): array
+    public function removeColumns(string $table, array $columns, array $schema = null): array
     {
-        $schema = $this->describe($table);
-
+        if ($schema === null) {
+            $schema = $this->describe($table);
+        }
+        
         foreach ($columns as $column) {
             if (isset($schema['columns'][$column])) {
                 unset($schema['columns'][$column]);
@@ -467,21 +467,26 @@ class SqliteSchema extends BaseSchema
 
     /**
      * Renames an index
-     * @requires MySQL 5.7+
      *
      * @param string $table
      * @param string $oldName
      * @param string $newName
+     * @param array $schema
      * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): array
+    public function renameIndex(string $table, string $oldName, string $newName, array $schema = null): array
     {
+        if ($schema === null) {
+            $schema = $this->describe($table);
+        }
+
         $indexes = $this->indexes($table);
 
         $data = [];
-        foreach ($indexes as $index) {
+        foreach ($indexes as $i => $index) {
             if ($index['name'] === $oldName) {
                 $data = $index;
+                unset($indexes[$i]);
                 break;
             }
         }
@@ -582,12 +587,15 @@ class SqliteSchema extends BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
+     * @param array $schema
      * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): array
+    public function removeForeignKey(string $fromTable, string $constraint, array $schema = null): array
     {
-        $schema = $this->describe($fromTable);
-
+        if ($schema === null) {
+            $schema = $this->describe($fromTable);
+        }
+       
         if (! isset($schema['constraints'][$constraint])) {
             throw new InvalidArgumentException(sprintf('Constraint %s does not exist', $constraint));
         }
@@ -828,9 +836,11 @@ class SqliteSchema extends BaseSchema
      * @param string $onDelete
      * @return array
      */
-    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null): array
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null, array $schema = null): array
     {
-        $schema = $this->describe($fromTable);
+        if ($schema === null) {
+            $schema = $this->describe($fromTable);
+        }
 
         $schema['constraints'][$name] = [
             'type' => 'foreign',
