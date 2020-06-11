@@ -849,7 +849,7 @@ class Migration
         );
 
         if ($this->calledBy() === 'change') {
-            $schema = $this->adapter()->describe($fromTable);
+            $schema = in_array($fromTable, $this->pendingTables) ? null : $this->adapter()->describe($fromTable);
 
             $this->reverseStatements[] = new Sql(
                 $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)
