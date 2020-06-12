@@ -640,7 +640,7 @@ class PgsqlSchemaTest extends OriginTestCase
         $adapter = new PgsqlSchema('test');
         $expected = 'DROP INDEX "author_id"'; // Different on pgsql no table name used
         $result = $adapter->removeIndex('articles', 'author_id');
-        $this->assertEquals($expected, $result[0]);
+        $this->assertEquals($expected, $result);
     }
     
     public function testRenameColumn()

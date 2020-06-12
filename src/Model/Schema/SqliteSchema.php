@@ -53,12 +53,6 @@ class SqliteSchema extends BaseSchema
     ];
 
     /**
-     * Caches schema
-     * @var array
-     */
-    private $schema = [];
-  
-    /**
      * This describes the table in the database using the new format. This will require caching due to the amount
      * of queries that will need to be executed.
      *
@@ -300,21 +294,9 @@ class SqliteSchema extends BaseSchema
   
         $indexes = [];
 
-        /*
-        [seq] => 1
-            [name] => sqlite_autoindex_tposts_1
-            [unique] => 1
-            [origin] => u
-            [partial] => 0
-            */
         foreach ($results as $result) {
             $sql = sprintf('PRAGMA index_info(%s)', $this->quoteIdentifier($result['name']));
             $columns = [];
-            /*
-            [seqno] => 0
-            [cid] => 2
-            [name] => f2
-            */
             foreach ($this->fetchAll($sql) as $column) {
                 $columns[] = $column['name'];
             }
@@ -359,7 +341,7 @@ class SqliteSchema extends BaseSchema
         // store adjusted schema for future calls
         $schema = $this->describe($table);
 
-        $schema['columns'][$name] = ['type' => $type, 'null' => true,'default' => null] + $options;
+        $schema['columns'][$name] = $options + ['type' => $type, 'null' => true,'default' => null];
         $out = $this->createTableSql($table, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($table, 'schema_tmp'));
@@ -375,32 +357,85 @@ class SqliteSchema extends BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
+     * @param array $schema
      * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): array
+    public function renameColumn(string $table, string $from, string $to, array $schema = null): array
     {
         $out = [];
 
-        $schema = $this->describe($table);
-
-        if (isset($schema['columns'][$from])) {
-            $columns = [];
-            foreach ($schema['columns'] as $column => $definition) {
-                if ($column === $from) {
-                    $columns[$to] = $definition;
-                } else {
-                    $columns[$column] = $definition;
-                }
-            }
-            
-            $out = $this->createTableSql($table, $columns, $schema[$table]);
-
-            array_unshift($out, $this->renameTable($table, 'schema_tmp'));
-            $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
-            $out[] = $this->dropTableSql('schema_tmp');
+        if ($schema === null) {
+            $schema = $this->describe($table);
         }
 
+        if (! isset($schema['columns'][$from])) {
+            throw new InvalidArgumentException(sprintf('Column %s does not exist', $from));
+        }
+       
+        // rename column in schema
+        $schema['columns'][$to] = $schema['columns'][$from];
+        unset($schema['columns'][$from]);
+
+        // rename constraints
+        foreach ($schema['constraints'] as $constraint => $definition) {
+            if ($definition['column'] === $from) {
+                $schema['constraints'][$constraint]['column'] = $to;
+            } elseif (is_array($definition['column']) && in_array($from, $definition['column'])) {
+                $key = array_search($from, $definition['column']);
+                $schema['constraints'][$constraint]['column'][$key] = $to;
+            }
+        }
+        
+        foreach ($schema['indexes'] as $index => $definition) {
+            if ($definition['column'] === $from) {
+                $schema['indexes'][$index]['column'] = $to;
+                $schema = $this->renameIndexInSchema($table, $index, $schema);
+            } elseif (is_array($definition['column']) && in_array($from, $definition['column'])) {
+                $key = array_search($from, $definition['column']);
+                $schema['indexes'][$index]['column'][$key] = $to;
+                $schema = $this->renameIndexInSchema($table, $index, $schema);
+            }
+        }
+
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
+
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
+        $out[] = $this->dropTableSql('schema_tmp');
+
         return $out;
+    }
+
+    /**
+     * Internal helper for renaming columns to swap schema data around
+     *
+     * @param string $table
+     * @param string $index
+     * @param array $schema
+     * @return array
+     */
+    private function renameIndexInSchema(string $table, string $index, array $schema): array
+    {
+        $newIndexName = $this->getIndexName($table, $schema['indexes'][$index]['column']);
+      
+        $schema['indexes'][$newIndexName] = $schema['indexes'][$index];
+        unset($schema['indexes'][$index]);
+
+        return $schema;
+    }
+
+    /**
+     * Gets an index name
+     *
+     * @param string $table
+     * @param string|array $column , [column_1,column_2]
+     * @return string table_column_name_index
+     */
+    private function getIndexName(string $table, $column): string
+    {
+        $name = implode('_', (array) $column);
+
+        return strtolower($table . '_' . $name) .'_index';
     }
 
     /**
@@ -453,16 +488,14 @@ class SqliteSchema extends BaseSchema
      * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
      * @param string $name
-     * @return array
+     * @return string
      */
-    public function removeIndex(string $table, string $name): array
+    public function removeIndex(string $table, string $name): string
     {
-        $sql = sprintf(
+        return sprintf(
             'DROP INDEX %s',
             $this->quoteIdentifier($name)
         );
-
-        return [$sql];
     }
 
     /**
@@ -480,16 +513,15 @@ class SqliteSchema extends BaseSchema
             $schema = $this->describe($table);
         }
 
-        $data = [];
-        foreach ($schema['indexes'] as $i => $index) {
-            if ($index['name'] === $oldName) {
-                $data = $index;
-                break;
-            }
+        if (! isset($schema['indexes'][$oldName])) {
+            throw new InvalidArgumentException(sprintf('Index %s does not exist', $oldName));
         }
+     
+        $index = $schema['indexes'][$oldName];
 
-        $out = $this->removeIndex($table, $oldName);
-        $out[] = $this->addIndex($table, $data['column'], $newName, ['unique' => $data['unique'] ?? false]);
+        $out = [];
+        $out[] = $this->removeIndex($table, $oldName);
+        $out[] = $this->addIndex($table, $index['column'], $newName, ['unique' => $index['unique'] ?? false]);
 
         return $out;
     }
@@ -554,17 +586,13 @@ class SqliteSchema extends BaseSchema
     {
         $sql = sprintf('PRAGMA foreign_key_list(%s)', $this->quoteIdentifier($table));
 
-        $results = $this->fetchAll($sql);
-        /*
-        [id] => 0
-        [seq] => 0
-        [table] => users
-        [from] => user_id
-        [to] => id
-        [on_update] => NO ACTION
-        [on_delete] => NO ACTION
-        [match] => NONE
-        */
+        $actionMap = [
+            'CASCADE' => 'cascade',
+            'RESTRICT' => 'restrict',
+            'NO ACTION' => 'noAction',
+            'SET NULL' => 'setNull',
+            'SET DEFAULT' => 'setDefault'
+        ];
 
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
@@ -574,6 +602,9 @@ class SqliteSchema extends BaseSchema
                 'column' => $result['from'],
                 'referencedTable' => $result['table'],
                 'referencedColumn' => $result['to'],
+                'update' => $actionMap[$result['on_update']],
+                'delete' => $actionMap[$result['on_delete']]
+                //'match' => $result['match']
             ];
         }
 
@@ -596,8 +627,8 @@ class SqliteSchema extends BaseSchema
         if (! isset($schema['constraints'][$constraint])) {
             throw new InvalidArgumentException(sprintf('Constraint %s does not exist', $constraint));
         }
-        unset($schema['constriants'][$constraint]);
-
+        unset($schema['constraints'][$constraint]);
+    
         $out = $this->createTableSql($fromTable, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($fromTable, 'schema_tmp'));
@@ -643,9 +674,13 @@ class SqliteSchema extends BaseSchema
                 $autoIncrementColumn = $name;
             }
         }
-        
+     
         if (isset($options['constraints'])) {
             foreach ($options['constraints'] as $name => $definition) {
+                if (! isset($definition['type'])) {
+                    debug($options);
+                    die();
+                }
                 // primary key set for autoincrments in table sql, so dont add again
                 if ($definition['type'] === 'primary' && in_array($autoIncrementColumn, (array) $definition['column'])) {
                     continue;
@@ -838,7 +873,7 @@ class SqliteSchema extends BaseSchema
         if ($schema === null) {
             $schema = $this->describe($fromTable);
         }
-
+       
         $schema['constraints'][$name] = [
             'type' => 'foreign',
             'column' => $column,
@@ -854,5 +889,32 @@ class SqliteSchema extends BaseSchema
         $out[] = $this->dropTableSql('schema_tmp');
 
         return $out;
+    }
+
+    /**
+    * Standardizes default values
+    *
+    * @param mixed $value
+    * @return mixed
+    */
+    protected function defaultValue(string $type, $value)
+    {
+        if ($value === null) {
+            return null;
+        }
+        
+        if (in_array($type, ['bigint','integer','float','decimal'])) {
+            return ($value == (int) $value) ? (int) $value : (float) $value;
+        }
+
+        if ($type === 'boolean') {
+            return (bool) $value;
+        }
+        
+        if (in_array($type, ['string','text'])) {
+            return trim($value, '\'');
+        }
+
+        return $value;
     }
 }

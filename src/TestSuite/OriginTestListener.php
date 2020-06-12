@@ -48,7 +48,7 @@ class OriginTestListener implements TestListener
      */
     public function startTestSuite(TestSuite $suite): void
     {
-        $this->enabled = ConnectionManager::has('test');
+        $this->enabled = ConnectionManager::config('test') ? true : false;
         if ($this->enabled) {
             $this->fixtureManager = new FixtureManager();
         }

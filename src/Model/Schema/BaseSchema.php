@@ -203,9 +203,9 @@ abstract class BaseSchema
      *
      * @param string $table
      * @param string $name
-     * @return array
+     * @return string
      */
-    abstract public function removeIndex(string $table, string $name): array;
+    abstract public function removeIndex(string $table, string $name): string;
 
     /**
      * Renames an index
@@ -515,17 +515,18 @@ abstract class BaseSchema
     */
     protected function defaultValue(string $type, $value)
     {
-        if (in_array($type, ['bigint','integer','float','decimal'])) {
-            if (is_numeric($value)) {
-                return ($value == (int) $value) ? (int) $value : (float) $value;
-            }
-        } elseif ($type === 'boolean') {
-            return (bool) $value;
+        if ($value === null) {
+            return null;
         }
-        if ($type === 'string' && ! is_null($value)) {
-            $value = trim($value, '\'');
+        
+        if (in_array($type, ['bigint','integer','float','decimal'])) {
+            return ($value == (int) $value) ? (int) $value : (float) $value;
         }
 
+        if ($type === 'boolean') {
+            return (bool) $value;
+        }
+        
         return $value;
     }
 }

@@ -444,17 +444,15 @@ class MysqlSchema extends BaseSchema
      * @see https://dev.mysql.com/doc/refman/8.0/en/drop-index.html
      * @param string $table
      * @param string $name
-     * @return array
+     * @return string
      */
-    public function removeIndex(string $table, string $name): array
+    public function removeIndex(string $table, string $name): string
     {
-        $sql = sprintf(
+        return sprintf(
             'DROP INDEX %s ON %s',
             $this->quoteIdentifier($name),
             $this->quoteIdentifier($table)
         );
-
-        return [$sql];
     }
 
     /**

@@ -21,6 +21,7 @@ namespace Origin\Migration;
  * @internal Originaly wanted change to automatically reverse changes, some changes to be reversed need
  * actual schema, which means data needs to be stored somewhere.
  *
+ * Sqlite is proving challenging.
  */
 
 use Origin\Inflector\Inflector;
@@ -131,7 +132,6 @@ class Migration
         if (empty($this->statements)) {
             throw new Exception('Migration does not do anything.');
         }
-
         $this->executeStatements($this->statements);
 
         return $this->statements;
@@ -505,6 +505,11 @@ class Migration
 
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->describe($table);
+            
+            // kansas city shuffle
+            $schema['columns'][$to] = $schema['columns'][$from];
+            unset($schema['columns'][$from]);
+
             $this->reverseStatements[] = new Sql(
                 $this->adapter()->renameColumn($table, $to, $from, $schema)
             );
@@ -741,6 +746,10 @@ class Migration
 
         if ($this->calledBy() === 'change') {
             $schema = $this->adapter()->describe($table);
+            
+            $schema['indexes'][$newName] = $schema['indexes'][$oldName];
+            unset($schema['indexes'][$oldName]);
+
             $this->reverseStatements[] = new Sql(
                 $this->adapter()->renameIndex($table, $newName, $oldName, $schema)
             );
@@ -854,6 +863,8 @@ class Migration
 
         if ($this->calledBy() === 'change') {
             $schema = in_array($fromTable, $this->pendingTables) ? null : $this->adapter()->describe($fromTable);
+            
+            $schema['constraints'][$options['name']] = false;
 
             $this->reverseStatements[] = new Sql(
                 $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)

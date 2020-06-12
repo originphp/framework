@@ -84,7 +84,7 @@ class SqliteSchemaTest extends OriginTestCase
          */
         $schema = $adapter->describe('tposts');
 
-        $this->assertEquals('6ef78ed3e7ddc08de9fb40cbb1b3bf30', md5(json_encode($schema)));
+        $this->assertEquals('b8b9931a93c2ca3b6f75914f6506d85c', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 
@@ -98,7 +98,9 @@ class SqliteSchemaTest extends OriginTestCase
         $adapter = new SqliteSchema('test');
         $schema = [
             'id' => ['type' => 'integer','autoIncrement' => true],
-            'title' => ['type' => 'string'],
+            'title' => ['type' => 'string', 'null' => false],
+            'category' => ['type' => 'string', 'null' => true],
+            'status' => ['type' => 'string', 'null' => false, 'default' => 'new'],
             'description' => 'text',
             'created' => 'datetime',
             'modified' => 'datetime',
@@ -111,8 +113,8 @@ class SqliteSchemaTest extends OriginTestCase
             'options' => ['autoIncrement' => 1000],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
-    
-        $this->assertEquals('befbc6001f3e708fdd14ab3fdb266969', md5($result[0]));
+
+        $this->assertEquals('6abdb182ca0d0b8089cbab6ff063907f', md5($result[0]));
    
         if ($adapter->connection()->engine() === 'sqlite') {
             foreach ($result as $statement) {
@@ -622,7 +624,7 @@ class SqliteSchemaTest extends OriginTestCase
         $adapter = new SqliteSchema('test');
         $expected = 'DROP INDEX "author_id"'; // Different on pgsql no table name used
         $result = $adapter->removeIndex('articles', 'author_id');
-        $this->assertEquals($expected, $result[0]);
+        $this->assertEquals($expected, $result);
     }
     
     public function testRenameColumn()
@@ -660,7 +662,7 @@ class SqliteSchemaTest extends OriginTestCase
         $this->assertTrue($adapter->connection()->execute($sql));
         
         $statements = $adapter->renameIndex('articles', 'search_title', 'title_search');
-
+ 
         $this->assertEquals('fa8aae5397107b1cd933b8f7301d1912', md5(json_encode($statements)));
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));

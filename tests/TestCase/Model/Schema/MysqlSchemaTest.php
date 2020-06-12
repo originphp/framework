@@ -617,7 +617,7 @@ class MysqlSchemaTest extends OriginTestCase
         $adapter = new MysqlSchema('test');
         $expected = 'DROP INDEX `author_id` ON `articles`';
         $result = $adapter->removeIndex('articles', 'author_id');
-        $this->assertEquals($expected, $result[0]);
+        $this->assertEquals($expected, $result);
     }
     
     public function testRenameColumn()

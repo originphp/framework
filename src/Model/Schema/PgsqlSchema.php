@@ -340,16 +340,14 @@ class PgsqlSchema extends BaseSchema
      *
      * @param string $table
      * @param string $name
-     * @return array
+     * @return string
      */
-    public function removeIndex(string $table, string $name): array
+    public function removeIndex(string $table, string $name): string
     {
-        $sql = sprintf(
+        return sprintf(
             'DROP INDEX %s',
             $this->quoteIdentifier($name)
         );
-
-        return [$sql];
     }
 
     /**
