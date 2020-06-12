@@ -1076,6 +1076,8 @@ class Migration
      */
     public function reverseStatements(): array
     {
-        return array_reverse($this->reverseStatements);
+        return $this->ungroupStatements(
+            array_reverse($this->reverseStatements)
+        );
     }
 }

@@ -2,6 +2,12 @@
 
 ## [unreleased]
 
+### Added
+- Add console quiet mode
+
+### Fixed
+- Fixed issue with returning rollbacks by commands due to recent refactor
+
 ## [2.7.0] - 2020-06-12
 
 ### Added
