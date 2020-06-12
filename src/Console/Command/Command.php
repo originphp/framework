@@ -134,6 +134,7 @@ abstract class Command
 
         $this->addOption('help', ['short' => 'h', 'description' => 'Displays this help message', 'type' => 'boolean']);
         $this->addOption('verbose', ['short' => 'v', 'description' => 'Displays additional output (if available)', 'type' => 'boolean']);
+        $this->addOption('quiet', ['short' => 'q', 'description' => 'Does not display output', 'type' => 'boolean']);
 
         $this->validateName($this->name);
     }
@@ -194,6 +195,10 @@ abstract class Command
         // Enable verbosity
         if ($this->options('verbose')) {
             $this->verbose = true;
+        }
+
+        if ($this->options('quiet')) {
+            $this->io->disableOutput();
         }
 
         if ($this->options('help')) {

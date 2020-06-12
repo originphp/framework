@@ -28,6 +28,7 @@ class ConsoleOutput
     const RAW = 0;
     const PLAIN = 1;
     const COLOR = 2;
+    const QUIET = 3;
 
     protected $mode = SELF::COLOR;
 
@@ -159,7 +160,7 @@ class ConsoleOutput
         if ($mode === null) {
             return $this->mode;
         }
-        if (! in_array($mode, [self::RAW,self::PLAIN, self::COLOR])) {
+        if (! in_array($mode, [self::RAW,self::PLAIN, self::COLOR, self::QUIET])) {
             throw new InvalidArgumentException(sprintf('Invalid mode %s', $mode));
         }
         $this->mode = $mode;
@@ -178,6 +179,10 @@ class ConsoleOutput
         }
         
         $data = $this->styleText($data);
+
+        if ($this->mode === self::QUIET) {
+            return strlen($data);
+        }
 
         if ($newLine) {
             $data .= "\n";

@@ -63,9 +63,9 @@ class ConsoleIo
     /**
      * Constructor
      *
-     * @param ConsoleOutput $out
-     * @param ConsoleOutput $err
-     * @param ConsoleInput $in
+     * @param \Origin\Console\ConsoleOutput $out
+     * @param \Origin\Console\ConsoleOutput $err
+     * @param \Origin\Console\ConsoleInput $in
      */
     public function __construct(ConsoleOutput $out = null, ConsoleOutput $err = null, ConsoleInput $in = null)
     {
@@ -658,5 +658,16 @@ class ConsoleIo
     {
         $string = $this->format($text, $options);
         $this->stdout->write($string);
+    }
+
+    /**
+    * Enables quiet mode
+    *
+    * @return void
+    */
+    public function disableOutput() : void
+    {
+        $this->stdout->mode(ConsoleOutput::QUIET);
+        $this->stderr->mode(ConsoleOutput::QUIET);
     }
 }
