@@ -212,13 +212,16 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->addColumn('articles', 'category_id', 'integer');
+        $migration->addColumn('articles', 'status', 'string');
       
         $reversableStatements = $migration->invokeStart();
 
         $this->assertTrue($migration->columnExists('articles', 'category_id'));
+        $this->assertTrue($migration->columnExists('articles', 'status'));
 
         $migration->rollback($reversableStatements);
         $this->assertFalse($migration->columnExists('articles', 'category_id'));
+        $this->assertFalse($migration->columnExists('articles', 'status'));
     }
 
     /**
@@ -492,7 +495,7 @@ class MigrationTest extends OriginTestCase
         $reversableStatements = array_merge($migration->invokeStart(), $reversableStatements);
         
         $expected = [
-            'name' => 'fk_user_id',
+            'name' => 'fk_origin_c05a10b6',  //fk_origin_c05a10b6
             'table' => 'articles',
             'column' => 'user_id',
             'referencedTable' => 'users',
@@ -568,17 +571,52 @@ class MigrationTest extends OriginTestCase
 
     public function testAddForeignKeyByName()
     {
+        # Prepare fixture
         $migration = $this->migration();
-        $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
-        $reversableStatements = $migration->invokeStart();
 
+        $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
+        $migration->invokeStart();
+
+        # Migrate
         $migration = $this->migration();
         $migration->addForeignKey('articles', 'users', ['name' => 'myfk_001']);
-        $reversableStatements = array_merge($migration->invokeStart(), $reversableStatements);
-        $this->assertTrue($migration->foreignKeyExists('articles', ['name' => 'myfk_001']));
+        $reversableStatements = $migration->invokeStart();
+
+        // in sqlite there is no way to extract foreignkey name
+        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_c05a10b6' : 'myfk_001';
+     
+        $this->assertTrue($migration->foreignKeyExists('articles', ['name' => $name]));
+  
+        $migration->rollback($reversableStatements);
+      
+        $this->assertFalse($migration->foreignKeyExists('articles', ['name' => $name]));
+    }
+
+    /**
+     * This is important, as for sqlite we have to do alot of magic
+     */
+    public function testAddForeignKeyOnNewTable()
+    {
+        # Prepare fixtures
+        $migration = $this->migration();
+        $migration->createTable('contacts', [
+            'name' => 'string',
+            'account_id' => 'integer',
+            'owner_id' => 'integer',
+        ]);
+        $migration->createTable('accounts', [
+            'name' => 'string',
+            'description' => 'text',
+            'created' => 'datetime',
+            'modified' => 'datetime'
+        ]);
+        $migration->addForeignKey('contacts', 'accounts');
+
+        $reversableStatements = $migration->invokeStart();
+        $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
 
         $migration->rollback($reversableStatements);
-        $this->assertFalse($migration->foreignKeyExists('articles', ['name' => 'myfk_001']));
+        $this->assertFalse($migration->tableExists('contacts'));
     }
 
     public function testRemoveForeignKey()
@@ -603,23 +641,26 @@ class MigrationTest extends OriginTestCase
        
         $migration->addForeignKey('contacts', 'accounts');
         $migration->addForeignKey('contacts', 'members', ['column' => 'owner_id','name' => 'fk_a1']);
+
         $undotables = $migration->invokeStart(); # add to end
-       
+            
+        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_320405e8' : 'fk_a1';
+
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
-        $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => 'fk_a1']));
+        $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => $name]));
 
         # Migrate
         $migration = $this->migration();
         $migration->removeForeignKey('contacts', 'accounts');
-        $migration->removeForeignKey('contacts', ['name' => 'fk_a1']);
+        $migration->removeForeignKey('contacts', ['name' => $name]);
         $reversableStatements = $migration->invokeStart(); # add to end
 
         $this->assertFalse($migration->foreignKeyExists('contacts', 'account_id'));
-        $this->assertFalse($migration->foreignKeyExists('contacts', ['name' => 'fk_a1']));
+        $this->assertFalse($migration->foreignKeyExists('contacts', ['name' => $name]));
             
         $migration->rollback($reversableStatements);
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
-        $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => 'fk_a1']));
+        $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => $name]));
         $migration->rollback($undotables);
     }
 

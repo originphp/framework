@@ -72,14 +72,18 @@ class SqliteSchema extends BaseSchema
         # Convert constraints
         foreach ($this->indexes($table) as $index) {
             $name = $index['name'];
-            // @todo not check data here
+            // this constraint is added in convertTableDescription
+            if (substr($name, 0, 16) === 'sqlite_autoindex') {
+                continue;
+            }
+      
             if ($index['type'] === 'unique') {
                 $constraints[$name] = ['type' => 'unique','column' => $index['column']];
             } else {
                 $indexes[$name] = ['type' => 'index','column' => $index['column']];
             }
         }
-        
+
         foreach ($this->foreignKeys($table) as $foreignKey) {
             $name = $foreignKey['name'];
             $constraints[$name] = [
@@ -87,6 +91,10 @@ class SqliteSchema extends BaseSchema
                 'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
+            if (substr($name, 0, 16) === 'sqlite_autoindex') {
+                debug($foreignKey);
+                die();
+            }
         }
 
         list($columns, $constraints) = $this->convertTableDescription($results, $constraints, $isAutoincrement);
@@ -577,7 +585,9 @@ class SqliteSchema extends BaseSchema
     }
 
     /**
-     * Returns a list of foreign keys on a table
+     * Returns a list of foreign keys on a table.
+     *
+     * @internal There is no way to get foreignkey name in sqlite
      *
      * @param string $table
      * @return array
@@ -597,7 +607,7 @@ class SqliteSchema extends BaseSchema
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => 'fk_' . $result['from'],
+                'name' => 'fk_origin_' . hash('crc32', $table . '__' . $result['from']),
                 'table' => $table,
                 'column' => $result['from'],
                 'referencedTable' => $result['table'],
@@ -677,10 +687,6 @@ class SqliteSchema extends BaseSchema
      
         if (isset($options['constraints'])) {
             foreach ($options['constraints'] as $name => $definition) {
-                if (! isset($definition['type'])) {
-                    debug($options);
-                    die();
-                }
                 // primary key set for autoincrments in table sql, so dont add again
                 if ($definition['type'] === 'primary' && in_array($autoIncrementColumn, (array) $definition['column'])) {
                     continue;

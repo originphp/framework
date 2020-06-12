@@ -21,13 +21,21 @@ namespace Origin\Migration;
  * @internal Originaly wanted change to automatically reverse changes, some changes to be reversed need
  * actual schema, which means data needs to be stored somewhere.
  *
- * Sqlite is proving challenging.
+ * Sqlite is proving challenging, adding foreign keys to tables that do not exist yet.
+ *
+ * These methods require table sql
+ *
+ * - addForeignKey
+ * - changeColumn
+ * - renameColumn
+ * - removeForeignKey
  */
 
 use Origin\Inflector\Inflector;
 use Origin\Model\ConnectionManager;
 use Origin\Model\Schema\BaseSchema;
 use Origin\Core\Exception\Exception;
+use Origin\Model\Engine\SqliteEngine;
 use Origin\Model\Exception\DatasourceException;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Migration\Exception\IrreversibleMigrationException;
@@ -68,8 +76,8 @@ class Migration
      *
      * @var array
      */
-    protected $pendingTables = [];
-    protected $pendingColumns = [];
+    private $pendingTables = [];
+    private $pendingColumns = [];
 
     /**
      * Constructor
@@ -80,6 +88,46 @@ class Migration
     {
         $this->adapter = $adapter;
         $this->datasource = $adapter->datasource();
+
+        /**
+         * For SQL create connection for memory and copy existing tables
+         */
+        if ($this->isSqlite()) {
+            $this->initializeInMemorySqlite();
+        }
+    }
+
+    private function initializeInMemorySqlite(): void
+    {
+        // Delete database if already exists
+        if (ConnectionManager::has('origin_memory')) {
+            ConnectionManager::get('origin_memory')->disconnect();
+            ConnectionManager::drop('origin_memory');
+        }
+
+        // create connection
+        ConnectionManager::create(
+            'origin_memory',
+            ['database' => ':memory:','className' => SqliteEngine::class]
+        );
+
+        // create copy of table
+        $connection = ConnectionManager::get('origin_memory');
+        
+        $connection->disableForeignKeyConstraints();
+
+        foreach ($this->tables() as $table) {
+            $schema = $this->adapter()->describe($table);
+            $this->executeInMemory(
+                $this->adapter()->createTableSql($table, $schema['columns'], $schema)
+            );
+        }
+        $connection->enableForeignKeyConstraints();
+    }
+
+    private function isSqlite(): bool
+    {
+        return $this->connection()->engine() === 'sqlite';
     }
 
     /**
@@ -285,6 +333,10 @@ class Migration
                 $this->adapter()->dropTableSql($name)
             );
         }
+
+        if ($this->isSqlite()) {
+            $this->createTableInMemory($name, $schema, $tableOptions);
+        }
     }
 
     /**
@@ -292,7 +344,7 @@ class Migration
      *
      * @param string $table1
      * @param string $table2
-     * @param array $options same options as create table
+     * @param array $options
      * @return void
      */
     public function createJoinTable(string $table1, string $table2, array $options = []): void
@@ -309,7 +361,7 @@ class Migration
         # For the benefit of working with Indexs and Foreign Keys  on new tables/columns
         $this->pendingTables[] = $name;
         $this->pendingColumns[$name] = array_keys($schema);
-  
+
         // do not run through this->createTable due to called by
         foreach ($this->adapter()->createTableSql($name, $schema, $options) as $statement) {
             $this->statements[] = new Sql($statement);
@@ -319,6 +371,45 @@ class Migration
             $this->reverseStatements[] = new Sql(
                 $this->adapter()->dropTableSql($name)
             );
+        }
+
+        if ($this->isSqlite()) {
+            $this->createTableInMemory($name, $schema, $options);
+        }
+    }
+
+    /**
+    * Creates a table in memory inorder to get the schema back from it
+    *
+    * @param string $table
+    * @param array $columns
+    * @param array $tableOptions
+    * @return array
+    */
+    private function createTableInMemory(string $table, array $columns, array $tableOptions): array
+    {
+        $this->executeInMemory($this->adapter()->createTableSql($table, $columns, $tableOptions));
+
+        return ConnectionManager::get('origin_memory')->describe($table);
+    }
+
+    /**
+     * SQL Lite handler
+     *
+     * @param array $statements
+     * @return void
+     */
+    private function executeInMemory(array $statements): void
+    {
+        try {
+            $connection = ConnectionManager::get('origin_memory');
+            foreach ($statements as $statement) {
+                $connection->execute($statement);
+            }
+        } catch (DatasourceException $exception) {
+            debug($statement);
+            backtrace();
+            throw new Exception($exception->getMessage());
         }
     }
 
@@ -852,24 +943,55 @@ class Migration
             'delete' => null,
         ];
   
-        // Get column name first
-        if ($options['name'] === null) {
+        // Sqlite does not allow to retrive names, force name standard so that things later dont break
+        if ($this->isSqlite() || $options['name'] === null) {
             $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
         }
-        //string $fromTable, string $name, string $column, string $toTable, string $primaryKey
-        $this->statements[] = new Sql(
-            $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete'])
+
+        $schema = $this->isSqlite() ? $this->getSchema($fromTable) : null;
+
+        $this->statements[] = $sql = new Sql(
+            $this->adapter()->addForeignKey($fromTable, $options['name'], $options['column'], $toTable, $options['primaryKey'], $options['update'], $options['delete'], $schema)
         );
 
-        if ($this->calledBy() === 'change') {
-            $schema = in_array($fromTable, $this->pendingTables) ? null : $this->adapter()->describe($fromTable);
-            
-            $schema['constraints'][$options['name']] = false;
-
-            $this->reverseStatements[] = new Sql(
-                $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)
-            );
+        if ($this->isSqlite()) {
+            $this->executeInMemory($sql->statements());
         }
+
+        if ($this->calledBy() !== 'change') {
+            return;
+        }
+
+        $schema = null;
+        if ($this->isSqlite()) {
+            $schema = $this->getSchema($fromTable);
+
+            $schema['constraints'][$options['name']] = false;
+        }
+
+        $this->reverseStatements[] = new Sql(
+            $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)
+        );
+    }
+
+    /**
+     * Gets the schema for a table
+     *
+     * @param string $table
+     * @return array
+     */
+    private function getSchema(string $table): array
+    {
+        $schema = null;
+        if ($this->isSqlite()) {
+            $connection = ConnectionManager::get('origin_memory');
+            $schema = in_array($table, $connection->tables()) ? $connection->describe($table) : null;
+        }
+        if ($schema === null) {
+            $schema = $this->adapter()->describe($table);
+        }
+
+        return $schema;
     }
   
     /**
