@@ -394,14 +394,16 @@ class SqliteSchema extends BaseSchema
             }
         }
         
+        /**
+         * Mysql does not rename indexes, so this wont either
+         */
+        
         foreach ($schema['indexes'] as $index => $definition) {
             if ($definition['column'] === $from) {
                 $schema['indexes'][$index]['column'] = $to;
-                $schema = $this->renameIndexInSchema($table, $index, $schema);
             } elseif (is_array($definition['column']) && in_array($from, $definition['column'])) {
                 $key = array_search($from, $definition['column']);
                 $schema['indexes'][$index]['column'][$key] = $to;
-                $schema = $this->renameIndexInSchema($table, $index, $schema);
             }
         }
 
@@ -412,24 +414,6 @@ class SqliteSchema extends BaseSchema
         $out[] = $this->dropTableSql('schema_tmp');
 
         return $out;
-    }
-
-    /**
-     * Internal helper for renaming columns to swap schema data around
-     *
-     * @param string $table
-     * @param string $index
-     * @param array $schema
-     * @return array
-     */
-    private function renameIndexInSchema(string $table, string $index, array $schema): array
-    {
-        $newIndexName = $this->getIndexName($table, $schema['indexes'][$index]['column']);
-      
-        $schema['indexes'][$newIndexName] = $schema['indexes'][$index];
-        unset($schema['indexes'][$index]);
-
-        return $schema;
     }
 
     /**

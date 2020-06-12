@@ -81,7 +81,8 @@ class PgsqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-        $this->assertEquals('b05d3e56cf40e933b365e1dd0441123e', md5(json_encode($schema)));
+
+        $this->assertEquals('b4159faa9acaa065f45fb4f2ce0307af', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 

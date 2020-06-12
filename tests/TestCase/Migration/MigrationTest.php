@@ -108,13 +108,10 @@ class MigrationTest extends OriginTestCase
     }
 
     /**
-     * Senario
-     *
      * @return void
      */
     public function testRealLifeExample()
     {
-        $this->markTestIncomplete();
         $migration = $this->migration();
         
         $migration->createTable('products', [
@@ -128,27 +125,17 @@ class MigrationTest extends OriginTestCase
         $migration->addIndex('products', 'status');
         $migration->addForeignKey('products', 'users', 'owner_id');
         $migration->addForeignKey('products', 'users', 'manager_id');
-     
-        $this->assertTrue($migration->foreignKeyExists('products', 'fk_origin_1b2f2b89'));
-        $this->assertTrue($migration->foreignKeyExists('products', 'fk_origin_1af1da1b'));
-        $this->assertTrue($migration->indexExists('products', 'products_name_index'));
-        $this->assertTrue($migration->indexExists('products', 'products_status_index'));
+       
+        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1af1da1b']));
+        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1b2f2b89']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
 
         $migration->reset();
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->tableExists('products'));
     }
 
-    /**
-     * Senario
-     *
-     * @return void
-     */
-    public function testRealLifeExample2()
-    {
-        // rename column, change specs, then add indexes and foreignkeys
-        $this->markTestIncomplete();
-    }
     public function testCreateTable()
     {
         $migration = $this->migration();
@@ -239,22 +226,13 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->columnExists('articles', 'status'));
     }
 
-    /**
-     * This tests with all settings, there is an issue with sqlite
-     * `NOT NULL column with default value NULL error` which is caused by test design, but is
-     * ok so i am keeping seperate for now as its tested using mysql + pgsql
-     */
     public function testAddColumnComprehensive()
     {
         $migration = $this->migration();
         // NOT NULL column with default value NULL error
-        if ($migration->connection()->engine() === 'sqlite') {
-            $this->markTestSkipped('Skipped for sqlite');
-        }
 
         $migration->createTable('articles2');
    
-        $migration = $this->migration();
         $migration->addColumn('articles', 'category_id', 'integer');
         $migration->addColumn('articles', 'opens', 'integer', ['limit' => 3]); // #! changed
         $migration->addColumn('articles', 'amount', 'decimal', ['precision' => 5,'scale' => 2]);
@@ -531,26 +509,21 @@ class MigrationTest extends OriginTestCase
         $migration->addIndex('users', ['id','email']);
        
         $this->assertTrue($migration->indexExists('users', ['id','email']));
-      
-        # Migrate
-        $migration = $this->migration();
-
+    
         $migration->renameColumn('users', 'id', 'lng_id');
 
         $this->assertTrue($migration->columnExists('users', 'lng_id'));
         $this->assertFalse($migration->columnExists('users', 'id'));
 
-        $this->assertTrue($migration->indexExists('users', ['lng_id','email']));
-        $this->assertFalse($migration->indexExists('users', ['id','email']));
-
+        $this->assertTrue($migration->indexExists('users', ['name' => 'users_id_email_index']));
+      
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
 
         $this->assertFalse($migration->columnExists('users', 'lng_id'));
         $this->assertTrue($migration->columnExists('users', 'id'));
   
-        $this->assertFalse($migration->indexExists('users', ['lng_id','email']));
-        $this->assertTrue($migration->indexExists('users', ['id','email']));
+        $this->assertFalse($migration->indexExists('users', ['name' => 'users_id_email_index']));
     }
 
     public function testAddForeignKeyCustom()
@@ -653,6 +626,9 @@ class MigrationTest extends OriginTestCase
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
         $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => $name]));
         //fk_origin_caf8d09a
+
+        $otherStatements = $migration->reverseStatements();
+
         # Migrate
         $migration = $this->migration();
         $migration->removeForeignKey('contacts', 'accounts');
@@ -666,6 +642,10 @@ class MigrationTest extends OriginTestCase
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
         $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => $name]));
+
+        $migration->rollback($otherStatements);
+        $this->assertFalse($migration->tableExists('members'));
+        $this->assertFalse($migration->tableExists('accounts'));
     }
 
     public function testUpDown()

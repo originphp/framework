@@ -515,11 +515,11 @@ abstract class BaseSchema
     */
     protected function defaultValue(string $type, $value)
     {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
         
-        if (in_array($type, ['bigint','integer','float','decimal'])) {
+        if (in_array($type, ['bigint','integer','float','decimal']) && is_numeric($value)) {
             return ($value == (int) $value) ? (int) $value : (float) $value;
         }
 

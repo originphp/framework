@@ -63,7 +63,6 @@ class MysqlSchemaTest extends OriginTestCase
         ];
         
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-    
         $this->assertEquals('b19d5510f223e5afc9ea69e5e0ae8a30', md5($statements[0]));
 
         if ($adapter->connection()->engine() === 'mysql') {
@@ -81,7 +80,8 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-        $this->assertEquals('d5075693ca941d5e65d86feac5e6542a', md5(json_encode($schema)));
+       
+        $this->assertEquals('ce3ecc5650694866b141495952429f5e', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 

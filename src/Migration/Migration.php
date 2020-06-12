@@ -132,7 +132,7 @@ class Migration
             throw new Exception('Migration did not do anything.');
         }
         
-        return $this->statements;
+        return $this->ungroupStatements($this->statements);
     }
 
     /**
@@ -152,10 +152,31 @@ class Migration
         }
 
         foreach ($statements as $sql) {
+            // transform string statements
+            if (is_string($sql) || is_array($sql)) {
+                $sql = new Sql($sql);
+            }
             $this->executeStatements($sql);
         }
         
-        return $statements;
+        return $this->ungroupStatements($statements);
+    }
+
+    /**
+     * Ungroups the SQL statements if SQL objects were used
+     *
+     * @param array $statements
+     * @return array
+     */
+    private function ungroupStatements(array $statements): array
+    {
+        $out = [];
+        foreach ($statements as $sql) {
+            $ungrouped = ($sql instanceof Sql) ? $sql->statements() : (array) $sql;
+            $out = array_merge($out, $ungrouped);
+        }
+
+        return $out;
     }
 
     /**
