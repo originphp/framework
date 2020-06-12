@@ -1358,7 +1358,7 @@ class Model
          * handle results for group and none groups
          */
         if (empty($options['group'])) {
-            $results = $results[0]['count'];
+            $results = (int) $results[0]['count'];
         } else {
             $results = $results ? $results : [];
         }
@@ -1417,7 +1417,7 @@ class Model
          * handle results for group and none groups
          */
         if (empty($options['group'])) {
-            $results = $results[0][$operation];
+            $results = ctype_digit($results[0][$operation]) ? (int) $results[0][$operation] : (float) $results[0][$operation];
         } else {
             $results = $results ? $results : [];
         }

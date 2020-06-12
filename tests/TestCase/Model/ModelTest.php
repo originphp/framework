@@ -418,6 +418,10 @@ class ModelTest extends OriginTestCase
 
     public function testSaveExceptionRollback()
     {
+        if ($this->Article->connection()->engine() === 'sqlite') {
+            $this->markTestSkipped('Skipping as this does not generate exception in mysqli');
+        }
+
         $this->expectException(DatasourceException::class);
         $data = [
             'title' => str_repeat('x', 256),
@@ -609,6 +613,15 @@ class ModelTest extends OriginTestCase
             $expected = [
                 'type' => 'integer',
                 'limit' => 32,
+                'null' => false,
+                'default' => null,
+                'autoIncrement' => true,
+            ];
+        } elseif ($ds->engine() === 'sqlite') {
+            $expected = [
+                'type' => 'integer',
+                'limit' => null,
+                'unsigned' => false,
                 'null' => false,
                 'default' => null,
                 'autoIncrement' => true,
@@ -978,7 +991,8 @@ class ModelTest extends OriginTestCase
             ['count' => 2, 'author_id' => 1000],
             ['count' => 1, 'author_id' => 1001]
         ];
-        $this->assertSame($expected, $result);
+ 
+        $this->assertEquals($expected, $result);
     }
 
     public function testAggregates()
@@ -994,7 +1008,7 @@ class ModelTest extends OriginTestCase
             ['count' => 2, 'author_id' => 1000],
             ['count' => 1, 'author_id' => 1001]
         ];
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     public function testFindList()

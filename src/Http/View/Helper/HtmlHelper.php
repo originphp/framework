@@ -35,6 +35,24 @@ class HtmlHelper extends Helper
     ];
 
     /**
+     * Formats content in a block, such as span, small, etc
+     *
+     * @param string $content
+     * @param array $attributes
+     * @return string
+     */
+    public function tag(string $name, string $content, array $attributes = []): string
+    {
+        $options = [
+            'tag' => $name,
+            'content' => $content,
+            'attributes' => $this->attributesToString($attributes),
+        ];
+
+        return $this->templater()->format('tag', $options);
+    }
+
+    /**
      * Wraps content in a div
      *
      * @param string $content

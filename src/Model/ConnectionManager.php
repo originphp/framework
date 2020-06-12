@@ -16,6 +16,7 @@ namespace Origin\Model;
 
 use Origin\Model\Engine\MysqlEngine;
 use Origin\Model\Engine\PgsqlEngine;
+use Origin\Model\Engine\SqliteEngine;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
@@ -25,7 +26,8 @@ class ConnectionManager
 
     protected static $engineMap = [
         'mysql' => MysqlEngine::class,
-        'pgsql' => PgsqlEngine::class
+        'pgsql' => PgsqlEngine::class,
+        'sqlite' => SqliteEngine::class
     ];
 
     /**

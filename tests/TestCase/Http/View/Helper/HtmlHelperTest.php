@@ -99,4 +99,11 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<div class="important"><p>Hello</p></div>';
         $this->assertEquals($expected, $this->Html->div($content, ['class' => 'important']));
     }
+
+    public function testTag()
+    {
+        $content = '<p>Hello</p>';
+        $expected = '<div class="important"><p>Hello</p></div>';
+        $this->assertEquals($expected, $this->Html->tag('div', $content, ['class' => 'important']));
+    }
 }

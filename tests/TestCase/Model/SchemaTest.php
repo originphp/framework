@@ -25,10 +25,13 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
     {
         $schema = new \ApplicationSchema();
         $connection = ConnectionManager::get('test');
-        
+
         $this->executeStatements($schema->createSql($connection));
     }
 
+    /**
+     * @depends testCreateSql
+     */
     public function testCreateSqlInvalidForeignKeySettings()
     {
         $this->expectException(Exception::class);
@@ -39,7 +42,9 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 
         $this->executeStatements($schema->createSql($connection));
     }
-
+    /**
+     * @depends testCreateSql
+     */
     public function testDropSql()
     {
         $schema = new \ApplicationSchema();
@@ -47,12 +52,15 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
 
         $this->executeStatements($schema->dropSql($connection));
     }
-
+    /**
+     * @depends testCreateSql
+     */
     protected function executeStatements(array $statements)
     {
         $connection = ConnectionManager::get('test');
         $connection->begin();
         $connection->disableForeignKeyConstraints();
+ 
         foreach ($statements as $statement) {
             $this->assertTrue($connection->execute($statement));
         }

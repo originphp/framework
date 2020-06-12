@@ -80,7 +80,7 @@ class Mailbox
      */
     public function __construct(Entity $inboundEmail)
     {
-        $this->id = $inboundEmail->id;
+        $this->id = (int) $inboundEmail->id;
         $this->mail = new Mail($inboundEmail->message);
 
         $this->InboundEmail = ModelRegistry::get('InboundEmail', ['className' => InboundEmail::class]);

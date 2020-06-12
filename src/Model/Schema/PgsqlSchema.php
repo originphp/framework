@@ -272,11 +272,12 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $name
      * @param array $options
-     * @return string
+     * @return array
      */
-    public function changeColumn(string $table, string $name, string $type, array $options = []): string
+    public function changeColumn(string $table, string $name, string $type, array $options = []): array
     {
         $options += ['default' => null, 'null' => null];
+        $out = [];
         if (isset($this->typeMap[$type])) {
             $agnoType = $type;
             $type = $this->typeMap[$type];
@@ -289,14 +290,15 @@ class PgsqlSchema extends BaseSchema
                 $type = "{$type}({$options['limit']})";
             }
         }
-        $name = $this->quoteIdentifier($name);
 
         $sql = sprintf(
             'ALTER TABLE %s ALTER COLUMN %s SET DATA TYPE %s',
             $this->quoteIdentifier($table),
-            $name,
+            $this->quoteIdentifier($name),
             $type
         );
+
+        $name = $this->quoteIdentifier($name);
        
         $default = $this->schemaValue($options['default']);
         
@@ -308,7 +310,9 @@ class PgsqlSchema extends BaseSchema
             $sql .= ", ALTER COLUMN {$name} SET NOT NULL";
         }
 
-        return $sql;
+        $out[] = $sql;
+
+        return $out;
     }
 
     /**
@@ -317,17 +321,18 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return string
+     * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): string
+    public function renameColumn(string $table, string $from, string $to): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s RENAME COLUMN %s TO %s',
             $this->quoteIdentifier($table),
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to)
         );
-        //return "ALTER TABLE {$table} RENAME COLUMN {$from} TO {$to}";
+
+        return [$sql];
     }
 
     /**
@@ -352,15 +357,17 @@ class PgsqlSchema extends BaseSchema
      * @param string $table
      * @param string $oldName
      * @param string $newName
-     * @return string
+     * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): string
+    public function renameIndex(string $table, string $oldName, string $newName): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER INDEX %s RENAME TO %s',
             $this->quoteIdentifier($oldName),
             $this->quoteIdentifier($newName)
         );
+
+        return [$sql];
     }
 
     /**
@@ -392,21 +399,38 @@ class PgsqlSchema extends BaseSchema
     public function foreignKeys(string $table): array
     {
         $config = ConnectionManager::config($this->datasource);
-
+        // constraint info is in
         $sql = sprintf(
-            'SELECT tc.table_name, kcu.column_name as column_name,tc.constraint_name AS constraint_name, ccu.table_name AS referenced_table_name, ccu.column_name AS referenced_column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE  tc.table_catalog = %s AND  tc.table_name = %s AND tc.table_schema = \'public\' AND tc.constraint_type = \'FOREIGN KEY\'',
-            $this->schemaValue($this->connection()->database()),
+            'SELECT c1.conname AS name, a1.attname AS "column",
+            c1.confupdtype AS "update", c1.confdeltype AS "delete", c1.confrelid::regclass AS "referencedTable", a2.attname AS "referencedColumn"
+            FROM pg_catalog.pg_namespace n1
+            INNER JOIN pg_catalog.pg_class c2 ON (n1.oid = c2.relnamespace)
+            INNER JOIN pg_catalog.pg_constraint c1 ON (n1.oid = c1.connamespace)
+            INNER JOIN pg_catalog.pg_attribute a1 ON (a1.attrelid = c2.oid AND c1.conrelid = a1.attrelid AND a1.attnum = ANY(c1.conkey))
+            INNER JOIN pg_catalog.pg_attribute a2 ON (a1.attrelid = c2.oid AND c1.confrelid = a2.attrelid AND a2.attnum = ANY(c1.confkey))
+            WHERE n1.nspname = \'public\' AND c1.contype = \'f\' AND c2.relname = %s',
             $this->schemaValue($table)
         );
+
         $out = [];
+
+        $actionMap = [
+            'c' => 'cascade',
+            'r' => 'restrict',
+            'a' => 'noAction',
+            null => 'setDefault', // @todo investigate this
+            null => 'setNull',
+        ];
 
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => $result['constraint_name'],
-                'table' => $result['table_name'],
-                'column' => $result['column_name'],
-                'referencedTable' => $result['referenced_table_name'],
-                'referencedColumn' => $result['referenced_column_name'],
+                'name' => $result['name'],
+                'table' => $table,
+                'column' => $result['column'],
+                'referencedTable' => $result['referencedTable'],
+                'referencedColumn' => $result['referencedColumn'],
+                'update' => $actionMap[$result['update']],
+                'delete' => $actionMap[$result['delete']],
             ];
         }
 
@@ -417,15 +441,17 @@ class PgsqlSchema extends BaseSchema
      *
      * @param string $fromTable
      * @param string $constraint
-     * @return string
+     * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): string
+    public function removeForeignKey(string $fromTable, string $constraint): array
     {
-        return sprintf(
+        $sql = sprintf(
             'ALTER TABLE %s DROP CONSTRAINT %s',
             $this->quoteIdentifier($fromTable),
             $this->quoteIdentifier($constraint)
         );
+
+        return [$sql];
     }
 
     /**
@@ -477,14 +503,13 @@ class PgsqlSchema extends BaseSchema
     * Sql for truncating a table
     *
     * @param string $table
-    * @return string
+    * @return array
     */
-    public function truncateTableSql(string $table): string
+    public function truncateTableSql(string $table): array
     {
-        return sprintf(
-            'TRUNCATE TABLE %s RESTART IDENTITY CASCADE',
-            $this->quoteIdentifier($table)
-        );
+        $sql = sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', $this->quoteIdentifier($table));
+
+        return [$sql];
     }
 
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string
@@ -742,5 +767,18 @@ class PgsqlSchema extends BaseSchema
         }
 
         return ['type' => 'string'];
+    }
+
+    /**
+    * Maps the onclause value
+    *
+    * @param string $value
+    * @return string
+    */
+    protected function onClause(string $value): string
+    {
+        $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
+
+        return $map[$value] ?? 'RESTRICT';
     }
 }

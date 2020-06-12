@@ -37,7 +37,7 @@ class QueueFixture extends Fixture
         'indexes' => [
             'queue_index' => ['type' => 'index', 'column' => 'queue'],
         ],
-        'options' => ['engine' => 'InnoDB', 'collation' => 'utf8mb4_0900_ai_ci','autoIncrement' => 1000],
+        'options' => ['engine' => 'InnoDB', 'autoIncrement' => 1000],
      
     ];
 }

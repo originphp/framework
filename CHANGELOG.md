@@ -1,5 +1,24 @@
 # Changelog
 
+## [unreleased]
+
+## [2.7.0] - 2020-06-12
+
+### Added
+- Added Sqlite engine
+- Added reading database constraint actions 
+
+### Changed
+- Changed Fixture Manager to not try to load fixtures if not database settings are present
+- Migration::addForeignKey, now accepts string as third argument for column name e.g. `$migration->addForeignKey('products', 'users', 'owner_id');`
+
+### Fixed
+- Fixed Form select control type detect with empty value
+
+### Added
+
+- Added HtmlHelper::tag for cleaner code with views
+
 ## [2.6.2] - 2020-05-30
 
 ### Fixed

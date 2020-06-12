@@ -21,44 +21,41 @@ include_once DATABASE . DS . 'seed.php';
 
 class SeedTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
+    private function connection()
     {
-        $connection = ConnectionManager::get('test');
-        $schema = new \ApplicationSchema();
-        $this->executeStatements($schema->createSql($connection));
+        return ConnectionManager::get('test');
     }
     
     public function testInsertSql()
     {
-        $connection = ConnectionManager::get('test');
-        $seed = new \ApplicationSeed();
-        $connection->begin();
-        $connection->disableForeignKeyConstraints();
-        
-        foreach ($seed->insertSql($connection) as $query) {
-            list($sql, $params) = $query;
-            $this->assertTrue($connection->execute($sql, $params));
-        }
-        $connection->enableForeignKeyConstraints();
-        $connection->commit();
-    }
+        $this->executeStatements(
+            (new \ApplicationSchema())->createSql($this->connection())
+        );
 
-    protected function tearDown(): void
-    {
-        $connection = ConnectionManager::get('test');
-        $schema = new \ApplicationSchema();
+        $this->executeStatements(
+            (new \ApplicationSeed())->insertSql($this->connection())
+        );
 
-        $connection->begin();
-        $connection->disableForeignKeyConstraints();
-        $this->executeStatements($schema->dropSql($connection));
-        $connection->enableForeignKeyConstraints();
-        $connection->commit();
+        $this->executeStatements(
+            (new \ApplicationSchema())->dropSql($this->connection())
+        );
     }
 
     protected function executeStatements(array $statements)
     {
+        $connection = ConnectionManager::get('test');
+        $connection->begin();
+        $connection->disableForeignKeyConstraints();
+       
         foreach ($statements as $sql) {
-            ConnectionManager::get('test')->execute($sql);
+            if (is_array($sql)) {
+                list($sql, $params) = $sql;
+                $this->assertTrue($connection->execute($sql, $params));
+            } else {
+                $this->assertTrue($connection->execute($sql));
+            }
         }
+        $connection->enableForeignKeyConstraints();
+        $connection->commit();
     }
 }

@@ -15,10 +15,11 @@
 namespace Origin\Test\Model\Schema;
 
 use Origin\Model\Connection;
-use Origin\Model\Schema\PgsqlSchema;
+use InvalidArgumentException;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Model\Schema\SqliteSchema;
 
-class PgsqlSchemaTest extends OriginTestCase
+class SqliteSchemaTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Post','Origin.User','Origin.Article','Origin.Deal'];
 
@@ -26,7 +27,8 @@ class PgsqlSchemaTest extends OriginTestCase
     {
         
         // todo unsigned
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
+
         $schema = [
             'f0' => ['type' => 'integer','autoIncrement' => true,'comment' => 'This will be primary key'],
             'f1' => ['type' => 'string','limit' => 80,'null' => false],
@@ -59,12 +61,11 @@ class PgsqlSchemaTest extends OriginTestCase
             'options' => ['autoIncrement' => 1000],
         ];
         $statements = $adapter->createTableSql('tposts', $schema, $options);
-
-        $this->assertEquals('748bcf000f5716f447166950340b9575', md5($statements[0]));
+   
+        $this->assertEquals('986833f9f7b31d0266ed7256f130077d', md5($statements[0]));
         $this->assertEquals('CREATE INDEX "u2" ON "tposts" (f2)', $statements[1]);
-        $this->assertEquals('COMMENT ON COLUMN "tposts"."f0" IS \'This will be primary key\'', $statements[2]);
-
-        if ($adapter->connection()->engine() === 'pgsql') {
+     
+        if ($adapter->connection()->engine() === 'sqlite') {
             $this->assertTrue($adapter->connection()->execute($statements[0]));
             $this->assertTrue($adapter->connection()->execute($statements[1]));
         }
@@ -73,16 +74,17 @@ class PgsqlSchemaTest extends OriginTestCase
     // not getting correct constraint
     public function testDescribeTable()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for PgSQL');
+        $adapter = new SqliteSchema('test');
+
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for Sqlite');
         }
         /**
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
 
-        $this->assertEquals('b4159faa9acaa065f45fb4f2ce0307af', md5(json_encode($schema)));
+        $this->assertEquals('b8b9931a93c2ca3b6f75914f6506d85c', md5(json_encode($schema)));
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 
@@ -93,10 +95,12 @@ class PgsqlSchemaTest extends OriginTestCase
          */
     public function testCreateTableSqlBasic()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $schema = [
             'id' => ['type' => 'integer','autoIncrement' => true],
-            'title' => ['type' => 'string'],
+            'title' => ['type' => 'string', 'null' => false],
+            'category' => ['type' => 'string', 'null' => true],
+            'status' => ['type' => 'string', 'null' => false, 'default' => 'new'],
             'description' => 'text',
             'created' => 'datetime',
             'modified' => 'datetime',
@@ -109,10 +113,10 @@ class PgsqlSchemaTest extends OriginTestCase
             'options' => ['autoIncrement' => 1000],
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
-        
-        $this->assertEquals('d406a607d78e19c3a5490ee66890799a', md5($result[0]));
-        $this->assertEquals('391876f15125755e54eca9cdcbb1d1a9', md5($result[1]));
-        if ($adapter->connection()->engine() === 'pgsql') {
+
+        $this->assertEquals('6abdb182ca0d0b8089cbab6ff063907f', md5($result[0]));
+   
+        if ($adapter->connection()->engine() === 'sqlite') {
             foreach ($result as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
@@ -131,9 +135,11 @@ class PgsqlSchemaTest extends OriginTestCase
             ],
         ];
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-        
-        $this->assertEquals('11c6420036d251d2a7f9c9df9cb2971f', md5($result[0]));
-        if ($adapter->connection()->engine() === 'pgsql') {
+
+        $this->assertEquals('7c4830eba8bfa1f521e3297d76f4be90', md5($result[0]));
+        if ($adapter->connection()->engine() === 'sqlite') {
+            $adapter->connection()->execute($adapter->dropTableSql('tarticles', ['ifExists' => true]));
+
             foreach ($result as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
@@ -143,7 +149,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testCreateTableSqlIndex()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $schema = [
             'id' => 'integer',
             'title' => ['type' => 'string'],
@@ -164,12 +170,12 @@ class PgsqlSchemaTest extends OriginTestCase
         ];
         $result = $adapter->createTableSql('tposts', $schema, $options);
       
-        $this->assertEquals('4d6bbdd7f570bb892c3a484a1621a3f6', md5($result[0]));
+        $this->assertEquals('d0b8f36fd14522f03292b598a21fe5e3', md5($result[0]));
         $this->assertStringContainsString('CREATE UNIQUE INDEX "title_u" ON "tposts" (code)', $result[1]);
         $this->assertStringContainsString('CREATE INDEX "title_idx" ON "tposts" (title)', $result[2]);
         $this->assertStringContainsString('CREATE INDEX "title_ft" ON "tposts" (title)', $result[3]);
 
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             foreach ($result as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
@@ -179,7 +185,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testCreateTableSqlForeignKey()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
 
         $schema = [
             'id' => 'integer',
@@ -196,8 +202,7 @@ class PgsqlSchemaTest extends OriginTestCase
         ];
         
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-        
-        $this->assertEquals('24fa96935e3c34613596bc7d9a29f93d', md5($result[0]));
+        $this->assertEquals('3277f3b5ff41e87f93a0899e1eae8c2f', md5($result[0]));
 
         $options = [
             'constraints' => [
@@ -213,10 +218,10 @@ class PgsqlSchemaTest extends OriginTestCase
         ];
 
         $result = $adapter->createTableSql('tarticles', $schema, $options);
-        $this->assertEquals('38b774843bdba657fbb52ff58ee9dc14', md5($result[0]));
+        $this->assertEquals('2f53804c0b56650ffc26270e23127916', md5($result[0]));
 
         // sanity check
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             $schema = [
                 'id' => 'integer',
                 'name' => ['type' => 'string'],
@@ -244,6 +249,7 @@ class PgsqlSchemaTest extends OriginTestCase
             ];
 
             $statements = array_merge($statements, $adapter->createTableSql('tarticles', $schema, $options));
+          
             foreach ($statements as $statement) {
                 $this->assertTrue($adapter->connection()->execute($statement));
             }
@@ -254,7 +260,7 @@ class PgsqlSchemaTest extends OriginTestCase
                 'column' => 'user_id',
                 'references' => ['tusers','id'],
             ];
-            $this->assertEquals($expected, $schema['constraints']['fk_users_id']);
+            $this->assertEquals($expected, $schema['constraints']['fk_user_id']);
 
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tusers'));
@@ -263,7 +269,7 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testAddColumn()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $expected = 'ALTER TABLE "apples" ADD COLUMN "colour" VARCHAR(255)';
         
         $result = $adapter->addColumn('apples', 'colour', 'string');
@@ -274,8 +280,9 @@ class PgsqlSchemaTest extends OriginTestCase
         $expected = 'ALTER TABLE "apples" ADD COLUMN "colour" VARCHAR(40)';
         $this->assertEquals($expected, $result);
 
+        // sqlite does not have limit for integer
         $result = $adapter->addColumn('apples', 'qty', 'integer', ['limit' => 3]);
-        $expected = 'ALTER TABLE "apples" ADD COLUMN "qty" INTEGER'; # Different on PGSQL
+        $expected = 'ALTER TABLE "apples" ADD COLUMN "qty" INTEGER';
         $this->assertEquals($expected, $result);
 
         # # # TEST DEFAULTS
@@ -309,7 +316,7 @@ class PgsqlSchemaTest extends OriginTestCase
         $result = $adapter->addColumn('apples', 'price', 'decimal', ['precision' => 8,'scale' => 2]);
         $this->assertEquals($expected, $result);
 
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             $result = $adapter->addColumn('articles', 'category', 'string', ['default' => 'new','limit' => 40]);
             $this->assertTrue($adapter->connection()->execute($result));
         }
@@ -317,18 +324,22 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testAddForeignKey()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER TABLE "articles" ADD CONSTRAINT "fk_origin_12345" FOREIGN KEY (author_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE';
-        $result = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertEquals($expected, $result[0]);
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped();
+        }
+       
+        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+        $this->assertEquals('cebbf262e5c2956368af58cc9d582ed2', md5(json_encode($statements)));
+
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
 
     public function testAddIndex()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $expected = 'CREATE INDEX "owner_name" ON "accounts" (owner_id)';
         $result = $adapter->addIndex('accounts', 'owner_id', 'owner_name');
         $this->assertEquals($expected, $result);
@@ -342,7 +353,7 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertEquals($expected, $result);
 
         // Small sanity check
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             $result = $adapter->addIndex('articles', 'title', 'index_title');
             $this->assertTrue($adapter->connection()->execute($result));
         }
@@ -352,81 +363,27 @@ class PgsqlSchemaTest extends OriginTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * Leave SQL comments in place.
-     */
     public function testChangeColumn()
     {
-        $adapter = new PgsqlSchema('test');
-        
-        // ALTER TABLE "articles" ALTER COLUMN "id" SET DATA TYPE INTEGER
-
-        $statements = $adapter->changeColumn('articles', 'id', 'integer', ['limit' => '15']); // Ignored for this type on pgsql
-        $this->assertEquals('ba0890c051a468e8d25c3d6a9d1ebf35', md5(json_encode($statements)));
-
-        # check for syntax errors
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() != 'sqlite') {
+            $this->markTestSkipped('Requires sqlite');
         }
+       
+        $statements = $adapter->changeColumn('articles', 'title', 'string', ['limit' => '15']);
+        $this->assertEquals('4fbafb0c1ae18ec5ae8b0933c5ee5ecd', md5(json_encode($statements)));
 
-        // 'ALTER TABLE "deals" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(8,4)';
-        $statements = $adapter->changeColumn('deals', 'amount', 'decimal', ['precision' => 8,'scale' => 4]); // Ignored for this type on pgsql
-        $this->assertEquals('e589a55b83286b440f90bb9204175f8f', md5(json_encode($statements)));
-
-        # check for syntax errors
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
-
-        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\'';
-        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown']); // Ignored for this type on pgsql
-        $this->assertEquals('0b961ad551c728e430960ecad47fe1c9', md5(json_encode($statements)));
-
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
-        }
-
-        //  'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT \'unkown\', ALTER COLUMN "name" SET NOT NULL';
-        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => 'unkown','null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals('b0597c132ae18e7775a905d47437838b', md5(json_encode($statements)));
-
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
-        }
-
-        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET DEFAULT NULL';
-        $statements = $adapter->changeColumn('deals', 'name', 'string', ['default' => '']); // Ignored for this type on pgsql
-        $this->assertEquals('e32bb9d3a6f5cd264692d845a19c9abb', md5(json_encode($statements)));
-
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
-        }
-
-        // 'ALTER TABLE "deals" ALTER COLUMN "name" SET DATA TYPE VARCHAR(255), ALTER COLUMN "name" SET NOT NULL';
-        $statements = $adapter->changeColumn('deals', 'name', 'string', ['null' => false]); // Ignored for this type on pgsql
-        $this->assertEquals('83af110d7fc35b9fd5eaa56fda6854b8', md5(json_encode($statements)));
-
-        if ($adapter->connection()->engine() === 'pgsql') {
-            foreach ($statements as $statement) {
-                $this->assertTrue($adapter->connection()->execute($statement));
-            }
-        }
+        $meta = $adapter->describe('articles')['columns'];
+        $this->assertEquals('15', $meta['title']['limit']);
     }
 
     public function testColumnExists()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
             $this->markTestSkipped('This is test is for pgsql');
         }
        
@@ -436,18 +393,18 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testSchemaValue()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $this->assertEquals('NULL', $adapter->schemaValue(null));
         $this->assertEquals(3, $adapter->schemaValue(3));
         $this->assertEquals("'foo'", $adapter->schemaValue('foo'));
-        $this->assertEquals('TRUE', $adapter->schemaValue(true));
-        $this->assertEquals('FALSE', $adapter->schemaValue(false));
+        $this->assertEquals(1, $adapter->schemaValue(true));
+        $this->assertEquals(0, $adapter->schemaValue(false));
     }
 
     public function testColumns()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
             $this->markTestSkipped('This is test is for pgsql');
         }
         $expected = ['id','title','body','published','created','modified'];
@@ -457,13 +414,13 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testConnection()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $this->assertInstanceOf(Connection::class, $adapter->connection());
     }
 
     public function testDatasource()
     {
-        $adapter = new PgsqlSchema('foo');
+        $adapter = new SqliteSchema('foo');
         $this->assertEquals('foo', $adapter->datasource());
         $adapter->datasource('bar');
         $this->assertEquals('bar', $adapter->datasource());
@@ -474,8 +431,11 @@ class PgsqlSchemaTest extends OriginTestCase
      */
     public function testCreateTable()
     {
-        $adapter = new PgsqlSchema('test');
-       
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This is test is for pgsql');
+        }
+
         $schema = [
             'id' => ['type' => 'integer','autoIncrement' => true],
             'name' => ['type' => 'string','default' => ''],
@@ -489,43 +449,40 @@ class PgsqlSchemaTest extends OriginTestCase
                 'idx_name' => ['type' => 'index', 'column' => 'name'],
             ]
         ];
-        $statements = $adapter->createTableSql('foo', $schema, $options);
-        $this->assertEquals('851886f807b42951dce4017a2686be57', md5(json_encode($statements)));
-
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This is test is for pgsql');
-        }
-        foreach ($statements as $statement) {
+        $result = $adapter->createTableSql('foo', $schema, $options);
+        $this->assertEquals('2066db80f80aded3e9f108be2ec987b3', md5(json_encode($result)));
+        
+        foreach ($result as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
 
     public function testChangeAutoIncrementSql()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER SEQUENCE foo_id_seq RESTART WITH 1024';
+        $adapter = new SqliteSchema('test');
+        $expected = 'UPDATE SQLITE_SEQUENCE SET seq = 1024 WHERE name = "foo"';
         $result = $adapter->changeAutoIncrementSql('foo', 'id', 1024); # created in createTable
         $this->assertEquals($expected, $result);
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             $this->assertTrue($adapter->connection()->execute($result));
         }
     }
 
     public function testDropTable()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'DROP TABLE "foo" CASCADE';
+        $adapter = new SqliteSchema('test');
+        $expected = 'DROP TABLE "foo"';
         $result = $adapter->dropTableSql('foo'); # created in createTable
         $this->assertEquals($expected, $result);
-        $this->assertEquals('DROP TABLE IF EXISTS "foo" CASCADE', $adapter->dropTableSql('foo', ['ifExists' => true]));
-        if ($adapter->connection()->engine() === 'pgsql') {
+        $this->assertEquals('DROP TABLE IF EXISTS "foo"', $adapter->dropTableSql('foo', ['ifExists' => true]));
+        if ($adapter->connection()->engine() === 'sqlite') {
             $this->assertTrue($adapter->connection()->execute($result));
         }
     }
 
     public function testForeignKeyExists()
     {
-        $stub = $this->getMock(PgsqlSchema::class, ['foreignKeys']);
+        $stub = $this->getMock(SqliteSchema::class, ['foreignKeys']);
         // Configure the stub.
 
         $foreignKeys = [
@@ -546,16 +503,19 @@ class PgsqlSchemaTest extends OriginTestCase
      */
     public function testForeignKeys()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
+        }
+        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+      
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
 
-        $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-        $this->assertTrue($adapter->connection()->execute($sql[0]));
- 
+        // In Sqlite name is generated when retrieving to avoid  having to parse data.
         $expected = [
-            'name' => 'fk_origin_12345',
+            'name' => 'fk_author_id', //
             'table' => 'articles',
             'column' => 'author_id',
             'referencedTable' => 'users',
@@ -568,54 +528,68 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testIndexes()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
         }
         $indexes = $adapter->indexes('articles');
-  
-        $expected = [
-            'name' => 'articles_pkey', // different on pgsql
-            'column' => 'id',
-            'type' => 'unique',
-        ];
-        $this->assertEquals($expected, $indexes[0]);
 
+        $this->assertEmpty($indexes);
+
+        $sql = $adapter->addIndex('articles', 'id', 'single_column_index');
+        $this->assertTrue($adapter->connection()->execute($sql));
+        $indexes = $adapter->indexes('articles');
+        $expected = [
+            'name' => 'single_column_index',
+            'column' => ['id'],
+            'type' => 'index',
+        ];
+ 
+        $this->assertEquals($expected, $indexes[0]);
+       
         // Tests multi column index  + normal index type
         $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
         $this->assertTrue($adapter->connection()->execute($sql));
         $indexes = $adapter->indexes('articles');
-        
+    
         $expected = [
             'name' => 'test_multicolumn_index',
             'column' => ['id','author_id'],
             'type' => 'index',
         ];
-        $this->assertEquals($expected, $indexes[1]);
+        $this->assertEquals($expected, $indexes[0]); // this is correct, latest top
     }
 
     public function testRemoveColumn()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER TABLE "articles" DROP COLUMN "modified"';
-        $result = $adapter->removeColumn('articles', 'modified');
-        $this->assertEquals($expected, $result[0]);
-    
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $adapter = new SqliteSchema('test');
+      
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped();
+        }
+
+        $statements = $adapter->removeColumn('articles', 'modified');
+      
+        $this->assertEquals('1e9ebf5ffef547f150ed11aa5b8b0aab', md5(json_encode($statements)));
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
 
     public function testRemoveColumns()
     {
-        $adapter = new PgsqlSchema('test');
-       
-        $expected = "ALTER TABLE \"articles\"\nDROP COLUMN \"created\",\nDROP COLUMN \"modified\"";
-        $result = $adapter->removeColumns('articles', ['created','modified']);
-        $this->assertEquals($expected, $result[0]);
- 
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $adapter = new SqliteSchema('test');
+
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped();
+        }
+
+        $statements = $adapter->removeColumns('articles', ['created','modified']);
+
+        $this->assertEquals('10f6fb602326d3483f1fa8229c4fc8a6', md5(json_encode($statements)));
+
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
 
@@ -624,21 +598,30 @@ class PgsqlSchemaTest extends OriginTestCase
      */
     public function testRemoveForeignKey()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER TABLE "articles" DROP CONSTRAINT "fk_origin_12345"';
-        $result = $adapter->removeForeignKey('articles', 'fk_origin_12345');
-        $this->assertEquals($expected, $result[0]);
-
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $sql = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
-            $this->assertTrue($adapter->connection()->execute($sql[0]));
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() != 'sqlite') {
+            $this->markTestSkipped('Skipping');
         }
+
+        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+     
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
+        }
+
+        $statements = $adapter->removeForeignKey('articles', 'fk_author_id');
+        $this->assertEquals('2a1087001005c4858170d333e99a1c56', md5(json_encode($statements)));
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        $adapter->removeForeignKey('articles', 'foo');
     }
 
     public function testRemoveIndex()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $expected = 'DROP INDEX "author_id"'; // Different on pgsql no table name used
         $result = $adapter->removeIndex('articles', 'author_id');
         $this->assertEquals($expected, $result);
@@ -646,45 +629,53 @@ class PgsqlSchemaTest extends OriginTestCase
     
     public function testRenameColumn()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         /**
          * for pgsql comptability with older versions it needs to run some statements
          * this test for pgsql pgsql is a simple command
          */
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
+        }
+    
+        $statements = $adapter->renameColumn('articles', 'author_id', 'user_id');
+    
+        $this->assertEquals('d65f7c45ed6d8dc2b4284e01e7f55e56', md5(json_encode($statements)));
+
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
 
-        $expected = 'ALTER TABLE "articles" RENAME COLUMN "author_id" TO "user_id"'; // different on pgsql
-        $result = $adapter->renameColumn('articles', 'author_id', 'user_id');
-        $this->assertEquals($expected, $result[0]);
-        $this->assertTrue($adapter->connection()->execute($result[0]));
+        $schema = $adapter->describe('articles');
+        $this->assertArrayHasKey('user_id', $schema['columns']);
     }
 
-    /**
-     * @depends testAddIndex
-     */
     public function testRenameIndex()
     {
-        $adapter = new PgsqlSchema('test');
-        $expected = 'ALTER INDEX "search_title" RENAME TO "title_search"'; // different on pgsql
-        $result = $adapter->renameIndex('articles', 'search_title', 'title_search');
-        $this->assertEquals($expected, $result[0]);
+        $adapter = new SqliteSchema('test');
+   
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped();
+        }
 
-        if ($adapter->connection()->engine() === 'pgsql') {
-            $sql = $adapter->addIndex('articles', 'title', 'search_title');
-            $this->assertTrue($adapter->connection()->execute($sql));
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $sql = $adapter->addIndex('articles', 'title', 'search_title');
+        $this->assertTrue($adapter->connection()->execute($sql));
+        
+        $statements = $adapter->renameIndex('articles', 'search_title', 'title_search');
+ 
+        $this->assertEquals('fa8aae5397107b1cd933b8f7301d1912', md5(json_encode($statements)));
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
     
     public function testRenameTable()
     {
-        $adapter = new PgsqlSchema('test');
+        $adapter = new SqliteSchema('test');
         $expected = 'ALTER TABLE "articles" RENAME TO "artikel"'; // different on pgsql
         $result = $adapter->renameTable('articles', 'artikel');
         $this->assertEquals($expected, $result);
-        if ($adapter->connection()->engine() === 'pgsql') {
+        if ($adapter->connection()->engine() === 'sqlite') {
             $this->assertTrue($adapter->connection()->execute($result));
             $result = $adapter->renameTable('artikel', 'articles');
             $this->assertTrue($adapter->connection()->execute($result)); // rename back for fixture manager
@@ -693,20 +684,20 @@ class PgsqlSchemaTest extends OriginTestCase
     
     public function testShowCreateTable()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
         }
 
         $result = $adapter->showCreateTable('articles');
-        $this->assertEquals('a021a9a15d1444af83fed87aff779785', md5($result));
+        $this->assertEquals('0f64f57b1ab596399b50276e30d2d748', md5($result));
     }
 
     public function testTableExists()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
         }
         $this->assertTrue($adapter->tableExists('articles'));
         $this->assertFalse($adapter->tableExists('foos'));
@@ -714,13 +705,13 @@ class PgsqlSchemaTest extends OriginTestCase
 
     public function testTables()
     {
-        $adapter = new PgsqlSchema('test');
-        if ($adapter->connection()->engine() !== 'pgsql') {
-            $this->markTestSkipped('This test is for pgsql');
+        $adapter = new SqliteSchema('test');
+        if ($adapter->connection()->engine() !== 'sqlite') {
+            $this->markTestSkipped('This test is for sqlite');
         }
        
         $tables = $adapter->tables();
-
+   
         $this->assertEquals(['articles','deals','posts','users'], $tables); // assert equals crashing phpunit
     }
 }

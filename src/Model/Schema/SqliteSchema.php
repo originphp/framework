@@ -14,49 +14,24 @@
 declare(strict_types = 1);
 namespace Origin\Model\Schema;
 
-use Origin\Model\ConnectionManager;
+use InvalidArgumentException;
 use Origin\Core\Exception\Exception;
 
 /**
- * Migrations - This is designed for editing the schema, sometimes data might need to modified but
- * it should not be used to insert data. (if you have too then use connection manager)
- * There are suttle changes here, so this cannot be just droped in model driver. E.g. decimal and numeric does not have limit
+ * Sqlite is a bit problametic as it is missing many Sql features or has is more restricted, for example
+ * foreign keys can only be added at the time of table creation, Concat not supported. Can set the autoIncrement value
+ * with no records in the database, are just some of the problems encountered.
  */
 
-class MysqlSchema extends BaseSchema
+class SqliteSchema extends BaseSchema
 {
     /**
      * The quote character for table names and columns
      *
      * @var string
      */
-    protected $quote = '`';
+    protected $quote = '"';
 
-    /**
-     * MySQL TinyText field length
-     */
-    const TINYTEXT = 255;
-
-    /**
-     * MySQL MediumText field length
-     */
-    const MEDIUMTEXT = 16777215;
-
-    /**
-     * MySQL LongText field length
-     */
-    const LONGTEXT = 4294967295;
-
-    /**
-     * MySQL column limits for texts
-     *
-     * @var array
-     */
-    protected $columnLimits = [
-        'tinytext' => self::TINYTEXT,
-        'longtext' => self::LONGTEXT,
-        'mediumtext' => self::MEDIUMTEXT,
-    ];
     /**
      * This is required for renaming columns
      *
@@ -65,7 +40,7 @@ class MysqlSchema extends BaseSchema
     protected $typeMap = [
         'string' => 'VARCHAR',
         'text' => 'TEXT',
-        'integer' => 'INT',
+        'integer' => 'INTEGER',
         'bigint' => 'BIGINT',
         'float' => 'FLOAT',
         'decimal' => 'DECIMAL',
@@ -74,9 +49,9 @@ class MysqlSchema extends BaseSchema
         'time' => 'TIME',
         'timestamp' => 'TIMESTAMP',
         'binary' => 'BLOB',
-        'boolean' => 'TINYINT',
+        'boolean' => 'BOOLEAN',
     ];
-  
+
     /**
      * This describes the table in the database using the new format. This will require caching due to the amount
      * of queries that will need to be executed.
@@ -88,24 +63,27 @@ class MysqlSchema extends BaseSchema
      */
     public function describe(string $table): array
     {
-        $results = $this->fetchAll('SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($table));
-        $columns = $this->convertTableDescription($results);
-
+        $results = $this->fetchAll('PRAGMA table_info(' . $this->quoteIdentifier($table) .  ')');
+    
+        $isAutoincrement = (bool) $this->fetchRow('SELECT count(*) FROM sqlite_master WHERE tbl_name="' . $table . '" AND sql LIKE "%AUTOINCREMENT%"');
+       
         $indexes = $constraints = [];
 
         # Convert constraints
-
         foreach ($this->indexes($table) as $index) {
             $name = $index['name'];
-            if ($index['name'] === 'PRIMARY') {
-                $constraints['primary'] = ['type' => 'primary','column' => $index['column']];
-            } elseif ($index['type'] === 'unique') {
+            // this constraint is added in convertTableDescription
+            if (substr($name, 0, 16) === 'sqlite_autoindex') {
+                continue;
+            }
+      
+            if ($index['type'] === 'unique') {
                 $constraints[$name] = ['type' => 'unique','column' => $index['column']];
             } else {
-                $indexes[$name] = ['type' => $index['type'],'column' => $index['column']];
+                $indexes[$name] = ['type' => 'index','column' => $index['column']];
             }
         }
-        
+
         foreach ($this->foreignKeys($table) as $foreignKey) {
             $name = $foreignKey['name'];
             $constraints[$name] = [
@@ -113,13 +91,15 @@ class MysqlSchema extends BaseSchema
                 'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
+            if (substr($name, 0, 16) === 'sqlite_autoindex') {
+                debug($foreignKey);
+                die();
+            }
         }
 
-        $row = $this->fetchRow("SHOW TABLE STATUS WHERE Name =  '{$table}'");
-        $options = [
-            'engine' => $row['Engine'],
-            'collate' => $row['Collation'],
-        ];
+        list($columns, $constraints) = $this->convertTableDescription($results, $constraints, $isAutoincrement);
+
+        $options = [];
 
         return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes, 'options' => $options];
     }
@@ -127,72 +107,77 @@ class MysqlSchema extends BaseSchema
     /**
      * Converts the results from the describeTableSQL to abstract
      *
+     * @internal to get autoincrement field need to look at constrains
+     *
      * @param array $data
+     * @param array $constraints
+     * @param boolean $isAutoIncrement
      * @return array
      */
-    protected function convertTableDescription(array $data): array
+    protected function convertTableDescription(array $data, array $constraints, bool $isAutoIncrement): array
     {
         $out = [];
+        /**
+         * cid,name,type,notnull,dflt_value,pk
+         */
     
         foreach ($data as $row) {
-            $definition = $this->parseColumn($row['Type']);
+            $definition = $this->parseColumn($row['type']);
+
             $definition += [
-                'null' => $row['Null'] === 'YES'?true:false,
-                'default' => $this->defaultvalue($definition['type'], $row['Default']),
+                'null' => ! $row['notnull'],
+                'default' => $this->defaultvalue($definition['type'], $row['dflt_value']),
             ];
-            if (! empty($row['Collation'])) {
-                $definition['collate'] = $row['Collation'];
-            }
-            if (! empty($row['Comment'])) {
-                $definition['comment'] = $row['Comment'];
+           
+            if ($row['pk'] && $isAutoIncrement) {
+                $definition['null'] = false;
+                $definition['autoIncrement'] = true;
+                $constraints['primary'] = ['type' => 'unique','column' => $row['name']]; // must be string here to set autoincrement
             }
 
-            if (isset($row['Extra']) && $row['Extra'] === 'auto_increment') {
-                $definition['autoIncrement'] = true;
-            }
-            $out[$row['Field']] = $definition;
+            $out[$row['name']] = $definition;
         }
 
-        return $out;
+        return [$out, $constraints];
     }
 
     /**
      * Parses column data
      *
-     * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
-     * @see https://dev.mysql.com/doc/refman/5.5/en/data-types.html
+     * @see https://www.sqlite.org/datatype3.html
      *
      * @param string $column e.g int(11) unsigned
      * @return array
      */
     protected function parseColumn(string $column): array
     {
-        preg_match('/([a-z]+)(?:\(([0-9,]+)\))*/i', $column, $matches); //'int(10) unsigned'
+        preg_match('/(unsigned )?([a-z]+)(?:\(([0-9,]+)\))*/i', $column, $matches); //'unsigned int(10)'
         if (empty($matches)) {
             throw new Exception(sprintf('Error parsing %s', $column));
         }
 
-        $unsigned = substr(strtolower($column), -8) === 'unsigned';
+        $unsigned = substr(strtolower($column), 0) === 'unsigned';
+
         $limit = $precision = $scale = null;
 
-        $col = strtolower($matches[1]);
-        if (isset($matches[2])) {
-            $limit = (int) $matches[2]; // convert to int
+        $col = strtolower($matches[2]);
+        if (isset($matches[3])) {
+            $limit = (int) $matches[3]; // convert to int
         }
 
         if ($col === 'varchar') {
             return ['type' => 'string','limit' => $limit];
         }
 
-        if ($col === 'int') {
+        if ($col === 'integer') {
             return ['type' => 'integer','limit' => $limit,'unsigned' => $unsigned];
         }
         /**
          * Handle floats and decimals. map doubles to decimal
          */
         if (in_array($col, ['float','decimal','double'])) {
-            if (isset($matches[2]) && strpos($matches[2], ',') !== false) {
-                list($precision, $scale) = explode(',', $matches[2]);
+            if (isset($matches[3]) && strpos($matches[3], ',') !== false) {
+                list($precision, $scale) = explode(',', $matches[3]);
                 $precision = (int) $precision; // important
                 $scale = (int) $scale;
             }
@@ -219,10 +204,6 @@ class MysqlSchema extends BaseSchema
         if ($col === 'char') {
             return ['type' => 'string','limit' => $limit,'fixed' => true];
         }
-
-        if (in_array($col, ['tinytext','longtext','mediumtext'])) {
-            return ['type' => 'text', 'limit' => $this->columnLimits[$col]];
-        }
        
         if ($col === 'blob') {
             return ['type' => 'binary'];
@@ -244,6 +225,7 @@ class MysqlSchema extends BaseSchema
         /**
          * Work with mapped or custom types
          */
+
         $type = $data['type'];
         $isMapped = isset($this->typeMap[$data['type']]);
         if ($isMapped) {
@@ -260,11 +242,6 @@ class MysqlSchema extends BaseSchema
             if (! empty($data['fixed'])) {
                 $type = 'CHAR';
             }
-        } elseif ($data['type'] === 'text') {
-            if (! empty($data['limit']) and in_array($data['limit'], $this->columnLimits)) {
-                $key = array_search($data['limit'], $this->columnLimits);
-                $type = strtoupper($key);
-            }
         } elseif ($data['type'] === 'boolean') {
             $type = 'TINYINT(1)';
             $data['null'] = false;
@@ -273,7 +250,7 @@ class MysqlSchema extends BaseSchema
         $out .= ' ' . $type;
 
         // deal with types that have limits or custom types with limit set
-        if (! empty($data['limit']) && (in_array($data['type'], ['integer','string','bigint']) || ! $isMapped)) {
+        if (! empty($data['limit']) && (in_array($data['type'], ['string','bigint']) || ! $isMapped)) {
             $out .= '(' . $data['limit'] . ')';
         } elseif (! empty($data['precision']) && (in_array($data['type'], ['decimal','float']) || ! $isMapped)) {
             $out .= '(' . $data['precision'] .',' . ($data['scale'] ?? 0) . ')'; // 0 is MySQL default
@@ -284,10 +261,6 @@ class MysqlSchema extends BaseSchema
             $out .= ' UNSIGNED';
         }
 
-        if (in_array($data['type'], ['string','text']) && ! empty($data['collate'])) {
-            $out .= ' COLLATE ' . $data['collate'];
-        }
-        
         if (isset($data['null']) && $data['null'] === false) {
             $out .= ' NOT NULL';
         }
@@ -303,13 +276,13 @@ class MysqlSchema extends BaseSchema
         }
 
         if (in_array($data['type'], ['integer','bigint']) && ! empty($data['autoIncrement'])) {
-            $out .= ' AUTO_INCREMENT';
+            $out .= ' PRIMARY KEY AUTOINCREMENT';
         } elseif (isset($data['default'])) {
             $out .= ' DEFAULT ' . $this->schemaValue($data['default']);
         }
         
         if (! empty($data['comment'])) {
-            $out .= ' COMMENT ' . $this->schemaValue($data['comment']);
+            $out .= ' /* ' . $data['comment'] . ' */';
         }
         
         return $out;
@@ -323,33 +296,24 @@ class MysqlSchema extends BaseSchema
      */
     public function indexes(string $table): array
     {
-        $sql = sprintf('SHOW INDEX FROM %s', $this->quoteIdentifier($table));
+        $sql = sprintf('PRAGMA index_list(%s)', $this->quoteIdentifier($table));
+
         $results = $this->fetchAll($sql);
+  
         $indexes = [];
-      
+
         foreach ($results as $result) {
-            /**
-             * Handle multiple columns in a index
-             */
-            if ($result['Seq_in_index'] > 1) {
-                $key = count($indexes) - 1;
-                $indexes[$key]['column'] = (array) $indexes[$key]['column'];
-                $indexes[$key]['column'][] = $result['Column_name'];
-                continue;
+            $sql = sprintf('PRAGMA index_info(%s)', $this->quoteIdentifier($result['name']));
+            $columns = [];
+            foreach ($this->fetchAll($sql) as $column) {
+                $columns[] = $column['name'];
             }
 
             $indexes[] = [
-                'name' => $result['Key_name'],
-                'column' => $result['Column_name'],
-                'type' => ($result['Non_unique'] == 0) ?'unique' : 'index',
+                'name' => $result['name'],
+                'column' => $columns,
+                'type' => $result['unique'] ? 'unique' : 'index',
             ];
-
-            /**
-             * Full text support
-             */
-            if ($result['Index_type'] === 'FULLTEXT') {
-                $indexes[count($indexes) - 1]['type'] = 'fulltext';
-            }
         }
 
         return  $indexes;
@@ -365,16 +329,14 @@ class MysqlSchema extends BaseSchema
     public function renameTable(string $from, string $to): string
     {
         return sprintf(
-            'RENAME TABLE %s TO %s',
+            'ALTER TABLE %s RENAME TO %s',
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to)
         );
-        
-        //return  "RENAME TABLE {$from} TO {$to}";
     }
 
     /**
-     * Changes a column according to the new definition
+     * Changes a column according to the new definition.
      *
      * @param string $table
      * @param string $name
@@ -383,59 +345,133 @@ class MysqlSchema extends BaseSchema
      */
     public function changeColumn(string $table, string $name, string $type, array $options = []): array
     {
-        $options += ['name' => $name, 'type' => $type];
+        $out = [];
+        // store adjusted schema for future calls
+        $schema = $this->describe($table);
 
-        $sql = sprintf(
-            'ALTER TABLE %s MODIFY COLUMN %s',
-            $this->quoteIdentifier($table),
-            $this->columnSql($options)
-        );
+        $schema['columns'][$name] = $options + ['type' => $type, 'null' => true,'default' => null];
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
 
-        return [$sql];
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
     }
 
     /**
-     * Returns a rename column SQL statement
-     * @internal Changed to be compatable with older versions of MySQL e.g 5.x
+     * Returns a rename column SQL statements (does not handle indexes or constraints)
+     *
      * @param string $table
      * @param string $from
      * @param string $to
+     * @param array $schema
      * @return array
      */
-    public function renameColumn(string $table, string $from, string $to): array
+    public function renameColumn(string $table, string $from, string $to, array $schema = null): array
     {
-        $tableSchema = $this->describe($table)['columns'];
-        $definition = '';
-        $schema = null;
+        $out = [];
 
-        /**
-         * Make it reversable
-         * @this should not be here
-         */
-        if (isset($tableSchema[$from])) {
-            $schema = $tableSchema[$from];
-        } elseif (isset($tableSchema[$to])) {
-            $schema = $tableSchema[$to];
+        if ($schema === null) {
+            $schema = $this->describe($table);
         }
 
-        if ($schema) {
-            $definition = $this->typeMap[$schema['type']];
-            if (! empty($schema['limit'])) {
-                $definition .= "({$schema['limit']})";
-            } elseif (in_array($schema['type'], ['float','decimal'])) {
-                $definition .= "({$schema['precision']},{$schema['scale']})";
+        if (! isset($schema['columns'][$from])) {
+            throw new InvalidArgumentException(sprintf('Column %s does not exist', $from));
+        }
+       
+        // rename column in schema
+        $schema['columns'][$to] = $schema['columns'][$from];
+        unset($schema['columns'][$from]);
+
+        // rename constraints
+        foreach ($schema['constraints'] as $constraint => $definition) {
+            if ($definition['column'] === $from) {
+                $schema['constraints'][$constraint]['column'] = $to;
+            } elseif (is_array($definition['column']) && in_array($from, $definition['column'])) {
+                $key = array_search($from, $definition['column']);
+                $schema['constraints'][$constraint]['column'][$key] = $to;
+            }
+        }
+        
+        /**
+         * Mysql does not rename indexes, so this wont either
+         */
+        
+        foreach ($schema['indexes'] as $index => $definition) {
+            if ($definition['column'] === $from) {
+                $schema['indexes'][$index]['column'] = $to;
+            } elseif (is_array($definition['column']) && in_array($from, $definition['column'])) {
+                $key = array_search($from, $definition['column']);
+                $schema['indexes'][$index]['column'][$key] = $to;
             }
         }
 
-        $sql = sprintf(
-            'ALTER TABLE %s CHANGE %s %s %s',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($from),
-            $this->quoteIdentifier($to),
-            $definition
-        );
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
 
-        return [$sql];
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
+    }
+
+    /**
+     * Gets an index name
+     *
+     * @param string $table
+     * @param string|array $column , [column_1,column_2]
+     * @return string table_column_name_index
+     */
+    private function getIndexName(string $table, $column): string
+    {
+        $name = implode('_', (array) $column);
+
+        return strtolower($table . '_' . $name) .'_index';
+    }
+
+    /**
+    * Removes a column from the table
+    *
+    * @param string $table
+    * @param string $column
+    * @param array $schema optionally pass an array of schema to use
+     * @return array
+     */
+    public function removeColumn(string $table, string $column, array $schema = null): array
+    {
+        return $this->removeColumns($table, [$column], $schema);
+    }
+
+    /**
+     * Removes multiple columns from the table (does not remove indexes or constraints)
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $schema optionally pass an array of schema to use
+     * @return array
+     */
+    public function removeColumns(string $table, array $columns, array $schema = null): array
+    {
+        if ($schema === null) {
+            $schema = $this->describe($table);
+        }
+        
+        foreach ($columns as $column) {
+            if (isset($schema['columns'][$column])) {
+                unset($schema['columns'][$column]);
+            }
+        }
+
+        $out = $this->createTableSql($table, $schema['columns'], $schema);
+        array_unshift($out, $this->renameTable($table, 'schema_tmp'));
+
+        $fields = implode(', ', array_keys($schema['columns']));
+
+        $out[] = sprintf('INSERT INTO %s SELECT %s FROM schema_tmp', $this->quoteIdentifier($table), $fields);
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
     }
 
     /**
@@ -449,31 +485,37 @@ class MysqlSchema extends BaseSchema
     public function removeIndex(string $table, string $name): string
     {
         return sprintf(
-            'DROP INDEX %s ON %s',
-            $this->quoteIdentifier($name),
-            $this->quoteIdentifier($table)
+            'DROP INDEX %s',
+            $this->quoteIdentifier($name)
         );
     }
 
     /**
      * Renames an index
-     * @requires MySQL 5.7+
      *
      * @param string $table
      * @param string $oldName
      * @param string $newName
+     * @param array $schema
      * @return array
      */
-    public function renameIndex(string $table, string $oldName, string $newName): array
+    public function renameIndex(string $table, string $oldName, string $newName, array $schema = null): array
     {
-        $sql = sprintf(
-            'ALTER TABLE %s RENAME INDEX %s TO %s',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($oldName),
-            $this->quoteIdentifier($newName)
-        );
+        if ($schema === null) {
+            $schema = $this->describe($table);
+        }
 
-        return [$sql];
+        if (! isset($schema['indexes'][$oldName])) {
+            throw new InvalidArgumentException(sprintf('Index %s does not exist', $oldName));
+        }
+     
+        $index = $schema['indexes'][$oldName];
+
+        $out = [];
+        $out[] = $this->removeIndex($table, $oldName);
+        $out[] = $this->addIndex($table, $index['column'], $newName, ['unique' => $index['unique'] ?? false]);
+
+        return $out;
     }
 
     /**
@@ -484,14 +526,26 @@ class MysqlSchema extends BaseSchema
      */
     public function truncateTableSql(string $table): array
     {
-        $sql = sprintf('TRUNCATE TABLE %s', $this->quoteIdentifier($table));
+        $out = [];
+        
+        $out[] = sprintf('DELETE from sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table));
+        $out[] = sprintf('DELETE FROM %s', $this->quoteIdentifier($table));
 
-        return [$sql];
+        return $out;
     }
 
+    /**
+     * Changes the autoincrement number. Due to how sqlite works, you can't set the number to start with, unless
+     * you create a record, set the number then delete the record.
+     *
+     * @param string $table
+     * @param string $column
+     * @param integer $counter
+     * @return string
+     */
     public function changeAutoIncrementSql(string $table, string $column, int $counter): string
     {
-        return sprintf('ALTER TABLE %s AUTO_INCREMENT = %d', $this->quoteIdentifier($table), $counter);
+        return sprintf('UPDATE SQLITE_SEQUENCE SET seq = %d WHERE name = %s', $counter, $this->quoteIdentifier($table));
     }
 
     /**
@@ -501,7 +555,7 @@ class MysqlSchema extends BaseSchema
      */
     public function disableForeignKeySql(): string
     {
-        return 'SET FOREIGN_KEY_CHECKS = 0';
+        return 'PRAGMA foreign_keys = OFF';
     }
 
     /**
@@ -511,40 +565,20 @@ class MysqlSchema extends BaseSchema
      */
     public function enableForeignKeySql(): string
     {
-        return 'SET FOREIGN_KEY_CHECKS = 1';
+        return 'PRAGMA foreign_keys = ON';
     }
 
     /**
-     * Returns a list of foreign keys on a table
+     * Returns a list of foreign keys on a table.
+     *
+     * @internal There is no way to get foreignkey name in sqlite
      *
      * @param string $table
      * @return array
      */
     public function foreignKeys(string $table): array
     {
-        $config = ConnectionManager::config($this->datasource);
-
-        //SELECT TABLE_NAME as 'table',COLUMN_NAME as 'column',CONSTRAINT_NAME as 'name', REFERENCED_TABLE_NAME as 'referencedTable',REFERENCED_COLUMN_NAME as 'referencedColumn' FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = 'origin' AND TABLE_NAME = 'bookmarks'
-
-        $sql = sprintf(
-            "SELECT 
-            s1.TABLE_NAME AS 'table',
-            s1.COLUMN_NAME AS 'column',
-            s1.CONSTRAINT_NAME AS 'name', 
-            s1.REFERENCED_TABLE_NAME AS 'referencedTable',
-            s1.REFERENCED_COLUMN_NAME AS 'referencedColumn',
-            c1.UPDATE_RULE as 'update',
-            c1.DELETE_RULE as 'delete'
-        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS s1 
-        INNER JOIN information_schema.referential_constraints AS c1
-        WHERE 
-            REFERENCED_TABLE_SCHEMA = %s AND 
-            s1.CONSTRAINT_NAME = c1.CONSTRAINT_NAME AND 
-            s1.CONSTRAINT_SCHEMA = c1.CONSTRAINT_SCHEMA AND 
-            s1.TABLE_NAME = %s",
-            $this->schemaValue($config['database']),
-            $this->schemaValue($table)
-        );
+        $sql = sprintf('PRAGMA foreign_key_list(%s)', $this->quoteIdentifier($table));
 
         $actionMap = [
             'CASCADE' => 'cascade',
@@ -553,38 +587,51 @@ class MysqlSchema extends BaseSchema
             'SET NULL' => 'setNull',
             'SET DEFAULT' => 'setDefault'
         ];
- 
+
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => $result['name'],
+                'name' => 'fk_origin_' . hash('crc32', $table . '__' . $result['from']),
                 'table' => $table,
-                'column' => $result['column'],
-                'referencedTable' => $result['referencedTable'],
-                'referencedColumn' => $result['referencedColumn'],
-                'update' => $actionMap[$result['update']],
-                'delete' => $actionMap[$result['delete']],
+                'column' => $result['from'],
+                'referencedTable' => $result['table'],
+                'referencedColumn' => $result['to'],
+                'update' => $actionMap[$result['on_update']],
+                'delete' => $actionMap[$result['on_delete']]
+                //'match' => $result['match']
             ];
         }
 
         return $out;
     }
     /**
-     * Returns a remove foreignKey constraint SQL statement
+     * Sqlite does not support adding or removing foreign keys on existing tables
      *
      * @param string $fromTable
      * @param string $constraint
+     * @param array $schema
      * @return array
      */
-    public function removeForeignKey(string $fromTable, string $constraint): array
+    public function removeForeignKey(string $fromTable, string $constraint, array $schema = null): array
     {
-        $sql = sprintf(
-            'ALTER TABLE %s DROP FOREIGN KEY %s',
-            $this->quoteIdentifier($fromTable),
-            $this->quoteIdentifier($constraint)
-        );
+        if ($schema === null) {
+            $schema = $this->describe($fromTable);
+        }
+       
+        if (! isset($schema['constraints'][$constraint])) {
+            debug($schema['constraints']);
+            backtrace();
+            throw new InvalidArgumentException(sprintf('Constraint %s does not exist', $constraint));
+        }
+        unset($schema['constraints'][$constraint]);
+    
+        $out = $this->createTableSql($fromTable, $schema['columns'], $schema);
 
-        return [$sql];
+        array_unshift($out, $this->renameTable($fromTable, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
     }
     /**
      * Undocumented function
@@ -594,9 +641,9 @@ class MysqlSchema extends BaseSchema
      */
     public function showCreateTable(string $table): string
     {
-        $result = $this->fetchRow('SHOW CREATE TABLE ' . $this->quoteIdentifier($table));
+        $result = $this->fetchRow('SELECT sql from sqlite_master WHERE name = ' . $this->quoteIdentifier($table));
 
-        return $result['Create Table'];
+        return $result['sql'];
     }
 
     /**
@@ -611,27 +658,35 @@ class MysqlSchema extends BaseSchema
     {
         $columns = $constraints = $indexes = $databaseOptions = [];
         
-        # All Databases
+        $autoIncrementColumn = null;
+        
         foreach ($schema as $name => $definition) {
             if (is_string($definition)) {
                 $definition = ['type' => $definition];
             }
             $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
+
+            if (! empty($definition['autoIncrement'])) {
+                $autoIncrementColumn = $name;
+            }
         }
-        
+     
         if (isset($options['constraints'])) {
             foreach ($options['constraints'] as $name => $definition) {
+                // primary key set for autoincrments in table sql, so dont add again
+                if ($definition['type'] === 'primary' && in_array($autoIncrementColumn, (array) $definition['column'])) {
+                    continue;
+                }
                 $constraints[] = '  ' .  $this->tableConstraint(['name' => $name] + $definition);
             }
         }
         
         if (isset($options['indexes'])) {
             foreach ($options['indexes'] as $name => $definition) {
-                $indexes[] = '  ' .  $this->tableIndex(['name' => $name] + $definition);
+                $indexes[] = $this->tableIndex(['name' => $name,'table' => $table] + $definition);
             }
         }
 
-        # MySQL Options
         if (isset($options['options'])) {
             $databaseOptions = $options['options'];
             /**
@@ -667,28 +722,13 @@ class MysqlSchema extends BaseSchema
      */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array
     {
-        $out = sprintf(
-            "CREATE TABLE %s (\n%s\n)",
-            $this->quoteIdentifier($table),
-            implode(",\n", array_merge($columns, $constraints, $indexes))
-        );
-
-        if (isset($options['engine'])) {
-            $out .= ' ENGINE=' . $options['engine'];
+        $out = [];
+        $definition = implode(",\n", array_merge($columns, $constraints));
+        $out[] = sprintf("CREATE TABLE \"%s\" (\n%s\n)", $table, $definition);
+        foreach ($indexes as $index) {
+            $out[] = $index;
         }
 
-        /**
-         * @see https://dev.mysql.com/doc/refman/8.0/en/charset-table.html
-         */
-        if (isset($options['charset'])) {
-            $out .= ' DEFAULT CHARACTER SET=' . $options['charset'];
-        }
-        
-        if (isset($options['collate'])) {
-            $out .= ' COLLATE=' . $options['collate'];
-        }
-        
-        $out = [$out];
         if (isset($options['setAutoIncrement'])) {
             $out[] = $options['setAutoIncrement'];
         }
@@ -733,7 +773,7 @@ class MysqlSchema extends BaseSchema
         }
         // unique constraint and index very similar, here using key terminology
         if ($attributes['type'] === 'unique') {
-            return sprintf('UNIQUE KEY (%s)', $columns);
+            return sprintf('UNIQUE (%s)', $columns);
         }
        
         if ($attributes['type'] === 'foreign') {
@@ -750,22 +790,20 @@ class MysqlSchema extends BaseSchema
     */
     protected function tableIndex(array $attributes): string
     {
-        $string = null;
-
-        if ($attributes['type'] === 'index') {
-            $string = 'INDEX %s (%s)';
-        } elseif ($attributes['type'] === 'unique') {
-            $string = 'UNIQUE INDEX %s (%s)';
-        } elseif ($attributes['type'] === 'fulltext') {
-            $string = 'FULLTEXT INDEX %s (%s)';
+        if (empty($attributes['table'])) {
+            throw new Exception(sprintf('No table name provided for index %s', $attributes['name']));
         }
-        if ($string) {
-            $columns = implode(',', (array) $attributes['column']);
-
-            return sprintf($string, $this->quoteIdentifier($attributes['name']), $columns);
+        $string = 'CREATE INDEX %s ON %s (%s)';
+        if ($attributes['type'] === 'unique') {
+            $string = 'CREATE UNIQUE INDEX %s ON %s (%s)';
         }
-   
-        throw new Exception(sprintf('Unknown index type %s', $attributes['type']));
+
+        return sprintf(
+            $string,
+            $this->quoteIdentifier($attributes['name']),
+            $this->quoteIdentifier($attributes['table']),
+            implode(', ', (array) $attributes['column'])
+        );
     }
 
     /**
@@ -808,5 +846,67 @@ class MysqlSchema extends BaseSchema
         }
 
         return sprintf($sql, $this->quoteIdentifier($table));
+    }
+
+    /**
+     * Sqlite does not support adding foreign keys to existing tables
+     *
+     * @param string $fromTable
+     * @param string $name
+     * @param string $column
+     * @param string $toTable
+     * @param string $primaryKey
+     * @param string $onUpdate
+     * @param string $onDelete
+     * @return array
+     */
+    public function addForeignKey(string $fromTable, string $name, string $column, string $toTable, string $primaryKey, string $onUpdate = null, string $onDelete = null, array $schema = null): array
+    {
+        if ($schema === null) {
+            $schema = $this->describe($fromTable);
+        }
+       
+        $schema['constraints'][$name] = [
+            'type' => 'foreign',
+            'column' => $column,
+            'references' => [$toTable, $primaryKey],
+            'update' => $onUpdate,
+            'delete' => $onDelete
+        ];
+
+        $out = $this->createTableSql($fromTable, $schema['columns'], $schema);
+
+        array_unshift($out, $this->renameTable($fromTable, 'schema_tmp'));
+        $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
+        $out[] = $this->dropTableSql('schema_tmp');
+
+        return $out;
+    }
+
+    /**
+    * Standardizes default values
+    *
+    * @param mixed $value
+    * @return mixed
+    */
+    protected function defaultValue(string $type, $value)
+    {
+        if ($value === null) {
+            return null;
+        }
+        
+        if (in_array($type, ['bigint','integer','float','decimal'])) {
+            return ($value == (int) $value) ? (int) $value : (float) $value;
+        }
+
+        if ($type === 'boolean') {
+            return (bool) $value;
+        }
+        
+        if (in_array($type, ['string','text'])) {
+            return trim($value, '\'');
+        }
+
+        return $value;
     }
 }

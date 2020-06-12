@@ -19,6 +19,7 @@ use Origin\Model\Schema\TableSchema;
 
 class Schema
 {
+
     /**
      * Returns the SQL for creating tables, indexes and foreign keys
      *
@@ -27,7 +28,7 @@ class Schema
      */
     public function createSql(Connection $datasource): array
     {
-        $out = [];
+        $out = $foreignKeys = [];
 
         $properties = get_object_vars($this);
 
@@ -36,20 +37,21 @@ class Schema
          * This is important for pgsql when creating a table that references another
          * table that has not been created yet since foreign keys checks cannot be disabled
          */
-        $foreignKeys = [];
-        foreach (array_keys($properties) as $table) {
-            $foreignKeys[$table] = [];
-            $data = $properties[$table];
-            if (isset($data['constraints'])) {
-                foreach ($data['constraints'] as $name => $settings) {
-                    if (isset($settings['type']) && $settings['type'] === 'foreign') {
-                        $foreignKeys[$table][$name] = $settings;
-                        unset($properties[$table]['constraints'][$name]);
+        if ($datasource->engine() === 'pgsql') {
+            foreach (array_keys($properties) as $table) {
+                $foreignKeys[$table] = [];
+                $data = $properties[$table];
+                if (isset($data['constraints'])) {
+                    foreach ($data['constraints'] as $name => $settings) {
+                        if (isset($settings['type']) && $settings['type'] === 'foreign') {
+                            $foreignKeys[$table][$name] = $settings;
+                            unset($properties[$table]['constraints'][$name]);
+                        }
                     }
                 }
             }
         }
-        
+      
         /**
          * Create the create table statements
          */
@@ -63,16 +65,19 @@ class Schema
          * Add all foreign keys statements
          * @example ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_ibfk_1" FOREIGN KEY (user_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE
          */
-        foreach (array_keys($properties) as $table) {
-            foreach ($foreignKeys[$table] as $name => $settings) {
-                if (! isset($settings['column']) || ! isset($settings['references'][0]) || ! isset($settings['references'][1])) {
-                    throw new Exception(sprintf('Invalid foreign key settings for %s on table %s ', $name, $table));
+        if ($datasource->engine() === 'pgsql') {
+            foreach (array_keys($properties) as $table) {
+                foreach ($foreignKeys[$table] as $name => $settings) {
+                    if (! isset($settings['column']) || ! isset($settings['references'][0]) || ! isset($settings['references'][1])) {
+                        throw new Exception(sprintf('Invalid foreign key settings for %s on table %s ', $name, $table));
+                    }
+                    $sql = $datasource->adapter()->addForeignKey($table, $name, $settings['column'], $settings['references'][0], $settings['references'][1]);
+                    $out = array_merge($out, $sql);
                 }
-                $out[] = $datasource->adapter()->addForeignKey($table, $name, $settings['column'], $settings['references'][0], $settings['references'][1]);
             }
         }
-
-        return $out;
+       
+        return array_filter($out);
     }
 
     /**
