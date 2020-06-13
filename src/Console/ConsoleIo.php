@@ -661,7 +661,7 @@ class ConsoleIo
     }
 
     /**
-    * Enables quiet mode
+    * Sets the output level, e.g. quiet mode.
     *
     * @return void
     */
