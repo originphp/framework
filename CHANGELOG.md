@@ -1,6 +1,13 @@
 # Changelog
 
 ## [unreleased]
+## [2.7.2] - 2020-06-13
+
+### Fixed
+- Fixed various issues with Sqlite, testing and travis
+- Fixed some committed debug code
+
+## [2.7.1] - 2020-06-12
 
 ### Added
 - Add console quiet mode
