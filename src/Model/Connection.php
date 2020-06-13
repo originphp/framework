@@ -655,6 +655,7 @@ abstract class Connection
     public function enableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->enableForeignKeySql());
+        $this->statement->closeCursor();
     }
 
     /**
@@ -665,6 +666,7 @@ abstract class Connection
     public function disableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->disableForeignKeySql());
+        $this->statement->closeCursor();
     }
 
     /**
