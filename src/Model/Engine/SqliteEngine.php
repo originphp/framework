@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Model\Engine;
 
+use Exception;
 use Origin\Model\Connection;
 
 class SqliteEngine extends Connection
@@ -72,5 +73,43 @@ class SqliteEngine extends Connection
     public function databases(): array
     {
         return [];
+    }
+
+    /**
+     * Disables foreign keys then runs a callback as a transaction, if an exception is
+     * thrown or or the callback returns false then the transaction will be rolledback.
+     *
+     * @example
+     *
+     * $connection->transaction(function ($connection) use ($statements) {
+     *     $this->processStatements($connection,$statements);
+     * });
+     *
+     * @param callable $callback
+     * @return mixed
+     */
+    public function transaction(callable $callback)
+    {
+        $this->disableForeignKeyConstraints();
+        $this->begin();
+      
+        try {
+            $result = $callback($this);
+        } catch (Exception $exception) {
+            $this->rollback();
+            $this->enableForeignKeyConstraints();
+
+            throw $exception;
+        }
+
+        if ($result === false) {
+            $this->rollback();
+        } else {
+            $this->commit();
+        }
+
+        $this->enableForeignKeyConstraints();
+
+        return $result;
     }
 }

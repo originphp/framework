@@ -125,6 +125,43 @@ abstract class Connection
     }
 
     /**
+     * Disables foreign keys then runs a callback as a transaction, if an exception is
+     * thrown or or the callback returns false then the transaction will be rolledback.
+     *
+     * @example
+     *
+     * $connection->transaction(function ($connection) use ($statements) {
+     *     $this->processStatements($connection,$statements);
+     * });
+     *
+     * @param callable $callback
+     * @return mixed
+     */
+    public function transaction(callable $callback)
+    {
+        $this->begin();
+        $this->disableForeignKeyConstraints();
+
+        try {
+            $result = $callback($this);
+        } catch (Exception $exception) {
+            $this->enableForeignKeyConstraints();
+            $this->rollback();
+            throw $exception;
+        }
+        
+        $this->enableForeignKeyConstraints();
+
+        if ($result === false) {
+            $this->rollback();
+        } else {
+            $this->commit();
+        }
+
+        return $result;
+    }
+
+    /**
      * connects to database.
      *
      * @param array $config
