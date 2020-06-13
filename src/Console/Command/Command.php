@@ -20,6 +20,7 @@ use Origin\Model\ModelTrait;
 use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
 use Origin\Console\ArgumentParser;
+use Origin\Console\ConsoleOutput;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 
@@ -160,6 +161,17 @@ abstract class Command
             $argv[] = is_int($key) ? $value : "{$key}={$value}";
         }
 
+        /**
+         * Pass output level args to sub commands as this shares the IO
+         */
+        if ($this->options('quiet')) {
+            $argv[] = '--quiet';
+        }
+
+        if ($this->options('verbose')) {
+            $argv[] = '--verbose';
+        }
+
         return $instance->run($argv);
     }
 
@@ -197,9 +209,8 @@ abstract class Command
             $this->verbose = true;
         }
 
-        if ($this->options('quiet')) {
-            $this->io->disableOutput();
-        }
+        $level = $this->options('quiet') ? ConsoleOutput::QUIET : ConsoleOutput::NORMAL;
+        $this->io->level($level);
 
         if ($this->options('help')) {
             $this->displayHelp();

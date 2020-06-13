@@ -28,9 +28,17 @@ class ConsoleOutput
     const RAW = 0;
     const PLAIN = 1;
     const COLOR = 2;
-    const QUIET = 3;
 
     protected $mode = SELF::COLOR;
+
+    /**
+     * Handle output levels
+     */
+    const VERBOSE = 2;
+    const NORMAL = 1;
+    const QUIET = 0;
+
+    protected $level = SELF::NORMAL;
 
     protected $foregroundColors = [
         'default' => 39,
@@ -160,7 +168,7 @@ class ConsoleOutput
         if ($mode === null) {
             return $this->mode;
         }
-        if (! in_array($mode, [self::RAW,self::PLAIN, self::COLOR, self::QUIET])) {
+        if (! in_array($mode, [self::RAW,self::PLAIN, self::COLOR])) {
             throw new InvalidArgumentException(sprintf('Invalid mode %s', $mode));
         }
         $this->mode = $mode;
@@ -172,7 +180,7 @@ class ConsoleOutput
      * @param string|array $data
      * @return int
      */
-    public function write($data, $newLine = true): int
+    public function write($data, $newLine = true, int $level = SELF::NORMAL): int
     {
         if (is_array($data)) {
             $data = implode("\n", $data);
@@ -180,7 +188,7 @@ class ConsoleOutput
         
         $data = $this->styleText($data);
 
-        if ($this->mode === self::QUIET) {
+        if ($this->level === self::QUIET || ($level === self::VERBOSE && $this->level === self::NORMAL)) {
             return strlen($data);
         }
 
@@ -332,5 +340,21 @@ class ConsoleOutput
         $this->styles[$name] = $values;
 
         return true;
+    }
+
+    /**
+     * Sets and gets the output level
+     *
+     * @todo integrate verbosity into all output including errors etc
+     *
+     * @param integer $level
+     * @return integer
+     */
+    public function level(int $level = null) : int
+    {
+        if (!is_null($level)) {
+            $this->level = $level;
+        }
+        return $this->level;
     }
 }
