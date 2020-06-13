@@ -78,7 +78,7 @@ class ConnectionManager
          * If the SQLite databse does not start with / then add ROOT path.
          * e.g. database/main.sqlite3 is idea.
          */
-        if ($config['engine'] === 'sqlite' && substr($config['database'], 0, 1) !== '/') {
+        if ($config['engine'] === 'sqlite' && $config['database'] && substr($config['database'], 0, 1) !== '/') {
             $config['database'] = ROOT .'/' . $config['database'];
         }
          
