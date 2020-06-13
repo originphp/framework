@@ -417,20 +417,6 @@ class SqliteSchema extends BaseSchema
     }
 
     /**
-     * Gets an index name
-     *
-     * @param string $table
-     * @param string|array $column , [column_1,column_2]
-     * @return string table_column_name_index
-     */
-    private function getIndexName(string $table, $column): string
-    {
-        $name = implode('_', (array) $column);
-
-        return strtolower($table . '_' . $name) .'_index';
-    }
-
-    /**
     * Removes a column from the table
     *
     * @param string $table
