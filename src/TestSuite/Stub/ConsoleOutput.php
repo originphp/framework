@@ -30,6 +30,11 @@ class ConsoleOutput extends BaseConsoleOutput
             $buffer[] = '';
         }
         $buffer = implode("\n", $buffer);
+
+        if ($this->level === self::QUIET || ($level === self::VERBOSE && $this->level === self::NORMAL)) {
+            return strlen($buffer);
+        }
+
         $this->buffer .= $buffer;
 
         return strlen($buffer);
