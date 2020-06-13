@@ -642,7 +642,7 @@ class SqliteSchemaTest extends OriginTestCase
     
         $statements = $adapter->renameColumn('articles', 'author_id', 'user_id');
     
-        $this->assertEquals('d65f7c45ed6d8dc2b4284e01e7f55e56', md5(json_encode($statements)));
+        $this->assertEquals('6a874657926d2ccdc3ce679c589266f5', md5(json_encode($statements)));
 
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
