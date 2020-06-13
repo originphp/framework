@@ -605,8 +605,6 @@ class SqliteSchema extends BaseSchema
         }
        
         if (! isset($schema['constraints'][$constraint])) {
-            debug($schema['constraints']);
-            backtrace();
             throw new InvalidArgumentException(sprintf('Constraint %s does not exist', $constraint));
         }
         unset($schema['constraints'][$constraint]);
