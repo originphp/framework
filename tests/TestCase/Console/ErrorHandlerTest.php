@@ -51,7 +51,7 @@ class MockConsoleOutputErrorHandler extends ConsoleOutput
     {
         return $this->buffer;
     }
-    public function write($data, $newLine = true): int
+    public function write($data, $newLine = true, int $level = SELF::NORMAL): int
     {
         $this->buffer .= $data;
 
