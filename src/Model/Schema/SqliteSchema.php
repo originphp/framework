@@ -91,10 +91,6 @@ class SqliteSchema extends BaseSchema
                 'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
-            if (substr($name, 0, 16) === 'sqlite_autoindex') {
-                debug($foreignKey);
-                die();
-            }
         }
 
         list($columns, $constraints) = $this->convertTableDescription($results, $constraints, $isAutoincrement);
@@ -117,9 +113,6 @@ class SqliteSchema extends BaseSchema
     protected function convertTableDescription(array $data, array $constraints, bool $isAutoIncrement): array
     {
         $out = [];
-        /**
-         * cid,name,type,notnull,dflt_value,pk
-         */
     
         foreach ($data as $row) {
             $definition = $this->parseColumn($row['type']);
@@ -878,7 +871,7 @@ class SqliteSchema extends BaseSchema
         if ($value === null) {
             return null;
         }
-        
+       
         if (in_array($type, ['bigint','integer','float','decimal'])) {
             return ($value == (int) $value) ? (int) $value : (float) $value;
         }
