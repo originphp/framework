@@ -125,8 +125,7 @@ abstract class Connection
     }
 
     /**
-     * Disables foreign keys then runs a callback as a transaction, if an exception is
-     * thrown or or the callback returns false then the transaction will be rolledback.
+     * Creates and handles a DB transaction with the option to disable foreign key constraints.
      *
      * @example
      *
@@ -135,22 +134,31 @@ abstract class Connection
      * });
      *
      * @param callable $callback
+     * @param boolean $disbleForeignKeyConstraints
      * @return mixed
      */
-    public function transaction(callable $callback)
+    public function transaction(callable $callback, bool $disbleForeignKeyConstraints = false)
     {
         $this->begin();
-        $this->disableForeignKeyConstraints();
 
+        if ($disbleForeignKeyConstraints) {
+            $this->disableForeignKeyConstraints();
+        }
+       
         try {
             $result = $callback($this);
         } catch (Exception $exception) {
-            $this->enableForeignKeyConstraints();
+            if ($disbleForeignKeyConstraints) {
+                $this->enableForeignKeyConstraints();
+            }
+           
             $this->rollback();
             throw $exception;
         }
         
-        $this->enableForeignKeyConstraints();
+        if ($disbleForeignKeyConstraints) {
+            $this->enableForeignKeyConstraints();
+        }
 
         if ($result === false) {
             $this->rollback();

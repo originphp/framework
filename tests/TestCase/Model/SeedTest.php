@@ -53,6 +53,6 @@ class SeedTest extends \PHPUnit\Framework\TestCase
                     $this->assertTrue($connection->execute($sql));
                 }
             }
-        });
+        }, true);
     }
 }

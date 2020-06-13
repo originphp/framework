@@ -76,8 +76,7 @@ class SqliteEngine extends Connection
     }
 
     /**
-     * Disables foreign keys then runs a callback as a transaction, if an exception is
-     * thrown or or the callback returns false then the transaction will be rolledback.
+     * Creates and handles a DB transaction with the option to disable foreign key constraints.
      *
      * @example
      *
@@ -86,18 +85,24 @@ class SqliteEngine extends Connection
      * });
      *
      * @param callable $callback
+     * @param boolean $disbleForeignKeyConstraints
      * @return mixed
      */
-    public function transaction(callable $callback)
+    public function transaction(callable $callback, bool $disbleForeignKeyConstraints = false)
     {
-        $this->disableForeignKeyConstraints();
+        if ($disbleForeignKeyConstraints) {
+            $this->disableForeignKeyConstraints();
+        }
+        
         $this->begin();
       
         try {
             $result = $callback($this);
         } catch (Exception $exception) {
             $this->rollback();
-            $this->enableForeignKeyConstraints();
+            if ($disbleForeignKeyConstraints) {
+                $this->enableForeignKeyConstraints();
+            }
 
             throw $exception;
         }
@@ -108,7 +113,9 @@ class SqliteEngine extends Connection
             $this->commit();
         }
 
-        $this->enableForeignKeyConstraints();
+        if ($disbleForeignKeyConstraints) {
+            $this->enableForeignKeyConstraints();
+        }
 
         return $result;
     }

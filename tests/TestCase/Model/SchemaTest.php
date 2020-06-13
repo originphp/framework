@@ -62,6 +62,6 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
             foreach ($statements as $statement) {
                 $this->assertTrue($connection->execute($statement));
             }
-        });
+        }, true);
     }
 }
