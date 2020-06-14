@@ -58,13 +58,10 @@ class SchemaTest extends \PHPUnit\Framework\TestCase
     protected function executeStatements(array $statements)
     {
         $connection = ConnectionManager::get('test');
-        $connection->begin();
-        $connection->disableForeignKeyConstraints();
- 
-        foreach ($statements as $statement) {
-            $this->assertTrue($connection->execute($statement));
-        }
-        $connection->enableForeignKeyConstraints();
-        $connection->commit();
+        $connection->transaction(function ($connection) use ($statements) {
+            foreach ($statements as $statement) {
+                $this->assertTrue($connection->execute($statement));
+            }
+        }, true);
     }
 }

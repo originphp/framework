@@ -125,6 +125,51 @@ abstract class Connection
     }
 
     /**
+     * Creates and handles a DB transaction with the option to disable foreign key constraints.
+     *
+     * @example
+     *
+     * $connection->transaction(function ($connection) use ($statements) {
+     *     $this->processStatements($connection,$statements);
+     * });
+     *
+     * @param callable $callback
+     * @param boolean $disbleForeignKeyConstraints
+     * @return mixed
+     */
+    public function transaction(callable $callback, bool $disbleForeignKeyConstraints = false)
+    {
+        $this->begin();
+
+        if ($disbleForeignKeyConstraints) {
+            $this->disableForeignKeyConstraints();
+        }
+       
+        try {
+            $result = $callback($this);
+        } catch (Exception $exception) {
+            if ($disbleForeignKeyConstraints) {
+                $this->enableForeignKeyConstraints();
+            }
+           
+            $this->rollback();
+            throw $exception;
+        }
+        
+        if ($disbleForeignKeyConstraints) {
+            $this->enableForeignKeyConstraints();
+        }
+
+        if ($result === false) {
+            $this->rollback();
+        } else {
+            $this->commit();
+        }
+
+        return $result;
+    }
+
+    /**
      * connects to database.
      *
      * @param array $config
@@ -655,6 +700,7 @@ abstract class Connection
     public function enableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->enableForeignKeySql());
+        $this->statement->closeCursor();
     }
 
     /**
@@ -665,6 +711,7 @@ abstract class Connection
     public function disableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->disableForeignKeySql());
+        $this->statement->closeCursor();
     }
 
     /**

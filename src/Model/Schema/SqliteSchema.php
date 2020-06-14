@@ -91,10 +91,6 @@ class SqliteSchema extends BaseSchema
                 'column' => $foreignKey['column'],
                 'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
             ];
-            if (substr($name, 0, 16) === 'sqlite_autoindex') {
-                debug($foreignKey);
-                die();
-            }
         }
 
         list($columns, $constraints) = $this->convertTableDescription($results, $constraints, $isAutoincrement);
@@ -117,9 +113,6 @@ class SqliteSchema extends BaseSchema
     protected function convertTableDescription(array $data, array $constraints, bool $isAutoIncrement): array
     {
         $out = [];
-        /**
-         * cid,name,type,notnull,dflt_value,pk
-         */
     
         foreach ($data as $row) {
             $definition = $this->parseColumn($row['type']);
@@ -350,7 +343,15 @@ class SqliteSchema extends BaseSchema
         $schema = $this->describe($table);
 
         $schema['columns'][$name] = $options + ['type' => $type, 'null' => true,'default' => null];
-        $out = $this->createTableSql($table, $schema['columns'], $schema);
+      
+        // Drop all indexes
+        $out = [];
+        foreach ($schema['indexes'] as $index => $defintion) {
+            $out[] = $this->removeIndex($table, $index);
+        }
+        $out = array_merge($out, $this->createTableSql($table, $schema['columns'], $schema));
+
+        #$out = $this->createTableSql($table, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($table, 'schema_tmp'));
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
@@ -397,7 +398,6 @@ class SqliteSchema extends BaseSchema
         /**
          * Mysql does not rename indexes, so this wont either
          */
-        
         foreach ($schema['indexes'] as $index => $definition) {
             if ($definition['column'] === $from) {
                 $schema['indexes'][$index]['column'] = $to;
@@ -407,27 +407,20 @@ class SqliteSchema extends BaseSchema
             }
         }
 
-        $out = $this->createTableSql($table, $schema['columns'], $schema);
+        // Drop all indexes
+        $out = [];
+        foreach ($schema['indexes'] as $index => $defintion) {
+            $out[] = $this->removeIndex($from, $index);
+        }
+        $out = array_merge($out, $this->createTableSql($table, $schema['columns'], $schema));
+
+        #$out = $this->createTableSql($table, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($table, 'schema_tmp'));
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($table));
         $out[] = $this->dropTableSql('schema_tmp');
 
         return $out;
-    }
-
-    /**
-     * Gets an index name
-     *
-     * @param string $table
-     * @param string|array $column , [column_1,column_2]
-     * @return string table_column_name_index
-     */
-    private function getIndexName(string $table, $column): string
-    {
-        $name = implode('_', (array) $column);
-
-        return strtolower($table . '_' . $name) .'_index';
     }
 
     /**
@@ -619,13 +612,18 @@ class SqliteSchema extends BaseSchema
         }
        
         if (! isset($schema['constraints'][$constraint])) {
-            debug($schema['constraints']);
-            backtrace();
             throw new InvalidArgumentException(sprintf('Constraint %s does not exist', $constraint));
         }
         unset($schema['constraints'][$constraint]);
-    
-        $out = $this->createTableSql($fromTable, $schema['columns'], $schema);
+
+        // Drop all indexes
+        $out = [];
+        foreach ($schema['indexes'] as $index => $defintion) {
+            $out[] = $this->removeIndex($fromTable, $index);
+        }
+        $out = array_merge($out, $this->createTableSql($fromTable, $schema['columns'], $schema));
+       
+        #$out = $this->createTableSql($fromTable, $schema['columns'], $schema);
 
         array_unshift($out, $this->renameTable($fromTable, 'schema_tmp'));
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
@@ -874,8 +872,14 @@ class SqliteSchema extends BaseSchema
             'delete' => $onDelete
         ];
 
-        $out = $this->createTableSql($fromTable, $schema['columns'], $schema);
-
+        // Drop all indexes
+        $out = [];
+        foreach ($schema['indexes'] as $index => $defintion) {
+            $out[] = $this->removeIndex($fromTable, $index);
+        }
+        $out = array_merge($out, $this->createTableSql($fromTable, $schema['columns'], $schema));
+        
+        //$out = $this->createTableSql($fromTable, $schema['columns'], $schema);
         array_unshift($out, $this->renameTable($fromTable, 'schema_tmp'));
         $out[] = sprintf('INSERT INTO %s SELECT * FROM schema_tmp', $this->quoteIdentifier($fromTable));
         $out[] = $this->dropTableSql('schema_tmp');
@@ -894,7 +898,7 @@ class SqliteSchema extends BaseSchema
         if ($value === null) {
             return null;
         }
-        
+       
         if (in_array($type, ['bigint','integer','float','decimal'])) {
             return ($value == (int) $value) ? (int) $value : (float) $value;
         }

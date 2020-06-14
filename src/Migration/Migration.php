@@ -541,11 +541,9 @@ class Migration
         if ($this->calledBy() !== 'change') {
             return;
         }
-
-        $schema = $this->adapter()->describe($table);
-        
+      
         $this->reverseStatements[] = new Sql(
-            $this->adapter()->renameColumn($table, $to, $from, $schema)
+            $this->adapter()->renameColumn($table, $to, $from)
         );
     }
 
@@ -797,11 +795,9 @@ class Migration
         if ($this->calledBy() !== 'change') {
             return ;
         }
-        
-        $schema = $this->adapter()->describe($table);
 
         $this->reverseStatements[] = new Sql(
-            $this->adapter()->renameIndex($table, $newName, $oldName, $schema)
+            $this->adapter()->renameIndex($table, $newName, $oldName)
         );
     }
   
@@ -921,10 +917,8 @@ class Migration
             return;
         }
 
-        $schema = $this->adapter()->describe($fromTable);
-
         $this->reverseStatements[] = new Sql(
-            $this->adapter()->removeForeignKey($fromTable, $options['name'], $schema)
+            $this->adapter()->removeForeignKey($fromTable, $options['name'])
         );
     }
 

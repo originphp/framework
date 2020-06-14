@@ -49,9 +49,11 @@ class BatchInsertQueryTest extends OriginTestCase
     {
         $this->truncateTable();
 
+        $limit = env('TRAVIS') === 'true' ? 199 : 1000;
+
         $this->assertEquals(0, $this->Post->find('count'));
         $records = [];
-        for ($i = 0;$i < 1000;$i++) {
+        for ($i = 0;$i < $limit;$i++) {
             $records[] = [
                 'title' => uniqid(),
                 'body' => bin2hex(random_bytes(mt_rand(10, 200))),
@@ -62,6 +64,6 @@ class BatchInsertQueryTest extends OriginTestCase
         }
 
         $this->assertTrue((new BatchInsertQuery($this->Post))->execute($records));
-        $this->assertEquals(1000, $this->Post->find('count'));
+        $this->assertEquals($limit, $this->Post->find('count'));
     }
 }

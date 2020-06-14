@@ -44,18 +44,15 @@ class SeedTest extends \PHPUnit\Framework\TestCase
     protected function executeStatements(array $statements)
     {
         $connection = ConnectionManager::get('test');
-        $connection->begin();
-        $connection->disableForeignKeyConstraints();
-       
-        foreach ($statements as $sql) {
-            if (is_array($sql)) {
-                list($sql, $params) = $sql;
-                $this->assertTrue($connection->execute($sql, $params));
-            } else {
-                $this->assertTrue($connection->execute($sql));
+        $connection->transaction(function ($connection) use ($statements) {
+            foreach ($statements as $sql) {
+                if (is_array($sql)) {
+                    list($sql, $params) = $sql;
+                    $this->assertTrue($connection->execute($sql, $params));
+                } else {
+                    $this->assertTrue($connection->execute($sql));
+                }
             }
-        }
-        $connection->enableForeignKeyConstraints();
-        $connection->commit();
+        }, true);
     }
 }

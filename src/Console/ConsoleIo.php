@@ -661,13 +661,13 @@ class ConsoleIo
     }
 
     /**
-    * Enables quiet mode
+    * Sets the output level, e.g. quiet mode.
     *
     * @return void
     */
-    public function disableOutput() : void
+    public function level(int $level) : void
     {
-        $this->stdout->mode(ConsoleOutput::QUIET);
-        $this->stderr->mode(ConsoleOutput::QUIET);
+        $this->stdout->level($level);
+        $this->stderr->level($level);
     }
 }

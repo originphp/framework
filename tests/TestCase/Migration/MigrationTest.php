@@ -123,15 +123,25 @@ class MigrationTest extends OriginTestCase
         ]);
         $migration->addIndex('products', 'name');
         $migration->addIndex('products', 'status');
-        $migration->addForeignKey('products', 'users', 'owner_id');
-        $migration->addForeignKey('products', 'users', 'manager_id');
        
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
+       
+        $migration->addForeignKey('products', 'users', 'owner_id');
+            
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
+        
+        $migration->addForeignKey('products', 'users', 'manager_id');
+      
         $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1af1da1b']));
         $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1b2f2b89']));
+       
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
 
         $migration->reset();
+
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->tableExists('products'));
     }
@@ -240,11 +250,17 @@ class MigrationTest extends OriginTestCase
         $migration->addColumn('articles', 'comment_1', 'string', ['default' => 'no comment']);
         $migration->addColumn('articles', 'comment_2', 'string', ['default' => 'foo','null' => true]);
         $migration->addColumn('articles', 'comment_3', 'string', ['default' => '123','null' => false]);
+      
         /**
          * If the table is created,when rolling back cant test fields, but fixture inserts data will cause
          * error cannot be null so this particular column is put in new table.
+         *
          */
-        $migration->addColumn('articles2', 'comment_4', 'string', ['null' => false]);
+        if ($migration->connection()->engine() !== 'sqlite') {
+            $migration->addColumn('articles2', 'comment_4', 'string', ['null' => false]);
+            $this->assertTrue($migration->columnExists('articles2', 'comment_4', ['null' => false]));
+        }
+
         $migration->addColumn('articles', 'comment_5', 'string', ['null' => true]);
 
         $this->assertTrue($migration->columnExists('articles', 'category_id'));
@@ -253,13 +269,13 @@ class MigrationTest extends OriginTestCase
         } else {
             $this->assertTrue($migration->columnExists('articles', 'opens')); // Integer does not limit on pgsql
         }
-       
+
         $this->assertTrue($migration->columnExists('articles', 'amount', ['precision' => 5,'scale' => 2]));
         $this->assertTrue($migration->columnExists('articles', 'balance', ['precision' => 10,'scale' => 0]));
         $this->assertTrue($migration->columnExists('articles', 'comment_1', ['default' => 'no comment']));
         $this->assertTrue($migration->columnExists('articles', 'comment_2', ['default' => 'foo','null' => true]));
         $this->assertTrue($migration->columnExists('articles', 'comment_3', ['default' => '123','null' => false]));
-        $this->assertTrue($migration->columnExists('articles2', 'comment_4', ['null' => false]));
+
         $this->assertTrue($migration->columnExists('articles', 'comment_5', ['null' => true]));
         
         $migration->reset(); // clear statements that have been run

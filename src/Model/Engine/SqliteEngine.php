@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Model\Engine;
 
+use Exception;
 use Origin\Model\Connection;
 
 class SqliteEngine extends Connection
@@ -72,5 +73,50 @@ class SqliteEngine extends Connection
     public function databases(): array
     {
         return [];
+    }
+
+    /**
+     * Creates and handles a DB transaction with the option to disable foreign key constraints.
+     *
+     * @example
+     *
+     * $connection->transaction(function ($connection) use ($statements) {
+     *     $this->processStatements($connection,$statements);
+     * });
+     *
+     * @param callable $callback
+     * @param boolean $disbleForeignKeyConstraints
+     * @return mixed
+     */
+    public function transaction(callable $callback, bool $disbleForeignKeyConstraints = false)
+    {
+        if ($disbleForeignKeyConstraints) {
+            $this->disableForeignKeyConstraints();
+        }
+        
+        $this->begin();
+      
+        try {
+            $result = $callback($this);
+        } catch (Exception $exception) {
+            $this->rollback();
+            if ($disbleForeignKeyConstraints) {
+                $this->enableForeignKeyConstraints();
+            }
+
+            throw $exception;
+        }
+
+        if ($result === false) {
+            $this->rollback();
+        } else {
+            $this->commit();
+        }
+
+        if ($disbleForeignKeyConstraints) {
+            $this->enableForeignKeyConstraints();
+        }
+
+        return $result;
     }
 }

@@ -73,6 +73,14 @@ class ConnectionManager
         if (empty($config['className']) || ! class_exists($config['className'])) {
             throw new InvalidArgumentException('Invalid database engine');
         }
+
+        /**
+         * If the SQLite databse does not start with / then add ROOT path.
+         * e.g. database/main.sqlite3 is idea.
+         */
+        if ($config['engine'] === 'sqlite' && $config['database'] && substr($config['database'], 0, 1) !== '/') {
+            $config['database'] = ROOT .'/' . $config['database'];
+        }
          
         $datasource = new $config['className'](['connection' => $name] + $config);
 
