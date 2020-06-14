@@ -1,6 +1,11 @@
 # Changelog
 
 ## [unreleased]
+## [2.7.3] - 2020-06-14
+
+### Added
+- Added connection::transaction and refactored code to use this
+
 ## [2.7.2] - 2020-06-13
 
 ### Fixed
