@@ -1,6 +1,12 @@
 # Changelog
 
 ## [unreleased]
+
+## [2.7.4] - 2020-06-17
+
+### Fixed
+- Fixed General error: 1 no such table: sqlite_sequence when running tests and table does not exist
+
 ## [2.7.3] - 2020-06-14
 
 ### Added

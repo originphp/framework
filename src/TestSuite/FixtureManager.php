@@ -129,7 +129,10 @@ class FixtureManager
             }
         } catch (DataSourceException $e) {
             ConnectionManager::get('test')->rollback();  # Cancel Transaction
-            throw new Exception(sprintf('Error creating fixture %s for test case %s : %s', $fixture, $this->testCaseName, $e->getMessage()));
+            // run db:test:prepare
+            throw new Exception(
+                sprintf('Error creating fixture %s for test case %s : %s', $fixture, $this->testCaseName, $e->getMessage())
+            );
         }
     }
 

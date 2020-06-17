@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Model\Schema;
 
 use InvalidArgumentException;
+use Origin\Model\ConnectionManager;
 use Origin\Core\Exception\Exception;
 
 /**
@@ -520,11 +521,28 @@ class SqliteSchema extends BaseSchema
     public function truncateTableSql(string $table): array
     {
         $out = [];
+
+        if ($this->hasSquences()) {
+            $out[] = sprintf('DELETE from sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table));
+        }
         
-        $out[] = sprintf('DELETE from sqlite_sequence WHERE name = %s', $this->quoteIdentifier($table));
         $out[] = sprintf('DELETE FROM %s', $this->quoteIdentifier($table));
 
         return $out;
+    }
+
+    /**
+     * Check that the squences table exists, if not it will generate an error
+     * e.g. General error: 1 no such table: sqlite_sequence
+     *
+     * @return boolean
+     */
+    private function hasSquences(): bool
+    {
+        $connection = ConnectionManager::get($this->datasource);
+        $connection->execute('SELECT * FROM sqlite_master WHERE name = "sqlite_sequence"');
+      
+        return ! empty($connection->fetchAll());
     }
 
     /**
