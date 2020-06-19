@@ -1146,6 +1146,45 @@ class ModelTest extends OriginTestCase
         $this->Article->find('first', ['associated' => ['Foo']]);
     }
 
+    public function testFindAssociatedWithPrefix()
+    {
+        $this->Article->belongsTo('Author');
+        $result = $this->Article->find('first', [
+            'associated' => ['Author' => ['fields' => ['authors.id','authors.name as author_name']]],
+        ]);
+        
+        $this->assertEquals(1001, $result->author->id);
+        $this->assertEquals('Author #2', $result->author_name);
+    }
+
+    public function testFindAssociationFields()
+    {
+        $this->Article->belongsTo('Author');
+        $this->Article->hasMany('Comment');
+
+        $result = $this->Article->find('first', [
+            'associated' => ['Author','Comment']
+        ]);
+
+        $this->assertArrayHasKey('created', $result->comments[0]);
+        $this->assertArrayHasKey('created', $result->author);
+
+        $this->Article->belongsTo('Author', [
+            'fields' => ['authors.id','authors.name','authors.description']
+        ]);
+        $this->Article->hasMany('Comment', [
+            'fields' => ['comments.id','comments.article_id','comments.description']
+        ]);
+       
+        $result = $this->Article->find('first', [
+            'associated' => ['Author','Comment']
+        ]);
+        $this->assertArrayNotHasKey('created', $result->comments[0]);
+        $this->assertEquals('Comment #2', $result->comments[0]['description']);
+
+        $this->assertArrayNotHasKey('created', $result->author);
+    }
+
     public function testExists()
     {
         $this->assertTrue($this->Article->exists(1000));
