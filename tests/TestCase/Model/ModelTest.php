@@ -1151,8 +1151,9 @@ class ModelTest extends OriginTestCase
         $this->Article->belongsTo('Author');
         $result = $this->Article->find('first', [
             'associated' => ['Author' => ['fields' => ['authors.id','authors.name as author_name']]],
+            'conditions' => ['id' => 1000], // author id
         ]);
-        
+
         $this->assertEquals(1001, $result->author->id);
         $this->assertEquals('Author #2', $result->author_name);
     }
@@ -1163,7 +1164,8 @@ class ModelTest extends OriginTestCase
         $this->Article->hasMany('Comment');
 
         $result = $this->Article->find('first', [
-            'associated' => ['Author','Comment']
+            'associated' => ['Author','Comment'],
+            'conditions' => ['id' => 1000], // author id
         ]);
 
         $this->assertArrayHasKey('created', $result->comments[0]);
@@ -1177,7 +1179,8 @@ class ModelTest extends OriginTestCase
         ]);
        
         $result = $this->Article->find('first', [
-            'associated' => ['Author','Comment']
+            'associated' => ['Author','Comment'],
+            'conditions' => ['id' => 1000], // author id
         ]);
         $this->assertArrayNotHasKey('created', $result->comments[0]);
         $this->assertEquals('Comment #2', $result->comments[0]['description']);
