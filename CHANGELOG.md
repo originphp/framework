@@ -2,6 +2,13 @@
 
 ## [unreleased]
 
+## [2.7.5] - 2020-06-19
+### Fixed
+- Fixed default fields on associations which were overwritten by associated fields
+
+### Changed
+- Changed associated fields options to not add prefixes to fields with spaces or an existing prefix.
+
 ## [2.7.4] - 2020-06-17
 
 ### Fixed
