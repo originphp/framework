@@ -705,7 +705,7 @@ class QueryBuilder
 
         $params['type'] = strtoupper($params['type']);
         $tableReference = $this->tableReference($params['table'], $params['alias']);
-        
+  
         return "{$params['type']} JOIN {$tableReference} ON ({$this->conditions($params['alias'], $params['conditions'])})";
     }
 

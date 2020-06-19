@@ -350,11 +350,12 @@ class ConsoleOutput
      * @param integer $level
      * @return integer
      */
-    public function level(int $level = null) : int
+    public function level(int $level = null): int
     {
-        if (!is_null($level)) {
+        if (! is_null($level)) {
             $this->level = $level;
         }
+
         return $this->level;
     }
 }

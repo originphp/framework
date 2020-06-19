@@ -19,8 +19,8 @@ use Origin\Model\ModelTrait;
 
 use Origin\Console\ConsoleIo;
 use Origin\Console\CommandRunner;
-use Origin\Console\ArgumentParser;
 use Origin\Console\ConsoleOutput;
+use Origin\Console\ArgumentParser;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 

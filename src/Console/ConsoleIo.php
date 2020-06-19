@@ -665,7 +665,7 @@ class ConsoleIo
     *
     * @return void
     */
-    public function level(int $level) : void
+    public function level(int $level): void
     {
         $this->stdout->level($level);
         $this->stderr->level($level);
