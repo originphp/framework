@@ -247,6 +247,7 @@ abstract class Connection
                     'affected' => $this->lastAffected(),
                     'time' => microtime(true) - $start,
                 ];
+                
                 /**
                  * Limit to 200 queries to prevent memory issues
                  */
@@ -546,9 +547,6 @@ abstract class Connection
         
         for ($i = 0; $i < $numberOfFields; ++$i) {
             $column = $statement->getColumnMeta($i); // could be bottle neck on
-            if ($column === false) {
-                debug([$numberOfFields,$i]);
-            }
             if (empty($column['table']) || $this->isVirtualField($column['name'])) {
                 $this->columnMap[$i] = [0, $column['name']];
             } else {
