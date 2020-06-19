@@ -60,6 +60,7 @@ class Finder
             # If foreignKeys are missing data then objects wont be put together
             # to prevent empty records, but this means valid records wont show as well.
             $results = $this->prepareResults($results);
+        
             $results = $this->loadAssociatedBelongsTo($query, $results);
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
@@ -153,6 +154,7 @@ class Finder
     protected function loadAssociatedBelongsTo(array $query, array $results): array
     {
         $belongsTo = $this->model->association('belongsTo');
+
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) && isset($belongsTo[$model])) {
                 $foreignKey = $belongsTo[$model]['foreignKey'];
@@ -184,7 +186,7 @@ class Finder
             if (isset($config['associated']) && isset($hasOne[$model])) {
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
-                $primaryKey = $this->model->$model->primaryKey();
+        
                 $modelTableAlias = Inflector::tableName($model);
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) { // Author id
@@ -212,10 +214,11 @@ class Finder
         $hasMany = $this->model->association('hasMany');
         foreach ($hasMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
+                $fields = $config['fields']; // backwards comptability: create copy before overwrite
                 $config = array_merge($config, $query['associated'][$alias]);
 
                 if (empty($config['fields'])) {
-                    $config['fields'] = $this->model->{$alias}->fields();
+                    $config['fields'] = empty($fields) ?  $this->model->{$alias}->fields() : $fields;
                 }
 
                 foreach ($results as $index => &$result) {
@@ -244,6 +247,7 @@ class Finder
         $hasAndBelongsToMany = $this->model->association('hasAndBelongsToMany');
         foreach ($hasAndBelongsToMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
+                $fields = $config['fields']; // backwards comptability: create copy before overwite
                 $config = array_merge($config, $query['associated'][$alias]);
 
                 $config['joins'][0] = [
@@ -254,7 +258,7 @@ class Finder
                 ];
                 $config['conditions'] = [];
                 if (empty($config['fields'])) {
-                    $config['fields'] = array_merge($this->model->$alias->fields(), $this->model->{$config['with']}->fields());
+                    $config['fields'] = empty($fields) ? array_merge($this->model->$alias->fields(), $this->model->{$config['with']}->fields()) : $fields;
                 }
 
                 foreach ($results as $index => &$result) {

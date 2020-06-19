@@ -1442,7 +1442,9 @@ class Model
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
+                    $fields = $config['fields']; // backwards compatability: create copy before overwrite
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
+
                     $query['joins'][] = [
                         'table' => $this->$alias->table,
                         'alias' => Inflector::tableName($alias),
@@ -1455,7 +1457,7 @@ class Model
                      * If the value is null add, but not an empty array
                      */
                     if ($config['fields'] === null) {
-                        $config['fields'] = $this->$alias->fields();
+                        $config['fields'] = empty($fields) ? $this->$alias->fields() : $fields;
                     }
 
                     if ($config['fields']) {
@@ -1489,7 +1491,9 @@ class Model
             
             if ($config['fields']) {
                 foreach ($config['fields'] as $key => $value) {
-                    $config['fields'][$key] = "{$tableAlias}.{$value}";
+                    // be flexible for custom joins or renaming a column
+                    $addPrefix = strpos($value, '.') === false && strpos($value, ' ') === false;
+                    $config['fields'][$key] = $addPrefix ? "{$tableAlias}.{$value}" : $value;
                 }
             }
             
