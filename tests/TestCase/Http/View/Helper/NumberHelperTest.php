@@ -44,4 +44,9 @@ class NumberHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('33.33%', $this->Number->percent(33.333333));
     }
+
+    public function testReadableSize()
+    {
+        $this->assertSame('1.15 GB', $this->Number->readableSize(1234567890));
+    }
 }

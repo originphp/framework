@@ -78,4 +78,17 @@ class NumberHelper extends Helper
     {
         return Number::format($value, $options);
     }
+
+    /**
+    * Formats bytes to human readable size
+    *
+    * @param integer $bytes
+    * @param array $options
+    *   - precision: default:2 the level of precision
+    * @return string
+    */
+    public function readableSize(int $bytes, array $options = []): string
+    {
+        return Number::readableSize($bytes, $options);
+    }
 }

@@ -15,6 +15,7 @@
 namespace Origin\Test\Utility;
 
 use Origin\Utility\Number;
+use InvalidArgumentException;
 
 class NumberTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,6 +27,8 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('1,234,567.00', Number::format(1234567.00)); // test float
         $this->assertEquals('1,234,567.00', Number::format('1234567.00')); // test float
         $this->assertEquals('1,234,567.80', Number::format(1234567.801234));
+
+        $this->assertEquals('1,234,567.00', Number::format('1234567', ['places' => 2]));
 
         $backup = Number::locale();
         $this->assertEquals('1,200.23', Number::format(1200.2345));
@@ -70,5 +73,44 @@ class NumberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('($1,234.57)', Number::currency(-1234.56789, 'USD'));
         $this->assertEquals('-$1,234.57', Number::currency(-1234.56789, 'USD', ['negative' => 'not brackets']));
+    }
+
+    public function testReadableSize()
+    {
+        $this->assertEquals('0 Bytes', Number::readableSize(0));
+        $this->assertEquals('123 Bytes', Number::readableSize(123));
+        $this->assertEquals('1.21 KB', Number::readableSize(1234));
+        $this->assertEquals('12.06 KB', Number::readableSize(12345));
+        $this->assertEquals('1.18 MB', Number::readableSize(1234567));
+        $this->assertEquals('1.15 GB', Number::readableSize(1234567890));
+        $this->assertEquals('1.12 TB', Number::readableSize(1234567890123));
+        $this->assertEquals('1.10 PB', Number::readableSize(1234567890123456));
+        $this->assertEquals('1.07 EB', Number::readableSize(1234567890123456789));
+        
+        $this->assertEquals('1.18 MB', Number::readableSize(1234567, ['precision' => 2]));
+        $this->assertEquals('1.122833 TB', Number::readableSize(1234567890123, ['precision' => 6]));
+    }
+
+    public function testParseSize()
+    {
+        $this->assertEquals(0, Number::parseSize('0 Bytes'));
+        $this->assertEquals(123, Number::parseSize('123 Bytes'));
+        $this->assertEquals(1024, Number::parseSize('1 KB'));
+        $this->assertEquals(1048576, Number::parseSize('1 MB'));
+        $this->assertEquals(1073741824, Number::parseSize('1 GB'));
+        $this->assertEquals(1099511627776, Number::parseSize('1 TB'));
+        $this->assertEquals(1125899906842624, Number::parseSize('1 PB'));
+        $this->assertEquals(1152921504606846976, Number::parseSize('1 EB'));
+
+        $this->assertEquals(1048576, Number::parseSize('1MB')); // no space
+        $this->assertEquals(1048576, Number::parseSize('1mb')); // lowercase
+
+        $this->assertEquals(1048576 * 1.5, Number::parseSize('1.5 MB'));
+        $this->assertEquals(1048576 * 1.25, Number::parseSize('1.25 MB'));
+        
+        $this->assertEquals(1048576 * 1.25, Number::parseSize('1.25mb'));
+
+        $this->expectException(InvalidArgumentException::class);
+        Number::parseSize('10 Kilometers');
     }
 }
