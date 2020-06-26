@@ -187,6 +187,8 @@ class View
      * This renders a view within a view, it does not render a template, this is used
      * to break up large view files, as opposed to elements which are for sharing.
      *
+     * @deprecated This will be deprected use view::render instead.
+     *
      * @param string $name
      * @param array $vars
      * @return string
