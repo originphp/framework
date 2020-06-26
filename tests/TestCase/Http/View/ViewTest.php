@@ -137,6 +137,10 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getViewFilename', ['index']);
 
+        $expected = APP.'/Http/View/Tests/shared/foo.ctp';
+        $view->setFile($expected); // Prevent exception
+        $result = $view->callMethod('getViewFilename', ['shared/foo']);
+
         $expected = APP.'/Http/View/Rest/json.ctp';
         $view->setFile($expected); // Prevent exception
         $result = $view->callMethod('getViewFilename', ['/Rest/json']);
@@ -206,7 +210,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $view->set('title', 'Layout Loaded');
-        $result = $view->callMethod('render', ['edit', 'layout']);
+        $result = $view->callMethod('renderView', ['edit', 'layout']);
         $expected = '<h1>Layout Loaded<h1><h2>Action Loaded: edit</h2><span>Element Loaded</span>';
         $this->assertEquals($expected, str_replace("\n", '', $result));
     }
@@ -219,7 +223,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
     public function testViewRender()
     {
         $this->View->loadHelper('Flash');
-        $result = $this->View->render('/Posts/index', 'default');
+        $result = $this->View->renderView('/Posts/index', 'default');
 
         $this->assertStringContainsString('<h1>Posts Home Page</h1>', $result); // view
         $this->assertStringContainsString('<title>Tests</title>', $result); // Layout
@@ -231,13 +235,13 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new PostsController($request, new Response());
         $view = new View($controller);
         $expected = "<h1>Info</h1>\n<div class=\"tab\"></div>";
-        $this->assertStringContainsString($expected, $view->render('info'));
+        $this->assertStringContainsString($expected, $view->renderView('info'));
     }
 
     public function testViewRenderPlugin()
     {
         $this->View->loadHelper('Flash');
-        $result = $this->View->render('Widget.Widgets/items', false);
+        $result = $this->View->renderView('Widget.Widgets/items', false);
         $this->assertEquals('<h2>Widget Items</h2>', $result);
 
         $request = new Request('tests/edit/2048');
@@ -247,7 +251,7 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller->request()->params('plugin', 'Widget');
 
         $view = new View($controller);
-        $result = $view->render('items');
+        $result = $view->renderView('items');
         $this->assertEquals('<h2>Widget Items</h2>', $result);
     }
 
@@ -272,12 +276,12 @@ class ViewTest extends \PHPUnit\Framework\TestCase
     public function testMissingViewException()
     {
         $this->expectException(MissingViewException::class);
-        $this->View->render('i-dont-exist');
+        $this->View->renderView('i-dont-exist');
     }
     public function testMissingLayoutException()
     {
         $this->expectException(MissingLayoutException::class);
-        $this->View->render('/Posts/index', 'non-existant-layout');
+        $this->View->renderView('/Posts/index', 'non-existant-layout');
     }
 
     public function testGetNonExistantHelper()

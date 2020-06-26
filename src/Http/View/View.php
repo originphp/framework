@@ -142,6 +142,8 @@ class View
     /**
      * Returns a rendered element
      *
+     * @deprecated this will be deprecated in 3.0
+     *
      * @param string $name Name of the element e.g. math-widget, html_editor
      * @param array $vars Variables that will be made available in the element
      * @return string
@@ -161,14 +163,13 @@ class View
     }
 
     /**
-     * This renders a view within a view, it does not render a template, this is used
-     * to break up large view files, as opposed to elements which are for sharing.
-     *
-     * @param string $name
-     * @param array $vars
-     * @return string
-     */
-    public function view(string $name, array $vars = []): string
+    * DRY up your views, render a view (without layout) , a 'partial view'
+    *
+    * @param string $name  foo, shared/foo (subfolder), /Elements/foo, Make.MyController/action
+    * @param array $vars
+    * @return string
+    */
+    public function render(string $name, array $vars = []): string
     {
         $view__filename = $this->getViewFilename($name);
 
@@ -180,6 +181,19 @@ class View
         include $view__filename;
 
         return ob_get_clean();
+    }
+
+    /**
+     * This renders a view within a view, it does not render a template, this is used
+     * to break up large view files, as opposed to elements which are for sharing.
+     *
+     * @param string $name
+     * @param array $vars
+     * @return string
+     */
+    public function view(string $name, array $vars = []): string
+    {
+        return $this->render($name, $vars);
     }
 
     /**
@@ -247,6 +261,8 @@ class View
 
     /**
      * Gets the filename for the element
+     *
+     * @deprecated this will be deprecated in 3.0
      *
      * @param string $name
      * @return string
@@ -347,7 +363,7 @@ class View
      * @param string $layout
      * @return string $buffer
      */
-    public function render(string $path, string $layout = null): string
+    public function renderView(string $path, string $layout = null): string
     {
         $view__filename = $this->getViewFilename($path);
 

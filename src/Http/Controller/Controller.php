@@ -493,7 +493,7 @@ class Controller
                 $layout = $this->layout;
             }
             $view->helpers($this->viewHelpers);
-            $body = $view->render($template, $layout);
+            $body = $view->renderView($template, $layout);
             unset($view);
         }
     
