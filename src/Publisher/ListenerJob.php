@@ -30,7 +30,7 @@ class ListenerJob extends Job
         ( new Publisher())->dispatch(new $className(), $method, $args);
     }
 
-    public function errorHandler(\Exception $exception): void
+    protected function errorHandler(\Exception $exception): void
     {
         $this->retry();
     }
