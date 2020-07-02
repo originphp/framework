@@ -1,5 +1,12 @@
 # Changelog
 
+
+## [3.0.0] - 
+
+- Removed autoloading from bootstrap (since 2.5)
+- Removed `Model\Exception\NotFoundException`
+- Removed backwards compatibility code
+
 ## [2.8.0] - 2020-06-26
 
 ## Changed

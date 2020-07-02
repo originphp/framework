@@ -63,13 +63,8 @@ class InboundEmail extends Model
         (new MailboxJob())->dispatch($inboundEmail);
 
         # Schedule the mailbox cleaner
-        /**
-         * @deprecated Mailbox.KeepEmails
-         */
-        $cleanWhen = Config::read('App.mailboxKeepEmails') ?? Config::read('Mailbox.KeepEmails');
-        $cleanAfter = $cleanWhen ?? '+30 days';
          
-        (new MailboxCleanJob())->schedule($cleanAfter)->dispatch();
+        (new MailboxCleanJob())->schedule(Config::read('App.mailboxKeepEmails'))->dispatch();
     }
     
     /**

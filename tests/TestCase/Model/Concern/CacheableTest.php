@@ -21,7 +21,7 @@ use Origin\Model\ModelRegistry;
 use Origin\Model\Concern\Cacheable;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Concern\Timestampable;
-use Origin\Model\Exception\NotFoundException;
+use Origin\Model\Exception\RecordNotFoundException;
 
 class YetAnotherArticle extends Model
 {
@@ -189,7 +189,7 @@ class CacheableTest extends OriginTestCase
 
         // Check delete record no longer is retrived
         $this->Article->delete($article);
-        $this->expectException(NotFoundException::class);
+        $this->expectException(RecordNotFoundException::class);
         $this->Article->get(1000);
     }
 }

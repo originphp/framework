@@ -703,15 +703,7 @@ class SqliteSchema extends BaseSchema
             }
         }
 
-        if (isset($options['options'])) {
-            $databaseOptions = $options['options'];
-            /**
-             * @deprecated This provides backwards comptability
-             */
-            if (is_string($databaseOptions)) {
-                $databaseOptions = ['options' => $options];
-            }
-        }
+        $databaseOptions = $options['options'] ?? [];
 
         if (isset($options['options']['autoIncrement']) && isset($options['constraints']['primary']['column'])) {
             if (is_string($options['constraints']['primary']['column'])) {

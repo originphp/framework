@@ -166,11 +166,10 @@ class Cookie
 
     /**
      * Gets the security key
-     * @deprecated Security.key has been deprecated
      * @return string
      */
     private function securityKey(): string
     {
-        return Config::read('App.securityKey') ?? Config::read('Security.key');
+        return Config::read('App.securityKey');
     }
 }

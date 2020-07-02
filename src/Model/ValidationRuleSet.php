@@ -90,11 +90,6 @@ class ValidationRuleSet
                 $definition = ['rule' => $definition];
             }
 
-            /**
-             * Deal with backwards compatability
-             */
-            $definition = $this->backwardsComptability($definition);
-
             $this->rules[$name] = $this->add($definition);
        
             $counter++;
@@ -178,27 +173,5 @@ class ValidationRuleSet
     public function toArray(): array
     {
         return $this->rules;
-    }
-
-    /**
-     * Handle deprecated keys required, allowEmpty. Does not adjust rule notBlank required, as this could
-     * break bc.
-     *
-     * @deprecated required and allowEmpty keys, and notBlank rule now changed to required.
-     * @param array $params
-     * @return array
-     */
-    private function backwardsComptability(array $params): array
-    {
-        if (isset($params['required'])) {
-            $params['present'] = $params['required'];
-            unset($params['required']);
-        }
-        if (isset($params['allowBlank'])) {
-            $params['allowEmpty'] = $params['allowBlank'];
-            unset($params['allowBlank']);
-        }
-
-        return $params;
     }
 }

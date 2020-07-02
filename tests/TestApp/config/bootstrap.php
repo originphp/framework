@@ -2,6 +2,7 @@
 
 use Origin\Log\Log;
 use Origin\Job\Queue;
+use Origin\Cache\Cache;
 use Origin\Core\Config;
 use Origin\Core\Plugin;
 use Origin\Email\Email;
@@ -56,7 +57,7 @@ date_default_timezone_set(Config::read('App.defaultTimezone'));
  * but you can get from component, e.g. Log::config('key');
  */
 Log::config(Config::consume('Log'));
-#Cache::config(Config::consume('Cache')); #! Import Disable
+Cache::config(Config::consume('Cache')); #! Import Disable
 ConnectionManager::config(Config::consume('Database'));
 #Storage::config(Config::consume('Storage')); #! Import Disable
 Email::config(Config::consume('Email'));

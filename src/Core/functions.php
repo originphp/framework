@@ -82,16 +82,11 @@ function isConsole(): bool
 /**
  * Check wether debug is enabled in a backward compatabile way.
  *
- * @deprecated This will be deprecated in 3.0 don't rely on this.
  * @return boolean
  */
 function debugEnabled(): bool
 {
-    if (Config::exists('App.debug')) {
-        return Config::read('App.debug') == true;
-    }
-
-    return Config::read('debug') == true;
+    return Config::read('App.debug') == true;
 }
 
 /**

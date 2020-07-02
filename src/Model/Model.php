@@ -1442,7 +1442,7 @@ class Model
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
-                    $fields = $config['fields']; // backwards compatability: create copy before overwrite
+                    $fields = $config['fields']; // create copy before overwrite
                     $config = array_merge($config, $query['associated'][$alias]); /// fields
 
                     $query['joins'][] = [

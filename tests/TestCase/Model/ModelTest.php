@@ -29,11 +29,11 @@ use Origin\Core\Exception\Exception;
 use Origin\Model\Model as BaseModel;
 use Origin\TestSuite\OriginTestCase;
 
-use Origin\Model\Exception\NotFoundException;
 use Origin\Model\Exception\DatasourceException;
-
 use Origin\Model\Exception\MissingModelException;
+
 use Origin\Core\Exception\InvalidArgumentException;
+use Origin\Model\Exception\RecordNotFoundException;
 
 class Model extends BaseModel
 {
@@ -1198,7 +1198,7 @@ class ModelTest extends OriginTestCase
     {
         $result = $this->Article->get(1001);
         $this->assertEquals('Article #2', $result->title);
-        $this->expectException(NotFoundException::class);
+        $this->expectException(RecordNotFoundException::class);
         $this->Article->get(10000000);
     }
 

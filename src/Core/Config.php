@@ -42,7 +42,6 @@ class Config
  
     /**
      * Loads values from a PHP config file. app will load config into App.
-     * @internal this is for backwards compatability for now
      *
      * @param string $config e.g. app, cache, database, email, log
      * @return void

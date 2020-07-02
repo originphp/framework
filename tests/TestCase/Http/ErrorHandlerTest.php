@@ -173,7 +173,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         Config::write('App.debug', false);
        
         $errorHandler->exceptionHandler(
-            new \Origin\Model\Exception\NotFoundException('passwords.txt could not be found')
+            new \Origin\Model\Exception\RecordNotFoundException('passwords.txt could not be found')
         );
     
         $this->assertStringNotContainsString('NotFoundException', $errorHandler->response());

@@ -633,21 +633,14 @@ class Request
      *
      * @see https://www.php-fig.org/psr/psr-7/
      *
-     * $result = $request->header('www-Authenticate');
      * $request->header('WWW-Authenticate', 'Negotiate');
      *
      * @param string $header name of header to get
      * @param string $value value of header to set
-     * @return array|string|null
+     * @return array|
      */
-    public function header(string $header, string $value = null)
+    public function header(string $header, string $value = null): array
     {
-        /**
-         * Backwards comptability check :
-         */
-        if (func_num_args() === 1 && strpos($header, ':') === false) {
-            return $this->headers($header);
-        }
         // allow for HTTP/1.0 404 Not Found ? is this really needed
         if ($value === null && strpos($header, ':') != false) {
             list($header, $value) = explode(':', $header, 2);

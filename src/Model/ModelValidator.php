@@ -270,45 +270,6 @@ class ModelValidator
     }
 
     /**
-     * Legacy rules
-     * @deprecated custom, inList
-     */
-
-    /**
-     * Custom validation rule, when
-     * @codeCoverageIgnore
-     * @param string $value
-     * @param string $regex
-     * @return boolean
-     */
-    public function custom($value, $regex): bool
-    {
-        deprecationWarning('Validation rule `custom` has been deprecated use `regex` instead');
-
-        return (bool) preg_match($regex, $value);
-    }
-
-    /**
-     * Checks a value is in a list
-     * @codeCoverageIgnore
-     * @param string|int|float $value
-     * @param array $values
-     * @param boolean $caseInSensitive
-     * @return boolean
-     */
-    public function inList($value, $values, $caseInSensitive = false): bool
-    {
-        deprecationWarning('Validation rule `inList` has been deprecated use `in` instead');
-        if ($caseInSensitive) {
-            $values = array_map('mb_strtolower', $values);
-
-            return in_array(mb_strtolower($value), $values);
-        }
-
-        return in_array($value, $values);
-    }
-
-    /**
      * This is used by the confirm rule, it checks that same value in another field e.g. password_confirm
      *
      * @param mixed $value1

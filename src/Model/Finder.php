@@ -214,7 +214,7 @@ class Finder
         $hasMany = $this->model->association('hasMany');
         foreach ($hasMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
-                $fields = $config['fields']; // backwards comptability: create copy before overwrite
+                $fields = $config['fields']; // create copy before overwrite
                 $config = array_merge($config, $query['associated'][$alias]);
 
                 if (empty($config['fields'])) {
@@ -247,7 +247,7 @@ class Finder
         $hasAndBelongsToMany = $this->model->association('hasAndBelongsToMany');
         foreach ($hasAndBelongsToMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
-                $fields = $config['fields']; // backwards comptability: create copy before overwite
+                $fields = $config['fields']; // create copy before overwite
                 $config = array_merge($config, $query['associated'][$alias]);
 
                 $config['joins'][0] = [
