@@ -12,6 +12,7 @@
 - Removed autoloading from bootstrap (since 2.5)
 - Removed `Model\Exception\NotFoundException`
 - Removed backwards compatibility code
+- Removed `View::view`
 
 ## [2.8.0] - 2020-06-26
 
