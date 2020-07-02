@@ -1338,34 +1338,7 @@ class Model
      */
     protected function finderCount(ArrayObject $options)
     {
-        # Modify Query
-        $options['fields'] = ['COUNT(*) AS count'];
-        if (empty($options['group'])) {
-            $options['order'] = null;
-        }
-
-        /**
-         * Remove model::order from group queries
-         */
-        if (! empty($options['group'])) {
-            if ($options['order'] === $this->order) {
-                $options['order'] = null;
-            }
-            $options['fields'] = array_merge($options['fields'], (array) $options['group']);
-        }
-
-        $results = (new Finder($this))->find($options, 'assoc');
-
-        /**
-         * handle results for group and none groups
-         */
-        if (empty($options['group'])) {
-            $results = (int) $results[0]['count'];
-        } else {
-            $results = $results ? $results : [];
-        }
-
-        return $results;
+        return $this->calculate('count', '*', (array) $options);
     }
 
     /**
@@ -1419,7 +1392,7 @@ class Model
          * handle results for group and none groups
          */
         if (empty($options['group'])) {
-            $results = ctype_digit($results[0][$operation]) ? (int) $results[0][$operation] : (float) $results[0][$operation];
+            $results = ctype_digit((string) $results[0][$operation]) ? (int) $results[0][$operation] : (float) $results[0][$operation];
         } else {
             $results = $results ? $results : [];
         }
