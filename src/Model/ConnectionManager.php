@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,12 +12,14 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Model;
 
 use Origin\Model\Engine\MysqlEngine;
-use Origin\Model\Engine\PgsqlEngine;
 use Origin\Model\Engine\SqliteEngine;
+use Origin\Model\Engine\PostgresEngine;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
@@ -26,7 +29,7 @@ class ConnectionManager
 
     protected static $engineMap = [
         'mysql' => MysqlEngine::class,
-        'pgsql' => PgsqlEngine::class,
+        'postgres' => PostgresEngine::class,
         'sqlite' => SqliteEngine::class
     ];
 
@@ -60,16 +63,16 @@ class ConnectionManager
         }
 
         $defaults = ['name' => $name, 'host' => 'localhost', 'database' => null, 'username' => null, 'password' => null];
-        
+
         $config = array_merge($defaults, static::config($name));
-       
+
         if (isset($config['engine'])) {
             $config['className'] = static::$engineMap[$config['engine']] ?? null;
         } elseif (isset($config['className'])) {
             $classMap = array_flip(static::$engineMap);
             $config['engine'] = $classMap[$config['className']] ?? null;
         }
-      
+
         if (empty($config['className']) || ! class_exists($config['className'])) {
             throw new InvalidArgumentException('Invalid database engine');
         }
@@ -79,9 +82,9 @@ class ConnectionManager
          * e.g. database/main.sqlite3 is idea.
          */
         if ($config['engine'] === 'sqlite' && $config['database'] && substr($config['database'], 0, 1) !== '/') {
-            $config['database'] = ROOT .'/' . $config['database'];
+            $config['database'] = ROOT . '/' . $config['database'];
         }
-         
+
         $datasource = new $config['className'](['connection' => $name] + $config);
 
         $datasource->connect($config);

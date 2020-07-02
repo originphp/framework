@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -17,6 +18,7 @@
  * and can benefit from other features. Also since this now uses fixtures, each setUp data is reset. This will be
  * make it easier to track down errors.
  */
+
 namespace Origin\Test\ModelRefactored;
 
 use ArrayObject;
@@ -158,7 +160,7 @@ class Article extends Model
     }
 
     /**
-    * After create callback
+     * After create callback
      *
      * @param \Origin\Model\Entity $entity
      * @param ArrayObject $options
@@ -169,7 +171,7 @@ class Article extends Model
     }
 
     /**
-    * After update callback
+     * After update callback
      *
      * @param \Origin\Model\Entity $entity
      * @param ArrayObject $options
@@ -214,23 +216,23 @@ class Article extends Model
     }
 
     /**
-    * After commit callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @param ArrayObject $options
-    * @return bool
-    */
+     * After commit callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return bool
+     */
     public function afterCommitCallback(Entity $entity, ArrayObject $options): void
     {
     }
 
     /**
-    * After rollback callback
-    *
-    * @param \Origin\Model\Entity $entity
-    * @param ArrayObject $options
-    * @return void
-    */
+     * After rollback callback
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param ArrayObject $options
+     * @return void
+     */
     public function afterRollbackCallback(Entity $entity, ArrayObject $options): void
     {
     }
@@ -299,7 +301,7 @@ class ModelTest extends OriginTestCase
             'name' => 'Address',
             'connection' => 'test',
         ]);
-    
+
         ModelRegistry::set('Article', $this->Article);
         ModelRegistry::set('Author', $this->Author);
         ModelRegistry::set('Book', $this->Book);
@@ -322,7 +324,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeValidate('beforeValidateCallback');
 
-        $expected = ['beforeValidateCallback' => ['on' => ['create','update']]];
+        $expected = ['beforeValidateCallback' => ['on' => ['create', 'update']]];
         $this->assertEquals($expected, $Article->callbacks('beforeValidate'));
     }
 
@@ -340,7 +342,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->beforeSave('beforeSaveCallback');
 
-        $expected = ['beforeSaveCallback' => ['on' => ['create','update']]];
+        $expected = ['beforeSaveCallback' => ['on' => ['create', 'update']]];
         $this->assertEquals($expected, $Article->callbacks('beforeSave'));
     }
 
@@ -367,7 +369,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterValidate('afterValidateCallback');
 
-        $expected = ['afterValidateCallback' => ['on' => ['create','update']]];
+        $expected = ['afterValidateCallback' => ['on' => ['create', 'update']]];
         $this->assertEquals($expected, $Article->callbacks('afterValidate'));
     }
 
@@ -385,7 +387,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterSave('afterSaveCallback');
 
-        $expected = ['afterSaveCallback' => ['on' => ['create','update']]];
+        $expected = ['afterSaveCallback' => ['on' => ['create', 'update']]];
         $this->assertEquals($expected, $Article->callbacks('afterSave'));
     }
 
@@ -403,7 +405,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterRollback('afterRollbackCallback');
 
-        $expected = ['afterRollbackCallback' => ['on' => ['create','update','delete']]];
+        $expected = ['afterRollbackCallback' => ['on' => ['create', 'update', 'delete']]];
         $this->assertEquals($expected, $Article->callbacks('afterRollback'));
     }
 
@@ -412,7 +414,7 @@ class ModelTest extends OriginTestCase
         $Article = new Article();
         $Article->afterCommit('afterCommitCallback');
 
-        $expected = ['afterCommitCallback' => ['on' => ['create','update','delete']]];
+        $expected = ['afterCommitCallback' => ['on' => ['create', 'update', 'delete']]];
         $this->assertEquals($expected, $Article->callbacks('afterCommit'));
     }
 
@@ -430,7 +432,7 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin','rollback',
+            'begin', 'rollback',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
@@ -453,8 +455,8 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin','rollback','exists'
-        ], ['className' => Article::class,'table' => 'throw-an-exception']);
+            'begin', 'rollback', 'exists'
+        ], ['className' => Article::class, 'table' => 'throw-an-exception']);
 
         $stub->expects($this->once())
             ->method('begin');
@@ -578,7 +580,7 @@ class ModelTest extends OriginTestCase
     public function testSchema()
     {
         $ds = $this->Article->connection();
-        
+
         $schema = $this->Article->schema();
 
         $this->assertIsArray($schema);
@@ -591,9 +593,9 @@ class ModelTest extends OriginTestCase
 
         $this->assertArrayHasKey('indexes', $schema);
         $this->assertEmpty($schema['indexes']); // no index set
-        
+
         $this->assertArrayHasKey('id', $schema['columns']);
-        
+
         if ($ds->engine() === 'mysql') {
             $this->assertArrayHasKey('options', $schema);
             $this->assertNotEmpty($schema['options']);
@@ -609,7 +611,7 @@ class ModelTest extends OriginTestCase
             'autoIncrement' => true,
         ];
 
-        if ($ds->engine() === 'pgsql') {
+        if ($ds->engine() === 'postgres') {
             $expected = [
                 'type' => 'integer',
                 'limit' => 32,
@@ -627,7 +629,7 @@ class ModelTest extends OriginTestCase
                 'autoIncrement' => true,
             ];
         }
-        
+
         $this->assertEquals($expected, $schema);
     }
 
@@ -648,16 +650,16 @@ class ModelTest extends OriginTestCase
         $options = ['constraints' => ['primary' => ['type' => 'primary', 'column' => 'not_id']]];
         $ds = $this->Article->connection();
         $statements = $ds->adapter()->createTableSql('foos', [
-            'not_id' => ['type' => 'integer','autoIncrement' => true],
+            'not_id' => ['type' => 'integer', 'autoIncrement' => true],
             'undetectable' => 'string'
         ], $options);
-      
+
         foreach ($statements as $statement) {
             $ds->execute($statement);
         }
-        
-        $dummy = new Model(['name' => 'Foo','connection' => 'test']);
-  
+
+        $dummy = new Model(['name' => 'Foo', 'connection' => 'test']);
+
         $this->expectException(Exception::class);
         $display = $dummy->displayField;
         $ds->execute('DROP TABLE foos');
@@ -829,7 +831,7 @@ class ModelTest extends OriginTestCase
             'mode' => 'replace',
         ];
         $this->assertEquals($expected, $relationship);
-        
+
         // Test Merging
         $relationship = $Candidate->hasAndBelongsToMany('Candidate', ['conditions' => ['Candidate.active' => true]]);
         $this->assertEquals('candidates_jobs.candidate_id = candidates.id', $relationship['conditions'][0]);
@@ -869,7 +871,7 @@ class ModelTest extends OriginTestCase
 
         $result = $this->Article->first();
         $this->assertInstanceOf(Entity::class, $result);
-        
+
         $result = $this->Article->find('first', ['conditions' => ['id' => 123456789]]);
         $this->assertNull($result);
 
@@ -896,7 +898,7 @@ class ModelTest extends OriginTestCase
 
         $result = $this->Article->all();
         $this->assertInstanceOf(Collection::class, $result);
-        
+
         $result = $this->Article->find('all', ['conditions' => ['id' => 123456789]]);
         $this->assertTrue(is_array($result));
 
@@ -923,8 +925,8 @@ class ModelTest extends OriginTestCase
 
     public function testFindFields()
     {
-        $result = $this->Article->find('first', ['fields' => ['id','title']])->toArray();
-        $this->assertEquals(['id','title'], array_keys($result));
+        $result = $this->Article->find('first', ['fields' => ['id', 'title']])->toArray();
+        $this->assertEquals(['id', 'title'], array_keys($result));
 
         $options = ['fields' => ['DISTINCT (author_id)']];
         $result = $this->Article->find('all', $options);
@@ -935,8 +937,8 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(3, count($result));
 
         $result = $this->Article->find('all', [
-            'fields' => ['COUNT(*) as total','author_id'],
-            'group' => 'author_id','order' => 'author_id ASC', //mysql 8/5 return in different order
+            'fields' => ['COUNT(*) as total', 'author_id'],
+            'group' => 'author_id', 'order' => 'author_id ASC', //mysql 8/5 return in different order
         ]);
 
         $this->assertEquals(1000, $result[0]->author_id);
@@ -947,7 +949,7 @@ class ModelTest extends OriginTestCase
          * Virtual fields not finalized yet but this is just to test that it is working
          * posts should be post since with virtual field it can be only one
          */
-        $result = $this->Article->find('first', ['fields' => ['id','title as posts__title']]);
+        $result = $this->Article->find('first', ['fields' => ['id', 'title as posts__title']]);
         $this->assertEquals('Article #1', $result->post->title);
     }
 
@@ -961,7 +963,7 @@ class ModelTest extends OriginTestCase
     {
         $conditions = [
             'conditions' => ['id' => 1000],
-            'fields' => ['articles.id','articles.title','authors.name'],
+            'fields' => ['articles.id', 'articles.title', 'authors.name'],
             'joins' => [],
         ];
         $conditions['joins'][] = [
@@ -972,9 +974,9 @@ class ModelTest extends OriginTestCase
                 'authors.id = articles.author_id',
             ],
         ];
-       
+
         $result = $this->Article->find('first', $conditions);
-       
+
         $this->assertEquals('Author #2', $result->author->name);
     }
 
@@ -986,12 +988,12 @@ class ModelTest extends OriginTestCase
         $result = $this->Article->find('count', ['conditions' => ['id' => 123456789]]);
         $this->assertEquals(0, $result);
 
-        $result = $this->Article->find('count', ['group' => 'author_id','order' => 'author_id ASC']);
+        $result = $this->Article->find('count', ['group' => 'author_id', 'order' => 'author_id ASC']);
         $expected = [
             ['count' => 2, 'author_id' => 1000],
             ['count' => 1, 'author_id' => 1001]
         ];
- 
+
         $this->assertEquals($expected, $result);
     }
 
@@ -1003,7 +1005,7 @@ class ModelTest extends OriginTestCase
         $this->assertEquals(1000, $this->Article->minimum('id'));
         $this->assertEquals(1002, $this->Article->maximum('id'));
 
-        $result = $this->Article->count('all', ['group' => 'author_id','order' => 'author_id ASC']);
+        $result = $this->Article->count('all', ['group' => 'author_id', 'order' => 'author_id ASC']);
         $expected = [
             ['count' => 2, 'author_id' => 1000],
             ['count' => 1, 'author_id' => 1001]
@@ -1014,15 +1016,15 @@ class ModelTest extends OriginTestCase
     public function testFindList()
     {
         $list = $this->Article->find('list', ['fields' => ['id']]); // ['a','b','c']
-        $this->assertEquals([1000,1001,1002], $list);
+        $this->assertEquals([1000, 1001, 1002], $list);
 
-        $list = $this->Article->find('list', ['fields' => ['id','title']]); // ['a'=>'b']
-        $this->assertEquals([1000 => 'Article #1',1001 => 'Article #2',1002 => 'Article #3'], $list);
+        $list = $this->Article->find('list', ['fields' => ['id', 'title']]); // ['a'=>'b']
+        $this->assertEquals([1000 => 'Article #1', 1001 => 'Article #2', 1002 => 'Article #3'], $list);
 
-        $list = $this->Article->find('list', ['fields' => ['id','title','author_id']]); // ['c'=>['a'=>'b']
+        $list = $this->Article->find('list', ['fields' => ['id', 'title', 'author_id']]); // ['c'=>['a'=>'b']
         $expected = [
             1001 => [1000 => 'Article #1'],
-            1000 => [1001 => 'Article #2',1002 => 'Article #3'],
+            1000 => [1001 => 'Article #2', 1002 => 'Article #3'],
         ];
         $this->assertEquals($expected, $list);
     }
@@ -1033,14 +1035,14 @@ class ModelTest extends OriginTestCase
     public function testList()
     {
         $list = $this->Article->list(['fields' => ['id']]); // ['a','b','c']
-        $this->assertEquals([1000,1001,1002], $list);
+        $this->assertEquals([1000, 1001, 1002], $list);
     }
 
     public function testFindCallbacks()
     {
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeFindCallback','afterFindCallback',
+            'beforeFindCallback', 'afterFindCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
@@ -1057,7 +1059,7 @@ class ModelTest extends OriginTestCase
     {
         //Article::class
         $stub = $this->getMockForModel('Article', [
-            'beforeFindCallback','afterFindCallback',
+            'beforeFindCallback', 'afterFindCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
@@ -1073,7 +1075,7 @@ class ModelTest extends OriginTestCase
     public function testFindCallbacksDisabled()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeFindCallback','afterFindCallback',
+            'beforeFindCallback', 'afterFindCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->never())
@@ -1096,7 +1098,7 @@ class ModelTest extends OriginTestCase
 
         $this->Article->hasAndBelongsToMany('Tag');
         $this->Article->Tag->hasAndBelongsToMany('Tag');
-    
+
         $result = $this->Article->find('first');
         $this->assertEquals(1000, $result->id);
         $this->assertNull($result->author);
@@ -1112,15 +1114,15 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($result->author->has('created'));
 
         $result = $this->Article->find('first', [
-            'associated' => ['Author' => ['fields' => ['id','name']]],
+            'associated' => ['Author' => ['fields' => ['id', 'name']]],
         ]);
         $this->assertFalse($result->author->has('created'));
-       
+
         $result = $this->Article->find('first', [
             'conditions' => ['id' => 1001],
             'associated' => ['Author' => ['associated' => ['Address']]],
         ]);
-    
+
         $this->assertEquals(1000, $result->author_id);
         $this->assertEquals(1000, $result->author->id);
         $this->assertEquals(1000, $result->author->address->author_id);
@@ -1129,7 +1131,7 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($result->author->address->has('created'));
         $result = $this->Article->find('first', [
             'conditions' => ['id' => 1001],
-            'associated' => ['Author' => ['associated' => ['Address' => ['fields' => ['id','author_id','description']]]]],
+            'associated' => ['Author' => ['associated' => ['Address' => ['fields' => ['id', 'author_id', 'description']]]]],
         ]);
         $this->assertFalse($result->author->address->has('created'));
 
@@ -1150,7 +1152,7 @@ class ModelTest extends OriginTestCase
     {
         $this->Article->belongsTo('Author');
         $result = $this->Article->find('first', [
-            'associated' => ['Author' => ['fields' => ['authors.id','authors.name as author_name']]],
+            'associated' => ['Author' => ['fields' => ['authors.id', 'authors.name as author_name']]],
             'conditions' => ['id' => 1000], // author id
         ]);
 
@@ -1164,7 +1166,7 @@ class ModelTest extends OriginTestCase
         $this->Article->hasMany('Comment');
 
         $result = $this->Article->find('first', [
-            'associated' => ['Author','Comment'],
+            'associated' => ['Author', 'Comment'],
             'conditions' => ['id' => 1000], // author id
         ]);
 
@@ -1172,14 +1174,14 @@ class ModelTest extends OriginTestCase
         $this->assertArrayHasKey('created', $result->author);
 
         $this->Article->belongsTo('Author', [
-            'fields' => ['authors.id','authors.name','authors.description']
+            'fields' => ['authors.id', 'authors.name', 'authors.description']
         ]);
         $this->Article->hasMany('Comment', [
-            'fields' => ['comments.id','comments.article_id','comments.description']
+            'fields' => ['comments.id', 'comments.article_id', 'comments.description']
         ]);
-       
+
         $result = $this->Article->find('first', [
-            'associated' => ['Author','Comment'],
+            'associated' => ['Author', 'Comment'],
             'conditions' => ['id' => 1000], // author id
         ]);
         $this->assertArrayNotHasKey('created', $result->comments[0]);
@@ -1253,7 +1255,7 @@ class ModelTest extends OriginTestCase
         $this->assertNotEmpty($this->Article->association('belongsTo'));
         $this->Article->hasAndBelongsToMany('Tag');
         $this->assertNotEmpty($this->Article->association('hasAndBelongsToMany'));
-        
+
         $this->expectException(Exception::class);
         $this->Article->association('doesNotBelongToAnyButMightDo');
     }
@@ -1265,7 +1267,7 @@ class ModelTest extends OriginTestCase
         $article->author_id = 1001;
         $article->title = 'Testing CRUD';
         $article->description = 'Just going to test it all';
-       
+
         $this->assertNotEmpty($article->modified());
         $this->assertTrue($this->Article->save($article));
         $this->assertNotEmpty($article->id);
@@ -1273,13 +1275,13 @@ class ModelTest extends OriginTestCase
 
         $this->assertTrue($article->created());
         $this->assertFalse($article->deleted());
-   
+
         # # # READ # # #
         $result = $this->Article->get($article->id);
         $this->assertEquals('Testing CRUD', $article->title);
 
         # # # UPDATE # # #
-        $requestData = ['title' => 'Testing Update in CRUD','description' => 'Lovely Jubely'];
+        $requestData = ['title' => 'Testing Update in CRUD', 'description' => 'Lovely Jubely'];
         $article = $this->Article->patch($result, $requestData);
         $this->assertNotEmpty($article->modified());
         $this->assertTrue($this->Article->save($article));
@@ -1316,8 +1318,9 @@ class ModelTest extends OriginTestCase
         $this->Article->validate('title', [
             'rule' => 'notBlank',
             'required' => true,
-            'on' => 'create']);
-        
+            'on' => 'create'
+        ]);
+
         $article->author_id = 1001;
         $article->title = null;
         $article->body = 'Title is blank so it should fail';
@@ -1328,7 +1331,7 @@ class ModelTest extends OriginTestCase
         $article->author_id = 1001;
         $article->title = 'Now this should work';
         $article->body = 'did not want to call reset';
-   
+
         $this->assertTrue($this->Article->save($article));
 
         $article = $this->Article->new();
@@ -1344,7 +1347,7 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacks()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','beforeCreateCallback','afterCreateCallback','afterCommitCallback','beforeUpdateCallback','afterUpdateCallback','afterRollbackCallback'
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback', 'beforeCreateCallback', 'afterCreateCallback', 'afterCommitCallback', 'beforeUpdateCallback', 'afterUpdateCallback', 'afterRollbackCallback'
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
@@ -1380,7 +1383,7 @@ class ModelTest extends OriginTestCase
 
         $stub->expects($this->never())
             ->method('afterRollbackCallback');
-     
+
         $article = $stub->new();
         $article->title = 'Callback Test';
         $article->author_id = 512;
@@ -1392,7 +1395,7 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksUpdate()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','beforeCreateCallback','afterCreateCallback','afterCommitCallback','beforeUpdateCallback','afterUpdateCallback','afterRollbackCallback'
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback', 'beforeCreateCallback', 'afterCreateCallback', 'afterCommitCallback', 'beforeUpdateCallback', 'afterUpdateCallback', 'afterRollbackCallback'
         ], ['className' => Article::class]);
         $stub->initCallbacks();
 
@@ -1430,10 +1433,10 @@ class ModelTest extends OriginTestCase
         $stub->expects($this->never())
             ->method('afterRollbackCallback');
 
-        $Article = new Model(['name' => 'Article','connection' => 'test']);
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
         $article = $Article->find('first');
         $article->title = 'title has changed';
-  
+
         $this->assertTrue($stub->save($article));
     }
 
@@ -1443,7 +1446,7 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksValidationFail()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback',
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
@@ -1467,12 +1470,12 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($stub->save($article));
     }
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveCallbacksBeforeSaveReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','afterCommitCallback'
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback', 'afterRollbackCallback', 'afterCommitCallback'
         ], ['className' => Article::class]);
 
         $stub->initCallbacks();
@@ -1510,16 +1513,16 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksBeforeCreateReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','beforeCreateCallback','afterCreateCallback','beforeUpdateCallback','afterUpdateCallback'
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback', 'afterRollbackCallback', 'beforeCreateCallback', 'afterCreateCallback', 'beforeUpdateCallback', 'afterUpdateCallback'
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
             ->method('beforeValidateCallback')
             ->willReturn(true);
-  
+
         $stub->expects($this->once())
             ->method('afterValidateCallback');
-  
+
         $stub->expects($this->once())
             ->method('beforeSaveCallback')
             ->willReturn(true);
@@ -1530,24 +1533,24 @@ class ModelTest extends OriginTestCase
 
         $stub->expects($this->never())
             ->method('afterCreateCallback');
-    
+
         $stub->expects($this->never())
             ->method('beforeUpdateCallback');
 
         $stub->expects($this->never())
             ->method('afterUpdateCallback');
-  
+
         $stub->expects($this->never())
             ->method('afterSaveCallback');
-  
+
         $stub->expects($this->once())
             ->method('afterRollbackCallback');
-  
+
         $article = $stub->new();
         $article->author_id = 1234;
         $article->title = 'Mocked method will return false';
         $article->body = 'Article body goes here.';
-  
+
         $this->assertFalse($stub->save($article));
     }
 
@@ -1557,16 +1560,16 @@ class ModelTest extends OriginTestCase
     public function testSaveCallbacksBeforeUpdateReturnFalse()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback','afterRollbackCallback','beforeCreateCallback','afterCreateCallback','beforeUpdateCallback','afterUpdateCallback'
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback', 'afterRollbackCallback', 'beforeCreateCallback', 'afterCreateCallback', 'beforeUpdateCallback', 'afterUpdateCallback'
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
             ->method('beforeValidateCallback')
             ->willReturn(true);
-  
+
         $stub->expects($this->once())
             ->method('afterValidateCallback');
-  
+
         $stub->expects($this->once())
             ->method('beforeSaveCallback')
             ->willReturn(true);
@@ -1577,33 +1580,33 @@ class ModelTest extends OriginTestCase
 
         $stub->expects($this->never())
             ->method('afterUpdateCallback');
-    
+
         $stub->expects($this->never())
             ->method('beforeCreateCallback');
 
         $stub->expects($this->never())
             ->method('afterCreateCallback');
-  
+
         $stub->expects($this->never())
             ->method('afterSaveCallback');
-  
+
         $stub->expects($this->once())
             ->method('afterRollbackCallback');
-  
-        $Article = new Model(['name' => 'Article','connection' => 'test']);
+
+        $Article = new Model(['name' => 'Article', 'connection' => 'test']);
         $article = $Article->find('first');
         $article->title = 'title has changed';
-      
+
         $this->assertFalse($stub->save($article));
     }
 
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveCallbacksDisabled()
     {
         $stub = $this->getMockForModel('Article', [
-            'beforeValidateCallback','afterValidateCallback','beforeSaveCallback','afterSaveCallback',
+            'beforeValidateCallback', 'afterValidateCallback', 'beforeSaveCallback', 'afterSaveCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->never())
@@ -1659,16 +1662,16 @@ class ModelTest extends OriginTestCase
                 'description' => 'Last seen in Tokyo',
             ],
         ];
-       
+
         $author = $this->Author->new($data);
-    
+
         $this->Author->save($author, ['associated' => false]);
         $this->assertNull($author->address->id);
     }
 
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedBelongsTo()
     {
         $this->Article->belongsTo('Author');
@@ -1695,8 +1698,8 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Article->save($article));
     }
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedHasOne()
     {
         $this->Author->hasOne('Address');
@@ -1709,9 +1712,9 @@ class ModelTest extends OriginTestCase
                 'description' => 'Last seen in Tokyo',
             ],
         ];
-       
+
         $author = $this->Author->new($data);
-  
+
         $this->assertTrue($this->Author->save($author));
         $this->assertNotEmpty($author->address->id);
         $this->assertEquals($author->id, $author->address->author_id);
@@ -1722,8 +1725,8 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Author->save($article));
     }
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedHasMany()
     {
         $this->Article->hasMany('Comment');
@@ -1739,7 +1742,7 @@ class ModelTest extends OriginTestCase
         ];
         $article = $this->Article->new($data);
         $this->assertTrue($this->Article->save($article));
- 
+
         $this->assertNotEmpty($article->comments[0]->id);
         $this->assertEquals($article->id, $article->comments[0]->article_id);
         $this->assertNotEmpty($article->comments[1]->id);
@@ -1752,13 +1755,13 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Article->save($article));
     }
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedHasAndBelongsToManyPrimarykey()
     {
         $this->Article->hasAndBelongsToMany('Tag');
         $this->Article->Tag->hasAndBelongsToMany('Tag');
-        
+
         /// Create a new Article for this test
         $data = [
             'title' => 'belongsToManyPrimaryKey',
@@ -1767,7 +1770,7 @@ class ModelTest extends OriginTestCase
         ];
         $article = $this->Article->new($data);
         $this->assertTrue($this->Article->save($article));
-     
+
         $data = [
             'id' => $article->id,
             'tags' => [
@@ -1793,13 +1796,13 @@ class ModelTest extends OriginTestCase
         $this->assertFalse($this->Article->save($article));
     }
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedHasAndBelongsToManyDisplayField()
     {
         $this->Article->hasAndBelongsToMany('Tag');
         $this->Article->Tag->hasAndBelongsToMany('Tag');
-        
+
         /// Create a new Article for this test
         $data = [
             'title' => 'belongsToManyDisplayField',
@@ -1808,7 +1811,7 @@ class ModelTest extends OriginTestCase
         ];
         $article = $this->Article->new($data);
         $this->assertTrue($this->Article->save($article));
-     
+
         $data = [
             'id' => 1000, # Article ID
             'tags' => [
@@ -1818,13 +1821,13 @@ class ModelTest extends OriginTestCase
             ],
         ];
         $article = $this->Article->new($data);
-     
+
         $this->assertTrue($this->Article->save($article));
         # Postgre returns different id numbers
         $this->assertNotEmpty($article->tags[0]->id);
         $this->assertNotEmpty($article->tags[1]->id);
         $this->assertNotEquals($article->tags[0]->id, $article->tags[1]->id);
-        
+
         $article = $this->Article->get($article->id, ['associated' => ['Tag']]);
         $this->assertEquals(3, count($article->tags));
     }
@@ -1833,7 +1836,7 @@ class ModelTest extends OriginTestCase
     {
         $this->Article->hasAndBelongsToMany('Tag');
         $this->Article->Tag->hasAndBelongsToMany('Tag');
-        
+
         $data = [
             'id' => 1000,
             'tags' => [
@@ -1845,15 +1848,15 @@ class ModelTest extends OriginTestCase
     }
 
     /**
-      * @depends testCrud
-      */
+     * @depends testCrud
+     */
     public function testSaveAssociatedHasAndBelongsToManyAppend()
     {
         $this->Article->hasAndBelongsToMany('Tag', ['mode' => 'append']);
         $this->Article->Tag->hasAndBelongsToMany('Tag', ['mode' => 'append']);
 
         $article = $this->Article->get(1000, ['associated' => ['Tag']]);
-     
+
         // test non existant ids
         $data = [
             'id' => $article->id,
@@ -1883,8 +1886,8 @@ class ModelTest extends OriginTestCase
     public function testNewEntities()
     {
         $data = [
-            ['title' => 'Dummy Article #1','author_id' => 5432,'body' => '...'],
-            ['title' => 'Dummy Article #2','author_id' => 6789,'body' => '...'],
+            ['title' => 'Dummy Article #1', 'author_id' => 5432, 'body' => '...'],
+            ['title' => 'Dummy Article #2', 'author_id' => 6789, 'body' => '...'],
         ];
         $articles = $this->Article->newEntities($data);
         $this->assertEquals('Dummy Article #1', $articles[0]->title);
@@ -1893,9 +1896,9 @@ class ModelTest extends OriginTestCase
     public function testSaveMany()
     {
         $data = [
-            ['title' => 'Dummy Article #1','author_id' => 5432,'body' => '...'],
-            ['title' => 'Dummy Article #2','author_id' => 6789,'body' => '...'],
-            ['title' => 'Dummy Article #3','author_id' => 1212,'body' => '...'],
+            ['title' => 'Dummy Article #1', 'author_id' => 5432, 'body' => '...'],
+            ['title' => 'Dummy Article #2', 'author_id' => 6789, 'body' => '...'],
+            ['title' => 'Dummy Article #3', 'author_id' => 1212, 'body' => '...'],
         ];
         $articles = $this->Article->newEntities($data);
         $this->assertTrue($this->Article->saveMany($articles));
@@ -1925,28 +1928,28 @@ class ModelTest extends OriginTestCase
         $this->Article->hasMany('Comment');
         $this->Article->hasAndBelongsToMany('Tag');
 
-        $article = $this->Article->get(1000, ['associated' => ['Comment','Tag']]);
+        $article = $this->Article->get(1000, ['associated' => ['Comment', 'Tag']]);
         $comments = count($article->comments);
         $tags = count($article->tags);
         # test deleteDepenent False
         $this->assertTrue($this->Article->delete($article));
-    
+
         $this->assertEquals($comments, $this->Article->Comment->find('count', ['conditions' => ['article_id' => 1000]])); // did not delete
         $this->assertNotEquals($tags, $this->Article->ArticlesTag->find('count', ['conditions' => ['article_id' => 1000]])); // Delete always
-     
-       $this->Article->hasMany('Comment', ['dependent' => true]);
-        $article = $this->Article->get(1002, ['associated' => ['Comment','Tag']]);
+
+        $this->Article->hasMany('Comment', ['dependent' => true]);
+        $article = $this->Article->get(1002, ['associated' => ['Comment', 'Tag']]);
         $this->assertGreaterThan(0, count($article->comments));
         $this->assertTrue($this->Article->delete($article));
         $this->assertEquals(0, $this->Article->Comment->find('count', ['conditions' => ['article_id' => 1002]])); // did not delete
     }
- 
+
     public function testDeleteNoCascade()
     {
         $this->Article->hasMany('Comment');
         $this->Article->hasAndBelongsToMany('Tag');
 
-        $article = $this->Article->get(1000, ['associated' => ['Comment','Tag']]);
+        $article = $this->Article->get(1000, ['associated' => ['Comment', 'Tag']]);
         $comments = count($article->comments);
         $tags = count($article->tags);
         $this->assertTrue($this->Article->delete($article, ['cascade' => false]));
@@ -1956,10 +1959,10 @@ class ModelTest extends OriginTestCase
     public function testDeleteNoCallbacks()
     {
         $article = $this->Article->get(1000);
-    
+
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDeleteCallback','afterDeleteCallback','afterCommitCallback',
+            'beforeDeleteCallback', 'afterDeleteCallback', 'afterCommitCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->never())
@@ -1991,7 +1994,7 @@ class ModelTest extends OriginTestCase
 
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDeleteCallback','afterDeleteCallback','afterCommitCallback',
+            'beforeDeleteCallback', 'afterDeleteCallback', 'afterCommitCallback',
         ], ['className' => Article::class]);
         $stub->initCallbacks();
 
@@ -2014,7 +2017,7 @@ class ModelTest extends OriginTestCase
 
         # Stub Model
         $stub = $this->getMockForModel('Article', [
-            'beforeDeleteCallback','afterDeleteCallback','afterRollbackCallback','afterCommitCallback'
+            'beforeDeleteCallback', 'afterDeleteCallback', 'afterRollbackCallback', 'afterCommitCallback'
         ], ['className' => Article::class]);
         $stub->initCallbacks();
         $stub->expects($this->once())
@@ -2029,7 +2032,7 @@ class ModelTest extends OriginTestCase
 
         $stub->expects($this->never())
             ->method('afterRollbackCallback');
-            
+
         $this->assertFalse($stub->delete($article));
     }
 
@@ -2078,11 +2081,11 @@ class ModelTest extends OriginTestCase
         $this->assertEmpty($article->body);
         $this->assertEmpty($article->author); // test associated
 
-        $article = $this->Article->new($data, ['fields' => ['title','author'],'associated' => ['Author']]);
+        $article = $this->Article->new($data, ['fields' => ['title', 'author'], 'associated' => ['Author']]);
         $this->assertNotEmpty($article->title);
         $this->assertNotEmpty($article->author->location);
 
-        $article = $this->Article->new($data, ['fields' => ['title','author'],'associated' => ['Author' => ['fields' => ['name']]]]);
+        $article = $this->Article->new($data, ['fields' => ['title', 'author'], 'associated' => ['Author' => ['fields' => ['name']]]]);
         $this->assertNotEmpty($article->title);
         $this->assertNotEmpty($article->author->name);
         $this->assertEmpty($article->author->location);
@@ -2120,7 +2123,7 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin','rollback','processSave',
+            'begin', 'rollback', 'processSave',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
@@ -2138,7 +2141,7 @@ class ModelTest extends OriginTestCase
 
         ## Test Commit is called
         $stub = $this->getMockForModel('Article', [
-            'begin','commit','processSave',
+            'begin', 'commit', 'processSave',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
@@ -2164,10 +2167,10 @@ class ModelTest extends OriginTestCase
         ];
 
         $article = $this->Article->new($data);
-        
+
         # Test Disable
         $stub = $this->getMockForModel('Article', [
-            'begin','commit','processSave',
+            'begin', 'commit', 'processSave',
         ], ['className' => Article::class]);
         $stub->expects($this->once())->method('processSave')->willReturn(true);
         $stub->expects($this->never())->method('begin');
@@ -2175,7 +2178,7 @@ class ModelTest extends OriginTestCase
         $this->assertTrue($stub->save($article, ['transaction' => false]));
 
         $stub = $this->getMockForModel('Article', [
-            'begin','rollback','processSave',
+            'begin', 'rollback', 'processSave',
         ], ['className' => Article::class]);
         $stub->expects($this->once())->method('processSave')->willReturn(false);
         $stub->expects($this->never())->method('begin');

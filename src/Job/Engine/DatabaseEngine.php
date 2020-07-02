@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link         https://www.originphp.com
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
@@ -75,20 +78,20 @@ class DatabaseEngine extends BaseEngine
     }
 
     /**
-    * Gets the next message in the queue
-    *
-    * @param string $queue
-    * @return \Origin\Job\Job|null
-    */
+     * Gets the next message in the queue
+     *
+     * @param string $queue
+     * @return \Origin\Job\Job|null
+     */
     public function fetch(string $queue = 'default'): ?Job
     {
         $record = $this->model()->find('first', [
             'conditions' => [
-                'queue' => $queue,'status' => 'queued','locked' => null,'scheduled <=' => date('Y-m-d H:i:s'),
+                'queue' => $queue, 'status' => 'queued', 'locked' => null, 'scheduled <=' => date('Y-m-d H:i:s'),
             ],
             'order' => ['id ASC'],
         ]);
-        
+
         if ($record && $this->lockRecord($record)) {
             $job = $this->deserialize($record->data);
 
@@ -121,11 +124,11 @@ class DatabaseEngine extends BaseEngine
     }
 
     /**
-    * Handles a job that was successful
-    *
-    * @param \Origin\Job\Job $job
-    * @return boolean
-    */
+     * Handles a job that was successful
+     *
+     * @param \Origin\Job\Job $job
+     * @return boolean
+     */
     public function success(Job $job): bool
     {
         if (! $job->backendId()) {
@@ -146,7 +149,7 @@ class DatabaseEngine extends BaseEngine
         if (! $job->backendId()) {
             return false;
         }
-        
+
         $entity = $this->model()->new([
             'id' => $job->backendId(),
         ]);
@@ -167,7 +170,7 @@ class DatabaseEngine extends BaseEngine
         if (! $job->backendId()) {
             return false;
         }
-        
+
         if ($job->attempts() < $tries + 1) {
             return $this->updateDatabase([
                 'id' => $job->backendId(),
@@ -225,7 +228,7 @@ class DatabaseEngine extends BaseEngine
         $model = $this->model();
         $model->begin();
 
-        if (in_array($model->connection()->engine(), ['mysql','pgsql'])) {
+        if (in_array($model->connection()->engine(), ['mysql', 'postgres'])) {
             $result = $this->model->query(
                 "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
                 [

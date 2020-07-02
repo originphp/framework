@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Model;
 
 use PDO;
@@ -31,12 +34,12 @@ use Origin\Model\Exception\DatasourceException;
 abstract class Connection
 {
     /**
-     * The datasource name e.g mysql or pgsql
+     * The datasource name e.g mysql or postgres
      *
      * @var string
      */
     protected $name;
-    
+
     /**
      * Holds the connection to datasource.
      *
@@ -144,18 +147,18 @@ abstract class Connection
         if ($disbleForeignKeyConstraints) {
             $this->disableForeignKeyConstraints();
         }
-       
+
         try {
             $result = $callback($this);
         } catch (Exception $exception) {
             if ($disbleForeignKeyConstraints) {
                 $this->enableForeignKeyConstraints();
             }
-           
+
             $this->rollback();
             throw $exception;
         }
-        
+
         if ($disbleForeignKeyConstraints) {
             $this->enableForeignKeyConstraints();
         }
@@ -177,7 +180,7 @@ abstract class Connection
     public function connect(array $config): void
     {
         $config += ['engine' => 'mysql'];
-       
+
         $flags = [
             PDO::ATTR_PERSISTENT => false,
             PDO::ATTR_EMULATE_PREPARES => false, // use real prepared statements
@@ -207,7 +210,7 @@ abstract class Connection
     }
 
     /**
-     * Gets the db engine e.g. mysql or pgsql
+     * Gets the db engine e.g. mysql or postgres
      *
      * @return string
      */
@@ -247,7 +250,7 @@ abstract class Connection
                     'affected' => $this->lastAffected(),
                     'time' => microtime(true) - $start,
                 ];
-                
+
                 /**
                  * Limit to 200 queries to prevent memory issues
                  */
@@ -255,7 +258,7 @@ abstract class Connection
                     array_shift($this->log);
                 }
             }
-            
+
             // Fallback if disabled PDO::ERRMODE_EXCEPTION flag
             if (! $result) {
                 return false;
@@ -267,7 +270,7 @@ abstract class Connection
              * Important: rollback transcation if one was started.
              */
             $this->rollback();
-            
+
             throw new DatasourceException($e->getMessage());
         }
 
@@ -415,7 +418,7 @@ abstract class Connection
 
         if ($type === 'model') {
             $this->mapColumns();
-         
+
             return $this->toModel($result, $this->columnMap);
         }
 
@@ -435,7 +438,7 @@ abstract class Connection
 
             return null;
         }
-        
+
         return ! empty($results) ?  $this->toList($results) : null;
     }
 
@@ -459,7 +462,7 @@ abstract class Connection
 
             return null;
         }
-    
+
         if ($type !== 'model') {
             return $results;
         }
@@ -483,7 +486,7 @@ abstract class Connection
     protected function toList(array $rows): array
     {
         $result = [];
- 
+
         $columnCount = count($rows[0]);
         foreach ($rows as $row) {
             if ($columnCount == 1) {
@@ -542,9 +545,9 @@ abstract class Connection
         if ($statement == null) {
             $statement = $this->statement;
         }
-     
+
         $numberOfFields = $statement->columnCount();
-        
+
         for ($i = 0; $i < $numberOfFields; ++$i) {
             $column = $statement->getColumnMeta($i); // could be bottle neck on
             if (empty($column['table']) || $this->isVirtualField($column['name'])) {
@@ -567,14 +570,14 @@ abstract class Connection
     }
 
     /**
-    * Takes a numerical set results and maps to model. Originally was
-    * using getColumnMeta(), however the table result which is used to map
-    * does not work on postgresql. This will only work if all fields are quoted.
-    *
-    * @param array $records numerically index
-    * @param array $fields
-    * @return array
-    */
+     * Takes a numerical set results and maps to model. Originally was
+     * using getColumnMeta(), however the table result which is used to map
+     * does not work on postgresql. This will only work if all fields are quoted.
+     *
+     * @param array $records numerically index
+     * @param array $fields
+     * @return array
+     */
     public function mapNumericResults(array $records, array $fields): array
     {
         $count = count($fields);
@@ -583,7 +586,7 @@ abstract class Connection
         $results = [];
         foreach ($records as $record) {
             $array = [];
-            for ($i = 0;$i < $count;$i++) {
+            for ($i = 0; $i < $count; $i++) {
                 $model = $index[$i]['model'];
                 $field = $index[$i]['field'];
                 $array[$model][$field] = $record[$i];
@@ -606,17 +609,17 @@ abstract class Connection
     {
         $index = [];
         $count = count($fields);
-      
+
         /**
          * Build an index
          */
-        for ($i = 0;$i < $count;$i++) {
+        for ($i = 0; $i < $count; $i++) {
             $model = 0; // default value
             $field = $fields[$i];
             if (preg_match('/^[A-Za-z0-9_]+\.[a-z0-9_]+$/i', $field)) {
                 list($model, $field) = explode('.', $fields[$i]);
             }
-            
+
             $position = stripos($fields[$i], ' AS ');
             if ($position !== false) {
                 $field = substr($field, $position + 4);
@@ -641,10 +644,10 @@ abstract class Connection
     public function adapter(): BaseSchema
     {
         if ($this->adapter === null) {
-            $adapterClass = __NAMESPACE__ . '\Schema\\'. ucfirst($this->name) . 'Schema';
+            $adapterClass = __NAMESPACE__ . '\Schema\\' . ucfirst($this->name) . 'Schema';
             $this->adapter = new $adapterClass($this->config['connection']);
         }
-      
+
         return $this->adapter;
     }
 
@@ -689,12 +692,12 @@ abstract class Connection
      * @return array
      */
     abstract public function tables(): array;
-    
+
     /**
-    * Enables Foreign Key Constraints
-    *
-    * @return void
-    */
+     * Enables Foreign Key Constraints
+     *
+     * @return void
+     */
     public function enableForeignKeyConstraints(): void
     {
         $this->execute($this->adapter()->enableForeignKeySql());
@@ -722,7 +725,7 @@ abstract class Connection
     public function select(string $table, array $options): bool
     {
         $builder = $this->queryBuilder($table, $options['alias']);
-        $sql = $builder->selectStatement($options);// How to handle this elegently without having to do same work as selct
+        $sql = $builder->selectStatement($options); // How to handle this elegently without having to do same work as selct
         return $this->execute($sql, $builder->getValues());
     }
 

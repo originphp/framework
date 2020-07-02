@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -20,12 +21,12 @@ use Origin\Model\ConnectionManager;
  * @todo migrate from model tests here, since this object was created and tests
  * were not moved
  */
-class PgsqlEngineTest extends \PHPUnit\Framework\TestCase
+class PostgresEngineTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp(): void
     {
         $connection = ConnectionManager::get('test');
-        if ($connection->engine() !== 'pgsql') {
+        if ($connection->engine() !== 'postgres') {
             $this->markTestSkipped('This test is for pgSQL');
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -87,7 +88,7 @@ class MockMigration extends Migration
 
 class MigrationTest extends OriginTestCase
 {
-    protected $fixtures = ['Origin.Article','Origin.User','Origin.Deal'];
+    protected $fixtures = ['Origin.Article', 'Origin.User', 'Origin.Deal'];
 
     public function adapter()
     {
@@ -113,7 +114,7 @@ class MigrationTest extends OriginTestCase
     public function testRealLifeExample()
     {
         $migration = $this->migration();
-        
+
         $migration->createTable('products', [
             'owner_id' => 'integer',
             'name' => 'string',
@@ -123,20 +124,20 @@ class MigrationTest extends OriginTestCase
         ]);
         $migration->addIndex('products', 'name');
         $migration->addIndex('products', 'status');
-       
+
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
-       
+
         $migration->addForeignKey('products', 'users', 'owner_id');
-            
+
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
-        
+
         $migration->addForeignKey('products', 'users', 'manager_id');
-      
+
         $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1af1da1b']));
         $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1b2f2b89']));
-       
+
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
         $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
 
@@ -150,32 +151,32 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
 
-        $options = ['engine' => 'InnoDB','autoIncrement' => 10000,'charset' => 'utf8','collate' => 'utf8_unicode_ci'];
+        $options = ['engine' => 'InnoDB', 'autoIncrement' => 10000, 'charset' => 'utf8', 'collate' => 'utf8_unicode_ci'];
 
         $migration->createTable('products', [
             'name' => 'string',
             'description' => 'text',
-            'column_1' => ['type' => 'string','default' => 'foo'],
-            'column_2' => ['type' => 'string','default' => 'foo','null' => true],
-            'column_3' => ['type' => 'string','default' => 'foo','null' => false],
-            'column_4' => ['type' => 'string','null' => false],
-            'column_5' => ['type' => 'string','null' => true],
-            'column_6' => ['type' => 'VARCHAR','limit' => 5], // test non agnostic#$
+            'column_1' => ['type' => 'string', 'default' => 'foo'],
+            'column_2' => ['type' => 'string', 'default' => 'foo', 'null' => true],
+            'column_3' => ['type' => 'string', 'default' => 'foo', 'null' => false],
+            'column_4' => ['type' => 'string', 'null' => false],
+            'column_5' => ['type' => 'string', 'null' => true],
+            'column_6' => ['type' => 'VARCHAR', 'limit' => 5], // test non agnostic#$
         ], $options);
-                
+
         $this->assertTrue($migration->columnExists('products', 'id'));
 
         $engine = $migration->connection()->engine();
 
         if ($engine !== 'sqlite') {
-            $index = $engine === 'pgsql' ? 'products_pkey' :  'PRIMARY';
-    
+            $index = $engine === 'postgres' ? 'products_pkey' :  'PRIMARY';
+
             $this->assertTrue($migration->indexExists('products', ['name' => $index])); #$
         }
-       
+
         $this->assertTrue($migration->columnExists('products', 'name', ['type' => 'string']));
         $this->assertTrue($migration->columnExists('products', 'description', ['type' => 'text']));
-        
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->tableExists('products'));
@@ -185,7 +186,7 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->createJoinTable('contacts', 'tags');
-  
+
         $this->assertTrue($migration->tableExists('contacts_tags'));
         $this->assertTrue($migration->columnExists('contacts_tags', 'contact_id'));
         $this->assertTrue($migration->columnExists('contacts_tags', 'tag_id'));
@@ -194,13 +195,13 @@ class MigrationTest extends OriginTestCase
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->tableExists('contacts_tags'));
     }
-    
+
     public function testDropTable()
     {
         $migration = $this->migration();
         $migration->dropTable('articles');
         $this->assertFalse($migration->tableExists('articles'));
-  
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->tableExists('articles'));
@@ -210,7 +211,7 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->renameTable('articles', 'ez_articles');
-        
+
         $this->assertTrue($migration->tableExists('ez_articles'));
 
         $migration->reset(); // clear statements that have been run
@@ -226,7 +227,7 @@ class MigrationTest extends OriginTestCase
         $migration = $this->migration();
         $migration->addColumn('articles', 'category_id', 'integer');
         $migration->addColumn('articles', 'status', 'string');
-    
+
         $this->assertTrue($migration->columnExists('articles', 'category_id'));
         $this->assertTrue($migration->columnExists('articles', 'status'));
 
@@ -242,15 +243,15 @@ class MigrationTest extends OriginTestCase
         // NOT NULL column with default value NULL error
 
         $migration->createTable('articles2');
-   
+
         $migration->addColumn('articles', 'category_id', 'integer');
         $migration->addColumn('articles', 'opens', 'integer', ['limit' => 3]); // #! changed
-        $migration->addColumn('articles', 'amount', 'decimal', ['precision' => 5,'scale' => 2]);
+        $migration->addColumn('articles', 'amount', 'decimal', ['precision' => 5, 'scale' => 2]);
         $migration->addColumn('articles', 'balance', 'decimal'); // use defaults
         $migration->addColumn('articles', 'comment_1', 'string', ['default' => 'no comment']);
-        $migration->addColumn('articles', 'comment_2', 'string', ['default' => 'foo','null' => true]);
-        $migration->addColumn('articles', 'comment_3', 'string', ['default' => '123','null' => false]);
-      
+        $migration->addColumn('articles', 'comment_2', 'string', ['default' => 'foo', 'null' => true]);
+        $migration->addColumn('articles', 'comment_3', 'string', ['default' => '123', 'null' => false]);
+
         /**
          * If the table is created,when rolling back cant test fields, but fixture inserts data will cause
          * error cannot be null so this particular column is put in new table.
@@ -270,14 +271,14 @@ class MigrationTest extends OriginTestCase
             $this->assertTrue($migration->columnExists('articles', 'opens')); // Integer does not limit on pgsql
         }
 
-        $this->assertTrue($migration->columnExists('articles', 'amount', ['precision' => 5,'scale' => 2]));
-        $this->assertTrue($migration->columnExists('articles', 'balance', ['precision' => 10,'scale' => 0]));
+        $this->assertTrue($migration->columnExists('articles', 'amount', ['precision' => 5, 'scale' => 2]));
+        $this->assertTrue($migration->columnExists('articles', 'balance', ['precision' => 10, 'scale' => 0]));
         $this->assertTrue($migration->columnExists('articles', 'comment_1', ['default' => 'no comment']));
-        $this->assertTrue($migration->columnExists('articles', 'comment_2', ['default' => 'foo','null' => true]));
-        $this->assertTrue($migration->columnExists('articles', 'comment_3', ['default' => '123','null' => false]));
+        $this->assertTrue($migration->columnExists('articles', 'comment_2', ['default' => 'foo', 'null' => true]));
+        $this->assertTrue($migration->columnExists('articles', 'comment_3', ['default' => '123', 'null' => false]));
 
         $this->assertTrue($migration->columnExists('articles', 'comment_5', ['null' => true]));
-        
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->columnExists('articles', 'category_id'));
@@ -287,18 +288,18 @@ class MigrationTest extends OriginTestCase
     public function testColumns()
     {
         $migration = $this->migration();
-        $expected = ['id','author_id','title','body','created','modified'];
+        $expected = ['id', 'author_id', 'title', 'body', 'created', 'modified'];
         $this->assertSame($expected, $migration->columns('articles'));
     }
 
     public function testChangeColumnSetting()
     {
         $migration = $this->migration();
- 
+
         $migration->changeColumn('articles', 'title', 'string', ['limit' => 10]);
-   
+
         $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 10]));
-    
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255]));
@@ -307,11 +308,11 @@ class MigrationTest extends OriginTestCase
     public function testChangeColumnType()
     {
         $migration = $this->migration();
- 
+
         $migration->changeColumn('articles', 'body', 'string');
-   
+
         $this->assertTrue($migration->columnExists('articles', 'body', ['type' => 'string']));
-        
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->columnExists('articles', 'body', ['type' => 'text']));
@@ -323,21 +324,21 @@ class MigrationTest extends OriginTestCase
     public function testChangeColumnNullConstraint()
     {
         $migration = $this->migration();
-        
-        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255,'null' => false]));
+
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255, 'null' => false]));
         //$migration->changeColumn('articles', 'title', 'string', ['limit' => 10, 'null' => true]);
 
         $migration->changeColumn('articles', 'title', 'string', ['limit' => 10]);
 
-        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 10,'null' => true]));
-        
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 10, 'null' => true]));
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
-        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255,'null' => false]));
+        $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255, 'null' => false]));
     }
 
     /**
-     * This really is for Pgsql
+     * This really is for Postgres
      *
      * @return void
      */
@@ -346,18 +347,18 @@ class MigrationTest extends OriginTestCase
         $migration = $this->migration();
         $migration->changeColumn('deals', 'status', 'string', ['limit' => 40]);
 
-        $this->assertTrue($migration->columnExists('deals', 'status', ['limit' => 40,'default' => null]));
-       
+        $this->assertTrue($migration->columnExists('deals', 'status', ['limit' => 40, 'default' => null]));
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
-        $this->assertTrue($migration->columnExists('deals', 'status', ['limit' => 50,'default' => 'new']));
+        $this->assertTrue($migration->columnExists('deals', 'status', ['limit' => 50, 'default' => 'new']));
     }
 
     public function testRemoveColumn()
     {
         $migration = $this->migration();
         $migration->removeColumn('articles', 'body');
-        
+
         $this->assertFalse($migration->columnExists('articles', 'body'));
 
         $migration->reset(); // clear statements that have been run
@@ -369,13 +370,13 @@ class MigrationTest extends OriginTestCase
     {
         # Prep
         $migration = $this->migration();
-        $migration->addColumn('articles', 'remove_me', 'string', ['null' => true,'default' => 'test']);
-        $migration->addColumn('articles', 'remove_me_as_well', 'string', ['null' => true,'default' => 'test']);
-                
+        $migration->addColumn('articles', 'remove_me', 'string', ['null' => true, 'default' => 'test']);
+        $migration->addColumn('articles', 'remove_me_as_well', 'string', ['null' => true, 'default' => 'test']);
+
         # Test Up
         $migration = $this->migration();
-        $migration->removeColumns('articles', ['remove_me','remove_me_as_well']);
-        
+        $migration->removeColumns('articles', ['remove_me', 'remove_me_as_well']);
+
         $this->assertFalse($migration->columnExists('articles', 'remove_me'));
         $this->assertFalse($migration->columnExists('articles', 'remove_me_as_well'));
 
@@ -390,7 +391,7 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->renameColumn('articles', 'title', 'article_title');
-        
+
         $this->assertTrue($migration->columnExists('articles', 'article_title'));
 
         $migration->reset(); // clear statements that have been run
@@ -409,11 +410,11 @@ class MigrationTest extends OriginTestCase
             'owner_id' => 'integer',
         ]);
         $migration->addIndex('c1', 'account_id');
-        
+
         $this->assertTrue(
             $migration->indexExists('c1', 'account_id')
         );
-       
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->indexExists('c1', 'account_id'));
@@ -423,17 +424,17 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->addIndex('articles', 'author_id');
-        $migration->addIndex('articles', ['id','title']);
+        $migration->addIndex('articles', ['id', 'title']);
         $migration->addIndex('articles', 'created', ['unique' => true]);
-       
+
         $this->assertTrue($migration->indexExists('articles', 'author_id'));
-        $this->assertTrue($migration->indexExists('articles', ['id','title']));
+        $this->assertTrue($migration->indexExists('articles', ['id', 'title']));
         $this->assertTrue($migration->indexExists('articles', 'created'));
-    
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->indexExists('articles', 'author_id'));
-        $this->assertFalse($migration->indexExists('articles', ['id','title']));
+        $this->assertFalse($migration->indexExists('articles', ['id', 'title']));
         $this->assertFalse($migration->indexExists('articles', 'created'));
     }
 
@@ -441,14 +442,14 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->addIndex('articles', 'author_id');
-        
+
         $this->assertTrue($migration->indexExists('articles', 'author_id'));
-        
+
         $migration = $this->migration();
         $migration->renameIndex('articles', 'articles_author_id_index', 'aaii_index');
 
         $this->assertTrue($migration->indexExists('articles', ['name' => 'aaii_index']));
-        
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->indexExists('articles', ['name' => 'aaii_index']));
@@ -458,26 +459,26 @@ class MigrationTest extends OriginTestCase
     {
         $migration = $this->migration();
         $migration->addIndex('articles', 'title');
-        
+
         $this->assertTrue($migration->indexExists('articles', 'title'));
-      
+
         $migration = $this->migration();
         $migration->removeIndex('articles', 'title');
-        
+
         $this->assertFalse($migration->indexExists('articles', 'title'));
-      
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->indexExists('articles', 'title'));
     }
-   
+
     public function testAddForeignKey()
     {
         // Prepare
         $migration = $this->migration();
         $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
         $migration->addForeignKey('articles', 'users');
-       
+
         $this->assertTrue($migration->foreignKeyExists('articles', ['column' => 'user_id']));
 
         $migration->reset(); // clear statements that have been run
@@ -490,10 +491,10 @@ class MigrationTest extends OriginTestCase
         // Prepare
         $migration = $this->migration();
         $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
-        
+
         $migration = $this->migration();
-        $migration->addForeignKey('articles', 'users', ['update' => 'cascade','delete' => 'restrict']);
-        
+        $migration->addForeignKey('articles', 'users', ['update' => 'cascade', 'delete' => 'restrict']);
+
         $expected = [
             'name' => 'fk_origin_c05a10b6',  //fk_origin_c05a10b6
             'table' => 'articles',
@@ -519,26 +520,26 @@ class MigrationTest extends OriginTestCase
      */
     public function testRenameColumnWithIndex()
     {
-        
+
         # Prepare fixture
         $migration = $this->migration();
-        $migration->addIndex('users', ['id','email']);
-       
-        $this->assertTrue($migration->indexExists('users', ['id','email']));
-    
+        $migration->addIndex('users', ['id', 'email']);
+
+        $this->assertTrue($migration->indexExists('users', ['id', 'email']));
+
         $migration->renameColumn('users', 'id', 'lng_id');
 
         $this->assertTrue($migration->columnExists('users', 'lng_id'));
         $this->assertFalse($migration->columnExists('users', 'id'));
 
         $this->assertTrue($migration->indexExists('users', ['name' => 'users_id_email_index']));
-      
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
 
         $this->assertFalse($migration->columnExists('users', 'lng_id'));
         $this->assertTrue($migration->columnExists('users', 'id'));
-  
+
         $this->assertFalse($migration->indexExists('users', ['name' => 'users_id_email_index']));
     }
 
@@ -547,15 +548,15 @@ class MigrationTest extends OriginTestCase
         # Prepare fixture
         $migration = $this->migration();
         $migration->renameColumn('users', 'id', 'lng_id');
-        
+
         $this->assertTrue($migration->columnExists('users', 'lng_id'));
 
         # Migrate
         $migration = $this->migration();
         $migration->addForeignKey('articles', 'users', [
-            'column' => 'author_id','primaryKey' => 'lng_id',
+            'column' => 'author_id', 'primaryKey' => 'lng_id',
         ]);
-       
+
         $this->assertTrue($migration->columnExists('users', 'lng_id'));
         $this->assertTrue($migration->foreignKeyExists('articles', ['column' => 'author_id']));
 
@@ -570,19 +571,19 @@ class MigrationTest extends OriginTestCase
         $migration = $this->migration();
 
         $migration->addColumn('articles', 'user_id', 'integer', ['default' => 1000]);
- 
+
         # Migrate
         $migration = $this->migration();
         $migration->addForeignKey('articles', 'users', ['name' => 'myfk_001']);
-        
+
         // in sqlite there is no way to extract foreignkey name
         $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_c05a10b6' : 'myfk_001';
-     
+
         $this->assertTrue($migration->foreignKeyExists('articles', ['name' => $name]));
-  
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
-      
+
         $this->assertFalse($migration->foreignKeyExists('articles', ['name' => $name]));
     }
 
@@ -632,10 +633,10 @@ class MigrationTest extends OriginTestCase
             'name' => 'string',
             'description' => 'text',
         ]);
-       
+
         $migration->addForeignKey('contacts', 'accounts');
-  
-        $migration->addForeignKey('contacts', 'members', ['column' => 'owner_id','name' => 'fk_a1']); // fk_origin_320405e8
+
+        $migration->addForeignKey('contacts', 'members', ['column' => 'owner_id', 'name' => 'fk_a1']); // fk_origin_320405e8
 
         $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_caf8d09a' : 'fk_a1'; // fk_origin_caf8d09a
 
@@ -653,7 +654,7 @@ class MigrationTest extends OriginTestCase
 
         $this->assertFalse($migration->foreignKeyExists('contacts', 'account_id'));
         $this->assertFalse($migration->foreignKeyExists('contacts', ['name' => $name]));
-            
+
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
@@ -670,7 +671,7 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->tableExists('products'));
         $migration->start();
         $this->assertTrue($migration->tableExists('products'));
-        
+
         $migration->rollback();
         $this->assertFalse($migration->tableExists('products'));
     }
@@ -805,12 +806,12 @@ class MigrationTest extends OriginTestCase
     public function testColumnExists()
     {
         $migration = new CreateProductTableMigration($this->adapter());
-      
+
         $this->assertTrue($migration->columnExists('articles', 'title'));
         $this->assertTrue($migration->columnExists('articles', 'title', ['type' => 'string']));
         $this->assertFalse($migration->columnExists('articles', 'title', ['type' => 'integer']));
         $this->assertFalse($migration->columnExists('articles', 'title', ['default' => 'nonya']));
-      
+
         $this->assertTrue($migration->columnExists('articles', 'title', ['limit' => 255]));
         $this->assertFalse($migration->columnExists('articles', 'title', ['limit' => 10]));
 
@@ -823,7 +824,7 @@ class MigrationTest extends OriginTestCase
         $this->assertTrue($migration->columnExists('deals', 'amount', ['scale' => 2]));
         $this->assertFalse($migration->columnExists('deals', 'amount', ['scale' => 4]));
 
-        $this->assertTrue($migration->columnExists('deals', 'amount', ['precision' => 15,'scale' => 2]));
+        $this->assertTrue($migration->columnExists('deals', 'amount', ['precision' => 15, 'scale' => 2]));
     }
 
     public function testAddIndexException()
@@ -880,7 +881,7 @@ class MigrationTest extends OriginTestCase
         $migration = new CreateProductTableMigration($this->adapter());
         $result = $migration->fetchRow('SELECT * FROM articles');
         $expected = [
-            'id' => 1000,'author_id' => 1001,'title' => 'Article #1','body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00','modified' => '2019-03-27 13:12:00',
+            'id' => 1000, 'author_id' => 1001, 'title' => 'Article #1', 'body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00', 'modified' => '2019-03-27 13:12:00',
         ];
         $this->assertEquals($expected, $result);
     }
@@ -890,7 +891,7 @@ class MigrationTest extends OriginTestCase
         $migration = new CreateProductTableMigration($this->adapter());
         $result = $migration->fetchAll('SELECT * FROM articles LIMIT 1');
         $expected = [
-            'id' => 1000,'author_id' => 1001,'title' => 'Article #1','body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00','modified' => '2019-03-27 13:12:00',
+            'id' => 1000, 'author_id' => 1001, 'title' => 'Article #1', 'body' => 'Description about article #1', 'created' => '2019-03-27 13:10:00', 'modified' => '2019-03-27 13:12:00',
         ];
         $this->assertEquals([$expected], $result);
     }

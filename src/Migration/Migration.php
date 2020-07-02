@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Migration;
 
 /**
@@ -54,7 +57,7 @@ class Migration
      * @var array
      */
     protected $statements = [];
-    
+
     /**
      * These are the statements magically detected to reverse
      * @internal only works when you run the migration first time, rollback wont work since some schema information wont
@@ -131,7 +134,7 @@ class Migration
         if (empty($this->statements)) {
             throw new Exception('Migration did not do anything.');
         }
-        
+
         return $this->ungroupStatements($this->statements);
     }
 
@@ -158,7 +161,7 @@ class Migration
             }
             $this->executeStatements($sql);
         }
-        
+
         return $this->ungroupStatements($statements);
     }
 
@@ -228,7 +231,7 @@ class Migration
      */
     public function execute(string $statement): void
     {
-        if (! in_array($this->calledBy(), ['up','down'])) {
+        if (! in_array($this->calledBy(), ['up', 'down'])) {
             throw new Exception('Execute can only be called from up/down');
         }
         $this->statements[] = $sql = new Sql($statement);
@@ -259,40 +262,40 @@ class Migration
     }
 
     /**
-    * Creates a new table, the id column is created regardless.
-    *
-    * @example
-    *
-    * $this->createTable('products',[
-    *  'name' => 'string',
-    *  'amount' => ['type'=>'decimal,'limit'=>10,'precision'=>10],'
-    * ]);
-    *
-    *
-    * @param string $name table name
-    * @param array $schema This is an array to build the table, the key for each row should be the field name
-    * and then pass either a string with type of field or an array with more specific options (type,limit,null,precision,default)
-    * @param array $options The option keys are as follows (constraints/indexes are here but deliberately not documentated)
-    *   - id: default true wether to create primaryKey column and constraint.
-    *   - primaryKey: default is 'id' the column name of the primary key. Set to false not to use primaryKey
-    *   - engine: this is for MySQL only. e.g InnoDB
-    *   - charset: this is for MySQL DEFAULT CHARACTER SET e.g. utf8
-    *   - collate: this is for MySQL utf8_unicode_ci
-    *   - autoIncrement: this sets the auto increment (mysql) or serial (pgsql) value. e.g. 10000
-    * @return void
-    */
+     * Creates a new table, the id column is created regardless.
+     *
+     * @example
+     *
+     * $this->createTable('products',[
+     *  'name' => 'string',
+     *  'amount' => ['type'=>'decimal,'limit'=>10,'precision'=>10],'
+     * ]);
+     *
+     *
+     * @param string $name table name
+     * @param array $schema This is an array to build the table, the key for each row should be the field name
+     * and then pass either a string with type of field or an array with more specific options (type,limit,null,precision,default)
+     * @param array $options The option keys are as follows (constraints/indexes are here but deliberately not documentated)
+     *   - id: default true wether to create primaryKey column and constraint.
+     *   - primaryKey: default is 'id' the column name of the primary key. Set to false not to use primaryKey
+     *   - engine: this is for MySQL only. e.g InnoDB
+     *   - charset: this is for MySQL DEFAULT CHARACTER SET e.g. utf8
+     *   - collate: this is for MySQL utf8_unicode_ci
+     *   - autoIncrement: this sets the auto increment (mysql) or serial (pgsql) value. e.g. 10000
+     * @return void
+     */
     public function createTable(string $name, array $schema = [], array $options = []): void
     {
         $tableOptions = ['options' => $options];
 
-        $options += ['id' => true,'primaryKey' => 'id'];
+        $options += ['id' => true, 'primaryKey' => 'id'];
         if ($options['id'] && $options['primaryKey']) {
             $schema = [$options['primaryKey'] => [
                 'type' => 'integer',
                 'autoIncrement' => true,
             ]] + $schema;
-     
-            $tableOptions['constraints']['primary'] = ['type' => 'primary','column' => $options['primaryKey']];
+
+            $tableOptions['constraints']['primary'] = ['type' => 'primary', 'column' => $options['primaryKey']];
         }
 
         $this->statements[] = $sql = new Sql(
@@ -320,19 +323,19 @@ class Migration
      */
     public function createJoinTable(string $table1, string $table2, array $options = []): void
     {
-        $tables = [$table1,$table2];
+        $tables = [$table1, $table2];
         sort($tables);
         $name = implode('_', $tables);
         # This will create up and down
         $schema = [
-            Inflector::singular($tables[0]).'_id' => 'integer',
-            Inflector::singular($tables[1]).'_id' => 'integer',
+            Inflector::singular($tables[0]) . '_id' => 'integer',
+            Inflector::singular($tables[1]) . '_id' => 'integer',
         ];
 
         $this->statements[] = $sql = new Sql(
             $this->adapter()->createTableSql($name, $schema, $options)
         );
-      
+
         $this->executeStatements($sql);
 
         if ($this->calledBy() !== 'change') {
@@ -359,7 +362,7 @@ class Migration
         }
 
         $schema = $this->adapter()->describe($table);
-        
+
         $this->statements[] = $sql = new Sql(
             $this->adapter()->dropTableSql($table, $options)
         );
@@ -399,10 +402,10 @@ class Migration
     }
 
     /**
-       * Returns an list of tables
-       *
-       * @return array
-       */
+     * Returns an list of tables
+     *
+     * @return array
+     */
     public function tables(): array
     {
         return $this->adapter()->tables();
@@ -438,15 +441,15 @@ class Migration
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
         }
-        
+
         $schema = $this->adapter()->describe($table);
-        
+
         $this->statements[] = $sql = new Sql(
             $this->adapter()->addColumn($table, $name, $type, $options)
         );
 
         $this->executeStatements($sql);
-        
+
         if ($this->calledBy() != 'change') {
             return;
         }
@@ -457,19 +460,19 @@ class Migration
     }
 
     /**
-    * Changes a column according to the new definition.
-    *
-    * @internal pgsql works differently to mysql. In mysql whole column is redefined, and null value is not
-    * constraint.
-    * @param string $table table name
-    * @param string $name column name
-    * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
-    * @param array $options The following options keys can be used:
-    *   - limit: limits the column length for string and bytes for text,binary,and integer
-    *   - default: the default value, use '' or null
-    *   - null: allows or disallows null values to be used
-    *   - precision: the precision for the number (places to before the decimal point)
-    *   - scale: the numbers after the decimal point
+     * Changes a column according to the new definition.
+     *
+     * @internal pgsql works differently to mysql. In mysql whole column is redefined, and null value is not
+     * constraint.
+     * @param string $table table name
+     * @param string $name column name
+     * @param string $type (primaryKey,string,text,integer,bigint,float,decimal,datetime,time,date,binary,boolean)
+     * @param array $options The following options keys can be used:
+     *   - limit: limits the column length for string and bytes for text,binary,and integer
+     *   - default: the default value, use '' or null
+     *   - null: allows or disallows null values to be used
+     *   - precision: the precision for the number (places to before the decimal point)
+     *   - scale: the numbers after the decimal point
      * @return void
      */
     public function changeColumn(string $table, string $name, string $type, array $options = []): void
@@ -484,16 +487,16 @@ class Migration
 
         $engine = $this->connection()->engine();
         $schema = $this->adapter()->describe($table);
-        
+
         $statements = [];
         // This is here because it relies on information, could add as dropConstrint
         // Drop DEFAULT constraint if it exists (same in both MySQL and PgSQL)
-        if (in_array($engine, ['pgsql','mysql']) && $schema['columns'][$name]['default']) {
+        if (in_array($engine, ['postgres', 'mysql']) && $schema['columns'][$name]['default']) {
             $statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP DEFAULT";
         }
 
         // In PgSQL not null is constraint.
-        if ($engine === 'pgsql' && $schema['columns'][$name]['null'] === false) {
+        if ($engine === 'postgres' && $schema['columns'][$name]['null'] === false) {
             $statements[] = "ALTER TABLE {$table} ALTER COLUMN {$name} DROP NOT NULL";
         }
         if ($statements) {
@@ -541,7 +544,7 @@ class Migration
         if ($this->calledBy() !== 'change') {
             return;
         }
-      
+
         $this->reverseStatements[] = new Sql(
             $this->adapter()->renameColumn($table, $to, $from)
         );
@@ -647,7 +650,7 @@ class Migration
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
         }
-       
+
         $schema = $this->adapter()->describe($table)['columns'];
 
         if (! isset($schema[$column])) {
@@ -679,27 +682,27 @@ class Migration
     }
 
     /**
-      * Add an index on table
-      *
-      * @param string $table
-      * @param string|array $column owner_id, [owner_id,tenant_id]
-      * @param array $options
-      *  - name: name of index
-      */
+     * Add an index on table
+     *
+     * @param string $table
+     * @param string|array $column owner_id, [owner_id,tenant_id]
+     * @param array $options
+     *  - name: name of index
+     */
     public function addIndex(string $table, $column, array $options = []): void
     {
         if (! $this->tableExists($table)) {
             throw new Exception("{$table} table does not exist");
         }
-        $options += ['unique' => false,'name' => null];
-         
+        $options += ['unique' => false, 'name' => null];
+
         $options = $this->indexOptions($table, array_merge(['column' => $column], $options));
 
         $columnString = $options['column'];
         if (is_array($columnString)) {
             $columnString = implode(',', $columnString);
         }
-      
+
         $this->statements[] = $sql = new Sql(
             $this->adapter()->addIndex($table, $columnString, $options['name'], $options)
         );
@@ -714,7 +717,7 @@ class Migration
             $this->adapter()->removeIndex($table, $options['name'])
         );
     }
-  
+
     /**
      * Removes an index on table if it exists
      *
@@ -729,7 +732,7 @@ class Migration
         }
 
         $options = $this->indexOptions($table, $options);
-  
+
         $index = null;
         foreach ($this->indexes($table) as $index) {
             if ($index['name'] === $options['name']) {
@@ -756,7 +759,7 @@ class Migration
             )
         );
     }
-  
+
     /**
      * Preps index options
      *
@@ -775,7 +778,7 @@ class Migration
 
         return $options;
     }
-  
+
     /**
      * Renames an index on a table
      *
@@ -793,14 +796,14 @@ class Migration
         $this->executeStatements($sql);
 
         if ($this->calledBy() !== 'change') {
-            return ;
+            return;
         }
 
         $this->reverseStatements[] = new Sql(
             $this->adapter()->renameIndex($table, $newName, $oldName)
         );
     }
-  
+
     /**
      * Checks if a table exists
      *
@@ -822,7 +825,7 @@ class Migration
     public function indexExists(string $table, $options): bool
     {
         $options = $this->indexOptions($table, $options);
-       
+
         return $this->indexNameExists($table, $options['name']);
     }
 
@@ -838,7 +841,7 @@ class Migration
         if (! $this->tableExists($table)) {
             return false;
         }
-        
+
         $indexes = $this->indexes($table);
         foreach ($indexes as $index) {
             if ($index['name'] === $indexName) {
@@ -860,7 +863,7 @@ class Migration
     {
         $name = implode('_', (array) $column);
 
-        return strtolower($table . '_' . $name) .'_index';
+        return strtolower($table . '_' . $name) . '_index';
     }
 
     /**
@@ -885,7 +888,7 @@ class Migration
             $optionsOrColumn = ['column' => $optionsOrColumn];
         }
         $options = is_null($optionsOrColumn) ? [] : $optionsOrColumn;
-        
+
         if (! $this->tableExists($fromTable)) {
             throw new Exception("{$fromTable} does not exist");
         }
@@ -895,13 +898,13 @@ class Migration
         }
 
         $options += [
-            'column' => strtolower(Inflector::singular($toTable)).'_id',
+            'column' => strtolower(Inflector::singular($toTable)) . '_id',
             'primaryKey' => 'id',
             'name' => null,
             'update' => null,
             'delete' => null,
         ];
-  
+
         // Sqlite does not allow to retrive names, force name standard so that things later dont break
         if ($this->connection()->engine() === 'sqlite' || $options['name'] === null) {
             $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
@@ -912,7 +915,7 @@ class Migration
         );
 
         $this->executeStatements($sql);
-        
+
         if ($this->calledBy() !== 'change') {
             return;
         }
@@ -943,18 +946,18 @@ class Migration
         $options = $optionsOrToTable;
         if (is_string($options)) {
             $options = [
-                'column' => strtolower(Inflector::singular($options)).'_id',
+                'column' => strtolower(Inflector::singular($options)) . '_id',
             ];
         }
-        $options += ['name' => null,'column' => null,'primaryKey' => 'id'];
-  
+        $options += ['name' => null, 'column' => null, 'primaryKey' => 'id'];
+
         if (empty($options['column']) && empty($options['name'])) {
             throw new InvalidArgumentException('Column or name needs to be specified');
         }
 
         $foreignKey = null;
         $foreignKeys = $this->foreignKeys($fromTable);
-          
+
         foreach ($foreignKeys as $foreignKey) {
             if ($options['column'] && $foreignKey['column'] === $options['column']) {
                 $options['name'] = $foreignKey['name'];
@@ -967,7 +970,7 @@ class Migration
         }
 
         $schema = $this->adapter()->describe($fromTable);
-    
+
         $this->statements[] = $sql = new Sql(
             $this->adapter()->removeForeignKey($fromTable, $options['name'])
         );
@@ -985,7 +988,7 @@ class Migration
             );
         }
     }
-  
+
     /**
      * Gets the foreign keys for a table
      *
@@ -996,7 +999,7 @@ class Migration
     {
         return $this->adapter()->foreignKeys($table);
     }
-  
+
     /**
      * Checks if foreignKey exists
      * @param string $fromTable
@@ -1018,36 +1021,36 @@ class Migration
 
         return $this->adapter()->foreignKeyExists($fromTable, $columnOrOptions);
     }
-      
+
     /**
-    * Creates a unique foreignKey name
-    *
-    * @param string $table
-    * @param string $column
-    * @return string
-    */
+     * Creates a unique foreignKey name
+     *
+     * @param string $table
+     * @param string $column
+     * @return string
+     */
     private function getForeignKeyIdentifier(string $table, string $column): string
     {
         return hash('crc32', $table . '__' . $column);
     }
 
     /**
-    * Fetchs a single row from the database
-    *
-    * @param string $sql
-    * @return array|null
-    */
+     * Fetchs a single row from the database
+     *
+     * @param string $sql
+     * @return array|null
+     */
     public function fetchRow(string $sql): ?array
     {
         return $this->connection()->execute($sql) === true ? $this->connection()->fetch() : null;
     }
 
     /**
-    * Fetchs all rows from database
-    *
-    * @param string $sql
-    * @return array
-    */
+     * Fetchs all rows from database
+     *
+     * @param string $sql
+     * @return array
+     */
     public function fetchAll(string $sql): ?array
     {
         return $this->connection()->execute($sql) === true ? $this->connection()->fetchAll() : null;

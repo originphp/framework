@@ -10,7 +10,7 @@ env:
     - TRAVIS=true
   matrix:
     - DB_ENGINE=mysql DB_HOST=localhost DB_USERNAME=root
-    - DB_ENGINE=pgsql DB_HOST=localhost DB_USERNAME=postgres
+    - DB_ENGINE=postgres DB_HOST=localhost DB_USERNAME=postgres
     - DB_ENGINE=sqlite DB_HOST=localhost DB_USERNAME=jim
 services:
   - mysql
@@ -19,8 +19,8 @@ services:
 before_install:
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin;'; fi
   - if [ $DB_ENGINE = 'mysql' ]; then mysql -u root -e 'CREATE DATABASE origin_test;'; fi
-  - if [ $DB_ENGINE = 'pgsql' ]; then psql -c 'CREATE DATABASE origin;' -U postgres; fi
-  - if [ $DB_ENGINE = 'pgsql' ]; then psql -c 'CREATE DATABASE origin_test;' -U postgres; fi
+  - if [ $DB_ENGINE = 'postgres' ]; then psql -c 'CREATE DATABASE origin;' -U postgres; fi
+  - if [ $DB_ENGINE = 'postgres' ]; then psql -c 'CREATE DATABASE origin_test;' -U postgres; fi
   - pecl channel-update pecl.php.net
   - pecl install mailparse
   - echo yes | pecl install -f apcu

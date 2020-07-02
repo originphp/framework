@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,7 +12,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Model;
 
 use Origin\Core\Exception\Exception;
@@ -37,7 +40,7 @@ class Schema
          * This is important for pgsql when creating a table that references another
          * table that has not been created yet since foreign keys checks cannot be disabled
          */
-        if ($datasource->engine() === 'pgsql') {
+        if ($datasource->engine() === 'postgres') {
             foreach (array_keys($properties) as $table) {
                 $foreignKeys[$table] = [];
                 $data = $properties[$table];
@@ -51,7 +54,7 @@ class Schema
                 }
             }
         }
-      
+
         /**
          * Create the create table statements
          */
@@ -65,7 +68,7 @@ class Schema
          * Add all foreign keys statements
          * @example ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_ibfk_1" FOREIGN KEY (user_id) REFERENCES "users" (id) DEFERRABLE INITIALLY IMMEDIATE
          */
-        if ($datasource->engine() === 'pgsql') {
+        if ($datasource->engine() === 'postgres') {
             foreach (array_keys($properties) as $table) {
                 foreach ($foreignKeys[$table] as $name => $settings) {
                     if (! isset($settings['column']) || ! isset($settings['references'][0]) || ! isset($settings['references'][1])) {
@@ -76,7 +79,7 @@ class Schema
                 }
             }
         }
-       
+
         return array_filter($out);
     }
 
@@ -94,7 +97,7 @@ class Schema
         foreach (array_keys($properties) as $table) {
             $out[] = $datasource->adapter()->dropTableSql($table);
         }
-        
+
         return $out;
     }
 

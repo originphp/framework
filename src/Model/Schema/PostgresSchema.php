@@ -13,7 +13,8 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Origin\Model\Schema;
 
 use Origin\Model\ConnectionManager;
@@ -25,7 +26,7 @@ use Origin\Core\Exception\Exception;
  * There are suttle changes here, so this cannot be just droped in model driver. E.g. decimal and numeric does not have limit
  */
 
-class PgsqlSchema extends BaseSchema
+class PostgresSchema extends BaseSchema
 {
     protected $typeMap = [
         'string' => 'VARCHAR',
@@ -43,17 +44,17 @@ class PgsqlSchema extends BaseSchema
     ];
 
     /**
-        * This is the new create Table function
-        *
-        * @param string $table
-        * @param array $schema
-        * @param array $options
-        * @return array
-        */
+     * This is the new create Table function
+     *
+     * @param string $table
+     * @param array $schema
+     * @param array $options
+     * @return array
+     */
     public function createTableSql(string $table, array $schema, array $options = []): array
     {
         $columns = $constraints = $indexes = $databaseOptions = [];
-        
+
         # All Databases
         foreach ($schema as $name => $definition) {
             if (is_string($definition)) {
@@ -65,17 +66,17 @@ class PgsqlSchema extends BaseSchema
             }
             $columns[] = '  ' . $this->columnSql(['name' => $name] + $definition);
         }
-        
+
         if (isset($options['constraints'])) {
             foreach ($options['constraints'] as $name => $definition) {
                 $constraints[] = '  ' .  $this->tableConstraint(['name' => $name] + $definition);
             }
         }
-        
+
         # On PostgreSQL indexes are added after creating the name
         if (isset($options['indexes'])) {
             foreach ($options['indexes'] as $name => $definition) {
-                $indexes[] = $this->tableIndex(['name' => $name,'table' => $table] + $definition);
+                $indexes[] = $this->tableIndex(['name' => $name, 'table' => $table] + $definition);
             }
         }
 
@@ -102,16 +103,16 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * This is the new create Table function
-    * @internal on pgsql indexes have to be created outside of the table definition
-    *
-    * @param string $table
-    * @param array $columns
-    * @param array $constraints
-    * @param array $indexes
-    * @param array $options
-    * @return array
-    */
+     * This is the new create Table function
+     * @internal on pgsql indexes have to be created outside of the table definition
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $constraints
+     * @param array $indexes
+     * @param array $options
+     * @return array
+     */
     protected function buildCreateTableSql(string $table, array $columns, array $constraints, array $indexes, array $options = []): array
     {
         $out = $comments = [];
@@ -139,11 +140,11 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * This creates a foreignKey table parameter
-    *
-    * @param array $attributes name,columns,references, update,delete
-    * @return string
-    */
+     * This creates a foreignKey table parameter
+     *
+     * @param array $attributes name,columns,references, update,delete
+     * @return string
+     */
     protected function tableConstraintForeign(array $attributes): string
     {
         $sql = sprintf(
@@ -153,7 +154,7 @@ class PgsqlSchema extends BaseSchema
             $this->quoteIdentifier($attributes['references'][0]),
             $attributes['references'][1]
         );
-        
+
         if (! empty($attributes['update']) || ! empty($attributes['delete'])) {
             $sql .= ' ' . sprintf('ON UPDATE %s ON DELETE %s', $this->onClause($attributes['update']), $this->onClause($attributes['delete']));
         }
@@ -162,11 +163,11 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * Creates the contraint code
-    *
-    * @param array $attributes
-    * @return string
-    */
+     * Creates the contraint code
+     *
+     * @param array $attributes
+     * @return string
+     */
     protected function tableConstraint(array $attributes): string
     {
         $columns = implode(',', (array) $attributes['column']);
@@ -176,7 +177,7 @@ class PgsqlSchema extends BaseSchema
         if ($attributes['type'] === 'unique') {
             return sprintf('CONSTRAINT %s UNIQUE (%s)', $this->quoteIdentifier($attributes['name']), $columns);
         }
-       
+
         if ($attributes['type'] === 'foreign') {
             return $this->tableConstraintForeign($attributes);
         }
@@ -184,14 +185,14 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * creates the indexes when creating tables. In Postgresql this is the same
-    * as add index as this is added after the create table. Eventually the
-    * addIndex needs to be re factored to quote identifiers, but not before this task has been
-    * completed.
-    *
-    * @param array $attributes
-    * @return string
-    */
+     * creates the indexes when creating tables. In Postgresql this is the same
+     * as add index as this is added after the create table. Eventually the
+     * addIndex needs to be re factored to quote identifiers, but not before this task has been
+     * completed.
+     *
+     * @param array $attributes
+     * @return string
+     */
     protected function tableIndex(array $attributes): string
     {
         if (empty($attributes['table'])) {
@@ -225,7 +226,7 @@ class PgsqlSchema extends BaseSchema
         );
         $results = $this->fetchAll($sql);
         $indexes = [];
-        
+
         foreach ($results as $result) {
             /**
              * handle multiple columns
@@ -238,11 +239,11 @@ class PgsqlSchema extends BaseSchema
                     continue;
                 }
             }
-            
+
             $indexes[] = [
                 'name' => $result['name'],
                 'column' => $result['column'],
-                'type' => $result['unique'] ? 'unique': 'index',
+                'type' => $result['unique'] ? 'unique' : 'index',
             ];
         }
 
@@ -283,7 +284,7 @@ class PgsqlSchema extends BaseSchema
             $type = $this->typeMap[$type];
 
             if ($agnoType === 'decimal') {
-                $options += ['precision' => 10,'scale' => 0];
+                $options += ['precision' => 10, 'scale' => 0];
                 $type = "{$type}({$options['precision']},{$options['scale']})";
             } elseif ($agnoType === 'string') {
                 $options += ['limit' => 255];
@@ -299,9 +300,9 @@ class PgsqlSchema extends BaseSchema
         );
 
         $name = $this->quoteIdentifier($name);
-       
+
         $default = $this->schemaValue($options['default']);
-        
+
         if (! empty($options['default']) && $options['null'] === false) {
             $sql .= ", ALTER COLUMN {$name} SET DEFAULT {$default}, ALTER COLUMN {$name} SET NOT NULL";
         } elseif (isset($options['default'])) {
@@ -371,15 +372,15 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-         * Sql for disabling foreign key checks
-         *
-         * @return string
-         */
+     * Sql for disabling foreign key checks
+     *
+     * @return string
+     */
     public function disableForeignKeySql(): string
     {
         return 'SET CONSTRAINTS ALL DEFERRED';
     }
-    
+
     /**
      * Sql for enabling foreign key checks
      *
@@ -437,7 +438,7 @@ class PgsqlSchema extends BaseSchema
         return $out;
     }
     /**
-    * Returns a remove foreign key SQL stataement
+     * Returns a remove foreign key SQL stataement
      *
      * @param string $fromTable
      * @param string $constraint
@@ -500,11 +501,11 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * Sql for truncating a table
-    *
-    * @param string $table
-    * @return array
-    */
+     * Sql for truncating a table
+     *
+     * @param string $table
+     * @return array
+     */
     public function truncateTableSql(string $table): array
     {
         $sql = sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', $this->quoteIdentifier($table));
@@ -518,13 +519,13 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * Returns a SQL statement for dropping a table
-    *
-    * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
-    * @param string $table
-    * @param array $options ifExists default is false
-    * @return string
-    */
+     * Returns a SQL statement for dropping a table
+     *
+     * @internal on pgsql cascade is required for dropping tables if foreign keys reference it
+     * @param string $table
+     * @param array $options ifExists default is false
+     * @return string
+     */
     public function dropTableSql(string $table, array $options = []): string
     {
         $sql = 'DROP TABLE %s CASCADE';
@@ -536,14 +537,14 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * This describes the table in the database using the new format. This will require caching due to the amount
-    * of queries that will need to be executed.
-    *
-    * @internal this is the new function, will evenutally replace schema
-    *
-    * @param string $table
-    * @return array
-    */
+     * This describes the table in the database using the new format. This will require caching due to the amount
+     * of queries that will need to be executed.
+     *
+     * @internal this is the new function, will evenutally replace schema
+     *
+     * @param string $table
+     * @return array
+     */
     public function describe(string $table): array
     {
         $database = $this->connection()->database();
@@ -570,26 +571,26 @@ class PgsqlSchema extends BaseSchema
      ORDER BY position";
 
         $results = $this->fetchAll($sql);
-     
+
         $columns = $this->convertTableDescription($results);
 
         $indexes = $constraints = [];
-     
+
         /**
          * Convert primary key to constraint
          */
         foreach ($this->indexes($table) as $index) {
             if (substr($index['name'], -5) === '_pkey') {
-                $constraints['primary'] = ['type' => 'primary','column' => $index['column']];
+                $constraints['primary'] = ['type' => 'primary', 'column' => $index['column']];
                 continue;
             }
             $name = $index['name'];
             // unique constraint is same as unique index
             if ($index['type'] === 'unique') {
-                $constraints[$name] = ['type' => 'unique','column' => $index['column']];
+                $constraints[$name] = ['type' => 'unique', 'column' => $index['column']];
                 continue;
             }
-            $indexes[$name] = ['type' => 'index','column' => $index['column']];
+            $indexes[$name] = ['type' => 'index', 'column' => $index['column']];
         }
 
         foreach ($this->foreignKeys($table) as $foreignKey) {
@@ -597,11 +598,11 @@ class PgsqlSchema extends BaseSchema
             $constraints[$name] = [
                 'type' => 'foreign',
                 'column' => $foreignKey['column'],
-                'references' => [$foreignKey['referencedTable'],$foreignKey['referencedColumn']],
+                'references' => [$foreignKey['referencedTable'], $foreignKey['referencedColumn']],
             ];
         }
-   
-        return ['columns' => $columns,'constraints' => $constraints,'indexes' => $indexes];
+
+        return ['columns' => $columns, 'constraints' => $constraints, 'indexes' => $indexes];
     }
 
     /**
@@ -622,7 +623,7 @@ class PgsqlSchema extends BaseSchema
         if ($isMapped) {
             $type = $this->typeMap[$data['type']];
         }
-        
+
         /**
          * Handle specials and default values
          */
@@ -635,9 +636,9 @@ class PgsqlSchema extends BaseSchema
             }
         }
 
-        if (in_array($data['type'], ['integer','bigint']) && ! empty($data['autoIncrement'])) {
-            $type = $data['type'] === 'integer'?'SERIAL':'BIGSERIAL';
-            unset($data['default'],$data['null']);
+        if (in_array($data['type'], ['integer', 'bigint']) && ! empty($data['autoIncrement'])) {
+            $type = $data['type'] === 'integer' ? 'SERIAL' : 'BIGSERIAL';
+            unset($data['default'], $data['null']);
             // serial is the equivelent of `id INTEGER NOT NULL DEFAULT nextval('table_name_id_seq')`
         }
 
@@ -650,12 +651,12 @@ class PgsqlSchema extends BaseSchema
             if ($data['type'] === 'float') {
                 $out .= '(' . $data['precision'] . ')';
             } elseif ($data['type'] === 'decimal' || ! $isMapped) {
-                $out .= '(' . $data['precision'] .',' . ($data['scale'] ?? 0) . ')';
+                $out .= '(' . $data['precision'] . ',' . ($data['scale'] ?? 0) . ')';
             }
         }
 
-        if (in_array($data['type'], ['string','text']) && ! empty($data['collate'])) {
-            $out .= ' COLLATE "' . $data['collate'] .'"';
+        if (in_array($data['type'], ['string', 'text']) && ! empty($data['collate'])) {
+            $out .= ' COLLATE "' . $data['collate'] . '"';
         }
 
         if (isset($data['null']) && $data['null'] === false) {
@@ -667,7 +668,7 @@ class PgsqlSchema extends BaseSchema
         } elseif (isset($data['default'])) {
             $out .= ' DEFAULT ' . $this->schemaValue($data['default']);
         }
-        
+
         return $out;
     }
 
@@ -680,11 +681,11 @@ class PgsqlSchema extends BaseSchema
     protected function convertTableDescription(array $data): array
     {
         $out = [];
-              
+
         foreach ($data as $row) {
             $defintion = $this->parseColumn($row);
             $defintion += [
-                'null' => $row['null'] === 'YES'?true:false,
+                'null' => $row['null'] === 'YES' ? true : false,
                 'default' => $row['default'],
             ];
 
@@ -704,7 +705,7 @@ class PgsqlSchema extends BaseSchema
             if (! empty($row['collation'])) {
                 $defintion['collate'] = $row['collation'];
             }
-           
+
             if (! empty($row['comment'])) {
                 $defintion['comment'] = $row['comment'];
             }
@@ -713,7 +714,7 @@ class PgsqlSchema extends BaseSchema
             if (! empty($row['autoincrement'])) {
                 $defintion['autoIncrement'] = true;
             }
-          
+
             $out[$row['name']] = $defintion;
         }
 
@@ -735,15 +736,15 @@ class PgsqlSchema extends BaseSchema
         }
 
         if ($row['type'] === 'character varying') {
-            return ['type' => 'string','limit' => $row['limit']];
+            return ['type' => 'string', 'limit' => $row['limit']];
         }
 
         if ($col === 'character') {
-            return ['type' => 'string','limit' => $row['limit'],'fixed' => true];
+            return ['type' => 'string', 'limit' => $row['limit'], 'fixed' => true];
         }
 
         if ($col === 'integer' || $col === 'bigint') {
-            return ['type' => $col,'limit' => $row['precision']];
+            return ['type' => $col, 'limit' => $row['precision']];
         }
 
         if ($col === 'real') {
@@ -751,10 +752,10 @@ class PgsqlSchema extends BaseSchema
         }
 
         if ($col === 'numeric') {
-            return ['type' => 'decimal','precision' => $row['precision'],'scale' => $row['scale']];
+            return ['type' => 'decimal', 'precision' => $row['precision'], 'scale' => $row['scale']];
         }
 
-        if (in_array($col, ['boolean','date','text','time',])) {
+        if (in_array($col, ['boolean', 'date', 'text', 'time',])) {
             return ['type' => $col];
         }
 
@@ -770,14 +771,14 @@ class PgsqlSchema extends BaseSchema
     }
 
     /**
-    * Maps the onclause value
-    *
-    * @param string $value
-    * @return string
-    */
+     * Maps the onclause value
+     *
+     * @param string $value
+     * @return string
+     */
     protected function onClause(string $value): string
     {
-        $map = ['cascade' => 'CASCADE','restrict' => 'RESTRICT','setNull' => 'SET NULL','setDefault' => 'SET DEFAULT','noAction' => 'NO ACTION'];
+        $map = ['cascade' => 'CASCADE', 'restrict' => 'RESTRICT', 'setNull' => 'SET NULL', 'setDefault' => 'SET DEFAULT', 'noAction' => 'NO ACTION'];
 
         return $map[$value] ?? 'RESTRICT';
     }

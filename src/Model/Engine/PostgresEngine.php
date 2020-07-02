@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2020 Jamiel Sharief.
@@ -11,20 +12,22 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
+
 namespace Origin\Model\Engine;
 
 use Origin\Model\Connection;
 
-class PgsqlEngine extends Connection
+class PostgresEngine extends Connection
 {
-    protected $name = 'pgsql';
+    protected $name = 'postgres';
 
     /**
-    * What to quote table and column aliases
-    *
-    * @var string
-    */
+     * What to quote table and column aliases
+     *
+     * @var string
+     */
     protected $quote = '"';
 
     /**
@@ -37,12 +40,12 @@ class PgsqlEngine extends Connection
     {
         extract($config);
         if ($database) {
-            return "{$engine}:host={$host};dbname={$database};options='--client_encoding=UTF8'";
+            return "pgsql:host={$host};dbname={$database};options='--client_encoding=UTF8'";
         }
 
-        return "{$engine}:host={$host};options='--client_encoding=UTF8'";
+        return "pgsql:host={$host};options='--client_encoding=UTF8'";
     }
-    
+
     /**
      * Gets a list of tables
      *
@@ -51,7 +54,7 @@ class PgsqlEngine extends Connection
     public function tables(): array
     {
         $sql = 'SELECT table_name as "table" FROM information_schema.tables WHERE table_schema=\'public\'';
-       
+
         $out = [];
         if ($this->execute($sql)) {
             $list = $this->fetchList();

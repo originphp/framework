@@ -1,11 +1,12 @@
 <?php
+
 use Origin\Model\Engine\MysqlEngine;
-use Origin\Model\Engine\PgsqlEngine;
 use Origin\Model\Engine\SqliteEngine;
+use Origin\Model\Engine\PostgresEngine;
 
 /**
  * Database configuration
- * Engines are mysql and pgsql
+ * Engines are mysql and postgres
  * @link https://www.originphp.com/docs/getting-started/
  */
 
@@ -13,7 +14,7 @@ $engine = env('DB_ENGINE', 'mysql');
 
 $engineMap = [
     'mysql' => MysqlEngine::class,
-    'pgsql' => PgsqlEngine::class,
+    'postgres' => PostgresEngine::class,
     'sqlite' => SqliteEngine::class
 ];
 
