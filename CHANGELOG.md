@@ -7,6 +7,7 @@
 
 - Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw
 a `MissingSharedViewException`.
+- Change `Mail::attachments` property to private, use `Mail::attachments()` instead.
 
 ## Removed
 
