@@ -13,11 +13,8 @@
  */
 
 use Origin\Log\Log;
-use Origin\Cache\Cache;
-use Origin\Core\Config;
 use Origin\Core\PhpFile;
 use Origin\DotEnv\DotEnv;
-use Origin\Core\Autoloader;
 
 define('START_TIME', microtime(true));
 
@@ -63,15 +60,3 @@ if (file_exists($configFile)) {
         (new PhpFile())->write($configFile, $vars, ['short' => true,'before' => implode("\n", $header)]);
     }
 }
-
-/**
- * Moved here from bootstrap in version 2.5
- */
-$autoloader = Autoloader::instance();
-$autoloader->directory(ROOT);
-
-$autoloader->addNamespaces([
-    'App' => 'app',
-    'App\\Test' => 'tests'
-]);
-$autoloader->register();
