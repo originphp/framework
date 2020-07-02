@@ -43,18 +43,6 @@ Log::config('default', [
     'file' => LOGS . '/application.log'
 ]);
 
-// internal caching
-/**
- * Backwards comptability
- */
-Cache::config('origin', [
-    'engine' => 'File',
-    'path' => CACHE . '/origin',
-    'duration' => debugEnabled() ? '+2 minutes' : '+24 hours',
-    'prefix' => 'cache_',
-    'serialize' => true
-]);
-
 /**
  * As of version 2.6 .env.php is the cached version of .env. Prior
  * to this config was set manually .env.php
