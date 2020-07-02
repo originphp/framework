@@ -49,6 +49,35 @@ class Result
     }
 
     /**
+     * Checks if the result is a success, does not have error key
+     *
+     * @return boolean
+     */
+    public function success(): bool
+    {
+        return ! isset($this->error);
+    }
+
+    /**
+     * Gets the data from the result, or specific data using the key
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function data(string $key = null)
+    {
+        if ($key === null) {
+            return $this->data;
+        }
+
+        if (! isset($this->data) || ! isset($this->data[$key])) {
+            return null;
+        }
+
+        return $this->data[$key];
+    }
+
+    /**
     * Magic method is trigged when the object is treated as string.
     *
     * @return string
@@ -93,6 +122,7 @@ class Result
             return $object->toArray();
         }
         $array = (array) $object;
+
         foreach ($array as $property => $value) {
             if (is_object($value)) {
                 $array[$property] = $this->convertToArray($value);

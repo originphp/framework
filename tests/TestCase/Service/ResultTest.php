@@ -28,6 +28,7 @@ class ResultTest extends \PHPUnit\Framework\TestCase
     {
         $result = new Result(['success' => true,'data' => ['foo' => 'bar']]);
         $expected = '{"success":true,"data":{"foo":"bar"}}';
+
         $this->assertEquals($expected, $result->toJson());
       
         $expected = <<< EOF
@@ -40,5 +41,26 @@ class ResultTest extends \PHPUnit\Framework\TestCase
 EOF;
         $this->assertEquals($expected, $result->toJson(['pretty' => true]));
         $this->assertEquals($expected, (string) $result);
+    }
+
+    public function testSuccess()
+    {
+        $result = new Result(['data' => []]);
+        $this->assertTrue($result->success());
+
+        $result = new Result(['error' => []]);
+        $this->assertFalse($result->success());
+    }
+
+    public function testData()
+    {
+        $data = ['foo' => 'bar'];
+        $result = new Result(['data' => $data]);
+        $this->assertEquals('bar', $result->data('foo'));
+        $this->assertNull($result->data('bar'));
+        $this->assertEquals($data, $result->data());
+
+        $result = new Result(['error' => []]);
+        $this->assertNull($result->data('bar'));
     }
 }

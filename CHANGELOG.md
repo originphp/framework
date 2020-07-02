@@ -3,6 +3,11 @@
 
 ## [3.0.0] - 
 
+## Added
+
+- Added `success` method to `Service\Result`.
+- Added `data` method to `Service\Result`.
+
 ## Changed
 
 - Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw
