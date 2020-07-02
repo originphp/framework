@@ -5,14 +5,26 @@
 
 ## Changed
 
-- Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder
+- Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw
+a `MissingSharedViewException`.
 
 ## Removed
 
 - Removed autoloading from bootstrap (since 2.5)
 - Removed `Model\Exception\NotFoundException`
-- Removed backwards compatibility code
+- Removed `View\Exception\MissingElementException`
 - Removed `View::view`
+
+- Removed backwards compatibility , you need to adjust config file, and if you have used them elsewhere, then you will need
+to adjust accordingly.
+    - `config/app.php`: `debug` this should be `App.debug`
+    - `config/app.php`: `Security.key` this should be`App.securityKey`
+    - `config/app.php`: `Session.timeout` this should be `App.sessionTimeout`
+    - `config/app.php`: `Mailbox.KeepEmails` this should be `App.mailboxKeepEmails`
+
+- Removed backwards compatibility for model validation setting for individual rules
+    - `allowBlank` - this was changed to `allowEmpty`
+    - `required`: use `required` rule
 
 ## [2.8.0] - 2020-06-26
 
