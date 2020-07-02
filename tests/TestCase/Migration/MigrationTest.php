@@ -125,21 +125,21 @@ class MigrationTest extends OriginTestCase
         $migration->addIndex('products', 'name');
         $migration->addIndex('products', 'status');
 
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_name']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_status']));
 
         $migration->addForeignKey('products', 'users', 'owner_id');
 
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_name']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_status']));
 
         $migration->addForeignKey('products', 'users', 'manager_id');
 
-        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1af1da1b']));
-        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_origin_1b2f2b89']));
+        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_1af1da1b']));
+        $this->assertTrue($migration->foreignKeyExists('products', ['name' => 'fk_1b2f2b89']));
 
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_name_index']));
-        $this->assertTrue($migration->indexExists('products', ['name' => 'products_status_index']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_name']));
+        $this->assertTrue($migration->indexExists('products', ['name' => 'idx_products_status']));
 
         $migration->reset();
 
@@ -446,13 +446,13 @@ class MigrationTest extends OriginTestCase
         $this->assertTrue($migration->indexExists('articles', 'author_id'));
 
         $migration = $this->migration();
-        $migration->renameIndex('articles', 'articles_author_id_index', 'aaii_index');
+        $migration->renameIndex('articles', 'idx_articles_author_id', 'idx_aaii');
 
-        $this->assertTrue($migration->indexExists('articles', ['name' => 'aaii_index']));
+        $this->assertTrue($migration->indexExists('articles', ['name' => 'idx_aaii']));
 
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
-        $this->assertFalse($migration->indexExists('articles', ['name' => 'aaii_index']));
+        $this->assertFalse($migration->indexExists('articles', ['name' => 'idx_aaii']));
     }
 
     public function testRemoveIndex()
@@ -496,7 +496,7 @@ class MigrationTest extends OriginTestCase
         $migration->addForeignKey('articles', 'users', ['update' => 'cascade', 'delete' => 'restrict']);
 
         $expected = [
-            'name' => 'fk_origin_c05a10b6',  //fk_origin_c05a10b6
+            'name' => 'fk_c05a10b6',  //fk_c05a10b6
             'table' => 'articles',
             'column' => 'user_id',
             'referencedTable' => 'users',
@@ -532,7 +532,7 @@ class MigrationTest extends OriginTestCase
         $this->assertTrue($migration->columnExists('users', 'lng_id'));
         $this->assertFalse($migration->columnExists('users', 'id'));
 
-        $this->assertTrue($migration->indexExists('users', ['name' => 'users_id_email_index']));
+        $this->assertTrue($migration->indexExists('users', ['name' => 'idx_users_id_email']));
 
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
@@ -540,7 +540,7 @@ class MigrationTest extends OriginTestCase
         $this->assertFalse($migration->columnExists('users', 'lng_id'));
         $this->assertTrue($migration->columnExists('users', 'id'));
 
-        $this->assertFalse($migration->indexExists('users', ['name' => 'users_id_email_index']));
+        $this->assertFalse($migration->indexExists('users', ['name' => 'idx_users_id_email']));
     }
 
     public function testAddForeignKeyCustom()
@@ -577,7 +577,7 @@ class MigrationTest extends OriginTestCase
         $migration->addForeignKey('articles', 'users', ['name' => 'myfk_001']);
 
         // in sqlite there is no way to extract foreignkey name
-        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_c05a10b6' : 'myfk_001';
+        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_c05a10b6' : 'myfk_001';
 
         $this->assertTrue($migration->foreignKeyExists('articles', ['name' => $name]));
 
@@ -636,13 +636,13 @@ class MigrationTest extends OriginTestCase
 
         $migration->addForeignKey('contacts', 'accounts');
 
-        $migration->addForeignKey('contacts', 'members', ['column' => 'owner_id', 'name' => 'fk_a1']); // fk_origin_320405e8
+        $migration->addForeignKey('contacts', 'members', ['column' => 'owner_id', 'name' => 'fk_a1']); // fk_320405e8
 
-        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_origin_caf8d09a' : 'fk_a1'; // fk_origin_caf8d09a
+        $name = $migration->connection()->engine() === 'sqlite' ? 'fk_caf8d09a' : 'fk_a1'; // fk_caf8d09a
 
         $this->assertTrue($migration->foreignKeyExists('contacts', 'account_id'));
         $this->assertTrue($migration->foreignKeyExists('contacts', ['name' => $name]));
-        //fk_origin_caf8d09a
+        //fk_caf8d09a
 
         $otherStatements = $migration->reverseStatements();
 

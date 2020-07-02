@@ -602,7 +602,7 @@ class SqliteSchema extends BaseSchema
         $out = [];
         foreach ($this->fetchAll($sql) as $result) {
             $out[] = [
-                'name' => 'fk_origin_' . hash('crc32', $table . '__' . $result['from']),
+                'name' => 'fk_' . hash('crc32', $table . '__' . $result['from']),
                 'table' => $table,
                 'column' => $result['from'],
                 'referencedTable' => $result['table'],

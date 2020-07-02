@@ -863,7 +863,7 @@ class Migration
     {
         $name = implode('_', (array) $column);
 
-        return strtolower($table . '_' . $name) . '_index';
+        return 'idx_' . strtolower($table . '_' . $name);
     }
 
     /**
@@ -877,7 +877,7 @@ class Migration
      * @param string|array $optionsOrColumn either column e.g. owner_id or an array of options with the following keys
      * - column: the foreignKey on the fromTable defaults toTable.singularized_id
      * - primaryKey: the primary key defaults to id
-     * - name: the constraint name defaults to fk_origin_1234567891
+     * - name: the constraint name defaults to fk_1234567891
      * - update: action to carry out on update. (cascade,restrict,setNull,setDefault,noAction)
      * - delete: action to carry out on delete. (cascade,restrict,setNull,setDefault,noAction)
      * @return void
@@ -907,7 +907,7 @@ class Migration
 
         // Sqlite does not allow to retrive names, force name standard so that things later dont break
         if ($this->connection()->engine() === 'sqlite' || $options['name'] === null) {
-            $options['name'] = 'fk_origin_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
+            $options['name'] = 'fk_' . $this->getForeignKeyIdentifier($fromTable, $options['column']);
         }
 
         $this->statements[] = $sql = new Sql(
@@ -928,12 +928,12 @@ class Migration
     /**
      * removeForeignKey('accounts','owners'); // removes accounts.owner_id
      * removeForeignKey('accounts',['column'=>'owner_id'];
-     * removeForeignKey('accounts',['name'=>'fk_origin_1234567891'];
+     * removeForeignKey('accounts',['name'=>'fk_1234567891'];
      *
      * @param string $fromTable
      * @param string|array $optionsOrToTable table name or array with any of the following options:
      *  - column: the foreignKey on the fromTable defaults optionsOrToTable.singularized_id
-     *  - name: the constraint name defaults to fk_origin_1234567891
+     *  - name: the constraint name defaults to fk_1234567891
      *  - primaryKey: the primary key defaults to id
      * @return void
      */

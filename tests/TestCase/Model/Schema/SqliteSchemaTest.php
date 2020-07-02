@@ -261,7 +261,7 @@ class SqliteSchemaTest extends OriginTestCase
                 'references' => ['tusers','id'],
             ];
            
-            $this->assertEquals($expected, $schema['constraints']['fk_origin_97a33924']);
+            $this->assertEquals($expected, $schema['constraints']['fk_97a33924']);
 
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tarticles'));
             $this->assertTrue($adapter->connection()->execute('DROP TABLE tusers'));
@@ -330,7 +330,7 @@ class SqliteSchemaTest extends OriginTestCase
             $this->markTestSkipped();
         }
        
-        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+        $statements = $adapter->addForeignKey('articles', 'fk_12345', 'author_id', 'users', 'id');
         $this->assertEquals('cebbf262e5c2956368af58cc9d582ed2', md5(json_encode($statements)));
 
         foreach ($statements as $statement) {
@@ -487,16 +487,16 @@ class SqliteSchemaTest extends OriginTestCase
         // Configure the stub.
 
         $foreignKeys = [
-            ['name' => 'fk_origin_e74ce85cbc','column' => 'author_name'],
+            ['name' => 'fk_e74ce85cbc','column' => 'author_name'],
         ];
 
         $stub->method('foreignKeys')
             ->willReturn($foreignKeys);
         # Check logic
         $this->assertTrue($stub->foreignKeyExists('books', ['column' => 'author_name']));
-        $this->assertTrue($stub->foreignKeyExists('books', ['name' => 'fk_origin_e74ce85cbc']));
+        $this->assertTrue($stub->foreignKeyExists('books', ['name' => 'fk_e74ce85cbc']));
         $this->assertFalse($stub->foreignKeyExists('books', ['column' => 'id']));
-        $this->assertFalse($stub->foreignKeyExists('books', ['name' => 'fk_origin_e75ce86cb2']));
+        $this->assertFalse($stub->foreignKeyExists('books', ['name' => 'fk_e75ce86cb2']));
     }
 
     /**
@@ -508,7 +508,7 @@ class SqliteSchemaTest extends OriginTestCase
         if ($adapter->connection()->engine() !== 'sqlite') {
             $this->markTestSkipped('This test is for sqlite');
         }
-        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+        $statements = $adapter->addForeignKey('articles', 'fk_12345', 'author_id', 'users', 'id');
       
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
@@ -516,7 +516,7 @@ class SqliteSchemaTest extends OriginTestCase
 
         // In Sqlite name is generated when retrieving to avoid  having to parse data.
         $expected = [
-            'name' => 'fk_origin_5e445c0c', //
+            'name' => 'fk_5e445c0c', //
             'table' => 'articles',
             'column' => 'author_id',
             'referencedTable' => 'users',
@@ -604,13 +604,13 @@ class SqliteSchemaTest extends OriginTestCase
             $this->markTestSkipped('Skipping');
         }
 
-        $statements = $adapter->addForeignKey('articles', 'fk_origin_12345', 'author_id', 'users', 'id');
+        $statements = $adapter->addForeignKey('articles', 'fk_12345', 'author_id', 'users', 'id');
      
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
         }
 
-        $statements = $adapter->removeForeignKey('articles', 'fk_origin_5e445c0c');
+        $statements = $adapter->removeForeignKey('articles', 'fk_5e445c0c');
 
         $this->assertEquals('68002eb7e8b1cf066121e066b53e8bfe', md5(json_encode($statements)));
         foreach ($statements as $statement) {
