@@ -331,7 +331,7 @@ class SqliteSchemaTest extends OriginTestCase
         }
        
         $statements = $adapter->addForeignKey('articles', 'fk_12345', 'author_id', 'users', 'id');
-        $this->assertEquals('cebbf262e5c2956368af58cc9d582ed2', md5(json_encode($statements)));
+        $this->assertEquals('2d99dd3486675e9a6df37cbabee69ddc', md5(json_encode($statements)));
 
         foreach ($statements as $statement) {
             $this->assertTrue($adapter->connection()->execute($statement));
