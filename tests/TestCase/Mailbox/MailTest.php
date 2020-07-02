@@ -33,7 +33,7 @@ class MailTest extends \PHPUnit\Framework\TestCase
         $message = file_get_contents(__DIR__ . '/messages/html-attachment.eml');
         $mail = new Mail($message);
   
-        $mail->attachments[0]['tmp'] = '/tmp/foo'; // change from random
+        $mail->attachments()['tmp'] = '/tmp/foo'; // change from random
         $this->assertEquals(202003145, crc32(serialize($mail)));
 
         /**

@@ -120,11 +120,10 @@ class Mail
 
     /**
      * Array of attachments
-     * @internal this will be deprecated in next major release use ::atachments() instead.
      *
      * @var array
      */
-    public $attachments = [];
+    private $attachments = [];
 
     /**
      * Email headers in array format
