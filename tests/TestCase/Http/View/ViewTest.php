@@ -24,7 +24,7 @@ use Origin\Http\Controller\Controller;
 use App\Http\Controller\PostsController;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
-use Origin\Http\View\Exception\MissingElementException;
+use Origin\Http\View\Exception\MissingSharedViewException;
 
 class MockController extends Controller
 {
@@ -68,13 +68,13 @@ class MockView extends View
         $this->overideFiles = $files;
     }
 
-    protected function getElementFilename(string $name): string
+    protected function getSharedViewFilename(string $name): string
     {
         if (isset($this->overideFiles[$name])) {
             return $this->overideFiles[$name];
         }
 
-        return parent::getElementFilename($name);
+        return parent::getSharedViewFilename($name);
     }
 
     protected function getLayoutFilename(string $name): string
@@ -176,13 +176,13 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $controller = new TestsController($request, new Response());
         $view = new MockView($controller);
 
-        $expected = APP.'/Http/View/Element/recordTable.ctp';
+        $expected = APP.'/Http/View/Shared/recordTable.ctp';
         $view->setFile($expected); // Prevent exception
-        $result = $view->callMethod('getElementFilename', ['recordTable']);
+        $result = $view->callMethod('getSharedViewFilename', ['recordTable']);
 
-        $expected = PLUGINS.'/contact_manager/src/Http/View/Element/recordTable.ctp';
+        $expected = PLUGINS.'/contact_manager/src/Http/View/Shared/recordTable.ctp';
         $view->setFile($expected); // Prevent exception
-        $result = $view->callMethod('getElementFilename', ['ContactManager.recordTable']);
+        $result = $view->callMethod('getSharedViewFilename', ['ContactManager.recordTable']);
 
         $this->assertEquals($expected, $result);
     }
@@ -268,10 +268,10 @@ class ViewTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->View->fetch('foo'));
     }
 
-    public function testMissingElementException()
+    public function testMissingSharedViewException()
     {
-        $this->expectException(MissingElementException::class);
-        $this->View->element('i-dont-exist');
+        $this->expectException(MissingSharedViewException::class);
+        $this->View->renderShared('i-dont-exist');
     }
     public function testMissingViewException()
     {

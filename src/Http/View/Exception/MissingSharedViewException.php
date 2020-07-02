@@ -16,8 +16,8 @@ namespace Origin\Http\View\Exception;
 
 use Origin\Core\Exception\Exception;
 
-class MissingElementException extends Exception
+class MissingSharedViewException extends Exception
 {
-    protected $template = 'Element %s could not be found.';
+    protected $template = 'Shared view %s could not be found.';
     protected $defaultErrorCode = 500;
 }

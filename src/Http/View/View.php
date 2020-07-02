@@ -24,7 +24,7 @@ use Origin\Http\Controller\Controller;
 use Origin\Http\View\Helper\HelperRegistry;
 use Origin\Http\View\Exception\MissingViewException;
 use Origin\Http\View\Exception\MissingLayoutException;
-use Origin\Http\View\Exception\MissingElementException;
+use Origin\Http\View\Exception\MissingSharedViewException;
 
 class View
 {
@@ -140,17 +140,15 @@ class View
     }
 
     /**
-     * Returns a rendered element
-     *
-     * @deprecated this will be deprecated in 3.0
+     * Renders a partial view from the shared folder
      *
      * @param string $name Name of the element e.g. math-widget, html_editor
-     * @param array $vars Variables that will be made available in the element
+     * @param array $vars Variables that will be made available in the partial
      * @return string
      */
-    public function element(string $name, array $vars = []): string
+    public function renderShared(string $name, array $vars = []): string
     {
-        $element__filename = $this->getElementFilename($name);
+        $element__filename = $this->getSharedViewFilename($name);
 
         $vars = array_merge($this->vars, $vars);
        
@@ -262,21 +260,21 @@ class View
     }
 
     /**
-     * Gets the filename for the element
+     * Gets the filename for the shared partial view
      *
      * @deprecated this will be deprecated in 3.0
      *
      * @param string $name
      * @return string
      */
-    protected function getElementFilename(string $name): string
+    protected function getSharedViewFilename(string $name): string
     {
-        $filename = $this->getFilename($name, 'Element');
+        $filename = $this->getFilename($name, 'Shared');
         if ($this->fileExists($filename)) {
             return $filename;
         }
 
-        throw new MissingElementException($name);
+        throw new MissingSharedViewException($name);
     }
 
     /**

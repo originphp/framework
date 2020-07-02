@@ -3,6 +3,12 @@
 
 ## [3.0.0] - 
 
+## Changed
+
+- Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder
+
+## Removed
+
 - Removed autoloading from bootstrap (since 2.5)
 - Removed `Model\Exception\NotFoundException`
 - Removed backwards compatibility code
