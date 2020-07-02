@@ -22,19 +22,33 @@ class MailTest extends \PHPUnit\Framework\TestCase
     {
         $message = file_get_contents(__DIR__ . '/messages/text.eml');
         $mail = new Mail($message);
+
         #debug($mail);
-        $this->assertEquals(2518035855, crc32(serialize($mail)));
+        $this->assertEquals(997208093, crc32(serialize($mail)));
 
         $message = file_get_contents(__DIR__ . '/messages/html.eml');
         $mail = new Mail($message);
 
-        $this->assertEquals(1475267297, crc32(serialize($mail)));
+        $this->assertEquals(1191201039, crc32(serialize($mail)));
 
         $message = file_get_contents(__DIR__ . '/messages/html-attachment.eml');
         $mail = new Mail($message);
   
-        $mail->attachments()['tmp'] = '/tmp/foo'; // change from random
-        $this->assertEquals(202003145, crc32(serialize($mail)));
+        $attachments = $mail->attachments();
+        $attachments[0]['tmp'] = '/tmp/foo';
+        $this->assertEquals('jamiel.to@gmail.com', $mail->to);
+        $this->assertEquals('jamiel.from@gmail.com', $mail->from);
+        $this->assertEquals('HTML email with Attachment', $mail->subject);
+        $this->assertEquals('941afeddf705afd99957c5c8132acfd7', md5($mail->htmlPart));
+        $expected = [
+            'name' => 'README.md',
+            'type' => 'text/plain',
+            'size' => '57',
+            'tmp' => '/tmp/foo'
+        ];
+        $attachments = $mail->attachments();
+        $attachments[0]['tmp'] = '/tmp/foo';
+        $this->assertEquals([$expected], $attachments);
 
         /**
          * I want to reach reply-to, sender, return-path and add multiple cc/bcc
@@ -60,7 +74,8 @@ Jamiel Sharief
 
 EOF;
         $mail = new Mail($message);
-        $this->assertEquals(42897348, crc32(serialize($mail)));
+
+        $this->assertEquals(1529504234, crc32(serialize($mail)));
     }
 
     public function testRecipients()
