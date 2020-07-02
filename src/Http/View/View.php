@@ -247,8 +247,6 @@ class View
     /**
      * Gets the filename for the shared partial view
      *
-     * @deprecated this will be deprecated in 3.0
-     *
      * @param string $name
      * @return string
      */
