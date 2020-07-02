@@ -167,7 +167,7 @@ class Job
     }
 
     /**
-    * Registers a callback to be called before a job is dispatch
+    * Registers a callback to be called before a job is dispatched
     *
     * @param string $method
     * @return void
@@ -175,6 +175,28 @@ class Job
     protected function afterDispatch(string $method): void
     {
         $this->registerCallback('afterDispatch', $method);
+    }
+
+    /**
+     * Registers a callback for handling errors
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function onError(string $method): void
+    {
+        $this->registerCallback('onError', $method);
+    }
+
+    /**
+    * Registers a callback which run if successful
+    *
+    * @param string $method
+    * @return void
+    */
+    protected function onSuccess(string $method): void
+    {
+        $this->registerCallback('onSuccess', $method);
     }
 
     /**
@@ -254,8 +276,7 @@ class Job
             if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
-
-            $this->executeHook('onError', [$e]);
+            $this->dispatchCallbacks('onError', [$e]);
 
             if ($this->enqueued && $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
@@ -270,7 +291,8 @@ class Job
             $this->connection()->success($this);
         }
 
-        $this->executeHook('onSuccess', $this->arguments);
+        $this->dispatchCallbacks('onSuccess', [$this->arguments]);
+
         $this->executeHook('shutdown');
 
         return true;

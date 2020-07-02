@@ -813,13 +813,15 @@ class Model
         $result = $assocation->saveBelongsTo($data, $options);
       
         if ($result) {
+            $event = $data->exists() === true ? 'update' : 'create';
             try {
                 $result = $this->processSave($data, $options);
             } catch (\Exception $e) {
-                if ($options['callbacks'] && method_exists($this, 'onError')) {
-                    $this->onError($e);
+                if ($options['callbacks']) {
+                    $this->triggerCallback('onError', $event, [$e]);
                 }
-                $this->cancelTransaction($data, $options, $data->exists() === true ? 'update' : 'create');
+           
+                $this->cancelTransaction($data, $options, $event);
                 throw $e;
             }
         }
@@ -1222,8 +1224,8 @@ class Model
             $result = $this->connection()->delete($this->table, [$this->primaryKey => $this->id]);
             $entity->deleted($result);
         } catch (\Exception $e) {
-            if ($options['callbacks'] && method_exists($this, 'onError')) {
-                $this->onError($e);
+            if ($options['callbacks']) {
+                $this->triggerCallback('onError', 'delete', [$e]);
             }
             $this->cancelTransaction($entity, $options, 'delete');
             throw $e;
@@ -1852,6 +1854,19 @@ class Model
     {
         $options += ['on' => ['create','update','delete']];
         $this->registerCallback('afterRollback', $method, $options);
+    }
+
+    /**
+    * Register a callback for error handling
+    *
+    * @param string $method
+    * @param array $options (no options for this callback)
+    * @return void
+    */
+    public function onError(string $method, array $options = []): void
+    {
+        $options += ['on' => ['create','update','delete']];
+        $this->registerCallback('onError', $method, $options);
     }
 
     /**

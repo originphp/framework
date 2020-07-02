@@ -28,9 +28,11 @@ class PassOrFailJob extends Job
     
     protected $connection = 'default';
 
-    public function initialize(): void
+    protected function initialize(): void
     {
         $this->status = 'new';
+        $this->onError('errorHandler');
+        $this->successHandler('done');
     }
 
     public function execute(bool $pass = true): void
@@ -39,15 +41,18 @@ class PassOrFailJob extends Job
             $a = 1 / 0;
         }
     }
-    public function onSuccess(bool $pass = true): void
+
+    public function successHandler(bool $pass = true): void
     {
         $this->status = 'success';
     }
-    public function onError(\Exception $exception): void
+
+    public function errorHandler(\Exception $exception): void
     {
         $this->status = 'error';
         $this->retry(['wait' => 'now','limit' => 1]);
     }
+
     public function set($array)
     {
         foreach ($array as $key => $value) {

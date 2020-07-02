@@ -25,6 +25,8 @@ class SupportMailbox extends Mailbox
 {
     public $beforeCalled = false;
     public $afterCalled = false;
+    public $onSuccessCalled = false;
+
     protected $bounceClass;
 
     public function bounceMe()
@@ -41,20 +43,29 @@ class SupportMailbox extends Mailbox
     {
         $this->beforeProcess('beforeProcessCallback');
         $this->afterProcess('afterProcessCallback');
+        $this->onSuccess('onSuccessCallback');
     }
+    
     protected function process()
     {
         if ($this->bounceClass) {
             $this->bounceWith($this->bounceClass);
         }
     }
+
     protected function beforeProcessCallback()
     {
         $this->beforeCalled = true;
     }
+
     protected function afterProcessCallback()
     {
         $this->afterCalled = true;
+    }
+
+    protected function onSuccessCallback()
+    {
+        $this->onSuccessCalled = true;
     }
 }
 
@@ -109,6 +120,7 @@ class MailboxTest extends OriginTestCase
         $mailbox->dispatch();
         $this->assertTrue($mailbox->beforeCalled);
         $this->assertTrue($mailbox->afterCalled);
+        $this->assertTrue($mailbox->onSuccessCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('delivered', $inboundEmail->status);
     }
@@ -120,7 +132,8 @@ class MailboxTest extends OriginTestCase
         $mailbox->bounceMe();
         $mailbox->dispatch();
         $this->assertTrue($mailbox->beforeCalled);
-        $this->assertFalse($mailbox->afterCalled);
+        $this->assertTrue($mailbox->afterCalled);
+        $this->assertFalse($mailbox->onSuccessCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('bounced', $inboundEmail->status);
     }
@@ -133,6 +146,7 @@ class MailboxTest extends OriginTestCase
         $mailbox->dispatch();
         $this->assertTrue($mailbox->beforeCalled);
         $this->assertFalse($mailbox->afterCalled);
+        $this->assertFalse($mailbox->onSuccessCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('failed', $inboundEmail->status);
     }

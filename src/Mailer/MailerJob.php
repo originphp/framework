@@ -19,13 +19,18 @@ use Origin\Job\Job;
 class MailerJob extends Job
 {
     protected $queue = 'mailers';
+
+    protected function initialize(): void
+    {
+        $this->onError('errorHandler');
+    }
     
     public function execute(array $params): void
     {
         $params['mailer']->dispatch(...$params['arguments']);
     }
 
-    public function onError(\Exception $exception): void
+    public function errorHandler(\Exception $exception): void
     {
         $this->retry(['wait' => '+30 minutes','limit' => 3]);
     }

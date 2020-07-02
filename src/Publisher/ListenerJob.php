@@ -20,12 +20,17 @@ class ListenerJob extends Job
 {
     protected $queue = 'listeners';
 
+    protected function initialize(): void
+    {
+        $this->onError('errorHandler');
+    }
+
     protected function execute(string $className, string $method, array $args = [])
     {
         ( new Publisher())->dispatch(new $className(), $method, $args);
     }
 
-    public function onError(\Exception $exception): void
+    public function errorHandler(\Exception $exception): void
     {
         $this->retry();
     }

@@ -125,6 +125,28 @@ class Mailbox
     }
 
     /**
+     * Registers a callback for handling errors
+     *
+     * @param string $method
+     * @return void
+     */
+    protected function onError(string $method): void
+    {
+        $this->registerCallback('onError', $method);
+    }
+
+    /**
+    * Registers a callback which run if successful
+    *
+    * @param string $method
+    * @return void
+    */
+    protected function onSuccess(string $method): void
+    {
+        $this->registerCallback('onSuccess', $method);
+    }
+
+    /**
      * Dispatches the message to the mailbox
      *
      * @param \Origin\Model\Entity $message
@@ -150,20 +172,19 @@ class Mailbox
         try {
             if ($this->dispatchCallbacks('beforeProcess')) {
                 $this->process();
-                if ($this->bounced === false) {
-                    $this->dispatchCallbacks('afterProcess');
-                }
+                $this->dispatchCallbacks('afterProcess');
             }
 
             if ($this->bounced === false) {
                 $this->setStatus('delivered');
+                $this->dispatchCallbacks('onSuccess');
             }
 
             return true;
         } catch (\Exception $exception) {
             $this->setStatus('failed');
             Log::error($exception->getMessage());
-            $this->executeHook('onError', [$exception]);
+            $this->dispatchCallbacks('onError', [$exception]);
         }
         
         return false;

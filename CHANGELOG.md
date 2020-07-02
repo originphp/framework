@@ -8,11 +8,24 @@
 - Added `success` method to `Service\Result`.
 - Added `data` method to `Service\Result`.
 
+- Jobs
+    - Added `onSuccess` callback registration (BC)
+    - Added `onError` callback registration (BC)
+
+- Mailbox
+    - Added `onSuccess` callback registration
+    - Added `onError` callback registration (BC)
+
+- Added `onError` callback registration (BC)
+
+
 ## Changed
 
 - Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw
 a `MissingSharedViewException`.
-- Change `Mail::attachments` property to private, use `Mail::attachments()` instead.
+- Changed `Mail::attachments` property to private, use `Mail::attachments()` instead.
+- Changed Mailbox `afterProcess` callback is called even if the mail bounces, use `onSuccess` instead if you only want
+to check non bounced messages
 
 ## Removed
 

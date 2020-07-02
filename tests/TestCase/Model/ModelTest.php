@@ -76,6 +76,8 @@ class Article extends Model
 
         $this->afterRollback('afterRollbackCallback');
         $this->afterCommit('afterCommitCallback');
+
+        $this->onError('errorHandler');
     }
 
     /**
@@ -243,7 +245,7 @@ class Article extends Model
      * @param \Exception $exception
      * @return void
      */
-    public function onError(\Exception $exception): void
+    public function errorHandler(\Exception $exception): void
     {
     }
 
