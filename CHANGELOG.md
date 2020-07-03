@@ -21,9 +21,8 @@
 
 ## Changed
 
-- Changed index and foreign key names when creating migrations to use `fk_` or `idx_` prefix
-- Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw
-a `MissingSharedViewException`.
+- Changed default index and foreign key names when creating migrations to use `fk_` or `idx_` prefix
+- Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw a `MissingSharedViewException`.
 - Changed `Mail::attachments` property to private, use `Mail::attachments()` instead.
 - Changed Mailbox `afterProcess` callback is called even if the mail bounces, use `onSuccess` instead if you only want
 to check non bounced messages
@@ -54,8 +53,8 @@ to adjust accordingly.
 
 ## Added
 
-- Added Number::readableSize 
-- Added Number::parseSize
+- Added `Number::readableSize`
+- Added `Number::parseSize`
 
 ## [2.7.5] - 2020-06-19
 
