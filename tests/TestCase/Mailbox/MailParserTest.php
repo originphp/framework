@@ -128,7 +128,7 @@ class MailParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('README.md', $attachments[0]['name']);
         $this->assertEquals('text/plain', $attachments[0]['type']);
         $this->assertEquals(57, $attachments[0]['size']);
-        $this->assertRegExp('/\/tmp\/([a-z0-9]+)$/i', $attachments[0]['tmp']);
+        $this->assertMatchesRegularExpression('/\/tmp\/([a-z0-9]+)$/i', $attachments[0]['tmp']);
     }
 
     public function testAttachmentsGetBody()

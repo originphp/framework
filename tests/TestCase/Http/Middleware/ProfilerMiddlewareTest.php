@@ -46,6 +46,6 @@ class ProfilerMiddlewareTest extends OriginTestCase
         // [2019-11-05 12:16:22] GET http://localhost/ 0.0004s 4.27mb
         $contents = file_get_contents(LOGS . '/profile.log');
         $this->assertStringContainsString($expected, $contents);
-        $this->assertRegExp('/([0-9\.]+)s ([0-9\.]+)mb/', $contents);
+        $this->assertMatchesRegularExpression('/([0-9\.]+)s ([0-9\.]+)mb/', $contents);
     }
 }

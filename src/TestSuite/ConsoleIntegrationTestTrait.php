@@ -150,7 +150,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertOutputRegExp(string $expression): void
     {
-        $this->assertRegexp($expression, $this->stdout->read());
+        $this->assertMatchesRegularExpression($expression, $this->stdout->read());
     }
 
     /**
@@ -213,7 +213,7 @@ trait ConsoleIntegrationTestTrait
      */
     public function assertErrorRegExp(string $expression): void
     {
-        $this->assertRegexp($expression, $this->stderr->read());
+        $this->assertMatchesRegularExpression($expression, $this->stderr->read());
     }
 
     /**

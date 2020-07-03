@@ -93,7 +93,7 @@ class RedisEngineTest extends OriginTestCase
      
         // Check it was added
         $result = $this->engine->redis()->lpop('queue:test');
-        $this->assertRegExp('/' . $job->id().'/', $result);
+        $this->assertMatchesRegularExpression('/' . $job->id().'/', $result);
     }
 
     public function testAddScheduled()
@@ -103,7 +103,7 @@ class RedisEngineTest extends OriginTestCase
 
         // Check it was added
         $result = $this->engine->redis()->zrange('scheduled:test', 0, -1); // schedule uses different type of list
-        $this->assertRegExp('/' . $job->id().'/', $result[0]);
+        $this->assertMatchesRegularExpression('/' . $job->id().'/', $result[0]);
     }
 
     public function testFetch()
