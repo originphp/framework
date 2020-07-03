@@ -120,6 +120,15 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $OriginTestCase->fixtures(['Article']);
         $this->assertEquals(['Article'], $OriginTestCase->fixtures());
     }
+
+    public function testDeprecation()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $OriginTestCase->deprecated(function () {
+            deprecationWarning('foo is deprecated use bar instead.');
+            $this->assertTrue(true);
+        });
+    }
 }
 /**
  * This must be AFTER test case declaration
