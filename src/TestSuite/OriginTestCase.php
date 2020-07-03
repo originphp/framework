@@ -117,4 +117,23 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
 
         return $this->fixtures = $fixtures;
     }
+
+    /**
+    * Executes code that has been deprecated without trigering the
+    * deprecation warning.
+    *
+    * @example
+    *
+    *  $this->deprecated(function () {
+    *      $object = new CustoObject();
+    *      $this->assertTrue($object->dontUse());
+    *  });
+    */
+    public function deprecated(callable $callable)
+    {
+        $level = error_reporting();
+        error_reporting(E_ALL & ~E_USER_DEPRECATED);
+        $callable();
+        error_reporting($level);
+    }
 }

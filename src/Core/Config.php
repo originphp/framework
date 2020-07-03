@@ -75,7 +75,7 @@ class Config
     public static function write(string $key = null, $value = null): void
     {
         static::dot()->set($key, $value);
-        if ($key === 'debug') {
+        if ($key === 'App.debug') {
             ini_set('display_errors', (string) $value);
         }
     }

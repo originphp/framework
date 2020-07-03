@@ -28,7 +28,7 @@ require ROOT . '/vendor/autoload.php';
 /**
  * Register error handler
  */
-$errorHandler = (PHP_SAPI === 'cli' or PHP_SAPI === 'phpdbg') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
+$errorHandler = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
 require ORIGIN . '/src/Core/functions.php';

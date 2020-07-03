@@ -218,23 +218,34 @@ function env(string $variable, $default = null)
 }
 
 /**
- * A helper function that Logs a deprecation warning and triggers an error if in debug mode
+ * Triggers a deprecation warning if error reporting is set to show deprecation warnings.
  *
  * @param string $message
+ * @param integer $frameNo
  * @return void
  */
-function deprecationWarning(string $message): void
+function deprecationWarning(string $message, int $frameNo = 1): void
 {
+    $showDeprecationWarnings = error_reporting() & E_USER_DEPRECATED; // is a bit! & bitwise operator
+    if (! $showDeprecationWarnings) {
+        return;
+    }
+
     $trace = debug_backtrace();
-    if (isset($trace[1])) {
-        $message = sprintf('%s - %s. Line: %s', $message, str_replace(ROOT . DS, '', $trace[1]['file']), $trace[1]['line']);
+    if (isset($trace[$frameNo])) {
+        $file = $trace[$frameNo]['file'] ?? 'internal';
+        $line = $trace[$frameNo]['line'] ?? '?';
+        $message = sprintf(
+            "%s\nFile: %s.\nLine: %s",
+            $message,
+            str_replace(ROOT . DS, '', $file),
+            $line
+        );
     }
 
     Log::warning($message);
 
-    if (debugEnabled()) {
-        trigger_error($message, E_USER_DEPRECATED);
-    }
+    trigger_error($message, E_USER_DEPRECATED);
 }
 
 /**
