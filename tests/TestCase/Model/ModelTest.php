@@ -1310,32 +1310,34 @@ class ModelTest extends OriginTestCase
      */
     public function testSaveValidation()
     {
-        $article = $this->Article->new();
-        $this->assertFalse($this->Article->save($article));
-
-        $this->Article->validate('title', [
-            'rule' => 'notBlank',
-            'required' => true,
-            'on' => 'create']);
-        
-        $article->author_id = 1001;
-        $article->title = null;
-        $article->body = 'Title is blank so it should fail';
-        $this->assertFalse($this->Article->save($article));
-        $this->assertNotEmpty($article->errors());
-
-        $article = $this->Article->new();
-        $article->author_id = 1001;
-        $article->title = 'Now this should work';
-        $article->body = 'did not want to call reset';
-   
-        $this->assertTrue($this->Article->save($article));
-
-        $article = $this->Article->new();
-        $article->author_id = 1001;
-        $article->title = 'Testing CRUD';
-        $article->body = ['bad data'];
-        $this->assertFalse($this->Article->save($article));
+        $this->deprecated(function () {
+            $article = $this->Article->new();
+            $this->assertFalse($this->Article->save($article));
+    
+            $this->Article->validate('title', [
+                'rule' => 'notBlank',
+                'required' => true,
+                'on' => 'create']);
+            
+            $article->author_id = 1001;
+            $article->title = null;
+            $article->body = 'Title is blank so it should fail';
+            $this->assertFalse($this->Article->save($article));
+            $this->assertNotEmpty($article->errors());
+    
+            $article = $this->Article->new();
+            $article->author_id = 1001;
+            $article->title = 'Now this should work';
+            $article->body = 'did not want to call reset';
+       
+            $this->assertTrue($this->Article->save($article));
+    
+            $article = $this->Article->new();
+            $article->author_id = 1001;
+            $article->title = 'Testing CRUD';
+            $article->body = ['bad data'];
+            $this->assertFalse($this->Article->save($article));
+        });
     }
 
     /**

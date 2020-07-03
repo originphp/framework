@@ -174,6 +174,7 @@ class Session
         if (Config::exists('Session.timeout')) {
             $timeout = Config::read('Session.timeout');
         }
+        
         $lastActivity = $this->read('Session.lastActivity');
         $this->write('Session.lastActivity', time());
 
@@ -330,4 +331,7 @@ class Session
     {
         $_SESSION = [];
     }
+}
+if (Config::exists('Session.timeout')) {
+    deprecationWarning('Session.timeout has been deprecated use App.sessionTimeout instead.', 0);
 }

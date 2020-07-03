@@ -174,23 +174,25 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testValidateRequired()
     {
-        $Validator = $this->Validator;
-        $Validator->rules([
-            'name' => 'alphaNumeric',
-            'email' => ['rule' => 'email', 'required' => false],
-        ]);
-
-        $entity = new Entity(['name' => 'data']);
-        $this->assertTrue($Validator->validates($entity));
-
-        $Validator->rules([
-            'name' => 'alphaNumeric',
-            'email' => ['rule' => 'email', 'required' => true],
-        ]);
-        $this->assertFalse($Validator->validates($entity));
-
-        $entity = new Entity(['name' => 'data', 'email' => 'js@example.com']);
-        $this->assertTrue($Validator->validates($entity));
+        $this->deprecated(function () {
+            $Validator = $this->Validator;
+            $Validator->rules([
+                'name' => 'alphaNumeric',
+                'email' => ['rule' => 'email', 'required' => false],
+            ]);
+    
+            $entity = new Entity(['name' => 'data']);
+            $this->assertTrue($Validator->validates($entity));
+    
+            $Validator->rules([
+                'name' => 'alphaNumeric',
+                'email' => ['rule' => 'email', 'required' => true],
+            ]);
+            $this->assertFalse($Validator->validates($entity));
+    
+            $entity = new Entity(['name' => 'data', 'email' => 'js@example.com']);
+            $this->assertTrue($Validator->validates($entity));
+        });
     }
 
     /**
@@ -200,37 +202,39 @@ class ModelValidatorTest extends OriginTestCase
      */
     public function testValidatesRequiredKey()
     {
-        $Validator = $this->Validator;
+        $this->deprecated(function () {
+            $Validator = $this->Validator;
 
-        $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric', 'required' => true],
-        ]);
+            $Validator->rules([
+                'name' => ['rule' => 'alphaNumeric', 'required' => true],
+            ]);
 
-        $create = true;
-        $update = false;
+            $create = true;
+            $update = false;
 
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
-        $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $create));
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
-        $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $update));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+            $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $create));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+            $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $update));
 
-        $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric', 'on' => 'create', 'required' => true],
-        ]);
+            $Validator->rules([
+                'name' => ['rule' => 'alphaNumeric', 'on' => 'create', 'required' => true],
+            ]);
 
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
-        $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $create));
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
-        $this->assertTrue($Validator->validates(new Entity(['foo' => 'bar']), $update));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+            $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $create));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+            $this->assertTrue($Validator->validates(new Entity(['foo' => 'bar']), $update));
 
-        $Validator->rules([
-            'name' => ['rule' => 'alphaNumeric', 'on' => 'update', 'required' => true],
-        ]);
+            $Validator->rules([
+                'name' => ['rule' => 'alphaNumeric', 'on' => 'update', 'required' => true],
+            ]);
 
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
-        $this->assertTrue($Validator->validates(new Entity(['foo' => 'bar']), $create));
-        $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
-        $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $update));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $create));
+            $this->assertTrue($Validator->validates(new Entity(['foo' => 'bar']), $create));
+            $this->assertTrue($Validator->validates(new Entity(['name' => 'data']), $update));
+            $this->assertFalse($Validator->validates(new Entity(['foo' => 'bar']), $update));
+        });
     }
 
     public function testValidationRuleArray()
@@ -332,25 +336,27 @@ class ModelValidatorTest extends OriginTestCase
      */
     public function testValidates()
     {
-        $this->Article->validate('title', 'email');
+        $this->deprecated(function () {
+            $this->Article->validate('title', 'email');
 
-        $article = $this->Article->new(['title' => '']);
-        $this->assertFalse($this->Article->validates($article));
-
-        $this->Article->validate('title', ['rule' => 'email', 'required' => true]);
-        $article = $this->Article->new(['foo' => 'bar']);
-        $this->assertFalse($this->Article->validates($article));
-
-        # Run validation again despite no data being modified, still should show errors
-        $this->assertFalse($this->Article->validates($article));
-
-        $this->Article->validate('title', ['rule' => 'email', 'allowBlank' => true]);
-        $article = $this->Article->new(['title' => '']);
-        $this->assertTrue($this->Article->validates($article));
-
-        $this->Article->validate('body', 'alphanumeric');
-        $article = $this->Article->new(['title' => '', 'body' => ['bad data']]);
-        $this->assertFalse($this->Article->validates($article));
+            $article = $this->Article->new(['title' => '']);
+            $this->assertFalse($this->Article->validates($article));
+    
+            $this->Article->validate('title', ['rule' => 'email', 'required' => true]);
+            $article = $this->Article->new(['foo' => 'bar']);
+            $this->assertFalse($this->Article->validates($article));
+    
+            # Run validation again despite no data being modified, still should show errors
+            $this->assertFalse($this->Article->validates($article));
+    
+            $this->Article->validate('title', ['rule' => 'email', 'allowBlank' => true]);
+            $article = $this->Article->new(['title' => '']);
+            $this->assertTrue($this->Article->validates($article));
+    
+            $this->Article->validate('body', 'alphanumeric');
+            $article = $this->Article->new(['title' => '', 'body' => ['bad data']]);
+            $this->assertFalse($this->Article->validates($article));
+        });
     }
 
     /**
@@ -421,22 +427,24 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testNotBlank()
     {
-        $this->Article->validate('title', ['notBlank', 'alphaNumeric']);
-        $article = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
-        $this->assertTrue($this->Article->validates($article));
-        $article->title = '';
-        $this->assertFalse($this->Article->validates($article));
-        $article->title = null;
+        $this->deprecated(function () {
+            $this->Article->validate('title', ['notBlank', 'alphaNumeric']);
+            $article = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
+            $this->assertTrue($this->Article->validates($article));
+            $article->title = '';
+            $this->assertFalse($this->Article->validates($article));
+            $article->title = null;
 
-        $this->Article->validate('title', [
-            'rule' => 'notBlank',
-            'required' => true,
-            'on' => 'create']);
+            $this->Article->validate('title', [
+                'rule' => 'notBlank',
+                'required' => true,
+                'on' => 'create']);
         
-        $article->author_id = 1001;
-        $article->title = null;
-        $article->body = 'Title is blank so it should fail';
-        $this->assertFalse($this->Article->validates($article));
+            $article->author_id = 1001;
+            $article->title = null;
+            $article->body = 'Title is blank so it should fail';
+            $this->assertFalse($this->Article->validates($article));
+        });
     }
 
     public function testPresentRule()

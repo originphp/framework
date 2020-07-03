@@ -17,6 +17,7 @@ namespace Origin\Test\Core;
 use Origin\Core\Dot;
 use Origin\Core\Config;
 use Origin\Core\Exception\Exception;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Core\Exception\FileNotFoundException;
 
 class MockConfig extends Config
@@ -31,7 +32,7 @@ class MockConfig extends Config
     }
 }
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends OriginTestCase
 {
     public function testRead()
     {
@@ -51,11 +52,14 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         Config::write('Test', $expected);
         $this->assertEquals($expected, Config::read('Test'));
 
-        Config::write('debug', 0);
-        $this->assertEquals(0, Config::read('debug'));
-
-        Config::write('debug', 1);
-        $this->assertEquals(1, Config::read('debug'));
+        $this->deprecated(function () {
+            Config::write('debug', 0);
+            $this->assertEquals(0, Config::read('debug'));
+    
+            Config::write('debug', 1);
+            $this->assertEquals(1, Config::read('debug'));
+        });
+       
         // Test Multi
         Config::write('Test.key1', 'one');
         Config::write('Test.key2', 'two');

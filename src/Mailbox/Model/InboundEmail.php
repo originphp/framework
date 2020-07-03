@@ -68,7 +68,7 @@ class InboundEmail extends Model
          */
         $cleanWhen = Config::read('App.mailboxKeepEmails') ?? Config::read('Mailbox.KeepEmails');
         $cleanAfter = $cleanWhen ?? '+30 days';
-         
+
         (new MailboxCleanJob())->schedule($cleanAfter)->dispatch();
     }
     
@@ -106,4 +106,8 @@ class InboundEmail extends Model
     {
         return $this->updateColumn($id, 'status', $status);
     }
+}
+         
+if (Config::exists('Mailbox.KeepEmails')) {
+    deprecationWarning('Mailbox.KeepEmails has been deprecated use App.mailboxKeepEmails instead.', 0);
 }

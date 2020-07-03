@@ -278,3 +278,7 @@ function now(): string
 {
     return date('Y-m-d H:i:s');
 }
+
+if (env('APP_DEBUG') != false && env('APP_DEBUG') != true) {
+    deprecationWarning('debug config key has been deprecated use App.debug instead.');
+}

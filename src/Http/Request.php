@@ -646,6 +646,8 @@ class Request
          * Backwards comptability check :
          */
         if (func_num_args() === 1 && strpos($header, ':') === false) {
+            deprecationWarning('Using request:headers to get headers has been deprecated use request::headers instead.');
+
             return $this->headers($header);
         }
         // allow for HTTP/1.0 404 Not Found ? is this really needed

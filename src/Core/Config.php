@@ -76,7 +76,11 @@ class Config
     public static function write(string $key = null, $value = null): void
     {
         static::dot()->set($key, $value);
+        
         if ($key === 'debug') {
+            deprecationWarning('debug config setting deprecated use App.debug instead.');
+        }
+        if ($key === 'App.debug' || $key === 'debug') {
             ini_set('display_errors', (string) $value);
         }
     }

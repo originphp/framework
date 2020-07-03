@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.8.1] - 2020-07-03
+
+### Fixed
+- Fixed Config::write to use App.debug
+
+### Deprecated
+
+Added deprecation warnings for previously deprecated features which had backwards compatibility.
+
+- Deprecated request::header() for getting items from header
+- Deprecated model validation setting required
+- Deprecated model validation setting allowEmpty
+- Deprecated config settings: debug, Security.key, Session.timeout and Mailbox.KeepEmails
+
 ## [2.8.0] - 2020-06-26
 
 ## Changed

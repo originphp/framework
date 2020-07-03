@@ -174,3 +174,6 @@ class Cookie
         return Config::read('App.securityKey') ?? Config::read('Security.key');
     }
 }
+if (Config::exists('Security.key')) {
+    deprecationWarning('Security.key has been deprecated use App.securityKey instead.', 0);
+}

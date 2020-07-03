@@ -114,17 +114,19 @@ class ValidationRuleSetTest extends OriginTestCase
 
     public function testBackwardsCompat()
     {
-        $rule = new ValidationRuleSet([
-            ['rule' => 'foo', 'allowBlank' => true],
-            ['rule' => 'bar', 'required' => true],
-        ]);
-        $out = $rule->toArray();
-
-        $this->assertArrayNotHasKey('allowBlank', $out['rule-1']);
-        $this->assertTrue($out['rule-1']['allowEmpty']);
-
-        $this->assertArrayNotHasKey('required', $out['rule-2']);
-        $this->assertTrue($out['rule-2']['present']);
+        $this->deprecated(function () {
+            $rule = new ValidationRuleSet([
+                ['rule' => 'foo', 'allowBlank' => true],
+                ['rule' => 'bar', 'required' => true],
+            ]);
+            $out = $rule->toArray();
+    
+            $this->assertArrayNotHasKey('allowBlank', $out['rule-1']);
+            $this->assertTrue($out['rule-1']['allowEmpty']);
+    
+            $this->assertArrayNotHasKey('required', $out['rule-2']);
+            $this->assertTrue($out['rule-2']['present']);
+        });
     }
 
     public function testStringParsing()

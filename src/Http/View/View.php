@@ -142,8 +142,6 @@ class View
     /**
      * Returns a rendered element
      *
-     * @deprecated this will be deprecated in 3.0
-     *
      * @param string $name Name of the element e.g. math-widget, html_editor
      * @param array $vars Variables that will be made available in the element
      * @return string
@@ -188,6 +186,7 @@ class View
      * to break up large view files, as opposed to elements which are for sharing.
      *
      * @deprecated This will be deprected use view::render instead.
+     * @codeCoverageIgnore
      *
      * @param string $name
      * @param array $vars
@@ -195,6 +194,8 @@ class View
      */
     public function view(string $name, array $vars = []): string
     {
+        deprecationWarning('View::view has been deprecated use View::render instead.');
+
         return $this->render($name, $vars);
     }
 
@@ -263,8 +264,6 @@ class View
 
     /**
      * Gets the filename for the element
-     *
-     * @deprecated this will be deprecated in 3.0
      *
      * @param string $name
      * @return string

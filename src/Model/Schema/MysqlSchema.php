@@ -638,6 +638,7 @@ class MysqlSchema extends BaseSchema
              * @deprecated This provides backwards comptability
              */
             if (is_string($databaseOptions)) {
+                deprecationWarning('Using string for schema options is deprecated.');
                 $databaseOptions = ['options' => $options];
             }
         }

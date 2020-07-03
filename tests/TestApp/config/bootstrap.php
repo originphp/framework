@@ -35,6 +35,7 @@ $autoloader->register();
  * Config::load('stripe');
  * $token  = Config::read('Stripe.privateKey');
  */
+
 Config::load('app');
 Config::load('log');
 Config::load('cache');

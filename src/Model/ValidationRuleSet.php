@@ -191,10 +191,12 @@ class ValidationRuleSet
     private function backwardsComptability(array $params): array
     {
         if (isset($params['required'])) {
+            deprecationWarning('Validation rule setting `required` has been deprecated use the `required` rule instead.');
             $params['present'] = $params['required'];
             unset($params['required']);
         }
         if (isset($params['allowBlank'])) {
+            deprecationWarning('Validation rule setting `allowBlank` as been deprecated use `allowEmpty` instead.');
             $params['allowEmpty'] = $params['allowBlank'];
             unset($params['allowBlank']);
         }
