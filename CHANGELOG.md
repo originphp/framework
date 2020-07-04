@@ -17,7 +17,7 @@
     - Added `onSuccess` callback registration
     - Added `onError` callback registration (BC)
 
-- Added `onError` callback registration (BC)
+- Model Added `onError` callback registration (BC)
 
 ## Changed
 
