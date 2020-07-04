@@ -44,11 +44,7 @@ class BatchInsertQuery extends QueryObject
             throw new InvalidArgumentException('No records');
         }
 
-        /**
-         * work with older PHP version
-         */
-        $firstKey = key($records);
-        reset($records);
+        $firstKey = array_key_first($records);
         
         $fields = array_keys($records[$firstKey]);
         $questionMarks = array_fill(0, count($fields), '?');
