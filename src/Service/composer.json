@@ -2,8 +2,8 @@
     "name": "originphp/service",
     "description": "Service Objects",
     "type": "library",
-    "keywords": ["service","service object"],
-    "homepage": "https://www.originphp.com",
+    "keywords": ["service","services","service object"],
+    "homepage": "https://www.originphp.com/docs/services/",
     "license": "MIT",
     "authors": [
       {
