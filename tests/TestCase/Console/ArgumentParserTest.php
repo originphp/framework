@@ -32,6 +32,19 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foobar', $arguments['text_c']);
     }
 
+    public function testParseOptionWithouthOperator()
+    {
+        $ap = new ArgumentParser();
+        $ap->addOption('text_a', ['type' => 'string','short' => 'a']);
+        $ap->addOption('text_b', ['type' => 'string','short' => 'b']);
+        $ap->addArgument('text_c', ['type' => 'string']);
+
+        list($options, $arguments) = $ap->parse(['--text_a','foo','-b','bar','foobar']);
+        $this->assertEquals('foo', $options['text_a']);
+        $this->assertEquals('bar', $options['text_b']);
+        $this->assertEquals('foobar', $arguments['text_c']);
+    }
+
     public function testDefault()
     {
         $ap = new ArgumentParser();
@@ -129,6 +142,24 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap = new ArgumentParser();
         $this->expectException(ConsoleException::class);
         $ap->parse(['-v=1234']);
+    }
+
+    public function testParseOptionMissingValue()
+    {
+        $ap = new ArgumentParser();
+        $ap->addOption('foo', ['type' => 'string']);
+
+        $this->expectException(ConsoleException::class);
+        $ap->parse(['--foo']);
+    }
+
+    public function testParseOptionMissingValueEqual()
+    {
+        $ap = new ArgumentParser();
+        $ap->addOption('foo', ['type' => 'string']);
+
+        $this->expectException(ConsoleException::class);
+        $ap->parse(['--foo=']);
     }
 
     public function testArray()

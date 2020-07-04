@@ -56,6 +56,11 @@ class ArgumentParser
 
     protected $usage = null;
 
+    /**
+     * @var array
+     */
+    private $argv = [];
+
     public function __construct(string $name = 'command', string $description = null)
     {
         $this->command = $name;
@@ -208,7 +213,10 @@ class ArgumentParser
     {
         $arguments = $options = [];
         $args = [];
-        foreach ($argv as $key => $arg) {
+
+        $this->argv = $argv;
+
+        while (($arg = array_shift($this->argv))) {
             if (is_string($arg) && $this->isLongOption($arg)) {
                 $options = $this->parseLongOption($arg, $options);
             } elseif (is_string($arg) && $this->isShortOption($arg)) {
@@ -327,6 +335,12 @@ class ArgumentParser
        
         if (strpos($option, '=') !== false) {
             list($option, $value) = explode('=', $option);
+        } else {
+            $value = array_shift($this->argv) ?? null;
+        }
+
+        if ($value === null || $value === '') {
+            throw new ConsoleException(sprintf('Option `%s` requires a value.', $name));
         }
       
         $value = $this->value($this->options[$name]['type'], $value);

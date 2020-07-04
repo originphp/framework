@@ -4,6 +4,8 @@
 
 ## Added
 
+- Added improved console option parsing, you can now do `bin/console command --option value`
+
 - Added `success` method to `Service\Result`.
 - Added `data` method to `Service\Result`.
 
