@@ -1,0 +1,32 @@
+{
+    "name": "originphp/service",
+    "description": "Service Objects",
+    "type": "library",
+    "keywords": ["service","service object"],
+    "homepage": "https://www.originphp.com",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Service": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Origin\\Test\\Service": "tests/"
+      }
+    },
+    "require": {
+      "php": ">=7.3.0"
+    },
+    "require-dev": {
+      "phpunit/phpunit": "^9"
+    },
+    "suggest": {}
+  }
+  
