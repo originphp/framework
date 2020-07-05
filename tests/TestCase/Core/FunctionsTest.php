@@ -30,27 +30,6 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Dispatcher', $classname);
     }
 
-    public function testTranslate()
-    {
-        $null = null;
-        $this->assertNull(__($null));
-        $expected = 'Nothing';
-        $translate = __($expected); // no translation return as is
-        $this->assertEquals('Nothing', $translate);
-
-        $translated = __('Your password is {password}!', ['password' => 'secret']);
-        $this->assertEquals('Your password is secret!', $translated);
-        
-        $translated = __('Your username is {email} and your password is {password}.', [
-            'email' => 'jimbo@example.com',
-            'password' => 'secret',
-        ]);
-        $this->assertEquals('Your username is jimbo@example.com and your password is secret.', $translated);
-        $translate = 'You have no apples|You have one apple|You have {count} apples';
-        $this->assertEquals('You have no apples', __($translate, ['count' => 0]));
-        $this->assertEquals('You have one apple', __($translate, ['count' => 1]));
-        $this->assertEquals('You have 2 apples', __($translate, ['count' => 2]));
-    }
     public function testH()
     {
         $this->assertEquals('&lt;h1&gt;Headline&lt;/h1&gt;', h('<h1>Headline</h1>'));
@@ -86,7 +65,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/Core/FunctionsTest.php Line: 84
+tests/TestCase/Core/FunctionsTest.php Line: 63
 
 Array
 (
@@ -107,7 +86,7 @@ EOF;
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/Core/FunctionsTest.php Line: 105
+tests/TestCase/Core/FunctionsTest.php Line: 84
 
 &lt;p&gt;foo&lt;/p&gt;
 

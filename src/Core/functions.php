@@ -12,8 +12,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Origin\Log\Log;
-use Origin\I18n\I18n;
 use Origin\Core\Config;
 use Origin\Core\Debugger;
 
@@ -170,23 +168,6 @@ function commandSplit(string $command): array
 }
 
 /**
- * Translate and format a string.
- *
- * @example __('Order with id {id} by user {name}...',['id'=>$user->id,'name'=>$user->name]);
- * @param string $string
- * @param array $vars array of vars e.g ['id'=>$user->id,'name'=>$user->name]
- * @return string|null formatted
- */
-function __(string $string = null, array $vars = []): ?string
-{
-    if ($string) {
-        return I18n::translate($string, $vars);
-    }
-
-    return null;
-}
-
-/**
  * Convenient function for htmlspecialchars.
  *
  * @param string $text
@@ -242,8 +223,6 @@ function deprecationWarning(string $message, int $frameNo = 1): void
             $line
         );
     }
-
-    Log::warning($message);
 
     trigger_error($message, E_USER_DEPRECATED);
 }

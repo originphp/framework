@@ -31,7 +31,11 @@ require ROOT . '/vendor/autoload.php';
 $errorHandler = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
 $errorHandler->register();
 
+/**
+ * @todo this is temporary will be loaded through composer, test bootstrap maybe.
+ */
 require ORIGIN . '/src/Core/functions.php';
+require ORIGIN . '/src/I18n/functions.php';
 
 // configure default logging (required)
 // errors during early bootstrap stage can be caught e.g. parse error in application.php
