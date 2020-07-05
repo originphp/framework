@@ -17,7 +17,7 @@ namespace Origin\Job;
 use \ArrayObject;
 use Origin\Log\Log;
 use Origin\Core\HookTrait;
-use Origin\Model\ModelTrait;
+use Origin\Core\ModelTrait;
 use Origin\Security\Security;
 use Origin\Job\Engine\BaseEngine;
 use Origin\Core\CallbackRegistrationTrait;

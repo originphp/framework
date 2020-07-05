@@ -16,7 +16,7 @@ namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
-use Origin\Model\ModelTrait;
+use Origin\Core\ModelTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 

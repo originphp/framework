@@ -21,7 +21,7 @@ use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Core\HookTrait;
-use Origin\Model\ModelTrait;
+use Origin\Core\ModelTrait;
 use Origin\Http\View\XmlView;
 use Origin\Http\View\JsonView;
 use Origin\Inflector\Inflector;

@@ -47,6 +47,8 @@ to adjust accordingly.
     - `allowBlank` - this was changed to `allowEmpty`
     - `required`: use `required` rule
 
+- Removed `Model\ModelTrait`, this has been replaced with a `Core\ModelTrait`
+
 ## [2.8.0] - 2020-06-26
 
 ## Changed

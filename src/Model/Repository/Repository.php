@@ -15,7 +15,7 @@ declare(strict_types = 1);
 namespace Origin\Model\Repository;
 
 use Origin\Core\HookTrait;
-use Origin\Model\ModelTrait;
+use Origin\Core\ModelTrait;
 use Origin\Inflector\Inflector;
 
 /**

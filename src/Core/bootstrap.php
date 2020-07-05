@@ -36,13 +36,9 @@ $errorHandler->register();
  */
 require ORIGIN . '/src/Core/functions.php';
 require ORIGIN . '/src/I18n/functions.php';
+require ORIGIN . '/src/Model/functions.php';
 
-// configure default logging (required)
-// errors during early bootstrap stage can be caught e.g. parse error in application.php
-Log::config('default', [
-    'engine' => 'File',
-    'file' => LOGS . '/application.log'
-]);
+// 05.07.2020 removed default log which was setup here to catch errors in app.php.
 
 /**
  * As of version 2.6 .env.php is the cached version of .env. Prior

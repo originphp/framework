@@ -22,6 +22,7 @@ namespace Origin\Model;
 
 use ArrayObject;
 use Origin\Core\HookTrait;
+use Origin\Core\ModelTrait;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;

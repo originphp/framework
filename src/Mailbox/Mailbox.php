@@ -20,7 +20,7 @@ use Origin\Model\Entity;
 use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
 use Origin\Service\Result;
-use Origin\Model\ModelTrait;
+use Origin\Core\ModelTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Exception\Exception;
 use Origin\Mailbox\Model\ImapMessage;
