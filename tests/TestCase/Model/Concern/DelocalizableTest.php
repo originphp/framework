@@ -32,7 +32,7 @@ class Deal extends Model
     }
 }
 
-class DelocalizeTest extends OriginTestCase
+class DelocalizableTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Deal'];
 

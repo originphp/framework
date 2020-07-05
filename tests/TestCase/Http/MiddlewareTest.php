@@ -30,7 +30,7 @@ class MyMiddleware extends Middleware
     }
 }
 
-class MiddlwareTest extends \PHPUnit\Framework\TestCase
+class MiddlewareTest extends \PHPUnit\Framework\TestCase
 {
     public function testInvoke()
     {

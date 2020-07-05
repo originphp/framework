@@ -53,7 +53,7 @@ class CallbackRegistry
     }
 }
 
-class CallbackRegistrationTest extends \PHPUnit\Framework\TestCase
+class CallbackRegistrationTraitTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddCallback()
     {

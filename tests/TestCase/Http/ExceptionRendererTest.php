@@ -16,7 +16,7 @@ namespace Origin\Test\Http\Controller\Component;
 
 use Origin\Http\Exception\InternalErrorException;
 
-class InternalErrorExceptionTest extends \PHPUnit\Framework\TestCase
+class ExceptionRendererTest extends \PHPUnit\Framework\TestCase
 {
     public function testException()
     {
