@@ -14,8 +14,8 @@
 namespace Origin\Test\Redis;
 
 use Redis;
-use Origin\Redis\RedisConnection;
 use Origin\Core\Exception\Exception;
+use Origin\Job\Engine\RedisConnection;
 
 class RedisConnectionTest extends \PHPUnit\Framework\TestCase
 {

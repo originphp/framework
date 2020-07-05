@@ -16,7 +16,6 @@ namespace Origin\Job\Engine;
 
 use Redis;
 use Origin\Job\Job;
-use Origin\Redis\RedisConnection;
 
 class RedisEngine extends BaseEngine
 {

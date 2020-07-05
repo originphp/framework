@@ -12,7 +12,7 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 declare(strict_types = 1);
-namespace Origin\Redis;
+namespace Origin\Job\Engine;
 
 /**
  * Should work with phpredis
