@@ -12,7 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test;
+namespace Origin\Test\Core;
 
 class FunctionsTest extends \PHPUnit\Framework\TestCase
 {
@@ -86,7 +86,7 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/FunctionsTest.php Line: 84
+tests/TestCase/Core/FunctionsTest.php Line: 84
 
 Array
 (
@@ -107,7 +107,7 @@ EOF;
         
         $expected = <<< EOF
 # # # # # DEBUG # # # # #
-tests/TestCase/FunctionsTest.php Line: 105
+tests/TestCase/Core/FunctionsTest.php Line: 105
 
 &lt;p&gt;foo&lt;/p&gt;
 
