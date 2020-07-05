@@ -21,7 +21,7 @@
 
 ## Changed
 
-- Changed to work with PHPUnit 9.0 deprecations `assertRegExp` and `assertNotRegExp`
+- Framework `bootstrap.php` has been moved to the `Core` directory (BC)
 - Changed default index and foreign key names when creating migrations to use `fk_` or `idx_` prefix
 - Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw a `MissingSharedViewException`.
 - Changed `Mail::attachments` property to private, use `Mail::attachments()` instead.

@@ -12,9 +12,7 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 declare(strict_types = 1);
-namespace Origin;
-
-use Origin\Core\HookTrait;
+namespace Origin\Core;
 
 class BaseObject
 {

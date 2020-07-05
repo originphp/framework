@@ -12,9 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test;
+namespace Origin\Test\Core;
 
-use Origin\BaseObject;
+use Origin\Core\BaseObject;
 use Origin\Http\Controller\Controller;
 
 class ValueObject extends BaseObject

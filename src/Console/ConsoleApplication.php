@@ -27,7 +27,7 @@ use Origin\Console\Exception\ConsoleException;
  *
  * @example:
  * #!/usr/bin/env php
- * require __DIR__ . '/vendor/originphp/framework/src/bootstrap.php';
+ * require __DIR__ . '/vendor/originphp/framework/src/Core/bootstrap.php';
  * use Origin\Console\ConsoleApplication;
  *
  * $consoleApplication = new ConsoleApplication();
