@@ -360,22 +360,24 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testNotBlank()
     {
-        $this->Article->validate('title', ['notBlank', 'alphaNumeric']);
-        $article = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
-        $this->assertTrue($this->Article->validates($article));
-        $article->title = '';
-        $this->assertFalse($this->Article->validates($article));
-        $article->title = null;
+        $this->deprecated(function () {
+            $this->Article->validate('title', ['notBlank', 'alphaNumeric']);
+            $article = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
+            $this->assertTrue($this->Article->validates($article));
+            $article->title = '';
+            $this->assertFalse($this->Article->validates($article));
+            $article->title = null;
 
-        $this->Article->validate('title', [
-            'rule' => 'notBlank',
-            'required' => true,
-            'on' => 'create']);
+            $this->Article->validate('title', [
+                'rule' => 'notBlank',
+                'required' => true,
+                'on' => 'create']);
         
-        $article->author_id = 1001;
-        $article->title = null;
-        $article->body = 'Title is blank so it should fail';
-        $this->assertFalse($this->Article->validates($article));
+            $article->author_id = 1001;
+            $article->title = null;
+            $article->body = 'Title is blank so it should fail';
+            $this->assertFalse($this->Article->validates($article));
+        });
     }
 
     public function testPresentRule()
