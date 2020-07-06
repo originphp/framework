@@ -88,7 +88,7 @@ class CsrfProtectionMiddleware extends Middleware
      */
     protected function isTestEnvironment(): bool
     {
-        return (isConsole() and env('ORIGIN_ENV') === 'test');
+        return (isConsole() && env('ORIGIN_ENV') === 'test');
     }
 
     /**
