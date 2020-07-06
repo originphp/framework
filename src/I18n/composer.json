@@ -3,7 +3,8 @@
   "description": "OriginPHP I18n package",
   "type": "library",
   "keywords": [
-    "originPHP","i18n"
+    "originPHP",
+    "i18n"
   ],
   "homepage": "https://www.originphp.com/",
   "license": "MIT",
@@ -23,7 +24,9 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/core" : "*",
-    "originphp/utility" : "*"
-  }
+    "originphp/core": "*",
+    "originphp/utility": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

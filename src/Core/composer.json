@@ -2,7 +2,10 @@
   "name": "originphp/core",
   "description": "OriginPHP Core",
   "type": "library",
-  "keywords": ["originPHP","core"],
+  "keywords": [
+    "originPHP",
+    "core"
+  ],
   "homepage": "https://www.originphp.com/",
   "license": "MIT",
   "authors": [
@@ -21,9 +24,11 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/inflector" : "^1.0"
+    "originphp/inflector": "^1.0"
   },
   "suggest": {
     "originphp/dotenv": "If this package is used part of the framework and you will use bootstrap.php"
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

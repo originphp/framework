@@ -1,31 +1,35 @@
 {
-    "name": "originphp/test-suite",
-    "description": "OriginPHP Test Suite",
-    "type": "library",
-    "keywords": ["test suite","integration testing"],
-    "homepage": "https://www.originphp.com/",
-    "license": "MIT",
-    "authors": [
-      {
-        "name": "Jamiel Sharief",
-        "email": "js@originphp.com"
-      }
-    ],
-    "autoload": {
-      "psr-4": {
-        "Origin\\TestSuite": "."
-      }
-    },
-    "require": {
-      "php": ">=7.3.0",
-      "originphp/core": "*",
-      "originphp/inflector" : "^1.0",
-      "originphp/model": "*",
-      "phpunit/phpunit": "^9"
-    },
-    "suggest": {
-      "originphp/http": "If you are going to use integration testing for web based applications",
-      "originphp/console": "If you are going to use integration testing for console based commands"
-   }
-  }
-  
+  "name": "originphp/test-suite",
+  "description": "OriginPHP Test Suite",
+  "type": "library",
+  "keywords": [
+    "test suite",
+    "integration testing"
+  ],
+  "homepage": "https://www.originphp.com/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\TestSuite": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "originphp/core": "*",
+    "originphp/inflector": "^1.0",
+    "originphp/model": "*",
+    "phpunit/phpunit": "^9"
+  },
+  "suggest": {
+    "originphp/http": "If you are going to use integration testing for web based applications",
+    "originphp/console": "If you are going to use integration testing for console based commands"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

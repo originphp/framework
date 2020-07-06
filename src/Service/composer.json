@@ -1,24 +1,29 @@
 {
-    "name": "originphp/service",
-    "description": "OriginPHP Service Objects",
-    "type": "library",
-    "keywords": ["service","services","service object"],
-    "homepage": "https://www.originphp.com/docs/services/",
-    "license": "MIT",
-    "authors": [
-      {
-        "name": "Jamiel Sharief",
-        "email": "js@originphp.com"
-      }
-    ],
-    "autoload": {
-      "psr-4": {
-        "Origin\\Service\\": "."
-      }
-    },
-    "require": {
-      "php": ">=7.3.0",
-      "originphp/core": "*"
+  "name": "originphp/service",
+  "description": "OriginPHP Service Objects",
+  "type": "library",
+  "keywords": [
+    "service",
+    "services",
+    "service object"
+  ],
+  "homepage": "https://www.originphp.com/docs/services/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
     }
-  }
-  
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Service\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "originphp/core": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

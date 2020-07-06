@@ -1,28 +1,34 @@
 {
-    "name": "originphp/job",
-    "description": "OriginPHP Queue System",
-    "type": "library",
-    "keywords": ["queue","task","job","background"],
-    "homepage": "https://www.originphp.com/",
-    "license": "MIT",
-    "authors": [
-      {
-        "name": "Jamiel Sharief",
-        "email": "js@originphp.com"
-      }
-    ],
-    "autoload": {
-      "psr-4": {
-        "Origin\\Job\\": "."
-      }
-    },
-    "require": {
-      "php": ">=7.3.0",
-      "originphp/configurable" : "^1.0",
-      "originphp/core" : "*",
-      "originphp/log" : "^1.0",
-      "originphp/model" : "*",
-      "originphp/security" : "^1.0"
+  "name": "originphp/job",
+  "description": "OriginPHP Queue System",
+  "type": "library",
+  "keywords": [
+    "queue",
+    "task",
+    "job",
+    "background"
+  ],
+  "homepage": "https://www.originphp.com/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
     }
-  }
-  
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Job\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "originphp/configurable": "^1.0",
+    "originphp/core": "*",
+    "originphp/log": "^1.0",
+    "originphp/model": "*",
+    "originphp/security": "^1.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

@@ -18,19 +18,21 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/cache" : "^1.0",
-    "originphp/configurable" : "^1.0",
-    "originphp/core" : "*",
-    "originphp/defer" : "^1.0",
-    "originphp/i18n" : "*",
-    "originphp/inflector" : "^1.0",
-    "originphp/log" : "^1.0",
-    "originphp/model" : "*",
-    "originphp/security" : "^1.0",
-    "originphp/utility" : "*",
-    "originphp/xml" : "^1.0"
+    "originphp/cache": "^1.0",
+    "originphp/configurable": "^1.0",
+    "originphp/core": "*",
+    "originphp/defer": "^1.0",
+    "originphp/i18n": "*",
+    "originphp/inflector": "^1.0",
+    "originphp/log": "^1.0",
+    "originphp/model": "*",
+    "originphp/security": "^1.0",
+    "originphp/utility": "*",
+    "originphp/xml": "^1.0"
   },
   "suggest": {
     "originphp/model": "To use the Auth component"
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
