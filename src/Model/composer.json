@@ -16,7 +16,10 @@
   "autoload": {
     "psr-4": {
       "Origin\\Model\\": "."
-    }
+    },
+    "files": [
+      "functions.php"
+    ]
   },
   "require": {
     "php": ">=7.3.0",

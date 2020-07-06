@@ -24,7 +24,12 @@
   "autoload": {
     "psr-4": {
       "Origin\\": "src/"
-    }
+    },
+    "files": [
+      "src/Core/functions.php",
+      "src/I18n/functions.php",
+      "src/Model/functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
