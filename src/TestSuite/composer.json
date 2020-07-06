@@ -20,9 +20,7 @@
       "php": ">=7.3.0",
       "originphp/core": "*",
       "originphp/inflector" : "^1.0",
-      "originphp/model": "*"
-    },
-    "require-dev": {
+      "originphp/model": "*",
       "phpunit/phpunit": "^9"
     },
     "suggest": {
