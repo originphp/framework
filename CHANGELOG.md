@@ -48,6 +48,8 @@ to adjust accordingly.
     - `required`: use `required` rule
 
 - Removed `Model\ModelTrait`, this has been replaced with a `Core\ModelTrait`
+- Removed `ORIGIN` constant
+
 ## [2.8.1] - 2020-07-03
 
 ### Fixed
