@@ -2,7 +2,7 @@
     "name": "originphp/mailbox",
     "description": "OriginPHP Mailbox",
     "type": "library",
-    "keywords": ["mailbox","imap"],
+    "keywords": ["mailbox","imap","pop3"],
     "homepage": "https://www.originphp.com/",
     "license": "MIT",
     "authors": [

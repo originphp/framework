@@ -2,7 +2,7 @@
     "name": "originphp/publisher",
     "description": "OriginPHP Publisher",
     "type": "library",
-    "keywords": ["publisher"],
+    "keywords": ["publisher","subscribe","pub-sub"],
     "homepage": "https://www.originphp.com/",
     "license": "MIT",
     "authors": [

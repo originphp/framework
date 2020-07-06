@@ -2,8 +2,8 @@
     "name": "originphp/job",
     "description": "OriginPHP Queue System",
     "type": "library",
-    "keywords": ["service","services","service object"],
-    "homepage": "https://www.originphp.com/docs/services/",
+    "keywords": ["queue","task","job","background"],
+    "homepage": "https://www.originphp.com/",
     "license": "MIT",
     "authors": [
       {

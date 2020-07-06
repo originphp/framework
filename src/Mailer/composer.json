@@ -2,7 +2,7 @@
     "name": "originphp/mailer",
     "description": "OriginPHP Mailer",
     "type": "library",
-    "keywords": ["mailer"],
+    "keywords": ["mailer","smtp","email"],
     "homepage": "https://www.originphp.com/",
     "license": "MIT",
     "authors": [
