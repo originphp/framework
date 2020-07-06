@@ -1,0 +1,30 @@
+{
+    "name": "originphp/mailbox",
+    "description": "OriginPHP Mailbox",
+    "type": "library",
+    "keywords": ["mailbox","imap"],
+    "homepage": "https://www.originphp.com/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Mailbox\\": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/configurable" : "^1.0",
+      "originphp/core" : "*",
+      "originphp/job" : "*",
+      "originphp/log" : "*",
+      "originphp/model" : "*",
+      "originphp/security" : "^1.0",
+      "originphp/service" : "*"
+    }
+  }
+  

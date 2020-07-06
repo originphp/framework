@@ -1,0 +1,26 @@
+{
+    "name": "originphp/console",
+    "description": "OriginPHP Console",
+    "type": "library",
+    "keywords": ["originPHP","console"],
+    "homepage": "https://www.originphp.com/docs/console-commands/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Console\\": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/core" : "*",
+      "originphp/inflector" : "^1.0",
+      "originphp/log" : "^1.0"
+    }
+  }
+  

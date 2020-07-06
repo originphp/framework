@@ -1,0 +1,26 @@
+{
+    "name": "originphp/migration",
+    "description": "OriginPHP Migration",
+    "type": "library",
+    "keywords": ["migration"],
+    "homepage": "https://www.originphp.com/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Migration": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/core" : "*",
+      "originphp/inflector" : "^1.0",
+      "originphp/model": "*"
+    }
+  }
+  

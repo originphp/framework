@@ -14,6 +14,13 @@ use Origin\Model\ConnectionManager;
 require __DIR__ . '/paths.php';
 require ORIGIN . '/src/Core/bootstrap.php';
 
+/**
+ * Manual loading of functions of other packages.
+ */
+require ORIGIN . '/src/Core/functions.php';
+require ORIGIN . '/src/I18n/functions.php';
+require ORIGIN . '/src/Model/functions.php';
+
 # # # START CUSTOM TEST APP CODE # # #
 # 1. Load .env
 # 2. Setup test App namespace

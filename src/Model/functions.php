@@ -17,20 +17,22 @@ use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
 
-/**
- * Loads a model, uses from registry or creates a new one.
- * This is an internal function and subject to change.
- *
- * @param string $model User, MyPlugin.User, User::class
- * @param array $options
- * @return \Origin\Model\Model
- */
- function modelRegistryGet(string $model, array $options = []): Model
- {
-     $object = ModelRegistry::get($model, $options);
-     if (! $object) {
-         throw new MissingModelException($model);
-     }
+if (! function_exists('modelRegistryGet')) {
+    /**
+     * Loads a model, uses from registry or creates a new one.
+     * This is an internal function and subject to change.
+     *
+     * @param string $model User, MyPlugin.User, User::class
+     * @param array $options
+     * @return \Origin\Model\Model
+     */
+    function modelRegistryGet(string $model, array $options = []): Model
+    {
+        $object = ModelRegistry::get($model, $options);
+        if (! $object) {
+            throw new MissingModelException($model);
+        }
 
-     return $object;
- }
+        return $object;
+    }
+}

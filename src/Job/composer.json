@@ -1,6 +1,6 @@
 {
-    "name": "originphp/service",
-    "description": "OriginPHP Service Objects",
+    "name": "originphp/job",
+    "description": "OriginPHP Queue System",
     "type": "library",
     "keywords": ["service","services","service object"],
     "homepage": "https://www.originphp.com/docs/services/",
@@ -13,12 +13,16 @@
     ],
     "autoload": {
       "psr-4": {
-        "Origin\\Service\\": "."
+        "Origin\\Job\\": "."
       }
     },
     "require": {
       "php": ">=7.3.0",
-      "originphp/core": "*"
+      "originphp/configurable" : "^1.0",
+      "originphp/core" : "*",
+      "originphp/log" : "^1.0",
+      "originphp/model" : "*",
+      "originphp/security" : "^1.0"
     }
   }
   

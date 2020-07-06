@@ -1,0 +1,31 @@
+{
+    "name": "originphp/model",
+    "description": "OriginPHP ORM",
+    "type": "library",
+    "keywords": ["orm"],
+    "homepage": "https://www.originphp.com/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Model": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/cache" : "^1.0",
+      "originphp/configurable" : "^1.0",
+      "originphp/core" : "*",
+      "originphp/inflector" : "^1.0",
+      "originphp/log" : "^1.0",
+      "originphp/utility" : "*",
+      "originphp/validation" : "^1.0",
+      "originphp/xml" : "^1.0"
+    }
+  }
+  

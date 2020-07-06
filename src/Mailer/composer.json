@@ -1,0 +1,28 @@
+{
+    "name": "originphp/mailer",
+    "description": "OriginPHP Mailer",
+    "type": "library",
+    "keywords": ["mailer"],
+    "homepage": "https://www.originphp.com/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Mailer\\": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/core" : "*",
+      "originphp/email" : "^1.0",
+      "originphp/html" : "^1.0",
+      "originphp/inflector" : "^1.0",
+      "originphp/job" : "^1.0"
+    }
+  }
+  

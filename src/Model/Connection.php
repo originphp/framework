@@ -23,7 +23,6 @@ use PDOException;
 use PDOStatement;
 use Origin\Log\Log;
 use Origin\Cache\Cache;
-use Origin\Core\Config;
 use Origin\Model\Schema\BaseSchema;
 use Origin\Model\Exception\ConnectionException;
 use Origin\Model\Exception\DatasourceException;

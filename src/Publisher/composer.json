@@ -1,0 +1,27 @@
+{
+    "name": "originphp/publisher",
+    "description": "OriginPHP Publisher",
+    "type": "library",
+    "keywords": ["publisher"],
+    "homepage": "https://www.originphp.com/",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Jamiel Sharief",
+        "email": "js@originphp.com"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Origin\\Publisher": "."
+      }
+    },
+    "require": {
+      "php": ">=7.3.0",
+      "originphp/core" : "*"
+    },
+    "suggest": {
+      "originphp/job": "If you are going to queue events"
+    }
+  }
+  

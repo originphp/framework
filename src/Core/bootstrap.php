@@ -12,7 +12,6 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Origin\Log\Log;
 use Origin\Core\PhpFile;
 use Origin\DotEnv\DotEnv;
 
@@ -26,19 +25,13 @@ require ORIGIN . '/src/Core/Autoloader.php';
 require ROOT . '/vendor/autoload.php';
 
 /**
- * Register error handler
+ * Register framework error handler
  */
-$errorHandler = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? new Origin\Console\ErrorHandler() : new Origin\Http\ErrorHandler();
-$errorHandler->register();
-
-/**
- * @todo this is temporary will be loaded through composer, test bootstrap maybe.
- */
-require ORIGIN . '/src/Core/functions.php';
-require ORIGIN . '/src/I18n/functions.php';
-require ORIGIN . '/src/Model/functions.php';
-
-// 05.07.2020 removed default log which was setup here to catch errors in app.php.
+if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
+    ( new Origin\Console\ErrorHandler())->register();
+} else {
+    ( new Origin\Http\ErrorHandler())->register();
+}
 
 /**
  * As of version 2.6 .env.php is the cached version of .env. Prior
