@@ -20,8 +20,8 @@ define('START_TIME', microtime(true));
 /**
  * Load Autoloader
  */
-require ORIGIN . '/src/Core/Exception/Exception.php';
-require ORIGIN . '/src/Core/Autoloader.php';
+require __DIR__ . '/Exception/Exception.php';
+require __DIR__ . '/Autoloader.php';
 require ROOT . '/vendor/autoload.php';
 
 /**
