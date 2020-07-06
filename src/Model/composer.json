@@ -15,7 +15,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Origin\\Model": "."
+      "Origin\\Model\\": "."
     }
   },
   "require": {
