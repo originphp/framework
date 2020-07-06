@@ -12,7 +12,7 @@ use Origin\Mailbox\Mailbox;
 use Origin\Model\ConnectionManager;
 
 require __DIR__ . '/paths.php';
-require dirname(__DIR__) . '/src/Core/bootstrap.php';
+require dirname(__DIR__, 3) . '/src/Core/bootstrap.php';
 
 # # # START CUSTOM TEST APP CODE # # #
 # 1. Load .env
