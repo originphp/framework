@@ -27,8 +27,7 @@
     },
     "files": [
       "src/Core/functions.php",
-      "src/I18n/functions.php",
-      "src/Model/functions.php"
+      "src/I18n/functions.php"
     ]
   },
   "autoload-dev": {
