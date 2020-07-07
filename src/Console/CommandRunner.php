@@ -68,9 +68,8 @@ class CommandRunner
      */
     protected function buildNamespaceMap(): void
     {
-        $folder = 'Console' .DS .'Command';
+        $folder = 'Console/Command';
         $this->namespaces = [
-            'Origin' => ORIGIN . DS . 'src' . DS . $folder,
             Config::read('App.namespace') => APP . DS . $folder
         ];
 
