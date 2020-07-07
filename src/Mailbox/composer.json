@@ -28,7 +28,7 @@
     "originphp/log": "*",
     "originphp/model": "*",
     "originphp/security": "^1.0",
-    "originphp/service": "*"
+    "originphp/service-object": "*"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
