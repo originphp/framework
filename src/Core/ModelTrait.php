@@ -15,6 +15,9 @@ declare(strict_types = 1);
 namespace Origin\Core;
 
 use Origin\Core\Exception\Exception;
+use Origin\Model\Model;
+use Origin\Model\ModelRegistry;
+use Origin\Model\Exception\MissingModelException;
 
 /**
  * A trait used within the framework to make it easy to load models, this layer
@@ -36,16 +39,30 @@ trait ModelTrait
       */
     public function loadModel(string $model, array $options = [])
     {
-        if (! function_exists('modelRegistryGet')) {
-            throw new Exception('originphp/model package is not loaded.');
-        }
-
         list($plugin, $alias) = pluginSplit($model);
 
         if (isset($this->$alias)) {
             return $this->$alias;
         }
 
-        return $this->$alias = modelRegistryGet($model, $options);
+        return $this->$alias = $this->modelRegistryGet($model, $options);
+    }
+
+
+    /**
+     * Loads a model, uses from registry or creates a new one.
+     *
+     * @param string $model User, MyPlugin.User, User::class
+     * @param array $options
+     * @return \Origin\Model\Model
+     */
+    private function modelRegistryGet(string $model, array $options = []): Model
+    {
+        $object = ModelRegistry::get($model, $options);
+        if (! $object) {
+            throw new MissingModelException($model);
+        }
+
+        return $object;
     }
 }
