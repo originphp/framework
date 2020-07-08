@@ -21,10 +21,10 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/core": "*",
+    "originphp/core": "^3.0",
     "originphp/inflector": "^1.0",
-    "originphp/model": "*",
-    "phpunit/phpunit": "^9"
+    "originphp/model": "^3.0",
+    "phpunit/phpunit": "^9.2"
   },
   "suggest": {
     "originphp/http": "If you are going to use integration testing for web based applications",

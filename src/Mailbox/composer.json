@@ -23,12 +23,12 @@
   "require": {
     "php": ">=7.3.0",
     "originphp/configurable": "^1.0",
-    "originphp/core": "*",
-    "originphp/job": "*",
-    "originphp/log": "*",
-    "originphp/model": "*",
+    "originphp/core": "^3.0",
+    "originphp/job": "^3.0",
+    "originphp/log": "^1.0",
+    "originphp/model": "^3.0",
     "originphp/security": "^1.0",
-    "originphp/service-object": "*"
+    "originphp/service-object": "^3.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true

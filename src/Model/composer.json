@@ -22,10 +22,10 @@
     "php": ">=7.3.0",
     "originphp/cache": "^1.0",
     "originphp/configurable": "^1.0",
-    "originphp/core": "*",
+    "originphp/core": "^3.0",
     "originphp/inflector": "^1.0",
     "originphp/log": "^1.0",
-    "originphp/utility": "*",
+    "originphp/utility": "^3.0",
     "originphp/validation": "^1.0",
     "originphp/xml": "^1.0"
   },

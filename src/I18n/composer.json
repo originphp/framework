@@ -24,8 +24,8 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/core": "*",
-    "originphp/utility": "*"
+    "originphp/core": "^3.0",
+    "originphp/utility": "^3.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
