@@ -14,7 +14,6 @@
 declare(strict_types = 1);
 namespace Origin\Core;
 
-use Origin\Core\Exception\Exception;
 use Origin\Model\Model;
 use Origin\Model\ModelRegistry;
 use Origin\Model\Exception\MissingModelException;
@@ -47,7 +46,6 @@ trait ModelTrait
 
         return $this->$alias = $this->modelRegistryGet($model, $options);
     }
-
 
     /**
      * Loads a model, uses from registry or creates a new one.
