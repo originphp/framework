@@ -66,15 +66,13 @@ class Result
      */
     public function data(string $key = null)
     {
+        $data = $this->data ?? null;
+
         if ($key === null) {
-            return $this->data;
+            return $data;
         }
 
-        if (! isset($this->data) || ! isset($this->data[$key])) {
-            return null;
-        }
-
-        return $this->data[$key];
+        return $data[$key] ?? null;
     }
 
     /**
