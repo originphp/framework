@@ -26,8 +26,7 @@
 - Changed default index and foreign key names when creating migrations to use `fk_` or `idx_` prefix
 - Changed `View::element` to `View::renderShared`, this now renders a partial view from the shared folder, and will throw a `MissingSharedViewException`.
 - Changed `Mail::attachments` property to private, use `Mail::attachments()` instead.
-- Changed Mailbox `afterProcess` callback is called even if the mail bounces, use `onSuccess` instead if you only want
-to check non bounced messages
+- Changed Mailbox `afterProcess` callback is called even if the mail bounces, use `onSuccess` instead if you only want to check non bounced messages
 
 ## Removed
 
