@@ -2,7 +2,7 @@
 
 ## [3.0.2] - 2020-07-09
 
-### Changed
+### Fixed
 
 - Fixed issue with nested quiet display in console output
 
