@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.8.2] - 2020-07-09
+
+- Fixed issue with nested quiet display in console output
+
 ## [2.8.1] - 2020-07-03
 
 ### Fixed

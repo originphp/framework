@@ -149,6 +149,8 @@ abstract class Command
      */
     public function runCommand(string $command, array $args = []): int
     {
+        $defaultLevel = $this->io->stdout()->level();
+        
         $runner = new CommandRunner($this->io);
         $instance = $runner->findCommand($command);
         if (! $instance instanceof Command) {
@@ -160,7 +162,7 @@ abstract class Command
         foreach ($args as $key => $value) {
             $argv[] = is_int($key) ? $value : "{$key}={$value}";
         }
-
+        
         /**
          * Pass output level args to sub commands as this shares the IO
          */
@@ -172,7 +174,11 @@ abstract class Command
             $argv[] = '--verbose';
         }
 
-        return $instance->run($argv);
+        $result = $instance->run($argv);
+
+        $this->io->level($defaultLevel);
+
+        return $result;
     }
 
     /**
@@ -204,12 +210,18 @@ abstract class Command
         $this->options = $options;
         $this->arguments = $arguments;
 
+        $level = ConsoleOutput::NORMAL;
+
         // Enable verbosity
         if ($this->options('verbose')) {
             $this->verbose = true;
+            $level = ConsoleOutput::VERBOSE; /** notImplementedYet */
         }
 
-        $level = $this->options('quiet') ? ConsoleOutput::QUIET : ConsoleOutput::NORMAL;
+        if ($this->options('quiet')) {
+            $level = ConsoleOutput::QUIET;
+        }
+
         $this->io->level($level);
 
         if ($this->options('help')) {
