@@ -9,7 +9,7 @@ OriginPHP is a MVC web application framework for PHP developers designed to be f
 
 ## Features
 
-- ORM database with support for MySQL and PostgreSQL.
+- ORM database with support for MySQL, Postgres & SQLite.
 - Caching that supports APCu, Redis, Memcache and File based cache. 
 - Web Applications using MVC pattern
 - Console Applications and Commands
@@ -34,7 +34,7 @@ web application
 - Service Objects
 - Repositories
 - Query Objects
-- Send Email using SMTP
+- Send Email using SMTP with support OAUTH2
 - Mailboxes - receive and process emails using piping, IMAP or POP3.
 - Collections
 - and much more
