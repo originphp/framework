@@ -1,7 +1,9 @@
 # Changelog
 
 ## [3.1.0] - 2020-07-17
+
 ### Added
+
 - Added preloading support
 
 ## [3.0.2] - 2020-07-09
