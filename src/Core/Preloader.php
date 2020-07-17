@@ -48,14 +48,13 @@ class Preloader
     /**
      * Default name for ignore file
      *
-     * @param array $config
+     * @param string $config
      */
-    private $ignoreFile = '.preloadignore';
+    private $ignoreFile = null;
 
     public function __construct(array $config = [])
     {
-        $config += ['ignoreFile' => $this->ignoreFile];
-        $this->ignoreFile = $config['ignoreFile'];
+        $this->ignoreFile = $config['ignoreFile'] ?? '.preloadignore';
     }
 
     /**
