@@ -1,5 +1,12 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+- Added `formGroup` template to `FormHelper`
+- Added `formCheck` template to `FormHelper`
+
 ## [3.0.2] - 2020-07-17
 
 ### Added

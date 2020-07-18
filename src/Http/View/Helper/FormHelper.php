@@ -53,16 +53,10 @@ class FormHelper extends Helper
             'file' => ['div' => 'form-group', 'class' => 'form-control-file'],
         ],
         'templates' => [
-            // Controls
-            /*/ Maybe going forward
-        @todo a possible solution to use only templates. Issue is shared class without complications. That said
-        currently when I need something different i use the text and then customise with classes. So maybe priority should be to setting control class.
-        e.g:
-        'textControl' => '<div class="form-group {class} text{required}">{before}<input type="text" name="{name}"{attributes}>{after}</div>',
-        */
             'control' => '<div class="{class} {type}{required}">{before}{content}{after}</div>',
             'controlError' => '<div class="{class} {type}{required} error">{before}{content}{after}{error}</div>',
-            // HTML
+            'formGroup' => '{label}{input}', // does not apply to chec
+            'formCheck' => '{input}{label}', // used by checkboxes
             'button' => '<button type="{type}"{attributes}>{name}</button>',
             'checkbox' => '<input type="checkbox" name="{name}" value="{value}"{attributes}>',
             'div' => '<div{attributes}>{content}</div>',
@@ -455,11 +449,11 @@ class FormHelper extends Helper
             }
         }
 
-        if ($type === 'checkbox') {
-            $output = $fieldOutput . $labelOutput;
-        } else {
-            $output = $labelOutput . $fieldOutput;
-        }
+        $groupTemplate = $type === 'checkbox' ? 'formCheck' : 'formGroup';
+        $output =  $this->formatTemplate($groupTemplate, [
+            'label' => $labelOutput,
+            'input' => $fieldOutput
+        ]);
 
         $options['class'] = $div;
         if ($required) {
@@ -519,7 +513,7 @@ class FormHelper extends Helper
                 $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d'), $options['format']);
             }
 
-            if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) && preg_match('/(\d{4})-(\d{2})-(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
         }
@@ -557,7 +551,7 @@ class FormHelper extends Helper
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
-            if (! empty($options['value']) and preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) && preg_match('/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']);
             }
         }
@@ -690,7 +684,7 @@ class FormHelper extends Helper
             if (empty($options['placeholder'])) {
                 $options['placeholder'] = 'e.g. ' . Date::format(date('Y-m-d H:i:s'), $options['format']);
             }
-            if (! empty($options['value']) and preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
+            if (! empty($options['value']) && preg_match('/(\d{2}):(\d{2}):(\d{2})/', $options['value'])) {
                 $options['value'] = Date::format($options['value'], $options['format']); // Daylight saving issue with timefields
             }
         }
