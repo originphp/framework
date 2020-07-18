@@ -114,13 +114,69 @@ trait ConsoleIntegrationTestTrait
             ++$x;
         }
 
-        $argv = explode(' ', "console {$command}");
+        $argv = $this->splitCommand("console {$command}");
         list($namespace, $class) = namespacesplit(get_class($this));
 
         $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
         $commandRunner = new CommandRunner($io);
         $this->commandResult = $commandRunner->run($argv);
         $this->command = $commandRunner->command();
+    }
+
+    /**
+     * Splits a command line argument, and looks for data enclosed in double quotes ONLY
+     *
+     * @param string $command
+     * @return array
+     */
+    protected function splitCommand(string $command) : array
+    {
+        $args = [];
+        $arg = '';
+        $len = strlen($command);
+        $enclosed = false;
+        for ($i=0;$i<$len;$i++) {
+            $char = substr($command, $i, 1);
+            if ($char === ' ' && $enclosed === false) {
+                if ($arg) {
+                    $args[] = $arg;
+                }
+                $arg = '';
+                continue;
+            }
+
+            if ($enclosed === false && $char === '"') {
+                $arg = $arg . '"';
+                $enclosed = true;
+                continue;
+            }
+
+            if ($enclosed === true && $char === '"') {
+                $arg =  $arg . '"';
+                $enclosed = false;
+                continue;
+            }
+
+            $arg .= $char;
+        }
+        $args[] = $arg;
+
+        return $args;
+        /*
+        $placeHolders = [];
+        preg_match_all('/"([^"]*)"/', $command, $matches);
+        foreach ($matches[0] as $needle) {
+            $placeHolder = '{P' . count($placeHolders) . '}';
+            $command = str_replace($needle, $placeHolder, $command);
+            $placeHolders[$placeHolder] = $needle;
+        }
+        $args = str_getcsv($command, ' ');
+        foreach ($args as &$arg) {
+            foreach ($placeHolders as $find => $replace) {
+                $arg = str_replace($find, $replace, $arg);
+            }
+        }
+        return $args;*/
     }
 
     /**

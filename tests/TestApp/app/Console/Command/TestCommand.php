@@ -12,6 +12,10 @@ class TestCommand extends Command
     public function initialize(): void
     {
         $this->addArgument('test', ['description' => 'Which test','required' => true]);
+        $this->addOption('message', [
+            'type' => 'string',
+            'default' => 'Hello world!'
+        ]);
     }
 
     public function execute(): void
@@ -22,7 +26,7 @@ class TestCommand extends Command
 
     public function say()
     {
-        $this->out('Hello world!');
+        $this->out($this->options('message'));
     }
 
     public function ask()

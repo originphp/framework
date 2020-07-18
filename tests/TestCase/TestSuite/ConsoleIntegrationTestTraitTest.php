@@ -38,6 +38,12 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('Hello world!', $this->output());
     }
 
+    public function testExecEnclosed()
+    {
+        $this->exec('test say --message="foo bar"');
+        $this->assertStringContainsString('foo bar', $this->output());
+    }
+
     public function testExecInput()
     {
         $this->exec('test ask', ['no']);
