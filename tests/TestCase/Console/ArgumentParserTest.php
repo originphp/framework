@@ -105,6 +105,14 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
         $ap->addArgument('value2', ['type' => 'string']);
     }
 
+    public function testParseOptionArray()
+    {
+        $ap = new ArgumentParser();
+        $ap->addOption('allow', ['type' => 'array']);
+        list($options, $arguments) = $ap->parse(['--allow=192.168.1.100','--allow=192.168.1.200']);
+        $this->assertEquals(['192.168.1.100','192.168.1.200'], $options['allow']);
+    }
+
     public function testParseBoolean()
     {
         $ap = new ArgumentParser();

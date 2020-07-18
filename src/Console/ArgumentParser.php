@@ -345,8 +345,16 @@ class ArgumentParser
       
         $value = $this->value($this->options[$name]['type'], $value);
  
-        $options[$name] = $value;
-   
+        # Handle arrays
+        if ($this->options[$name]['type'] === 'array') {
+            if (!isset($options[$name])) {
+                $options[$name] = [];
+            }
+            $options[$name][] = $value;
+        } else {
+            $options[$name] = $value;
+        }
+ 
         return $options;
     }
 
@@ -426,7 +434,7 @@ class ArgumentParser
         */
     protected function isShortOption(string $option): bool
     {
-        return ($option[0] === '-' and substr($option, 0, 2) != '--');
+        return ($option[0] === '-' && substr($option, 0, 2) != '--');
     }
 
     /**
