@@ -174,11 +174,6 @@ class ErrorHandler
      */
     public function exceptionHandler($exception): void
     {
-        $errorCode = 500;
-        if ($exception->getCode() === 404) {
-            $errorCode = 404;
-        }
-
         $this->logException($exception);
         $this->cleanBuffer();
 
