@@ -310,7 +310,7 @@ class ArgumentParser
         }
 
         if ($type === 'string') {
-            return (string) $value;
+            return trim((string) $value, '" ');
         }
 
         return $value;
