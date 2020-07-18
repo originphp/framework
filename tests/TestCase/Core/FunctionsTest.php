@@ -107,4 +107,10 @@ EOF;
         $out = ob_get_clean();
         $this->assertStringContainsString("{\n    \"key\": \"value\"\n}\n", $out);
     }
+
+    public function testTmpPath()
+    {
+        $this->assertEquals(TMP, tmp_path());
+        $this->assertEquals(TMP .'/storage/foo.json', tmp_path('storage/foo.json'));
+    }
 }

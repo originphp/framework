@@ -277,3 +277,17 @@ if (! function_exists('now')) {
         return date('Y-m-d H:i:s');
     }
 }
+
+if (! function_exists('tmp_path')) {
+    /**
+     * Handy function for working with tmp paths
+     * e.g. file_put_contents(tmp_path('storage/data.json'));
+     *
+     * @param string $path
+     * @return void
+     */
+    function tmp_path(string $path = null)
+    {
+        return TMP . ($path ? DS  . $path : '');
+    }
+}
