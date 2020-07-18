@@ -73,6 +73,7 @@ class ExceptionRenderer
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
         $errorMessage = ($exception->getCode() === 404) ? 'Not Found' : 'An Internal Error has Occured';
+       
         if ($exception instanceof HttpException) {
             $errorCode = $exception->getCode();
             $errorMessage = $exception->getMessage(); # used in rendering
@@ -87,7 +88,7 @@ class ExceptionRenderer
         $error400 = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS .  '400.ctp';
       
         $file = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS . $errorCode . '.ctp';
-        if ($exception instanceof HttpException and file_exists($error400) && $exception->getCode() < 500) {
+        if ($exception instanceof HttpException && file_exists($error400) && $exception->getCode() < 500) {
             $file = $error400;
         }
 
