@@ -64,13 +64,7 @@ class ServerTest extends OriginTestCase
 
     public function testDispatchMaintenanceMode()
     {
-        // clear mailbox directory
-        $files = scandir(tmp_path('mailbox'));
-        foreach ($files as $file) {
-            if (! in_array($file, ['.','..'])) {
-                unlink(tmp_path('mailbox/' . $file));
-            }
-        }
+        $this->cleanDirectory();
 
         // enable maintenance mode
         file_put_contents(tmp_path('maintenance.json'), json_encode([]));
@@ -91,5 +85,19 @@ class ServerTest extends OriginTestCase
         $server = new MockServer($message);
         $this->assertTrue($server->dispatch());
         $this->assertEquals(3, $this->InboundEmail->count());
+    }
+
+    private function cleanDirectory()
+    {
+        if (! is_dir(tmp_path('mailbox'))) {
+            return;
+        }
+        // clear mailbox directory
+        $files = scandir(tmp_path('mailbox'));
+        foreach ($files as $file) {
+            if (! in_array($file, ['.','..'])) {
+                unlink(tmp_path('mailbox/' . $file));
+            }
+        }
     }
 }
