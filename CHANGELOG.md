@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added `MaintenanceModeMiddleware`
 - Added `tmp_path` helper function
 - Added parsing command options with values enclosed in double quotes
 - Added type `array` for Console options, allow to set multiple values
