@@ -37,12 +37,7 @@ class Server
      */
     protected $stream = 'php://stdin';
 
-    /**
-    * Dispatches the pipe process
-    *
-    * @return bool
-    */
-    public function dispatch(): bool
+    protected function initialize(): void
     {
         # Set memory limit to prevent issues with large emails
         ini_set('memory_limit', '256M');
@@ -50,6 +45,20 @@ class Server
         $this->InboundEmail = ModelRegistry::get('InboundEmail', [
             'className' => InboundEmail::class
         ]);
+        // here because load from disk
+        if (! is_dir(tmp_path('mailbox'))) {
+            mkdir(tmp_path('mailbox'));
+        }
+    }
+
+    /**
+    * Dispatches the pipe process
+    *
+    * @return bool
+    */
+    public function dispatch(): bool
+    {
+        $this->initialize();
 
         // store in temp folder
         if ($this->maintenanceMode()) {
@@ -73,10 +82,6 @@ class Server
      */
     protected function saveToDisk(string $message): bool
     {
-        if (! is_dir(tmp_path('mailbox'))) {
-            mkdir(tmp_path('mailbox'));
-        }
-
         return (bool) file_put_contents(
             tmp_path('mailbox/' . Security::uuid()),
             $message
