@@ -129,13 +129,13 @@ trait ConsoleIntegrationTestTrait
      * @param string $command
      * @return array
      */
-    protected function splitCommand(string $command) : array
+    protected function splitCommand(string $command): array
     {
         $args = [];
         $arg = '';
         $len = strlen($command);
         $enclosed = false;
-        for ($i=0;$i<$len;$i++) {
+        for ($i = 0;$i < $len;$i++) {
             $char = substr($command, $i, 1);
             if ($char === ' ' && $enclosed === false) {
                 if ($arg) {
@@ -152,7 +152,7 @@ trait ConsoleIntegrationTestTrait
             }
 
             if ($enclosed === true && $char === '"') {
-                $arg =  $arg . '"';
+                $arg = $arg . '"';
                 $enclosed = false;
                 continue;
             }

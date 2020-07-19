@@ -347,7 +347,7 @@ class ArgumentParser
  
         # Handle arrays
         if ($this->options[$name]['type'] === 'array') {
-            if (!isset($options[$name])) {
+            if (! isset($options[$name])) {
                 $options[$name] = [];
             }
             $options[$name][] = $value;

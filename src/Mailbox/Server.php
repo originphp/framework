@@ -97,6 +97,7 @@ class Server
             }
             if (! $this->saveToDb(file_get_contents(tmp_path('mailbox/' . $file)))) {
                 debug($file);
+
                 return false;
             }
             unlink(tmp_path('mailbox/' . $file));

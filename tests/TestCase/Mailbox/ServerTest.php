@@ -67,7 +67,7 @@ class ServerTest extends OriginTestCase
         // clear mailbox directory
         $files = scandir(tmp_path('mailbox'));
         foreach ($files as $file) {
-            if (!in_array($file, ['.','..'])) {
+            if (! in_array($file, ['.','..'])) {
                 unlink(tmp_path('mailbox/' . $file));
             }
         }

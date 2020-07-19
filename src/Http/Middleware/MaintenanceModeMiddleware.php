@@ -49,7 +49,7 @@ class MaintenanceModeMiddleware extends Middleware
      *
      * @return boolean
      */
-    protected function maintenanceMode() : bool
+    protected function maintenanceMode(): bool
     {
         return file_exists(tmp_path('maintenance.json'));
     }

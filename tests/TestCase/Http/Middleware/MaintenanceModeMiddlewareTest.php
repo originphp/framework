@@ -1,9 +1,9 @@
 <?php
 namespace App\Test\Http\Middleware;
 
-use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Request;
 use Origin\Http\Response;
+use Origin\TestSuite\OriginTestCase;
 use App\Http\Middleware\MaintenanceModeMiddleware;
 
 class MaintenanceModeMiddlewareTest extends OriginTestCase
@@ -18,7 +18,7 @@ class MaintenanceModeMiddlewareTest extends OriginTestCase
     */
     protected $response = null;
 
-    protected function startup() : void
+    protected function startup(): void
     {
         $this->request = new Request();
         $this->response = new Response();

@@ -450,7 +450,7 @@ class FormHelper extends Helper
         }
 
         $groupTemplate = $type === 'checkbox' ? 'formCheck' : 'formGroup';
-        $output =  $this->formatTemplate($groupTemplate, [
+        $output = $this->formatTemplate($groupTemplate, [
             'label' => $labelOutput,
             'input' => $fieldOutput
         ]);
