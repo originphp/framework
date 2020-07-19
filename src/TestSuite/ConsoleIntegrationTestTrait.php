@@ -28,14 +28,14 @@ trait ConsoleIntegrationTestTrait
     /**
      * Holds the standard console output.
      *
-     * @var \Origin\Console\ConsoleOutput
+     * @var \Origin\TestSuite\Stub\ConsoleOutput
      */
     protected $stdout = null;
 
     /**
      * Holds the console output for errors.
      *
-     * @var \Origin\Console\ConsoleOutput
+     * @var \Origin\TestSuite\Stub\ConsoleOutput
      */
     protected $stderr = null;
 
@@ -146,13 +146,11 @@ trait ConsoleIntegrationTestTrait
             }
 
             if ($enclosed === false && $char === '"') {
-                $arg = $arg . '"';
                 $enclosed = true;
                 continue;
             }
 
             if ($enclosed === true && $char === '"') {
-                $arg = $arg . '"';
                 $enclosed = false;
                 continue;
             }
