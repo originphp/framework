@@ -19,6 +19,10 @@ use Origin\Http\Middleware\Exception\MaintainenceModeException;
 
 class MaintenanceModeMiddleware extends Middleware
 {
+    protected $defaultConfig = [
+        'html' => false
+    ];
+
     /**
      * This HANDLES the request. Use this to make changes to the request.
      *
@@ -37,11 +41,26 @@ class MaintenanceModeMiddleware extends Middleware
             // Send headers
             $this->sendHeader('Maintenance-Started: ' . $data['time']);
             $this->sendHeader('Retry-After: ' . ($data['retry'] ? ($data['time'] + $data['retry']) : null));
-        
-            throw new MaintainenceModeException(
-                $data['message']
-            );
+
+            if ($this->config('html')) {
+                $this->sendHeader('Location: /maintainence.html');
+                $this->exit();
+            } else {
+                throw new MaintainenceModeException(
+                    $data['message']
+                );
+            }
         }
+    }
+
+    /**
+     * Wrapped for testing
+     *
+     * @return void
+     */
+    protected function exit(): void
+    {
+        exit();
     }
 
     /**
