@@ -43,7 +43,7 @@ class MaintenanceModeMiddleware extends Middleware
             $this->sendHeader('Retry-After: ' . ($data['retry'] ? ($data['time'] + $data['retry']) : null));
 
             if ($this->config('html')) {
-                $this->sendHeader('Location: /maintainence.html');
+                $this->sendHeader('Location: /maintenance.html');
                 $this->exit();
             } else {
                 throw new MaintainenceModeException(
