@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed redirect location to mainteance mode html page
+- Fixed redirect location to maintenance mode HTML page
 
 ## [3.1.0] - 2020-07-19
 
