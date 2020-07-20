@@ -1,10 +1,10 @@
 # Changelog
 
-## [3.1.1] - 2020-07-20
+## [unreleased]
 
 ### Fixed
 
-- Fixed redirect location to maintence mode html page
+- Fixed redirect location to mainteance mode html page
 
 ## [3.1.0] - 2020-07-19
 
