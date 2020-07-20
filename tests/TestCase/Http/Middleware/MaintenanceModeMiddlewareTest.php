@@ -123,7 +123,7 @@ class MaintenanceModeMiddlewareTest extends OriginTestCase
         
         $middleware($this->request, $this->response);
         $this->assertTrue($middleware->wasStopped());
-        $this->assertEquals('/maintainence.html', $middleware->headers('Location'));
+        $this->assertEquals('/maintenance.html', $middleware->headers('Location'));
         $this->assertEquals($this->payload['time'], $middleware->headers('Maintenance-Started'));
         $this->assertEquals($this->payload['time'] + 60, $middleware->headers('Retry-After'));
     }
