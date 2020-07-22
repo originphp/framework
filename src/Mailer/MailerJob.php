@@ -25,6 +25,11 @@ class MailerJob extends Job
         $this->onError('errorHandler');
     }
     
+    /**
+     * Executes the MailerJob, the first param is class or object and then after that are arguments
+     *
+     * @return void
+     */
     public function execute(): void
     {
         $arguments = func_get_args();
@@ -33,16 +38,16 @@ class MailerJob extends Job
          * Temporary backwards comptability to prevent queued jobs from breaking
          * @deprecated this will be depcreated
          */
-        if (isset($arguments[0]['mailer'])) {
+        if (isset($arguments[0]) && is_array($arguments[0])) {
             $mailer = $arguments['mailer'];
             $arguments = $arguments['arguments'];
         } else {
-            $mailerClass = array_shift($arguments);
-            if (! is_object($mailerClass)) {
-                $mailer = new $mailerClass();
+            $mailer = array_shift($arguments);
+            if (! is_object($mailer)) {
+                $mailer = new $mailer();
             }
         }
-
+     
         $mailer->dispatch(...$arguments);
     }
 

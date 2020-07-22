@@ -38,6 +38,15 @@ class AnotherDemoMailer extends Mailer
             'contentType' => 'html'
         ]);
     }
+    /**
+     * Returns the options set by mail
+     *
+     * @return void
+     */
+    public function options()
+    {
+        return $this->options;
+    }
 }
 
 class MailerJobTest extends OriginTestCase
@@ -47,12 +56,15 @@ class MailerJobTest extends OriginTestCase
     /**
      * Test add to queue
      *
+     * @deprecated this will be removed in future
+     *
      * @return void
      */
-    public function testDispatch()
+    public function testDispatchBackwardsComptability()
     {
+        $mailer = new AnotherDemoMailer();
         $params = [
-            'mailer' => new AnotherDemoMailer(),
+            'mailer' => $mailer,
             'arguments' => [
                 [
                     'first_name' => 'jim',
@@ -65,20 +77,52 @@ class MailerJobTest extends OriginTestCase
         $this->assertTrue((new MailerJob())->dispatch($params));
     }
 
-    public function testDispatchNow()
+    /**
+    * Test add to queue
+    *
+    * @deprecated this will be removed in future
+    *
+    * @return void
+    */
+    public function testDispatchObject()
     {
-        $params = [
-            'mailer' => new AnotherDemoMailer(),
-            'arguments' => [
-                [
-                    'first_name' => 'jim',
-                    'email' => 'demo@originphp.com',
-                    'html' => '<p>This is a test </p>'
-                ]
-            ],
+        $data = [
+            'first_name' => 'jim',
+            'email' => 'demo@originphp.com',
+            'html' => '<p>This is a test </p>'
+        ];
+        $this->assertTrue((new MailerJob())->dispatch(new AnotherDemoMailer(), $data));
+    }
+
+    /**
+     * Test add to queue
+     *
+     * @deprecated this will be removed in future
+     *
+     * @return void
+     */
+    public function testDispatch()
+    {
+        $data = [
+            'first_name' => 'jim',
+            'email' => 'demo@originphp.com',
+            'html' => '<p>This is a test </p>'
         ];
 
-        $this->assertTrue((new MailerJob())->dispatchNow($params));
+        $this->assertTrue((new AnotherDemoMailer())->dispatch());
+    }
+
+    public function testDispatchNow()
+    {
+        $mailer = new AnotherDemoMailer();
+        $data = [
+            'first_name' => 'jim',
+            'email' => 'demo@originphp.com',
+            'html' => '<p>This is a test </p>'
+        ];
+
+        $this->assertTrue((new MailerJob())->dispatchNow($mailer, $data));
+        $this->assertEquals('this is the subject message', $mailer->options()['subject']);
     }
 
     /**
