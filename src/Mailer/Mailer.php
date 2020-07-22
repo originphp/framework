@@ -230,12 +230,10 @@ abstract class Mailer
       */
     public function dispatchLater(): bool
     {
-        $params = [
-            'mailer' => $this,
-            'arguments' => func_get_args(),
-        ];
+        $arguments = func_get_args();
+        array_unshift($arguments, get_class($this));
 
-        return (new MailerJob())->dispatch($params);
+        return (new MailerJob())->dispatch(...$arguments);
     }
 
     /**

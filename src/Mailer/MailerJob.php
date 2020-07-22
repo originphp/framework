@@ -25,9 +25,23 @@ class MailerJob extends Job
         $this->onError('errorHandler');
     }
     
-    public function execute(array $params): void
+    public function execute(): void
     {
-        $params['mailer']->dispatch(...$params['arguments']);
+        $arguments = func_get_args();
+
+        /**
+         * Temporary backwards comptability to prevent queued jobs from breaking
+         * @deprecated this will be depcreated
+         */
+        if (isset($arguments['arguments'])) {
+            $mailer = $arguments['mailer'];
+            $arguments = $arguments['arguments'];
+        } else {
+            $mailerClass = array_shift($arguments);
+            $mailer = new $mailerClass();
+        }
+
+        $mailer->dispatch(...$arguments);
     }
 
     public function errorHandler(\Exception $exception): void

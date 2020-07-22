@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Changed
+
+- Changed `MailerJob` execute params (this has backwards  compatibility to prevent queued jobs from breaking)
+
 ## [3.1.1] - 2020-07-20
 
 ### Fixed
