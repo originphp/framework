@@ -561,6 +561,45 @@ trait IntegrationTestTrait
     }
 
     /**
+     * Assert that session has has
+     *
+     * @param string $key
+     * @param mixed $expected
+     * @return void
+     */
+    public function assertSession(string $key, $expected): void
+    {
+        $actual = $this->request->session()->read($key);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Asserts that a session has a key
+     *
+     * @param string $key
+     * @return void
+     */
+    public function assertSessionHasKey(string $key): void
+    {
+        $this->assertTrue($this->request->session()->exists($key));
+    }
+
+    /**
+     * Asserts that flash message was set
+     *
+     * @param string $expected
+     * @return void
+     */
+    public function assertFlashMessage(string $expected)
+    {
+        $messages = [];
+        foreach ($this->request->session()->read('Flash') as $message) {
+            $messages[] = $message['message'];
+        }
+        $this->assertContains($expected, $messages);
+    }
+
+    /**
      * Asserts a response header
      *
      * @param string $header
@@ -614,5 +653,17 @@ trait IntegrationTestTrait
         $cookies = $this->response()->cookies();
         $this->assertArrayHasKey($cookie, $cookies);
         $this->assertEquals($cookies[$cookie]['value'], $value);
+    }
+
+    /**
+     * Asserts that a cookie was not set
+     *
+     * @param string $cookie
+     * @return void
+     */
+    public function assertCookieNotSet(string $cookie)
+    {
+        $cookies = $this->response()->cookies();
+        $this->assertArrayNotHasKey($cookie, $cookies);
     }
 }

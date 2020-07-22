@@ -352,4 +352,27 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->response->cookie('key', 'value');
         $this->assertCookie('key', 'value');
     }
+    public function testAssertCookieNotSet()
+    {
+        $this->get('/posts/list');
+        $this->assertCookieNotSet('foo');
+    }
+
+    public function testAssertSession()
+    {
+        $this->get('/posts/list');
+        $this->controller->request()->session()->write('foo', 'bar');
+        $this->assertSession('foo', 'bar');
+        $this->assertSessionHasKey('foo');
+    }
+
+    public function testAssertFlash()
+    {
+        $this->get('/posts/list');
+        $messages = [
+            ['template' => 'alert','message' => 'the quick brown fox']
+        ];
+        $this->controller->request()->session()->write('Flash', $messages);
+        $this->assertFlashMessage('the quick brown fox');
+    }
 }

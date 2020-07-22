@@ -2,11 +2,15 @@
 
 ## [unreleased]
 
+- added `assertCookieNotSet` to `IntegrationTestTrait`
+- added `assertFlashMessage` to `IntegrationTestTrait`
+- added `assertSession` to `IntegrationTestTrait`
+- added `assertSessionHasKey` to `IntegrationTestTrait`
 - Added `JobTestTrait`
 
 ### Changed
 
-- Changed `MailerJob` execute params (this has backwards  compatibility to prevent queued jobs from breaking)
+- Changed `MailerJob` execute params (this has backwards compatibility to prevent queued jobs from breaking)
 
 ## [3.1.1] - 2020-07-20
 
