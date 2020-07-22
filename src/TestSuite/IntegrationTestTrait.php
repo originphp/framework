@@ -171,7 +171,7 @@ trait IntegrationTestTrait
      * Fetches a view variable
      *
      * @param string $key
-     * @return string|null
+     * @return mixed
      */
     public function viewVariable(string $key)
     {
