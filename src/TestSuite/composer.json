@@ -28,7 +28,8 @@
   },
   "suggest": {
     "originphp/http": "If you are going to use integration testing for web based applications",
-    "originphp/console": "If you are going to use integration testing for console based commands"
+    "originphp/console": "If you are going to use integration testing for console based commands",
+    "originphp/job": "If you want to test queued jobs"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
