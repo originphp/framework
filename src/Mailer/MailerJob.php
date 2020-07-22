@@ -33,12 +33,14 @@ class MailerJob extends Job
          * Temporary backwards comptability to prevent queued jobs from breaking
          * @deprecated this will be depcreated
          */
-        if (isset($arguments['arguments'])) {
+        if (isset($arguments[0]['mailer'])) {
             $mailer = $arguments['mailer'];
             $arguments = $arguments['arguments'];
         } else {
             $mailerClass = array_shift($arguments);
-            $mailer = new $mailerClass();
+            if (! is_object($mailerClass)) {
+                $mailer = new $mailerClass();
+            }
         }
 
         $mailer->dispatch(...$arguments);
