@@ -92,7 +92,7 @@ trait IntegrationTestTrait
     protected $testWithErrorHandler = true;
 
     /**
-     * Undocumented function
+     * Disables Middleware
      *
      * @return void
      */
@@ -270,6 +270,25 @@ trait IntegrationTestTrait
     }
 
     /**
+     * Cleans the state during the tear down
+     *
+     * @return void
+     */
+    protected function cleanup(): void
+    {
+        $this->env = [];
+        $this->session = [];
+        $this->headers = [];
+        $this->cookies = [];
+        $this->testWithMiddleware = true;
+        $this->testWithErrorHandler = true;
+
+        $this->controller = null;
+        $this->request = null;
+        $this->response = null;
+    }
+
+    /**
      * Sends the request for the test
      *
      * @param string $method
@@ -342,16 +361,6 @@ trait IntegrationTestTrait
                 throw $e;
             }
         }
-    }
-
-    /**
-     * IMPORTANT:: call parent::tearDown
-     */
-    protected function tearDown(): void
-    {
-        parent::teardown();
-        $this->session = $this->headers = $this->cookies = $this->env = [];
-        $this->controller = $this->request = $this->response = null;
     }
 
     /**

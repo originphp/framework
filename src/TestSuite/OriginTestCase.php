@@ -95,12 +95,17 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->executeHook('startup');
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
         $this->executeHook('shutdown');
+        if (method_exists($this, 'cleanup')) {
+            $this->cleanup();
+        }
     }
 
     /**
