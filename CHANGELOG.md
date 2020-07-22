@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+- Added `JobTestTrait`
+
 ### Changed
 
 - Changed `MailerJob` execute params (this has backwards  compatibility to prevent queued jobs from breaking)
