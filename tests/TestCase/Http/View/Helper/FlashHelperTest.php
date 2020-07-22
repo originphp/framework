@@ -31,7 +31,9 @@ class FlashHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->Flash->messages());
         $expected = '<div class="alert alert-danger" role="alert">holy moly</div>';
-        $this->Flash->Session->write('Flash', ['error' => ['holy moly']]);
+        $this->Flash->Session->write('Flash', [
+            ['template' => 'error','message' => 'holy moly']
+        ]);
         $this->assertEquals($expected, $this->Flash->messages());
     }
 }
