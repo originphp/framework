@@ -109,7 +109,7 @@ class MailerJobTest extends OriginTestCase
             'html' => '<p>This is a test </p>'
         ];
 
-        $this->assertTrue((new AnotherDemoMailer())->dispatch());
+        $this->assertTrue((new MailerJob())->dispatch(AnotherDemoMailer::class, $data));
     }
 
     public function testDispatchNow()
