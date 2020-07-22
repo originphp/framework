@@ -47,11 +47,14 @@ class FlashComponent extends Component
     public function addMessage(string $type, string $message): void
     {
         $messages = [];
-        $key = "Flash.{$type}";
-        if ($this->Session->exists($key)) {
-            $messages = $this->Session->read($key);
+
+        if ($this->Session->exists('Flash')) {
+            $messages = $this->Session->read('Flash');
         }
-        $messages[] = $message;
-        $this->Session->write($key, $messages);
+        $messages[] = [
+            'template' => $type,
+            'message' => $message
+        ];
+        $this->Session->write('Flash', $messages);
     }
 }

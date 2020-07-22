@@ -44,11 +44,11 @@ class FlashHelper extends Helper
         }
         $output = '';
 
-        foreach ($this->Session->read('Flash') as $template => $messages) {
+        foreach ($this->Session->read('Flash') as $message) {
+            $template = $message['template'];
+            $message = $message['message'];
             if (isset($this->config['templates'][$template])) {
-                foreach ($messages as $message) {
-                    $output .= sprintf($this->config['templates'][$template], $message);
-                }
+                $output .= sprintf($this->config['templates'][$template], $message);
             }
         }
         $this->Session->delete('Flash');
