@@ -154,7 +154,7 @@ class ConsoleOutput
      */
     public function supportsAnsi(): bool
     {
-        return function_exists('posix_isatty') and posix_isatty($this->stream);
+        return function_exists('posix_isatty') && posix_isatty($this->stream);
     }
 
     /**

@@ -157,7 +157,7 @@ class Cookie
             $value = substr($value, $length);
             $value = Security::decrypt($value, $key);
         }
-        if ($value and substr($value, 0, 1) === '{') {
+        if ($value && substr($value, 0, 1) === '{') {
             $value = json_decode($value, true);
         }
 
