@@ -17,6 +17,7 @@ namespace Origin\Test\Mailer;
 use Origin\Email\Message;
 use Origin\Mailer\Mailer;
 use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\JobTestTrait;
 use Origin\TestSuite\OriginTestCase;
 
 class DemoMailer extends Mailer
@@ -48,6 +49,7 @@ class DemoMailer extends Mailer
 
 class MailerTest extends OriginTestCase
 {
+    use JobTestTrait;
     protected $fixtures = ['Origin.Queue'];
     public function testDispatch()
     {
@@ -68,6 +70,19 @@ class MailerTest extends OriginTestCase
             'email' => 'demo@originphp.com',
         ];
         $this->assertTrue((new DemoMailer())->dispatchLater($params));
+        $this->assertEquals(1, $this->runEnqueuedJobs());
+        
+        $messages = Mailer::delivered();
+        $this->assertIsArray($messages);
+        $this->assertCount(1, $messages);
+
+        $message = $messages[0];
+        $this->assertStringContains('To: demo@originphp.com', $message->header());
+    }
+
+    public function testMailerWasCleared()
+    {
+        $this->assertEmpty(Mailer::delivered());
     }
 
     public function testPreview()

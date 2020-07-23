@@ -121,6 +121,11 @@ abstract class Mailer
      */
     protected $arguments = [];
 
+    /**
+     * Mails delivered during test
+     */
+    protected static $delivered = [];
+
     public function __construct(array $config = [])
     {
         $config += ['account' => $this->account];
@@ -219,6 +224,10 @@ abstract class Mailer
         $this->executeHook('startup');
         $result = $this->buildEmail()->send();
         $this->executeHook('shutdown');
+
+        if (env('ORIGIN_ENV') === 'test') {
+            static::$delivered[] = $result;
+        }
 
         return $result;
     }
@@ -330,5 +339,25 @@ abstract class Mailer
         }
 
         return $this->headers = $headers;
+    }
+
+    /**
+     * Returns the messages that were delivered using the test driver
+     *
+     * @return array
+     */
+    public static function delivered(): array
+    {
+        return static::$delivered;
+    }
+
+    /**
+     * Clears the emails that were delivered with the test driver
+     *
+     * @return void
+     */
+    public static function clearDelivered(): void
+    {
+        static::$delivered = [];
     }
 }
