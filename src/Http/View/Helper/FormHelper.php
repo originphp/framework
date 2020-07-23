@@ -420,7 +420,7 @@ class FormHelper extends Helper
         $required = false;
         if ($model) {
             $requiredFields = $this->requiredFields($model);
-            $required = ($requiredFields and in_array($column, $requiredFields));
+            $required = ($requiredFields && in_array($column, $requiredFields));
         }
 
         if ($type === 'select') {

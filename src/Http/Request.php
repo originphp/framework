@@ -354,7 +354,7 @@ class Request
             $type = $this->params('type');
         }
         $extension = $this->params('ext');
-        if ($extension and in_array($extension, ['html', 'json', 'xml'])) {
+        if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
             $type = $extension;
         } else {
             $accepts = $this->accepts();
@@ -545,7 +545,7 @@ class Request
 
         // If router extension set and its valid.
         $extension = $this->params('ext');
-        if ($extension and in_array($extension, ['html', 'json', 'xml'])) {
+        if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
             return true;
         }
 

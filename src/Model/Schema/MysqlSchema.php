@@ -261,7 +261,7 @@ class MysqlSchema extends BaseSchema
                 $type = 'CHAR';
             }
         } elseif ($data['type'] === 'text') {
-            if (! empty($data['limit']) and in_array($data['limit'], $this->columnLimits)) {
+            if (! empty($data['limit']) && in_array($data['limit'], $this->columnLimits)) {
                 $key = array_search($data['limit'], $this->columnLimits);
                 $type = strtoupper($key);
             }

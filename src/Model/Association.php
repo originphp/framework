@@ -407,7 +407,7 @@ class Association
         }
 
         foreach ($links as $linkId) {
-            if ($config['mode'] === 'append' and in_array($linkId, $existingJoins)) {
+            if ($config['mode'] === 'append' && in_array($linkId, $existingJoins)) {
                 continue;
             }
             $insertData = [

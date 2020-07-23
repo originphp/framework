@@ -110,7 +110,7 @@ class ErrorHandler
     public function handleFatalError(): void
     {
         $error = error_get_last();
-        if (is_array($error) and in_array($error['type'], [E_PARSE,E_ERROR,E_USER_ERROR])) {
+        if (is_array($error) && in_array($error['type'], [E_PARSE,E_ERROR,E_USER_ERROR])) {
             $this->fatalErrorHandler($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }

@@ -868,7 +868,7 @@ class QueryBuilder
                 continue;
             }
             //array("NOT" => array("Post.title" => array("First post", "Second post", "Third post")  ))
-            if (is_string($key) and in_array($key, ['AND', 'OR', 'NOT'])) {
+            if (is_string($key) && in_array($key, ['AND', 'OR', 'NOT'])) {
                 $buffer = [];
                 $start = '(';
                 $end = ')';
