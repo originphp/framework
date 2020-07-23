@@ -58,12 +58,11 @@ class RedisConnection
             } else {
                 $result = $redis->connect($config['host'], $config['port'], $config['timeout']);
             }
+            if ($result && isset($config['password'])) {
+                $result = $redis->auth($config['password']);
+            }
         } catch (RedisException $e) {
-            // result still false
-        }
-
-        if ($result && isset($config['password'])) {
-            $result = $redis->auth($config['password']);
+            $result = false;
         }
 
         if (! $result) {

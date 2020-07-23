@@ -8,6 +8,10 @@
 - added `assertSessionHasKey` to `IntegrationTestTrait`
 - Added `JobTestTrait`
 
+### Fixed
+
+- Redis connection invalid password throwing error on travis due to recent changes in extension. ERR AUTH <password> called without any password configured for the default user. Are you sure your configuration is correct
+
 ### Changed
 
 - Changed `MailerJob` execute params (this has backwards compatibility to prevent queued jobs from breaking)
