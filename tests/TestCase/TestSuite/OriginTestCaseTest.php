@@ -129,6 +129,17 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
             $this->assertTrue(true);
         });
     }
+
+    public function testAssertStringContains()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $OriginTestCase->assertStringContains('fox', 'A quick brown fox');
+    }
+    public function testAssertStringNotContains()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $OriginTestCase->assertStringNotContains('foo', 'A quick brown fox');
+    }
 }
 /**
  * This must be AFTER test case declaration

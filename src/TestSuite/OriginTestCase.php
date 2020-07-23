@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Origin\Core\Resolver;
+use Origin\Mailer\Mailer;
 use Origin\Core\HookTrait;
 use Origin\Core\ModelTrait;
 use Origin\Model\ModelRegistry;
@@ -106,6 +107,9 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
         if (method_exists($this, 'cleanup')) {
             $this->cleanup();
         }
+        if (class_exists(Mailer::class)) {
+            Mailer::clearDelivered();
+        }
     }
 
     /**
@@ -140,5 +144,31 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
         error_reporting(E_ALL & ~E_USER_DEPRECATED);
         $callable();
         error_reporting($level);
+    }
+
+    /**
+     * A less ugly short wrapper for assertStringContainsString
+     *
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     * @return void
+     */
+    public function assertStringContains(string $needle, string $haystack, string $message = ''): void
+    {
+        $this->assertStringContainsString($needle, $haystack, $message);
+    }
+
+    /**
+     * A less ugly short wrapper for assertStringNotContainsString
+     *
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     * @return void
+     */
+    public function assertStringNotContains(string $needle, string $haystack, string $message = ''): void
+    {
+        $this->assertStringNotContainsString($needle, $haystack, $message);
     }
 }

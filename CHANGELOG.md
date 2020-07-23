@@ -2,6 +2,9 @@
 
 ## [unreleased]
 
+- added `Mailer::delivered()`
+- added `assertStringContains` to `OriginTestCase`
+- added `assertStringNotContains` to `OriginTestCase`
 - added `assertCookieNotSet` to `IntegrationTestTrait`
 - added `assertFlashMessage` to `IntegrationTestTrait`
 - added `assertSession` to `IntegrationTestTrait`
