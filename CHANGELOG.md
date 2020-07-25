@@ -2,6 +2,7 @@
 
 ## [unreleased]
 
+- added `storage_path` function
 - added `Mailer::delivered()`
 - added `assertStringContains` to `OriginTestCase`
 - added `assertStringNotContains` to `OriginTestCase`

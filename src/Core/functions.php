@@ -281,13 +281,32 @@ if (! function_exists('now')) {
 if (! function_exists('tmp_path')) {
     /**
      * Handy function for working with tmp paths
-     * e.g. file_put_contents(tmp_path('storage/data.json'));
+     * e.g. file_put_contents(tmp_path('session/data.json'));
      *
      * @param string $path
-     * @return void
+     * @return string
      */
     function tmp_path(string $path = null)
     {
         return TMP . ($path ? DS  . $path : '');
+    }
+}
+
+if (! function_exists('storage_path')) {
+    /**
+     * Handy function for working with storage paths, outside of the Storage component
+     * e.g. file_get_contents(tmp_path('data/data.json'));
+     *
+     * @param string $path
+     * @return string
+     */
+    function storage_path(string $path = null)
+    {
+        /**
+         * backwards compatible, remove in version 4
+         */
+        $folder = defined('STORAGE') ? STORAGE : ROOT . '/storage';
+  
+        return $folder . ($path ? DS  . $path : '');
     }
 }
