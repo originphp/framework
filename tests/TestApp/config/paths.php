@@ -10,6 +10,7 @@ define('DATABASE', ORIGIN . '/tests/TestApp/database');
 define('PLUGINS', ORIGIN . '/tests/TestApp/plugins');
 define('TESTS', ORIGIN . '/tests/TestApp/tests');
 define('WEBROOT', ROOT . '/public');
+define('STORAGE', ORIGIN . '/tests/TestApp/storage');
 
 define('TMP', sys_get_temp_dir());
 define('LOGS', TMP . '/logs');
