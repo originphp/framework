@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.2.0] - 2020-07-26
 
 - added `storage_path` function
 - added `Mailer::delivered()`
