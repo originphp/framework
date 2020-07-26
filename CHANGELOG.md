@@ -2,6 +2,8 @@
 
 ## [3.2.0] - 2020-07-26
 
+### Added
+
 - added `storage_path` function
 - added `Mailer::delivered()`
 - added `assertStringContains` to `OriginTestCase`
