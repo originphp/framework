@@ -447,10 +447,9 @@ class Model
      *   - message: the error message to show if the rule fails
      *   - on: default:null. set to create or update to run the rule only on those
      *   - present: default:false the field (key) must be present but can be empty
-     *   - nullable: default:false accepts null values
-     *   - stop: default:true stop on validation failure
+     *   - allowEmpty: default:false accepts null values
+     *   - stopOnFail: default:true stop on validation failure
      * @return void
-     *
      */
     public function validate(string $field, $options): void
     {
