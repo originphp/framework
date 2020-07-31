@@ -43,6 +43,48 @@ class ContainerTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($record->foo));
     }
 
+    public function testIsDirty()
+    {
+        $record = new ActiveRecord();
+       
+        $this->assertFalse($record->isDirty());
+        $this->assertFalse($record->isDirty('foo'));
+        $record->foo = 'bar';
+        $this->assertTrue($record->isDirty());
+        $this->assertTrue($record->isDirty('foo'));
+        unset($record->foo);
+        $this->assertFalse($record->isDirty());
+    }
+
+    public function testIsClean()
+    {
+        $record = new ActiveRecord();
+       
+        $this->assertTrue($record->isClean());
+        $this->assertTrue($record->isClean('foo'));
+        $record->foo = 'bar';
+        $this->assertFalse($record->isClean());
+        $this->assertFalse($record->isClean('foo'));
+    }
+
+    public function testChanged()
+    {
+        $record = new ActiveRecord();
+        $record->foo = 'bar'; // this is initial value not changed
+        
+        $this->assertEmpty($record->changed());
+        $this->assertNull($record->changed('foo'));
+        $this->assertFalse($record->wasChanged());
+        $this->assertFalse($record->wasChanged('foo'));
+
+        # Change original data
+        $record->foo = 'foobar';
+        $this->assertNotEmpty($record->changed());
+        $this->assertEquals('bar', $record->changed('foo'));
+        $this->assertTrue($record->wasChanged());
+        $this->assertTrue($record->wasChanged('foo'));
+    }
+
     public function testToArray()
     {
         $record = new ActiveRecord();
