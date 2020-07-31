@@ -19,11 +19,13 @@ use Origin\Model\Model;
 use Origin\Http\Request;
 use Origin\Utility\Date;
 use Origin\Http\Response;
+use Origin\Record\Record;
 use Origin\Http\View\View;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Controller\Controller;
+
 use Origin\Http\View\Helper\FormHelper;
 
 class ViewTestsController extends Controller
@@ -70,6 +72,25 @@ class MockFormHelper extends FormHelper
     }
 }
 
+class Checkout extends Record
+{
+    protected function initialize(): void
+    {
+        $this->addField('name', 'string');
+        $this->addField('email', ['type' => 'string', 'length' => 125]);
+        $this->addField('agree', ['type' => 'boolean', 'default' => true]);
+        $this->addField('age', ['type' => 'integer']);
+
+        $this->validate('name', 'required');
+        $this->validate('email', [
+            'required',
+            'email'
+        ]);
+
+        $this->validate('age', ['optional', 'integer']);
+    }
+}
+
 class FormHelperTest extends OriginTestCase
 {
     protected $fixtures = ['Origin.Post'];
@@ -80,6 +101,28 @@ class FormHelperTest extends OriginTestCase
         $controller = new ViewTestsController($request, new Response());
         $View = new View($controller);
         $this->Form = new MockFormHelper($View);
+    }
+
+    public function testRecordGet()
+    {
+        $checkout = new Checkout();
+
+        $checkout->name = 'foo';
+        $checkout->email = 'foo@example.com';
+        $checkout->age = 21;
+
+        $helper = $this->Form;
+        $helper->create($checkout);
+        
+        // check value
+        $this->assertStringContains('value="foo"', $helper->control('name'));
+
+        // check parsing validation rules
+        $this->assertStringContains('form-group text required', $helper->control('name'));
+        
+        // check detection is working
+        $this->assertStringContains('"form-group number"', $helper->control('age'));
+        $this->assertStringContains('form-check checkbox', $helper->control('agree'));
     }
 
     public function testCreate()
@@ -113,7 +156,7 @@ class FormHelperTest extends OriginTestCase
         ModelRegistry::set('Post', new Post());
         $FormHelper->request()->data(['title' => 'Article Title']);
         $this->assertNotNull($FormHelper->create('Article'));
-        $this->assertEquals('Article Title', $FormHelper->getProperty('data')->title);
+        $this->assertEquals('Article Title', $FormHelper->getProperty('entity')->title);
     }
 
     public function testText()

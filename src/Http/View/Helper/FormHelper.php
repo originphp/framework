@@ -22,9 +22,10 @@ use Origin\Http\Router;
 use Origin\Model\Entity;
 use Origin\Utility\Date;
 
+use Origin\Record\Record;
 use Origin\Utility\Number;
-use Origin\Model\Collection;
 
+use Origin\Model\Collection;
 use Origin\Inflector\Inflector;
 use Origin\Model\ModelRegistry;
 use Origin\Http\View\TemplateTrait;
@@ -87,11 +88,14 @@ class FormHelper extends Helper
     protected $modelName = null;
 
     /**
-     * Holds the data
+     * Holds the Entity
      *
-     * @var array|entity|null
+     * @var \Origin\Model\Entity|null
      */
-    protected $data = null;
+    protected $entity = null;
+
+    /** */
+    protected $data = [];
 
     /**
      * Filled from introspect.
@@ -117,7 +121,7 @@ class FormHelper extends Helper
     /**
      * Creates a form element
      *
-     * @param \Origin\Model\Entity|string|null $entity, null or Model name
+     * @param \Origin\Model\Entity|\Origin\Record\Record|string|null $entity, $record, 'User' or null
      * @param array $options type, url and html attributes
      * @return string
      */
@@ -125,12 +129,14 @@ class FormHelper extends Helper
     {
         $attributes = [];
 
-        $model = $this->data = null;
+        $model = $this->entity = null;
 
         /**
          * 09.06.19 - Added this, to validate request data name of model is passed instead of entity.
          * This will create the entity object and validate it. This enables form input type detection,
          * and required fields.
+         *
+         * @todo investigate if this is good idea.  I think this was added to accomdate working with forms calling other controllers
          */
         if (is_string($entity)) {
             $model = $entity;
@@ -145,8 +151,12 @@ class FormHelper extends Helper
         }
 
         if ($entity instanceof Entity) {
-            $this->data = $entity;
+            $this->entity = $entity;
             $model = $entity->name();
+        } elseif ($entity instanceof Record) {
+            $this->modelName = $entity->name();
+            $this->data = $entity->toArray();
+            $this->introspectRecord($entity);
         }
         if ($model) {
             $this->modelName = $model;
@@ -233,6 +243,39 @@ class FormHelper extends Helper
     }
 
     /**
+     * Introspects the Record
+     *
+     * @param \Origin\Model\Record $record
+     * @return array
+     */
+    protected function introspectRecord(Record $record): array
+    {
+        $meta = [
+            'columnMap' => [],
+            'requiredFields' => [],
+            'primaryKey' => null,
+            'maxlength' => [],
+        ];
+        foreach ($record->schema() as $field => $settings) {
+            $type = $settings['type'];
+
+            if (in_array($settings['type'], ['float', 'integer', 'decimal'])) {
+                $type = 'number';
+            }
+
+            $meta['columnMap'][$field] = $type;
+
+            if (empty($row['limit']) === false && $type != 'boolean') {
+                $meta['maxlength'][$field] = $settings['length'];
+            }
+        }
+
+        $meta['requiredFields'] = $this->parseRequiredFields($record->validator()->rules());
+
+        return $this->meta[$record->name()] = $meta;
+    }
+
+    /**
      * Introspects the model
      *
      * @param string $name
@@ -250,7 +293,7 @@ class FormHelper extends Helper
             'maxlength' => [],
         ];
 
-        $entity = $this->data;
+        $entity = $this->entity;
 
         $model = ModelRegistry::get($name);
 
@@ -277,9 +320,7 @@ class FormHelper extends Helper
             }
         }
 
-        $this->meta[$name] = $meta;
-
-        return $meta;
+        return $this->meta[$name] = $meta;
     }
 
     /**
@@ -296,7 +337,11 @@ class FormHelper extends Helper
 
         foreach ($validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {
-                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required']) || $validationRule['present']) {
+                /**
+                 * @deprecated present
+                 */
+                $present = isset($validationRule['present']) && $validationRule['present'] === true;
+                if (in_array($validationRule['rule'], ['notBlank','notEmpty','required']) || $present) {
                     $result[] = $field;
                 }
             }
@@ -402,8 +447,8 @@ class FormHelper extends Helper
 
         $errorOutput = '';
         // Get Validation Errors
-        if ($this->data) {
-            $entity = $this->getEntity($this->data, $name);
+        if ($this->entity) {
+            $entity = $this->getEntity($this->entity, $name);
 
             if ($entity) {
                 $model = $entity->name();
@@ -981,8 +1026,8 @@ class FormHelper extends Helper
             }
         }
         if (! isset($options['value'])) {
-            if ($this->data) {
-                $entity = $this->getEntity($this->data, $name);
+            if ($this->entity) {
+                $entity = $this->getEntity($this->entity, $name);
                 $parts = explode('.', $name);
                 $last = end($parts);
 
@@ -997,9 +1042,9 @@ class FormHelper extends Helper
                 }
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
-                $requestData = $this->request()->data();
-                if ($requestData) {
-                    $dot = new Dot($requestData);
+                $data = $this->data ?: $this->request()->data();
+                if ($data) {
+                    $dot = new Dot($data);
                     $value = $dot->get($name);
                     if ($value) {
                         $options['value'] = $value;
