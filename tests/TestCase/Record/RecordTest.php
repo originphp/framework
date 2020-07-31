@@ -109,11 +109,37 @@ class RecordTest extends \PHPUnit\Framework\TestCase
     {
         $form = new CheckoutForm();
         $form->name = 'Joe';
+      
         $this->assertFalse($form->validates());
         $this->assertEquals('JOE', $form->name);
 
         $form->email = 'demo@example.com';
         $this->assertTrue($form->validates());
         $this->assertEquals('joe', $form->name);
+    }
+
+    public function testNew()
+    {
+        $data = ['name' => 'foo','email' => 'demo@example.com'];
+        $form = Record::new($data);
+        $this->assertInstanceOf(Record::class, $form);
+        $this->assertEquals($data, $form->toArray());
+
+        $data = ['name' => 'foo','email' => 'demo@example.com'];
+        $form = Record::new($data, ['fields' => ['name']]);
+        $this->assertInstanceOf(Record::class, $form);
+        $this->assertEquals(['name' => 'foo'], $form->toArray());
+    }
+
+    public function testPatch()
+    {
+        $data = ['name' => 'foo','email' => 'demo@example.com'];
+        $form = Record::new($data);
+        $this->assertInstanceOf(Record::class, $form);
+   
+        $data = ['name' => 'bar','email' => 'jon.snow@example.com'];
+        $form = Record::patch($form, $data, ['fields' => ['name']]);
+        $this->assertInstanceOf(Record::class, $form);
+        $this->assertEquals(['name' => 'bar','email' => 'demo@example.com'], $form->toArray());
     }
 }

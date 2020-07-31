@@ -38,6 +38,13 @@ class Record
     use ContainerTrait;
 
     /**
+     * Record name (private)
+     *
+     * @var string
+     */
+    private $name = null;
+
+    /**
      * Holds the schema for Record
      *
      * @example
@@ -57,16 +64,82 @@ class Record
      * @var array
      */
     private $fieldTypes = [
-        'string','text','integer','bigint','float','decimal','datetime','time','date','binary','boolean'
+        'string','text','integer','float','decimal','datetime','time','date','binary','boolean'
     ];
 
-    public function __construct(array $data = [])
+    public function __construct(array $data = [], array $options = [])
     {
+        $options += ['name' => $this->name];
+
+        if ($options['name'] === null) {
+            list($namespace, $options['name']) = namespaceSplit(get_class($this));
+        }
+        $this->name = $options['name'];
+
         $this->executeHook('initialize');
         $this->initializeTraits();
 
         $this->setDefaultValues();
         $this->set($data);
+    }
+
+    /**
+     * Creates a new object
+     *
+     * @param array $data
+     * @param array $options
+     *  - fields : array of fields that are allowed or leave blank for all
+     * @return static
+     */
+    public static function new(array $data = [], array $options = [])
+    {
+        $options += ['fields' => null];
+        
+        if (is_array($options['fields'])) {
+            $data = static::filterData($data, $options['fields']);
+        }
+
+        return new static($data, $options);
+    }
+
+    /**
+     * Patches an existing record with an array of data
+     *
+     * @param \Origin\Record\Record $record
+     * @param array $data
+     * @param array $options
+     * @return static
+     */
+    public static function patch(Record $record, array $data = [], array $options = [])
+    {
+        $options += ['fields' => null];
+        
+        if (is_array($options['fields'])) {
+            $data = static::filterData($data, $options['fields']);
+        }
+
+        $record->set($data);
+
+        return $record;
+    }
+
+    /**
+     * Protect from mass assignment
+     *
+     * @param array $data
+     * @param array $fields
+     * @return array
+     */
+    private static function filterData(array $data, array $fields = null): array
+    {
+        $out = [];
+        foreach ($data as $key => $value) {
+            if ($fields === null || in_array($key, $fields)) {
+                $out[$key] = $value;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -97,7 +170,7 @@ class Record
                 $this->containerData,
                 $isNewRecord
             );
-    
+           
             if (empty($this->validationErrors)) {
                 $this->dispatchCallbacks('afterValidate');
 
@@ -154,7 +227,7 @@ class Record
      *
      * @param string $name
      * @param string|array $typeOrOptions e.g. type or ['type'=>'string','limit']
-     *  - type: string, text, integer, bigint, float, decimal, datetime, time, date, binary, boolean
+     *  - type: string, text, integer, float, decimal, datetime, time, date, binary, boolean
      *  - length: default:null
      *  - default: default value to use
      * @return self
@@ -188,5 +261,15 @@ class Record
         }
 
         return $this->schema[$name] ?? null;
+    }
+
+    /**
+     * Gets the name of this Record
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
     }
 }
