@@ -90,6 +90,10 @@ class ValidationRuleSet
                 $definition = ['rule' => $definition];
             }
 
+            if (isset($definition['present'])) {
+                deprecationWarning('present key has been deprecated use present rule instead');
+            }
+
             $this->rules[$name] = $this->add($definition);
        
             $counter++;
