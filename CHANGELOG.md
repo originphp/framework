@@ -1,5 +1,20 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+- Added `Record` for working with data that is not persisted to the database and works with FormHelper
+- Added `ContainerTrait` to keep things DRY.
+
+### Fixed
+
+- Fixed `AuthComponent` now destorys all session data not just Auth related data
+
+### Deprecated
+
+- Deprecated `present` options key, use the `present` validation rule instead 
+
 ## [3.2.0] - 2020-07-26
 
 ### Added

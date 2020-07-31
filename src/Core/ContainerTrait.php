@@ -29,7 +29,7 @@ trait ContainerTrait
     protected $containerData = [];
 
     /**
-    * Checks if a key exists
+    * Checks if property set and has a non null value
     *
     * @param string $key
     * @return boolean
