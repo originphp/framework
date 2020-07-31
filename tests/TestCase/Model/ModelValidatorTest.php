@@ -401,13 +401,15 @@ class ModelValidatorTest extends OriginTestCase
         $articleValid = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
         $articleInvalid = $this->Article->new(['body' => 'not important']);
 
-        $this->Article->validate('title', [
-            'alphaNumeric' => [
-                'rule' => 'alphaNumeric',
-                'present' => true
-            ],
-        ]);
-
+        $this->deprecated(function () {
+            $this->Article->validate('title', [
+                'alphaNumeric' => [
+                    'rule' => 'alphaNumeric',
+                    'present' => true
+                ],
+            ]);
+        });
+   
         $this->assertTrue($this->Article->validates($articleValid));
         $this->assertFalse($this->Article->validates($articleInvalid));
 
@@ -417,14 +419,17 @@ class ModelValidatorTest extends OriginTestCase
 
     public function testStopOnFail()
     {
-        # Check Present termination
-        $this->Article->validate('title', [
-            'alphaNumeric' => [
-                'rule' => 'alphaNumeric',
-                'present' => true,
-                'stopOnFail' => true
-            ],
-        ]);
+        $this->deprecated(function () {
+            # Check Present termination
+            $this->Article->validate('title', [
+                'alphaNumeric' => [
+                    'rule' => 'alphaNumeric',
+                    'present' => true,
+                    'stopOnFail' => true
+                ],
+            ]);
+        });
+
         $articleValid = $this->Article->new(['title' => 'foo', 'body' => 'not important']);
         $articleInvalid = $this->Article->new(['body' => 'not important']);
 
