@@ -88,14 +88,14 @@ class FormHelper extends Helper
     protected $modelName = null;
 
     /**
-     * Holds the Entity
-     *
      * @var \Origin\Model\Entity|null
      */
     protected $entity = null;
 
-    /** */
-    protected $data = [];
+    /**
+     * @var \Origin\Record\Record|null
+     */
+    protected $record = null;
 
     /**
      * Filled from introspect.
@@ -155,7 +155,7 @@ class FormHelper extends Helper
             $model = $entity->name();
         } elseif ($entity instanceof Record) {
             $this->modelName = $entity->name();
-            $this->data = $entity->toArray();
+            $this->record = $entity;
             $this->introspectRecord($entity);
         }
         if ($model) {
@@ -446,19 +446,26 @@ class FormHelper extends Helper
         $column = end($parts);
 
         $errorOutput = '';
+        $errors = [];
+
         // Get Validation Errors
         if ($this->entity) {
             $entity = $this->getEntity($this->entity, $name);
 
             if ($entity) {
                 $model = $entity->name();
-                if ($entity->errors($column)) {
-                    foreach ($entity->errors($column) as $error) {
-                        $errorOutput .= $this->formatTemplate('error', ['content' => $error]);
-                    }
-                    $template = 'controlError';
-                }
+                $errors = $entity->errors($column);
             }
+        }
+        if ($this->record) {
+            $errors = $this->record->errors($column);
+        }
+
+        if ($errors) {
+            foreach ($errors as $error) {
+                $errorOutput .= $this->formatTemplate('error', ['content' => $error]);
+            }
+            $template = 'controlError';
         }
 
         // Check if field is required to add required class
@@ -1042,7 +1049,7 @@ class FormHelper extends Helper
                 }
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
-                $data = $this->data ?: $this->request()->data();
+                $data = $this->record ? $this->record->toArray() : $this->request()->data();
                 if ($data) {
                     $dot = new Dot($data);
                     $value = $dot->get($name);

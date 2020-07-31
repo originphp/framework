@@ -123,6 +123,11 @@ class FormHelperTest extends OriginTestCase
         // check detection is working
         $this->assertStringContains('"form-group number"', $helper->control('age'));
         $this->assertStringContains('form-check checkbox', $helper->control('agree'));
+
+        // Check validation errors
+        $checkout->invalidate('name', 'You must provide a name');
+        $helper->create($checkout);
+        $this->assertStringContains('<div class="error-message">You must provide a name</div>', $helper->control('name'));
     }
 
     public function testCreate()
