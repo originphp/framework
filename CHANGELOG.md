@@ -9,7 +9,7 @@
 
 ### Fixed
 
-- Fixed `AuthComponent` now destorys all session data not just Auth related data
+- Fixed `AuthComponent` now destroys all session data not just Auth related data
 
 ### Deprecated
 
