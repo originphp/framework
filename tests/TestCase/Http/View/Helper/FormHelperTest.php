@@ -86,7 +86,7 @@ class Checkout extends Record
             'required',
             'email'
         ]);
-
+      
         $this->validate('age', ['optional', 'integer']);
     }
 }
@@ -125,7 +125,7 @@ class FormHelperTest extends OriginTestCase
         $this->assertStringContains('form-check checkbox', $helper->control('agree'));
 
         // Check validation errors
-        $checkout->invalidate('name', 'You must provide a name');
+        $checkout->error('name', 'You must provide a name');
         $helper->create($checkout);
         $this->assertStringContains('<div class="error-message">You must provide a name</div>', $helper->control('name'));
     }

@@ -69,7 +69,7 @@ class Record
         if ($options['name'] === null) {
             list($namespace, $options['name']) = namespaceSplit(get_class($this));
         }
-        $this->name = $options['name'];
+        $this->name($options['name']);
 
         $this->executeHook('initialize');
         $this->initializeTraits();
