@@ -63,4 +63,16 @@ EOF;
         $result = new Result(['error' => []]);
         $this->assertNull($result->data('bar'));
     }
+
+    public function testError()
+    {
+        $data = ['foo' => 'bar'];
+        $result = new Result(['error' => $data]);
+        $this->assertEquals('bar', $result->error('foo'));
+        $this->assertNull($result->error('bar'));
+        $this->assertEquals($data, $result->error());
+
+        $result = new Result(['data' => []]);
+        $this->assertNull($result->error('bar'));
+    }
 }

@@ -76,6 +76,23 @@ class Result
     }
 
     /**
+     * Gets the error array or a value for a particular key
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function error(string $key = null)
+    {
+        $data = $this->error ?? null;
+
+        if ($key === null) {
+            return $data;
+        }
+
+        return $data[$key] ?? null;
+    }
+
+    /**
     * Magic method is trigged when the object is treated as string.
     *
     * @return string
