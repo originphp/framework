@@ -252,7 +252,8 @@ class Record
     }
     
     /**
-     * Validates this object.
+     * Runs the validations on this object returns true or false, and
+     * errors can be accessed using errors
      *
      * @param boolean $isNewRecord
      * @return boolean
@@ -271,7 +272,7 @@ class Record
                     $this->error($field, $message);
                 }
             }
-            /** this is called even if validation fails */
+            /** this is called even if validation fails **/
             $this->dispatchCallbacks('afterValidate');
         }
 
