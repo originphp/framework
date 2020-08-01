@@ -27,77 +27,28 @@ use Origin\Xml\Xml;
 use JsonSerializable;
 use Origin\Inflector\Inflector;
 
-class Entity implements ArrayAccess, JsonSerializable
+class Entity extends BaseEntity implements ArrayAccess, JsonSerializable
 {
     /**
-     * Holds the properties and values for this entity.
-     *
-     * @var array
-     */
-    protected $_properties = [];
-
-    /**
-     * Holds the validation errors for this entity (not nested).
-     *
-     * @var array
-     */
-    protected $_errors = [];
-
-    /**
-     * The name of this entity, alias of the model.
-     *
-     * @var string
-     */
-    protected $_name = null;
-
-    /**
-     * If the record exists in the database (set during find)
+     * If entity exists in the database
      *
      * @var bool
      */
-    protected $_exists = null;
-
-    /**
-     * Holds modified fields
-     *
-     * @var array
-     */
-    protected $_modified = [];
+    private $entityExists = null;
 
     /**
      * The entity is new and inserted into database
      *
      * @var boolean
      */
-    protected $_created = false;
+    private $entityCreated = false;
   
     /**
-     * If the entity was deleted
+     * If the entity was deleted from the database
      *
      * @var boolean
      */
-    protected $_deleted = false;
-
-    /**
-    * Cached lists of accessors
-    *
-    * @var array
-    */
-    protected static $accessors = [];
-
-    /**
-     * Virtual fields that will be exposed when using toArray,toJson,and toXml
-     *
-     * @var array
-     */
-    protected $_virtual = [];
-
-    /**
-     * Fields that should not be exposed when using toArray,toJson,and toXml
-     *
-     * @var array
-     */
-    protected $_hidden = [];
+    private $entityDeleted = false;
 
     /**
      * Constructor
@@ -113,8 +64,8 @@ class Entity implements ArrayAccess, JsonSerializable
     {
         $options += ['name' => null, 'exists' => false, 'markClean' => false];
 
-        $this->_name = $options['name'];
-        $this->_exists = $options['exists'];
+        $this->entityName = $options['name'];
+        $this->entityExists = $options['exists'];
 
         foreach ($properties as $property => $value) {
             $this->set($property, $value);
@@ -122,103 +73,23 @@ class Entity implements ArrayAccess, JsonSerializable
         if ($options['markClean']) {
             $this->reset();
         }
-    }
 
-    /**
-     * Magic method for setting data on inaccessible properties.
-     *
-     * @param string $property
-     * @param mixed $value
-     * @return void
-     */
-    public function __set(string $property, $value)
-    {
-        $this->set($property, $value);
-    }
-
-    /**
-     * Magic method to get data from inaccessible properties.
-     *
-     * @param string $property
-     * @return mixed
-     */
-    public function &__get(string $property)
-    {
-        return $this->get($property);
-    }
-
-    /**
-     * Magic method is triggered by calling isset() or empty() on inaccessible properties.
-     *
-     * @param string $property
-     * @return boolean
-     */
-    public function __isset(string $property)
-    {
-        return $this->has($property);
-    }
-
-    /**
-     * Magic method is triggered by unset on inaccessible properties.
-     *
-     * @param string $property
-     * @return boolean
-     */
-    public function __unset(string $property)
-    {
-        $this->unset($property);
-    }
-
-    /**
-     * Magic method is trigged when calling var_dump
-     *
-     * @return array
-     */
-    public function __debugInfo()
-    {
-        $properties = $this->_properties;
-        foreach ($this->_virtual as $field) {
-            $properties[$field] = $this->$field;
+        if (! empty($this->_hidden)) {
+            deprecationWarning('Entity::$_hidden is deprecated use Entity::$hidden instead');
+            $this->hidden = $this->_hidden;
+            unset($this->_hidden);
         }
-
-        return $properties;
-    }
-
-    /**
-     * Magic method is trigged when the object is treated as string,
-     * e.g. echo $entity
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toJson(['pretty' => true]);
-    }
-
-    /**
-     * Handles the entity errors, can set, get and check
-     *
-     *  $errors = $entity->errors();
-     *  $fieldErrors = $entity->errors('contact_name');
-     *  $entity->errors('email','invalid email address');
-     *
-     * @param string $field
-     * @param string $error
-     * @return array|null|void
-     */
-    public function errors(string $field = null, string $error = null)
-    {
-        if ($field === null) {
-            return $this->_errors;
+        if (! empty($this->_virtual)) {
+            deprecationWarning('Entity::$_virtual is deprecated use Entity::$virtual instead');
+            $this->virtual = $this->_virtual;
+            unset($this->_virtual);
         }
-        if ($error === null) {
-            return $this->_errors[$field] ?? null;
-        }
-        $this->invalidate($field, $error);
     }
 
     /**
      * Sets a validation error
+     *
+     * @deprecated
      *
      * @param string $field
      * @param string $error
@@ -226,109 +97,8 @@ class Entity implements ArrayAccess, JsonSerializable
      */
     public function invalidate(string $field, string $error): void
     {
-        if (! isset($this->_errors[$field])) {
-            $this->_errors[$field] = [];
-        }
-        $this->_errors[$field][] = $error;
-    }
-
-    /**
-     * Unsets a property or array of properties
-     *
-     * @param string|array $properties
-     * @return \Origin\Model\Entity;
-     */
-    public function unset($properties): Entity
-    {
-        foreach ((array)$properties as $key) {
-            unset($this->_properties[$key]);
-            unset($this->_modified[$key]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a value from the entity
-     *
-     * @return mixed
-     */
-    public function &get(string $property)
-    {
-        $result = null;
-
-        $method = static::accessor($property, 'get');
-
-        if (isset($this->_properties[$property])) {
-            $result = &$this->_properties[$property];
-        }
-        if ($method) {
-            $result = $this->$method($result);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Gets the accessor method
-     *
-     * @param string $property
-     * @param string $type
-     * @return string|null
-     */
-    protected static function accessor(string $property, string $type): ?string
-    {
-        $class = static::class;
-
-        if (isset(static::$accessors[$class][$type][$property])) {
-            return static::$accessors[$class][$type][$property];
-        }
-
-        if ($class === Entity::class) {
-            return null;
-        }
-
-        $method = $type . Inflector::studlyCaps($property);
-        if (! in_array($method, get_class_methods($class))) {
-            $method = '';
-        }
-
-        return static::$accessors[$class][$type][$property] = $method;
-    }
-
-    /**
-     * Sets a property/properties of the entity.
-     *
-     * @param string|array $properties
-     * @param mixed $value
-     */
-    public function set($properties, $value = null): Entity
-    {
-        if (is_array($properties) === false) {
-            $properties = [$properties => $value];
-        }
-
-        foreach ($properties as $property => $value) {
-            $method = static::accessor($property, 'set');
-            if ($method) {
-                $value = $this->$method($value);
-            }
-            $this->_properties[$property] = $value;
-            $this->_modified[$property] = true;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Resets the modified properties
-     *
-     * @return void
-     */
-    public function reset(): void
-    {
-        $this->_modified = [];
-        $this->_errors = [];
+        deprecationWarning('Entity::invalidate deprecated use error instead');
+        $this->error($field, $error);
     }
 
     /**
@@ -339,7 +109,7 @@ class Entity implements ArrayAccess, JsonSerializable
      */
     public function exists(bool $exists = null): bool
     {
-        return $this->setGetPersisted('exists', $exists);
+        return $this->setGetPersisted('entityExists', $exists);
     }
 
     /**
@@ -350,7 +120,7 @@ class Entity implements ArrayAccess, JsonSerializable
      */
     public function created(bool $created = null): bool
     {
-        return $this->setGetPersisted('created', $created);
+        return $this->setGetPersisted('entityCreated', $created);
     }
     /**
      * If the record was deleted
@@ -360,13 +130,18 @@ class Entity implements ArrayAccess, JsonSerializable
      */
     public function deleted(bool $deleted = null): bool
     {
-        return $this->setGetPersisted('deleted', $deleted);
+        return $this->setGetPersisted('entityDeleted', $deleted);
     }
 
-    private function setGetPersisted(string $type, bool $value = null)
+    /**
+     * Setter/Getter for persisted states
+     *
+     * @param string $var
+     * @param boolean $value
+     * @return bool
+     */
+    private function setGetPersisted(string $var, bool $value = null): bool
     {
-        $var = '_' . $type;
-
         if ($value === null) {
             return $this->$var;
         }
@@ -375,92 +150,18 @@ class Entity implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Returns the list of properties that have been modified, if you supply
-     * a property name, then it will return a boolean result to tell you if the property has
-     * been changed.
-     *
-     * $array = $entity->modified();
-     * $bool = $entity->modified('email');
-     *
-     * @return array|bool
-     */
-    public function modified(string $property = null)
-    {
-        if ($property === null) {
-            return array_keys($this->_modified);
-        }
-
-        return isset($this->_modified[$property]);
-    }
-
-    /**
-     * Checks if Entity has property set. This SHOULD work like isset.
-     *
-     * @param string $property name of property
-     * @return bool true of false
-     */
-    public function has($property): bool
-    {
-        return isset($this->_properties[$property]);
-    }
-
-    /**
-     * Returns a list of properties for the Entity.
-     * Use this instead of get_object_vars.
-     *
-     * @return array properties
-     */
-    public function properties(): array
-    {
-        return array_keys($this->_properties);
-    }
-
-    /**
      * Checks if a entity has a property SET (regardless if null).
+     *
+     * @deprecated This will be deprecated as its code bloat
      *
      * @param string $property
      * @return bool
      */
     public function propertyExists(string $property): bool
     {
-        return array_key_exists($property, $this->_properties);
-    }
+        deprecationWarning('Entity::propertyExists has been deprecated');
 
-    /**
-     * Gets the entity name, aka the model or alias.
-     *
-     * @return string|null model name
-     */
-    public function name(): ?string
-    {
-        return $this->_name;
-    }
-
-    /**
-     * Converts the Entity into an array.
-     *
-     * @return array result
-     */
-    public function toArray(): array
-    {
-        $result = [];
-        foreach ($this->visibleProperties() as $property) {
-            $value = $this->$property;
-            if (is_array($value) || $value instanceof Collection) {
-                foreach ($value as $k => $v) {
-                    if ($v instanceof Entity) {
-                        $result[$property][$k] = $v->toArray();
-                    }
-                }
-                continue;
-            }
-            if ($value instanceof Entity) {
-                $value = $value->toArray();
-            }
-            $result[$property] = $value;
-        }
-
-        return $result;
+        return in_array($property, $this->properties());
     }
 
     /**
@@ -485,26 +186,15 @@ class Entity implements ArrayAccess, JsonSerializable
      */
     public function toXml(): string
     {
-        $root = Inflector::camelCase($this->_name ?? 'record');
+        $root = Inflector::camelCase($this->name() ?? 'record');
 
         return Xml::fromArray([$root => $this->toArray()]);
     }
 
     /**
-     * Gets the visible properties
-     *
-     * @return array
-     */
-    private function visibleProperties(): array
-    {
-        $properties = array_keys($this->_properties);
-        $properties = array_merge($properties, $this->_virtual);
-
-        return array_diff($properties, $this->_hidden);
-    }
-
-    /**
      * Sets and gets hidden properties
+     *
+     * @deprecated This will likely be deprecated in future
      *
      * @param array $properties
      * @return array
@@ -512,14 +202,16 @@ class Entity implements ArrayAccess, JsonSerializable
     public function hidden(array $properties = null): array
     {
         if ($properties === null) {
-            return $this->_hidden;
+            return $this->hidden;
         }
 
-        return $this->_hidden = $properties;
+        return $this->hidden = $properties;
     }
 
     /**
      * Sets and gets virtual properties
+     *
+     * @deprecated This will likely be deprecated in future
      *
      * @param array $properties
      * @return array
@@ -527,10 +219,10 @@ class Entity implements ArrayAccess, JsonSerializable
     public function virtual(array $properties = null): array
     {
         if ($properties === null) {
-            return $this->_virtual;
+            return $this->virtual;
         }
 
-        return $this->_virtual = $properties;
+        return $this->virtual = $properties;
     }
 
     /**

@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added `Record` for working with data that is not persisted to the database and works with FormHelper
+- Added `Record` for working with data that is not persisted to the database and works with `FormHelper`
 - Added `ContainerTrait` to keep things DRY.
 
 ### Fixed
@@ -13,6 +13,10 @@
 
 ### Deprecated
 
+- Deprecated `Entity::propertyExists`
+- Deprecated `Entity::$_virtual` use `Entity::$virtual` instead
+- Deprecated `Entity::$_hidden` use `Entity::$hidden` instead
+- Deprecated `Entity::invalidate` use `Entity::error` instead
 - Deprecated `present` options key, use the `present` validation rule instead 
 
 ## [3.2.0] - 2020-07-26
