@@ -212,11 +212,7 @@ class Entity implements ArrayAccess, JsonSerializable
             return $this->_errors;
         }
         if ($error === null) {
-            if (isset($this->_errors[$field])) {
-                return $this->_errors[$field];
-            }
-
-            return null;
+            return $this->_errors[$field] ?? null;
         }
         $this->invalidate($field, $error);
     }
