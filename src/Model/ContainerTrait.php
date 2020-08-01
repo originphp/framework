@@ -12,7 +12,9 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 declare(strict_types = 1);
-namespace Origin\Core;
+namespace Origin\Model;
+
+use Origin\Inflector\Inflector;
 
 /**
  * Container Trait.
@@ -22,11 +24,11 @@ namespace Origin\Core;
 trait ContainerTrait
 {
     /**
-     * Holds container data in a protected array, important for flexability.
+     * Holds data
      *
      * @var array
      */
-    protected $containerData = [];
+    private $containerData = [];
 
     /**
      * Holds the dirty fields
@@ -41,6 +43,54 @@ trait ContainerTrait
      * @var array
      */
     private $changedData = [];
+
+    /**
+     * Holds the errors
+     *
+     * @var array
+     */
+    private $errors = [];
+
+    /**
+    * Cached lists of accessors
+    *
+    * @var array
+    */
+    protected static $accessors = [];
+
+    /**
+     * @var string
+     */
+    private $dataContainerName = null;
+
+    /**
+     * Virtual fields that will be exposed when using toArray, toJson and toXml
+     *
+     * @var array
+     */
+    protected $virtual = [];
+
+    /**
+     * Fields that should not be exposed when using toArray, toJson and toXml
+     *
+     * @var array
+     */
+    protected $hidden = [];
+
+    /**
+     * Sets or gets the name for this object
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function name(string $name = null): ? string
+    {
+        if ($name === null) {
+            return $this->dataContainerName;
+        }
+
+        return $this->dataContainerName = $name;
+    }
 
     /**
     * Checks if property set and has a non null value
@@ -64,8 +114,14 @@ trait ContainerTrait
     {
         $value = $default;
         
+        $method = static::accessor($key, 'get');
+        
         if (isset($this->containerData[$key])) {
             $value = &$this->containerData[$key];
+        }
+
+        if ($method) {
+            $value = $this->$method($value);
         }
 
         return $value;
@@ -83,6 +139,11 @@ trait ContainerTrait
         $data = is_array($key) ? $key : [$key => $value];
 
         foreach ($data as $key => $value) {
+            $method = static::accessor($key, 'set');
+            if ($method) {
+                $value = $this->$method($value);
+            }
+
             if (! array_key_exists($key, $this->changedData) &&
                 array_key_exists($key, $this->containerData) &&
                 $value !== $this->containerData[$key]
@@ -113,13 +174,59 @@ trait ContainerTrait
     }
     
     /**
-     * Returns an array of data in the container
+     * Gets all errors or for a specific field
      *
+     * @param string $field
+     * @return array|null
+     */
+    public function errors(string $field = null): ? array
+    {
+        if ($field === null) {
+            return $this->errors;
+        }
+
+        return $this->errors[$field] ?? null;
+    }
+
+    /**
+     * Sets an error
+     *
+     * @param string $field
+     * @param string $message
      * @return void
      */
-    public function toArray()
+    public function error(string $field, string $message): void
     {
-        return $this->containerData;
+        if (! isset($this->errors[$field])) {
+            $this->errors[$field] = [];
+        }
+        $this->errors[$field][] = $message;
+    }
+
+    /**
+     * Returns an array of data in the container
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $out = [];
+        foreach ($this->visibleProperties() as $property) {
+            $value = $this->$property;
+            if (is_iterable($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_object($v) && method_exists($v, 'toArray')) {
+                        $out[$property][$k] = $v->toArray();
+                    }
+                }
+                continue;
+            } elseif (is_object($value) && method_exists($value, 'toArray')) {
+                $value = $value->toArray();
+            }
+            $out[$property] = $value;
+        }
+
+        return $out;
     }
 
     /**
@@ -179,14 +286,26 @@ trait ContainerTrait
     }
 
     /**
+     * Gets the dirty fields
+     *
+     * @param string $attribute
+     * @return array
+     */
+    public function dirty(): array
+    {
+        return array_keys($this->dirtyData);
+    }
+
+    /**
      * Cleans the state of this container
      *
      * @return void
      */
-    public function clean(): void
+    public function reset(): void
     {
         $this->changedData = [];
         $this->dirtyData = [];
+        $this->errors = [];
     }
 
     /**
@@ -235,12 +354,46 @@ trait ContainerTrait
     }
 
     /**
-     * Magic method
+     * Returns a string representation of this object
      *
      * @return string
      */
     public function __toString()
     {
-        return (string) json_encode($this->containerData, JSON_PRETTY_PRINT);
+        return (string) json_encode($this->toArray(), JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Gets the visible properties for this object
+     *
+     *
+     * @return array
+     */
+    private function visibleProperties(): array
+    {
+        $properties = array_merge(array_keys($this->containerData), $this->virtual);
+
+        return array_diff($properties, $this->hidden);
+    }
+
+    /**
+     * Gets the accessor method
+     *
+     * @param string $property
+     * @param string $type
+     * @return mixed
+     */
+    protected static function accessor(string $property, string $type)
+    {
+        $class = static::class;
+
+        if (isset(static::$accessors[$class][$type][$property])) {
+            return static::$accessors[$class][$type][$property];
+        }
+
+        $method = $type . Inflector::studlyCaps($property);
+        if (in_array($method, get_class_methods($class))) {
+            return static::$accessors[$class][$type][$property] = $method;
+        }
     }
 }

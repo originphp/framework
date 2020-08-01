@@ -11,9 +11,9 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Job;
+namespace Origin\Test\Model;
 
-use Origin\Record\Record;
+use Origin\Model\Record;
 use BadMethodCallException;
 
 class InvalidCheckoutForm extends Record
@@ -40,7 +40,7 @@ class CheckoutForm extends Record
         ]);
 
         $this->beforeValidate('changeName');
-        $this->afterValidate('changeNameAgain');
+        $this->afterValidate('changeEmail');
     }
 
     protected function changeName()
@@ -48,9 +48,9 @@ class CheckoutForm extends Record
         $this->name = strtoupper($this->name);
     }
 
-    protected function changeNameAgain()
+    protected function changeEmail()
     {
-        $this->name = strtolower($this->name);
+        $this->email = strtoupper($this->email);
     }
 }
 
@@ -109,13 +109,11 @@ class RecordTest extends \PHPUnit\Framework\TestCase
     {
         $form = new CheckoutForm();
         $form->name = 'Joe';
-      
-        $this->assertFalse($form->validates());
-        $this->assertEquals('JOE', $form->name);
-
         $form->email = 'demo@example.com';
-        $this->assertTrue($form->validates());
-        $this->assertEquals('joe', $form->name);
+
+        $form->validates();
+        $this->assertEquals('JOE', $form->name);
+        $this->assertEquals('DEMO@EXAMPLE.COM', $form->email);
     }
 
     public function testNew()

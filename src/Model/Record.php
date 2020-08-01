@@ -12,13 +12,12 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 declare(strict_types = 1);
-namespace Origin\Record;
+namespace Origin\Model;
 
 use Origin\Core\HookTrait;
 use BadMethodCallException;
-use Origin\Core\ContainerTrait;
+use Origin\Validation\Validator;
 use Origin\Core\InitializerTrait;
-use \Origin\Validation\ValidateTrait;
 use Origin\Core\CallbackRegistrationTrait;
 
 /**
@@ -32,17 +31,8 @@ class Record
     use InitializerTrait;
     use HookTrait;
     use CallbackRegistrationTrait;
-    use ValidateTrait {
-        validates as private validatesTrait;
-    }
-    use ContainerTrait;
 
-    /**
-     * Record name (private)
-     *
-     * @var string
-     */
-    private $name = null;
+    use ContainerTrait;
 
     /**
      * Holds the schema for Record
@@ -66,6 +56,11 @@ class Record
     private $fieldTypes = [
         'string','text','integer','float','decimal','datetime','time','date','binary','boolean'
     ];
+
+    /**
+     * @var \Origin\Validation\Validator
+     */
+    private $validator;
 
     public function __construct(array $data = [], array $options = [])
     {
@@ -157,31 +152,6 @@ class Record
     }
 
     /**
-     * Validates this object.
-     *
-     *
-     * @param boolean $isNewRecord
-     * @return boolean
-     */
-    public function validates(bool $isNewRecord = true): bool
-    {
-        if ($this->dispatchCallbacks('beforeValidate')) {
-            $this->validationErrors = $this->validator()->validate(
-                $this->containerData,
-                $isNewRecord
-            );
-           
-            if (empty($this->validationErrors)) {
-                $this->dispatchCallbacks('afterValidate');
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Dispatches the callbacks
      *
      * @param string $callback
@@ -264,12 +234,61 @@ class Record
     }
 
     /**
-     * Gets the name of this Record
+     * Validates a field
      *
-     * @return string
+     * @param string $field name of the field to validate
+     * @param string|array $name rule name for single rule or an array for multiple rules
+     * @param array $options options
+    *    - rule: name of rule, array, callbable e.g. required, numeric, ['date', 'Y-m-d'],[$this,'method']
+     *   - message: the error message to show if the rule fails
+     *   - on: default:null. set to create or update to run the rule only on those
+     *   - allowEmpty: default:false validation will be pass on empty values.
+     *   - stopOnFail: default:false wether to continue if validation fails
+     * @return void
      */
-    public function name(): string
+    public function validate(string $field, $name, array $options = []): void
     {
-        return $this->name;
+        $this->validator()->add($field, $name, $options);
+    }
+    
+    /**
+     * Validates this object.
+     *
+     * @param boolean $isNewRecord
+     * @return boolean
+     */
+    public function validates(bool $isNewRecord = true): bool
+    {
+        $errors = [];
+        if ($this->dispatchCallbacks('beforeValidate')) {
+            $errors = $this->validator()->validate(
+                $this->toArray(),
+                $isNewRecord
+            );
+
+            foreach ($errors as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->error($field, $message);
+                }
+            }
+            /** this is called even if validation fails */
+            $this->dispatchCallbacks('afterValidate');
+        }
+
+        return empty($errors);
+    }
+
+    /**
+    * Gets the Validator Object
+    *
+    * @return \Origin\Validation\Validator
+    */
+    public function validator(): Validator
+    {
+        if (! $this->validator) {
+            $this->validator = new Validator();
+        }
+
+        return $this->validator;
     }
 }

@@ -12,13 +12,28 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace Origin\Test\Core;
+namespace Origin\Test\Model;
 
-use Origin\Core\ContainerTrait;
+use Origin\Model\ContainerTrait;
 
 class ActiveRecord
 {
     use ContainerTrait;
+}
+
+class SimpleContact extends ActiveRecord
+{
+    protected $hidden = ['password'];
+    protected $virtual = ['full_name'];
+
+    protected function getFullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+    protected function setFirstName($value)
+    {
+        return ucfirst(strtolower($value));
+    }
 }
 
 class ContainerTraitTest extends \PHPUnit\Framework\TestCase
@@ -97,5 +112,68 @@ class ContainerTraitTest extends \PHPUnit\Framework\TestCase
         $record = new ActiveRecord();
         $record->foo = 'bar';
         $this->assertEquals("{\n    \"foo\": \"bar\"\n}", (string) $record);
+    }
+
+    public function testName()
+    {
+        $record = new ActiveRecord();
+        $record->name = 'foo';
+
+        $record->name('Record');
+        $this->assertEquals('Record', $record->name());
+    }
+
+    public function testError()
+    {
+        $record = new ActiveRecord();
+        $record->name = 'foo';
+
+        $this->assertEmpty($record->errors());
+        $this->assertIsArray($record->errors());
+
+        $record->error('name', 'Invalid name');
+        $this->assertEquals(['name' => ['Invalid name']], $record->errors());
+        $this->assertEquals(['Invalid name'], $record->errors('name'));
+
+        $record->reset();
+        $this->assertEmpty($record->errors());
+    }
+
+    public function testHidden()
+    {
+        $record = new SimpleContact();
+        $record->name = 'Jon';
+        $record->password = 'secret';
+        $this->assertArrayHasKey('name', $record->toArray());
+        $this->assertArrayNotHasKey('password', $record->toArray());
+    }
+
+    public function testMutations()
+    {
+        $record = new SimpleContact();
+        $record->first_name = 'jon'; // setFirstName
+        $record->last_name = 'snow';
+        $this->assertEquals('Jon snow', $record->full_name); //getFullName
+    }
+
+    /**
+     * @depends testMutations
+     */
+    public function testVirtual()
+    {
+        $record = new SimpleContact();
+        $record->first_name = 'Jon';
+        $record->last_name = 'Snow';
+        $this->assertArrayHasKey('full_name', $record->toArray());
+        $this->assertEquals('Jon Snow', $record->toArray()['full_name']);
+    }
+
+    public function testDirty()
+    {
+        $record = new SimpleContact();
+        $record->name = 'Jon';
+        $this->assertEquals(['name'], $record->dirty());
+        $record->reset();
+        $this->assertEmpty($record->dirty());
     }
 }
