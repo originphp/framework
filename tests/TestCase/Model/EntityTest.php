@@ -15,6 +15,7 @@
 namespace Origin\Test\Model;
 
 use Origin\Model\Entity;
+use Origin\TestSuite\OriginTestCase;
 
 class User extends Entity
 {
@@ -28,7 +29,22 @@ class User extends Entity
     }
 }
 
-class EntityTest extends \PHPUnit\Framework\TestCase
+class UserWithBackwardComptabilityOne extends Entity
+{
+    protected $_virtual = ['full_name'];
+
+    protected function getFullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+}
+
+class UserWithBackwardComptabilityTwo extends Entity
+{
+    protected $_hidden = ['password'];
+}
+
+class EntityTest extends OriginTestCase
 {
     public function testSet()
     {
@@ -169,10 +185,12 @@ class EntityTest extends \PHPUnit\Framework\TestCase
             'author_id' => null,
         ];
 
-        $entity = new Entity($data);
-        $entity->invalidate('title', 'invalid title');
+        $this->deprecated(function () use ($data) {
+            $entity = new Entity($data);
+            $entity->invalidate('title', 'invalid title');
      
-        $this->assertEquals(['invalid title'], $entity->errors('title'));
+            $this->assertEquals(['invalid title'], $entity->errors('title'));
+        });
     }
 
     public function testToString()
@@ -191,40 +209,37 @@ class EntityTest extends \PHPUnit\Framework\TestCase
 
     public function testPropertyExists()
     {
-        $entity = new Entity(['name' => 'test']);
-        $this->assertTrue($entity->propertyExists('name'));
-        $entity = new Entity(['name' => null]);
-        $this->assertTrue($entity->propertyExists('name'));
-        $this->assertFalse($entity->propertyExists('foo'));
+        $this->deprecated(function () {
+            $entity = new Entity(['name' => 'test']);
+            $this->assertTrue($entity->propertyExists('name'));
+            $entity = new Entity(['name' => null]);
+            $this->assertTrue($entity->propertyExists('name'));
+            $this->assertFalse($entity->propertyExists('foo'));
+        });
     }
 
-    public function testDebugInfo()
-    {
-        $data = ['name' => 'test'];
-        $entity = new Entity($data);
-        $this->assertEquals($data, $entity->__debugInfo());
-    }
-
-    public function testErrors()
+    public function testError()
     {
         $entity = new Entity(['name' => 'test']);
-        $entity->errors('name', 'Can\'t be called test');
+        $entity->error('name', 'Can\'t be called test');
         $this->assertEquals(['Can\'t be called test'], $entity->errors('name'));
     }
 
     public function testModified()
     {
-        $entity = new Entity(['name' => 'test'], ['markClean' => true]);
-        $this->assertEquals([], $entity->modified());
-        $this->assertFalse($entity->modified('name'));
-
-        $entity->name = 'new name';
-        $this->assertEquals(['name'], $entity->modified());
-        $entity->foo = 'bar';
-        $this->assertEquals(['name','foo'], $entity->modified());
-        
-        $this->assertTrue($entity->modified('name'));
-        $this->assertTrue($entity->modified('foo'));
+        $this->deprecated(function () {
+            $entity = new Entity(['name' => 'test'], ['markClean' => true]);
+            $this->assertEquals([], $entity->modified());
+            $this->assertFalse($entity->modified('name'));
+    
+            $entity->name = 'new name';
+            $this->assertEquals(['name'], $entity->modified());
+            $entity->foo = 'bar';
+            $this->assertEquals(['name','foo'], $entity->modified());
+            
+            $this->assertTrue($entity->modified('name'));
+            $this->assertTrue($entity->modified('foo'));
+        });
     }
 
     public function testStates()
@@ -310,5 +325,24 @@ class EntityTest extends \PHPUnit\Framework\TestCase
         $array = $user->toArray();
         $this->assertFalse(isset($array['password']));
         $this->assertEquals(['password'], $user->hidden());
+    }
+
+    public function testHiddenBc()
+    {
+        $this->deprecated(function () {
+            $user = new UserWithBackwardComptabilityTwo();
+            $user->password = 'secret';
+            $this->assertArrayNotHasKey('password', $user->toArray());
+        });
+    }
+
+    public function testVirtualBC()
+    {
+        $this->deprecated(function () {
+            $user = new UserWithBackwardComptabilityOne();
+            $user->first_name = 'jon';
+            $user->last_name = 'snow';
+            $this->assertEquals('jon snow', $user->full_name);
+        });
     }
 }
