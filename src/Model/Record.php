@@ -26,14 +26,12 @@ use Origin\Core\CallbackRegistrationTrait;
  * Objective to have an object that work with form data that is not in database, or other data that might
  * need validating without having to setup in the database. This needs to work with the FormHelper
  */
-class Record
+class Record extends BaseEntity
 {
     use InitializerTrait;
     use HookTrait;
     use CallbackRegistrationTrait;
-
-    use ContainerTrait;
-
+ 
     /**
      * Holds the schema for Record
      *
