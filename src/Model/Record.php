@@ -100,7 +100,7 @@ class Record
     /**
      * Patches an existing record with an array of data
      *
-     * @param \Origin\Record\Record $record
+     * @param \Origin\Model\Record $record
      * @param array $data
      * @param array $options
      * @return static

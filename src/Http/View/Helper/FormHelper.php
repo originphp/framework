@@ -20,9 +20,9 @@ namespace Origin\Http\View\Helper;
 use Origin\Core\Dot;
 use Origin\Http\Router;
 use Origin\Model\Entity;
-use Origin\Utility\Date;
+use Origin\Model\Record;
 
-use Origin\Record\Record;
+use Origin\Utility\Date;
 use Origin\Utility\Number;
 
 use Origin\Model\Collection;
@@ -93,7 +93,7 @@ class FormHelper extends Helper
     protected $entity = null;
 
     /**
-     * @var \Origin\Record\Record|null
+     * @var \Origin\Model\Record|null
      */
     protected $record = null;
 
@@ -121,7 +121,7 @@ class FormHelper extends Helper
     /**
      * Creates a form element
      *
-     * @param \Origin\Model\Entity|\Origin\Record\Record|string|null $entity, $record, 'User' or null
+     * @param \Origin\Model\Entity|\Origin\Model\Record|string|null $entity, $record, 'User' or null
      * @param array $options type, url and html attributes
      * @return string
      */

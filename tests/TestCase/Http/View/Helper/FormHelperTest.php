@@ -17,9 +17,9 @@ namespace Origin\Test\Http\View\Helper;
 
 use Origin\Model\Model;
 use Origin\Http\Request;
+use Origin\Model\Record;
 use Origin\Utility\Date;
 use Origin\Http\Response;
-use Origin\Record\Record;
 use Origin\Http\View\View;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\TestTrait;
