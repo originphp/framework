@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added `config_path` helper function
 - Added `Record` for working with data that is not persisted to the database and works with `FormHelper`
 - Added `ContainerTrait` to keep things DRY.
 

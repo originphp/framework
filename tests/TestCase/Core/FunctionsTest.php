@@ -114,6 +114,12 @@ EOF;
         $this->assertEquals(TMP .'/storage/foo.json', tmp_path('storage/foo.json'));
     }
 
+    public function testConfigPath()
+    {
+        $this->assertEquals(CONFIG, config_path());
+        $this->assertEquals(CONFIG .'/data/foo.json', config_path('data/foo.json'));
+    }
+
     public function testStoragePath()
     {
         $this->assertEquals(STORAGE, storage_path());

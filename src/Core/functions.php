@@ -310,3 +310,17 @@ if (! function_exists('storage_path')) {
         return $folder . ($path ? DS  . $path : '');
     }
 }
+
+if (! function_exists('config_path')) {
+    /**
+     * Handy function for working with tmp paths
+     * e.g. file_put_contents(tmp_path('session/data.json'));
+     *
+     * @param string $path
+     * @return string
+     */
+    function config_path(string $path = null)
+    {
+        return CONFIG . ($path ? DS  . $path : '');
+    }
+}
