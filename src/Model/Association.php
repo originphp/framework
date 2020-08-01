@@ -272,7 +272,7 @@ class Association
                 continue;
             }
 
-            if ($data->$key->modified()) {
+            if ($data->$key->isDirty()) {
                 if (! $this->model->$alias->save($data->$key, $associatedOptions)) {
                     return false;
                 }
@@ -292,7 +292,7 @@ class Association
             if (! in_array($alias, $options['associated']) || ! $data->has($key) || ! $data->$key instanceof Entity) {
                 continue;
             }
-            if ($data->$key->modified()) {
+            if ($data->$key->isDirty()) {
                 $foreignKey = $this->model->association('hasOne')[$alias]['foreignKey'];
                 $data->$key->$foreignKey = $this->model->id();
 
@@ -320,7 +320,7 @@ class Association
                 if (! $record instanceof Entity) {
                     continue;
                 }
-                if ($record->modified()) {
+                if ($record->isDirty()) {
                     $record->$foreignKey = $data->{$this->model->primaryKey()};
                     if (! $this->model->$alias->save($record, $associatedOptions)) {
                         return false;

@@ -615,7 +615,7 @@ class Model
         /**
          * Only modified fields are saved. The values can be the same, but still counted as modified.
          */
-        $columns = array_intersect(array_keys($this->schema()['columns']), $entity->modified());
+        $columns = array_intersect(array_keys($this->schema()['columns']), $entity->dirty());
 
         $data = [];
         foreach ($columns as $column) {

@@ -1270,7 +1270,7 @@ class ModelTest extends OriginTestCase
         $article->title = 'Testing CRUD';
         $article->description = 'Just going to test it all';
 
-        $this->assertNotEmpty($article->modified());
+        $this->assertNotEmpty($article->dirty());
         $this->assertTrue($this->Article->save($article));
         $this->assertNotEmpty($article->id);
         $this->assertNotEmpty($this->Article->id());
@@ -1285,7 +1285,7 @@ class ModelTest extends OriginTestCase
         # # # UPDATE # # #
         $requestData = ['title' => 'Testing Update in CRUD', 'description' => 'Lovely Jubely'];
         $article = $this->Article->patch($result, $requestData);
-        $this->assertNotEmpty($article->modified());
+        $this->assertNotEmpty($article->dirty());
         $this->assertTrue($this->Article->save($article));
 
         $this->assertFalse($article->created());

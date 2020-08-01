@@ -150,7 +150,7 @@ class ModelValidator
      */
     public function validates(Entity $entity, bool $create = true): bool
     {
-        $modified = $entity->modified();
+        $modified = $entity->dirty();
 
         foreach ($this->validationRules as $field => $ruleset) {
             foreach ($ruleset as $validationRule) {

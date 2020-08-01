@@ -388,9 +388,9 @@ class MarshallerTest extends OriginTestCase
         ];
     
         $patched = $Article->patch($record, $data);
-        $this->assertTrue($record->modified('modified')); // sanity check
+        $this->assertTrue($record->isDirty('modified')); // sanity check
 
-        $this->assertFalse($record->modified('id'));
-        $this->assertFalse($record->modified('created'));
+        $this->assertFalse($record->isDirty('id'));
+        $this->assertFalse($record->isDirty('created'));
     }
 }

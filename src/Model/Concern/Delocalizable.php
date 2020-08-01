@@ -40,7 +40,7 @@ trait Delocalizable
     public function delocalize(Entity $entity): bool
     {
         $columns = $this->schema()['columns'];
-        foreach ($entity->modified() as $field) {
+        foreach ($entity->dirty() as $field) {
             $value = $entity->get($field);
             if ($value && isset($columns[$field])) {
                 $value = $this->processField($columns[$field]['type'], $value);

@@ -84,7 +84,7 @@ trait Timestampable
         if (! $this->hasField($field)) {
             return;
         }
-        if (empty($entity->$field) || ! in_array($field, $entity->modified())) {
+        if (empty($entity->$field) || ! in_array($field, $entity->dirty())) {
             $entity->set($field, $this->timestamp);
         }
     }
