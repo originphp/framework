@@ -75,7 +75,7 @@ class BaseEntity
     *
     * @var array
     */
-    private static $accessors = [];
+    protected static $accessors = [];
 
     /**
      * Sets or gets the name for this object
