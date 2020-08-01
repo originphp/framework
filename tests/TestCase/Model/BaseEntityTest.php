@@ -14,11 +14,10 @@
 
 namespace Origin\Test\Model;
 
-use Origin\Model\ContainerTrait;
+use Origin\Model\BaseEntity;
 
-class ActiveRecord
+class ActiveRecord extends BaseEntity
 {
-    use ContainerTrait;
 }
 
 class SimpleContact extends ActiveRecord
@@ -36,7 +35,7 @@ class SimpleContact extends ActiveRecord
     }
 }
 
-class ContainerTraitTest extends \PHPUnit\Framework\TestCase
+class BaseEntityTest extends \PHPUnit\Framework\TestCase
 {
     public function testFunctions()
     {

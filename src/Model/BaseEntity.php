@@ -17,52 +17,10 @@ namespace Origin\Model;
 use Origin\Inflector\Inflector;
 
 /**
- * Container Trait.
- *
- * This is used by Record & will be used by Entity (@todo refactor)
+ * BaseEntity class, used by Record and Entity will be refactored to use this.
  */
-trait ContainerTrait
+class BaseEntity
 {
-    /**
-     * Holds data
-     *
-     * @var array
-     */
-    private $containerData = [];
-
-    /**
-     * Holds the dirty fields
-     *
-     * @var array
-     */
-    private $dirtyData = [];
-
-    /**
-     * Holds the data that has been changed
-     *
-     * @var array
-     */
-    private $changedData = [];
-
-    /**
-     * Holds the errors
-     *
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-    * Cached lists of accessors
-    *
-    * @var array
-    */
-    protected static $accessors = [];
-
-    /**
-     * @var string
-     */
-    private $dataContainerName = null;
-
     /**
      * Virtual fields that will be exposed when using toArray, toJson and toXml
      *
@@ -78,6 +36,48 @@ trait ContainerTrait
     protected $hidden = [];
 
     /**
+     * Name of this entity, e.g User, Book
+     *
+     * @var string
+     */
+    protected $entityName = null;
+
+    /**
+     * Holds data
+     *
+     * @var array
+     */
+    private $entityData = [];
+
+    /**
+     * Holds the dirty fields
+     *
+     * @var array
+     */
+    private $entityDirty = [];
+
+    /**
+     * Holds the data that has been changed
+     *
+     * @var array
+     */
+    private $entityChanged = [];
+
+    /**
+     * Holds the errors
+     *
+     * @var array
+     */
+    private $entityErrors = [];
+
+    /**
+    * Cached lists of accessors
+    *
+    * @var array
+    */
+    private static $accessors = [];
+
+    /**
      * Sets or gets the name for this object
      *
      * @param string $name
@@ -86,10 +86,10 @@ trait ContainerTrait
     public function name(string $name = null): ? string
     {
         if ($name === null) {
-            return $this->dataContainerName;
+            return $this->entityName;
         }
 
-        return $this->dataContainerName = $name;
+        return $this->entityName = $name;
     }
 
     /**
@@ -100,7 +100,7 @@ trait ContainerTrait
     */
     public function has(string $key): bool
     {
-        return isset($this->containerData[$key]);
+        return isset($this->entityData[$key]);
     }
 
     /**
@@ -116,8 +116,8 @@ trait ContainerTrait
         
         $method = static::accessor($key, 'get');
         
-        if (isset($this->containerData[$key])) {
-            $value = &$this->containerData[$key];
+        if (isset($this->entityData[$key])) {
+            $value = &$this->entityData[$key];
         }
 
         if ($method) {
@@ -144,15 +144,15 @@ trait ContainerTrait
                 $value = $this->$method($value);
             }
 
-            if (! array_key_exists($key, $this->changedData) &&
-                array_key_exists($key, $this->containerData) &&
-                $value !== $this->containerData[$key]
+            if (! array_key_exists($key, $this->entityChanged) &&
+                array_key_exists($key, $this->entityData) &&
+                $value !== $this->entityData[$key]
                 ) {
-                $this->changedData[$key] = $this->containerData[$key] ;
+                $this->entityChanged[$key] = $this->entityData[$key] ;
             }
 
-            $this->containerData[$key] = $value;
-            $this->dirtyData[$key] = true;
+            $this->entityData[$key] = $value;
+            $this->entityDirty[$key] = true;
         }
     }
 
@@ -164,8 +164,8 @@ trait ContainerTrait
     */
     public function unset(string $key): bool
     {
-        if (isset($this->containerData[$key])) {
-            unset($this->containerData[$key] , $this->dirtyData[$key] , $this->changedData[$key]);
+        if (isset($this->entityData[$key])) {
+            unset($this->entityData[$key] , $this->entityDirty[$key] , $this->entityChanged[$key]);
 
             return true;
         }
@@ -182,10 +182,10 @@ trait ContainerTrait
     public function errors(string $field = null): ? array
     {
         if ($field === null) {
-            return $this->errors;
+            return $this->entityErrors;
         }
 
-        return $this->errors[$field] ?? null;
+        return $this->entityErrors[$field] ?? null;
     }
 
     /**
@@ -197,10 +197,10 @@ trait ContainerTrait
      */
     public function error(string $field, string $message): void
     {
-        if (! isset($this->errors[$field])) {
-            $this->errors[$field] = [];
+        if (! isset($this->entityErrors[$field])) {
+            $this->entityErrors[$field] = [];
         }
-        $this->errors[$field][] = $message;
+        $this->entityErrors[$field][] = $message;
     }
 
     /**
@@ -213,15 +213,16 @@ trait ContainerTrait
         $out = [];
         foreach ($this->visibleProperties() as $property) {
             $value = $this->$property;
-            if (is_iterable($value)) {
+
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                $value = $value->toArray();
+            } elseif (is_iterable($value)) {
                 foreach ($value as $k => $v) {
                     if (is_object($v) && method_exists($v, 'toArray')) {
                         $out[$property][$k] = $v->toArray();
                     }
                 }
                 continue;
-            } elseif (is_object($value) && method_exists($value, 'toArray')) {
-                $value = $value->toArray();
             }
             $out[$property] = $value;
         }
@@ -232,68 +233,89 @@ trait ContainerTrait
     /**
      * Checks if data or an attribute has been modified (dirty)
      *
-     * @param string $attribute
+     * @param string $property
      * @return boolean
      */
-    public function isDirty(string $attribute = null): bool
+    public function isDirty(string $property = null): bool
     {
-        if ($attribute === null) {
-            return ! empty($this->dirtyData);
+        if ($property === null) {
+            return ! empty($this->entityDirty);
         }
 
-        return isset($this->dirtyData[$attribute]);
+        return isset($this->entityDirty[$property]);
     }
 
     /**
      * Checks if data or an attribute has not been modified
      *
-     * @param string $attribute
+     * @param string $property
      * @return boolean
      */
-    public function isClean(string $attribute = null): bool
+    public function isClean(string $property = null): bool
     {
-        return ! $this->isDirty($attribute);
+        return ! $this->isDirty($property);
     }
 
     /**
      * Checks if a value was changed from the original
      *
-     * @param string $attribute
+     * @param string $property
      * @return boolean
      */
-    public function wasChanged(string $attribute = null): bool
+    public function wasChanged(string $property = null): bool
     {
-        if ($attribute === null) {
-            return ! empty($this->changedData);
+        if ($property === null) {
+            return ! empty($this->entityChanged);
         }
 
-        return isset($this->changedData[$attribute]);
+        return isset($this->entityChanged[$property]);
     }
 
     /**
      * Gets the changed fields or value for a particular attribute
      *
-     * @param string $attribute
+     * @param string $property
      * @return mixed
      */
-    public function changed(string $attribute = null)
+    public function changed(string $property = null)
     {
-        if ($attribute === null) {
-            return $this->changedData;
+        if ($property === null) {
+            return $this->entityChanged;
         }
 
-        return $this->changedData[$attribute] ?? null;
+        return $this->entityChanged[$property] ?? null;
     }
 
     /**
-     * Gets the dirty fields
-     *
-     * @param string $attribute
-     * @return array
-     */
-    public function dirty(): array
+    * Returns the list of properties that have been modified, if you supply
+    * a property name, then it will return a boolean result to tell you if the property has
+    * been changed. (wrapper for dirty)
+    *
+    * $array = $entity->modified();
+    * $bool = $entity->modified('email');
+    *
+    * @internal this goes with changed, and uses dirty (same thing)
+    *
+    * @return array|bool
+    */
+    public function modified(string $property = null)
     {
-        return array_keys($this->dirtyData);
+        return $this->dirty($property);
+    }
+
+    /**
+     * Gets the dirty fields or returns a boolean result if the property was made dirty
+     *
+     * @param string $property
+     * @return mixed
+     */
+    public function dirty(string $property = null)
+    {
+        if ($property === null) {
+            return array_keys($this->entityDirty);
+        }
+
+        return isset($this->entityDirty[$property]);
     }
 
     /**
@@ -303,9 +325,9 @@ trait ContainerTrait
      */
     public function reset(): void
     {
-        $this->changedData = [];
-        $this->dirtyData = [];
-        $this->errors = [];
+        $this->entityChanged = [];
+        $this->entityDirty = [];
+        $this->entityErrors = [];
     }
 
     /**
@@ -364,6 +386,16 @@ trait ContainerTrait
     }
 
     /**
+      * Gets the list of properties on this entity
+      *
+      * @return array properties
+      */
+    public function properties(): array
+    {
+        return array_keys($this->entityData);
+    }
+
+    /**
      * Gets the visible properties for this object
      *
      *
@@ -371,7 +403,7 @@ trait ContainerTrait
      */
     private function visibleProperties(): array
     {
-        $properties = array_merge(array_keys($this->containerData), $this->virtual);
+        $properties = array_merge(array_keys($this->entityData), $this->virtual);
 
         return array_diff($properties, $this->hidden);
     }
