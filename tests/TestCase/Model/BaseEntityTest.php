@@ -44,6 +44,7 @@ class BaseEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $record->get('foo'));
         $this->assertTrue($record->has('foo'));
         $this->assertTrue($record->unset('foo'));
+        $this->assertFalse($record->unset('foo'));
         $this->assertFalse($record->has('foo'));
     }
 
