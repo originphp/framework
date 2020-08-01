@@ -628,7 +628,7 @@ class Model
          */
         foreach ($data as $key => $value) {
             if (is_array($value) || is_object($value)) {
-                $entity->invalidate($key, 'Invalid data');
+                $entity->error($key, 'Invalid data');
             }
         }
      
