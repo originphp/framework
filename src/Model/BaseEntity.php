@@ -395,6 +395,22 @@ class BaseEntity
         return array_keys($this->entityData);
     }
 
+    public function __debugInfo()
+    {
+        $data = $this->entityData;
+        foreach ($this->virtual as $field) {
+            $data[$field] = $this->$field;
+        }
+        $extra = [
+            '*name' => $this->entityName,
+            '*dirty' => $this->isDirty() ? 'true' : 'false',
+            '*changed' => ! empty($this->changed()) ? 'true' : 'false',
+            '*errors' => $this->entityErrors
+        ];
+
+        return $extra + $data;
+    }
+
     /**
      * Gets the visible properties for this object
      *

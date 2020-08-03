@@ -176,4 +176,15 @@ class BaseEntityTest extends \PHPUnit\Framework\TestCase
         $record->reset();
         $this->assertEmpty($record->dirty());
     }
+
+    public function testDebugInfo()
+    {
+        $record = new SimpleContact();
+        $record->name('SimpleContact');
+
+        $record->name = 'Jon';
+        $record->error('name', 'missing last');
+        $expected = '{"*name":"SimpleContact","*dirty":"true","*changed":"false","*errors":{"name":["missing last"]},"name":"Jon","full_name":" "}';
+        $this->assertEquals($expected, json_encode($record->__debugInfo()));
+    }
 }
