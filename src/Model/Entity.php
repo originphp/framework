@@ -77,12 +77,10 @@ class Entity extends BaseEntity implements ArrayAccess, JsonSerializable
         if (! empty($this->_hidden)) {
             deprecationWarning('Entity::$_hidden is deprecated use Entity::$hidden instead');
             $this->hidden = $this->_hidden;
-            unset($this->_hidden);
         }
         if (! empty($this->_virtual)) {
             deprecationWarning('Entity::$_virtual is deprecated use Entity::$virtual instead');
             $this->virtual = $this->_virtual;
-            unset($this->_virtual);
         }
     }
 
