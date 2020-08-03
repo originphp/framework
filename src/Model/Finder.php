@@ -65,6 +65,7 @@ class Finder
             $results = $this->loadAssociatedHasOne($query, $results);
             $results = $this->loadAssociatedHasMany($query, $results);
             $results = $this->loadAssociatedHasAndBelongsToMany($query, $results);
+
             $results = new Collection($results, ['name' => $this->model->alias()]);
         }
 
@@ -136,7 +137,7 @@ class Finder
                     }
                 }
             }
-
+            $entity->reset();
             $buffer[] = $entity;
         }
         unset($belongsTo,$hasOne,$thisData,$entity);
@@ -163,6 +164,7 @@ class Finder
                     if (isset($result->$foreignKey)) {
                         $config['conditions'] = [$this->model->$model->primaryKey() => $result->$foreignKey];
                         $result->$property = $this->model->$model->find('first', $config);
+                        $result->reset();
                     }
                 }
             }
@@ -193,6 +195,7 @@ class Finder
                         $config['conditions'] = $hasOne[$model]['conditions'];
                         $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey()}];
                         $result->$property = $this->model->$model->find('first', $config);
+                        $result->reset();
                     }
                 }
             }
@@ -227,6 +230,7 @@ class Finder
                         $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
                         $models = Inflector::plural(Inflector::camelCase($alias));
                         $result->$models = $this->model->$alias->find('all', $config);
+                        $result->reset();
                     }
                 }
             }
@@ -269,6 +273,7 @@ class Finder
 
                     $models = Inflector::plural(Inflector::camelCase($alias));
                     $result->$models = $this->model->$alias->find('all', $config);
+                    $result->reset();
                 }
             }
         }
