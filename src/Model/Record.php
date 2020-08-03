@@ -62,7 +62,7 @@ class Record extends BaseEntity
 
     public function __construct(array $data = [], array $options = [])
     {
-        $options += ['name' => $this->name];
+        $options += ['name' => $this->name, 'markClean' => false];
 
         if ($options['name'] === null) {
             list($namespace, $options['name']) = namespaceSplit(get_class($this));
@@ -73,7 +73,12 @@ class Record extends BaseEntity
         $this->initializeTraits();
 
         $this->setDefaultValues();
+        
         $this->set($data);
+
+        if ($options['markClean']) {
+            $this->reset();
+        }
     }
 
     /**
