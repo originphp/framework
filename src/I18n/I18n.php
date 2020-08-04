@@ -15,6 +15,7 @@ declare(strict_types = 1);
 namespace Origin\I18n;
 
 use Locale;
+use Origin\Core\Plugin;
 use Origin\Utility\Date;
 use Origin\Utility\Number;
 use Origin\I18n\Date as I18nDate;
@@ -258,8 +259,24 @@ class I18n
             static::locale(static::defaultLocale());
         }
 
-        if (isset(static::$messages[$message])) {
+        if (isset(static::$messages[$message]) && ! is_array(static::$messages[$message])) {
             $message = static::$messages[$message];
+        }
+
+        /**
+         * Handle nested e.g. parent.child.name
+         */
+        if (strpos($message, '.') !== false && strpos($message, ' ') === false) {
+            $messages = static::$messages;
+            foreach (explode('.', $message) as $path) {
+                if (! is_array($messages) || ! array_key_exists($path, $messages)) {
+                    break;
+                }
+                $messages = $messages[$path];
+            }
+            if (is_string($messages) || is_numeric($messages)) {
+                $message = $messages;
+            }
         }
 
         // Handle plurals
@@ -293,16 +310,24 @@ class I18n
      */
     protected static function loadMessages(string $language): void
     {
-        $filename = APP . DS . 'Locale' . DS . $language . '.php';
-        
+        $searchPaths = [
+            APP . "/Locale/{$language}.php"
+        ];
+
+        foreach (Plugin::loaded() as $plugin) {
+            $searchPaths[] = Plugin::path($plugin) . "/src/Locale/{$language}.php";
+        }
+  
         static::$messages = [];
 
-        if (file_exists($filename)) {
-            $messages = include $filename;
-            if (! is_array($messages)) {
-                throw new Exception("{$language}.php does not return an array");
+        foreach ($searchPaths as $filename) {
+            if (file_exists($filename)) {
+                $messages = include $filename;
+                if (! is_array($messages)) {
+                    throw new Exception("{$language}.php does not return an array");
+                }
+                static::$messages = $messages;
             }
-            static::$messages = $messages;
         }
     }
 }
