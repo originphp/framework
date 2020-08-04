@@ -69,6 +69,8 @@ class Record extends BaseEntity
         }
         $this->name($options['name']);
 
+        $this->normalizeSchema();
+
         $this->executeHook('initialize');
         $this->initializeTraits();
 
@@ -79,6 +81,26 @@ class Record extends BaseEntity
         if ($options['markClean']) {
             $this->reset();
         }
+    }
+
+    /**
+     * If schema has been defined as an array
+     *
+     * @param array $schema
+     * @return array
+     */
+    private function normalizeSchema()
+    {
+        $out = [];
+        foreach ($this->schema as $key => $value) {
+            if (! is_array($value)) {
+                $value = ['type' => $value];
+            }
+            $value += ['type' => null,'length' => null,'default' => null];
+            $out[$key] = $value;
+        }
+
+        $this->schema = $out;
     }
 
     /**
@@ -131,12 +153,13 @@ class Record extends BaseEntity
     private static function filterData(array $data, array $fields = null): array
     {
         $out = [];
+     
         foreach ($data as $key => $value) {
             if ($fields === null || in_array($key, $fields)) {
                 $out[$key] = $value;
             }
         }
-
+      
         return $out;
     }
 
