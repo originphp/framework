@@ -1056,6 +1056,9 @@ class FormHelper extends Helper
                     if ($value) {
                         $options['value'] = $value;
                     }
+                    if ($this->record && $this->record->errors($name)) {
+                        $options = $this->addClass('error', $options);
+                    }
                 }
             }
         }
