@@ -436,8 +436,8 @@ class FormHelper extends Helper
             }
 
             $labelOutput = $this->formatTemplate('label', $labelOptions);
-            unset($options['label']);
         }
+        unset($options['label']);
 
         $template = 'control';
         $model = $this->modelName;
@@ -1069,6 +1069,7 @@ class FormHelper extends Helper
         if (! isset($options['value']) && isset($options['default'])) {
             $options['value'] = $options['default'];
         }
+        unset($options['default']);
 
         return $options;
     }
