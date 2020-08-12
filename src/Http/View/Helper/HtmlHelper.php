@@ -95,11 +95,14 @@ class HtmlHelper extends Helper
      * $html->css('/assets/css/form.css');
      * html->css('Myplugin.form.css'); // remember to include extension
      * @param string $path
+     * @param array $options inline default false
      * @return string
      */
-    public function css(string $path): string
+    public function css(string $path, array $options = []): string
     {
-        return $this->asset($path, ['ext' => 'css']);
+        $options += ['inline' => false];
+
+        return $this->asset($path, $options + ['ext' => 'css']);
     }
 
     /**
@@ -128,12 +131,15 @@ class HtmlHelper extends Helper
         * $html->js('form'); // /js/form.js
         * $html->js('/assets/js/form.js');
         * html->js('Myplugin.form.js'); // remember to include extension
-        * @param string $path
-        * @return string
-        */
-    public function js(string $path): string
+         * @param string $path
+         * @param array $options inline default false
+         * @return string
+         */
+    public function js(string $path, array $options = []): string
     {
-        return $this->asset($path, ['ext' => 'js']);
+        $options += ['inline' => false];
+
+        return $this->asset($path, $options + ['ext' => 'js']);
     }
 
     private function asset($path, $options): string
@@ -157,10 +163,14 @@ class HtmlHelper extends Helper
             $path = DS .$options['ext'] . DS . $path;
         }
 
-        if ($plugin) {
-            $filename = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
+        if ($options['inline'] || $plugin) {
+            $filename = WEBROOT . '/' . $path;
+            if ($plugin) {
+                $filename = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
+            }
+          
             if ($options['ext'] === 'js') {
-                return '<script>' .$this->loadFile($filename) . '</script>';
+                return '<script>' . $this->loadFile($filename) . '</script>';
             }
    
             return '<style>' .$this->loadFile($filename) . '</style>';
