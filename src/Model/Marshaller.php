@@ -173,8 +173,6 @@ class Marshaller
     {
         $options += ['name' => $entity->name(), 'associated' => [], 'fields' => []];
 
-        $entity->reset(); // reset modified
-
         $options['associated'] = $this->normalizeAssociated($options['associated']);
         $propertyMap = $this->buildAssociationMap(array_keys($options['associated']));
 
