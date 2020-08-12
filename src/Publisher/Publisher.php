@@ -110,13 +110,11 @@ class Publisher
      * $events->publish('startup');
      *
      * @param string $event
+     * @param mixed ...$args argument or multiple arguments that will be passed to event
      * @return void
      */
-    public function publish(string $event): void
+    public function publish(string $event, ...$args): void
     {
-        $args = func_get_args();
-        array_shift($args);
-
         $globalListeners = static::instance()->listeners();
         $listeners = array_merge($globalListeners, $this->listeners);
 

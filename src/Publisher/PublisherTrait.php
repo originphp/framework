@@ -67,11 +67,12 @@ trait PublisherTrait
      *
      * $this->publish('cancelCustomerOrder',$order, $user);
      *
-     * @param string $event  'cancelCustomerOrder'
+     * @param string $event  e.g. 'cancelCustomerOrder'
+     * @param mixed ...$args argument or multiple arguments that will be passed to event
      * @return void
      */
-    public function publish(string $event): void
+    public function publish(string $event, ...$args): void
     {
-        $this->publisher()->publish(...func_get_args());
+        $this->publisher()->publish($event, ...$args);
     }
 }
