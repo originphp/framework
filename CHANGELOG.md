@@ -12,6 +12,8 @@
 ### Fixed
 
 - Fixed `AuthComponent` now destroys all session data not just Auth related data
+- Fixed `FormHelper` leaving empty label attribtue when disabling label in control
+- Fixed `FormHelper` leaving empty default attribute
 
 ### Deprecated
 
