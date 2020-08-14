@@ -373,24 +373,26 @@ class MarshallerTest extends OriginTestCase
         $this->assertNull($patched['comment']->created);
     }
 
-    public function testPatchSameValueDifferentTypes()
+    /**
+     * This test was used incorrectly before, now this is a sanity check.
+     */
+    public function testPatchDirties()
     {
         // Load models into registry as we are using custom class
         $Article = $this->loadModel('Article', ['className' => Article::class]);
     
         $record = $Article->get(1000);
-        $record->created = null;
 
         $data = [
-            'id' => '1000', // string
             'created' => '', // null string
             'modified' => 'foo'
         ];
     
-        $patched = $Article->patch($record, $data);
-        $this->assertTrue($record->isDirty('modified')); // sanity check
+        $Article->patch($record, $data);
 
         $this->assertFalse($record->isDirty('id'));
-        $this->assertFalse($record->isDirty('created'));
+
+        $this->assertTrue($record->isDirty('modified'));
+        $this->assertTrue($record->isDirty('created'));
     }
 }
