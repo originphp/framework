@@ -7,7 +7,8 @@
 - Added `Entity::isDirty` check if dirty
 - Added `Entity::isClean` check if clean
 - Added `Entity::wasChanged` to see if previous values were changed
-- Added `Entity::changed` for tracking changed values
+- Added `Entity::changed` for getting changed values
+- Added `Entity::dirty` for getting modified values
 - Added `inline` option for `HtmlHelper::css`
 - Added `inline` option for `HtmlHelper::js`
 - Added `Service\Result::error`
