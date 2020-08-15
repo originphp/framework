@@ -86,16 +86,20 @@ class Service
     }
 
     /**
-     * Dispatches the service calling the execute method which should be set
+     * Dispatches the service calling the execute method which should be set.
      *
-     * @return \Origin\Service\Result|null
+     * @return \Origin\Service\Result
      */
-    public function dispatch(): ?Result
+    public function dispatch(): Result
     {
         $this->executeHook('startup');
         $result = $this->execute(...func_get_args());
         $this->executeHook('shutdown');
 
-        return $result;
+        /**
+         * Backwards compatabile (until version 4)
+         * @deprecated must always return a Result object.
+         */
+        return $result ?? new Result([]);
     }
 }
