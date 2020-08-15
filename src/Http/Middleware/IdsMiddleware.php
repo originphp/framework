@@ -60,7 +60,7 @@ class IdsMiddleware extends Middleware
      *
      * @var array
      */
-    private $rules = [
+    protected $rules = [
         [
             'name' => 'SQL Injection Attack',
             'signature' => '/(((\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+)|(\%00)|(0x[a-f0-9]+))/i',
@@ -103,6 +103,16 @@ class IdsMiddleware extends Middleware
             'level' => 1
         ]
     ];
+
+    /**
+     * Gets the configured rules
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return $this->rules;
+    }
 
     /**
      * This HANDLES the request. Use this to make changes to the request.

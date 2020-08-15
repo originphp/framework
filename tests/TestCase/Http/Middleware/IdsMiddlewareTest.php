@@ -2,6 +2,7 @@
 
 namespace App\Test\Http\Middleware;
 
+use Origin\Core\PhpFile;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\TestSuite\OriginTestCase;
@@ -77,6 +78,33 @@ class IdsMiddlewareTest extends OriginTestCase
         $this->assertContains('SQL Injection Attack', $middleware->events()[0]['matches']);
 
         $_POST = [];
+    }
+
+    public function testLoadRulesFromFile()
+    {
+        $filename = tmp_path('ids-rules.php');
+        $data = [
+            'name' => 'SQL Injection Attack',
+            'signature' => '/(((\d+\)?))|(\')|(\%27)).*((\%[a-f0-9]+)|(\%00)|(0x[a-f0-9]+))/i',
+            'description' => 'Check for digits or single quote then followed by any hex chars,hexdecimal or null byte',
+            'level' => 1
+        ];
+        $php = (new PhpFile())->write($filename, [$data]);
+        $middleware = new MockIdsMiddleware(['rules' => $filename]);
+        $middleware->handle($this->request);
+      
+        $this->assertNotEmpty($middleware->rules());
+        $this->assertCount(1, $middleware->rules());
+    }
+
+    /**
+     * Test that rules/events = null
+     */
+    public function testCleanUp()
+    {
+        $middleware = new IdsMiddleware();
+        $middleware->handle($this->request);
+        $this->assertEquals('7891845666c8e71463597fb739b43584', md5(serialize($middleware)));
     }
 
     public function sql()
