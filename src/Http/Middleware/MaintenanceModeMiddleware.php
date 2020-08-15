@@ -56,6 +56,8 @@ class MaintenanceModeMiddleware extends Middleware
     /**
      * Wrapped for testing
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     protected function exit(): void
@@ -75,6 +77,8 @@ class MaintenanceModeMiddleware extends Middleware
 
     /**
      * Sends a header for the exception
+     *
+     * @codeCoverageIgnore
      *
      * @param string $header
      * @return void
