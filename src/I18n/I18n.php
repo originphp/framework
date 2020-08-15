@@ -263,22 +263,6 @@ class I18n
             $message = static::$messages[$message];
         }
 
-        /**
-         * Handle nested e.g. parent.child.name
-         */
-        if (strpos($message, '.') !== false && strpos($message, ' ') === false) {
-            $messages = static::$messages;
-            foreach (explode('.', $message) as $path) {
-                if (! is_array($messages) || ! array_key_exists($path, $messages)) {
-                    break;
-                }
-                $messages = $messages[$path];
-            }
-            if (is_string($messages) || is_numeric($messages)) {
-                $message = (string) $messages;
-            }
-        }
-
         // Handle plurals
         if (strpos($message, '|') !== false && isset($vars['count'])) {
             $messages = explode('|', $message);
