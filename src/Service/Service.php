@@ -86,7 +86,8 @@ class Service
     }
 
     /**
-     * Dispatches the service calling the execute method which should be set
+     * Dispatches the service calling the execute method, make sure this returns
+     * a Result object as in future this will be required. (null will be deprecated)
      *
      * @return \Origin\Service\Result|null
      */
