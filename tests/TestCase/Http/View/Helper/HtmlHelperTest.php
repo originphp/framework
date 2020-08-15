@@ -59,8 +59,11 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $expected = '<link rel="stylesheet" type="text/css" href="/assets/css/form.css" />';
         $this->assertSame($expected, $this->Html->css('/assets/css/form.css'));
     
-        $expected = '<style>.plugin { color:#fff }</style>';
+        $expected = "<style>\n.plugin { color:#fff }\n</style>";
         $this->assertSame($expected, $this->Html->css('Widget.default.css'));
+
+        $expected = "<style>\n@import \"external.css\";\n</style>";
+        $this->assertSame($expected, $this->Html->css('foo', ['inline' => true]));
 
         $this->expectException(NotFoundException::class);
         $this->Html->css('Widget.does-not-exist.css');
@@ -78,9 +81,13 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->Html->js('/assets/js/form.js'));
     
         $this->assertStringContainsString(
-            file_get_contents(ORIGIN . '/tests/TestApp/plugins/widget/public/js/default.js'),
+            file_get_contents(ROOT . '/tests/TestApp/plugins/widget/public/js/default.js'),
             $this->Html->js('Widget.default.js')
         );
+
+        $expected = "<script>\nvar foo = null;\n</script>";
+        $this->assertSame($expected, $this->Html->js('foo', ['inline' => true]));
+
         $this->expectException(NotFoundException::class);
         $this->Html->js('Widget.does-not-exist.js');
     }

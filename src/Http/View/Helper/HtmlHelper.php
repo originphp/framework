@@ -164,16 +164,16 @@ class HtmlHelper extends Helper
         }
 
         if ($options['inline'] || $plugin) {
-            $filename = WEBROOT . '/' . $path;
+            $filename = WEBROOT .  $path;
             if ($plugin) {
                 $filename = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'public' . DS . $options['ext'] . DS . $path;
             }
           
             if ($options['ext'] === 'js') {
-                return '<script>' . $this->loadFile($filename) . '</script>';
+                return '<script>' . PHP_EOL . $this->loadFile($filename) . PHP_EOL .  '</script>';
             }
    
-            return '<style>' .$this->loadFile($filename) . '</style>';
+            return '<style>' . PHP_EOL .  $this->loadFile($filename) . PHP_EOL .  '</style>';
         }
 
         return $this->templater()->format($options['ext'], ['url' => $path]);
