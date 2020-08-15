@@ -64,7 +64,7 @@ class MailboxDownloadService extends Service
      * Wrapped to make it easier to test
      *
      * @param array $options
-     * @return void
+     * @return \Generator
      */
     protected function download(array $options)
     {
@@ -121,8 +121,7 @@ class MailboxDownloadService extends Service
             }
         }
 
-        return $this->result([
-            'success' => true,
+        return new Result([
             'data' => $messageIds
         ]);
     }
