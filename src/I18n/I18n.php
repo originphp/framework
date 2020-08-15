@@ -275,7 +275,7 @@ class I18n
                 $messages = $messages[$path];
             }
             if (is_string($messages) || is_numeric($messages)) {
-                $message = $messages;
+                $message = (string) $messages;
             }
         }
 
