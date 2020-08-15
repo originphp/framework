@@ -54,9 +54,9 @@ EOF;
 
         $messageId = '<12345@mail.gmail.com>';
         $result = $mailboxDownload->dispatch('test');
-        $this->assertTrue($result->success);
+        $this->assertTrue($result->success());
         // Check message id
-        $this->assertEquals([$messageId], $result->data);
+        $this->assertEquals([$messageId], $result->data());
 
         # Check saved inbound email
         $lastInbound = $this->InboundEmail->first(['order' => ['id' => 'desc']]);
@@ -68,7 +68,7 @@ EOF;
 
         # Check duplicate message is not saved
         $result = $mailboxDownload->dispatch('test');
-        $this->assertEquals([], $result->data);
+        $this->assertEquals([], $result->data());
     }
 
     /**
@@ -79,6 +79,6 @@ EOF;
     public function testExecute()
     {
         $result = (new MailboxDownloadService($this->InboundEmail, $this->Imap))->dispatch('test');
-        $this->assertTrue($result->success);
+        $this->assertTrue($result->success());
     }
 }
