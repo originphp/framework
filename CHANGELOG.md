@@ -4,15 +4,17 @@
 
 ### Added
 
+- Added `inline` option for `HtmlHelper::css`
+- Added `inline` option for `HtmlHelper::js`
 - Added `Service\Result::error`
 - Added `config_path` helper function
 - Added `Record` for working with data that is not persisted to the database and works with `FormHelper`
-- Added `ContainerTrait` to keep things DRY.
 
 ### Fixed
 
+- Fixed enities marked as clean during the patch process
 - Fixed `AuthComponent` now destroys all session data not just Auth related data
-- Fixed `FormHelper` leaving empty label attribtue when disabling label in control
+- Fixed `FormHelper` leaving empty label attribute when disabling label in control
 - Fixed `FormHelper` leaving empty default attribute
 
 ### Deprecated
