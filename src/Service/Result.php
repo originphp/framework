@@ -116,34 +116,35 @@ class Result
     }
 
     /**
-     * Converts the Result object into an Array
+     * Converts the Result object into an array
      *
      * @return array
      */
     public function toArray(): array
     {
-        return $this->convertToArray($this);
+        return $this->convertToArray(get_object_vars($this));
     }
 
     /**
-     * Recursively converts an object to an array
+     * Recursive function for toArray
      *
-     * @param object $object
+     * @param array
      * @return array
      */
-    private function convertToArray(object $object): array
+    private function convertToArray(array $data): array
     {
-        if (method_exists($object, 'toArray') && ! $object instanceof Result) {
-            return $object->toArray();
-        }
-        $array = (array) $object;
+        $out = [];
 
-        foreach ($array as $property => $value) {
-            if (is_object($value)) {
-                $array[$property] = $this->convertToArray($value);
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->convertToArray($value);
+            } elseif (is_object($value)) {
+                $value = method_exists($value, 'toArray') ? $value->toArray() : (array) $value;
             }
+
+            $out[$key] = $value;
         }
 
-        return $array;
+        return $out;
     }
 }

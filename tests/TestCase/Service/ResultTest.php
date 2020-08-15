@@ -15,6 +15,19 @@ namespace Origin\Test\Job;
 
 use Origin\Service\Result;
 
+class SomeObject
+{
+    private $data = [];
+    public function __construct(array $data = [])
+    {
+        $this->data = $data;
+    }
+    public function toArray()
+    {
+        return $this->data;
+    }
+}
+
 class ResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitialize()
@@ -41,6 +54,19 @@ class ResultTest extends \PHPUnit\Framework\TestCase
 EOF;
         $this->assertEquals($expected, $result->toJson(['pretty' => true]));
         $this->assertEquals($expected, (string) $result);
+    }
+
+    public function testToArray()
+    {
+        $result = new Result([
+            'data' => [
+                'foo' => 'bar',
+                'objects' => [
+                    new SomeObject(['key' => 'value'])
+                ]
+            ]
+        ]);
+        debug($result->toArray());
     }
 
     public function testSuccess()
