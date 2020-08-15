@@ -97,6 +97,10 @@ class Service
         $result = $this->execute(...func_get_args());
         $this->executeHook('shutdown');
 
+        if ($result === null) {
+            deprecationWarning('Service objects must return a Result object, returning null has been deprecated.');
+        }
+
         return $result;
     }
 }

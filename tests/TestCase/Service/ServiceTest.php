@@ -14,6 +14,7 @@
 namespace Origin\Test\Job;
 
 use Origin\Service\Service;
+use Origin\TestSuite\OriginTestCase;
 
 class MockService extends Service
 {
@@ -43,7 +44,14 @@ class MockService extends Service
         return $this->arg2;
     }
 }
-class ServiceTest extends \PHPUnit\Framework\TestCase
+
+class ServiceThatReturnsNull extends Service
+{
+    protected function execute()
+    {
+    }
+}
+class ServiceTest extends OriginTestCase
 {
     public function testInitialize()
     {
@@ -58,5 +66,13 @@ class ServiceTest extends \PHPUnit\Framework\TestCase
         $result = $service->dispatch('p1', 'p2');
         $this->assertTrue($result->success);
         $this->assertEquals(['param1' => 'p1','param2' => 'p2'], $result->data);
+    }
+
+    public function testDeprecationWarning()
+    {
+        $this->deprecated(function () {
+            $result = (new ServiceThatReturnsNull())->dispatch();
+            $this->assertNull($result);
+        });
     }
 }

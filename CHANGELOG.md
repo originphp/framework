@@ -24,11 +24,12 @@
 
 ### Deprecated
 
+- Deprecated `Service` objects returning `null`, must always a return a `Result` object
 - Deprecated `Entity::propertyExists`
 - Deprecated `Entity::$_virtual` use `Entity::$virtual` instead
 - Deprecated `Entity::$_hidden` use `Entity::$hidden` instead
 - Deprecated `Entity::invalidate` use `Entity::error` instead
-- Deprecated `present` options key, use the `present` validation rule instead 
+- Deprecated `present` options key, use the `present` validation rule instead
 
 ## [3.2.0] - 2020-07-26
 
