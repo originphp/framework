@@ -66,7 +66,14 @@ EOF;
                 ]
             ]
         ]);
-        debug($result->toArray());
+        $expected = [
+            'data' => [
+                'foo' => 'bar',
+                'objects' => [
+                    ['key' => 'value']
+                ]
+            ]];
+        $this->assertSame($expected, $result->toArray());
     }
 
     public function testSuccess()
