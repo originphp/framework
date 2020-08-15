@@ -1,9 +1,13 @@
 # Changelog
 
-## [unreleased]
+## [3.3.0] - 2020-08-15
 
 ### Added
 
+- Added `Entity::isDirty` check if dirty
+- Added `Entity::isClean` check if clean
+- Added `Entity::wasChanged` to see if previous values were changed
+- Added `Entity::changed` for tracking changed values
 - Added `inline` option for `HtmlHelper::css`
 - Added `inline` option for `HtmlHelper::js`
 - Added `Service\Result::error`
