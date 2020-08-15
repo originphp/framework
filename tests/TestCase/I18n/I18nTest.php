@@ -128,12 +128,6 @@ class I18nTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Hay 0 manzanas', __('There is one apple|There are {count} apples', ['count' => 0]));
         $this->assertEquals('Hay una manzana', __('There is one apple|There are {count} apples', ['count' => 1]));
         $this->assertEquals('Hay 2 manzanas', __('There is one apple|There are {count} apples', ['count' => 2]));
-
-        // Test nested
-        $this->assertEquals('nube', __('products.pro.name'));
-        $this->assertNull(__('products.starter.name')); // does not exist
-        $this->assertNull(__('products.pro.description')); // does not exist
-        $this->assertNull(__('products.pro')); // is an array
     }
 
     public function testLoadMessagesException()
