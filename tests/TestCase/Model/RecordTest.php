@@ -16,6 +16,13 @@ namespace Origin\Test\Model;
 use Origin\Model\Record;
 use BadMethodCallException;
 
+class SomeRecord extends Record
+{
+    protected $schema = [
+        'name' => 'string'
+    ];
+}
+
 class InvalidCheckoutForm extends Record
 {
     protected function initialize()
@@ -81,6 +88,25 @@ class RecordTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $form->schema());
         $this->assertSame($expected['email'], $form->schema('email'));
         $this->assertNull($form->schema('foo'));
+    }
+
+    public function testNormalizeSchema()
+    {
+        $object = new SomeRecord();
+        $expected = [
+            'type' => 'string',
+            'length' => null,
+            'default' => null
+        ];
+        $this->assertEquals($expected, $object->schema('name'));
+    }
+
+    public function testMarkClean()
+    {
+        $form = new CheckoutForm(['name' => 'Peter Hook']);
+        $this->assertFalse($form->isClean());
+        $form = new CheckoutForm(['name' => 'Peter Hook'], ['markClean' => true]);
+        $this->assertTrue($form->isClean());
     }
 
     public function testDefaultValuesAreSet()
