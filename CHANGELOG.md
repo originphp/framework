@@ -17,7 +17,7 @@
 
 ### Fixed
 
-- Fixed enities marked as clean during the patch process
+- Fixed entities marked as clean during the patch process
 - Fixed `AuthComponent` now destroys all session data not just Auth related data
 - Fixed `FormHelper` leaving empty label attribute when disabling label in control
 - Fixed `FormHelper` leaving empty default attribute
