@@ -258,7 +258,7 @@ class ModelValidator
         if (is_null($value)) {
             return true;
         }
-        if (is_string($value) and trim($value) === '') {
+        if (is_string($value) && trim($value) === '') {
             return true;
         }
       
