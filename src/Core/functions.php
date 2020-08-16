@@ -286,7 +286,7 @@ if (! function_exists('tmp_path')) {
      * @param string $path
      * @return string
      */
-    function tmp_path(string $path = null)
+    function tmp_path(string $path = null): string
     {
         return TMP . ($path ? DS  . $path : '');
     }
@@ -300,7 +300,7 @@ if (! function_exists('storage_path')) {
      * @param string $path
      * @return string
      */
-    function storage_path(string $path = null)
+    function storage_path(string $path = null): string
     {
         /**
          * backwards compatible, remove in version 4
@@ -313,13 +313,13 @@ if (! function_exists('storage_path')) {
 
 if (! function_exists('config_path')) {
     /**
-     * Handy function for working with tmp paths
-     * e.g. file_put_contents(tmp_path('session/data.json'));
+     * Handy function for working with config paths
+     * e.g. config_path('locales/en_GB.php')
      *
      * @param string $path
      * @return string
      */
-    function config_path(string $path = null)
+    function config_path(string $path = null): string
     {
         return CONFIG . ($path ? DS  . $path : '');
     }
