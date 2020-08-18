@@ -1,5 +1,11 @@
 # Changelog
 
+### Added
+
+- Added plugin syntax to loadModel
+- Added plugin syntax to assocations
+- HtmlHelper automically adds `plugin` when linking inside plugin, use false to disable.
+
 ## [3.3.0] - 2020-08-15
 
 ### Added
