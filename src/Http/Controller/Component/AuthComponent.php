@@ -252,16 +252,14 @@ class AuthComponent extends Component
     /**
      * Logsout user and returns URL to redirect too. Deafaults to loginAction
      * but will return logoutRedirect as well.
-     * - Deletes the Auth Info in the Session. Previously used session destroy but this will
-     * render flash messages useless.
      *
      * @return string url where to redirect too
      */
     public function logout(): string
     {
-        $this->Session->delete('Auth');
+        $this->Session->destroy();
         $logoutRedirect = $this->config['logoutRedirect'] ?? $this->config['loginAction'];
-
+      
         return Router::url($logoutRedirect);
     }
 
@@ -276,7 +274,7 @@ class AuthComponent extends Component
     {
         $user = null;
         # API authentication should not check data in Session
-        if (in_array('Form', $this->config['authenticate']) or in_array('Http', $this->config['authenticate'])) {
+        if (in_array('Form', $this->config['authenticate']) || in_array('Http', $this->config['authenticate'])) {
             $user = $this->Session->read('Auth.User');
         }
         /**
@@ -420,7 +418,7 @@ class AuthComponent extends Component
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
             $this->Session->write('Auth.redirect', $this->request()->path(true));
-
+         
             return $this->controller()->redirect(Router::url($this->config['loginAction']));
         }
        
