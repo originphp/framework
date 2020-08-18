@@ -43,7 +43,7 @@ class PaginatorComponent extends Component
     /**
      * Paginates the records
      *
-     * @param Model $model
+     * @param \Origin\Model\Model $model
      * @param array $settings
      * @return mixed
      */
