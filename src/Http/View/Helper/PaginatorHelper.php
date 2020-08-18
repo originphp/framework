@@ -30,9 +30,9 @@ class PaginatorHelper extends Helper
             'number' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
             'numberActive' => '<li class="page-item active"><a class="page-link" href="{url}">{text}</a></li>',
             'prev' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-            'prevDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
+            'prevDisabled' => '<li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">{text}</a></li>',
             'next' => '<li class="page-item"><a class="page-link" href="{url}">{text}</a></li>',
-            'nextDisabled' => '<li class="page-item"><a class="page-link" href="#" onclick="return false;">{text}</a></li>', ],
+            'nextDisabled' => '<li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">{text}</a></li>', ],
     ];
 
     /**
@@ -40,10 +40,9 @@ class PaginatorHelper extends Helper
      *
      * @param string $column field name
      * @param string $text   link text
-     *
      * @return string link
      */
-    public function sort(string $column, string $text = null)
+    public function sort(string $column, string $text = null): string
     {
         if ($text === null) {
             $text = Inflector::human($column);
@@ -54,7 +53,7 @@ class PaginatorHelper extends Helper
         $query['sort'] = $column;
         if ($paging && $column === $paging['sort']) {
             $query['direction'] = ($paging['direction'] === 'asc' ? 'desc' : 'asc');
-            $template = 'sort'.ucfirst($paging['direction']);
+            $template = 'sort' . ucfirst($paging['direction']);
         } else {
             $query['direction'] = 'asc';
             $template = 'sort';
@@ -62,18 +61,31 @@ class PaginatorHelper extends Helper
 
         $options = [
             'text' => $text,
-            'url' => $this->request()->path().'?'.http_build_query($query),
+            'url' => $this->request()->path() . '?' . http_build_query($query)
         ];
 
         return $this->templater()->format($template, $options);
     }
 
-    public function prev(string $text = 'Previous', array $options = [])
+    /**
+     * Generates the previous link
+     *
+     * @param string $text
+     * @param array $options
+     * @return string
+     */
+    public function prev(string $text = 'Previous', array $options = []): string
     {
         return $this->generateLink($text, 'prevPage', $options);
     }
 
-    public function numbers(array $options = [])
+    /**
+     * Generates the numbers string
+     *
+     * @param array $options
+     * @return string
+     */
+    public function numbers(array $options = []): string
     {
         $paging = $this->params();
 
@@ -97,7 +109,7 @@ class PaginatorHelper extends Helper
             }
             $query['page'] = $i;
 
-            $options['url'] = $this->request()->path().'?'.http_build_query($query);
+            $options['url'] = $this->request()->path() . '?' . http_build_query($query);
             $options['text'] = $i;
             $output .= $this->templater()->format($template, $options);
         }
@@ -105,26 +117,42 @@ class PaginatorHelper extends Helper
         return $output;
     }
 
-    public function next(string $text = 'Next', array $options = [])
+    /**
+     * Generates the next link
+     *
+     * @param string $text
+     * @param array $options
+     * @return string
+     */
+    public function next(string $text = 'Next', array $options = []): string
     {
         return $this->generateLink($text, 'nextPage', $options);
     }
 
     /**
-     * Generates the html for the Pagnation control (includes previous, numbers and next).
+     * Generates the paginator control, which includes previous,numbers and next links
+     *
+     * @param string $previous
+     * @param string $next
+     * @return string
      */
-    public function control($previous = 'Previous', $next = 'Next')
+    public function control($previous = 'Previous', $next = 'Next'): string
     {
-        $output = $this->prev($previous).$this->numbers().$this->next($next);
+        $output = $this->prev($previous) . $this->numbers() . $this->next($next);
 
         return $this->templater()->format('control', ['content' => $output]);
     }
 
-    protected function generateLink($text, $type, $options)
+    /**
+     * @param string $text
+     * @param string $type
+     * @param array $options
+     * @return string
+     */
+    protected function generateLink(string $text, string $type, array $options): string
     {
-        $defaults = ['active' => '', 'text' => $text, 'url' => '#', 'onclick' => 'return false;'];
-        $options += $defaults;
-
+        $options += ['active' => '', 'text' => $text, 'url' => '#'];
+       
         $query = $this->request()->query();
         $paging = $this->params();
 
@@ -132,22 +160,24 @@ class PaginatorHelper extends Helper
             $query['page'] = $paging['current'];
         }
         if ($type === 'nextPage') {
-            $template = 'nextDisabled';
             if ($paging['nextPage']) {
                 $query['page'] = $query['page'] + 1;
                 $template = 'next';
+            } else {
+                $template = 'nextDisabled';
             }
         }
 
         if ($type === 'prevPage') {
-            $template = 'prevDisabled';
             if ($paging['prevPage']) {
                 $query['page'] = $query['page'] - 1;
                 $template = 'prev';
+            } else {
+                $template = 'prevDisabled';
             }
         }
-        $options['url'] = $this->request()->path().'?'.http_build_query($query);
-
+        $options['url'] = $this->request()->path() . '?' . http_build_query($query);
+        
         return $this->templater()->format($template, $options);
     }
 
@@ -156,7 +186,7 @@ class PaginatorHelper extends Helper
      *
      * @return array
      */
-    public function params()
+    public function params(): array
     {
         return $this->view()->get('paging');
     }
