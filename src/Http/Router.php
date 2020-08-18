@@ -194,7 +194,7 @@ class Router
         $params = [
             'controller' => null,
             'action' => null,
-            'plugin' => null,
+            'plugin' => static::$request->params('plugin'),
         ];
         $url = array_merge($params, $url);
 
