@@ -294,7 +294,7 @@ class Session
      */
     public function started(): bool
     {
-        return ($this->started or session_status() === PHP_SESSION_ACTIVE);
+        return ($this->started || session_status() === PHP_SESSION_ACTIVE);
     }
 
     /**
