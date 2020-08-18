@@ -62,8 +62,9 @@ class Association
             $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
         $tableAlias = Inflector::tableName($this->model->alias());
-        $associationTableAlias = Inflector::tableName($association);
-        $conditions = ["{$tableAlias}.id = {$associationTableAlias}.{$options['foreignKey']}"];
+        list($plugin, $associated) = pluginSplit($association);
+        $associatedAlias = Inflector::tableName($associated);
+        $conditions = ["{$tableAlias}.id = {$associatedAlias}.{$options['foreignKey']}"];
 
         if (! empty($options['conditions'])) {
             $conditions = array_merge($conditions, (array) $options['conditions']);
@@ -110,7 +111,9 @@ class Association
             $options['foreignKey'] = Inflector::underscored($this->extractClass($options['className'])) . '_id';
         }
         $alias = Inflector::tableName($this->model->alias());
-        $associatedAlias = Inflector::tableName($association);
+
+        list($plugin, $associated) = pluginSplit($association);
+        $associatedAlias = Inflector::tableName($associated);
 
         $conditions = ["{$alias}.{$options['foreignKey']} = {$associatedAlias}.id"];
 
@@ -126,7 +129,7 @@ class Association
     {
         if (strpos($class, '\\')) {
             list($namespace, $class) = namespaceSplit($class);
-        } elseif (strpos($class, '.')) {
+        } else {
             list($plugin, $class) = pluginSplit($class);
         }
 
@@ -169,7 +172,7 @@ class Association
         if (is_null($options['foreignKey'])) {
             $options['foreignKey'] = Inflector::underscored($this->model->name()) . '_id';
         }
-
+   
         return $options;
     }
 

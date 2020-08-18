@@ -332,7 +332,9 @@ class Model
      */
     public function hasOne(string $association, array $options = []): array
     {
-        return $this->hasOne[$association] = (new Association($this))->hasOne($association, $options);
+        list($plugin, $alias) = pluginSplit($association);
+
+        return $this->hasOne[$alias] = (new Association($this))->hasOne($association, $options);
     }
 
     /**
@@ -360,12 +362,14 @@ class Model
      */
     public function belongsTo(string $association, array $options = []): array
     {
-        $this->belongsTo[$association] = (new Association($this))->belongsTo($association, $options);
+        list($plugin, $alias) = pluginSplit($association);
+
+        $this->belongsTo[$alias] = (new Association($this))->belongsTo($association, $options);
         if (isset($options['counterCache']) && ! isset($this->CounterCache)) {
             $this->enableCounterCache();
         }
 
-        return $this->belongsTo[$association];
+        return $this->belongsTo[$alias];
     }
 
     /**
@@ -390,7 +394,9 @@ class Model
      */
     public function hasMany(string $association, array $options = []): array
     {
-        return  $this->hasMany[$association] = (new Association($this))->hasMany($association, $options);
+        list($plugin, $alias) = pluginSplit($association);
+
+        return $this->hasMany[$alias] = (new Association($this))->hasMany($association, $options);
     }
 
     /**
@@ -418,7 +424,9 @@ class Model
      */
     public function hasAndBelongsToMany(string $association, array $options = []): array
     {
-        return $this->hasAndBelongsToMany[$association] = (new Association($this))->hasAndBelongsToMany($association, $options);
+        list($plugin, $alias) = pluginSplit($association);
+
+        return $this->hasAndBelongsToMany[$alias] = (new Association($this))->hasAndBelongsToMany($association, $options);
     }
 
     /**
