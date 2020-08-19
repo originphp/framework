@@ -191,10 +191,14 @@ class Router
         if (empty($url)) {
             return '/';
         }
+
+        $requestParams = static::$request->params();
+
         $params = [
             'controller' => null,
             'action' => null,
-            'plugin' => static::$request->params('plugin'),
+            'plugin' => $requestParams['plugin'] ?? null,
+            'prefix' => $requestParams['prefix'] ?? null
         ];
         $url = array_merge($params, $url);
 
@@ -206,6 +210,15 @@ class Router
         if ($url['plugin']) {
             $output .= '/' . Inflector::underscored($url['plugin']);
         }
+
+        /**
+         * Experimental
+         */
+        if (! empty($url['prefix'])) {
+            $output .= '/' . $url['prefix'];
+        }
+
+        unset($url['plugin'],$url['prefix']);
 
         $controller = empty($url['controller']) ? $params['controller'] : $url['controller'];
         $action = empty($url['action']) ? $params['action'] : $url['action'];

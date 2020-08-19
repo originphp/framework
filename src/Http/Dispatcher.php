@@ -54,15 +54,20 @@ class Dispatcher
      *
      * @param string $controller
      * @param string $plugin
+     * @param string $prefix
      * @return string
      */
-    protected function getClass(string $controller, string $plugin = null): string
+    protected function getClass(string $controller, string $plugin = null, string $prefix = null): string
     {
         $namespace = Config::read('App.namespace');
         if ($plugin) {
             $namespace = $plugin;
         }
 
+        if ($prefix) {
+            $controller = $prefix . '\\' . $controller;
+        }
+ 
         return $namespace . '\Http\Controller\\' . $controller . 'Controller';
     }
 
@@ -76,13 +81,13 @@ class Dispatcher
     public function dispatch(Request $request, Response $response): Response
     {
         if ($request->params('controller')) {
-            $class = $this->getClass($request->params('controller'), $request->params('plugin'));
+            $class = $this->getClass($request->params('controller'), $request->params('plugin'), $request->params('prefix'));
             if (! class_exists($class)) {
                 throw new MissingControllerException($request->params('controller'));
             }
-            
+           
             $this->controller = new $class($request, $response);
-
+            
             return $this->controller->dispatch($request->params('action'));
         }
         throw new RouterException('No route found.', 404);

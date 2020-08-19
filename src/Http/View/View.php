@@ -298,6 +298,11 @@ class View
         if ($plugin) {
             $viewPath = PLUGINS . DS . Inflector::underscored($plugin) . DS . 'src' . DS . 'Http' . DS . 'View';
         }
+
+        $prefix = $this->request->params('prefix');
+        if ($prefix) {
+            $viewPath .= DS . $prefix;
+        }
        
         if ($withControllerName) {
             $viewPath = $viewPath . DS . $this->controllerName;
