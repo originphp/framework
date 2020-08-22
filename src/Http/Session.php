@@ -59,11 +59,6 @@ class Session
             $this->setIniConfig($config);
         }
 
-        // For DOT and CLI
-        if (! isset($_SESSION)) {
-            $_SESSION = [];
-        }
-
         if ($this->started() === false) {
             $this->start();
         }
@@ -95,6 +90,8 @@ class Session
         }
 
         if (isConsole()) {
+            $_SESSION = [];
+
             return $this->started = true;
         }
 
@@ -274,13 +271,12 @@ class Session
     public function destroy(): void
     {
         if (! $this->started()) {
-            // @codeCoverageIgnoreStart
-            session_start();
-            // @codeCoverageIgnoreEnd
+            $this->start();
         }
-        if (isConsole() === false) {
+        if (! headers_sent()) {
             // @codeCoverageIgnoreStart
             session_destroy();
+            unset($_COOKIE[session_name()]);
             // @codeCoverageIgnoreEnd
         }
         $this->started = false;
