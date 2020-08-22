@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.4.0] - 2020-08-22
+
 ### Added
 
 - Added Router prefixes
