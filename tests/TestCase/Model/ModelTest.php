@@ -312,6 +312,32 @@ class ModelTest extends OriginTestCase
         ModelRegistry::set('Address', $this->Address);
     }
 
+    /**
+     * Test Assocation alias
+     */
+    public function testAssocationAliases()
+    {
+        $article = new Article();
+        $article->hasOne('One');
+        $article->hasMany('Two');
+        $article->hasAndBelongsToMany('Three');
+        $article->belongsTo('Four');
+        $this->assertArrayHasKey('One', $article->association('hasOne'));
+        $this->assertArrayHasKey('Two', $article->association('hasMany'));
+        $this->assertArrayHasKey('Three', $article->association('hasAndBelongsToMany'));
+        $this->assertArrayHasKey('Four', $article->association('belongsTo'));
+
+        $article = new Article();
+        $article->hasOne('Plugin.One');
+        $article->hasMany('Plugin.Two');
+        $article->hasAndBelongsToMany('Plugin.Three');
+        $article->belongsTo('Plugin.Four');
+        $this->assertArrayHasKey('One', $article->association('hasOne'));
+        $this->assertArrayHasKey('Two', $article->association('hasMany'));
+        $this->assertArrayHasKey('Three', $article->association('hasAndBelongsToMany'));
+        $this->assertArrayHasKey('Four', $article->association('belongsTo'));
+    }
+
     public function testRegisterCallbackBeforeCreate()
     {
         $Article = new Article();

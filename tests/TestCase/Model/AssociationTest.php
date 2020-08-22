@@ -48,4 +48,24 @@ class AssociationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('user_id', $result['associationForeignKey']);
         $this->assertEquals('foos_users', $result['joinTable']);
     }
+
+    /**
+     * Test using Plugin.Model as the alias name.
+     * @interal this does not affect hasMany
+     */
+    public function testPluginAlias()
+    {
+        $model = new Model(['name' => 'Foo']);
+        $assocation = new Association($model);
+
+        $belongsTo = $assocation->belongsTo('Plugin.User');
+        $this->assertEquals(['foos.user_id = users.id'], $belongsTo['conditions']);
+
+        $hasOne = $assocation->hasOne('Plugin.User');
+        $this->assertEquals(['foos.id = users.foo_id'], $hasOne['conditions']);
+
+        // hasMany not applicable
+        $hasAndBelongsToMany = $assocation->hasAndBelongsToMany('Plugin.User');
+        $this->assertEquals(['foos_users.user_id = users.id'], $hasAndBelongsToMany['conditions']);
+    }
 }
