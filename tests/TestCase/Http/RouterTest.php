@@ -23,18 +23,38 @@ class MockRouter extends Router
     {
         static::$routes = [];
     }
+    public static function setRoutes(array $routes)
+    {
+        static::$routes = $routes;
+    }
 }
 class RouterTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
+    protected static $routes = [];
+
+    public static function setUpBeforeClass(): void
     {
-        // Add Default Routes
-        MockRouter::add('/:controller/:action/*');
-        MockRouter::add('/:controller', ['action' => 'index']);
+        static::$routes = Router::routes();
+        MockRouter::reset();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        MockRouter::reset();
+
+        MockRouter::setRoutes(static::$routes);
+    }
+
+    protected function tearDown(): void
+    {
+        MockRouter::reset();
     }
 
     public function testParseDefaultRoute()
     {
+        MockRouter::add('/:controller/:action/*');
+        MockRouter::add('/:controller', ['action' => 'index']);
+
         $result = MockRouter::parse('leads/index');
         $this->assertEquals('Leads', $result['controller']);
         $this->assertEquals('index', $result['action']);
@@ -61,8 +81,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testGreedyArgs()
     {
-        MockRouter::reset();
         MockRouter::add('/posts/custom/*', ['controller' => 'Articles', 'action' => 'show', 'all']);
+
         $result = MockRouter::parse('/posts/custom');
         $this->assertEquals('all', $result['args'][0]);
         $result = MockRouter::parse('/posts/custom/1234');
@@ -72,7 +92,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testComplicated()
     {
-        MockRouter::reset();
         MockRouter::add('/', ['controller' => 'pages', 'action' => 'display', 'home']);
         MockRouter::add('/t/*', ['controller' => 'Topics','action' => 'view']);
         MockRouter::add('/:controller/:action/*');
@@ -92,8 +111,12 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Topics', $result['controller']);
         $this->assertEquals('view', $result['action']);
     }
+
     public function testRouteIndex()
     {
+        MockRouter::add('/:controller/:action/*');
+        MockRouter::add('/:controller', ['action' => 'index']);
+
         $result = MockRouter::parse('/leads');
 
         $this->assertEquals('Leads', $result['controller']);
@@ -107,12 +130,13 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testRoutes()
     {
+        MockRouter::add('/:controller/:action/*');
+       
         $this->assertNotEmpty(MockRouter::routes());
     }
 
     public function testRouteHome()
     {
-        MockRouter::reset();
         MockRouter::add('/', ['controller' => 'pages', 'action' => 'display', 'home']);
 
         $result = MockRouter::parse('/');
@@ -124,7 +148,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testRoutePage()
     {
-        MockRouter::reset();
         MockRouter::add('/help', ['controller' => 'docs', 'action' => 'view', 256]);
 
         $result = MockRouter::parse('/help');
@@ -136,7 +159,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameController()
     {
-        MockRouter::reset();
         MockRouter::add(
             '/developers/:action/*',
             ['controller' => 'users']
@@ -149,8 +171,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testOneController()
     {
-        MockRouter::reset();
-
         MockRouter::add('/:action/*', ['controller' => 'jobs']); // one controller
 
         $result = MockRouter::parse('/active');
@@ -161,7 +181,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testUrl()
     {
-        MockRouter::reset();
         MockRouter::add('/:controller/:action/*');
         MockRouter::request(new Request('articles/view/100'));
 
@@ -219,7 +238,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testPlugin()
     {
-        MockRouter::reset();
         MockRouter::add('/contact_manager/:controller/:action', ['action' => 'index','plugin' => 'ContactManager']);
        
         MockRouter::request(new Request('/contact_manager/contacts/add'));
@@ -235,7 +253,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testPrefix()
     {
-        MockRouter::reset();
         MockRouter::add('/admin/:controller/:action', ['prefix' => 'Admin']);
      
         MockRouter::request(new Request('/admin/users/edit'));
