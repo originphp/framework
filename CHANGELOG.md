@@ -2,10 +2,10 @@
 
 ### Added
 
-- Added `Router` prefixes
+- Added Router prefixes
 - Added plugin syntax to loadModel
 - Added plugin syntax to assocations
-- HtmlHelper automically adds `plugin` when linking inside plugin, use false to disable.
+- HtmlHelper automically adds plugin when linking inside plugin, use false to disable.
 
 ### Changed
 
