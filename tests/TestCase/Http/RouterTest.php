@@ -216,4 +216,37 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['xml'], Router::extensions());
         Router::extensions(['json','xml']); // put back
     }
+
+    public function testPlugin()
+    {
+        MockRouter::reset();
+        MockRouter::add('/contact_manager/:controller/:action', ['action' => 'index','plugin' => 'ContactManager']);
+       
+        MockRouter::request(new Request('/contact_manager/contacts/add'));
+        
+        $route = MockRouter::parse('/contact_manager/contacts/add');
+        $this->assertEquals('Contacts', $route['controller']);
+        $this->assertEquals('ContactManager', $route['plugin']);
+
+        // check plugin is added to the URL, this is used by redirect & html::link
+        $this->assertEquals('/contact_manager/contacts/view', MockRouter::url(['action' => 'view']));
+        $this->assertEquals('/contacts/view', MockRouter::url(['action' => 'view','plugin' => false]));
+    }
+
+    public function testPrefix()
+    {
+        MockRouter::reset();
+        MockRouter::add('/admin/:controller/:action', ['prefix' => 'Admin']);
+     
+        MockRouter::request(new Request('/admin/users/edit'));
+        
+        $route = MockRouter::parse('/admin/users/edit');
+
+        $this->assertEquals('Users', $route['controller']);
+        $this->assertEquals('Admin', $route['prefix']);
+       
+        // check plugin is added to the URL, this is used by redirect & html::link
+        $this->assertEquals('/admin/users/view', MockRouter::url(['action' => 'view']));
+        $this->assertEquals('/users/view', MockRouter::url(['action' => 'view','prefix' => false]));
+    }
 }

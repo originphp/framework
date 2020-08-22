@@ -211,11 +211,8 @@ class Router
             $output .= '/' . Inflector::underscored($url['plugin']);
         }
 
-        /**
-         * Experimental
-         */
         if (! empty($url['prefix'])) {
-            $output .= '/' . $url['prefix'];
+            $output .= '/' . Inflector::underscored($url['prefix']);
         }
 
         unset($url['plugin'],$url['prefix']);
