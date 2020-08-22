@@ -95,7 +95,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
         $paging = ['current' => 1, 'pages' => 1,  'records' => 10, 'sort' => 'name', 'direction' => 'asc', 'prevPage' => false, 'nextPage' => false];
 
         $Paginator->view()->set('paging', $paging);
-        $expected = '<li class="page-item"><a class="page-link" href="#" onclick="return false;">Previous</a></li>';
+        $expected = '<li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">Previous</a></li>';
         $this->assertEquals($expected, $Paginator->prev());
     }
 
@@ -111,7 +111,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
         $paging = ['current' => 1, 'pages' => 1,  'records' => 10, 'sort' => 'name', 'direction' => 'asc', 'prevPage' => false, 'nextPage' => false];
 
         $Paginator->view()->set('paging', $paging);
-        $expected = '<li class="page-item"><a class="page-link" href="#" onclick="return false;">Next</a></li>';
+        $expected = '<li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">Next</a></li>';
         $this->assertEquals($expected, $Paginator->next());
     }
 
@@ -127,7 +127,7 @@ class PaginatorHelperTest extends \PHPUnit\Framework\TestCase
         $paging = ['current' => 1, 'pages' => 1,  'records' => 10, 'sort' => 'name', 'direction' => 'asc', 'prevPage' => false, 'nextPage' => false];
 
         $Paginator->view()->set('paging', $paging);
-        $expected = '<ul class="pagination"><li class="page-item"><a class="page-link" href="#" onclick="return false;">Previous</a></li><li class="page-item active"><a class="page-link" href="/articles/edit/2048?page=1">1</a></li><li class="page-item"><a class="page-link" href="#" onclick="return false;">Next</a></li></ul>';
+        $expected = '<ul class="pagination"><li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">Previous</a></li><li class="page-item active"><a class="page-link" href="/articles/edit/2048?page=1">1</a></li><li class="page-item disabled"><a class="page-link" href="#" onclick="return false;">Next</a></li></ul>';
         $this->assertEquals($expected, $Paginator->control());
     }
 }
