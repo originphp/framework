@@ -2,9 +2,14 @@
 
 ### Added
 
+- Added `Router` prefixes
 - Added plugin syntax to loadModel
 - Added plugin syntax to assocations
 - HtmlHelper automically adds `plugin` when linking inside plugin, use false to disable.
+
+### Changed
+
+- Changed Paginator template to use disabled class
 
 ## [3.3.0] - 2020-08-15
 
