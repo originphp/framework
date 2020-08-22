@@ -188,6 +188,6 @@ class PaginatorHelper extends Helper
      */
     public function params(): array
     {
-        return $this->view()->get('paging');
+        return $this->view()->get('paging') ?? [];
     }
 }
