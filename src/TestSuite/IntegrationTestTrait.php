@@ -319,8 +319,7 @@ trait IntegrationTestTrait
         }
             
         $this->request = new Request($url);
-        $this->request->session()->destroy();
-       
+    
         $this->response = $this->getMockBuilder(Response::class)
             ->setMethods(['send','stop'])
             ->getMock();
@@ -329,7 +328,7 @@ trait IntegrationTestTrait
         foreach ($this->session as $key => $value) {
             $this->request->session()->write($key, $value);
         }
-
+        
         // Send Headers
         foreach ($this->headers as $header => $value) {
             $this->response->header($header, $value);

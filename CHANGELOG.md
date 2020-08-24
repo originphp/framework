@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.4.1] - 2020-08-24
+
+### Fixed
+
+- Fixed integration test with session data due to refactor in [3.4.0], now the Session object is shared from the Request instead of creating a new one.
+
 ## [3.4.0] - 2020-08-22
 
 ### Added

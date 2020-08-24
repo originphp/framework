@@ -31,17 +31,13 @@ class SessionComponent extends Component
     protected $session = null;
 
     /**
-     * Lazy loads the session object
+     * Gets the Session object from the Request
      *
      * @return \Origin\Http\Session
      */
     protected function session(): Session
     {
-        if ($this->session === null) {
-            $this->session = new Session();
-        }
-
-        return $this->session;
+        return $this->request()->session();
     }
     /**
      * Reads a value of a session

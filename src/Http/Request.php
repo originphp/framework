@@ -684,7 +684,7 @@ class Request
     /**
      * Returns the session object
      *
-     * @return Session
+     * @return \Origin\Http\Session
      */
     public function session(): Session
     {
