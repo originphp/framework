@@ -528,7 +528,7 @@ trait IntegrationTestTrait
      *
      * @param string $text
      */
-    public function assertRedirectNotContains(string $text)
+    public function assertRedirectNotContains(string $text): void
     {
         $headers = $this->response()->headers();
         if (empty($headers['Location'])) {
@@ -542,7 +542,7 @@ trait IntegrationTestTrait
      *
      * @return void
      */
-    public function assertResponseEmpty()
+    public function assertResponseEmpty(): void
     {
         $body = $this->response()->body();
         $this->assertEmpty($body);
@@ -553,10 +553,26 @@ trait IntegrationTestTrait
      *
      * @return void
      */
-    public function assertResponseNotEmpty()
+    public function assertResponseNotEmpty(): void
     {
         $body = $this->response()->body();
         $this->assertNotEmpty($body);
+    }
+
+    /**
+     * Asserts that the response body matches a regular expression pattern
+     */
+    public function assertResponseRegExp(string $pattern): void
+    {
+        $this->assertMatchesRegularExpression($pattern, $this->response()->body());
+    }
+
+    /**
+    * Asserts that the response body does not match a regular expression pattern
+    */
+    public function assertResponseNotRegExp(string $pattern): void
+    {
+        $this->assertDoesNotMatchRegularExpression()($pattern, $this->response()->body());
     }
 
     /**
