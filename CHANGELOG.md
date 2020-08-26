@@ -2,8 +2,15 @@
 
 ## [unreleased]
 
+### Fixed
+
+- Fixed issues with default conditions sometimes not respected when fetching associated data
+- Fixed belongsTo/hasOne to work with fields without table alias (user guide previously insisted to use table alias anyway, but in other relationships it worked automatically)
+
 ### Added
 
+- Added associated condition overide when fetching related data
+- Added associated order overide when fetching related data (hasMany,hasAndBelongsToMany)
 - Added assertResponseRegExp to IntegrationTestTrait
 - Added assertResponseNotRegExp to IntegrationTestTrait
 

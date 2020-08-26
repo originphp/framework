@@ -40,7 +40,7 @@ class Finder
     public function find(ArrayObject $query, string $type = 'model')
     {
         $query = (array) $query;
-        
+      
         $connection = $this->model->connection();
         $connection->select($this->model->table(), $query + ['alias' => Inflector::tableName($this->model->alias())]);
 
@@ -160,9 +160,16 @@ class Finder
             if (isset($config['associated']) && isset($belongsTo[$model])) {
                 $foreignKey = $belongsTo[$model]['foreignKey'];
                 $property = lcfirst($model);
+
+                // fields can be overwritten in associated, if not use defaults from belongsTo settings
+                $config['fields'] = empty($config['fields']) ? $belongsTo[$model]['fields'] : $config['fields'];
+                $conditions = empty($config['conditions']) ? $belongsTo[$model]['conditions'] : $config['conditions'];
+                unset($conditions[0]); // remove join condition
+
                 foreach ($results as &$result) {
                     if (isset($result->$foreignKey)) {
-                        $config['conditions'] = [$this->model->$model->primaryKey() => $result->$foreignKey];
+                        $config['conditions'] = $conditions;
+                        $config['conditions'][] = [$this->model->$model->primaryKey() => $result->$foreignKey];
                         $result->$property = $this->model->$model->find('first', $config);
                         $result->reset();
                     }
@@ -184,16 +191,29 @@ class Finder
     public function loadAssociatedHasOne(array $query, array  $results): array
     {
         $hasOne = $this->model->association('hasOne');
+   
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) && isset($hasOne[$model])) {
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
-        
                 $modelTableAlias = Inflector::tableName($model);
+
+                // fields can be overwritten in associated, if not use defaults from hasOne settings
+                $conditions = $config['conditions'] ?? [];
+                if (empty($conditions)) {
+                    $conditions = $hasOne[$model]['conditions'];
+                    unset($conditions[0]); // remove join condition
+                }
+
+                $config['fields'] = empty($config['fields']) ? $hasOne[$model]['fields'] : $config['fields'];
+              
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) { // Author id
-                        $config['conditions'] = $hasOne[$model]['conditions'];
-                        $config['conditions'] = ["{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey()}];
+                        $config['conditions'] = $conditions;
+                        $config['conditions'][] = [
+                            "{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey()}
+                        ];
+
                         $result->$property = $this->model->$model->find('first', $config);
                         $result->reset();
                     }
@@ -217,18 +237,20 @@ class Finder
         $hasMany = $this->model->association('hasMany');
         foreach ($hasMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
-                $fields = $config['fields']; // create copy before overwrite
-                $config = array_merge($config, $query['associated'][$alias]);
-
-                if (empty($config['fields'])) {
-                    $config['fields'] = empty($fields) ?  $this->model->{$alias}->fields() : $fields;
-                }
-
+                // fields can be overwritten in associated, if not use defaults from hasMany settings
+                $overide = $query['associated'][$alias];
+                $config['fields'] = empty($overide['fields']) ? $hasMany[$alias]['fields'] : $overide['fields'];
+                $conditions = empty($overide['conditions']) ? $hasMany[$alias]['conditions'] : $overide['conditions'];
+                $config['order'] = empty($overide['order']) ?  $hasMany[$alias]['order'] : $overide['order'];
+                
+                $models = Inflector::plural(Inflector::camelCase($alias));
+                $tableAlias = Inflector::tableName($alias);
+           
                 foreach ($results as $index => &$result) {
                     if (isset($result->{$this->model->primaryKey()})) {
-                        $tableAlias = Inflector::tableName($alias);
+                        $config['conditions'] = $conditions ?? [];
                         $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
-                        $models = Inflector::plural(Inflector::camelCase($alias));
+                      
                         $result->$models = $this->model->$alias->find('all', $config);
                         $result->reset();
                     }
@@ -251,27 +273,31 @@ class Finder
         $hasAndBelongsToMany = $this->model->association('hasAndBelongsToMany');
         foreach ($hasAndBelongsToMany as $alias => $config) {
             if (isset($query['associated'][$alias])) {
-                $fields = $config['fields']; // create copy before overwite
-                $config = array_merge($config, $query['associated'][$alias]);
+                $overide = $query['associated'][$alias];
+                $config['fields'] = empty($overide['fields']) ? $hasAndBelongsToMany[$alias]['fields'] : $overide['fields'];
+                $conditions = empty($overide['conditions']) ? $hasAndBelongsToMany[$alias]['conditions'] : $overide['conditions'];
+                $config['order'] = empty($overide['order']) ? $hasAndBelongsToMany[$alias]['order'] : $overide['order'];
+                $models = Inflector::plural(Inflector::camelCase($alias));
+
+                // extract join condition e.g. articles_tags.tag_id = tags.id
+                if (! empty($overide['conditions'])) {
+                    array_unshift($conditions, $hasAndBelongsToMany[$alias]['conditions'][0]);
+                }
 
                 $config['joins'][0] = [
                     'table' => $config['joinTable'],
                     'alias' => Inflector::tableName($config['with']),
                     'type' => 'INNER',
-                    'conditions' => $config['conditions'],
+                    'conditions' => $conditions,
                 ];
+                $withAlias = Inflector::tableName($config['with']);
                 $config['conditions'] = [];
-                if (empty($config['fields'])) {
-                    $config['fields'] = empty($fields) ? array_merge($this->model->$alias->fields(), $this->model->{$config['with']}->fields()) : $fields;
-                }
-
-                foreach ($results as $index => &$result) {
+               
+                foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) {
-                        $withAlias = Inflector::tableName($config['with']);
                         $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
                     }
-
-                    $models = Inflector::plural(Inflector::camelCase($alias));
+    
                     $result->$models = $this->model->$alias->find('all', $config);
                     $result->reset();
                 }

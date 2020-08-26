@@ -1422,31 +1422,30 @@ class Model
         }
 
         $query['associated'] = $this->associatedConfig($query);
+   
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
-                    $fields = $config['fields']; // create copy before overwrite
-                    $config = array_merge($config, $query['associated'][$alias]); /// fields
+                    $fields = empty($query['associated'][$alias]['fields']) ? $config['fields'] : $query['associated'][$alias]['fields'];
+                    $conditions = empty($query['associated'][$alias]['conditions']) ? $config['conditions'] : $query['associated'][$alias]['conditions'];
 
                     $query['joins'][] = [
                         'table' => $this->$alias->table,
                         'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
-                        'conditions' => $config['conditions'],
+                        'conditions' => $conditions,
                         'connection' => $this->connection,
                     ];
 
-                    /**
-                     * If the value is null add, but not an empty array
-                     */
-                    if ($config['fields'] === null) {
-                        $config['fields'] = empty($fields) ? $this->$alias->fields() : $fields;
+                    if (is_array($fields)) {
+                        $fields = $this->$alias->prepareFields($fields);
                     }
-
-                    if ($config['fields']) {
-                        // If it throw an error, then it can be confusing to know source, so turn to array
-                        $query['fields'] = array_merge((array) $query['fields'], (array) $config['fields']);
+                    // If the value is null add, but not an empty array
+                    if ($fields === null) {
+                        $fields = $this->$alias->fields();
                     }
+                    // If it throw an error, then it can be confusing to know source, so turn to array
+                    $query['fields'] = array_merge((array) $query['fields'], $fields);
                 }
             }
         }

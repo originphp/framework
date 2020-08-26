@@ -261,8 +261,8 @@ class Association
     /**
      * Saves the parents
      *
-     * @param Entity $data
-     * @param ArrayObject $options
+     * @param \Origin\Model\Entity $data
+     * @param \ArrayObject $options
      * @return boolean
      */
     public function saveBelongsTo(Entity $data, ArrayObject $options): bool
