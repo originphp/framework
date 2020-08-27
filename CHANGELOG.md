@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fixed issue with PHPUnit mock models not able to detect custom entity class
 - Fixed issues with default conditions sometimes not respected when fetching associated data
 - Fixed belongsTo/hasOne to work with fields without table alias (user guide previously insisted to use table alias anyway, but in other relationships it worked automatically)
 

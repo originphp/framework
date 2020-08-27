@@ -18,7 +18,6 @@ use Origin\Inflector\Inflector;
 
 class Marshaller
 {
-    use EntityLocatorTrait;
     /**
      * Undocumented variable
      *
@@ -105,7 +104,7 @@ class Marshaller
             $model = ModelRegistry::get($options['name']);
         }
 
-        $entityClass = $this->entityClass($model);
+        $entityClass = $model ? $model->entityClass() : Entity::class;
         $entity = new $entityClass([], $options);
 
         $properties = [];

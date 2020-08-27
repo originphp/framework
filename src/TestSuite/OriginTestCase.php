@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\TestSuite;
 
+use Origin\Model\Entity;
 use Origin\Core\Resolver;
 use Origin\Mailer\Mailer;
 use Origin\Core\HookTrait;
@@ -58,9 +59,17 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
             }
         }
 
-        list($plugin, $alias) = pluginSplit($alias);
-        $options += ['name' => $alias, 'alias' => $alias];
+        list($namespace, $modelName) = namespaceSplit($options['className']);
+        $entityClass = $namespace . '\Entity\\' . $modelName;
+        $entityClass = class_exists($entityClass) ? $entityClass : Entity::class;
 
+        list($plugin, $alias) = pluginSplit($alias);
+        $options += [
+            'name' => $alias,
+            'alias' => $alias,
+            'entityClass' => $entityClass
+        ];
+        
         $existingConfig = ModelRegistry::config($alias);
         if ($existingConfig) {
             $options += $existingConfig;

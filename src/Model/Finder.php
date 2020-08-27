@@ -22,7 +22,6 @@ use Origin\Inflector\Inflector;
  */
 class Finder
 {
-    use EntityLocatorTrait;
     protected $model = null;
 
     public function __construct(Model $model)
@@ -92,7 +91,7 @@ class Finder
         $belongsTo = $this->model->association('belongsTo');
         $hasOne = $this->model->association('hasOne');
        
-        $entityClass = $this->entityClass($this->model);
+        $entityClass = $this->model->entityClass();
 
         foreach ($results as $record) {
             $thisData = (isset($record[$alias]) ? $record[$alias] : []); // Work with group and no fields from db
@@ -124,7 +123,7 @@ class Finder
                         }
                     }
    
-                    $associatedEntityClass = $this->entityClass($this->model->$model);
+                    $associatedEntityClass = $this->model->$model->entityClass();
                     $entity->$associated = new $associatedEntityClass($data, ['name' => ucfirst($associated), 'exists' => true, 'markClean' => true]);
                 } else {
                     /**

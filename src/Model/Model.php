@@ -150,6 +150,11 @@ class Model
      */
     protected $marshaller = null;
 
+    /**
+     * @var string|null
+     */
+    protected $entityClass = null;
+
     public function __construct(array $config = [])
     {
         $config += [
@@ -157,24 +162,24 @@ class Model
             'alias' => $this->alias,
             'connection' => $this->connection,
             'table' => $this->table,
+            'entityClass' => null
         ];
      
+        list($namespace, $modelName) = namespaceSplit(get_class($this));
+
         extract($config);
 
-        if (is_null($name)) {
-            list($namespace, $name) = namespaceSplit(get_class($this));
-        }
-        $this->name = $name;
+        $this->name = $name ?? $modelName;
 
-        if (is_null($alias)) {
-            $alias = $this->name;
+        if (! $entityClass) {
+            $entityClass = $namespace . '\Entity\\' .  $this->name ;
+            $entityClass = class_exists($entityClass) ? $entityClass : Entity::class;
         }
-        $this->alias = $alias;
+        $this->entityClass = $entityClass;
+      
+        $this->alias = $alias ?? $this->name;
 
-        if (is_null($table)) {
-            $table = Inflector::tableName($this->name);
-        }
-        $this->table = $table;
+        $this->table = $table ?? Inflector::tableName($this->name);
 
         if ($this->primaryKey === null) {
             $this->primaryKey = 'id';
@@ -189,6 +194,16 @@ class Model
         
         $this->executeHook('initialize', [$config]);
         $this->initializeTraits($config);
+    }
+
+    /**
+     * Gets the Entity class for this Model
+     *
+     * @return string
+     */
+    public function entityClass(): string
+    {
+        return $this->entityClass;
     }
 
     /**
@@ -1642,7 +1657,7 @@ class Model
      */
     public function new(array $requestData = null, array $options = []): Entity
     {
-        $entityClass = $this->entityClass($this);
+        $entityClass = $this->entityClass();
 
         if ($requestData === null) {
             return new $entityClass([], ['name' => $this->alias]);
