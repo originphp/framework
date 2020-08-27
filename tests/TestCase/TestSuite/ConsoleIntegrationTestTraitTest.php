@@ -79,4 +79,10 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->exec('test say');
         $this->assertInstanceOf(Command::class, $this->command());
     }
+
+    public function testCommandUnkown()
+    {
+        $this->exec('this-does-not-exist');
+        $this->assertNull($this->command());
+    }
 }

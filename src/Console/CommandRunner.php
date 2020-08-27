@@ -153,7 +153,7 @@ class CommandRunner
      *
      * @return \Origin\Console\Command\Command
      */
-    public function command(): Command
+    public function command(): ?Command
     {
         return $this->command;
     }
