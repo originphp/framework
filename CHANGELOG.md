@@ -11,6 +11,7 @@
 
 ### Added
 
+- Added plugin syntax support for load config files
 - Added Model::create
 - Added Model::saveOrFail
 - Added associated condition overide when fetching related data

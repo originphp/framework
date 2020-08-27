@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Core;
 
+use Origin\Inflector\Inflector;
 use Origin\Core\Exception\Exception;
 use Origin\Core\Exception\FileNotFoundException;
 
@@ -41,28 +42,58 @@ class Config
     }
  
     /**
-     * Loads values from a PHP config file. app will load config into App.
+     * Loads values from a PHP config file. app will load config into App. This now
+     * merges config so plugins can provide default config, which can be overwritten
+     * in app config folder. To overide config from plugins, load must be called after
+     * the plugin has been loaded.
      *
-     * @param string $config e.g. app, cache, database, email, log
+     * Config::load('app');
+     * Config::load('MyPlugin.users');
+     *
+     * @param string $config name of config, accepts plugin syntax
      * @return void
      */
     public static function load(string $name): void
     {
-        $filename = CONFIG . '/' . $name . '.php';
+        list($plugin, $file) = pluginSplit($name);
+        
+        if ($plugin) {
+            $plugin = Inflector::underscored($plugin);
+            $filename = PLUGINS . "/{$plugin}/config/{$file}.php";
+        } else {
+            $filename = CONFIG . "/{$name}.php";
+        }
 
+        $array = static::readFile($filename);
+
+        $name = $plugin ? $file : $name;
+
+        // merge values
+        $configKey = ucfirst($name);
+        $values = static::read($configKey) ?? [];
+        if ($values) {
+            $array = array_merge($values, $array);
+        }
+        // set values
+        static::dot()->set($configKey, $array);
+    }
+
+    /**
+     * @param string $filename
+     * @return array
+     */
+    protected static function readFile(string $filename): array
+    {
         if (! is_file($filename)) {
             throw new FileNotFoundException(sprintf('%s could not be found.', $filename));
         }
 
         $array = include $filename;
-
-        if (! is_array($array)) {
-            throw new Exception(sprintf('Config file %s did not return an array', $filename));
+        if (is_array($array)) {
+            return $array;
         }
 
-        foreach ([ucfirst($name) => $array] as $key => $value) {
-            static::dot()->set($key, $value);
-        }
+        throw new Exception(sprintf('Config file %s did not return an array', $filename));
     }
 
     /**
