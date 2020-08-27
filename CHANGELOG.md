@@ -9,6 +9,8 @@
 
 ### Added
 
+- Added Model::create
+- Added Model::saveOrFail
 - Added associated condition overide when fetching related data
 - Added associated order overide when fetching related data (hasMany,hasAndBelongsToMany)
 - Added assertResponseRegExp to IntegrationTestTrait

@@ -28,13 +28,18 @@ use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;
 use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
+use Origin\Model\Exception\RecordSaveException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\RecordNotFoundException;
 
 class Model
 {
-    use InitializerTrait, ModelTrait, CounterCacheable, HookTrait, CallbackRegistrationTrait, EntityLocatorTrait;
+    use InitializerTrait;
+    use ModelTrait;
+    use CounterCacheable;
+    use HookTrait;
+    use CallbackRegistrationTrait;
     
     /**
      * The name for this model, this generated automatically.
@@ -771,6 +776,47 @@ class Model
         }
 
         return $associated;
+    }
+
+    /**
+     * Creates a record and persists to database, in the case an error (validation) occurs
+     * a RecordSaveException is thrown.
+     *
+     * @param array $data
+     * @param array $options options array that is passed to the save method
+     * @return \Origin\Model\Entity
+     * @throws \Origin\Model\Exception\RecordSaveException
+     */
+    public function create(array $data, array $options = []): Entity
+    {
+        $entity = $this->new($data);
+        if ($this->save($entity, $options) === false) {
+            throw new RecordSaveException($entity, 'create');
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Saves the record or throws an exception, this is ideal for using in silent or internal processes
+     * where data should always save unless a bug/change occurs elsewhere that stops this. Uses this in cases
+     * where you either don't check the the return value of save or if the normal save fails you check for false
+     * then throw an exception.
+     *
+     * @param \Origin\Model\Entity $entity
+     * @param array $options
+     *   - validate: set to false to skip validation
+     *   - callbacks: call the callbacks duing each stage. You can also put only before or after
+     *   - transaction: wether to save through a database transaction (default:true)
+     *   - associated: default true. boolean or an array of associated data to save as well
+     * @return void
+     * @throws \Origin\Model\Exception\RecordSaveException
+     */
+    public function saveOrFail(Entity $entity, array $options = []): void
+    {
+        if ($this->save($entity, $options) === false) {
+            throw new RecordSaveException($entity, 'save');
+        }
     }
 
     /**
