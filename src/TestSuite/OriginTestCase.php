@@ -67,7 +67,8 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
         $options += [
             'name' => $alias,
             'alias' => $alias,
-            'entityClass' => $entityClass
+            'entityClass' => $entityClass,
+            'connection' => 'test'
         ];
         
         $existingConfig = ModelRegistry::config($alias);
