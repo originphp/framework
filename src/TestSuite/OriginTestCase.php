@@ -48,7 +48,7 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
      * @param array  $methods methods to mock
      * @param array  $options (className,table,alias,datasource)
      *
-     * @return \Origin\Model\Model
+     * @return \Origin\Model\Model|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockForModel(string $alias, array $methods = [], array $options = [])
     {
