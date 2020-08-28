@@ -14,14 +14,15 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
-use Iterator;
 use Countable;
 use ArrayAccess;
+use ArrayIterator;
 use Origin\Xml\Xml;
 use JsonSerializable;
+use IteratorAggregate;
 use Origin\Inflector\Inflector;
 
-class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
+class Collection implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
 {
     /**
      * Items in collection
@@ -30,12 +31,6 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
      */
     protected $items;
 
-    /**
-     * Position in items
-     *
-     * @var integer
-     */
-    protected $position = 0;
     /**
      * Name of model
      *
@@ -172,40 +167,27 @@ class Collection implements ArrayAccess, Iterator, Countable, JsonSerializable
     {
         unset($this->items[$key]);
     }
-
-    public function rewind()
+ 
+    /**
+     * IteratorAggregate Interface
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
     {
-        $this->position = 0;
+        return new ArrayIterator($this->items);
     }
 
-    public function current()
-    {
-        return $this->items[$this->position];
-    }
-
-    public function key()
-    {
-        return $this->position;
-    }
-
-    public function next()
-    {
-        ++$this->position;
-    }
-
-    public function valid()
-    {
-        return isset($this->items[$this->position]);
-    }
-    
     /**
      * Gets the first item in the collection
      *
-     * @return \Origin\Model\Entity|null
+     * @return void
      */
     public function first()
     {
-        return $this->items[0] ?? null;
+        $item = reset($this->items);
+
+        return $item ? $item : null;
     }
 
     /**
