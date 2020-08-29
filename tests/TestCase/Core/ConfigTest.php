@@ -119,6 +119,13 @@ class ConfigTest extends OriginTestCase
         $this->assertEquals('foo', MockConfig::read('Sample-config.bar'));
     }
 
+    public function testLoadPlugin()
+    {
+        MockConfig::load('Widget.foo');
+
+        $this->assertEquals('value', MockConfig::read('Foo.key'));
+    }
+
     public function testLoadFileNotFound()
     {
         $this->expectException(FileNotFoundException::class);

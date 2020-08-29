@@ -122,8 +122,8 @@ class Finder
                             continue;
                         }
                     }
-   
-                    $associatedEntityClass = $this->model->$model->entityClass();
+                    // play nice with joins, virtual_fields and things that do not exist
+                    $associatedEntityClass = isset($this->model->$model) ? $this->model->$model->entityClass() : Entity::class;
                     $entity->$associated = new $associatedEntityClass($data, ['name' => ucfirst($associated), 'exists' => true, 'markClean' => true]);
                 } else {
                     /**

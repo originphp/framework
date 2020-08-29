@@ -19,17 +19,35 @@ use Origin\Model\Collection;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testArray()
+    public function testIteratorAggregate()
     {
-        $array = [
+        $collection = new Collection([
             new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
             new Entity(['title' => 'bar'], ['name' => 'Bookmark']),
-        ];
-        $collection = new Collection($array);
+        ]);
+
         foreach ($collection as $key => $value) {
             $this->assertInstanceOf(Entity::class, $value);
         }
+    }
+
+    public function testCountable()
+    {
+        $collection = new Collection([
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
+            new Entity(['title' => 'bar'], ['name' => 'Bookmark']),
+        ]);
+  
         $this->assertEquals(2, count($collection));
+    }
+
+    public function testArrayAccess()
+    {
+        $collection = new Collection([
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
+            new Entity(['title' => 'bar'], ['name' => 'Bookmark']),
+        ]);
+  
         $this->assertInstanceOf(Entity::class, $collection[0]);
         $this->assertInstanceOf(Entity::class, $collection[1]);
         $collection['key'] = 'value';
@@ -38,6 +56,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         unset($collection['key']);
         $collection[] = ['offsetget'];
     }
+
     public function testDebugInfo()
     {
         $array = [
@@ -47,6 +66,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $data = print_r($collection, true);
         $this->assertStringContainsString('[0] => Origin\Model\Entity Object', $data);
     }
+    
     public function testToJson()
     {
         $array = [
@@ -56,6 +76,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('[{"title":"foo"}]', $collection->toJson());
     }
+
     public function testToXml()
     {
         $array = [

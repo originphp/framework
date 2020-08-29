@@ -572,7 +572,7 @@ trait IntegrationTestTrait
     */
     public function assertResponseNotRegExp(string $pattern): void
     {
-        $this->assertDoesNotMatchRegularExpression()($pattern, $this->response()->body());
+        $this->assertDoesNotMatchRegularExpression($pattern, $this->response()->body());
     }
 
     /**

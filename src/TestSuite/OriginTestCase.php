@@ -46,7 +46,11 @@ abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
      *
      * @param string $alias   Name of model - Bookmark, MyPlugin.Contact
      * @param array  $methods methods to mock
-     * @param array  $options (className,table,alias,datasource)
+     * @param array  $options The following options keys are supported
+     *  - name: the name of the model
+     *  - alias: the alias of the model
+     *  - entityClass: the class of the entity to be used, defaults to \Origin\Model\Entity
+     *  - connection: the database connection to use, default test.
      *
      * @return \Origin\Model\Model|\PHPUnit\Framework\MockObject\MockObject
      */

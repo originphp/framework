@@ -15,6 +15,7 @@
 namespace Origin\Test\TestSuite;
 
 use Origin\Model\Model;
+use Origin\Model\Entity;
 use Origin\Model\ModelRegistry;
 use Origin\TestSuite\OriginTestCase;
 use Origin\Model\Exception\MissingModelException;
@@ -25,6 +26,10 @@ class User extends Model
     {
         return true;
     }
+}
+
+class UserEntity extends Entity
+{
 }
 
 class LemonPie
@@ -100,12 +105,29 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('userz', $mock->table());
     }
 
+    public function testTestGetMockModelOptions()
+    {
+        $OriginTestCase = new AnotherMockOriginTestCase();
+        $mock = $OriginTestCase->getMockForModel('User', ['true'], [
+            'name' => 'ThisIsUser',
+            'alias' => 'SomeUser',
+            'entityClass' => UserEntity::class,
+            'className' => User::class
+        ]);
+        $this->assertEquals('ThisIsUser', $mock->name());
+        $this->assertEquals('SomeUser', $mock->alias());
+        $this->assertEquals(UserEntity::class, $mock->entityClass());
+        $this->assertTrue(method_exists($mock, 'find'));
+
+        // test that default connection is test, its hacky, but did not want to polu
+        $this->assertEquals('test', $mock->connection()->config()['connection']);
+    }
+
     public function testUnkownClass()
     {
         $this->expectException(MissingModelException::class);
 
-        $OriginTestCase = new AnotherMockOriginTestCase();
-        $mock = $OriginTestCase->getMockForModel('Foo');
+        (new AnotherMockOriginTestCase())->getMockForModel('Foo');
     }
     public function testCallbacks()
     {
@@ -123,8 +145,7 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
 
     public function testDeprecation()
     {
-        $OriginTestCase = new AnotherMockOriginTestCase();
-        $OriginTestCase->deprecated(function () {
+        (new AnotherMockOriginTestCase())->deprecated(function () {
             deprecationWarning('foo is deprecated use bar instead.');
             $this->assertTrue(true);
         });
@@ -132,13 +153,11 @@ class OriginTestCaseTest extends \PHPUnit\Framework\TestCase
 
     public function testAssertStringContains()
     {
-        $OriginTestCase = new AnotherMockOriginTestCase();
-        $OriginTestCase->assertStringContains('fox', 'A quick brown fox');
+        (new AnotherMockOriginTestCase())->assertStringContains('fox', 'A quick brown fox');
     }
     public function testAssertStringNotContains()
     {
-        $OriginTestCase = new AnotherMockOriginTestCase();
-        $OriginTestCase->assertStringNotContains('foo', 'A quick brown fox');
+        (new AnotherMockOriginTestCase())->assertStringNotContains('foo', 'A quick brown fox');
     }
 }
 /**

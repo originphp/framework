@@ -32,8 +32,9 @@ use Origin\Model\Model as BaseModel;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Model\Exception\DatasourceException;
-use Origin\Model\Exception\MissingModelException;
+use Origin\Model\Exception\RecordSaveException;
 
+use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\RecordNotFoundException;
 
@@ -1004,7 +1005,6 @@ class ModelTest extends OriginTestCase
         ];
 
         $result = $this->Article->find('first', $conditions);
-
         $this->assertEquals('Author #2', $result->author->name);
     }
 
@@ -2212,5 +2212,32 @@ class ModelTest extends OriginTestCase
         $stub->expects($this->never())->method('begin');
         $stub->expects($this->never())->method('rollback');
         $this->assertFalse($stub->save($article, ['transaction' => false]));
+    }
+
+    public function testCreate()
+    {
+        $this->assertInstanceOf(
+            Entity::class, $this->Article->create(['title' => 'foo'])
+        );
+    }
+
+    public function testCreateFail()
+    {
+        $this->expectException(RecordSaveException::class);
+        $this->Article->create([]);
+    }
+
+    public function testSaveOrFail()
+    {
+        $article = $this->Article->find('first');
+        $article->title = 'foo';
+        $this->assertNull($this->Article->saveOrFail($article));
+    }
+
+    public function testSaveOrFailFail()
+    {
+        $article = $this->Article->find('first');
+        $this->expectException(RecordSaveException::class);
+        $this->Article->saveOrFail($article);
     }
 }

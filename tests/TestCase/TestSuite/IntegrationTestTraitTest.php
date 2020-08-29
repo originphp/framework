@@ -252,16 +252,30 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertResponseForbidden();
     }
 
-    public function testAssertResponseContains()
+    public function testAssertResponseRegExp()
     {
         $this->get('/posts/index');
-        $this->assertResponseContains('Posts Home Page');
+        $this->assertResponseRegExp('/Posts Home Page/');
     }
+
+    public function testAssertResponseNotRegExp()
+    {
+        $this->get('/posts/index');
+        $this->assertResponseNotRegExp('/Contacts Home Page/');
+    }
+
     public function testAssertResponseNotContains()
     {
         $this->get('/posts/index');
         $this->assertResponseNotContains('Contacts Home Page');
     }
+
+    public function testAssertResponseContains()
+    {
+        $this->get('/posts/index');
+        $this->assertResponseContains('Posts Home Page');
+    }
+
     public function testAssertResponseEquals()
     {
         $this->get('/posts/list');

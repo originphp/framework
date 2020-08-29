@@ -127,6 +127,16 @@ abstract class Connection
     }
 
     /**
+     * Returns the connection configuration
+     *
+     * @return array
+     */
+    public function config(): array
+    {
+        return $this->config;
+    }
+
+    /**
      * Creates and handles a DB transaction with the option to disable foreign key constraints.
      *
      * @example
