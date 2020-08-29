@@ -62,7 +62,13 @@ class Router
      * Creates a new route.
      *
      * @param string $route  '/contacts/view'
-     * @param array  $params array(controller,action,arguments);
+     * @param array  $params The following options keys supported
+     *  - controller: name of the controller to route to e.g. Articles
+     *  - action: name of the action to call in the controller e.g. indesx
+     *  - args: arguments to be passed
+     *  Conditions:
+     *  - method: filter condition for request method e.g. post
+     *  - type: filter condition for request type e.g. json
      */
     public static function add(string $route, array $params = [])
     {
@@ -98,7 +104,10 @@ class Router
 
         $params = array_merge($defaults, $params);
         $params['pattern'] = "/^{$pattern}$/i";
-        self::$routes[] = $params;
+
+        $path = $params['plugin'] ?? $params['path'] ?? '/';
+     
+        self::$routes[$path][] = $params;
     }
 
     /**
@@ -138,10 +147,35 @@ class Router
             $url = substr($url, 0, -$length);
         }
  
-        foreach (self::$routes as $routedParams) {
-            if (preg_match($routedParams['pattern'], $url, $matches)) {
-                if (empty($routedParams['method']) || ($routedParams['method'] && strtoupper($routedParams['method']) === env('REQUEST_METHOD'))) {
+        /**
+         * Get paths sorted by longest path first.
+         * This has been introduced so that default routes don't clash with
+         * additional routes when bootstraping (future version)
+         */
+        $paths = array_keys(self::$routes);
+        rsort($paths);
+
+        $request = static::request();
+
+        if ($request) {
+            $requestMethod = static::request()->method();
+            $requestType = static::request()->type();
+        }
+   
+        foreach ($paths as $path) {
+            foreach (self::$routes[$path] as $routedParams) {
+                if (preg_match($routedParams['pattern'], $url, $matches)) {
+                    if ($request) {
+                        if (! empty($routedParams['method']) && strtoupper($routedParams['method']) !== $requestMethod) {
+                            continue;
+                        }
+                        if (! empty($routedParams['type']) && $routedParams['type'] !== $requestType) {
+                            continue;
+                        }
+                    }
+                 
                     unset($routedParams['method'],$routedParams['pattern']);
+
                     $params = array_merge($template, $routedParams);
                     foreach ($matches as $key => $value) {
                         if (is_string($key)) {
@@ -238,13 +272,13 @@ class Router
                 $arguments[] = $value;
                 continue;
             }
-            $arguments[] = $key.':'.urlencode($value);
+            $arguments[] = $key . ':' . urlencode($value);
         }
         if ($arguments) {
-            $output .= '/'.implode('/', $arguments);
+            $output .= '/' . implode('/', $arguments);
         }
 
-        return $output.$queryString;
+        return $output . $queryString;
     }
 
     /**
