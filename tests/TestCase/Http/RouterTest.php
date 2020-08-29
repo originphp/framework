@@ -253,14 +253,14 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testPrefix()
     {
-        MockRouter::add('/admin/:controller/:action', ['prefix' => 'Admin']);
+        MockRouter::add('/admin/:controller/:action', ['prefix' => 'admin']);
      
         MockRouter::request(new Request('/admin/users/edit'));
         
         $route = MockRouter::parse('/admin/users/edit');
 
         $this->assertEquals('Users', $route['controller']);
-        $this->assertEquals('Admin', $route['prefix']);
+        $this->assertEquals('admin', $route['prefix']);
        
         // check plugin is added to the URL, this is used by redirect & html::link
         $this->assertEquals('/admin/users/view', MockRouter::url(['action' => 'view']));

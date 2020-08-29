@@ -209,10 +209,8 @@ class Router
         }
         if ($url['plugin']) {
             $output .= '/' . Inflector::underscored($url['plugin']);
-        }
-
-        if (! empty($url['prefix'])) {
-            $output .= '/' . Inflector::underscored($url['prefix']);
+        } elseif (! empty($url['prefix'])) {
+            $output .= '/' . $url['prefix'];
         }
 
         unset($url['plugin'],$url['prefix']);
