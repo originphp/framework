@@ -273,9 +273,9 @@ trait ConsoleIntegrationTestTrait
     /**
      * Returns the Command Object.
      *
-     * @return \Origin\Console\Command\Command
+     * @return \Origin\Console\Command\Command|null
      */
-    public function command(): Command
+    public function command(): ?Command
     {
         return $this->command;
     }

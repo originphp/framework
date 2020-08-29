@@ -151,7 +151,7 @@ class CommandRunner
     /**
      * Returns the Command object that was created
      *
-     * @return \Origin\Console\Command\Command
+     * @return \Origin\Console\Command\Command|null
      */
     public function command(): ?Command
     {
