@@ -301,7 +301,7 @@ class View
 
         $prefix = $this->request->params('prefix');
         if ($prefix) {
-            $viewPath .= DS . $prefix;
+            $viewPath .= DS . Inflector::studlyCaps($prefix);
         }
        
         if ($withControllerName) {
