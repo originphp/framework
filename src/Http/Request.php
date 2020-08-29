@@ -148,15 +148,14 @@ class Request
             $url = substr($url, 1);
         }
 
-        $this->params = Router::parse($url);
-
         $this->processEnvironment($options['server']);
         $this->processGet($url);
         $this->processPost($options['post']);
         $this->processFiles($options['files']);
   
-        $this->detectRequestType();
         Router::request($this);
+        $this->params = Router::parse($url);
+        $this->detectRequestType();
     }
 
     /**
@@ -339,9 +338,8 @@ class Request
     /**
      * This detects the type for the request.
      *
-     * 1. If the route itself says it must be in a type, then use that first.
-     * 2. If the client requests using an extension then it is assumed that is what is to be delivered.
-     * 3. If the accept header is set as such
+     * 1. If the client requests using an extension then it is assumed that is what is to be delivered.
+     * 2. If the accept header is set as such
      *
      * This is all only relevant for autorendering.
      *
@@ -350,10 +348,9 @@ class Request
     protected function detectRequestType(): ?string
     {
         $type = 'html';
-        if (in_array($this->params('type'), ['xml', 'json'])) {
-            $type = $this->params('type');
-        }
+    
         $extension = $this->params('ext');
+
         if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
             $type = $extension;
         } else {
@@ -366,7 +363,7 @@ class Request
                 }
             }
         }
-
+       
         return $this->type($type);
     }
 

@@ -271,11 +271,6 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
     public function testType()
     {
-        $request = new MockRequest();
-        $request->params('type', 'json');
-        $request->callMethod('detectRequestType');
-        $this->assertEquals('json', $request->type());
-
         // Test Accepts
         $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/json']]);
         $this->assertEquals('json', $request->type());
