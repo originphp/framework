@@ -4,11 +4,12 @@
 
 ### Fixed
 
-- Fixed fatal error when PHP Session ID is invalid
+- Fixed fatal error when PHP Session ID has invalid format caused by change to Session::destroy in [3.3.0]
 - Fixed mock model to set default connection to test
 - Fixed issue with PHPUnit mock models not able to detect custom entity class
 - Fixed issues with default conditions sometimes not respected when fetching associated data
 - Fixed belongsTo/hasOne to work with fields without table alias (user guide previously insisted to use table alias anyway, but in other relationships it worked automatically)
+
 
 ### Added
 
@@ -22,6 +23,7 @@
 
 ### Changed
 
+- Changed Router param type, this was setting the request type instead of filtering
 - Changed Model\Collection to use `IteratorAggregate`
 
 ## [3.4.1] - 2020-08-24
