@@ -19,6 +19,10 @@
 - Added assertResponseRegExp to IntegrationTestTrait
 - Added assertResponseNotRegExp to IntegrationTestTrait
 
+### Changed
+
+- Changed Model\Collection to use `IteratorAggregate`
+
 ## [3.4.1] - 2020-08-24
 
 ### Fixed
