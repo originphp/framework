@@ -146,6 +146,7 @@ class Session
             $id = $_COOKIE[$name];
         }
         if ($id && ! preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
+            unset($_COOKIE[session_name()]); // delete invalid cookie and prevent recursive loop
             $this->destroy();
 
             return null;

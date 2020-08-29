@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fixed fatal error when PHP Session ID is invalid
 - Fixed mock model to set default connection to test
 - Fixed issue with PHPUnit mock models not able to detect custom entity class
 - Fixed issues with default conditions sometimes not respected when fetching associated data
