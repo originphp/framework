@@ -159,7 +159,7 @@ class Router
 
         if ($request) {
             $requestMethod = static::request()->method();
-            $requestType = static::request()->type();
+            $requestType = static::request()->contentType();
         }
    
         foreach ($paths as $path) {
@@ -170,7 +170,10 @@ class Router
                             continue;
                         }
                         if (! empty($routedParams['type']) && $routedParams['type'] !== $requestType) {
-                            continue;
+                            // handle application/json or json
+                            if ($routedParams['type'] !== $requestType || strpos($requestType, '/', $routedParams['type']) === false) {
+                                continue;
+                            }
                         }
                     }
                  
@@ -237,6 +240,7 @@ class Router
         $url = array_merge($params, $url);
 
         $output = '';
+        $extension = null;
 
         if (static::$request) {
             $params = static::$request->params();
@@ -257,14 +261,18 @@ class Router
 
         $queryString = '';
         if (isset($url['?']) && is_array($url['?'])) {
-            $queryString = '?'.http_build_query($url['?']);
-            unset($url['?']);
+            $queryString = '?' . http_build_query($url['?']);
         }
 
         if (isset($url['#']) && is_string($url['#'])) {
-            $queryString .= '#'.$url['#'];
-            unset($url['#']);
+            $queryString .= '#' . $url['#'];
         }
+
+        if (! empty($url['ext'])) {
+            $extension = '.' . $url['ext'];
+        }
+
+        unset($url['ext'],$url['?'],$url['#']);
 
         $arguments = [];
         foreach ($url as $key => $value) {
@@ -278,7 +286,7 @@ class Router
             $output .= '/' . implode('/', $arguments);
         }
 
-        return $output . $queryString;
+        return $output . $extension . $queryString;
     }
 
     /**
