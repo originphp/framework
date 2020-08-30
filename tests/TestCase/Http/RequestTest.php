@@ -283,14 +283,5 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
         $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/xml']]);
         $this->assertEquals('xml', $request->type());
-
-        $request = new MockRequest('/', ['server' => ['CONTENT_TYPE' => 'application/json']]);
-        $this->assertEquals('json', $request->type());
-
-        $request = new MockRequest('/', ['server' => ['CONTENT_TYPE' => 'application/xml']]);
-        $this->assertEquals('xml', $request->type());
-
-        $request = new MockRequest('/', ['server' => ['CONTENT_TYPE' => 'text/xml']]);
-        $this->assertEquals('xml', $request->type());
     }
 }

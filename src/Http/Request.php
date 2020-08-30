@@ -160,7 +160,7 @@ class Request
          * Detect the request type that it will be rendered in.
          * @internal I think in future maybe this should not be here but in the controller
          */
-        $this->detectRequestedFormat();
+        $this->detectRequestedOutput();
     }
 
     /**
@@ -327,8 +327,8 @@ class Request
     }
 
     /**
-     * Sets and gets the request type (format) that will be rendered, if you want
-     * to know what was requested see contentType
+     * Sets and gets the request type (format) that will be rendered. If you want to know what
+     * the request body format is then use contentType
      *
      * @deprecated this will be renamed to renderType or something similar to prevent confusion
      *
@@ -344,24 +344,16 @@ class Request
     }
 
     /**
-     * Detects the how the request should be rendered
+     * Detects the requested output format
      *
-     * 1. if the content-type header is set, e.g. Content-Type: application/json
-     * 2. if in the routing params an extension has been set
-     * 3. if the first available accept type is json or xml
-     * 4. if no matches are found just return HTML
+     * 1. If in the routing params an extension has been set
+     * 2. if the first available accept type is json or xml
+     * 3. if no matches are found just return HTML
      *
      * @return void
      */
-    protected function detectRequestedFormat(): void
+    protected function detectRequestedOutput(): void
     {
-        $contentType = $this->contentType();
-        if ($contentType) {
-            $this->type($this->getType($contentType));
-
-            return;
-        }
-
         $extension = $this->params('ext');
         if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
             $this->type($extension);
