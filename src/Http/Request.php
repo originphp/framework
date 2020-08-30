@@ -578,6 +578,16 @@ class Request
     }
 
     /**
+     * This is the content type that is used in this request
+     *
+     * @return string
+     */
+    public function contentType(): ?string
+    {
+        return $this->env('CONTENT_TYPE');
+    }
+
+    /**
      * Parse accept headers into arrays
      * example: en-GB,en;q=0.9,es;q=0.8 becomes [en-GB,en,es]
      *
