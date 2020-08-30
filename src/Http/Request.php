@@ -155,7 +155,12 @@ class Request
   
         Router::request($this);
         $this->params = Router::parse($url);
-        $this->detectRequestType();
+
+        /**
+         * Detect the request type that it will be rendered in.
+         * @internal I think in future maybe this should not be here but in the controller
+         */
+        $this->detectRequestedFormat();
     }
 
     /**
@@ -322,8 +327,11 @@ class Request
     }
 
     /**
-     * Sets and gets the request type (format), ie. what will be RENDERED e.g html, json or xml.
-     * This is somewhat different to contentType.
+     * Sets and gets the request type (format) that will be rendered, if you want
+     * to know what was requested see contentType
+     *
+     * @deprecated this will be renamed to renderType or something similar to prevent confusion
+     *
      * @param string $type
      * @return string|void
      */
@@ -336,35 +344,57 @@ class Request
     }
 
     /**
-     * This detects the type for the request.
+     * Detects the how the request should be rendered
      *
-     * 1. If the client requests using an extension then it is assumed that is what is to be delivered.
-     * 2. If the accept header is set as such
+     * 1. if the content-type header is set, e.g. Content-Type: application/json
+     * 2. if in the routing params an extension has been set
+     * 3. if the first available accept type is json or xml
+     * 4. if no matches are found just return HTML
      *
-     * This is all only relevant for autorendering.
-     *
-     * @return string|null
+     * @return void
      */
-    protected function detectRequestType(): ?string
+    protected function detectRequestedFormat(): void
     {
-        $type = 'html';
-    
-        $extension = $this->params('ext');
+        $contentType = $this->contentType();
+        if ($contentType) {
+            $this->type($this->getType($contentType));
 
+            return;
+        }
+
+        $extension = $this->params('ext');
         if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
-            $type = $extension;
-        } else {
-            $accepts = $this->accepts();
-            if ($accepts) {
-                if ($accepts[0] === 'application/json') {
-                    $type = 'json';
-                } elseif (in_array($accepts[0], ['application/xml', 'text/xml'])) {
-                    $type = 'xml';
-                }
-            }
+            $this->type($extension);
+
+            return;
         }
        
-        return $this->type($type);
+        $accepts = $this->accepts();
+        if ($accepts) {
+            $this->type($this->getType($accepts[0]));
+
+            return;
+        }
+       
+        $this->type('html');
+    }
+
+    /**
+     * Checks if
+     *
+     * @param string $header
+     * @return string
+     */
+    private function getType(string $header): string
+    {
+        if ($header === 'application/json') {
+            return 'json';
+        }
+        if (in_array($header, ['application/xml', 'text/xml'])) {
+            return 'xml';
+        }
+
+        return 'html';
     }
 
     /**
