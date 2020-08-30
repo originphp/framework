@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.5.0] - 2020-08-20
+## [3.5.0] - 2020-08-30
 
 ### Fixed
 
@@ -13,6 +13,7 @@
 
 ### Added
 
+- Added request::contentType
 - Added plugin syntax support for load config files
 - Added Model::create
 - Added Model::saveOrFail
