@@ -29,23 +29,24 @@ use Origin\Inflector\Inflector;
 class Router
 {
     /**
-     * Holds the routes.
-     *
      * @var array
      */
     protected static $routes = [];
 
+    /**
+     * @var \Origin\Http\Request
+     */
     protected static $request = null;
 
     /**
-     * Holds the default extensions to parse. e.g json, xml
+     * Default extensions to parse. e.g json, xml
      *
      * @var array
      */
     protected static $extensions = ['json','xml'];
 
     /**
-     * Sets the extensions to parse
+     * Sets and gets the extensions to parse
      *
      * @param array $extensions
      * @return array|void
@@ -59,7 +60,7 @@ class Router
     }
 
     /**
-     * Creates a new route.
+     * Adds a new route
      *
      * @param string $route  '/contacts/view'
      * @param array  $params The following options keys supported
@@ -69,8 +70,9 @@ class Router
      *  Conditions:
      *  - method: filter condition for request method e.g. post
      *  - type: filter condition for request type e.g. json
+     * @return void
      */
-    public static function add(string $route, array $params = [])
+    public static function add(string $route, array $params = []): void
     {
         $defaults = [
             'controller' => null,
@@ -113,11 +115,10 @@ class Router
     /**
      * Parses a URL and returns the routing params.
      *
-     * @param string $url string
-     *
-     * @return array $params
+     * @param string $url
+     * @return array|null
      */
-    public static function parse(string $url)
+    public static function parse(string $url): ? array
     {
         if (strlen($url) && $url[0] === '/') {
             $url = substr($url, 1);
@@ -147,6 +148,48 @@ class Router
             $url = substr($url, 0, -$length);
         }
  
+        $matched = static::matchRoutes($url);
+        if (! $matched) {
+            return null;
+        }
+
+        $params = array_merge($template, $matched['routedParams']);
+        foreach ($matched['matches'] as $key => $value) {
+            if (is_string($key)) {
+                $params[$key] = $value;
+            }
+        }
+
+        // gracefully handle invalid routes
+        $params['controller'] = $params['controller'] ? Inflector::studlyCaps($params['controller']) : null;
+
+        $named = [];
+        // Parse Greedy results *
+        if (! empty($params['greedy'])) {
+            foreach (explode('/', $params['greedy']) as $paramater) {
+                if (strpos($paramater, ':') !== false) {
+                    list($key, $value) = explode(':', $paramater);
+                    $named[$key] = urldecode($value);
+                    continue;
+                }
+                $params['args'][] = $paramater;
+            }
+        }
+        $params['named'] = $named;
+
+        unset($params['greedy']);
+      
+        return $params;
+    }
+
+    /**
+     * Matches a URL against a route
+     *
+     * @param string $url
+     * @return array
+     */
+    private static function matchRoutes(string $url): array
+    {
         /**
          * Get paths sorted by longest path first.
          * This has been introduced so that default routes don't clash with
@@ -161,7 +204,7 @@ class Router
             $requestMethod = static::request()->method();
             $requestType = static::request()->contentType();
         }
-   
+
         foreach ($paths as $path) {
             foreach (self::$routes[$path] as $routedParams) {
                 if (preg_match($routedParams['pattern'], $url, $matches)) {
@@ -176,42 +219,13 @@ class Router
                             }
                         }
                     }
-                 
+
                     unset($routedParams['method'],$routedParams['pattern']);
 
-                    $params = array_merge($template, $routedParams);
-                    foreach ($matches as $key => $value) {
-                        if (is_string($key)) {
-                            $params[$key] = $value;
-                        }
-                    }
-                    // gracefully handle invalid routes
-                    $params['controller'] = $params['controller'] ? Inflector::studlyCaps($params['controller']): null;
-                    break;
+                    return ['routedParams' => $routedParams,'matches' => $matches];
                 }
             }
         }
-
-        // No params no route
-        if (! empty($params)) {
-            $named = [];
-            // Parse Greedy results *
-            if (! empty($params['greedy'])) {
-                $parts = explode('/', $params['greedy']);
-                foreach ($parts as $paramater) {
-                    if (strpos($paramater, ':') != false) {
-                        list($key, $value) = explode(':', $paramater);
-                        $named[$key] = urldecode($value);
-                    } else {
-                        $params['args'][] = $paramater;
-                    }
-                }
-            }
-            $params['named'] = $named;
-            unset($params['greedy']);
-        }
-
-        return $params;
     }
 
     /**
@@ -220,7 +234,7 @@ class Router
      * @param array|string $url
      * @return string url
      */
-    public static function url($url)
+    public static function url($url): string
     {
         if (is_string($url)) {
             return $url; // nothing to do
@@ -292,7 +306,7 @@ class Router
     /**
      * Sets or gets the request objects
      *
-     * @param Request $request
+     * @param \Origin\Http\Request $request
      * @return \Origin\Http\Request|null
      */
     public static function request(Request $request = null)
@@ -309,7 +323,7 @@ class Router
      *
      * @return array
      */
-    public static function routes()
+    public static function routes(): array
     {
         return self::$routes;
     }
