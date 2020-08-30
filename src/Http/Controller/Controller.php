@@ -38,7 +38,11 @@ use Origin\Http\Controller\Exception\PrivateMethodException;
  */
 class Controller
 {
-    use ModelTrait, InitializerTrait, HookTrait, CallbackRegistrationTrait;
+    use ModelTrait;
+    use InitializerTrait;
+    use HookTrait;
+    use CallbackRegistrationTrait;
+    
     /**
      * Controller name.
      *
@@ -457,7 +461,7 @@ class Controller
 
             return;
         }
-
+        
         if ($this->autoRender && $this->serialize && $this->request->type() === 'json') {
             $this->renderJson(null, $options['status']);
 
