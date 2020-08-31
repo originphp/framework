@@ -17,6 +17,23 @@ namespace Origin\Test\Http;
 use Origin\Http\Response;
 use Origin\Http\Exception\NotFoundException;
 
+class MockResponse extends Response
+{
+    protected $sentHeaders = '';
+    protected function sendHeader(string $name, $value = null): void
+    {
+        $header = $name;
+        if ($value) {
+            $header = "{$name}: {$value}";
+        }
+        $this->sentHeaders .= $header . PHP_EOL;
+    }
+    public function sentHeaders(): string
+    {
+        return $this->sentHeaders;
+    }
+}
+
 class ResponseTest extends \PHPUnit\Framework\TestCase
 {
     public function testBody()
@@ -96,5 +113,27 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(NotFoundException::class);
         $response->file('/var/www/---does-not-exist.md', ['download' => true]);
+    }
+
+    public function testExpires()
+    {
+        $response = new Response();
+        $response->expires('2020-08-31 19:30:00');
+        $this->assertEquals('Mon, 31 Aug 2020 19:30:00 GMT', $response->headers('Expires'));
+    }
+
+    public function testDefaultCacheControlHeader()
+    {
+        $response = new MockResponse();
+        $response->send();
+        $this->assertStringContainsString('Cache-Control: no-cache, private', $response->sentHeaders());
+    }
+
+    public function testDefaultCacheControlHeaderWithExpires()
+    {
+        $response = new MockResponse();
+        $response->expires('2020-08-31 19:30:00');
+        $response->send();
+        $this->assertStringContainsString('Cache-Control: private, must-revalidate', $response->sentHeaders());
     }
 }

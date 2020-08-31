@@ -86,4 +86,13 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<records><record><title>foo</title></record></records>\n", $collection->toXml());
     }
+
+    public function testIsEmpty()
+    {
+        $collection = new Collection([
+            new Entity(['title' => 'foo'], ['name' => 'Bookmark']),
+        ]);
+        $this->assertFalse($collection->isEmpty());
+        $this->assertTrue((new Collection([]))->isEmpty());
+    }
 }

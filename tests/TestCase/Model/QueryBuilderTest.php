@@ -147,6 +147,20 @@ class QueryBuilderTest extends \PHPUnit\Framework\TestCase
             ->where(['id IN' => 'SELECT STATEMENT']);
         $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IN ( SELECT STATEMENT )';
         $this->assertEquals($expected, $builder->write());
+
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+            ->where(['id' => [1000]]);
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IN ( :u0 )';
+        $this->assertEquals($expected, $builder->write());
+
+        // empty array
+        $builder = new QueryBuilder('users', 'User');
+        $builder->select(['id','name','email'])
+            ->where(['id' => []]);
+                
+        $expected = 'SELECT User.id, User.name, User.email FROM `users` AS `User` WHERE User.id IS NULL';
+        $this->assertEquals($expected, $builder->write());
     }
 
     public function testConditionsOR()
