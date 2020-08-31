@@ -14,6 +14,8 @@
 declare(strict_types = 1);
 namespace Origin\Http;
 
+use DateTime;
+use DateTimeZone;
 use Origin\Http\Exception\NotFoundException;
 
 class Response
@@ -93,6 +95,16 @@ class Response
 
         $this->sendCookies();
         $this->header('Content-Type', $this->contentType);
+    
+        /**
+         * By default Cache-Control is set to private for all requests unless response is set to cached
+         */
+        if (! isset($this->headers['Cache-Control'])) {
+            $isCacheable = $this->headers('Expires') || $this->headers('Last-Modified') ;
+            $cacheControl = $isCacheable ? 'private, must-revalidate' : 'no-cache, private';
+            $this->header('Cache-Control', $cacheControl);
+        }
+       
         foreach ($this->headers as $name => $value) {
             $this->sendHeader($name, $value);
         }
@@ -146,13 +158,13 @@ class Response
      *
      *  $response->header('HTTP/1.0 404 Not Found');
      *  $response->header('Accept-Language', 'en-us,en;q=0.5');
-     *  $response->header(['Accept-Encoding'=>'gzip,deflate']);
+     *  $response->header(['Accept-Encoding' => 'gzip,deflate']);
      *
      * @param string|array $header []
-     * @param mixed $value
+     * @param string $value
      * @return array
      */
-    public function header($header, $value = null): array
+    public function header($header, string $value = null): array
     {
         if (is_string($header)) {
             if ($value === null && strpos($header, ':') !== false) {

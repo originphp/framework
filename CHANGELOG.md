@@ -1,5 +1,20 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+- Added expires to Response
+- Added isEmpty to Model\Collection 
+
+### Fixed
+
+- Fixed error caused by empty array for IN conditions
+
+### Changed
+
+- Changed default Cache-Control in Response to `no-cache, private`
+
 ## [3.5.0] - 2020-08-30
 
 ### Fixed
