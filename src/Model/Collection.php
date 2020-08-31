@@ -60,9 +60,19 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable, JsonSeria
     *
     * @return int
     */
-    public function count()
+    public function count(): int
     {
         return count($this->items);
+    }
+
+    /**
+     * Returns true if the Collection is empty
+     *
+     * @return boolean
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
     }
 
     /**
