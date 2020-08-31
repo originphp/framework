@@ -935,8 +935,6 @@ class QueryBuilder
     }
 
     /**
-     * Undocumented function
-     *
      * @param string $field
      * @param string $expression
      * @param mixed $value
@@ -944,8 +942,8 @@ class QueryBuilder
      */
     protected function expression(string $field, string $expression, $value): string
     {
-        // Handle Null Values
-        if ($value === null) {
+        // Handle Null | empty Values
+        if ($value === null || (is_array($value) && empty($value))) {
             // Handle Null Values
             if ($expression === '=') {
                 return "{$field} IS NULL";
@@ -959,7 +957,7 @@ class QueryBuilder
         }
 
         if ($expression === 'BETWEEN' || $expression === 'NOT BETWEEN') {
-            if (! is_array($value) or count($value) !== 2) {
+            if (! is_array($value) || count($value) !== 2) {
                 throw new QueryBuilderException('Bad paramaters');
             }
             $placeholder = $this->nextPlaceholder();
