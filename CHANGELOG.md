@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [3.6.0] - 2020-08-31
 
 ### Added
 
@@ -13,7 +13,7 @@
 
 ### Changed
 
-- Changed default Cache-Control in Response to `no-cache, private`
+- Changed default Cache-Control in Response to `no-cache, private`.
 
 ## [3.5.0] - 2020-08-30
 
