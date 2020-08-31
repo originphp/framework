@@ -344,6 +344,19 @@ class Response
     }
 
     /**
+     * Sets the Expires headers, you
+     *
+     * @param string $time
+     * @return void
+     */
+    public function expires(string $time = 'now'): void
+    {
+        $expires = date('Y-m-d H:i:s', strtotime($time));
+        $dateTime = ( new DateTime($expires))->setTimeZone(new DateTimeZone('UTC'));
+        $this->header('Expires', $dateTime->format('D, j M Y H:i:s') . ' GMT');
+    }
+
+    /**
      * Write the cookies
      *
      * @return void
