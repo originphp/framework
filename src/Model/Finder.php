@@ -155,20 +155,22 @@ class Finder
     {
         $belongsTo = $this->model->association('belongsTo');
 
+        // request as seperate condition if query includes associated
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) && isset($belongsTo[$model])) {
                 $foreignKey = $belongsTo[$model]['foreignKey'];
                 $property = lcfirst($model);
-
+                unset($belongsTo[$model]['conditions'][0]); // remove join condition
+                
                 // fields can be overwritten in associated, if not use defaults from belongsTo settings
                 $config['fields'] = empty($config['fields']) ? $belongsTo[$model]['fields'] : $config['fields'];
                 $conditions = empty($config['conditions']) ? $belongsTo[$model]['conditions'] : $config['conditions'];
-                unset($conditions[0]); // remove join condition
-
+            
                 foreach ($results as &$result) {
                     if (isset($result->$foreignKey)) {
                         $config['conditions'] = $conditions;
                         $config['conditions'][] = [$this->model->$model->primaryKey() => $result->$foreignKey];
+
                         $result->$property = $this->model->$model->find('first', $config);
                         $result->reset();
                     }
@@ -191,6 +193,7 @@ class Finder
     {
         $hasOne = $this->model->association('hasOne');
    
+        // request as seperate condition if query includes associated
         foreach ($query['associated'] as $model => $config) {
             if (isset($config['associated']) && isset($hasOne[$model])) {
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
@@ -204,7 +207,7 @@ class Finder
                     unset($conditions[0]); // remove join condition
                 }
 
-                $config['fields'] = empty($config['fields']) ? $hasOne[$model]['fields'] : $config['fields'];
+                $config['fields'] = $config['fields'] ?: $hasOne[$model]['fields'];
               
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) { // Author id
@@ -234,28 +237,28 @@ class Finder
     protected function loadAssociatedHasMany(array $query, array $results): array
     {
         $hasMany = $this->model->association('hasMany');
-        foreach ($hasMany as $alias => $config) {
-            if (isset($query['associated'][$alias])) {
-                // fields can be overwritten in associated, if not use defaults from hasMany settings
-                $overide = $query['associated'][$alias];
-                $config['fields'] = empty($overide['fields']) ? $hasMany[$alias]['fields'] : $overide['fields'];
-                $conditions = empty($overide['conditions']) ? $hasMany[$alias]['conditions'] : $overide['conditions'];
-                $config['order'] = empty($overide['order']) ?  $hasMany[$alias]['order'] : $overide['order'];
-                
-                $models = Inflector::plural(Inflector::camelCase($alias));
-                $tableAlias = Inflector::tableName($alias);
-           
-                foreach ($results as $index => &$result) {
+
+        foreach ($query['associated'] as $model => $config) {
+            if (isset($hasMany[$model])) {
+                $config['fields'] = empty($config['fields']) ? $hasMany[$model]['fields'] : $config['fields'];
+                $config['order'] = empty($config['order']) ? $hasMany[$model]['order'] : $config['order'];
+                $conditions = empty($config['conditions']) ? $hasMany[$model]['conditions'] : $config['conditions'];
+    
+                $models = Inflector::plural(Inflector::camelCase($model));
+                $tableAlias = Inflector::tableName($model);
+
+                foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) {
                         $config['conditions'] = $conditions ?? [];
-                        $config['conditions']["{$tableAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
-                      
-                        $result->$models = $this->model->$alias->find('all', $config);
+                        $config['conditions']["{$tableAlias}.{$hasMany[$model]['foreignKey']}"] = $result->{$this->model->primaryKey()};
+    
+                        $result->$models = $this->model->$model->find('all', $config);
                         $result->reset();
                     }
                 }
             }
         }
+  
         unset($hasMany);
 
         return $results;
@@ -270,38 +273,36 @@ class Finder
     protected function loadAssociatedHasAndBelongsToMany(array $query, array $results): array
     {
         $hasAndBelongsToMany = $this->model->association('hasAndBelongsToMany');
-        foreach ($hasAndBelongsToMany as $alias => $config) {
-            if (isset($query['associated'][$alias])) {
-                $overide = $query['associated'][$alias];
-                $config['fields'] = empty($overide['fields']) ? $hasAndBelongsToMany[$alias]['fields'] : $overide['fields'];
-                $conditions = empty($overide['conditions']) ? $hasAndBelongsToMany[$alias]['conditions'] : $overide['conditions'];
-                $config['order'] = empty($overide['order']) ? $hasAndBelongsToMany[$alias]['order'] : $overide['order'];
-                $models = Inflector::plural(Inflector::camelCase($alias));
 
-                // extract join condition e.g. articles_tags.tag_id = tags.id
-                if (! empty($overide['conditions'])) {
-                    array_unshift($conditions, $hasAndBelongsToMany[$alias]['conditions'][0]);
-                }
+        foreach ($query['associated'] as $model => $config) {
+            if (isset($hasAndBelongsToMany[$model])) {
+                $config['fields'] = empty($config['fields']) ? $hasAndBelongsToMany[$model]['fields'] : $config['fields'];
+                $config['order'] = empty($config['order']) ? $hasAndBelongsToMany[$model]['order'] : $config['order'];
+              
+                $models = Inflector::plural(Inflector::camelCase($model));
 
+                $joinConditions = empty($config['conditions']) ? $hasAndBelongsToMany[$model]['conditions'] : [$hasAndBelongsToMany[$model]['conditions'][0]];
+                
                 $config['joins'][0] = [
-                    'table' => $config['joinTable'],
-                    'alias' => Inflector::tableName($config['with']),
+                    'table' => $hasAndBelongsToMany[$model]['joinTable'],
+                    'alias' => Inflector::tableName($hasAndBelongsToMany[$model]['with']),
                     'type' => 'INNER',
-                    'conditions' => $conditions,
+                    'conditions' => $joinConditions
                 ];
-                $withAlias = Inflector::tableName($config['with']);
-                $config['conditions'] = [];
+                $withAlias = Inflector::tableName($hasAndBelongsToMany[$model]['with']);
                
+                $config['conditions'] = $config['conditions'] ?? [];
+
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) {
-                        $config['joins'][0]['conditions']["{$withAlias}.{$config['foreignKey']}"] = $result->{$this->model->primaryKey()};
+                        $config['conditions']["{$withAlias}.{$hasAndBelongsToMany[$model]['foreignKey']}"] = $result->{$this->model->primaryKey()};
+                        $result->$models = $this->model->$model->find('all', $config);
+                        $result->reset();
                     }
-    
-                    $result->$models = $this->model->$alias->find('all', $config);
-                    $result->reset();
                 }
             }
         }
+
         unset($hasAndBelongsToMany);
 
         return $results;

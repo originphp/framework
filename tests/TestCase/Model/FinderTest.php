@@ -415,7 +415,7 @@ class FinderTest extends OriginTestCase
     /**
      * @depends testFindHasAndBelongsToManyDefaultOrder
      */
-    public function testFindHasAndBelongsToManyAssocaitedOrder()
+    public function testFindHasAndBelongsToManyAssociatedOrder()
     {
         $this->Article->hasAndBelongsToMany('Tag', [
             'order' => 'id DESC'
@@ -448,7 +448,7 @@ class FinderTest extends OriginTestCase
     }
 
     /**
-    * @depends testFindHasAndBelongsToManyDefaultConditions
+    * @-depends testFindHasAndBelongsToManyDefaultConditions
     */
     public function testFindHasAndBelongsToManyAssociatedConditions()
     {
@@ -466,7 +466,7 @@ class FinderTest extends OriginTestCase
 
         $article = $this->Article->get(1000, [
             'associated' => [
-                'Tag' => ['conditions' => ['article_id' => 1000]],
+                'Tag' => ['conditions' => ['articles_tags.article_id' => 1000]],
             ]
         ]);
   
@@ -508,5 +508,62 @@ class FinderTest extends OriginTestCase
         $this->assertNotEmpty($article->tags[0]->title);
         $this->assertNotEmpty($article->tags[0]->created);
         $this->assertNull($article->tags[0]->modified);
+    }
+
+    public function testFindAssociatedNestedBelongsTo()
+    {
+        $this->Article->belongsTo('Author');
+        $this->Article->Author->hasMany('Article');
+
+        $article = $this->Article->get(1000, [
+            'associated' => [
+                'Author' => [
+                    'associated' => [
+                        'Article'
+                    ]]
+            ]
+        ]);
+
+        $this->assertNotEmpty($article->author);
+        $this->assertNotEmpty($article->author->articles);
+    }
+
+    public function testFindAssociatedNestedHasMany()
+    {
+        $this->Article->hasMany('Comment');
+        $this->Article->Comment->belongsTo('Article');
+
+        $article = $this->Article->get(1000, [
+            'associated' => [
+                'Comment' => [
+                    'associated' => [
+                        'Article'
+                    ]]
+            ]
+        ]);
+
+        $this->assertNotEmpty($article->comments);
+        $this->assertNotEmpty($article->comments[0]->article);
+    }
+
+    public function testFindAssociatedNestedHasOne()
+    {
+        $this->Author->hasOne('Address');
+        $this->Author->Address->belongsTo('Author');
+
+        $author = $this->Author->get(1000, [
+            'associated' => [
+                'Address' => [
+                    'associated' => 'Author'
+                ]
+            ]
+        ]);
+        $this->assertNotEmpty($author->address);
+        $this->assertNotEmpty($author->address->author);
+    }
+
+    public function testFindassociatedNestedHasAndBelongsToMany()
+    {
+        $this->markTestIncomplete('need some fixtures for this');
     }
 }

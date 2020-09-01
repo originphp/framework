@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Fixed
+
+- Fixed issue finding nested assocated data caused by [3.5.0] and added additional tests
+
 ## [3.6.0] - 2020-08-31
 
 ### Added
