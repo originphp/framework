@@ -19,6 +19,7 @@ use Origin\Inflector\Inflector;
 
 /**
  * This handles the model finds
+ *
  */
 class Finder
 {
@@ -147,6 +148,9 @@ class Finder
     /**
      * Recursively load associated belongsTo
      *
+     * @internal as hasOne and belongsTo are normally done via join this function is only run when requesting
+     * another level of data hence checking $config['associated'] is set.
+     *
      * @param array $query
      * @param array $results
      * @return array
@@ -160,17 +164,21 @@ class Finder
             if (isset($config['associated']) && isset($belongsTo[$model])) {
                 $foreignKey = $belongsTo[$model]['foreignKey'];
                 $property = lcfirst($model);
-                unset($belongsTo[$model]['conditions'][0]); // remove join condition
-                
+                $modelTableAlias = Inflector::tableName($model);
+                $primaryKey = $this->model->$model->primaryKey();
+
                 // fields can be overwritten in associated, if not use defaults from belongsTo settings
                 $config['fields'] = empty($config['fields']) ? $belongsTo[$model]['fields'] : $config['fields'];
+             
+                // remove join condition as it is not needed since its a seperate query
+                unset($belongsTo[$model]['conditions'][0]); // articles.author_id = authors.id
                 $conditions = empty($config['conditions']) ? $belongsTo[$model]['conditions'] : $config['conditions'];
-            
+                
                 foreach ($results as &$result) {
                     if (isset($result->$foreignKey)) {
                         $config['conditions'] = $conditions;
-                        $config['conditions'][] = [$this->model->$model->primaryKey() => $result->$foreignKey];
-
+                        $config['conditions']["{$modelTableAlias}.{$primaryKey}"] = $result->$foreignKey;
+                       
                         $result->$property = $this->model->$model->find('first', $config);
                         $result->reset();
                     }
@@ -184,6 +192,9 @@ class Finder
 
     /**
      * Recursively load associated hasOne
+     *
+     * @internal as hasOne and belongsTo are normally done via join this function is only run when requesting
+     * another level of data hence checking $config['associated'] is set.
      *
      * @param array $query
      * @param array $results
@@ -199,22 +210,17 @@ class Finder
                 $foreignKey = $hasOne[$model]['foreignKey']; // author_id
                 $property = lcfirst($model);
                 $modelTableAlias = Inflector::tableName($model);
+            
+                $config['fields'] = empty($config['fields']) ? $hasOne[$model]['fields'] : $config['fields'] ;
 
-                // fields can be overwritten in associated, if not use defaults from hasOne settings
-                $conditions = $config['conditions'] ?? [];
-                if (empty($conditions)) {
-                    $conditions = $hasOne[$model]['conditions'];
-                    unset($conditions[0]); // remove join condition
-                }
-
-                $config['fields'] = $config['fields'] ?: $hasOne[$model]['fields'];
+                // remove join condition as it is not needed since its a seperate query
+                unset($hasOne[$model]['conditions'][0]);
+                $conditions = empty($config['conditions']) ? $hasOne[$model]['conditions'] : $config['conditions'];
               
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) { // Author id
                         $config['conditions'] = $conditions;
-                        $config['conditions'][] = [
-                            "{$modelTableAlias}.{$foreignKey}" => $result->{$this->model->primaryKey()}
-                        ];
+                        $config['conditions']["{$modelTableAlias}.{$foreignKey}"] = $result->{$this->model->primaryKey()};
 
                         $result->$property = $this->model->$model->find('first', $config);
                         $result->reset();
@@ -242,10 +248,11 @@ class Finder
             if (isset($hasMany[$model])) {
                 $config['fields'] = empty($config['fields']) ? $hasMany[$model]['fields'] : $config['fields'];
                 $config['order'] = empty($config['order']) ? $hasMany[$model]['order'] : $config['order'];
-                $conditions = empty($config['conditions']) ? $hasMany[$model]['conditions'] : $config['conditions'];
     
                 $models = Inflector::plural(Inflector::camelCase($model));
                 $tableAlias = Inflector::tableName($model);
+
+                $conditions = empty($config['conditions']) ? $hasMany[$model]['conditions'] : $config['conditions'];
 
                 foreach ($results as &$result) {
                     if (isset($result->{$this->model->primaryKey()})) {

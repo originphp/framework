@@ -80,9 +80,15 @@ class FinderTest extends OriginTestCase
     public function testFindBelongsTo()
     {
         $this->Article->belongsTo('Author');
+        $this->Article->Author->hasMany('Article');
 
+        // need 3 levels to test belongsTo & hasOne
         $article = $this->Article->get(1000, [
-            'associated' => 'Author'
+            'associated' => [
+                'Author' => [
+                    'associated' => 'Article'
+                ]
+            ]
         ]);
 
         $this->assertEquals(1001, $article->author->id);
@@ -99,9 +105,14 @@ class FinderTest extends OriginTestCase
         $this->Article->belongsTo('Author', [
             'conditions' => ['id' => 1234]
         ]);
+        $this->Article->Author->hasMany('Article');
 
         $article = $this->Article->get(1000, [
-            'associated' => 'Author'
+            'associated' => [
+                'Author' => [
+                    'associated' => 'Article'
+                ]
+            ]
         ]);
 
         $this->assertNull($article->author);
@@ -207,7 +218,7 @@ class FinderTest extends OriginTestCase
         $this->Author->hasOne('Address', [
             'conditions' => ['id' => 1234]
         ]);
-
+        
         $author = $this->Author->get(1000, [
             'associated' => 'Address'
         ]);
@@ -448,7 +459,7 @@ class FinderTest extends OriginTestCase
     }
 
     /**
-    * @-depends testFindHasAndBelongsToManyDefaultConditions
+    * @depends testFindHasAndBelongsToManyDefaultConditions
     */
     public function testFindHasAndBelongsToManyAssociatedConditions()
     {
@@ -560,6 +571,76 @@ class FinderTest extends OriginTestCase
         ]);
         $this->assertNotEmpty($author->address);
         $this->assertNotEmpty($author->address->author);
+    }
+
+    /**
+     * Check the conditions overide in loadAssociatedBelongsTo, this is hard to reach
+     * needs 3 levels. Here testing conditions are not causing issues to join and that conditions
+     * are working.
+     */
+    public function testFindAssociatedNestedBelongsToConditions()
+    {
+        $this->Article->belongsTo('Author');
+        $this->Article->Author->hasMany('Article');
+
+        $article = $this->Article->get(1000, [
+            'associated' => [
+                'Author' => [
+                    'associated' => 'Article',
+                    'conditions' => ['name !=' => 'foo']
+                ]
+            ]
+        ]);
+
+        $this->assertNotEmpty($article->author);
+        $this->assertEquals(1001, $article->author->id);
+        $this->assertNotEmpty($article->author->articles);
+   
+        $article = $this->Article->get(1000, [
+            'associated' => [
+                'Author' => [
+                    'associated' => 'Article',
+                    'conditions' => ['id !=' => 1001]
+                ]
+            ]
+        ]);
+        $this->assertNotEmpty($article);
+        $this->assertEmpty($article->author);
+    }
+
+    /**
+     * Check the conditions overide in loadAssociatedHasOne, this is hard to reach
+     * needs 3 levels. Here testing conditions are not causing issues to join and that conditions
+     * are working.
+     */
+    public function testFindAssociatedNestedHasOneConditions()
+    {
+        $this->Author->hasOne('Address');
+        $this->Author->Address->belongsTo('Author');
+
+        $author = $this->Author->get(1000, [
+            'associated' => [
+                'Address' => [
+                    'associated' => 'Author',
+                    'conditions' => ['description !=' => 'foo']
+                ]
+            ]
+        ]);
+        $this->assertNotEmpty($author->address);
+        $this->assertEquals(1002, $author->address->id);
+        $this->assertNotEmpty($author->address->author);
+
+        $author = $this->Author->get(1000, [
+            'associated' => [
+                'Address' => [
+                    'associated' => 'Author',
+                    'conditions' => ['id !=' => 1002]
+                ]
+            ]
+        ]);
+
+        $this->assertNotEmpty($author);
+        $this->assertEmpty($author->address);
     }
 
     public function testFindassociatedNestedHasAndBelongsToMany()

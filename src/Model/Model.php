@@ -997,6 +997,7 @@ class Model
         $options += ['conditions' => []];
 
         $options['conditions'][$this->primaryKey] = $id;
+
         if ($result = $this->find('first', $options)) {
             return $result;
         }
@@ -1474,28 +1475,32 @@ class Model
      *
      * @param string $type e.g. first,all,list, count
      * @param \ArrayObject $query
-     * @return ArrayObject $query
+     * @return \ArrayObject $query
      */
     protected function prepareQuery(string $type, ArrayObject $query): ArrayObject
     {
         if ($type === 'first' || $type === 'all') {
             $query['fields'] = empty($query['fields']) ? $this->fields() : $this->prepareFields($query['fields']);
         }
-
+       
         $query['associated'] = $this->associatedConfig($query);
-   
+        
         foreach (['belongsTo', 'hasOne'] as $association) {
             foreach ($this->$association as $alias => $config) {
                 if (isset($query['associated'][$alias])) {
                     $fields = empty($query['associated'][$alias]['fields']) ? $config['fields'] : $query['associated'][$alias]['fields'];
                     $conditions = empty($query['associated'][$alias]['conditions']) ? $config['conditions'] : $query['associated'][$alias]['conditions'];
 
+                    // add join condition to conditions that have be passed in query
+                    if (! empty($query['associated'][$alias]['conditions'])) {
+                        array_unshift($conditions, $config['conditions'][0]);
+                    }
+
                     $query['joins'][] = [
                         'table' => $this->$alias->table,
                         'alias' => Inflector::tableName($alias),
                         'type' => ($association === 'belongsTo' ? $config['type'] : 'LEFT'),
-                        'conditions' => $conditions,
-                        'connection' => $this->connection,
+                        'conditions' => $conditions
                     ];
 
                     if (is_array($fields)) {
@@ -1524,6 +1529,7 @@ class Model
     protected function associatedConfig(ArrayObject $query): array
     {
         $out = [];
+
         foreach ((array) $query['associated'] as $alias => $config) {
             if (is_int($alias)) {
                 $alias = $config;
