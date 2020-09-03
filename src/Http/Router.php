@@ -226,6 +226,8 @@ class Router
                 }
             }
         }
+
+        return [];
     }
 
     /**

@@ -146,6 +146,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['home'], $result['args']);
     }
 
+    public function testRouterNoMatchFound()
+    {
+        $this->assertEquals([], MockRouter::parse('/foo'));
+    }
+
     public function testRoutePage()
     {
         MockRouter::add('/help', ['controller' => 'docs', 'action' => 'view', 256]);

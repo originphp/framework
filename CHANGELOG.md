@@ -1,6 +1,10 @@
 # Changelog
 
-## [unreleasd]
+## [3.7.0] - 2020-09-03
+
+### Fixed
+
+- Fixed router type error when no route found caused by recent update and improved test to catch this
 
 ### Added
 
