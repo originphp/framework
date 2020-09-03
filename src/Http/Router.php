@@ -212,9 +212,12 @@ class Router
                         if (! empty($routedParams['method']) && strtoupper($routedParams['method']) !== $requestMethod) {
                             continue;
                         }
-                        if (! empty($routedParams['type']) && $routedParams['type'] !== $requestType) {
-                            // handle application/json or json
-                            if ($routedParams['type'] !== $requestType || strpos($requestType, '/', $routedParams['type']) === false) {
+                        if (! empty($routedParams['type'])) {
+                            if ($requestType && $routedParams['type'] !== $requestType) {
+                                if ($routedParams['type'] !== $requestType && strpos($requestType . '/', $routedParams['type']) === false) {
+                                    continue;
+                                }
+                            } else {
                                 continue;
                             }
                         }

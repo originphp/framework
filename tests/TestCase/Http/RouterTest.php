@@ -148,7 +148,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testRouterNoMatchFound()
     {
-        $this->assertEquals([], MockRouter::parse('/foo'));
+        $this->assertNull(MockRouter::parse('/foo'));
     }
 
     public function testRoutePage()
@@ -278,5 +278,40 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         // check plugin is added to the URL, this is used by redirect & html::link
         $this->assertEquals('/admin/users/view', MockRouter::url(['action' => 'view']));
         $this->assertEquals('/users/view', MockRouter::url(['action' => 'view','prefix' => false]));
+    }
+
+    /**
+     * This feature requires the request to be set
+     */
+    public function testRequestType()
+    {
+        MockRouter::add('/api/:controller/:action/*', ['type' => 'json']);
+
+        MockRouter::request(new Request('/api/leads/get'));
+        $this->assertNull(MockRouter::parse('/api/leads/get'));
+
+        $request = new Request('/api/leads/get', [
+            'server' => ['CONTENT_TYPE' => 'application/json']
+        ]);
+        MockRouter::request($request);
+        $this->assertNotNull(MockRouter::parse('/api/leads/get'));
+    }
+
+    /**
+     * This feature requires the request to be set
+     */
+    public function testRequestMethod()
+    {
+        MockRouter::add('/leads/edit', ['method' => 'post']);
+        MockRouter::request(new Request('/leads/edit'));
+        $this->assertNull(MockRouter::parse('/leads/edit'));
+
+        $request = new Request('/leads/edit', ['server' => ['REQUEST_METHOD' => 'POST']]);
+        MockRouter::request($request);
+        $this->assertNotNull(MockRouter::parse('/leads/edit'));
+
+        $request = new Request('/leads/edit', ['server' => ['REQUEST_METHOD' => 'GET']]);
+        MockRouter::request($request);
+        $this->assertNull(MockRouter::parse('/leads/edit'));
     }
 }
