@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed router type error when no route found caused by recent update and improved test to catch this
+- Fixed router match content type caused by recent update and improved testing
 
 ### Added
 
