@@ -84,19 +84,19 @@ class ErrorHandler
      * We want to handle ajax/json exception properly (ie. not rendering html)
      *
      * Conventions which means json:
+     *
      * 1. If server requested with XMLHttpRequest (cross-domain requests might not show this jquery)
-     * 2. If content_type of the request was application/json (this would have to be set manually by curl etc). Ajax
-     * post also set this
-     * 3. If the .json extension is detected
+     * 2. If the first accept header is JSON
+     * 3. If the .json extension is detected & allowed in the route
      *
      * @return boolean
      */
-    protected function isAjax(): bool
+    protected function respondAsJson(): bool
     {
         $result = false;
         $request = Router::request();
         if ($request) {
-            $result = ($request->ajax() || $request->type() === 'json');
+            $result = ($request->isAjax() || $request->respondAs() === 'json');
         }
 
         return $result;
@@ -180,7 +180,7 @@ class ErrorHandler
         /**
          * Display debug backtrace use App.debug
          */
-        if (debugEnabled() && ! $this->isAjax()) {
+        if (debugEnabled() && ! $this->respondAsJson()) {
             $this->debugExceptionHandler($exception);
         } else {
             $renderer = new ExceptionRenderer(Router::request());

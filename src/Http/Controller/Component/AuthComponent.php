@@ -207,7 +207,7 @@ class AuthComponent extends Component
                     return $this->user = $user;
                 }
             }
-            $this->request()->type('json'); // Force all api usage as json
+            $this->request()->header('Accept', 'application/json'); // Force all api usage as json
             throw new ForbiddenException($this->config['authError']);
         }
         $credentials = $this->getCredentials();

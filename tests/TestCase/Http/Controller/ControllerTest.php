@@ -419,7 +419,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $book->name = 'How to use PHPUnit';
         $controller->set('book', $book);
         $controller->serialize('book');
-        $request->type('json');
+        $request->header('Accept', 'application/json');
         $controller->render();
         $this->assertEquals($book->toJson(), $controller->response()->body());
     }
@@ -459,7 +459,8 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $book->name = 'How to use PHPUnit';
         $controller->set('book', $book);
         $controller->serialize('book');
-        $request->type('xml');
+        $request->header('Accept', 'application/xml');
+        
         $controller->render();
         $expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><book><name>How to use PHPUnit</name></book></response>\n";
         $this->assertEquals($expected, $controller->response()->body());

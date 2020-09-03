@@ -1,5 +1,19 @@
 # Changelog
 
+## [unreleasd]
+
+### Added
+
+- Added Request::isAjax
+- Added Request::isJson
+- Added Request::isXml
+- Added Request::respondAs
+
+### Deprecated
+
+- Deprecated Request::ajax use Request::isAjax instead
+- Deprecated Request::type use Request::respondAs
+
 ## [3.6.1] - 2020-09-02
 
 ### Fixed

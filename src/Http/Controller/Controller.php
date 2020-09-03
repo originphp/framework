@@ -453,17 +453,26 @@ class Controller
         $body = null;
 
         /**
+         * Handle autorendering for serializing
+         */
+        if ($this->autoRender && $this->serialize) {
+            if ($this->request->respondAs() === 'json') {
+                $this->renderJson(null, $options['status']);
+    
+                return;
+            } elseif ($this->request->respondAs() === 'xml') {
+                $this->renderXml(null, $options['status']);
+    
+                return;
+            }
+        }
+
+        /**
          * When working with json sometimes values can empty, for example autocomplete
          * so array key exists better than isset.
          */
         if (array_key_exists('json', $options)) {
             $this->renderJson($options['json'], $options['status']);
-
-            return;
-        }
-        
-        if ($this->autoRender && $this->serialize && $this->request->type() === 'json') {
-            $this->renderJson(null, $options['status']);
 
             return;
         }
@@ -474,12 +483,6 @@ class Controller
             return;
         }
 
-        if ($this->autoRender && $this->serialize && $this->request->type() === 'xml') {
-            $this->renderXml(null, $options['status']);
-
-            return;
-        }
-        
         if (array_key_exists('text', $options)) {
             $options['type'] = 'txt';
             $body = $options['text'];

@@ -249,24 +249,51 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $request = new MockRequest();
         $this->assertNull($request->ip());
     }
-    public function testSsl()
+    public function testisSsl()
     {
         $request = new MockRequest();
-        $this->assertFalse($request->ssl());
+        $this->assertFalse($request->isSsl());
         $request = new MockRequest(null, ['server' => ['HTTPS' => 'off']]);
-        $this->assertFalse($request->ssl());
+        $this->assertFalse($request->isSsl());
         $request = new MockRequest(null, ['server' => ['HTTPS' => 'on']]);
-        $this->assertTrue($request->ssl());
+        $this->assertTrue($request->isSsl());
         $request = new MockRequest(null, ['server' => ['HTTPS' => 1]]);
-        $this->assertTrue($request->ssl());
+        $this->assertTrue($request->isSsl());
     }
-    public function testAjax()
+    public function testisAjax()
     {
         $request = new MockRequest();
-        $this->assertFalse($request->ajax());
+        $this->assertFalse($request->isAjax());
     
         $request = new MockRequest(null, ['server' => ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']]);
-        $this->assertTrue($request->ajax());
+        $this->assertTrue($request->isAjax());
+    }
+
+    public function testisJson()
+    {
+        $request = new MockRequest();
+        $this->assertFalse($request->isJson());
+    
+        $request = new MockRequest('/posts/1000.json');
+        $this->assertTrue($request->isJson());
+
+        $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/json']]);
+        $this->assertTrue($request->isJson());
+    }
+
+    public function testisXml()
+    {
+        $request = new MockRequest();
+        $this->assertFalse($request->isXml());
+
+        $request = new MockRequest('/posts/1000.xml');
+        $this->assertTrue($request->isXml());
+    
+        $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/xml']]);
+        $this->assertTrue($request->isXml());
+
+        $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'text/xml']]);
+        $this->assertTrue($request->isXml());
     }
    
     public function testReferer()
@@ -279,9 +306,9 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     {
         // Test Accepts
         $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/json']]);
-        $this->assertEquals('json', $request->type());
+        $this->assertEquals('json', $request->respondAs());
 
         $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/xml']]);
-        $this->assertEquals('xml', $request->type());
+        $this->assertEquals('xml', $request->respondAs());
     }
 }

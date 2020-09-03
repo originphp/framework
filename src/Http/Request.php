@@ -106,6 +106,8 @@ class Request
     /**
      * Request type
      *
+     * @deprecated This will be deprecated
+     *
      * @var string
      */
     protected $type = null;
@@ -155,12 +157,6 @@ class Request
   
         Router::request($this);
         $this->params = Router::parse($url);
-
-        /**
-         * Detect the request type that it will be rendered in.
-         * @internal I think in future maybe this should not be here but in the controller
-         */
-        $this->detectRequestedOutput();
     }
 
     /**
@@ -337,6 +333,7 @@ class Request
      */
     public function type(string $type = null)
     {
+        deprecationWarning('Request::type has been deprecated set accept header instead.');
         if ($type === null) {
             return $this->type;
         }
@@ -344,31 +341,34 @@ class Request
     }
 
     /**
-     * Detects the requested output format
+     * Detects the type to respond as e.g. html, json, xml
      *
      * 1. If in the routing params an extension has been set
      * 2. if the first available accept type is json or xml
      * 3. if no matches are found just return HTML
      *
-     * @return void
+     * @return string
      */
-    protected function detectRequestedOutput(): void
+    public function respondAs(): string
     {
+        /**
+         * @backwards comptability
+         */
+        if ($this->type) {
+            return $this->type;
+        }
+
         $extension = $this->params('ext');
         if ($extension && in_array($extension, ['html', 'json', 'xml'])) {
-            $this->type($extension);
-
-            return;
+            return $extension;
         }
        
         $accepts = $this->accepts();
         if ($accepts) {
-            $this->type($this->getType($accepts[0]));
-
-            return;
+            return $this->getType($accepts[0]);
         }
        
-        $this->type('html');
+        return 'html';
     }
 
     /**
@@ -391,22 +391,66 @@ class Request
 
     /**
      * Checks if the request uses SSL
-     *
+     * @deprecated
      * @return bool
      */
     public function ssl(): bool
+    {
+        deprecationWarning('Request ssl is deprecated use isSsl instead');
+
+        return $this->isSsl();
+    }
+
+    /**
+     * Checks if the request is ajax request
+     * @deprecated
+     * @return boolean
+     */
+    public function ajax(): bool
+    {
+        deprecationWarning('Request ajax is deprecated use isAjax instead');
+
+        return $this->isAjax();
+    }
+
+    /**
+     * Check to see whether the request was sent via SSL
+     *
+     * @return boolean
+     */
+    public function isSsl(): bool
     {
         return ($this->env('HTTPS') == 1 || $this->env('HTTPS') === 'on');
     }
 
     /**
-     * Checks if the request is ajax request
+     * Check to see whether the current request header X-Requested-With is equal to XMLHttpRequest.
      *
      * @return boolean
      */
-    public function ajax(): bool
+    public function isAjax(): bool
     {
         return ($this->env('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest');
+    }
+
+    /**
+     * Check to see whether the request has a json extension or a accept ‘application/json’ mimetype.
+     *
+     * @return boolean
+     */
+    public function isJson(): bool
+    {
+        return $this->params('ext') === 'json' || $this->accepts('application/json');
+    }
+
+    /**
+    * Check to see whether the request has a json extension or a accept ‘application/json’ mimetype.
+    *
+    * @return boolean
+    */
+    public function isXml(): bool
+    {
+        return $this->params('ext') === 'xml' || $this->accepts(['application/xml', 'text/xml']);
     }
 
     /**

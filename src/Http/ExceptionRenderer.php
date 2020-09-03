@@ -14,28 +14,24 @@
 declare(strict_types = 1);
 namespace Origin\Http;
 
+use Throwable;
 use Origin\Http\Exception\HttpException;
 
 class ExceptionRenderer
 {
     /**
-    * Undocumented variable
-    *
     * @var \Origin\Http\Request
     */
     protected $request;
+
     /**
-     * Undocumented variable
-     *
      * @var \Origin\Http\Response
      */
     protected $response;
 
     /**
-     * Construtor
-     *
-     * @param Request $request (Required for ajax detection)
-     * @param Response $response (not required, but might need to be replaced)
+     * @param \Origin\Http\Request $request (Required to detect JSON error handling)
+     * @param \Origin\Http\Response $response (not required, but might need to be replaced)
      */
     public function __construct(Request $request = null, Response $response = null)
     {
@@ -46,7 +42,14 @@ class ExceptionRenderer
         $this->response = $response ? $response : new Response();
     }
 
-    public function render($exception, $debug = false): Response
+    /**
+     * Renders the error
+     *
+     * @param \Throwable $exception
+     * @param boolean $debug
+     * @return \Origin\Http\Response
+     */
+    public function render(Throwable $exception, $debug = false): Response
     {
         if ($debug) {
             $errorCode = $exception->getCode();
@@ -55,7 +58,7 @@ class ExceptionRenderer
             list($errorCode, $errorMessage) = $this->getErrorCodeAndMessage($exception);
         }
        
-        if ($this->request->ajax() || $this->request->type() === 'json') {
+        if ($this->request->isAjax() || $this->request->respondAs() === 'json') {
             $body = json_encode(['error' => ['message' => $errorMessage, 'code' => $errorCode]]);
         } else {
             ob_start();
@@ -69,7 +72,11 @@ class ExceptionRenderer
         return $this->response;
     }
 
-    protected function getErrorCodeAndMessage($exception): array
+    /**
+     * @param Throwable $exception
+     * @return array
+     */
+    protected function getErrorCodeAndMessage(Throwable $exception): array
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
         $errorMessage = ($exception->getCode() === 404) ? 'Not Found' : 'An Internal Error has Occured';
@@ -81,8 +88,12 @@ class ExceptionRenderer
 
         return [$errorCode,$errorMessage];
     }
-    
-    protected function getFileToRender($exception)
+
+    /**
+     * @param throwable $exception
+     * @return string
+     */
+    protected function getFileToRender(throwable $exception): String
     {
         $errorCode = ($exception->getCode() === 404) ? 404 : 500;
         $error400 = APP . DS . 'Http' . DS . 'View' . DS . 'Error' . DS .  '400.ctp';

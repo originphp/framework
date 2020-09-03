@@ -64,7 +64,7 @@ class JsonView
         /**
          * If user requests JSON and serialize is set then use that
          */
-        if ($data === null && $this->request->type() === 'json' && ! empty($this->serialize)) {
+        if ($data === null && $this->request->respondAs() === 'json' && ! empty($this->serialize)) {
             $data = $this->serialize($this->serialize);
         }
 
