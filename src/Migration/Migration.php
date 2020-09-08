@@ -777,7 +777,7 @@ class Migration
         if (is_string($options) || (! isset($options['name']) && ! isset($options['column']))) {
             $options = ['column' => $options];
         }
-        if (! empty($options['column'])) {
+        if (! empty($options['column']) && empty($options['name'])) {
             $options['name'] = $this->getIndexName($table, $options['column']);
         }
 

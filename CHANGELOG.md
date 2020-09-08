@@ -1,5 +1,12 @@
 # Changelog
 
+## [unreleased]
+
+### Fixed
+
+- Fixed migration now throws error exception if index does not exist
+- Fixed migration adding index by specific name was being overwritten by default
+
 ## [3.7.0] - 2020-09-03
 
 ### Fixed
