@@ -740,6 +740,11 @@ class Migration
             }
             $index = null;
         }
+
+        if (! $index) {
+            throw new Exception("index {$options['name']} does not exist");
+        }
+  
         $this->statements[] = $sql = new Sql(
             $this->adapter()->removeIndex($table, $options['name'])
         );
