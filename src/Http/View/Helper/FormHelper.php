@@ -1050,15 +1050,16 @@ class FormHelper extends Helper
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
                 $data = $this->record ? $this->record->toArray() : $this->request()->data();
+
                 if ($data) {
                     $dot = new Dot($data);
                     $value = $dot->get($name);
                     if ($value) {
                         $options['value'] = $value;
                     }
-                    if ($this->record && $this->record->errors($name)) {
-                        $options = $this->addClass('error', $options);
-                    }
+                }
+                if ($this->record && $this->record->errors($name)) {
+                    $options = $this->addClass('error', $options);
                 }
             }
         }

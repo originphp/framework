@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fixed FormHelper bug not adding error class to Record forms when no data was posted
 - Fixed migration now throws error exception if index does not exist
 - Fixed migration adding index by specific name was being overwritten by default
 
