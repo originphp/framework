@@ -843,9 +843,9 @@ class Request
     /**
      * Reads the php://input stream
      *
-     * @return string
+     * @return string|false
      */
-    protected function readInput(): ?string
+    protected function readInput()
     {
         $fh = fopen('php://input', 'r');
         defer($context, 'fclose', $fh);
