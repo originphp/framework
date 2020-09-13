@@ -426,16 +426,19 @@ class MigrationTest extends OriginTestCase
         $migration->addIndex('articles', 'author_id');
         $migration->addIndex('articles', ['id', 'title']);
         $migration->addIndex('articles', 'created', ['unique' => true]);
+        $migration->addIndex('articles', ['id','author_id'], ['name' => 'idx_foo']);
 
         $this->assertTrue($migration->indexExists('articles', 'author_id'));
         $this->assertTrue($migration->indexExists('articles', ['id', 'title']));
         $this->assertTrue($migration->indexExists('articles', 'created'));
+        $this->assertTrue($migration->indexExists('articles', ['name' => 'idx_foo']));
 
         $migration->reset(); // clear statements that have been run
         $migration->rollback($migration->reverseStatements());
         $this->assertFalse($migration->indexExists('articles', 'author_id'));
         $this->assertFalse($migration->indexExists('articles', ['id', 'title']));
         $this->assertFalse($migration->indexExists('articles', 'created'));
+        $this->assertFalse($migration->indexExists('articles', ['name' => 'idx_foo']));
     }
 
     public function testRenameIndex()
@@ -834,11 +837,18 @@ class MigrationTest extends OriginTestCase
         $migration->addIndex('bananas', 'foo');
     }
 
-    public function testRemoveIndexException()
+    public function testRemoveIndexMissingTableException()
     {
         $migration = new CreateProductTableMigration($this->adapter());
         $this->expectException(Exception::class);
         $migration->removeIndex('bananas', 'foo');
+    }
+
+    public function testRemoveIndexNoneExistantException()
+    {
+        $migration = new CreateProductTableMigration($this->adapter());
+        $this->expectException(Exception::class);
+        $migration->removeIndex('deals', 'foo');
     }
 
     public function testAddForeignKeyException()

@@ -127,7 +127,9 @@ class FormHelperTest extends OriginTestCase
         // Check validation errors
         $checkout->error('name', 'You must provide a name');
         $helper->create($checkout);
-        $this->assertStringContains('<div class="error-message">You must provide a name</div>', $helper->control('name'));
+
+        //  div and input has error class and error message is displayed
+        $this->assertStringContains('<div class="form-group text required error"><label for="name">Name</label><input type="text" name="name" class="form-control error" id="name" value="foo"><div class="error-message">You must provide a name</div></div>', $helper->control('name'));
     }
 
     public function testCreate()
