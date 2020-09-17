@@ -2,6 +2,9 @@
 
 ### Added
 
+- Added BundleHelper
+- Added MinifyMiddleware
+- Added query param support to HtmlHelper css & js methods
 - Added Session garbage collection
 
 ### Fixed
