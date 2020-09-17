@@ -155,7 +155,7 @@ class HtmlHelper extends Helper
             $path = $b;
         }
         $length = strlen('.' . $options['ext']);
-        if (substr($path, -$length) !== '.' . $options['ext']) {
+        if (substr($path, -$length) !== '.' . $options['ext'] && strpos($path, '?') === false) {
             $path .= '.' . $options['ext'];
         }
         // without path $html->css('form');
