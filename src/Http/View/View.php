@@ -83,7 +83,7 @@ class View
      */
     protected $viewPath = APP . DS . 'Http' . DS . 'View';
 
-    public function __construct(Controller $controller = null)
+    public function __construct(Controller $controller)
     {
         $this->controllerName = $controller->name();
 
