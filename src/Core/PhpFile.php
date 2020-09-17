@@ -31,7 +31,7 @@ class PhpFile
     public function read(string $filename): array
     {
         if (! file_exists($filename)) {
-            throw new InvalidArgumentException(sprintf('File `%` does not exist', $filename));
+            throw new InvalidArgumentException(sprintf('File `%s` does not exist', $filename));
         }
         $out = include $filename;
         if (is_array($out)) {

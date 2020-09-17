@@ -1,5 +1,13 @@
 # Changelog
 
+### Added
+
+- Added Session garbage collection
+
+### Fixed
+
+- Fixed PhpFile invalid argument exception message
+
 ## [3.7.1] - 2020-09-14
 
 ### Fixed
