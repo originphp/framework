@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Http\Middleware;
+namespace Origin\Test\Http\Middleware;
 
 use Origin\Core\PhpFile;
 use Origin\Http\Request;
