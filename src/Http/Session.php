@@ -38,6 +38,10 @@ class Session
      */
     public function __construct()
     {
+        if (Config::exists('App.sessionTimeout')) {
+            $this->timeout = Config::read('App.sessionTimeout');
+        }
+
         /**
         * Security considerations:
         *
@@ -49,6 +53,8 @@ class Session
         $config = [
             'session.save_path' => TMP . DS . 'sessions',
             'session.cookie_httponly' => 1,
+            'session.gc_maxlifetime' => $this->timeout * 60,
+            'session.cookie_lifetime' => $this->timeout * 60
         ];
 
         if (env('HTTPS')) {
@@ -158,12 +164,8 @@ class Session
      * @param integer $timeout
      * @return boolean
      */
-    protected function timedOut($timeout = 3600): bool
+    protected function timedOut(int $timeout): bool
     {
-        if (Config::exists('App.sessionTimeout')) {
-            $timeout = Config::read('App.sessionTimeout');
-        }
-
         $lastActivity = $this->read('Session.lastActivity');
         $this->write('Session.lastActivity', time());
 
