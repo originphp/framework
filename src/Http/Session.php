@@ -132,7 +132,7 @@ class Session
             throw new Exception('Error starting a session.');
         }
 
-        if ($this->timedOut($this->timeout)) {
+        if ($this->timedOut()) {
             $this->destroy();
             $this->start();
         }
@@ -161,17 +161,17 @@ class Session
     /**
      * Checks if session timedout
      *
-     * @param integer $timeout
+
      * @return boolean
      */
-    protected function timedOut(int $timeout): bool
+    protected function timedOut(): bool
     {
         $lastActivity = $this->read('Session.lastActivity');
         $this->write('Session.lastActivity', time());
 
         $result = false;
         if ($lastActivity) {
-            $result = (time() - $lastActivity > $timeout);
+            $result = (time() - $lastActivity > $this->timeout);
         }
         
         return $result;
