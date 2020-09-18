@@ -10,7 +10,8 @@ use Origin\Core\PhpFile;
  * Bundle Helper for bundling JS and CSS files from the public folder to reduce the number of requests
  * on the server and for faster loading. Note. This is not designed to work with plugin files.
  *
- * Create a config/bundles.php, paths will be prefixed with the public folder e.g. /var/www/public/
+ * Create a config/bundles.php, paths will be prefixed with the public folder e.g. /var/www/public/ and js or css if the
+ * file does not start with a /
  *
  * return [
  *  'bundle.js' => [
@@ -31,9 +32,9 @@ use Origin\Core\PhpFile;
  *
  * To configure the helper when loading the helper pass any of the options:
  *
- *  - minify: default true. Minfifies the JS and CSS.
- *  - js_path: default: cache_js path is releative to public
- *  - css_path: default: cache_css path is releative to public
+ *  - minify: default:true. Minfifies the JS and CSS bundles be generated on each request.
+ *  - js_path: default:cache_js path is releative to public
+ *  - css_path: default:cache_css path is releative to public
  *
  * @internal
  *  - using name format bundle-xxxx.js creates lots of zombie files and then requires cleaning up. better to use ?version
@@ -175,7 +176,7 @@ class BundleHelper extends Helper
             $contents .= $this->loadFile(WEBROOT . $file) . PHP_EOL;
         }
 
-        file_put_contents($tmpfile, $contents);
+        file_put_contents($tmpfile, $contents, LOCK_EX);
         rename($tmpfile, $cachedFile);
     }
 
