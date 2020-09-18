@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.8.0] - 2020-09-18
+
 ### Added
 
 - Added BundleHelper
