@@ -1,9 +1,11 @@
 # Changelog
 
+## [3.8.1] - 2020-09-26
+
 ### Deprecated
 
-- Deprecated BundleHelper config js_path use jsPath instead
-- Deprecated BundleHelper config css_path use cssPath instead
+- Deprecated BundleHelper config js_path use jsPath instead (correcting design mistake from last weeks commit)
+- Deprecated BundleHelper config css_path use cssPath instead (correcting design mistake from last weeks commit)
 
 ### Fixed
 
