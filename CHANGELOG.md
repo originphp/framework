@@ -1,5 +1,14 @@
 # Changelog
 
+### Deprecated
+
+- Deprecated BundleHelper config js_path use jsPath instead
+- Deprecated BundleHelper config css_path use cssPath instead
+
+### Fixed
+
+- Fixed ConsoleIo table type errors when passing non string values
+
 ## [3.8.0] - 2020-09-18
 
 ### Added

@@ -129,7 +129,7 @@ class BundleHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testNoPath()
     {
-        $this->Bundler->config('js_path', '');
+        $this->Bundler->config('jsPath', '');
         $this->Bundler->bundles([
             'bundle.js' => [
                 'application.js',

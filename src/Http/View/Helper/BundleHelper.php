@@ -33,8 +33,8 @@ use Origin\Core\PhpFile;
  * To configure the helper when loading the helper pass any of the options:
  *
  *  - minify: default:true. Minfifies the JS and CSS bundles be generated on each request.
- *  - js_path: default:cache_js path is releative to public
- *  - css_path: default:cache_css path is releative to public
+ *  - jsPath: default:cache_js path relative to application webroot
+ *  - cssDirectory: default:cache_css path relative to application webroot
  *
  * @internal
  *  - using name format bundle-xxxx.js creates lots of zombie files and then requires cleaning up. better to use ?version
@@ -45,8 +45,8 @@ class BundleHelper extends Helper
     protected $defaultConfig = [
         'minify' => true,
         'cache' => true,
-        'js_path' => 'cache_js',
-        'css_path' => 'cache_css',
+        'jsPath' => 'cache_js',
+        'cssPath' => 'cache_css',
     ];
 
     /**
@@ -149,7 +149,15 @@ class BundleHelper extends Helper
      */
     private function bundledFile(string $filename, string $extension): string
     {
-        $path = $this->config($extension .'_path');
+        $path = $this->config($extension .'Path');
+
+        // I committed this using css_path instead of cssPath, this is to address this
+        if (isset($this->config[$extension .'_path'])) {
+            deprecationWarning(
+                sprintf('Bundle config %s is deprecated use %sPath instead', $extension .'_path', $extension)
+            );
+            $path = $this->config($extension .'_path');
+        }
 
         return ($path ? '/' . $path .'/' : '/') . $filename;
     }
