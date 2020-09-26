@@ -201,9 +201,10 @@ class ConsoleIo
         }
         // Calculate width of each column
         $widths = [];
-        foreach ($array as $rowIndex => $row) {
-            $maxColumnWidth = 0;
+        foreach ($array as $row) {
             foreach ($row as $columnIndex => $cell) {
+                $cell = (string) $cell;
+                
                 if (! isset($widths[$columnIndex])) {
                     $widths[$columnIndex] = 0;
                 }
@@ -225,7 +226,8 @@ class ConsoleIo
         if ($headers) {
             $headers = '|';
             foreach ($array[0] as $i => $cell) {
-                $headers .= ' '.str_pad($cell, $widths[$i] - 2, ' ', STR_PAD_RIGHT).'|';
+                $cell = (string) $cell;
+                $headers .= ' ' . str_pad($cell, $widths[$i] - 2, ' ', STR_PAD_RIGHT) . '|';
             }
             $out[] = $headers;
             $out[] = $seperator;
@@ -235,7 +237,8 @@ class ConsoleIo
         foreach ($array as $row) {
             $cells = '|';
             foreach ($row as $i => $cell) {
-                $cells .= ' '.str_pad($cell, $widths[$i] - 2, ' ', STR_PAD_RIGHT).'|';
+                $cell = (string) $cell;
+                $cells .= ' ' . str_pad($cell, $widths[$i] - 2, ' ', STR_PAD_RIGHT) . '|';
             }
             $out[] = $cells;
         }
@@ -254,7 +257,7 @@ class ConsoleIo
     public function list($elements, string $bullet = '*', int $indent = 2): void
     {
         foreach ((array) $elements as $element) {
-            $this->out(str_repeat(' ', $indent).$bullet.' '.$element);
+            $this->out(str_repeat(' ', $indent) . $bullet . ' ' . $element);
         }
     }
 
