@@ -240,7 +240,7 @@ class BundleHelper extends Helper
      * @param string $string
      * @return string
      */
-    private function minify(string $string): string
+    protected function minify(string $string): string
     {
         return preg_replace(
             [
