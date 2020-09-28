@@ -529,8 +529,8 @@ abstract class Command
     */
     protected function interpolate($messages, array $context = []): array
     {
-        if (is_string($messages)) {
-            $messages = [$messages];
+        if (! is_array($messages)) {
+            $messages = [(string) $messages];
         }
 
         $replace = [];
