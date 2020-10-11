@@ -26,7 +26,7 @@ class NumberHelper extends Helper
      *
      * @param string|float|integer $value 1234567.43
      * @param string $currency USD|EUR|GBP|AUD etc.
-     * @param array $options before,after,places,thousands,decimals
+     * @param array $options additional options
      * @return string
      */
     public function currency($value, string $currency = null, array $options = []): string
@@ -35,18 +35,20 @@ class NumberHelper extends Helper
     }
     
     /**
-    * Formats a percent number
-    *
-    *  $number->percent(50.55); // 50.55%
-    *
-    * @param string|int|float $value 1234567.43
+     * Formats a percent number
+     *
+     *  $number->percent(50.55); // 50.55%
+     *
+     * @param string|int|float $value 1234567.43
      * @param integer $precision
+     * @param array $options additional options
      * @return string
      */
-    public function percent($value, int $precision = 2): string
+    public function percent($value, int $precision = 2, array $options = []): string
     {
-        return Number::percent($value, $precision);
+        return Number::percent($value, $precision, $options);
     }
+
     /**
     * Formats a number with a specified level of precision
     *
@@ -54,11 +56,12 @@ class NumberHelper extends Helper
     *
     * @param string|int|float $value 1234567.43
     * @param int $precision max number of decimal places to show
+    * @param array $options additional options
     * @return string
     */
-    public function precision($value, int $precision = 2): string
+    public function precision($value, int $precision = 2, array $options = []): string
     {
-        return Number::precision($value, $precision);
+        return Number::precision($value, $precision, $options);
     }
     /**
      * Formats a number
@@ -67,11 +70,12 @@ class NumberHelper extends Helper
      *
      * @param string|int|float $value
      * @param array $options
-     *   - before: something to be shown before
-     *   - after: something to be added after
-     *   - thousands: the thousands seperator
-     *   - decimals: the decimals seperator
-     *   - places: how many decimal points to show
+     *  - before: something to be shown before
+     *  - after: something to be added after
+     *  - thousands: the thousands seperator
+     *  - decimals: the decimals seperator
+     *  - places: how many decimal points to show
+     *  - negative: default:()
      * @return string
      */
     public function format($value, array $options = []): string

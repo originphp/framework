@@ -109,13 +109,15 @@ class Number
      *
      * @param float $value
      * @param integer $precision
+     * @param array $options additional options
      * @return string
      */
-    public static function precision($value, int $precision = 2): string
+    public static function precision($value, int $precision = 2, array $options = []): string
     {
+        $options['places'] = $precision;
         $value = sprintf("%01.{$precision}f", $value);
 
-        return static::format($value, ['places' => $precision]);
+        return static::format($value, $options);
     }
     
     /**
@@ -133,7 +135,7 @@ class Number
             $value *= 100;
         }
 
-        return static::precision($value, $precision) . '%';
+        return static::precision($value, $precision, $options) . '%';
     }
     /**
      * Formats a number from database.
