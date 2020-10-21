@@ -317,6 +317,42 @@ class Query implements IteratorAggregate
     }
 
     /**
+     * Chunks the query into multiple qureries and passes the results into a given closure
+     *
+     * @param integer $count
+     * @param callable $callback
+     * @return boolean
+     */
+    public function chunk(int $count, callable $callback) : bool
+    {
+        $page = 1;
+
+        $conditions = $this->toArray();
+        $conditions['offset'] = null;
+        $conditions['limit'] = $count;
+        
+        do {
+            $conditions['page'] = $page;
+          
+            $collection = $this->model->all($conditions);
+
+            $found = $collection->count();
+
+            if ($found === 0) {
+                break;
+            }
+
+            if ($callback($collection, $page) === false) {
+                return false;
+            }
+
+            $page ++;
+        } while ($found === $count);
+
+        return true;
+    }
+
+    /**
      * Gets the query as an array ready for use by the model
      *
      * @return array

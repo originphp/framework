@@ -1036,7 +1036,7 @@ class Model
             'callbacks' => true,
             'associated' => [],
         ]);
-        
+
         if ($options['callbacks'] === true) {
             if ($this->triggerCallback('beforeFind', 'find', [$options]) === false) {
                 return null;
@@ -1135,6 +1135,29 @@ class Model
     public function list(array $options = []): array
     {
         return $this->find('list', $options);
+    }
+
+    /**
+     * Runs the query in chunks to reduce memory usage when working with large datasets.
+     * @example
+     *
+     *  $this->Artcile->chunk(200, function ($articles, $page) {
+     *     // do something with articles collection or return false to break
+     *  });
+     *
+     * @param integer $count
+     * @param callable $callback
+     * @param array $params The following options keys are supported
+     *  - conditions: an array of conditions
+     *  - fields: an array of fields
+     * @return boolean
+     */
+    public function chunk(int $count, callable $callback, array $params = []) : bool
+    {
+        $conditions = $params['conditions'] ?? [];
+        $fields = $params['fields'] ?? [];
+      
+        return (new Query($this, $conditions, $fields))->chunk($count, $callback);
     }
 
     /**
