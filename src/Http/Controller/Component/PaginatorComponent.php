@@ -151,7 +151,7 @@ class PaginatorComponent extends Component
      */
     protected function getTotal(array $settings): int
     {
-        unset($settings['page'],$settings['limit'], $settings['order'] , $settings['associated']);
+        unset($settings['page'],$settings['limit'], $settings['order']);
 
         return $this->model->find('count', $settings);
     }
