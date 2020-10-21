@@ -1403,12 +1403,31 @@ class Model
     /**
      * This is the count finder
      *
+     * @internal changed this back to own code, passing it through calculate duplicated things (bug fix)
+     *
      * @param \ArrayObject $options (conditions,fields, joins, group, callbacks,etc)
      * @return int|array count
      */
     protected function finderCount(ArrayObject $options)
     {
-        return $this->calculate('count', '*', (array) $options);
+        $options['fields'] = ['count(*) AS count'];
+
+        if ($options['group']) {
+            $options['fields'] = array_merge($options['fields'], (array) $options['group']);
+        }
+
+        $results = (new Finder($this))->find($options, 'assoc');
+    
+        /**
+         * handle results for group and none groups
+         */
+        if (empty($options['group'])) {
+            $results = $results[0]['count'] + 0;
+        } else {
+            $results = $results ? $results : [];
+        }
+ 
+        return $results;
     }
 
     /**
