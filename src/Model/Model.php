@@ -1147,16 +1147,16 @@ class Model
      *
      * @param integer $size size of each chunk
      * @param callable $callback
-     * @param array $params The following options keys are supported
+     * @param array $options The following options keys are supported
      *  - conditions: an array of conditions
      *  - fields: an array of fields
      *  - associated: an array of associated models to fetch
      *  - order: a string or an array e.g. id ASC
      * @return boolean
      */
-    public function chunk(int $size, callable $callback, array $params = []) : bool
+    public function chunk(int $size, callable $callback, array $options = []) : bool
     {
-        return $this->batchQuery($params)->chunk($size, $callback);
+        return $this->batchQuery($options)->chunk($size, $callback);
     }
 
     /**
@@ -1164,7 +1164,7 @@ class Model
      * work with large datasets.
      *
      * @param callable $callback
-     * @param array $params The following options keys are supported
+     * @param array $options The following options keys are supported
      *  - size: chunk size to use. default:1000
      *  - conditions: an array of conditions
      *  - fields: an array of fields
@@ -1172,29 +1172,29 @@ class Model
      *  - order: a string or an array e.g. id ASC
      * @return boolean
      */
-    public function each(callable $callback, array $params = []): bool
+    public function each(callable $callback, array $options = []): bool
     {
-        return $this->batchQuery($params)->each($callback, $params['size'] ?? 1000);
+        return $this->batchQuery($options)->each($callback, $options['size'] ?? 1000);
     }
 
     /**
      * Builds the batch query object
      *
-     * @param array $params
+     * @param array $options
      * @return Query
      */
-    private function batchQuery(array $params) : Query
+    private function batchQuery(array $options) : Query
     {
-        $params += ['conditions' => [], 'fields' => [],'associated' => [],'order' => null];
+        $options += ['conditions' => [], 'fields' => [],'associated' => [],'order' => null];
 
-        $query = new Query($this, $params['conditions'], $params['fields']);
+        $query = new Query($this, $options['conditions'], $options['fields']);
 
-        if ($params['associated']) {
-            $query->with($params['associated']);
+        if ($options['associated']) {
+            $query->with($options['associated']);
         }
 
-        if ($params['order']) {
-            $query->order($params['order']);
+        if ($options['order']) {
+            $query->order($options['order']);
         }
 
         return $query;
