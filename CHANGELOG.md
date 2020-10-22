@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.9.0] - 2020-10-24
+
+### Added
+
+- Added Model::chunk
+- Added Model::each
+- Added Query::chunk
+- Added Query::each
+
+### Fixed
+
+- Fixed issue with finderCount running twice
+
 ## [3.8.1] - 2020-09-26
 
 ### Deprecated
