@@ -317,19 +317,20 @@ class Query implements IteratorAggregate
     }
 
     /**
-     * Chunks the query into multiple qureries and passes the results into a given closure
+     * Chunks query results in batches and passes them to a callback
      *
-     * @param integer $count
+     * @param integer $size
      * @param callable $callback
      * @return boolean
      */
-    public function chunk(int $count, callable $callback) : bool
+    public function chunk(int $size, callable $callback) : bool
     {
         $page = 1;
 
         $conditions = $this->toArray();
+
         $conditions['offset'] = null;
-        $conditions['limit'] = $count;
+        $conditions['limit'] = $size;
         
         do {
             $conditions['page'] = $page;
@@ -345,11 +346,31 @@ class Query implements IteratorAggregate
             if ($callback($collection, $page) === false) {
                 return false;
             }
+            unset($collection);
 
             $page ++;
-        } while ($found === $count);
+        } while ($found === $size);
 
         return true;
+    }
+
+    /**
+     * Executes a callback for each item through chunking to make it more memory efficient to
+     * work with large datasets.
+     *
+     * @param callable $callback
+     * @param integer $chunkSize
+     * @return bool
+     */
+    public function each(callable $callback, int $chunkSize = 1000) : bool
+    {
+        return $this->chunk($chunkSize, function ($collection) use ($callback) {
+            foreach ($collection as $index => $entity) {
+                if ($callback($entity, $index) === false) {
+                    return false;
+                }
+            }
+        });
     }
 
     /**
@@ -425,6 +446,9 @@ class Query implements IteratorAggregate
         return $this->all();
     }
 
+    /**
+     * @return array
+     */
     public function __debugInfo()
     {
         return $this->toArray();

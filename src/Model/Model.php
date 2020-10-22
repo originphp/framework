@@ -1145,19 +1145,59 @@ class Model
      *     // do something with articles collection or return false to break
      *  });
      *
-     * @param integer $count
+     * @param integer $size size of each chunk
      * @param callable $callback
      * @param array $params The following options keys are supported
      *  - conditions: an array of conditions
      *  - fields: an array of fields
+     *  - associated: an array of associated models to fetch
+     *  - order: a string or an array e.g. id ASC
      * @return boolean
      */
-    public function chunk(int $count, callable $callback, array $params = []) : bool
+    public function chunk(int $size, callable $callback, array $params = []) : bool
     {
-        $conditions = $params['conditions'] ?? [];
-        $fields = $params['fields'] ?? [];
-      
-        return (new Query($this, $conditions, $fields))->chunk($count, $callback);
+        return $this->batchQuery($params)->chunk($size, $callback);
+    }
+
+    /**
+     * Executes a callback for each item through chunking to make it more memory efficient to
+     * work with large datasets.
+     *
+     * @param callable $callback
+     * @param array $params The following options keys are supported
+     *  - size: chunk size to use. default:1000
+     *  - conditions: an array of conditions
+     *  - fields: an array of fields
+     *  - associated: an array of associated models to fetch
+     *  - order: a string or an array e.g. id ASC
+     * @return boolean
+     */
+    public function each(callable $callback, array $params = []): bool
+    {
+        return $this->batchQuery($params)->each($callback, $params['size'] ?? 1000);
+    }
+
+    /**
+     * Builds the batch query object
+     *
+     * @param array $params
+     * @return Query
+     */
+    private function batchQuery(array $params) : Query
+    {
+        $params += ['conditions' => [], 'fields' => [],'associated' => [],'order' => null];
+
+        $query = new Query($this, $params['conditions'], $params['fields']);
+
+        if ($params['associated']) {
+            $query->with($params['associated']);
+        }
+
+        if ($params['order']) {
+            $query->order($params['order']);
+        }
+
+        return $query;
     }
 
     /**
