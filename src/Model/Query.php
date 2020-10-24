@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Model;
 
+use Generator;
 use IteratorAggregate;
 use Origin\Inflector\Inflector;
 use Origin\Core\Exception\InvalidArgumentException;
@@ -317,13 +318,12 @@ class Query implements IteratorAggregate
     }
 
     /**
-     * Chunks query results in batches and passes them to a callback
+     * Chunks query results into multiple queries making it more memory efficient
      *
      * @param integer $size
-     * @param callable $callback
-     * @return boolean
+     * @return \Generator
      */
-    public function chunk(int $size, callable $callback) : bool
+    public function chunk(int $size) : Generator
     {
         $page = 1;
 
@@ -337,40 +337,35 @@ class Query implements IteratorAggregate
           
             $collection = $this->model->all($conditions);
 
-            $found = $collection->count();
+            // handle empty collection
+            $found = $collection ? $collection->count() : 0;
 
             if ($found === 0) {
                 break;
             }
 
-            if ($callback($collection, $page) === false) {
-                return false;
-            }
+            yield $collection;
             unset($collection);
 
             $page ++;
         } while ($found === $size);
-
-        return true;
     }
 
     /**
-     * Executes a callback for each item through chunking to make it more memory efficient to
-     * work with large datasets.
+     * Processes a query and results in a memory efficient way, use this when working with thousands of records
      *
-     * @param callable $callback
      * @param integer $chunkSize
      * @return bool
      */
-    public function each(callable $callback, int $chunkSize = 1000) : bool
+    public function each(int $chunkSize = 1000) : Generator
     {
-        return $this->chunk($chunkSize, function ($collection) use ($callback) {
-            foreach ($collection as $index => $entity) {
-                if ($callback($entity, $index) === false) {
-                    return false;
+        foreach ($this->chunk($chunkSize) as $collection) {
+            foreach ($collection as $entity) {
+                if ($entity) {
+                    yield $entity;
                 }
             }
-        });
+        }
     }
 
     /**

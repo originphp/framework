@@ -20,6 +20,7 @@ namespace Origin\Model;
  *
  */
 
+use Generator;
 use ArrayObject;
 use Origin\Core\HookTrait;
 use Origin\Core\ModelTrait;
@@ -1138,69 +1139,6 @@ class Model
     }
 
     /**
-     * Runs the query in chunks to reduce memory usage when working with large datasets.
-     * @example
-     *
-     *  $this->Artcile->chunk(200, function ($articles, $page) {
-     *     // do something with articles collection or return false to break
-     *  });
-     *
-     * @param integer $size size of each chunk
-     * @param callable $callback
-     * @param array $options The following options keys are supported
-     *  - conditions: an array of conditions
-     *  - fields: an array of fields
-     *  - associated: an array of associated models to fetch
-     *  - order: a string or an array e.g. id ASC
-     * @return boolean
-     */
-    public function chunk(int $size, callable $callback, array $options = []) : bool
-    {
-        return $this->batchQuery($options)->chunk($size, $callback);
-    }
-
-    /**
-     * Executes a callback for each item through chunking to make it more memory efficient to
-     * work with large datasets.
-     *
-     * @param callable $callback
-     * @param array $options The following options keys are supported
-     *  - size: chunk size to use. default:1000
-     *  - conditions: an array of conditions
-     *  - fields: an array of fields
-     *  - associated: an array of associated models to fetch
-     *  - order: a string or an array e.g. id ASC
-     * @return boolean
-     */
-    public function each(callable $callback, array $options = []): bool
-    {
-        return $this->batchQuery($options)->each($callback, $options['size'] ?? 1000);
-    }
-
-    /**
-     * Builds the batch query object
-     *
-     * @param array $options
-     * @return Query
-     */
-    private function batchQuery(array $options) : Query
-    {
-        $options += ['conditions' => [], 'fields' => [],'associated' => [],'order' => null];
-
-        $query = new Query($this, $options['conditions'], $options['fields']);
-
-        if ($options['associated']) {
-            $query->with($options['associated']);
-        }
-
-        if ($options['order']) {
-            $query->order($options['order']);
-        }
-
-        return $query;
-    }
-
-    /**
      * Finds all records by array of conditions
      *
      * @param array $conditions
@@ -1218,6 +1156,77 @@ class Model
     public function findAllBy(array $conditions = [], array $options = [])
     {
         return $this->find('all', array_merge($options, ['conditions' => $conditions]));
+    }
+
+    /**
+     * This uses findInBatches and yeilds on record at a time
+     *
+     * @param array $options The following options keys are supported
+     *  - size: default:1000. The size of each batch
+     *  - start: the starting primary key, e.g. 1000
+     *  - finish: the primary key where to stop
+     * @return Generator
+     */
+    public function findEach(array $options = []): Generator
+    {
+        foreach ($this->findInBatches($options) as $collection) {
+            if ($collection) {
+                foreach ($collection as $entity) {
+                    yield $entity;
+                }
+            }
+        }
+    }
+
+    /**
+     * A memory efficient way to work with 1000s of records, this will return a collection with
+     * the size of each batch. This is used by findEach.
+     *
+     * @param array $options The following options keys are supported
+     *  - size: default:1000. The size of each batch
+     *  - start: the starting primary key, e.g. 1000
+     *  - finish: the primary key where to stop
+     * @return Generator
+     */
+    public function findInBatches(array $options = []): Generator
+    {
+        $options += ['size' => 1000,'start' => null,'finish' => null];
+     
+        $page = 1;
+
+        $conditions = [];
+
+        if ($options['start']) {
+            $conditions[$this->primaryKey() . ' >='] = $options['start'];
+        }
+
+        if ($options['finish']) {
+            $conditions[$this->primaryKey() . ' <='] = $options['finish'];
+        }
+        
+        $params = [
+            'conditions' => $conditions,
+            'offset' => null,
+            'limit' => $options['size']
+        ];
+ 
+        do {
+            $params['page'] = $page;
+
+            $collection = $this->all($params);
+
+            $found = $collection ? $collection->count() : 0;
+
+            if ($found === 0) {
+                break;
+            }
+
+            yield $collection;
+
+            unset($collection);
+
+            $page ++;
+        } while ($found === $options['size']);
     }
 
     /**

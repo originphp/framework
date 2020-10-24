@@ -21,6 +21,7 @@
 
 namespace Origin\Test\ModelRefactored;
 
+use Generator;
 use ArrayObject;
 use Origin\Model\Entity;
 
@@ -2239,5 +2240,70 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->find('first');
         $this->expectException(RecordSaveException::class);
         $this->Article->saveOrFail($article);
+    }
+
+    public function testFindInBatches()
+    {
+        // Article IDs 1000,1001,1002
+        $batches = $this->Article->findInBatches();
+        $this->assertInstanceOf(Generator::class, $batches);
+
+        $batches = $this->Article->findInBatches();
+        $this->assertGeneratorClass(Collection::class, $batches);
+      
+        $batches = $this->Article->findInBatches();
+        $this->assertGeneratorCount(1, $batches);
+
+        $batches = $this->Article->findInBatches(['size' => 2]);
+        $this->assertGeneratorCount(2, $batches);
+
+        // this also tests no results which is important with generator
+
+        $batches = $this->Article->findInBatches(['start' => 1003]);
+        $this->assertGeneratorCount(0, $batches);
+
+        $batches = $this->Article->findInBatches(['finish' => 99]);
+        $this->assertGeneratorCount(0, $batches);
+    }
+
+    public function testFindEach()
+    {
+        // Article IDs 1000,1001,1002
+        $articles = $this->Article->findEach();
+        $this->assertInstanceOf(Generator::class, $articles);
+        foreach ($articles as $article) {
+            $this->assertInstanceOf(Entity::class, $article);
+        }
+
+        // test no results
+        $articles = $this->Article->findEach(['start' => 10000000]);
+        $article = null;
+        $this->assertInstanceOf(Generator::class, $articles);
+        foreach ($articles as $article) {
+        }
+        $this->assertNull($article);
+    }
+
+    /**
+     * Asserts that a generator has x items
+     */
+    protected function assertGeneratorCount(int $expected, Generator $results)
+    {
+        $actual = 0;
+
+        foreach ($results as $result) {
+            $actual ++;
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Asserts that the results in the generator are a certain class
+     */
+    protected function assertGeneratorClass(string $expected, Generator $results)
+    {
+        foreach ($results as $result) {
+            $this->assertInstanceOf($expected, $result);
+        }
     }
 }
