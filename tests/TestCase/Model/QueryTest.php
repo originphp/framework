@@ -279,7 +279,7 @@ class QueryTest extends OriginTestCase
         $this->assertGeneratorCount(2, $chunks);
 
         // test no result generator
-        $chunks = $this->Article->where(['id' => 'abcd'])->chunk(100);
+        $chunks = $this->Article->where(['id' => 12345678])->chunk(100);
         $this->assertGeneratorCount(0, $chunks);
     }
 
@@ -293,7 +293,7 @@ class QueryTest extends OriginTestCase
         $this->assertGeneratorCount(3, $articles);
 
         // test no results
-        $articles = $this->Article->where(['id' => 'foo'])->each();
+        $articles = $this->Article->where(['id' => 12345678])->each();
         $this->assertGeneratorCount(0, $articles);
     }
 }
