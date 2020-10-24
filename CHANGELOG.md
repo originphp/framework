@@ -4,9 +4,9 @@
 
 ### Added
 
-- Added Model::chunk
-- Added Model::each
-- Added Query::chunk
+- Added Model::findInBatches
+- Added Model::findEach
+- Added Query::cunk
 - Added Query::each
 
 ### Fixed
