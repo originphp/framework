@@ -33,11 +33,12 @@ use Origin\Model\Model as BaseModel;
 use Origin\TestSuite\OriginTestCase;
 
 use Origin\Model\Exception\DatasourceException;
-use Origin\Model\Exception\RecordSaveException;
 
+use Origin\Model\Exception\RecordSaveException;
 use Origin\Model\Exception\MissingModelException;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Model\Exception\RecordNotFoundException;
+use Origin\Test\TestCase\Model\GeneratorTestTrait as ModelGeneratorTestTrait;
 
 class Model extends BaseModel
 {
@@ -259,6 +260,8 @@ class Article extends Model
 
 class ModelTest extends OriginTestCase
 {
+    use ModelGeneratorTestTrait;
+    
     protected $fixtures = [
         'Framework.Article',
         'Framework.ArticlesTag',
@@ -2282,28 +2285,5 @@ class ModelTest extends OriginTestCase
         foreach ($articles as $article) {
         }
         $this->assertNull($article);
-    }
-
-    /**
-     * Asserts that a generator has x items
-     */
-    protected function assertGeneratorCount(int $expected, Generator $results)
-    {
-        $actual = 0;
-
-        foreach ($results as $result) {
-            $actual ++;
-        }
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Asserts that the results in the generator are a certain class
-     */
-    protected function assertGeneratorClass(string $expected, Generator $results)
-    {
-        foreach ($results as $result) {
-            $this->assertInstanceOf($expected, $result);
-        }
     }
 }

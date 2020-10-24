@@ -19,12 +19,14 @@
  */
 namespace Origin\Test\ModelRefactored;
 
+use Generator;
 use Origin\Model\Model;
 
 use Origin\Model\Entity;
 
 use Origin\Model\Collection;
 use Origin\TestSuite\OriginTestCase;
+use Origin\Test\TestCase\Model\GeneratorTestTrait;
 use Origin\Core\Exception\InvalidArgumentException;
 
 class QueryArticle extends Model
@@ -47,6 +49,7 @@ class QueryAuthor extends Model
 
 class QueryTest extends OriginTestCase
 {
+    use GeneratorTestTrait;
     public $fixtures = ['Origin.Article','Origin.Author'];
 
     public function setUp(): void
@@ -260,5 +263,37 @@ class QueryTest extends OriginTestCase
     {
         $query = $this->Article->select(['id','title']);
         $this->assertEquals(1002, $query->maximum('id'));
+    }
+
+    public function testChunk()
+    {
+        $chunks = $this->Article->select(['id','title'])->chunk(100);
+        $this->assertInstanceOf(Generator::class, $chunks);
+        $this->assertGeneratorCount(1, $chunks);
+
+        $chunks = $this->Article->select(['id','title'])->chunk(100);
+        $this->assertGeneratorClass(Collection::class, $chunks);
+
+        // test sizing
+        $chunks = $this->Article->select(['id','title'])->chunk(2);
+        $this->assertGeneratorCount(2, $chunks);
+
+        // test no result generator
+        $chunks = $this->Article->where(['id' => 'abcd'])->chunk(100);
+        $this->assertGeneratorCount(0, $chunks);
+    }
+
+    public function testEach()
+    {
+        $articles = $this->Article->select(['id','title'])->each();
+        $this->assertInstanceOf(Generator::class, $articles);
+        $this->assertGeneratorCount(3, $articles);
+
+        $articles = $this->Article->select(['id','title'])->each(2);
+        $this->assertGeneratorCount(3, $articles);
+
+        // test no results
+        $articles = $this->Article->where(['id' => 'foo'])->each();
+        $this->assertGeneratorCount(0, $articles);
     }
 }
