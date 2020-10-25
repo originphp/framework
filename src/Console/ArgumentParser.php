@@ -149,13 +149,14 @@ class ArgumentParser
     public function addOption(string $name, array $options = []): void
     {
         $options += ['name' => $name,'short' => null,'default' => null,'required' => false,'type' => 'string','description' => '','banner' => strtoupper($name)];
+        
         if ($options['default'] && $options['required']) {
             throw new ConsoleException("Option {$name} cannot be required and have default value");
         }
         if (! in_array($options['type'], ['string','boolean','integer','array','hash'])) {
             throw new ConsoleException("Option {$name} invalid type");
         }
-    
+
         if ($options['short']) {
             $this->shortOptions[$options['short']] = $options;
         }
@@ -531,16 +532,18 @@ class ArgumentParser
     {
         $options = [];
         foreach ($this->options as $option) {
+            $isBoolean = $option['type'] === 'boolean';
+            
             $text = '--' . $option['name'];
 
             if ($option['short']) {
                 $text = '-' . $option['short']. ', ' . $text;
             }
-            if ($option['type'] !== 'boolean') {
+            if (! $isBoolean) {
                 $text .= '=' . $option['banner'] ;
             }
             $help = $option['description'];
-            if (array_key_exists('default', $option) && $option['default'] !== null) {
+            if (! $isBoolean && array_key_exists('default', $option) && $option['default'] !== null) {
                 $default = " <yellow>[default: {$option['default']}]</yellow>";
                 if (is_array($help)) {
                     $rows = count($help);
