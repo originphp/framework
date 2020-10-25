@@ -12,7 +12,7 @@
 ### Fixed
 
 - Fixed console command option help for bools was showing default value
-- Fixed issue with finderCount running twice
+- Fixed issue with finderCount parsing arguments twice due to refactor
 
 ## [3.8.1] - 2020-09-26
 
