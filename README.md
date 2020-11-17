@@ -1,7 +1,7 @@
 # OriginPHP Framework
 
 ![license](https://img.shields.io/badge/license-MIT-brightGreen.svg)
-[![build](https://travis-ci.org/originphp/framework.svg?branch=master)](https://travis-ci.org/originphp/framework)
+[![build status](https://travis-ci.com/originphp/framework.svg?branch=master)](https://travis-ci.com/originphp/framework)
 [![coverage](https://coveralls.io/repos/github/originphp/framework/badge.svg?branch=master)](https://coveralls.io/github/originphp/framework?branch=master)
 ![memory](https://img.shields.io/badge/memory-950KB-brightGeen.svg)
 
