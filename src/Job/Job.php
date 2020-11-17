@@ -270,7 +270,7 @@ class Job
                 $this->execute(...$this->arguments);
                 $this->dispatchCallbacks('afterDispatch', [$this->arguments]);
             }
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             Log::error($e->getMessage());
         
             if ($this->enqueued) {
