@@ -115,7 +115,7 @@ class ErrorHandler
 
         $message = "{$debug['class']} {$debug['message']}";
         if (isset($debug['stackFrames'][0]['file'])) {
-            $filename = str_replace(ROOT . DS, '', $debug['stackFrames'][0]['file']);
+            $filename = $this->shortenPath($debug['stackFrames'][0]['file']);
             $message .= " {$filename}:{$debug['stackFrames'][0]['line']}";
         }
         Log::error($message);
@@ -183,7 +183,7 @@ class ErrorHandler
      */
     protected function shortenPath(string $filename): string
     {
-        return str_replace(ROOT . DS, '', $filename);
+        return str_replace(ROOT . DIRECTORY_SEPARATOR, '', $filename);
     }
 
     /**

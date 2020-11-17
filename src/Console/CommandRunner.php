@@ -68,14 +68,13 @@ class CommandRunner
      */
     protected function buildNamespaceMap(): void
     {
-        $folder = 'Console/Command';
         $this->namespaces = [
-            Config::read('App.namespace') => APP . DS . $folder
+            Config::read('App.namespace') => APP . '/Console/Command'
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = Plugin::path($plugin) . DS . 'src' . DS . $folder;
+            $this->namespaces[$plugin] = Plugin::path($plugin). '/src/Console/Command';
         }
     }
 
@@ -280,7 +279,7 @@ class CommandRunner
                 $results[] = [
                     'className' => substr($file, 0, -4),
                     'namespace' => $namespace.'\Console\Command',
-                    'filename' => $directory.DS.$file,
+                    'filename' => $directory . '/' . $file,
                 ];
             }
         }
