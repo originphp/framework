@@ -499,7 +499,7 @@ abstract class Command
      */
     public function throwError(string $title, string $message = null): void
     {
-        $msg = "<exception> ERROR </exception> <heading>{$title}</heading>\n";
+        $msg = "\n<exception> ERROR </exception> <heading>{$title}</heading>\n";
         if ($message) {
             $msg .= "<text>{$message}</text>\n";
         }
