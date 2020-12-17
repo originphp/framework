@@ -96,6 +96,8 @@ class Helper
      * Converts an array of attributes to string format e.g
      * becomes.
      *
+     * Boolean values are handled differently, either they will add or ignore the key.
+     *
      * @param array $attributes ['class'=>'form-control']
      * @return string class="form-control"
      */
@@ -105,8 +107,8 @@ class Helper
         foreach ($attributes as $key => $value) {
             if ($value === true) {
                 $result[] = $key;
-            } elseif (is_scalar($value)) {
-                $result[] = "{$key}=\"{$value}\"";
+            } elseif ($value !== false && is_scalar($value)) {
+                $result[] = is_int($key) ? (string) $value : "{$key}=\"{$value}\"";
             }
         }
 
