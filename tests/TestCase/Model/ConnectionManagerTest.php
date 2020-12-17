@@ -37,9 +37,9 @@ class ConnectionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(ConnectionManager::has('foo'));
     }
 
-    public function testDatasources()
+    public function testList()
     {
-        $datasources = ConnectionManager::datasources();
+        $datasources = ConnectionManager::list();
         $this->assertTrue(in_array('default', $datasources));
         $this->assertTrue(in_array('test', $datasources));
     }

@@ -130,10 +130,23 @@ class ConnectionManager
 
     /**
      * Returns a list of datasources (connections)
-     *
+     * @codeCoverageIgnore
+     * @deprecated Use ConnectionManager::list() instead
      * @return array
      */
     public static function datasources(): array
+    {
+        deprecationWarning('ConnectionManager::datasources has been deprecated use ConnectionManager::list instead');
+
+        return static::list();
+    }
+
+    /**
+     * Returns a list of connections
+     *
+     * @return array
+     */
+    public static function list(): array
     {
         return array_keys(static::$config);
     }
