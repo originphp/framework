@@ -221,6 +221,7 @@ class FormHelper extends Helper
     {
         $options = array_merge(['hiddenField' => true], $options);
         $options = $this->prepareOptions($name, $options);
+
         $checked = ! empty($options['value']) ? true : false;
         if ($checked) {
             $options['checked'] = true;
@@ -366,7 +367,7 @@ class FormHelper extends Helper
      */
     public function control(string $name, array $options = []): string
     {
-        $selectOptions = [];
+        $selectOptions = $labelOptions = [];
 
         if (empty($options['type']) && array_key_exists('options', $options)) {
             $options['type'] = 'select';
@@ -376,8 +377,11 @@ class FormHelper extends Helper
             $options['type'] = $this->detectType($name);
         }
 
+        // Work with control templates which have label settings
         if (isset($this->config['controlDefaults'][$options['type']])) {
-            $options += $this->config['controlDefaults'][$options['type']];
+            $controlOptions = $this->config['controlDefaults'][$options['type']];
+            $labelOptions = $controlOptions['label'] ?? [];
+            $options += $controlOptions;
         }
 
         $before = $options['before'] ?? null;
@@ -424,12 +428,11 @@ class FormHelper extends Helper
             if (is_array($options['label'])) {
                 $labelOptions = $options['label'];
             } else {
-                $labelOptions = [
+                $labelOptions += [
                     'name' => $options['id'],
                     'text' => $options['label'],
                 ];
             }
-
             $labelOptions['name'] = $options['id'];
             if (empty($labelOptions['text'])) {
                 $labelOptions['text'] = $label;
