@@ -437,9 +437,9 @@ class Controller
      *   - template: default option, this will render the html template from the views folder.
      *   Other
      *   - status: the status code to return, e.g. 404
-     * @return void
+     * @return \Origin\Http\Response
      */
-    public function render($options = [])
+    public function render($options = []): Response
     {
         $template = $this->request->params('action');
         $options = empty($options) ? $template : $options;
@@ -457,13 +457,9 @@ class Controller
          */
         if ($this->autoRender && $this->serialize) {
             if ($this->request->respondAs() === 'json') {
-                $this->renderJson(null, $options['status']);
-    
-                return;
+                return $this->renderJson(null, $options['status']);
             } elseif ($this->request->respondAs() === 'xml') {
-                $this->renderXml(null, $options['status']);
-    
-                return;
+                return $this->renderXml(null, $options['status']);
             }
         }
 
@@ -472,15 +468,11 @@ class Controller
          * so array key exists better than isset.
          */
         if (array_key_exists('json', $options)) {
-            $this->renderJson($options['json'], $options['status']);
-
-            return;
+            return $this->renderJson($options['json'], $options['status']);
         }
         
         if (array_key_exists('xml', $options)) {
-            $this->renderXml($options['xml'], $options['status']);
-
-            return;
+            return $this->renderXml($options['xml'], $options['status']);
         }
 
         if (array_key_exists('text', $options)) {
@@ -506,7 +498,9 @@ class Controller
     
         $this->response->type($options['type']);   // 'json' or application/json
         $this->response->statusCode($options['status']); // 200
-        $this->response->body($body); //
+        $this->response->body($body);
+
+        return $this->response;
     }
 
     /**
@@ -550,15 +544,17 @@ class Controller
      *  403 - Forbidden (For application level permisions)
      *
      * @param array|string $data data which will be json encoded
-     * @return void
+     * @return \Origin\Http\Response
      */
-    public function renderJson($data, int $status = 200): void
+    public function renderJson($data, int $status = 200): Response
     {
         $this->autoRender = false; // Only render once
         $this->triggerCallback('beforeRender');
-        $this->response->type('json');   // 'json' or application/json
+        $this->request->header('Accept', 'application/json');   // 'json' or application/json
         $this->response->statusCode($status); // 200
         $this->response->body((new JsonView($this))->render($data));
+
+        return $this->response;
     }
 
     /**
@@ -578,15 +574,17 @@ class Controller
      *
      * @param array $data
      * @param integer $status
-     * @return void
+     * @return \Origin\Http\Response
      */
-    public function renderXml($data, int $status = 200): void
+    public function renderXml($data, int $status = 200): Response
     {
         $this->autoRender = false; // Disable for dispatcher
         $this->triggerCallback('beforeRender');
         $this->response->type('xml');
         $this->response->statusCode($status); // 200
         $this->response->body((new XmlView($this))->render($data));
+
+        return $this->response;
     }
 
     /**
