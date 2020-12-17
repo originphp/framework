@@ -176,8 +176,14 @@ class FormHelperTest extends OriginTestCase
         $expected = '<input type="text" name="article" class="form-control">';
         $this->assertEquals($expected, $FormHelper->text('article', ['class' => 'form-control']));
 
+        $expected = '<input type="text" name="article" class="form-control">';
+        $this->assertEquals($expected, $FormHelper->text('article', ['class' => 'form-control','disabled' => false]));
+
         $expected = '<input type="text" name="article" class="form-control" disabled>';
         $this->assertEquals($expected, $FormHelper->text('article', ['class' => 'form-control', 'disabled' => true]));
+
+        $expected = '<input type="text" name="article" class="form-control" disabled>';
+        $this->assertEquals($expected, $FormHelper->text('article', ['class' => 'form-control', 'disabled']));
 
         $expected = '<input type="text" name="article[title]">';
         $this->assertEquals($expected, $FormHelper->text('article.title'));
