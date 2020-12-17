@@ -39,11 +39,11 @@ class BlogPostsController extends Controller
      * We want this to run
      *
      * @param string $view
-     * @return void
+     * @return Response
      */
-    public function render($options = [])
+    public function render($options = []): Response
     {
-        return true;
+        return $this->response;
     }
 }
 
