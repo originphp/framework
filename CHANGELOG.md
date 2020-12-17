@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.9.1] - 2020-12-17
+
+### Fixed
+
+- Fixed JSON response setting content type
+- Fixed FormHelper using custom label in templates with label setting
+- Fixed FormHelper boolean attributes to work with false. e.g. default=false
+
+### Changed
+
+- Changed Controller::render return type to Response
+- Changed Controller::renderJson return type to Response
+- Changed Controller::renderXml return type to Response
+
 ## [3.9.0] - 2020-10-24
 
 ### Added
