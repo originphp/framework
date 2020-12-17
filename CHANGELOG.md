@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.9.1] - 2020-12-17
+## [3.9.3] - 2020-12-17
 
 ### Fixed
 
@@ -13,6 +13,10 @@
 - Changed Controller::render return type to Response
 - Changed Controller::renderJson return type to Response
 - Changed Controller::renderXml return type to Response
+
+### Deprecated
+
+- Deprecated ConnectionManager::datasources use ConnectionManager::list instead
 
 ## [3.9.0] - 2020-10-24
 
