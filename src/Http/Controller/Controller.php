@@ -550,10 +550,11 @@ class Controller
     {
         $this->autoRender = false; // Only render once
         $this->triggerCallback('beforeRender');
-        $this->request->header('Accept', 'application/json');   // 'json' or application/json
+       
+        $this->response->type('json');
         $this->response->statusCode($status); // 200
         $this->response->body((new JsonView($this))->render($data));
-
+       
         return $this->response;
     }
 
