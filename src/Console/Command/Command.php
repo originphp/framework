@@ -26,7 +26,9 @@ use Origin\Console\Exception\StopExecutionException;
 
 abstract class Command
 {
-    use ModelTrait,HookTrait;
+    use ModelTrait;
+    use HookTrait;
+
     /**
      * Default error code.
      *
