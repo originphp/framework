@@ -187,4 +187,49 @@ class BaseEntityTest extends \PHPUnit\Framework\TestCase
         $expected = '{"*name":"SimpleContact","*dirty":"true","*changed":"false","*errors":{"name":["missing last"]},"name":"Jon","full_name":" "}';
         $this->assertEquals($expected, json_encode($record->__debugInfo()));
     }
+
+    public function testIsEmpty()
+    {
+        $record = new SimpleContact();
+        $record->first_name = 'jon'; // setFirstName
+        $record->last_name = 'snow';
+        $record->subscribed = false;
+        $record->status = '';
+        $record->something = [];
+    
+        $this->assertTrue($record->isEmpty('status'));
+        $this->assertTrue($record->isEmpty('something'));
+        $this->assertTrue($record->isEmpty('foo'));
+
+        $this->assertFalse($record->isEmpty('first_name'));
+        $this->assertFalse($record->isEmpty('subscribed'));
+    }
+
+    public function testNotEmpty()
+    {
+        $record = new SimpleContact();
+        $record->first_name = 'jon'; // setFirstName
+        $record->last_name = 'snow';
+        $record->subscribed = false;
+        $record->status = '';
+        $record->something = [];
+    
+        $this->assertFalse($record->notEmpty('status'));
+        $this->assertFalse($record->notEmpty('something'));
+        $this->assertFalse($record->notEmpty('foo'));
+
+        $this->assertTrue($record->notEmpty('first_name'));
+        $this->assertTrue($record->notEmpty('subscribed'));
+    }
+
+    public function testHasErrors()
+    {
+        $record = new ActiveRecord();
+        $record->name = 'foo';
+
+        $this->assertFalse($record->hasErrors());
+
+        $record->error('name', 'something is wrong');
+        $this->assertTrue($record->hasErrors());
+    }
 }

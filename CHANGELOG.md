@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.10.0] - 2020-12-26
+
+### Added
+
+- Added isEmpty to BaseEntity
+- Added notEmpty to BaseEntity
+- Added hasErrors to BaseEntity
+
 ## [3.9.3] - 2020-12-17
 
 ### Fixed

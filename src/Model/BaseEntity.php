@@ -395,6 +395,44 @@ class BaseEntity
         return array_keys($this->entityData);
     }
 
+    /**
+     * Checks that the value is not null, is not an empty string or an empty array. This works similar
+     * to validation rule, but not PHP empty which will check false as well.
+     *
+     * @param string $property
+     * @return boolean
+     */
+    public function isEmpty(string $property): bool
+    {
+        $value = $this->get($property);
+
+        return $value === null || $value === '' || $value === [];
+    }
+
+    /**
+     * Checks if a property has a non-empty value (see isEmpty)
+     *
+     * @param string $property
+     * @return boolean
+     */
+    public function notEmpty(string $property): bool
+    {
+        return ! $this->isEmpty($property);
+    }
+
+    /**
+     * Checks if this entity has any errors
+     *
+     * @return boolean
+     */
+    public function hasErrors(): bool
+    {
+        return ! empty($this->entityErrors);
+    }
+
+    /**
+     * @return array
+     */
     public function __debugInfo()
     {
         $data = $this->entityData;
