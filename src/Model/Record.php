@@ -260,7 +260,11 @@ class Record extends BaseEntity
     }
 
     /**
-     * Validates a field
+     * Sets up the validation rules for a field, an existing rules for this field will be
+     * removed and replaced with the new ones defined.
+     *
+     * @internal This needs to act as a replace, like in Models, and consistent with hasOne methods
+     * etc.
      *
      * @param string $field name of the field to validate
      * @param string|array $name rule name for single rule or an array for multiple rules
@@ -274,7 +278,7 @@ class Record extends BaseEntity
      */
     public function validate(string $field, $name, array $options = []): void
     {
-        $this->validator()->add($field, $name, $options);
+        $this->validator()->remove($field)->add($field, $name, $options);
     }
     
     /**
