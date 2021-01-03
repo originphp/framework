@@ -531,7 +531,7 @@ class ConsoleIo
 
     protected function sttyInstalled(): bool
     {
-        exec('stty --version', $output, $exitcode);
+        exec('stty 2>&1', $output, $exitcode);
 
         return $exitcode === 0;
     }

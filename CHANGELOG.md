@@ -1,11 +1,16 @@
 # Changelog
 
+## [3.11.1] - 2021-01-03
+
+### Fixed
+
+- Fixed askSecret not working on MAC installation
 
 ## [3.11.0] - 2021-01-03
 
 ### Added
 
-- Added ConsoleIo::askScret
+- Added ConsoleIo::askSecret
 
 ## [3.10.1] - 2020-12-27
 
