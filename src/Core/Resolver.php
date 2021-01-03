@@ -14,6 +14,9 @@
 declare(strict_types = 1);
 namespace Origin\Core;
 
+/**
+ * TODO: consider renaming this Application or App
+ */
 class Resolver
 {
     /**
@@ -63,5 +66,22 @@ class Resolver
     public static function classExists(string $class): bool
     {
         return class_exists($class);
+    }
+
+    /**
+     * Removes the leading APP or ROOT from path in the application.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function trimPath(string $path): string
+    {
+        if (defined('APP') && strpos($path, APP) === 0) {
+            $path = str_replace(APP . DIRECTORY_SEPARATOR, '', $path);
+        } elseif (defined('ROOT') && strpos($path, ROOT) === 0) {
+            $path = str_replace(ROOT . DIRECTORY_SEPARATOR, '', $path);
+        }
+
+        return $path;
     }
 }

@@ -14,6 +14,7 @@
 
 use Origin\Core\Config;
 use Origin\Core\Debugger;
+use Origin\Core\Resolver;
 use Origin\Core\Exception\Exception;
 
 if (! function_exists('backtrace')) {
@@ -32,7 +33,7 @@ if (! function_exists('backtrace')) {
                 $errorHandler->render($debug, true);
             } elseif (! isConsole() && class_exists('Origin\Http\ErrorHandler')) {
                 ob_clean();
-                require APP .  DS . 'Http' . DS . 'View' . DS . 'error' . DS . 'debug.ctp';
+                require APP . '/Http/View/error/debug.ctp';
             } else {
                 throw new Exception('Backtrace not supported');
             }
@@ -55,8 +56,10 @@ if (! function_exists('debug')) {
     {
         if (debugEnabled()) {
             $backtrace = debug_backtrace();
-            $filename = str_replace(ROOT . DS, '', $backtrace[0]['file']);
+
+            $filename = Resolver::trimPath($backtrace[0]['file']);
             $line = $backtrace[0]['line'];
+
             $data = print_r($data, true);
             if ($isHtml) {
                 $data = h($data);
@@ -171,7 +174,8 @@ if (! function_exists('pluginSplit')) {
 if (! function_exists('commandSplit')) {
     /**
      * Splits a command
-     *
+     * @deprecated This will be deprecated in future, its been moved to CommandRunner which is the only use
+     * case.
      * @param string $command app:create-user,
      * @return array
      */
@@ -239,10 +243,11 @@ if (! function_exists('deprecationWarning')) {
         if (isset($trace[$frameNo])) {
             $file = $trace[$frameNo]['file'] ?? 'internal';
             $line = $trace[$frameNo]['line'] ?? '?';
+
             $message = sprintf(
                 "%s\nFile: %s.\nLine: %s",
                 $message,
-                str_replace(ROOT . DS, '', $file),
+                $file,
                 $line
             );
         }
@@ -288,7 +293,7 @@ if (! function_exists('tmp_path')) {
      */
     function tmp_path(string $path = null): string
     {
-        return TMP . ($path ? DS  . $path : '');
+        return TMP . ($path ? DIRECTORY_SEPARATOR . $path : '');
     }
 }
 
@@ -307,7 +312,7 @@ if (! function_exists('storage_path')) {
          */
         $folder = defined('STORAGE') ? STORAGE : ROOT . '/storage';
   
-        return $folder . ($path ? DS  . $path : '');
+        return $folder . ($path ? DIRECTORY_SEPARATOR  . $path : '');
     }
 }
 
@@ -321,6 +326,6 @@ if (! function_exists('config_path')) {
      */
     function config_path(string $path = null): string
     {
-        return CONFIG . ($path ? DS  . $path : '');
+        return CONFIG . ($path ? DIRECTORY_SEPARATOR  . $path : '');
     }
 }
