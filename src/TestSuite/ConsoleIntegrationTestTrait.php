@@ -15,9 +15,9 @@ declare(strict_types = 1);
 namespace Origin\TestSuite;
 
 use Origin\Console\ConsoleIo;
-use Origin\Console\ConsoleInput;
 use Origin\Console\CommandRunner;
 use Origin\Console\Command\Command;
+use Origin\TestSuite\Stub\ConsoleInput;
 use Origin\TestSuite\Stub\ConsoleOutput;
 
 /**
@@ -97,22 +97,8 @@ trait ConsoleIntegrationTestTrait
 
         $this->stdout = new ConsoleOutput();
         $this->stderr = new ConsoleOutput();
-        $this->stdin = $this->getMockBuilder(ConsoleInput::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['read'])
-            ->getMock();
-
-        $x = 0;
-        foreach ($input as $data) {
-            $this->stdin->expects(
-                $this->at($x)
-            )
-                ->method('read')
-                ->will(
-                    $this->returnValue($data)
-                );
-            ++$x;
-        }
+        $this->stdin = new ConsoleInput();
+        $this->stdin->setInput($input);
 
         $argv = $this->splitCommand("console {$command}");
         list($namespace, $class) = namespacesplit(get_class($this));

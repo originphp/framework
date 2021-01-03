@@ -34,15 +34,17 @@ class ConsoleInputTest extends \PHPUnit\Framework\TestCase
     
     public function testRead()
     {
+        /**
+         * At has been deprecated
+         * @see https://github.com/sebastianbergmann/phpunit/issues/4297
+         */
         $ConsoleInput = $this->getMockBuilder(ConsoleInput::class)
             ->disableOriginalConstructor()
-            ->setMethods(['read'])
+            //->setMethods(['read'])
             ->getMock();
 
-        $ConsoleInput->expects($this->at(0))->method('read')->will($this->returnValue(''));
-        $ConsoleInput->expects($this->at(1))->method('read')->will($this->returnValue('q'));
-
-        $this->assertEquals('', $ConsoleInput->read());
+        $ConsoleInput->expects($this->once())->method('read')->will($this->returnValue('q'));
+    
         $this->assertEquals('q', $ConsoleInput->read());
     }
 
