@@ -68,4 +68,11 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
         MockResolver::addClass($expected);
         $this->assertEquals($expected, MockResolver::className('Myplugin.Banana', 'Controller/Component', 'Component', 'Http'));
     }
+
+    public function testTrimPath()
+    {
+        $this->assertEquals('foo/bar', Resolver::trimPath(APP . '/foo/bar'));
+        $this->assertEquals('foo/bar', Resolver::trimPath(ROOT . '/foo/bar'));
+        $this->assertEquals('/var/www/foo/bar', Resolver::trimPath('/var/www/foo/bar'));
+    }
 }
