@@ -286,6 +286,18 @@ EOF;
         $this->assertStringContainsString('continue?', $this->stdout->read());
     }
 
+    /**
+     * TODO: not sure how to test STTY just yet
+     *
+     * @return void
+     */
+    public function testAskScret()
+    {
+        $io = $this->io();
+        $this->stdin->set('1234');
+        $this->assertEquals('1234', $io->askSecret('password'));
+    }
+
     public function testAskChoice()
     {
         $io = $this->io();

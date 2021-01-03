@@ -500,6 +500,43 @@ class ConsoleIo
     }
 
     /**
+     * Asks a question with a hidden response, for passwords, tokens etc. Stty is
+     * required for this work (linux systems). If it is not available input will be
+     * displayed on screen.
+     *
+     * @param string $prompt
+     * @return string|null
+     */
+    public function askSecret(string $prompt): ? string
+    {
+        $this->stdout->write("\033[32;49m".$prompt);
+        $this->stdout->write("\033[97;49m> ", false);
+
+        $stty = $this->sttyInstalled();
+
+        if ($stty) {
+            $mode = shell_exec('stty -g');
+            shell_exec('stty -echo');
+        }
+
+        $input = $this->stdin->read();
+
+        if ($stty) {
+            shell_exec("stty {$mode}");
+        }
+        
+        $this->stdout->write("\033[0m"); // reset + line break
+        return $input;
+    }
+
+    protected function sttyInstalled(): bool
+    {
+        exec('stty --version', $output, $exitcode);
+
+        return $exitcode === 0;
+    }
+
+    /**
      * Asks the user a question and returns the value (or default if set).
      *
      * @param string $prompt  The question to ask
