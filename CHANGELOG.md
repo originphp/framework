@@ -1,10 +1,17 @@
 # Changelog
 
+
+## [3.11.0] - 2021-01-03
+
+### Added
+
+- Added ConsoleIo::askScret
+
 ## [3.10.1] - 2020-12-27
 
 ### Fixed
 
-- Fixed Record::validate method behavior to overwrite existing rules when called so it acts like the model:validate method. 
+- Fixed Record::validate method behavior to overwrite existing rules when called so it acts like the model:validate method.
 
 ## [3.10.0] - 2020-12-26
 
