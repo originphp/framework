@@ -994,9 +994,13 @@ class QueryBuilder
         return "{$field} {$expression} ( ".$this->placeholdersToString(array_values($placeholders)).' )';
     }
 
-    protected function placeholdersToString(array $placeholders)
+    /**
+     * @param array $placeholders
+     * @return string
+     */
+    protected function placeholdersToString(array $placeholders): string
     {
-        array_walk($placeholders, function (&$value, &$key) {
+        array_walk($placeholders, function (&$value) {
             $value = ":{$value}";
         });
 
