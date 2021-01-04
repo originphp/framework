@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.11.2] - 2021-01-04
+
+## Changed
+
+- Changed Console integration error thrown when missing input (refactored 3.11.1)
+
+### Fixed
+
+- Fixed issue on PHP 8 with QueryBuilder::placeholdersToString function
+
 ## [3.11.1] - 2021-01-03
 
 ### Fixed
