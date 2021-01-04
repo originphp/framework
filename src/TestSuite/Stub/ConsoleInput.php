@@ -14,8 +14,8 @@
 declare(strict_types=1);
 namespace Origin\TestSuite\Stub;
 
-use Origin\Console\Exception\ConsoleException;
 use Origin\Console\ConsoleInput as BaseConsoleInput;
+use Origin\TestSuite\Exception\ConsoleInputRequired;
 
 class ConsoleInput extends BaseConsoleInput
 {
@@ -33,7 +33,7 @@ class ConsoleInput extends BaseConsoleInput
         $index = $this->currentIndex();
 
         if (! isset($this->input[$index])) {
-            throw new ConsoleException('ConsoleInput expected more input');
+            throw new ConsoleInputRequired('Console input is requesting more input that what was provided');
         }
 
         return $this->input[$index];
