@@ -22,28 +22,30 @@
   <php>
     <const name="PHPUNIT" value="true"/>
     <env name="ORIGIN_ENV" value="test"/>
-    <!-- # Database Settings mysql/pgsql
-            <env name="DB_HOST" value="localhost" />
-            <env name="DB_USERNAME" value="root" />
-            <env name="DB_PASSWORD" value="root" />
-            <env name="DB_ENGINE" value="mysql" />
-        -->
-    <!-- # MailFetcher Testing - Gmail blocks Travis IPs
-            <env name="EMAIL_IMAP_USERNAME" value="secret"/>
-            <env name="EMAIL_IMAP_PASSWORD" value="secret"/>
-            <env name="EMAIL_IMAP_HOST" value="imap.gmail.com"/>
-            <env name="EMAIL_IMAP_PORT" value="993"/>
-            <env name="EMAIL_IMAP_ENCRYPTION" value="ssl"/>
-           
-            <env name="EMAIL_POP3_USERNAME" value="secret"/>
-            <env name="EMAIL_POP3_PASSWORD" value="secret"/>
-            <env name="EMAIL_POP3_HOST" value="pop.gmail.com"/>
-            <env name="EMAIL_POP3_PORT" value="995"/>
-            <env name="EMAIL_POP3_ENCRYPTION" value="ssl"/>
-        -->
-    
-      <env name="REDIS_HOST" value="127.0.0.1"/>
-      <env name="REDIS_PORT" value="6379"/>
-      
+
+  <!-- 
+    <env name="DB_HOST" value="localhost" />
+    <env name="DB_USERNAME" value="root" />
+    <env name="DB_PASSWORD" value="root" />
+    <env name="DB_ENGINE" value="mysql" />
+  -->
+
+  <!-- 
+    <env name="EMAIL_IMAP_USERNAME" value="secret"/>
+    <env name="EMAIL_IMAP_PASSWORD" value="secret"/>
+    <env name="EMAIL_IMAP_HOST" value="imap.gmail.com"/>
+    <env name="EMAIL_IMAP_PORT" value="993"/>
+    <env name="EMAIL_IMAP_ENCRYPTION" value="ssl"/>
+
+    <env name="EMAIL_POP3_USERNAME" value="secret"/>
+    <env name="EMAIL_POP3_PASSWORD" value="secret"/>
+    <env name="EMAIL_POP3_HOST" value="pop.gmail.com"/>
+    <env name="EMAIL_POP3_PORT" value="995"/>
+    <env name="EMAIL_POP3_ENCRYPTION" value="ssl"/>
+  -->
+
+    <env name="REDIS_HOST" value="127.0.0.1"/>
+    <env name="REDIS_PORT" value="6379"/>
+
   </php>
 </phpunit>
