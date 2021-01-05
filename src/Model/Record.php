@@ -118,7 +118,7 @@ class Record extends BaseEntity
         if (is_array($options['fields'])) {
             $data = static::filterData($data, $options['fields']);
         }
-
+        /** @phpstan-ignore-next-line */
         return new static($data, $options);
     }
 

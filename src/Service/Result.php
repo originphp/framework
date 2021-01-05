@@ -22,8 +22,8 @@ namespace Origin\Service;
  *
  *  # Examples
  *
- *  $result = new Result(['success'=>true,'data'=>['foo'=>'bar']]);
- *  $result = new Result(['success'=>false,'error'=>['message'=>'foo does not exist']]);
+ *  $result = new Result(['data'=>['foo'=>'bar']]);
+ *  $result = new Result(['error'=>['message'=>'foo does not exist']]);
  *
  *  You don't have to set the success key, you can just use `data` OR `error `inline with the gle JSON style guide
  *  the success and error methods will pick this up. For example:
@@ -66,7 +66,7 @@ class Result
      */
     public function data(string $key = null)
     {
-        $data = $this->data ?? null;
+        $data = isset($this->data) ? $this->data : null;
 
         if ($key === null) {
             return $data;
@@ -83,7 +83,7 @@ class Result
      */
     public function error(string $key = null)
     {
-        $data = $this->error ?? null;
+        $data = isset($this->error) ? $this->error : null;
 
         if ($key === null) {
             return $data;

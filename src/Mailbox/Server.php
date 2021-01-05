@@ -28,7 +28,7 @@ class Server
      *
      * @var \Origin\Mailbox\Model\InboundEmail
      */
-    protected $inboundEmail = null;
+    protected $InboundEmail = null;
 
     /**
      * Pipe stream

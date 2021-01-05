@@ -78,6 +78,9 @@ EOF;
     */
     public function testExecute()
     {
+        if (!getenv('EMAIL_IMAP_HOST')) {
+            $this->markTestSkipped();
+        }
         $result = (new MailboxDownloadService($this->InboundEmail, $this->Imap))->dispatch('test');
         $this->assertTrue($result->success());
     }

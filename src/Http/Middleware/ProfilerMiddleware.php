@@ -61,8 +61,6 @@ class ProfilerMiddleware extends Middleware
     public function process(Request $request, Response $response): void
     {
         $this->request = $request;
-        $this->method = $request->method();
-        $this->url = $request->url();
     }
 
     /**

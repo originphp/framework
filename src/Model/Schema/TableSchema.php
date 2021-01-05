@@ -170,7 +170,7 @@ class TableSchema
             if (empty($attributes['references'])) {
                 throw new Exception(sprintf('Constraint %s is missing references', $name));
             }
-            if (! is_array($attributes['references']) or count($attributes['references']) !== 2) {
+            if (! is_array($attributes['references']) || count($attributes['references']) !== 2) {
                 throw new Exception(sprintf('Constraint %s references should be an array with table and column name', $name));
             }
         

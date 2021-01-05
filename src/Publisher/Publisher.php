@@ -17,7 +17,7 @@ namespace Origin\Publisher;
 use Origin\Publisher\Exception\PublisherException;
 use Origin\Core\Exception\InvalidArgumentException;
 
-class Publisher
+final class Publisher
 {
     /**
      * @var \Origin\Publisher\Publisher
@@ -44,7 +44,7 @@ class Publisher
 
         return static::$instance;
     }
-
+    
     /**
      * Subscribes an object
      *

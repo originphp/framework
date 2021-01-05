@@ -24,7 +24,7 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension not loaded');
         }
-        if (! getenv('REDIS_HOST') or ! getenv('REDIS_PORT')) {
+        if (! getenv('REDIS_HOST') || ! getenv('REDIS_PORT')) {
             $this->markTestSkipped('Redis settings not found');
         }
     }

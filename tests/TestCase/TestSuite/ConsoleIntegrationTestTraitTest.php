@@ -17,7 +17,7 @@ namespace Origin\Test\TestSuite;
 use Origin\TestSuite\TestTrait;
 use Origin\Console\Command\Command;
 use Origin\TestSuite\ConsoleIntegrationTestTrait;
-use Origin\TestSuite\Exception\ConsoleInputRequired;
+use Origin\TestSuite\Exception\ConsoleInputRequiredException;
 
 class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -55,7 +55,7 @@ class ConsoleIntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testExecInputNotEnoughInput()
     {
-        $this->expectException(ConsoleInputRequired::class);
+        $this->expectException(ConsoleInputRequiredException::class);
         $this->exec('test ask', []);
     }
 

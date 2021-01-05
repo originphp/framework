@@ -153,7 +153,7 @@ class MailboxTest extends OriginTestCase
 
     public function testDownload()
     {
-        if (! env('EMAIL_IMAP_USERNAME') or ! env('EMAIL_IMAP_PASSWORD')) {
+        if (! env('EMAIL_IMAP_USERNAME') || ! env('EMAIL_IMAP_PASSWORD')) {
             $this->markTestSkipped(
                 'Imap username and password not setup'
             );

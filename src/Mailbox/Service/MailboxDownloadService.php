@@ -25,6 +25,10 @@ use Origin\Mailbox\Model\InboundEmail;
 class MailboxDownloadService extends Service
 {
     /**
+     * @var array
+     */
+    protected $config;
+    /**
      * @var \Origin\Mailbox\Model\InboundEmail
      */
     protected $InboundEmail;

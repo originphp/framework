@@ -595,28 +595,22 @@ class MailParser
             return $last['content-type'] === 'text/html' ? 'html' : 'text';
         }
 
+        $out = 'text';
+
         /**
          * Two versions of the same mesage are provided but check html version actually exists as
          * it could be richtext.
          * @link http://www.freesoft.org/CIE/RFC/1521/18.htm
          */
         if (in_array($contentType, ['multipart/related', 'multipart/mixed'])) {
-            $out = 'text';
             foreach ($this->parts as $part) {
                 if ($part['content-type'] === 'text/html') {
                     $out = 'html';
                     break;
                 }
             }
-
-            return $out;
-        }
-
-        /**
-         * Parse email reports, original message is included so this can be tricky.
-         */
-        if ($contentType === 'multipart/report') {
-            $out = 'text';
+        } elseif ($contentType === 'multipart/report') {
+            // Parse email reports, original message is included so this can be tricky.
             foreach ($this->parts as $part) {
                 if ($part['content-type'] === 'message/delivery-status') {
                     $out = 'text';
@@ -627,9 +621,9 @@ class MailParser
                     break;
                 }
             }
-
-            return $out;
         }
+
+        return $out;
     }
 
     public function __destruct()

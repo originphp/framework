@@ -330,7 +330,7 @@ class AuthComponent extends Component
      */
     protected function isAllowed(string $action): bool
     {
-        return (in_array($action, $this->allowedActions) or in_array('*', $this->allowedActions));
+        return (in_array($action, $this->allowedActions) || in_array('*', $this->allowedActions));
     }
 
     /**

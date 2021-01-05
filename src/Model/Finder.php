@@ -69,7 +69,7 @@ class Finder
             $results = new Collection($results, ['name' => $this->model->alias()]);
         }
 
-        unset($sql, $connection);
+        unset($connection);
 
         return $results;
     }

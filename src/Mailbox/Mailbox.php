@@ -30,7 +30,11 @@ use Origin\Mailbox\Service\MailboxDownloadService;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
-class Mailbox
+/**
+ * Add the process method to your class
+ * @method void process() This will be called by dispatch
+ */
+abstract class Mailbox
 {
     use HookTrait, Configurable, ModelTrait, CallbackRegistrationTrait;
   

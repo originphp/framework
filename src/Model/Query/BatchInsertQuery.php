@@ -20,6 +20,12 @@ use InvalidArgumentException;
 
 class BatchInsertQuery extends QueryObject
 {
+
+    /**
+     * @var \Origin\Model\Model
+     */
+    private $Model;
+    
     protected function initialize(Model $model): void
     {
         $this->Model = $model;

@@ -38,6 +38,10 @@ use Origin\Inflector\Inflector;
 
  */
 
+/**
+ * Add the execute method to your class
+ * @method \Origin\Email\Message execute() This will be called by dispatch
+ */
 abstract class Mailer
 {
     use HookTrait;

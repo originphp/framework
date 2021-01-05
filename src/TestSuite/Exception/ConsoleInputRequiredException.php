@@ -16,6 +16,6 @@ namespace Origin\TestSuite\Exception;
 
 use RuntimeException;
 
-class ConsoleInputRequired extends RuntimeException
+class ConsoleInputRequiredException extends RuntimeException
 {
 }

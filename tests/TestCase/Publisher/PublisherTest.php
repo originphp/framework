@@ -43,14 +43,6 @@ class SimpleObject
     use PublisherTrait;
 }
 
-class MockPublisher extends Publisher
-{
-    public static function destroy()
-    {
-        static::$instance = null;
-    }
-}
-
 /**
  * @property \App\Model\User $User
  */
@@ -142,7 +134,7 @@ class PublisherTest extends OriginTestCase
 
     public function testInstance()
     {
-        $this->assertInstanceOf(Publisher::class, MockPublisher::instance());
+        $this->assertInstanceOf(Publisher::class, Publisher::instance());
     }
 
     public function testGlobal()

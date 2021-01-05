@@ -44,15 +44,19 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
 
     public function testDownloadImap()
     {
-        if (! env('EMAIL_IMAP_USERNAME') or ! env('EMAIL_IMAP_PASSWORD')) {
+        if (! env('EMAIL_IMAP_USERNAME') || ! env('EMAIL_IMAP_PASSWORD')) {
             $this->markTestSkipped(
                 'EMAIL username and password not setup'
             );
         }
 
         $fetcher = new MailFetcher([
-            'host' => env('EMAIL_IMAP_HOST'),'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
-            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD'),'timeout' => 5
+            'host' => env('EMAIL_IMAP_HOST'),
+            'port' => env('EMAIL_IMAP_PORT'),
+            'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),
+            'validateCert' => false,
+            'username' => env('EMAIL_IMAP_USERNAME'),
+            'password' => env('EMAIL_IMAP_PASSWORD'),'timeout' => 5
         ]);
 
         $messages = $fetcher->download(['limit' => 1]);
@@ -90,8 +94,12 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
     public function testSync($messageId)
     {
         $fetcher = new MailFetcher([
-            'host' => env('EMAIL_IMAP_HOST'),'port' => env('EMAIL_IMAP_PORT'),'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),'validateCert' => false,
-            'username' => env('EMAIL_IMAP_USERNAME'),'password' => env('EMAIL_IMAP_PASSWORD')
+            'host' => env('EMAIL_IMAP_HOST'),
+            'port' => env('EMAIL_IMAP_PORT'),
+            'encryption' => env('EMAIL_IMAP_ENCRYPTION', null),
+            'validateCert' => false,
+            'username' => env('EMAIL_IMAP_USERNAME'),
+            'password' => env('EMAIL_IMAP_PASSWORD')
         ]);
 
         $fetcher->download(['limit' => 1,'messageId' => $messageId]);
@@ -106,14 +114,19 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
      */
     public function testDownloadPop3()
     {
-        if (! env('EMAIL_POP3_USERNAME') or ! env('EMAIL_POP3_PASSWORD')) {
+        if (! env('EMAIL_POP3_USERNAME') || ! env('EMAIL_POP3_PASSWORD')) {
             $this->markTestSkipped(
                 'EMAIL username and password not setup'
             );
         }
         $fetcher = new MailFetcher([
-            'host' => env('EMAIL_POP3_HOST'),'port' => env('EMAIL_POP3_PORT'),'encryption' => env('EMAIL_POP3_ENCRYPTION', null),'validateCert' => false,
-            'username' => env('EMAIL_POP3_USERNAME'),'password' => env('EMAIL_POP3_PASSWORD'),'protocol' => 'pop3'
+            'host' => env('EMAIL_POP3_HOST'),
+            'port' => env('EMAIL_POP3_PORT'),
+            'encryption' => env('EMAIL_POP3_ENCRYPTION', null),
+            'validateCert' => false,
+            'username' => env('EMAIL_POP3_USERNAME'),
+            'password' => env('EMAIL_POP3_PASSWORD'),
+            'protocol' => 'pop3'
         ]);
         // there may or may not be messages if we keep running tests
         $messages = $fetcher->download(['limit' => 1]);

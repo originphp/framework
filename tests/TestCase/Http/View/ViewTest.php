@@ -55,7 +55,7 @@ class MockView extends View
 
     public function fileExists(string $filename): bool
     {
-        return in_array($filename, $this->mockFiles) or file_exists($filename);
+        return in_array($filename, $this->mockFiles) || file_exists($filename);
     }
 
     public function setFile(string $filename)

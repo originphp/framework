@@ -27,9 +27,16 @@ use Origin\Core\CallbackRegistrationTrait;
  * (new SendUserWelcomeEmail($user))->dispatch(['wait' => '+5 minutes']);
  */
 
+ /**
+ * Add the execute method to your class
+ * @method bool execute() This will be called by dispatch
+ */
 class Job
 {
-    use ModelTrait,HookTrait,CallbackRegistrationTrait;
+    use ModelTrait;
+    use HookTrait;
+    use CallbackRegistrationTrait;
+
     /**
      * This is the display name for the job
      *
@@ -111,6 +118,13 @@ class Job
      * @var array
      */
     protected $retryOptions = null;
+
+    /**
+     * Date the job was serialized
+     *
+     * @var string|null
+     */
+    protected $serialized = null;
 
     /**
      * Constructor

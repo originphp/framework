@@ -24,6 +24,10 @@ use Origin\Console\ArgumentParser;
 use Origin\Console\Exception\ConsoleException;
 use Origin\Console\Exception\StopExecutionException;
 
+/**
+ * Add the execute method to your class
+ * @method void execute() This will be called by dispatch
+ */
 abstract class Command
 {
     use ModelTrait;

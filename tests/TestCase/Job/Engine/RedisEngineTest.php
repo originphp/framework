@@ -72,7 +72,7 @@ class RedisEngineTest extends OriginTestCase
             $this->markTestSkipped('Redis extension not loaded');
         }
 
-        if (! env('REDIS_HOST') or ! env('REDIS_PORT')) {
+        if (! env('REDIS_HOST') || ! env('REDIS_PORT')) {
             $this->markTestSkipped('Redis settings not found');
         }
 

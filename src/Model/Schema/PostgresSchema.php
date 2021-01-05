@@ -415,11 +415,11 @@ class PostgresSchema extends BaseSchema
 
         $out = [];
 
+        // TODO: investigate setDefault
         $actionMap = [
             'c' => 'cascade',
             'r' => 'restrict',
             'a' => 'noAction',
-            null => 'setDefault', // @todo investigate this
             null => 'setNull',
         ];
 

@@ -274,9 +274,9 @@ class Marshaller
      * @param \Origin\Model\Collection $collection
      * @param array $data
      * @param array $options
-     * @return void
+     * @return array
      */
-    private function matchMany(Collection $collection, array $data, array $options = [])
+    private function matchMany(Collection $collection, array $data, array $options = []): array
     {
         // for matching we need a model
         $primaryKey = $this->getPrimaryKey($options['name']);

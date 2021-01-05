@@ -1,0 +1,90 @@
+#
+# OriginPHP Framework
+# Copyright 2021 Jamiel Sharief.
+#
+# Licensed under The MIT License
+# The above copyright notice and this permission notice shall be included in all copies or substantial
+# portions of the Software.
+#
+# @copyright    Copyright (c) Jamiel Sharief
+# @link         https://www.originphp.com
+# @license      https://opensource.org/licenses/mit-license.php MIT License
+#
+name: CI
+on:
+  push:
+jobs:
+  tests:
+    name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
+    runs-on: "ubuntu-latest"
+    strategy:
+#      max-parallel: 3
+      matrix:
+        php-version:
+          - "7.4"
+#          - "8.0"
+          - "7.3"
+        database:
+          - mysql
+          - postgres
+          - sqlite
+    steps:
+      - name: Checkout source code
+        uses: "actions/checkout@v2"
+      - name: Setup MySQL
+        if: matrix.database == 'mysql'
+        run: |
+          docker run -d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=origin_test -p 3306:3306 mysql:8.0.16 --default-authentication-plugin=mysql_native_password --disable-log-bin
+          sudo apt-get install mysql-client
+      - name: Setup PostgresSQL
+        if: matrix.database == 'postgres'
+        run: |
+          docker run -d -e POSTGRES_PASSWORD=root -e POSTGRES_DB=origin_test -p 5432:5432 postgres
+          sudo apt-get install postgresql-client
+      - name: Setup Redis 
+        run: docker run -p 6379:6379 -d redis
+      - name: Install PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "xdebug"
+          php-version: "${{ matrix.php-version }}"
+          tools: composer:v2
+          extensions: pdo_mysql, pdo_sqlite, pdo_pgsql, mailparse
+      - name: Install dependencies
+        run: |
+          composer require php-coveralls/php-coveralls:^2.4 --dev --no-update
+          composer update --no-progress --prefer-dist
+      - name: Run PHPUnit
+        run: |
+          if [[ ${{ matrix.database }} == 'sqlite' ]]; then
+            export DB_USERNAME=jim;
+          fi;
+          if [[ ${{ matrix.database }} == 'mysql' ]]; then
+            export DB_USERNAME=root;
+            sudo mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE origin;'
+          fi;
+          if [[ ${{ matrix.database }} == 'postgres' ]]; then
+            export DB_USERNAME=postgres;
+            sudo PGPASSWORD=root psql -h 127.0.0.1 -c 'CREATE DATABASE origin;' -U postgres
+          fi;
+          php vendor/bin/phpunit --coverage-clover=clover.xml
+        env:
+          DB_PASSWORD: root
+          DB_ENGINE: ${{ matrix.database }}
+          EMAIL_IMAP_HOST: ${{ secrets.EMAIL_IMAP_HOST }}
+          EMAIL_IMAP_USERNAME: ${{ secrets.EMAIL_IMAP_USERNAME }}
+          EMAIL_IMAP_PASSWORD: ${{ secrets.EMAIL_IMAP_PASSWORD }}
+          EMAIL_IMAP_PORT: ${{ secrets.EMAIL_IMAP_PORT }}
+          EMAIL_IMAP_ENCRYPTION: ${{ secrets.EMAIL_IMAP_ENCRYPTION }}
+          EMAIL_POP3_HOST: ${{ secrets.EMAIL_POP3_HOST }}
+          EMAIL_POP3_USERNAME: ${{ secrets.EMAIL_POP3_USERNAME }}
+          EMAIL_POP3_PASSWORD: ${{ secrets.EMAIL_POP3_PASSWORD }}
+          EMAIL_POP3_PORT: ${{ secrets.EMAIL_POP3_PORT }}
+          EMAIL_POP3_ENCRYPTION: ${{ secrets.EMAIL_POP3_ENCRYPTION }}
+      - name: Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: "php vendor/bin/php-coveralls --verbose"
+        if: ${{ success() }}
+      - name: Run PHPStan 
+        run: "vendor/bin/phpstan analyse src --error-format=github"

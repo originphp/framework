@@ -65,7 +65,11 @@ use Origin\Core\HookTrait;
  *
  */
 
-class Service
+/**
+ * Add the execute method to your class
+ * @method \Origin\Service\Result execute() This will be called by dispatch
+ */
+abstract class Service
 {
     use HookTrait;
 

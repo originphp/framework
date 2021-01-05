@@ -486,6 +486,7 @@ class Controller
             if (isset($options['template'])) {
                 $template = $options['template'];
             }
+            /** @phpstan-ignore-next-line */
             $view = new ApplicationView($this);
             $layout = null;
             if ($options['type'] === 'html' && $this->layout) {

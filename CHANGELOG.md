@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.11.3] - 2021-01-05
+
+## Changed
+
+- Changed Service class to abstract class
+
+## Fixed
+
+- Fixed ConsoleInputRequiredException (3.11.2) name
+
 ## [3.11.2] - 2021-01-04
 
 ## Changed

@@ -1,9 +1,9 @@
-/composer.lock
-/node_modules
-/phpunit.xml
-/vendor
+vendor/
+composer.lock
+phpunit.xml
+.phpunit.result.cache
 .env
 .env.php
 .vscode
-/tests/TestApp/config/.env.php
-!/tests/TestApp/config/.env
+tests/TestApp/config/.env.php
+!tests/TestApp/config/.env

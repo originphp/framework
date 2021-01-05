@@ -12,9 +12,13 @@ class MinifyMiddlewareTest extends OriginTestCase
     public function testMinfiy()
     {
         $html = <<< EOF
+<html>
+    <body>
         <h1>
             foo
         </h1>
+    </body>
+</html>
 EOF;
 
         $response = new Response();
@@ -22,15 +26,19 @@ EOF;
 
         $middleware = new MinifyMiddleware();
         $middleware(new Request(), $response);
-        $this->assertEquals('<html><body><h1> foo </h1></body></html>', $response->body());
+        $this->assertEquals('<html> <body> <h1> foo </h1> </body> </html>', $response->body());
     }
     
     public function testConfigIsWorking()
     {
         $html = <<< EOF
+<html>
+    <body>
         <h1>
             foo
         </h1>
+    </body>
+</html>
 EOF;
 
         $response = new Response();

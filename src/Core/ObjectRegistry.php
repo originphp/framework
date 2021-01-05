@@ -108,7 +108,7 @@ class ObjectRegistry
      */
     public function enable(string $object): bool
     {
-        if (! isset($this->loaded[$object]) or in_array($object, $this->enabled)) {
+        if (! isset($this->loaded[$object]) || in_array($object, $this->enabled)) {
             return false;
         }
         $this->enabled[] = $object;
