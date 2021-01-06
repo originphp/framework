@@ -21,7 +21,7 @@
   "require": {
     "php": ">=7.3.0",
     "originphp/core": "^3.0",
-    "originphp/inflector": "^1.0",
+    "originphp/inflector": "^2.0",
     "originphp/model": "^3.0"
   },
   "minimum-stability": "dev",

@@ -23,9 +23,9 @@
   "require": {
     "php": ">=7.3.0",
     "originphp/core": "^3.0",
-    "originphp/email": "^1.0",
-    "originphp/html": "^1.0",
-    "originphp/inflector": "^1.0",
+    "originphp/email": "^2.0",
+    "originphp/html": "^2.0",
+    "originphp/inflector": "^2.0",
     "originphp/job": "^3.0"
   },
   "minimum-stability": "dev",

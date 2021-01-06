@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.11.4] - 2021-01-06
+
+### Changed
+
+- Changed subtree split package versions for latest packages that require minimum PHP 7.3
+
 ## [3.11.3] - 2021-01-05
 
 ## Changed

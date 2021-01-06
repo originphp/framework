@@ -20,14 +20,14 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/cache": "^1.0",
-    "originphp/configurable": "^1.0",
+    "originphp/cache": "^2.0",
+    "originphp/configurable": "^2.0",
     "originphp/core": "^3.0",
-    "originphp/inflector": "^1.0",
-    "originphp/log": "^1.0",
+    "originphp/inflector": "^2.0",
+    "originphp/log": "^2.0",
     "originphp/utility": "^3.0",
-    "originphp/validation": "^1.0",
-    "originphp/xml": "^1.0"
+    "originphp/validation": "^2.0",
+    "originphp/xml": "^2.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
