@@ -1,5 +1,12 @@
 # Changelog
 
+
+## [3.12.0] - 2021-01-10
+
+### Changed
+
+- Changed composer required versions to work with bumped versions (min PHP 7.3)
+
 ## [3.11.4] - 2021-01-06
 
 ### Changed
