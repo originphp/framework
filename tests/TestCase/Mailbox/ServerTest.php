@@ -78,7 +78,9 @@ class ServerTest extends OriginTestCase
          * Test dispatch process and save to HD
          */
         $this->assertTrue($server->dispatch());
-        @unlink(tmp_path('maintenance.json'));
+        if (file_exists(tmp_path('maintenance.json'))) {
+            unlink(tmp_path('maintenance.json'));
+        }
 
         // Test not in maintencemode
         $message = file_get_contents(__DIR__  . '/messages/html.eml');

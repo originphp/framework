@@ -130,6 +130,8 @@ class MaintenanceModeMiddlewareTest extends OriginTestCase
 
     protected function tearDown(): void
     {
-        @unlink(tmp_path('maintenance.json'));
+        if (file_exists(tmp_path('maintenance.json'))) {
+            unlink(tmp_path('maintenance.json'));
+        }
     }
 }

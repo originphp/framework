@@ -274,7 +274,6 @@ abstract class Connection
             }
         } catch (PDOException $e) {
             Log::debug($this->unprepare($sql, $params));
-
             /**
              * Important: rollback transcation if one was started.
              */
@@ -329,11 +328,17 @@ abstract class Connection
      */
     public function begin(): bool
     {
-        if ($this->transactionStarted === false) {
-            $this->transactionStarted = $this->connection->beginTransaction();
+        if ($this->transactionStarted) {
+            return false;
         }
 
-        return $this->transactionStarted;
+        if ($this->connection->inTransaction()) {
+            return false;
+        }
+        
+        $this->connection->beginTransaction();
+
+        return $this->transactionStarted = true;
     }
 
     /**
@@ -343,13 +348,16 @@ abstract class Connection
      */
     public function commit(): bool
     {
-        if ($this->transactionStarted) {
-            $this->transactionStarted = false;
-
-            return $this->connection->commit();
+        if (! $this->transactionStarted) {
+            return false;
         }
+        $this->transactionStarted = false;
 
-        return false;
+        if (! $this->connection->inTransaction()) {
+            return false;
+        }
+       
+        return $this->connection->commit();
     }
 
     /**
@@ -359,13 +367,17 @@ abstract class Connection
      */
     public function rollback(): bool
     {
-        if ($this->transactionStarted) {
-            $this->transactionStarted = false;
+        if (! $this->transactionStarted) {
+            return false;
+        }
+        
+        $this->transactionStarted = false;
 
-            return $this->connection->rollBack();
+        if (! $this->connection->inTransaction()) {
+            return false;
         }
 
-        return false;
+        return $this->connection->rollBack();
     }
 
     /**
@@ -735,6 +747,7 @@ abstract class Connection
     {
         $builder = $this->queryBuilder($table, $options['alias']);
         $sql = $builder->selectStatement($options); // How to handle this elegently without having to do same work as selct
+
         return $this->execute($sql, $builder->getValues());
     }
 

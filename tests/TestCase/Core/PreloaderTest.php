@@ -23,7 +23,7 @@ class PreloaderTest extends \PHPUnit\Framework\TestCase
 {
     private function removeBasePath(array $result, string $path = APP)
     {
-        array_walk($result['loaded'], function (&$value, &$key) use ($path) {
+        array_walk($result['loaded'], function (&$value) use ($path) {
             $value = str_replace($path . '/', '', $value);
         });
 

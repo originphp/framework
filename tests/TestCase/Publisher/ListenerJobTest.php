@@ -16,7 +16,7 @@ class ErrorListener
 {
     public function create(object $object)
     {
-        $a = 1 / 0;
+        $value = $abc['foo'];
     }
 }
 

@@ -1002,8 +1002,8 @@ class FormHelper extends Helper
             if (! $noneSelected && strval($selectOptions['value']) === strval($key)) {
                 $template = $this->config['templates']['optionSelected'];
             }
-            $template = str_replace('{value}', $key, $template);
-            $output .= str_replace('{text}', $value, $template);
+            $template = str_replace('{value}', (string) $key, $template);
+            $output .= str_replace('{text}', (string) $value, $template);
         }
 
         return $output;

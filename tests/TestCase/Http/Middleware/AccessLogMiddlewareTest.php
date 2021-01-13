@@ -20,7 +20,9 @@ class AccessLogMiddlewareTest extends OriginTestCase
 
     public function testRun()
     {
-        @unlink(LOGS . '/access.log');
+        if (file_exists(LOGS . '/access.log')) {
+            unlink(LOGS . '/access.log');
+        }
 
         # Setup Request & Response
         $this->request = new Request();

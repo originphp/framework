@@ -85,6 +85,14 @@ Plugin::load('Make');
 Plugin::initialize();
 
 /**
+ * Quick function to help go backwards
+ */
+function isPHP8(): bool
+{
+    return version_compare(PHP_VERSION, '8.0.0') >= 0;
+}
+
+/**
  * Load the routes after plugins have been loaded
  */
 require CONFIG . '/routes.php';

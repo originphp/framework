@@ -18,8 +18,11 @@ $engineMap = [
     'sqlite' => SqliteEngine::class
 ];
 
-@unlink(ROOT . '/origin.db');
-@unlink(ROOT . '/origin_test.db');
+foreach ([ROOT . '/origin.db',ROOT . '/origin_test.db'] as $file) {
+    if (file_exists($file)) {
+        unlink($file);
+    }
+}
 
 return [
     'default' => [

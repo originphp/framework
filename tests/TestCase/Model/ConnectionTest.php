@@ -73,7 +73,7 @@ class ConnectionTest extends OriginTestCase
             'modified' => now(),
         ];
         $this->assertTrue($this->connection->begin());
-        $this->assertTrue($this->connection->begin()); // Call twice for code coverage
+        $this->assertFalse($this->connection->begin()); // Call twice for code coverage
         $this->assertTrue($this->connection->insert('authors', $data));
         $this->assertTrue($this->connection->commit());
         $this->assertFalse($this->connection->commit()); // Call twice for code coverage
@@ -88,7 +88,7 @@ class ConnectionTest extends OriginTestCase
             'modified' => now(),
         ];
         $this->assertTrue($this->connection->begin());
-        $this->assertTrue($this->connection->begin()); // Call twice for code coverage
+        $this->assertFalse($this->connection->begin()); // Call twice for code coverage
         $this->assertTrue($this->connection->insert('authors', $data));
         $this->assertTrue($this->connection->rollback());
         $this->assertFalse($this->connection->rollback()); // Call twice for code coverage

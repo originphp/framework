@@ -52,6 +52,8 @@ class ThrottleMiddlewareTest extends OriginTestCase
     public function tearDown(): void
     {
         Cache::clear(['config' => 'throttle']);
-        @unlink(TMP . '/blacklist.php');
+        if (file_exists(TMP . '/blacklist.php')) {
+            unlink(TMP . '/blacklist.php');
+        }
     }
 }

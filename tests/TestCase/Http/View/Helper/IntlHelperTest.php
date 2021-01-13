@@ -70,6 +70,6 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
         $timezones = $this->Intl->timezones();
       
         $this->assertEquals('GMT +00:00 - UTC', $timezones['UTC']);
-        $this->assertEquals(426, count($timezones)); // not sure if this varys on differen like locales
+        $this->assertGreaterThanOrEqual(425, count($timezones)); // not sure if this varys on differen like locales
     }
 }

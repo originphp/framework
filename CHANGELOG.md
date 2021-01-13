@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.14.0] - 2021-01-14
+
+### Fixed
+
+- Fixed PHP 8.0 issues
+
 ## [3.13.0] - 2021-01-13
 
 ### Added

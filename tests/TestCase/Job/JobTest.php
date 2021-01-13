@@ -38,7 +38,7 @@ class PassOrFailJob extends Job
     public function execute(bool $pass = true): void
     {
         if (! $pass) {
-            $a = 1 / 0;
+            $value = $abc['foo'];
         }
     }
 

@@ -55,7 +55,7 @@ class Templater
         if (preg_match_all('/\{([a-z0-9_]+)\}/i', $template, $matches)) {
             foreach ($matches[1] as $placeholder) {
                 $value = $data[$placeholder] ?? null;
-                $template = str_replace("{{$placeholder}}", $value, $template);
+                $template = str_replace("{{$placeholder}}", (string) $value, $template);
             }
         }
 

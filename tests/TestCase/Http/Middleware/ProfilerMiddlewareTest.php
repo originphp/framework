@@ -26,7 +26,9 @@ class ProfilerMiddlewareTest extends OriginTestCase
 
     public function testMiddleware()
     {
-        @unlink(LOGS . '/profile.log');
+        if (file_exists(LOGS . '/profile.log')) {
+            unlink(LOGS . '/profile.log');
+        }
 
         # Setup Request & Response
         $this->request = new Request();
