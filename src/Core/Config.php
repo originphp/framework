@@ -49,33 +49,50 @@ class Config
      *
      * Config::load('app');
      * Config::load('MyPlugin.users');
+     * Config::load('/var/www/config/backup.php'); Will load with backup key
+     *
+     * Config::load('/var/www/config/custom-config.php','Foo');
      *
      * @param string $config name of config, accepts plugin syntax
      * @return void
      */
-    public static function load(string $name): void
+    public static function load(string $name, string $key = null, bool $merge = true): void
     {
-        list($plugin, $file) = pluginSplit($name);
-        
-        if ($plugin) {
-            $plugin = Inflector::underscored($plugin);
-            $filename = PLUGINS . "/{$plugin}/config/{$file}.php";
+        if (strpos($name, DIRECTORY_SEPARATOR) !== false) {
+            $filename = $name;
+            $name = pathinfo($name, PATHINFO_FILENAME);
         } else {
-            $filename = CONFIG . "/{$name}.php";
-        }
+            // Locate File
+            list($plugin, $file) = pluginSplit($name);
+        
+            if ($plugin) {
+                $plugin = Inflector::underscored($plugin);
+                $filename = PLUGINS . "/{$plugin}/config/{$file}.php";
+            } else {
+                $filename = CONFIG . "/{$name}.php";
+            }
 
+            // Determine key
+            $name = $plugin ? $file : $name;
+        }
+       
+        if ($key == null) {
+            $key = ucfirst($name);
+        }
+        
+        // Read file
         $array = static::readFile($filename);
 
-        $name = $plugin ? $file : $name;
-
         // merge values
-        $configKey = ucfirst($name);
-        $values = static::read($configKey) ?? [];
-        if ($values) {
-            $array = array_merge($values, $array);
+        if ($merge) {
+            $values = static::read($key) ?? [];
+            if ($values) {
+                $array = array_merge($values, $array);
+            }
         }
+       
         // set values
-        static::dot()->set($configKey, $array);
+        static::dot()->set($key, $array);
     }
 
     /**

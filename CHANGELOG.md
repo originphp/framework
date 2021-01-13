@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.0] - 2021-01-13
+
+### Added
+
+- Added Config::load file to load from any path
+- Added Config::load key to loads config into any key
+- Added Config::load merge option so user can overwrite
 
 ## [3.12.0] - 2021-01-10
 

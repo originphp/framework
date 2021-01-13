@@ -136,7 +136,7 @@ class ConfigTest extends OriginTestCase
     public function testLoadDoesNotReturnArray()
     {
         $this->expectException(Exception::class);
-        $sampleConfig = CONFIG . '/storage.php';
+        $sampleConfig = CONFIG . '/path.php';
         MockConfig::load($sampleConfig);
     }
 
@@ -150,5 +150,28 @@ class ConfigTest extends OriginTestCase
         $data = Config::consume('ApiCompany');
         $this->assertEquals($data, ['token' => $token]);
         $this->assertNull(Config::read('ApiCompany'));
+    }
+
+    public function testLoadWithDifferentKey()
+    {
+        MockConfig::load('sample-config', 'Barr');
+        $this->assertEquals('bar', MockConfig::read('Barr.foo'));
+    }
+
+    public function testLoadFile()
+    {
+        MockConfig::write('Sample-config', []); // remove existing data
+        $this->assertNull(MockConfig::read('Sample-config.foo'));
+       
+        MockConfig::load(CONFIG . '/sample-config.php');
+
+        $this->assertEquals('bar', MockConfig::read('Sample-config.foo'));
+    }
+
+    public function testLoadFileWithDifferentKey()
+    {
+        MockConfig::load(CONFIG . '/sample-config.php', 'Fooz');
+
+        $this->assertEquals('bar', MockConfig::read('Fooz.foo'));
     }
 }
