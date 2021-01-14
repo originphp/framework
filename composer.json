@@ -57,9 +57,29 @@
     "phpunit/phpunit": "^9.2",
     "phpstan/phpstan": "^0.12.64"
   },
+  "replace": {
+    "originphp/console": "self.version",
+    "originphp/core": "self.version",
+    "originphp/http": "self.version",
+    "originphp/i18n": "self.version",
+    "originphp/job": "self.version",
+    "originphp/mailbox": "self.version",
+    "originphp/mailer": "self.version",
+    "originphp/migration": "self.version",
+    "originphp/model": "self.version",
+    "originphp/publisher": "self.version",
+    "originphp/service": "self.version",
+    "originphp/test-suite": "self.version",
+    "originphp/utility": "self.version"
+  },
   "suggest": {
     "ext-redis": "Redis",
     "ext-imap": "Imap",
     "ext-mailparse": "Mailparse"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true
   }
 }

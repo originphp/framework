@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.15.0] - 2021-01-14
+
+### Changed 
+
+- Changed composer configuration
+
 ## [3.14.0] - 2021-01-14
 
 ### Fixed
