@@ -69,11 +69,13 @@ class CommandRunner
     protected function buildNamespaceMap(): void
     {
         $this->namespaces = [
+            Config::read('App.namespace') => APP . '/Command', // work with console specific apps
             Config::read('App.namespace') => APP . '/Console/Command'
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
+            $this->namespaces[$plugin] = Plugin::path($plugin). '/src/Command'; // work with console specific apps
             $this->namespaces[$plugin] = Plugin::path($plugin). '/src/Console/Command';
         }
     }
@@ -268,17 +270,20 @@ class CommandRunner
         if (! file_exists($directory)) {
             return [];
         }
-       
+
+        $isConsoleDirectory = strpos($directory, '/Console/Command') !== false;
+        $suffix = $isConsoleDirectory ? '\Console\Command' : '\Command';
+
         $files = scandir($directory);
        
         foreach ($files as $file) {
             if (substr($file, -4) !== '.php') {
                 continue;
             }
-            if (substr($file, -11) === 'Command.php' && $file !== 'Command.php') {
+            if (substr($file, -11) === 'Command.php' && !in_array($file, ['Command.php','BaseCommand.php'])) {
                 $results[] = [
                     'className' => substr($file, 0, -4),
-                    'namespace' => $namespace.'\Console\Command',
+                    'namespace' => $namespace . $suffix,
                     'filename' => $directory . '/' . $file,
                 ];
             }

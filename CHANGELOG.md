@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.16.0] - 2021-01-17
+
+### Fixed
+
+- Fixed ConsoleIO::ask not adding line break when using default option
+
+### Changed
+
+- Changed CommandRunner to search App/Command as well for Console specific applications.
+
 ## [3.15.0] - 2021-01-14
 
 ### Changed 
