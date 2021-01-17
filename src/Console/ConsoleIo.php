@@ -154,7 +154,7 @@ class ConsoleIo
     public function title(string $title, string $style = 'heading'): void
     {
         $this->out("<{$style}>{$title}</{$style}>");
-        $this->out("<{$style}>".str_repeat('=', strlen($title))."</{$style}>");
+        $this->out("<{$style}>" . str_repeat('=', strlen($title))."</{$style}>");
         $this->nl();
     }
 
@@ -168,7 +168,7 @@ class ConsoleIo
     public function heading(string $heading, string $style = 'heading'): void
     {
         $this->out("<{$style}>{$heading}</{$style}>");
-        $this->out("<{$style}>".str_repeat('-', strlen($heading))."</{$style}>");
+        $this->out("<{$style}>" . str_repeat('-', strlen($heading))."</{$style}>");
         $this->nl();
     }
 
@@ -492,10 +492,11 @@ class ConsoleIo
         $this->stdout->write("\033[97;49m> ", false);
         $input = $this->stdin->read();
         if ($input === '' && $default) {
-            return $default;
+            $input = $default;
         }
 
         $this->stdout->write("\033[0m"); // reset + line break
+
         return $input;
     }
 
@@ -525,7 +526,8 @@ class ConsoleIo
             shell_exec("stty {$mode}");
         }
         
-        $this->stdout->write("\033[0m"); // reset + line break
+        $this->stdout->write("\033[0m\n"); // reset + line break
+
         return $input;
     }
 
@@ -563,15 +565,16 @@ class ConsoleIo
             $this->stdout->write("\033[32;49m{$prompt} {$extra}");
             $this->stdout->write("\033[97;49m> ", false);
             $input = $this->stdin->read();
-            if ($input === '' && $default) {
-                return $default;
-            }
             # Catch out errors caused by not sending data via ConsoleIntegratioTest::exec
             if ($input === null) {
                 throw new ConsoleException(sprintf('No input for `%s`', $prompt));
             }
+            if ($input === '' && $default) {
+                $input = $default;
+            }
         }
         $this->stdout->write("\033[0m"); // reset + line break
+
         return $input;
     }
 
