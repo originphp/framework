@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Changed CommandRunner to search App/Command as well for Console specific applications.
+- Changed CommandRunner to also search App/Command as well for Console specific applications.
 
 ## [3.15.0] - 2021-01-14
 
