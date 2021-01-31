@@ -32,7 +32,7 @@ class BackgroundProcess extends BaseProcess
 
     /**
      * The time that the process was started
-     * 
+     *
      * @var integer|null
      */
     protected $started = null;
@@ -80,7 +80,6 @@ class BackgroundProcess extends BaseProcess
 
         $this->timeout = $options['timeout'];
         $this->outputEnabled = $options['output'];
-
     }
 
     /**
@@ -90,7 +89,6 @@ class BackgroundProcess extends BaseProcess
      */
     public function start()
     {
-
         if ($this->process && $this->isRunning()) {
             throw new RuntimeException('This process is already running another background process');
         }
@@ -100,17 +98,16 @@ class BackgroundProcess extends BaseProcess
         );
 
         if (! is_resource($this->process)) {
-            return throw new RuntimeException('Error starting process');
+            throw new RuntimeException('Error starting process');
         }
 
         $this->started = time();
   
-        if(!$this->outputEnabled){
+        if (! $this->outputEnabled) {
             stream_set_blocking($this->pipes[0], false);
             stream_set_blocking($this->pipes[1], false);
             stream_set_blocking($this->pipes[2], false);
         }
-    
     }
 
     /**
@@ -131,6 +128,7 @@ class BackgroundProcess extends BaseProcess
     public function isRunning(): bool
     {
         $this->updateStatus();
+
         return $this->status('running') ?: false;
     }
 
@@ -157,7 +155,7 @@ class BackgroundProcess extends BaseProcess
      *
      * @example
      * function ($output,$error) {
-     *   return str_contains($output,$ready);
+     *   return str_contains($output,'ready');
      * }
      * @param callable $callback
      * @return bool
@@ -183,9 +181,9 @@ class BackgroundProcess extends BaseProcess
     /**
      * @return void
      */
-    private function checkTimeout() : void 
+    private function checkTimeout(): void
     {
-        if($this->hasTimedOut()){
+        if ($this->hasTimedOut()) {
             $this->stop();
             throw new TimeoutException(sprintf('Maximum timeout of %s reached', $this->timeout));
         }
@@ -194,9 +192,9 @@ class BackgroundProcess extends BaseProcess
     /**
      * @return void
      */
-    private function checkStarted() : void
+    private function checkStarted(): void
     {
-        if(!is_resource($this->process)){
+        if (! is_resource($this->process)) {
             throw new LogicException('The process must be started');
         }
     }
@@ -212,6 +210,7 @@ class BackgroundProcess extends BaseProcess
 
         if ($this->isRunning() && extension_loaded('posix')) {
             $pid = proc_get_status($this->process)['pid'];
+
             return posix_kill($pid, SIGKILL);
         }
 
@@ -226,6 +225,7 @@ class BackgroundProcess extends BaseProcess
     public function output(): string
     {
         $this->readOutput();
+
         return $this->stdout;
     }
 
@@ -234,35 +234,38 @@ class BackgroundProcess extends BaseProcess
      *
      * @return string
      */
-    public function error():  string
+    public function error(): string
     {
         $this->readError();
+
         return $this->stderr;
     }
 
     /**
-     * Gets any new output since the last the call 
-     * 
+     * Gets any new output since the last the call
+     *
      * @return string
      */
-    public function readOutput() : ?string 
+    public function readOutput(): ?string
     {
-        if(isset($this->pipes[1])){
+        if (isset($this->pipes[1])) {
             $this->stdout .= stream_get_contents($this->pipes[1]);
         }
+
         return null;
     }
 
     /**
-     * Gets any new error output since the last the call 
-     * 
+     * Gets any new error output since the last the call
+     *
      * @return string
      */
-    public function readError() : ?string 
+    public function readError(): ?string
     {
-        if(isset($this->pipes[2])){
+        if (isset($this->pipes[2])) {
             return $this->stderr .= stream_get_contents($this->pipes[2]);
         }
+
         return null;
     }
 
@@ -270,28 +273,28 @@ class BackgroundProcess extends BaseProcess
      * @return integer|null
      */
     public function exitCode(): ?int
-    {  
+    {
         return $this->status('exitcode');
     }
 
     /**
      * @return void
      */
-    private function updateStatus() : void 
+    private function updateStatus(): void
     {
-        if (!is_resource($this->process)) {
+        if (! is_resource($this->process)) {
             return;
         }
         $this->status = proc_get_status($this->process);
 
-        if($this->status['running'] === false){
+        if ($this->status['running'] === false) {
 
             // get last input
             $this->readOutput();
             $this->readError();
 
             // close
-            if(!$this->outputEnabled){
+            if (! $this->outputEnabled) {
                 fclose($this->pipes[0]);
                 fclose($this->pipes[1]);
                 fclose($this->pipes[2]);
@@ -304,7 +307,7 @@ class BackgroundProcess extends BaseProcess
     }
 
     /**
-     * Gets the status of the process 
+     * Gets the status of the process
      * @param string $key
      * @return mixed
      */
