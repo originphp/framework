@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.17.2] - 2021-01-31
+
+### Fixed
+
+- Fixed issue with standard process during output mode
+- Fixed commands not working properly due to missing environment variables like PATH.
+
 ## [3.17.1] - 2021-01-31
 
 ### Fixed

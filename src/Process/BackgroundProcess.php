@@ -60,6 +60,26 @@ class BackgroundProcess extends BaseProcess
     private $timeout = null;
 
     /**
+     * @var array
+     */
+    protected $env = [];
+
+    /**
+     * @var string
+     */
+    protected $directory;
+
+    /**
+     * @var string
+     */
+    protected $command;
+
+    /**
+     * @var boolean
+     */
+    protected $outputEnabled = false;
+
+    /**
      * @param string|array $stringOrArray
      * @param array $options The following options are supported
      *  - directory: the directory to execute the command in, default is getcwd
@@ -80,6 +100,7 @@ class BackgroundProcess extends BaseProcess
         ];
 
         $this->setDirectory($options['directory']);
+        $this->setupEnvironment();
         $this->setEnv((array) $options['env']);
         $this->setCommand($stringOrArray, $options['escape']);
 
@@ -321,5 +342,105 @@ class BackgroundProcess extends BaseProcess
         $this->updateStatus();
 
         return $this->status[$key] ?? null;
+    }
+
+    /**
+     * @param string $directory
+     * @return void
+     */
+    protected function setDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
+            throw new RuntimeException('Invalid directory');
+        }
+        $this->directory = $directory;
+    }
+
+    /**
+     * Any value as false will delete a current var
+     *
+     * @param array $env
+     * @return void
+     */
+    protected function setEnv(array $env): void
+    {
+        foreach ($env as $key => $value) {
+            if ($value === false) {
+                unset($this->env[$key]);
+                continue;
+            }
+            $this->env[$key] = $value;
+        }
+    }
+
+    /**
+     * Copy the ENV vars so commands can work as expected
+     *
+     * @return void
+     */
+    protected function setupEnvironment(): void
+    {
+        foreach ($_SERVER as $key => $value) {
+            $found = getenv($key);
+            if ($found !== false) {
+                $this->env[$key] = $value;
+            }
+        }
+
+        foreach ($_ENV as $key => $value) {
+            $this->env[$key] = $value;
+        }
+    }
+
+    /**
+     * Escapes a command for use
+     *
+     * @param string|array $stringOrArray
+     * @return string|array
+     */
+    private function escapeCommand($stringOrArray)
+    {
+        if (is_string($stringOrArray)) {
+            return escapeshellcmd($stringOrArray);
+        }
+
+        return array_map('escapeshellarg', $stringOrArray);
+    }
+
+    /**
+     * @param string|array $stringOrArray
+     * @param boolean $escape
+     * @return void
+     */
+    protected function setCommand($stringOrArray, bool $escape = true): void
+    {
+        if ($escape) {
+            $stringOrArray = $this->escapeCommand($stringOrArray);
+        }
+
+        $this->command = is_array($stringOrArray) ? implode(' ', $stringOrArray) : $stringOrArray;
+    }
+
+    /**
+     * @see https://www.php.net/manual/en/function.proc-open.php
+     *
+     * @param boolean $output
+     * @return array
+     */
+    protected function descriptorspec(): array
+    {
+        if ($this->outputEnabled && $this->isTTY()) {
+            return [
+                ['file', '/dev/tty', 'r'],
+                ['file', '/dev/tty', 'w'],
+                ['file', '/dev/tty', 'w'],
+            ];
+        }
+
+        return [
+            ['pipe','r'],
+            ['pipe','w'],
+            ['pipe','w']
+        ];
     }
 }

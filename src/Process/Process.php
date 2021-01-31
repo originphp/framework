@@ -14,6 +14,12 @@
 declare(strict_types = 1);
 namespace Origin\Process;
 
+/**
+ * Process
+ *
+ * @internal refactored to go through background process due to issue with getting output, cant use stream
+ * so you have to go through a loop, essentially recreating code in the background process
+ */
 class Process extends BaseProcess
 {
     /**
@@ -32,9 +38,12 @@ class Process extends BaseProcess
     protected $exitCode = null;
 
     /**
-     * @var integer|null
+     * Raw command
+     *
+     * @var string|array
      */
-    protected $timeout = null;
+    protected $command;
+    protected $options;
 
     /**
      * @param string|array $stringOrArray
@@ -43,59 +52,36 @@ class Process extends BaseProcess
      *  - env: an array of key values for environment variables
      *  - output: (bool) default if TTY is supported output will be sent to screen
      *  - escape: default: true escapes the command
+     *  - timeout: set the timeout value in seconds
      * @return void
      */
     public function __construct($stringOrArray, array $options = [])
     {
-        $options += [
-            'directory' => getcwd(),
-            'env' => [],
-            'output' => false,
-            'escape' => true
-        ];
-
-        $this->setDirectory($options['directory']);
-        $this->setEnv((array) $options['env']);
-        $this->setCommand($stringOrArray, $options['escape']);
-        
-        $this->outputEnabled = $options['output'];
+        $this->command = $stringOrArray;
+        $this->options = $options;
     }
 
     /**
      * Executes a command
      *
-     * @param string|array $stringOrArray
-     * @param array $options The following options are supported
-     *  - directory: the directory to execute the command in, default is getcwd
-     *  - env: an array of key values for environment variables
-     *  - output: (bool) default if TTY is supported output will be sent to screen
-     *  - escape: default: true escapes the command
      * @return boolean
      */
     public function execute(): bool
     {
         $this->stdout = $this->stderr = '';
-        $this->exitCode = null;
-
-        $process = proc_open(
-            $this->command, $this->descriptorspec($this->outputEnabled), $pipes, $this->directory, $this->env
-        );
-        if (! $process) {
-            return false;
-        }
         
-        $this->stdout = stream_get_contents($pipes[1]);
-        $this->stderr = stream_get_contents($pipes[2]);
-       
-        fclose($pipes[0]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-       
-        $this->exitCode = proc_close($process);
+        $process = new BackgroundProcess($this->command, $this->options);
+        $process->start();
+        $process->wait();
+
+        $this->stdout = $process->output();
+        $this->stderr = $process->error();
+
+        $this->exitCode = $process->exitCode();
 
         return $this->exitCode === 0;
     }
-
+    
     /**
      * Gets the exit code or null if it was not run
      *
