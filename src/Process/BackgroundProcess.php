@@ -55,6 +55,11 @@ class BackgroundProcess extends BaseProcess
     private $status = [];
 
     /**
+     * @var int|null
+     */
+    private $timeout = null;
+
+    /**
      * @param string|array $stringOrArray
      * @param array $options The following options are supported
      *  - directory: the directory to execute the command in, default is getcwd
