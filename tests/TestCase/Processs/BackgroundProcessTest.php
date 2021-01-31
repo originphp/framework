@@ -52,6 +52,13 @@ class BackgroundProcessTest extends OriginTestCase
         $process->stop();
     }
 
+    public function testErrorSuccess()
+    {
+        $process = new BackgroundProcess(['ls -la']);
+        $this->expectException(LogicException::class);
+        $process->success();
+    }
+
     public function testErrorExitCode()
     {
         $process = new BackgroundProcess(['ls -la']);

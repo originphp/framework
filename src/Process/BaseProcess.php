@@ -25,15 +25,5 @@ abstract class BaseProcess
         return function_exists('posix_isatty') && posix_isatty(STDOUT);
     }
     
-    /**
-     * Checks if the process ended successfully
-     *
-     * @return boolean
-     */
-    public function success(): bool
-    {
-        return $this->exitCode() === 0;
-    }
-
     abstract public function exitCode(): ? int;
 }

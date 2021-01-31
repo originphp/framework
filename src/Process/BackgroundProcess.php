@@ -443,4 +443,18 @@ class BackgroundProcess extends BaseProcess
             ['pipe','w']
         ];
     }
+
+    /**
+     * Checks if the process ended successfully
+     *
+     * @return boolean
+     */
+    public function success(): bool
+    {
+        if (empty($this->status)) {
+            throw new LogicException('The process was not started');
+        }
+
+        return $this->exitCode() === 0;
+    }
 }

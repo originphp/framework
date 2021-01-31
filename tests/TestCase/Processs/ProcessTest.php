@@ -14,7 +14,6 @@ class ProcessTest extends OriginTestCase
 
         $this->assertEmpty($process->error());
         $this->assertEquals(0, $process->exitCode());
-        $this->assertTrue($process->success());
     }
 
     public function testExecuteENV()
@@ -36,6 +35,5 @@ class ProcessTest extends OriginTestCase
         $this->assertEmpty($process->output());
         $this->assertNotEmpty($process->error());
         $this->assertEquals(1, $process->exitCode());
-        $this->assertFalse($process->success());
     }
 }
