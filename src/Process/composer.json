@@ -1,0 +1,28 @@
+{
+  "name": "originphp/process",
+  "description": "OriginPHP Process",
+  "type": "library",
+  "keywords": [
+    "process",
+    "background"
+  ],
+  "homepage": "https://www.originphp.com/docs/process/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Service\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "originphp/core": "^3.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
