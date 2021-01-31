@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.17.3] - 2021-01-31
+
 ### Added
 
 - Added logic exception if user calls BackgroundProcess::success without starting the process
