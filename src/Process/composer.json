@@ -6,7 +6,7 @@
     "process",
     "background"
   ],
-  "homepage": "https://www.originphp.com/docs/process/",
+  "homepage": "https://www.originphp.com/docs/utility/process/",
   "license": "MIT",
   "authors": [
     {
@@ -16,12 +16,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "Origin\\Service\\": "."
+      "Origin\\Process\\": "."
     }
   },
   "require": {
-    "php": ">=7.3.0",
-    "originphp/core": "^3.0"
+    "php": ">=7.3.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true
