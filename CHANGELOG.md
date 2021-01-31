@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.17.0] - 2021-01-31
+
+### Added
+
+- Added Process
+- Added BackgroundProcess
+
 ## [3.16.0] - 2021-01-17
 
 ### Fixed
