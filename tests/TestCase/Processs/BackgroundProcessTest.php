@@ -73,12 +73,15 @@ class BackgroundProcessTest extends OriginTestCase
     }
 
     /**
-     * @-depends testStart
+     * @depends testStart
      * @internal not sure how to get info from TTY, cant use output buffering etc
      * @return void
      */
     public function testOutput()
     {
+        if (! posix_isatty(STDOUT)) {
+            $this->markTestSkipped();
+        }
         $process = new BackgroundProcess('echo started; sleep 1 ; echo completed', ['escape' => false,'output' => true]);
         $process->start();
         $this->assertTrue($process->isRunning());
