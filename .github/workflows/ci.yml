@@ -66,7 +66,8 @@ jobs:
             export DB_USERNAME=postgres;
             sudo PGPASSWORD=root psql -h 127.0.0.1 -c 'CREATE DATABASE origin;' -U postgres
           fi;
-          php vendor/bin/phpunit --coverage-clover=clover.xml
+          mkdir -p build/logs
+          php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
         env:
           DB_PASSWORD: root
           DB_ENGINE: ${{ matrix.database }}
