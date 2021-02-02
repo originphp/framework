@@ -83,8 +83,8 @@ jobs:
       - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            composer global require php-coveralls/php-coveralls
-            php-coveralls --coverage_clover=build/logs/clover.xml -v
+        run: |
+          composer global require php-coveralls/php-coveralls
+          php-coveralls --coverage_clover=build/logs/clover.xml -v
       - name: Run PHPStan 
         run: "vendor/bin/phpstan analyse src --error-format=github"
