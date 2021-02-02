@@ -88,6 +88,6 @@ jobs:
           COVERALLS_FLAG_NAME: ${{ matrix.php-version }}-${{ matrix.database }}
         run: |
           composer global require php-coveralls/php-coveralls
-          php-coveralls --coverage_clover=build/logs/clover.xml -v
+          php-coveralls --coverage_clover=build/logs/clover.xml --verbose
       - name: Run PHPStan 
         run: "vendor/bin/phpstan analyse src --error-format=github"
