@@ -52,8 +52,7 @@ jobs:
           extensions: pdo_mysql, pdo_sqlite, pdo_pgsql, mailparse
       - name: Install dependencies
         run: |
-          composer require php-coveralls/php-coveralls:^2.4 --dev --no-update
-          composer update --no-progress --prefer-dist
+          composer install
       - name: Run PHPUnit
         run: |
           if [[ ${{ matrix.database }} == 'sqlite' ]]; then
@@ -81,10 +80,11 @@ jobs:
           EMAIL_POP3_PASSWORD: ${{ secrets.EMAIL_POP3_PASSWORD }}
           EMAIL_POP3_PORT: ${{ secrets.EMAIL_POP3_PORT }}
           EMAIL_POP3_ENCRYPTION: ${{ secrets.EMAIL_POP3_ENCRYPTION }}
-      - name: Coveralls
+      - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: "php vendor/bin/php-coveralls --verbose"
-        if: ${{ success() }}
+          run: |
+          composer global require php-coveralls/php-coveralls
+          php-coveralls --coverage_clover=build/logs/clover.xml -v
       - name: Run PHPStan 
         run: "vendor/bin/phpstan analyse src --error-format=github"
