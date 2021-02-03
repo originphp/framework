@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.17.5] - 2021-02-03
+
+### Fixed
+
+- Fixed issue with BackgroundProcess::wait stalling on some commands
+- Fixed issue with BackgroundProcess timeout
+
+## [3.17.4] - 2021-02-02
+
+### Fixed
+
+- Fixed BackgroundProcess:wait type error when SIGKILL constant not available (non console)
+
 ## [3.17.3] - 2021-01-31
 
 ### Added
