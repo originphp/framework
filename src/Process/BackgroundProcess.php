@@ -153,9 +153,7 @@ class BackgroundProcess extends BaseProcess
      */
     public function isRunning(): bool
     {
-        $this->updateStatus();
-
-        return $this->status('running') ?: false;
+        return $this->status('running') === true;
     }
 
     /**
@@ -168,8 +166,13 @@ class BackgroundProcess extends BaseProcess
         $this->checkStarted();
 
         while ($this->isRunning()) {
-            $this->checkTimeout();
 
+            // pipes need to be read or some commands will get stuck e.g. rsync
+            $this->readOutput();
+            $this->readError();
+        
+            $this->checkTimeout();
+            
             usleep(1000);
         }
 
@@ -237,7 +240,7 @@ class BackgroundProcess extends BaseProcess
         if ($this->isRunning() && extension_loaded('posix')) {
             $pid = proc_get_status($this->process)['pid'];
 
-            return posix_kill($pid, SIGKILL);
+            return posix_kill($pid, 9);
         }
 
         return false;
