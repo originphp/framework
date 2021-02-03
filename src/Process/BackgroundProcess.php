@@ -143,7 +143,7 @@ class BackgroundProcess extends BaseProcess
      */
     public function hasTimedOut(): bool
     {
-        return $this->timeout && $this->isRunning() && time() > $this->started;
+        return $this->timeout && $this->isRunning() && time() > ($this->started + $this->timeout);
     }
 
     /**
@@ -211,7 +211,7 @@ class BackgroundProcess extends BaseProcess
     {
         if ($this->hasTimedOut()) {
             $this->stop();
-            throw new TimeoutException(sprintf('Maximum timeout of %s reached', $this->timeout));
+            throw new TimeoutException(sprintf('Maximum timeout of %s seconds reached', $this->timeout));
         }
     }
 
