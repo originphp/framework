@@ -80,8 +80,14 @@ class MysqlSchemaTest extends OriginTestCase
          * Any slight changes should be investigated fully
          */
         $schema = $adapter->describe('tposts');
-       
-        $this->assertEquals('ce3ecc5650694866b141495952429f5e', md5(json_encode($schema)));
+        
+        /**
+         * Difference is `body` text DEFAULT NULL, or `body` text both work on each other
+         */
+        $hash = md5(json_encode($schema));
+        $mysql = 'ce3ecc5650694866b141495952429f5e';
+        $mariadb = '772d3c533e138912606007b55defa1e8';
+        $this->assertContains($hash, [$mysql,$mariadb]);
         $this->assertTrue($adapter->connection()->execute('DROP TABLE tposts'));
     }
 
@@ -643,19 +649,27 @@ class MysqlSchemaTest extends OriginTestCase
     }
 
     /**
-     * @depends testAddIndex
+     * @xxxdepends testAddIndex
      */
     public function testRenameIndex()
     {
         $adapter = new MysqlSchema('test');
-        $expected = 'ALTER TABLE `articles` RENAME INDEX `search_title` TO `title_search`';
-        $result = $adapter->renameIndex('articles', 'search_title', 'title_search');
-        $this->assertEquals($expected, $result[0]);
+        if ($adapter->connection()->engine() !== 'mysql') {
+            $this->markTestSkipped('Cant test this without MySQL');
+        }
 
-        if ($adapter->connection()->engine() === 'mysql') {
-            $sql = $adapter->addIndex('articles', 'title', 'search_title');
-            $this->assertTrue($adapter->connection()->execute($sql));
-            $this->assertTrue($adapter->connection()->execute($result[0]));
+        $sql = $adapter->addIndex('articles', 'title', 'search_title');
+        $this->assertTrue($adapter->connection()->execute($sql));
+
+        $expected = [
+            'CREATE INDEX `title_search` ON `articles` (title)',
+            'DROP INDEX `search_title` ON `articles`',
+        ];
+        $statements = $adapter->renameIndex('articles', 'search_title', 'title_search');
+
+        $this->assertSame($expected, $statements);
+        foreach ($statements as $statement) {
+            $this->assertTrue($adapter->connection()->execute($statement));
         }
     }
     
@@ -680,9 +694,15 @@ class MysqlSchemaTest extends OriginTestCase
         }
 
         $result = $adapter->showCreateTable('articles');
-        // Different mysql versions e.g. 5.x vs 8 will return slightly different result
-        $expected = "CREATE TABLE `articles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `author_id` int(11) DEFAULT NULL,\n  `title` varchar(255) NOT NULL,\n  `body` text,\n  `created` datetime DEFAULT NULL,\n  `modified` datetime DEFAULT NULL,\n  PRIMARY KEY (`id`)\n)"; // Any slight change, needs to be investigated
-        $this->assertStringContainsString($expected, $result);
+  
+        $this->assertStringContainsString('CREATE TABLE `articles` (', $result);
+        $this->assertStringContainsString('`id` int(11) NOT NULL AUTO_INCREMENT,', $result);
+        $this->assertStringContainsString('`author_id` int(11) DEFAULT NULL,', $result);
+        $this->assertStringContainsString('`title` varchar(255) NOT NULL,', $result);
+        $this->assertMatchesRegularExpression('/`body` text(,| DEFAULT NULL,)/', $result); // MariaDB/MySQL Difference
+        $this->assertStringContainsString('`created` datetime DEFAULT NULL', $result);
+        $this->assertStringContainsString('`modified` datetime DEFAULT NULL', $result);
+        $this->assertStringContainsString('PRIMARY KEY (`id`)', $result);
     }
 
     public function testTableExists()

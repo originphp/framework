@@ -296,7 +296,8 @@ class MysqlSchema extends BaseSchema
             if (isset($data['null']) && $data['null'] === true) {
                 $out .= ' NULL';
             }
-            if (isset($data['default']) && strtolower($data['default']) === 'current_timestamp') {
+            // mariadb returning
+            if (isset($data['default']) && strpos(strtolower($data['default']), 'current_timestamp') !== false) {
                 $out .= ' DEFAULT CURRENT_TIMESTAMP';
                 unset($data['default'],$data['null']);
             }
@@ -456,8 +457,10 @@ class MysqlSchema extends BaseSchema
     }
 
     /**
-     * Renames an index
+     * Renames an index (uses native implementation to work with MySQL <5.7 & older versions of MariaDB)
+     *
      * @requires MySQL 5.7+
+     * @requires MariaDB 10.5+ (not default in Ubuntu)
      *
      * @param string $table
      * @param string $oldName
@@ -466,14 +469,19 @@ class MysqlSchema extends BaseSchema
      */
     public function renameIndex(string $table, string $oldName, string $newName): array
     {
-        $sql = sprintf(
-            'ALTER TABLE %s RENAME INDEX %s TO %s',
-            $this->quoteIdentifier($table),
-            $this->quoteIdentifier($oldName),
-            $this->quoteIdentifier($newName)
-        );
+        $indexes = $this->indexes($table);
+        foreach ($indexes as $index) {
+            if ($index['name'] === $oldName) {
+                return [
+                    $this->addIndex($table, $index['column'], $newName, [
+                        'unique' => $index['type'] === 'unique'
+                    ]),
+                    $this->removeIndex($table, $oldName)
+                ];
+            }
+        }
 
-        return [$sql];
+        return [];
     }
 
     /**

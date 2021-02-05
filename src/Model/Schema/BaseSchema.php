@@ -179,11 +179,10 @@ abstract class BaseSchema
         $sql = 'CREATE INDEX %s ON %s (%s)';
         if (! empty($options['unique'])) {
             $sql = 'CREATE UNIQUE INDEX %s ON %s (%s)';
-        }
-        if (! empty($options['type'])) {
+        } elseif (! empty($options['type'])) {
             $sql = 'CREATE ' . strtoupper($options['type']) . ' INDEX %s ON %s (%s)';
         }
-
+  
         return sprintf($sql, $this->quoteIdentifier($name), $this->quoteIdentifier($table), $column);
         
         /*
