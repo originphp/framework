@@ -62,22 +62,34 @@ class CommandRunner
     }
 
     /**
-     * Builds a map of namespaces and directories. First the framework then App.
+     * Builds a map of namespaces and directories
      *
      * @return void
      */
     protected function buildNamespaceMap(): void
     {
         $this->namespaces = [
-            Config::read('App.namespace') => APP . '/Command', // work with console specific apps
-            Config::read('App.namespace') => APP . '/Console/Command'
+            Config::read('App.namespace') => $this->getNamespace(APP)
         ];
 
         $plugins = Plugin::loaded();
         foreach ($plugins as $plugin) {
-            $this->namespaces[$plugin] = Plugin::path($plugin). '/src/Command'; // work with console specific apps
-            $this->namespaces[$plugin] = Plugin::path($plugin). '/src/Console/Command';
+            $this->namespaces[$plugin] = $this->getNamespace(Plugin::path($plugin). '/src');
         }
+    }
+    /**
+     * Checks if single console application e.g. APP/Command if not leaves default
+     *
+     * @param string $path
+     * @return string
+     */
+    private function getNamespace(string $path): string
+    {
+        if (is_dir($path . '/Command')) {
+            return $path . '/Command';
+        }
+
+        return  $path  .'/Console/Command';
     }
 
     /**
@@ -280,7 +292,7 @@ class CommandRunner
             if (substr($file, -4) !== '.php') {
                 continue;
             }
-            if (substr($file, -11) === 'Command.php' && !in_array($file, ['Command.php','BaseCommand.php'])) {
+            if (substr($file, -11) === 'Command.php' && ! in_array($file, ['Command.php','BaseCommand.php'])) {
                 $results[] = [
                     'className' => substr($file, 0, -4),
                     'namespace' => $namespace . $suffix,
