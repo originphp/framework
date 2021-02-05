@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.17.6] - 2021-02-05
+
+### Fixed
+
+- Fixed command runner checking directory for console specific applications (3.15.0)
+
 ## [3.17.5] - 2021-02-03
 
 ### Fixed
