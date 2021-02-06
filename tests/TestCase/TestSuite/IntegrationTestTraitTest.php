@@ -389,4 +389,10 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->controller->request()->session()->write('Flash', $messages);
         $this->assertFlashMessage('the quick brown fox');
     }
+
+    public function testAssertFlashNotSet()
+    {
+        $this->get('/posts/list');
+        $this->assertFlashMessageNotSet('the quick brown fox');
+    }
 }

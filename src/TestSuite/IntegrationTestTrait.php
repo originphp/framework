@@ -607,11 +607,31 @@ trait IntegrationTestTrait
      */
     public function assertFlashMessage(string $expected)
     {
+        $this->assertContains($expected, $this->getFlashMessages());
+    }
+
+    /**
+     * Asserts that a particular message was not set
+     *
+     * @param string $message
+     * @return void
+     */
+    public function assertFlashMessageNotSet(string $message): void
+    {
+        $this->assertNotContains($message, $this->getFlashMessages());
+    }
+
+    private function getFlashMessages(): array
+    {
         $messages = [];
-        foreach ($this->request->session()->read('Flash') as $message) {
+
+        $flash = $this->request->session()->read('Flash') ?: [];
+
+        foreach ($flash as $message) {
             $messages[] = $message['message'];
         }
-        $this->assertContains($expected, $messages);
+
+        return $messages;
     }
 
     /**
