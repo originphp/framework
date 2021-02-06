@@ -70,6 +70,8 @@ class Response
      */
     protected $file = null;
 
+    protected $sent = false;
+
     /**
      * Sets or gets the buffered output.
      *
@@ -110,23 +112,45 @@ class Response
             $this->sendHeader($name, $value);
         }
         if ($this->file) {
-            // @codeCoverageIgnoreStart
             readfile($this->file);
-        // @codeCoverageIgnoreEnd
         } else {
             echo $this->body;
         }
+
+        $this->sent = true;
     }
 
     /**
      * Checks the status of the response object to see if its ready to be used.
      * If body has already been sent or a file set then its nos longer in ready state.
-     *
+     * @deprecated use sent instead
      * @return bool
      */
     public function ready(): bool
     {
+        deprecationWarning('Response:ready has been deprecated use response:sent instead');
+
         return empty($this->body) && empty($this->file);
+    }
+
+    /**
+     * Checks if the response was sent
+     *
+     * @return boolean
+     */
+    public function sent(): bool
+    {
+        return $this->sent;
+    }
+
+    /**
+     * Returns the sent file
+     *
+     * @return string|null
+     */
+    public function sentFile(): ?string
+    {
+        return $this->sent ? $this->file : null;
     }
 
     /**
