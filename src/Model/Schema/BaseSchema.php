@@ -173,16 +173,19 @@ abstract class BaseSchema
      */
     public function addIndex(string $table, $column, string $name, array $options = []): string
     {
+        $options += ['unique' => false, 'type' => null];
+
         if (is_array($column)) {
             $column = implode(', ', $column);
         }
+
         $sql = 'CREATE INDEX %s ON %s (%s)';
-        if (! empty($options['unique'])) {
+        if ($options['unique']) {
             $sql = 'CREATE UNIQUE INDEX %s ON %s (%s)';
         } elseif (! empty($options['type'])) {
             $sql = 'CREATE ' . strtoupper($options['type']) . ' INDEX %s ON %s (%s)';
         }
-  
+
         return sprintf($sql, $this->quoteIdentifier($name), $this->quoteIdentifier($table), $column);
         
         /*
