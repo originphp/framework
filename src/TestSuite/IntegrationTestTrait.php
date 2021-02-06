@@ -701,4 +701,18 @@ trait IntegrationTestTrait
         $cookies = $this->response()->cookies();
         $this->assertArrayNotHasKey($cookie, $cookies);
     }
+
+    /**
+     * Asserts that a file was sent through the response
+     *
+     * @param string $absolutePath
+     * @return void
+     */
+    public function assertFileSent(string $absolutePath): void
+    {
+        $response = $this->response();
+        $this->assertTrue($response->sent(), 'Response was not sent');
+        $this->assertNotNull($response->sentFile(), 'Response did not send a file');
+        $this->assertEquals($this->response()->sentFile(), $absolutePath, 'This file was not sent');
+    }
 }

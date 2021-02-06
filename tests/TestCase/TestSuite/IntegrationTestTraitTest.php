@@ -395,4 +395,16 @@ class IntegrationTestTraitTest extends \PHPUnit\Framework\TestCase
         $this->get('/posts/list');
         $this->assertFlashMessageNotSet('the quick brown fox');
     }
+
+    public function testAssertFileSent()
+    {
+        $this->response = new Response();
+       
+        $this->response->file(ROOT . DS . 'README.md');
+        ob_start();
+        $this->response->send();
+        ob_get_clean();
+
+        $this->assertFileSent(ROOT . DS . 'README.md');
+    }
 }
