@@ -87,7 +87,9 @@ class ResponseTest extends OriginTestCase
         $response = new Response();
         $response->statusCode(200);
         $response->header('Accept-Language', 'en-us,en;q=0.5');
+        $this->assertFalse($response->sent());
         $this->assertNull($response->send()); // or $response->send()
+        $this->assertTrue($response->sent());
     }
 
     public function testType()
@@ -145,6 +147,20 @@ class ResponseTest extends OriginTestCase
         $headers = $response->headers();
         $this->assertEquals('attachment; filename="README.md"', $headers['Content-Disposition']);
 
+        $this->assertNull($response->sentFile());
+
+        ob_start();
+        $response->send();
+        ob_get_clean();
+        
+        $this->assertTrue($response->sent());
+        $this->assertEquals(ROOT . DS . 'README.md', $response->sentFile());
+    }
+
+    public function testFileNotFound()
+    {
+        $response = new Response();
+       
         $this->expectException(NotFoundException::class);
         $response->file('/var/www/---does-not-exist.md', ['download' => true]);
     }
