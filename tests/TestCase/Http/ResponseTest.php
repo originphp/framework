@@ -15,6 +15,8 @@
 namespace Origin\Test\Http;
 
 use Origin\Http\Response;
+use InvalidArgumentException;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Exception\NotFoundException;
 
 class MockResponse extends Response
@@ -34,7 +36,7 @@ class MockResponse extends Response
     }
 }
 
-class ResponseTest extends \PHPUnit\Framework\TestCase
+class ResponseTest extends OriginTestCase
 {
     public function testBody()
     {
@@ -96,11 +98,43 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('text/html', $response->type());
         $this->assertEquals('application/json', $response->type('json'));
 
-        $response->type(['swf' => 'application/x-shockwave-flash']);
+        $this->deprecated(function () use ($response) {
+            $response->type(['swf' => 'application/x-shockwave-flash']);
+        });
+       
         $this->assertEquals('application/x-shockwave-flash', $response->type('swf'));
         $mpeg = 'audio/mpeg';
         $this->assertEquals($mpeg, $response->Type($mpeg));
-        $this->assertFalse($response->type('foo'));
+
+        $this->expectException(InvalidArgumentException::class);
+        
+        $response->type('foo');
+    }
+
+    public function testMimeType()
+    {
+        $response = new Response();
+
+        $this->assertEquals(
+            'application/x-shockwave-flash',
+            $response->mimeType('swf', 'application/x-shockwave-flash')
+        );
+        $this->assertEquals('application/x-shockwave-flash', $response->mimeType('swf'));
+        $this->expectException(InvalidArgumentException::class);
+        $response->mimeType('foo');
+    }
+
+    public function testMimeTypes()
+    {
+        $response = new Response();
+        $this->assertIsArray($response->mimeTypes());
+        $this->assertArrayHasKey('json', $response->mimeTypes());
+
+        $mimeTypes = $response->mimeTypes();
+        $mimeTypes['swf'] = 'application/x-shockwave-flash';
+    
+        $this->assertEquals($mimeTypes, $response->mimeTypes($mimeTypes));
+        $this->assertArrayHasKey('swf', $response->mimeTypes());
     }
 
     public function testFile()

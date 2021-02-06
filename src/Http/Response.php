@@ -16,6 +16,7 @@ namespace Origin\Http;
 
 use DateTime;
 use DateTimeZone;
+use InvalidArgumentException;
 use Origin\Http\Exception\NotFoundException;
 
 class Response
@@ -288,6 +289,7 @@ class Response
      *
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
+     * @todo
      *
      * @param string|array $contentType
      * @return mixed
@@ -297,10 +299,10 @@ class Response
         if ($contentType === null) {
             return $this->contentType;
         }
+
         if (is_array($contentType)) {
-            foreach ($contentType as $type => $definition) {
-                $this->mimeTypes[$type] = $definition;
-            }
+            deprecationWarning('Using response:type to set definitions has been deprecated use types instead.');
+            $this->mimeTypes($contentType);
 
             return $this->contentType;
         }
@@ -312,7 +314,41 @@ class Response
             return $this->contentType = $contentType;
         }
 
-        return false;
+        throw new InvalidArgumentException('Invalid content type');
+    }
+
+    /**
+     * Sets or gets the mime type definitions
+     *
+     * @param array $definitions Definitions to add
+     * @return array
+     */
+    public function mimeTypes(array $definitions = null): array
+    {
+        if (is_null($definitions)) {
+            $definitions = $this->mimeTypes;
+        }
+
+        return $this->mimeTypes = $definitions;
+    }
+
+    /**
+     * Gets or sets a mime type in the definition
+     *
+     * @param string $type
+     * @param string $mime
+     * @return string
+     */
+    public function mimeType(string $type, string $mime = null): string
+    {
+        if ($mime === null) {
+            if (isset($this->mimeTypes[$type])) {
+                return $this->mimeTypes[$type];
+            }
+            throw new InvalidArgumentException('Invalid content type');
+        }
+
+        return $this->mimeTypes[$type] = $mime;
     }
 
     /**
