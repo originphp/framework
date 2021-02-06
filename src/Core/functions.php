@@ -329,3 +329,26 @@ if (! function_exists('config_path')) {
         return CONFIG . ($path ? DIRECTORY_SEPARATOR  . $path : '');
     }
 }
+
+if (! function_exists('temp_name')) {
+    /**
+     * Convenient function for generating a name for a temporary file in the system temp
+     * directory
+     *
+     * @param string $prefix
+     * @param integer $length 6
+     *  6 = 56,800,235,584 possible combinations,
+     *  7 = 3,521,614,606,208
+     * @return string
+     */
+    function temp_name(int $length = 6, string $prefix = null): string
+    {
+        $out = '';
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for ($i = 0; $i < $length; $i++) {
+            $out .= $characters[random_int(0, 61)];
+        }
+
+        return sys_get_temp_dir() . '/' . $prefix . $out;
+    }
+}

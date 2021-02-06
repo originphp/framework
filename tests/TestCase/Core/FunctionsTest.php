@@ -125,4 +125,12 @@ EOF;
         $this->assertEquals(STORAGE, storage_path());
         $this->assertEquals(STORAGE .'/folder/foo.json', storage_path('folder/foo.json'));
     }
+
+    public function testTempName()
+    {
+        $this->assertStringStartsWith(sys_get_temp_dir() .'/', temp_name());
+        $this->assertMatchesRegularExpression('/[A-Za-z0-9]{6}$/', temp_name());
+        $this->assertMatchesRegularExpression('/php[A-Za-z0-9]{6}$/', temp_name(6, 'php'));
+        $this->assertMatchesRegularExpression('/php[A-Za-z0-9]{8}$/', temp_name(8, 'php'));
+    }
 }
