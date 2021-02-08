@@ -20,6 +20,9 @@ use Origin\Process\Exception\TimeoutException;
 
 class BackgroundProcess extends BaseProcess
 {
+    const STDOUT = 1;
+    const STDERR = 2;
+    
     /**
      * @var resource|null
      */
@@ -277,11 +280,9 @@ class BackgroundProcess extends BaseProcess
      */
     public function readOutput(): ?string
     {
-        if (isset($this->pipes[1])) {
-            $this->stdout .= stream_get_contents($this->pipes[1]);
-        }
+        $this->stdout .= $out = $this->readPipe(self::STDOUT);
 
-        return null;
+        return $out;
     }
 
     /**
@@ -291,11 +292,20 @@ class BackgroundProcess extends BaseProcess
      */
     public function readError(): ?string
     {
-        if (isset($this->pipes[2])) {
-            return $this->stderr .= stream_get_contents($this->pipes[2]);
-        }
+        $this->stderr .= $out = $this->readPipe(self::STDERR);
 
-        return null;
+        return $out;
+    }
+
+    /**
+     * Reads the PIPE stream
+     *
+     * @param integer $index
+     * @return string|null
+     */
+    private function readPipe(int $index): ? string
+    {
+        return isset($this->pipes[$index]) ? stream_get_contents($this->pipes[$index]) : null;
     }
 
     /**

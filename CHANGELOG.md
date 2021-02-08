@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.18.1] - 2021-02-08
+
+### Fixed
+
+- Fixed issue with some output from BackgroundProcesss being duplicated
+
+## [3.18.0] - 2021-02-06
+
+### Added
+
+- Added assertFlashMessageNotSet in ConsoleIntegrationTest
+- Added assertFileSent in IntegrationTest
+- Added Response::sent
+- Added Response::sentFile
+- Added Response::mimeTypes
+- Added Response::mimeType
+- Added temp_name function
+
+### Deprecated
+
+- Deprecated setting mime types using Response::type use Reponse::mimeType instead
+
+### Changed
+
+- Changed migration renameIndex to use naitve implemenation to work with older versions of MySQL and current stable version of MariaDB
+
+### Fixed
+
+- Fixed issue parsing column SQL on MariaDB currenttimestamp
+
 ## [3.17.6] - 2021-02-05
 
 ### Fixed
@@ -61,7 +91,7 @@
 
 ## [3.15.0] - 2021-01-14
 
-### Changed 
+### Changed
 
 - Changed composer configuration
 
@@ -231,7 +261,7 @@
 ### Added
 
 - Added expires to Response
-- Added isEmpty to Model\Collection 
+- Added isEmpty to Model\Collection
 
 ### Fixed
 
@@ -250,7 +280,6 @@
 - Fixed issue with PHPUnit mock models not able to detect custom entity class
 - Fixed issues with default conditions sometimes not respected when fetching associated data
 - Fixed belongsTo/hasOne to work with fields without table alias (user guide previously insisted to use table alias anyway, but in other relationships it worked automatically)
-
 
 ### Added
 
@@ -383,12 +412,14 @@
 - Added `data` method to `Service\Result`.
 
 - Jobs
-    - Added `onSuccess` callback registration (BC)
-    - Added `onError` callback registration (BC)
+
+  - Added `onSuccess` callback registration (BC)
+  - Added `onError` callback registration (BC)
 
 - Mailbox
-    - Added `onSuccess` callback registration
-    - Added `onError` callback registration (BC)
+
+  - Added `onSuccess` callback registration
+  - Added `onError` callback registration (BC)
 
 - Model Added `onError` callback registration (BC)
 
@@ -409,15 +440,12 @@
 - Removed `View::view`
 
 - Removed backwards compatibility , you need to adjust config file, and if you have used them elsewhere, then you will need
-to adjust accordingly.
-    - `config/app.php`: `debug` this should be `App.debug`
-    - `config/app.php`: `Security.key` this should be`App.securityKey`
-    - `config/app.php`: `Session.timeout` this should be `App.sessionTimeout`
-    - `config/app.php`: `Mailbox.KeepEmails` this should be `App.mailboxKeepEmails`
+  to adjust accordingly. - `config/app.php`: `debug` this should be `App.debug` - `config/app.php`: `Security.key` this should be`App.securityKey` - `config/app.php`: `Session.timeout` this should be `App.sessionTimeout` - `config/app.php`: `Mailbox.KeepEmails` this should be `App.mailboxKeepEmails`
 
 - Removed backwards compatibility for model validation setting for individual rules
-    - `allowBlank` - this was changed to `allowEmpty`
-    - `required`: use `required` rule
+
+  - `allowBlank` - this was changed to `allowEmpty`
+  - `required`: use `required` rule
 
 - Removed `Model\ModelTrait`, this has been replaced with a `Core\ModelTrait`
 - Removed `ORIGIN` constant
@@ -425,6 +453,7 @@ to adjust accordingly.
 ## [2.8.1] - 2020-07-03
 
 ### Fixed
+
 - Fixed Config::write to use App.debug
 
 ### Deprecated
@@ -466,33 +495,40 @@ Added deprecation warnings for previously deprecated features which had backward
 ## [2.7.3] - 2020-06-14
 
 ### Added
+
 - Added connection::transaction and refactored code to use this
 
 ## [2.7.2] - 2020-06-13
 
 ### Fixed
+
 - Fixed various issues with Sqlite, testing and travis
 - Fixed some committed debug code
 
 ## [2.7.1] - 2020-06-12
 
 ### Added
+
 - Add console quiet mode
 
 ### Fixed
+
 - Fixed issue with returning rollbacks by commands due to recent refactor
 
 ## [2.7.0] - 2020-06-12
 
 ### Added
+
 - Added Sqlite engine
-- Added reading database constraint actions 
+- Added reading database constraint actions
 
 ### Changed
+
 - Changed Fixture Manager to not try to load fixtures if not database settings are present
 - Migration::addForeignKey, now accepts string as third argument for column name e.g. `$migration->addForeignKey('products', 'users', 'owner_id');`
 
 ### Fixed
+
 - Fixed Form select control type detect with empty value
 
 ### Added
@@ -538,8 +574,8 @@ Added deprecation warnings for previously deprecated features which had backward
 - Changed validation settings key with full backwards compatibility
   - renamed validation setting key `required` to `present`
   - validation setting key `allowBlank` to `allowEmpty`
-- Changed behavior of `required`, previously this was checking modified fields, to work with a certain form 
-behavior, however this was incorrect, now it checks if key is present full stop.
+- Changed behavior of `required`, previously this was checking modified fields, to work with a certain form
+  behavior, however this was incorrect, now it checks if key is present full stop.
 
 ### Notice
 
@@ -548,6 +584,7 @@ behavior, however this was incorrect, now it checks if key is present full stop.
 ## [2.5.1] - 2020-05-12
 
 ### Fixed
+
 - Fixed Number::parser returning 0 when non numeric strings were passed
 - Fixed Model::new not using entity locator for custom entity classes
 - Fixed FormHelper radio custom class
@@ -555,9 +592,11 @@ behavior, however this was incorrect, now it checks if key is present full stop.
 ## [2.5.0] - 2020-05-02
 
 ### Added
+
 - Added BatchInsertQuery for doing batch inserts
 
-### Fixed 
+### Fixed
+
 - Fixed bug in MysqlSchema when mapping from generic float definition
 - Fixed changelog date to show correct year :(
 
@@ -612,7 +651,7 @@ cleaned up code, changed visibility on methods and properties, and fixed docbloc
 - Fixed form helper adding error class on associated objects with validation errors
 - Fixed backtrace path
 - Fixed marshaller patching detecting posted integer/null fields were treated as modified due to different
-types, but were not.
+  types, but were not.
 
 ## [2.3.1] - 2019-12-03
 
@@ -639,6 +678,7 @@ types, but were not.
 - Added callbacks to Job beforeQueue,afterQueue, beforeDispatch, afterDispatch
 
 ### Fixed
+
 - Fixed Controller callbacks disabling
 - Fixed Console error render calls exit with exitcode 1
 
@@ -649,18 +689,22 @@ types, but were not.
 ## [2.2.1] - 2019-11-11
 
 ### Changed
+
 - improved IDS Middleware SQL injection attack rules.
 
 ### Fixed
+
 - Fixed IDS Middleware issue with log filename on unix
-- Fixed IDS Middleware performance rule 
+- Fixed IDS Middleware performance rule
 
 ## [2.2.0] - 2019-11-06
 
 ### Fixed
+
 - Fixed issue with group reflection of tests in PHP 7.3 only
 
 ### Changed
+
 - exceptions that extends HttpException will now show error message even if status code is 500 or above.
 
 ### Added
@@ -673,14 +717,19 @@ types, but were not.
 - ThrottleMiddleware
 
 ### Changed
+
 - Controller::redirect adjusted and now no longer stops script execution, it lets the dispatcher handle this.
 
 ## [2.1.0] - 2019-11-01
+
 ### Added
+
 - Added Cacheable concern for Models
 
 ## [2.0.1] - 2019-10-30
+
 ### Fixed
+
 - OriginTestCase changed to Abstract class which was causing unexpected issues with PHPUnit
 - Fixed CSRF token now rewrites cookie with each GET request
 - Fixed loadMiddleware accepts options
@@ -701,9 +750,10 @@ Summary of what has changed:
 2. Changed application folder a structure to a more organized way which makes it easier to work with given the number of folders that are now used. This affects Controllers, Middleware, Views and Mailers. see the [upgrade guide](http://localhost:8080/docs/upgrade) for more information on the folder structure.
 
 3. Changed how some features work
-    - changed how callbacks work in Controllers and Models, callbacks are now registered.
-    - changed Middleware callbacks and design
-    - Migrations store version in db as biginteger
+
+   - changed how callbacks work in Controllers and Models, callbacks are now registered.
+   - changed Middleware callbacks and design
+   - Migrations store version in db as biginteger
 
 4. Added strict types,return types any public properties have been changed to protected
 
@@ -732,19 +782,18 @@ I have been working full time on the framework to get this where it is now, chan
 - Changed public properties to protected
 - Security::uid now returns a 16 character base 62 random string.
 - Model callbacks have changed, now they need registering and arguments that will be passed have also been changed.
- See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
-    Important: Model::afterFind now passes a collection for single or multiple results
+  See [callbacks](https://www.originphp.com/docs/model/callbacks/) for more details.
+  Important: Model::afterFind now passes a collection for single or multiple results
 - Controller callbacks are now `startup` and `shutdown` inline with framework. beforeRedirect and beforeRender are used to register callbacks.
 - Folder structure has change for both App and Framework
-    - `App\Command` changed to `App\Console\Command`
-    - `App\Controller` change to `App\Http\View`
-    - `App\View` changed to `App\Http\View`
-    - `App\Middleware` changed to `App\Http\Middleware`
-    - `Origin\Command` change to `Origin\Console\Command`
-    - `Origin\Controller` change to `Origin\Http\View`
-    - `Origin\View` change to `Origin\Http\View`
-    - `Origin\Http\Middleware` class changed to `Origin\Http\Middleware\Middleware`
-    
+  - `App\Command` changed to `App\Console\Command`
+  - `App\Controller` change to `App\Http\View`
+  - `App\View` changed to `App\Http\View`
+  - `App\Middleware` changed to `App\Http\Middleware`
+  - `Origin\Command` change to `Origin\Console\Command`
+  - `Origin\Controller` change to `Origin\Http\View`
+  - `Origin\View` change to `Origin\Http\View`
+  - `Origin\Http\Middleware` class changed to `Origin\Http\Middleware\Middleware`
 - Mailer templates folder and filename structure
 - Error triggered in Jobs are now logged to help with debugging
 - Model::$datasource changed Model::$connection
@@ -759,7 +808,6 @@ I have been working full time on the framework to get this where it is now, chan
 - Datasource class renamed to Connection
 - Locale files are now PHP changed from YAML
 - File::info renamed filename key to name
-
 
 ** Utilities **
 
@@ -783,8 +831,8 @@ I have been working full time on the framework to get this where it is now, chan
 - Cache is now a composer package
 - Elasticsearch is now a composer package under a different namespace `Elasticsearch`
 
-- Changed Bootstrap process.  ConsoleApplications need to load config/bootstrap, previously this
-loaded the framework bootstrap file.
+- Changed Bootstrap process. ConsoleApplications need to load config/bootstrap, previously this
+  loaded the framework bootstrap file.
 - Console Commands return exit codes, added assertion for this
 - Origin\Exception\Exception and Origin\Exception\CoreException are now in Origin\Core\Exception
 
