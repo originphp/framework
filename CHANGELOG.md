@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.18.3] - 2021-02-12
+
+### Changed
+
+- Changed Reponse::file to return the name of the file if one was set
+
+### Fixed
+
+- Fixed view render error when sending files due to change 3.18.
+
 ## [3.18.2] - 2021-02-11
 
 ### Fixed
@@ -19,7 +29,6 @@
 - Added assertFlashMessageNotSet in ConsoleIntegrationTest
 - Added assertFileSent in IntegrationTest
 - Added Response::sent
-- Added Response::sentFile
 - Added Response::mimeTypes
 - Added Response::mimeType
 - Added temp_name function

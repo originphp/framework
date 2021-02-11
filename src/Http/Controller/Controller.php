@@ -689,7 +689,7 @@ class Controller
      
         call_user_func_array([$this, $action], $this->request->params('args'));
      
-        if ($this->autoRender && ! $this->response->sent()) {
+        if ($this->autoRender && ! $this->response->sent() && ! $this->response->file()) {
             $this->render();
         }
 

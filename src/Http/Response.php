@@ -142,17 +142,7 @@ class Response
     {
         return $this->sent;
     }
-
-    /**
-     * Returns the sent file
-     *
-     * @return string|null
-     */
-    public function sentFile(): ?string
-    {
-        return $this->sent ? $this->file : null;
-    }
-
+    
     /**
      * Wrapper to help with testing
      *
@@ -376,7 +366,7 @@ class Response
     }
 
     /**
-     * Renders a file either for download or inline
+     * Sets or gets the the response file
      *
      * ## Options
      * - name: the filename to appear in browser
@@ -388,10 +378,14 @@ class Response
      *  - name: the filename to appear in browser
      *  - download: if true
      *  - type: mime content type (default autodetected )
-     * @return void
+     * @return string|null
      */
-    public function file(string $filename, array $options = []): void
+    public function file(string $filename = null, array $options = []): ?string
     {
+        if ($filename === null) {
+            return $this->file;
+        }
+
         # Setup Options
         $options += ['name' => null,'download' => false,'type' => null];
        
@@ -412,11 +406,11 @@ class Response
         }
         $this->type($options['type']);
      
-        $this->file = $filename;
+        return $this->file = $filename;
     }
 
     /**
-     * Sets the Expires headers, you
+     * Sets the Expires headers
      *
      * @param string $time
      * @return void

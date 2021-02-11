@@ -142,19 +142,18 @@ class ResponseTest extends OriginTestCase
     public function testFile()
     {
         $response = new Response();
-       
+        $this->assertNull($response->file());
+
         $response->file(ROOT . DS . 'README.md', ['download' => true]);
         $headers = $response->headers();
         $this->assertEquals('attachment; filename="README.md"', $headers['Content-Disposition']);
-
-        $this->assertNull($response->sentFile());
 
         ob_start();
         $response->send();
         ob_get_clean();
         
         $this->assertTrue($response->sent());
-        $this->assertEquals(ROOT . DS . 'README.md', $response->sentFile());
+        $this->assertEquals(ROOT . DS . 'README.md', $response->file());
     }
 
     public function testFileNotFound()

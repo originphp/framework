@@ -712,7 +712,7 @@ trait IntegrationTestTrait
     {
         $response = $this->response();
         $this->assertTrue($response->sent(), 'Response was not sent');
-        $this->assertNotNull($response->sentFile(), 'Response did not send a file');
-        $this->assertEquals($this->response()->sentFile(), $absolutePath, 'This file was not sent');
+        $this->assertNotNull($response->file(), 'Response did not send a file');
+        $this->assertEquals($response->file(), $absolutePath, 'This file was not sent');
     }
 }
