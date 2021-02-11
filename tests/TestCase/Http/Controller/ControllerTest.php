@@ -162,6 +162,19 @@ class FruitComponent extends Component
     }
 }
 
+class ReadmesController extends Controller
+{
+    /**
+     * Help test when rendering a file download
+     *
+     * @return void
+     */
+    public function download()
+    {
+        $this->response->file(ROOT . '/README.md', ['download' => true]);
+    }
+}
+
 class ControllerTest extends \PHPUnit\Framework\TestCase
 {
     protected $controller = null;
@@ -357,6 +370,16 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render();
 
         $this->assertEquals('<h1>Posts Home Page</h1>', $controller->response()->body());
+    }
+    
+    /**
+     * Recently a code change caused a bug with response file downloads  and this was not caught.
+     * If this runs and causes MissingViewException.
+     */
+    public function testRenderResponseWithFile()
+    {
+        $controller = new ReadmesController(new Request(), new Response());
+        $this->assertInstanceOf(Response::class, $controller->dispatch('download'));
     }
 
     public function testRenderSerializeArraysJson()
