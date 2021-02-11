@@ -300,7 +300,7 @@ if (! function_exists('tmp_path')) {
 if (! function_exists('storage_path')) {
     /**
      * Handy function for working with storage paths, outside of the Storage component
-     * e.g. file_get_contents(tmp_path('data/data.json'));
+     * e.g. file_get_contents(storage_path('data/data.json'));
      *
      * @param string $path
      * @return string
