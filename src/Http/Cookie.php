@@ -134,9 +134,11 @@ class Cookie
         if (is_array($value)) {
             $value = json_encode($value);
         }
+
+        $key = $this->securityKey();
        
-        if ($encrypt) {
-            $value = self::prefix . Security::encrypt($value, $this->securityKey());
+        if ($encrypt && $key) {
+            $value = self::prefix . Security::encrypt($value, $key);
         }
        
         return (string) $value;
@@ -151,9 +153,9 @@ class Cookie
     protected function unpack(string $value)
     {
         $length = strlen(self::prefix);
-        // a parse error in application will trigger type error with security::decrypt
+  
         $key = $this->securityKey();
-        if (substr($value, 0, $length) === self::prefix && $key) {
+        if ($key && substr($value, 0, $length) === self::prefix) {
             $value = substr($value, $length);
             $value = Security::decrypt($value, $key);
         }
@@ -166,9 +168,9 @@ class Cookie
 
     /**
      * Gets the security key
-     * @return string
+     * @return string|null
      */
-    private function securityKey(): string
+    private function securityKey(): ?string
     {
         return Config::read('App.securityKey');
     }

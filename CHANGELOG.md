@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.18.2] - 2021-02-11
+
+### Fixed
+
+- Fixed type errors when trying to write a cookie when no key is present.
+
 ## [3.18.1] - 2021-02-08
 
 ### Fixed
