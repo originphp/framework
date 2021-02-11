@@ -1,7 +1,7 @@
 <?php
 /**
  * OriginPHP Framework
- * Copyright 2018 - 2021 Jamiel Sharief.
+ * Copyright 2018 - 2019 Jamiel Sharief.
  *
  * Licensed under The MIT License
  * The above copyright notice and this permission notice shall be included in all copies or substantial
@@ -11,25 +11,55 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-declare(strict_types = 1);
-namespace Origin\Http\Middleware;
+
+namespace Origin\Test\Http\Middleware;
 
 use Origin\Http\Request;
 use Origin\Http\Response;
-use Origin\Http\Dispatcher;
 
-class DispatcherMiddleware extends Middleware
+use Origin\Http\Middleware\Middleware;
+use Origin\Http\Middleware\MiddlewareRunner;
+
+class OneMiddleware extends Middleware
 {
-    /**
-       * This dispatch process is being done through middleware since this will
-       * create and process a response object. E.g. setting cookies in the controller, will
-       * modify the response object, and that should be available to other middlewares.
-       *
-       * @param \Origin\Http\Request $request
-       */
+    public function handle(Request $request): void
+    {
+        $request->data('one', 'one');
+    }
     public function process(Request $request, Response $response): void
     {
-        $dispatcher = Dispatcher::instance();
-        $dispatcher->dispatch($request, $response);
+        $response->header('X-One', 'one');
+    }
+}
+
+class TwoMiddleware extends Middleware
+{
+    public function handle(Request $request): void
+    {
+        $request->data('two', 'two');
+    }
+    
+    public function process(Request $request, Response $response): void
+    {
+        $response->header('X-Two', 'two');
+    }
+}
+
+class MiddlewareRunnerTest extends \PHPUnit\Framework\TestCase
+{
+    public function testRun()
+    {
+        $request = new Request();
+        $response = new Response();
+        $runner = new MiddlewareRunner();
+        $runner->add(new OneMiddleware());
+        $runner->add(new TwoMiddleware());
+
+        $runner->run($request, $response);
+
+        $this->assertEquals('one', $request->data('one'));
+        $this->assertEquals('two', $request->data('two'));
+        $this->assertEquals('one', $response->headers('X-One'));
+        $this->assertEquals('two', $response->headers('X-Two'));
     }
 }

@@ -323,7 +323,7 @@ class Query implements IteratorAggregate
      * @param integer $size
      * @return \Generator
      */
-    public function chunk(int $size) : Generator
+    public function chunk(int $size): Generator
     {
         $page = 1;
 
@@ -357,7 +357,7 @@ class Query implements IteratorAggregate
      * @param integer $chunkSize
      * @return bool
      */
-    public function each(int $chunkSize = 1000) : Generator
+    public function each(int $chunkSize = 1000): Generator
     {
         foreach ($this->chunk($chunkSize) as $collection) {
             foreach ($collection as $entity) {
