@@ -7,6 +7,7 @@ class PostsController extends ApplicationController
     {
         $this->set('title', 'Posts Controller Page');
     }
+
     public function list()
     {
         $this->layout = false;
@@ -18,6 +19,7 @@ class PostsController extends ApplicationController
     {
         $this->$key = $value;
     }
+    
     public function getProperty($key)
     {
         return $this->$key ?? null;

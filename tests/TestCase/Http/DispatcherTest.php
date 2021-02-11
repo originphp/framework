@@ -80,6 +80,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
         $Dispatcher->dispatch(new Request('blog_posts/index'), new Response());
         $this->assertInstanceOf(Controller::class, $Dispatcher->controller());
     }
+
     public function testGetClass()
     {
         $Dispatcher = new MockDispatcher2();
@@ -100,6 +101,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
         $Dispatcher = new MockDispatcher();
         $Dispatcher->dispatch(new Request('blog_posts/does_not_exist'), new Response());
     }
+    
     public function testPrivateControllerMethod()
     {
         $this->expectException(PrivateMethodException::class);

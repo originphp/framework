@@ -162,7 +162,7 @@ class Cookie
         if ($value && substr($value, 0, 1) === '{') {
             $value = json_decode($value, true);
         }
-
+        
         return $value;
     }
 
