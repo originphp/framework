@@ -184,7 +184,7 @@ class Session
      * @param mixed $value
      * @return void
      */
-    public function write(string $key = null, $value = null): void
+    public function write(string $key, $value): void
     {
         $Dot = new Dot($_SESSION);
         $Dot->set($key, $value);
@@ -208,7 +208,6 @@ class Session
         foreach ($_SESSION as $key => $value) {
             if (! isset($data[$key])) {
                 unset($_SESSION[$key]);
-                continue;
             }
         }
         foreach ($data as $key => $value) {
@@ -222,7 +221,7 @@ class Session
      * @param string $key
      * @return mixed|null
      */
-    public function read(string $key = null)
+    public function read(string $key)
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {
@@ -238,7 +237,7 @@ class Session
      * @param string $key
      * @return boolean
      */
-    public function exists(string $key = null): bool
+    public function exists(string $key): bool
     {
         $Dot = new Dot($_SESSION);
 
@@ -250,7 +249,7 @@ class Session
      * @param string $key
      * @return boolean
      */
-    public function delete(string $key = null): bool
+    public function delete(string $key): bool
     {
         $Dot = new Dot($_SESSION);
         if ($Dot->has($key)) {

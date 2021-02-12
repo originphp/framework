@@ -600,7 +600,8 @@ trait IntegrationTestTrait
     }
 
     /**
-     * Asserts that flash message was set
+     * Asserts that flash message was set. Only works for setting flash messages
+     * then redirecting as the Flash helper will consume the message during render.
      *
      * @param string $expected
      * @return void
@@ -611,7 +612,8 @@ trait IntegrationTestTrait
     }
 
     /**
-     * Asserts that a particular message was not set
+     * Asserts that a particular message was not set. Only works for setting flash messages
+     * then redirecting as the Flash helper will consume the message during render.
      *
      * @param string $message
      * @return void

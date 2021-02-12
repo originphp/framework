@@ -373,7 +373,7 @@ class Response
      * - download: if true
      * - type: mime content type (default autodetected )
      *
-     * @param string $filename name and location of file
+     * @param string|null $filename name and location of file
      * @param array $options The following option keys are supported
      *  - name: the filename to appear in browser
      *  - download: if true
