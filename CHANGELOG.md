@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.18.4] - 2021-02-13
+
+### Fixed
+
+- Fixed type hinting in Session
+
 ## [3.18.3] - 2021-02-12
 
 ### Changed
