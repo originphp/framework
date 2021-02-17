@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.18.5] - 2021-02-17
+
+### Fixed
+
+- Fixed composer ambiguous class resolution for new class Process
+
 ## [3.18.4] - 2021-02-13
 
 ### Fixed
