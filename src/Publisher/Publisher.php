@@ -167,7 +167,7 @@ final class Publisher
         /**
          * Work with any object
          */
-        if (method_exists($object, $event) and call_user_func_array([$object,$event], $args) === false) {
+        if (method_exists($object, $event) && call_user_func_array([$object,$event], $args) === false) {
             return false;
         }
 
