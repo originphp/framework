@@ -655,23 +655,27 @@ class Event
     /**
      * Runs this callable before the event is executed
      *
-     * @param callable $callable
-     * @return void
+     * @param \Closure $closure
+     * @return self
      */
-    public function before(callable $callable)
+    public function before(Closure $closure)
     {
-        $this->beforeCallbacks[] = $callable;
+        $this->beforeCallbacks[] = $closure;
+
+        return $this;
     }
 
     /**
      * Runs this callable after the event is executed
      *
-     * @param callable $callable
-     * @return void
+     * @param \Closure $closure
+     * @return self
      */
-    public function after(callable $callable)
+    public function after(Closure $closure)
     {
-        $this->afterCallbacks[] = $callable;
+        $this->afterCallbacks[] = $closure;
+
+        return $this;
     }
 
     /**
