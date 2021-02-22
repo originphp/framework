@@ -44,6 +44,11 @@ class CronExpression
     protected $segments = [];
 
     /**
+     * @var array
+     */
+    protected $parsedSegments = [];
+
+    /**
      * Maps the cron syntax position to datetime format
      *
      * @var array
