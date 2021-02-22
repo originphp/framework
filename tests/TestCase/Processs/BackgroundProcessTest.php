@@ -8,17 +8,25 @@ use Origin\Process\BackgroundProcess;
 
 class BackgroundProcessTest extends OriginTestCase
 {
+    public function testPid()
+    {
+        $process = new BackgroundProcess('sleep 1', ['escape' => false]);
+        $this->assertNull($process->pid());
+        $process->start();
+        $this->assertIsInt($process->pid());
+    }
     public function testStart()
     {
         $process = new BackgroundProcess('echo started; sleep 3 ; echo completed', ['escape' => false]);
+
         $process->start();
         $this->assertTrue($process->isRunning());
         sleep(1);
-            
+   
         $this->assertStringContains('started', $process->output());
         $this->assertStringNotContains('completed', $process->output());
         $this->assertEquals(-1, $process->exitCode());
- 
+        
         sleep(3);
         $this->assertFalse($process->isRunning());
         $this->assertStringContains('started', $process->output());

@@ -160,6 +160,16 @@ class BackgroundProcess extends BaseProcess
     }
 
     /**
+     * Gets the PID for the process
+     *
+     * @return integer|null
+     */
+    public function pid(): ? int
+    {
+        return $this->status('pid');
+    }
+
+    /**
      * Waits for the background process to stop running
      *
      * @return int|null

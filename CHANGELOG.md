@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.19.0] - 2021-02-22
+
+### Added
+
+- Added BackgroundProcess::pid to get the process id
+
 ## [3.18.5] - 2021-02-17
 
 ### Fixed
