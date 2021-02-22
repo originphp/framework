@@ -22,7 +22,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
     public function testCommand()
     {
         $schedule = new Schedule();
-        $this->assertInstanceOf(Event::class, $schedule->command('ls -lah'));
+        $this->assertInstanceOf(Event::class, $schedule->command('ls', ['-lah']));
     }
 
     public function testJob()

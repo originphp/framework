@@ -201,6 +201,15 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $event->cron('foo');
     }
 
+    public function testMinutes()
+    {
+        $this->assertEquals('*/5 * * * *', ($this->eventFixture())->every5Minutes()->expression());
+        $this->assertEquals('*/10 * * * *', ($this->eventFixture())->every10Minutes()->expression());
+        $this->assertEquals('*/15 * * * *', ($this->eventFixture())->every15Minutes()->expression());
+        $this->assertEquals('*/20 * * * *', ($this->eventFixture())->every20Minutes()->expression());
+        $this->assertEquals('*/30 * * * *', ($this->eventFixture())->every30Minutes()->expression());
+    }
+
     public function testinMaintenanceMode()
     {
         $event = new Event('callable', function () {
@@ -241,23 +250,36 @@ class EventTest extends \PHPUnit\Framework\TestCase
 
     public function testBeforeCallback()
     {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-        
-        $this->assertFalse($callable->invoked);
-        $event->before($callable);
+        $obj = new stdClass();
+        $obj->wasCalled = false;
+
+        $event = $this->eventFixture();
+
+        $closure = function () use ($obj) {
+            $obj->wasCalled = true;
+        };
+
+        $this->assertFalse($obj->wasCalled);
+        $event->before($closure);
         $event->execute();
-        $this->assertTrue($callable->invoked);
+        $this->assertTrue($obj->wasCalled);
     }
 
     public function testAfterCallback()
     {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-        $this->assertFalse($callable->invoked);
-        $event->after($callable);
+        $obj = new stdClass();
+        $obj->wasCalled = false;
+
+        $event = $this->eventFixture();
+
+        $closure = function () use ($obj) {
+            $obj->wasCalled = true;
+        };
+
+        $this->assertFalse($obj->wasCalled);
+        $event->after($closure);
         $event->execute();
-        $this->assertTrue($callable->invoked);
+        $this->assertTrue($obj->wasCalled);
     }
 
     public function testFilter()
