@@ -18,7 +18,7 @@ jobs:
     name: "PHP ${{ matrix.php-version }} ${{ matrix.database }}"
     runs-on: "ubuntu-latest"
     strategy:
-#      max-parallel: 3
+      #      max-parallel: 3
       matrix:
         php-version:
           - "7.3"
@@ -41,7 +41,7 @@ jobs:
         run: |
           docker run -d -e POSTGRES_PASSWORD=root -e POSTGRES_DB=origin_test -p 5432:5432 postgres
           sudo apt-get install postgresql-client
-      - name: Setup Redis 
+      - name: Setup Redis
         run: docker run -p 6379:6379 -d redis
       - name: Install PHP
         uses: "shivammathur/setup-php@v2"
@@ -84,10 +84,8 @@ jobs:
       - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_PARALLEL: true
-          COVERALLS_FLAG_NAME: ${{ matrix.php-version }}-${{ matrix.database }}
         run: |
           composer global require php-coveralls/php-coveralls
           php-coveralls --coverage_clover=build/logs/clover.xml --verbose
-      - name: Run PHPStan 
+      - name: Run PHPStan
         run: "vendor/bin/phpstan analyse src --error-format=github"
