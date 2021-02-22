@@ -660,7 +660,7 @@ class Event
      */
     public function before(callable $callable)
     {
-        $this->beforeCallable = $callable;
+        $this->beforeCallbacks[] = $callable;
     }
 
     /**
@@ -671,7 +671,7 @@ class Event
      */
     public function after(callable $callable)
     {
-        $this->afterCallable = $callable;
+        $this->afterCallbacks[] = $callable;
     }
 
     /**
