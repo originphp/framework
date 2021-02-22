@@ -22,6 +22,9 @@ use Origin\Process\BackgroundProcess;
 
 class Event
 {
+    /**
+     * @var string
+     */
     private $type;
 
     /**
