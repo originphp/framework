@@ -10,15 +10,32 @@ class BackupTask extends Task
     protected $name = 'backup task';
     protected $description = 'Daily backup job';
 
+    private $tempName;
+
+    protected function initialize(): void
+    {
+        $this->tempName = sys_get_temp_dir() . '/schedule-background-test.tmp';
+    }
+
+    public function tempName(): string
+    {
+        return $this->tempName;
+    }
+
     protected function handle(Schedule $schedule): void
     {
+        if (file_exists($this->tempName)) {
+            unlink($this->tempName);
+        }
 
-        // ID: 86dc375026e0
-        $event = $schedule->call(function () {
-            echo 'Backing up';
-            sleep(1);
-            echo 'Backup completed';
+        $tmp = $this->tempName;
+
+        // ID: 5546177403d8
+        $event = $schedule->call(function () use ($tmp) {
+            file_put_contents($tmp, (string) getmypid());
         })->everyMinute()
             ->inBackground();
+
+        #debug($event->id());
     }
 }

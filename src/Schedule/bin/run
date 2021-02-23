@@ -13,21 +13,21 @@
  * @license      https://opensource.org/licenses/mit-license.php MIT License
  */
 
-define('ROOT', dirname(__DIR__));
-define('APP', ROOT . '/src');
-
 /**
- * Current version of the framework uses own autoloader. This command needs to work as part of framework, part
- * of package.
+ * Load the bootstrap file if this exists, else only load the composer autoload.php file.
  */
-$isFramework = is_dir(ROOT . '/vendor/originphp/framework');
-if ($isFramework && file_exists(ROOT . '/config/autoload.php') && file_exists(ROOT . '/config/bootstrap.php')) {
-    ROOT . '/config/bootstrap.php';
-} elseif (file_exists(ROOT . '/vendor/autoload.php')) {
-    require ROOT . '/vendor/autoload.php';
-} elseif (file_exists(getcwd() . '/vendor/autoload.php')) {
-    require getcwd() . '/vendor/autoload.php';
+$workingDirectory = getcwd();
+$base = dirname(__DIR__) ;
+
+if (file_exists($workingDirectory . '/config/bootstrap.php')) {
+    $bootstrap = $workingDirectory . '/config/bootstrap.php';
+} elseif (file_exists($base  . '/vendor/autoload.php')) {
+    $bootstrap = $base  . '/vendor/autoload.php';
+} else {
+    $bootstrap = $workingDirectory . '/vendor/autoload.php';
 }
+
+require $bootstrap;
 
 use Origin\Console\ConsoleApplication;
 use Origin\Schedule\Command\ScheduleRunCommand;

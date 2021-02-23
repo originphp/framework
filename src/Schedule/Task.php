@@ -39,9 +39,9 @@ abstract class Task
      */
     protected $description = null;
 
-    public function __construct(Schedule $schedule)
+    public function __construct()
     {
-        $this->schedule = $schedule;
+        $this->schedule = new Schedule($this);
         
         list($namespace, $name) = namespaceSplit(get_class($this));
         $this->name = $this->name ?? $name;

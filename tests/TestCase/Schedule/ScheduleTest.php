@@ -11,31 +11,33 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\Schedule;
+namespace Origin\Test\TestCase\Schedule;
 
 use stdClass;
 use Origin\Schedule\Event;
 use Origin\Mailer\MailerJob;
 use InvalidArgumentException;
 use Origin\Schedule\Schedule;
+use Origin\Test\TestCase\Schedule\Task\MiscTask;
+use Origin\Test\TestCase\Schedule\Task\BackupTask;
 
 class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
     public function testCommand()
     {
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
         $this->assertInstanceOf(Event::class, $schedule->command('ls', ['-lah']));
     }
 
     public function testJob()
     {
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
         $this->assertInstanceOf(Event::class, $schedule->job(new MailerJob));
     }
 
     public function testCall()
     {
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
         $this->assertInstanceOf(Event::class, $schedule->call(function () {
             return true;
         }));
@@ -43,7 +45,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testEvents()
     {
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
         
         $this->assertIsArray($schedule->events());
         $this->assertEmpty($schedule->events());
@@ -63,7 +65,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testRunId()
     {
-        Schedule::run(__DIR__ . '/Task', 'c6cc44a85c4d');
+        Schedule::run(__DIR__ . '/Task', '4b083e6cdcd6');
         $this->assertNull(null);
     }
 
@@ -84,7 +86,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $object = new stdClass();
         $object->called = false;
 
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
 
         $schedule->call(function () use ($object) {
             $object->called = true;
@@ -100,15 +102,14 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
      */
     public function testDispatchBackground()
     {
-        $schedule = new Schedule;
+        $backupTask = new BackupTask();
+        $schedule = new Schedule($backupTask);
 
-        $schedule->call(function () {
-            echo 'foo';
-        })->everyMinute()->inBackground();
-
-        $schedule->dispatch();
-
-        $this->assertNull(null); // Check no errors caught, does not mean it worked
+        $this->assertFileDoesNotExist($backupTask->tempName());
+        $backupTask->dispatch();
+    
+        sleep(1);
+        $this->assertFileExists($backupTask->tempName());
     }
 
     /**
@@ -119,7 +120,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $object = new stdClass();
         $object->called = false;
 
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
 
         $day = (int) date('d') === 1 ?  2 : 3;
         $expression = "0 0 {$day} * *"; // never run
@@ -140,7 +141,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $object = new stdClass();
         $object->called = false;
 
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
 
         file_put_contents(tmp_path('maintenance.json'), 'foo');
 
@@ -163,7 +164,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $object = new stdClass();
         $object->called = false;
 
-        $schedule = new Schedule;
+        $schedule = new Schedule(new MiscTask);
 
         file_put_contents(tmp_path('maintenance.json'), 'foo');
 

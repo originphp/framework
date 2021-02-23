@@ -46,7 +46,7 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function testInvoke()
     {
-        $task = new DummyTask(new Schedule);
+        $task = new DummyTask();
         $result = $task();
         $this->assertTrue($task->initialized);
         $this->assertFalse($task->startup);
@@ -55,13 +55,13 @@ class TaskTest extends \PHPUnit\Framework\TestCase
 
     public function testSchedule()
     {
-        $task = new DummyTask(new Schedule);
+        $task = new DummyTask();
         $this->assertInstanceOf(Schedule::class, $task->schedule());
     }
 
     public function testDispatch()
     {
-        $task = new DummyTask(new Schedule);
+        $task = new DummyTask();
 
         $this->assertTrue($task->initialized);
         $this->assertFalse($task->startup);

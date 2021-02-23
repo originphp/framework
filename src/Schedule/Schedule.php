@@ -48,9 +48,19 @@ class Schedule
     const SATURDAY = 6;
     
     /**
+     * @var \Origin\Schedule\Task
+     */
+    private $task;
+
+    /**
      * @var \Origin\Schedule\Event[]
      */
     private $events = [];
+
+    public function __construct(Task $task)
+    {
+        $this->task = $task;
+    }
 
     /**
      * Calls any callable, e.g. closure, class with __invoke
@@ -112,6 +122,8 @@ class Schedule
      */
     public function dispatch(): void
     {
+        $path = $this->getPath($this->task);
+
         foreach ($this->events as $event) {
             if (! $event->isDue('now')) {
                 continue;
@@ -125,8 +137,12 @@ class Schedule
 
             for ($i = 0;$i < $config['instances'] ;$i++) {
                 if ($config['background']) {
-                    $process = new BackgroundProcess($this->buildCommand($event->id()));
-  
+                    // debug(implode(' ', $this->buildCommand($path, $event->id())));
+
+                    $process = new BackgroundProcess(
+                        $this->buildCommand($path, $event->id())
+                    );
+                    
                     $process->start();
                 } else {
                     $event->execute();
@@ -135,15 +151,31 @@ class Schedule
         }
     }
 
-    private function buildCommand(string $id)
+    /**
+     * Gets the directory where object file is
+     *
+     * @param object $object
+     * @return string
+     */
+    private function getPath(object $object): string
     {
-        /*if (class_exists(Commands\Console\Command\ScheduleRunCommand::class)) {
-            return ['vendor/bin/schedule:run',"--id={$id}"];
-        }*/
-        $reflection = new ReflectionClass($this);
-        $path = pathinfo($reflection->getFilename(), PATHINFO_DIRNAME);
+        $reflection = new ReflectionClass($object);
 
-        return [$path . '/bin/run', "--id={$id}"];
+        return pathinfo($reflection->getFilename(), PATHINFO_DIRNAME);
+    }
+
+    /**
+     * Builds the command for the background process
+     *
+     * @param string $path
+     * @param string $id
+     * @return array
+     */
+    private function buildCommand(string $path, string $id): array
+    {
+        $schedulePath = $this->getPath($this);
+
+        return [$schedulePath . '/bin/run',"--directory={$path}", "--id={$id}"];
     }
 
     /**
@@ -227,7 +259,8 @@ class Schedule
         foreach (scandir($path) as $file) {
             if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                 $class = static::parseClassName($path . '/' . $file);
-                $task = new $class(new Schedule($path));
+
+                $task = new $class();
                 if ($task instanceof Task) {
                     $out[] = $task;
                 }
