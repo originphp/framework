@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.19.0] - 2021-02-22
+## [3.19.0] - 2021-02-23
 
 ### Added
 
 - Added BackgroundProcess::pid to get the process id
+- Added Task Scheduling (Schedule, Event, Task)
 
 ## [3.18.5] - 2021-02-17
 
