@@ -175,7 +175,7 @@ class Schedule
     {
         $schedulePath = $this->getPath($this);
 
-        return [$schedulePath . '/bin/run',"--directory={$path}", "--id={$id}"];
+        return [$schedulePath . '/bin/schedule:run',"--directory={$path}", "--id={$id}"];
     }
 
     /**
