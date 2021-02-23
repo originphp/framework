@@ -101,8 +101,7 @@ trait ConsoleIntegrationTestTrait
         $this->stdin->setInput($input);
 
         $argv = $this->splitCommand("console {$command}");
-        list($namespace, $class) = namespacesplit(get_class($this));
-
+    
         $io = new ConsoleIo($this->stdout, $this->stderr, $this->stdin);
         $commandRunner = new CommandRunner($io);
         $this->commandResult = $commandRunner->run($argv);
