@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+/**
+ * OriginPHP Framework
+ * Copyright 2018 - 2021 Jamiel Sharief.
+ *
+ * Licensed under The MIT License
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * @copyright    Copyright (c) Jamiel Sharief
+ * @link         https://www.originphp.com
+ * @license      https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+define('ROOT', dirname(__DIR__));
+define('APP', ROOT . '/src');
+
+/**
+ * Current version of the framework uses own autoloader. This command needs to work as part of framework, part
+ * of package.
+ */
+$isFramework = is_dir(ROOT . '/vendor/originphp/framework');
+if ($isFramework && file_exists(ROOT . '/config/autoload.php') && file_exists(ROOT . '/config/bootstrap.php')) {
+    ROOT . '/config/bootstrap.php';
+} elseif (file_exists(ROOT . '/vendor/autoload.php')) {
+    require ROOT . '/vendor/autoload.php';
+} elseif (file_exists(getcwd() . '/vendor/autoload.php')) {
+    require getcwd() . '/vendor/autoload.php';
+}
+
+use Origin\Console\ConsoleApplication;
+use Origin\Schedule\Command\ScheduleRunCommand;
+
+$app = new ConsoleApplication();
+$app->name('run');
+$app->description([
+    'Runs scheduled tasks'
+]);
+$app->addCommand('run', ScheduleRunCommand::class);
+exit($app->run());

@@ -21,6 +21,11 @@ abstract class Task
     use HookTrait;
 
     /**
+     * @var \Origin\Schedule\Schedule
+     */
+    protected $schedule;
+
+    /**
      * Name of this task
      *
      * @var string
@@ -34,8 +39,10 @@ abstract class Task
      */
     protected $description = null;
 
-    public function __construct()
+    public function __construct(Schedule $schedule)
     {
+        $this->schedule = $schedule;
+        
         list($namespace, $name) = namespaceSplit(get_class($this));
         $this->name = $this->name ?? $name;
 
@@ -51,16 +58,35 @@ abstract class Task
     abstract protected function handle(Schedule $schedule): void;
 
     /**
-     * Dispatches the task
+     * Invokes this task
+     *
+     * @return void
+     */
+    public function __invoke(): void
+    {
+        $this->handle($this->schedule);
+    }
+
+    /**
+     * Dispatches the Task
      *
      * @return void
      */
     public function dispatch(): void
     {
-        $schedule = new Schedule();
         $this->executeHook('startup');
-        $this->handle($schedule);
-        $schedule->dispatch();
+        $this->handle($this->schedule);
+        $this->schedule->dispatch();
         $this->executeHook('shutdown');
+    }
+
+    /**
+     * Gets the schedule object for this task
+     *
+     * @return \Origin\Schedule\Schedule
+     */
+    public function schedule(): Schedule
+    {
+        return $this->schedule;
     }
 }

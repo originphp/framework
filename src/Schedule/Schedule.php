@@ -15,6 +15,10 @@ declare(strict_types = 1);
 namespace Origin\Schedule;
 
 use Origin\Job\Job;
+use ReflectionClass;
+use InvalidArgumentException;
+use Origin\Process\BackgroundProcess;
+use Origin\Configurable\StaticConfigurable as Configurable;
 
 /**
  * Schedule your tasks using source control and PHP. This is new and is under development.
@@ -24,6 +28,17 @@ use Origin\Job\Job;
  */
 class Schedule
 {
+    use Configurable;
+
+    /**
+     * Default Configuration
+     *
+     * @var array
+     */
+    protected static $defaultConfig = [
+        'path' => null
+    ];
+    
     const SUNDAY = 0;
     const MONDAY = 1;
     const TUESDAY = 2;
@@ -33,20 +48,9 @@ class Schedule
     const SATURDAY = 6;
     
     /**
-     * @var array
+     * @var \Origin\Schedule\Event[]
      */
     private $events = [];
-
-    /**
-     * @var string
-     */
-    private $time;
-
-    public function __construct(array $options = [])
-    {
-        $options += ['time' => 'now'];
-        $this->time = $options['time'];
-    }
 
     /**
      * Calls any callable, e.g. closure, class with __invoke
@@ -109,10 +113,143 @@ class Schedule
     public function dispatch(): void
     {
         foreach ($this->events as $event) {
-            if ($event->isDue($this->time) && (! $this->maintenanceMode() || $event->runsInMaintenanceMode())) {
-                $event->execute();
+            if (! $event->isDue('now')) {
+                continue;
+            }
+
+            $config = $event->config();
+  
+            if ($this->maintenanceMode() && ! $config['maintenanceMode']) {
+                continue;
+            }
+
+            for ($i = 0;$i < $config['instances'] ;$i++) {
+                if ($config['background']) {
+                    $process = new BackgroundProcess($this->buildCommand($event->id()));
+  
+                    $process->start();
+                } else {
+                    $event->execute();
+                }
             }
         }
+    }
+
+    private function buildCommand(string $id)
+    {
+        /*if (class_exists(Commands\Console\Command\ScheduleRunCommand::class)) {
+            return ['vendor/bin/schedule:run',"--id={$id}"];
+        }*/
+        $reflection = new ReflectionClass($this);
+        $path = pathinfo($reflection->getFilename(), PATHINFO_DIRNAME);
+
+        return [$path . '/bin/run', "--id={$id}"];
+    }
+
+    /**
+     * Runs
+     *
+     * @param string $path
+     * @param string $eventId
+     * @return void
+     */
+    public static function run(string $path, string $eventId = null): void
+    {
+        if (! is_dir($path)) {
+            throw new InvalidArgumentException('Path does not exist');
+        }
+
+        if ($eventId) {
+            static::runEvent($path, $eventId);
+        } else {
+            static::runEvents($path);
+        }
+    }
+
+    /**
+     * Runs all the events on all the tasks
+     *
+     * @param string $path
+     * @return void
+     */
+    private static function runEvents(string $path): void
+    {
+        foreach (static::loadTasks($path) as $task) {
+            $task->dispatch();
+        }
+    }
+
+    /**
+     * Runs a specific event in the tasks
+     *
+     * @param string $path
+     * @param string $eventId
+     * @return void
+     */
+    private static function runEvent(string $path, string $eventId): void
+    {
+        $event = static::findById($eventId, static::loadTasks($path));
+      
+        if (! $event) {
+            throw new InvalidArgumentException('Invalid event ID');
+        }
+        $event->execute();
+    }
+
+    /**
+     * @param string $id
+     * @param array $tasks
+     * @return \Origin\Schedule\Event|null
+     */
+    private static function findById(string $id, array $tasks): ?Event
+    {
+        foreach ($tasks as $task) {
+            $task(); // invoke only
+            foreach ($task->schedule()->events() as $event) {
+                if ($event->id() === $id) {
+                    return $event;
+                }
+            }
+        }
+
+        return null;
+    }
+  
+    /**
+     * Loads an array of Task objects
+     *
+     * @return array
+     */
+    private static function loadTasks(string $path): array
+    {
+        $out = [];
+
+        foreach (scandir($path) as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
+                $class = static::parseClassName($path . '/' . $file);
+                $task = new $class(new Schedule($path));
+                if ($task instanceof Task) {
+                    $out[] = $task;
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    private static function parseClassName(string $path): string
+    {
+        $class = substr(pathinfo($path, PATHINFO_BASENAME), 0, -4);
+        $contents = file_get_contents($path);
+        if (preg_match('#^namespace\s+(.+?);$#sm', $contents, $matches)) {
+            $class = '\\' . $matches[1] . '\\' . $class;
+        }
+
+        return $class;
     }
 
     /**

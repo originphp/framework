@@ -23,7 +23,7 @@ use Origin\Process\BackgroundProcess;
 class Event
 {
     /**
-     * @var string
+     * @var string command|job|callable
      */
     private $type;
 
@@ -42,7 +42,10 @@ class Event
     private $arguments;
 
     /**
-     * Path to output file
+     * Path to where output should go. This can also be /dev/null so that cron does not email
+     * errors or information.
+     *
+     * TODO: should this be default /dev/null ?
      *
      * @var string
      */
@@ -56,32 +59,32 @@ class Event
     private $appendOutput = false;
 
     /**
-     * Don't run command in background process
+     * If a command should run in the background
      *
      * @var boolean
      */
-    private $runInForeground = false;
+    private $background = false;
 
     /**
      * This event should run even if in maintence mode
      *
      * @var boolean
      */
-    private $ignoreMaintenanceMode = false;
+    private $maintenanceMode = false;
 
     /**
-     * Restricts the maximum number of instances of this tasks running at the same time
+     * Restricts the maximum number of instances of this event running at the same time
      *
      * @var int
      */
     private $max = 0;
 
     /**
-     * How many times this task will be executed
+     * How many times this event will be executed
      *
      * @var integer
      */
-    private $count = 1;
+    private $instances = 1;
 
     /**
      * Callables that will be called before the event is executed
@@ -139,8 +142,20 @@ class Event
     private $pids = [];
 
     /**
+     * @var array
+     */
+    private $successCallbacks = [];
+
+    /**
+     * @var array
+     */
+    private $errorCallbacks = [];
+
+    /**
+     * Create an instance
+     *
      * @param string $type
-     * @param string|job|callable|object $data
+     * @param mixed $data
      * @param array $arguments
      */
     public function __construct(string $type, $data, array $arguments = [])
@@ -148,17 +163,15 @@ class Event
         $this->type = $type;
         $this->data = $data;
         $this->arguments = $arguments;
-
-        $this->id = $this->id();
     }
 
     /**
      * Schedule this event using a cron expression
      *
      * @param string $expression e.g. '0 0 * * 0;
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function cron(string $expression)
+    public function cron(string $expression): Event
     {
         $this->segments = explode(' ', $expression);
   
@@ -171,9 +184,9 @@ class Event
 
     /**
      * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    private function minutes(int $step = null)
+    private function minutes(int $step = null): Event
     {
         $this->segments = array_fill(0, 5, '*');
 
@@ -185,12 +198,11 @@ class Event
     }
 
     /**
-     * Schedule this event to run every minutes
+     * Schedule this event to run every minute
      *
-     * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function everyMinute()
+    public function everyMinute(): Event
     {
         return $this->minutes();
     }
@@ -199,9 +211,9 @@ class Event
      * Schedule this event to run every 5 minutes
      *
      * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function every5Minutes()
+    public function every5Minutes(): Event
     {
         return $this->minutes(5);
     }
@@ -210,9 +222,9 @@ class Event
      * Schedule this event to run every 10 minutes
      *
      * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function every10Minutes()
+    public function every10Minutes(): Event
     {
         return $this->minutes(10);
     }
@@ -221,9 +233,9 @@ class Event
      * Schedule this event to run every 15 minutes
      *
      * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function every15Minutes()
+    public function every15Minutes(): Event
     {
         return $this->minutes(15);
     }
@@ -232,9 +244,9 @@ class Event
      * Schedule this event to run every 20 minutes
      *
      * @param integer $step set a value to run every x minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function every20Minutes()
+    public function every20Minutes(): Event
     {
         return $this->minutes(20);
     }
@@ -243,9 +255,9 @@ class Event
     * Schedule this event to run every 30 minutes
     *
     * @param integer $step set a value to run every x minutes
-    * @return self
+    * @return \Origin\Schedule\Event
     */
-    public function every30Minutes()
+    public function every30Minutes(): Event
     {
         return $this->minutes(30);
     }
@@ -253,9 +265,9 @@ class Event
     /**
      * Schedule this event to run hourly
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function hourly()
+    public function hourly(): Event
     {
         $this->segments[0] = 0; // run at minute 0 of each hour
 
@@ -265,9 +277,9 @@ class Event
     /**
      * Schedule this event to run daily
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function daily()
+    public function daily(): Event
     {
         $this->segments[0] = 0;
         $this->segments[1] = 0;
@@ -279,9 +291,9 @@ class Event
      * Schedule this even to run weekly, on sunday
      *
      * @param integer $day
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function weekly()
+    public function weekly(): Event
     {
         $this->segments[0] = 0;
         $this->segments[1] = 0;
@@ -293,9 +305,9 @@ class Event
     /**
      * Schedule this event to run monthly
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function monthly()
+    public function monthly(): Event
     {
         $this->segments[0] = 0;
         $this->segments[1] = 0;
@@ -305,11 +317,11 @@ class Event
     }
 
     /**
-     * Run tasks every quarter
+     * Schedule this event to run quarter
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function quarterly()
+    public function quarterly(): Event
     {
         $this->segments[0] = 0;
         $this->segments[1] = 0;
@@ -320,11 +332,11 @@ class Event
     }
 
     /**
-     * Run tasks every year
+     * Schedule this event to run every year
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function yearly()
+    public function yearly(): Event
     {
         $this->segments[0] = 0;
         $this->segments[1] = 0;
@@ -337,9 +349,9 @@ class Event
     /**
      * Schedule this event to run on Sundays
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function sundays()
+    public function sundays(): Event
     {
         $this->segments[4] = 0;
 
@@ -349,9 +361,9 @@ class Event
     /**
      * Schedule this event to run on Mondays
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function mondays()
+    public function mondays(): Event
     {
         $this->segments[4] = 1;
 
@@ -361,9 +373,9 @@ class Event
     /**
      * Schedule this event to run on Tuesday
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function tuesdays()
+    public function tuesdays(): Event
     {
         $this->segments[4] = 2;
 
@@ -373,9 +385,9 @@ class Event
     /**
      * Schedule this event to run on Wednesday
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function wednesdays()
+    public function wednesdays(): Event
     {
         $this->segments[4] = 3;
 
@@ -385,9 +397,9 @@ class Event
     /**
      * Schedule this event to run on Thursday
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function thursdays()
+    public function thursdays(): Event
     {
         $this->segments[4] = 4;
 
@@ -397,9 +409,9 @@ class Event
     /**
     * Schedule this event to run on Friday
     *
-    * @return self
+    * @return \Origin\Schedule\Event
     */
-    public function fridays()
+    public function fridays(): Event
     {
         $this->segments[4] = 5;
 
@@ -409,9 +421,9 @@ class Event
     /**
     * Schedule this event to run on Saturday
     *
-    * @return self
+    * @return \Origin\Schedule\Event
     */
-    public function saturdays()
+    public function saturdays(): Event
     {
         $this->segments[4] = 6;
 
@@ -422,9 +434,9 @@ class Event
      * Schedule this event to run on particular day of the week
      *
      * @param integer $day 0= Sunday, 6 = Saturday
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function on(int $day)
+    public function on(int $day): Event
     {
         $this->segments[4] = $day;
 
@@ -432,13 +444,13 @@ class Event
     }
     
     /**
-     * Schedules the event to run at a specific time
+     * Schedules this event to run at a specific time
      *
      * @param integer $hours
      * @param integer $minutes
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function at(int $hours, int $minutes = 0)
+    public function at(int $hours, int $minutes = 0): Event
     {
         $this->segments[1] = $hours;
         $this->segments[0] = $minutes;
@@ -447,11 +459,11 @@ class Event
     }
 
     /**
-     * Run tasks on weekdays
+     * Schedule this event to run on weekdays
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function weekdays()
+    public function weekdays(): Event
     {
         $this->segments[4] = '1-5';
 
@@ -459,11 +471,11 @@ class Event
     }
 
     /**
-     * Run tasks between two different hours, e.g. 9-17
+     * Schedule this event to run between two times e.g. 9-17
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function between(int $start, int $end)
+    public function between(int $start, int $end): Event
     {
         $this->segments[1] = $start . '-' . $end;
 
@@ -471,35 +483,68 @@ class Event
     }
 
     /**
-     * Executes the event
+     * Starts the execution process for the event
      *
-     * @return void
+     * @return bool false indicates an error
      */
-    public function execute(): void
+    public function execute(): bool
     {
+        if (! $this->meetsConditions()) {
+            return true;
+        }
+
         $this->loadLockFile();
 
+        if ($this->max > 0 && count($this->pids) >= $this->max) {
+            return true;
+        }
+
+        $this->executeCallbacks($this->beforeCallbacks);
+       
+        $result = false;
+        switch ($this->type) {
+            case 'command':
+                $result = $this->dispatchCommand();
+            break;
+            case 'job':
+                $result = $this->dispatchJob();
+            break;
+            case 'callable':
+                $result = $this->dispatchCallable();
+            break;
+        }
+
+        if ($result) {
+            $this->executeCallbacks($this->successCallbacks);
+        } else {
+            $this->executeCallbacks($this->errorCallbacks);
+        }
+        
+        $this->executeCallbacks($this->afterCallbacks);
+
+        return $result;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function meetsConditions(): bool
+    {
         // work with when
         foreach ($this->filters as $callback) {
-            if ($callback() !== true) {
-                return;
+            if (! $callback()) {
+                return false;
             }
         }
 
         // work with skip
         foreach ($this->rejects as $callback) {
-            if ($callback() === true) {
-                return;
+            if ($callback()) {
+                return false;
             }
         }
-        
-        $this->executeCallbacks($this->beforeCallbacks);
-       
-        for ($i = 0;$i < $this->count;$i++) {
-            $this->spawnProcess();
-        }
 
-        $this->executeCallbacks($this->afterCallbacks);
+        return true;
     }
 
     /**
@@ -510,30 +555,6 @@ class Event
     {
         foreach ($callbacks as $callback) {
             call_user_func($callback);
-        }
-    }
-
-    /**
-     * Runs the task x amount of times
-     *
-     * @return void
-     */
-    private function spawnProcess(): void
-    {
-        if ($this->max > 0 && count($this->pids) >= $this->max) {
-            return;
-        }
-        
-        switch ($this->type) {
-            case 'job':
-                $this->dispatchJob();
-            break;
-            case 'command':
-                $this->dispatchCommand();
-            break;
-            case 'callable':
-                $this->dispatchCallable();
-            break;
         }
     }
 
@@ -560,27 +581,29 @@ class Event
     }
 
     /**
-     * @return void
+     * @return boolean
      */
-    private function dispatchJob(): void
+    private function dispatchJob(): bool
     {
         $this->updateLockFile();
-        $this->data->dispatch(...$this->arguments);
+
+        return $this->data->dispatch(...$this->arguments);
     }
 
     /**
-     * @return void
-     */
-    private function dispatchCallable(): void
+      * @return boolean
+      */
+    private function dispatchCallable(): bool
     {
         $this->updateLockFile();
-        call_user_func_array($this->data, $this->arguments);
+
+        return call_user_func_array($this->data, $this->arguments) !== false;
     }
 
     /**
-     * @return void
-     */
-    private function dispatchCommand(): void
+      * @return boolean
+      */
+    private function dispatchCommand(): bool
     {
         $command = $this->data;
 
@@ -590,14 +613,14 @@ class Event
         }
      
         $process = new BackgroundProcess($command, ['escape' => false]);
-       
+
         $process->start();
         
         $this->updateLockFile($process->pid());
-        
-        if ($this->runInForeground) {
-            $process->wait();
-        }
+    
+        $process->wait();
+
+        return $process->success();
     }
 
     /**
@@ -622,7 +645,7 @@ class Event
      */
     private function lockFile(): string
     {
-        return sys_get_temp_dir() . '/origin-' . $this->id . '.lock';
+        return sys_get_temp_dir() . '/schedule-' . $this->id . '.lock';
     }
 
     /**
@@ -630,9 +653,9 @@ class Event
      *
      * @param string $path
      * @param boolean $append
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function output(string $path, bool $append = false)
+    public function output(string $path, bool $append = false): Event
     {
         $this->output = $path;
         $this->appendOutput = $append;
@@ -641,24 +664,24 @@ class Event
     }
 
     /**
-     * Waits for the command to finish
+     * Runs the command in the background
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function wait()
+    public function inBackground(): Event
     {
-        $this->runInForeground = true;
+        $this->background = true;
 
         return $this;
     }
 
     /**
-     * Runs this callable before the event is executed
+     * Runs this closure before the event is executed
      *
      * @param \Closure $closure
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function before(Closure $closure)
+    public function before(Closure $closure): Event
     {
         $this->beforeCallbacks[] = $closure;
 
@@ -666,12 +689,12 @@ class Event
     }
 
     /**
-     * Runs this callable after the event is executed
+     * Runs this closure after the event is executed
      *
      * @param \Closure $closure
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function after(Closure $closure)
+    public function after(Closure $closure): Event
     {
         $this->afterCallbacks[] = $closure;
 
@@ -679,28 +702,42 @@ class Event
     }
 
     /**
-     * Set the event so that the task will run even if maintence mode is enabled
+     * Runs this closure if the the task was run without errors
      *
-     * @return self
+     * @param \Closure $closure
+     * @return \Origin\Schedule\Event
      */
-    public function inMaintenanceMode()
+    public function onSuccess(Closure $closure): Event
     {
-        $this->ignoreMaintenanceMode = true;
+        $this->successCallbacks[] = $closure;
 
         return $this;
     }
 
     /**
-     * Checks if this even should be run in maintence mode, which is
-     * set by runInMaintenanceMode
+     * Runs this closure if the task returned an error during the dispatch process
      *
-     * @return boolean
+     * @param \Closure $closure
+     * @return \Origin\Schedule\Event
      */
-    public function runsInMaintenanceMode(): bool
+    public function onError(Closure $closure): Event
     {
-        return $this->ignoreMaintenanceMode;
+        $this->errorCallbacks[] = $closure;
+
+        return $this;
     }
 
+    /**
+     * Set the event so that the task will run even if maintence mode is enabled
+     *
+     * @return \Origin\Schedule\Event
+     */
+    public function inMaintenanceMode(): Event
+    {
+        $this->maintenanceMode = true;
+
+        return $this;
+    }
     /**
      * Checks if event is due to be run
      *
@@ -714,9 +751,9 @@ class Event
     /**
      * Limits the number of concurrent instances of the command that can be run
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function limit(int $instances)
+    public function limit(int $instances): Event
     {
         $this->max = $instances;
 
@@ -724,13 +761,13 @@ class Event
     }
 
     /**
-     * The number of times this task will be executed
+     * The number of times this task will be spawned
      *
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function count(int $count)
+    public function instances(int $instances): Event
     {
-        $this->count = $count;
+        $this->instances = $instances;
 
         return $this;
     }
@@ -739,9 +776,9 @@ class Event
      * Apply a condition so that the task is only run if the closure returns true or the boolean is true.
      *
      * @param Callable|bool
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function when($callback)
+    public function when($callback): Event
     {
         $this->filters[] = is_callable($callback) ? $callback : function () use ($callback) {
             return $callback;
@@ -754,9 +791,9 @@ class Event
      * Apply a condition so that the task is skipped if the closure returns true or the boolean is true.
      *
      * @param Callable|bool
-     * @return self
+     * @return \Origin\Schedule\Event
      */
-    public function skip($callback)
+    public function skip($callback): Event
     {
         $this->rejects[] = is_callable($callback) ? $callback : function () use ($callback) {
             return $callback;
@@ -773,12 +810,48 @@ class Event
      */
     public function id(): string
     {
+        if (! isset($this->id)) {
+            $this->id = $this->generateId();
+        }
+
+        return $this->id;
+    }
+
+    /**
+     * Creates the ID by serializing the Closure or object and then by
+     * hashing it
+     *
+     * @return string
+     */
+    private function generateId(): string
+    {
         $data = $this->data;
         if ($this->data instanceof Closure) {
             $data = $this->serializeClosure($this->data);
+        } elseif (is_object($this->data)) {
+            $data = serialize($this->data);
         }
 
-        return $this->hash(json_encode([$this->type,$data,$this->arguments]));
+        return $this->hash(json_encode([
+            $this->type, $data, $this->arguments, $this->expression()
+        ]));
+    }
+
+    /**
+     * Gets the generated config for this event
+     *
+     * @return array
+     */
+    public function config(): array
+    {
+        return [
+            'id' => $this->id(),
+            'expression' => $this->expression(),
+            'background' => $this->background,
+            'maintenanceMode' => $this->maintenanceMode,
+            'instances' => $this->instances,
+            'max' => $this->max
+        ];
     }
 
     /**

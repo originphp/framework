@@ -18,23 +18,59 @@ use Origin\Schedule\Schedule;
 
 class DummyTask extends Task
 {
-    protected function handle(Schedule $schedule): void
+    public $initialized = false;
+    public $startup = false;
+    public $shutdown = false;
+
+    protected function initialize(): void
+    {
+        $this->initialized = true;
+    }
+    protected function startup()
+    {
+        $this->startup = true;
+    }
+    public function handle(Schedule $schedule): void
     {
         $schedule->command('ls -lah')
             ->everyMinute();
+    }
+
+    protected function shutdown()
+    {
+        $this->shutdown = true;
     }
 }
 
 class TaskTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * Not much to test here other than there are no errors thrown
-     */
+    public function testInvoke()
+    {
+        $task = new DummyTask(new Schedule);
+        $result = $task();
+        $this->assertTrue($task->initialized);
+        $this->assertFalse($task->startup);
+        $this->assertFalse($task->shutdown);
+    }
+
+    public function testSchedule()
+    {
+        $task = new DummyTask(new Schedule);
+        $this->assertInstanceOf(Schedule::class, $task->schedule());
+    }
+
     public function testDispatch()
     {
-        $schedule = new Schedule();
-        $task = new DummyTask();
-        $result = $task->dispatch($schedule);
-        $this->assertNull($result);
+        $task = new DummyTask(new Schedule);
+
+        $this->assertTrue($task->initialized);
+        $this->assertFalse($task->startup);
+        $this->assertFalse($task->shutdown);
+
+        $result = $task->dispatch();
+
+        $this->assertTrue($task->startup);
+        $this->assertTrue($task->shutdown);
+        $this->assertInstanceOf(Schedule::class, $task->schedule());
     }
 }

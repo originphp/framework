@@ -38,14 +38,6 @@ class CallableWasInvoked
     }
 }
 
-class MockEvent extends Event
-{
-    public function pids()
-    {
-        return $this->pids;
-    }
-}
-
 class EventTestJob extends Job
 {
     public $dispatched = false;
@@ -96,22 +88,6 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $event = $this->eventFixture();
         $this->assertInstanceOf(Event::class, $event->between(9, 17));
         $this->assertEquals('* 9-17 * * *', $event->expression());
-    }
-
-    public function testCount()
-    {
-        $obj = new stdClass();
-        $obj->counter = 0;
-
-        $event = new Event('callable', function ($obj) {
-            $obj->counter ++;
-
-            return true;
-        }, [$obj]);
-
-        $this->assertInstanceOf(Event::class, $event->count(2));
-        $event->execute();
-        $this->assertEquals(2, $obj->counter);
     }
 
     public function testLimit()
@@ -212,12 +188,34 @@ class EventTest extends \PHPUnit\Framework\TestCase
 
     public function testinMaintenanceMode()
     {
+        $event = $this->eventFixture();
+        $this->assertArrayHasKey('maintenanceMode', $event->config());
+
+        $this->assertFalse($event->config()['maintenanceMode']);
+        $this->assertInstanceOf(Event::class, $event->inMaintenanceMode());
+        $this->assertTrue($event->config()['maintenanceMode']);
+    }
+
+    public function testInstances()
+    {
+        $event = $this->eventFixture();
+        $this->assertArrayHasKey('instances', $event->config());
+
+        $this->assertEquals(1, $event->config()['instances']);
+        $this->assertInstanceOf(Event::class, $event->instances(3));
+        $this->assertEquals(3, $event->config()['instances']);
+    }
+
+    public function testinBackground()
+    {
         $event = new Event('callable', function () {
             return true;
         });
-        $this->assertFalse($event->runsInMaintenanceMode());
-        $this->assertInstanceOf(Event::class, $event->inMaintenanceMode());
-        $this->assertTrue($event->runsInMaintenanceMode());
+        $this->assertArrayHasKey('background', $event->config());
+
+        $this->assertFalse($event->config()['background']);
+        $this->assertInstanceOf(Event::class, $event->inBackground());
+        $this->assertTrue($event->config()['background']);
     }
 
     public function testCallableDispatch()
@@ -231,7 +229,6 @@ class EventTest extends \PHPUnit\Framework\TestCase
     public function testCommandDispatch()
     {
         $event = new Event('command', 'php -v');
-        $event->wait();
         $output = temp_name();
 
         $this->assertInstanceOf(Event::class, $event->output($output));
@@ -375,6 +372,6 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $event = new Event('callable', function () {
             return true;
         });
-        $this->assertEquals('391d6f1a8706', $event->id());
+        $this->assertEquals('16e4afeadf8a', $event->id());
     }
 }
