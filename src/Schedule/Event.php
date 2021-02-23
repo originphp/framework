@@ -500,7 +500,7 @@ class Event
         }
 
         $this->executeCallbacks($this->beforeCallbacks);
-       
+ 
         $result = false;
         switch ($this->type) {
             case 'command':
@@ -513,6 +513,8 @@ class Event
                 $result = $this->dispatchCallable();
             break;
         }
+        
+        $this->executeCallbacks($this->afterCallbacks);
 
         if ($result) {
             $this->executeCallbacks($this->successCallbacks);
@@ -520,8 +522,6 @@ class Event
             $this->executeCallbacks($this->errorCallbacks);
         }
         
-        $this->executeCallbacks($this->afterCallbacks);
-
         return $result;
     }
 
