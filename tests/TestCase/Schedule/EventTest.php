@@ -279,6 +279,44 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->wasCalled);
     }
 
+    public function testOnSuccess()
+    {
+        $obj = new stdClass();
+        $obj->success = false;
+        $obj->error = false;
+
+        $event = new Event('command', 'ls -lah');
+        $event->everyMinute()->onSuccess(function () use ($obj) {
+            $obj->success = true;
+        })->onError(function () use ($obj) {
+            $obj->error = true;
+        });
+
+        $event->execute();
+
+        $this->assertTrue($obj->success);
+        $this->assertFalse($obj->error);
+    }
+
+    public function testOnError()
+    {
+        $obj = new stdClass();
+        $obj->success = false;
+        $obj->error = false;
+
+        $event = new Event('command', 'foo');
+        $event->everyMinute()->onSuccess(function () use ($obj) {
+            $obj->success = true;
+        })->onError(function () use ($obj) {
+            $obj->error = true;
+        });
+
+        $event->execute();
+
+        $this->assertFalse($obj->success);
+        $this->assertTrue($obj->error);
+    }
+
     public function testFilter()
     {
         $callable = new CallableWasInvoked();
@@ -367,11 +405,24 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($callable->invoked);
     }
 
+    /**
+     * Test the various ID are generated without errors
+     *
+     * @return void
+     */
     public function testId()
     {
         $event = new Event('callable', function () {
             return true;
         });
         $this->assertEquals('16e4afeadf8a', $event->id());
+
+        $callable = new MyCallable;
+        $event = new Event('callable', $callable, [123]);
+        $this->assertEquals('221d9d9ddf34', $event->id());
+
+        $job = new EventTestJob();
+        $event = new Event('job', $job);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{12}+/', $event->id());
     }
 }
