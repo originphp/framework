@@ -16,8 +16,8 @@ namespace Origin\Test\TestCase\Schedule;
 use stdClass;
 use Origin\Schedule\Event;
 use Origin\Mailer\MailerJob;
-use InvalidArgumentException;
 use Origin\Schedule\Schedule;
+use Origin\Schedule\Exception\ScheduleException;
 use Origin\Test\TestCase\Schedule\Task\MiscTask;
 use Origin\Test\TestCase\Schedule\Task\BackupTask;
 
@@ -71,13 +71,13 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testRunIdInvalid()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ScheduleException::class);
         Schedule::run(__DIR__ . '/Task', '1234');
     }
     
     public function testRunInvalidPath()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ScheduleException::class);
         Schedule::run('/foo');
     }
 

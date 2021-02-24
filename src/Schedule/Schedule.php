@@ -16,14 +16,14 @@ namespace Origin\Schedule;
 
 use Origin\Job\Job;
 use ReflectionClass;
-use InvalidArgumentException;
 use Origin\Process\BackgroundProcess;
+use Origin\Schedule\Exception\ScheduleException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
 /**
  * Schedule your tasks using source control and PHP. This is new and is under development.
  *
- * Cron: * * * * * cd /var/www && bin/console scheduler:run
+ * Cron: * * * * * cd /var/www && bin/console schedule:run
  *
  */
 class Schedule
@@ -137,12 +137,9 @@ class Schedule
 
             for ($i = 0;$i < $config['instances'] ;$i++) {
                 if ($config['background']) {
-                    // debug(implode(' ', $this->buildCommand($path, $event->id())));
-
                     $process = new BackgroundProcess(
                         $this->buildCommand($path, $event->id())
                     );
-                    
                     $process->start();
                 } else {
                     $event->execute();
@@ -188,7 +185,7 @@ class Schedule
     public static function run(string $path, string $eventId = null): void
     {
         if (! is_dir($path)) {
-            throw new InvalidArgumentException('Path does not exist');
+            throw new ScheduleException('Directory does not exist');
         }
 
         if ($eventId) {
@@ -223,7 +220,7 @@ class Schedule
         $event = static::findById($eventId, static::loadTasks($path));
       
         if (! $event) {
-            throw new InvalidArgumentException('Invalid event ID');
+            throw new ScheduleException('Invalid event ID');
         }
         $event->execute();
     }
