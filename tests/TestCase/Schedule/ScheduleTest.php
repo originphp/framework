@@ -63,12 +63,6 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(null);
     }
 
-    public function testRunId()
-    {
-        Schedule::run(__DIR__ . '/Task', '4b083e6cdcd6');
-        $this->assertNull(null);
-    }
-
     public function testRunIdInvalid()
     {
         $this->expectException(ScheduleException::class);
@@ -177,5 +171,11 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         unlink(tmp_path('maintenance.json'));
 
         $this->assertTrue($object->called);
+    }
+
+    public function testRunId()
+    {
+        Schedule::run(__DIR__ . '/Task', '86074869511f');
+        $this->assertNull(null);
     }
 }

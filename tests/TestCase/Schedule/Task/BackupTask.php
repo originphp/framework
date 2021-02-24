@@ -14,7 +14,13 @@ class BackupTask extends Task
 
     protected function initialize(): void
     {
-        $this->tempName = sys_get_temp_dir() . '/schedule-background-test.tmp';
+        // problem with parallel builds and testing background
+        $path = getcwd() . '/tmp';
+
+        if (! is_dir($path)) {
+            mkdir($path);
+        }
+        $this->tempName = $path . '/background-test';
     }
 
     public function tempName(): string
@@ -24,18 +30,17 @@ class BackupTask extends Task
 
     protected function handle(Schedule $schedule): void
     {
-        if (file_exists($this->tempName)) {
-            unlink($this->tempName);
-        }
-
         $tmp = $this->tempName;
 
-        // ID: 5546177403d8
+        // ID: e0765fbac6c9
         $event = $schedule->call(function () use ($tmp) {
-            file_put_contents($tmp, (string) getmypid());
+            $count = 0;
+            if (file_exists($tmp)) {
+                $count = (int) file_get_contents($tmp);
+                $count++;
+            }
+            file_put_contents($tmp, (string) $count, LOCK_EX);
         })->everyMinute()
             ->inBackground();
-
-        #debug($event->id());
     }
 }
