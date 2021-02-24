@@ -18,9 +18,11 @@ class MiscTask extends Task
         })->yearly();
 
         //
-        $schedule->call(function () {
-            $var = 'always runs in foreground';
+        $event = $schedule->call(function () {
+            return true;
         })->everyMinute();
+
+        #debug($event->id());
 
         $schedule->call(function () {
             $var = 'always runs in background';

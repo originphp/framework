@@ -175,7 +175,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testRunId()
     {
-        Schedule::run(__DIR__ . '/Task', '86074869511f');
+        Schedule::run(__DIR__ . '/Task', '3a1787289e29');
         $this->assertNull(null);
     }
 }
