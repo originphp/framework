@@ -178,25 +178,6 @@ class Record extends BaseEntity
     }
 
     /**
-     * Dispatches the callbacks
-     *
-     * @param string $callback
-     * @param array $arguments
-     * @return boolean
-     */
-    protected function dispatchCallbacks(string $callback, array $arguments = []): bool
-    {
-        foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            $this->validateCallback($method);
-            if ($this->$method(...$arguments) === false) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Registers a callback to be called before validation
      *
      * @param string $method

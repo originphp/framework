@@ -174,21 +174,21 @@ abstract class Mailbox
     {
         $this->setStatus('processing');
         try {
-            if ($this->dispatchCallbacks('beforeProcess')) {
+            if ($this->dispatchMailboxCallbacks('beforeProcess')) {
                 $this->process();
-                $this->dispatchCallbacks('afterProcess');
+                $this->dispatchMailboxCallbacks('afterProcess');
             }
 
             if ($this->bounced === false) {
                 $this->setStatus('delivered');
-                $this->dispatchCallbacks('onSuccess');
+                $this->dispatchMailboxCallbacks('onSuccess');
             }
 
             return true;
         } catch (\Exception $exception) {
             $this->setStatus('failed');
             Log::error($exception->getMessage());
-            $this->dispatchCallbacks('onError', [$exception]);
+            $this->dispatchMailboxCallbacks('onError', [$exception]);
         }
         
         return false;
@@ -199,7 +199,7 @@ abstract class Mailbox
      * @param string $callback
      * @return bool
      */
-    private function dispatchCallbacks(string $callback): bool
+    private function dispatchMailboxCallbacks(string $callback): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($callback);

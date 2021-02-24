@@ -109,4 +109,22 @@ trait CallbackRegistrationTrait
             throw new BadMethodCallException(sprintf('%s method does not exist', $callback));
         }
     }
+
+    /**
+     * Dispatches callbacks, if stopped it will return false
+     *
+     * @param string $callback
+     * @return bool continue
+     */
+    private function dispatchCallbacks(string $callback, array $arguments = []): bool
+    {
+        foreach ($this->registeredCallbacks($callback) as $method => $options) {
+            $this->validateCallback($method);
+            if ($this->$method(...$arguments) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

@@ -184,7 +184,7 @@ class CommandRunner
         # Use Conventions - Faster
         $namespace = Config::read('App.namespace');
         $className = $namespace.'\Console\Command\\'.Inflector::studlyCaps(preg_replace('/[:-]/', '_', $command)).'Command';
-       
+ 
         $object = $this->createCommand($className);
         if ($object && $object->name() === $command) {
             return $object;
@@ -192,7 +192,7 @@ class CommandRunner
        
         $this->autoDiscover();
         $commands = $this->getCommandList();
-     
+        
         $object = null;
         if (isset($commands[$command])) {
             $object = $this->createCommand($commands[$command]);
