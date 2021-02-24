@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.19.1] - 2021-02-24
+
+## Changed
+
+- Changed Schedule to throw ScheduleException instead of InvalidArgumentException
+
 ## [3.19.0] - 2021-02-23
 
 ### Added
