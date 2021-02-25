@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.20.0] - 2021-02-25
+
+Expecting official release of Schedule this weekend
+
+## Changed
+
+- Changed Schedule dispatch process, renamed inbackground,inMaintenence, and instances.
+
 ## [3.19.1] - 2021-02-24
 
 ## Changed
