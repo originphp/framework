@@ -70,8 +70,7 @@ class Job
     protected $wait = null;
 
     /**
-     * The default timeout in seconds. Set to false
-     * to disable
+     * The default timeout in seconds. Set to 0 to disable.
      *
      * @var integer
      */
