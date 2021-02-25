@@ -21,6 +21,10 @@ class BackupTask extends Task
             mkdir($path);
         }
         $this->tempName = $path . '/background-test';
+
+        if (file_exists($this->tempName)) {
+            unlink($this->tempName);
+        }
     }
 
     public function tempName(): string
@@ -40,7 +44,6 @@ class BackupTask extends Task
                 $count++;
             }
             file_put_contents($tmp, (string) $count, LOCK_EX);
-        })->everyMinute()
-            ->inBackground();
+        })->everyMinute()->background();
     }
 }

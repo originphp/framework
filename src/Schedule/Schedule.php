@@ -130,12 +130,14 @@ class Schedule
             }
 
             $config = $event->config();
-  
-            if ($this->maintenanceMode() && ! $config['maintenanceMode']) {
-                continue;
-            }
+            
+            $loaded = count($event->pids());
+            
+            for ($i = 0;$i < $config['processes'] ;$i++) {
+                if ($config['max'] > 0 && $loaded >= $config['max']) {
+                    break;
+                }
 
-            for ($i = 0;$i < $config['instances'] ;$i++) {
                 if ($config['background']) {
                     $process = new BackgroundProcess(
                         $this->buildCommand($path, $event->id())
@@ -144,6 +146,7 @@ class Schedule
                 } else {
                     $event->execute();
                 }
+                $loaded++;
             }
         }
     }
@@ -280,15 +283,5 @@ class Schedule
         }
 
         return $class;
-    }
-
-    /**
-     * Check if app is in maintencemode
-     *
-     * @return boolean
-     */
-    private function maintenanceMode(): bool
-    {
-        return file_exists(tmp_path('maintenance.json'));
     }
 }

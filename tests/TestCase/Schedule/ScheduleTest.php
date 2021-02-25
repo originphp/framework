@@ -21,6 +21,16 @@ use Origin\Schedule\Exception\ScheduleException;
 use Origin\Test\TestCase\Schedule\Task\MiscTask;
 use Origin\Test\TestCase\Schedule\Task\BackupTask;
 
+class AnotherCallableWasInvoked
+{
+    public $invoked = false;
+
+    public function __invoke()
+    {
+        $this->invoked = true;
+    }
+}
+
 class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
     public function testCommand()
@@ -55,6 +65,24 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         });
         $this->assertIsArray($schedule->events());
         $this->assertNotEMpty($schedule->events());
+    }
+
+    public function testLimit()
+    {
+        $schedule = new Schedule(new MiscTask);
+
+        $obj = new stdClass();
+        $obj->counter = 0;
+
+        $event = $schedule->call(function ($obj) {
+            $foo = 'bar'; // must be unique to other tests in the PID
+            $obj->counter ++;
+
+            return true;
+        }, [$obj])->everyMinute()->processes(3)->limit(2);
+ 
+        $schedule->dispatch();
+        $this->assertEquals(2, $obj->counter); # Counter does not increase as PID still running
     }
 
     public function testRun()
@@ -92,7 +120,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @depends testDispatch
+     * @-depends testDispatch
      */
     public function testDispatchBackground()
     {
@@ -127,29 +155,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($object->called);
     }
-    /**
-     * @depends testDispatch
-     */
-    public function testDispatchMaintenanceMode()
-    {
-        $object = new stdClass();
-        $object->called = false;
-
-        $schedule = new Schedule(new MiscTask);
-
-        file_put_contents(tmp_path('maintenance.json'), 'foo');
-
-        $schedule->call(function () use ($object) {
-            $object->called = true;
-        })->everyMinute();
-
-        $schedule->dispatch();
-        
-        unlink(tmp_path('maintenance.json'));
-
-        $this->assertFalse($object->called);
-    }
-
+  
     /**
     * @depends testDispatch
     */
@@ -164,7 +170,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
         $schedule->call(function () use ($object) {
             $object->called = true;
-        })->everyMinute()->inMaintenanceMode();
+        })->everyMinute()->evenInMaintenanceMode();
 
         $schedule->dispatch();
         
@@ -177,5 +183,73 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
     {
         Schedule::run(__DIR__ . '/Task', '3a1787289e29');
         $this->assertNull(null);
+    }
+
+    public function testFilter()
+    {
+        $callable = new AnotherCallableWasInvoked();
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->when(function () {
+            return false;
+        });
+        $schedule->dispatch();
+        $this->assertFalse($callable->invoked);
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->when(function () {
+            return true;
+        });
+        $schedule->dispatch();
+        $this->assertTrue($callable->invoked);
+    }
+
+    public function testFilterBool()
+    {
+        $callable = new AnotherCallableWasInvoked();
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->when(false);
+        $schedule->dispatch();
+        $this->assertFalse($callable->invoked);
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->when(true);
+        $schedule->dispatch();
+        $this->assertTrue($callable->invoked);
+    }
+
+    public function testReject()
+    {
+        $callable = new AnotherCallableWasInvoked();
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->skip(function () {
+            return true;
+        });
+        $schedule->dispatch();
+        $this->assertFalse($callable->invoked);
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->skip(function () {
+            return false;
+        });
+        $schedule->dispatch();
+        $this->assertTrue($callable->invoked);
+    }
+
+    public function testRejectBool()
+    {
+        $callable = new AnotherCallableWasInvoked();
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->skip(true);
+        $schedule->dispatch();
+        $this->assertFalse($callable->invoked);
+
+        $schedule = new Schedule(new MiscTask);
+        $schedule->call($callable)->everyMinute()->skip(false);
+        $schedule->dispatch();
+        $this->assertTrue($callable->invoked);
     }
 }

@@ -92,23 +92,32 @@ class EventTest extends \PHPUnit\Framework\TestCase
 
     public function testLimit()
     {
-        $obj = new stdClass();
-        $obj->counter = 0;
+        $event = $this->eventFixture();
+        $this->assertInstanceOf(Event::class, $event->limit(3));
+        $this->assertEquals(3, $event->config()['max']);
+    }
 
-        $event = new Event('callable', function ($obj) {
-            $foo = 'bar'; // must be unique to other tests in the PID
-            $obj->counter ++;
+    public function testProcesses()
+    {
+        $event = $this->eventFixture();
+        $this->assertInstanceOf(Event::class, $event->processes(3));
+        $this->assertEquals(3, $event->config()['processes']);
+    }
 
+    public function testWhen()
+    {
+        $event = $this->eventFixture();
+        $this->assertInstanceOf(Event::class, $event->when(function () {
             return true;
-        }, [$obj]);
+        }));
+    }
 
-        $this->assertInstanceOf(Event::class, $event->limit(2));
-        $event->execute();
-        $this->assertEquals(1, $obj->counter);
-        $event->execute();
-        $this->assertEquals(2, $obj->counter);
-        $event->execute();
-        $this->assertEquals(2, $obj->counter); # Counter does not increase as PID still running
+    public function testSkip()
+    {
+        $event = $this->eventFixture();
+        $this->assertInstanceOf(Event::class, $event->skip(function () {
+            return true;
+        }));
     }
 
     public function testDaysOfWeek()
@@ -192,18 +201,8 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('maintenanceMode', $event->config());
 
         $this->assertFalse($event->config()['maintenanceMode']);
-        $this->assertInstanceOf(Event::class, $event->inMaintenanceMode());
+        $this->assertInstanceOf(Event::class, $event->evenInMaintenanceMode());
         $this->assertTrue($event->config()['maintenanceMode']);
-    }
-
-    public function testInstances()
-    {
-        $event = $this->eventFixture();
-        $this->assertArrayHasKey('instances', $event->config());
-
-        $this->assertEquals(1, $event->config()['instances']);
-        $this->assertInstanceOf(Event::class, $event->instances(3));
-        $this->assertEquals(3, $event->config()['instances']);
     }
 
     public function testinBackground()
@@ -214,7 +213,7 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('background', $event->config());
 
         $this->assertFalse($event->config()['background']);
-        $this->assertInstanceOf(Event::class, $event->inBackground());
+        $this->assertInstanceOf(Event::class, $event->background());
         $this->assertTrue($event->config()['background']);
     }
 
@@ -317,92 +316,21 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->error);
     }
 
-    public function testFilter()
+    public function testIsDueMaintenanceMode()
     {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $return = $event->when(function () {
-            return false;
-        });
-        $this->assertInstanceOf(Event::class, $return);
+        $event = $this->eventFixture()->everyMinute();
+                
+        $this->assertTrue($event->isDue());
 
-        $event->execute();
-        $this->assertFalse($callable->invoked);
+        file_put_contents(tmp_path('maintenance.json'), '[]');
 
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $event->when(function () {
-            return true;
-        });
+        $this->assertFalse($event->isDue());
 
-        $event->execute();
-        $this->assertTrue($callable->invoked);
-    }
+        $event->evenInMaintenanceMode();
 
-    public function testFilterBool()
-    {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $return = $event->when(false);
-        $this->assertInstanceOf(Event::class, $return);
-
-        $event->execute();
-        $this->assertFalse($callable->invoked);
-
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $event->when(true);
-
-        $event->execute();
-        $this->assertTrue($callable->invoked);
-    }
-
-    public function testReject()
-    {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $return = $event->skip(function () {
-            return true;
-        });
-        $this->assertInstanceOf(Event::class, $return);
-
-        $event->execute();
-        $this->assertFalse($callable->invoked);
-
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $event->skip(function () {
-            return false;
-        });
-
-        $event->execute();
-        $this->assertTrue($callable->invoked);
-    }
-
-    public function testRejectBool()
-    {
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $return = $event->skip(true);
-        $this->assertInstanceOf(Event::class, $return);
-
-        $event->execute();
-        $this->assertFalse($callable->invoked);
-
-        $callable = new CallableWasInvoked();
-        $event = new Event('callable', $callable);
-      
-        $event->skip(false);
-
-        $event->execute();
-        $this->assertTrue($callable->invoked);
+        $this->assertTrue($event->isDue());
+        
+        unlink(tmp_path('maintenance.json'));
     }
 
     /**

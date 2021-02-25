@@ -70,10 +70,10 @@ class Event
      *
      * @var boolean
      */
-    private $maintenanceMode = false;
+    private $runInMaintenanceMode = false;
 
     /**
-     * Restricts the maximum number of instances of this event running at the same time
+     * Restricts the maximum number of processes of this event running at the same time
      *
      * @var int
      */
@@ -84,7 +84,7 @@ class Event
      *
      * @var integer
      */
-    private $instances = 1;
+    private $processes = 1;
 
     /**
      * Callables that will be called before the event is executed
@@ -489,16 +489,6 @@ class Event
      */
     public function execute(): bool
     {
-        if (! $this->meetsConditions()) {
-            return true;
-        }
-
-        $this->loadLockFile();
-
-        if ($this->max > 0 && count($this->pids) >= $this->max) {
-            return true;
-        }
-
         $this->executeCallbacks($this->beforeCallbacks);
  
         $result = false;
@@ -528,7 +518,7 @@ class Event
     /**
      * @return boolean
      */
-    private function meetsConditions(): bool
+    protected function meetsConditions(): bool
     {
         // work with when
         foreach ($this->filters as $callback) {
@@ -559,25 +549,29 @@ class Event
     }
 
     /**
-     * Loads the lock file, checks if the pids are running
+     * Loads a list of PIDS for this event
+     *
+     * @return array
      */
-    private function loadLockFile(): void
+    public function pids(): array
     {
         $this->pids = [];
 
         $lockfile = $this->lockFile();
-        if (! file_exists($lockfile)) {
-            return ;
-        }
-        $data = json_decode(file_get_contents($lockfile), true);
 
+        $data = [];
+
+        if (file_exists($lockfile)) {
+            $data = json_decode(file_get_contents($lockfile), true);
+        }
+       
         foreach ($data as $index => $pid) {
             if (! posix_kill(intval($pid), 0)) {
                 unset($data[$index]);
             }
         }
 
-        $this->pids = array_values($data); // reindex always
+        return $this->pids = array_values($data); // reindex always
     }
 
     /**
@@ -668,7 +662,7 @@ class Event
      *
      * @return \Origin\Schedule\Event
      */
-    public function inBackground(): Event
+    public function background(): Event
     {
         $this->background = true;
 
@@ -732,9 +726,9 @@ class Event
      *
      * @return \Origin\Schedule\Event
      */
-    public function inMaintenanceMode(): Event
+    public function evenInMaintenanceMode(): Event
     {
-        $this->maintenanceMode = true;
+        $this->runInMaintenanceMode = true;
 
         return $this;
     }
@@ -745,17 +739,25 @@ class Event
      */
     public function isDue(string $time = 'now'): bool
     {
-        return (new CronExpression($this->expression(), $time))->isDue();
+        if (! (new CronExpression($this->expression(), $time))->isDue()) {
+            return false;
+        }
+
+        if ($this->maintenanceModeEnabled() && ! $this->runInMaintenanceMode) {
+            return false;
+        }
+    
+        return $this->meetsConditions();
     }
 
     /**
-     * Limits the number of concurrent instances of the command that can be run
+     * Limits the number of concurrent processes of the command that can be run
      *
      * @return \Origin\Schedule\Event
      */
-    public function limit(int $instances): Event
+    public function limit(int $processes): Event
     {
-        $this->max = $instances;
+        $this->max = $processes;
 
         return $this;
     }
@@ -765,9 +767,9 @@ class Event
      *
      * @return \Origin\Schedule\Event
      */
-    public function instances(int $instances): Event
+    public function processes(int $count): Event
     {
-        $this->instances = $instances;
+        $this->processes = $count;
 
         return $this;
     }
@@ -848,8 +850,8 @@ class Event
             'id' => $this->id(),
             'expression' => $this->expression(),
             'background' => $this->background,
-            'maintenanceMode' => $this->maintenanceMode,
-            'instances' => $this->instances,
+            'maintenanceMode' => $this->runInMaintenanceMode,
+            'processes' => $this->processes,
             'max' => $this->max
         ];
     }
@@ -860,12 +862,11 @@ class Event
      */
     private function serializeClosure(Closure $closure): string
     {
-        $out = '';
-
         $function = new ReflectionFunction($closure);
         $file = new SplFileObject($function->getFileName());
         $file->seek($function->getStartLine() - 1);
-        
+
+        $out = '';
         while ($file->key() < $function->getEndLine()) {
             $out .= $file->current();
             $file->next();
@@ -893,5 +894,15 @@ class Event
     public function expression(): string
     {
         return implode(' ', $this->segments);
+    }
+
+    /**
+    * Check if app is in maintencemode
+    *
+    * @return boolean
+    */
+    private function maintenanceModeEnabled(): bool
+    {
+        return file_exists(tmp_path('maintenance.json'));
     }
 }

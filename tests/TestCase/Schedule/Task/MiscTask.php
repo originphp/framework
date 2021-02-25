@@ -26,6 +26,6 @@ class MiscTask extends Task
 
         $schedule->call(function () {
             $var = 'always runs in background';
-        })->everyMinute()->inBackground();
+        })->everyMinute()->background();
     }
 }
