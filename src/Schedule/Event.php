@@ -16,6 +16,7 @@ namespace Origin\Schedule;
 
 use Closure;
 use SplFileObject;
+use RuntimeException;
 use ReflectionFunction;
 use InvalidArgumentException;
 use Origin\Process\BackgroundProcess;
@@ -549,7 +550,7 @@ class Event
     }
 
     /**
-     * Loads a list of PIDS for this event
+     * Loads a list of PIDS for this event (updates the pid file)
      *
      * @return array
      */
@@ -560,17 +561,26 @@ class Event
         $lockfile = $this->lockFile();
 
         $data = [];
-
+     
         if (file_exists($lockfile)) {
             $data = file($lockfile);
         }
+      
         foreach ($data as $index => $pid) {
             if (! posix_kill(intval($pid), 0)) {
                 unset($data[$index]);
             }
         }
 
-        return $this->pids = array_values($data); // reindex always
+        $this->pids = array_values($data); // reindex always
+
+        if ($this->pids) {
+            if (! file_put_contents($this->lockFile(), implode("\n", $this->pids), LOCK_EX)) {
+                throw new RuntimeException('Error writing to lockfile');
+            }
+        }
+
+        return $this->pids;
     }
 
     /**
@@ -624,10 +634,12 @@ class Event
      */
     private function updateLockFile(int $pid = null): bool
     {
-        $this->pids[] = $pid ?: getmypid();
+        $pid = $pid ?: getmypid();
+
+        $this->pids[] = $pid;
 
         return (bool) file_put_contents(
-            $this->lockFile(), implode("\n", $this->pids) . PHP_EOL, LOCK_EX | FILE_APPEND
+            $this->lockFile(), $pid . PHP_EOL, LOCK_EX | FILE_APPEND
         );
     }
     
