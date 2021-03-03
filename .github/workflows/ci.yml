@@ -49,7 +49,7 @@ jobs:
           coverage: "xdebug"
           php-version: "${{ matrix.php-version }}"
           tools: composer:v2
-          extensions: pdo_mysql, pdo_sqlite, pdo_pgsql, mailparse
+          extensions: pdo_mysql, pdo_sqlite, pdo_pgsql, mailparse, imap
       - name: Install dependencies
         run: |
           composer install
