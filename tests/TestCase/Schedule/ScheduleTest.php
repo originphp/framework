@@ -128,9 +128,10 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $schedule = new Schedule($backupTask);
 
         $this->assertFileDoesNotExist($backupTask->tempName());
+
         $backupTask->dispatch();
     
-        sleep(2);
+        sleep(4);
         $this->assertFileExists($backupTask->tempName());
     }
 
