@@ -562,9 +562,8 @@ class Event
         $data = [];
 
         if (file_exists($lockfile)) {
-            $data = json_decode(file_get_contents($lockfile), true);
+            $data = file($lockfile);
         }
-       
         foreach ($data as $index => $pid) {
             if (! posix_kill(intval($pid), 0)) {
                 unset($data[$index]);
@@ -628,7 +627,7 @@ class Event
         $this->pids[] = $pid ?: getmypid();
 
         return (bool) file_put_contents(
-            $this->lockFile(), json_encode($this->pids), LOCK_EX
+            $this->lockFile(), implode("\n", $this->pids) . PHP_EOL, LOCK_EX | FILE_APPEND
         );
     }
     

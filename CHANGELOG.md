@@ -1,8 +1,12 @@
 # Changelog
 
-## [3.20.0] - 2021-02-25
+## [3.20.1] - 2021-03-03
 
-Expecting official release of Schedule this weekend
+### Fixed
+
+- Fixed bug with spawning event processes
+
+## [3.20.0] - 2021-02-25
 
 ## Changed
 
