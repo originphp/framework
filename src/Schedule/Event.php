@@ -573,9 +573,11 @@ class Event
             }
         }
 
-        if (file_put_contents($pidsFile, implode("\n", $this->pids), LOCK_EX) === false) {
+        if (file_put_contents($pidsFile, implode("\n", $this->pids) . PHP_EOL, LOCK_EX) === false) {
             throw new RuntimeException('Error writing pids to file');
         }
+
+        $lock->release();
 
         return $this->pids;
     }

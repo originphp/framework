@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.20.2] - 2021-03-04
+
+### Fixed
+
+- Fixed issue with Event::pids not adding line ending at the end of the file which caused issues when updating long running tasks.
+
 ## [3.20.1] - 2021-03-04
 
 ### Fixed
