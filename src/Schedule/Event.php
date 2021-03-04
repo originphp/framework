@@ -560,24 +560,19 @@ class Event
 
         $lockfile = $this->lockFile();
 
-        $data = [];
-     
         if (file_exists($lockfile)) {
-            $data = file($lockfile);
+            $data = trim(file_get_contents($lockfile));
+            $this->pids = explode("\n", $data);
         }
-      
-        foreach ($data as $index => $pid) {
+
+        foreach ($this->pids as $index => $pid) {
             if (! posix_kill(intval($pid), 0)) {
-                unset($data[$index]);
+                unset($this->pids[$index]);
             }
         }
 
-        $this->pids = array_values($data); // reindex always
-
-        if ($this->pids) {
-            if (! file_put_contents($this->lockFile(), implode("\n", $this->pids), LOCK_EX)) {
-                throw new RuntimeException('Error writing to lockfile');
-            }
+        if (file_put_contents($lockfile, implode("\n", $this->pids), LOCK_EX) === false) {
+            throw new RuntimeException('Error writing to lockfile');
         }
 
         return $this->pids;
