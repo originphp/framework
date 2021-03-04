@@ -558,21 +558,23 @@ class Event
     {
         $this->pids = [];
 
-        $lockfile = $this->lockFile();
+        $pidsFile = $this->lockFile();
 
-        if (file_exists($lockfile)) {
-            $data = trim(file_get_contents($lockfile));
-            $this->pids = explode("\n", $data);
-        }
+        if (file_exists($pidsFile)) {
+            $contents = file_get_contents($pidsFile);
 
-        foreach ($this->pids as $index => $pid) {
-            if (! posix_kill(intval($pid), 0)) {
-                unset($this->pids[$index]);
+            if ($contents) {
+                $pids = explode("\n", trim($contents));
+                foreach ($pids  as  $pid) {
+                    if (posix_kill(intval($pid), 0)) {
+                        $this->pids[] = $pid;
+                    }
+                }
             }
         }
 
-        if (file_put_contents($lockfile, implode("\n", $this->pids), LOCK_EX) === false) {
-            throw new RuntimeException('Error writing to lockfile');
+        if (file_put_contents($pidsFile, implode("\n", $this->pids), LOCK_EX) === false) {
+            throw new RuntimeException('Error writing pids to file');
         }
 
         return $this->pids;
@@ -622,7 +624,7 @@ class Event
     }
 
     /**
-     * Adds the pid to the lockfile
+     * Adds the pid to the pidsFile
      *
      * @param integer $pid
      * @return boolean
@@ -645,7 +647,7 @@ class Event
      */
     private function lockFile(): string
     {
-        return sys_get_temp_dir() . '/schedule-' . $this->id . '.lock';
+        return sys_get_temp_dir() . '/event-' . $this->id . '.pids';
     }
 
     /**
