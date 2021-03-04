@@ -569,6 +569,16 @@ class Event
 
         $pidsFile = $this->lockFile();
 
+        /**
+         * Lock this process but does not stop race if you call schedule:run twice at the same time
+         * which you should not.
+         */
+        $lock = new Lock('event-' . $this->id());
+
+        if (! $lock->acquire()) {
+            throw new RuntimeException('Error getting lock');
+        }
+
         if (file_exists($pidsFile)) {
             $contents = file_get_contents($pidsFile);
 
