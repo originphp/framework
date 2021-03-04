@@ -57,7 +57,7 @@ class EventTest extends \PHPUnit\Framework\TestCase
 {
     private function eventFixture()
     {
-        return  new Event('callable', function () {
+        return new Event('callable', function () {
             return true;
         });
     }
@@ -95,6 +95,20 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $event = $this->eventFixture();
         $this->assertInstanceOf(Event::class, $event->limit(3));
         $this->assertEquals(3, $event->config()['max']);
+    }
+
+    public function testLimitCatch()
+    {
+        $event = new Event('callable', function () {
+            $var = 'foo';
+        });
+        $event->limit(3);
+     
+        $this->assertTrue($event->execute());
+        $this->assertTrue($event->execute());
+        $this->assertTrue($event->execute());
+        $this->assertFalse($event->execute());
+        $this->assertEquals(3, count($event->pids()));
     }
 
     public function testProcesses()

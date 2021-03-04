@@ -490,6 +490,15 @@ class Event
      */
     public function execute(): bool
     {
+        /**
+         * Scheduler already checks, but this is complicated by running things in the background,
+         * so this has been added here.
+         */
+        $loaded = count($this->pids());
+        if ($this->max > 0 && $loaded >= $this->max) {
+            return false;
+        }
+
         $this->executeCallbacks($this->beforeCallbacks);
  
         $result = false;
