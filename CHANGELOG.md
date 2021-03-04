@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.20.1] - 2021-03-03
+## [3.20.1] - 2021-03-04
 
 ### Fixed
 
-- Fixed bug with spawning event processes
+- Fixed issue with Schedule spawning multiple processes and counting properly (race condition)
+- Fixed issue with Schedule lockfile which causes it constantly increase
 
 ## [3.20.0] - 2021-02-25
 
