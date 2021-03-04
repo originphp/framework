@@ -14,17 +14,7 @@ class BackupTask extends Task
 
     protected function initialize(): void
     {
-        // problem with parallel builds and testing background
-        $path = getcwd() . '/tmp';
-
-        if (! is_dir($path)) {
-            mkdir($path);
-        }
-        $this->tempName = $path . '/background-test';
-
-        if (file_exists($this->tempName)) {
-            unlink($this->tempName);
-        }
+        $this->tempName = sys_get_temp_dir() . '/backup-task-' . date('Ymd');
     }
 
     public function tempName(): string

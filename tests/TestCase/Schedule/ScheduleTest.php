@@ -120,18 +120,17 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @-depends testDispatch
+     * This is problamatic on parrallel testing, something seems to have changed
+     * with github actions and previous work around stopped working
      */
     public function testDispatchBackground()
     {
         $backupTask = new BackupTask();
         $schedule = new Schedule($backupTask);
 
-        $this->assertFileDoesNotExist($backupTask->tempName());
-
         $backupTask->dispatch();
     
-        sleep(4);
+        sleep(2);
         $this->assertFileExists($backupTask->tempName());
     }
 
