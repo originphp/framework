@@ -11,10 +11,10 @@
  * @link        https://www.originphp.com
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-namespace Origin\Test\TestCase\Schedule;
+namespace Origin\Test\TestCase\Lock;
 
 use LogicException;
-use Origin\Schedule\Lock;
+use Origin\Lock\Lock;
 
 class LockTest extends \PHPUnit\Framework\TestCase
 {
@@ -61,6 +61,28 @@ class LockTest extends \PHPUnit\Framework\TestCase
     {
         $lock = new Lock('test');
         $this->expectException(LogicException::class);
+        $lock->release();
+    }
+
+    public function testIsAcquired()
+    {
+        $lock = new Lock('test');
+        $this->assertFalse($lock->isAcquired());
+        $this->assertTrue($lock->acquire());
+        $this->assertTrue($lock->isAcquired());
+        $lock->release();
+        $this->assertFalse($lock->isAcquired());
+    }
+
+    public function testAutoRelease()
+    {
+        $lock = new Lock('test');
+        $this->assertTrue($lock->acquire());
+        $this->assertTrue($lock->isAcquired());
+        unset($lock);
+
+        $lock = new Lock('test');
+        $this->assertTrue($lock->acquire());
         $lock->release();
     }
 

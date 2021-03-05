@@ -1,0 +1,27 @@
+{
+  "name": "originphp/lock",
+  "description": "OriginPHP Lock",
+  "type": "library",
+  "keywords": [
+    "lock"
+  ],
+  "homepage": "https://www.originphp.com/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Lock\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "originphp/defer": "^2.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

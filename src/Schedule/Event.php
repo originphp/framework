@@ -17,6 +17,7 @@ namespace Origin\Schedule;
 use Closure;
 use SplFileObject;
 use LogicException;
+use Origin\Lock\Lock;
 use RuntimeException;
 use ReflectionFunction;
 use InvalidArgumentException;

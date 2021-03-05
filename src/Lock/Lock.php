@@ -12,16 +12,11 @@
  * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
 declare(strict_types = 1);
-namespace Origin\Schedule;
+namespace Origin\Lock;
 
-use Exception;
 use LogicException;
 use RuntimeException;
 
-/**
- * New class, this might be eventually moved into own namespace or into filesystem, not
- * sure yet.
- */
 class Lock
 {
     const BLOCKING = LOCK_EX;
@@ -42,39 +37,81 @@ class Lock
     private $fp = null;
 
     /**
-     * @param string $path
+     * Release on self destruct
+     *
+     * @var boolean
      */
-    public function __construct(string $name)
+    private $autoRelease = true;
+
+    /**
+     * Constructor
+     *
+     * @param string $name
+     * @param array $options The following options are supported
+     *  - autoRelease: default:true. Automatically release on destruct if not released
+     */
+    public function __construct(string $name, array $options = [])
     {
+        $options += ['autoRelease' => true];
+
         $this->path = sys_get_temp_dir() . "/{$name}.lock";
+    }
+
+    /**
+     * Checks if a lock has been acquired
+     *
+     * @return boolean
+     */
+    public function isAcquired(): bool
+    {
+        if (! file_exists($this->path)) {
+            return false;
+        }
+
+        $fp = $this->getFilePointer();
+        defer($void, 'fclose', $fp);
+
+        return ! flock($fp, LOCK_SH | LOCK_NB);
+    }
+
+    /**
+     * Opens the file
+     *
+     * @return void
+     */
+    private function getFilePointer()
+    {
+        $fp = fopen($this->path, 'r+');
+        if (! $fp) {
+            throw new RuntimeException('Error opening lock file');
+        }
+
+        return $fp;
     }
 
     /**
      * Acquires a lock, if it cannot get a lock it will return false.
      *
-     * @param boolean $block
+     * @param boolean $blocking
      * @return boolean
      */
-    public function acquire(bool $block = true): bool
+    public function acquire(bool $blocking = true): bool
     {
         if ($this->fp) {
             throw new LogicException('Lock has already been acquired');
         }
 
         touch($this->path); // Ensure file exists
-       
-        $this->fp = fopen($this->path, 'r+');
-        if (! $this->fp) {
-            throw new RuntimeException('Error opening file');
-        }
 
-        if (! flock($this->fp, $block ? self::BLOCKING : self::NON_BLOCKING)) {
+        $this->fp = $this->getFilePointer();
+       
+        if (! flock($this->fp, $blocking ? self::BLOCKING : self::NON_BLOCKING)) {
             $this->closeFile();
 
             return false;
         }
 
-        return ftruncate($this->fp, 0) && fwrite($this->fp, (string) getmypid()) && fflush($this->fp);
+        return ftruncate($this->fp, 0) && (bool) fwrite($this->fp, (string) getmypid()) && fflush($this->fp);
     }
 
     /**
@@ -91,15 +128,7 @@ class Lock
         if (! flock($this->fp, LOCK_UN)) {
             throw new RuntimeException('Error releasing lock');
         }
-
-        $this->closeFile();
-    }
-
-    /**
-     * Close the file if its still open
-     */
-    public function __destruct()
-    {
+        
         $this->closeFile();
     }
 
@@ -111,8 +140,20 @@ class Lock
     private function closeFile(): void
     {
         if ($this->fp && ! fclose($this->fp)) {
-            throw new Exception('Error closing file');
+            throw new RuntimeException('Error closing lock file');
         }
         $this->fp = null;
+    }
+
+    /**
+     * Close the file if its still open
+     */
+    public function __destruct()
+    {
+        if ($this->fp && $this->autoRelease) {
+            $this->release();
+        }
+
+        $this->closeFile();
     }
 }

@@ -193,14 +193,18 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $schedule->call($callable)->everyMinute()->when(function () {
             return false;
         });
+       
         $schedule->dispatch();
+      
         $this->assertFalse($callable->invoked);
-
+       
         $schedule = new Schedule(new MiscTask);
         $schedule->call($callable)->everyMinute()->when(function () {
             return true;
         });
+       
         $schedule->dispatch();
+       
         $this->assertTrue($callable->invoked);
     }
 
