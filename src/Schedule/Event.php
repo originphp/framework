@@ -565,40 +565,64 @@ class Event
      */
     public function pids(): array
     {
-        $this->pids = [];
-
-        $pidsFile = $this->lockFile();
-
-        /**
-         * Lock this process but does not stop race if you call schedule:run twice at the same time
-         * which you should not.
-         */
         $lock = new Lock('event-' . $this->id());
 
         if (! $lock->acquire()) {
             throw new RuntimeException('Error getting lock');
         }
 
-        if (file_exists($pidsFile)) {
-            $contents = file_get_contents($pidsFile);
+        // get valid PIDS
+        $this->pids = $this->removeNonRunning($this->loadPids());
 
-            if ($contents) {
-                $pids = explode("\n", trim($contents));
-                foreach ($pids  as  $pid) {
-                    if (posix_kill(intval($pid), 0)) {
-                        $this->pids[] = $pid;
-                    }
-                }
+        // write all pids to file
+        if ($this->pids) {
+            if (file_put_contents($this->lockFile(), implode("\n", $this->pids) . PHP_EOL, LOCK_EX) === false) {
+                throw new RuntimeException('Error writing pids to file');
             }
-        }
-
-        if (file_put_contents($pidsFile, implode("\n", $this->pids) . PHP_EOL, LOCK_EX) === false) {
-            throw new RuntimeException('Error writing pids to file');
         }
 
         $lock->release();
 
         return $this->pids;
+    }
+
+    /**
+     * Checks if the pid is a value before converting to an int and then checks
+     * if the pid is running
+     *
+     * @param array $pids
+     * @return array
+     */
+    private function removeNonRunning(array $pids): array
+    {
+        $out = [];
+        foreach ($pids as $pid) {
+            if ($pid && posix_kill((int) $pid, 0)) {
+                $out[] = $pid;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Loads the pids from the file and removes when finished
+     *
+     * @return void
+     */
+    private function loadPids(): array
+    {
+        $out = [];
+        $pidsFile = $this->lockFile();
+
+        if (file_exists($pidsFile)) {
+            $contents = file_get_contents($pidsFile);
+
+            $out = explode("\n", trim($contents));
+            unlink($pidsFile);
+        }
+
+        return $out;
     }
 
     /**
