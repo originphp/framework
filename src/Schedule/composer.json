@@ -22,9 +22,10 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/core": "^3.19",
+    "originphp/core": "^3.20",
     "originphp/configurable": "^2.0",
-    "originphp/process": "^3.19"
+    "originphp/console": "^3.20",
+    "originphp/process": "^3.20"
   },
   "suggest": {
     "originphp/job": "If you are going to queue events"
