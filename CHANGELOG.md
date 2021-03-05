@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.20.3] - 2021-03-05
+
+### Fixed
+
+- Fixed issue with background Events which were causing higher than normal CPU load
+
 ## [3.20.2] - 2021-03-04
 
 ### Fixed

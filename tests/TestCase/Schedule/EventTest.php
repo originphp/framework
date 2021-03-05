@@ -14,6 +14,7 @@
 namespace Origin\Test\Schedule;
 
 use stdClass;
+use LogicException;
 use Origin\Job\Job;
 use Origin\Schedule\Event;
 use InvalidArgumentException;
@@ -132,6 +133,26 @@ class EventTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Event::class, $event->skip(function () {
             return true;
         }));
+    }
+
+    public function testStartStop()
+    {
+        $event = new Event('command', 'sleep 30');
+        $this->assertTrue($event->start());
+
+        $process = $event->getProcess();
+        $this->assertTrue($process->isRunning());
+
+        $event->stop();
+    
+        $this->assertFalse($process->isRunning());
+    }
+
+    public function testStopLogicException()
+    {
+        $event = $this->eventFixture();
+        $this->expectException(LogicException::class);
+        $event->stop();
     }
 
     public function testDaysOfWeek()

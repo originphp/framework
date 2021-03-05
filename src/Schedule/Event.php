@@ -16,6 +16,7 @@ namespace Origin\Schedule;
 
 use Closure;
 use SplFileObject;
+use LogicException;
 use RuntimeException;
 use ReflectionFunction;
 use InvalidArgumentException;
@@ -151,6 +152,11 @@ class Event
      * @var array
      */
     private $errorCallbacks = [];
+
+    /**
+     * @var \Origin\Process\BackgroundProcess
+     */
+    private $process;
 
     /**
      * Create an instance
@@ -484,21 +490,85 @@ class Event
     }
 
     /**
+     * Starts an event in a background process
+     *
+     * @return boolean
+     */
+    public function start(): bool
+    {
+        if ($this->hasToManyProcesses()) {
+            return false;
+        }
+
+        $this->process = new BackgroundProcess($this->getCommand(), ['escape' => false]);
+
+        $this->process->start();
+        
+        $this->updateLockFile($this->process ->pid());
+
+        return true;
+    }
+
+    /**
+     * Gets the Process for this event if any.
+     *
+     * @return BackgroundProcess|null
+     */
+    public function getProcess(): ? BackgroundProcess
+    {
+        return $this->process ?? null;
+    }
+
+    /**
+     * Stops the event process, this is used to mark as complete or cancel the running
+     * event
+     *
+     * @return void
+     */
+    public function stop(): void
+    {
+        if (! isset($this->process)) {
+            throw new LogicException('Process was not started');
+        }
+
+        $error = false;
+        // Cancel a running process
+        if ($this->process->isRunning()) {
+            $this->process->stop();
+            $this->process->wait();
+        }
+
+        $this->executeCallbacks($this->afterCallbacks);
+
+        if ($this->process->success()) {
+            $this->executeCallbacks($this->successCallbacks);
+        } else {
+            $this->executeCallbacks($this->errorCallbacks);
+        }
+    }
+
+    /**
+     * Scheduler already checks, but this is complicated by running things in the background,
+     * so this has been added here.
+     * @return boolean
+     */
+    private function hasToManyProcesses(): bool
+    {
+        $loaded = count($this->pids());
+
+        return $this->max > 0 && $loaded >= $this->max;
+    }
+
+    /**
      * Starts the execution process for the event
      *
      * @return bool false indicates an error
      */
     public function execute(): bool
     {
-        /**
-         * Scheduler already checks, but this is complicated by running things in the background,
-         * so this has been added here.
-         */
-        $loaded = count($this->pids());
-        if ($this->max > 0 && $loaded >= $this->max) {
+        if ($this->hasToManyProcesses()) {
             return false;
         }
-
         $this->executeCallbacks($this->beforeCallbacks);
  
         $result = false;
@@ -513,15 +583,15 @@ class Event
                 $result = $this->dispatchCallable();
             break;
         }
-        
-        $this->executeCallbacks($this->afterCallbacks);
 
+        $this->executeCallbacks($this->afterCallbacks);
+        
         if ($result) {
             $this->executeCallbacks($this->successCallbacks);
         } else {
             $this->executeCallbacks($this->errorCallbacks);
         }
-        
+
         return $result;
     }
 
@@ -642,7 +712,18 @@ class Event
     {
         $this->updateLockFile();
 
-        return call_user_func_array($this->data, $this->arguments) !== false;
+        if ($this->output) {
+            ob_start();
+        }
+
+        $result = call_user_func_array($this->data, $this->arguments) !== false;
+
+        if ($this->output) {
+            $output = ob_get_clean();
+            file_put_contents($this->output, $output, $this->appendOutput ? FILE_APPEND : 0);
+        }
+
+        return $result;
     }
 
     /**
@@ -650,22 +731,37 @@ class Event
       */
     private function dispatchCommand(): bool
     {
+        $this->process = new BackgroundProcess($this->getCommand(), ['escape' => false]);
+
+        $this->process->start();
+        
+        $this->updateLockFile($this->process->pid());
+    
+        /**
+         * Originally was running into issues with CPU usage of 2% for each background process, even if the
+         * scripts did nothing. This no longer occurs. I think happened because of the usleep nuber combined with
+         * runing PHP within PHP.
+         */
+        $this->process->wait();
+
+        return $this->process->success();
+    }
+
+    /**
+     * Gets the command
+     *
+     * @return string|null
+     */
+    private function getCommand(): ?string
+    {
         $command = $this->data;
 
         if ($this->output) {
             $redirect = $this->appendOutput ? '>>' : '>';
             $command .= " {$redirect} {$this->output} 2>&1";
         }
-     
-        $process = new BackgroundProcess($command, ['escape' => false]);
 
-        $process->start();
-        
-        $this->updateLockFile($process->pid());
-    
-        $process->wait();
-
-        return $process->success();
+        return $command;
     }
 
     /**
@@ -901,6 +997,7 @@ class Event
     {
         return [
             'id' => $this->id(),
+            'type' => $this->type,
             'expression' => $this->expression(),
             'background' => $this->background,
             'maintenanceMode' => $this->runInMaintenanceMode,

@@ -16,7 +16,7 @@ namespace Origin\Schedule;
 
 use Origin\Job\Job;
 use ReflectionClass;
-use Origin\Process\BackgroundProcess;
+use Origin\Process\Process;
 use Origin\Schedule\Exception\ScheduleException;
 use Origin\Configurable\StaticConfigurable as Configurable;
 
@@ -56,6 +56,8 @@ class Schedule
      * @var \Origin\Schedule\Event[]
      */
     private $events = [];
+
+    private $logger = null;
 
     public function __construct(Task $task)
     {
@@ -124,30 +126,59 @@ class Schedule
     {
         $path = $this->getPath($this->task);
 
+        $backgroundEvents = [];
+
         foreach ($this->events as $event) {
             if (! $event->isDue('now')) {
                 continue;
             }
-
+           
             $config = $event->config();
-            
+
             $loaded = count($event->pids());
-            
+
+            // Create command for callable to be executed in the background
+            if ($config['type'] === 'callable' && $config['background']) {
+                $backgroundCommand = $this->buildCommand($path, $event->id());
+                $event = new Event('command', implode(' ', $backgroundCommand));
+            }
+
             for ($i = 0;$i < $config['processes'] ;$i++) {
+                // check limits
                 if ($config['max'] > 0 && $loaded >= $config['max']) {
                     break;
                 }
-
-                if ($config['background']) {
-                    $process = new BackgroundProcess(
-                        $this->buildCommand($path, $event->id())
-                    );
-                    $process->start();
+                
+                if ($config['background'] && in_array($config['type'], ['callable','command'])) {
+                    $eventClone = clone $event;
+                    $backgroundEvents[] = $eventClone;
+                    $eventClone->start();
                 } else {
                     $event->execute();
                 }
                 $loaded++;
             }
+        }
+
+        $this->waitForBackgroundEvents($backgroundEvents);
+    }
+
+    /**
+     * @param array $backgroundEvents
+     * @return void
+     */
+    private function waitForBackgroundEvents(array $backgroundEvents): void
+    {
+        while ($backgroundEvents) {
+            foreach ($backgroundEvents as $key => $event) {
+                $process = $event->getProcess();
+                if ($process->isRunning() === false) {
+                    $event->stop();
+                    unset($backgroundEvents[$key]);
+                }
+            }
+            
+            usleep(250000); // 0.25 seconds
         }
     }
 
