@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.21.1] - 2021-03-06
+
+### Fixed
+
+- Fixed issue with rendering twice, caused by 3.18
+
 ## [3.21.0] - 2021-03-06
 
 ### Added
