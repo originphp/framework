@@ -34,7 +34,7 @@ class Lock
      *
      * @var resource
      */
-    private $fp = null;
+    private $handle = null;
 
     /**
      * Release on self destruct
@@ -68,7 +68,7 @@ class Lock
             return false;
         }
 
-        $fp = $this->getFilePointer();
+        $fp = $this->openFile();
         defer($void, 'fclose', $fp);
 
         return ! flock($fp, LOCK_SH | LOCK_NB);
@@ -79,7 +79,7 @@ class Lock
      *
      * @return Resource
      */
-    private function getFilePointer()
+    private function openFile()
     {
         $fp = fopen($this->path, 'r+');
         if (! $fp) {
@@ -97,21 +97,21 @@ class Lock
      */
     public function acquire(bool $blocking = true): bool
     {
-        if ($this->fp) {
+        if ($this->handle) {
             throw new LogicException('Lock has already been acquired');
         }
 
         touch($this->path); // Ensure file exists
 
-        $this->fp = $this->getFilePointer();
+        $this->handle = $this->openFile();
        
-        if (! flock($this->fp, $blocking ? self::BLOCKING : self::NON_BLOCKING)) {
+        if (! flock($this->handle, $blocking ? self::BLOCKING : self::NON_BLOCKING)) {
             $this->closeFile();
 
             return false;
         }
 
-        return ftruncate($this->fp, 0) && (bool) fwrite($this->fp, (string) getmypid()) && fflush($this->fp);
+        return ftruncate($this->handle, 0) && (bool) fwrite($this->handle, (string) getmypid()) && fflush($this->handle);
     }
 
     /**
@@ -121,11 +121,11 @@ class Lock
      */
     public function release(): void
     {
-        if (! $this->fp) {
+        if (! $this->handle) {
             throw new LogicException('Lock was not acquired');
         }
 
-        if (! flock($this->fp, LOCK_UN)) {
+        if (! flock($this->handle, LOCK_UN)) {
             throw new RuntimeException('Error releasing lock');
         }
         
@@ -139,10 +139,10 @@ class Lock
      */
     private function closeFile(): void
     {
-        if ($this->fp && ! fclose($this->fp)) {
+        if ($this->handle && ! fclose($this->handle)) {
             throw new RuntimeException('Error closing lock file');
         }
-        $this->fp = null;
+        $this->handle = null;
     }
 
     /**
@@ -150,7 +150,7 @@ class Lock
      */
     public function __destruct()
     {
-        if ($this->fp && $this->autoRelease) {
+        if ($this->handle && $this->autoRelease) {
             $this->release();
         }
 
