@@ -77,7 +77,7 @@ class Lock
     /**
      * Opens the file
      *
-     * @return void
+     * @return Resource
      */
     private function getFilePointer()
     {
