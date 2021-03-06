@@ -63,6 +63,7 @@
     "originphp/http": "self.version",
     "originphp/i18n": "self.version",
     "originphp/job": "self.version",
+    "originphp/lock": "self.version",
     "originphp/mailbox": "self.version",
     "originphp/mailer": "self.version",
     "originphp/migration": "self.version",
