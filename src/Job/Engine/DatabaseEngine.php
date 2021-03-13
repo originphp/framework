@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OriginPHP Framework
  * Copyright 2018 - 2021 Jamiel Sharief.
@@ -8,24 +7,17 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software.
  *
- * @copyright     Copyright (c) Jamiel Sharief
- * @link         https://www.originphp.com
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @copyright   Copyright (c) Jamiel Sharief
+ * @link        https://www.originphp.com
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
  */
-
-declare(strict_types=1);
 
 namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
 use Origin\Model\Entity;
-use Origin\Model\Concern\Timestampable;
-
-class Queue extends Model
-{
-    use Timestampable;
-}
+use Origin\Job\Model\Queue;
 
 class DatabaseEngine extends BaseEngine
 {

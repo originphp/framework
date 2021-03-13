@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.21.2] - 2021-03-13
+
+### Changed
+
+- Move Job DatabaseEngine Queue Model to its own file
+
 ## [3.21.1] - 2021-03-06
 
 ### Fixed
