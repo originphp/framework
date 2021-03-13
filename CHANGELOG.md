@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Move Job DatabaseEngine Queue Model to its own file
+- Moved Job DatabaseEngine Queue Model to its own file
 
 ## [3.21.1] - 2021-03-06
 
