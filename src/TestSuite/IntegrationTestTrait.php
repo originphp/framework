@@ -713,7 +713,6 @@ trait IntegrationTestTrait
     public function assertFileSent(string $absolutePath): void
     {
         $response = $this->response();
-        $this->assertTrue($response->sent(), 'Response was not sent');
         $this->assertNotNull($response->file(), 'Response did not send a file');
         $this->assertEquals($response->file(), $absolutePath, 'This file was not sent');
     }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.21.2] - 2021-04-02
+
+### Fixed
+
+- Fixed assertFileSent this was incorrectly also checking if the response::sent was actually called
+
 ## [3.21.2] - 2021-03-13
 
 ### Changed
