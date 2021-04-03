@@ -138,7 +138,7 @@ class MailParser
      */
     public function header(): string
     {
-        return trim($this->extract(0, $this->parts[1]['starting-pos-body'], "\r\n"));
+        return trim($this->extract(0, $this->parts[1]['starting-pos-body']), "\r\n");
     }
 
     /**

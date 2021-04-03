@@ -156,6 +156,11 @@ class Model
      */
     protected $entityClass = null;
 
+    /**
+     * @var \Origin\Model\ModelValidator
+     */
+    private $ModelValidator;
+
     public function __construct(array $config = [])
     {
         $config += [

@@ -262,7 +262,7 @@ class ArgumentParser
     protected function parseArguments(array $args): array
     {
         $keys = array_keys($this->arguments);
-        $arguments = [];
+        $arguments = $values = [];
         foreach ($args as $key => $arg) {
             if (isset($keys[$key])) {
                 $name = $keys[$key];

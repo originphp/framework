@@ -685,7 +685,7 @@ class PostgresSchema extends BaseSchema
         foreach ($data as $row) {
             $defintion = $this->parseColumn($row);
             $defintion += [
-                'null' => $row['null'] === 'YES' ? true : false,
+                'null' => $row['null'] === 'YES',
                 'default' => $row['default'],
             ];
 

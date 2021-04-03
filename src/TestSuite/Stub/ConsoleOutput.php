@@ -22,10 +22,7 @@ class ConsoleOutput extends BaseConsoleOutput
 
     public function write($data, $newLine = true, int $level = SELF::NORMAL): int
     {
-        $buffer = [];
-        foreach ((array) $data as $line) {
-            $buffer[] = $line;
-        }
+        $buffer = (array) $data;
         if ($newLine) {
             $buffer[] = '';
         }

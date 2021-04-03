@@ -25,6 +25,11 @@ namespace Origin\Http\View;
 trait TemplateTrait
 {
     /**
+     * @var \Origin\Http\View\Templater
+     */
+    private $templater = null;
+
+    /**
      * Sets or gets templates
      *
      * $templates = $this->templates();

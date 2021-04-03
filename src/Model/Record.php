@@ -33,6 +33,11 @@ class Record extends BaseEntity
     use CallbackRegistrationTrait;
  
     /**
+     * @var string|null
+     */
+    private $name = null;
+    
+    /**
      * Holds the schema for Record
      *
      * @example

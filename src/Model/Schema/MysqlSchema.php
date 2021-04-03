@@ -137,7 +137,7 @@ class MysqlSchema extends BaseSchema
         foreach ($data as $row) {
             $definition = $this->parseColumn($row['Type']);
             $definition += [
-                'null' => $row['Null'] === 'YES'?true:false,
+                'null' => $row['Null'] === 'YES',
                 'default' => $this->defaultvalue($definition['type'], $row['Default']),
             ];
             if (! empty($row['Collation'])) {

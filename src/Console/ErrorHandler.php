@@ -170,7 +170,7 @@ class ErrorHandler
                 $this->out('<white>' . $this->shortenPath($stackFrame['file']) . "</white> <yellowBackground> {$stackFrame['line']} </yellowBackground>");
             }
         }
-        if ($fullBacktrace === false && $i > 3) {
+        if ($fullBacktrace === false && count($stackFrames) > 3) {
             $this->out("\n<yellow>Use --verbose to see the full backtrace.</yellow>\n");
         }
     }

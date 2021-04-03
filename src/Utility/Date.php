@@ -200,7 +200,7 @@ class Date
             $dateString = "2019-01-01 {$dateString}";
         }
         // Only convert timezone if date is supplied.
-        if ($hasDate and static::convert()) {
+        if ($hasDate && static::convert()) {
             $dateString = static::convertTimezone($dateString, date_default_timezone_get(), static::$locale['timezone']);
         }
 
@@ -227,7 +227,7 @@ class Date
     public static function parseDateTime(string $dateString): ?string
     {
         $dateString = static::convertFormat($dateString, static::$locale['datetime'], 'Y-m-d H:i:s');
-        if ($dateString and static::convert()) {
+        if ($dateString && static::convert()) {
             $dateString = static::convertTimezone($dateString, static::$locale['timezone'], date_default_timezone_get());
         }
 

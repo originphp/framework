@@ -69,10 +69,9 @@ class Cookie
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
             'encrypt' => true,
         ];
-    
-        extract($options);
+
         $value = $this->pack($value, $options['encrypt']);
-        $this->setCookie($name, $value, $options['expires'], $path, $domain, $secure, $httpOnly);
+        $this->setCookie($name, $value, $options['expires'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
     }
 
     /**

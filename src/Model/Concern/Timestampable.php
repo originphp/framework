@@ -35,6 +35,16 @@ trait Timestampable
      */
     private $timestamp;
 
+    /**
+     * @var string
+     */
+    private $createdField;
+
+    /**
+     * @var string
+     */
+    private $modifiedField;
+
     public function initializeTimestampable()
     {
         if (! isset($this->createdField)) {
