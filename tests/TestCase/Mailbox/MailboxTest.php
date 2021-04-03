@@ -14,6 +14,7 @@
 
 namespace Origin\Test\Mailbox;
 
+use Exception;
 use Origin\Mailbox\Mail;
 use Origin\Mailer\Mailer;
 use Origin\Service\Result;
@@ -26,6 +27,7 @@ class SupportMailbox extends Mailbox
     public $beforeCalled = false;
     public $afterCalled = false;
     public $onSuccessCalled = false;
+    public $onErrorCallback = null;
 
     protected $bounceClass;
 
@@ -44,6 +46,7 @@ class SupportMailbox extends Mailbox
         $this->beforeProcess('beforeProcessCallback');
         $this->afterProcess('afterProcessCallback');
         $this->onSuccess('onSuccessCallback');
+        $this->onError('onErrorCallback');
     }
     
     protected function process()
@@ -66,6 +69,11 @@ class SupportMailbox extends Mailbox
     protected function onSuccessCallback()
     {
         $this->onSuccessCalled = true;
+    }
+
+    protected function onErrorCallback(Exception $exception)
+    {
+        $this->onErrorCallback = $exception;
     }
 }
 
@@ -149,6 +157,7 @@ class MailboxTest extends OriginTestCase
         $this->assertFalse($mailbox->onSuccessCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('failed', $inboundEmail->status);
+        $this->assertInstanceOf(Exception::class, $mailbox->onErrorCallback); // check this passed
     }
 
     public function testDownload()

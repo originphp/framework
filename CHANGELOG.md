@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.21.4] - 2021-04-03
+
+### Fixed
+
+- Fixed Mailbox onError callback not passing exception as argument
+
 ## [3.21.3] - 2021-04-02
 
 ### Fixed

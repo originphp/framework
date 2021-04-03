@@ -193,17 +193,18 @@ abstract class Mailbox
         
         return false;
     }
+
     /**
      * Dispatches the callbacks for the Mailbox
      *
      * @param string $callback
      * @return bool
      */
-    private function dispatchMailboxCallbacks(string $callback): bool
+    private function dispatchMailboxCallbacks(string $callback, array $arguments = []): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
             $this->validateCallback($callback);
-            if ($this->$method() === false || $this->bounced) {
+            if ($this->$method(...$arguments) === false || $this->bounced) {
                 return false;
             }
         }
