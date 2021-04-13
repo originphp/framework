@@ -36,7 +36,7 @@ use Origin\Console\Exception\ConsoleException;
  *  'DB application for creating and dropping tables'
  * ]);
  * $consoleApplication->addCommand('create', 'CreateTable');
- * $consoleApplication->run();
+ * exit($consoleApplication->run());
  */
 
 use Origin\Core\Exception\InvalidArgumentException;
