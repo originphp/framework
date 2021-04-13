@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.22.0] - 2021-04-13
+
+### Changed
+
+- Updated Defer version to 3.x
+
 ## [3.21.4] - 2021-04-03
 
 ### Fixed
