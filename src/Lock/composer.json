@@ -20,7 +20,7 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/defer": "^2.0"
+    "originphp/defer": "^3.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true

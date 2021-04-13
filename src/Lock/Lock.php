@@ -16,6 +16,7 @@ namespace Origin\Lock;
 
 use LogicException;
 use RuntimeException;
+use function Origin\Defer\defer;
 
 class Lock
 {

@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Http;
 
+use function Origin\Defer\defer;
 use Origin\Http\Exception\MethodNotAllowedException;
 
 class Request

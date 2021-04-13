@@ -37,7 +37,7 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "originphp/defer": "^1.0|^2.0",
+    "originphp/defer": "^3.0",
     "originphp/configurable": "^1.0|^2.0",
     "originphp/inflector": "^1.0|^2.0",
     "originphp/security": "^1.0|^2.0",
