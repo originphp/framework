@@ -842,7 +842,7 @@ class Request
      * @param string $property
      * @param string|array $key
      * @param mixed $value
-     * @return void
+     * @return mixed
      */
     private function setGetProperty(string $property, $key = null, $value = null)
     {
