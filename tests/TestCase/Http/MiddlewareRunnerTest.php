@@ -24,7 +24,7 @@ class OneMiddleware extends Middleware
 {
     public function handle(Request $request): void
     {
-        $request->data('one', 'one');
+        $request->data->set('one', 'one');
     }
     public function process(Request $request, Response $response): void
     {
@@ -36,7 +36,7 @@ class TwoMiddleware extends Middleware
 {
     public function handle(Request $request): void
     {
-        $request->data('two', 'two');
+        $request->data->set('two', 'two');
     }
 
     public function process(Request $request, Response $response): void

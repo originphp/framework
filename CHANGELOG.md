@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.23.0] - 2021-04-16
+
+### Deprecated
+
+- Request `cookie` option has been deprecated use `cookies` instead
+- Request::cookie method has been deprecated use Request::$cookies->set() instead
+- Request::header method has been deprecated use Request::$headers->set() instead
+- Request::env method deprecated use Request::server instead
+- Request setting query params using query method has been deprecated, use Request::$query->set() instead
+- Request setting data using data method has been deprecated, use Request::$query->set() instead
+- Request setting cookies using cookie method has been deprecated use Request::$cookies->set() instead
+- Request setting headers using header method has been deprecated use Request::$headers->set() instead
+
+## Removed
+
+- Request::initialize method has been removed (BC) if you have used this method to overwrite request properties, this is no longer required.
+
+### Fixed
+
+- Fixed request default settings, now if any default setting is provided, the rest are assumed empty. Previously this merged some with real data
+
 ## [3.22.0] - 2021-04-13
 
 ### Changed

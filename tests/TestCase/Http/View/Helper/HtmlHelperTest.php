@@ -33,7 +33,7 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLink()
     {
-        $this->Html->request()->params('controller', 'Articles');
+        $this->Html->request()->params->set('controller', 'Articles');
         
         $expected = '<a href="/">view</a>';
         $result = $this->Html->link('view', null);

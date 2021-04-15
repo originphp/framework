@@ -237,7 +237,7 @@ class IdsMiddleware extends Middleware
                 '[%s] %s %s %s "%s" "%s"',
                 date('Y-m-d H:i:s'),
                 $request->ip(),
-                $request->env('REQUEST_URI'),
+                $request->server('REQUEST_URI'),
                 $event['name'],
                 $event['data'],
                 implode(',', $event['matches'])

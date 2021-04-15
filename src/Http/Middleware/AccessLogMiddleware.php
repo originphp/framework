@@ -62,8 +62,8 @@ class AccessLogMiddleware extends Middleware
             $request->session()->read('Auth.User.id') ?: '-',
             date('d/M/Y:H:i:s O'),
             $request->method(),
-            $request->env('REQUEST_URI'),
-            $request->env('SERVER_PROTOCOL'),
+            $request->server('REQUEST_URI'),
+            $request->server('SERVER_PROTOCOL'),
             $response->statusCode(),
             mb_strlen($response->body() ?? '')
         );

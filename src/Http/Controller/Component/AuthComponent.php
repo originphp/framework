@@ -207,7 +207,7 @@ class AuthComponent extends Component
                     return $this->user = $user;
                 }
             }
-            $this->request()->header('Accept', 'application/json'); // Force all api usage as json
+            $this->request()->headers->set('Accept', 'application/json'); // Force all api usage as json
             throw new ForbiddenException($this->config['authError']);
         }
         $credentials = $this->getCredentials();
@@ -312,8 +312,8 @@ class AuthComponent extends Component
         }
 
         if (in_array('Http', $this->config['authenticate'])) {
-            $username = (string) $this->request()->env('PHP_AUTH_USER');
-            $password = (string) $this->request()->env('PHP_AUTH_PW');
+            $username = (string) $this->request()->server('PHP_AUTH_USER');
+            $password = (string) $this->request()->server('PHP_AUTH_PW');
             if ($username && $password) {
                 return ['username' => $username, 'password' => $password];
             }

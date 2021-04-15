@@ -15,43 +15,61 @@ declare(strict_types = 1);
 namespace Origin\Http;
 
 use function Origin\Defer\defer;
+
+use Origin\Core\KeyValueContainer;
 use Origin\Http\Exception\MethodNotAllowedException;
 
+/**
+ * Deprecations and changes
+ *
+ * - Request object is suppose to be more reading and response object more writing, so for the rrequest object
+ * setting data will be done via the Objects
+ *
+ * - Methods query, data, params, cookies will have a default value added to it next major release
+ */
 class Request
 {
     /**
      * Request params.
-     *
-     * @var array
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
      */
-    protected $params = [
-        'controller' => null,
-        'action' => null,
-        'args' => [],
-        'named' => [],
-        'plugin' => null,
-        'route' => null,
-    ];
+    public $params;
 
     /**
-     * Holds the query data.
-     * @var array
+     * Holds the query data. $_GET
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
      */
-    protected $query = [];
+    public $query;
 
     /**
      * Will contain form post data including from PUT/PATCH and delete
-     *
-     * @var array
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
      */
-    protected $data = [];
+    public $data;
 
     /**
      * Array of actual cookies
-     *
-     * @var array
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
      */
-    protected $cookies = [];
+    public $cookies;
+
+    /**
+     * Original Headers
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
+     */
+    public $headers;
+
+    /**
+     * Holds the server and environment vars
+     * TODO: change to typed property in next major version
+     * @var \Origin\Core\KeyValueContainer
+     */
+    public $server;
 
     /**
      * Address of request including base folder WITHOUT Query params.
@@ -70,15 +88,8 @@ class Request
     protected $path = null;
 
     /**
-     * Original Headers
-     *
-     * @var array
-     */
-    protected $headers = [];
-
-    /**
      * Mapped names
-     *
+     * @deprecated
      * @var array
      */
     protected $headersNames = [];
@@ -98,13 +109,6 @@ class Request
     protected $format = null;
 
     /**
-     * Holds the environment vars
-     *
-     * @var array
-     */
-    protected $environment = null;
-
-    /**
      * Request type
      *
      * @deprecated This will be deprecated
@@ -116,48 +120,124 @@ class Request
     /**
      * This makes it easy for testing e.g $request = new Request('articles/edit/2048');
      *
-     * @param string $url articles/edit/2048
+     * @param string $uri articles/edit/2048
      * @param array $options environment $_SERVER array
      * @return void
      */
-    public function __construct(string $url = null, array $options = [])
+    public function __construct(string $uri = null, array $options = [])
     {
-        $this->initialize($url, $options);
+        if (empty($options)) {
+            $options = $this->createFromGlobals();
+        }
+        $this->setParameters($options + ['uri' => $uri]);
     }
 
     /**
-     * Initializes the request
+     * Sets the request parameters
      *
-     * @param string $url articles/edit/2048
-     * @param array $options [$_SERVER,$_COOOKIE,$_POST,$_FILES]
+     * @param array $options
      * @return void
      */
-    public function initialize(string $url = null, array $options = []): void
+    private function setParameters(array $options): void
     {
         $options += [
-            'server' => $_SERVER,
-            'post' => (array) $_POST,
-            'cookie' => $this->processCookies(),
-            'files' => (array) $_FILES,
+            'uri' => null,
+            'query' => [],
+            'server' => [],
+            'post' => [],
+            'cookies' => [],
+            'files' => [],
+            'input' => null,
+            'headers' => []
         ];
-        $this->environment = $options['server'];
-        $this->cookies = $options['cookie'];
 
-        if ($url === null) {
-            $url = $this->uri();
+        if (isset($options['cookie'])) {
+            deprecationWarning('The config key cookie has been deprecated uses cookies instead');
+            $options['cookies'] = $options['cookie'];
+            unset($options['cookie']);
+        }
+
+        $this->server = new KeyValueContainer($options['server']);
+        $this->cookies = new KeyValueContainer($options['cookies']);
+        $this->headers = new KeyValueContainer($options['headers']);
+        $this->data = new KeyValueContainer($options['post']); // This will get replaced if using post
+        $this->query = new KeyValueContainer($options['query']);
+    
+        if ($options['uri'] === null) {
+            $options['uri'] = $this->uri();
+        } elseif (! $this->server->has('REQUEST_URI')) {
+            $this->server->set('REQUEST_URI', $options['uri']);
+        }
+
+        if (! $this->server->has('REQUEST_METHOD')) {
+            $this->server->set('REQUEST_METHOD', 'GET');
+        }
+        
+        // Remove leading /
+        $uri = $options['uri'];
+        if (strlen($uri) && $uri[0] === '/') {
+            $uri = substr($uri, 1);
+        }
+
+        // Build Query and prepare build URL
+ 
+        $query = [];
+        if (strpos($uri, '?') !== false) {
+            list($uri, $queryString) = explode('?', $uri);
+            parse_str($queryString, $query);
+        }
+ 
+        $this->path = '/' . $uri;
+        $this->url = $this->buildUrl($this->path);
+          
+        // use parsed query if not provided
+        if (empty($options['query'])) {
+            $this->query = new KeyValueContainer($query);
+        }
+ 
+        if (empty($options['headers'])) {
+            $this->extractHeaders($options['server']);
         }
        
-        if (strlen($url) && $url[0] === '/') {
-            $url = substr($url, 1);
-        }
+        $this->processPost($options['post'], $options['input']);
 
-        $this->processEnvironment($options['server']);
-        $this->processGet($url);
-        $this->processPost($options['post']);
-        $this->processFiles($options['files']);
-  
+        foreach ($options['files'] as $key => $value) {
+            $this->data->set($key, $value);
+        }
+        
+        $this->params = new KeyValueContainer(Router::parse($uri) ?: []); // So user can overide
         Router::request($this);
-        $this->params = Router::parse($url);
+    }
+
+    /**
+     * Creates a parameters array using globals
+     *
+     * @return array
+     */
+    private function createFromGlobals(): array
+    {
+        return [
+            'query' => [],
+            'server' => $_SERVER,
+            'post' => (array) $_POST,
+            'cookies' => $this->processCookies(),
+            'files' => (array) $_FILES,
+            'input' => $this->readInput(),
+            'headers' => [],
+        ];
+    }
+
+    /**
+     * Creates a full URL from passed vars
+     *
+     * @return string
+     */
+    private function buildUrl(string $path): string
+    {
+        $host = $this->server('HTTP_HOST') ?? 'localhost';
+        $scheme = $this->server('REQUEST_SCHEME') ?? 'http';
+
+        return $scheme . '://' . $host . $path;
     }
 
     /**
@@ -173,26 +253,7 @@ class Request
      */
     public function query($key = null, $value = null)
     {
-        if ($key === null) {
-            return $this->query;
-        }
-
-        if (is_array($key)) {
-            $this->query = $key;
-
-            return;
-        }
-        if (func_num_args() === 2) {
-            $this->query[$key] = $value;
-
-            return;
-        }
-
-        if (isset($this->query[$key])) {
-            return $this->query[$key];
-        }
-
-        return null;
+        return $this->setGetProperty('query', ...func_get_args());
     }
 
     /**
@@ -201,7 +262,6 @@ class Request
      *  $all = $request->data();
      *  $value = $request->data('key');
      *  $request->data('key','value');
-     *  $request->data($someArray); // Will replace all data
      *
      * @param string|array|null $key
      * @param mixed $value
@@ -209,25 +269,19 @@ class Request
      */
     public function data($key = null, $value = null)
     {
-        if ($key === null) {
-            return $this->data;
-        }
+        return $this->setGetProperty('data', ...func_get_args());
+    }
 
-        if (is_array($key)) {
-            $this->data = $key;
-
-            return;
-        }
-
-        if (func_num_args() === 2) {
-            return $this->data[$key] = $value;
-        }
-
-        if (isset($this->data[$key])) {
-            return $this->data[$key];
-        }
-
-        return null;
+    /**
+     * Gets a value from the SERVER
+     *
+     * @param string $key
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function server(string $key, $defaultValue = null)
+    {
+        return $this->server->get($key) ?? null;
     }
 
     /**
@@ -235,7 +289,6 @@ class Request
      *
      *  $all = $request->params();
      *  $value = $request->params('key');
-     *  $request->params('key','value');
      *
      * @param string|array|null $key
      * @param mixed $value
@@ -243,27 +296,7 @@ class Request
      */
     public function params($key = null, $value = null)
     {
-        if ($key === null) {
-            return $this->params;
-        }
-
-        if (is_array($key)) {
-            $this->params = $key;
-
-            return;
-        }
-
-        if (func_num_args() === 2) {
-            $this->params[$key] = $value;
-
-            return;
-        }
-
-        if (isset($this->params[$key])) {
-            return $this->params[$key];
-        }
-
-        return null;
+        return $this->setGetProperty('params', ...func_get_args());
     }
 
     /**
@@ -274,7 +307,7 @@ class Request
      */
     protected function uri(): string
     {
-        return $this->env('REQUEST_URI') ?? '';
+        return $this->server('REQUEST_URI') ?? '';
     }
 
     /**
@@ -287,12 +320,7 @@ class Request
      */
     public function url(bool $includeQuery = false): string
     {
-        $url = $this->url;
-        if ($includeQuery && $this->query) {
-            $url .= '?' . http_build_query($this->query);
-        }
-
-        return $url;
+        return  $this->url . ($includeQuery ? $this->queryString() : null);
     }
 
     /**
@@ -305,12 +333,21 @@ class Request
      */
     public function path(bool $includeQuery = false): string
     {
-        $path = $this->path;
-        if ($includeQuery && $this->query) {
-            $path .= '?' . http_build_query($this->query);
+        return $this->path . ($includeQuery ? $this->queryString() : null);
+    }
+
+    /**
+     * Gets the query string
+     *
+     * @return string|null
+     */
+    private function queryString(): ? string
+    {
+        if ($this->query->isEmpty()) {
+            return null;
         }
 
-        return $path;
+        return  '?' . http_build_query($this->query->toArray());
     }
 
     /**
@@ -320,7 +357,7 @@ class Request
      */
     public function referer(): ?string
     {
-        return $this->env('HTTP_REFERER'); // Misspelling is correct
+        return $this->server('HTTP_REFERER'); // Misspelling is correct
     }
 
     /**
@@ -421,7 +458,7 @@ class Request
      */
     public function isSsl(): bool
     {
-        return ($this->env('HTTPS') == 1 || $this->env('HTTPS') === 'on');
+        return ($this->server('HTTPS') == 1 || $this->server('HTTPS') === 'on');
     }
 
     /**
@@ -431,7 +468,7 @@ class Request
      */
     public function isAjax(): bool
     {
-        return ($this->env('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest');
+        return ($this->server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest');
     }
 
     /**
@@ -461,40 +498,16 @@ class Request
      */
     public function ip(): ?string
     {
-        $ip = $this->env('HTTP_CLIENT_IP');
+        $ip = $this->server('HTTP_CLIENT_IP');
         if ($ip) {
             return $ip;
         }
-        $ip = $this->env('HTTP_X_FORWARDED_FOR');
+        $ip = $this->server('HTTP_X_FORWARDED_FOR');
         if ($ip) {
             return $ip;
         }
 
-        return $this->env('REMOTE_ADDR');
-    }
-
-    /**
-     * Processes the GET stuff
-     *
-     * @param string $url
-     * @return void
-     */
-    protected function processGet(string $url = null): void
-    {
-        // Build Query
-        $query = [];
-        if (strpos($url, '?') !== false) {
-            list($url, $queryString) = explode('?', $url);
-            parse_str($queryString, $query);
-        }
-
-        $this->path = '/' . $url;
-
-        $host = $this->env('HTTP_HOST') ?? 'localhost';
-        $scheme = $this->env('REQUEST_SCHEME') ?? 'http';
-        $this->url = $scheme . '://' . $host . $this->path;
-
-        $this->query($query);
+        return $this->server('REMOTE_ADDR');
     }
 
     /**
@@ -504,7 +517,7 @@ class Request
      */
     public function host(bool $trustProxy = false): ?string
     {
-        return $trustProxy ? $this->env('HTTP_X_FORWARDED_HOST') : $this->env('HTTP_HOST');
+        return $trustProxy ? $this->server('HTTP_X_FORWARDED_HOST') : $this->server('HTTP_HOST');
     }
 
     /**
@@ -512,37 +525,14 @@ class Request
      *
      * @return array
      */
-    protected function processPost(array $data = []): array
+    protected function processPost(array $data, string $input = null): void
     {
         if ($this->is(['put', 'patch', 'delete'])) {
             parse_str($this->readInput(), $data);
+        } elseif ($this->is(['post']) && $this->server('CONTENT_TYPE') === 'application/json' && $input) {
+            $data = json_decode($input, true) ?: [];
         }
-        if ($this->is(['post'])) {
-            if ($this->env('CONTENT_TYPE') === 'application/json') {
-                $input = $this->readInput();
-                if ($input) {
-                    $data = json_decode($this->readInput(), true);
-                    if (! is_array($data)) {
-                        $data = [];
-                    }
-                }
-            }
-        }
-        $this->data($data);
-
-        return $data;
-    }
-
-    /**
-     * Process the files array
-     *
-     * @return void
-     */
-    protected function processFiles(array $files = []): void
-    {
-        foreach ($files as $header => $data) {
-            $this->data[$header] = $data;
-        }
+        $this->data = new KeyValueContainer($this->data->toArray() + $data);
     }
 
     /**
@@ -553,7 +543,7 @@ class Request
      */
     public function is($type): bool
     {
-        $method = $this->env('REQUEST_METHOD');
+        $method = $this->server('REQUEST_METHOD');
         if (! $method) {
             return false;
         }
@@ -571,7 +561,7 @@ class Request
      */
     public function method(): ?string
     {
-        return $this->env('REQUEST_METHOD');
+        return $this->server('REQUEST_METHOD');
     }
 
     /**
@@ -602,7 +592,7 @@ class Request
      */
     public function accepts($type = null)
     {
-        $acceptHeaders = $this->parseAcceptWith($this->headers('accept'));
+        $acceptHeaders = $this->parseAcceptWith($this->headers('Accept'));
         if ($type === null) {
             return $acceptHeaders;
         }
@@ -632,7 +622,7 @@ class Request
     {
         $acceptedLanguages = [];
 
-        $languages = $this->parseAcceptWith($this->headers('accept-language'));
+        $languages = $this->parseAcceptWith($this->headers('Accept-Language'));
         foreach ($languages as $lang) {
             $acceptedLanguages[] = str_replace('-', '_', $lang);
         }
@@ -651,7 +641,7 @@ class Request
      */
     public function contentType(): ?string
     {
-        return $this->env('CONTENT_TYPE');
+        return $this->server('CONTENT_TYPE');
     }
 
     /**
@@ -685,21 +675,16 @@ class Request
      *
      * @param string $key
      * @param string $value
-     * @return string|null|void
+     * @return string|null
      */
     public function env(string $key, string $value = null)
     {
+        deprecationWarning('Request::env has been  deprecated use Request::server instead');
         if (func_num_args() === 2) {
-            $this->environment[$key] = $value;
-
-            return;
+            return $this->server[$key] = $value;
         }
 
-        if (isset($this->environment[$key])) {
-            return $this->environment[$key];
-        }
-
-        return null;
+        return $this->server[$key] ?? null;
     }
 
     /**
@@ -715,6 +700,7 @@ class Request
      */
     public function header(string $header, string $value = null): array
     {
+        deprecationWarning('Request::header has been deprecated use Request::headers->set() instead');
         // allow for HTTP/1.0 404 Not Found ? is this really needed
         if ($value === null && strpos($header, ':') != false) {
             list($header, $value) = explode(':', $header, 2);
@@ -731,17 +717,19 @@ class Request
     /**
      * Gets headers
      *
-     * @see https://www.php-fig.org/psr/psr-7/
      * @param string|array $header
      * @return mixed
      */
     public function headers($header = null)
     {
         if ($header === null) {
-            return $this->headers;
+            return $this->headers->toArray();
         }
+       
         if (is_array($header)) {
-            $this->headers = $this->headersNames = [];
+            deprecationWarning('Setting using headers has been deprecated use Request::headers->set() instead');
+            $this->headersNames = [];
+            $this->headers = new KeyValueContainer();
             foreach ($header as $key => $value) {
                 $this->header($key, $value);
             }
@@ -778,6 +766,8 @@ class Request
      */
     public function cookie(string $header, string $value): string
     {
+        deprecationWarning('Request::cookie has been deprecated use Request::cookies->set() instead');
+
         return $this->cookies[$header] = $value;
     }
 
@@ -790,15 +780,7 @@ class Request
      */
     public function cookies($key = null)
     {
-        if ($key === null) {
-            return $this->cookies;
-        }
-
-        if (is_array($key)) {
-            return $this->cookies = $key;
-        }
-
-        return $this->cookies[$key] ?? null;
+        return $this->setGetProperty('cookies', ...func_get_args());
     }
     /**
      * Processes the $_COOKIE var
@@ -822,21 +804,21 @@ class Request
      * @param array $environment
      * @return void
      */
-    protected function processEnvironment(array $environment): void
+    protected function extractHeaders(array $environment): void
     {
         foreach ($environment as $key => $value) {
             $header = null;
-            if (strpos($key, 'HTTP_') !== false) {
+            if (substr($key, 0, 5) === 'HTTP_') {
                 $header = substr($key, 5);
             }
             //CONTENT_TYPE,CONTENT_LENGTH,CONTENT_MD5
-            if (strpos($key, 'CONTENT_') !== false) {
+            if (substr($key, 0, 8) === 'CONTENT_') {
                 $header = $key;
             }
             if ($header) {
                 $header = str_replace('_', ' ', strtolower($header));
                 $header = str_replace(' ', '-', ucwords($header));
-                $this->header($header, $value);
+                $this->headers->set($header, $value);
             }
         }
     }
@@ -852,5 +834,34 @@ class Request
         defer($context, 'fclose', $fh);
 
         return stream_get_contents($fh);
+    }
+
+    /**
+     * Container magic
+     *
+     * @param string $property
+     * @param string|array $key
+     * @param mixed $value
+     * @return void
+     */
+    private function setGetProperty(string $property, $key = null, $value = null)
+    {
+        if ($key === null) {
+            return $this->$property->toArray();
+        }
+
+        if (is_array($key)) {
+            return $this->$property = new KeyValueContainer($key);
+        }
+
+        if ($value) {
+            $plural = in_array($property, ['cookie','header']) ? 's' : null; //
+            // TODO: when this is removed change data/query/cookie for default value
+            deprecationWarning("Setting with {$property}() has been deprecated use {$property}{$plural}->set() instead.");
+
+            return $this->$property->set($key, $value);
+        }
+
+        return $this->$property->get($key);
     }
 }

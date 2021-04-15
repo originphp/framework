@@ -16,6 +16,7 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Request;
 use Origin\TestSuite\TestTrait;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Http\Exception\MethodNotAllowedException;
 
 class MockRequest extends Request
@@ -31,7 +32,7 @@ class MockRequest extends Request
         return $this->input;
     }
 }
-class RequestTest extends \PHPUnit\Framework\TestCase
+class RequestTest extends OriginTestCase
 {
     public function testParseGet()
     {
@@ -83,38 +84,54 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     }
     public function testEnv()
     {
-        $request = new Request('articles/index', ['server' => ['FOO' => 'BAR']]);
-        $this->assertNull($request->env('BAR'));
-        $this->assertEquals('BAR', $request->env('FOO'));
-
-        $request = new Request();
-        $request->env('FOO', 'BAR');
-        $this->assertEquals('BAR', $request->env('FOO'));
+        $this->deprecated(function () {
+            $request = new Request('articles/index', ['server' => ['FOO' => 'BAR']]);
+     
+            $this->assertNull($request->env('BAR'));
+            $this->assertEquals('BAR', $request->env('FOO'));
+    
+            $request = new Request();
+            $request->env('FOO', 'BAR');
+            $this->assertEquals('BAR', $request->env('FOO'));
+        });
     }
     public function testJsonPost()
     {
-        $request = new MockRequest();
+        $request = new Request('/articles/index', [
+            'server' => [
+                'CONTENT_TYPE' => 'application/json',
+                'REQUEST_METHOD' => 'POST'
+            ],
+            'input' => '{"title":"CNBC","url":"https://www.cnbc.com"}'
+        ]);
        
-        $_SERVER['CONTENT_TYPE'] = 'application/json';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $request->setInput('{"title":"CNBC","url":"https://www.cnbc.com"}');
-
-        $request->initialize('articles/index');
         $expected = ['title' => 'CNBC','url' => 'https://www.cnbc.com'];
         $this->assertEquals($expected, $request->data());
 
-        $request = new MockRequest();
-       
-        $_SERVER['CONTENT_TYPE'] = 'application/json';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $request->setInput('{"title":"CNBC","url":""https://www.cnbc.com"}'); // Badd data
+        $request = new Request('/articles/index', [
+            'server' => [
+                'CONTENT_TYPE' => 'application/json',
+                'REQUEST_METHOD' => 'POST'
+            ],
+            'input' => '{"title":"CNBC","url":""https://www.cnbc.com"}' // BAD JSON
+        ]);
+     
         $this->assertEquals([], $request->data());
     }
 
     public function testQuery()
     {
-        $request = new MockRequest();
-        $request->query('key', 'value');
+        $this->deprecated(function () {
+            $request = new Request();
+            $request->query('key', 'value');
+            $this->assertEquals('value', $request->query('key'));
+            $this->assertEquals(['key' => 'value'], $request->query());
+            $this->assertNull($request->query('fozzy'));
+        });
+
+        // changed to use new SETTER
+        $request = new Request();
+        $request->query->set('key', 'value');
         $this->assertEquals('value', $request->query('key'));
         $this->assertEquals(['key' => 'value'], $request->query());
         $this->assertNull($request->query('fozzy'));
@@ -122,8 +139,19 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
     public function testData()
     {
-        $request = new MockRequest();
-        $request->data('key', 'value');
+        $this->deprecated(function () {
+            $request = new MockRequest();
+            $request->data('key', 'value');
+            $this->assertEquals('value', $request->data('key'));
+            $this->assertEquals(['key' => 'value'], $request->data());
+            $this->assertNull($request->data('fozzy'));
+            $data = ['foo' => 'bar'];
+            $request->data($data); // test replace
+            $this->assertEquals($data, $request->data());
+        });
+
+        $request = new Request();
+        $request->data->set('key', 'value');
         $this->assertEquals('value', $request->data('key'));
         $this->assertEquals(['key' => 'value'], $request->data());
         $this->assertNull($request->data('fozzy'));
@@ -135,7 +163,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     public function testParams()
     {
         $request = new MockRequest();
-        $request->params('key', 'value');
+        $request->params->set('key', 'value');
         $this->assertEquals('value', $request->params('key'));
         $this->assertNotEmpty($request->params());
         $this->assertNull($request->params('fozzy'));
@@ -158,7 +186,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
 
     public function testFiles()
     {
-        $request = new MockRequest('/', ['files' => ['file' => 'dummy file']]);
+        $request = new Request('/', ['files' => ['file' => 'dummy file']]);
         $this->assertEquals('dummy file', $request->data('file'));
     }
 
@@ -181,24 +209,38 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $request->cookies($expected);
         $this->assertEquals($expected, $request->cookies());// test replace
     }
+    public function testHeadersDeprecated()
+    {
+        $this->deprecated(function () {
+            $request = new MockRequest();
+            $request->header('WWW-Authenticate', 'Negotiate');
+            $request->header('Content-type: application/pdf');
+    
+            $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
+            $this->assertEquals('Negotiate', $request->headers('www-authenticate')); // PSR friendly
+            $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-type' => 'application/pdf'], $request->headers());
+    
+            $this->assertEquals(null, $request->headers('secret'));
+    
+            $expected = [
+                'X-Extra' => 'Foo',
+                'Location' => 'https://www.originphp.com'
+            ];
+            $request->headers($expected);
+            $this->assertEquals($expected, $request->headers());
+        });
+    }
+
     public function testHeaders()
     {
         $request = new MockRequest();
-        $request->header('WWW-Authenticate', 'Negotiate');
-        $request->header('Content-type: application/pdf');
+        $request->headers->set('WWW-Authenticate', 'Negotiate');
+        $request->headers->set('Content-type', 'application/pdf');
 
         $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
-        $this->assertEquals('Negotiate', $request->headers('www-authenticate')); // PSR friendly
         $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-type' => 'application/pdf'], $request->headers());
 
         $this->assertEquals(null, $request->headers('secret'));
-
-        $expected = [
-            'X-Extra' => 'Foo',
-            'Location' => 'https://www.originphp.com'
-        ];
-        $request->headers($expected);
-        $this->assertEquals($expected, $request->headers());
     }
 
     /**
@@ -207,7 +249,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
     public function testAcceptLanguage()
     {
         $request = new MockRequest();
-        $request->header('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
+        $request->headers->set('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
         $this->assertTrue($request->acceptLanguage('en'));
         $this->assertEquals(['en_GB','en','es'], $request->acceptLanguage());
     }
@@ -224,7 +266,7 @@ class RequestTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($request->accepts('application/json'));
 
         $request = new MockRequest();
-        $request->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
+        $request->headers->set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
         $accepts = $request->accepts();
         $this->assertEquals('text/html', $accepts[0]);
         $this->assertTrue($request->accepts(['application/xml','application/json']));

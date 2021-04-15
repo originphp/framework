@@ -149,8 +149,8 @@ class AuthComponentTest extends OriginTestCase
 
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         
         $result = $AuthComponent->getUser();
         $this->assertEquals('James', $result['name']);
@@ -184,8 +184,8 @@ class AuthComponentTest extends OriginTestCase
     public function testGetCredentials()
     {
         $request = new Request('/users/login');
-        $request->data('user_name', 'claire');
-        $request->data('passwd', 'secret');
+        $request->data->set('user_name', 'claire');
+        $request->data->set('passwd', 'secret');
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
 
@@ -196,8 +196,8 @@ class AuthComponentTest extends OriginTestCase
 
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config(['authenticate' => ['Http']]);
-        $AuthComponent->request()->env('PHP_AUTH_USER', 'amanda');
-        $AuthComponent->request()->env('PHP_AUTH_PW', 'amanDa1');
+        $AuthComponent->request()->server->set('PHP_AUTH_USER', 'amanda');
+        $AuthComponent->request()->server->set('PHP_AUTH_PW', 'amanDa1');
 
         $expected = ['username' => 'amanda', 'password' => 'amanDa1'];
         $this->assertEquals($expected, $AuthComponent->callMethod('getCredentials'));
@@ -275,8 +275,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         
         $result = $AuthComponent->identify();
         $this->assertEquals('James', $result->name);
@@ -287,8 +287,8 @@ class AuthComponentTest extends OriginTestCase
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
         $AuthComponent->config('scope', ['id' => 1024]);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -303,8 +303,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Http']);
-        $AuthComponent->request()->env('PHP_AUTH_USER', 'amanda@example.com');
-        $AuthComponent->request()->env('PHP_AUTH_PW', 'secret2');
+        $AuthComponent->request()->server->set('PHP_AUTH_USER', 'amanda@example.com');
+        $AuthComponent->request()->server->set('PHP_AUTH_PW', 'secret2');
         $user = $AuthComponent->identify();
         $this->assertNotNull($user);
         $this->assertEquals('Amanda', $user->name);
@@ -314,7 +314,7 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Api']);
-        $AuthComponent->request()->query('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
+        $AuthComponent->request()->query->set('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
         $user = $AuthComponent->identify();
         $this->assertEquals('Amanda', $user->name);
     }
@@ -323,8 +323,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', '1234');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', '1234');
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -332,8 +332,8 @@ class AuthComponentTest extends OriginTestCase
     {
         $AuthComponent = $this->AuthComponent;
         $AuthComponent->config('authenticate', ['Form']);
-        $AuthComponent->request()->data('email', 'mark.ronson@example.com');
-        $AuthComponent->request()->data('password', 'funky');
+        $AuthComponent->request()->data->set('email', 'mark.ronson@example.com');
+        $AuthComponent->request()->data->set('password', 'funky');
         $this->assertFalse($AuthComponent->identify());
     }
 
@@ -382,8 +382,8 @@ class AuthComponentTest extends OriginTestCase
       
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         $AuthComponent->config('scope', ['name' !== 'nobody']); // test scope whilst at it
         $this->assertNull($AuthComponent->startup());
         $expected = [
@@ -406,7 +406,7 @@ class AuthComponentTest extends OriginTestCase
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
         $AuthComponent->config('authenticate', ['Api']);
-        $AuthComponent->request()->query('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
+        $AuthComponent->request()->query->set('api_token', 'dea50af153b77b3f3b725517ba18b5f0619fa4da');
         $AuthComponent->config('scope', ['name' !== 'nobody']); // test scope whilst at it
         $this->assertNull($AuthComponent->startup());
         $expected = [
@@ -427,8 +427,8 @@ class AuthComponentTest extends OriginTestCase
       
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', '----');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', '----');
         
         $this->assertInstanceOf(Response::class, $AuthComponent->startup());
     }
@@ -440,7 +440,7 @@ class AuthComponentTest extends OriginTestCase
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
         $AuthComponent->config('authenticate', ['Api']);
-        $AuthComponent->request()->query('api_token', '1234-5678-9012-3456-7890');
+        $AuthComponent->request()->query->set('api_token', '1234-5678-9012-3456-7890');
         $this->expectException(ForbiddenException::class);
         $AuthComponent->startup();
     }
@@ -452,8 +452,8 @@ class AuthComponentTest extends OriginTestCase
         $Controller = new UsersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
         $AuthComponent->config('authenticate', ['Form','Controller']);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         $this->assertInstanceOf(Response::class, $AuthComponent->startup());
       
         $Controller = new UsersController($request, new Response());
@@ -469,8 +469,8 @@ class AuthComponentTest extends OriginTestCase
         $Controller = new MembersController($request, new Response());
         $AuthComponent = new MockAuthComponent($Controller);
         $AuthComponent->config('authenticate', ['Form','Controller']);
-        $AuthComponent->request()->data('email', 'james@example.com');
-        $AuthComponent->request()->data('password', 'secret1');
+        $AuthComponent->request()->data->set('email', 'james@example.com');
+        $AuthComponent->request()->data->set('password', 'secret1');
         $this->expectException(Exception::class); // MembersController does have an isAuthorized() method.
         $AuthComponent->startup();
     }

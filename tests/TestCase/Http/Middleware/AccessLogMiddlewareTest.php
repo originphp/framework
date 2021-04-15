@@ -28,10 +28,10 @@ class AccessLogMiddlewareTest extends OriginTestCase
         $this->request = new Request();
         $this->response = new Response();
 
-        $this->request->env('REMOTE_ADDR', '192.162.1.20');
-        $this->request->env('REQUEST_METHOD', 'GET');
-        $this->request->env('REQUEST_URI', '/bookmarks');
-        $this->request->env('SERVER_PROTOCOL', 'HTTP/1.1');
+        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server->set('REQUEST_METHOD', 'GET');
+        $this->request->server->set('REQUEST_URI', '/bookmarks');
+        $this->request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
         $this->response->statusCode(200);
         $this->response->body('hello world');
 

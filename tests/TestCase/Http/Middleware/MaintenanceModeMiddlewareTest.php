@@ -81,7 +81,7 @@ class MaintenanceModeMiddlewareTest extends OriginTestCase
         
         //REMOTE_ADDR
         $middleware = new MockMaintenanceModeMiddleware();
-        $this->request->env('REMOTE_ADDR', '192.168.1.100');
+        $this->request->server->set('REMOTE_ADDR', '192.168.1.100');
 
         $this->expectException(MaintainenceModeException::class);
         $middleware($this->request, $this->response);
@@ -91,7 +91,7 @@ class MaintenanceModeMiddlewareTest extends OriginTestCase
     {
         $this->enableMaintenanceMode();
         $middleware = new MockMaintenanceModeMiddleware();
-        $this->request->env('REMOTE_ADDR', '192.168.1.200');
+        $this->request->server->set('REMOTE_ADDR', '192.168.1.200');
 
         $middleware($this->request, $this->response);
         $this->assertFalse($middleware->wasStopped());
