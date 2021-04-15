@@ -29,7 +29,7 @@ class ThrottleMiddlewareTest extends OriginTestCase
     public function testMiddlewareExecution()
     {
         # Setup the Request
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
 
         $middleware = new ThrottleMiddleware();
         $result = $middleware($this->request, $this->response);
@@ -39,7 +39,7 @@ class ThrottleMiddlewareTest extends OriginTestCase
     public function testMiddlewareToManyRequests()
     {
         # Ban Requester
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
         $middleware = new ThrottleMiddleware(['limit' => 0,'period' => 1]);
         $middleware($this->request, $this->response);
 

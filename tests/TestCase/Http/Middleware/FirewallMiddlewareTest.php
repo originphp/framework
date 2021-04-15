@@ -42,7 +42,7 @@ class FirewallMiddlewareTest extends OriginTestCase
     {
         // Invoke the middleware
         $middleware = new MockFirewallMiddleware();
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
 
         $result = $middleware($this->request, $this->response);
         $this->assertInstanceOf(Response::class, $result);
@@ -54,7 +54,7 @@ class FirewallMiddlewareTest extends OriginTestCase
         $middleware = new MockFirewallMiddleware();
 
         $middleware->blacklist('192.162.1.20');
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
 
         $this->expectException(ForbiddenException::class);
         $middleware($this->request, $this->response);
@@ -64,7 +64,7 @@ class FirewallMiddlewareTest extends OriginTestCase
     {
         // Invoke the middleware
         $middleware = new MockFirewallMiddleware();
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
         $middleware->whitelist('192.162.1.20');
         $middleware->blacklist('192.162.1.20'); // Whitelist overides blacklist
         $result = $middleware($this->request, $this->response);
@@ -75,7 +75,7 @@ class FirewallMiddlewareTest extends OriginTestCase
     {
         $middleware = new MockFirewallMiddleware();
         $middleware->whitelist('192.162.1.20');
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.21');
+        $this->request->server('REMOTE_ADDR', '192.162.1.21');
         $this->expectException(ForbiddenException::class);
         $middleware($this->request, $this->response);
     }

@@ -56,7 +56,7 @@ class IdsMiddlewareTest extends OriginTestCase
     public function testQuery()
     {
         //http://localhost:8000/bookmarks/view/1000?id=-1%20UNION%20SELECT%20password%20FROM%20users%20where%20id=1
-        $this->request->query->set('id', '-1 UNION SELECT password FROM users where id=1');
+        $this->request->query('id', '-1 UNION SELECT password FROM users where id=1');
 
         // Invoke the middleware
         $middleware = new MockIdsMiddleware(['level' => 3]);

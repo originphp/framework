@@ -16,60 +16,51 @@ namespace Origin\Http;
 
 use function Origin\Defer\defer;
 
-use Origin\Core\KeyValueContainer;
 use Origin\Http\Exception\MethodNotAllowedException;
 
-/**
- * Deprecations and changes
- *
- * - Request object is suppose to be more reading and response object more writing, so for the rrequest object
- * setting data will be done via the Objects
- *
- * - Methods query, data, params, cookies will have a default value added to it next major release
- */
 class Request
 {
     /**
      * Request params.
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $params;
+    protected $params;
 
     /**
      * Holds the query data. $_GET
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $query;
+    protected $query;
 
     /**
      * Will contain form post data including from PUT/PATCH and delete
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $data;
+    protected $data;
 
     /**
      * Array of actual cookies
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $cookies;
+    protected $cookies;
 
     /**
      * Original Headers
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $headers;
+    protected $headers;
 
     /**
      * Holds the server and environment vars
-     * TODO: change to typed property in next major version
-     * @var \Origin\Core\KeyValueContainer
+     *
+     * @var array
      */
-    public $server;
+    protected $server;
 
     /**
      * Address of request including base folder WITHOUT Query params.
@@ -89,7 +80,7 @@ class Request
 
     /**
      * Mapped names
-     * @deprecated
+     *
      * @var array
      */
     protected $headersNames = [];
@@ -102,17 +93,9 @@ class Request
     protected $session = null;
 
     /**
-     * Holds the requested format. e.g html,xml,json
-     *
-     * @var string
-     */
-    protected $format = null;
-
-    /**
      * Request type
      *
      * @deprecated This will be deprecated
-     *
      * @var string
      */
     protected $type = null;
@@ -157,20 +140,20 @@ class Request
             unset($options['cookie']);
         }
 
-        $this->server = new KeyValueContainer($options['server']);
-        $this->cookies = new KeyValueContainer($options['cookies']);
-        $this->headers = new KeyValueContainer($options['headers']);
-        $this->data = new KeyValueContainer($options['post']); // This will get replaced if using post
-        $this->query = new KeyValueContainer($options['query']);
+        $this->server = (array) $options['server'];
+        $this->cookies = (array) $options['cookies'];
+        $this->headers = (array) $options['headers'];
+        $this->data = (array) $options['post']; // This will get replaced if using post
+        $this->query = (array) $options['query'];
     
         if ($options['uri'] === null) {
             $options['uri'] = $this->uri();
-        } elseif (! $this->server->has('REQUEST_URI')) {
-            $this->server->set('REQUEST_URI', $options['uri']);
+        } elseif (! isset($this->server['REQUEST_URI'])) {
+            $this->server['REQUEST_URI'] = $options['uri'];
         }
-
-        if (! $this->server->has('REQUEST_METHOD')) {
-            $this->server->set('REQUEST_METHOD', 'GET');
+      
+        if (! isset($this->server['REQUEST_METHOD'])) {
+            $this->server['REQUEST_METHOD'] = 'GET';
         }
         
         // Remove leading /
@@ -192,7 +175,7 @@ class Request
           
         // use parsed query if not provided
         if (empty($options['query'])) {
-            $this->query = new KeyValueContainer($query);
+            $this->query = $query;
         }
  
         if (empty($options['headers'])) {
@@ -201,11 +184,9 @@ class Request
        
         $this->processPost($options['post'], $options['input']);
 
-        foreach ($options['files'] as $key => $value) {
-            $this->data->set($key, $value);
-        }
+        $this->data = array_merge($this->data, $options['files']);
         
-        $this->params = new KeyValueContainer(Router::parse($uri) ?: []); // So user can overide
+        $this->params = Router::parse($uri) ?: [];
         Router::request($this);
     }
 
@@ -241,56 +222,64 @@ class Request
     }
 
     /**
-     * Set/get the values in query
-     *
-     *  $all = $request-query();
-     *  $value = $request->query('key');
-     *  $request->query('key','value');
-     *
-     * @param string|array|null $key
-     * @param mixed $value
-     * @return mixed
-     */
+    * Gets a query value or all values, or replace all values with an array e.g $_GET
+    *
+    * $all = $request->query();
+    * $single = $request->query('email');
+    * $request->query(['key'=>'value']) to replace
+    * $request->query('key','value');
+    *
+    * @param null|string|array $key
+    * @param mixed $value
+    * @return mixed
+    */
     public function query($key = null, $value = null)
     {
         return $this->setGetProperty('query', ...func_get_args());
     }
 
     /**
-     * Set/get the values in data, can set individual or whole data array
-     *
-     *  $all = $request->data();
-     *  $value = $request->data('key');
-     *  $request->data('key','value');
-     *
-     * @param string|array|null $key
-     * @param mixed $value
-     * @return mixed
-     */
+    * Gets a single value, all values, or overwrite all values with an array e.g. $_POST
+    *
+    * $all = $request->data();
+    * $single = $request->data('email');
+    * $request->data(['key'=>'value']) to replace
+    * $request->data('foo','bar');
+    *
+    * @param null|string|array $key
+    * @param mixed $value
+    * @return mixed
+    */
     public function data($key = null, $value = null)
     {
         return $this->setGetProperty('data', ...func_get_args());
     }
 
     /**
-     * Gets a value from the SERVER
+     * Gets a single value, all values, or overwrite all values with an array e.g $_SERVER
      *
-     * @param string $key
-     * @param mixed $defaultValue
+     * $all = $request->server();
+     * $single = $request->server('NAME');
+     * $request->server(['key'=>'value']) to replace with array
+     * $request->server('key','value');
+     *
+     * @param null|string|array $key
+     * @param mixed $value
      * @return mixed
      */
-    public function server(string $key, $defaultValue = null)
+    public function server($key = null, $value = null)
     {
-        return $this->server->get($key) ?? $defaultValue;
+        return $this->setGetProperty('server', ...func_get_args());
     }
 
     /**
-     * Set/get the values in params
+     * Gets a single param, all params, or overwrite all params with an array
      *
-     *  $all = $request->params();
-     *  $value = $request->params('key');
+     * $all = $request->params();
+     * $single = $request->params('foo');
+     * $request->params(['key'=>'value']) to replace
      *
-     * @param string|array|null $key
+     * @param null|string|array $key
      * @param mixed $value
      * @return mixed
      */
@@ -343,11 +332,11 @@ class Request
      */
     private function queryString(): ? string
     {
-        if ($this->query->isEmpty()) {
+        if (empty($this->query)) {
             return null;
         }
-
-        return  '?' . http_build_query($this->query->toArray());
+    
+        return  '?' . http_build_query($this->query);
     }
 
     /**
@@ -532,7 +521,7 @@ class Request
         } elseif ($this->is(['post']) && $this->server('CONTENT_TYPE') === 'application/json' && $input) {
             $data = json_decode($input, true) ?: [];
         }
-        $this->data = new KeyValueContainer($this->data->toArray() + $data);
+        $this->data = array_merge($this->data, $data);
     }
 
     /**
@@ -700,9 +689,8 @@ class Request
      */
     public function header(string $header, string $value = null): array
     {
-        deprecationWarning('Request::header has been deprecated use Request::headers->set() instead');
         // allow for HTTP/1.0 404 Not Found ? is this really needed
-        if ($value === null && strpos($header, ':') != false) {
+        if ($value === null && strpos($header, ':') !== false) {
             list($header, $value) = explode(':', $header, 2);
         }
         $value = trim($value);
@@ -715,7 +703,11 @@ class Request
     }
 
     /**
-     * Gets headers
+     * Gets a header value or all headers, or replace all headers with an array
+     *
+     * $all = $request->headers();
+     * $single = $request->headers('Content-Type');
+     * $request->headers(['key'=>'value']) to replace
      *
      * @param string|array $header
      * @return mixed
@@ -723,13 +715,11 @@ class Request
     public function headers($header = null)
     {
         if ($header === null) {
-            return $this->headers->toArray();
+            return $this->headers;
         }
        
         if (is_array($header)) {
-            deprecationWarning('Setting using headers has been deprecated use Request::headers->set() instead');
-            $this->headersNames = [];
-            $this->headers = new KeyValueContainer();
+            $this->headers = $this->headersNames = [];
             foreach ($header as $key => $value) {
                 $this->header($key, $value);
             }
@@ -766,21 +756,22 @@ class Request
      */
     public function cookie(string $header, string $value): string
     {
-        deprecationWarning('Request::cookie has been deprecated use Request::cookies->set() instead');
-
         return $this->cookies[$header] = $value;
     }
 
     /**
-     * Gets a cookie or sets the cookies array
+     * Gets a query value or all values, or replace all values with an array e.g $_GET
      *
+     * $all = $request->cookies();
+     * $single = $request->cookies('email');
+     * $request->cookies(['key'=>'value']) to replace
      *
      * @param string|array $key
      * @return mixed
      */
     public function cookies($key = null)
     {
-        return $this->setGetProperty('cookies', ...func_get_args());
+        return $this->setGetProperty('cookies', $key);
     }
     /**
      * Processes the $_COOKIE var
@@ -818,7 +809,7 @@ class Request
             if ($header) {
                 $header = str_replace('_', ' ', strtolower($header));
                 $header = str_replace(' ', '-', ucwords($header));
-                $this->headers->set($header, $value);
+                $this->header($header, $value);
             }
         }
     }
@@ -837,8 +828,6 @@ class Request
     }
 
     /**
-     * Container magic
-     *
      * @param string $property
      * @param string|array $key
      * @param mixed $value
@@ -847,21 +836,17 @@ class Request
     private function setGetProperty(string $property, $key = null, $value = null)
     {
         if ($key === null) {
-            return $this->$property->toArray();
+            return $this->$property;
         }
 
         if (is_array($key)) {
-            return $this->$property = new KeyValueContainer($key);
+            return $this->$property = $key;
         }
 
-        if ($value) {
-            $plural = in_array($property, ['cookie','header']) ? 's' : null; //
-            // TODO: when this is removed change data/query/cookie for default value
-            deprecationWarning("Setting with {$property}() has been deprecated use {$property}{$plural}->set() instead.");
-
-            return $this->$property->set($key, $value);
+        if (func_num_args() === 3) {
+            return $this->$property[$key] = $value;
         }
 
-        return $this->$property->get($key);
+        return $this->$property[$key] ?? null;
     }
 }

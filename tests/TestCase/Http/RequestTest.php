@@ -131,7 +131,7 @@ class RequestTest extends OriginTestCase
 
         // changed to use new SETTER
         $request = new Request();
-        $request->query->set('key', 'value');
+        $request->query('key', 'value');
         $this->assertEquals('value', $request->query('key'));
         $this->assertEquals(['key' => 'value'], $request->query());
         $this->assertNull($request->query('fozzy'));
@@ -151,7 +151,7 @@ class RequestTest extends OriginTestCase
         });
 
         $request = new Request();
-        $request->data->set('key', 'value');
+        $request->data('key', 'value');
         $this->assertEquals('value', $request->data('key'));
         $this->assertEquals(['key' => 'value'], $request->data());
         $this->assertNull($request->data('fozzy'));
@@ -163,7 +163,7 @@ class RequestTest extends OriginTestCase
     public function testParams()
     {
         $request = new MockRequest();
-        $request->params->set('key', 'value');
+        $request->params('key', 'value');
         $this->assertEquals('value', $request->params('key'));
         $this->assertNotEmpty($request->params());
         $this->assertNull($request->params('fozzy'));
@@ -234,8 +234,8 @@ class RequestTest extends OriginTestCase
     public function testHeaders()
     {
         $request = new MockRequest();
-        $request->headers->set('WWW-Authenticate', 'Negotiate');
-        $request->headers->set('Content-type', 'application/pdf');
+        $request->header('WWW-Authenticate', 'Negotiate');
+        $request->header('Content-type', 'application/pdf');
 
         $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
         $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-type' => 'application/pdf'], $request->headers());
@@ -249,7 +249,7 @@ class RequestTest extends OriginTestCase
     public function testAcceptLanguage()
     {
         $request = new MockRequest();
-        $request->headers->set('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
+        $request->header('Accept-Language', 'en-GB,en;q=0.9,es;q=0.8');
         $this->assertTrue($request->acceptLanguage('en'));
         $this->assertEquals(['en_GB','en','es'], $request->acceptLanguage());
     }
@@ -266,7 +266,7 @@ class RequestTest extends OriginTestCase
         $this->assertTrue($request->accepts('application/json'));
 
         $request = new MockRequest();
-        $request->headers->set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
+        $request->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3');
         $accepts = $request->accepts();
         $this->assertEquals('text/html', $accepts[0]);
         $this->assertTrue($request->accepts(['application/xml','application/json']));

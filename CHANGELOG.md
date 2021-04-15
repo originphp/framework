@@ -5,13 +5,12 @@
 ### Deprecated
 
 - Request `cookie` option has been deprecated use `cookies` instead
-- Request::cookie method has been deprecated use Request::$cookies->set() instead
-- Request::header method has been deprecated use Request::$headers->set() instead
 - Request::env method deprecated use Request::server instead
-- Request setting query params using query method has been deprecated, use Request::$query->set() instead
-- Request setting data using data method has been deprecated, use Request::$query->set() instead
-- Request setting cookies using cookie method has been deprecated use Request::$cookies->set() instead
-- Request setting headers using header method has been deprecated use Request::$headers->set() instead
+
+### Added
+
+- Added `headers` option to Request::\_\_construct
+- Added `input` option to Request::\_\_construct
 
 ## Removed
 

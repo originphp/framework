@@ -60,7 +60,7 @@ class CsrfProtectionMiddleware extends Middleware
         }
 
         # Set the CSRF Token in the request
-        $request->params->set('csrfToken', $token);
+        $request->params('csrfToken', $token);
     }
 
     /**

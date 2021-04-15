@@ -22,7 +22,7 @@ class MyMiddleware extends Middleware
 {
     public function handle(Request $request): void
     {
-        $request->data->set('foo', 'bar');
+        $request->data('foo', 'bar');
     }
     public function process(Request $request, Response $response): void
     {

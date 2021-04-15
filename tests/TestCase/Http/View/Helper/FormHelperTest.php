@@ -161,7 +161,7 @@ class FormHelperTest extends OriginTestCase
 
         // Create the entity manually from string and validate.
         ModelRegistry::set('Post', new Post());
-        $FormHelper->request()->data->set('title', 'Article Title');
+        $FormHelper->request()->data('title', 'Article Title');
         $this->assertNotNull($FormHelper->create('Article'));
         $this->assertEquals('Article Title', $FormHelper->getProperty('entity')->title);
     }
@@ -615,7 +615,7 @@ class FormHelperTest extends OriginTestCase
 
     public function testRequestData()
     {
-        $this->Form->request()->data->set('name', 'bobby');
+        $this->Form->request()->data('name', 'bobby');
         $expected = '<input type="text" name="name" value="bobby">';
         $this->assertSame($expected, $this->Form->text('name'));
     }
@@ -627,18 +627,18 @@ class FormHelperTest extends OriginTestCase
 
     public function testFormCsrfField()
     {
-        $this->Form->request()->params->set('csrfToken', '* ORIGINPHP *');
+        $this->Form->request()->params('csrfToken', '* ORIGINPHP *');
         $result = $this->Form->create();
         $this->assertStringContainsString('<input type="hidden" name="csrfToken" value="* ORIGINPHP *">', $result);
     }
 
     public function testFormEscapeValues()
     {
-        $this->Form->request()->data->set('email', '"><script>alert(1)</script><"');
+        $this->Form->request()->data('email', '"><script>alert(1)</script><"');
         $expected = '<input type="text" name="email" value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;&quot;">';
         $this->assertSame($expected, $this->Form->text('email'));
 
-        $this->Form->request()->data->set('name', '>Foo');
+        $this->Form->request()->data('name', '>Foo');
         $expected = '<input type="text" name="name" value=">Foo">';
         $this->assertSame($expected, $this->Form->text('name', ['escape' => false]));
     }

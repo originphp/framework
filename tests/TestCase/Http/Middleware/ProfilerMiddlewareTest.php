@@ -34,8 +34,8 @@ class ProfilerMiddlewareTest extends OriginTestCase
         $this->request = new Request();
         $this->response = new Response();
 
-        $this->request->server->set('REMOTE_ADDR', '192.162.1.20');
-        $this->request->server->set('REQUEST_METHOD', 'GET');
+        $this->request->server('REMOTE_ADDR', '192.162.1.20');
+        $this->request->server('REQUEST_METHOD', 'GET');
 
         # Run Middleware
         $middleware = new ProfilerMiddleware();

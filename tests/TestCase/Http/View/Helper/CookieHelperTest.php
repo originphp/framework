@@ -36,7 +36,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
     public function testExists()
     {
         $this->assertFalse($this->Cookie->exists('password'));
-        $this->Cookie->request()->cookies->set('foo', 'bar'); // Set in request
+        $this->Cookie->request()->cookie('foo', 'bar'); // Set in request
         $this->AssertTrue($this->Cookie->exists('foo'));
     }
     public function testRead()
@@ -59,7 +59,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
     public function testdestroy()
     {
         $this->assertFalse($this->Cookie->exists('secret'));
-        $this->Cookie->request()->cookies->set('secret', 'bar'); // Set in request
+        $this->Cookie->request()->cookie('secret', 'bar'); // Set in request
         $this->assertTrue($this->Cookie->exists('secret'));
         $this->Cookie->destroy();
         $this->assertEquals([], $_COOKIE);

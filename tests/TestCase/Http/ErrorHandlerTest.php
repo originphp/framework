@@ -203,7 +203,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     public function testExceptionHandlerAjax()
     {
         $request = new Request('/api/users/fetch');
-        $request->headers->set('Accept', 'application/json');
+        $request->header('Accept', 'application/json');
         Router::request($request);
 
         $errorHandler = new MockErrorHandler();
@@ -221,7 +221,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     public function testExceptionHandlerAjaxDebugDisabled()
     {
         $request = new Request('/api/users/fetch');
-        $request->headers->set('Accept', 'application/json');
+        $request->header('Accept', 'application/json');
         Router::request($request);
 
         $errorHandler = new MockErrorHandler();
@@ -239,7 +239,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     public function testExceptionHandlerAjaxDebugDisabledNonHttp()
     {
         $request = new Request('/api/users/fetch');
-        $request->headers->set('Accept', 'application/json');
+        $request->header('Accept', 'application/json');
         Router::request($request);
 
         $errorHandler = new MockErrorHandler();
@@ -257,7 +257,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     public function testExceptionHandlerAjaxDebugDisabledServiceUnavailable()
     {
         $request = new Request('/api/users/fetch');
-        $request->headers->set('Accept', 'application/json');
+        $request->header('Accept', 'application/json');
         Router::request($request);
 
         $errorHandler = new MockErrorHandler();
