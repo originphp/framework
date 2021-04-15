@@ -99,12 +99,13 @@ class IdsMiddlewareTest extends OriginTestCase
 
     /**
      * Test that rules/events = null
+     * @internal Hash will be different when not running in Docker due to MAC system.
      */
     public function testCleanUp()
     {
         $middleware = new IdsMiddleware();
         $middleware->handle($this->request);
-        $this->assertEquals('92c560b3f7cae19d07d42b574528e52a', md5(serialize($middleware)));
+        $this->assertEquals('7891845666c8e71463597fb739b43584', md5(serialize($middleware)));
     }
 
     public function sql()
