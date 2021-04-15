@@ -281,7 +281,7 @@ class Request
      */
     public function server(string $key, $defaultValue = null)
     {
-        return $this->server->get($key) ?? null;
+        return $this->server->get($key) ?? $defaultValue;
     }
 
     /**
