@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.23.1] - 2021-04-16
+
+### Fixed
+
+- Fixed leading slash in dummy request creation
+
 ## [3.23.0] - 2021-04-16
 
 ### Deprecated

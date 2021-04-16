@@ -178,8 +178,10 @@ class Request
 
         // Create some values if reqeust uri has no value
         if (empty($this->server['REQUEST_URI'])) {
-            $this->server['REQUEST_URI'] = $options['uri'];
-            $this->server['QUERY_STRING'] = $queryString ?? '';
+            $this->server['REQUEST_URI'] = '/' . ltrim($options['uri'], '/');
+            if (isset($queryString)) {
+                $this->server['QUERY_STRING'] = $queryString; // only set if available as
+            }
         }
         if (empty($this->server['REQUEST_METHOD'])) {
             $this->server['REQUEST_METHOD'] = 'GET';

@@ -336,4 +336,13 @@ class RequestTest extends OriginTestCase
         $request = new MockRequest(null, ['server' => ['HTTP_ACCEPT' => 'application/xml']]);
         $this->assertEquals('xml', $request->respondAs());
     }
+
+    public function testFill()
+    {
+        $request = new Request('/bookmarks/index?foo=bar', ['server' => []]);
+
+        $this->assertEquals('/bookmarks/index?foo=bar', $request->server('REQUEST_URI'));
+        $this->assertEquals('foo=bar', $request->server('QUERY_STRING'));
+        $this->assertEquals('GET', $request->server('REQUEST_METHOD'));
+    }
 }
