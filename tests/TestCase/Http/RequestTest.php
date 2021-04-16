@@ -121,14 +121,7 @@ class RequestTest extends OriginTestCase
 
     public function testQuery()
     {
-        $this->deprecated(function () {
-            $request = new Request();
-            $request->query('key', 'value');
-            $this->assertEquals('value', $request->query('key'));
-            $this->assertEquals(['key' => 'value'], $request->query());
-            $this->assertNull($request->query('fozzy'));
-        });
-
+ 
         // changed to use new SETTER
         $request = new Request();
         $request->query('key', 'value');
@@ -139,17 +132,6 @@ class RequestTest extends OriginTestCase
 
     public function testData()
     {
-        $this->deprecated(function () {
-            $request = new MockRequest();
-            $request->data('key', 'value');
-            $this->assertEquals('value', $request->data('key'));
-            $this->assertEquals(['key' => 'value'], $request->data());
-            $this->assertNull($request->data('fozzy'));
-            $data = ['foo' => 'bar'];
-            $request->data($data); // test replace
-            $this->assertEquals($data, $request->data());
-        });
-
         $request = new Request();
         $request->data('key', 'value');
         $this->assertEquals('value', $request->data('key'));
@@ -235,10 +217,11 @@ class RequestTest extends OriginTestCase
     {
         $request = new MockRequest();
         $request->header('WWW-Authenticate', 'Negotiate');
-        $request->header('Content-type', 'application/pdf');
+        $request->header('Content-Type', 'application/pdf');
 
         $this->assertEquals('Negotiate', $request->headers('WWW-Authenticate'));
-        $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-type' => 'application/pdf'], $request->headers());
+        $this->assertEquals('application/pdf', $request->headers('content-type')); // Case
+        $this->assertEquals(['WWW-Authenticate' => 'Negotiate','Content-Type' => 'application/pdf'], $request->headers());
 
         $this->assertEquals(null, $request->headers('secret'));
     }
