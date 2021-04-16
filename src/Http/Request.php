@@ -148,12 +148,6 @@ class Request
     
         if ($options['uri'] === null) {
             $options['uri'] = $this->uri();
-        } elseif (! isset($this->server['REQUEST_URI'])) {
-            $this->server['REQUEST_URI'] = $options['uri'];
-        }
-      
-        if (! isset($this->server['REQUEST_METHOD'])) {
-            $this->server['REQUEST_METHOD'] = 'GET';
         }
         
         // Remove leading /
@@ -180,6 +174,15 @@ class Request
  
         if (empty($options['headers'])) {
             $this->extractHeaders($options['server']);
+        }
+
+        // Create some values if reqeust uri has no value
+        if (empty($this->server['REQUEST_URI'])) {
+            $this->server['REQUEST_URI'] = $options['uri'];
+            $this->server['QUERY_STRING'] = $queryString ?? '';
+        }
+        if (empty($this->server['REQUEST_METHOD'])) {
+            $this->server['REQUEST_METHOD'] = 'GET';
         }
        
         $this->processPost($options['post'], $options['input']);
