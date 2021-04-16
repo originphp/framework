@@ -4,7 +4,7 @@
 
 ### Deprecated
 
-- Request `cookie` option has been deprecated use `cookies` instead
+- Request `cookie` construct option has been deprecated use `cookies` instead
 - Request::env method deprecated use Request::server instead
 
 ### Added
