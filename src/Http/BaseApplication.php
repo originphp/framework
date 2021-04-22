@@ -74,6 +74,8 @@ class BaseApplication
         $this->executeHook('startup');
         $this->runner->run($this->request, $this->response);
         $this->executeHook('shutdown');
+
+        $this->request->session()->close();
         
         return $this->response;
     }
