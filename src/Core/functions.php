@@ -84,7 +84,7 @@ if (! function_exists('isConsole')) {
      */
     function isConsole(): bool
     {
-        return (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
+        return (! defined('SWOOLE_HTTP') && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg'));
     }
 }
 
