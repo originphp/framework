@@ -19,7 +19,7 @@ use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 
 use Origin\TestSuite\TestTrait;
-use Origin\Core\KeyValueContainer;
+
 use Origin\Http\Controller\Controller;
 use Origin\Core\Exception\RouterException;
 use Origin\Http\Controller\Exception\MissingMethodException;
@@ -52,7 +52,7 @@ class AnotherMockRequest extends Request
 {
     public function reset()
     {
-        $this->params = new KeyValueContainer();
+        $this->params = [];
     }
 }
 
