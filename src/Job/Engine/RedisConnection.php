@@ -40,6 +40,7 @@ class RedisConnection
      */
     public static function connect(array $config): Redis
     {
+        deprecationWarning('RedisConnection has been deprecated used Redis::connect instead');
         $config += [
             'host' => '127.0.0.1','port' => 6379,'password' => null,'timeout' => 0,'persistent' => true, // Faster!!!
             'path' => null];

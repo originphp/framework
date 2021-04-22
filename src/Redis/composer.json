@@ -1,0 +1,24 @@
+{
+  "name": "originphp/redis",
+  "description": "OriginPHP Redis",
+  "type": "library",
+  "keywords": [],
+  "homepage": "https://www.originphp.com/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Publisher\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

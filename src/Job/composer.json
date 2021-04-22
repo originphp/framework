@@ -27,6 +27,7 @@
     "originphp/core": "^3.0",
     "originphp/log": "^2.0",
     "originphp/model": "^3.0",
+    "originphp/redis": "^3.0",
     "originphp/security": "^2.0"
   },
   "minimum-stability": "dev",

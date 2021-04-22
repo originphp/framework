@@ -15,9 +15,10 @@ namespace Origin\Test\Redis;
 
 use Redis;
 use Origin\Core\Exception\Exception;
+use Origin\TestSuite\OriginTestCase;
 use Origin\Job\Engine\RedisConnection;
 
-class RedisConnectionTest extends \PHPUnit\Framework\TestCase
+class RedisConnectionTest extends OriginTestCase
 {
     protected function setUp(): void
     {
@@ -36,41 +37,49 @@ class RedisConnectionTest extends \PHPUnit\Framework\TestCase
      */
     public function testPersistent()
     {
-        $result = RedisConnection::connect([
-            'host' => getenv('REDIS_HOST'),
-            'port' => (int) getenv('REDIS_PORT'),
-            'timeout' => 0,
-            'persistent' => 'persisten-id',
-        ]);
-        $this->assertInstanceOf(Redis::class, $result);
+        $this->deprecated(function () {
+            $result = RedisConnection::connect([
+                'host' => getenv('REDIS_HOST'),
+                'port' => (int) getenv('REDIS_PORT'),
+                'timeout' => 0,
+                'persistent' => 'persisten-id',
+            ]);
+            $this->assertInstanceOf(Redis::class, $result);
+        });
     }
     public function testSocketException()
     {
         $this->expectException(Exception::class);
-        RedisConnection::connect([
-            'port' => (int) getenv('REDIS_PORT'),
-            'timeout' => 0,
-            'path' => '/var/sockets/redis',
-        ]);
+        $this->deprecated(function () {
+            RedisConnection::connect([
+                'port' => (int) getenv('REDIS_PORT'),
+                'timeout' => 0,
+                'path' => '/var/sockets/redis',
+            ]);
+        });
     }
     public function testNonPersisentException()
     {
         $this->expectException(Exception::class);
-        RedisConnection::connect([
-            'host' => 'foo',
-            'port' => 1234,
-            'timeout' => 0,
+        $this->deprecated(function () {
+            RedisConnection::connect([
+                'host' => 'foo',
+                'port' => 1234,
+                'timeout' => 0,
 
-        ]);
+            ]);
+        });
     }
     public function testInvalidPassword()
     {
         $this->expectException(Exception::class);
-        RedisConnection::connect([
-            'host' => getenv('REDIS_HOST'),
-            'port' => (int) getenv('REDIS_PORT'),
-            'timeout' => 0,
-            'password' => 'secret',
-        ]);
+        $this->deprecated(function () {
+            RedisConnection::connect([
+                'host' => getenv('REDIS_HOST'),
+                'port' => (int) getenv('REDIS_PORT'),
+                'timeout' => 0,
+                'password' => 'secret',
+            ]);
+        });
     }
 }

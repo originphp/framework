@@ -16,6 +16,7 @@ namespace Origin\Job\Engine;
 
 use Redis;
 use Origin\Job\Job;
+use Origin\Redis\Connection;
 
 class RedisEngine extends BaseEngine
 {
@@ -43,8 +44,7 @@ class RedisEngine extends BaseEngine
        */
     public function initialize(array $config): void
     {
-        $mergedWithDefault = $this->config();
-        $this->Redis = RedisConnection::connect($mergedWithDefault);
+        $this->Redis = (new Connection($this->config()))->client(); // Merged with Default
     }
 
     /**
