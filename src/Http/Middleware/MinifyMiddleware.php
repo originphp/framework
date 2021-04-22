@@ -47,7 +47,7 @@ class MinifyMiddleware extends Middleware
     */
     public function process(Request $request, Response $response): void
     {
-        if ($response->type() === 'text/html' && $response->body()) {
+        if ($response->contentType() === 'text/html' && $response->body()) {
             $this->minifyBody($response);
         }
     }

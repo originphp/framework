@@ -428,7 +428,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render(['json' => $data,'status' => 201]);
         $this->assertEquals(json_encode($data), $controller->response()->body());
         $this->assertEquals(201, $controller->response()->statusCode());
-        $this->assertEquals('application/json', $controller->response()->type());
+        $this->assertEquals('application/json', $controller->response()->contentType());
 
         $controller = new TestsController($request, new Response());
         $book = new Entity();
@@ -464,7 +464,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render(['xml' => $data,'status' => 201]);
         $this->assertEquals($expected, $controller->response()->body());
         $this->assertEquals(201, $controller->response()->statusCode());
-        $this->assertEquals('application/xml', $controller->response()->type());
+        $this->assertEquals('application/xml', $controller->response()->contentType());
 
         $controller = new TestsController($request, new Response());
         $controller->render(['xml' => $xml]); //xml string
@@ -496,7 +496,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render(['text' => 'OK','status' => 201]);
         $this->assertEquals('OK', $controller->response()->body());
         $this->assertEquals(201, $controller->response()->statusCode());
-        $this->assertEquals('text/plain', $controller->response()->type());
+        $this->assertEquals('text/plain', $controller->response()->contentType());
     }
 
     public function testRenderFile()
@@ -506,7 +506,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller->render(['file' => ROOT . DS .'phpunit.xml.dist','status' => 201]);
         $this->assertEquals(file_get_contents(ROOT . DS .'phpunit.xml.dist'), $controller->response()->body());
         $this->assertEquals(201, $controller->response()->statusCode());
-        $this->assertEquals('text/xml', $controller->response()->type());
+        $this->assertEquals('text/xml', $controller->response()->contentType());
     }
 
     public function testRedirect()

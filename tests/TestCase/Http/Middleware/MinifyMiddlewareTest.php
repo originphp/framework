@@ -55,7 +55,7 @@ EOF;
         $json = json_encode(['key' => 'value']);
 
         $response = new Response();
-        $response->type('application/json');
+        $response->contentType('application/json');
         $response->body($json);
 
         $middleware = new MinifyMiddleware();

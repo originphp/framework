@@ -97,20 +97,31 @@ class ResponseTest extends OriginTestCase
         $response = new Response();
         
         // Test Set
-        $this->assertEquals('text/html', $response->type());
-        $this->assertEquals('application/json', $response->type('json'));
-
+      
         $this->deprecated(function () use ($response) {
+            $this->assertEquals('text/html', $response->type());
+            $this->assertEquals('application/json', $response->type('json'));
             $response->type(['swf' => 'application/x-shockwave-flash']);
+            $this->assertEquals('application/x-shockwave-flash', $response->type('swf'));
+            $mpeg = 'audio/mpeg';
+            $this->assertEquals($mpeg, $response->type($mpeg));
+            $this->expectException(InvalidArgumentException::class);
+        
+            $response->contentType('foo');
         });
-       
-        $this->assertEquals('application/x-shockwave-flash', $response->type('swf'));
-        $mpeg = 'audio/mpeg';
-        $this->assertEquals($mpeg, $response->Type($mpeg));
+    }
+
+    public function testContentType()
+    {
+        $response = new Response();
+        
+        // Test Set
+        $this->assertEquals('text/html', $response->contentType());
+        $this->assertEquals('application/json', $response->contentType('json'));
 
         $this->expectException(InvalidArgumentException::class);
         
-        $response->type('foo');
+        $response->contentType('foo');
     }
 
     public function testMimeType()

@@ -497,7 +497,7 @@ class Controller
             unset($view);
         }
     
-        $this->response->type($options['type']);   // 'json' or application/json
+        $this->response->contentType($options['type']);   // 'json' or application/json
         $this->response->statusCode($options['status']); // 200
         $this->response->body($body);
 
@@ -552,7 +552,7 @@ class Controller
         $this->autoRender = false; // Only render once
         $this->triggerCallback('beforeRender');
        
-        $this->response->type('json');
+        $this->response->contentType('json');
         $this->response->statusCode($status); // 200
         $this->response->body((new JsonView($this))->render($data));
        
@@ -582,7 +582,7 @@ class Controller
     {
         $this->autoRender = false; // Disable for dispatcher
         $this->triggerCallback('beforeRender');
-        $this->response->type('xml');
+        $this->response->contentType('xml');
         $this->response->statusCode($status); // 200
         $this->response->body((new XmlView($this))->render($data));
 

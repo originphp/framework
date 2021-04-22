@@ -267,7 +267,7 @@ class Response
      *  $response->cookie('key',$value);
      *  $response->cookie('key',$value,['expires'=>'+5 days');
      *
-    * @param string $name
+     * @param string $name
      * @param mixed $value string, array etc
      * @param array $options The options keys are:
      *   - expires: default:'+1 month'. a strtotime string e.g. +5 days, 2019-01-01 10:23:55
@@ -303,19 +303,20 @@ class Response
      *
      *  // add definitions
      *  $response->type(['swf' => 'application/x-shockwave-flash']);
-     * @todo
+     * @deprecated use contentType instead
      *
      * @param string|array $contentType
      * @return mixed
      */
     public function type($contentType = null)
     {
+        deprecationWarning('Using response:type has been deprecated use contentType or mimeTypes');
+
         if ($contentType === null) {
             return $this->contentType;
         }
 
         if (is_array($contentType)) {
-            deprecationWarning('Using response:type to set definitions has been deprecated use types instead.');
             $this->mimeTypes($contentType);
 
             return $this->contentType;
@@ -404,7 +405,7 @@ class Response
         if ($options['download']) {
             $this->header('Content-Disposition', 'attachment; filename="' . $options['name'] . '"');
         }
-        $this->type($options['type']);
+        $this->contentType($options['type']);
      
         return $this->file = $filename;
     }
@@ -420,6 +421,29 @@ class Response
         $expires = date('Y-m-d H:i:s', strtotime($time));
         $dateTime = ( new DateTime($expires))->setTimeZone(new DateTimeZone('UTC'));
         $this->header('Expires', $dateTime->format('D, j M Y H:i:s') . ' GMT');
+    }
+
+    /**
+     * Sets or gets the content type
+     *
+     * @param string $type
+     * @return string|null
+     */
+    public function contentType(string $type = null): ?string
+    {
+        if ($type === null) {
+            return $this->contentType;
+        }
+
+        if (isset($this->mimeTypes[$type])) {
+            return $this->contentType = $this->mimeTypes[$type];
+        }
+
+        if (strpos($type, '/') !== false) {
+            return $this->contentType = $type;
+        }
+
+        throw new InvalidArgumentException('Invalid content type');
     }
 
     /**
