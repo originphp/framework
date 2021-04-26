@@ -36,7 +36,10 @@ use Origin\Configurable\StaticConfigurable as Configurable;
  */
 abstract class Mailbox
 {
-    use HookTrait, Configurable, ModelTrait, CallbackRegistrationTrait;
+    use HookTrait;
+    use Configurable;
+    use ModelTrait;
+    use CallbackRegistrationTrait;
   
     /**
      * Inbound email id (not email message id)

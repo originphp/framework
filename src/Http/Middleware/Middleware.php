@@ -21,7 +21,9 @@ use Origin\Configurable\InstanceConfigurable as Configurable;
 
 class Middleware
 {
-    use Configurable, HookTrait;
+    use Configurable;
+    use HookTrait;
+    
     /**
      * Constructor
      */
