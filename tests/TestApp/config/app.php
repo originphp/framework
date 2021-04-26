@@ -22,7 +22,6 @@ return [
     'namespace' => 'App',
     'encoding' => 'UTF-8',
     'defaultTimezone' => 'UTC',
-    'sessionTimeout' => 3600,
     'securityKey' => env('APP_KEY'),
     'schemaFormat' => 'php',
     'mailboxKeepEmails' => '+30 days'

@@ -16,107 +16,110 @@ namespace Origin\Test\Http;
 
 use Origin\Http\Session;
 use Origin\Security\Security;
-use Origin\TestSuite\TestTrait;
-
-class MockSession extends Session
-{
-    use TestTrait;
-}
+use Origin\Http\Session\Engine\ArrayEngine;
 
 class SessionTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
+    public function testSessionStart()
     {
-        $this->Session = new Session();
-    }
- 
-    public function testWrite()
-    {
-        $this->Session->write('sessionTest', 'works');
-        $this->assertTrue(isset($_SESSION['sessionTest']));
-        $this->assertEquals('works', $_SESSION['sessionTest']);
+        $session = new Session(new ArrayEngine);
+        $this->assertFalse($session->started());
+        $session->start();
+        $this->assertTrue($session->started());
     }
 
-    public function testRead()
+    public function testSessionId()
     {
-        $this->assertNull($this->Session->read('sessionTest'));
-
-        $this->Session->write('sessionTest', 'works');
-
-        $this->assertEquals('works', $this->Session->read('sessionTest'));
-        
-        $this->Session->write('Test.status', 'ok');
-        $this->assertEquals('ok', $this->Session->read('Test.status'));
+        $session = new Session(new ArrayEngine);
+        $this->assertNull($session->id());
+        $id = uniqid();
+        $session->id($id);
+        $this->assertEquals($id, $session->id());
     }
-
-    public function testExists()
+  
+    public function testGet()
     {
-        $this->Session->write('Test.status', 'ok');
-        $this->assertTrue($this->Session->exists('Test.status'));
-        $this->assertFalse($this->Session->exists('Test.password'));
-    }
+        $session = new Session(new ArrayEngine);
+        $this->assertNull($session->read('foo'));
+        $this->assertEquals('bar', $session->read('foo', 'bar'));
 
-    public function testDelete()
-    {
-        $this->Session->write('Test.status', 'ok');
-        $this->assertTrue($this->Session->delete('Test.status'));
-        $this->assertFalse($this->Session->delete('Test.password'));
-    }
-
-    public function testDestroy()
-    {
-        $this->Session->write('Test.status', 'ok');
-
-        $this->assertTrue($this->Session->started());
-        $this->Session->destroy();
-        $this->assertFalse($this->Session->exists('Test.status'));
+        $session->write('foo', 'bar');
+        $this->assertEquals('bar', $session->read('foo'));
     }
 
     /**
-     * @depends testDestroy
+     * @depends testGet
      */
-    public function testCreate()
+    public function testSet()
     {
-        $this->Session->destroy();
-        $this->Session->start();
-        $this->Session->write('Test.status', 'ok');
-        $this->assertTrue($this->Session->exists('Test.status'));
+        $session = new Session(new ArrayEngine);
+        $session->write('foo', 'bar');
+        $this->assertEquals('bar', $session->read('foo'));
+    }
+
+    /**
+     * @depends testSet
+     */
+    public function testExists()
+    {
+        $session = new Session(new ArrayEngine);
+        $this->assertFalse($session->exists('foo'));
+
+        $session->write('foo', 'bar');
+        $this->assertTrue($session->exists('foo'));
+    }
+
+    /**
+     * @depends testSet
+     */
+    public function testDelete()
+    {
+        $session = new Session(new ArrayEngine);
+
+        $session->write('foo', 'bar');
+        $this->assertTrue($session->exists('foo'));
+    
+        $this->assertTrue($session->delete('foo'));
+        $this->assertFalse($session->delete('foo'));
+        $this->assertFalse($session->exists('foo'));
+    }
+
+    public function testSessionArray()
+    {
+        $session = new Session(new ArrayEngine);
+        $this->assertEquals([], $session->toArray());
+        $session->write('foo', 'bar');
+        $this->assertEquals(['foo' => 'bar'], $session->toArray());
     }
 
     public function testClear()
     {
-        $this->Session->write('Test.status', 'ok');
-        $this->assertNotEmpty($_SESSION);
-        $this->Session->clear();
-        $this->assertEmpty($_SESSION);
+        $session = new Session(new ArrayEngine);
+        $session->write('foo', 'bar');
+        $this->assertNotEmpty($session->toArray());
+        $session->clear();
+        $this->assertEmpty($session->toArray());
     }
-    public function testValidate()
+
+    public function testDestroy()
     {
-        $session = new MockSession();
-        $name = session_name();
-       
-        $_COOKIE[$name] = Security::uuid();
-        $id = $session->callMethod('validateCookie');
-        $this->assertEquals(36, strlen($id));
-        unset($_COOKIE[$name]);
+        $session = new Session(new ArrayEngine);
         
-        $session = new MockSession();
-        $_COOKIE[$name] = base64_encode(md5('originPHP'));
-        $this->assertNull($session->callMethod('validateCookie'));
-        unset($_COOKIE[$name]);
+        // Setup
+        $id = Security::hex(32);
+        $session->id($id);
+        $session->start();
+        $session->write('foo', 'bar');
 
-        $session = new MockSession();
-        $_COOKIE[$name] = bin2hex(random_bytes(1024));
-        $this->assertNull($session->callMethod('validateCookie'));
-        unset($_COOKIE[$name]);
-    }
+        $this->assertTrue($session->started());
+        $this->assertEquals($id, $session->id());
+        $this->assertNotEmpty($session->toArray());
 
-    public function testTimedout()
-    {
-        $session = new MockSession();
-        $session->write('Session.lastActivity', time());
-        $this->assertFalse($session->callMethod('timedOut'));
-        $session->write('Session.lastActivity', strtotime('-3601 seconds'));
-        $this->assertTrue($session->callMethod('timedOut'));
+        // Test
+
+        $session->destroy();
+        $this->assertFalse($session->started());
+        $this->assertNull($session->id());
+        $this->assertEmpty($session->toArray());
     }
 }

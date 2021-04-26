@@ -14,8 +14,10 @@
 declare(strict_types = 1);
 namespace Origin\Http;
 
-use function Origin\Defer\defer;
+use Origin\Core\Config;
 
+use function Origin\Defer\defer;
+use Origin\Http\Session\Engine\PhpEngine;
 use Origin\Http\Exception\MethodNotAllowedException;
 
 class Request
@@ -145,7 +147,7 @@ class Request
         $this->headers = (array) $options['headers'];
         $this->data = (array) $options['post']; // This will get replaced if using post
         $this->query = (array) $options['query'];
-    
+
         if ($options['uri'] === null) {
             $options['uri'] = $this->uri();
         }
@@ -745,7 +747,8 @@ class Request
     public function session(): Session
     {
         if ($this->session === null) {
-            $this->session = new Session();
+            $class = Config::read('Session.className') ?: PhpEngine::class;
+            $this->session = new Session(new $class);
         }
 
         return $this->session;

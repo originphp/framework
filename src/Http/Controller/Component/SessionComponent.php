@@ -37,7 +37,11 @@ class SessionComponent extends Component
      */
     protected function session(): Session
     {
-        return $this->request()->session();
+        if (! isset($this->session)) {
+            $this->session = $this->request()->session();
+        }
+
+        return $this->session;
     }
     /**
      * Reads a value of a session

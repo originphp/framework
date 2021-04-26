@@ -45,6 +45,7 @@ Config::load('storage');
 Config::load('email');
 Config::load('queue');
 Config::load('mailbox');
+Config::load('session');
 
 /**
  * Configure the server

@@ -18,6 +18,7 @@ use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
 use Origin\Http\Middleware\Middleware;
 use Origin\Http\Middleware\MiddlewareRunner;
+use Origin\Http\Middleware\SessionMiddleware;
 use Origin\Http\Middleware\DispatcherMiddleware;
 use Origin\Core\Exception\InvalidArgumentException;
 
@@ -70,15 +71,20 @@ class BaseApplication
      */
     public function dispatch(): Response
     {
+        /**
+         * This is backwards compatible helper, this will be @deprecated in future versions before last release
+         * TODO: Add deprecation warning before last release
+         */
+        if (! in_array(SessionMiddleware::class, $this->runner->list())) {
+            $this->addMiddleware(new SessionMiddleware);
+        }
        
-        # By running last it will run it first during process
+        # By adding it last it will run it first during process
         $this->addMiddleware(new DispatcherMiddleware);
-
+        
         $this->executeHook('startup');
         $this->runner->run($this->request, $this->response);
         $this->executeHook('shutdown');
-
-        $this->request->session()->close();
         
         return $this->response;
     }

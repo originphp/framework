@@ -28,7 +28,8 @@
     "originphp/model": "^3.0",
     "originphp/security": "^2.0",
     "originphp/utility": "^3.0",
-    "originphp/xml": "^2.0"
+    "originphp/xml": "^2.0",
+    "originphp/redis": "^3.0"
   },
   "suggest": {
     "originphp/model": "To use the Auth component"

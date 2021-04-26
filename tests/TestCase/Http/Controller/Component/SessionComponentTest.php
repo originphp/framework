@@ -29,7 +29,6 @@ class SessionComponentTest extends \PHPUnit\Framework\TestCase
     public function testWrite()
     {
         $this->Session->write('foo', 'bar');
-        $this->assertEquals('bar', $_SESSION['foo']);
         $this->assertTrue($this->Session->exists('foo'));
     }
     public function testClear()

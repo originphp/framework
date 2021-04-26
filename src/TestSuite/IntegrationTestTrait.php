@@ -17,13 +17,15 @@ namespace Origin\TestSuite;
 use Exception;
 use Origin\Http\Router;
 use Origin\Http\Request;
+use Origin\Http\Session;
 use App\Http\Application;
 use Origin\Http\Response;
 use Origin\Http\Dispatcher;
 use Origin\Http\ExceptionRenderer;
-
 use PHPUnit\Exception as PhpunitException;
+use Origin\Http\Session\Engine\ArrayEngine;
 use Origin\Model\Exception\DatasourceException;
+use Origin\TestSuite\Stub\Request as TestRequest;
 
 /**
  * A way to test controllers from a higher level
@@ -318,8 +320,18 @@ trait IntegrationTestTrait
             $_SERVER[$key] = $value;
         }
             
-        $this->request = new Request($url);
-    
+        $this->request = new TestRequest($url);
+
+        /**
+         * Switch session engine to array for testing, since cant set values unless the session is started. Starting
+         * the session in the middleware, ID is being set, so this will fail
+         * TODO: maybe add setSession to the request
+         * Set the session driver
+         */
+       
+        $class = ArrayEngine::class;
+        $this->request->setSession(new Session(new $class));
+
         $this->response = $this->getMockBuilder(Response::class)
             ->setMethods(['send','stop'])
             ->getMock();
@@ -328,7 +340,7 @@ trait IntegrationTestTrait
         foreach ($this->session as $key => $value) {
             $this->request->session()->write($key, $value);
         }
-        
+
         // Send Headers
         foreach ($this->headers as $header => $value) {
             $this->response->header($header, $value);

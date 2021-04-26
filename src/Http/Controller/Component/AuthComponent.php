@@ -257,7 +257,12 @@ class AuthComponent extends Component
      */
     public function logout(): string
     {
-        $this->Session->destroy();
+        $session = $this->request()->session();
+
+        // Destroy session and regenerate ID to prevent session issues
+        $session->destroy();
+        $session->start();
+
         $logoutRedirect = $this->config['logoutRedirect'] ?? $this->config['loginAction'];
       
         return Router::url($logoutRedirect);
@@ -273,6 +278,7 @@ class AuthComponent extends Component
     public function user(string $property = null)
     {
         $user = null;
+
         # API authentication should not check data in Session
         if (in_array('Form', $this->config['authenticate']) || in_array('Http', $this->config['authenticate'])) {
             $user = $this->Session->read('Auth.User');
@@ -418,7 +424,7 @@ class AuthComponent extends Component
         if ($this->config['unauthorizedRedirect']) {
             $this->Flash->error($this->config['authError']);
             $this->Session->write('Auth.redirect', $this->request()->path(true));
-         
+
             return $this->controller()->redirect(Router::url($this->config['loginAction']));
         }
        

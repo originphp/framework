@@ -14,76 +14,31 @@
 declare(strict_types = 1);
 namespace Origin\Http;
 
-use Origin\Core\Dot;
-use Origin\Core\Config;
-use Origin\Security\Security;
-use Origin\Core\Exception\Exception;
+use Origin\Http\Session\Engine\PhpEngine;
+use Origin\Http\Session\SessionEngineInterface;
 
+/**
+ * This class is nessary for backwards compatability, however this could be seat as a class redirect and use
+ * the engine directly. TODO: think about this
+ */
 class Session
 {
     /**
-     * Bool when started
+     * @var \Origin\Http\Session\SessionEngineInterface
+     */
+    private $session;
+
+    /**
+     * Optional constructor argument has been provided for backwards compatability.
+     * TODO: Consider it to not be optional in 4.x, BC
      *
-     * @var boolean
+     * @param \Origin\Http\Session\SessionEngineInterface $session
      */
-    protected $started = false;
-
-    /**
-     * @var integer
-     */
-    protected $timeout = 3600;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function __construct(SessionEngineInterface $session = null)
     {
-        if (Config::exists('App.sessionTimeout')) {
-            $this->timeout = Config::read('App.sessionTimeout');
-        }
-
-        /**
-        * Security considerations:
-        *
-        * - session.cookie_secure: If the connection is HTTPS then only send cookies through this.
-        * - session.cookie_httponly: Tell the browsers that the session cookies should not availble client side
-        *   to help prevent cookie theft (a majority of XSS attacks include highjacking the session cookie).
-        */
-    
-        $config = [
-            'session.save_path' => TMP . DS . 'sessions',
-            'session.cookie_httponly' => 1,
-            'session.gc_maxlifetime' => $this->timeout * 60,
-            'session.cookie_lifetime' => $this->timeout * 60
-        ];
-
-        if (env('HTTPS')) {
-            $config['session.cookie_secure'] = 1;
-        }
-
-        if (! $this->started() && ! headers_sent()) {
-            $this->setIniConfig($config);
-        }
-
-        if ($this->started() === false) {
-            $this->start();
-        }
+        $this->session = $session ?: new PhpEngine();
     }
-
-    /**
-     * Configs the session for use
-     *
-     * @return void
-     */
-    protected function setIniConfig(array $config): void
-    {
-        foreach ($config as $option => $value) {
-            if (ini_set($option, (string) $value) === false) {
-                throw new Exception(sprintf('Error configuring session for `%s`', $option));
-            }
-        }
-    }
-
+   
     /**
      * Starts the session
      *
@@ -91,90 +46,63 @@ class Session
      */
     public function start(): bool
     {
-        if ($this->started) {
-            return false;
+        return $this->session->start();
+    }
+
+    /**
+     * Checks if session started
+     *
+     * @return bool
+     */
+    public function started(): bool
+    {
+        return $this->session->started();
+    }
+
+    /**
+     * Sets and gets the session ID. New sessions will be started with this ID if it is a valid
+     * hexidemcial string with the same length as configured in Session.idLength
+    * @see https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+    * @param string $id
+    * @return string|void
+    */
+    public function id(string $id = null)
+    {
+        if ($id === null) {
+            return $this->session->id();
         }
 
-        if (isConsole()) {
-            $_SESSION = [];
-
-            return $this->started = true;
+        if (! $this->session->started()) {
+            $this->session->id($id);
         }
-
-        if ($this->started()) {
-            throw new Exception('Session already started.');
-        }
-
-        /**
-         * Validate cookie and create secure session ID
-         * @see https://www.owasp.org/index.php/Full_Path_Disclosure
-         */
-        $id = $this->validateCookie();
-      
-        $this->startSession($id);
-        
-        return $this->started = true;
     }
     
     /**
-     * Main logic for starting session
+     * Sets or gets the name. New sessions will be created with this id
      *
-     * @param string $id
+     * @param string $name
      * @return void
      */
-    protected function startSession(string $id = null): void
+    public function name(string $name = null)
     {
-        if ($id === null) {
-            $this->id(Security::uuid());
+        if ($name === null) {
+            return $this->session->name();
         }
         
-        if (! session_start()) {
-            throw new Exception('Error starting a session.');
-        }
-
-        if ($this->timedOut()) {
-            $this->destroy();
-            $this->start();
+        if (! $this->session->started()) {
+            $this->session->name($name);
         }
     }
 
     /**
-     * This will validate the cookie and return the ID if it is correct
+     * Reads an item from the session
      *
-     * @return string|null
+     * @param string $key
+     * @return mixed|null
      */
-    protected function validateCookie(): ?string
+    public function read(string $key, $default = null)
     {
-        $id = $_COOKIE[session_name()] ?? null;
-
-        if ($id && ! preg_match('/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/', $id)) {
-            unset($_COOKIE[session_name()]); // delete invalid cookie and prevent recursive loop
-
-            $this->destroy();
-
-            return null;
-        }
-
-        return $id;
-    }
-
-    /**
-     * Checks if session timedout
-     *
-
-     * @return boolean
-     */
-    protected function timedOut(): bool
-    {
-        $lastActivity = $this->read('Session.lastActivity');
-        $this->write('Session.lastActivity', time());
-
-        $result = false;
-        if ($lastActivity) {
-            $result = (time() - $lastActivity > $this->timeout);
-        }
-        
-        return $result;
+        return $this->session->read($key, $default);
     }
 
     /**
@@ -186,49 +114,7 @@ class Session
      */
     public function write(string $key, $value): void
     {
-        $Dot = new Dot($_SESSION);
-        $Dot->set($key, $value);
-        if (strpos($key, '.') === false) {
-            $_SESSION[$key] = $value;
-
-            return;
-        }
-        // Overwite session vars
-        $this->overwrite($Dot->items());
-    }
-
-    /**
-     * Overwrite each session var, for PHP reasons
-     *
-     * @param array $data
-     * @return void
-     */
-    protected function overwrite(array $data): void
-    {
-        foreach ($_SESSION as $key => $value) {
-            if (! isset($data[$key])) {
-                unset($_SESSION[$key]);
-            }
-        }
-        foreach ($data as $key => $value) {
-            $_SESSION[$key] = $value;
-        }
-    }
-
-    /**
-     * Reads an item from the session
-     *
-     * @param string $key
-     * @return mixed|null
-     */
-    public function read(string $key)
-    {
-        $Dot = new Dot($_SESSION);
-        if ($Dot->has($key)) {
-            return $Dot->get($key);
-        }
-
-        return null;
+        $this->session->write($key, $value);
     }
 
     /**
@@ -239,9 +125,7 @@ class Session
      */
     public function exists(string $key): bool
     {
-        $Dot = new Dot($_SESSION);
-
-        return $Dot->has($key);
+        return $this->session->exists($key);
     }
     /**
      * Deletes a key in the session
@@ -251,15 +135,7 @@ class Session
      */
     public function delete(string $key): bool
     {
-        $Dot = new Dot($_SESSION);
-        if ($Dot->has($key)) {
-            $Dot->delete($key);
-            $this->overwrite($Dot->items());
-
-            return true;
-        }
-
-        return false;
+        return $this->session->delete($key);
     }
 
     /**
@@ -269,46 +145,17 @@ class Session
      */
     public function destroy(): void
     {
-        if (! $this->started()) {
-            $this->start();
-        }
-        if (! headers_sent()) {
-            // @codeCoverageIgnoreStart
-            session_destroy();
-            unset($_COOKIE[session_name()]);
-            // @codeCoverageIgnoreEnd
-        }
-        $this->started = false;
-        $_SESSION = [];
+        $this->session->destroy();
     }
 
     /**
-     * Checks if session started
+     * Closes the session
      *
-     * @return bool
+     * @return boolean
      */
-    public function started(): bool
+    public function close(): bool
     {
-        return ($this->started || session_status() === PHP_SESSION_ACTIVE);
-    }
-
-    /**
-     * Sets (if headers not already sent) and gets the session id
-    *
-    * @param string $id
-    * @return string|void
-    */
-    public function id(string $id = null)
-    {
-        if ($id === null) {
-            return session_id();
-        }
-
-        if (! headers_sent()) {
-            // @codeCoverageIgnoreStart
-            session_id($id);
-            // @codeCoverageIgnoreEnd
-        }
+        return $this->session->close();
     }
 
     /**
@@ -318,6 +165,16 @@ class Session
      */
     public function clear(): void
     {
-        $_SESSION = [];
+        $this->session->clear();
+    }
+
+    /**
+     * Gets the session data as an array
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->session->toArray();
     }
 }

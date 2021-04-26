@@ -31,6 +31,7 @@ class MiddlewareRunner
      * @var integer
      */
     protected $current = 0;
+
     /**
      * Adds a middleware to the runner
      *
@@ -40,6 +41,20 @@ class MiddlewareRunner
     public function add(Middleware $object)
     {
         $this->middlewareStack[] = $object;
+    }
+
+    /**
+     * Returns a list of the middleware added to the runner
+     * @return array
+     */
+    public function list(): array
+    {
+        $out = [];
+        foreach ($this->middlewareStack as $object) {
+            $out[] = get_class($object);
+        }
+
+        return $out;
     }
 
     /**
