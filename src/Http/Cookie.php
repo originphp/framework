@@ -57,6 +57,7 @@ class Cookie
      *   - domain: domains cookie will be available on
      *   - secure: default:false. only send if through https
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
+     *   - sameSite: default:none  can be lax, strict or none (requires secure)
      * @return void
      */
     public function write(string $name, $value, array $options = []): void
@@ -68,10 +69,12 @@ class Cookie
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
             'encrypt' => true,
+            'sameSite' => null // lax/strict/none
         ];
 
-        $value = $this->pack($value, $options['encrypt']);
-        $this->setCookie($name, $value, $options['expires'], $options['path'], $options['domain'], $options['secure'], $options['httpOnly']);
+        $this->setCookie(
+            $name, $this->pack($value, $options['encrypt']), $options
+        );
     }
 
     /**
@@ -117,9 +120,16 @@ class Cookie
      * @return void
      * @codeCoverageIgnore
      */
-    protected function setCookie($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false, $httpOnly = false): void
+    protected function setCookie(string $name, string $value, array $options): void
     {
-        setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+        setcookie($name, $value, [
+            'expires' => $options['expires'],
+            'path' => $options['path'],
+            'domain' => $options['domain'],
+            'secure' => $options['secure'],
+            'httponly' => $options['httpOnly'],
+            'samesite' => $options['sameSite'] ? ucfirst(strtolower($options['sameSite'])) : null
+        ]);
     }
 
     /**

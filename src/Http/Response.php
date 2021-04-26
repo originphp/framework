@@ -276,6 +276,7 @@ class Response
      *   - domain: domains cookie will be available on
      *   - secure: default:false. only send if through https
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
+     *   - sameSite: default:null Use samesite cookies, none,strict and lax. Note you might need to use secure to use none option
      * @return void
      */
     public function cookie(string $name, $value, array $options = []): void
@@ -289,8 +290,9 @@ class Response
             'secure' => false, // only send if through https
             'httpOnly' => false, // only available to  HTTP protocol not to javascript
             'encrypt' => true,
+            'sameSite' => null // lax/strict/none
         ];
-        $options['expires'] = strtotime($options['expires']);
+        $options['expires'] = is_string($options['expires']) ?  strtotime($options['expires']) : $options['expires'];
         
         $this->cookies[$name] = $options;
     }

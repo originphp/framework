@@ -56,6 +56,7 @@ class CookieComponent extends Component
      *   - domain: domains cookie will be available on
      *   - secure: default:false. only send if through https
      *   - httpOnly: default:false. only available to HTTP protocol not to javascript
+     *   - sameSite: default:none  can be lax, strict or none (requires secure)
      * @return void
      */
     public function write(string $name, $value, array $options = []): void

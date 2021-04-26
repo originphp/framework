@@ -26,7 +26,8 @@ class CsrfProtectionMiddleware extends Middleware
         'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions,
         'httpOnly' => false, // only available to HTTP protocol (not javascript)
         'secure' => false, // cookie only transmitted over HTTPS,
-        'encrypt' => true
+        'encrypt' => true,
+        'sameSite' => null
     ];
 
     /**
