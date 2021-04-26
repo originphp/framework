@@ -15,6 +15,7 @@
 namespace Origin\Test\Http\View\Helper;
 
 use Origin\Core\Plugin;
+use Origin\Http\Router;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Http\View\View;
@@ -33,8 +34,10 @@ class HtmlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testLink()
     {
-        $this->Html->request()->params('controller', 'Articles');
-        
+        $request = new Request('/articles');
+      
+        Router::request($request);
+   
         $expected = '<a href="/">view</a>';
         $result = $this->Html->link('view', null);
         $this->assertEquals($expected, $result);

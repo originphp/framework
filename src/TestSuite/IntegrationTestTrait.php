@@ -344,6 +344,9 @@ trait IntegrationTestTrait
                 (new Application($this->request, $this->response))->dispatch();
                 $this->controller = Dispatcher::instance()->controller();
             } else {
+                // Set the request in the router as this is done Application
+                Router::request($this->request);
+                // Dispatch
                 $dispatcher = new Dispatcher();
                 $dispatcher->dispatch($this->request, $this->response);
                 $this->controller = $dispatcher->controller();

@@ -512,6 +512,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     public function testRedirect()
     {
         $request = new Request('tests/edit/2048');
+        Router::request($request);
         $response = $this->getMockBuilder(Response::class)
             ->setMethods(['header', 'send','statusCode','stop'])
             ->getMock();
