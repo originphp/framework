@@ -19,15 +19,18 @@ use Origin\Http\Response;
 use Origin\Security\Security;
 use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
+/**
+ * @see https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+ */
 class CsrfProtectionMiddleware extends Middleware
 {
     protected $defaultConfig = [
         'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
-        'expires' => '+60 minutes', // Expiry time defaults to 60 minutes like sessions,
-        'httpOnly' => false, // only available to HTTP protocol (not javascript)
+        'expires' => 0, // Cookie expires after browser is closed
+        'encrypt' => false, // Encryption helps identify system
+        'httpOnly' => true, // only available to HTTP protocol (not javascript)
         'secure' => false, // cookie only transmitted over HTTPS,
-        'encrypt' => true,
-        'sameSite' => null
+        'sameSite' => 'strict'
     ];
 
     /**
