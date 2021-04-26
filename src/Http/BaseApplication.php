@@ -57,6 +57,9 @@ class BaseApplication
         $this->response = $response ?: new Response();
         $this->runner = $runner ?: new MiddlewareRunner();
 
+        // Set the Request
+        Router::request($this->request);
+
         $this->executeHook('initialize');
     }
 

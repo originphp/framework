@@ -24,6 +24,7 @@ namespace Origin\Http;
   * Router::add('/:controller/*', ['action'=>'edit','method'=>'PATCH']);
   * Router::add('/:controller/*', ['action'=>'delete','method'=>'DELETE']);
   */
+use RuntimeException;
 use Origin\Inflector\Inflector;
 
 class Router
@@ -246,6 +247,10 @@ class Router
         }
         if (empty($url)) {
             return '/';
+        }
+
+        if (! isset(static::$request)) {
+            throw new RuntimeException('Request not set in the router');
         }
 
         $requestParams = static::$request->params();

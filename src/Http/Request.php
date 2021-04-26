@@ -192,7 +192,6 @@ class Request
         $this->data = array_merge($this->data, $options['files']);
         
         $this->params = Router::parse($uri) ?: [];
-        Router::request($this);
     }
 
     /**
