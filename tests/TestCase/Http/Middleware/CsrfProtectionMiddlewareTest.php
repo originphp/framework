@@ -29,8 +29,39 @@ class MockCsrfProtectionMiddleware extends CsrfProtectionMiddleware
 
 class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
 {
-    const SAMPLETOKEN = '4f837aa1cd7a164b467dd29864b8f5eea1903222d77ef99b4a48627f22a39382713f6621ac02732bb056d2c14cdb55a6113bf9e9b81d226f64875fb797ef2123';
+    const SAMPLETOKEN = '18d812304631794e81342e7c1e7bf97e';
     
+    public function testCreateToken()
+    {
+        $request = new Request();
+        $response = new Response();
+        $middleware = new MockCsrfProtectionMiddleware();
+
+        $this->assertTrue($request->is('get'));
+
+        $middleware($request, $response);
+       
+        $this->assertNotEmpty($response->cookies('CSRF-Token'));
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}+$/', $response->cookies('CSRF-Token')['value']);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}+$/', $request->params('csrfToken'));
+    }
+
+    /**
+     * @depends testCreateToken
+     */
+    public function testDisableCSRFProtection()
+    {
+        $request = new Request();
+        $response = new Response();
+        $middleware = new MockCsrfProtectionMiddleware();
+
+        $request->params('csrfProtection', false);
+
+        $middleware($request, $response);
+
+        $this->assertEmpty($response->cookies('CSRF-Token'));
+    }
+
     public function testHandleGet()
     {
         $request = new Request();
@@ -40,7 +71,7 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $request->server('REQUEST_METHOD', 'GET');
 
         $middleware->handle($request, $response);
-        $this->assertEquals(128, strlen($request->params('csrfToken')));
+        $this->assertEquals(32, strlen($request->params('csrfToken')));
     }
 
     public function testHandleGetWithCookie()
@@ -80,7 +111,7 @@ class CsrfProtectionMiddlewareTest extends \PHPUnit\Framework\TestCase
         $request->server('REQUEST_METHOD', 'GET');
         $middleware($request, $response);
      
-        $this->assertEquals(128, strlen($request->params('csrfToken'))); // check agin
+        $this->assertEquals(32, strlen($request->params('csrfToken'))); // check agin
         $this->assertEquals($request->params('csrfToken'), $response->cookies('CSRF-Token')['value']);
     }
 

@@ -17,27 +17,33 @@ namespace Origin\Http\Middleware;
 use Origin\Http\Request;
 use Origin\Http\Response;
 use Origin\Security\Security;
+use Origin\Http\Exception\BadRequestException;
 use Origin\Http\Middleware\Exception\InvalidCsrfTokenException;
 
 /**
+ * To prevent token errors if session expires, add the following code to your header to refresh the page
+ * at the end of the session.
+ * IMPORTANT: set to 1 second longer than timeout if not it will keep somebody logged in forever.
+ *
+ * <meta http-equiv="refresh" content="<?= Config::read('Session.timeout') + 1 ?>">
+ *
+ * Security
+ * - Session cookies must use SameSite attribute
+ * - Implement at least one itigation from Defense in Depth Mitigations section
+ * - Moved away from cookies to store CSRF token, see ByPassing CSRF Protections by OWSAP
+ *
  * @see https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
  */
 class CsrfProtectionMiddleware extends Middleware
 {
     protected $defaultConfig = [
-        'cookieName' => 'CSRF-Token', // Cookie name for generated CSRF token
-        'expires' => 0, // Cookie expires after browser is closed
-        'encrypt' => false, // Encryption helps identify system
-        'httpOnly' => true, // only available to HTTP protocol (not javascript)
-        'secure' => false, // cookie only transmitted over HTTPS,
-        'sameSite' => 'strict'
+        'cookieName' => 'CSRF-Token',
+        'tokenLength' => 32,  // CSRF token length 128 bits (16 bytes) is the recommended minimum
+        'singleUse' => false  // If enabled token will be regenerated each time it used. Not AJAX friendly
     ];
 
     /**
-     * This handles the request
-     *
-     * If the request is a post request, it will validate the CSRF token
-     * If the request is a get request and thre is no cookie (or it expired) it will generate a new token
+     * This handles the request. If the request is a post request, it will validate the CSRF token
      *
      * @param \Origin\Http\Request $request
      * @return void
@@ -45,25 +51,32 @@ class CsrfProtectionMiddleware extends Middleware
     public function handle(Request $request): void
     {
         if ($request->params('csrfProtection') === false) {
-            return ;
+            return;
         }
+     
+        // Generate the CSRF token and store in session
+        $token = $request->cookies($this->config('cookieName')) ?: $this->generateToken();
   
-        # Generate the CSRF token
-        $token = $request->cookies($this->config('cookieName'));
-        if ($request->is(['get']) && $token === null) {
-            $token = $this->generateToken();
-        }
-         
-        # Works it
+        // Validate the token
         if ($request->is(['post', 'put', 'patch', 'delete']) || $request->data()) {
+            $this->verifyOrigin($request);
             $this->validateToken($request);
-            # Remove csrfToken field that posted with form
+          
+            // Remove csrfToken field that was posted with form
             $post = $request->data();
             unset($post['csrfToken']);
             $request->data($post);
-        }
 
-        # Set the CSRF Token in the request
+            // regenerate token
+            if ($this->config('singleUse')) {
+                $token = $this->generateToken();
+            }
+        }
+       
+        /**
+         * Set the CSRF Token in the request
+         * @internal This is being stored twice now,
+         */
         $request->params('csrfToken', $token);
     }
 
@@ -77,12 +90,64 @@ class CsrfProtectionMiddleware extends Middleware
     public function process(Request $request, Response $response): void
     {
         if ($request->params('csrfProtection') === false) {
-            return ;
+            return;
         }
-   
-        if ($request->method() === 'GET') {
-            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), $this->config);
+       
+        // If token has changed write it again
+        if ($request->cookies($this->config('cookieName')) !== $request->params('csrfToken')) {
+            $defaults = [
+                'expires' => 0, // Cookie expires after browser is closed
+                'encrypt' => false, // Encryption helps identify system
+                'secure' => $request->server('HTTPS') !== null,
+                'httpOnly' => true,
+                'sameSite' => 'Strict'
+            ];
+
+            $response->cookie($this->config('cookieName'), $request->params('csrfToken'), array_merge($defaults, $this->config));
         }
+    }
+
+    /**
+     * EXPERIMENTAL: If the Origin header is present check that, if not check referer
+     *
+     * @param \Origin\Http\Request $request
+     * @return void
+     */
+    private function verifyOrigin($request): void
+    {
+        $uri = $request->headers('Origin') ?: $request->headers('Referer');
+        
+        if ($uri) {
+            $host = $this->parseHost($uri);
+
+            if ($host !== $request->host()) {
+                throw new BadRequestException('Request made from different host');
+            }
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $url
+     * @return string
+     */
+    private function parseHost(string $url): string
+    {
+        $parsed = parse_url($url);
+
+        return empty($parsed['port']) ? $parsed['host'] : $parsed['host'] .  ':' . $parsed['port'];
+    }
+
+    /**
+     * For security reasons make sure token submitted is hexidemical and correct length
+     *
+     * @param string|null $token
+     * @return boolean
+     */
+    private function isValidToken(string $token = null): bool
+    {
+        return $token && (bool) preg_match('/^[0-9a-f]{' . $this->config('tokenLength') .'}+$/', $token);
     }
 
     /**
@@ -98,25 +163,31 @@ class CsrfProtectionMiddleware extends Middleware
     /**
      * Validates the CSRF token using either the cookie or the header
      *
-     * @param Request $request
+     * @param \Origin\Http\Request $request
      * @return void
      */
     private function validateToken(Request $request): void
     {
-        /**
-         * Disable when runing unit tests
-         */
+        // Don't run in tests
         if ($this->isTestEnvironment()) {
             return;
         }
 
         $token = $request->cookies($this->config('cookieName'));
+        $formToken = $request->data('csrfToken') ?: $request->headers('X-CSRF-Token');
 
-        if (! $token) {
-            throw new InvalidCsrfTokenException('Missing CSRF Token Cookie.');
+        // Check token is in the right places
+        if (! $token || ! $formToken) {
+            throw new InvalidCsrfTokenException('Missing CSRF Token.');
         }
- 
-        if (! Security::compare($token, $request->data('csrfToken')) && ! Security::compare($token, $request->headers('X-CSRF-Token'))) {
+
+        // Validate token format is correct
+        if (! $this->isValidToken($formToken)) {
+            throw new InvalidCsrfTokenException('Invalid CSRF Token.');
+        }
+
+        // Check that the tokens match up
+        if (! Security::compare($token, $formToken)) {
             throw new InvalidCsrfTokenException('CSRF Token Mismatch.');
         }
     }
@@ -128,10 +199,6 @@ class CsrfProtectionMiddleware extends Middleware
     */
     private function generateToken(): string
     {
-        $randomBytes = random_bytes(64);
-
-        return Security::hash($randomBytes, [
-            'type' => 'sha512'
-        ]);
+        return Security::hex($this->config('tokenLength'));
     }
 }
