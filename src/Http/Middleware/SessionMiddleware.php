@@ -34,6 +34,10 @@ class SessionMiddleware extends Middleware
      */
     private $session;
 
+    /**
+     * @param \Origin\Http\Request $request
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $this->session = $request->session();
@@ -44,8 +48,21 @@ class SessionMiddleware extends Middleware
 
         $this->session->id($this->id);
         $this->session->start();
+
+        /**
+         * This removes the cookie header set by PHP session extension, so we can write our own cookie
+         * if this becomes problematic or confusing due to PHP.ini settings, then remove. Call here
+         */
+        if (! headers_sent()) {
+            header_remove('Set-Cookie');
+        }
     }
 
+    /**
+     * @param \Origin\Http\Request $request
+     * @param \Origin\Http\Response $response
+     * @return void
+     */
     public function process(Request $request, Response $response): void
     {
         if (! $request->cookies($this->name) || $this->id !== $this->session->id()) {
@@ -53,12 +70,6 @@ class SessionMiddleware extends Middleware
         }
 
         $this->session->close();
-
-        /**
-         * This removes the cookie header set by PHP session extension, so we can write our own cookie
-         * if this becomes problematic or confusing due to PHP.ini settings, then remove
-         */
-        header_remove('Set-Cookie');
     }
 
     private function getSessionId(Request $request): ?string
