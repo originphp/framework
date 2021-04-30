@@ -33,14 +33,25 @@ class MiddlewareRunner
     protected $current = 0;
 
     /**
-     * Adds a middleware to the runner
+     * Adds a Middleware to the end of the queue
      *
      * @param \Origin\Http\Middleware\Middleware $object
      * @return void
      */
-    public function add(Middleware $object)
+    public function add(Middleware $object): void
     {
         $this->middlewareStack[] = $object;
+    }
+
+    /**
+     * Adds a Middleware to the start of the queue
+     *
+     * @param Middleware $object
+     * @return void
+     */
+    public function prepend(Middleware $object): void
+    {
+        array_unshift($this->middlewareStack, $object);
     }
 
     /**

@@ -62,4 +62,13 @@ class MiddlewareRunnerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('one', $response->headers('X-One'));
         $this->assertEquals('two', $response->headers('X-Two'));
     }
+
+    public function testPrepend()
+    {
+        $runner = new MiddlewareRunner();
+        $runner->add(new OneMiddleware());
+        $runner->prepend(new TwoMiddleware());
+
+        $this->assertEquals(TwoMiddleware::class, $runner->list()[0]);
+    }
 }
