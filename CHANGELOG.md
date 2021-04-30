@@ -1,5 +1,38 @@
 # Changelog
 
+## [3.24.0] - 2021-04-30
+
+### Deprecated
+
+- Deprecated Response::type use Response::contentType instead
+- Deprecated Job/RedisConnection internal class if you have used this then use the new Redis package
+- Configuration setting sessionTimeout deprecated use Session.timeout. Create config/session.php and load in bootstrap.php.
+
+### Added
+
+- Added Bag a basic collection for key values pairs
+- Added SessionEngineInterface for custom session engines
+- Added check to isConsole for SWOOLE_HTTP constant (until Swoole introduce their own)
+- Added Redis package
+- Added sameSite option when writing cookies
+- Added CsrfMiddleware option for singleUse to regenerate token after it has been used
+- Added CsrfMiddleware check origin
+
+### Changed
+
+- Changed setting request in Router from Request object to BaseApplication.
+- Changed CSRFProtectionMiddleware token generation and length
+- Changed default CSRFProtection cookie settings
+
+### Fixed
+
+- Fixed Response setting cookie expiry option to 0 or any other integer
+
+### Changed
+
+- Changed PHP session ID format
+- Changed CsrfMiddleware to use Sessions
+
 ## [3.23.1] - 2021-04-16
 
 ### Fixed
