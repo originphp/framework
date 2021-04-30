@@ -325,8 +325,6 @@ trait IntegrationTestTrait
         /**
          * Switch session engine to array for testing, since cant set values unless the session is started. Starting
          * the session in the middleware, ID is being set, so this will fail
-         * TODO: maybe add setSession to the request
-         * Set the session driver
          */
        
         $class = ArrayEngine::class;
