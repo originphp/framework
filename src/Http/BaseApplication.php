@@ -76,11 +76,11 @@ class BaseApplication
          * TODO: Add deprecation warning before last release
          */
         if (! in_array(SessionMiddleware::class, $this->runner->list())) {
-            $this->addMiddleware(new SessionMiddleware);
+            $this->runner->prepend(new SessionMiddleware);
         }
        
         # By adding it last it will run it first during process
-        $this->addMiddleware(new DispatcherMiddleware);
+        $this->runner->add(new DispatcherMiddleware);
         
         $this->executeHook('startup');
         $this->runner->run($this->request, $this->response);
