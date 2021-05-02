@@ -133,7 +133,7 @@ final class Publisher
         foreach ($listeners as $listener) {
             $options = $listener['options'];
             $object = $listener['object'];
-            if ($options['on'] && ! in_array($event, (array)$options['on'])) {
+            if ($options['on'] && ! in_array($event, (array) $options['on'])) {
                 continue;
             }
 
