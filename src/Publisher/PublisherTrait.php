@@ -14,31 +14,27 @@
 declare(strict_types = 1);
 namespace Origin\Publisher;
 
-use Origin\Core\Resolver;
-
 trait PublisherTrait
 {
     /**
-     * Publisher
-     *
-     * @var \Origin\Publisher\Publisher
+     * @var Origin\Publisher\Publisher
      */
-    private $Publisher = null;
+    private $publisherInstance;
 
     /**
-     * Gets the event manager
+     * Gets the local instance of Publisher
      *
-     * @return Origin\Publisher\Publisher
+     * @return \Origin\Publisher\Publisher
      */
-    private function publisher(): Publisher
+    private function getPublisher(): Publisher
     {
-        if (! $this->Publisher) {
-            $this->Publisher = new Publisher();
+        if (! isset($this->publisherInstance)) {
+            $this->publisherInstance = new Publisher();
         }
 
-        return $this->Publisher;
+        return $this->publisherInstance;
     }
-    
+
     /**
      * Subscribes an object
      *
@@ -50,15 +46,7 @@ trait PublisherTrait
      */
     public function subscribe($object, array $options = []): bool
     {
-        if (is_string($object)) {
-            $object = Resolver::className($object, 'Listener', 'Listener');
-        }
-
-        if (is_object($object) || is_string($object)) {
-            return $this->publisher()->subscribe($object, $options);
-        }
-        
-        return false;
+        return $this->getPublisher()->subscribe($object, $options);
     }
 
     /**
@@ -73,6 +61,6 @@ trait PublisherTrait
      */
     public function publish(string $event, ...$args): void
     {
-        $this->publisher()->publish($event, ...$args);
+        $this->getPublisher()->publish($event, ...$args);
     }
 }

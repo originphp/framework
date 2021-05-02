@@ -14,6 +14,7 @@
 declare(strict_types = 1);
 namespace Origin\Publisher;
 
+use Origin\Core\Resolver;
 use Origin\Publisher\Exception\PublisherException;
 use Origin\Core\Exception\InvalidArgumentException;
 
@@ -91,9 +92,20 @@ final class Publisher
     public function subscribe($object, array $options = []): bool
     {
         $options += ['on' => null,'queue' => null];
+        
+        if (is_string($object)) {
+            $object = Resolver::className($object, 'Listener', 'Listener');
+        }
+
+        // backwards compatability
+        if (! is_object($object) && ! is_string($object)) {
+            return false;
+        }
+    
         if ($options['queue'] && is_object($object)) {
             throw new InvalidArgumentException('Subscribe using queue requires a class name');
         }
+
         $this->listeners[] = [
             'object' => $object,
             'options' => $options
@@ -121,10 +133,8 @@ final class Publisher
         foreach ($listeners as $listener) {
             $options = $listener['options'];
             $object = $listener['object'];
-            if ($options['on']) {
-                if (! in_array($event, (array)$options['on'])) {
-                    continue;
-                }
+            if ($options['on'] && ! in_array($event, (array)$options['on'])) {
+                continue;
             }
 
             # Queue Listener
@@ -147,7 +157,8 @@ final class Publisher
     }
 
     /**
-     * Dispatches the event to the listener
+     * Handles the dispatch, used by publish and ListenerJob
+     *
      * @internal return type can be anything only false is important to Publisher. Callbacks should
      * only work on Listener instances
      *
@@ -158,15 +169,12 @@ final class Publisher
      */
     public function dispatch($object, string $event, array $args = []): bool
     {
-        /**
-         * Work with listenter
-         */
+        // Work with listenter
         if ($object instanceof Listener) {
             return $object->dispatch($event, $args);
         }
-        /**
-         * Work with any object
-         */
+        
+        // Work with any object
         if (method_exists($object, $event) && call_user_func_array([$object,$event], $args) === false) {
             return false;
         }
