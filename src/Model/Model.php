@@ -2047,7 +2047,6 @@ class Model
      */
     protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true): bool
     {
-        $this->validateCallback($callback);
         if (call_user_func_array([$this,$callback], $arguments) === false && $isStoppable) {
             return false;
         }

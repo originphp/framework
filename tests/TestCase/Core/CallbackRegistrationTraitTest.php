@@ -47,7 +47,6 @@ class CallbackRegistry
     {
         $callbacks = $this->registeredCallbacks($callback);
         foreach ($callbacks as $callback => $options) {
-            $this->validateCallback($callback);
             call_user_func([$this,$callback]);
         }
     }

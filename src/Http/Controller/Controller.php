@@ -136,7 +136,7 @@ class Controller
         $this->response = $response ?: new Response();
 
         $this->componentRegistry = new ComponentRegistry($this);
-
+       
         $this->executeHook('initialize');
         $this->initializeTraits();
     }
@@ -296,7 +296,6 @@ class Controller
     protected function triggerCallback(string $callback): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            $this->validateCallback($callback);
             if ($this->isResponseOrRedirect($this->$method())) {
                 return false;
             }

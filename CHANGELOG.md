@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.24.1] - 2021-05-04
+
+### Changed
+
+- Refactored Publisher so it can be called directly as well
+- Changed validation of callback to be checked when the callback is registered rather than before each execution
+
 ## [3.24.0] - 2021-04-30
 
 ### Deprecated

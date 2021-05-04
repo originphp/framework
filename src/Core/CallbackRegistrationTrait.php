@@ -38,6 +38,7 @@ trait CallbackRegistrationTrait
      */
     protected function registerCallback(string $callback, string $method, array $options = []): void
     {
+        $this->validateCallback($callback);
         $this->registeredCallbacks[$callback][$method] = $options;
     }
 
@@ -106,20 +107,19 @@ trait CallbackRegistrationTrait
     private function validateCallback(string $callback): void
     {
         if (! method_exists($this, $callback)) {
-            throw new BadMethodCallException(sprintf('%s method does not exist', $callback));
+            throw new BadMethodCallException(sprintf("Invalid callback '%s' method does not exist.", $callback));
         }
     }
 
     /**
      * Dispatches callbacks, if stopped it will return false
-     *
+     * TODO: rename dispatchCallbacks
      * @param string $callback
      * @return bool continue
      */
     private function dispatchCallbacks(string $callback, array $arguments = []): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            $this->validateCallback($method);
             if ($this->$method(...$arguments) === false) {
                 return false;
             }
