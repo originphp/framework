@@ -38,7 +38,7 @@ trait CallbackRegistrationTrait
      */
     protected function registerCallback(string $callback, string $method, array $options = []): void
     {
-        $this->validateCallback($callback);
+        $this->validateCallback($method);
         $this->registeredCallbacks[$callback][$method] = $options;
     }
 

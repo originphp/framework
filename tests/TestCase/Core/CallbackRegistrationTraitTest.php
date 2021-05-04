@@ -50,6 +50,12 @@ class CallbackRegistry
             call_user_func([$this,$callback]);
         }
     }
+    public function doSomething()
+    {
+    }
+    public function doSomethingElse()
+    {
+    }
 }
 
 class CallbackRegistrationTraitTest extends \PHPUnit\Framework\TestCase
