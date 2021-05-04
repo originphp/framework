@@ -64,6 +64,23 @@ class PassOrFailJob extends Job
     {
         return array_keys($this->registeredCallbacks($callback));
     }
+
+    /**
+     * For callbacks
+     *
+     * @return void
+     */
+    public function foo()
+    {
+    }
+    /**
+     * For callbacks
+     *
+     * @return void
+     */
+    public function bar()
+    {
+    }
 }
 class PassOrFailRedis extends PassOrFailJob
 {
