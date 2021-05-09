@@ -77,6 +77,20 @@ class SupportMailbox extends Mailbox
     }
 }
 
+class ExceptionMailbox extends SupportMailbox
+{
+    protected function beforeProcessCallback()
+    {
+        $this->beforeCalled = true;
+        $this->bounceWith(BounceMailer::class);
+    }
+
+    protected function process()
+    {
+        throw new Exception('Process called');
+    }
+}
+
 class BounceMailer extends Mailer
 {
     protected function execute()
@@ -136,11 +150,14 @@ class MailboxTest extends OriginTestCase
     public function testDispatchWithBounce()
     {
         $inboundEmail = $this->InboundEmail->find('first');
-        $mailbox = new SupportMailbox($inboundEmail);
-        $mailbox->bounceMe();
+        $mailbox = new ExceptionMailbox($inboundEmail);
+        $mailbox->bounceMe(); // Set to bounce in callback.
         $mailbox->dispatch();
         $this->assertTrue($mailbox->beforeCalled);
-        $this->assertTrue($mailbox->afterCalled);
+        
+        // if process was called an exception would be thrown here
+
+        $this->assertFalse($mailbox->afterCalled);
         $this->assertFalse($mailbox->onSuccessCalled);
         $inboundEmail = $this->InboundEmail->find('first');
         $this->assertEquals('bounced', $inboundEmail->status);

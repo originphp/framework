@@ -21,11 +21,11 @@ use Origin\Core\Resolver;
 use Origin\Core\HookTrait;
 use Origin\Service\Result;
 use Origin\Core\ModelTrait;
+use Origin\Core\CallbacksTrait;
 use Origin\Model\ModelRegistry;
 use Origin\Core\Exception\Exception;
 use Origin\Mailbox\Model\ImapMessage;
 use Origin\Mailbox\Model\InboundEmail;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Mailbox\Service\MailboxDownloadService;
 use Origin\Core\Exception\InvalidArgumentException;
 use Origin\Configurable\StaticConfigurable as Configurable;
@@ -39,7 +39,7 @@ abstract class Mailbox
     use HookTrait;
     use Configurable;
     use ModelTrait;
-    use CallbackRegistrationTrait;
+    use CallbacksTrait;
   
     /**
      * Inbound email id (not email message id)
@@ -177,36 +177,36 @@ abstract class Mailbox
     {
         $this->setStatus('processing');
         try {
-            if ($this->dispatchMailboxCallbacks('beforeProcess')) {
+            if ($this->dispatchCallback('beforeProcess') && $this->bounced === false) {
                 $this->process();
-                $this->dispatchMailboxCallbacks('afterProcess');
-            }
-
-            if ($this->bounced === false) {
+                $this->dispatchCallback('afterProcess');
+                
                 $this->setStatus('delivered');
-                $this->dispatchMailboxCallbacks('onSuccess');
+                $this->dispatchCallback('onSuccess');
             }
 
             return true;
         } catch (\Exception $exception) {
             $this->setStatus('failed');
             Log::error($exception->getMessage());
-            $this->dispatchMailboxCallbacks('onError', [$exception]);
+            $this->dispatchCallback('onError', [$exception], false);
         }
         
         return false;
     }
 
     /**
-     * Dispatches the callbacks for the Mailbox
+     * Dispatches a callback
      *
      * @param string $callback
-     * @return bool
+     * @param array $arguments
+     * @param boolean $cancelable
+     * @return boolean
      */
-    private function dispatchMailboxCallbacks(string $callback, array $arguments = []): bool
+    protected function dispatchCallback(string $callback, array $arguments = [], bool $cancelable = true): bool
     {
-        foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if ($this->$method(...$arguments) === false || $this->bounced) {
+        foreach ($this->getCallbacks($callback) as $method => $options) {
+            if ($this->$method(...$arguments) === false && $cancelable) {
                 return false;
             }
         }

@@ -19,8 +19,8 @@ use Origin\Log\Log;
 use Origin\Core\HookTrait;
 use Origin\Core\ModelTrait;
 use Origin\Security\Security;
+use Origin\Core\CallbacksTrait;
 use Origin\Job\Engine\BaseEngine;
-use Origin\Core\CallbackRegistrationTrait;
 
 /**
  * (new SendUserWelcomeEmail($user))->dispatch();
@@ -35,7 +35,7 @@ class Job
 {
     use ModelTrait;
     use HookTrait;
-    use CallbackRegistrationTrait;
+    use CallbacksTrait;
 
     /**
      * This is the display name for the job
@@ -258,9 +258,9 @@ class Job
         $this->arguments = func_get_args();
         $this->enqueued = date('Y-m-d H:i:s');
 
-        $this->dispatchCallbacks('beforeQueue', [$this->arguments]);
+        $this->dispatchCallback('beforeQueue', [$this->arguments]);
         $result = $this->connection()->add($this, $this->wait ?: 'now');
-        $this->dispatchCallbacks('afterQueue', [$this->arguments]);
+        $this->dispatchCallback('afterQueue', [$this->arguments]);
 
         return $result;
     }
@@ -279,9 +279,9 @@ class Job
             $this->executeHook('initialize');
             $this->executeHook('startup');
 
-            if ($this->dispatchCallbacks('beforeDispatch', [$this->arguments])) {
+            if ($this->dispatchCallback('beforeDispatch', [$this->arguments])) {
                 $this->execute(...$this->arguments);
-                $this->dispatchCallbacks('afterDispatch', [$this->arguments]);
+                $this->dispatchCallback('afterDispatch', [$this->arguments]);
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
@@ -289,7 +289,7 @@ class Job
             if ($this->enqueued) {
                 $this->connection()->fail($this);
             }
-            $this->dispatchCallbacks('onError', [$e]);
+            $this->dispatchCallback('onError', [$e]);
 
             if ($this->enqueued && $this->retryOptions) {
                 $this->connection()->retry($this, $this->retryOptions['limit'], $this->retryOptions['wait']);
@@ -304,7 +304,7 @@ class Job
             $this->connection()->success($this);
         }
 
-        $this->dispatchCallbacks('onSuccess', [$this->arguments]);
+        $this->dispatchCallback('onSuccess', [$this->arguments]);
 
         $this->executeHook('shutdown');
 

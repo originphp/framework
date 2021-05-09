@@ -16,9 +16,9 @@ namespace Origin\Model;
 
 use Origin\Core\HookTrait;
 use BadMethodCallException;
+use Origin\Core\CallbacksTrait;
 use Origin\Validation\Validator;
 use Origin\Core\InitializerTrait;
-use Origin\Core\CallbackRegistrationTrait;
 
 /**
  * Active record but without persistance, may need to carry out an action like send an email (contact form) or send data to an API like Stripe.
@@ -30,7 +30,7 @@ class Record extends BaseEntity
 {
     use InitializerTrait;
     use HookTrait;
-    use CallbackRegistrationTrait;
+    use CallbacksTrait;
  
     /**
      * @var string|null
@@ -277,7 +277,7 @@ class Record extends BaseEntity
     public function validates(bool $isNewRecord = true): bool
     {
         $errors = [];
-        if ($this->dispatchCallbacks('beforeValidate')) {
+        if ($this->dispatchCallback('beforeValidate')) {
             $errors = $this->validator()->validate(
                 $this->toArray(),
                 $isNewRecord
@@ -289,7 +289,7 @@ class Record extends BaseEntity
                 }
             }
             /** this is called even if validation fails **/
-            $this->dispatchCallbacks('afterValidate');
+            $this->dispatchCallback('afterValidate');
         }
 
         return empty($errors);

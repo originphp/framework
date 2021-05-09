@@ -24,10 +24,10 @@ use Origin\Core\HookTrait;
 use Origin\Core\ModelTrait;
 use Origin\Http\View\XmlView;
 use Origin\Http\View\JsonView;
+use Origin\Core\CallbacksTrait;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use App\Http\View\ApplicationView;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Http\Controller\Component\Component;
 use Origin\Http\Controller\Component\ComponentRegistry;
 use Origin\Http\Controller\Exception\MissingMethodException;
@@ -41,7 +41,7 @@ class Controller
     use ModelTrait;
     use InitializerTrait;
     use HookTrait;
-    use CallbackRegistrationTrait;
+    use CallbacksTrait;
     
     /**
      * Controller name.
@@ -252,7 +252,7 @@ class Controller
         if ($this->isResponseOrRedirect($this->executeHook('startup'))) {
             return $this->response;
         }
-        if (! $this->triggerCallback('beforeAction')) {
+        if (! $this->dispatchCallback('beforeAction')) {
             return $this->response;
         }
         if ($this->isResponseOrRedirect($this->componentRegistry->call('startup'))) {
@@ -272,7 +272,7 @@ class Controller
         if ($this->isResponseOrRedirect($this->componentRegistry->call('shutdown'))) {
             return $this->response;
         }
-        if (! $this->triggerCallback('afterAction')) {
+        if (! $this->dispatchCallback('afterAction')) {
             return $this->response;
         }
         if ($this->isResponseOrRedirect($this->executeHook('shutdown'))) {
@@ -295,8 +295,23 @@ class Controller
        */
     protected function triggerCallback(string $callback): bool
     {
-        foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if ($this->isResponseOrRedirect($this->$method())) {
+        deprecationWarning('triggerCallback has been deprecated use dispatchCallback instead');
+
+        return $this->dispatchCallback($callback);
+    }
+
+    /**
+     * Dispatches a callback
+     *
+     * @param string $callback
+     * @param array $arguments
+     * @param boolean $cancelable
+     * @return boolean
+     */
+    protected function dispatchCallback(string $callback, array $arguments = [], bool $cancelable = true): bool
+    {
+        foreach ($this->getCallbacks($callback) as $method => $options) {
+            if ($this->isResponseOrRedirect($this->$method(...$arguments)) && $cancelable) {
                 return false;
             }
         }
@@ -549,7 +564,7 @@ class Controller
     public function renderJson($data, int $status = 200): Response
     {
         $this->autoRender = false; // Only render once
-        $this->triggerCallback('beforeRender');
+        $this->dispatchCallback('beforeRender');
        
         $this->response->contentType('json');
         $this->response->statusCode($status); // 200
@@ -580,7 +595,7 @@ class Controller
     public function renderXml($data, int $status = 200): Response
     {
         $this->autoRender = false; // Disable for dispatcher
-        $this->triggerCallback('beforeRender');
+        $this->dispatchCallback('beforeRender');
         $this->response->contentType('xml');
         $this->response->statusCode($status); // 200
         $this->response->body((new XmlView($this))->render($data));
@@ -605,7 +620,7 @@ class Controller
     public function redirect($url, int $code = 302): Response
     {
         $this->autoRender = false;
-        $this->triggerCallback('beforeRedirect');
+        $this->dispatchCallback('beforeRedirect');
 
         $this->response->statusCode($code);
         $this->response->header('Location', Router::url($url));

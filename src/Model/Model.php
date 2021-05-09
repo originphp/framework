@@ -24,10 +24,10 @@ use Generator;
 use ArrayObject;
 use Origin\Core\HookTrait;
 use Origin\Core\ModelTrait;
+use Origin\Core\CallbacksTrait;
 use Origin\Inflector\Inflector;
 use Origin\Core\InitializerTrait;
 use Origin\Core\Exception\Exception;
-use Origin\Core\CallbackRegistrationTrait;
 use Origin\Model\Concern\CounterCacheable;
 use Origin\Model\Exception\RecordSaveException;
 use Origin\Model\Exception\MissingModelException;
@@ -40,7 +40,7 @@ class Model
     use ModelTrait;
     use CounterCacheable;
     use HookTrait;
-    use CallbackRegistrationTrait;
+    use CallbacksTrait;
     
     /**
      * The name for this model, this generated automatically.
@@ -2013,44 +2013,24 @@ class Model
     }
 
     /**
-     * This is called when a callback is triggered, it looks up the registered callbacks and
-     * then calls the dispatcher
+     * Initiates a callback and dispatches it sincce here we have an `on` option.
      *
      * @param string $callback
      * @param string $event
      * @param array $arguments
-     * @param boolean $isStoppable
+     * @param boolean $cancelable
      * @return boolean
      */
-    protected function triggerCallback(string $callback, string $event, array $arguments = [], bool $isStoppable = true): bool
+    protected function triggerCallback(string $callback, string $event, array $arguments = [], bool $cancelable = true): bool
     {
-        foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if (! in_array($event, (array) $options['on'])) {
-                continue;
-            }
-            $result = $this->dispatchCallback($method, $arguments, $isStoppable);
-            if ($isStoppable && $result === false) {
+        foreach ($this->getCallbacks($callback) as $method => $options) {
+            $on = in_array($event, (array) $options['on']);
+
+            if ($on && $this->$method(...$arguments) === false && $cancelable) {
                 return false;
             }
         }
     
-        return true;
-    }
-
-    /**
-     * dispatches a Callback.
-     *
-     * @param string $callback
-     * @param array $arguments
-     * @param boolean $isStoppable
-     * @return bool
-     */
-    protected function dispatchCallback(string $callback, array $arguments = [], bool $isStoppable = true): bool
-    {
-        if (call_user_func_array([$this,$callback], $arguments) === false && $isStoppable) {
-            return false;
-        }
-
         return true;
     }
 

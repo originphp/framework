@@ -16,6 +16,9 @@ namespace Origin\Core;
 
 use BadMethodCallException;
 
+/**
+ * @deprecated this will be removed in 4.x
+ */
 trait CallbackRegistrationTrait
 {
     /**
@@ -113,14 +116,13 @@ trait CallbackRegistrationTrait
 
     /**
      * Dispatches callbacks, if stopped it will return false
-     * TODO: rename dispatchCallbacks
      * @param string $callback
      * @return bool continue
      */
-    private function dispatchCallbacks(string $callback, array $arguments = []): bool
+    private function dispatchCallbacks(string $callback, array $arguments = [], bool $cancelable = true): bool
     {
         foreach ($this->registeredCallbacks($callback) as $method => $options) {
-            if ($this->$method(...$arguments) === false) {
+            if ($this->$method(...$arguments) === false && $cancelable) {
                 return false;
             }
         }
