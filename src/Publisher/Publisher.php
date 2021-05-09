@@ -40,10 +40,17 @@ final class Publisher
     public static function instance(): Publisher
     {
         if (static::$instance === null) {
-            static::$instance = new static();
+            static::$instance = new static(['global' => true]);
         }
 
         return static::$instance;
+    }
+    private $global = false;
+
+    public function __construct(array $config = [])
+    {
+        $config += ['global' => false];
+        $this->global = $config['global'];
     }
     
     /**
@@ -127,8 +134,15 @@ final class Publisher
      */
     public function publish(string $event, ...$args): void
     {
-        $globalListeners = static::instance()->listeners();
-        $listeners = array_merge($globalListeners, $this->listeners);
+        $listeners = $this->listeners;
+
+        if ($this->global === false) {
+            $listeners = array_merge(static::instance()->listeners(), $listeners);
+        }
+
+        debug($listeners);
+        //$globalListeners = static::instance()->listeners();
+        // $listeners = array_merge($globalListeners, $this->listeners);
 
         foreach ($listeners as $listener) {
             $options = $listener['options'];
