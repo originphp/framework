@@ -24,7 +24,8 @@ use Origin\Model\Exception\MissingModelException;
 
 abstract class OriginTestCase extends \PHPUnit\Framework\TestCase
 {
-    use ModelTrait, HookTrait;
+    use ModelTrait;
+    use HookTrait;
     /**
      * Holds the Fixtures list
      * examples

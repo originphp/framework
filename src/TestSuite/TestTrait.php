@@ -23,7 +23,7 @@ trait TestTrait
      * @param string $method doSomething
      * @param array  $args   [arg1,arg2]
      *
-     * @return result from function
+     * @return mixed $result from function
      */
     public function callMethod(string $method, array $args = [])
     {
