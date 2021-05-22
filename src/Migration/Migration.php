@@ -149,7 +149,7 @@ class Migration
         $this->down();
         $this->reversable(); // Do not run change here
     
-        if (empty($this->statements) || $statements) {
+        if (empty($this->statements) && empty($statements)) {
             throw new Exception('Migration did not do anything.');
         }
 
