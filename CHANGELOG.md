@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.24.2] - 2021-05-09
+
+### Fixed
+
+- Fixed Publisher that was dispatching callbacks in the background, it also ran the callback in the foreground
+- Fixed Migration using UP/DOWN method trying to execute statements twice
+
+## [3.24.2] - 2021-05-09
+
+### Fixed
+
+- Fixed Mailbox multiple callbacks being triggered for the same event when emails are bounced
+- Fixed Publisher publish global and local listeners merged twice
+
+### Deprecated
+
+- Deprecated CallbacksRegistrationTrait use CallbacksTrait instead - some method names have been changed and backwards comptability has been added.
+
 ## [3.24.1] - 2021-05-04
 
 ### Changed
