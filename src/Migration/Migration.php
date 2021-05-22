@@ -148,9 +148,8 @@ class Migration
     {
         $this->down();
         $this->reversable(); // Do not run change here
-        $statements = array_merge($this->statements, $statements);
-
-        if (empty($statements)) {
+    
+        if (empty($this->statements) || $statements) {
             throw new Exception('Migration did not do anything.');
         }
 
@@ -162,7 +161,7 @@ class Migration
             $this->executeStatements($sql);
         }
 
-        return $this->ungroupStatements($statements);
+        return $this->ungroupStatements(array_merge($this->statements, $statements));
     }
 
     /**
