@@ -823,4 +823,12 @@ abstract class Connection
     {
         return $this->log;
     }
+
+   /*
+    TODO: 
+    public function getSQLStatement(): ? string
+    {
+        return $this->sqlStatment;
+    }
+    */
 }
