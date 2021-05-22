@@ -33,6 +33,13 @@ final class Publisher
     protected $listeners = [];
 
     /**
+     * Flag
+     *
+     * @var boolean
+     */
+    private $global = false;
+
+    /**
      * Gets the instance of the HookTrait
      *
      * @return \Origin\Publisher\Publisher
@@ -45,8 +52,12 @@ final class Publisher
 
         return static::$instance;
     }
-    private $global = false;
-
+    
+    /**
+     * Constructor
+     *
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $config += ['global' => false];
@@ -140,7 +151,6 @@ final class Publisher
             $listeners = array_merge(static::instance()->listeners(), $listeners);
         }
 
-        debug($listeners);
         //$globalListeners = static::instance()->listeners();
         // $listeners = array_merge($globalListeners, $this->listeners);
 
@@ -157,6 +167,7 @@ final class Publisher
                 if (! $result) {
                     throw new PublisherException('Error dispatching ListenerJob');
                 }
+                continue;
             }
 
             # Create object if needed
