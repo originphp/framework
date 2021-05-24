@@ -230,7 +230,7 @@ class Marshaller
                 // only set properties that have values that were changed
                 // forms posting of null values are "" and integers are strings
                 if (
-                    $value !== $original && ! ($value === '' && $original === null) and
+                    $value !== $original && ! ($value === '' && $original === null) &&
                     ! (is_numeric($original) && (string) $value === (string) $original)
                 ) {
                     $properties[$property] = $value;
