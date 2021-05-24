@@ -283,7 +283,6 @@ class Record extends BaseEntity
      */
     public function validates(bool $isNewRecord = true): bool
     {
-        $errors = [];
         if ($this->dispatchCallback('beforeValidate')) {
             $errors = $this->validator()->validate(
                 $this->toArray(),
@@ -299,7 +298,7 @@ class Record extends BaseEntity
             $this->dispatchCallback('afterValidate');
         }
 
-        return empty($errors);
+        return $this->hasErrors() === false;
     }
 
     /**

@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.24.3] - 2021-05-24
+## [3.24.4] - 2021-05-24
 
 ### Fixed
 
-- Fixed Record::patch behavior,
+- Fixed Record::patch behaviour this marked every field as dirty
+- Fixed Record::validates behaviour so that fields can be invalidated before validate is called like Models.
 
 ## [3.24.3] - 2021-05-22
 

@@ -115,14 +115,31 @@ class RecordTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->agreeToTerms);
     }
 
-    public function testValidation()
+    public function testValidationFail()
     {
         $form = new CheckoutForm();
         $form->name = 'joe';
         $form->email = 'invalid-email';
         $this->assertFalse($form->validates());
+    }
+
+    public function testValidation()
+    {
+        $form = new CheckoutForm();
+        $form->name = 'joe';
         $form->email = 'demo@example.com';
         $this->assertTrue($form->validates());
+    }
+
+    public function testValidationPreset()
+    {
+        $form = new CheckoutForm();
+        $form->name = 'joe';
+        $form->email = 'demo@example.com';
+
+        $form->error('name', 'Needs to start with a capital letter');
+
+        $this->assertFalse($form->validates());
     }
 
     public function testInvalidFieldType()
@@ -165,5 +182,17 @@ class RecordTest extends \PHPUnit\Framework\TestCase
         $form = Record::patch($form, $data, ['fields' => ['name']]);
         $this->assertInstanceOf(Record::class, $form);
         $this->assertEquals(['name' => 'bar','email' => 'demo@example.com'], $form->toArray());
+    }
+
+    public function testPatchDirty()
+    {
+        $form = Record::new([
+            'name' => 'foo',
+            'email' => 'demo@example.com'
+        ], ['markClean' => true]);
+      
+        $form = Record::patch($form, ['email' => 'demo2@example.com']);
+       
+        $this->assertEquals(['email'], $form->modified());
     }
 }
