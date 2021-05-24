@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.24.3] - 2021-05-24
+
+### Fixed
+
+- Fixed Record::patch behavior,
+
 ## [3.24.3] - 2021-05-22
 
 ### Fixed

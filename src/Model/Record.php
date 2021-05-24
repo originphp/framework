@@ -143,8 +143,15 @@ class Record extends BaseEntity
             $data = static::filterData($data, $options['fields']);
         }
 
-        $record->set($data);
-
+        foreach ($data as $property => $value) {
+            $original = $record->get($property);
+            if ($value !== $original && ! ($value === '' && $original === null) &&
+                ! (is_numeric($original) && (string) $value === (string) $original)
+            ) {
+                $record->set($property, $value);
+            }
+        }
+    
         return $record;
     }
 
