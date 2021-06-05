@@ -47,5 +47,11 @@
     <env name="REDIS_HOST" value="127.0.0.1"/>
     <env name="REDIS_PORT" value="6379"/>
 
+  <!-- 
+    <env name="SSH_HOST" value="localhost"/>
+    <env name="SSH_PRIVATE_KEY" value="/home/me/.ssh/id_rsa"/>
+    <env name="SSH_USERNAME" value="me"/>
+    <env name="SSH_PASSWORD" value="secret"/>
+  -->
   </php>
 </phpunit>

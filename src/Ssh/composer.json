@@ -1,0 +1,28 @@
+{
+  "name": "originphp/ssh",
+  "description": "OriginPHP SSH",
+  "type": "library",
+  "keywords": [
+    "ssh",
+    "scp"
+  ],
+  "homepage": "https://www.originphp.com/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamiel Sharief",
+      "email": "js@originphp.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Origin\\Ssh\\": "."
+    }
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "ext-ssh2": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

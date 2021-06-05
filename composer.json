@@ -73,12 +73,14 @@
     "originphp/schedule": "self.version",
     "originphp/service": "self.version",
     "originphp/test-suite": "self.version",
-    "originphp/utility": "self.version"
+    "originphp/utility": "self.version",
+    "originphp/ssh": "self.version"
   },
   "suggest": {
     "ext-redis": "Redis",
     "ext-imap": "Imap",
-    "ext-mailparse": "Mailparse"
+    "ext-mailparse": "Mailparse",
+    "ext-ssh2": "SSH2 extension"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
