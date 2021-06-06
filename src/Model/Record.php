@@ -294,9 +294,10 @@ class Record extends BaseEntity
                     $this->error($field, $message);
                 }
             }
-            /** this is called even if validation fails **/
-            $this->dispatchCallback('afterValidate');
         }
+
+        /** this is called even if validation fails **/
+        $this->dispatchCallback('afterValidate', [], false);
 
         return $this->hasErrors() === false;
     }
