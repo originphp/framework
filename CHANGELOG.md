@@ -1,5 +1,10 @@
 # Changelog
 
+### Fixed
+
+- Fixed Redis::client not passing options
+- Fixed Redis composer.json for substree split
+
 ## [3.24.4] - 2021-05-24
 
 ### Fixed
