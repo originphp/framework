@@ -196,25 +196,6 @@ abstract class Mailbox
     }
 
     /**
-     * Dispatches a callback
-     *
-     * @param string $callback
-     * @param array $arguments
-     * @param boolean $cancelable
-     * @return boolean
-     */
-    protected function dispatchCallback(string $callback, array $arguments = [], bool $cancelable = true): bool
-    {
-        foreach ($this->getCallbacks($callback) as $method => $options) {
-            if ($this->$method(...$arguments) === false && $cancelable) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Bounces a message with a mailer, the \Origin\Mailbox\Mail object will be passed
      * to the mailer. This will also halt futher processing
      *
