@@ -70,11 +70,12 @@
     "originphp/model": "self.version",
     "originphp/process": "self.version",
     "originphp/publisher": "self.version",
+    "originphp/redis": "self.version",
     "originphp/schedule": "self.version",
     "originphp/service": "self.version",
+    "originphp/ssh": "self.version",
     "originphp/test-suite": "self.version",
-    "originphp/utility": "self.version",
-    "originphp/ssh": "self.version"
+    "originphp/utility": "self.version"
   },
   "suggest": {
     "ext-redis": "Redis",
