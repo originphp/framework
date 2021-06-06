@@ -301,7 +301,7 @@ class Controller
     }
 
     /**
-     * Dispatches a callback
+     * Dispatches a callback (overide Callbacks trait to look for response)
      *
      * @param string $callback
      * @param array $arguments
@@ -311,7 +311,8 @@ class Controller
     protected function dispatchCallback(string $callback, array $arguments = [], bool $cancelable = true): bool
     {
         foreach ($this->getCallbacks($callback) as $method => $options) {
-            if ($this->isResponseOrRedirect($this->$method(...$arguments)) && $cancelable) {
+            $result = $this->$method(...$arguments);
+            if ($this->isResponseOrRedirect($result) || ($result === false && $cancelable)) {
                 return false;
             }
         }
