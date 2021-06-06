@@ -201,7 +201,6 @@ class Connection
 
         if (isset($config['database'])) {
             $result = $redis->select((int) $config['database']);
-            debug($result);
         }
 
         if (! empty($config['prefix'])) {

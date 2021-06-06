@@ -160,7 +160,7 @@ class Redis
      */
     public static function client(array $options = []): \Redis
     {
-        return static::redis();
+        return static::redis($options);
     }
 
     private static function redis(array $options = []): Connection
