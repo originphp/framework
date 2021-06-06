@@ -1,9 +1,13 @@
 # Changelog
 
+## [3.24.5] - 2021-06-06
+
 ### Fixed
 
 - Fixed Redis::client not passing options
 - Fixed Redis composer.json for substree split
+- Fixed Record::afterValidate callback so its called even if validation fails
+- Fixed controller callback cancel
 
 ## [3.24.4] - 2021-05-24
 
