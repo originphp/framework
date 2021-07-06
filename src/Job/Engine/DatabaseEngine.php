@@ -16,7 +16,6 @@ namespace Origin\Job\Engine;
 
 use Origin\Job\Job;
 use Origin\Model\Model;
-use Origin\Model\Entity;
 use Origin\Job\Model\Queue;
 
 class DatabaseEngine extends BaseEngine
@@ -48,6 +47,7 @@ class DatabaseEngine extends BaseEngine
     public function add(Job $job, string $strtotime = 'now'): bool
     {
         $model = $this->model();
+
         $entity = $model->new([
             'queue' => $job->queue(),
             'data' => '[]',
@@ -77,20 +77,44 @@ class DatabaseEngine extends BaseEngine
      */
     public function fetch(string $queue = 'default'): ?Job
     {
+        // Setup Vars
+        $model = $this->model();
+        $isSqlLite = ! in_array($model->connection()->engine(), ['mysql', 'postgres']);
+        $result = false;
+        $return = null;
+
+        /**
+         * PDO reports as not in transaction when using sqlite exclusive transaction.
+         */
+        $isSqlLite ? $model->query('BEGIN EXCLUSIVE TRANSACTION') : $model->begin();
+      
         $record = $this->model()->find('first', [
             'conditions' => [
                 'queue' => $queue, 'status' => 'queued', 'locked' => null, 'scheduled <=' => date('Y-m-d H:i:s'),
             ],
-            'order' => ['id ASC'],
+            'order' => ['id ASC']
         ]);
+       
+        if ($record) {
+            if (! $isSqlLite) {
+                $result = $this->model->query(
+                    "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;", ['id' => $record->id]
+                );
+            }
 
-        if ($record && $this->lockRecord($record)) {
-            $job = $this->deserialize($record->data);
+            $result = $model->query(
+                "UPDATE {$model->table()} SET locked = :locked , modified = :modified WHERE id = :id;",
+                ['id' => $record->id,   'locked' => now(),  'modified' => now()]
+            );
 
-            return $job;
+            if ($result) {
+                $return = $this->deserialize($record->data);
+            }
         }
-
-        return null;
+     
+        $isSqlLite ? $model->query('commit') : $model->commit(); //
+     
+        return $return;
     }
 
     /**
@@ -207,38 +231,5 @@ class DatabaseEngine extends BaseEngine
         $entity = $model->new($data);
 
         return $this->model()->save($entity);
-    }
-
-    /**
-     * Locks a record
-     *
-     * @param Entity $record
-     * @return boolean
-     */
-    protected function lockRecord(Entity $record): bool
-    {
-        $model = $this->model();
-        $model->begin();
-
-        if (in_array($model->connection()->engine(), ['mysql', 'postgres'])) {
-            $result = $this->model->query(
-                "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
-                [
-                    'id' => $record->id,
-                ]
-            );
-        }
-
-        $result = $model->query(
-            "UPDATE {$model->table()} SET locked = :locked , modified = :modified WHERE id = :id;",
-            [
-                'id' => $record->id,
-                'locked' => now(),
-                'modified' => now(),
-            ]
-        );
-        $model->commit();
-
-        return (bool) $result;
     }
 }

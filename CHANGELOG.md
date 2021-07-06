@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.25.1] - 2021-07-06
+
+### Fixed
+
+- Fixed issue caused by race condition in sqlite queues
+
 ## [3.25.0] - 2021-06-06
 
 ### Fixed
