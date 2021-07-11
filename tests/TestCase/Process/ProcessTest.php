@@ -13,7 +13,7 @@ class ProcessTest extends OriginTestCase
         $this->assertStringContains('git version', $process->getOutput());
 
         $this->assertEmpty($process->getErrorOutput());
-        $this->assertEquals(0, $process->exitCode());
+        $this->assertEquals(0, $process->getExitCode());
     }
 
     public function testExecuteENV()
@@ -23,7 +23,7 @@ class ProcessTest extends OriginTestCase
         $this->assertStringContains('the quick brown fox', $process->getOutput());
 
         $this->assertEmpty($process->getErrorOutput());
-        $this->assertEquals(0, $process->exitCode());
+        $this->assertEquals(0, $process->getExitCode());
     }
 
     public function testExecuteError()
@@ -34,6 +34,6 @@ class ProcessTest extends OriginTestCase
        
         $this->assertEmpty($process->getOutput());
         $this->assertNotEmpty($process->getErrorOutput());
-        $this->assertEquals(1, $process->exitCode());
+        $this->assertEquals(1, $process->getExitCode());
     }
 }

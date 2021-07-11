@@ -25,14 +25,14 @@ class BackgroundProcessTest extends OriginTestCase
    
         $this->assertStringContains('started', $process->getOutput());
         $this->assertStringNotContains('completed', $process->getOutput());
-        $this->assertEquals(-1, $process->exitCode());
+        $this->assertEquals(-1, $process->getExitCode());
         
         sleep(3);
         $this->assertFalse($process->isRunning());
         $this->assertStringContains('started', $process->getOutput());
         $this->assertStringContains('completed', $process->getOutput());
 
-        $this->assertEquals(0, $process->exitCode());
+        $this->assertEquals(0, $process->getExitCode());
         $this->assertTrue($process->isSuccess());
     }
 
@@ -42,7 +42,7 @@ class BackgroundProcessTest extends OriginTestCase
         $process->start();
         $process->wait();
         $this->assertStringContains('cat: foo: No such file or directory', $process->getErrorOutput());
-        $this->assertEquals(1, $process->exitCode());
+        $this->assertEquals(1, $process->getExitCode());
         $this->assertFalse($process->isSuccess());
     }
 
@@ -70,7 +70,7 @@ class BackgroundProcessTest extends OriginTestCase
     public function testErrorExitCode()
     {
         $process = new BackgroundProcess(['ls -la']);
-        $this->assertNull($process->exitCode());
+        $this->assertNull($process->getExitCode());
     }
 
     public function testErrorDirectory()
@@ -106,7 +106,7 @@ class BackgroundProcessTest extends OriginTestCase
         $this->assertStringNotContains('started', $process->getOutput());
         $this->assertStringNotContains('completed', $process->getOutput());
 
-        $this->assertEquals(0, $process->exitCode());
+        $this->assertEquals(0, $process->getExitCode());
     }
 
     public function testStartStop()

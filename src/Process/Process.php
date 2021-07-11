@@ -77,7 +77,7 @@ class Process extends BaseProcess
         $this->stdout = $process->getOutput();
         $this->stderr = $process->getErrorOutput();
 
-        $this->exitCode = $process->exitCode();
+        $this->exitCode = $process->getExitCode();
 
         return $this->exitCode === 0;
     }

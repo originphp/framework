@@ -68,7 +68,7 @@ trait ConsoleIntegrationTestTrait
      *
      * @return string
      */
-    public function output(): string
+    public function getOutput(): string
     {
         return $this->stdout->read();
     }
@@ -78,9 +78,33 @@ trait ConsoleIntegrationTestTrait
     *
     * @return string
     */
-    public function error(): string
+    public function getErrorOutput(): string
     {
         return $this->stderr->read();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return string
+     */
+    public function output(): string
+    {
+        deprecationWarning('ConsoleIntegrationTestTrait::output has been deprecated use ConsoleIntegrationTestTrait::getOutput instead');
+
+        return $this->getOutput();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return string
+     */
+    public function error(): string
+    {
+        deprecationWarning('ConsoleIntegrationTestTrait::error has been deprecated use ConsoleIntegrationTestTrait::getErrorOutput instead');
+
+        return $this->getErrorOutput();
     }
 
     /**

@@ -25,5 +25,5 @@ abstract class BaseProcess
         return function_exists('posix_isatty') && posix_isatty(STDOUT);
     }
     
-    abstract public function exitCode(): ? int;
+    abstract public function getExitCode(): ? int;
 }
