@@ -778,7 +778,9 @@ class Event
         $this->pids[] = $pid;
 
         return (bool) file_put_contents(
-            $this->lockFile(), $pid . PHP_EOL, LOCK_EX | FILE_APPEND
+            $this->lockFile(),
+            $pid . PHP_EOL,
+            LOCK_EX | FILE_APPEND
         );
     }
     

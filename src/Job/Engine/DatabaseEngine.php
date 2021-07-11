@@ -98,7 +98,8 @@ class DatabaseEngine extends BaseEngine
         if ($record) {
             if (! $isSqlLite) {
                 $result = $this->model->query(
-                    "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;", ['id' => $record->id]
+                    "SELECT * FROM {$model->table()} WHERE id = :id AND locked IS NULL FOR UPDATE;",
+                    ['id' => $record->id]
                 );
             }
 

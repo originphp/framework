@@ -173,7 +173,9 @@ class RedisEngine extends BaseEngine
             return false;
         }
         if ($this->redis->set(
-            $this->sessionKey(), json_encode($this->hash->items()), ['duration' => $this->timeout]
+            $this->sessionKey(),
+            json_encode($this->hash->items()),
+            ['duration' => $this->timeout]
         )) {
             $this->started = false;
         }

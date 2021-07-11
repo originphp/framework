@@ -136,7 +136,7 @@ class BundleHelper extends Helper
         }
 
         return $this->Html->$extension(
-             $this->bundledFile($filename, $extension) . '?version=' . $version
+            $this->bundledFile($filename, $extension) . '?version=' . $version
         );
     }
 
@@ -263,6 +263,7 @@ class BundleHelper extends Helper
                 '',
                 '\\1'
             ],
-        $string);
+            $string
+        );
     }
 }

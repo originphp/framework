@@ -323,7 +323,9 @@ class BackgroundProcess extends BaseProcess
     }
 
     /**
-     * @return integer|null
+     * Gets the exit code
+     *
+     * @return int|null
      */
     public function getExitCode(): ?int
     {
@@ -451,7 +453,6 @@ class BackgroundProcess extends BaseProcess
     /**
      * @see https://www.php.net/manual/en/function.proc-open.php
      *
-     * @param boolean $output
      * @return array
      */
     protected function descriptorspec(): array
@@ -524,10 +525,10 @@ class BackgroundProcess extends BaseProcess
     }
 
     /**
-    * @deprecated 3.26.0
-    * @codeCoverageIgnore
-    * @return integer|null
-    */
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return int|null
+     */
     public function exitCode(): ?int
     {
         trigger_error('BackgroundProcess::exitCode has been deprecated use BackgroundProcess::getExitCode instead', E_USER_DEPRECATED);
@@ -538,12 +539,12 @@ class BackgroundProcess extends BaseProcess
     /**
      * @deprecated 3.26.0
      * @codeCoverageIgnore
-     * @return int
+     * @return int|null
      */
-    public function pid(): ? int
+    public function pid(): ?int
     {
         trigger_error('BackgroundProcess::pid has been deprecated use BackgroundProcess::getPid instead', E_USER_DEPRECATED);
 
-        return $this->getErrorOutput();
+        return $this->getPid();
     }
 }

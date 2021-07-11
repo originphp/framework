@@ -2221,7 +2221,8 @@ class ModelTest extends OriginTestCase
     public function testCreate()
     {
         $this->assertInstanceOf(
-            Entity::class, $this->Article->create(['title' => 'foo'])
+            Entity::class,
+            $this->Article->create(['title' => 'foo'])
         );
     }
 

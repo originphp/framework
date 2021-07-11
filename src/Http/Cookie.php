@@ -73,7 +73,9 @@ class Cookie
         ];
 
         $this->setCookie(
-            $name, $this->pack($value, $options['encrypt']), $options
+            $name,
+            $this->pack($value, $options['encrypt']),
+            $options
         );
     }
 

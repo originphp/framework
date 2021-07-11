@@ -85,7 +85,7 @@ class CronExpression
             (int) $dateTime->format('H'),
             (int) $dateTime->format('i'),
             0
-       );
+        );
         $this->dateTime = $dateTime;
         $this->cron = $cron;
 

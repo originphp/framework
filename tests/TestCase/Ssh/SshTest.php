@@ -58,6 +58,7 @@ class SshTest extends \PHPUnit\Framework\TestCase
         if (! env('SSH_PRIVATE_KEY') || ! file_exists(env('SSH_PRIVATE_KEY'))) {
             $this->markTestSkipped();
         }
+
         $ssh = new Ssh([
             'host' => env('SSH_HOST'),
             'username' => env('SSH_USERNAME'),
