@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.26.0] - 2021-07-11
+
+### Fixed
+
+- Fixed SSH2 segmentation fault, bus error, \_libssh2_channel_free: Assertion `session' failed which started to appear inside the docker container. https://bugs.php.net/bug.php?id=79631
+
+### Deprecated
+
+A new originphp repo for rector upgrades will be added which will cover these.
+
+- Deprecated BackgroundProcesss::output use BackgroundProcess::getOutput
+- Deprecated BackgroundProcesss::error use BackgroundProcess::getError
+- Deprecated BackgroundProcesss::exitCode use BackgroundProcess::getExitCode instead
+- Deprecated BackgroundProcesss::success use BackgroundProcess::isSuccess instead
+- Deprecated BackgroundProcesss::pid use BackgroundProcess::getPid instead
+
+- Deprecated Processs::output use Process::getOutput
+- Deprecated Processs::error use Process::getError
+- Deprecated Processs::exitCode use Process::getExitCode instead
+
+- Deprecated ConsoleIntegrationTestTrait::output use ConsoleIntegrationTestTrait::getOutput
+- Deprecated ConsoleIntegrationTestTrait::error use ConsoleIntegrationTestTrait::getErrorOutput
+
+- Deprecated Model::begin use Model::beginTransaction instead
+- Deprecated Model::commit use Model::commitTransaction instead
+- Deprecated Model::rollback use Model::rollbackTransaction instead
+
 ## [3.25.1] - 2021-07-06
 
 ### Fixed
@@ -7,6 +34,10 @@
 - Fixed issue caused by race condition in sqlite queues
 
 ## [3.25.0] - 2021-06-06
+
+### Added
+
+- Added SSH
 
 ### Fixed
 
