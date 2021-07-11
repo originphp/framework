@@ -505,7 +505,7 @@ class Event
 
         $this->process->start();
         
-        $this->updateLockFile($this->process ->pid());
+        $this->updateLockFile($this->process ->getPid());
 
         return true;
     }
@@ -541,7 +541,7 @@ class Event
 
         $this->executeCallbacks($this->afterCallbacks);
 
-        if ($this->process->success()) {
+        if ($this->process->isSuccess()) {
             $this->executeCallbacks($this->successCallbacks);
         } else {
             $this->executeCallbacks($this->errorCallbacks);
@@ -736,7 +736,7 @@ class Event
 
         $this->process->start();
         
-        $this->updateLockFile($this->process->pid());
+        $this->updateLockFile($this->process->getPid());
     
         /**
          * Originally was running into issues with CPU usage of 2% for each background process, even if the
@@ -745,7 +745,7 @@ class Event
          */
         $this->process->wait();
 
-        return $this->process->success();
+        return $this->process->isSuccess();
     }
 
     /**
