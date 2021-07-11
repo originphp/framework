@@ -254,7 +254,7 @@ class Article extends Model
 
     public function callbacks(string $callback)
     {
-        return $this->registeredCallbacks($callback);
+        return $this->getCallbacks($callback);
     }
 }
 
@@ -465,14 +465,14 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin', 'rollback',
+            'beginTransaction', 'rollbackTransaction',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
-            ->method('begin');
+            ->method('beginTransaction');
 
         $stub->expects($this->once())
-            ->method('rollback');
+            ->method('rollbackTransaction');
 
         $article = $this->Article->new($data);
         $this->assertFalse($stub->save($article));
@@ -488,18 +488,18 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin', 'rollback', 'exists'
+            'beginTransaction', 'rollbackTransaction', 'exists'
         ], ['className' => Article::class, 'table' => 'throw-an-exception']);
 
         $stub->expects($this->once())
-            ->method('begin');
+            ->method('beginTransaction');
 
         $stub->expects($this->once())
             ->method('exists')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('rollback');
+            ->method('rollbackTransaction');
 
         $article = $this->Article->new($data);
         $stub->delete($article);
@@ -2134,15 +2134,15 @@ class ModelTest extends OriginTestCase
         $article = $this->Article->new($data);
 
         # Check Transactions actually work
-        $this->Article->begin();
+        $this->Article->beginTransaction();
         $this->assertTrue($this->Article->save($article, ['transaction' => false]));
-        $this->Article->rollback();
+        $this->Article->rollbackTransaction();
         $this->assertEquals(3, $this->Article->find('count'));
 
         $article = $this->Article->new($data);
-        $this->Article->begin();
+        $this->Article->beginTransaction();
         $this->assertTrue($this->Article->save($article, ['transaction' => false]));
-        $this->Article->commit();
+        $this->Article->commitTransaction();
         $this->assertEquals(4, $this->Article->find('count'));
     }
 
@@ -2155,36 +2155,36 @@ class ModelTest extends OriginTestCase
         ];
 
         $stub = $this->getMockForModel('Article', [
-            'begin', 'rollback', 'processSave',
+            'beginTransaction', 'rollbackTransaction', 'processSave',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
-            ->method('begin');
+            ->method('beginTransaction');
 
         $stub->expects($this->once())
             ->method('processSave')
             ->willReturn(false);
 
         $stub->expects($this->once())
-            ->method('rollback');
+            ->method('rollbackTransaction');
 
         $article = $this->Article->new($data);
         $this->assertFalse($stub->save($article));
 
         ## Test Commit is called
         $stub = $this->getMockForModel('Article', [
-            'begin', 'commit', 'processSave',
+            'beginTransaction', 'commitTransaction', 'processSave',
         ], ['className' => Article::class]);
 
         $stub->expects($this->once())
-            ->method('begin');
+            ->method('beginTransaction');
 
         $stub->expects($this->once())
             ->method('processSave')
             ->willReturn(true);
 
         $stub->expects($this->once())
-            ->method('commit');
+            ->method('commitTransaction');
 
         $article = $this->Article->new($data);
         $this->assertTrue($stub->save($article));
@@ -2202,19 +2202,19 @@ class ModelTest extends OriginTestCase
 
         # Test Disable
         $stub = $this->getMockForModel('Article', [
-            'begin', 'commit', 'processSave',
+            'beginTransaction', 'commitTransaction', 'processSave',
         ], ['className' => Article::class]);
         $stub->expects($this->once())->method('processSave')->willReturn(true);
-        $stub->expects($this->never())->method('begin');
-        $stub->expects($this->never())->method('commit');
+        $stub->expects($this->never())->method('beginTransaction');
+        $stub->expects($this->never())->method('commitTransaction');
         $this->assertTrue($stub->save($article, ['transaction' => false]));
 
         $stub = $this->getMockForModel('Article', [
-            'begin', 'rollback', 'processSave',
+            'beginTransaction', 'rollbackTransaction', 'processSave',
         ], ['className' => Article::class]);
         $stub->expects($this->once())->method('processSave')->willReturn(false);
-        $stub->expects($this->never())->method('begin');
-        $stub->expects($this->never())->method('rollback');
+        $stub->expects($this->never())->method('beginTransaction');
+        $stub->expects($this->never())->method('rollbackTransaction');
         $this->assertFalse($stub->save($article, ['transaction' => false]));
     }
 

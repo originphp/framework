@@ -64,13 +64,13 @@ class BatchInsertQuery extends QueryObject
         $buffer = implode(', ', $buffer);
 
         if ($options['transaction']) {
-            $this->Model->begin();
+            $this->Model->beginTransaction();
         }
 
         $this->executeQuery("INSERT INTO {$options['table']} ({$fields}) VALUES {$buffer}", $values);
 
         if ($options['transaction']) {
-            $this->Model->commit();
+            $this->Model->commitTransaction();
         }
 
         return true;

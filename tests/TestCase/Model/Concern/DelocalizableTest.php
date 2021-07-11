@@ -28,7 +28,7 @@ class Deal extends Model
 
     public function callbacks(string $callback)
     {
-        return array_keys($this->registeredCallbacks($callback));
+        return array_keys($this->getCallbacks($callback));
     }
 }
 

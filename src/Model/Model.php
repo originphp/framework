@@ -881,7 +881,7 @@ class Model
         $options['associated'] = $this->normalizeAssociated($options['associated']);
 
         if ($options['transaction']) {
-            $this->begin();
+            $this->beginTransaction();
         }
         $assocation = new Association($this);
         
@@ -912,7 +912,7 @@ class Model
         $event = $data->exists() === true ? 'update' : 'create';
 
         if ($result) {
-            $this->commitTransaction($data, $options, $event);
+            $this->doCommit($data, $options, $event);
         } else {
             $this->cancelTransaction($data, $options, $event);
         }
@@ -937,7 +937,7 @@ class Model
         $options += ['validate' => true, 'callbacks' => true, 'transaction' => true];
 
         if ($options['transaction']) {
-            $this->begin();
+            $this->beginTransaction();
         }
         $result = true;
         foreach ($data as $row) {
@@ -948,7 +948,7 @@ class Model
         }
        
         if ($options['transaction']) {
-            $result === true ? $this->commit() : $this->rollback();
+            $result === true ? $this->commitTransaction() : $this->rollbackTransaction();
     
             if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $options = new ArrayObject($options);
@@ -1359,7 +1359,7 @@ class Model
             }
         }
         if ($options['transaction']) {
-            $this->begin();
+            $this->beginTransaction();
         }
         $association = new Association($this);
         $association->deleteHasAndBelongsToMany($this->id, $options['callbacks']);
@@ -1382,7 +1382,7 @@ class Model
             if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterDelete', 'delete', [$entity, $options], false);
             }
-            $this->commitTransaction($entity, $options, 'delete');
+            $this->doCommit($entity, $options, 'delete');
         } else {
             $this->cancelTransaction($entity, $options, 'delete');
         }
@@ -1724,7 +1724,7 @@ class Model
      *
      * @return bool
      */
-    public function begin(): bool
+    public function beginTransaction(): bool
     {
         return $this->connection()->begin();
     }
@@ -1734,7 +1734,7 @@ class Model
      *
      * @return boolean
      */
-    public function commit(): bool
+    public function commitTransaction(): bool
     {
         return $this->connection()->commit();
     }
@@ -1744,9 +1744,39 @@ class Model
      *
      * @return boolean
      */
-    public function rollback(): bool
+    public function rollbackTransaction(): bool
     {
         return $this->connection()->rollBack();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return bool
+    */
+    public function begin(): bool
+    {
+        return $this->beginTransaction();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return bool
+    */
+    public function commit(): bool
+    {
+        return $this->commitTransaction();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return bool
+    */
+    public function rollback(): bool
+    {
+        return $this->rollbackTransaction();
     }
 
     /**
@@ -2042,10 +2072,10 @@ class Model
      * @param string $event
      * @return void
      */
-    private function commitTransaction(Entity $entity, ArrayObject $options, string $event): void
+    private function doCommit(Entity $entity, ArrayObject $options, string $event): void
     {
         if ($options['transaction']) {
-            $this->commit();
+            $this->commitTransaction();
             if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterCommit', $event, [$entity, $options], false);
             }
@@ -2063,7 +2093,7 @@ class Model
     private function cancelTransaction(Entity $entity, ArrayObject $options, string $event): void
     {
         if ($options['transaction']) {
-            $this->rollback();
+            $this->rollbackTransaction();
             if ($options['callbacks'] === true || $options['callbacks'] === 'after') {
                 $this->triggerCallback('afterRollback', $event, [$entity, $options], false);
             }

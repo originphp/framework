@@ -86,7 +86,7 @@ class DatabaseEngine extends BaseEngine
         /**
          * PDO reports as not in transaction when using sqlite exclusive transaction.
          */
-        $isSqlLite ? $model->query('BEGIN EXCLUSIVE TRANSACTION') : $model->begin();
+        $isSqlLite ? $model->query('BEGIN EXCLUSIVE TRANSACTION') : $model->beginTransaction();
       
         $record = $this->model()->find('first', [
             'conditions' => [
@@ -113,7 +113,7 @@ class DatabaseEngine extends BaseEngine
             }
         }
      
-        $isSqlLite ? $model->query('commit') : $model->commit(); //
+        $isSqlLite ? $model->query('commit') : $model->commitTransaction(); //
      
         return $return;
     }
