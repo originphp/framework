@@ -37,6 +37,7 @@ use InvalidArgumentException;
  * @see https://bugs.php.net/bug.php?id=78661
  * @see https://bugs.php.net/bug.php?id=58573
  */
+
 class Ssh
 {
     /**
@@ -193,7 +194,22 @@ class Ssh
      */
     public function disconnect(): bool
     {
-        return $this->isConnected() && ssh2_disconnect($this->connection);
+        $status = false;
+
+        if ($this->isConnected()) {
+            /**
+             * The correct way to disconnect is to set to null, only call ssh2_disconnect when using fopen. These
+             * are all the errors I got during testing depending upon testing single function or whole class etc :
+             *  - _libssh2_channel_free: Assertion `session' failed.
+             *  - Bus error
+             *  - Segmentation fault
+             * @see https://bugs.php.net/bug.php?id=79631
+             */
+            $this->connection = null;
+            $status = true;
+        }
+
+        return $status;
     }
 
     /**
