@@ -530,7 +530,8 @@ class Controller
         if ($keyOrKeys === null) {
             return $this->serialize;
         }
-        $this->serialize = $keyOrKeys;
+
+        return $this->serialize = $keyOrKeys;
     }
 
     /**

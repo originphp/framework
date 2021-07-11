@@ -94,7 +94,7 @@ class Record extends BaseEntity
      * @param array $schema
      * @return array
      */
-    private function normalizeSchema()
+    private function normalizeSchema() : array
     {
         $out = [];
         foreach ($this->schema as $key => $value) {
@@ -105,7 +105,7 @@ class Record extends BaseEntity
             $out[$key] = $value;
         }
 
-        $this->schema = $out;
+        return $this->schema = $out;
     }
 
     /**
