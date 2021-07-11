@@ -169,7 +169,7 @@ class Ssh
         $remoteFile = new RemoteFile();
         $remoteFile->name = basename($filePath);
         $remoteFile->directory = $pathInfo['dirname'];
-        $remoteFile->path = $filePath;
+        $remoteFile->path = '/' . ltrim($filePath, '/'); // remove double slash
         $remoteFile->extension = $pathInfo['extension'] ?? null;
         $remoteFile->timestamp = $info['mtime'];
         $remoteFile->size = $info['size'];

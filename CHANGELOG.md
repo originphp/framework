@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed SSH2 segmentation fault, bus error, \_libssh2_channel_free: Assertion `session' failed which started to appear inside the docker container. https://bugs.php.net/bug.php?id=79631
+- Fixed issue causing double slashes in file listing when using / as the path
 
 ### Deprecated
 
